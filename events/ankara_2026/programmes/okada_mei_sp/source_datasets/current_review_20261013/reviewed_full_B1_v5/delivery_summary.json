@@ -1,0 +1,224 @@
+{
+  "schema": "rinkspace.current-reviewed-source-fit-dataset-delivery.v1",
+  "event_id": "ankara_2026",
+  "programme_id": "okada_mei_sp",
+  "date": "2026-10-13",
+  "status": "finite_source_observation_inputs_ready_full_solver_graph_adapter_pending",
+  "dataset_reference": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\current_review_20261013\\reviewed_full_B1_v5\\fit_dataset.json",
+    "sha256": "324b84133e288d00391e7577965548a65fe7e526ee3595a90e88bff2a372aaf2"
+  },
+  "frozen_model_reference": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_current_points_ready_20261012\\accepted_states\\8a28afed8f9f896112e5b2f64be515b2bc02019e10e09c7e0eda2598579d4891\\state_identity.json",
+    "sha256": "5ac4f0f58c4bf24520a12ddbdca1396d1b9bc6356b38b8c3bfa23153ac4dea25"
+  },
+  "original_native_coverage_reference": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\full_programme_strict_source_review_20261012\\nine_cut_terminal_core_coverage_20261013_v1\\terminal_nine_cut_core_coverage.npz",
+    "sha256": "a269b9eb8974586a1ef726df62f48b540f3fed451974254114dfbab0c0f09893"
+  },
+  "source": {
+    "video_sha256": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891",
+    "time_base": "1/15360",
+    "pixel_domain": "native1920x1080"
+  },
+  "source_window": {
+    "start": "04:08:36.283",
+    "end_exclusive": "04:11:25.000",
+    "time_base": "1/15360"
+  },
+  "public_source_consumer_api": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\strict_source_fit_dataset_stream.py",
+    "module": "calibration.program_tracking.strict_source_fit_dataset_stream",
+    "function": "iter_dataset_rows",
+    "split_arguments": [
+      "fit",
+      "held"
+    ]
+  },
+  "counts": {
+    "fit_points": 1284138,
+    "held_points": 2368,
+    "pending_support_points": 63085,
+    "pending_named_points": 3513,
+    "native_frames": 10123,
+    "actual_exposures": 8503,
+    "actual_exposures_with_finite_fit": 6666,
+    "actual_exposures_without_finite_fit": 1837
+  },
+  "support_index_bytes": 2289970,
+  "source_cut_coverage": [
+    {
+      "cut": "001",
+      "shot_id": "230400000:R0410_001",
+      "native_frames": 1487,
+      "source_clock_actual_exposures": 1253,
+      "actual_exposures_with_finite_fit": 985,
+      "actual_exposures_without_finite_fit": 268,
+      "fit_points": 47786,
+      "held_points": 0,
+      "pending_support_points": 8001,
+      "pending_named_points": 298
+    },
+    {
+      "cut": "003",
+      "shot_id": "230400000:R0410_003",
+      "native_frames": 447,
+      "source_clock_actual_exposures": 373,
+      "actual_exposures_with_finite_fit": 300,
+      "actual_exposures_without_finite_fit": 73,
+      "fit_points": 27723,
+      "held_points": 0,
+      "pending_support_points": 1785,
+      "pending_named_points": 0
+    },
+    {
+      "cut": "004",
+      "shot_id": "230400000:R0410_004",
+      "native_frames": 2705,
+      "source_clock_actual_exposures": 2273,
+      "actual_exposures_with_finite_fit": 2033,
+      "actual_exposures_without_finite_fit": 240,
+      "fit_points": 358967,
+      "held_points": 396,
+      "pending_support_points": 2060,
+      "pending_named_points": 1454
+    },
+    {
+      "cut": "034",
+      "shot_id": "223403520:R0402_034",
+      "native_frames": 1498,
+      "source_clock_actual_exposures": 1265,
+      "actual_exposures_with_finite_fit": 835,
+      "actual_exposures_without_finite_fit": 430,
+      "fit_points": 84661,
+      "held_points": 0,
+      "pending_support_points": 10433,
+      "pending_named_points": 979
+    },
+    {
+      "cut": "035",
+      "shot_id": "223403520:R0402_035",
+      "native_frames": 680,
+      "source_clock_actual_exposures": 569,
+      "actual_exposures_with_finite_fit": 211,
+      "actual_exposures_without_finite_fit": 358,
+      "fit_points": 14754,
+      "held_points": 0,
+      "pending_support_points": 254,
+      "pending_named_points": 82
+    },
+    {
+      "cut": "036",
+      "shot_id": "223403520:R0402_036",
+      "native_frames": 119,
+      "source_clock_actual_exposures": 97,
+      "actual_exposures_with_finite_fit": 97,
+      "actual_exposures_without_finite_fit": 0,
+      "fit_points": 51694,
+      "held_points": 0,
+      "pending_support_points": 35,
+      "pending_named_points": 0
+    },
+    {
+      "cut": "037",
+      "shot_id": "223403520:R0402_037",
+      "native_frames": 952,
+      "source_clock_actual_exposures": 800,
+      "actual_exposures_with_finite_fit": 558,
+      "actual_exposures_without_finite_fit": 242,
+      "fit_points": 128945,
+      "held_points": 0,
+      "pending_support_points": 6879,
+      "pending_named_points": 0
+    },
+    {
+      "cut": "038",
+      "shot_id": "223403520:R0402_038",
+      "native_frames": 1653,
+      "source_clock_actual_exposures": 1381,
+      "actual_exposures_with_finite_fit": 1211,
+      "actual_exposures_without_finite_fit": 170,
+      "fit_points": 535386,
+      "held_points": 1823,
+      "pending_support_points": 29711,
+      "pending_named_points": 667
+    },
+    {
+      "cut": "039",
+      "shot_id": "223403520:R0402_039",
+      "native_frames": 582,
+      "source_clock_actual_exposures": 492,
+      "actual_exposures_with_finite_fit": 436,
+      "actual_exposures_without_finite_fit": 56,
+      "fit_points": 34222,
+      "held_points": 149,
+      "pending_support_points": 3927,
+      "pending_named_points": 33
+    }
+  ],
+  "all_original_source_UV_sigma_weights_and_operators_preserved": true,
+  "source_sigma_reconstructed_points": 0,
+  "own_native_QA_not_canonical_FIT": true,
+  "repeated_large_source_arrays_stored": false,
+  "full_solver_graph_adapter_installed": false,
+  "entire_iteration_speed_verified": false,
+  "whole_independent_shot_visual_accuracy_accepted": false,
+  "some_gray_material_source_support_sparse": true,
+  "solver_started": false,
+  "video_generated": false,
+  "baseline_independent_index_audit_reference": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\full_programme_strict_source_review_20261012\\current_source_pool_joint_qualified_20261013_v1\\final_logical_finite_source_index_audit_20261013_v1.json",
+    "sha256": "91041c7dd77645709e43b97c705c06ef7d1fe756902e47bbfbe2d760992b413a"
+  },
+  "exact_identity_revision_reference": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\full_programme_strict_source_review_20261012\\current_source_pool_joint_qualified_20261013_v1\\finite_fit_dataset_nested_identity_v3\\identity_revision_receipt.json",
+    "sha256": "94e9a68879ba7253a916c9f3bbdb77f6070781108acc14c9a88ea7c10d52998f"
+  },
+  "literal_all_31_source_preflight_reference": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\full_programme_strict_source_review_20261012\\current_source_pool_joint_qualified_20261013_v1\\original_terminal_plus_current_gray_board_full_B1_merge_operator_audit_20261013_v3.json",
+    "sha256": "61f38be5a20a606616e6f38b02ea94a54d6c47a71f6505db01bfdf193a2c7601"
+  },
+  "reviewed_B1_append_reference": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\full_programme_strict_source_review_20261012\\current_source_pool_joint_qualified_20261013_v1\\finite_fit_dataset_reviewed_full_B1_v5\\reviewed_delta_append_receipt.json",
+    "sha256": "36b3256eabba319d2343005b9918a4c9722f42654dce374fb6613659df7862a6"
+  },
+  "current_source_public_consumer_checks": [
+    {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\full_programme_strict_source_review_20261012\\current_source_pool_joint_qualified_20261013_v1\\finite_fit_dataset_nested_identity_v3\\public_consumer_smoke\\public_consumer_smoke.json",
+      "sha256": "80eab5acdd6834cebaadb319b0808c0b788d8d00234054a70a9caf4f2b843c5b"
+    },
+    {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\full_programme_strict_source_review_20261012\\current_source_pool_joint_qualified_20261013_v1\\finite_fit_dataset_reviewed_full_B1_v5\\public_consumer_smoke\\public_consumer_smoke.json",
+      "sha256": "a18cc4d0681ef25e544d36beb0ded2afface014ed8c918c2fbdfdc210c181848"
+    }
+  ],
+  "source_packages": 31,
+  "changes_from_initial_dataset": {
+    "exact_F3_nested_points_quarantined": 190,
+    "new_original_RGB_B1_paired_q50_centres": 1097,
+    "B1_exposures_with_new_points": 99,
+    "B1_exposures_kept_missing_or_pending": 27,
+    "small_12_point_B1_pack_in_final_dataset": false
+  },
+  "additional_specific_inner_identity_review_pending": {
+    "finite_points": 2193,
+    "cuts": [
+      "037",
+      "038",
+      "039",
+      "001"
+    ],
+    "review_inventory_reference": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\full_programme_strict_source_review_20261012\\current_source_pool_joint_qualified_20261013_v1\\source_scope_accuracy_review_v1\\terminal_nine_specific_inner_seed_chain_inventory.json",
+      "sha256": "26c4e851a77c032887ee2d22b46f9ed58241a2cb8b426ab67cb5ffb052491be5"
+    },
+    "inventory_is_not_automatic_deletion_authority": true,
+    "relevant_vision_optimizer_waits_for_source_admission": true
+  },
+  "vision_training_status": "source_supervision_preparation_optimizer_not_started",
+  "B1_sigma_semantics": "uncalibrated actual RGB gradient support and native quantization; not Gaussian accuracy certification",
+  "previous_delivery_reference": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\current_review_20261013\\delivery_summary.json",
+    "sha256": "97357c719e65eec4e228841409020266680d93f4ff9d9c3ec56563adfd95ce76"
+  }
+}

@@ -1,0 +1,21 @@
+# Independent historical GTSAM environment candidate; not executed or conda-locked.
+# Use conda env create --prefix <NEW Data directory> --file <this file>.
+# Never update the live gtsam-env or append the NumPy 2.x project .venv.
+name: rinkspace-gtsam-reconstruction
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11.16
+  - gtsam=4.2.2
+  - numpy=1.26.4
+  - libblas=*=*openblas
+  - pip
+  - pip:
+      # This geometry layer is a compatibility candidate, not observed in this conda env.
+      # These versions avoid copying the current CPU environment's NumPy 2.x stack.
+      - scipy==1.13.1
+      - opencv-python-headless==4.10.0.84
+      - Pillow==12.3.0
+      - av==17.1.0
+      - quadprog==0.1.13
+      - clarabel==0.11.1

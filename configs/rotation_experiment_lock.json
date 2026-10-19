@@ -1,0 +1,23 @@
+{
+  "schema": "rinkspace.rotation-experiment-snapshot.v1",
+  "created_at_utc": "2026-09-19T14:25:11.856862+00:00",
+  "scope": "Post-experiment reproducibility snapshot; NOT a pre-evaluation holdout lock",
+  "algorithm_version": "ice-only-rotation-zoom-photometric-1",
+  "sha256": {
+    "src/rinkspace/rotation_photometric.py": "d46b6f6dbbe39f4907f4f770fb0ca9e24b5282d019a373b2bd470f2443b51a6c",
+    "src/rinkspace/photometric_registration.py": "98576d513f33d6717213e8576a29c4c54f294b79540ca710752c1fd444fffafe",
+    "src/rinkspace/masked_photometric.py": "352a394c7534238685ac1711856646d315e801ea9849ff751f7d3359d9568ecc",
+    "scripts/run_rotation_photometric.py": "5115b1ea85665e85015446f46edca85421b9f79d82d2e0951f850230979ddbb3"
+  },
+  "config": {
+    "initial_focal_width_ratio": 4,
+    "max_keyframes": 40,
+    "maximum_fixed_keyframe_trials": 40
+  },
+  "source_assumptions": [
+    "Optical centre fixed; square pixels; centred principal point",
+    "Initial focal length = 4 sampled-image widths is a model assumption, not calibration",
+    "Four focal hypotheses 1,2,4,8 considered in development; data/error profile retained"
+  ],
+  "formal_accepted": false
+}

@@ -1,0 +1,184 @@
+{
+  "schema": "rinkfit.startup_validation.v1",
+  "date_utc": "2026-10-17",
+  "platform": "Linux x86_64",
+  "python": "3.12.14",
+  "numpy": "2.3.5",
+  "scipy": "1.17.0",
+  "cpp": "GCC 13.3.0",
+  "cmake": "3.28.3",
+  "ceres": "2.2.0",
+  "eigen": "3.4",
+  "suitesparse": "7.6.1",
+  "python_tests_passed": 27,
+  "ctest_passed": 3,
+  "source": {
+    "frames": 1248,
+    "observations": 182017,
+    "materials": 171,
+    "full_array_hash_validation_passed": true,
+    "S1_jobs": 3606,
+    "S1_planar_source_rows": 176237,
+    "S1_pending_3d_or_branch_source_rows": 5780,
+    "event_packet_source_rows": 182017,
+    "binary_array_hash_checks": 7
+  },
+  "real_S1_diagnostic": {
+    "frame": 1,
+    "plane": "board_y_max",
+    "source_rows": 81,
+    "materials": 10,
+    "max_native_px": 17.797409264224154,
+    "rms_native_px": 7.799929477418066,
+    "rank": 8,
+    "status": "iteration_limit",
+    "capture_iterations_per_stage": 1,
+    "pyramid_scales": [
+      0.25,
+      1.0
+    ],
+    "native_iterations": 2,
+    "independent_seed_count": 2,
+    "physical_budget_accepted": false
+  },
+  "real_corner_graph": {
+    "ice": {
+      "frames": 1248,
+      "independent_corner_edges": 0,
+      "degenerate_entity_edge_hypotheses": 0,
+      "components": 1248,
+      "conditional_metric_anchors": 0,
+      "actual_cycle_checks": 0,
+      "cycle_max_native_px": null,
+      "joint_refinement_status": "no_supported_joint_variables",
+      "initial_native_witness_rms_px": null,
+      "final_native_witness_rms_px": null,
+      "curve_pair_edges_bound": false,
+      "global_physical_verification": false
+    },
+    "board_top": {
+      "frames": 1248,
+      "independent_corner_edges": 0,
+      "degenerate_entity_edge_hypotheses": 0,
+      "components": 1248,
+      "conditional_metric_anchors": 0,
+      "actual_cycle_checks": 0,
+      "cycle_max_native_px": null,
+      "joint_refinement_status": "no_supported_joint_variables",
+      "initial_native_witness_rms_px": null,
+      "final_native_witness_rms_px": null,
+      "curve_pair_edges_bound": false,
+      "global_physical_verification": false
+    },
+    "board_x_min": {
+      "frames": 1248,
+      "independent_corner_edges": 0,
+      "degenerate_entity_edge_hypotheses": 0,
+      "components": 1248,
+      "conditional_metric_anchors": 0,
+      "actual_cycle_checks": 0,
+      "cycle_max_native_px": null,
+      "joint_refinement_status": "no_supported_joint_variables",
+      "initial_native_witness_rms_px": null,
+      "final_native_witness_rms_px": null,
+      "curve_pair_edges_bound": false,
+      "global_physical_verification": false
+    },
+    "board_x_max": {
+      "frames": 1248,
+      "independent_corner_edges": 0,
+      "degenerate_entity_edge_hypotheses": 0,
+      "components": 1248,
+      "conditional_metric_anchors": 0,
+      "actual_cycle_checks": 0,
+      "cycle_max_native_px": null,
+      "joint_refinement_status": "no_supported_joint_variables",
+      "initial_native_witness_rms_px": null,
+      "final_native_witness_rms_px": null,
+      "curve_pair_edges_bound": false,
+      "global_physical_verification": false
+    },
+    "board_y_min": {
+      "frames": 1248,
+      "independent_corner_edges": 0,
+      "degenerate_entity_edge_hypotheses": 0,
+      "components": 1248,
+      "conditional_metric_anchors": 0,
+      "actual_cycle_checks": 0,
+      "cycle_max_native_px": null,
+      "joint_refinement_status": "no_supported_joint_variables",
+      "initial_native_witness_rms_px": null,
+      "final_native_witness_rms_px": null,
+      "curve_pair_edges_bound": false,
+      "global_physical_verification": false
+    },
+    "board_y_max": {
+      "frames": 1248,
+      "independent_corner_edges": 618,
+      "degenerate_entity_edge_hypotheses": 0,
+      "components": 1056,
+      "conditional_metric_anchors": 0,
+      "actual_cycle_checks": 128,
+      "cycle_max_native_px": 6.571622890320416,
+      "joint_refinement_status": "scaled_gradient_converged",
+      "initial_native_witness_rms_px": 0.7984865685918567,
+      "final_native_witness_rms_px": 0.3531141457954576,
+      "curve_pair_edges_bound": false,
+      "global_physical_verification": false
+    }
+  },
+  "bootstrap_conversion": {
+    "legacy_angle_offsets_rad": [
+      0.46994008779593965,
+      -3.0962892643724884
+    ],
+    "pupil_constant_absorbed_in_dz": 0.004868374343052287,
+    "angle_gauge_function_values": [
+      -1.2913656201738027e-23,
+      -6.240522404257755e-23
+    ],
+    "native_rotation_error_rad": {
+      "rms": 4.631388401139434e-16,
+      "max_abs": 1.366972288372495e-15
+    },
+    "native_focal_error_px": {
+      "rms": 1.3056084564394177e-11,
+      "max_abs": 5.4569682106375694e-11
+    },
+    "center_error_rink_length_units": {
+      "rms": 2.949651256712853e-17,
+      "max_abs": 5.991705756259507e-17
+    },
+    "principal_conversion_error_px": {
+      "rms": 9.035620483256185e-12,
+      "max_abs": 1.5006662579253316e-11
+    },
+    "radial_coefficient_conversion_error": {
+      "rms": 1.8780410510525984,
+      "max_abs": 12.490733280857738
+    },
+    "eta_conversion_error": {
+      "rms": 0.0,
+      "max_abs": 0.0
+    },
+    "distortion_disk_certificate_failed_frames": 123,
+    "distortion_disk_minimum_bound": -1001.8773802173952
+  },
+  "bootstrap_blockers": [
+    "superellipse_p_not_implemented: preserve p; implement stable endpoints before scene replay",
+    "converted_low_dimensional_optics_uncertified: evaluate declared optical candidates before physical trials"
+  ],
+  "launcher_gates": {
+    "synthetic_event_backend_rejected": true,
+    "truncated_source_predictions_rejected": true,
+    "perfect_arithmetic_fixture_does_not_accept_physical_fit": true,
+    "empty_S3_keeps_1248_unresolved_rows": true
+  },
+  "not_executed": [
+    "all 3606 S1 production jobs",
+    "actual event-specific Ceres full-shot physical fit",
+    "Windows native execution",
+    "S6 physical/identifiability/video verification"
+  ],
+  "whole_shot_fit_completed": false
+}

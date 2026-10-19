@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RinkSpace · 本场冰场镜头</title>
+<link rel="stylesheet" href="/static/camera_classification.css"></head>
+<body>
+<header><div class="brand">RINKSPACE <span>机位分类</span></div><div class="read-only">只读证据浏览</div></header>
+<main>
+<section class="intro"><div><div class="eyebrow">原始源时间 · 场景筛选与机位证据</div><h1>本场冰场镜头</h1><p>先保留能看到本场冰场的画面，再查看镜头和机位候选；无关画面忽略，尚未判定的画面单独保留。</p></div><div class="intro-note">是否入选取决于画面中是否有本场冰场，不按比赛、热身、清冰或颁奖区分。<br>源时间不压缩；浏览器跳转用于导航，精确边界以源 PTS 为准。</div></section>
+<div id="load-error" role="alert" hidden></div><div id="overview" class="overview" aria-live="polite"></div>
+<nav class="tabs" aria-label="目录视图"><button class="active" data-tab="shots">入选冰场镜头</button><button data-tab="cameras">相关机位与候选</button><button data-tab="validation">范围与检查</button></nav>
+<section id="shots-tab">
+<div class="filters">
+<label>转播来源<select id="source-filter"><option value="">全部八场</option></select></label>
+<label>归属状态<select id="status-filter"><option value="">全部状态</option><option value="supported">有证据支持</option><option value="multiple_candidates">候选待确认</option><option value="unknown">未知</option><option value="not_applicable">不适用</option><option value="unprocessed">未处理</option></select></label>
+<label>物理机位<select id="camera-filter"><option value="">全部物理机位</option></select></label>
+<label>场次安装版本<select id="installation-filter"><option value="">全部安装版本</option></select></label>
+<label>外观候选组<input id="appearance-filter" placeholder="输入完整外观组编号，或从机位页选择"></label>
+<label>重点项目<select id="special-filter"><option value="">全部镜头</option><option value="boundary">边界未决</option><option value="duplicate">重复关联</option><option value="replay">回放／可能回放</option><option value="replay_unknown">回放身份未决</option></select></label>
+<label>画面类型<select id="content-filter"><option value="">全部画面类型</option></select></label>
+<label class="search">搜索镜头、时间或证据<input id="query-filter" type="search" placeholder="镜头编号、说明或旧标签"></label>
+<button id="reset-filters" class="subtle">重置筛选</button>
+</div>
+<section class="timeline-section"><div class="section-title"><h2 id="timeline-title">选择一场查看源时间轴</h2><span id="timeline-hover"></span></div><canvas id="timeline" height="70" aria-label="源时间轴：入选冰场镜头、已忽略与场景待判定时段" role="img"></canvas><div class="legend"><span class="supported">冰场镜头：归属有支持</span><span class="multiple_candidates">冰场镜头：候选待确认</span><span class="unknown">冰场镜头：机位未知</span><span class="scope-ignored">已忽略无关画面</span><span class="scope-pending">场景待判定，尚未分镜</span><span>上方橙线：边界未决</span></div><p class="scope-note">空档沿用原片时间。灰色已忽略；浅黄色仍待判断是否为本场冰场，不计作已忽略。</p><div class="jump"><label>按源时间查找 <input id="jump-time" placeholder="04:19:26.900 或 15566.9" aria-label="源时间"></label><button id="jump-go">定位镜头</button><span id="jump-message" role="status" aria-live="polite"></span></div></section>
+<div class="results-heading"><h2 id="results-count">正在读取目录…</h2><div class="pagination"><button id="prev-page">上一页</button><span id="page-label"></span><button id="next-page">下一页</button></div></div>
+<div id="shot-grid" class="shot-grid"></div>
+</section>
+<section id="cameras-tab" hidden><div class="section-title"><h2>入选冰场镜头的机位与候选</h2><p>只列当前冰场镜头关联的记录；外观相似或候选标签不等于已确认机位。</p></div><div id="camera-grid" class="camera-grid"></div><details id="appearance-section"><summary>当前冰场镜头的外观候选组与历史标签</summary><div class="jump"><label>外观组来源<select id="appearance-source"><option value="">全部八场</option></select></label><input id="appearance-search" placeholder="按外观组编号搜索"><button id="appearance-prev">上一页</button><span id="appearance-count"></span><button id="appearance-next">下一页</button></div><div id="appearance-list" class="camera-grid"></div></details></section>
+<section id="validation-tab" hidden><div class="section-title"><h2>当前范围与检查</h2><p>场景待判定范围尚未进入分镜。历史检查保留追溯，不代表当前冰场筛选已完成。</p></div><div id="validation-content"></div></section>
+<footer><a id="catalog-download" href="#">打开完整 catalog.json</a><span>媒体和图片引用现有本地文件；不复制原片。</span></footer>
+</main>
+<dialog id="shot-dialog"><div class="dialog-top"><div><div id="detail-source" class="eyebrow"></div><h2 id="detail-title"></h2></div><button id="close-detail" aria-label="关闭镜头详情">关闭 ×</button></div><div id="detail-content"></div></dialog>
+<script src="/static/camera_classification.js"></script>
+</body></html>

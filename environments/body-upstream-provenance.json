@@ -1,0 +1,55 @@
+{
+  "schema": "rinkspace.body-upstream-provenance.v1",
+  "observed_date": "2026-10-11",
+  "status": "source_identity_observed_reconstruction_not_validated",
+  "upstream": {
+    "name": "GVHMR",
+    "git_remote": "https://github.com/zju3dv/GVHMR.git",
+    "head_ref": "refs/heads/main",
+    "commit_read_from_head_ref": "6ec3ca39336c50492c0fae65fba2fb831fc7d866",
+    "source_path_observed": "D:/OneDrive/codex_projs/FSrotation/cache/g0_gvhmr_runtime/GVHMR",
+    "installed_distribution": "gvhmr==1.0.0",
+    "installation_type": "editable local source according to dist-info/direct_url.json",
+    "working_tree_cleanliness": "not_checked; the commit alone does not archive local modifications"
+  },
+  "observed_runtime": {
+    "python": "3.11.0 Windows AMD64",
+    "torch": "2.7.1+cu128",
+    "torchvision": "0.22.1+cu128",
+    "pytorch3d": "0.7.8",
+    "numpy": "1.26.4",
+    "av": "13.0.0",
+    "smplx": "0.1.28",
+    "ultralytics": "8.2.42",
+    "full_metadata_snapshot": "observed-python311-windows.json#environments.body_gvhmr_cuda",
+    "pytorch3d_source": {
+      "distribution_direct_url": "file:///D:/OneDrive/codex_projs/FSrotation/cache/g0_gvhmr_runtime/pytorch3d",
+      "git_remote": "https://github.com/facebookresearch/pytorch3d.git",
+      "git_head_detached_commit": "75ebeeaea0908c5527e7b1e305fbc7681382db47",
+      "git_fetch_ref_observed": "refs/tags/V0.7.8:refs/tags/V0.7.8",
+      "working_tree_cleanliness_and_compiler_flags": "not_verified"
+    }
+  },
+  "upstream_requirements_observed": {
+    "torch": "2.3.0+cu121",
+    "torchvision": "0.18.0+cu121",
+    "numpy": "1.23.5",
+    "pytorch3d": "0.7.6 cp310 Linux wheel for CUDA 12.1 / PyTorch 2.3.0",
+    "av": "13.0.0"
+  },
+  "required_external_models": [
+    "GVHMR inputs/checkpoints/gvhmr/gvhmr_siga24_release.ckpt",
+    "GVHMR inputs/checkpoints/hmr2/epoch=10-step=25000.ckpt",
+    "GVHMR inputs/checkpoints/body_models/smplx/SMPLX_NEUTRAL.npz",
+    "FSpathing YOLO weights referenced by body_tracking/observations.py"
+  ],
+  "reconstruction_gates": [
+    "Archive or account for local GVHMR source modifications separately from the upstream commit.",
+    "The local Windows PyTorch3D 0.7.8 source identity is recorded; compiler flags and local modifications still need preservation. A distribution version or upstream commit alone is insufficient.",
+    "Retain separate model identities and upstream license/access terms; do not publish checkpoints from a pip freeze.",
+    "Use a separate NumPy 1.26.x / PyAV 13 environment; do not install the project's CPU requirements into it.",
+    "Resolve existing hardcoded external paths without changing the running body runtime.",
+    "Do not install the upstream requirements.txt verbatim on Windows/Python 3.11: it references a cp310 Linux wheel."
+  ],
+  "operations_this_turn": "Read only metadata and small upstream source/configuration files. No import of torch/body models, checkpoint loading, installation, upstream edits or GPU work."
+}

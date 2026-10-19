@@ -1,0 +1,35 @@
+{
+  "schema": "rinkfit.ceres_cuda_actual_production_use.v1",
+  "recorded_utc": "2026-10-18T15:44:51.500Z",
+  "candidate_build": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\cg22\\build_recipe.json",
+    "sha256": "151fc0fa3d0e82d2f04869a3b6ded7cd0576b86b4a17f1c95b980da30cea6ec4"
+  },
+  "complete_problem_comparison": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint9_1018a\\gpu_linear_probe_v1\\comparison.json",
+    "sha256": "675aa8b76b84c03439564e654043d3d7dceb1f99e3c24b8014f4bae401192c61"
+  },
+  "context_operations_9_shot_QA": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint9_1018a\\gpu_context_QA_v2\\actual_QA.json",
+    "sha256": "28e0f4ac46363c063092f96f697f5409acc366e024ab150c69dffb318359d34c"
+  },
+  "actual_production_report": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint9_1018a\\fit_full_source_v50\\formal_report.json",
+    "sha256": "4c349d65f18fde5d67735b78240e3ef86d945de7678f7aa5def42fc03323824e"
+  },
+  "actual_production_timing": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint9_1018a\\fit_full_source_v50\\solver_timing.jsonl",
+    "sha256": "2a49c49b3b0c0373b99a741be3557e838b0da8099f8c421b58d01c86eba8b098"
+  },
+  "production_enabled": true,
+  "linear_solver": "CUDA_SPARSE / CGNR / JACOBI",
+  "FP64": true,
+  "mixed_precision": false,
+  "existing_CPU_runtime_preserved": true,
+  "approx_actual_accepted_step_seconds": [
+    14.5,
+    14.9
+  ],
+  "accuracy_or_whole_fit_completion_claimed": false,
+  "notes": "Whole complete source/state single-step comparison used both existing GPU UV derivatives; CUDA only changes the linear backend there. The later production speed also includes exact cached-ambient scalar Jacobian chains and earlier source-DOM release."
+}

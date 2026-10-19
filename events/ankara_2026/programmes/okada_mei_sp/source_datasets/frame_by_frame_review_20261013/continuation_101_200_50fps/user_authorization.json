@@ -1,0 +1,18 @@
+{
+  "schema": "rinkspace.explicit-user-batch-continuation.v1",
+  "user_statement": "补充完这些之后先按照200帧这个样板继续补足101-199帧，然后我一起审核",
+  "frame_range_to_prepare": [101, 199],
+  "frame_range_to_review_together": [101, 200],
+  "reference_programme_frame": 200,
+  "reference_user_corrections": "../frame_000200_50fps/user_correction_01.json",
+  "source_clock": "ISU official single-programme video; native 50fps PTS",
+  "first_new_pts": 281856,
+  "last_new_pts": 306944,
+  "time_base": "1/12800",
+  "step_pts": 256,
+  "hard_maximum_points_per_frame": 500,
+  "frame_200_individually_accepted": false,
+  "batch_accepted": false,
+  "processing_frame_201_authorized": false,
+  "optimization_authorized_by_this_request": false
+}

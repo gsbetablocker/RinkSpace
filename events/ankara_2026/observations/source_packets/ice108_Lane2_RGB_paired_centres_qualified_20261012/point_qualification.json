@@ -1,0 +1,211 @@
+{
+  "schema": "rinkspace.source-only-point-qualification.v1",
+  "source_family": "additional_native_ice_curves",
+  "original_packet": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\observations\\source_packets\\ice108_Lane2_RGB_paired_centres_qualified_20261012\\unqualified_pixel_revision_parent.json",
+    "sha256": "597ce8e86af6d79c7dcee2fb0cccf4b457c95c16cbfa26ae111ac69c5520e556"
+  },
+  "records": [
+    {
+      "row_index": 0,
+      "row_id": "curling_centerline_F3_R3_source_candidate_native229702144",
+      "source_pts": 229702144,
+      "actual_exposure_pts": 229702144,
+      "original_uv_float64_sha256": "6a2911e2bc7a8be646037130126705d6a408c2273a1754982c253fc6964c1d2c",
+      "excluded_point_indices": [
+        9,
+        10
+      ],
+      "review_basis": "original_rgb_only",
+      "reason": "原RGB逐点放大可见9/10混在宽蓝色油漆交叉带中，无法分离curling centreline的独立局部灰线支持；仅取消这两个AI样本资格，不根据当前模型残差调整剩余点。",
+      "native_rgb_evidence": [
+        {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\history\\work_sessions\\20261001_private-thread-00010\\pelvis\\main4_geometry\\raw_229702144.jpg",
+          "sha256": "5b7ec4a4ca47d3caaf2bcd7ea9a177bc648d4b878c754864852d68a0222d62a1",
+          "source_pts": 229702144
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\I000_point_crops_00.png",
+          "sha256": "95a5d3310336579b52f621348ade1d1c5fa84e1b6eeec85e0a8e11c8a84f5171",
+          "source_pts": 229702144,
+          "evidence_kind": "original_RGB_nearest_neighbour_zoom_and_existing_UV_context_no_model"
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\I000_point_crops_06.png",
+          "sha256": "d0d452e6fe5373fe83248b89e4cb2ec9c1926ab78908f7d8cdb809c43cd00822",
+          "source_pts": 229702144,
+          "evidence_kind": "original_RGB_nearest_neighbour_zoom_and_existing_UV_context_no_model"
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\I000_point_crops_12.png",
+          "sha256": "a496c53c1705c2f3d26caebc37f6ad7c2bd7f6743bafee3513c7087092ad6cfb",
+          "source_pts": 229702144,
+          "evidence_kind": "original_RGB_nearest_neighbour_zoom_and_existing_UV_context_no_model"
+        }
+      ],
+      "qualification_changes_user_pixels_HELD_or_geometry": false
+    },
+    {
+      "row_index": 1,
+      "row_id": "curling_centerline_F3_R3_source_candidate_native229842432",
+      "source_pts": 229842432,
+      "actual_exposure_pts": 229842176,
+      "original_uv_float64_sha256": "cd7a47a590a62a748afe7a2f61f3239a3cf03383708872832a744c79ee0f0687",
+      "excluded_point_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "review_basis": "original_rgb_only",
+      "reason": "原RGB逐点放大：4/5位于house灰环面/环边，6..8位于内盘/灰环交界，9邻近冰刀及内盘，10位于灰环上缘，不能分离中心线；0..3只有很弱灰载体，不能独立确认其物理中心线身份。取消整行当前中心线FIT资格，不声称11点全是gross wrong；保留历史原像素。",
+      "native_rgb_evidence": [
+        {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\history\\work_sessions\\20261001_private-thread-00010\\pelvis\\main4_geometry\\raw_229842432.jpg",
+          "sha256": "39856f4c0a2079fe38d9a33e321863d29756060fd3de6f982c065464a6231bb5",
+          "source_pts": 229842432
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\I001_point_crops_00.png",
+          "sha256": "3a4e108336cff6127d7e697c4bd6abfc2d9c55d23fa72a0456e92d3d39b10ef4",
+          "source_pts": 229842432,
+          "evidence_kind": "original_RGB_nearest_neighbour_zoom_and_existing_UV_context_no_model"
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\I001_point_crops_06.png",
+          "sha256": "079481d1f048e1bcb8ea72108ef57b86bf44fc19e1aba4aec4c8a5ec77a8c428",
+          "source_pts": 229842432,
+          "evidence_kind": "original_RGB_nearest_neighbour_zoom_and_existing_UV_context_no_model"
+        }
+      ],
+      "qualification_changes_user_pixels_HELD_or_geometry": false
+    },
+    {
+      "row_index": 29,
+      "row_id": "cut6_source_230507776_lane2_upper_long_fit",
+      "source_pts": 230507776,
+      "actual_exposure_pts": 230507776,
+      "original_uv_float64_sha256": "d65d7c7125cdf14210f51d85e3a47f5e2146a1eb012ca986233d2172320ab99c",
+      "excluded_point_indices": [
+        0,
+        1
+      ],
+      "review_basis": "original_rgb_only",
+      "reason": "原RGB与用户确认230501120的lane2上长边seed及同曝光连续RGB轨迹对照，旧AI两个点处在另一条下斜house灰环/环侧带，和用户指向的更下方长灰线不是同一物理材料。仅排除旧assistant FIT行，保留用户UV与HELD。",
+      "native_rgb_evidence": [
+        {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\named66_823_9e_two_source_issues_20261005\\raw_native_230507776.png",
+          "sha256": "c989e93ecb2f871503b824d8904a4c3e05deda7044b078fcfe6d4836dd1340c0",
+          "source_pts": 230507776
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\I029_point_crops_00.png",
+          "sha256": "781d98caf60013778c5dc1c7e67d87d63e76a4efa9145e6d3c96d4522d67a469",
+          "source_pts": 230507776,
+          "evidence_kind": "original_RGB_nearest_neighbour_zoom_and_existing_UV_context_no_model"
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\user_annotations_20261007\\codex-clipboard-private-attachment-00026.png",
+          "sha256": "3c96023218e676eb8d47bbe810d6ba6e38b445880a5015b6c295a4ce26d287db",
+          "source_pts": 230501120,
+          "evidence_kind": "original_user_axis_attachment_reference_not_new_AI_pixels"
+        }
+      ],
+      "qualification_changes_user_pixels_HELD_or_geometry": false
+    },
+    {
+      "row_index": 38,
+      "row_id": "user_traced_native230502144_lane2_upper_long_fit_20261007",
+      "source_pts": 230502144,
+      "original_uv_float64_sha256": "e545cff19958aac26b5e26a53b3396ad526adc1d802d910c6bcbd70150528ef6",
+      "excluded_point_indices": [
+        1
+      ],
+      "review_basis": "original_rgb_only",
+      "reason": "Actual wide RAW has a strong upper material band and weak diagonal lower paint entering the same query; no independently distinguishable complete pair of this Lane2 paint sides, so original RGB transport UV cannot measure its geometric center. No replacement or uniform translation inferred.",
+      "native_rgb_evidence": [
+        {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\user_annotations_20261007\\lane2_source_profile_correspondence\\native_230502144.png",
+          "sha256": "199e0acab6610a137dfa490418c3e6f5e623f6a6cfcb6a233cff90e313edde55",
+          "source_pts": 230502144
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\native_ice_current_remaining_actual_RGB_review_20261012\\row38_p1_both_bands_wide_RAW_current.png",
+          "sha256": "820ce49e13c0248790617f4c5cb3666d5709c910ed1fadb7b84ac31232ed6e03",
+          "source_pts": 230502144
+        }
+      ]
+    },
+    {
+      "row_index": 40,
+      "row_id": "user_traced_native230504192_lane2_upper_long_fit_20261007",
+      "source_pts": 230504192,
+      "original_uv_float64_sha256": "ca5eb4924e7893a5ec66c10926337ced6185d851fbca06439b74a6e1288fd830",
+      "excluded_point_indices": [
+        1
+      ],
+      "review_basis": "original_rgb_only",
+      "reason": "Actual wide RAW has a strong upper material band and weak diagonal lower paint entering the same query; no independently distinguishable complete pair of this Lane2 paint sides, so original RGB transport UV cannot measure its geometric center. No replacement or uniform translation inferred.",
+      "native_rgb_evidence": [
+        {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\user_annotations_20261007\\lane2_source_profile_correspondence\\native_230504192.png",
+          "sha256": "26bc5458d3fb4279211beaeb2b9a02b14420ccc758fa894de815dce4f3f6a1ee",
+          "source_pts": 230504192
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\native_ice_current_remaining_actual_RGB_review_20261012\\row40_p1_both_bands_wide_RAW_current.png",
+          "sha256": "a80df86b4ae6267e80efc582ee1cfa42377f88d60c51aa9350aaa7c259f7a345",
+          "source_pts": 230504192
+        }
+      ]
+    },
+    {
+      "row_index": 42,
+      "row_id": "user_traced_native230506240_lane2_upper_long_fit_20261007",
+      "source_pts": 230506240,
+      "original_uv_float64_sha256": "7c31629ec13084f1bf9c7280d4799275d27f4da25a7951ac26ca6817ff52c3cc",
+      "excluded_point_indices": [
+        1
+      ],
+      "review_basis": "original_rgb_only",
+      "reason": "Actual wide RAW has a strong upper material band and weak diagonal lower paint entering the same query; no independently distinguishable complete pair of this Lane2 paint sides, so original RGB transport UV cannot measure its geometric center. No replacement or uniform translation inferred.",
+      "native_rgb_evidence": [
+        {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\user_annotations_20261007\\lane2_source_profile_correspondence\\native_230506240.png",
+          "sha256": "96fa2416bac12a280b5045be9f77e5bdaafdb7ff21efa226e27883cf076be345",
+          "source_pts": 230506240
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\native_ice_current_remaining_actual_RGB_review_20261012\\row42_p1_both_bands_wide_RAW_current.png",
+          "sha256": "483bea15cf66d5628040e41bd62269060f4304e235dd2aca532be93cd9cb11b7",
+          "source_pts": 230506240
+        }
+      ]
+    }
+  ],
+  "no_camera_projection_fit_residual_or_solver_cost_used": true,
+  "direct_user_strokes_and_original_HELD_preserved": true,
+  "accuracy_accepted": false,
+  "original15_exclusion_records_all_fields_exact": true,
+  "parent_qualification": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\B2_original_center_and_LOW_Ad4_missing_anchor_systematic\\uniform_full_cut_actual_RGB_candidates\\FINAL_native_ice101_same15_original_point_exclusions_qualification_20261011.json",
+    "sha256": "56c761acbee5b399e6933193489976c8ccce5a80aca078981841aebd0ccfd381"
+  },
+  "new34_source_midline_points_already_root_reviewed_not_excluded": true,
+  "new65_F2_source_already_root_reviewed_not_excluded": true,
+  "previous_original_qualification": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\F2_Ad24_26_sparse_temporal_actual_RGB_candidate\\FINAL_native_ice108_same15_original_point_exclusions_qualification_20261011.json",
+    "sha256": "dc9c1f089364616f99e79b25a8b6def5497b3138243d4fc54467398495f8d898"
+  },
+  "previous_selected_packet": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\observations\\source_packets\\ice108_saved_F3_scanline_locations_20261011\\packet.json",
+    "sha256": "7db7a80b2e163371ba244238bf6ea331f9934423c5bdbb0b8880c0f4f07ddeb8"
+  }
+}

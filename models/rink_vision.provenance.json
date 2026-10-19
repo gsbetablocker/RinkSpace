@@ -1,0 +1,93 @@
+{
+  "schema": "rinkspace.model-provenance.v1",
+  "observed_date": "2026-10-19",
+  "artifact": {
+    "path": "models/rink_vision.pt",
+    "bytes": 113742905,
+    "sha256": "26e792f2381a9bd66c484b8cfa38b13993f5c6cf11b52ef84ee22da65041f208",
+    "accuracy_accepted": false,
+    "contains_direct_source_image_buffers": false,
+    "storage_scope": "208 tensors and all 208 ZIP storage payloads are referenced by the model state_dict; no extra image payload or image buffer identified."
+  },
+  "base_model": {
+    "repository": "facebook/sam2.1-hiera-tiny",
+    "revision": "de431c4043854a71d8101e17995dfe596bf101a5",
+    "file": "model.safetensors",
+    "bytes": 155908064,
+    "sha256": "48c14467e5cf9e51870511feb72c89688e82dd74523142c0538b663e193ac2a7",
+    "downloaded_at_utc": "2026-09-18T06:58:57.706925+00:00",
+    "license": "Apache-2.0",
+    "license_file": "models/SAM2_LICENSE.txt",
+    "source_commit_url": "https://huggingface.co/facebook/sam2.1-hiera-tiny/commit/de431c4043854a71d8101e17995dfe596bf101a5",
+    "source_file_url": "https://huggingface.co/facebook/sam2.1-hiera-tiny/resolve/de431c4043854a71d8101e17995dfe596bf101a5/model.safetensors",
+    "model_card_url": "https://huggingface.co/facebook/sam2.1-hiera-tiny/blob/de431c4043854a71d8101e17995dfe596bf101a5/README.md",
+    "evidence": {
+      "local_download_receipt_sha256": "a51b927f82740fa4801e95ca0e8e8fe1e4f21437d5eb1cab451dad6da36a4c84",
+      "current_local_file_sha256_recomputed": true,
+      "official_fixed_commit_pointer_matches": true
+    }
+  },
+  "relationship": {
+    "freeze_backbone": true,
+    "base_key_prefix": "vision_encoder.",
+    "derived_key_prefix": "backbone.",
+    "tensors_compared": 162,
+    "tensors_identical": 162,
+    "tensor_bytes_compared": 108876544,
+    "method": "Static pickletools opcode analysis into inert symbols followed by SHA-256 comparison of corresponding contiguous float32 tensor byte ranges in ZIP storage and safetensors; no torch.load, pickle.load, GLOBAL import, REDUCE call, training or inference.",
+    "scope": "Complete vision encoder only; SAM2 mask decoder and video/object memory are not included in this artifact."
+  },
+  "modifications": {
+    "implementation": "src/rinkspace/vision_network.py",
+    "description_zh": "保留冻结 SAM2 视觉编码器；加入原像素局部分支、多尺度 FPN 投影、ConvGRU 时序状态、语义分类及线/圆/其他辅助预测头，训练项目预测部分；保存编码器架构与状态供离线重建。",
+    "classes": [
+      "background",
+      "ice_contact",
+      "board_top",
+      "ice_paint",
+      "ad_boundary",
+      "shadow_or_reflection"
+    ],
+    "upstream_tensor_bytes_modified": false,
+    "not_an_upstream_official_checkpoint": true
+  },
+  "training": {
+    "report_schema": "rinkspace.rink-vision-training.v1",
+    "report_sha256": "ac25881b209fce01b4fa1a4780973933c7e8bf3ac5ba72a477dc0db434f287ef",
+    "source_manifest_sha256": "249fb735379ce41a5ad6d9a91f56f4a544599cf226a4cc5b1cfc416476261829",
+    "source_video_id": "oxXu1avhrvs",
+    "source_video_sha256": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891",
+    "source_time_base": "1/15360",
+    "native_nominal_rate": "60/1",
+    "latest_step": 9200,
+    "resumed_from_step": 8400,
+    "training_source_pts": [
+      56218880,
+      14177280,
+      104693760,
+      205992960,
+      230507776,
+      231705088,
+      229376000,
+      230231552,
+      230379776,
+      226160640
+    ],
+    "development_source_pts": [
+      228372480
+    ],
+    "development_is_final_independent_validation": false,
+    "full_shot_accuracy_validated": false,
+    "future_frames_used": true,
+    "inputs_zh": "广播原片 RGB、用户确认的位置/轮廓/材质标注和项目审阅标注。此处是既有权重来源事实，不改变今后使用官方50帧单节目源的项目规则。",
+    "training_input_rights_verified": false,
+    "existing_authorization_record_reported_by_owner": false
+  },
+  "other_frameworks": {
+    "RAFT": "Referenced by vision_geometry.py as an independent local torchvision flow dependency; ignored models/cache checkpoint is not in the public Git candidate and not embedded in rink_vision.pt.",
+    "PIDNet": "Only a framework_sources reference in configs/rink_vision.json in inspected implementation; no PIDNet import or bundled checkpoint identified.",
+    "segmentation_models_pytorch": "Only a framework_sources reference in configs/rink_vision.json in inspected implementation; no import or bundled checkpoint identified.",
+    "co_tracker": "Only a framework_sources reference in configs/rink_vision.json in inspected implementation; no import or bundled checkpoint identified."
+  },
+  "rights_zh": "SAM2 上游编码器保留 Apache-2.0 许可；本项目声明不把整个派生权重改标 MIT，也不替训练视频、背景素材、用户提供标注取得授权。基础模型来源已核实，训练材料及派生模型公开范围仍按有效授权另行判断。"
+}

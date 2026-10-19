@@ -1,0 +1,1457 @@
+{
+  "schema": "rinkspace.framewise-feature-registry.v1",
+  "model_id": "ankara_2026.framewise_8a28_20261013",
+  "targets": {
+    "board.top": {
+      "kind": "board_edge",
+      "role": "top",
+      "part": null,
+      "residual": "point_to_named_finite_curve"
+    },
+    "board.contact": {
+      "kind": "board_edge",
+      "role": "contact",
+      "part": null,
+      "residual": "point_to_named_finite_curve"
+    },
+    "board.top.upper_right": {
+      "kind": "board_edge",
+      "role": "top",
+      "part": "upper_right",
+      "residual": "point_to_named_finite_curve"
+    },
+    "board.contact.upper_right": {
+      "kind": "board_edge",
+      "role": "contact",
+      "part": "upper_right",
+      "residual": "point_to_named_finite_curve"
+    },
+    "board.top.upper_long_side": {
+      "kind": "board_edge",
+      "role": "top",
+      "part": "upper_long_side",
+      "residual": "point_to_named_finite_curve"
+    },
+    "board.contact.upper_long_side": {
+      "kind": "board_edge",
+      "role": "contact",
+      "part": "upper_long_side",
+      "residual": "point_to_named_finite_curve"
+    },
+    "board.top.upper_left": {
+      "kind": "board_edge",
+      "role": "top",
+      "part": "upper_left",
+      "residual": "point_to_named_finite_curve"
+    },
+    "board.contact.upper_left": {
+      "kind": "board_edge",
+      "role": "contact",
+      "part": "upper_left",
+      "residual": "point_to_named_finite_curve"
+    },
+    "board.top.left_end": {
+      "kind": "board_edge",
+      "role": "top",
+      "part": "left_end",
+      "residual": "point_to_named_finite_curve"
+    },
+    "board.contact.left_end": {
+      "kind": "board_edge",
+      "role": "contact",
+      "part": "left_end",
+      "residual": "point_to_named_finite_curve"
+    },
+    "board.top.lower_left": {
+      "kind": "board_edge",
+      "role": "top",
+      "part": "lower_left",
+      "residual": "point_to_named_finite_curve"
+    },
+    "board.contact.lower_left": {
+      "kind": "board_edge",
+      "role": "contact",
+      "part": "lower_left",
+      "residual": "point_to_named_finite_curve"
+    },
+    "board.top.lower_long_side": {
+      "kind": "board_edge",
+      "role": "top",
+      "part": "lower_long_side",
+      "residual": "point_to_named_finite_curve"
+    },
+    "board.contact.lower_long_side": {
+      "kind": "board_edge",
+      "role": "contact",
+      "part": "lower_long_side",
+      "residual": "point_to_named_finite_curve"
+    },
+    "board.top.lower_right": {
+      "kind": "board_edge",
+      "role": "top",
+      "part": "lower_right",
+      "residual": "point_to_named_finite_curve"
+    },
+    "board.contact.lower_right": {
+      "kind": "board_edge",
+      "role": "contact",
+      "part": "lower_right",
+      "residual": "point_to_named_finite_curve"
+    },
+    "board.top.right_end": {
+      "kind": "board_edge",
+      "role": "top",
+      "part": "right_end",
+      "residual": "point_to_named_finite_curve"
+    },
+    "board.contact.right_end": {
+      "kind": "board_edge",
+      "role": "contact",
+      "part": "right_end",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad1.left_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 1,
+      "role": "left_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad1.left_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 1,
+      "role": "left_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad1.right_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 1,
+      "role": "right_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad1.right_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 1,
+      "role": "right_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad1.top_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 1,
+      "role": "top_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad1.bottom_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 1,
+      "role": "bottom_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad1.left_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 1,
+      "role": "left_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad1.right_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 1,
+      "role": "right_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad2.left_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 2,
+      "role": "left_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad2.left_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 2,
+      "role": "left_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad2.right_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 2,
+      "role": "right_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad2.right_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 2,
+      "role": "right_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad2.top_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 2,
+      "role": "top_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad2.bottom_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 2,
+      "role": "bottom_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad2.left_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 2,
+      "role": "left_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad2.right_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 2,
+      "role": "right_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad3.left_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 3,
+      "role": "left_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad3.left_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 3,
+      "role": "left_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad3.right_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 3,
+      "role": "right_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad3.right_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 3,
+      "role": "right_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad3.top_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 3,
+      "role": "top_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad3.bottom_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 3,
+      "role": "bottom_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad3.left_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 3,
+      "role": "left_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad3.right_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 3,
+      "role": "right_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad4.left_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 4,
+      "role": "left_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad4.left_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 4,
+      "role": "left_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad4.right_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 4,
+      "role": "right_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad4.right_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 4,
+      "role": "right_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad4.top_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 4,
+      "role": "top_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad4.bottom_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 4,
+      "role": "bottom_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad4.left_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 4,
+      "role": "left_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad4.right_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 4,
+      "role": "right_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad5.left_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 5,
+      "role": "left_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad5.left_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 5,
+      "role": "left_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad5.right_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 5,
+      "role": "right_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad5.right_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 5,
+      "role": "right_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad5.top_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 5,
+      "role": "top_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad5.bottom_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 5,
+      "role": "bottom_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad5.left_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 5,
+      "role": "left_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad5.right_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 5,
+      "role": "right_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad6.left_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 6,
+      "role": "left_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad6.left_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 6,
+      "role": "left_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad6.right_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 6,
+      "role": "right_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad6.right_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 6,
+      "role": "right_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad6.top_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 6,
+      "role": "top_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad6.bottom_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 6,
+      "role": "bottom_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad6.left_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 6,
+      "role": "left_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad6.right_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 6,
+      "role": "right_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad7.left_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 7,
+      "role": "left_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad7.left_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 7,
+      "role": "left_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad7.right_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 7,
+      "role": "right_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad7.right_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 7,
+      "role": "right_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad7.top_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 7,
+      "role": "top_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad7.bottom_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 7,
+      "role": "bottom_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad7.left_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 7,
+      "role": "left_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad7.right_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 7,
+      "role": "right_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad14.left_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 14,
+      "role": "left_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad14.left_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 14,
+      "role": "left_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad14.right_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 14,
+      "role": "right_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad14.right_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 14,
+      "role": "right_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad14.top_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 14,
+      "role": "top_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad14.bottom_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 14,
+      "role": "bottom_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad14.left_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 14,
+      "role": "left_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad14.right_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 14,
+      "role": "right_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad15.left_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 15,
+      "role": "left_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad15.left_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 15,
+      "role": "left_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad15.right_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 15,
+      "role": "right_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad15.right_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 15,
+      "role": "right_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad15.top_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 15,
+      "role": "top_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad15.bottom_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 15,
+      "role": "bottom_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad15.left_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 15,
+      "role": "left_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad15.right_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 15,
+      "role": "right_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad16.left_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 16,
+      "role": "left_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad16.left_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 16,
+      "role": "left_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad16.right_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 16,
+      "role": "right_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad16.right_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 16,
+      "role": "right_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad16.top_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 16,
+      "role": "top_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad16.bottom_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 16,
+      "role": "bottom_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad16.left_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 16,
+      "role": "left_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad16.right_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 16,
+      "role": "right_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad17.left_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 17,
+      "role": "left_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad17.left_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 17,
+      "role": "left_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad17.right_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 17,
+      "role": "right_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad17.right_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 17,
+      "role": "right_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad17.top_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 17,
+      "role": "top_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad17.bottom_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 17,
+      "role": "bottom_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad17.left_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 17,
+      "role": "left_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad17.right_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 17,
+      "role": "right_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad18.left_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 18,
+      "role": "left_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad18.left_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 18,
+      "role": "left_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad18.right_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 18,
+      "role": "right_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad18.right_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 18,
+      "role": "right_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad18.top_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 18,
+      "role": "top_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad18.bottom_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 18,
+      "role": "bottom_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad18.left_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 18,
+      "role": "left_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad18.right_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 18,
+      "role": "right_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad19.left_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 19,
+      "role": "left_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad19.left_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 19,
+      "role": "left_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad19.right_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 19,
+      "role": "right_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad19.right_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 19,
+      "role": "right_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad19.top_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 19,
+      "role": "top_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad19.bottom_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 19,
+      "role": "bottom_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad19.left_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 19,
+      "role": "left_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad19.right_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 19,
+      "role": "right_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad20.left_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 20,
+      "role": "left_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad20.left_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 20,
+      "role": "left_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad20.right_top": {
+      "kind": "ad_corner",
+      "advertisement_id": 20,
+      "role": "right_top",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad20.right_bottom": {
+      "kind": "ad_corner",
+      "advertisement_id": 20,
+      "role": "right_bottom",
+      "residual": "point_to_corresponding_corner_2d"
+    },
+    "Ad20.top_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 20,
+      "role": "top_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad20.bottom_edge": {
+      "kind": "ad_edge",
+      "advertisement_id": 20,
+      "role": "bottom_edge",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad20.left_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 20,
+      "role": "left_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad20.right_vertical": {
+      "kind": "ad_edge",
+      "advertisement_id": 20,
+      "role": "right_vertical",
+      "residual": "point_to_named_finite_curve"
+    },
+    "Ad2.print.ISU_S": {
+      "kind": "ad_print",
+      "advertisement_id": 2,
+      "contour_key": "ISU_S",
+      "residual": "point_to_named_finite_print_contour",
+      "material_coordinate_domain": "ad_rectangle_u_left_to_right_v_top_to_bottom",
+      "template": "ad2_material_template.json",
+      "geometry_status": "independent_source_template_initialization_not_accuracy_accepted"
+    },
+    "Ad2.print.U": {
+      "kind": "ad_print",
+      "advertisement_id": 2,
+      "contour_key": "U",
+      "residual": "point_to_named_finite_print_contour",
+      "material_coordinate_domain": "ad_rectangle_u_left_to_right_v_top_to_bottom",
+      "template": "ad2_material_template.json",
+      "geometry_status": "independent_source_template_initialization_not_accuracy_accepted"
+    },
+    "Ad2.print.hyphen": {
+      "kind": "ad_print",
+      "advertisement_id": 2,
+      "contour_key": "hyphen",
+      "residual": "point_to_named_finite_print_contour",
+      "material_coordinate_domain": "ad_rectangle_u_left_to_right_v_top_to_bottom",
+      "template": "ad2_material_template.json",
+      "geometry_status": "independent_source_template_initialization_not_accuracy_accepted"
+    },
+    "Ad2.print.SKATING_S": {
+      "kind": "ad_print",
+      "advertisement_id": 2,
+      "contour_key": "SKATING_S",
+      "residual": "point_to_named_finite_print_contour",
+      "material_coordinate_domain": "ad_rectangle_u_left_to_right_v_top_to_bottom",
+      "template": "ad2_material_template.json",
+      "geometry_status": "independent_source_template_initialization_not_accuracy_accepted"
+    },
+    "Ad2.print.K": {
+      "kind": "ad_print",
+      "advertisement_id": 2,
+      "contour_key": "K",
+      "residual": "point_to_named_finite_print_contour",
+      "material_coordinate_domain": "ad_rectangle_u_left_to_right_v_top_to_bottom",
+      "template": "ad2_material_template.json",
+      "geometry_status": "independent_source_template_initialization_not_accuracy_accepted"
+    },
+    "ice.F4:outer": {
+      "kind": "ice_curve",
+      "curve_id": "F4:outer",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.F4:middle": {
+      "kind": "ice_curve",
+      "curve_id": "F4:middle",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.F4:inner": {
+      "kind": "ice_curve",
+      "curve_id": "F4:inner",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.F4:center": {
+      "kind": "ice_curve",
+      "curve_id": "F4:center",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.R4:outer": {
+      "kind": "ice_curve",
+      "curve_id": "R4:outer",
+      "residual": "point_to_named_finite_ice_curve",
+      "display_feature_alias": "R4"
+    },
+    "ice.R4:middle": {
+      "kind": "ice_curve",
+      "curve_id": "R4:middle",
+      "residual": "point_to_named_finite_ice_curve",
+      "display_feature_alias": "R4"
+    },
+    "ice.R4:inner": {
+      "kind": "ice_curve",
+      "curve_id": "R4:inner",
+      "residual": "point_to_named_finite_ice_curve",
+      "display_feature_alias": "R4"
+    },
+    "ice.R4:center": {
+      "kind": "ice_curve",
+      "curve_id": "R4:center",
+      "residual": "point_to_named_finite_ice_curve",
+      "display_feature_alias": "R4"
+    },
+    "ice.F3:outer": {
+      "kind": "ice_curve",
+      "curve_id": "F3:outer",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.F3:middle": {
+      "kind": "ice_curve",
+      "curve_id": "F3:middle",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.F3:inner": {
+      "kind": "ice_curve",
+      "curve_id": "F3:inner",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.F3:center": {
+      "kind": "ice_curve",
+      "curve_id": "F3:center",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.R3:outer": {
+      "kind": "ice_curve",
+      "curve_id": "R3:outer",
+      "residual": "point_to_named_finite_ice_curve",
+      "display_feature_alias": "R3"
+    },
+    "ice.R3:middle": {
+      "kind": "ice_curve",
+      "curve_id": "R3:middle",
+      "residual": "point_to_named_finite_ice_curve",
+      "display_feature_alias": "R3"
+    },
+    "ice.R3:inner": {
+      "kind": "ice_curve",
+      "curve_id": "R3:inner",
+      "residual": "point_to_named_finite_ice_curve",
+      "display_feature_alias": "R3"
+    },
+    "ice.R3:center": {
+      "kind": "ice_curve",
+      "curve_id": "R3:center",
+      "residual": "point_to_named_finite_ice_curve",
+      "display_feature_alias": "R3"
+    },
+    "ice.F2:outer": {
+      "kind": "ice_curve",
+      "curve_id": "F2:outer",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.F2:middle": {
+      "kind": "ice_curve",
+      "curve_id": "F2:middle",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.F2:inner": {
+      "kind": "ice_curve",
+      "curve_id": "F2:inner",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.F2:center": {
+      "kind": "ice_curve",
+      "curve_id": "F2:center",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.R2:outer": {
+      "kind": "ice_curve",
+      "curve_id": "R2:outer",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.R2:middle": {
+      "kind": "ice_curve",
+      "curve_id": "R2:middle",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.R2:inner": {
+      "kind": "ice_curve",
+      "curve_id": "R2:inner",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.R2:center": {
+      "kind": "ice_curve",
+      "curve_id": "R2:center",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.F1:outer": {
+      "kind": "ice_curve",
+      "curve_id": "F1:outer",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.F1:middle": {
+      "kind": "ice_curve",
+      "curve_id": "F1:middle",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.F1:inner": {
+      "kind": "ice_curve",
+      "curve_id": "F1:inner",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.F1:center": {
+      "kind": "ice_curve",
+      "curve_id": "F1:center",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.R1:outer": {
+      "kind": "ice_curve",
+      "curve_id": "R1:outer",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.R1:middle": {
+      "kind": "ice_curve",
+      "curve_id": "R1:middle",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.R1:inner": {
+      "kind": "ice_curve",
+      "curve_id": "R1:inner",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.R1:center": {
+      "kind": "ice_curve",
+      "curve_id": "R1:center",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.C0:outer": {
+      "kind": "ice_curve",
+      "curve_id": "C0:outer",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.A1:outer": {
+      "kind": "ice_curve",
+      "curve_id": "A1:outer",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.A2:outer": {
+      "kind": "ice_curve",
+      "curve_id": "A2:outer",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.lane4:edge0": {
+      "kind": "ice_curve",
+      "curve_id": "lane4:edge0",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.lane4:edge1": {
+      "kind": "ice_curve",
+      "curve_id": "lane4:edge1",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.lane4:edge2": {
+      "kind": "ice_curve",
+      "curve_id": "lane4:edge2",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.lane3:edge0": {
+      "kind": "ice_curve",
+      "curve_id": "lane3:edge0",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.lane3:edge1": {
+      "kind": "ice_curve",
+      "curve_id": "lane3:edge1",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.lane3:edge2": {
+      "kind": "ice_curve",
+      "curve_id": "lane3:edge2",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.lane2:edge0": {
+      "kind": "ice_curve",
+      "curve_id": "lane2:edge0",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.lane2:edge1": {
+      "kind": "ice_curve",
+      "curve_id": "lane2:edge1",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.lane2:edge2": {
+      "kind": "ice_curve",
+      "curve_id": "lane2:edge2",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.lane1:edge0": {
+      "kind": "ice_curve",
+      "curve_id": "lane1:edge0",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.lane1:edge1": {
+      "kind": "ice_curve",
+      "curve_id": "lane1:edge1",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.lane1:edge2": {
+      "kind": "ice_curve",
+      "curve_id": "lane1:edge2",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.B1:segment0": {
+      "kind": "ice_curve",
+      "curve_id": "B1:segment0",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.B2:segment0": {
+      "kind": "ice_curve",
+      "curve_id": "B2:segment0",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.C:segment0": {
+      "kind": "ice_curve",
+      "curve_id": "C:segment0",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.goal_line_left:segment0": {
+      "kind": "ice_curve",
+      "curve_id": "goal_line_left:segment0",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.goal_line_right:segment0": {
+      "kind": "ice_curve",
+      "curve_id": "goal_line_right:segment0",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.goal_crease_left:boundary": {
+      "kind": "ice_curve",
+      "curve_id": "goal_crease_left:boundary",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.goal_crease_right:boundary": {
+      "kind": "ice_curve",
+      "curve_id": "goal_crease_right:boundary",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.curling_centerline_row3:segment0": {
+      "kind": "ice_curve",
+      "curve_id": "curling_centerline_row3:segment0",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.A3:outer": {
+      "kind": "ice_curve",
+      "curve_id": "A3:outer",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.A4:outer": {
+      "kind": "ice_curve",
+      "curve_id": "A4:outer",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.goal_trapezoid_left_lower_outer:segment0": {
+      "kind": "ice_curve",
+      "curve_id": "goal_trapezoid_left_lower_outer:segment0",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.goal_trapezoid_left_upper_outer:segment0": {
+      "kind": "ice_curve",
+      "curve_id": "goal_trapezoid_left_upper_outer:segment0",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.goal_trapezoid_right_lower_outer:segment0": {
+      "kind": "ice_curve",
+      "curve_id": "goal_trapezoid_right_lower_outer:segment0",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.goal_trapezoid_right_upper_outer:segment0": {
+      "kind": "ice_curve",
+      "curve_id": "goal_trapezoid_right_upper_outer:segment0",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.house_connection_F1_R1:segment0": {
+      "kind": "ice_curve",
+      "curve_id": "house_connection_F1_R1:segment0",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.house_connection_F2_R2:segment0": {
+      "kind": "ice_curve",
+      "curve_id": "house_connection_F2_R2:segment0",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.house_connection_F3_R3:segment0": {
+      "kind": "ice_curve",
+      "curve_id": "house_connection_F3_R3:segment0",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "ice.house_connection_F4_R4:segment0": {
+      "kind": "ice_curve",
+      "curve_id": "house_connection_F4_R4:segment0",
+      "residual": "point_to_named_finite_ice_curve"
+    },
+    "Ad2.print.SKATING_A": {
+      "kind": "ad_print",
+      "advertisement_id": 2,
+      "contour_key": "SKATING_A",
+      "residual": "point_to_named_finite_print_contour",
+      "material_coordinate_domain": "ad_rectangle_u_left_to_right_v_top_to_bottom",
+      "template": "ad2_material_template.json",
+      "geometry_status": "independent_source_template_initialization_not_accuracy_accepted",
+      "contour_role": "white_print_external_ink_contour"
+    },
+    "Ad2.print.SKATING_A_inner": {
+      "kind": "ad_print",
+      "advertisement_id": 2,
+      "contour_key": "SKATING_A_inner",
+      "residual": "point_to_named_finite_print_contour",
+      "material_coordinate_domain": "ad_rectangle_u_left_to_right_v_top_to_bottom",
+      "template": "ad2_material_template.json",
+      "geometry_status": "independent_source_template_initialization_not_accuracy_accepted",
+      "contour_role": "white_print_internal_hole_boundary"
+    },
+    "Ad2.print.ISU_I": {
+      "kind": "ad_print",
+      "advertisement_id": 2,
+      "contour_key": "ISU_I",
+      "residual": "point_to_named_finite_print_contour",
+      "material_coordinate_domain": "ad_rectangle_u_left_to_right_v_top_to_bottom",
+      "template": "ad2_material_template.json",
+      "geometry_status": "independent_low_resolution_source_template_initialization_not_fitted_truth",
+      "contour_role": "white_print_external_ink_contour"
+    },
+    "Ad2.print.SKATING_T": {
+      "kind": "ad_print",
+      "advertisement_id": 2,
+      "contour_key": "SKATING_T",
+      "residual": "point_to_named_finite_print_contour",
+      "material_coordinate_domain": "ad_rectangle_u_left_to_right_v_top_to_bottom",
+      "template": "ad2_material_template.json",
+      "geometry_status": "independent_low_resolution_source_template_initialization_not_fitted_truth",
+      "contour_role": "white_print_external_ink_contour"
+    },
+    "Ad2.print.SKATING_I": {
+      "kind": "ad_print",
+      "advertisement_id": 2,
+      "contour_key": "SKATING_I",
+      "residual": "point_to_named_finite_print_contour",
+      "material_coordinate_domain": "ad_rectangle_u_left_to_right_v_top_to_bottom",
+      "template": "ad2_material_template.json",
+      "geometry_status": "independent_low_resolution_source_template_initialization_not_fitted_truth",
+      "contour_role": "white_print_external_ink_contour"
+    },
+    "Ad2.print.SKATING_N": {
+      "kind": "ad_print",
+      "advertisement_id": 2,
+      "contour_key": "SKATING_N",
+      "residual": "point_to_named_finite_print_contour",
+      "material_coordinate_domain": "ad_rectangle_u_left_to_right_v_top_to_bottom",
+      "template": "ad2_material_template.json",
+      "geometry_status": "independent_low_resolution_source_template_initialization_not_fitted_truth",
+      "contour_role": "white_print_external_ink_contour"
+    },
+    "Ad2.print.SKATING_G": {
+      "kind": "ad_print",
+      "advertisement_id": 2,
+      "contour_key": "SKATING_G",
+      "residual": "point_to_named_finite_print_contour",
+      "material_coordinate_domain": "ad_rectangle_u_left_to_right_v_top_to_bottom",
+      "template": "ad2_material_template.json",
+      "geometry_status": "independent_low_resolution_source_template_initialization_not_fitted_truth",
+      "contour_role": "white_print_external_ink_contour"
+    },
+    "Ad2.print.dot": {
+      "kind": "ad_print",
+      "advertisement_id": 2,
+      "contour_key": "dot",
+      "residual": "point_to_named_finite_print_contour",
+      "material_coordinate_domain": "ad_rectangle_u_left_to_right_v_top_to_bottom",
+      "template": "ad2_material_template.json",
+      "geometry_status": "independent_low_resolution_source_template_initialization_not_fitted_truth",
+      "contour_role": "white_print_external_ink_contour"
+    },
+    "Ad2.print.COM_C": {
+      "kind": "ad_print",
+      "advertisement_id": 2,
+      "contour_key": "COM_C",
+      "residual": "point_to_named_finite_print_contour",
+      "material_coordinate_domain": "ad_rectangle_u_left_to_right_v_top_to_bottom",
+      "template": "ad2_material_template.json",
+      "geometry_status": "independent_low_resolution_source_template_initialization_not_fitted_truth",
+      "contour_role": "white_print_external_ink_contour"
+    },
+    "Ad2.print.COM_O": {
+      "kind": "ad_print",
+      "advertisement_id": 2,
+      "contour_key": "COM_O",
+      "residual": "point_to_named_finite_print_contour",
+      "material_coordinate_domain": "ad_rectangle_u_left_to_right_v_top_to_bottom",
+      "template": "ad2_material_template.json",
+      "geometry_status": "independent_low_resolution_source_template_initialization_not_fitted_truth",
+      "contour_role": "white_print_external_ink_contour"
+    },
+    "Ad2.print.COM_M": {
+      "kind": "ad_print",
+      "advertisement_id": 2,
+      "contour_key": "COM_M",
+      "residual": "point_to_named_finite_print_contour",
+      "material_coordinate_domain": "ad_rectangle_u_left_to_right_v_top_to_bottom",
+      "template": "ad2_material_template.json",
+      "geometry_status": "independent_low_resolution_source_template_initialization_not_fitted_truth",
+      "contour_role": "white_print_external_ink_contour"
+    },
+    "Ad2.print.COM_O_inner": {
+      "kind": "ad_print",
+      "advertisement_id": 2,
+      "contour_key": "COM_O_inner",
+      "residual": "point_to_named_finite_print_contour",
+      "material_coordinate_domain": "ad_rectangle_u_left_to_right_v_top_to_bottom",
+      "template": "ad2_material_template.json",
+      "geometry_status": "independent_low_resolution_source_template_initialization_not_fitted_truth",
+      "contour_role": "white_print_internal_hole_boundary"
+    }
+  },
+  "inherited_ice_features": [
+    {
+      "id": "F4",
+      "kind": "circle",
+      "scene_pointer": "/ice_features/0"
+    },
+    {
+      "id": "R4",
+      "kind": "circle",
+      "scene_pointer": "/ice_features/1"
+    },
+    {
+      "id": "F3",
+      "kind": "circle",
+      "scene_pointer": "/ice_features/2"
+    },
+    {
+      "id": "R3",
+      "kind": "circle",
+      "scene_pointer": "/ice_features/3"
+    },
+    {
+      "id": "F2",
+      "kind": "circle",
+      "scene_pointer": "/ice_features/4"
+    },
+    {
+      "id": "R2",
+      "kind": "circle",
+      "scene_pointer": "/ice_features/5"
+    },
+    {
+      "id": "F1",
+      "kind": "circle",
+      "scene_pointer": "/ice_features/6"
+    },
+    {
+      "id": "R1",
+      "kind": "circle",
+      "scene_pointer": "/ice_features/7"
+    },
+    {
+      "id": "C0",
+      "kind": "circle",
+      "scene_pointer": "/ice_features/8"
+    },
+    {
+      "id": "A1",
+      "kind": "circle",
+      "scene_pointer": "/ice_features/9"
+    },
+    {
+      "id": "A2",
+      "kind": "circle",
+      "scene_pointer": "/ice_features/10"
+    },
+    {
+      "id": "lane4",
+      "kind": "polygon",
+      "scene_pointer": "/ice_features/11"
+    },
+    {
+      "id": "lane3",
+      "kind": "polygon",
+      "scene_pointer": "/ice_features/12"
+    },
+    {
+      "id": "lane2",
+      "kind": "polygon",
+      "scene_pointer": "/ice_features/13"
+    },
+    {
+      "id": "lane1",
+      "kind": "polygon",
+      "scene_pointer": "/ice_features/14"
+    },
+    {
+      "id": "B1",
+      "kind": "polyline",
+      "scene_pointer": "/ice_features/15"
+    },
+    {
+      "id": "B2",
+      "kind": "polyline",
+      "scene_pointer": "/ice_features/16"
+    },
+    {
+      "id": "C",
+      "kind": "polyline",
+      "scene_pointer": "/ice_features/17"
+    },
+    {
+      "id": "goal_line_left",
+      "kind": "polyline",
+      "scene_pointer": "/ice_features/18"
+    },
+    {
+      "id": "goal_line_right",
+      "kind": "polyline",
+      "scene_pointer": "/ice_features/19"
+    },
+    {
+      "id": "goal_crease_left",
+      "kind": "polygon",
+      "scene_pointer": "/ice_features/20"
+    },
+    {
+      "id": "goal_crease_right",
+      "kind": "polygon",
+      "scene_pointer": "/ice_features/21"
+    },
+    {
+      "id": "curling_centerline_row3",
+      "kind": "polyline",
+      "scene_pointer": "/ice_features/22"
+    },
+    {
+      "id": "A3",
+      "kind": "circle",
+      "scene_pointer": "/ice_features/23"
+    },
+    {
+      "id": "A4",
+      "kind": "circle",
+      "scene_pointer": "/ice_features/24"
+    },
+    {
+      "id": "goal_trapezoid_left_lower_outer",
+      "kind": "polyline",
+      "scene_pointer": "/ice_features/25"
+    },
+    {
+      "id": "goal_trapezoid_left_upper_outer",
+      "kind": "polyline",
+      "scene_pointer": "/ice_features/26"
+    },
+    {
+      "id": "goal_trapezoid_right_lower_outer",
+      "kind": "polyline",
+      "scene_pointer": "/ice_features/27"
+    },
+    {
+      "id": "goal_trapezoid_right_upper_outer",
+      "kind": "polyline",
+      "scene_pointer": "/ice_features/28"
+    },
+    {
+      "id": "house_connection_F1_R1",
+      "kind": "polyline",
+      "scene_pointer": "/ice_features/29"
+    },
+    {
+      "id": "house_connection_F2_R2",
+      "kind": "polyline",
+      "scene_pointer": "/ice_features/30"
+    },
+    {
+      "id": "house_connection_F3_R3",
+      "kind": "polyline",
+      "scene_pointer": "/ice_features/31"
+    },
+    {
+      "id": "house_connection_F4_R4",
+      "kind": "polyline",
+      "scene_pointer": "/ice_features/32"
+    }
+  ],
+  "no_generic_nearest_advertisement_fallback": true,
+  "display_aliases": {},
+  "user_naming_correction": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_naming_correction.json",
+    "sha256": "7351169962c3c078b790869975239eb4220c4e01397bd7454a46fae706f75c62"
+  }
+}

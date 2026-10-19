@@ -1,0 +1,177 @@
+{
+  "schema": "rinkspace.official-static-surface-dataset.v1",
+  "selection": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\scope_clean_8a28_official50_20261014\\admission_selection.json",
+    "sha256": "cf507ad9eabbaa35a0a6ca899acaa4cff90cae211ae196f9f1774ffae4be1e27"
+  },
+  "event_id": "ankara_2026",
+  "programme_id": "okada_mei_sp",
+  "prepared_date_local": "2026-10-14",
+  "parent": {
+    "q_sha256": "8a28afed8f9f896112e5b2f64be515b2bc02019e10e09c7e0eda2598579d4891",
+    "scene": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_current_points_ready_20261012\\accepted_states\\8a28afed8f9f896112e5b2f64be515b2bc02019e10e09c7e0eda2598579d4891\\scene_UNACCEPTED.json",
+      "sha256": "c99e4005f0dbeb836e5eeab76a095f40c43c008c674f62f430b0dcd466251c6e"
+    },
+    "complete_state": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_current_points_ready_20261012\\accepted_states\\8a28afed8f9f896112e5b2f64be515b2bc02019e10e09c7e0eda2598579d4891\\complete_state_UNACCEPTED.npz",
+      "sha256": "0a3c36496187467d6aff1b49db9d367626ec5c42b8dc42ca870996bb694d4ca8"
+    },
+    "input_manifest": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_current_points_ready_20261012\\input_manifest.json",
+      "sha256": "9154f12ac3af650b5a2fec83d58b0203584cb76c8da4c2931bde7db5971c4405"
+    },
+    "state_identity": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_current_points_ready_20261012\\accepted_states\\8a28afed8f9f896112e5b2f64be515b2bc02019e10e09c7e0eda2598579d4891\\state_identity.json",
+      "sha256": "5ac4f0f58c4bf24520a12ddbdca1396d1b9bc6356b38b8c3bfa23153ac4dea25"
+    }
+  },
+  "source": {
+    "id": "O6j8L8TmfKo",
+    "url": "https://www.youtube.com/watch?v=O6j8L8TmfKo",
+    "channel": "Skating ISU",
+    "channel_id": "UCVZpqbnDjHyScSYGFPMUtYA",
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4",
+    "sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+    "native_fps": "50/1",
+    "time_base": "1/12800",
+    "native_pts_step": 256,
+    "width": 1920,
+    "height": 1080,
+    "native_frame_count": 16013,
+    "duration_pts": 4099328,
+    "duration_seconds": 320.26,
+    "contains_audio": true
+  },
+  "model": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\models\\framewise_8a28_20261013\\model.json",
+    "sha256": "67354b8cec23fe26c6ff37102ae5fe1acc6a5f6c25221283b3be862a92f9fbe4"
+  },
+  "source_clock": {
+    "time_base": "1/12800",
+    "fps": "50/1"
+  },
+  "navigation_initializers": [
+    {
+      "mapping": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\frame_by_frame_review_20261013\\opening_100_50fps\\navigation_mapping.json",
+        "sha256": "7aaef43695d25c557fb33678dd67b2c7929af49922b8effff9da1cdb3a998e38"
+      },
+      "camera_seeds": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\opening_100_50fps\\camera_seeds.npz",
+        "sha256": "48b531f8b030c71f92ed2a7381bbc23dfeb01bc02fbbe1d10496c06c64a2c629"
+      },
+      "match_summary": {
+        "confirmed_pixel_match": 46,
+        "inferred_navigation_from_unaccepted_pixel_candidate_with_accepted_neighbors": 54
+      },
+      "purpose": "initialization_only_not_source_observation"
+    },
+    {
+      "mapping": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\navigation_mapping.json",
+        "sha256": "67997053cde90a1e4fca5a4c0c281fce533791b7029deed3d671e82e2792941f"
+      },
+      "camera_seeds": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\camera_seeds.npz",
+        "sha256": "840917055b24e57f8829f35ed04afb5abb6b82dba5928aebbd7b20bef76364d1"
+      },
+      "match_summary": {
+        "confirmed_pixel_match": 100
+      },
+      "purpose": "initialization_only_not_source_observation"
+    }
+  ],
+  "admitted_frame_range": [
+    1,
+    200
+  ],
+  "frame_count": 200,
+  "first_native_pts": 256256,
+  "last_native_pts": 307200,
+  "counts": {
+    "shared_line_evidence": 3417,
+    "fit": 28796,
+    "top_level_inferred_vertices_excluded": 142,
+    "missing_source_scale": 670
+  },
+  "scope_counts": {
+    "board": 27236,
+    "ice": 5647
+  },
+  "target_counts": {
+    "board.top.upper_long_side": 2080,
+    "board.contact.upper_long_side": 2171,
+    "Ad2.top_edge": 1517,
+    "Ad2.bottom_edge": 1108,
+    "Ad2.print.hyphen": 1121,
+    "Ad2.print.ISU_S": 1628,
+    "Ad2.print.U": 2779,
+    "Ad2.print.K": 2774,
+    "Ad2.print.SKATING_S": 3730,
+    "Ad2.left_top": 196,
+    "Ad2.left_vertical": 471,
+    "Ad2.left_bottom": 199,
+    "Ad2.print.SKATING_A": 955,
+    "Ad2.print.SKATING_A_inner": 487,
+    "ice.R4:outer": 1214,
+    "Ad2.print.SKATING_T": 875,
+    "ice.R4:middle": 1139,
+    "ice.R4:inner": 783,
+    "Ad2.print.SKATING_I": 530,
+    "Ad2.print.SKATING_N": 1042,
+    "ice.R3:outer": 747,
+    "Ad2.print.SKATING_G": 1240,
+    "ice.R3:middle": 808,
+    "ice.R3:inner": 524,
+    "Ad2.print.dot": 306,
+    "Ad2.print.COM_C": 689,
+    "Ad2.print.ISU_I": 156,
+    "Ad2.print.COM_O": 426,
+    "Ad2.print.COM_O_inner": 316,
+    "ice.lane3:edge2": 353,
+    "Ad2.print.COM_M": 420,
+    "ice.lane2:edge0": 79,
+    "Ad2.right_top": 5,
+    "Ad2.right_bottom": 5,
+    "Ad2.right_vertical": 10
+  },
+  "excluded_candidate_batches": [
+    {
+      "reference": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\batch_manifest.json",
+        "sha256": "94f17f6f6d59c31a5c417e8e26f331010497213c3037f8eb89459c11a0c9f197"
+      },
+      "frame_count": 1048,
+      "points": 278098,
+      "reason": "unreviewed_candidate_not_admitted",
+      "candidate_user_acceptance_preserved": false
+    }
+  ],
+  "old_source_inventory_excluded": 4274668,
+  "old_motion_pairs_excluded": 2118488,
+  "old_source_exclusion_reason": "legacy_video_clock_and_unverified_official_source_material",
+  "old_pixels_classified_as_all_outside_scope": false,
+  "old_parameters_changed": false,
+  "original_files_modified": false,
+  "legacy_objectives_enabled": false,
+  "unknown_depth_points_admitted": 0,
+  "ordinary_fit_consumer": "calibration.program_tracking.official_static_surface_dataset.iter_fit_rows",
+  "other_evidence_consumer": "calibration.program_tracking.official_static_surface_dataset.iter_observations",
+  "ordinary_fit_consumer_check": {
+    "rows": 5777,
+    "points": 28796,
+    "actual_exposures": 200,
+    "all_rows_built_by_existing_framewise_residual_interface": true,
+    "diagnostic_unit_weights_used": false
+  },
+  "source_scales_are_original_localization_estimates_not_calibrated_noise": true,
+  "shared_line_and_derived_corner_weighting_installed": false,
+  "missing_source_scales_filled": false,
+  "full_programme_coverage": false,
+  "independent_HELD_created": false,
+  "accuracy_accepted": false,
+  "solver_started": false,
+  "full_solver_official_clock_adapter_installed": false,
+  "preparation_status": "confirmed_scope_selection_and_ordinary_fit_rows_prepared"
+}

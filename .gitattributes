@@ -1,0 +1,17 @@
+# Research manifests hash actual file bytes. Do not change those bytes during
+# add/checkout, including historical evidence and frozen implementation inputs.
+* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# This post-experiment snapshot retains one original indented blank line.
+# Its exact bytes are referenced in configs/rotation_experiment_lock.json.
+scripts/run_rotation_photometric.py whitespace=-blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+*.png binary
+*.jpg binary
+*.mp4 binary
+*.npy binary
+*.npz binary
+# Final neural weights can exceed GitHub's ordinary-file limit.
+models/*.pt filter=lfs diff=lfs merge=lfs -text
+models/*.pth filter=lfs diff=lfs merge=lfs -text
+
+# Compact technical review archives stay below the ordinary GitHub file limit.
+events/*/programmes/*/review/*.zip binary

@@ -1,0 +1,1255 @@
+{
+  "schema": "rinkspace.continuous-feedback-integration.v1",
+  "release_id": "continuous-feedback-20261019.1",
+  "runtime_version": "source-feedback-runtime.v1.2",
+  "project_root": "D:\\OneDrive\\codex_projs\\RinkSpace",
+  "branch": "codex/delivery-a",
+  "base_commit": "86db28e68e6128de875ed011f7c5d3f6ebccda16",
+  "changes_committed_or_pushed": false,
+  "package_import": {
+    "schema": "rink-feedback.package-transplant.v1",
+    "package_sha256": "38a4c9e69d6af0d0e2ec5adb37e960f2a819ef1f72be8db0ae48a8e4a6b4081c",
+    "package_commit": "9e2fc702318de27a7f6605e26ce9f92f2d18864b",
+    "package_files_verified": 67,
+    "implementation_files": [
+      "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rink_feedback\\__init__.py",
+      "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rink_feedback\\__main__.py",
+      "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rink_feedback\\adapters.py",
+      "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rink_feedback\\cli.py",
+      "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rink_feedback\\core.py",
+      "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rink_feedback\\cycle.py"
+    ],
+    "legacy_source_code_overwritten": false,
+    "seed_manifest_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\feedback\\seed_manifest.json",
+    "evidence_files": 33,
+    "evidence_bytes": 10598056,
+    "max_destination_path_utf16": 132,
+    "new_visual_accuracy_claimed": false
+  },
+  "code_versions": [
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rink_feedback\\__init__.py",
+      "sha256": "de0bb088249c8e21f2977b9da6fa6f26ec619b343dc2d768a52aeffd17d7ca55",
+      "bytes": 253,
+      "relative_path": "src/rink_feedback/__init__.py",
+      "before_sha256": null,
+      "symbols": {}
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rink_feedback\\__main__.py",
+      "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+      "bytes": 48,
+      "relative_path": "src/rink_feedback/__main__.py",
+      "before_sha256": null,
+      "symbols": {}
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rink_feedback\\adapters.py",
+      "sha256": "89d41737b810e3d24f61789a93e3cc6b95ce3e8763f926d7876f35182f6f15c1",
+      "bytes": 23729,
+      "relative_path": "src/rink_feedback/adapters.py",
+      "before_sha256": null,
+      "symbols": {
+        "AdapterError": 19,
+        "canonical_sha256": 23,
+        "file_sha256": 29,
+        "checked_relative": 37,
+        "_clock": 51,
+        "normalize_source": 63,
+        "source_key": 95,
+        "packet_points": 101,
+        "_point_multiset": 130,
+        "adapt_frame_edit": 136,
+        "correction_event_to_case": 237,
+        "normalize_fit_finding": 267,
+        "record_findings_and_query": 307,
+        "import_seed_bundle": 329,
+        "import_project_seed_bundle": 352
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rink_feedback\\cli.py",
+      "sha256": "a2d557a923196d081e49fd07ea958a23b6321dcddbdd606d797aa46be84efeae",
+      "bytes": 2969,
+      "relative_path": "src/rink_feedback/cli.py",
+      "before_sha256": null,
+      "symbols": {
+        "_read": 11,
+        "main": 20
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rink_feedback\\core.py",
+      "sha256": "ce685af0f681a7030e55fe27838c47189768c4c5c9b658606aa1793a114ca54f",
+      "bytes": 26348,
+      "relative_path": "src/rink_feedback/core.py",
+      "before_sha256": null,
+      "symbols": {
+        "ValidationError": 18,
+        "_json": 22,
+        "_hash": 26,
+        "_copy": 30,
+        "_object": 34,
+        "_text": 40,
+        "_sha": 46,
+        "_strings": 52,
+        "normalize_source": 60,
+        "source_key": 85,
+        "_scope": 90,
+        "_context": 103,
+        "_tokens": 117,
+        "_match": 127,
+        "Store": 160,
+        "__init__": 161,
+        "close": 188,
+        "__enter__": 191,
+        "__exit__": 194,
+        "_now": 198,
+        "record_source": 201,
+        "upsert_case": 209,
+        "_published": 238,
+        "query": 246,
+        "get_case": 258,
+        "_append": 272,
+        "record_finding": 293,
+        "record_use": 315,
+        "_get": 352,
+        "get_finding": 358,
+        "get_resolution": 361,
+        "resolutions_for_finding": 364,
+        "resolutions_for_source_group": 370,
+        "record_resolution": 383,
+        "stats": 445,
+        "export": 455
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rink_feedback\\cycle.py",
+      "sha256": "b0e0254cd248d716aacb92e56d7b17f5d3794fcbe82b8c09a65f97c970a396df",
+      "bytes": 16623,
+      "relative_path": "src/rink_feedback/cycle.py",
+      "before_sha256": null,
+      "symbols": {
+        "dependency_fingerprint": 50,
+        "same_review_subject": 67,
+        "FeedbackCycle": 79,
+        "__init__": 80,
+        "before_read": 83,
+        "checkpoint": 109,
+        "acknowledge_use": 173,
+        "learn": 210
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rinkspace\\feedback_outbox.py",
+      "sha256": "1c3a837b9bca38daac62138aa20fd4c46d04d5804f23ce198e2afa6c3eeb53c8",
+      "bytes": 34785,
+      "relative_path": "src/rinkspace/feedback_outbox.py",
+      "before_sha256": null,
+      "symbols": {
+        "_bytes": 26,
+        "_read": 31,
+        "_ref": 35,
+        "_write": 42,
+        "_immutable": 55,
+        "restore_manual_cases": 64,
+        "_scope": 77,
+        "registered_source_dataset": 113,
+        "_points": 138,
+        "_values": 161,
+        "_make_event": 166,
+        "deliver_human_edit": 239,
+        "apply_editor_role_labels": 363,
+        "restore_installation_cases": 388,
+        "record_source_installation": 394,
+        "replay_source_installation_outbox": 474,
+        "verify_manual_regressions": 501
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rinkspace\\feedback_regression.py",
+      "sha256": "2c0dfb7c540703e3de817e90df4382b0997d73a896e5090fd48007c18a1719a7",
+      "bytes": 6210,
+      "relative_path": "src/rinkspace/feedback_regression.py",
+      "before_sha256": null,
+      "symbols": {
+        "verify_feedback_regressions": 11
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rinkspace\\feedback_review.py",
+      "sha256": "9ccda1be228862e872b6490f1457b72c888327763805550538be82a736f3cf47",
+      "bytes": 8548,
+      "relative_path": "src/rinkspace/feedback_review.py",
+      "before_sha256": null,
+      "symbols": {
+        "_ref": 15,
+        "_checked": 19,
+        "review_existing_board_frame": 26
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rinkspace\\feedback_runtime.py",
+      "sha256": "b1f5a288e6b2fb88ce8121285190317eac83eeca585571c3fc72eac728ae264f",
+      "bytes": 18959,
+      "relative_path": "src/rinkspace/feedback_runtime.py",
+      "before_sha256": null,
+      "symbols": {
+        "file_sha": 28,
+        "canonical_sha": 33,
+        "atomic_json": 38,
+        "native_source": 48,
+        "resolve_scope": 62,
+        "feedback_store": 86,
+        "authenticate_refs": 114,
+        "SourceFeedbackRead": 126,
+        "learn_source_review": 267,
+        "__init__": 128,
+        "_use": 173,
+        "apply_inventory": 177,
+        "require_operator": 194,
+        "material_authority": 209,
+        "finish": 226
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rinkspace\\feedback_withdrawal.py",
+      "sha256": "145f02b25511fe37aaab004c13cbdf731ece7457def6676380b9fb254e409051",
+      "bytes": 12415,
+      "relative_path": "src/rinkspace/feedback_withdrawal.py",
+      "before_sha256": null,
+      "symbols": {
+        "WithdrawnSourceAssociations": 24,
+        "_image_hashes": 31,
+        "_withdrawal": 41,
+        "_candidate_key": 52,
+        "check_candidate_withdrawals": 61,
+        "packet_binding_candidates": 142,
+        "enforce_packet_withdrawals": 164,
+        "measurement_withdrawal_applicability": 191,
+        "__init__": 25
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rinkspace\\vision_data.py",
+      "sha256": "d84341c76daa6c6ab53ed1814b50efcb9ea963cfa5e5a14966cbd3b62e558bc2",
+      "bytes": 117531,
+      "relative_path": "src/rinkspace/vision_data.py",
+      "before_sha256": "61c88472b142e0f94a15f78a5cffba9dfdf3a393d3c6fccf34387923b6e2c2be",
+      "symbols": {
+        "_sha": 42,
+        "_jsonable": 47,
+        "_dumps": 61,
+        "_read": 65,
+        "_DataOnlyUnpickler": 69,
+        "load_original_packet": 85,
+        "_uv": 94,
+        "_pts": 105,
+        "_asset": 117,
+        "_advertisement_numbers": 123,
+        "_typed": 130,
+        "_init_db": 150,
+        "_index_row": 167,
+        "iter_observations": 222,
+        "_sample": 270,
+        "_annotation": 287,
+        "_user_samples": 301,
+        "_append_F1_raster_support": 364,
+        "prepare_dataset": 426,
+        "join_user_decisions": 534,
+        "_measurements_schema": 645,
+        "_verified_video_hash": 663,
+        "_gpu_rgb_profiles": 675,
+        "audit_source_pixels": 712,
+        "derive_reviewed_circle_packet": 919,
+        "decode_native_rgb": 1132,
+        "_appearance_features": 1168,
+        "_actual_rgb": 1177,
+        "make_advertisement_appearance_template": 1199,
+        "load_advertisement_appearance_template": 1222,
+        "match_advertisement_appearance": 1260,
+        "extract_advertisement_ink_contours": 1367,
+        "iter_advertisement_ink_candidates": 1526,
+        "iter_complete_source_ad_boundaries": 1578,
+        "audit_source_reliable_exposures": 1617,
+        "find_class": 71,
+        "flush": 785,
+        "report": 791,
+        "save": 804,
+        "whitespace": 1013,
+        "members": 1018,
+        "elements": 1035,
+        "window_sum": 1295,
+        "tensor_frame": 1706,
+        "binding": 1708,
+        "values": 1713,
+        "summary": 1484,
+        "sample_field": 1722,
+        "inspect": 1726,
+        "axis_profile": 824
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rinkspace\\vision_programme_ice_review.py",
+      "sha256": "f3f2971e17737cb668d687df84897e8da6a3025e5e71e9d13c1a7db2bc2d9174",
+      "bytes": 26757,
+      "relative_path": "src/rinkspace/vision_programme_ice_review.py",
+      "before_sha256": "4b0fbf4f6a8bb00b27618aa90372f2bdbdda412f790261e22d4db4b073ab0312",
+      "symbols": {
+        "_batched_actual_profiles": 29,
+        "_actual_profile_candidates": 71,
+        "ice_curve_inventory": 141,
+        "_source_queries": 199,
+        "_candidate_context_excluded": 261,
+        "IceProgrammeSourceReader": 274,
+        "quantile_interface": 81,
+        "add": 145,
+        "__init__": 276,
+        "read": 292
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rinkspace\\vision_source_fit.py",
+      "sha256": "056de4989295c7ae02e137825191be22ba6b354e5f7d7df9e8dd5b15b4820a89",
+      "bytes": 20384,
+      "relative_path": "src/rinkspace/vision_source_fit.py",
+      "before_sha256": "77822145250f33bc1613df47bf4b3550da68fb01395fa77f7aaf7b4439b677b0",
+      "symbols": {
+        "_plain": 23,
+        "_reference": 32,
+        "_physical_definition": 41,
+        "reread_original_fit_source_frame": 66,
+        "OriginalFITSourceReader": 206,
+        "reread_original_fit_request": 291,
+        "declared_ids": 77,
+        "__init__": 214,
+        "read": 260
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rinkspace\\vision_ice_source_role_override.py",
+      "sha256": "2f3f11aa7c0c30d42ae58a965a880b9b63a1572df1675a8802838a8a5b73c308",
+      "bytes": 7418,
+      "relative_path": "src/rinkspace/vision_ice_source_role_override.py",
+      "before_sha256": "20469c1e39228cde50dbe6d5ee7c93d3b9514f81c7e9a5058a38c5e535ba24a9",
+      "symbols": {
+        "effective_source_role_inventory": 16,
+        "remeasure_confirmed_source_roles": 45
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rinkspace\\programme_source_measurement_cache.py",
+      "sha256": "f071c8bd6e180b6ca8a34bf51a05bccadbe4737e19abe1bfb08e35857c70cbad",
+      "bytes": 14331,
+      "relative_path": "src/rinkspace/programme_source_measurement_cache.py",
+      "before_sha256": "8bf790daec8e5ca3f6c2ddd5379313d4eb2bdc9376c05633d92031581122a621",
+      "symbols": {
+        "_sha": 17,
+        "ProgrammeSourceMeasurementCache": 22,
+        "recheck_source_candidate_exclusions": 147,
+        "supplement_selected_profile_quantiles": 180,
+        "restore_exact_navigation_queries": 219,
+        "__init__": 23,
+        "refresh": 32,
+        "_load_chunk": 53,
+        "frame": 90
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\frame_point_editor.py",
+      "sha256": "9dc4ee83e587da2e2e821e469b65b2b62895c2df95feda94fe3a46e96b2a7498",
+      "bytes": 42624,
+      "relative_path": "calibration/program_tracking/frame_point_editor.py",
+      "before_sha256": "dde793d393c1bc4e7f70f6fd46f9d34107d39e071f0290789a448f7fa3a1a465",
+      "symbols": {
+        "EditConflict": 42,
+        "json_bytes": 46,
+        "digest": 50,
+        "ref": 54,
+        "write_atomic": 59,
+        "file_signature": 68,
+        "target_layer": 77,
+        "target_label": 84,
+        "point_inventory": 103,
+        "apply_operations": 114,
+        "PointEditorStore": 211,
+        "create_server": 581,
+        "main": 632,
+        "__init__": 212,
+        "refresh_current_acceptance": 252,
+        "flush_feedback": 276,
+        "is_read_only": 316,
+        "recover_transactions": 320,
+        "path": 332,
+        "binding_path": 337,
+        "media_path": 340,
+        "histories": 352,
+        "bootstrap": 355,
+        "frame": 369,
+        "checked_base": 402,
+        "edit": 411,
+        "undo": 419,
+        "review_signature": 430,
+        "review_entry": 435,
+        "review_candidates": 446,
+        "warm_review_cache": 462,
+        "prepare_review": 466,
+        "review_html": 473,
+        "editor_link": 476,
+        "commit": 485,
+        "Handler": 583,
+        "log_message": 584,
+        "send_bytes": 585,
+        "json": 590,
+        "host_valid": 591,
+        "do_GET": 592,
+        "do_POST": 610
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\extract_selected_frame_review.py",
+      "sha256": "5f8aee2ffc94c9b89c7828bd69717d4fb676ea32d72ea758e975a5b6e1247f0d",
+      "bytes": 15353,
+      "relative_path": "calibration/program_tracking/extract_selected_frame_review.py",
+      "before_sha256": null,
+      "symbols": {
+        "visible_intervals": 19,
+        "board_features": 28,
+        "glyph_features": 91,
+        "make_binding": 138,
+        "run": 172
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\validate_opening_frame_batch.py",
+      "sha256": "d238d6f6fc3950b382f3f74e741c1e4cec2a5bab6195fd9050b02360bfce3424",
+      "bytes": 19969,
+      "relative_path": "calibration/program_tracking/validate_opening_frame_batch.py",
+      "before_sha256": null,
+      "symbols": {
+        "require": 28,
+        "read": 33,
+        "sha": 37,
+        "reference": 42,
+        "integer": 46,
+        "source_vertices": 51,
+        "ordered_uv": 73,
+        "verify_physical_target": 78,
+        "assemble": 120,
+        "validate": 171,
+        "main": 260
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\rinkfit\\src\\rinkfit_joint\\feedback_checkpoint.py",
+      "sha256": "331074d6d318363b25630fc8aa8b1bcc5fada5b53509948516036360103f2913",
+      "bytes": 13119,
+      "relative_path": "calibration/rinkfit/src/rinkfit_joint/feedback_checkpoint.py",
+      "before_sha256": null,
+      "symbols": {
+        "_ref": 23,
+        "_array": 28,
+        "infer_context": 42,
+        "_store": 64,
+        "_diagnostics": 75,
+        "collect_findings": 105,
+        "consume_generation": 162,
+        "CheckpointObserver": 194,
+        "main": 239,
+        "__init__": 196,
+        "scan": 205,
+        "_run": 221,
+        "__enter__": 225,
+        "__exit__": 229
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\rinkfit\\src\\rinkfit_joint\\feedback_launch.py",
+      "sha256": "3c26e2351e5d046e834e7eb7d830db82a8287db97c8a0d2a754090b8c79802c6",
+      "bytes": 6755,
+      "relative_path": "calibration/rinkfit/src/rinkfit_joint/feedback_launch.py",
+      "before_sha256": null,
+      "symbols": {
+        "_ref": 20,
+        "_verify": 25,
+        "prepare": 32,
+        "inspect": 75,
+        "run": 99
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\rinkfit\\src\\rinkfit_joint\\feedback_material_guard.py",
+      "sha256": "3c41b5d015a1f6c02b16f5d369db80623f2460378bf5818cb6df3bfa05e23c14",
+      "bytes": 2262,
+      "relative_path": "calibration/rinkfit/src/rinkfit_joint/feedback_material_guard.py",
+      "before_sha256": null,
+      "symbols": {
+        "check_retrieved_material_order": 9
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\rinkfit\\src\\rinkfit_joint\\joint_solver.py",
+      "sha256": "c9e4edc4c3aa862e0bec5589576ece97f7d1fa41b23ab90fe57000583fcbd581",
+      "bytes": 32509,
+      "relative_path": "calibration/rinkfit/src/rinkfit_joint/joint_solver.py",
+      "before_sha256": null,
+      "symbols": {
+        "sha": 7,
+        "_source_membership_fingerprint": 8,
+        "assert_source_identity_current": 15,
+        "_inherit_source_recall_marker": 47,
+        "build": 64,
+        "execute": 97,
+        "execute_explicit": 113,
+        "rebind_current_auxiliaries": 133,
+        "rebind_explicit_nuisance": 185,
+        "independent_replay": 251,
+        "main": 278,
+        "bind_captured_nuisance": 292,
+        "absolute": 306,
+        "ar": 258,
+        "array": 312
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\rinkfit\\src\\rinkfit_joint\\__main__.py",
+      "sha256": "cf7d74483b16111fa2d0afd9b0f9f6ff0f537b7fc41d32a87b661211e76ee3fc",
+      "bytes": 6072,
+      "relative_path": "calibration/rinkfit/src/rinkfit_joint/__main__.py",
+      "before_sha256": null,
+      "symbols": {
+        "main": 8
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\legacy\\structured_programme_source_candidate\\original_ice_pixel_correction.py",
+      "sha256": "835e06949617e2659b14319f036fed53f6dfe23edf89e481ffbb2281602779b8",
+      "bytes": 38030,
+      "relative_path": "calibration/solver_runtime/legacy/structured_programme_source_candidate/original_ice_pixel_correction.py",
+      "before_sha256": null,
+      "symbols": {
+        "_sha": 20,
+        "_plain": 25,
+        "_reference": 30,
+        "_same_runtime_source": 37,
+        "_source_only_reading": 45,
+        "_qualified_named_lane": 65,
+        "_qualified_original_contact": 93,
+        "_qualified_original_top": 119,
+        "_qualified_advertisement_corner": 161,
+        "_qualified_target_ring_boundary": 195,
+        "_explicit_single_stroke_center_revision": 229,
+        "_qualified_painted_line_center": 266,
+        "_verify_record_original": 316,
+        "_verify_painted_row_coverage": 336,
+        "install_original_ice_pixel_correction": 368,
+        "review_corrected_ice_pixels": 544,
+        "require_painted_retirement_compaction": 574,
+        "declared": 67
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\source_manifest.json",
+      "sha256": "1f868b55c3ec36661518c25a9bdd3e03f483224ac84c928e3beb5ea71850ec3d",
+      "bytes": 215813,
+      "relative_path": "calibration/solver_runtime/source_manifest.json",
+      "before_sha256": null
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\scripts\\review_source_feedback.py",
+      "sha256": "ecf48e888b34753606eac5ff55ceb5aa2c2a0aef8f93e51c3d5c9e44a3a0d971",
+      "bytes": 1268,
+      "relative_path": "scripts/review_source_feedback.py",
+      "before_sha256": null,
+      "symbols": {}
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\scripts\\check_source_feedback.py",
+      "sha256": "3751ace39c56513a59a990a2415afb0696ab3d2f8069783c1fe970dfa9150574",
+      "bytes": 754,
+      "relative_path": "scripts/check_source_feedback.py",
+      "before_sha256": null,
+      "symbols": {}
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\tests\\test_feedback_checkpoint.py",
+      "sha256": "ada000cdc8d36a01ca9ebb5b275d58e4b4c09777196a8c0fb3a9b1adea315367",
+      "bytes": 6521,
+      "relative_path": "tests/test_feedback_checkpoint.py",
+      "before_sha256": null,
+      "symbols": {
+        "_sha": 15,
+        "_json": 19,
+        "checkpoint": 24,
+        "test_uses_native_operator_and_preserves_unknown": 55,
+        "test_exact_replay_is_idempotent_and_produces_pending_regression_jobs": 65,
+        "test_mutated_native_artifact_cannot_create_feedback": 76,
+        "test_incomplete_live_checkpoint_is_reported_without_mutating_solver": 83,
+        "test_prepared_launch_preserves_config_and_stops_before_recalled_source": 93
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\tests\\test_feedback_identity_join.py",
+      "sha256": "a195e5dc78e69e5cc9516968d3271f64524e7d004cee008e1d90aeb324adbdd5",
+      "bytes": 1775,
+      "relative_path": "tests/test_feedback_identity_join.py",
+      "before_sha256": null,
+      "symbols": {
+        "test_human_semantics_join_uses_video_clock_and_native_domain": 8
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\tests\\test_feedback_material_guard.py",
+      "sha256": "0cb683eab209bd593beddd45666500581b8e883e526ec220fc9041fbb7a73cf0",
+      "bytes": 1693,
+      "relative_path": "tests/test_feedback_material_guard.py",
+      "before_sha256": null,
+      "symbols": {
+        "test_learned_material_check_can_withhold_but_never_promote": 7,
+        "test_material_check_requires_current_lower_transition_evidence": 18,
+        "support": 23
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\tests\\test_feedback_outbox.py",
+      "sha256": "76082712419fc7fa43b9631be460972e68b4e2fc46028887281f73c537679614",
+      "bytes": 13912,
+      "relative_path": "tests/test_feedback_outbox.py",
+      "before_sha256": null,
+      "symbols": {
+        "dump": 13,
+        "packet": 19,
+        "journal": 28,
+        "deliver": 46,
+        "test_committed_journal_consumes_once_and_keeps_permanent_regression": 51,
+        "test_matching_acceptance_advances_same_case_once_and_snapshots_receipt": 64,
+        "test_add_click_keeps_unknown_precision_and_undo_retracts_old_instruction": 82,
+        "test_uncommitted_and_unrecorded_delta_never_become_corrections": 107,
+        "test_editor_label_uses_event_role_fact_without_rewriting_uv": 118,
+        "test_deleted_derived_index_rebuilds_cases_and_real_snapshot_regression": 128,
+        "test_diagnostic_dataset_cannot_publish_real_event_packet_as_human_fact": 142,
+        "test_scope_uses_explicit_nested_project_roots_and_registered_source": 150,
+        "test_nested_project_scope_wins_over_its_outer_data_directory": 173,
+        "installation_contract": 180,
+        "test_installation_inside_event_diagnostic_tree_never_publishes": 193,
+        "test_installation_retraction_survives_replay_and_derived_index_rebuild": 204
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\tests\\test_feedback_runtime.py",
+      "sha256": "ace69abe38e7972701673543f957e09edd2029770897748d7245a834ad6c34de",
+      "bytes": 8091,
+      "relative_path": "tests/test_feedback_runtime.py",
+      "before_sha256": null,
+      "symbols": {
+        "fixture_project": 12,
+        "source": 21,
+        "add_case": 25,
+        "test_complete_native_key_rejects_competing_hash_clock_or_boolean_pts": 35,
+        "test_reader_actually_uses_operator_but_never_changes_old_uv": 42,
+        "test_changed_fact_is_blocked_and_other_event_does_not_apply": 61,
+        "test_partial_lesson_has_no_position_truth_and_rebuilds_index": 71,
+        "test_source_scoped_advisory_recipe_is_consumed_as_check_not_fact": 98,
+        "test_validation_lineage_and_explicit_paths_remain_guarded": 116
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\tests\\test_feedback_withdrawal.py",
+      "sha256": "fb0b7cae2b3cafbf2eb15f438b00def267f0cbf6ced474eba82dc488c157e207",
+      "bytes": 7393,
+      "relative_path": "tests/test_feedback_withdrawal.py",
+      "before_sha256": null,
+      "symbols": {
+        "dump": 14,
+        "feedback": 20,
+        "check": 38,
+        "test_only_exact_association_is_withheld_and_consumption_receipt_is_real": 48,
+        "test_other_frame_video_clock_domain_never_consumes_withdrawal": 61,
+        "test_nearby_uv_and_similar_id_are_never_substituted": 68,
+        "test_new_query_without_original_id_is_explicitly_inapplicable": 73,
+        "test_latest_undo_retraction_allows_previously_withdrawn_association": 83,
+        "test_current_source_image_conflict_is_withheld_for_recheck_not_applied": 92,
+        "test_enforce_retains_input_packet_and_exposes_withheld_receipt": 102,
+        "test_diagnostic_tmp_candidate_never_consults_or_writes_production_feedback": 117
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\tests\\test_frame_point_editor.py",
+      "sha256": "91ee147a66ec1dba63a9acb61011bde7e2f6f0585457215be4be1fbea09edc11",
+      "bytes": 45115,
+      "relative_path": "tests/test_frame_point_editor.py",
+      "before_sha256": null,
+      "symbols": {
+        "test_circle_display_preserves_source_points_and_missing_arc": 28,
+        "test_native_material_trace_display_does_not_add_observations": 51,
+        "real_inputs": 67,
+        "packet_vertices": 79,
+        "corner_point": 83,
+        "ice_point_id": 92,
+        "bind_and_assemble": 97,
+        "test_delete_ice_point_preserves_other_coordinates_and_stable_ids": 103,
+        "test_unbound_material_can_be_reviewed_and_deleted_without_entering_fit": 117,
+        "test_delete_corner_and_adjacent_edge_reindexes_role_and_protected_metadata": 138,
+        "test_manual_points_have_human_provenance_and_exact_typed_targets": 164,
+        "test_duplicate_corner_refused_and_explicit_replacement_allowed": 186,
+        "test_bad_operations_do_not_mutate_source": 209,
+        "test_hard_ceiling_refuses_501_but_allows_500": 217,
+        "store": 228,
+        "test_store_save_rebinds_persists_counts_and_undo_restores_points": 258,
+        "test_save_and_undo_keep_current_model_reference_without_hash_cycle": 278,
+        "test_save_unbound_deletion_updates_manifest_inventory": 296,
+        "test_revision_reuses_source_media_without_overwriting_previous_overlays": 314,
+        "test_accepted_frames_share_review_navigation_but_reject_all_writes": 331,
+        "current_batch_acceptance": 358,
+        "fixture_file_snapshot": 366,
+        "test_current_accepted_batch_starts_read_only_and_serves_frames": 371,
+        "test_current_acceptance_invalid_receipt_refuses_start_without_writes": 402,
+        "test_current_acceptance_appearing_during_run_blocks_edit_and_undo": 422,
+        "test_current_accepted_frame_detects_changes_after_receipt_validation": 445,
+        "test_current_accepted_pending_recovery_does_not_overwrite_accepted_bytes": 459,
+        "test_store_conflict_and_model_change_reject_before_write": 476,
+        "test_legacy_feature_without_target_uses_registered_point_binding": 488,
+        "test_transaction_write_failure_rolls_back_all_authoritative_files": 507,
+        "test_interrupted_transaction_recovery_restores_snapshot": 526,
+        "review_payload": 536,
+        "saved_review_frames": 544,
+        "assert_review_matches_packet": 549,
+        "replace_fixture_packet": 557,
+        "delete_fixture_ice_point": 565,
+        "test_review_cache_second_save_reuses_unchanged_frame": 572,
+        "test_review_cache_external_atomic_replace_with_preserved_size_and_mtime": 599,
+        "test_review_cache_external_replace_after_commit_keeps_actual_packet": 619,
+        "test_review_cache_navigation_appearing_metadata_change_and_deletion": 645,
+        "test_review_cache_late_failure_does_not_reappear_in_next_save": 675,
+        "test_review_cache_continuous_edits_and_undo_survive_other_frame_save": 712,
+        "test_review_cache_restart_recovers_prepared_files_before_building_review": 726,
+        "test_review_cache_serialization_preserves_text_without_executable_markup": 748,
+        "server": 767,
+        "http": 776,
+        "test_http_origin_token_host_protection_and_authorized_save": 786,
+        "test_feedback_delivery_failure_never_rolls_back_saved_observations": 804,
+        "arc": 32,
+        "fail_once": 685,
+        "counted_read": 579,
+        "counted_display": 584,
+        "replace_after_commit": 624,
+        "unavailable": 807
+      }
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\tests\\test_original_ice_pixel_correction.py",
+      "sha256": "2cd57da3f3a5631b3c8f91ae9bd7c2fc34e67affee50aeca7df8740df7c9fe07",
+      "bytes": 36143,
+      "relative_path": "tests/test_original_ice_pixel_correction.py",
+      "before_sha256": null,
+      "symbols": {
+        "fixture": 18,
+        "test_actual_active_row_changes_without_touching_historical_source_or_world": 42,
+        "test_changed_source_bytes_and_original_runtime_pixels_reject_before_mutation": 55,
+        "test_held_points_cannot_be_silently_promoted_or_model_selected_pixels_admitted": 67,
+        "test_later_bad_record_does_not_partially_correct_state": 79,
+        "test_declared_lane_user_pixel_correction_preserves_material_and_without_inventing_support": 88,
+        "test_authenticated_navigation_does_not_authorize_projected_uv": 120,
+        "painted_center_fixture": 134,
+        "test_painted_centre_correction_keeps_geometry_sampling_and_original_paint_history": 158,
+        "test_painted_centre_binding_and_semantics_fail_closed_without_partial_mutation": 184,
+        "test_ring_boundaries_cannot_be_reinterpreted_as_painted_midlines": 199,
+        "test_only_source_confirmed_single_unfilled_circular_stroke_can_use_centre_semantics": 217,
+        "painted_retired_fixture": 242,
+        "test_paint_row_measured_and_retired_union_requires_actual_physical_removal": 269,
+        "test_paint_retirement_coverage_and_source_reference_fail_closed": 304,
+        "test_paint_retirement_changed_manifest_and_different_final_reference_reject": 311,
+        "test_production_must_select_exact_qualification_and_physical_compactor": 324,
+        "test_registered_single_circle_reads_explicit_material_style_fill": 337,
+        "original_course_fixture": 355,
+        "test_certified_top_pixels_preserve_finite_material_operator_sigma_support_and_fixed_q": 389,
+        "test_top_original_semantic_alias_reuses_exact_certified_finite_material": 412,
+        "test_top_alias_does_not_admit_other_facets_or_uncertified_names": 440,
+        "test_top_source_identity_and_blue_upper_semantics_fail_before_any_mutation": 465,
+        "test_top_requires_the_preexisting_same_finite_top_certificate": 475,
+        "test_top_label_cannot_admit_an_ad_edge_or_contact_as_board_top": 491,
+        "test_existing_contact_packet_keeps_its_legacy_fields_and_operator": 505,
+        "test_source_only_single_stroke_role_authority_does_not_relax_material_or_source_identity": 516,
+        "test_feedback_observer_failure_preserves_successfully_installed_source_rows": 556,
+        "unavailable": 559
+      }
+    },
+    {
+      "relative_path": "tests/test_feedback_regression.py",
+      "before_sha256": null,
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\tests\\test_feedback_regression.py",
+      "sha256": "90332e37a5a52a770a82f939a2f6241a298a9f47ac111411d2c2a70ab1177029",
+      "bytes": 5396,
+      "symbols": {
+        "_json": 16,
+        "isolated_ledger": 23,
+        "test_partial_original_subject_coverage_cannot_pass": 65,
+        "test_complete_coverage_also_requires_every_subject_wrong_role": 79,
+        "test_missing_finding_remains_unknown_and_does_not_abort_other_cases": 88,
+        "test_same_video_wrong_native_frame_is_rejected": 103,
+        "store_for_test": 27,
+        "add_case": 35,
+        "check": 58
+      }
+    }
+  ],
+  "connections": [
+    {
+      "entry": "IceProgrammeSourceReader.read",
+      "file": "src/rinkspace/vision_programme_ice_review.py",
+      "status": "runtime_query_effective_midline_inventory_and_actual_read_receipt",
+      "visual_new_frame_validation": "not_done_for_ice_in_this_task"
+    },
+    {
+      "entry": "OriginalFITSourceReader.read / reread_original_fit_source_frame",
+      "file": "src/rinkspace/vision_source_fit.py",
+      "status": "runtime_query_and_operator_conflict_withholding",
+      "visual_new_frame_validation": "not_done_for_this_branch"
+    },
+    {
+      "entry": "BoardMaterialRoleRequalifier.evaluate",
+      "file": "calibration/rinkfit/src/rinkfit_joint/board_source_requalification.py",
+      "status": "real_new_native_frame_consumption_and_material_postcondition_executed",
+      "evidence": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\release_consume_verified\\receipt.json",
+        "sha256": "e7f37ba9d7c280f4b7d7c9fa62b466e6eee706d963185c1b4ef2cf851e7f1898",
+        "bytes": 4445
+      }
+    },
+    {
+      "entry": "PointEditorStore.commit / refresh_current_acceptance",
+      "file": "calibration/program_tracking/frame_point_editor.py",
+      "status": "committed_edit_outbox_acceptance_undo_retry_and_durable_versions"
+    },
+    {
+      "entry": "make_binding / assemble",
+      "file": "src/rinkspace/feedback_withdrawal.py",
+      "status": "registered_candidate_exact_native_point_ID_target_UV_withdrawal_gate",
+      "diagnostic_candidate_policy": "no_production_query_or_use"
+    },
+    {
+      "entry": "install_original_ice_pixel_correction",
+      "file": "calibration/solver_runtime/legacy/structured_programme_source_candidate/original_ice_pixel_correction.py",
+      "status": "post_install_observer_tests_only_this_task",
+      "new_production_points_installed": false
+    },
+    {
+      "entry": "consume_generation / CheckpointObserver",
+      "file": "calibration/rinkfit/src/rinkfit_joint/feedback_checkpoint.py",
+      "status": "real_v98_diagnostic_replay_and_repeat_verified",
+      "automatic_image_scope_scan": false,
+      "automatic_current_native_review_dispatch": false,
+      "current_pixel_review_entry": "scripts/review_source_feedback.py --run ... --pts ... --predecessor-finding ..."
+    },
+    {
+      "entry": "joint9 feedback-run / joint_solver.execute_explicit",
+      "file": "calibration/rinkfit/src/rinkfit_joint/feedback_launch.py",
+      "status": "project_launch_hook_and_guard_verified_no_new_native_fit_started"
+    },
+    {
+      "entry": "verify_feedback_regressions / verify_manual_regressions",
+      "file": "src/rinkspace/feedback_regression.py",
+      "status": "executed_current_case_and_source_evidence_regression",
+      "evidence": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\regression_final_verified.json",
+        "sha256": "2100cd0a1a18ab47d3e6618916f23ada946f7d4ca11bc90916227d64374fe85f",
+        "bytes": 43471
+      }
+    }
+  ],
+  "real_cross_run_chain": {
+    "old_finding_id": "finding_da4bea9c0db42922cf701ac2",
+    "source_row_id": "board_instance_native/s02/621312/contact/35",
+    "old_source": {
+      "coordinate_domain": "native_pixels",
+      "native_hw": [
+        1080,
+        1920
+      ],
+      "pts": 621312,
+      "time_base": "1/12800",
+      "video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+    },
+    "old_source_seconds": 48.54,
+    "source_review": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\delivery_review\\receipt.json",
+      "sha256": "63a0fc44afdc396b7691771b9c2642d6c9a4ecb5e4ec7b722bce29817048d7ca",
+      "bytes": 123841
+    },
+    "original_image": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\real_run_a\\native.png",
+      "sha256": "9328acc4870686f5c2b3c8e702de6bf16761f6e81be19a8adae0ab436b790484",
+      "bytes": 676903
+    },
+    "original_UV": [
+      1599.9045061120808,
+      505.4906992644309
+    ],
+    "conclusion": "Actual mean is in board print/body above the bottom strip, so it cannot be admitted as ice contact; no replacement UV confirmed.",
+    "old_finding_resolution": {
+      "checks": {
+        "measurement_operator": {
+          "evidence_refs": [
+            "9328acc4870686f5c2b3c8e702de6bf16761f6e81be19a8adae0ab436b790484"
+          ],
+          "reasons": [
+            "unchanged_mean_inside_board_body_or_print_above_observed_yellow_strip"
+          ],
+          "status": "verified",
+          "value": "ordered_board_material_flanks"
+        },
+        "physical_instance": {
+          "status": "unknown"
+        },
+        "position": {
+          "status": "unknown"
+        },
+        "semantic_class": {
+          "reason": "A wrong boundary role does not by itself establish pixel material class",
+          "status": "unknown"
+        },
+        "visibility": {
+          "status": "unknown"
+        }
+      },
+      "evidence_assurance": "source identity and declarations checked; pixel interpretation is not verified by this ledger",
+      "evidence_refs": [
+        {
+          "current_frame": true,
+          "independent_of_model": true,
+          "kind": "native_pixels",
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\delivery_review\\native.png",
+          "sha256": "9328acc4870686f5c2b3c8e702de6bf16761f6e81be19a8adae0ab436b790484",
+          "source": {
+            "coordinate_domain": "native_pixels",
+            "native_hw": [
+              1080,
+              1920
+            ],
+            "pts": 621312,
+            "time_base": "1/12800",
+            "video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+          }
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\delivery_review\\review.json",
+          "sha256": "6ceae7c0608c28dbab46e3b2b1c1ec352b7a9b8c47b034ef7cc9a58142d34659"
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\delivery_review\\profiles\\621312_material_profiles.npz",
+          "role": "one_actual_RGB_material_profile_evidence_per_exposure",
+          "sha256": "c29c0628bc27c7981b3c0d455da5144b732563304f48f7520699a24c295113dd"
+        }
+      ],
+      "finding_id": "finding_da4bea9c0db42922cf701ac2",
+      "fit_mutated": false,
+      "learning_lesson": {
+        "original_49Q_operator_requalification_still_required": true,
+        "reader_check": "ordered_board_material_flanks",
+        "summary": "Compare current board material flanks; keep wrong-role means outside fit until the original operator is requalified"
+      },
+      "observation_transaction": null,
+      "recheck_blockers": [
+        "semantic_class needs a distinct verified check linked to this resolution's current native evidence",
+        "physical_instance needs a distinct verified check linked to this resolution's current native evidence",
+        "visibility needs a distinct verified check linked to this resolution's current native evidence",
+        "position needs a distinct verified check linked to this resolution's current native evidence"
+      ],
+      "request_recheck": true,
+      "resolution_id": "resolution_d6ade2354dec419e4018580c",
+      "resolution_type": "operator_error",
+      "source": {
+        "coordinate_domain": "native_pixels",
+        "native_hw": [
+          1080,
+          1920
+        ],
+        "pts": 621312,
+        "time_base": "1/12800",
+        "video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+      },
+      "source_evidence_present": true,
+      "source_evidence_supported": false,
+      "status": "unknown",
+      "unresolved_dimensions": [
+        "semantic_class",
+        "physical_instance",
+        "visibility",
+        "position"
+      ],
+      "verified_dimensions": [
+        "measurement_operator"
+      ]
+    },
+    "learned_case": {
+      "case_id": "lesson_de7e437cf2a80074af5ba880",
+      "version": 1,
+      "content_sha256": "354925186037e4b478f5d6b43626d8b16922061d5f0b43174a96cc23a5c1b08e"
+    },
+    "first_corrected_learning": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\real_run_a_corrected\\receipt.json",
+      "sha256": "efb3b9e8fd19db32ba9672da58d31e641ad9e0560b76ca685bf183b23b2ce40e",
+      "bytes": 114933
+    },
+    "current_source": {
+      "coordinate_domain": "native_pixels",
+      "native_hw": [
+        1080,
+        1920
+      ],
+      "pts": 624128,
+      "time_base": "1/12800",
+      "video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+    },
+    "current_source_seconds": 48.76,
+    "current_image": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\release_consume_verified\\native.png",
+      "sha256": "7395997d72841c726850c59fa111ff2d4cd38a9490d3f62326d7a476d9918666",
+      "bytes": 668648
+    },
+    "actual_independent_process_use": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\release_consume_verified\\receipt.json",
+      "sha256": "e7f37ba9d7c280f4b7d7c9fa62b466e6eee706d963185c1b4ef2cf851e7f1898",
+      "bytes": 4445
+    },
+    "use_ids": [
+      "use_3b9be2f1092925bb9a5710f5",
+      "use_afd5decda8a0937dc0c64203"
+    ],
+    "actual_executed_postcondition": {
+      "case_ids": [
+        "lesson_de7e437cf2a80074af5ba880"
+      ],
+      "executed": true,
+      "counts": {
+        "current_material_order_supported": 61,
+        "unknown_current_material_support": 14
+      },
+      "current_frame_evidence_rechecked": true,
+      "can_only_withhold": true
+    },
+    "current_role_counts": {
+      "pass": 61,
+      "wrong_role": 0,
+      "unresolved": 14
+    },
+    "model_or_observation_installed": false,
+    "new_frame_accuracy_improvement_verified": false,
+    "final_reader_recipe_sha256": "d1289b542abde8b56966cba7a89cf8a6725b9e86739ee037ea69e370f1520fb2",
+    "actual_reader_receipt": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\reads\\release_consume_verified\\624128_evaluate.json",
+      "sha256": "ab363f5725dd4907156d9d9c7e86a9c043b2030470f3bc509d87dcc83442a1d8",
+      "bytes": 13067
+    },
+    "same_reviewed_image_bytes_as_previous_release": true
+  },
+  "persistent_case_root": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\feedback",
+  "runtime_database": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\feedback.sqlite",
+  "active_cases": [
+    {
+      "case_id": "ankara.Ad7.confirmed_text_layout.20261016",
+      "version": 1
+    },
+    {
+      "case_id": "ankara.F3.outer.identity_weak_scope.20261006",
+      "version": 1
+    },
+    {
+      "case_id": "ankara.advertisements.template_vs_installation.20261005",
+      "version": 1
+    },
+    {
+      "case_id": "ankara.board_bottom_strip.material_role.20261006",
+      "version": 1
+    },
+    {
+      "case_id": "ankara.circular_lines.paint_center.20261018",
+      "version": 1
+    },
+    {
+      "case_id": "human_edit:5528507735a94a29903ffcb5bf7a3b06",
+      "version": 1
+    },
+    {
+      "case_id": "human_edit:840dd61f1b6440d99c3c31b1550cec86",
+      "version": 1
+    },
+    {
+      "case_id": "human_edit:8936a1177f0a42a7909664fec4ea4981",
+      "version": 1
+    },
+    {
+      "case_id": "lesson_ad2bde7df0bf5342541b1f28",
+      "version": 1
+    },
+    {
+      "case_id": "lesson_de7e437cf2a80074af5ba880",
+      "version": 1
+    }
+  ],
+  "source_registration": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\primary_source_selection.json",
+    "sha256": "a6398453a20cb9e55a85237517bf65217c3148183e495aeb1ca4899beaf5e5c5",
+    "bytes": 6093
+  },
+  "current_role_facts": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\model_constraints\\paint_roles_1018.json",
+    "sha256": "f4783bc67e2229167c373f0ac62f4abbadbdd284e855ed27e4630a3eca23cb2d",
+    "bytes": 2032
+  },
+  "formal_neural_weights": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\models\\rink_vision.pt",
+    "sha256": "26e792f2381a9bd66c484b8cfa38b13993f5c6cf11b52ef84ee22da65041f208",
+    "bytes": 113742905
+  },
+  "formal_neural_weights_loaded_in_real_reviews": false,
+  "training_started": false,
+  "preserved_full_fit": {
+    "checkpoint": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint9_1018a\\fit_full_source_v98\\resume_checkpoint.json",
+      "sha256": "7d16f98b4c53b918cf3ddbb45de95e6e7658d12b48d39ac403bb956b89215519",
+      "bytes": 74847477
+    },
+    "resume": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_joint9\\resume.json",
+      "sha256": "27946ee785e3f26c78dd6855452e4aed078b7b18ae511ae2b4b6d6bf371620ed",
+      "bytes": 10802
+    },
+    "status": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_joint9\\status.json",
+      "sha256": "a0da0c3784dda95d3d324033ffabb3245474c0072d330ecbe0c9b7297caa7e12",
+      "bytes": 49085
+    },
+    "fit_resumed": false
+  },
+  "tests": {
+    "base": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\targeted_tests_final_verified.json",
+      "sha256": "d28f8143e95ad11b646fae03b2df9406f66b88f419cc8b7fa3d07aee7b9d7228",
+      "bytes": 1449
+    },
+    "installer": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\installer_tests_final_verified.json",
+      "sha256": "f1ad5cd86daa083e873af86de39fd24693278a525dfb6888af6f1c1bae293bfb",
+      "bytes": 562
+    },
+    "base_passed": 132,
+    "installer_passed": 61,
+    "http_deselected": 2,
+    "package_contracts": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\package_contracts_verified.json",
+      "sha256": "6caf581dd588f122fbbf1d2fc6c48a69deb5608917bf87e1313a947161aa11f5",
+      "bytes": 6461
+    },
+    "regression": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\regression_tests_final_verified.json",
+      "sha256": "d5dad527f8bdc44db1d865626557dc20804e1d791be06857dedad596b68c4dec",
+      "bytes": 462
+    },
+    "regression_passed": 5,
+    "engineering_passed_total_separate_processes": 198
+  },
+  "checkpoint_replay": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\checkpoints_current.json",
+    "sha256": "490ff2bb2ba9b086ee22080ce4a98e8bedbdc825de3d38bd5fad3e44a0dc53a0",
+    "bytes": 4018555
+  },
+  "checkpoint_repeat": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\checkpoint_repeat_release.json",
+    "sha256": "aa95e4b8abf4d673a21d6380aca4d2f0ba0666d0f895c8b6ee15ba3144c9a6c9",
+    "bytes": 455
+  },
+  "regression": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\regression_final_verified.json",
+    "sha256": "2100cd0a1a18ab47d3e6618916f23ada946f7d4ca11bc90916227d64374fe85f",
+    "bytes": 43471
+  },
+  "candidate_launcher": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\candidate_launch.json",
+    "sha256": "abbeda8078c5fcbc4a495e7e673a53c8f63b6f29e20a5cf46cc72560bc90d99f",
+    "bytes": 3604
+  },
+  "launcher_validation": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\launch_validation.json",
+    "sha256": "3171fb770e6a1f9b10a91fc74b38a4949989ff86ad256f21f8bfcb1485395cec",
+    "bytes": 1141
+  },
+  "visual_review": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\assistant_release_image_review.json",
+    "sha256": "60abd0dc5787320c4f57eae44aa0da94d6bf2c2e6a982a024f7bcb53346c6fa9",
+    "bytes": 1733
+  },
+  "test_fixture_isolation": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\test_fixture_isolation_final_1019b.json",
+    "sha256": "43a595cbd48786111c06bd28eeb84eee23332d4064aa09ba7239a2845f381007",
+    "bytes": 1985650
+  },
+  "validation_level": {
+    "E0": "package_and_runtime_contracts",
+    "E1": "actual_current_native_frame_consumption_and_scoped_judgment_linkage",
+    "new_visual_accuracy_gain": false,
+    "E2": false,
+    "E3": false
+  },
+  "rollback_policy": "Keep original immutable source/observation/checkpoint and all durable retractions. Roll code back only to a version compatible with the latest measurement facts; the historical direct launcher is not a way around the recalled source guard. No automatic rollback or model switch was performed.",
+  "limitations": [
+    "No new-frame visual accuracy improvement, whole-shot error reduction, cross-programme/event generalization or training improvement established.",
+    "The two frames have different candidate inventories. Original wrong_role 2 versus later wrong_role 0 is not an error-reduction comparison; later 14/75 candidates remain unresolved.",
+    "A material role pass does not requalify the frozen original 49 sampled operator, Query or W, and does not install a fit observation. All source qualification recalls remain in force.",
+    "The current full nine-shot fit is paused_by_user; observer was replayed on a saved genuine generation, not exercised during a newly launched optimizer.",
+    "Historical direct Data Popen drivers remain unchanged and bypass the new observer; future authorized fitting must use the prepared project feedback-run launcher after source qualification is repaired.",
+    "The older BoardProgrammeSourceReader, generic vision_review/neural classifier and temporal identity/template consumers are not all wired to this feedback runtime. Current production material requalification, ice and FIT-source hooks are explicitly listed above; retrieved-only cases are not counted as used.",
+    "Cache query IDs are not original point IDs; exact manual withdrawal is intentionally inapplicable there. No cross-frame UV withdrawal or background-negative label is inferred.",
+    "No source-correct/model-mismatch visual success branch, full coverage or manual-workload improvement was demonstrated in this task.",
+    "Two HTTP loopback tests could not run in the sandbox. Package contracts and synthetic guard tests are engineering evidence only.",
+    "Development mistakes remain auditable: one overbroad semantic lesson was retracted by version, 102 scripted editor cases and 26 scripted installation cases remain terminally retracted, and 4897 diagnostic withdrawal uses are explicitly excluded from production metrics. Final fresh-process active cases=10; active scripted cases=0.",
+    "Checkpoint hooks automatically discover/group/retrieve and schedule pending native review tasks, but automatic dispatch of all checkpoint tasks to original image readers is not yet connected. One genuine task was explicitly rechecked with the linked native reader; unreviewed tasks remain unknown.",
+    "Rebuilding SQLite restores durable cases and terminal retractions, but does not reconstruct all original finding/use history. Regression now reports unknown_missing_finding and continues; it never invents that history."
+  ],
+  "status": "delivered_engineering_consumption_E1_visual_accuracy_not_established",
+  "audit_date": "2026-10-19",
+  "active_case_audit": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\active_cases_final_verified.json",
+    "sha256": "09057f997beb2a07a3173709caa4d9ce5bb899a684d11702b0895d57c3c86fba",
+    "bytes": 1268
+  },
+  "regression_execution": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\regression_final_execution.json",
+    "sha256": "985adf3233d6eb8fc19a731b8f767c78868b58da315fb12c70333d49f53f667f",
+    "bytes": 639
+  },
+  "installer_fixture_isolation": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\installer_fixture_isolation_final_1019.json",
+    "sha256": "5db5c41bc624d69dbb87f78a4c8a6a1b4f1141349d2959cb9696669051408016",
+    "bytes": 19198
+  },
+  "source_read_execution": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\release_consume_execution.json",
+    "sha256": "76484c5a12527e651774140275e8453ab95572bd833966a0efd2db28ff875caf",
+    "bytes": 898
+  },
+  "entry_page": "D:\\OneDrive\\codex_projs\\RinkSpace\\START_HERE.html",
+  "report_page": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\feedback\\index.html",
+  "final_path_scan": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\onedrive_paths_final_verified.json",
+    "sha256": "9af38eb97aa31a789199b0573ac176f97375d634f9901cb76f48a77a7dcebd5c",
+    "bytes": 160
+  },
+  "delivery_static_verification": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\delivery_static_verification.json",
+    "sha256": "65c0a94cbc997c6b2f914694542fe19bd598fcab8f3b885bf81bb8b56e57441f",
+    "bytes": 404
+  },
+  "delivery_artifacts": [
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\START_HERE.html",
+      "sha256": "01c5633e9dc5230089037ddbc204b0d7d4e902a2b4e746ef23550774f7d14b81",
+      "bytes": 549028
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\feedback\\index.html",
+      "sha256": "828d2a746c67602ebdbf3449d7520fde7f08625c0a9bdc1b82f1e40d37bf020b",
+      "bytes": 25139
+    }
+  ]
+}

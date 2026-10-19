@@ -1,0 +1,160 @@
+{
+  "schema": "rinkfit.selected_source_operator_compute_policy.v1",
+  "mode": "GPU_full_UV_with_CPU_primal_RS_profile_W_selected_source_target",
+  "preparer_driver": {
+    "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/gpu/driver_source.py",
+    "sha256": "d300c2fe379bf75be2c7ff716a44dbe2969237aa9c7d83a3f8e02525daa3530e"
+  },
+  "source_input_overrides": {
+    "helpers": {
+      "qbar": {
+        "executable": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\source_scope_build_v2\\qbar\\qbar_sparse.exe",
+          "sha256": "64b74f6499eca41160fd05f387d95ef341490972cc18ff154fd38672b609473e"
+        },
+        "recipe": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\source_scope_build_v2\\qbar\\recipe.json",
+          "sha256": "46371d2916bb62bc5e821aa230d1573c47e3a80c5a1a89852877af78debcbb65"
+        }
+      },
+      "values": {
+        "executable": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\source_scope_build_v2\\values\\reduced_state_values.exe",
+          "sha256": "3c29d627e82a98d1ba9b7f193dc9baae3b7fd244861ca992d0eac96594b71980"
+        },
+        "recipe": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\source_scope_build_v2\\values\\recipe.json",
+          "sha256": "f015a57fb85e1ea1e8cb9e591d69210f220272c4b320faa5335e62358651e1a8"
+        }
+      }
+    },
+    "whole_W_secondary": {
+      "executable": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\source_scope_build_v2\\whole_cpu\\whole_W_transport.exe",
+        "sha256": "bcb4957c7aed9f45288e9f4cf94c314f262f11748b0df629e1df864124a7bd8d"
+      },
+      "recipe": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\source_scope_build_v2\\whole_cpu\\recipe.json",
+        "sha256": "3fdc8d645f7ab2b92553a0fd91df2d6825e39cff9281813af6a34c15557b1ff5"
+      },
+      "source_files": [
+        {
+          "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\source_scope_build_v2\\whole_cpu\\whole.cpp",
+          "sha256": "1c6f319e4d5db2258b7410a0269a2e4577d25b1bee2be7e8c3eec72a465f356f"
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\source_scope_build_v2\\whole_cpu\\transport_qbar_base.cpp",
+          "sha256": "89360ef4b7f82cdf3f97c076e5acdf61a7530c0b77ec82312d4b418d21ed2ef4"
+        }
+      ],
+      "derivative_QA": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\model_checks\\whole_W_i6_FD\\report.json",
+        "sha256": "dfc26e54a33df1a8fb2732dd3bdca4aa7758d232f93b1d27801f34d0a5c39d01"
+      },
+      "scripts": {
+        "secondary_whole_W_qp.py": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\model_checks\\secondary_W_QP_fixed_epigraph.py",
+          "sha256": "e37772e43c5a0b3e5f54591aa2b05febba070960164e3164294f416d2f851eaa"
+        },
+        "repair_whole_W_qp.py": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\model_checks\\repair_whole_W_qp_rowscaled.py",
+          "sha256": "a3dc731237743e6ef3753967461f8b0bb502d7ea1b91747d415432ec15e691a3"
+        },
+        "whole_W_qp_core.py": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\model_checks\\whole_W_qp_core_visibility.py",
+          "sha256": "7f64e774056f46e7228ef017b349a195b110719e98bc3076371cb002dd3a66bd"
+        }
+      }
+    },
+    "profile_domains": {
+      "executable": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\source_scope_build_v2\\profile_cpu\\profile_implicit_transport.exe",
+        "sha256": "98335214314e0488920663306c4558f5ce6113d47916833135f707c807b24189"
+      },
+      "recipe": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\source_scope_build_v2\\profile_cpu\\recipe.json",
+        "sha256": "0b270cd05cb30e33bc8406d4ab75bd7bada19475bb4a6252e43561dbabe60361"
+      },
+      "source_files": [
+        {
+          "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\source_scope_build_v2\\profile_cpu\\profile.cpp",
+          "sha256": "191154e52a6fc9a40cb2e01b71d33d54fc87ceb46d3fa12b8fb66547820131ea"
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\source_scope_build_v2\\profile_cpu\\transport_qbar_base.cpp",
+          "sha256": "89360ef4b7f82cdf3f97c076e5acdf61a7530c0b77ec82312d4b418d21ed2ef4"
+        }
+      ],
+      "derivative_QA": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\joint_UV_SOCP_i8\\profile_implicit_FD_h1e6.json",
+        "sha256": "7fad0452bc33a4534ee08a0cdd7897f8a14bd90c31d686f1ebb1ab7c88dfa7b8"
+      }
+    },
+    "resident_transport": {
+      "recipe": {
+        "path": "D:/CodexData/RinkSpace_Data/runs/okada_s1_r11/audit_1018/source_scope_build_v2/resident/recipe.json",
+        "sha256": "0ea9d770855570ee15450ae9827036927384aba2fe87e1ec6e4e18ec91b62142"
+      },
+      "client": {
+        "path": "D:/OneDrive/codex_projs/RinkSpace/calibration/rinkfit/src/rinkfit_start/resident_scope.py",
+        "sha256": "4f81b49f1775e2ba827a37e48c44014cfe07bfb930702cc32fd91ddf62c7b089"
+      },
+      "QA": [
+        {
+          "path": "D:/CodexData/RinkSpace_Data/runs/okada_s1_r11/audit_1018/source_scope_gpu_QA/report.json",
+          "sha256": "a616d699c715d7c401c7b3a33dee1c0fb300203dd0119a5363844399971a8b55"
+        }
+      ]
+    },
+    "materializer_script": {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/calibration/rinkfit/src/rinkfit_start/materialize_refined_seed.py",
+      "sha256": "313f2b0a93961585178f3140ecd3e2f7a1cee65544950be64703e114dcdf978a"
+    },
+    "prepare_input_script": {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/calibration/rinkfit/src/rinkfit_start/prepare_qbar_input.py",
+      "sha256": "4d34004625768dbb970a828c30c3974e80e81f75e0127d937046f68f24f7a87d"
+    },
+    "ad_runner": {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/calibration/rinkfit/tools/reduced/run_source_target_ad.py",
+      "sha256": "b1ffad685b23e66216da6fcbb0de3ce95f0c8e8189515d40ac81e8427d99648c"
+    },
+    "operator_scope": "new selected-source target initialization; prepare operators only; old optimization history and multipliers are not imported"
+  },
+  "new_target_initialization": true,
+  "old_compute_policy_unchanged": {
+    "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/gpu/compute.json",
+    "sha256": "6347a2fb109a353cc5ba573b0f8c0424a01c54343d629ddcd84363f739b9ec2a"
+  },
+  "new_reader": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/okada_s1_r11/audit_1018/cpp_scope/event_packet.hpp",
+    "sha256": "9e31f3b3d5842979ade35f52e9cc0ba8a064d58f842bc44609c718b91b6f3bb5"
+  },
+  "build": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/okada_s1_r11/audit_1018/source_scope_build_v2/operators.json",
+    "sha256": "65a2ca67afcefd9d2351595ca6e3aa07998aab028f3e95c276e93dd45e82da13"
+  },
+  "fixed_state_GPU_equivalence": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/okada_s1_r11/audit_1018/source_scope_gpu_QA/report.json",
+    "sha256": "a616d699c715d7c401c7b3a33dee1c0fb300203dd0119a5363844399971a8b55"
+  },
+  "selected_target_scope": {
+    "raw_rows": 182017,
+    "active_rows": 182015,
+    "profiles": 961,
+    "entity_rows": 1692,
+    "ordinary_rows": 179362,
+    "W_rank": 214111,
+    "frames": 1248,
+    "source_identity": "81d615f651e5019802ec7de0198315d68e7cde9586ee9d478a3829166a4f0794",
+    "packet_sha256": "bcd88ca88891c72a83d160912cd8921bba20ff40ce6a1cf75011be6522a04ef2",
+    "semantic_sha256": "161a80dc27681cafd2c2da04138328c1e2d8fe53f3ea462226335bcd055b2a5c",
+    "query_sha256": "9d360e545b0a3b3943f679f415b62d7e2856bd0d11df1d261d26bb5ffabe4c97",
+    "active_mask_sha256": "392284e98db5360821b944b4a05e1658efacbb2742ed07911c3b9d16b65f5a11",
+    "active_statistics_sha256": "8cb6212299cb3d6a13b5f46e101bce1b173e65a01b4473fb229e7b81b29ee875",
+    "excluded_rows": [
+      25537,
+      34524
+    ]
+  },
+  "current_preparation_only_no_physical_master_or_SLP_step": true
+}

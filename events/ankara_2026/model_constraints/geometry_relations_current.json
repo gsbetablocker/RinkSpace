@@ -1,0 +1,140 @@
+{
+  "schema": "rinkspace.user-geometry-relations.current.v1",
+  "authority": {
+    "thread_id": "private-thread-00013",
+    "thread_title": "必须提速求解器",
+    "hockey_end_geometry_user_message": "private-thread-00017",
+    "hockey_centre_blue_geometry_user_message": "private-thread-00018",
+    "curling_geometry_user_message": "private-thread-00019",
+    "board_grid_user_message": "private-thread-00020",
+    "equal_ad_size_user_message": "private-thread-00021",
+    "remove_unseen_curling_user_message": "private-thread-00022",
+    "latest_in_this_thread": "四条Lane中线沿纵向穿过F1–R1至F4–R4圆心，并保留用户图中右侧延伸与端点；不能只连两个圆心。用真实节目连续画面中的新线和圈观测帮助修复贴合。用一个统一米制系数最接近60×30，不独立拉伸两轴。",
+    "lane_centreline_image": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/user_contours_20261004/user_lane_centrelines_original_20261005.png",
+    "lane_centreline_image_sha256": "910f6862f1256a8171a712b6770e18632b0545536eb341cb2f28c24dd566d487",
+    "lane_image_role": "用户几何形状及标记身份说明；计划图像素不是节目源UV观测。",
+    "curling_layout_original_user_messages": [
+      {
+        "thread_id": "private-thread-00023",
+        "thread_title": "冰面建模优先",
+        "message_id": "private-message-00003",
+        "verbatim_user_text": "[private conversation text omitted]",
+        "scope": "原F0至F3及R1至R4标签；两列各自共纵向坐标，不要求两端关于中场对称。"
+      },
+      {
+        "thread_id": "private-thread-00023",
+        "thread_title": "冰面建模优先",
+        "message_id": "private-message-00004",
+        "question": "两端这 8 个靶环的外径是否也全部相同？这会决定模型用一个共同半径，还是每端各用一个半径。",
+        "verbatim_user_answer": "[private conversation text omitted]"
+      },
+      {
+        "thread_id": "private-thread-00023",
+        "thread_title": "冰面建模优先",
+        "message_id": "private-message-00005",
+        "verbatim_user_text": "[private conversation text omitted]",
+        "supersedes": "confirmed_ring_layout.json 早期尚未确认等间距及两列配对横向坐标；后续 confirmed_layout_v2.json 已记录确认。",
+        "technical_fact_summary": "C0圆心位于整个冰场的几何中心；C为中线，B1/B2关于C对称；相邻圈等距，F/R配对连线平行于冰场长边。"
+      },
+      {
+        "thread_id": "private-thread-00027",
+        "thread_title": "广角镜头单独拟合",
+        "message_id": "private-message-00006",
+        "verbatim_user_text": "[private conversation text omitted]",
+        "technical_fact_summary": "四条Lane均左侧开口且只有三条实体边；同一Lane的F/R圆心位于上下两条长边之间的宽度中线上。"
+      },
+      {
+        "thread_id": "private-thread-00029",
+        "thread_title": "继续广角单独拟合0923",
+        "message_id": "private-message-00007",
+        "sequence": 1,
+        "verbatim_user_text": "[private conversation text omitted]"
+      },
+      {
+        "thread_id": "private-thread-00029",
+        "thread_title": "继续广角单独拟合0923",
+        "message_id": "private-message-00008",
+        "sequence": 2,
+        "verbatim_user_text": "[private conversation text omitted]",
+        "supersedes": "仅取消上一条的等长关系；等宽及右边线共线继续有效。"
+      },
+      {
+        "thread_id": "private-thread-00032",
+        "thread_title": "修正广角镜头联合拟合",
+        "message_id": "private-message-00009",
+        "verbatim_user_request": "[private conversation text omitted]",
+        "scope": "后续再次明确保留等宽及右边线共线；不是恢复等长。"
+      }
+    ],
+    "curling_layout_original_messages_verified_via_read_thread": true
+  },
+  "hockey_structure": {
+    "circles": "C0、A1、A2及对应另一端两个争球圈共用半径；圈与线同属共同冰球坐标架。",
+    "carriers": "中线、两条蓝线和两条球门线彼此平行；C0圆心在中线上，两蓝线关于中场对称。",
+    "faceoff_pairs": "同端两个争球圈有共同的球门线向内距离及横向对称间隔，不各自漂移。",
+    "crease": "保留真实场馆蓝区的已建模轮廓，不能用现行直边模板替换所见半圆。",
+    "trapezoids": "四条边使用同一对球门端/围挡端外缘跨度；每条连接实际球门端与实际围挡。"
+  },
+  "hockey_engineering_references_m": {
+    "common_radius": 4.5,
+    "faceoff_inward_from_goal": 6.0,
+    "faceoff_half_transverse_separation": 7.0,
+    "blue_pair_separation": 15.0,
+    "goal_to_actual_end": 4.0,
+    "trapezoid_goal_outer_span": 6.8,
+    "trapezoid_board_outer_span": 8.6,
+    "policy": "标准尺寸作工程参考，允许现场施工与尺度估计误差；中线/蓝线不可混用旧三等分规则。"
+  },
+  "curling_structure": {
+    "sheets": "四条赛道整体定义；同一行F/R两端圆心、方向和圆环关系共同估计。",
+    "houses": "八个营垒共用外圈半径和同心圆半径比；不能只拟合外圈并声称内圈正确。",
+    "connections": [
+      "F1–R1",
+      "F2–R2",
+      "F3–R3",
+      "F4–R4"
+    ],
+    "centreline_extent": "纵向穿过F/R圆心，保留已说明的右侧延伸和端点；右端不得自动等同于Lane矩形右端或仅停在R圆心。具体几何长度用可见源证据估计。",
+    "right_extent_initialization": {
+      "fraction_of_FR_separation": 0.11428571428571428,
+      "role": "用户图相对形状的近似初值；不是节目源像素观测、拟合先验或标准尺寸。",
+      "video_terminal_endpoint_identified": false,
+      "physical_transverse_cap_added": false
+    },
+    "lanes": "保留真实已观测的三条矩形边；未测第四边和赛道端点不补造。",
+    "pitch": "用户已确认相邻靶圈等间距，保留一个共同可估间距参数；数值由现场源证据估计，不能固定为4.75米赛道宽。",
+    "confirmed_layout_ties": {
+      "F_and_R_columns": "两端各自四个圆心共列，列平行短边；对应F/R圆心连线平行长边。共同F/R跨度由这两项关系推出，跨度数值仍可估，不要求两端相对中场镜像。",
+      "equal_row_spacing": "四行共用可估pitch；confirmed_layout_v2及原人类消息明确确认等间距，不能只读更早not_asserted而解除。",
+      "equal_Lane_width": "用户硬结构关系：四Lane共用一个可估宽度；没有确认固定米制宽度。",
+      "collinear_Lane_painted_right_edges": "用户硬结构关系：四条已观测矩形右边线在平行短边的一条直线上；共用可估纵向station，不固定历史6米。它们与靶圈连接中线的右端各自独立。",
+      "left_open_and_no_equal_length": "用户后来明确撤销等长，保留左侧开口。左端顶点只能作为有限绘制或源支持覆盖，不是已测实际端点、第四条物理边或等长约束。"
+    },
+    "unseen_marks": "未观测的hog/back/hack及标准端线不进入现场冰面标记库存。"
+  },
+  "curling_engineering_references_m": {
+    "tee_centre_separation": 34.75,
+    "outer_radius": 1.829,
+    "middle_radius": 1.219,
+    "inner_radius": 0.61,
+    "button_minimum_radius": 0.152,
+    "hog_inner_from_tee": 6.401,
+    "sheet_max_width": 4.75,
+    "policy": "这些标准不证明现场画有对应标线；按钮尺寸是下限。"
+  },
+  "board_and_advertisements": {
+    "board": "冰面水平、围挡竖直；每对顶部/底部共用世界XY。审阅必须画完整围挡横竖网格。",
+    "advertisements": "相同品牌两面的宽高共同估计；位置和离冰高度可各自估计，实际已建模边界与编号持续显示。",
+    "renderer": "每帧和俯视图画同一实际求解模型；不按置信度或误差隐藏线。"
+  },
+  "programme_and_scale": {
+    "last_complete_baseline": "9a8c1ac9d049",
+    "baseline_scope": "继承完整相机、已拟合几何和已有18行工程参考；不是仅继承相机。",
+    "actual_exposures": 8503,
+    "native_presentations": 10123,
+    "continuity": "共同场景跨帧不变，相机与骨盆根轨迹使用连续源观测及已修正曝光时钟。",
+    "metric": "几何求解后使用一个统一系数使长宽整体最接近60×30米，不按轴拉伸。",
+    "body_scope": "只看骨盆中心P的世界垂直投影G，不冒充冰刀接触。"
+  },
+  "status": "USER_REQUIREMENT_RECORD_NOT_FIT_OR_ACCURACY_ACCEPTANCE"
+}

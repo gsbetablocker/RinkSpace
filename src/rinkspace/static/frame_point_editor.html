@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>逐帧取点编辑</title>
+  <link rel="stylesheet" href="/static/frame_point_editor.css">
+  <script src="/static/frame_point_editor.js" defer></script>
+</head>
+<body>
+  <header>
+    <div class="heading"><h1 id="pageTitle">逐帧取点编辑</h1><span id="frameMeta">正在读取…</span></div>
+    <div class="toolbar">
+      <button id="previousFrame" title="上一帧（←）">← 上一帧</button>
+      <label>第 <input id="frameNumber" type="number" min="101" max="200" step="1" aria-label="帧号"> 帧</label>
+      <button id="jumpFrame">跳转</button>
+      <button id="nextFrame" title="下一帧（→）">下一帧 →</button>
+      <span class="separator"></span>
+      <button id="undoDraft" title="撤销本帧尚未保存的操作（Ctrl+Z）">撤销</button>
+      <button id="redoDraft" title="重做（Ctrl+Y）">重做</button>
+      <button id="saveFrame" class="primary" title="保存本帧（Ctrl+S）">保存本帧</button>
+      <button id="saveAll">保存全部待改帧 <span id="draftCount"></span></button>
+    </div>
+    <div id="status" role="status" aria-live="polite">正在连接本地数据集…</div>
+  </header>
+  <main>
+    <section class="viewer" aria-label="画面与取点">
+      <div class="viewbar">
+        <div class="modeGroup" aria-label="编辑模式">
+          <button id="modeBox" data-mode="box" class="active" title="拖出矩形，松手删除其中的点（B）">框选删除</button>
+          <button id="modeDelete" data-mode="delete" title="点击一个点就删除（D）">单点删除</button>
+          <button id="modeAdd" data-mode="add" title="先选标准物，再点击原图加点（A）">加点</button>
+          <button id="modeInspect" data-mode="inspect" title="点击已有点查看或选取其标准物（I）">查看 / 选标准物</button>
+        </div>
+        <label>画面 <select id="imageView"><option value="source">原图</option><option value="navigation">8a28 网格参考</option></select></label>
+        <label>缩放 <select id="zoom"><option value="fit">适应窗口</option><option value="1">100%</option><option value="2">200%</option><option value="3">300%</option></select></label>
+      </div>
+      <div id="modeHelp" class="modeHelp">拖出矩形，松手删除框内的点。误删可按 Ctrl+Z 撤销。</div>
+      <div id="viewport" tabindex="0" aria-label="取点画面，可缩放后滚动查看">
+        <div id="stage"><img id="frameImage" alt="当前帧原图" draggable="false"><canvas id="pointCanvas" width="1920" height="1080" aria-label="点击或框选编辑取点"></canvas></div>
+        <div id="imageLoading">正在读取画面…</div>
+      </div>
+      <div class="viewerFooter"><span id="cursorCoordinate">原图坐标：—</span><span id="pointCount">—</span><span id="draftState">—</span></div>
+    </section>
+    <aside>
+      <section>
+        <h2>点对应的模型标准物</h2>
+        <p class="hint">加点前选择标准物；也可用“查看 / 选标准物”点击已有点。</p>
+        <input id="targetSearch" type="search" placeholder="搜索：R4、围挡、Ad3、Ad5…" aria-label="搜索模型标准物">
+        <select id="targetSelect" size="8" aria-label="模型标准物"><option value="">正在读取…</option></select>
+        <div id="targetSummary" class="detail">尚未选择标准物。</div>
+        <div id="pointDetail" class="detail muted">点击已有点可查看坐标与归属。</div>
+      </section>
+      <section>
+        <h2>本帧读取说明</h2>
+        <div id="sourceLimits" class="detail muted">正在读取…</div>
+      </section>
+      <section>
+        <h2>显示</h2>
+        <div id="layerControls"></div>
+        <label class="check"><input id="showLines" type="checkbox" checked> 点之间的参考连线</label>
+        <label class="check"><input id="showLabels" type="checkbox" checked> 特征名称与广告编号</label>
+        <label class="check"><input id="showInferred" type="checkbox"> 遮挡处的推断线（没有点）</label>
+      </section>
+      <section>
+        <h2>保存与恢复</h2>
+        <p id="saveHelp" class="hint">修改先成为草稿。点击“保存”后，才写入数据集和模型对应登记。</p>
+        <button id="undoSaved">撤销本帧上次保存</button>
+        <button id="discardDraft" class="secondary">丢弃此帧草稿</button>
+        <div id="conflictNotice" class="error" hidden>此帧数据已更新，旧草稿不能覆盖。请丢弃此帧草稿后重新编辑。</div>
+        <p class="hint">换帧保留草稿，刷新后也会恢复。← / → 换帧；Ctrl+S 保存；Ctrl+Z 撤销；Ctrl+Y 重做。</p>
+      </section>
+    </aside>
+  </main>
+</body>
+</html>

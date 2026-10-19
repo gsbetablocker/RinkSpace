@@ -1,0 +1,2188 @@
+{
+  "schema": "rinkspace.reference_calibration_source_inventory.v1",
+  "role": "read_only_development_inputs_not_independent_validation",
+  "source_video_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\data\\input\\oxXu1avhrvs.mp4",
+  "source_video_sha256": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891",
+  "source_time_base": "1/15360",
+  "pixel_domain": "native distorted 1920x1080",
+  "scene_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\deliverables\\scene.json",
+  "scene_sha256": "08b4e0f68340a279354f735e5b501a0a0a8e254f451caef0f431e3d29328215b",
+  "scene_unit": "conditional_scene_units",
+  "verified_metre_scale": false,
+  "reference_bank_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\program_tracking\\anchors\\reference_bank.json",
+  "reference_bank_sha256": "5d4edf6d3d6aa68c6d5c02d5a6595a91f0e681a3b0dea62ad0c6861e79bfdd5e",
+  "direct_ad_source_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\program_tracking\\anchors\\source_ad_observations.json",
+  "direct_ad_source_sha256": "1fcd217c8fd717c91645f6b1bf8c364579f7c4698424f4da7e96dabc589fbf78",
+  "transferred_ad_source_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\program_tracking\\anchors\\source_ad3_transfers.json",
+  "transferred_ad_source_sha256": "92b426ba84051f0a12051e64eb0e38924f5abef05b303f70b69ea3b76dcd7cdc",
+  "references": [
+    {
+      "id": "v025_main_long_side_65617920",
+      "source_pts": 65617920,
+      "source_time_s": 4272.0,
+      "camera_id": "main_long_side",
+      "raw_camera_id": "main_long_side",
+      "camera_assignment_authority": "existing_assistant_visual_interval_review",
+      "installation_id": "women_sp_main",
+      "source_shot_id": "S012",
+      "image_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\women_sp_training_frames_1000\\frames\\00949_65617920.jpg",
+      "image_sha256": "2596f34f0aa734f1200c52a98cc330f82fd9e9e063e70423ffcc63ddb60e388e",
+      "image_size_wh": [
+        1920,
+        1080
+      ],
+      "source_observation_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\joint_279\\main\\observations_direct.json",
+      "source_observation_sha256": "9b64abccc5f42c494307a2bb2274c762782f1d70277aefd6382d107bfb7e7f6d",
+      "initial_camera25_role": "old_fitted_camera_initializer_only_not_observation",
+      "curves": [
+        {
+          "id": "main279_65617920_measured_000",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "physical_group_id": "upper_long_side_top",
+          "identity_status": null,
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "holdout_S085_85625088_upper_long_side_top",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "source_uv_count": 15
+        },
+        {
+          "id": "main279_65617920_measured_002",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "physical_group_id": "boards_upper_long_side_bottom",
+          "identity_status": "visually_associated_with_user_PPT_ad_identity_and_side",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "track_S027_69431552_main_69427200_boards_upper_long_side_bottom",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "source_uv_count": 22
+        },
+        {
+          "id": "main279_65617920_measured_003",
+          "target": {
+            "kind": "line_segment",
+            "feature_id": "B2"
+          },
+          "physical_group_id": "B2",
+          "identity_status": "visually_associated_to_user_corrected_scene_feature; not separately_user_confirmed",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "main_69427200_B2_1",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "line_segment",
+            "feature_id": "B2"
+          },
+          "source_uv_count": 15
+        }
+      ],
+      "ad3": {
+        "user_number": 3,
+        "physical_identity_authority": "user-confirmed advertisement instance IDs and order in the linked semantic contract",
+        "source_pixel_authority": "assistant_source_image_visual_reading_not_user_confirmed",
+        "corner_order": [
+          "left_top",
+          "right_top",
+          "right_bottom",
+          "left_bottom"
+        ],
+        "direct_source_uv": null,
+        "transferred_uv_derived": [
+          [
+            1605.5386962890625,
+            199.76583862304688
+          ],
+          [
+            1913.904541015625,
+            200.3040313720703
+          ],
+          [
+            1905.802734375,
+            260.3590393066406
+          ],
+          [
+            1606.236083984375,
+            255.20013427734375
+          ]
+        ],
+        "pixel_role": "homography_transfer_from_same_ad3_source_image",
+        "pixel_source_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\program_tracking\\anchors\\source_ad3_transfers.json",
+        "sigma_px": 5.0,
+        "method": "same_physical_ad3_mutual_RootSIFT_RANSAC_homography_native_pixels",
+        "transfer_inliers": 25,
+        "transfer_median_match_error_px": 0.7406874299049377,
+        "transferred_outside_image_corner_indices": [],
+        "world_geometry_role": "derived_conditional_scene_ad3_not_measured_xyz",
+        "world_geometry_source": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\deliverables\\scene.json"
+      }
+    },
+    {
+      "id": "v025_main_long_side_69427200",
+      "source_pts": 69427200,
+      "source_time_s": 4520.0,
+      "camera_id": "main_long_side",
+      "raw_camera_id": "main_long_side",
+      "camera_assignment_authority": "existing_assistant_visual_interval_review",
+      "installation_id": "women_sp_main",
+      "source_shot_id": "S027",
+      "image_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\women_sp_training_frames_1000\\frames\\01011_69427200.jpg",
+      "image_sha256": "edd5efaf84648eae3103411edbf76eea782f91fb48e462a8a8b53cc7df3c8ede",
+      "image_size_wh": [
+        1920,
+        1080
+      ],
+      "source_observation_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\joint_279\\main\\observations_direct.json",
+      "source_observation_sha256": "9b64abccc5f42c494307a2bb2274c762782f1d70277aefd6382d107bfb7e7f6d",
+      "initial_camera25_role": "old_fitted_camera_initializer_only_not_observation",
+      "curves": [
+        {
+          "id": "main279_69427200_measured_000",
+          "target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "physical_group_id": "R3",
+          "identity_status": "visually_associated_to_user_corrected_scene_feature; not separately_user_confirmed",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "main_69427200_R3_0",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "source_uv_count": 64
+        },
+        {
+          "id": "main279_69427200_measured_001",
+          "target": {
+            "kind": "line_segment",
+            "feature_id": "B2"
+          },
+          "physical_group_id": "B2",
+          "identity_status": "visually_associated_to_user_corrected_scene_feature; not separately_user_confirmed",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "track_S027_69431552_main_69427200_B2_1",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "line_segment",
+            "feature_id": "B2"
+          },
+          "source_uv_count": 27
+        },
+        {
+          "id": "main279_69427200_measured_002",
+          "target": {
+            "kind": "circle_outline",
+            "feature_id": "R2"
+          },
+          "physical_group_id": "R2",
+          "identity_status": "visually_associated_to_user_corrected_scene_feature; not separately_user_confirmed",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "main_69427200_R2_2",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "circle_outline",
+            "feature_id": "R2"
+          },
+          "source_uv_count": 27
+        },
+        {
+          "id": "main279_69427200_measured_003",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "physical_group_id": "boards_upper_long_side_top",
+          "identity_status": "visually_associated_with_user_PPT_ad_identity_and_side",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "main_69427200_boards_upper_long_side_top",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "source_uv_count": 55
+        },
+        {
+          "id": "main279_69427200_measured_004",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "physical_group_id": "boards_upper_long_side_bottom",
+          "identity_status": "visually_associated_with_user_PPT_ad_identity_and_side",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "track_S027_69431552_main_69427200_boards_upper_long_side_bottom",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "source_uv_count": 34
+        }
+      ],
+      "ad3": {
+        "user_number": 3,
+        "physical_identity_authority": "user-confirmed advertisement instance IDs and order in the linked semantic contract",
+        "source_pixel_authority": "assistant_source_image_visual_reading_not_user_confirmed",
+        "corner_order": [
+          "left_top",
+          "right_top",
+          "right_bottom",
+          "left_bottom"
+        ],
+        "direct_source_uv": [
+          [
+            372.0,
+            329.0
+          ],
+          [
+            782.0,
+            326.0
+          ],
+          [
+            782.0,
+            405.0
+          ],
+          [
+            372.0,
+            410.0
+          ]
+        ],
+        "transferred_uv_derived": null,
+        "pixel_role": "assistant_original_image_corner_reading",
+        "pixel_source_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\program_tracking\\anchors\\source_ad_observations.json",
+        "sigma_px": 4.0,
+        "method": "assistant_source_image_visual_reading",
+        "transfer_inliers": null,
+        "transfer_median_match_error_px": null,
+        "transferred_outside_image_corner_indices": [],
+        "world_geometry_role": "derived_conditional_scene_ad3_not_measured_xyz",
+        "world_geometry_source": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\deliverables\\scene.json"
+      }
+    },
+    {
+      "id": "v025_main_long_side_69488640",
+      "source_pts": 69488640,
+      "source_time_s": 4524.0,
+      "camera_id": "main_long_side",
+      "raw_camera_id": "main_long_side",
+      "camera_assignment_authority": "existing_assistant_visual_interval_review",
+      "installation_id": "women_sp_main",
+      "source_shot_id": "S027",
+      "image_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\women_sp_training_frames_1000\\frames\\01012_69488640.jpg",
+      "image_sha256": "0f8fa814a58a423f106841bea603453e7bf5838bb9eb1de58bf7a65b4da4100d",
+      "image_size_wh": [
+        1920,
+        1080
+      ],
+      "source_observation_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\joint_279\\main\\observations_direct.json",
+      "source_observation_sha256": "9b64abccc5f42c494307a2bb2274c762782f1d70277aefd6382d107bfb7e7f6d",
+      "initial_camera25_role": "old_fitted_camera_initializer_only_not_observation",
+      "curves": [
+        {
+          "id": "main279_69488640_measured_000",
+          "target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "physical_group_id": "R3",
+          "identity_status": "visually_associated_to_user_corrected_scene_feature; not separately_user_confirmed",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "track_S027_69492992_main_69427200_R3_0",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "source_uv_count": 64
+        },
+        {
+          "id": "main279_69488640_measured_001",
+          "target": {
+            "kind": "line_segment",
+            "feature_id": "B2"
+          },
+          "physical_group_id": "B2",
+          "identity_status": null,
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "holdout_S074_82254080_B2",
+          "sigma_px": 6.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "line_segment",
+            "feature_id": "B2"
+          },
+          "source_uv_count": 29
+        },
+        {
+          "id": "main279_69488640_measured_002",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "physical_group_id": "boards_upper_long_side_top",
+          "identity_status": "visually_associated_with_user_PPT_ad_identity_and_side",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "track_S027_69523712_main_69427200_boards_upper_long_side_top",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "source_uv_count": 61
+        },
+        {
+          "id": "main279_69488640_measured_030",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "physical_group_id": "boards_upper_long_side_bottom",
+          "identity_status": "visually_associated_with_user_PPT_ad_identity_and_side",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "main_68828160_boards_upper_long_side_bottom",
+          "sigma_px": 5.48149299621582,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "source_uv_count": 10
+        }
+      ],
+      "ad3": {
+        "user_number": 3,
+        "physical_identity_authority": "user-confirmed advertisement instance IDs and order in the linked semantic contract",
+        "source_pixel_authority": "assistant_source_image_visual_reading_not_user_confirmed",
+        "corner_order": [
+          "left_top",
+          "right_top",
+          "right_bottom",
+          "left_bottom"
+        ],
+        "direct_source_uv": null,
+        "transferred_uv_derived": [
+          [
+            192.11976623535156,
+            370.154541015625
+          ],
+          [
+            687.959716796875,
+            365.69903564453125
+          ],
+          [
+            689.598388671875,
+            461.15447998046875
+          ],
+          [
+            190.6986541748047,
+            467.88409423828125
+          ]
+        ],
+        "pixel_role": "homography_transfer_from_same_ad3_source_image",
+        "pixel_source_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\program_tracking\\anchors\\source_ad3_transfers.json",
+        "sigma_px": 5.0,
+        "method": "same_physical_ad3_mutual_RootSIFT_RANSAC_homography_native_pixels",
+        "transfer_inliers": 67,
+        "transfer_median_match_error_px": 0.4695553481578827,
+        "transferred_outside_image_corner_indices": [],
+        "world_geometry_role": "derived_conditional_scene_ad3_not_measured_xyz",
+        "world_geometry_source": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\deliverables\\scene.json"
+      }
+    },
+    {
+      "id": "v025_main_long_side_69550080",
+      "source_pts": 69550080,
+      "source_time_s": 4528.0,
+      "camera_id": "main_long_side",
+      "raw_camera_id": "main_long_side",
+      "camera_assignment_authority": "existing_assistant_visual_interval_review",
+      "installation_id": "women_sp_main",
+      "source_shot_id": "S027",
+      "image_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\women_sp_training_frames_1000\\frames\\01013_69550080.jpg",
+      "image_sha256": "a3959508da3971e6648267dc54a0218f020042c7424ec6c11eb4aca3c269e56d",
+      "image_size_wh": [
+        1920,
+        1080
+      ],
+      "source_observation_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\joint_279\\main\\observations_direct.json",
+      "source_observation_sha256": "9b64abccc5f42c494307a2bb2274c762782f1d70277aefd6382d107bfb7e7f6d",
+      "initial_camera25_role": "old_fitted_camera_initializer_only_not_observation",
+      "curves": [
+        {
+          "id": "main279_69550080_measured_000",
+          "target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "physical_group_id": "R3",
+          "identity_status": "visually_associated_to_user_corrected_scene_feature; not separately_user_confirmed",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "track_S027_69554432_main_69427200_R3_0",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "source_uv_count": 64
+        },
+        {
+          "id": "main279_69550080_measured_001",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "physical_group_id": "boards_upper_long_side_top",
+          "identity_status": "visually_associated_with_user_PPT_ad_identity_and_side",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "track_S027_69554432_main_69427200_boards_upper_long_side_top",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "source_uv_count": 63
+        },
+        {
+          "id": "main279_69550080_measured_017",
+          "target": {
+            "kind": "line_segment",
+            "feature_id": "B2"
+          },
+          "physical_group_id": "B2",
+          "identity_status": null,
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "holdout_S074_82254080_B2",
+          "sigma_px": 6.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "line_segment",
+            "feature_id": "B2"
+          },
+          "source_uv_count": 28
+        },
+        {
+          "id": "main279_69550080_measured_019",
+          "target": {
+            "kind": "circle_outline",
+            "feature_id": "R2"
+          },
+          "physical_group_id": "R2",
+          "identity_status": "visually_associated_to_user_corrected_scene_feature; not separately_user_confirmed",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "main_69427200_R2_2",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "circle_outline",
+            "feature_id": "R2"
+          },
+          "source_uv_count": 28
+        },
+        {
+          "id": "main279_69550080_measured_031",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "physical_group_id": "boards_upper_long_side_bottom",
+          "identity_status": "visually_associated_with_user_PPT_ad_identity_and_side",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "main_68828160_boards_upper_long_side_bottom",
+          "sigma_px": 5.48149299621582,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "source_uv_count": 14
+        }
+      ],
+      "ad3": {
+        "user_number": 3,
+        "physical_identity_authority": "user-confirmed advertisement instance IDs and order in the linked semantic contract",
+        "source_pixel_authority": "assistant_source_image_visual_reading_not_user_confirmed",
+        "corner_order": [
+          "left_top",
+          "right_top",
+          "right_bottom",
+          "left_bottom"
+        ],
+        "direct_source_uv": null,
+        "transferred_uv_derived": [
+          [
+            -34.49937438964844,
+            354.31573486328125
+          ],
+          [
+            475.663818359375,
+            349.85223388671875
+          ],
+          [
+            476.3795471191406,
+            446.10791015625
+          ],
+          [
+            -34.01078796386719,
+            453.97930908203125
+          ]
+        ],
+        "pixel_role": "homography_transfer_from_same_ad3_source_image",
+        "pixel_source_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\program_tracking\\anchors\\source_ad3_transfers.json",
+        "sigma_px": 5.0,
+        "method": "same_physical_ad3_mutual_RootSIFT_RANSAC_homography_native_pixels",
+        "transfer_inliers": 72,
+        "transfer_median_match_error_px": 0.35511314868927,
+        "transferred_outside_image_corner_indices": [
+          0,
+          3
+        ],
+        "world_geometry_role": "derived_conditional_scene_ad3_not_measured_xyz",
+        "world_geometry_source": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\deliverables\\scene.json"
+      }
+    },
+    {
+      "id": "v025_main_long_side_69611520",
+      "source_pts": 69611520,
+      "source_time_s": 4532.0,
+      "camera_id": "main_long_side",
+      "raw_camera_id": "main_long_side",
+      "camera_assignment_authority": "existing_assistant_visual_interval_review",
+      "installation_id": "women_sp_main",
+      "source_shot_id": "S027",
+      "image_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\women_sp_training_frames_1000\\frames\\01014_69611520.jpg",
+      "image_sha256": "8c6518c122634bfdb3d91074cd8d1b8513fa551c74f7e0ae96bc5afa1043284e",
+      "image_size_wh": [
+        1920,
+        1080
+      ],
+      "source_observation_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\joint_279\\main\\observations_direct.json",
+      "source_observation_sha256": "9b64abccc5f42c494307a2bb2274c762782f1d70277aefd6382d107bfb7e7f6d",
+      "initial_camera25_role": "old_fitted_camera_initializer_only_not_observation",
+      "curves": [
+        {
+          "id": "main279_69611520_measured_000",
+          "target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "physical_group_id": "R3",
+          "identity_status": "visually_associated_to_user_corrected_scene_feature; not separately_user_confirmed",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "track_S027_69615872_main_69427200_R3_0",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "source_uv_count": 64
+        },
+        {
+          "id": "main279_69611520_measured_001",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "physical_group_id": "boards_upper_long_side_top",
+          "identity_status": "visually_associated_with_user_PPT_ad_identity_and_side",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "track_S027_69600512_main_69427200_boards_upper_long_side_top",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "source_uv_count": 59
+        },
+        {
+          "id": "main279_69611520_measured_016",
+          "target": {
+            "kind": "line_segment",
+            "feature_id": "B2"
+          },
+          "physical_group_id": "B2",
+          "identity_status": "visually_associated_to_user_corrected_scene_feature; not separately_user_confirmed",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "track_S025_68826880_main_68828160_B2_1",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "line_segment",
+            "feature_id": "B2"
+          },
+          "source_uv_count": 28
+        },
+        {
+          "id": "main279_69611520_measured_017",
+          "target": {
+            "kind": "circle_outline",
+            "feature_id": "R2"
+          },
+          "physical_group_id": "R2",
+          "identity_status": "visually_associated_to_user_corrected_scene_feature; not separately_user_confirmed",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "main_69427200_R2_2",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "circle_outline",
+            "feature_id": "R2"
+          },
+          "source_uv_count": 24
+        },
+        {
+          "id": "main279_69611520_measured_026",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "physical_group_id": "boards_upper_long_side_bottom",
+          "identity_status": "visually_associated_with_user_PPT_ad_identity_and_side",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "main_68828160_boards_upper_long_side_bottom",
+          "sigma_px": 5.48149299621582,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "source_uv_count": 25
+        }
+      ],
+      "ad3": {
+        "user_number": 3,
+        "physical_identity_authority": "user-confirmed advertisement instance IDs and order in the linked semantic contract",
+        "source_pixel_authority": "assistant_source_image_visual_reading_not_user_confirmed",
+        "corner_order": [
+          "left_top",
+          "right_top",
+          "right_bottom",
+          "left_bottom"
+        ],
+        "direct_source_uv": null,
+        "transferred_uv_derived": [
+          [
+            15.047721862792969,
+            356.84405517578125
+          ],
+          [
+            522.5170288085938,
+            352.7194519042969
+          ],
+          [
+            524.1473999023438,
+            449.83404541015625
+          ],
+          [
+            13.480973243713379,
+            456.90435791015625
+          ]
+        ],
+        "pixel_role": "homography_transfer_from_same_ad3_source_image",
+        "pixel_source_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\program_tracking\\anchors\\source_ad3_transfers.json",
+        "sigma_px": 5.0,
+        "method": "same_physical_ad3_mutual_RootSIFT_RANSAC_homography_native_pixels",
+        "transfer_inliers": 84,
+        "transfer_median_match_error_px": 0.46880409121513367,
+        "transferred_outside_image_corner_indices": [],
+        "world_geometry_role": "derived_conditional_scene_ad3_not_measured_xyz",
+        "world_geometry_source": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\deliverables\\scene.json"
+      }
+    },
+    {
+      "id": "v025_main_long_side_74403840",
+      "source_pts": 74403840,
+      "source_time_s": 4844.0,
+      "camera_id": "main_long_side",
+      "raw_camera_id": "main_long_side",
+      "camera_assignment_authority": "existing_assistant_visual_interval_review",
+      "installation_id": "women_sp_main",
+      "source_shot_id": "S043",
+      "image_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\women_sp_training_frames_1000\\frames\\01092_74403840.jpg",
+      "image_sha256": "cfd6e0c2c459bd1458ce0b4dc9ad07295679946151d9dec435027e7320e147c8",
+      "image_size_wh": [
+        1920,
+        1080
+      ],
+      "source_observation_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\joint_279\\main\\observations_direct.json",
+      "source_observation_sha256": "9b64abccc5f42c494307a2bb2274c762782f1d70277aefd6382d107bfb7e7f6d",
+      "initial_camera25_role": "old_fitted_camera_initializer_only_not_observation",
+      "curves": [
+        {
+          "id": "main279_74403840_measured_000",
+          "target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "physical_group_id": "R3",
+          "identity_status": "visually_associated_to_user_corrected_scene_feature; not separately_user_confirmed",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "main_68828160_R3_0",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "source_uv_count": 59
+        },
+        {
+          "id": "main279_74403840_measured_001",
+          "target": {
+            "kind": "line_segment",
+            "feature_id": "B2"
+          },
+          "physical_group_id": "B2",
+          "identity_status": "visually_associated_to_user_corrected_scene_feature; not separately_user_confirmed",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "track_S025_68826880_main_68828160_B2_1",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "line_segment",
+            "feature_id": "B2"
+          },
+          "source_uv_count": 24
+        },
+        {
+          "id": "main279_74403840_measured_002",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "physical_group_id": "boards_upper_long_side_top",
+          "identity_status": "visually_associated_with_user_PPT_ad_identity_and_side",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "track_S027_69416704_main_69427200_boards_upper_long_side_top",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "source_uv_count": 29
+        },
+        {
+          "id": "main279_74403840_measured_003",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "physical_group_id": "boards_upper_long_side_bottom",
+          "identity_status": "visually_associated_with_user_PPT_ad_identity_and_side",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "track_S027_69431552_main_69427200_boards_upper_long_side_bottom",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "source_uv_count": 13
+        },
+        {
+          "id": "main279_74403840_measured_013",
+          "target": {
+            "kind": "circle_outline",
+            "feature_id": "R2"
+          },
+          "physical_group_id": "R2",
+          "identity_status": "visually_associated_to_user_corrected_scene_feature; not separately_user_confirmed",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "track_S027_69431552_main_69427200_R2_2",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "circle_outline",
+            "feature_id": "R2"
+          },
+          "source_uv_count": 27
+        }
+      ],
+      "ad3": {
+        "user_number": 3,
+        "physical_identity_authority": "user-confirmed advertisement instance IDs and order in the linked semantic contract",
+        "source_pixel_authority": "assistant_source_image_visual_reading_not_user_confirmed",
+        "corner_order": [
+          "left_top",
+          "right_top",
+          "right_bottom",
+          "left_bottom"
+        ],
+        "direct_source_uv": null,
+        "transferred_uv_derived": [
+          [
+            273.173828125,
+            432.033203125
+          ],
+          [
+            615.8900146484375,
+            429.35595703125
+          ],
+          [
+            620.8350830078125,
+            496.83123779296875
+          ],
+          [
+            267.4850769042969,
+            502.3562316894531
+          ]
+        ],
+        "pixel_role": "homography_transfer_from_same_ad3_source_image",
+        "pixel_source_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\program_tracking\\anchors\\source_ad3_transfers.json",
+        "sigma_px": 5.0,
+        "method": "same_physical_ad3_mutual_RootSIFT_RANSAC_homography_native_pixels",
+        "transfer_inliers": 25,
+        "transfer_median_match_error_px": 0.8134433627128601,
+        "transferred_outside_image_corner_indices": [],
+        "world_geometry_role": "derived_conditional_scene_ad3_not_measured_xyz",
+        "world_geometry_source": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\deliverables\\scene.json"
+      }
+    },
+    {
+      "id": "v025_main_long_side_81285120",
+      "source_pts": 81285120,
+      "source_time_s": 5292.0,
+      "camera_id": "main_long_side",
+      "raw_camera_id": "main_long_side",
+      "camera_assignment_authority": "existing_assistant_visual_interval_review",
+      "installation_id": "women_sp_main",
+      "source_shot_id": "S070",
+      "image_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\women_sp_training_frames_1000\\frames\\01204_81285120.jpg",
+      "image_sha256": "11b1338209b9e1049bb8a2f9bd5c5ec22f250e55ab9f6a73270a8ecf0f5437e2",
+      "image_size_wh": [
+        1920,
+        1080
+      ],
+      "source_observation_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\joint_279\\main\\observations_direct.json",
+      "source_observation_sha256": "9b64abccc5f42c494307a2bb2274c762782f1d70277aefd6382d107bfb7e7f6d",
+      "initial_camera25_role": "old_fitted_camera_initializer_only_not_observation",
+      "curves": [
+        {
+          "id": "main279_81285120_measured_000",
+          "target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "physical_group_id": "R3",
+          "identity_status": null,
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "holdout_S074_82223360_R3",
+          "sigma_px": 6.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "source_uv_count": 65
+        },
+        {
+          "id": "main279_81285120_measured_001",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "physical_group_id": "boards_upper_long_side_top",
+          "identity_status": "visually_associated_with_user_PPT_ad_identity_and_side",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "main_68828160_boards_upper_long_side_top",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "source_uv_count": 15
+        },
+        {
+          "id": "main279_81285120_measured_002",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "physical_group_id": "boards_upper_long_side_bottom",
+          "identity_status": "visually_associated_with_user_PPT_ad_identity_and_side",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "main_68828160_boards_upper_long_side_bottom",
+          "sigma_px": 5.48149299621582,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "source_uv_count": 22
+        },
+        {
+          "id": "main279_81285120_measured_011",
+          "target": {
+            "kind": "line_segment",
+            "feature_id": "B2"
+          },
+          "physical_group_id": "B2",
+          "identity_status": null,
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "holdout_S074_82192640_B2",
+          "sigma_px": 6.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "line_segment",
+            "feature_id": "B2"
+          },
+          "source_uv_count": 18
+        },
+        {
+          "id": "main279_81285120_measured_020",
+          "target": {
+            "kind": "circle_outline",
+            "feature_id": "R2"
+          },
+          "physical_group_id": "R2",
+          "identity_status": "visually_associated_to_user_corrected_scene_feature; not separately_user_confirmed",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "main_69427200_R2_2",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "circle_outline",
+            "feature_id": "R2"
+          },
+          "source_uv_count": 9
+        }
+      ],
+      "ad3": {
+        "user_number": 3,
+        "physical_identity_authority": "user-confirmed advertisement instance IDs and order in the linked semantic contract",
+        "source_pixel_authority": "assistant_source_image_visual_reading_not_user_confirmed",
+        "corner_order": [
+          "left_top",
+          "right_top",
+          "right_bottom",
+          "left_bottom"
+        ],
+        "direct_source_uv": null,
+        "transferred_uv_derived": [
+          [
+            174.37295532226562,
+            302.63812255859375
+          ],
+          [
+            436.1628723144531,
+            300.2265930175781
+          ],
+          [
+            439.41357421875,
+            350.05731201171875
+          ],
+          [
+            173.19522094726562,
+            354.95751953125
+          ]
+        ],
+        "pixel_role": "homography_transfer_from_same_ad3_source_image",
+        "pixel_source_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\program_tracking\\anchors\\source_ad3_transfers.json",
+        "sigma_px": 5.0,
+        "method": "same_physical_ad3_mutual_RootSIFT_RANSAC_homography_native_pixels",
+        "transfer_inliers": 20,
+        "transfer_median_match_error_px": 1.016584873199463,
+        "transferred_outside_image_corner_indices": [],
+        "world_geometry_role": "derived_conditional_scene_ad3_not_measured_xyz",
+        "world_geometry_source": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\deliverables\\scene.json"
+      }
+    },
+    {
+      "id": "v025_main_long_side_82206720",
+      "source_pts": 82206720,
+      "source_time_s": 5352.0,
+      "camera_id": "main_long_side",
+      "raw_camera_id": "main_long_side",
+      "camera_assignment_authority": "existing_assistant_visual_interval_review",
+      "installation_id": "women_sp_main",
+      "source_shot_id": "S074",
+      "image_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\women_sp_training_frames_1000\\frames\\01219_82206720.jpg",
+      "image_sha256": "38faf72335744b349169e1c62c13a12ce35a0aba0d27562959ceb22acd6cc60c",
+      "image_size_wh": [
+        1920,
+        1080
+      ],
+      "source_observation_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\joint_279\\main\\observations_direct.json",
+      "source_observation_sha256": "9b64abccc5f42c494307a2bb2274c762782f1d70277aefd6382d107bfb7e7f6d",
+      "initial_camera25_role": "old_fitted_camera_initializer_only_not_observation",
+      "curves": [
+        {
+          "id": "main279_82206720_measured_000",
+          "target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "physical_group_id": "R3",
+          "identity_status": null,
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "holdout_S074_82208000_R3",
+          "sigma_px": 6.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "source_uv_count": 71
+        },
+        {
+          "id": "main279_82206720_measured_001",
+          "target": {
+            "kind": "line_segment",
+            "feature_id": "B2"
+          },
+          "physical_group_id": "B2",
+          "identity_status": "visually_associated_to_user_corrected_scene_feature; not separately_user_confirmed",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "track_S025_68826880_main_68828160_B2_1",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "line_segment",
+            "feature_id": "B2"
+          },
+          "source_uv_count": 25
+        },
+        {
+          "id": "main279_82206720_measured_017",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "physical_group_id": "boards_upper_long_side_top",
+          "identity_status": "visually_associated_with_user_PPT_ad_identity_and_side",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "track_S027_69554432_main_69427200_boards_upper_long_side_top",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "source_uv_count": 17
+        },
+        {
+          "id": "main279_82206720_measured_030",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "physical_group_id": "boards_upper_long_side_bottom",
+          "identity_status": "visually_associated_with_user_PPT_ad_identity_and_side",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "main_68828160_boards_upper_long_side_bottom",
+          "sigma_px": 5.48149299621582,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "source_uv_count": 13
+        }
+      ],
+      "ad3": {
+        "user_number": 3,
+        "physical_identity_authority": "user-confirmed advertisement instance IDs and order in the linked semantic contract",
+        "source_pixel_authority": "assistant_source_image_visual_reading_not_user_confirmed",
+        "corner_order": [
+          "left_top",
+          "right_top",
+          "right_bottom",
+          "left_bottom"
+        ],
+        "direct_source_uv": null,
+        "transferred_uv_derived": [
+          [
+            -25.40111541748047,
+            322.0116271972656
+          ],
+          [
+            549.7568359375,
+            316.8204650878906
+          ],
+          [
+            549.4880981445312,
+            425.8632507324219
+          ],
+          [
+            -24.361248016357422,
+            435.1231994628906
+          ]
+        ],
+        "pixel_role": "homography_transfer_from_same_ad3_source_image",
+        "pixel_source_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\program_tracking\\anchors\\source_ad3_transfers.json",
+        "sigma_px": 5.0,
+        "method": "same_physical_ad3_mutual_RootSIFT_RANSAC_homography_native_pixels",
+        "transfer_inliers": 70,
+        "transfer_median_match_error_px": 0.46256929636001587,
+        "transferred_outside_image_corner_indices": [
+          0,
+          3
+        ],
+        "world_geometry_role": "derived_conditional_scene_ad3_not_measured_xyz",
+        "world_geometry_source": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\deliverables\\scene.json"
+      }
+    },
+    {
+      "id": "v025_main_long_side_82268160",
+      "source_pts": 82268160,
+      "source_time_s": 5356.0,
+      "camera_id": "main_long_side",
+      "raw_camera_id": "main_long_side",
+      "camera_assignment_authority": "existing_assistant_visual_interval_review",
+      "installation_id": "women_sp_main",
+      "source_shot_id": "S074",
+      "image_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\women_sp_training_frames_1000\\frames\\01220_82268160.jpg",
+      "image_sha256": "6c4cad67963d4704dc3c4c26000da0df421ae933b8e93d554d083dcf5140db2e",
+      "image_size_wh": [
+        1920,
+        1080
+      ],
+      "source_observation_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\joint_279\\main\\observations_direct.json",
+      "source_observation_sha256": "9b64abccc5f42c494307a2bb2274c762782f1d70277aefd6382d107bfb7e7f6d",
+      "initial_camera25_role": "old_fitted_camera_initializer_only_not_observation",
+      "curves": [
+        {
+          "id": "main279_82268160_measured_000",
+          "target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "physical_group_id": "R3",
+          "identity_status": null,
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "holdout_S074_82192640_R3",
+          "sigma_px": 6.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "source_uv_count": 66
+        },
+        {
+          "id": "main279_82268160_measured_001",
+          "target": {
+            "kind": "line_segment",
+            "feature_id": "B2"
+          },
+          "physical_group_id": "B2",
+          "identity_status": "visually_associated_to_user_corrected_scene_feature; not separately_user_confirmed",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "track_S025_68826880_main_68828160_B2_1",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "line_segment",
+            "feature_id": "B2"
+          },
+          "source_uv_count": 31
+        },
+        {
+          "id": "main279_82268160_measured_002",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "physical_group_id": "boards_upper_long_side_top",
+          "identity_status": "visually_associated_with_user_PPT_ad_identity_and_side",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "track_S027_69631232_main_69427200_boards_upper_long_side_top",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "source_uv_count": 33
+        },
+        {
+          "id": "main279_82268160_measured_030",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "physical_group_id": "boards_upper_long_side_bottom",
+          "identity_status": "visually_associated_with_user_PPT_ad_identity_and_side",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "main_68828160_boards_upper_long_side_bottom",
+          "sigma_px": 5.48149299621582,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "source_uv_count": 15
+        }
+      ],
+      "ad3": {
+        "user_number": 3,
+        "physical_identity_authority": "user-confirmed advertisement instance IDs and order in the linked semantic contract",
+        "source_pixel_authority": "assistant_source_image_visual_reading_not_user_confirmed",
+        "corner_order": [
+          "left_top",
+          "right_top",
+          "right_bottom",
+          "left_bottom"
+        ],
+        "direct_source_uv": null,
+        "transferred_uv_derived": [
+          [
+            -88.79874420166016,
+            363.5623474121094
+          ],
+          [
+            487.13543701171875,
+            359.1892395019531
+          ],
+          [
+            487.22589111328125,
+            468.3118591308594
+          ],
+          [
+            -88.54005432128906,
+            476.94384765625
+          ]
+        ],
+        "pixel_role": "homography_transfer_from_same_ad3_source_image",
+        "pixel_source_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\program_tracking\\anchors\\source_ad3_transfers.json",
+        "sigma_px": 5.0,
+        "method": "same_physical_ad3_mutual_RootSIFT_RANSAC_homography_native_pixels",
+        "transfer_inliers": 65,
+        "transfer_median_match_error_px": 0.47400978207588196,
+        "transferred_outside_image_corner_indices": [
+          0,
+          3
+        ],
+        "world_geometry_role": "derived_conditional_scene_ad3_not_measured_xyz",
+        "world_geometry_source": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\deliverables\\scene.json"
+      }
+    },
+    {
+      "id": "v025_main_long_side_86077440",
+      "source_pts": 86077440,
+      "source_time_s": 5604.0,
+      "camera_id": "main_long_side",
+      "raw_camera_id": "main_long_side",
+      "camera_assignment_authority": "existing_assistant_visual_interval_review",
+      "installation_id": "women_sp_main",
+      "source_shot_id": "S088",
+      "image_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\women_sp_training_frames_1000\\frames\\01282_86077440.jpg",
+      "image_sha256": "2dc223e57fddff65ac5557e6297fc541d3922cb6af7f10759b013f4a68e1263e",
+      "image_size_wh": [
+        1920,
+        1080
+      ],
+      "source_observation_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\joint_279\\main\\observations_direct.json",
+      "source_observation_sha256": "9b64abccc5f42c494307a2bb2274c762782f1d70277aefd6382d107bfb7e7f6d",
+      "initial_camera25_role": "old_fitted_camera_initializer_only_not_observation",
+      "curves": [
+        {
+          "id": "main279_86077440_measured_000",
+          "target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "physical_group_id": "R3",
+          "identity_status": "visually_associated_to_user_corrected_scene_feature; not separately_user_confirmed",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "track_S025_68811520_main_68828160_R3_0",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "source_uv_count": 43
+        },
+        {
+          "id": "main279_86077440_measured_001",
+          "target": {
+            "kind": "line_segment",
+            "feature_id": "B2"
+          },
+          "physical_group_id": "B2",
+          "identity_status": "visually_associated_to_user_corrected_scene_feature; not separately_user_confirmed",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "track_S025_68811520_main_68828160_B2_1",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "line_segment",
+            "feature_id": "B2"
+          },
+          "source_uv_count": 16
+        },
+        {
+          "id": "main279_86077440_measured_002",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "physical_group_id": "boards_upper_long_side_top",
+          "identity_status": "visually_associated_with_user_PPT_ad_identity_and_side",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "track_S025_68811520_main_68828160_boards_upper_long_side_top",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "source_uv_count": 19
+        }
+      ],
+      "ad3": {
+        "user_number": 3,
+        "physical_identity_authority": "user-confirmed advertisement instance IDs and order in the linked semantic contract",
+        "source_pixel_authority": "assistant_source_image_visual_reading_not_user_confirmed",
+        "corner_order": [
+          "left_top",
+          "right_top",
+          "right_bottom",
+          "left_bottom"
+        ],
+        "direct_source_uv": null,
+        "transferred_uv_derived": [
+          [
+            457.2276306152344,
+            445.90447998046875
+          ],
+          [
+            951.0892944335938,
+            447.7105712890625
+          ],
+          [
+            935.0958251953125,
+            542.6060791015625
+          ],
+          [
+            463.3009948730469,
+            548.1194458007812
+          ]
+        ],
+        "pixel_role": "homography_transfer_from_same_ad3_source_image",
+        "pixel_source_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\program_tracking\\anchors\\source_ad3_transfers.json",
+        "sigma_px": 5.0,
+        "method": "same_physical_ad3_mutual_RootSIFT_RANSAC_homography_native_pixels",
+        "transfer_inliers": 12,
+        "transfer_median_match_error_px": 0.8978029489517212,
+        "transferred_outside_image_corner_indices": [],
+        "world_geometry_role": "derived_conditional_scene_ad3_not_measured_xyz",
+        "world_geometry_source": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\deliverables\\scene.json"
+      }
+    },
+    {
+      "id": "v025_main_long_side_87121920",
+      "source_pts": 87121920,
+      "source_time_s": 5672.0,
+      "camera_id": "main_long_side",
+      "raw_camera_id": "main_long_side",
+      "camera_assignment_authority": "existing_assistant_visual_interval_review",
+      "installation_id": "women_sp_main",
+      "source_shot_id": "S092",
+      "image_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\women_sp_training_frames_1000\\frames\\01299_87121920.jpg",
+      "image_sha256": "f08b462948b0e00a3f58aa5351ddddb21b6e67e9eb98f18831c5153163dffa6a",
+      "image_size_wh": [
+        1920,
+        1080
+      ],
+      "source_observation_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\joint_279\\main\\observations_direct.json",
+      "source_observation_sha256": "9b64abccc5f42c494307a2bb2274c762782f1d70277aefd6382d107bfb7e7f6d",
+      "initial_camera25_role": "old_fitted_camera_initializer_only_not_observation",
+      "curves": [
+        {
+          "id": "main279_87121920_measured_000",
+          "target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "physical_group_id": "R3",
+          "identity_status": null,
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "holdout_S074_82177280_R3",
+          "sigma_px": 6.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "source_uv_count": 61
+        },
+        {
+          "id": "main279_87121920_measured_001",
+          "target": {
+            "kind": "line_segment",
+            "feature_id": "B2"
+          },
+          "physical_group_id": "B2",
+          "identity_status": null,
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "holdout_S074_82208000_B2",
+          "sigma_px": 6.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "line_segment",
+            "feature_id": "B2"
+          },
+          "source_uv_count": 12
+        },
+        {
+          "id": "main279_87121920_measured_002",
+          "target": {
+            "kind": "circle_outline",
+            "feature_id": "R2"
+          },
+          "physical_group_id": "R2",
+          "identity_status": "visually_associated_to_user_corrected_scene_feature; not separately_user_confirmed",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "main_69427200_R2_2",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "circle_outline",
+            "feature_id": "R2"
+          },
+          "source_uv_count": 28
+        },
+        {
+          "id": "main279_87121920_measured_003",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "physical_group_id": "boards_upper_long_side_top",
+          "identity_status": "visually_associated_with_user_PPT_ad_identity_and_side",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "track_S027_69477632_main_69427200_boards_upper_long_side_top",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "source_uv_count": 37
+        },
+        {
+          "id": "main279_87121920_measured_004",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "physical_group_id": "boards_upper_long_side_bottom",
+          "identity_status": "visually_associated_with_user_PPT_ad_identity_and_side",
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement_from_traceable_seed_identity",
+          "measurement_method": "mutual RootSIFT broad static-image correspondence; signed local edge or bidirectional unique printed-detail patch remeasurement",
+          "seed_observation_id": "main_68828160_boards_upper_long_side_bottom",
+          "sigma_px": 5.48149299621582,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "source_uv_count": 24
+        }
+      ],
+      "ad3": {
+        "user_number": 3,
+        "physical_identity_authority": "user-confirmed advertisement instance IDs and order in the linked semantic contract",
+        "source_pixel_authority": "assistant_source_image_visual_reading_not_user_confirmed",
+        "corner_order": [
+          "left_top",
+          "right_top",
+          "right_bottom",
+          "left_bottom"
+        ],
+        "direct_source_uv": null,
+        "transferred_uv_derived": [
+          [
+            376.53704833984375,
+            442.6302795410156
+          ],
+          [
+            672.5081787109375,
+            439.77227783203125
+          ],
+          [
+            673.49560546875,
+            496.1973571777344
+          ],
+          [
+            377.57666015625,
+            500.8484191894531
+          ]
+        ],
+        "pixel_role": "homography_transfer_from_same_ad3_source_image",
+        "pixel_source_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\program_tracking\\anchors\\source_ad3_transfers.json",
+        "sigma_px": 5.0,
+        "method": "same_physical_ad3_mutual_RootSIFT_RANSAC_homography_native_pixels",
+        "transfer_inliers": 60,
+        "transfer_median_match_error_px": 0.40189555287361145,
+        "transferred_outside_image_corner_indices": [],
+        "world_geometry_role": "derived_conditional_scene_ad3_not_measured_xyz",
+        "world_geometry_source": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\deliverables\\scene.json"
+      }
+    },
+    {
+      "id": "v025_secondary_long_side_75141120",
+      "source_pts": 75141120,
+      "source_time_s": 4892.0,
+      "camera_id": "secondary_long_side",
+      "raw_camera_id": "camera_secondary_long_side",
+      "camera_assignment_authority": null,
+      "installation_id": "women_sp_secondary",
+      "source_shot_id": "S047",
+      "image_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\women_sp_training_frames_1000\\frames\\01104_75141120.jpg",
+      "image_sha256": "872e93d5d7243534c7345bf5caf533b5b5fd5519b56b2239939b217e8bf09b62",
+      "image_size_wh": [
+        1920,
+        1080
+      ],
+      "source_observation_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\joint_279\\secondary\\observations.json",
+      "source_observation_sha256": "62053840e465dfd9f00a0606e574162ba0c1cfb86ce487b817533629f957e1ee",
+      "initial_camera25_role": "old_fitted_camera_initializer_only_not_observation",
+      "curves": [
+        {
+          "id": "secondary279_75141120_edge_0",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "physical_group_id": "boards_upper_long_side_top",
+          "identity_status": null,
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement",
+          "measurement_method": "static image correspondence followed by signed local edge remeasurement",
+          "seed_observation_id": "track_S027_69477632_main_69427200_boards_upper_long_side_top",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "source_uv_count": 23
+        },
+        {
+          "id": "secondary279_75141120_direct_board_contact",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "physical_group_id": "upper_long_side_contact",
+          "identity_status": null,
+          "identity_evidence": "straight stand-side boards identified by upper-ad instance sequence and architecture",
+          "measurement_origin": "actual_image_measurement",
+          "measurement_method": "direct structural colour-strip Hough search plus signed local gradient maxima; no projected samples",
+          "seed_observation_id": null,
+          "sigma_px": 3.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "source_uv_count": 78
+        },
+        {
+          "id": "secondary279_75141120_direct_R3",
+          "target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "physical_group_id": "R3",
+          "identity_status": null,
+          "identity_evidence": "same grey/red-centre house under user3 advert115 as old main S027 R3; nearby red house and blue-line order distinguish row",
+          "measurement_origin": "actual_image_measurement",
+          "measurement_method": "image_gradient_normal_maxima_with_subpixel_parabolic_refinement; no camera/model used",
+          "seed_observation_id": null,
+          "sigma_px": 6.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "source_uv_count": 44
+        }
+      ],
+      "ad3": {
+        "user_number": 3,
+        "physical_identity_authority": "user-confirmed advertisement instance IDs and order in the linked semantic contract",
+        "source_pixel_authority": "assistant_source_image_visual_reading_not_user_confirmed",
+        "corner_order": [
+          "left_top",
+          "right_top",
+          "right_bottom",
+          "left_bottom"
+        ],
+        "direct_source_uv": [
+          [
+            483.0,
+            388.0
+          ],
+          [
+            1545.0,
+            387.0
+          ],
+          [
+            1545.0,
+            580.0
+          ],
+          [
+            483.0,
+            578.0
+          ]
+        ],
+        "transferred_uv_derived": null,
+        "pixel_role": "assistant_original_image_corner_reading",
+        "pixel_source_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\program_tracking\\anchors\\source_ad_observations.json",
+        "sigma_px": 4.0,
+        "method": "assistant_source_image_visual_reading",
+        "transfer_inliers": null,
+        "transfer_median_match_error_px": null,
+        "transferred_outside_image_corner_indices": [],
+        "world_geometry_role": "derived_conditional_scene_ad3_not_measured_xyz",
+        "world_geometry_source": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\deliverables\\scene.json"
+      }
+    },
+    {
+      "id": "v025_secondary_long_side_75202560",
+      "source_pts": 75202560,
+      "source_time_s": 4896.0,
+      "camera_id": "secondary_long_side",
+      "raw_camera_id": "camera_secondary_long_side",
+      "camera_assignment_authority": null,
+      "installation_id": "women_sp_secondary",
+      "source_shot_id": "S047",
+      "image_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\women_sp_training_frames_1000\\frames\\01105_75202560.jpg",
+      "image_sha256": "0372ac92b00b8744b36522155d92843981617e59013848b2e6745ec6e07e2809",
+      "image_size_wh": [
+        1920,
+        1080
+      ],
+      "source_observation_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\joint_279\\secondary\\observations.json",
+      "source_observation_sha256": "62053840e465dfd9f00a0606e574162ba0c1cfb86ce487b817533629f957e1ee",
+      "initial_camera25_role": "old_fitted_camera_initializer_only_not_observation",
+      "curves": [
+        {
+          "id": "secondary279_75202560_edge_0",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "physical_group_id": "boards_upper_long_side_top",
+          "identity_status": null,
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement",
+          "measurement_method": "static image correspondence followed by signed local edge remeasurement",
+          "seed_observation_id": "track_S027_69477632_main_69427200_boards_upper_long_side_top",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "source_uv_count": 24
+        },
+        {
+          "id": "secondary279_75202560_direct_board_contact",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "physical_group_id": "upper_long_side_contact",
+          "identity_status": null,
+          "identity_evidence": "straight stand-side boards identified by upper-ad instance sequence and architecture",
+          "measurement_origin": "actual_image_measurement",
+          "measurement_method": "direct structural colour-strip Hough search plus signed local gradient maxima; no projected samples",
+          "seed_observation_id": null,
+          "sigma_px": 3.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "source_uv_count": 75
+        },
+        {
+          "id": "secondary279_75202560_direct_R3",
+          "target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "physical_group_id": "R3",
+          "identity_status": null,
+          "identity_evidence": "same grey/red-centre house under user3 advert115 as old main S027 R3; nearby red house and blue-line order distinguish row",
+          "measurement_origin": "actual_image_measurement",
+          "measurement_method": "image_gradient_normal_maxima_with_subpixel_parabolic_refinement; no camera/model used",
+          "seed_observation_id": null,
+          "sigma_px": 6.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "source_uv_count": 32
+        }
+      ],
+      "ad3": {
+        "user_number": 3,
+        "physical_identity_authority": "user-confirmed advertisement instance IDs and order in the linked semantic contract",
+        "source_pixel_authority": "assistant_source_image_visual_reading_not_user_confirmed",
+        "corner_order": [
+          "left_top",
+          "right_top",
+          "right_bottom",
+          "left_bottom"
+        ],
+        "direct_source_uv": null,
+        "transferred_uv_derived": [
+          [
+            354.5843811035156,
+            349.34063720703125
+          ],
+          [
+            1415.4810791015625,
+            347.7514953613281
+          ],
+          [
+            1416.0350341796875,
+            540.21826171875
+          ],
+          [
+            354.0186767578125,
+            539.4102172851562
+          ]
+        ],
+        "pixel_role": "homography_transfer_from_same_ad3_source_image",
+        "pixel_source_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\program_tracking\\anchors\\source_ad3_transfers.json",
+        "sigma_px": 5.0,
+        "method": "same_physical_ad3_mutual_RootSIFT_RANSAC_homography_native_pixels",
+        "transfer_inliers": 142,
+        "transfer_median_match_error_px": 0.4477217197418213,
+        "transferred_outside_image_corner_indices": [],
+        "world_geometry_role": "derived_conditional_scene_ad3_not_measured_xyz",
+        "world_geometry_source": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\deliverables\\scene.json"
+      }
+    },
+    {
+      "id": "v025_secondary_long_side_75264000",
+      "source_pts": 75264000,
+      "source_time_s": 4900.0,
+      "camera_id": "secondary_long_side",
+      "raw_camera_id": "camera_secondary_long_side",
+      "camera_assignment_authority": null,
+      "installation_id": "women_sp_secondary",
+      "source_shot_id": "S047",
+      "image_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\women_sp_training_frames_1000\\frames\\01106_75264000.jpg",
+      "image_sha256": "2018041fe85dea59570687bcbcacb92a948906e87ade4d04e99029e8b2847711",
+      "image_size_wh": [
+        1920,
+        1080
+      ],
+      "source_observation_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\outputs\\calibration\\ankara_2026_v015_joint\\joint_279\\secondary\\observations.json",
+      "source_observation_sha256": "62053840e465dfd9f00a0606e574162ba0c1cfb86ce487b817533629f957e1ee",
+      "initial_camera25_role": "old_fitted_camera_initializer_only_not_observation",
+      "curves": [
+        {
+          "id": "secondary279_75264000_edge_0",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "physical_group_id": "boards_upper_long_side_top",
+          "identity_status": null,
+          "identity_evidence": null,
+          "measurement_origin": "actual_image_remeasurement",
+          "measurement_method": "static image correspondence followed by signed local edge remeasurement",
+          "seed_observation_id": "track_S027_69477632_main_69427200_boards_upper_long_side_top",
+          "sigma_px": 5.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "top"
+          },
+          "source_uv_count": 19
+        },
+        {
+          "id": "secondary279_75264000_direct_board_contact",
+          "target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "physical_group_id": "upper_long_side_contact",
+          "identity_status": null,
+          "identity_evidence": "straight stand-side boards identified by upper-ad instance sequence and architecture",
+          "measurement_origin": "actual_image_measurement",
+          "measurement_method": "direct structural colour-strip Hough search plus signed local gradient maxima; no projected samples",
+          "seed_observation_id": null,
+          "sigma_px": 3.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "board_side",
+            "side": "upper_long_side",
+            "edge": "contact"
+          },
+          "source_uv_count": 82
+        },
+        {
+          "id": "secondary279_75264000_direct_R3",
+          "target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "physical_group_id": "R3",
+          "identity_status": null,
+          "identity_evidence": "same grey/red-centre house under user3 advert115 as old main S027 R3; nearby red house and blue-line order distinguish row",
+          "measurement_origin": "actual_image_measurement",
+          "measurement_method": "image_gradient_normal_maxima_with_subpixel_parabolic_refinement; no camera/model used",
+          "seed_observation_id": null,
+          "sigma_px": 6.0,
+          "source_uv_role": "real_image_edge_or_marking_remeasurement",
+          "source_uv_correlation": "same_curve_samples_not_independent_pixels",
+          "world_curve_role": "derived_conditional_scene_geometry_not_measured_xyz",
+          "world_geometry_target": {
+            "kind": "circle_outline",
+            "feature_id": "R3"
+          },
+          "source_uv_count": 37
+        }
+      ],
+      "ad3": {
+        "user_number": 3,
+        "physical_identity_authority": "user-confirmed advertisement instance IDs and order in the linked semantic contract",
+        "source_pixel_authority": "assistant_source_image_visual_reading_not_user_confirmed",
+        "corner_order": [
+          "left_top",
+          "right_top",
+          "right_bottom",
+          "left_bottom"
+        ],
+        "direct_source_uv": null,
+        "transferred_uv_derived": [
+          [
+            230.85435485839844,
+            400.7459716796875
+          ],
+          [
+            1294.2857666015625,
+            398.6914367675781
+          ],
+          [
+            1296.7193603515625,
+            589.5380859375
+          ],
+          [
+            228.00941467285156,
+            592.6333618164062
+          ]
+        ],
+        "pixel_role": "homography_transfer_from_same_ad3_source_image",
+        "pixel_source_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\program_tracking\\anchors\\source_ad3_transfers.json",
+        "sigma_px": 5.0,
+        "method": "same_physical_ad3_mutual_RootSIFT_RANSAC_homography_native_pixels",
+        "transfer_inliers": 112,
+        "transfer_median_match_error_px": 0.6034317016601562,
+        "transferred_outside_image_corner_indices": [],
+        "world_geometry_role": "derived_conditional_scene_ad3_not_measured_xyz",
+        "world_geometry_source": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\deliverables\\scene.json"
+      }
+    }
+  ],
+  "summary": {
+    "reference_frames": 14,
+    "camera_frames": {
+      "main_long_side": 11,
+      "secondary_long_side": 3
+    },
+    "source_curve_groups": 57,
+    "source_curve_pixels": 2026,
+    "direct_ad3_frames": 2,
+    "transferred_ad3_frames": 12
+  }
+}

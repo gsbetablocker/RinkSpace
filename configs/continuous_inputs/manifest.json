@@ -1,0 +1,32 @@
+{
+  "schema": "rinkspace.continuous-reproduction-inputs.v1",
+  "input_media_included": false,
+  "coordinate_resolution": [
+    960,
+    540
+  ],
+  "manual_assistance": true,
+  "clips": {
+    "jin": {
+      "inputs": "jin_inputs.json",
+      "inputs_sha256": "582ac73de3e64e6a06ed351c5b5bbc61ed307a25f9366b99cea8c876b0da870a",
+      "observations": "jin_observations.json.gz",
+      "observations_sha256": "da9bd1de389337698f05d97913dac4cc121c825d13b07d12d98957f4208aefd7",
+      "source_sha256": "55b47873e32b46095075ff6e806b56992ae4b3f94cba8f41227fdc6737590dfe"
+    },
+    "okada": {
+      "inputs": "okada_inputs.json",
+      "inputs_sha256": "0f93e64c39c8f16e861d2ccd52451b2a093971399f7a8b672b66293cf5a5c1c5",
+      "observations": "okada_observations.json.gz",
+      "observations_sha256": "b77d1054e10322468184472b84fd1f1db66c920921485a7d2dd02e01036a81aa",
+      "source_sha256": "843e7490a38e0c856da057d6a1f871804f56ae2463c530c735ca524524309150"
+    }
+  },
+  "runtime_versions": {
+    "python": "3.11.0",
+    "numpy": "2.4.6",
+    "opencv-python-headless": "4.14.0.94",
+    "Pillow": "12.3.0",
+    "av": "17.1.0"
+  }
+}

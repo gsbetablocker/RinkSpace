@@ -1,0 +1,163 @@
+{
+  "schema": "rinkspace.continuous-holdout-lock.v1",
+  "locked_at_utc": "2026-09-19T13:06:51.738825+00:00",
+  "status": "algorithm_and_config_frozen_before_JIN_protected_group_error_and_new_OKADA_evaluation",
+  "algorithm": {
+    "version": "masked-photometric-observed-keyframes-2",
+    "motion_model": "affine",
+    "approximation_not_metric_or_physical_camera_model": true,
+    "source_sha256": {
+      "src/rinkspace/masked_photometric.py": "352a394c7534238685ac1711856646d315e801ea9849ff751f7d3359d9568ecc",
+      "src/rinkspace/photometric_registration.py": "98576d513f33d6717213e8576a29c4c54f294b79540ca710752c1fd444fffafe",
+      "src/rinkspace/continuous_registration.py": "2cab820a1dc20c44eb211d18a30ef38c3a9eae67ab7547e7879c36bbd6d01a53",
+      "src/rinkspace/local_registration.py": "78e500bd98d1796fe6aab6132ef7d080e860dbf295e06d90134f32c4e4b66a68",
+      "src/rinkspace/geometry.py": "d33c3160d6f391cace853fe0b3495bac1b2042a5d5c241323bb808606fc8a08d",
+      "scripts/run_photometric_experiment.py": "fd51f85dd22e61eb5983735e201edbb5fca2e0431e57540ae99c3e8459e4d42f"
+    },
+    "config": {
+      "keyframe_interval_s": 0.4,
+      "max_keyframes": 10,
+      "max_recovery_gap_s": 0.6,
+      "forward_backward_px": 0.7,
+      "patch_radius_px": 10,
+      "pyramid_levels": 1,
+      "min_patch_correlation": 0.8,
+      "min_patch_std": 0.65,
+      "feature_count": 1800,
+      "motion_model": "affine",
+      "perspective_prior_weight": 0.001
+    },
+    "sparse_initializer_fit_config": {
+      "max_features": 1800,
+      "min_tracks": 18,
+      "min_inliers": 14,
+      "min_support_fraction": 0.025,
+      "min_support_width_fraction": 0.18,
+      "min_support_height_fraction": 0.12,
+      "ransac_threshold_px": 1.7,
+      "max_inlier_p95_px": 2.0,
+      "max_pair_displacement_fraction": 0.3,
+      "max_sample_gap_s": 0.6,
+      "forward_backward_px": 0.8,
+      "replenish_below": 140,
+      "direct_anchor_every": 10,
+      "dense_anchor_every": 1,
+      "max_canvas_pixels": 1800000
+    },
+    "maximum_fixed_keyframe_trials": 3,
+    "display_fit_point_limit": 200,
+    "missing_policy": "No identity filling; same-component observed-keyframe recovery; >0.6 seconds requires explicit declared new component",
+    "dense_prior": {
+      "perspective_terms_locked_to_zero": true,
+      "perspective_penalty_used": false,
+      "perspective_prior_weight_config_inactive_for_affine": 0.001
+    }
+  },
+  "runtime": {
+    "python": "3.11.0",
+    "numpy": "2.4.6",
+    "opencv": "4.14.0"
+  },
+  "git_commit": "1659a720a153949d6583cc3003adbb1193ab1b2e",
+  "git_note": "Source hashes freeze the working files, including uncommitted implementation; commit alone is insufficient",
+  "source_window_prelock": {
+    "path": "outputs/next_a_source_selection/source_selection.json",
+    "sha256": "cba711e7d768e645595306127c649322cbfc6ebdf58a2bbc98d6d43ff1390be2",
+    "locked_at_utc": "2026-09-19T12:25:21.121690+00:00",
+    "source_only_selection": true,
+    "registration_results_used_for_window_selection": false
+  },
+  "windows": [
+    {
+      "source_name": "jin",
+      "role": "development",
+      "source_sha256": "55b47873e32b46095075ff6e806b56992ae4b3f94cba8f41227fdc6737590dfe",
+      "source_frame_start": 5422,
+      "source_frame_end_exclusive": 5931,
+      "source_frame_count": 509,
+      "source_pts_start": 1388032,
+      "source_pts_end_exclusive": 1518336,
+      "source_pts_last": 1518080,
+      "time_base": "1/12800",
+      "start_s": 108.44,
+      "end_s_exclusive": 118.62,
+      "last_frame_s": 118.6,
+      "duration_s": 10.18
+    },
+    {
+      "source_name": "okada",
+      "role": "held_out",
+      "source_sha256": "843e7490a38e0c856da057d6a1f871804f56ae2463c530c735ca524524309150",
+      "source_frame_start": 3775,
+      "source_frame_end_exclusive": 4464,
+      "source_frame_count": 689,
+      "source_pts_start": 966400,
+      "source_pts_end_exclusive": 1142784,
+      "source_pts_last": 1142528,
+      "time_base": "1/12800",
+      "start_s": 75.5,
+      "end_s_exclusive": 89.28,
+      "last_frame_s": 89.26,
+      "duration_s": 13.78
+    }
+  ],
+  "sampling": {
+    "every_n": 1,
+    "sample_width": 960,
+    "source_pts_required": true,
+    "preserve_entire_window_and_all_failures": true
+  },
+  "JIN_protected_run": {
+    "output_directory": "outputs/next_a/photometric_affine_protected_50",
+    "mask_run": "outputs/next_a/jin_protected_masks",
+    "mask_metadata_sha256": "ee3acfffcc0b9f6ac9ceb9fe5258136eff1204e74de1ce7737ea0ea43f24bad1",
+    "mask_manifest_canonical_sha256": "5138cc0ec777b8a68b9690ebfd297bf55c7282bd9024951390243f6a2f051e84",
+    "source_only_mask_input_sha256": {
+      "outputs\\next_a_source_selection\\jin_boundary_corrections_50fps.json": "cc5f12b177efd465835ce70e6390b55cb1371906ad50cef11970ad055da3566a",
+      "outputs\\next_a\\people\\people.json": "71788efc43e836a0e904d438c1dc60e697dda7fbcb9d917d8e29225c52259f34",
+      "outputs\\next_a_source_selection\\gray_b_protection\\exclusions_50fps.json": "4df64b1aa9ba8c787bbaf0345c6b7f1a8baaa8ad5b9ee3e14e3f14361be88dba"
+    },
+    "physical_group_id": "B_gray_target",
+    "protected_native_sample_range_inclusive": [
+      145,
+      508
+    ],
+    "protected_physical_group_count": 1,
+    "raw_source_group_margin_px": 24,
+    "additional_dense_safe_erosion_px": 3,
+    "protection_source_freeze_path": "outputs/next_a_source_selection/gray_b_protection/source_review_freeze.json",
+    "protection_source_freeze_sha256": "aa7cf11c374f999ef15d52fec88494a4a16b983ba769bcd3d321d33e07285f92",
+    "protection_source_freeze_utc": "2026-09-19T12:58:42.063286+00:00",
+    "group_errors_seen_before_algorithm_lock": false,
+    "source_images_and_unprotected_JIN_runs_already_used_for_development": true,
+    "independence_scope": "Group pixels are excluded in this run; error is a subsequent development diagnostic, not a never-seen-source blind test",
+    "formal_six_groups_four_visible_requirement_met": false
+  },
+  "new_OKADA_holdout": {
+    "interval_s": [
+      75.5,
+      89.28
+    ],
+    "source_only_previewed": true,
+    "new_algorithm_result_not_evaluated_before_this_lock": true,
+    "evaluation_must_use_identical_algorithm_hashes_and_config": true,
+    "source_only_masks_and_visibility_may_be_defined_before_computing_maps": true,
+    "registration_or_error_must_not_guide_mask_selection": true
+  },
+  "old_OKADA_interval": {
+    "interval_s": [
+      144.84,
+      154.2
+    ],
+    "role": "previously_evaluated_development_evidence_not_new_blind_holdout",
+    "old_lock_path": "configs/holdout_lock.json",
+    "old_lock_sha256": "604bd91e64bc2af35e33f3fa08ff2329ba3d9acae2fa6d35e3eabe44e8f1dc55"
+  },
+  "protocol": [
+    "Do not alter this frozen implementation or its thresholds based on protected B error or the new OKADA result.",
+    "Evaluate the whole preselected shot and preserve missing frames, failures, ambiguous observations, and incomplete group coverage.",
+    "Only a demonstrated implementation bug permits a correction; record the old/new hashes and rerun consistently, without treating bugfix-tuned results as fresh blindness.",
+    "A failure or insufficient independent group coverage stays a failure or unverified result; neither fit correlation nor complete coverage is acceptance."
+  ],
+  "formal_acceptance": false
+}

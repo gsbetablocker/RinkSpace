@@ -1,0 +1,360 @@
+{
+  "schema": "rinkspace.presentation-sample.v1",
+  "event_id": "ankara_2026",
+  "programme_id": "okada_mei_sp",
+  "status": "complete",
+  "purpose": "last-shot visual layout, spin support-blade reference replacement and continuous ice-plane outro preview",
+  "reference_video": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/full_8a28afed_user_requested_20261012/grid_and_trajectory_WORKING.mp4",
+  "source": {
+    "id": "O6j8L8TmfKo",
+    "time_base": "1/12800",
+    "first_pts": 1838080,
+    "last_pts": 2415104,
+    "fps": 50,
+    "source_start": "00:02:23.600",
+    "source_end_inclusive": "00:03:08.680"
+  },
+  "display": {
+    "width": 1920,
+    "height": 1080,
+    "trajectory_fade_seconds": 2.5,
+    "trajectory_old_alpha": 0.22,
+    "line_width_m": 0.09,
+    "speedometer": {
+      "size_px": 220,
+      "position": "top_right",
+      "margin_px": 28
+    },
+    "coverage": {
+      "mode": "spatial_union",
+      "radius_m": 1,
+      "sigma_m": 1.5,
+      "warm_alpha": 0.32,
+      "palette": "deep_red",
+      "red_rgb_endpoints": [
+        [
+          241,
+          65,
+          35
+        ],
+        [
+          175,
+          22,
+          32
+        ]
+      ]
+    },
+    "outro": {
+      "turn_seconds": 3,
+      "fade_seconds": 0.55,
+      "hold_seconds": 1.2,
+      "visibility_gain": 2.3,
+      "statistics": false,
+      "uniform_trajectory": true,
+      "trajectory_rgb": [
+        4,
+        132,
+        244
+      ],
+      "trajectory_alpha": 0.7,
+      "particles_after_transition": false,
+      "age_gradient": false,
+      "summary_transition_seconds": 0.55
+    },
+    "particles": {
+      "style": "ice-plane centres with screen-space round/diamond/sliver billboards",
+      "seed": 20261016,
+      "particle_births": 7901,
+      "screen_core_radius_px": [
+        1.2,
+        3
+      ],
+      "maximum_alive": 128,
+      "halo_radius_multiple": 2.3,
+      "halo_gain": 0.2,
+      "rim_gain": 0.48,
+      "core_gain": 0.98,
+      "core_bgr": [
+        255,
+        249,
+        226
+      ],
+      "halo_bgr": [
+        255,
+        210,
+        75
+      ],
+      "sprite_scaling": "homography local Jacobian determinant geometric-mean, then clamp",
+      "preserves_seeded_particle_times_positions_lifetimes": true,
+      "foreground": "Sample.foreground person/broadcast protections",
+      "summary_particle_fade_seconds": 0.55,
+      "summary_particle_strength": "1 minus cubic smoothstep(elapsed/.55)",
+      "summary_foreground_strength": "1 minus OutroTransform quintic ease(elapsed/.55)",
+      "summary_after_fade": "Base pixels passed through without any particle drawing",
+      "decorative": true,
+      "not_equal_time_markers": true
+    }
+  },
+  "spin_contact": {
+    "windows_seconds": [
+      [
+        156.4,
+        165.9
+      ],
+      [
+        171.92,
+        184.9
+      ]
+    ],
+    "blend_seconds": 0.25,
+    "per_spin": {
+      "1": {
+        "frames": 476,
+        "valid": 366,
+        "inferred": 110
+      },
+      "2": {
+        "frames": 650,
+        "valid": 510,
+        "inferred": 140
+      }
+    },
+    "method": "Largest original undilated half-resolution SAM2 component; midpoint of bottom 3 rows scaled x2; source COCO ankles diagnose truncated boots; ground_xy uses unchanged camera",
+    "missing_candidate_policy": "Same-spin reliable UV interpolation; longer gaps may use observed lower ankle plus local reliable blade offset, always inferred",
+    "original_model_unmodified": true,
+    "manual_blade_accuracy_claimed": false
+  },
+  "runtime": {
+    "directory": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_last_shot_20261016/v2",
+    "source_packet": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_last_shot_20261016/source_packet.npz",
+    "source_receipt": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_last_shot_20261016/source_packet.json",
+    "contact_packet": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_last_shot_20261016/contact_packet.npz",
+    "contact_receipt": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_last_shot_20261016/contact_packet.json",
+    "video": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_last_shot_20261016/v2/RinkSpace_last_shot_demo_v2_final.mp4",
+    "report": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_last_shot_20261016/v2/sample_report.json",
+    "source_shot_seconds": 45.1,
+    "outro_seconds": 4.2,
+    "total_seconds": 49.3,
+    "base_video": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_last_shot_20261016/v2/RinkSpace_last_shot_demo_v2.mp4",
+    "base_report": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_last_shot_20261016/v2/base_sample_report.json",
+    "particle_pass": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_last_shot_20261016/v2/particle_pass.json"
+  },
+  "code": {
+    "renderer": "calibration/program_tracking/render_demo_last_shot.py",
+    "source_bridge": "calibration/program_tracking/demo_source.py",
+    "contact": "calibration/program_tracking/demo_contact.py",
+    "layers": "calibration/program_tracking/demo_layers.py",
+    "outro": "calibration/program_tracking/demo_outro.py",
+    "pipeline": "calibration/program_tracking/demo_pipeline.py",
+    "particle_pass": "calibration/program_tracking/demo_particle_pass.py"
+  },
+  "user_visual_review": "pending",
+  "verification": {
+    "path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_last_shot_20261016/v2/verification.json",
+    "decoded_video_frames": 2465,
+    "width": 1920,
+    "height": 1080,
+    "fps": "50",
+    "first_encoded_time_s": 0,
+    "last_encoded_time_s": 49.28,
+    "all_encoded_frame_intervals_seconds": 0.02,
+    "audio_streams": 1,
+    "audio_sample_rate": 48000,
+    "audio_rms": 0.0144892696856863,
+    "audio_peak": 0.08330000191926956,
+    "broadcast_timer_source_comparison": [
+      {
+        "frame": 0,
+        "mean_abs_error": 3.9460204081632653,
+        "p95_abs_error": 8
+      },
+      {
+        "frame": 2254,
+        "mean_abs_error": 5.435918367346939,
+        "p95_abs_error": 9
+      }
+    ],
+    "broadcast_timer_postprocess_base_comparison": [
+      {
+        "frame": 0,
+        "mean_abs_error": 2.071292517006803,
+        "p95_abs_error": 4
+      },
+      {
+        "frame": 2254,
+        "mean_abs_error": 2.380442176870748,
+        "p95_abs_error": 4
+      }
+    ],
+    "broadcast_timer_comparison_reference": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\demo_last_shot_20261016\\v2\\RinkSpace_last_shot_demo_v2.mp4",
+    "broadcast_timer_base_source_comparison": [
+      {
+        "frame": 0,
+        "mean_abs_error": 1.9947278911564625,
+        "p95_abs_error": 5
+      },
+      {
+        "frame": 2254,
+        "mean_abs_error": 3.081326530612245,
+        "p95_abs_error": 5
+      }
+    ],
+    "outro_start_max_pixel_difference": 0,
+    "video_sha256": "ac3e54608da36dcd1e4ff1d59adb7133f1e827b070edd7470e5f80bc3c6e0d76",
+    "video_bytes": 131265479
+  },
+  "code_sha256": {
+    "renderer": "276078dbf58bdf893cd62acc168dc6f277589623cbde86dabb59cd6bec056625",
+    "source_bridge": "82bc0136d03017b0790da22532595fa498936cf2102535f92036d4e40a979bc5",
+    "contact": "c0873e50efe52859b5794db15c4b6b1767e76178ad5d63433868c860771176fa",
+    "layers": "54ed96ee0df7b3b80e13a0c2b7dd52fd0e9bc75cbbc90c4fbffb057bfcb803a5",
+    "outro": "19fbdced5247067f1d134469f6b4f361b449c623800e6033c47022aa6fa86739",
+    "pipeline": "70f421b200f5fe0f1a6a60878274b9e52bf6148326990e5c5e033bd57070b895",
+    "particle_pass": "c07c99c4b8149a6893ca4fe2324010f8bfa0580ba96e44d5d4565acebef087e4"
+  },
+  "previous_samples": [
+    {
+      "version": "v1",
+      "runtime": {
+        "directory": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_last_shot_20261016",
+        "source_packet": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_last_shot_20261016/source_packet.npz",
+        "source_receipt": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_last_shot_20261016/source_packet.json",
+        "contact_packet": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_last_shot_20261016/contact_packet.npz",
+        "contact_receipt": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_last_shot_20261016/contact_packet.json",
+        "video": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_last_shot_20261016/RinkSpace_last_shot_demo.mp4",
+        "report": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_last_shot_20261016/sample_report.json",
+        "source_shot_seconds": 45.1,
+        "outro_seconds": 4.2,
+        "total_seconds": 49.3
+      },
+      "display": {
+        "width": 1920,
+        "height": 1080,
+        "trajectory_fade_seconds": 2.5,
+        "trajectory_old_alpha": 0.22,
+        "line_width_m": 0.09,
+        "speedometer": {
+          "size_px": 220,
+          "position": "top_right",
+          "margin_px": 28
+        },
+        "coverage": {
+          "mode": "spatial_union",
+          "radius_m": 1,
+          "sigma_m": 1.5,
+          "warm_alpha": 0.32,
+          "palette": "deep_red",
+          "red_rgb_endpoints": [
+            [
+              241,
+              65,
+              35
+            ],
+            [
+              175,
+              22,
+              32
+            ]
+          ]
+        },
+        "outro": {
+          "turn_seconds": 3,
+          "fade_seconds": 0.55,
+          "hold_seconds": 1.2,
+          "visibility_gain": 2.3,
+          "statistics": false,
+          "uniform_trajectory": true,
+          "trajectory_rgb": [
+            4,
+            132,
+            244
+          ],
+          "trajectory_alpha": 0.7,
+          "particles_after_transition": false,
+          "age_gradient": false,
+          "summary_transition_seconds": 0.55
+        },
+        "particles": {
+          "style": "ice-plane centres with screen-space round/diamond/sliver billboards",
+          "seed": 20261016,
+          "particle_births": 7901,
+          "screen_core_radius_px": [
+            1.2,
+            3
+          ],
+          "maximum_alive": 128,
+          "halo_radius_multiple": 2.3,
+          "halo_gain": 0.2,
+          "rim_gain": 0.48,
+          "core_gain": 0.98,
+          "core_bgr": [
+            255,
+            249,
+            226
+          ],
+          "halo_bgr": [
+            255,
+            210,
+            75
+          ],
+          "sprite_scaling": "homography local Jacobian determinant geometric-mean, then clamp",
+          "preserves_seeded_particle_times_positions_lifetimes": true,
+          "foreground": "Sample.foreground person/broadcast protections",
+          "summary_particle_fade_seconds": 0.55,
+          "summary_particle_strength": "1 minus cubic smoothstep(elapsed/.55)",
+          "summary_foreground_strength": "1 minus OutroTransform quintic ease(elapsed/.55)",
+          "summary_after_fade": "Base pixels passed through without any particle drawing",
+          "decorative": true,
+          "not_equal_time_markers": true
+        }
+      },
+      "verification": {
+        "path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_last_shot_20261016/verification.json",
+        "decoded_video_frames": 2465,
+        "width": 1920,
+        "height": 1080,
+        "fps": "50",
+        "first_encoded_time_s": 0,
+        "last_encoded_time_s": 49.28,
+        "all_encoded_frame_intervals_seconds": 0.02,
+        "audio_streams": 1,
+        "audio_sample_rate": 48000,
+        "audio_rms": 0.0144892696856863,
+        "audio_peak": 0.08330000191926956,
+        "broadcast_timer_source_comparison": [
+          {
+            "frame": 0,
+            "mean_abs_error": 2.0148979591836733,
+            "p95_abs_error": 5
+          },
+          {
+            "frame": 2254,
+            "mean_abs_error": 3.0703741496598638,
+            "p95_abs_error": 5
+          }
+        ],
+        "outro_start_max_pixel_difference": 0,
+        "video_sha256": "7cb3eea9ddd801d7e4c83f49cc573aec98fda78b4cb9abc33d909ebbbe9dc061",
+        "video_bytes": 103951870
+      },
+      "code": {
+        "renderer": "calibration/program_tracking/render_demo_last_shot.py",
+        "source_bridge": "calibration/program_tracking/demo_source.py",
+        "contact": "calibration/program_tracking/demo_contact.py",
+        "layers": "calibration/program_tracking/demo_layers.py",
+        "outro": "calibration/program_tracking/demo_outro.py",
+        "pipeline": "calibration/program_tracking/demo_pipeline.py",
+        "particle_pass": "calibration/program_tracking/demo_particle_pass.py"
+      },
+      "code_sha256": {
+        "renderer": "6c2586a382ec254f09200f844dd41a2a2a4317bcb835228c7d305b062578f8d6",
+        "source_bridge": "82bc0136d03017b0790da22532595fa498936cf2102535f92036d4e40a979bc5",
+        "contact": "c0873e50efe52859b5794db15c4b6b1767e76178ad5d63433868c860771176fa",
+        "layers": "eabc332461be8eb0d890a21f0e79bd4706decb0a8978d4afd43807f72e1108c0",
+        "outro": "19fbdced5247067f1d134469f6b4f361b449c623800e6033c47022aa6fa86739"
+      },
+      "user_visual_review": "Reviewed; user requested wider/deeper-red heat and particle/uniform-ending revisions."
+    }
+  ],
+  "version": "v2"
+}

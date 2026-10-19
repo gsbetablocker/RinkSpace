@@ -1,0 +1,370 @@
+{
+  "schema": "rinkspace.reusable-solver-inputs.v1",
+  "resource_root": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003",
+  "driver": "named66",
+  "source_options": {
+    "--world-init": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/user_corrected_programme_candidate/latest9a8c_world66_initialization_ONLY.json",
+    "--camera-seed": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_unlocked_geometry_696f_derived_C0_step_domains_20261008\\accepted_states\\af8cb83286f4125560452831b8113aa4230acb1037f64f49bff354d35723b4ba\\complete_state_UNACCEPTED.npz",
+    "--additional-ice-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\observations\\vision_training\\continuous_review\\cut6_clear_source_constraints\\complete_source_clear_anchor_append_20261007\\ice_clear_anchors_lane23_trace_and_goal_crease_v2_20261007.json",
+    "--additional-board-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\observations\\vision_training\\continuous_review\\Ad4_17_18_19_source_absolute_20261007\\board_parent_plus_Ad4_17_19_actual_RGB_multicut_v1.json",
+    "--additional-board-material-point-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\short_board_global_source_20261007\\independent_midtime_source\\material_parent_plus_short_board_independent_midtime_FIT_20261007.json",
+    "--additional-board-circle-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\short_board_global_source_20261007\\independent_midtime_source\\circle_parent_plus_short_board_independent_midtime_FIT_20261007.json",
+    "--original-source-role-retirement-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\ads_actual_identity_correction_20261005\\Ad7_original_print_corner_role_correction_CANDIDATE_v1.json",
+    "--independent-board-pattern-placement-source": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/model_constraints/user_advertisement_pairs_20261005.json",
+    "--persistent-ice-long-baseline-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\spin_source_long_baseline_20261005\\spin_micro_actual_original_anchor_v3_20261005\\spin_reviewed_ice_long_baseline_FIT_HELD_v3_micro_actual.json",
+    "--serial-source": true,
+    "--serial-current-patterns": false,
+    "--geometry-fd-workers": "8",
+    "--normal-workers": "8",
+    "--reuse-source-jacobian": true,
+    "--residual-source-workers": "6",
+    "--adaptive-source-backtracking": true,
+    "--residual-native-threads": "3",
+    "--static-motion-source-role-retirement-source": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/spin_source_long_baseline_20261005/actual50_jitter_source_diagnostic_20261005/spin_micro_broadcast_overlay_original_motion_role_retirement_SOURCE_ONLY_v1.json",
+    "--camera-mount-constraint-source": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/camera_hardware_20261001/user_camera_mount_and_height_20261006_v4.json",
+    "--camera-pivot-exterior-constraint-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\camera_hardware_20261001\\user_tripod_positions_20261006_v2.json",
+    "--original-ice-pixel-correction-source": "D:/CodexData/RinkSpace_Data/events/ankara_2026/observations/vision_training/continuous_review/F2_inner_native_source_correction_CPU_20261007/F2_inner_FIT_5632_first2_source_pixel_correction.json",
+    "--roll-prior-sigma-degrees": "0.5",
+    "--additional-native-board-track-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\irregular_six_ads_source_revisit_20261007\\native_board_tracks_six_frozen_normalized_shapes_source_anchors_v2_CANDIDATE.json",
+    "--estimate-unverified-physical-geometry": true,
+    "--original-motion-far-board-role-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\physical_geometry_unlock_20261008\\low_original_Ad4_nearby_source_roles\\secondary686_plus_low53_original_FIT_far_board_role_ADMITTED_v1.json",
+    "--strict-half-circle-crease": true,
+    "--derive-hockey-center-from-course": true
+  },
+  "complete_parent_state_identity": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_unlocked_geometry_696f_derived_C0_step_domains_20261008\\accepted_states\\af8cb83286f4125560452831b8113aa4230acb1037f64f49bff354d35723b4ba\\complete_state_UNACCEPTED.npz",
+    "container_field": "identity_json",
+    "q_sha256": "af8cb83286f4125560452831b8113aa4230acb1037f64f49bff354d35723b4ba"
+  },
+  "complete_parent_run": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_unlocked_geometry_696f_derived_C0_step_domains_20261008",
+  "checkpoint_sha256_at_registration": "865a4bf5219ab16e1554751e5a8295d49489aa4f16e53dfa30226b22b69d73bf",
+  "checkpoint_role": "Immutable af8cb actual complete34338 with current98 geometry, circle6/pattern4 suffixes and all18 original profile arrays. Resume exact complete q; do not append32 again or move original camera columns. Fresh role-revised objective profiles/J, existing numerical damping/step reinitialization when target changes.",
+  "expected_initial_canonical_q_sha256": "af8cb83286f4125560452831b8113aa4230acb1037f64f49bff354d35723b4ba",
+  "planned_parameter_count": 34338,
+  "planned_world_parameter_count": 98,
+  "planned_source_rows": 4651670,
+  "source_revision": "Original runtime, same unified freegeometry98 and canonical34338 state. Existing original FIT motion739 points have source-qualified current finite-board roles: old15 secondary preserved, new386 cut6 and285 cut2 secondary plus53 low5. All raw UV/PTS/sigma/FIT/HELD/roworder/scales/weights preserved; no new observed XYZ/planes, new scalar rows or parameters. Q starts at immutableaf8; prior source15 had locally improved but left continuous neighboring frames wrong. This larger source-qualified correction tests continuous actual camera support.",
+  "source_accuracy_accepted": false,
+  "not_started": false,
+  "status": "RESTART_EXISTING_INTERFACE_AFTER_EXPLICIT_CANONICAL_WIDE_GATE_MAPPING_FIX",
+  "solver_source_manifest_sha256": "a9fa93fe66d5fffc07f8268faa11f0f41a0c6114c0d36cbbf3a44db7eded0861",
+  "physical_geometry_small_verification": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\physical_geometry_unlock_20261008\\actual_complete_q_unlocked_geometry_check.json",
+    "sha256": "a555a8d1b6f8e184c7aa6feee1c834d2b711fd380ce236c95693b9450d5219c2",
+    "complete_q_sha256": "5da4ac3664f4f982d785021b9b6e17a1f5bbc76aa4042038588caf94e6ff5e9b",
+    "world_parameter_count": 98,
+    "all_world_columns_checked_against_actual_raw_residual": true,
+    "old34306_q_and18profiles_preserved": true,
+    "original44_track_r_J_exact": true,
+    "motion_graph_not_loaded": true,
+    "full_normal_not_evaluated": true,
+    "role": "historical default-false geometry extension proof; strict-half-circle source-change verification follows"
+  },
+  "additional_native_board_track_source_packet_sha256": "8c758d1f6ddd0757ba19c19a87c815d37024e538daae43379fad300bffad74e2",
+  "other_source_packet_sha256s": {
+    "additional_ice_source_packet_sha256": "f633c8b96dd331151d3f988f23cff764bbe51932c7ef7b9ec7e80b117e59a35c",
+    "board_edge_source_packet_sha256": "ba51916525ebeea5b52eded653bf2da53ba92d49e7ea095cee28e290b066ff47",
+    "board_material_source_packet_sha256": "7b92f0cf7ddf7ef09a1b1672f13b8cf19441ba3dfec77da5ac8acf0cf316f602",
+    "board_circle_source_packet_sha256": "eef5718b6bb5671b974a5f2e2ee79e4e5fae09c219abbc4e074322f6e09538a9"
+  },
+  "execution_revision": "Reuse existing fastest complete-source interface: FD8/residual6/native3/patterns4/Gram8, adaptive same-run RAM J reuse, original nonlinear print/mount/pivot guards and feasible shared LM step. Start new source target with fresh complete J; source derivatives, profiles, real residuals, masks, sigmas and true-cost acceptance preserved. Single immutableaf8cb34338 continuation; old two failed branches retained only as history. No arbitrary accepted-step/time cap; stop only numerical convergence, actual source QA failure/stagnation, or explicit user interruption. Record preparation, first full J+normal and real accepted wall intervals separately.",
+  "performance_acceptance": "Record actual cold preparation, first complete J+normal and accepted wall intervals on this new target; numerical cost is not visual alignment. Largest true native source errors drive correction.",
+  "current_task": "Finish fully aligned continuous nine-shot Okada overlay video from all actual native source and explicit latest user manual lane evidence.",
+  "resume_requires_user_instruction": false,
+  "historical_unaccepted_branches": [
+    {
+      "path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/okada_shared_prints_current_696f_local_branch_gate_20261007",
+      "q_sha256": "06205a94a7a713489a024e90aa81f0777195d40b96a2280b895c3cf426956a6e",
+      "reason": "Original source regressions despite local new-ad improvement"
+    },
+    {
+      "path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/okada_shared_prints_alternative_4075_20261007",
+      "q_sha256": "71a502dc9bf6a09704924592170419745b4d3533599d30efd51573ed38b71cd0",
+      "reason": "Original source regressions despite local Ad4 improvement"
+    },
+    {
+      "path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/okada_unlocked_geometry_current_696f_strict_blue_roles_20261008",
+      "q_sha256": "5da4ac3664f4f982d785021b9b6e17a1f5bbc76aa4042038588caf94e6ff5e9b",
+      "reason": "Actual first full-J worker refused world98 because existing absolute FD pool and batched helper required world66. Interface fixed from authoritative material.parameter_count; source target unchanged. First full normal not completed."
+    },
+    {
+      "path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/okada_unlocked_geometry_current_696f_strict_blue_roles_dynamic_pool_20261008",
+      "q_sha256": "5da4ac3664f4f982d785021b9b6e17a1f5bbc76aa4042038588caf94e6ff5e9b",
+      "reason": "Full4651670 J+normal completed73.80288s; checkpoint auxiliary JSON rejected np.int64 chart indices. Chart producer now plain ints; entire actual auxiliary serialization moved before full J. No accepted update. New confirmed C0 structural relation changes the current operator."
+    },
+    {
+      "path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/okada_unlocked_geometry_696f_derived_C0_20261008",
+      "q_sha256": "5da4ac3664f4f982d785021b9b6e17a1f5bbc76aa4042038588caf94e6ff5e9b",
+      "reason": "Full4651670 normal complete125.7156s; existing solver rejected +inf in newly assembled Lane one-sided domain. Kept physical guard, moved same nonnegative-domain tangent to existing halfspaces without artificial upper extent. No accepted state."
+    },
+    {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_unlocked_geometry_696f_derived_C0_step_domains_20261008",
+      "q_sha256": "af8cb83286f4125560452831b8113aa4230acb1037f64f49bff354d35723b4ba",
+      "reason": "29actual accepted states, then lagged36/fresh37 no lower full cost; originalAd4-leftHELD16.12->26.65px and blue20.88->22.68px. This full state is numerical seed only; new source role target justified by actual RGB, not repeat same objective."
+    },
+    {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_unlocked_geometry_af8cb_board739_current_20261008",
+      "status": "startup_diagnostic_interface_failure_before_initial_export",
+      "reason": "wide_same_state_replay used legacyCORE_COUNT slice despite dynamic core34300; helper-only compatibility repaired, actual sameq5808 source local check passed; numerical model/source objective unchanged"
+    },
+    {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_unlocked_geometry_af8cb_board739_dynamic_wide_20261008",
+      "status": "startup_canonical_chart_diagnostic_failure_before_initial_export",
+      "reason": "wide helper received canonical q but sliced evaluation core without explicit permutation. Actual Ad16 domain was never violated by saved state; chart caller fixed with existing evaluation_core callback and active-column mapping."
+    }
+  ],
+  "original_wide_actual_verification": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\physical_geometry_unlock_20261008\\unlocked98_actual_wide_r_J_and_all_extra_FD.json",
+    "sha256": "7cc19223fe5643c0e92ac776095c1935d80529a064dc7ae229db98bc1b009ec1",
+    "legacy66_vs98_actual5808_r_core_J_private25_J_bitexact": true,
+    "new32_columns_actual_uncached_FD_zero_and_J_zero": true,
+    "role": "historical default-false interface equivalence proof; current strict-half-circle actual wide source differs as explicitly modeled"
+  },
+  "user_confirmed_structural_ties_retained": {
+    "equal_house_pitch": true,
+    "common_FR_parallel_columns": true,
+    "equal_Lane_widths": true,
+    "collinear_Lane_rectangular_right_ends": true,
+    "authority": "confirmed_layout_v2 human statement plus Sep23 direct user confirmations; preserve free mean p15/p16/p21/p22, do not add unsupported layout8 coordinates",
+    "Lane_longitudinal_connection_right_extent_separate_from_rectangular_end": true
+  },
+  "original_motion_far_board_role_packet_sha256": "7c609bf13ccadb5425f8f573f452e0f6666d707ad36ed037bcae19af4876877c",
+  "original_motion_far_board_role_actual_verification": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\physical_geometry_unlock_20261008\\cut6_original_FIT15_role_verification\\original_motion_far_board_roles_all_world_FD_check_v1.json",
+    "sha256": "515728aa36c1c27d129f5c04a24bcd314ab4245de2eefa8ff691c67b4a9e4789",
+    "q_sha256": "5da4ac3664f4f982d785021b9b6e17a1f5bbc76aa4042038588caf94e6ff5e9b",
+    "mixed_all_world_and_actual_camera_FD_max_error": 6.82e-09,
+    "all98_world_column_FD_max_error": 6.76e-08,
+    "original15_UV_PTS_sigma_weights_indices_preserved": true,
+    "new_source_rows": 0,
+    "initial_unknown_depth_median_px": 0.33046,
+    "initial_typed_current_board_median_px": 14.75277,
+    "source_objective_correction_not_r_invariance": true,
+    "verification_scope": "historical original15 producer interface stage; final739 proof recorded separately"
+  },
+  "unmeasured_course_power_upper_guard_removed": {
+    "previous_numeric_upper": 8,
+    "current_domain": "p>1; all finite positive convex physical guards retained",
+    "baseline_did_not_touch_previous_upper": true,
+    "original_error_cause_not_claimed": true
+  },
+  "current_blue_crease_structure": {
+    "strict_half_circle_crease": true,
+    "old_inferred_ellipse_aspect_not_preserved": true,
+    "shared_radius_and_current_goal_frame_still_estimated": true,
+    "samples": 61,
+    "new_parameters": 0,
+    "source_roles_UV_sigma_preserved": true,
+    "all_blue_source_projection_and_J_must_be_reevaluated": true,
+    "old_ellipse_not_claimed_cause_of_all_misalignment": true
+  },
+  "strict_physical_geometry_actual_verification": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\physical_geometry_unlock_20261008\\strict_half_circle\\actual_complete_q_unlocked_geometry_check.json",
+    "sha256": "10a7699b93a6788f3d483305433769a40c00036d436a18ba54bcb31b14eb7bb6",
+    "strict_half_circle_crease": true,
+    "all98_uncached_columns_and_actual_camera_checked": true,
+    "old_complete34306_q_and18_profiles_preserved": true,
+    "motion_graph_not_loaded": true
+  },
+  "strict_native_ice_actual_verification": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\physical_geometry_unlock_20261008\\strict_half_circle\\native_ice_all98\\native_ice_circle_material_all_world_FD_check_v1.json",
+    "sha256": "e511a6aa396ed40f45c975a7ead684c844b6321017dddbd8ae921446be0c0e68",
+    "all98_uncached_columns_and_actual_camera_checked": true,
+    "isolated_crease_checked": true,
+    "passed": true
+  },
+  "original_motion_role_production_binder_verification": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\physical_geometry_unlock_20261008\\cut6_original_FIT15_role_verification\\original_motion_role_production_binder_check_v1.json",
+    "sha256": "077f23e5dcbe0d982451d4116432c1e6b7e6c77bdc1bc8284d263e0557878893",
+    "actual_production_binder_and_self_pickle_passed": true,
+    "actual_minimal_pickle_and_residual_double_copy_passed": true,
+    "worker_hook_owner_actual": true,
+    "source_rows_UV_PTS_sigma_preserved": true,
+    "verification_scope": "historical original15 producer interface stage; final739 proof recorded separately"
+  },
+  "strict_wide_verification_status": "Historical strict-only same-branch FD passed; current derive-C0 all98+25 actual FD passed and attached separately.",
+  "absolute_geometry_FD_worker_actual_verification": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\physical_geometry_unlock_20261008\\strict_half_circle\\actual_dynamic_absolute_FD_pool_check.json",
+    "sha256": "f2fa7081f654503bbdbaf3b3b5541e9bab9a568634e3601a580576e5e0d8abf5",
+    "world_parameter_count": 98,
+    "course_ad_circle_worker_vs_parent_bitexact": true,
+    "whole_motion_graph_not_loaded": true
+  },
+  "original225_review_interface_revision": {
+    "world_count_from_actual_binder": true,
+    "all225_original_HELD_materials_registered_without_source_edit": true,
+    "old_world66_digest_refers_to_prefix": true,
+    "current_complete_world_digest_reported": true,
+    "actual98_numeric_source_admission_checked": true
+  },
+  "derived_C0_actual_wide_verification": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\physical_geometry_unlock_20261008\\strict_half_circle_derived_C0\\actual_wide_all98_private25_nearest_branch_FD_and_geometry_change.json",
+    "sha256": "887af4eb50e6d4229966a6888c231699c1765756e380318fe432711585569ecb",
+    "all98_world_and25_private_camera_uncached_FD_passed": true,
+    "legacy0_1_actual_value_perturbations_zero_and_J_zero": true,
+    "steps_shrunk_only_for_actual_nearest_curve_branch_change": true,
+    "all_actual_source_rows_sigma_and_objective_preserved": true
+  },
+  "current_hockey_center_structure": {
+    "derive_hockey_center_from_course": true,
+    "authority": "user_confirmed_C0_is_current_course_center",
+    "datum": "XY midpoint of the currently estimated finite course bounds",
+    "archived_canonical_initializer_columns": [
+      0,
+      1
+    ],
+    "canonical_old_initializer_values_retained": true,
+    "archived_initializer_columns_not_effective_physical_DOF": true,
+    "no_new_parameters_or_priors": true,
+    "scene_all_source_values_and_derivative_chain_use_same_effective_world": true,
+    "geometry_unchanged_not_claimed": true
+  },
+  "current_derived_geometry_initializer": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\physical_geometry_unlock_20261008\\strict_half_circle_derived_C0\\complete_state_initializer_UNACCEPTED.npz",
+    "sha256": "0c09457975adbbcb785d6050102c96db86237786ec1c660e07c4594abc486809",
+    "q_sha256": "5da4ac3664f4f982d785021b9b6e17a1f5bbc76aa4042038588caf94e6ff5e9b",
+    "prior_target_weights_and_identity_inherited_only_not_current_acceptance": true
+  },
+  "Lane_right_extension_domain": {
+    "physical_relation": "108/945+current_offset >= 0",
+    "existing_nonlinear_guard_preserved": true,
+    "linearized_in_existing_shared_halfspace_interface": true,
+    "arbitrary_upper_bound_supplied": false,
+    "not_an_observation_or_prior": true,
+    "actual98world_last4_tangent_rows_identity_verified": true
+  },
+  "original225_derived_center_actual_check": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\physical_geometry_unlock_20261008\\strict_half_circle_derived_C0\\original225_review\\original225_derived_center_actual_source_check_v1.json",
+    "sha256": "56082044b3913400edc4ef9cf7c5d82e78e0a69344b58afe67d5598d6b4e43c1",
+    "all225_UV_sigma_split_roles_preserved": true,
+    "raw_legacy_center_perturbations_actual_world_and_render_bitexact_zero": true,
+    "structural_operator_change_reported_separately": true
+  },
+  "frozen_geometry98_complete_resume_preflight": {
+    "state_npz_sha256": "865a4bf5219ab16e1554751e5a8295d49489aa4f16e53dfa30226b22b69d73bf",
+    "q_sha256": "af8cb83286f4125560452831b8113aa4230acb1037f64f49bff354d35723b4ba",
+    "canonical_q_shape": [
+      34338
+    ],
+    "original_complete_prefix_count": 34306,
+    "additional_geometry_offset_count": 32,
+    "evaluation_core_count": 34300,
+    "complete_permutation_roundtrip_bitexact": true,
+    "original18_profile_array_shapes": {
+      "profile__weights_0": [
+        246156,
+        2
+      ],
+      "profile__present_0": [],
+      "profile__robust_0": [],
+      "profile__weights_1": [
+        400539,
+        2
+      ],
+      "profile__present_1": [],
+      "profile__robust_1": [],
+      "profile__weights_2": [
+        39679,
+        2
+      ],
+      "profile__present_2": [],
+      "profile__robust_2": [],
+      "profile__weights_3": [
+        435185,
+        2
+      ],
+      "profile__present_3": [],
+      "profile__robust_3": [],
+      "profile__weights_4": [
+        799549,
+        2
+      ],
+      "profile__present_4": [],
+      "profile__robust_4": [],
+      "profile__weights_5": [
+        274124,
+        2
+      ],
+      "profile__present_5": [],
+      "profile__robust_5": []
+    },
+    "fullstate_preserved_before_first_new_target_profile_update": true
+  },
+  "original_motion_role_new_target_production_checks": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\physical_geometry_unlock_20261008\\low_original_Ad4_nearby_source_roles\\actual739_production_proof\\actual_af8cb83286f4125560452831b8113aa4230acb1037f64f49bff354d35723b4ba_production_check_v1.json",
+    "sha256": "1271fe81955de704913356524f12e0168608a71b203d7416f66ee0b592fa8d05",
+    "status": "PASSED",
+    "q_sha256": "af8cb83286f4125560452831b8113aa4230acb1037f64f49bff354d35723b4ba",
+    "actual_fullsavedprofiles_profile_motion_residual_finite_extent_guard_passed": true,
+    "all739_world98_and_actual_camera_mount_lens_mixed_FD_max_error": 3.3636e-08,
+    "all739_six_course_column_FD_max_error": 1.282e-07,
+    "new_six_course_columns_operator_same_layout_all98_inherited_proof_sha256": "78a21b601b3b06fecef05e04351cd9a0577b125d41a81ad2c2abfd1b5da6e268",
+    "actual_full_producer_point_counts": [
+      39679,
+      435185
+    ],
+    "actual_fresh_minimal_pickle_and_residual_doublecopy_owner_passed": true,
+    "actual_secondary_finite_points": 692,
+    "actual_low_finite_points": 524,
+    "original15_and_nonnewrole_residuals_bitexact": true,
+    "source_rows_UV_PTS_sigma_profiles_and_weights_preserved": true,
+    "all739_all98_world_columns_separately_retested": false,
+    "new_source_rows": 0,
+    "no_tolerance_relaxation": true
+  },
+  "planned_original_finite_source_counts_by_block": {
+    "main1": 13,
+    "main7": 0,
+    "secondary": 692,
+    "low": 524,
+    "main9": 0,
+    "main4": 0
+  },
+  "planned_original_finite_board_point_count": 756,
+  "same_target_QA_baseline": "New run initial_states/af8cb before coupled update; target revises material roles of724 additional original FIT points plus preserves15 previously admitted secondary points. Original225 and packetHELD remain read-only. All34338 canonical parameters and18 savedprofiles resume exactly from immutableaf8 before new-target profile refresh.",
+  "additional_original_motion_role_components": [
+    {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\aligned_complete_20261007_478afaf77615\\continuous_adjacent_native_board_source\\three_worst_pairs_reinspection_20261007\\cut6_actual_original_motion_factor\\cut6_original_FIT15_actual_RGB_far_board_role_admitted_v1.json",
+      "sha256": "069b71bd6769ed9ca43abe197adbfddaf4e4b42736e7bdf0368254af26255798"
+    },
+    {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\physical_geometry_unlock_20261008\\low_original_Ad4_nearby_source_roles\\low_Ad4_nearby_original_FIT53_far_board_role_ADMITTED_v1.json",
+      "sha256": "0e66414c23957b518e0d4642022544ae0b12d7ff3aca943aa5321d0e4668c7e2"
+    },
+    {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\physical_geometry_unlock_20261008\\secondary_original_material_roles_source_only\\cut6_all389_actual_RGB386_far_board_material_qualified_ADMITTED_v1.json",
+      "sha256": "064fd91d406050ac32e3cfa68e816d1f3ffebba07cfceb9f83ab8bea09616690"
+    },
+    {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\physical_geometry_unlock_20261008\\secondary_original_material_roles_source_only\\cut2_all285_actual_RGB_far_board_material_qualified_ADMITTED_v1.json",
+      "sha256": "06ca509967bd539b05bfb1e7a7ea82adb1b692e14e2c414ea0216825daa7fbfc"
+    }
+  ],
+  "complete_parameter_resume_policy": "Retain all34338 canonical coordinates and18 profiles exactly at loading; same32 geometry offsets reused. Role-changed original53 FIT operator recomputes profiles and fresh complete J; oldmatrix/depth/damping source identity not inherited as same target.",
+  "planned_original_motion_role_points_by_block": {
+    "secondary": 686,
+    "low": 53
+  },
+  "new_original_motion_material_roles_relative_to_previous_target": 724,
+  "actual_wide_dynamic_core_helper_verification": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_unlocked_geometry_af8cb_board739_current_20261008\\actual_wide_dynamic_core_helper_check.json",
+    "sha256": "7db774ed4c09f0de5872ea54b2d0b0b10b81fdf375d09442afb3ce6ef0e82d2e",
+    "actual_physical_core_count": 34300,
+    "actual_rows": 5808,
+    "same_source_operator_and_tolerance": true,
+    "actual_piecewise_local_check_error": 0.00014270796248183615,
+    "existing_tolerance": 0.10218769474855441,
+    "operator_changed": false,
+    "complete_q_unchanged": true,
+    "scope": "historical physical-evaluation-chart test; canonical caller requires explicit callback, covered by later actual_wide_canonical_chart_helper_verification"
+  },
+  "actual_wide_canonical_chart_helper_verification": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_unlocked_geometry_af8cb_board739_dynamic_wide_20261008\\actual_wide_canonical_chart_helper_check.json",
+    "sha256": "5d5722d8c6dccf14800c97dfbd2663e4bc62b4d1a7bf84a4921712d94a075e22",
+    "complete_checkpoint_canonical34338_to_evaluation_core34300_explicit": true,
+    "actual_original5808_rows_and_all98_world_private25_direction": true,
+    "actual_existing_piecewise_gate_error": 0.00014270796248183615,
+    "existing_gate_tolerance": 0.10218769474855441,
+    "model_source_J_guard_tolerance_unchanged": true
+  }
+}

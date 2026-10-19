@@ -1,0 +1,175 @@
+{
+  "schema": "rinkspace.actual-source-hockey-shared-structure-review.v1",
+  "event_id": "ankara_2026",
+  "scope": "Independent source-image and source-inventory review, no solving or source modification",
+  "wide_source": {
+    "pts": 56218880,
+    "image": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\history\\legacy_outputs\\rink_model\\ankara_2026_shared\\v0.13-women-sp\\evidence\\survey\\survey_3660.png",
+    "image_sha256": "ccd92c70eaa4a8b410808ad0372dba4ce0fb7ba30de4a75ef0368459f32a86e5",
+    "problem": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\history\\legacy_outputs\\calibration\\ankara_2026_wide_joint_20260923\\A_pair_symmetry_A1_upper_A2_balance_v5\\problem.json",
+    "problem_sha256": "5b139c6a53b1926f8df20cf0810d5c45886fc7d5b47c8c9928a401438accce12",
+    "relevant_observations": [
+      {
+        "id": "women_sp_high_56218880_C",
+        "target": {
+          "kind": "line_segment",
+          "feature_id": "C"
+        },
+        "native_UV_count": 7,
+        "sigma_px": 3
+      },
+      {
+        "id": "women_sp_high_56218880_goal_line_right",
+        "target": {
+          "kind": "line_segment",
+          "feature_id": "goal_line_right"
+        },
+        "native_UV_count": 7,
+        "sigma_px": 5
+      },
+      {
+        "id": "women_sp_high_56218880_C0_left_visible",
+        "target": {
+          "kind": "circle_outline",
+          "feature_id": "C0"
+        },
+        "native_UV_count": 6,
+        "sigma_px": 3.5
+      },
+      {
+        "id": "women_sp_high_56218880_goal_crease_right_visible",
+        "target": {
+          "kind": "polygon_outline",
+          "feature_id": "goal_crease_right"
+        },
+        "native_UV_count": 36,
+        "sigma_px": 3.5
+      },
+      {
+        "id": "women_sp_high_56218880_C0_right_clear_native",
+        "target": {
+          "kind": "circle_outline",
+          "feature_id": "C0"
+        },
+        "native_UV_count": 7,
+        "sigma_px": 3.5
+      }
+    ],
+    "actual_RGB_viewed": true,
+    "visual_finding": "Right goal-line source is the red line through the blue crease diameter; right blue source is actual filled semicircle boundary; C0 observed blue arcs straddle central red transverse line."
+  },
+  "programme_source": {
+    "packet": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\observations\\vision_training\\continuous_review\\cut6_clear_source_constraints\\complete_source_clear_anchor_append_20261007\\ice_clear_anchors_lane23_trace_and_goal_crease_v2_20261007.json",
+    "packet_sha256": "f633c8b96dd331151d3f988f23cff764bbe51932c7ef7b9ec7e80b117e59a35c",
+    "native_frames": [
+      {
+        "pts": 229794304,
+        "feature": "C0",
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\history\\work_sessions\\20261001_01a0f635-83e9-7b32-9d8b-396f7e65bc67\\pelvis\\main4_geometry\\raw_229794304.jpg",
+        "sha256": "9791ff69f1675ee4d6475e70d7ae7c64b4695af5972040876c8a62ed741ce562",
+        "actual_RGB_viewed": true
+      },
+      {
+        "pts": 230955776,
+        "feature": "goal_crease_left",
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\goal_crease_shared_geometry_20261007\\native_230955776.png",
+        "sha256": "9e735fd62f7eea64d0b09f9b80e1bfd0eada77215ef3eb6f8d82c67bf13abe6a",
+        "actual_RGB_viewed": true
+      },
+      {
+        "pts": 230967552,
+        "feature": "goal_crease_left",
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\goal_crease_shared_geometry_20261007\\native_230967552.png",
+        "sha256": "5762fd4be9a4745fb93d36043274371ef563e2d50b639f2146b3e94fc5648cc7",
+        "actual_RGB_viewed": true
+      },
+      {
+        "pts": 230979840,
+        "feature": "goal_crease_left",
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\goal_crease_shared_geometry_20261007\\native_230979840.png",
+        "sha256": "8cd64c0efdea3ce39d8738275c5300267ad044b2e9a59ebbd9beeaccf4b7e4f5",
+        "actual_RGB_viewed": true
+      }
+    ],
+    "C0_visual_finding": "Actual central blue circle beside central red transverse line in front of JGP print, not a curling target.",
+    "goal_left_visual_finding": "Blue filled region and red curved boundary are visible; candidate faint straight red segments cannot be promoted to unique goal-line-left UV or endpoints from these three blurred cropped views.",
+    "additional_left_goal_line_FIT_rows": 0
+  },
+  "model_shared_structure": {
+    "initializer": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\user_corrected_programme_candidate\\latest9a8c_world66_initialization_ONLY.json",
+    "initializer_sha256": "48ec149a8d5edab9e60246ddcb28d7a4fdaddb3b7e1d711fe4c951bdd6d3a4b5",
+    "old_scene": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\current_common_hockey_soft_reference_source_freezes\\9a8c1ac9d049\\actual_terminal_four_source_images\\actual_current_scene.json",
+    "old_scene_sha256": "c109479e852a27b130f3b5019decabb21c7352ad4840fcc66570e7d03090b6e5",
+    "initializer_uses_old_solution_not_new_source_observations": true,
+    "crease_unit_shapes": {
+      "left": {
+        "shape": [
+          61,
+          3
+        ],
+        "min": [
+          -0.010305070393203624,
+          -0.9999469013523623,
+          0.0
+        ],
+        "max": [
+          1.031220456541799,
+          0.9999469013523623,
+          0.0
+        ]
+      },
+      "right": {
+        "shape": [
+          61,
+          3
+        ],
+        "min": [
+          -0.003328362418788907,
+          -0.9999944609864643,
+          0.0
+        ],
+        "max": [
+          1.031269503613721,
+          0.9999944609864643,
+          0.0
+        ]
+      }
+    },
+    "current_free_geometry": "Shared hockey centerXY/yaw and shared crease radius; side-specific goal-distance along hockey axis; crease center is goal-line midpoint and normalized shape is inherited.",
+    "observed_source_shape_not_measured_by_initializer": true
+  },
+  "wide_current_unmeasured_camera25": [
+    100.83733634263245,
+    -52.4061758020919,
+    25.98780063020014,
+    1.6351760530120756,
+    1.0419534101688626,
+    -0.9906686826262745,
+    7.277889477738052,
+    7.291096334471569,
+    236.359915602525,
+    435.474917436886,
+    139.33060161856244,
+    -0.2951307367797062,
+    0.0724590368026808,
+    -0.012186133684304577,
+    -0.01972005385465985,
+    -0.005814360515329823,
+    0.0953184005349483,
+    -0.025170771149324044,
+    0.0008962448578928467,
+    0.21199640321051988,
+    -0.042031113200421265,
+    0.01787446362703685,
+    -0.0006095095578815884,
+    0.07244478739784863,
+    -0.018949440321764228
+  ],
+  "limits": [
+    "This review does not prove a shared-frame contradiction or choose between camera/geometry basins.",
+    "Current wide optics have25 free parameters including skew/Brown14; small fitted wide errors are not independent physical geometry validation.",
+    "No uncertain goal-line role was added as FIT."
+  ],
+  "source_state_camera_or_solver_changed": false,
+  "accuracy_accepted": false
+}

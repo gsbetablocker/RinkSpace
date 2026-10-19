@@ -1,0 +1,232 @@
+{
+  "schema_version": "rinkspace.programme-camera-hardware-associations.v1",
+  "recorded_local_date": "2026-10-01",
+  "programme_id": "okada_mei_short_programme_source_f685d278",
+  "event_scope_id": "ankara_2026_user_scope",
+  "event_scope_note": "existing user event-scope identifier, not a new independently dated event assertion",
+  "source": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\data\\input\\oxXu1avhrvs.mp4",
+    "sha256": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891",
+    "final_video_resolution_wh": [
+      1920,
+      1080
+    ],
+    "final_video_rate": "60/1",
+    "final_video_time_base": "1/15360",
+    "frame_step_pts": 256,
+    "capture_frame_rate": null,
+    "camera_output_format": null,
+    "interpretation": "final video display clock and dimensions; no capture-rate inference from device capability"
+  },
+  "classification_input": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\configs\\camera_classification\\ankara_2026_user_confirmed.json",
+    "sha256": "37f11ddc1d131013f1e0bb8e713e910f7466398d390b4c05daf5eb391d4ace04",
+    "scope": "existing programme physical camera grouping; no new reclassification"
+  },
+  "source_shots_input": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\program_tracking\\source_shots.json",
+    "sha256": "5932fdd51cc33eaf3b40d5c2e8ec9cba758c23292bf70c6b9614936e6b6aad3b"
+  },
+  "hardware_registry": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\configs\\camera_hardware\\sony_pxw_z190.json",
+    "sha256": "5803c46eaf1a1f84bd885a2aa8cfe0e65b2d1e174d380baa869f332d0251de4d"
+  },
+  "analysis_scope": {
+    "start_pts": 229114112,
+    "end_pts_exclusive": 231705600,
+    "source_native_frame_count": 10123,
+    "shot_indices": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  "installations": [
+    {
+      "installation_id": "okada_sp_main_long_side_source_f685d278",
+      "camera_group_id": "main_long_side",
+      "calibration_installation_slot": 0,
+      "hardware_model_id": "sony_pxw_z190",
+      "model_association_status": "production_team_model_user_confirmed_for_current_three_installations",
+      "physical_unit_serial": null,
+      "separate_parameter_group": true,
+      "other_installation_optics_or_pose_reuse_authorized": false,
+      "field_settings": {
+        "steadyshot": null,
+        "digital_extender_enabled": null,
+        "crop_factor": null,
+        "camera_output_format": null,
+        "capture_frame_rate": null,
+        "readout_seconds": null
+      },
+      "source_shot_indices": [
+        1,
+        4,
+        7,
+        9
+      ],
+      "source_intervals": [
+        {
+          "shot_index": 1,
+          "start_pts": 229114112,
+          "end_pts_exclusive": 229497600,
+          "classification_authority": "user_corrected_authoritative_camera_csv",
+          "classification_review_status": "user_confirmed_complete_source_shot"
+        },
+        {
+          "shot_index": 4,
+          "start_pts": 229702144,
+          "end_pts_exclusive": 229945856,
+          "classification_authority": "assistant_independent_visual_review",
+          "classification_review_status": "assistant_reviewed_proxy_sequence"
+        },
+        {
+          "shot_index": 7,
+          "start_pts": 230518016,
+          "end_pts_exclusive": 230898688,
+          "classification_authority": "assistant_independent_visual_review",
+          "classification_review_status": "assistant_reviewed_proxy_sequence"
+        },
+        {
+          "shot_index": 9,
+          "start_pts": 231013120,
+          "end_pts_exclusive": 231705600,
+          "classification_authority": "assistant_independent_visual_review",
+          "classification_review_status": "assistant_reviewed_proxy_sequence"
+        }
+      ]
+    },
+    {
+      "installation_id": "okada_sp_secondary_long_side_source_f685d278",
+      "camera_group_id": "secondary_long_side",
+      "calibration_installation_slot": 1,
+      "hardware_model_id": "sony_pxw_z190",
+      "model_association_status": "production_team_model_user_confirmed_for_current_three_installations",
+      "physical_unit_serial": null,
+      "separate_parameter_group": true,
+      "other_installation_optics_or_pose_reuse_authorized": false,
+      "field_settings": {
+        "steadyshot": null,
+        "digital_extender_enabled": null,
+        "crop_factor": null,
+        "camera_output_format": null,
+        "capture_frame_rate": null,
+        "readout_seconds": null
+      },
+      "source_shot_indices": [
+        2,
+        6
+      ],
+      "source_intervals": [
+        {
+          "shot_index": 2,
+          "start_pts": 229497600,
+          "end_pts_exclusive": 229671680,
+          "classification_authority": "user_corrected_authoritative_camera_csv",
+          "classification_review_status": "user_confirmed_complete_source_shot"
+        },
+        {
+          "shot_index": 6,
+          "start_pts": 230369024,
+          "end_pts_exclusive": 230518016,
+          "classification_authority": "user_corrected_authoritative_camera_csv",
+          "classification_review_status": "user_confirmed_complete_source_shot"
+        }
+      ]
+    },
+    {
+      "installation_id": "okada_sp_low_end_source_f685d278",
+      "camera_group_id": "low_end",
+      "calibration_installation_slot": 2,
+      "hardware_model_id": "sony_pxw_z190",
+      "model_association_status": "production_team_model_user_confirmed_for_current_three_installations",
+      "physical_unit_serial": null,
+      "separate_parameter_group": true,
+      "other_installation_optics_or_pose_reuse_authorized": false,
+      "field_settings": {
+        "steadyshot": null,
+        "digital_extender_enabled": null,
+        "crop_factor": null,
+        "camera_output_format": null,
+        "capture_frame_rate": null,
+        "readout_seconds": null
+      },
+      "source_shot_indices": [
+        3,
+        5,
+        8
+      ],
+      "source_intervals": [
+        {
+          "shot_index": 3,
+          "start_pts": 229671680,
+          "end_pts_exclusive": 229702144,
+          "classification_authority": "assistant_independent_visual_review",
+          "classification_review_status": "assistant_reviewed_proxy_sequence"
+        },
+        {
+          "shot_index": 5,
+          "start_pts": 229945856,
+          "end_pts_exclusive": 230369024,
+          "classification_authority": "assistant_independent_visual_review",
+          "classification_review_status": "assistant_reviewed_proxy_sequence"
+        },
+        {
+          "shot_index": 8,
+          "start_pts": 230898688,
+          "end_pts_exclusive": 231013120,
+          "classification_authority": "assistant_independent_visual_review",
+          "classification_review_status": "assistant_reviewed_proxy_sequence"
+        }
+      ]
+    }
+  ],
+  "unassociated_known_groups": [
+    {
+      "camera_group_id": "high_oblique_overview",
+      "hardware_model_id": null,
+      "installation_id": null,
+      "status": "fourth classified camera exists but is outside this programme; hardware identity unconfirmed"
+    }
+  ],
+  "unassociated_other_event_material": [
+    {
+      "scope": "other event camera photos and sources, including prior Xian leads",
+      "hardware_model_id": null,
+      "installation_id": null,
+      "calibration_transfer_authorized": false,
+      "status": "not merged with current event installations"
+    }
+  ],
+  "geometry_binding": {
+    "active_scene_sha256": "93c654360712be798e65aa83e587415fa2693008ee320ccbc1972299ead293bd",
+    "scene_geometry_changed_by_hardware_metadata": false,
+    "optics_coefficients_changed_by_hardware_metadata": false
+  },
+  "previous_hardware_leads_retained": "three_frame_refit/program_tracking/camera_hardware_leads.md",
+  "team_report_evidence": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\evidence\\camera_hardware_20261001\\user_report.md",
+    "sha256": "ced2fe67064c14a022417cb5337da5e5cef6efd3885293584369f473bf5bac43",
+    "grade": "user_report_not_original_email"
+  },
+  "latest_user_camera_confirmation": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\evidence\\camera_hardware_20261001\\user_camera_mount_and_height_20261002_v3.json",
+    "sha256": "e42424eb9f0830336cc44cd9b5d24fa0808eba2186eea00662df25b886fee3e4"
+  },
+  "latest_user_tripod_positions": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\evidence\\camera_hardware_20261001\\user_tripod_positions_20261002.json",
+    "sha256": "2975563b431fb452fa06b8b4815b03566c2089cf7b210d2c08f925be6f8982ec",
+    "authority": "current_user_direct_annotation",
+    "recorded_local_date": "2026-10-02"
+  },
+  "historical_association_snapshot_before_nonzero_mount": {
+    "path": "D:\\CodexData\\.codex\\visualizations\\2026\\10\\02\\private-thread-00009\\RinkSpace_tmp\\user_nonzero_mount_20261002_v3\\okada_sp_installations_z190_v1.json",
+    "sha256": "f7a5116da0533e6bdc71f26652f0ed0fae199aca7460ef0cec6c1c5c40a141c9"
+  }
+}

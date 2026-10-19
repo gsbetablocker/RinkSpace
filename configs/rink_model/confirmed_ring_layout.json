@@ -1,0 +1,23 @@
+{
+  "schema_version": "rinkspace.user-confirmed-geometry.v1",
+  "evidence_kind": "user_statement_not_image_measurement",
+  "date": "2026-09-20",
+  "statements_zh": [
+    "R1 R2 R3 R4应该是一样大并且在平行于冰场短边的一条直线上的。",
+    "另一端的F0 F1 F2 F3也是一样大并且在平行于冰场短边的一条直线上的。",
+    "两端 8 个全部一样大"
+  ],
+  "confirmed_constraints": [
+    {"id":"all_eight_equal_outer_radius", "features":["R1","R2","R3","R4","F0","F1","F2","F3"], "quantity":"same physical outer ring radius", "method":"one shared unknown parameter"},
+    {"id":"R_centres_collinear_parallel_short_side", "features":["R1","R2","R3","R4"], "method":"one shared long-axis coordinate; individual transverse coordinates"},
+    {"id":"F_centres_collinear_parallel_short_side", "features":["F0","F1","F2","F3"], "method":"one shared long-axis coordinate; individual transverse coordinates"}
+  ],
+  "F3_identity": {
+    "previous_id":"F_assumed_2",
+    "status":"user_suggested_label_for_existing_orange_placeholder; no direct image observation added",
+    "previous_centre_model":[-72,36],
+    "transverse_position":"unobserved; placeholder with an explicit broad range, not an estimated source observation"
+  },
+  "not_asserted":["equal spacing between adjacent rings", "mirrored longitudinal end locations", "equal transverse coordinates across the two rows", "metre dimensions", "independently calibrated lens parameters"],
+  "independent_geometry_validation":false
+}

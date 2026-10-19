@@ -1,0 +1,44 @@
+{
+  "schema": "rinkspace.programme-native-source-audit-fact.v1",
+  "audit_id": "Ad4.K_arc1.three_residual_rows.20261018",
+  "not_a_direct_human_confirmation": true,
+  "source_rows": [
+    180150,
+    180343,
+    181327
+  ],
+  "native_pts": [
+    573184,
+    573440,
+    574720
+  ],
+  "time_base": "1/12800",
+  "source_times": [
+    "00:00:44.780",
+    "00:00:44.800",
+    "00:00:44.900"
+  ],
+  "source_evidence": {
+    "report_path": "D:/CodexData/RinkSpace_Data/runs/okada_s1_r11/ad4_residual3/report.json",
+    "report_sha256": "89b0c88e63f7c8086187ca3d360eaa6e337c1a077a432660bfedad31c9a93c08",
+    "review_path": "D:/CodexData/RinkSpace_Data/runs/okada_s1_r11/ad4_residual3/review.html",
+    "native_crops_path": "D:/CodexData/RinkSpace_Data/runs/okada_s1_r11/ad4_residual3/source3.png"
+  },
+  "current_model": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_iter2_Ad4_scope_full4\\model.json",
+    "sha256": "75b3d3c55fd66957967c65a553cf5b2f71137fb5c10a83c860ab6992a7e7145f"
+  },
+  "conclusion_zh": "3行均支持K下部白/紫真实材料边界可见，未发现来源污染/前景误标证据。原生PTS复解BGR逐像素一致、packet/PNG/mask哈希通过。没有充分逐段材料对应证据判定仅6仿射不足或模板漏段，故保留3行、两开放弧及现有仿射，本次不新增固定形状v2或自由顶点。",
+  "limitations_zh": [
+    "不是用户直接人工确认或独立计量验收。",
+    "未完成这三帧转折到f440有效warp的独立逐段材料对应，不能以nearest/当前station作为来源依据。",
+    "定点来源审计不替代同一模型完整镜头真实证据验收。"
+  ],
+  "mutations": {
+    "source_rows": false,
+    "source_template": false,
+    "solver_model": false,
+    "core_source": false,
+    "main_HTML": false
+  }
+}

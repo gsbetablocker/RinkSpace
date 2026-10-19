@@ -1,0 +1,61 @@
+{
+  "schema": "rinkfit.latest_user_review_handoff.v1",
+  "status": "STOPPED_FOR_USER_REVIEW",
+  "recorded_UTC": "2026-10-18T01:03:40.992173+00:00",
+  "user_requested_stop": true,
+  "no_automatic_resume": true,
+  "selected_main_checkpoint": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\physical_i20_full_capture_main\\checkpoints\\i00020_1792282587350451200\\manifest.json",
+    "sha256": "b94fbb69b0666f106f3f117c7a4502e6805c22fecfec7578b65ff061e93713c2"
+  },
+  "canonical_checkpoint": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\physical_i20_captured_prepare\\prepared\\checkpoints\\i00020_1792282640978672300\\manifest.json",
+    "sha256": "1ab7a213b5ed2e5cb21ae4541efef1d4bf457d3976698a899312b27c686677ab"
+  },
+  "metrics": {
+    "valid": true,
+    "active_RS_valid_rows": 182016,
+    "max_q": 120.21183824419492,
+    "maximum_error_px": 21.9282318707364,
+    "quantiles_px": [
+      1.1359515298249074,
+      8.614962323814524,
+      15.92992793945334,
+      21.9282318707364
+    ],
+    "over2": 59703,
+    "whole_original_W_half_cost": 513378.1002686647,
+    "max_query_equality_px": 8.464070333502605e-09,
+    "query_numerical_roots": 961,
+    "profile_global_interval_certified": false,
+    "maximum_source_row": 1408
+  },
+  "video": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\review_20261018\\shot1_i20_review.mp4",
+    "sha256": "9f3e1d2de885dd42c796fdf4b2fac5074772a60c07c5ec44a90731198121989f"
+  },
+  "video_source_seconds": [
+    20.02,
+    44.96
+  ],
+  "video_frames": 1248,
+  "fps": 50,
+  "duration_seconds": 24.96,
+  "package_path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\review_20261018\\Okada_Shot1_PRO_Review_20261018_final.zip",
+  "package_integrity_receipt_path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\review_20261018\\package_manifest.json",
+  "render_integrity_receipt_path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\review_20261018\\render_manifest.json",
+  "latest_full_trial_report": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\model_checks\\joint_full_S_i20_originalQP_full_actual\\report.json",
+    "sha256": "5d957a497c0177334f81a4ba58c0e8c5eeeca24cf7136065b7d89e7ec0e61f35"
+  },
+  "latest_full_trial_accepted": false,
+  "all_final_fit_certificates": false,
+  "known_incomplete": [
+    "2px full-shot accuracy",
+    "new-state global profile and fresh KKT",
+    "PhaseII complete correlated W station optimum",
+    "independent held-out whole-shot validation",
+    "V14 fresh SOC main-adoption interface not implemented"
+  ],
+  "resume_boundary": "No solver is to restart without a new user instruction; reuse complete CP and same-state operators only when authorized."
+}

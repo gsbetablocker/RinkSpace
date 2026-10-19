@@ -1,0 +1,227 @@
+{
+  "schema": "rinkfit.ceres_cuda_candidate_environment.v1",
+  "created_utc": "2026-10-18T17:00:40.455Z",
+  "purpose": "Independent CUDA Ceres2.2 candidate with actual projected-step gain correction; validated only after same complete-state comparison",
+  "source": {
+    "url": "https://codeload.github.com/ceres-solver/ceres-solver/zip/refs/tags/2.2.0",
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint9_1018a\\ceres_cuda22\\ceres-2.2.0.zip",
+    "sha256": "1fc28e22ce190ce4c1db04d0c2ddfdf8dc836609866d09372ea8533c8b6d490b",
+    "bytes": 4675470,
+    "fetched_utc": "2026-10-18T13:47:17.974Z",
+    "production_backend_changed": false
+  },
+  "source_cmake_compatibility_patch": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint9_1018a\\ceres_cuda22\\ceres-solver-2.2.0\\CMakeLists.txt",
+    "before_sha256": "64f5ba7e3d377aacf8ea3cc720f1449fdbafe218cb27173cdc10a058aa877816",
+    "after_sha256": "15cb759262446ee2fbfdf7d87d633fc897f836aae4bc4a01f99aa9244b3eb0e8",
+    "change": "CMake find_package minimum-major request Eigen3 3.3 -> 5.0; same installed Eigen5.0.1 as current CPU Ceres2.2.0 cpugplh5ddd2a5_213",
+    "numerical_source_changed": false,
+    "physics_or_fitting_state_changed": false,
+    "original_archive_preserved": true,
+    "cuda_architecture_patch": {
+      "before_sha256": "15cb759262446ee2fbfdf7d87d633fc897f836aae4bc4a01f99aa9244b3eb0e8",
+      "after_sha256": "553f3b24aa458a961fc9dd7944b3aa4f02f39078f0951886eaff7af9923ca2c1",
+      "change": "Respect explicitly provided CMAKE_CUDA_ARCHITECTURES=120; do not overwrite with obsolete 50;60;70;80 rejected by local CUDA13.3",
+      "numerical_source_changed": false
+    }
+  },
+  "configuration_command": [
+    "D:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe",
+    "-S",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint9_1018a\\ceres_cuda22\\ceres-solver-2.2.0",
+    "-B",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint9_1018a\\ceres_cuda22\\build",
+    "-G",
+    "Ninja",
+    "-DCMAKE_MAKE_PROGRAM=D:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe",
+    "-DCMAKE_BUILD_TYPE=Release",
+    "-DBUILD_SHARED_LIBS=ON",
+    "-DBUILD_TESTING=OFF",
+    "-DBUILD_EXAMPLES=OFF",
+    "-DBUILD_BENCHMARKS=OFF",
+    "-DSUITESPARSE=OFF",
+    "-DLAPACK=OFF",
+    "-DEIGENSPARSE=ON",
+    "-DUSE_CUDA=ON",
+    "-DCUDAToolkit_ROOT=D:/Program Files/CUDA",
+    "-DCMAKE_CUDA_ARCHITECTURES=120",
+    "-DCMAKE_CUDA_FLAGS=--expt-relaxed-constexpr",
+    "-DCMAKE_INSTALL_PREFIX=D:/OneDrive/codex_projs/RinkSpace/environments/cg22",
+    "-DCMAKE_EXPORT_PACKAGE_REGISTRY=OFF",
+    "-DCMAKE_CXX_COMPILER=D:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\cl.exe",
+    "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL",
+    "-DMSVC_USE_STATIC_CRT=OFF",
+    "-DCMAKE_PREFIX_PATH=D:\\CodexData\\RinkSpace_Data\\runtime_tools\\rf_deps\\eigen\\Library;D:\\CodexData\\RinkSpace_Data\\runtime_tools\\rf_deps\\glog\\Library;D:\\CodexData\\RinkSpace_Data\\runtime_tools\\rf_deps\\gflags\\Library",
+    "-DCMAKE_POLICY_DEFAULT_CMP0141=NEW",
+    "-DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT=",
+    "-DCMAKE_TRY_COMPILE_CONFIGURATION=Release",
+    "-DCMAKE_C_FLAGS=/DWIN32 /D_WINDOWS /W3 /utf-8 /Zc:preprocessor",
+    "-DCMAKE_CXX_FLAGS=/DWIN32 /D_WINDOWS /W3 /GR /EHsc /utf-8 /Zc:preprocessor /bigobj",
+    "-DCMAKE_CUDA_FLAGS=--expt-relaxed-constexpr -Xcompiler=/utf-8,/Zc:preprocessor,/EHsc,/bigobj",
+    "-DCMAKE_CUDA_STANDARD=17",
+    "-DCMAKE_CUDA_STANDARD_REQUIRED=ON"
+  ],
+  "build": {
+    "command": [
+      "D:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe",
+      "--build",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint9_1018a\\ceres_cuda22\\build",
+      "--config",
+      "Release",
+      "--parallel",
+      "1",
+      "--target",
+      "ceres"
+    ],
+    "result": {
+      "returncode": 0,
+      "elapsed": 456.2682993000053
+    },
+    "log": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint9_1018a\\ceres_projected_gain_v1\\build.log",
+      "sha256": "c797376d367fc419b81bc651f4c131446acc9f06fa046c401b9f51b4de489b4c"
+    },
+    "forced_rebuild": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint9_1018a\\ceres_projected_gain_v1\\force_source_recompile.json",
+      "sha256": "9119a531cce951430e80006459a45add92a07093c39a25b5bb84807ffec7ebc0"
+    },
+    "C4530_exception_unwind_warning": false
+  },
+  "install_result": {
+    "returncode": 0,
+    "elapsed": 0.36917790000734385,
+    "command": [
+      "D:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe",
+      "--install",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint9_1018a\\ceres_cuda22\\build",
+      "--config",
+      "Release",
+      "--prefix",
+      "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\cg22p"
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\cg22p\\bin\\ceres.dll",
+      "sha256": "21bd39fecf25632c69a43b06b4d4d9be8905628a0aeedb8266f6a8ae796ad466"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\cg22p\\lib\\ceres.lib",
+      "sha256": "b7ebaa6a6edb8f0673d7cec0639fda04ed25640a651aeeef3c0035846afe2d93"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\cg22p\\lib\\ceres_cuda_kernels.lib",
+      "sha256": "c5e14b797ad67ed547dc1799c3f07822b3b13e73514e1a9229dcc45cfc3b9bb5"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\cg22p\\include\\ceres\\internal\\config.h",
+      "sha256": "f6fcd6bbe993701e38a89e089cd6e6909288872719bf72107f9ae72967dca6bf"
+    }
+  ],
+  "build_cache_and_logs": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint9_1018a\\ceres_cuda22",
+  "dependencies_reused": [
+    "Eigen5.0.1",
+    "glog0.7.1",
+    "gflags2.3.0",
+    "CUDA13.3.73 SM120",
+    "MSVC14.44.35207 /MD /EHsc /Zc:preprocessor C++17 CUDA"
+  ],
+  "candidate_features": {
+    "CUDA": true,
+    "EigenSparse": true,
+    "SuiteSparse": false,
+    "LAPACK": false,
+    "FP64": true,
+    "mixed_precision": false
+  },
+  "production_adoption": true,
+  "production_adoption_condition": "Same complete original-source/v54 checkpoint comparison against cg22: identical initial theta/aux/duals/bounds/rawUV/J/objective, actual loaded DLL, unchanged first physical step and corrected effective-step gain, then measured production",
+  "old_production_library_unchanged": true,
+  "numerical_fitting_state_changed": false,
+  "projected_gain_candidate": true,
+  "original_library_preserved": "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\cg22",
+  "validation_scope": "Actual complete613441 active source problem with all RinkSpace affine manifolds, FP64 CGNR; next613745 source production actual loaded module verified. No general curved-manifold validation or convergence claim.",
+  "projected_gain_patch": {
+    "file": "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\cg22p\\projected_gain.patch",
+    "sha256": "d194f23aee9def19227d746678de132645ade6afe8401f7cea287dc3de4a8da2"
+  },
+  "patch_receipt": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint9_1018a\\ceres_projected_gain_v1\\patch_receipt.json",
+    "sha256": "5a6bb471ae76524d8b280e5fd9027dc9a0414a500990553497a8cc7295ca4cbd"
+  },
+  "candidate_ceres_dll_sha256": "21bd39fecf25632c69a43b06b4d4d9be8905628a0aeedb8266f6a8ae796ad466",
+  "candidate_build": {
+    "build_returncode": 0,
+    "build_seconds": 456.2682993000053,
+    "build_command": [
+      "D:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe",
+      "--build",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint9_1018a\\ceres_cuda22\\build",
+      "--config",
+      "Release",
+      "--parallel",
+      "1",
+      "--target",
+      "ceres"
+    ],
+    "install_returncode": 0,
+    "install_seconds": 0.36917790000734385,
+    "install_command": [
+      "D:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe",
+      "--install",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint9_1018a\\ceres_cuda22\\build",
+      "--config",
+      "Release",
+      "--prefix",
+      "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\cg22p"
+    ]
+  },
+  "original_GPU_candidate_build": {
+    "command": [
+      "D:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe",
+      "--build",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint9_1018a\\ceres_cuda22\\build",
+      "--config",
+      "Release",
+      "--parallel",
+      "1",
+      "--target",
+      "ceres"
+    ],
+    "result": {
+      "returncode": 0,
+      "elapsed": 424.5063346000097
+    },
+    "log": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint9_1018a\\ceres_cuda22\\build_v4.log",
+      "sha256": "a9271d47e36a453b9b580b1feee1c88d0aea7809da454117a0d0eb58ede2e0e3"
+    },
+    "C4530_exception_unwind_warning": false
+  },
+  "original_GPU_candidate_artifacts": [
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\cg22\\bin\\ceres.dll",
+      "sha256": "18283ea74554833eb84127340f6509694ebd7806b568f00c8fc011e26f7cc842"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\cg22\\lib\\ceres.lib",
+      "sha256": "b7ebaa6a6edb8f0673d7cec0639fda04ed25640a651aeeef3c0035846afe2d93"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\cg22\\lib\\ceres_cuda_kernels.lib",
+      "sha256": "594943d1e107425250cb0d73bee794be417ef95aa204f33cd30413cea408a415"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\cg22\\include\\ceres\\internal\\config.h",
+      "sha256": "f6fcd6bbe993701e38a89e089cd6e6909288872719bf72107f9ae72967dca6bf"
+    }
+  ],
+  "original_GPU_candidate_install_result": {
+    "returncode": 0,
+    "elapsed": 0.3547753000020748
+  },
+  "production_adoption_evidence": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\cg22p\\production_use.json",
+    "sha256": "7a24274609a10359f72842b06089b6bc1c92b00e7ccdcf420e4acfc7fcd02418"
+  }
+}

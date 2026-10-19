@@ -1,0 +1,144 @@
+{
+  "schema": "rinkspace.reusable-solver-inputs.v1",
+  "resource_root": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003",
+  "driver": "named66",
+  "event_id": "ankara_2026",
+  "programme_id": "okada_mei_sp",
+  "source_clock": {
+    "time_base": "1/15360",
+    "native_start_inclusive": 229114112,
+    "native_stop_exclusive": 231705600,
+    "native_presentations": 10123,
+    "shots": 9
+  },
+  "source_options": {
+    "--world-init": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/user_corrected_programme_candidate/latest9a8c_world66_initialization_ONLY.json",
+    "--camera-seed": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_joint_curve_integration_20261010_2342\\accepted_states\\75719b65139fa662366146c4517312319bdad9a88e6f2c25704966f550cb1eee\\complete_state_UNACCEPTED.npz",
+    "--additional-ice-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\main7_existing_gray_center_sources\\native_ice87_development_main7_Lane1_F1R1_two_center_curves_FIT_QUALIFIED.json",
+    "--additional-board-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\main1_Ad4_temporal_existing_motion_readonly\\whole_span_RGB_boundary_candidate\\native_board185_original109_q50_soft_locations_plus76_continuous_Ad4_RGB_UNADMITTED_CANDIDATE_20261011.json",
+    "--additional-board-material-point-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\full_a13c816f_user_review_20261009\\user_reported_low_board_motion_20261009\\short_end_Ad24_25_26_native229604096_actual_source\\material_parent_plus_Ad25_Ad26_native229604096_broad_support_SOURCE_CANDIDATE_v2.json",
+    "--additional-board-circle-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\full_a13c816f_user_review_20261009\\user_reported_low_board_motion_20261009\\short_end_Ad24_25_26_native229604096_actual_source\\circle_parent_plus_Ad24_native229604096_broad_support_SOURCE_CANDIDATE_v2.json",
+    "--original-source-role-retirement-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\ads_actual_identity_correction_20261005\\Ad7_original_print_corner_role_correction_CANDIDATE_v1.json",
+    "--independent-board-pattern-placement-source": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/model_constraints/user_advertisement_pairs_20261005.json",
+    "--persistent-ice-long-baseline-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\spin_source_long_baseline_20261005\\spin_micro_actual_original_anchor_v3_20261005\\spin_reviewed_ice_long_baseline_FIT_HELD_v3_micro_actual.json",
+    "--serial-source": true,
+    "--serial-current-patterns": false,
+    "--geometry-fd-workers": "20",
+    "--normal-workers": "8",
+    "--reuse-source-jacobian": true,
+    "--residual-source-workers": "6",
+    "--adaptive-source-backtracking": true,
+    "--residual-native-threads": "3",
+    "--static-motion-source-role-retirement-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\full_a13c816f_user_review_20261009\\user_reported_low_board_motion_20261009\\Ad23_existing_original_motion_role_diagnostic\\original_UI_retirement_preserved_plus_actual_dynamic_foot2_validity_CANDIDATE.json",
+    "--camera-mount-constraint-source": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/camera_hardware_20261001/user_camera_mount_and_height_20261006_v4.json",
+    "--camera-pivot-exterior-constraint-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\camera_hardware_20261001\\user_tripod_positions_20261006_v2.json",
+    "--original-ice-pixel-correction-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\board_top_contact_material_semantics\\original_TOP_RGB_measured_anchor_revision\\original_ice_and_TOP_actual_RGB_corrected_source_WHOLE_SOURCE_REVIEW36_20261011.json",
+    "--roll-prior-sigma-degrees": "0.5",
+    "--additional-native-board-track-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\secondary_Ad22_23_absolute_source_candidate_20261009\\native_full_parent_plus_secondary_Ad22_23_absolute_ADMITTED_v1.json",
+    "--estimate-unverified-physical-geometry": true,
+    "--original-motion-far-board-role-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\full_a13c816f_user_review_20261009\\user_reported_low_board_motion_20261009\\whole_cut1_original_long_baseline_role_candidate\\compaction_source_identity_repair\\complete_preserved29156_plus_active_LOW_and_main1_alias_safe31549_roles_ADMITTED_CANDIDATE.json",
+    "--strict-half-circle-crease": true,
+    "--derive-hockey-center-from-course": true,
+    "--estimate-unverified-goal-crease-placement": true,
+    "--original-motion-low-compaction-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\physical_geometry_unlock_20261008\\low_original_Ad4_nearby_source_roles\\first_clock_duplicate_retirement_compaction_20261008\\first_source_clock_and_explicit_retirement_compaction_CANDIDATE_v1.json",
+    "--original-motion-main-compaction-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\physical_geometry_unlock_20261008\\low_original_Ad4_nearby_source_roles\\first_clock_duplicate_retirement_compaction_20261008\\main_exact_same_pair_UV_role_sigma_duplicates_CANDIDATE_v1.json",
+    "--physical-course-scope-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\user_video_review_20261008\\c134_full_programme\\registered_user_complete_stroke_source_append_20261008\\user20_existing_lower_long_side_connected_lower_right_scope_authority_v1.json",
+    "--direct-human-truth-authority": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\main1_Ad4_temporal_existing_motion_readonly\\whole_span_RGB_boundary_candidate\\human_same54_rebound_BOARD185.json",
+    "--direct-human-full-stroke-guard": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\main1_Ad4_temporal_existing_motion_readonly\\whole_span_RGB_boundary_candidate\\human_same54_BOARD185_full_guard.json",
+    "--original-wide-human-truth-authority": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\user_video_review_20261008\\c134_full_programme\\registered_user_complete_stroke_source_append_20261008\\human_original_wide_top_contours_hard_authority_v1.json",
+    "--direct-human-stroke-cap-support": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\main1_Ad4_temporal_existing_motion_readonly\\whole_span_RGB_boundary_candidate\\human_same54_BOARD185_caps.json",
+    "--practical-human-location-envelope": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\main1_Ad4_temporal_existing_motion_readonly\\whole_span_RGB_boundary_candidate\\human_same54_BOARD185_location_NO_EXTRA_EXPANSION.json",
+    "--user-confirmed-source-truth-authority": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\main1_Ad4_temporal_existing_motion_readonly\\whole_span_RGB_boundary_candidate\\confirmed_same30_rebound_BOARD185_ICE87.json",
+    "--shared-hockey-curling-axis": true,
+    "--joint-source-truth-restoration": true,
+    "--direct-human-centre-target": true,
+    "--source-jacobian-refresh-ratio": "0.25",
+    "--truth-restoration-state": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_joint_curve_integration_20261010_2342\\accepted_states\\75719b65139fa662366146c4517312319bdad9a88e6f2c25704966f550cb1eee\\truth_restoration_state.json",
+    "--truth-restoration-priority": true,
+    "--initial-damping": 0.0011980499976398339,
+    "--original-source-point-qualification-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\main1_original_source_RGB_review\\original_absolute_same16_plus_main1_TOP1292_2288_observability18_CANDIDATE.json",
+    "--original-absolute-input-compaction-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\nearboard49_original_source_mass_coarsening_evidence_20261010.json",
+    "--principal-point-working-prior": true,
+    "--original-board-curve-integration-policy": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_board_curve_per_exposure_integration_POLICY_CANDIDATE_20261010_qualification18.json",
+    "--native-base-curve-integration-policy": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\main1_Ad4_temporal_existing_motion_readonly\\whole_span_RGB_boundary_candidate\\native_ice9_board128_authenticated_user_and_RGB_boundary_curve_weights_UNADMITTED_CANDIDATE_20261011.json",
+    "--truth-restoration-reviewed-manual-append-audit": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\q757_truth86_board185_exact_constant_axes_20261011_startup_binding.json",
+    "--save-initial-linearization-cache": true
+  },
+  "continuation": {
+    "complete_accepted_state": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_joint_curve_integration_20261010_2342\\accepted_states\\75719b65139fa662366146c4517312319bdad9a88e6f2c25704966f550cb1eee\\complete_state_UNACCEPTED.npz",
+    "checkpoint_file_sha256": "3e046cd20ddf199c739a02eb9869addd781967985615d3d2087c9e81e1d0ac61",
+    "truth_restoration_state": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_joint_curve_integration_20261010_2342\\accepted_states\\75719b65139fa662366146c4517312319bdad9a88e6f2c25704966f550cb1eee\\truth_restoration_state.json",
+    "truth_restoration_state_sha256": "fb246a4be7a7595303d3f6956642b2e1265aec0c6314e71574fc073813e7537a",
+    "state": {
+      "q_sha256": "75719b65139fa662366146c4517312319bdad9a88e6f2c25704966f550cb1eee",
+      "parameters": 34340,
+      "fields": 77,
+      "damping": 0.0011980499976398339,
+      "next_line_search_fraction": 1.0
+    },
+    "previous_input_configuration": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\full_source_review86_same757_original_support_rectangle_20261011.json",
+      "sha256": "fe4f48da7db5cb8f764e50919bd673177dadcc1a4c198ccddd83398f1224287b"
+    },
+    "parent_source_input_manifest": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_joint_curve_integration_20261010_2342\\input_manifest.json",
+      "sha256": "99d7c7acd0f84293d3760530194204e8f75b9c399617bb7555619dc3c687c8d0"
+    },
+    "expected_complete_active_source_scalars": 4502414,
+    "current_truth_group_count": 86,
+    "current_source_target_transaction": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\q757_truth86_board185_exact_constant_axes_20261011_transaction.json",
+      "sha256": "095b7ff0fd8c920f0eefa462fa54ac0ebc5f74b71dfb35ce42dfb241716750e1"
+    },
+    "reviewed_source_target_startup_binding": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\q757_truth86_board185_exact_constant_axes_20261011_startup_binding.json",
+      "sha256": "fdf4b1b2a9904b0367df1c307d0628beadca556cc3a3de69c7c9048682327908"
+    },
+    "actual_same_q86_proof": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\same_q757_original86_rectangle_exact_constant_axes_actual_audit_20261011.json",
+      "sha256": "ecf9453ed9220528cc362bbc32fa5fc6b5305c7e56d200cd597275ffdbf1d21a"
+    },
+    "actual_same_q_board185_and_protected_truth_proof": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\native_board185_q757_actual_R_J_integration_and_protected_guards_20261011.json",
+      "sha256": "2f9d2e3bd73b99671c5c5f1039958c7556df2559f4390c5aa688a2e92dad8b16"
+    },
+    "PP6_same_q_existing_prior_proof": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\actual_same_q757_PP6_existing_engineering_prior_inheritance_20261011.json",
+      "sha256": "c839a2bccdc1fda1449a29dcd5317bb44629761b277cecaa089ff406e908ffce"
+    },
+    "next_start_requires_fresh_source_J": true,
+    "no_cached_J_H_g_or_prefix_imported": true,
+    "original_supports_uncertainties_and_world_unchanged": true,
+    "cap_semantic_revision_is_not_geometric_accuracy_acceptance": true,
+    "solver_run_started": false,
+    "accuracy_accepted": false
+  },
+  "source_manifest_sha256": "98040dacd790ebef82700790245fd479035cdd97bfc266903a24ab281d2c044e",
+  "preparation_status": {
+    "final_programme_configuration": true,
+    "ready_to_start": true,
+    "actual_saved_public_receipt_combination_gate_passed": true,
+    "actual_complete_startup_source_count_and_all86_validation_still_required": true,
+    "historical_skeleton_status_not_used_as_execution_authority": true
+  },
+  "numerical_physical_endpoint_continuation": {
+    "previous_configuration": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\full_source_review86_same757_board185_constant_axes_20261011.json",
+      "sha256": "412491049423c40926d63e2eceaf0d969f122539536568ae32332c615104b4a2"
+    },
+    "actual_canonical_endpoint_event": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\native35_actual034757_canonical_trial_endpoint_event_helper_fixed_arithmetic_20261011.json",
+      "sha256": "ba7d0df54c932c74927293a1b3fedaefb4bb0a5407418de6f2dd7512232b1b75"
+    },
+    "actual_all86_event_guard": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\native35_actual034757_complete_event_all86_guard_20261011.json",
+      "sha256": "67e265912a09406ad4481f5f618e601bcc58da0c61b2d2472fb898a7cbbca9bc"
+    },
+    "event_step_is_not_a_geometric_solution": true,
+    "full_source_cost_and_physical_guard_still_required": true,
+    "event_acceptance_forces_next_complete_J_fresh": true,
+    "next_direction_must_allow_endpoint_release": true,
+    "full_source_initial_normal_reuse": false,
+    "continuous": true
+  }
+}

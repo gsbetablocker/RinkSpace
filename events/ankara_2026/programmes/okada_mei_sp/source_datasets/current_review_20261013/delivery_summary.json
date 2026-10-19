@@ -1,0 +1,173 @@
+{
+  "schema": "rinkspace.current-reviewed-source-fit-dataset-delivery.v1",
+  "event_id": "ankara_2026",
+  "programme_id": "okada_mei_sp",
+  "date": "2026-10-13",
+  "status": "finite_source_observation_inputs_ready_full_solver_graph_adapter_pending",
+  "dataset_reference": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\current_review_20261013\\fit_dataset.json",
+    "sha256": "cefd9856e4a5f4e49a8a895e9696f373ceabacd2be753289441df6ff5681d939"
+  },
+  "independent_index_audit_reference": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\full_programme_strict_source_review_20261012\\current_source_pool_joint_qualified_20261013_v1\\final_logical_finite_source_index_audit_20261013_v1.json",
+    "sha256": "91041c7dd77645709e43b97c705c06ef7d1fe756902e47bbfbe2d760992b413a"
+  },
+  "frozen_model_reference": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_current_points_ready_20261012\\accepted_states\\8a28afed8f9f896112e5b2f64be515b2bc02019e10e09c7e0eda2598579d4891\\state_identity.json",
+    "sha256": "5ac4f0f58c4bf24520a12ddbdca1396d1b9bc6356b38b8c3bfa23153ac4dea25"
+  },
+  "original_native_coverage_reference": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\full_programme_strict_source_review_20261012\\nine_cut_terminal_core_coverage_20261013_v1\\terminal_nine_cut_core_coverage.npz",
+    "sha256": "a269b9eb8974586a1ef726df62f48b540f3fed451974254114dfbab0c0f09893"
+  },
+  "source": {
+    "video_sha256": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891",
+    "time_base": "1/15360",
+    "pixel_domain": "native1920x1080"
+  },
+  "source_window": {
+    "start": "04:08:36.283",
+    "end_exclusive": "04:11:25.000",
+    "time_base": "1/15360"
+  },
+  "public_source_consumer_api": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\strict_source_fit_dataset_stream.py",
+    "module": "calibration.program_tracking.strict_source_fit_dataset_stream",
+    "function": "iter_dataset_rows",
+    "split_arguments": [
+      "fit",
+      "held"
+    ]
+  },
+  "counts": {
+    "fit_points": 1283231,
+    "held_points": 2368,
+    "pending_support_points": 63085,
+    "pending_named_points": 3323,
+    "native_frames": 10123,
+    "actual_exposures": 8503,
+    "actual_exposures_with_finite_fit": 6681,
+    "actual_exposures_without_finite_fit": 1822
+  },
+  "support_index_bytes": 2286718,
+  "source_cut_coverage": [
+    {
+      "cut": "001",
+      "shot_id": "230400000:R0410_001",
+      "native_frames": 1487,
+      "source_clock_actual_exposures": 1253,
+      "actual_exposures_with_finite_fit": 985,
+      "actual_exposures_without_finite_fit": 268,
+      "fit_points": 47786,
+      "held_points": 0,
+      "pending_support_points": 8001,
+      "pending_named_points": 298
+    },
+    {
+      "cut": "003",
+      "shot_id": "230400000:R0410_003",
+      "native_frames": 447,
+      "source_clock_actual_exposures": 373,
+      "actual_exposures_with_finite_fit": 300,
+      "actual_exposures_without_finite_fit": 73,
+      "fit_points": 27723,
+      "held_points": 0,
+      "pending_support_points": 1785,
+      "pending_named_points": 0
+    },
+    {
+      "cut": "004",
+      "shot_id": "230400000:R0410_004",
+      "native_frames": 2705,
+      "source_clock_actual_exposures": 2273,
+      "actual_exposures_with_finite_fit": 2033,
+      "actual_exposures_without_finite_fit": 240,
+      "fit_points": 358967,
+      "held_points": 396,
+      "pending_support_points": 2060,
+      "pending_named_points": 1454
+    },
+    {
+      "cut": "034",
+      "shot_id": "223403520:R0402_034",
+      "native_frames": 1498,
+      "source_clock_actual_exposures": 1265,
+      "actual_exposures_with_finite_fit": 850,
+      "actual_exposures_without_finite_fit": 415,
+      "fit_points": 83754,
+      "held_points": 0,
+      "pending_support_points": 10433,
+      "pending_named_points": 789
+    },
+    {
+      "cut": "035",
+      "shot_id": "223403520:R0402_035",
+      "native_frames": 680,
+      "source_clock_actual_exposures": 569,
+      "actual_exposures_with_finite_fit": 211,
+      "actual_exposures_without_finite_fit": 358,
+      "fit_points": 14754,
+      "held_points": 0,
+      "pending_support_points": 254,
+      "pending_named_points": 82
+    },
+    {
+      "cut": "036",
+      "shot_id": "223403520:R0402_036",
+      "native_frames": 119,
+      "source_clock_actual_exposures": 97,
+      "actual_exposures_with_finite_fit": 97,
+      "actual_exposures_without_finite_fit": 0,
+      "fit_points": 51694,
+      "held_points": 0,
+      "pending_support_points": 35,
+      "pending_named_points": 0
+    },
+    {
+      "cut": "037",
+      "shot_id": "223403520:R0402_037",
+      "native_frames": 952,
+      "source_clock_actual_exposures": 800,
+      "actual_exposures_with_finite_fit": 558,
+      "actual_exposures_without_finite_fit": 242,
+      "fit_points": 128945,
+      "held_points": 0,
+      "pending_support_points": 6879,
+      "pending_named_points": 0
+    },
+    {
+      "cut": "038",
+      "shot_id": "223403520:R0402_038",
+      "native_frames": 1653,
+      "source_clock_actual_exposures": 1381,
+      "actual_exposures_with_finite_fit": 1211,
+      "actual_exposures_without_finite_fit": 170,
+      "fit_points": 535386,
+      "held_points": 1823,
+      "pending_support_points": 29711,
+      "pending_named_points": 667
+    },
+    {
+      "cut": "039",
+      "shot_id": "223403520:R0402_039",
+      "native_frames": 582,
+      "source_clock_actual_exposures": 492,
+      "actual_exposures_with_finite_fit": 436,
+      "actual_exposures_without_finite_fit": 56,
+      "fit_points": 34222,
+      "held_points": 149,
+      "pending_support_points": 3927,
+      "pending_named_points": 33
+    }
+  ],
+  "all_original_source_UV_sigma_weights_and_operators_preserved": true,
+  "source_sigma_reconstructed_points": 0,
+  "own_native_QA_not_canonical_FIT": true,
+  "repeated_large_source_arrays_stored": false,
+  "full_solver_graph_adapter_installed": false,
+  "entire_iteration_speed_verified": false,
+  "whole_independent_shot_visual_accuracy_accepted": false,
+  "some_gray_material_source_support_sparse": true,
+  "solver_started": false,
+  "video_generated": false
+}

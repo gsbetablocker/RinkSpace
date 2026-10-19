@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "source": "source_1080p50.mp4",
+  "times_are": "source_pts_seconds",
+  "no_blind_benchmark_claim": true,
+  "windows": [
+    {
+      "id": "dev_26_30",
+      "start_s": 26,
+      "end_s": 30,
+      "role": "development",
+      "used_in_seed_tuning": true,
+      "shot_status": "sampled_single_shot_candidate",
+      "purpose": "reproduce candidate; not held-out accuracy"
+    },
+    {
+      "id": "cut_stress_30_34",
+      "start_s": 30,
+      "end_s": 34,
+      "role": "cut_stress_candidate",
+      "used_in_seed_tuning": false,
+      "shot_status": "contains_possible_camera_cut",
+      "purpose": "locate actual boundary before testing; never fit through cut"
+    },
+    {
+      "id": "validation_pool_76_84",
+      "start_s": 76,
+      "end_s": 84,
+      "role": "same_event_validation_pool",
+      "used_in_seed_tuning": false,
+      "shot_status": "mixed_cameras_need_segmentation",
+      "purpose": "choose a complete independent shot, freeze before tuning"
+    },
+    {
+      "id": "validation_pool_146_156",
+      "start_s": 146,
+      "end_s": 156,
+      "role": "same_event_validation_pool",
+      "used_in_seed_tuning": false,
+      "shot_status": "mixed_cameras_need_segmentation",
+      "purpose": "low/high view stress; no seamless-clip assumption"
+    }
+  ]
+}

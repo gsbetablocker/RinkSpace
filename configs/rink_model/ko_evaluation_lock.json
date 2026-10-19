@@ -1,0 +1,55 @@
+{
+  "schema": "rinkspace.frozen-model-evaluation.v1",
+  "frozen_at_utc": "2026-09-20T02:03:41.695099+00:00",
+  "python": "3.11.0",
+  "model_path": "outputs/rink_model/ankara_2026_shared/v0.3/rink_model.json",
+  "model_sha256": "771493594537828fdabbb582369a27c576a95832a8aa908ab79abc161f7945da",
+  "model_id": "ankara_2026_shared",
+  "model_revision": "v0.3",
+  "windows": [
+    {
+      "source_id": "ko",
+      "start_s": 74.54,
+      "end_s": 112.32,
+      "cuts": [
+        96.76
+      ],
+      "role": "new_source_inference_after_freeze",
+      "reason": "Two full shots selected by source-only observability and hard-cut review before localization; no KO pixels enter model or parameter tuning."
+    }
+  ],
+  "sources": {
+    "ko": "d3e1cf9b20c83477ad41f203416cff0acfda3587ded308908c79c85bc615d53b"
+  },
+  "core_file_sha256": {
+    "src/rinkspace/model_localization.py": "2a58c4c40cd7c6b0eb9ddd4a1c42856e2d597323b42fd53eb8ddb8ba9ac278d0",
+    "src/rinkspace/curve_registration.py": "df48cafadf7ceea0a2a109296e00c16abe5dd1d116d43b9b31b7e3d4fdbd3a3b",
+    "src/rinkspace/event_model.py": "7dccae1933588261e312eaf0b5b6500ac9e24efad06364714076a1873b3fa1f2",
+    "src/rinkspace/continuous_registration.py": "2cab820a1dc20c44eb211d18a30ef38c3a9eae67ab7547e7879c36bbd6d01a53",
+    "src/rinkspace/local_registration.py": "78e500bd98d1796fe6aab6132ef7d080e860dbf295e06d90134f32c4e4b66a68",
+    "src/rinkspace/masked_photometric.py": "ff9abede3b9420cc59a904cbd811de6fb7003c96a55a17043d7271809ff3137d",
+    "src/rinkspace/geometry.py": "d33c3160d6f391cace853fe0b3495bac1b2042a5d5c241323bb808606fc8a08d",
+    "src/rinkspace/rink_reference.py": "5a12714fb65d3d85c362645479427d5475c188eaee0eb9c6f5a0d0995648a2b2",
+    "src/rinkspace/model_evaluation.py": "cdda1aa0a91b93a5ab85a7dfbefbbd6b2035a11dd877fc61f99fe23b71f2eacd",
+    "src/rinkspace/foreground_rows.py": "5f828314b5757e063d4ef43bae78184cd87b5a90fe80d7b0f075d2d21a19f344"
+  },
+  "reference_asset_sha256": {
+    "outputs/rink_model/ankara_2026_shared/v0.3/views/survey_3610.jpg": "371c073e72e447d4883ab7c831a4a2516c68245dc9533bbd50cf486f75dd1886",
+    "outputs/rink_model/ankara_2026_shared/v0.3/views/ebihara_61.jpg": "1416d656cc8b6ae0547cce17a0d94cdd2d2931f142281bdbe209764c7252d155",
+    "outputs/rink_model/ankara_2026_shared/v0.3/views/broadcast_replay_7263.jpg": "0a4cf44a764fbe4ceede4402f37d66df181c5c2af27257c51053b259d025b8e1",
+    "outputs/rink_model/ankara_2026_shared/v0.3/views/broadcast_left_end_4560.jpg": "05262cf8aaec2095e00c5c9fe8b0b3c15d92141ccd4519b26eb42a495c73bae8",
+    "outputs/rink_model/ankara_2026_shared/v0.3/views/broadcast_end_warmup_6240.jpg": "80c37db087627ca12d7efdbd98d576301451ce509e21b06b891d4f4bed4d0617",
+    "outputs/rink_model/ankara_2026_shared/v0.3/views/ebihara_end_70.jpg": "db350b5e872fb3aead906e1c82011174266cc1453ee5e1e87105e9b6419d8892",
+    "outputs/rink_model/ankara_2026_shared/v0.3/views/ebihara_follow_150.jpg": "1c4ac360cffda4397f58cf899bc0d505e202d8028862701c2e2b9d98f499426f",
+    "outputs/rink_model/ankara_2026_shared/v0.3/views/ebihara_62_derived.jpg": "f43a90eeede4d7ed537cf7d0063b7503df1f52c333d9515de6a89933fc0c0f69",
+    "outputs/rink_model/ankara_2026_shared/v0.3/views/ebihara_63_derived.jpg": "4e5d1312ad36fe1c61b68db96c04170472c1736673216ae616ca29c644480f65"
+  },
+  "runtime_config": {
+    "refinement_motion_model": "similarity",
+    "reobserve_every": 5
+  },
+  "window_selection_file": "configs/rink_model/evaluation_windows.json",
+  "window_selection_sha256": "379ae4f8afafc89dd0cc0eab4e192b3ad31660a6c71fe61d96b2e7d4da550f4e",
+  "protocol": "Source-only windows selected before inference; no evaluation pixels may fit the model or tune the frozen locator. Failure frames stay in the denominator.",
+  "evaluation_outputs_seen_at_freeze": false
+}

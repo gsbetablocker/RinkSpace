@@ -1,0 +1,3207 @@
+{
+  "revision_id": "user_review_correction_02",
+  "user_instructions_zh": [
+    "第113帧红圈中的三个点删除。",
+    "后面几帧类似位置明显在R4外环内部而不是轮廓上的点也删除；真实中圈/内圈保留。",
+    "第139帧红圈中的两个点删除。",
+    "用户已说完并授权统一修改，同时核对每点对应标准物。"
+  ],
+  "attachments": [
+    {
+      "index": 113,
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\user_annotation_frame_113.png",
+      "sha256": "6736bdc882cdc225b4ad13b54cd8dec5c5bb0d2269e5b2ca80c4025784abab86"
+    },
+    {
+      "index": 139,
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\user_annotation_frame_139.png",
+      "sha256": "63e6104b5e3576de2c7aff478c8c00bf51e49438e5ad0b2e44fd643fc4199ee9"
+    }
+  ],
+  "independent_native_review": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\r4_independent_deletion_recommendations.json",
+    "sha256": "e3229bcabb254e9d0811eeee3dc7a9c969e86ccce93c061d63644e45cca7c8fe"
+  },
+  "frames": [
+    {
+      "index": 113,
+      "removed_count": 3,
+      "before_ice_point_count": 24,
+      "after_ice_point_count": 21,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000113.json",
+        "sha256": "e03a80f32dd1d10e7c2784d0c00b4f76b46fddbedf8b652c9159ba140ec498cf"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000113.json",
+        "sha256": "d214a318b156fb514efab2c130f6a2b28c83865fe51dc40c3f3f969d91e8587a"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 2,
+          "vertex_index": 1,
+          "uv": [
+            598.0604,
+            1012.4897
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "explicit user screenshot"
+        },
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 0,
+          "uv": [
+            612.89,
+            1041.8431
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "explicit user screenshot"
+        },
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 1,
+          "uv": [
+            583.5008,
+            1043.6977
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "explicit user screenshot"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 2,
+          "vertex_index": 1,
+          "uv": [
+            598.0604,
+            1012.4897
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 5.653486048745135,
+            "signed_interface_iqr_contrast": [
+              4.892829552220746,
+              4.892829552220746
+            ],
+            "transition_sigma_px": 7.6502394979195945,
+            "query_index": 36,
+            "candidate_index": 39,
+            "candidate_flags": 8,
+            "query_uv": [
+              596.7604074082676,
+              1017.9916585850735
+            ],
+            "profile_normal": [
+              0.22994271337626637,
+              -0.973204165920574
+            ],
+            "actual_source_sides_uv": [
+              [
+                598.060385330351,
+                1012.4896624104609
+              ],
+              [
+                598.060385330351,
+                1012.4896624104609
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  596.3396121388521,
+                  1019.7726226486086
+                ],
+                [
+                  598.060385330351,
+                  1012.4896624104609
+                ],
+                [
+                  598.7126607399994,
+                  1009.7289872115099
+                ]
+              ],
+              [
+                [
+                  596.3396121388521,
+                  1019.7726226486086
+                ],
+                [
+                  598.060385330351,
+                  1012.4896624104609
+                ],
+                [
+                  598.7126607399994,
+                  1009.7289872115099
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        },
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 0,
+          "uv": [
+            612.89,
+            1041.8431
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 6.115419450291826,
+            "signed_interface_iqr_contrast": [
+              3.5,
+              3.5
+            ],
+            "transition_sigma_px": 3.0503390847370366,
+            "query_index": 39,
+            "candidate_index": 43,
+            "candidate_flags": 8,
+            "query_uv": [
+              610.7187354622357,
+              1036.1260955088821
+            ],
+            "profile_normal": [
+              0.35505381306387124,
+              0.9348458642090715
+            ],
+            "actual_source_sides_uv": [
+              [
+                612.8900384565468,
+                1041.8430700898912
+              ],
+              [
+                612.8900384565468,
+                1041.8430700898912
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  612.2205425129615,
+                  1040.0803076833577
+                ],
+                [
+                  612.8900384565468,
+                  1041.8430700898912
+                ],
+                [
+                  613.6815560847228,
+                  1043.9271118715121
+                ]
+              ],
+              [
+                [
+                  612.2205425129615,
+                  1040.0803076833577
+                ],
+                [
+                  612.8900384565468,
+                  1041.8430700898912
+                ],
+                [
+                  613.6815560847228,
+                  1043.9271118715121
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        },
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 1,
+          "uv": [
+            583.5008,
+            1043.6977
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 0.36676421870831066,
+            "signed_interface_iqr_contrast": [
+              5.402341948658545,
+              5.402341948658545
+            ],
+            "transition_sigma_px": 4.931910862170934,
+            "query_index": 41,
+            "candidate_index": 45,
+            "candidate_flags": 8,
+            "query_uv": [
+              583.4309897794024,
+              1043.3376012718709
+            ],
+            "profile_normal": [
+              0.19043552755312318,
+              0.9816997045153695
+            ],
+            "actual_source_sides_uv": [
+              [
+                583.5008347168797,
+                1043.6976535970036
+              ],
+              [
+                583.5008347168797,
+                1043.6976535970036
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  582.9577498079611,
+                  1040.8980378873596
+                ],
+                [
+                  583.5008347168797,
+                  1043.6976535970036
+                ],
+                [
+                  584.2247455102056,
+                  1047.4294310706441
+                ]
+              ],
+              [
+                [
+                  582.9577498079611,
+                  1040.8980378873596
+                ],
+                [
+                  583.5008347168797,
+                  1043.6976535970036
+                ],
+                [
+                  584.2247455102056,
+                  1047.4294310706441
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 114,
+      "removed_count": 1,
+      "before_ice_point_count": 18,
+      "after_ice_point_count": 17,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000114.json",
+        "sha256": "700560c64d99ad55669c7dcb070761e67d26a73c1ce628f36daf92f2790789a9"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000114.json",
+        "sha256": "de6faf1e4e228bde9289db62edc4e5701e05db43b7c3103b35b3208373db6f67"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 1,
+          "vertex_index": 0,
+          "uv": [
+            595.5066,
+            1033.8719
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 1,
+          "vertex_index": 0,
+          "uv": [
+            595.5066,
+            1033.8719
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 2.5582247095545942,
+            "signed_interface_iqr_contrast": [
+              4.999361460728011,
+              4.999361460728011
+            ],
+            "transition_sigma_px": 5.811559299119884,
+            "query_index": 40,
+            "candidate_index": 40,
+            "candidate_flags": 8,
+            "query_uv": [
+              594.901531051522,
+              1031.3862556771933
+            ],
+            "profile_normal": [
+              0.23651201996822932,
+              0.9716285629861587
+            ],
+            "actual_source_sides_uv": [
+              [
+                595.5065819451115,
+                1033.8718998755335
+              ],
+              [
+                595.5065819451115,
+                1033.8718998755335
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  594.4561177652846,
+                  1029.5564278684417
+                ],
+                [
+                  595.5065819451115,
+                  1033.8718998755335
+                ],
+                [
+                  596.3103231608055,
+                  1037.1737951556233
+                ]
+              ],
+              [
+                [
+                  594.4561177652846,
+                  1029.5564278684417
+                ],
+                [
+                  595.5065819451115,
+                  1033.8718998755335
+                ],
+                [
+                  596.3103231608055,
+                  1037.1737951556233
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 115,
+      "removed_count": 1,
+      "before_ice_point_count": 22,
+      "after_ice_point_count": 21,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000115.json",
+        "sha256": "636a06ad15a294f7db31dca69ce9b480e34d6633098ab7b8e84efc5539f71290"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000115.json",
+        "sha256": "b989be49f66aee33965a6d20e2774cd036752c0bdc21ab3f3c132247db954dda"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 0,
+          "uv": [
+            611.3944,
+            1024.4646
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 0,
+          "uv": [
+            611.3944,
+            1024.4646
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 5.378280076268892,
+            "signed_interface_iqr_contrast": [
+              4.000000000000085,
+              4.000000000000085
+            ],
+            "transition_sigma_px": 4.9256709416056434,
+            "query_index": 39,
+            "candidate_index": 40,
+            "candidate_flags": 8,
+            "query_uv": [
+              609.4892611371682,
+              1019.4350913469932
+            ],
+            "profile_normal": [
+              0.3542299360089337,
+              0.9351583568760463
+            ],
+            "actual_source_sides_uv": [
+              [
+                611.394408944423,
+                1024.464634905936
+              ],
+              [
+                611.394408944423,
+                1024.464634905936
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  609.9547327529895,
+                  1020.6639250145489
+                ],
+                [
+                  611.394408944423,
+                  1024.464634905936
+                ],
+                [
+                  612.3084950711892,
+                  1026.877799896961
+                ]
+              ],
+              [
+                [
+                  609.9547327529895,
+                  1020.6639250145489
+                ],
+                [
+                  611.394408944423,
+                  1024.464634905936
+                ],
+                [
+                  612.3084950711892,
+                  1026.877799896961
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 116,
+      "removed_count": 2,
+      "before_ice_point_count": 23,
+      "after_ice_point_count": 21,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000116.json",
+        "sha256": "02df5451876ef93f7999f57170dccf8b0eec2be47c3f7430f82f67ed12cc54af"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000116.json",
+        "sha256": "d53f590d8b4874ccd6b8b21ffc021046cb3caddd421f2aba2b8d9456a75cca70"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 2,
+          "vertex_index": 1,
+          "uv": [
+            601.3556,
+            991.3269
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        },
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 0,
+          "uv": [
+            604.228,
+            1014.9553
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 2,
+          "vertex_index": 1,
+          "uv": [
+            601.3556,
+            991.3269
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 5.59133655481104,
+            "signed_interface_iqr_contrast": [
+              6.0010376263171565,
+              6.0010376263171565
+            ],
+            "transition_sigma_px": 7.147986294201543,
+            "query_index": 37,
+            "candidate_index": 40,
+            "candidate_flags": 8,
+            "query_uv": [
+              599.5978472952712,
+              996.6347405213012
+            ],
+            "profile_normal": [
+              0.3143697889672279,
+              -0.9493006034890636
+            ],
+            "actual_source_sides_uv": [
+              [
+                601.3555945880519,
+                991.3268813555086
+              ],
+              [
+                601.3555945880519,
+                991.3268813555086
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  599.4761820506227,
+                  997.0021323452673
+                ],
+                [
+                  601.3555945880519,
+                  991.3268813555086
+                ],
+                [
+                  602.5075347125256,
+                  987.8483745341671
+                ]
+              ],
+              [
+                [
+                  599.4761820506227,
+                  997.0021323452673
+                ],
+                [
+                  601.3555945880519,
+                  991.3268813555086
+                ],
+                [
+                  602.5075347125256,
+                  987.8483745341671
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        },
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 0,
+          "uv": [
+            604.228,
+            1014.9553
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 3.5984736185647788,
+            "signed_interface_iqr_contrast": [
+              4.815922581566525,
+              4.815922581566525
+            ],
+            "transition_sigma_px": 5.739541332430312,
+            "query_index": 39,
+            "candidate_index": 44,
+            "candidate_flags": 8,
+            "query_uv": [
+              602.954504481081,
+              1011.5897568817252
+            ],
+            "profile_normal": [
+              0.35390720131390363,
+              0.9352805423284289
+            ],
+            "actual_source_sides_uv": [
+              [
+                604.2280302084292,
+                1014.955339239251
+              ],
+              [
+                604.2280302084292,
+                1014.955339239251
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  602.7839291691425,
+                  1011.1389726940473
+                ],
+                [
+                  604.2280302084292,
+                  1014.955339239251
+                ],
+                [
+                  605.5241056673437,
+                  1018.3805144083682
+                ]
+              ],
+              [
+                [
+                  602.7839291691425,
+                  1011.1389726940473
+                ],
+                [
+                  604.2280302084292,
+                  1014.955339239251
+                ],
+                [
+                  605.5241056673437,
+                  1018.3805144083682
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 117,
+      "removed_count": 1,
+      "before_ice_point_count": 32,
+      "after_ice_point_count": 31,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000117.json",
+        "sha256": "2c277215e9c57276d54b4aa17cb2e7a44e3be006afd54e4f99e2c2809724d9c0"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000117.json",
+        "sha256": "44fa2341f06fb96ede11f6892eaae27e7449ffa232c7b7ab3fc4a40103a24b1e"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 0,
+          "uv": [
+            609.6882,
+            1007.0881
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 0,
+          "uv": [
+            609.6882,
+            1007.0881
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 3.7826761908568645,
+            "signed_interface_iqr_contrast": [
+              4.525733943717796,
+              4.525733943717796
+            ],
+            "transition_sigma_px": 5.104363379909805,
+            "query_index": 40,
+            "candidate_index": 41,
+            "candidate_flags": 8,
+            "query_uv": [
+              608.4354977414298,
+              1003.5188742089064
+            ],
+            "profile_normal": [
+              0.33116826764478097,
+              0.9435717134935504
+            ],
+            "actual_source_sides_uv": [
+              [
+                609.688200062617,
+                1007.0881004639044
+              ],
+              [
+                609.688200062617,
+                1007.0881004639044
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  608.4113708431777,
+                  1003.4501313342133
+                ],
+                [
+                  609.688200062617,
+                  1007.0881004639044
+                ],
+                [
+                  610.6917247302379,
+                  1009.9473644172242
+                ]
+              ],
+              [
+                [
+                  608.4113708431777,
+                  1003.4501313342133
+                ],
+                [
+                  609.688200062617,
+                  1007.0881004639044
+                ],
+                [
+                  610.6917247302379,
+                  1009.9473644172242
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 118,
+      "removed_count": 2,
+      "before_ice_point_count": 36,
+      "after_ice_point_count": 34,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000118.json",
+        "sha256": "b3a3e41b1be8991f55f76cf6f5f0b59588ebb556096f14790086688d3fcc7679"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000118.json",
+        "sha256": "9991fb80dd29e5e551773d9793cad6b3570e529bdfaac3c19802c84082864dc6"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 1,
+          "uv": [
+            612.1417,
+            975.2103
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        },
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 4,
+          "vertex_index": 0,
+          "uv": [
+            611.2515,
+            999.5458
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 1,
+          "uv": [
+            612.1417,
+            975.2103
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 6.593448550383271,
+            "signed_interface_iqr_contrast": [
+              5.49148614303914,
+              5.49148614303914
+            ],
+            "transition_sigma_px": 5.219295465138988,
+            "query_index": 38,
+            "candidate_index": 41,
+            "candidate_flags": 12,
+            "query_uv": [
+              609.9159507914964,
+              981.4167286021034
+            ],
+            "profile_normal": [
+              0.33757256109214306,
+              -0.9412995091880646
+            ],
+            "actual_source_sides_uv": [
+              [
+                612.1417181050786,
+                975.2103187177709
+              ],
+              [
+                612.1417181050786,
+                975.2103187177709
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  610.7569812914495,
+                  979.0715688111036
+                ],
+                [
+                  612.1417181050786,
+                  975.2103187177709
+                ],
+                [
+                  613.1337721658181,
+                  972.4440393808454
+                ]
+              ],
+              [
+                [
+                  610.7569812914495,
+                  979.0715688111036
+                ],
+                [
+                  612.1417181050786,
+                  975.2103187177709
+                ],
+                [
+                  613.1337721658181,
+                  972.4440393808454
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        },
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 4,
+          "vertex_index": 0,
+          "uv": [
+            611.2515,
+            999.5458
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 3.649681485251054,
+            "signed_interface_iqr_contrast": [
+              4.503405542784378,
+              4.503405542784378
+            ],
+            "transition_sigma_px": 4.620776530666998,
+            "query_index": 40,
+            "candidate_index": 43,
+            "candidate_flags": 8,
+            "query_uv": [
+              610.0441995536091,
+              996.1016009801377
+            ],
+            "profile_normal": [
+              0.33080486799656555,
+              0.9436991783983787
+            ],
+            "actual_source_sides_uv": [
+              [
+                611.2515319555671,
+                999.5458023991849
+              ],
+              [
+                611.2515319555671,
+                999.5458023991849
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  610.1219253464176,
+                  996.323332199687
+                ],
+                [
+                  611.2515319555671,
+                  999.5458023991849
+                ],
+                [
+                  612.1839735209104,
+                  1002.2058126476679
+                ]
+              ],
+              [
+                [
+                  610.1219253464176,
+                  996.323332199687
+                ],
+                [
+                  611.2515319555671,
+                  999.5458023991849
+                ],
+                [
+                  612.1839735209104,
+                  1002.2058126476679
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 119,
+      "removed_count": 1,
+      "before_ice_point_count": 33,
+      "after_ice_point_count": 32,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000119.json",
+        "sha256": "b20c3bfcdefc2d8d3bfe39d36f8f36d92a0d07a1aa9785526997b336bf787c34"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000119.json",
+        "sha256": "606d65a1047459170b4839858482d99888d55f4f8ff79a9c4125b075337b3aed"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 0,
+          "uv": [
+            617.2004,
+            991.4789
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 0,
+          "uv": [
+            617.2004,
+            991.4789
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 3.862167427925239,
+            "signed_interface_iqr_contrast": [
+              4.965156887940168,
+              4.965156887940168
+            ],
+            "transition_sigma_px": 5.189937434606794,
+            "query_index": 40,
+            "candidate_index": 44,
+            "candidate_flags": 8,
+            "query_uv": [
+              615.834236969301,
+              987.8664452302422
+            ],
+            "profile_normal": [
+              0.3537227124181438,
+              0.9353503315440429
+            ],
+            "actual_source_sides_uv": [
+              [
+                617.2003733077197,
+                991.4789248144307
+              ],
+              [
+                617.2003733077197,
+                991.4789248144307
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  615.6908987126501,
+                  987.4874153258157
+                ],
+                [
+                  617.2003733077197,
+                  991.4789248144307
+                ],
+                [
+                  618.1673912218804,
+                  994.0360140113212
+                ]
+              ],
+              [
+                [
+                  615.6908987126501,
+                  987.4874153258157
+                ],
+                [
+                  617.2003733077197,
+                  991.4789248144307
+                ],
+                [
+                  618.1673912218804,
+                  994.0360140113212
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 120,
+      "removed_count": 1,
+      "before_ice_point_count": 37,
+      "after_ice_point_count": 36,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000120.json",
+        "sha256": "bfc2926ebe15dd143df21f7a0c36f2099b7eb8808f4a2eb3a227667dc0ce8075"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000120.json",
+        "sha256": "93a208f4aa523a93604a69cc5e29fbbf19d0aaad6bcd84138f2829ca3ccdbb4a"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 0,
+          "uv": [
+            625.0074,
+            983.954
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 0,
+          "uv": [
+            625.0074,
+            983.954
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 4.698116274104054,
+            "signed_interface_iqr_contrast": [
+              4.0,
+              4.0
+            ],
+            "transition_sigma_px": 3.5268793961121268,
+            "query_index": 40,
+            "candidate_index": 46,
+            "candidate_flags": 8,
+            "query_uv": [
+              623.3443840077805,
+              979.5600679749523
+            ],
+            "profile_normal": [
+              0.35397266516724446,
+              0.9352557683940783
+            ],
+            "actual_source_sides_uv": [
+              [
+                625.0073887465907,
+                983.9540083208942
+              ],
+              [
+                625.0073887465907,
+                983.9540083208942
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  624.0819010490901,
+                  981.508712983594
+                ],
+                [
+                  625.0073887465907,
+                  983.9540083208942
+                ],
+                [
+                  625.7660181446037,
+                  985.9584357538139
+                ]
+              ],
+              [
+                [
+                  624.0819010490901,
+                  981.508712983594
+                ],
+                [
+                  625.0073887465907,
+                  983.9540083208942
+                ],
+                [
+                  625.7660181446037,
+                  985.9584357538139
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 121,
+      "removed_count": 1,
+      "before_ice_point_count": 35,
+      "after_ice_point_count": 34,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000121.json",
+        "sha256": "d25cce45ca234d8097fffce44b85787c7889ea53ac00b37113b72ac7a5208d78"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000121.json",
+        "sha256": "ff4d688735d2af008a09300b69c3d07b6253668557be6bbafed0b02620fc29f7"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 0,
+          "uv": [
+            629.4799,
+            975.6041
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 0,
+          "uv": [
+            629.4799,
+            975.6041
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 6.1705523160183695,
+            "signed_interface_iqr_contrast": [
+              4.322648469288197,
+              4.322648469288197
+            ],
+            "transition_sigma_px": 3.0662985529841777,
+            "query_index": 40,
+            "candidate_index": 43,
+            "candidate_flags": 8,
+            "query_uv": [
+              626.7339176344177,
+              970.0782063701743
+            ],
+            "profile_normal": [
+              0.44502106611705117,
+              0.8955201006744868
+            ],
+            "actual_source_sides_uv": [
+              [
+                629.4799434046232,
+                975.6040600014322
+              ],
+              [
+                629.4799434046232,
+                975.6040600014322
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  628.5323872271857,
+                  973.6972837429115
+                ],
+                [
+                  629.4799434046232,
+                  975.6040600014322
+                ],
+                [
+                  630.3731887186956,
+                  977.4015459958923
+                ]
+              ],
+              [
+                [
+                  628.5323872271857,
+                  973.6972837429115
+                ],
+                [
+                  629.4799434046232,
+                  975.6040600014322
+                ],
+                [
+                  630.3731887186956,
+                  977.4015459958923
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 122,
+      "removed_count": 2,
+      "before_ice_point_count": 34,
+      "after_ice_point_count": 32,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000122.json",
+        "sha256": "f6945e1d75e3d3e9013e58b6f4791b1804e8e217828d29a556b5a5af7445d998"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000122.json",
+        "sha256": "13d278aa78e2cfea5768aa61ad0e0f13c5df297a225a764372068e2c487075b8"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 2,
+          "vertex_index": 1,
+          "uv": [
+            624.7019,
+            944.374
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        },
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 0,
+          "uv": [
+            627.9317,
+            967.8064
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 2,
+          "vertex_index": 1,
+          "uv": [
+            624.7019,
+            944.374
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 4.884215884912928,
+            "signed_interface_iqr_contrast": [
+              5.970279448954869,
+              5.970279448954869
+            ],
+            "transition_sigma_px": 5.565567137073878,
+            "query_index": 39,
+            "candidate_index": 42,
+            "candidate_flags": 8,
+            "query_uv": [
+              623.2681452451334,
+              949.0430744085716
+            ],
+            "profile_normal": [
+              0.2935439579127238,
+              -0.9559455762609779
+            ],
+            "actual_source_sides_uv": [
+              [
+                624.7018773072909,
+                944.3740298398855
+              ],
+              [
+                624.7018773072909,
+                944.3740298398855
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  623.3485257240202,
+                  948.7813099908813
+                ],
+                [
+                  624.7018773072909,
+                  944.3740298398855
+                ],
+                [
+                  625.5524391027664,
+                  941.6041183366718
+                ]
+              ],
+              [
+                [
+                  623.3485257240202,
+                  948.7813099908813
+                ],
+                [
+                  624.7018773072909,
+                  944.3740298398855
+                ],
+                [
+                  625.5524391027664,
+                  941.6041183366718
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        },
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 0,
+          "uv": [
+            627.9317,
+            967.8064
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 3.766673634088351,
+            "signed_interface_iqr_contrast": [
+              4.345071872327793,
+              4.345071872327793
+            ],
+            "transition_sigma_px": 3.661796940129188,
+            "query_index": 41,
+            "candidate_index": 46,
+            "candidate_flags": 12,
+            "query_uv": [
+              626.6853889496333,
+              964.2518357383966
+            ],
+            "profile_normal": [
+              0.3308665900821007,
+              0.9436775400354949
+            ],
+            "actual_source_sides_uv": [
+              [
+                627.9316554108963,
+                967.8063610475297
+              ],
+              [
+                627.9316554108963,
+                967.8063610475297
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  627.0803456237737,
+                  965.3783071134028
+                ],
+                [
+                  627.9316554108963,
+                  967.8063610475297
+                ],
+                [
+                  628.7147485181639,
+                  970.0398515214446
+                ]
+              ],
+              [
+                [
+                  627.0803456237737,
+                  965.3783071134028
+                ],
+                [
+                  627.9316554108963,
+                  967.8063610475297
+                ],
+                [
+                  628.7147485181639,
+                  970.0398515214446
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 123,
+      "removed_count": 1,
+      "before_ice_point_count": 31,
+      "after_ice_point_count": 30,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000123.json",
+        "sha256": "3523a344b50a7d2bd34302e3fbd19efbf567a020219169a443efc51cda388b82"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000123.json",
+        "sha256": "67dfe0b0555a967bf140729fba107936fc89dfb28e5c8f9b4dc2083cc2826bb2"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 0,
+          "uv": [
+            625.9054,
+            959.6856
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 0,
+          "uv": [
+            625.9054,
+            959.6856
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 3.8213241938699403,
+            "signed_interface_iqr_contrast": [
+              5.058694489143818,
+              5.058694489143818
+            ],
+            "transition_sigma_px": 3.4014224336199095,
+            "query_index": 41,
+            "candidate_index": 43,
+            "candidate_flags": 8,
+            "query_uv": [
+              624.6425615292673,
+              956.0790239223553
+            ],
+            "profile_normal": [
+              0.33047991739601645,
+              0.9438130239607431
+            ],
+            "actual_source_sides_uv": [
+              [
+                625.9054324332008,
+                959.685639465306
+              ],
+              [
+                625.9054324332008,
+                959.685639465306
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  625.1657533645977,
+                  957.57320024661
+                ],
+                [
+                  625.9054324332008,
+                  959.685639465306
+                ],
+                [
+                  626.6821666993965,
+                  961.9039041101548
+                ]
+              ],
+              [
+                [
+                  625.1657533645977,
+                  957.57320024661
+                ],
+                [
+                  625.9054324332008,
+                  959.685639465306
+                ],
+                [
+                  626.6821666993965,
+                  961.9039041101548
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 124,
+      "removed_count": 1,
+      "before_ice_point_count": 25,
+      "after_ice_point_count": 24,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000124.json",
+        "sha256": "7071230afbcac6aef6d3aa5eabf354a1f272efb755c0be9a5e678f02fbe78196"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000124.json",
+        "sha256": "827380e285c12e972d5e8352ab8f7ce60c8abbb6c636dd4755151d74183402f1"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 2,
+          "vertex_index": 0,
+          "uv": [
+            629.2389,
+            952.2006
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 2,
+          "vertex_index": 0,
+          "uv": [
+            629.2389,
+            952.2006
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 4.235338693026675,
+            "signed_interface_iqr_contrast": [
+              5.053856354488289,
+              5.053856354488289
+            ],
+            "transition_sigma_px": 4.924485709125705,
+            "query_index": 41,
+            "candidate_index": 44,
+            "candidate_flags": 8,
+            "query_uv": [
+              627.8378474464506,
+              948.2036977644939
+            ],
+            "profile_normal": [
+              0.3307935267079244,
+              0.9437031539038818
+            ],
+            "actual_source_sides_uv": [
+              [
+                629.2388700695194,
+                952.2006002469543
+              ],
+              [
+                629.2388700695194,
+                952.2006002469543
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  628.06838644071,
+                  948.8613901266921
+                ],
+                [
+                  629.2388700695194,
+                  952.2006002469543
+                ],
+                [
+                  630.2658912458901,
+                  955.1305340123233
+                ]
+              ],
+              [
+                [
+                  628.06838644071,
+                  948.8613901266921
+                ],
+                [
+                  629.2388700695194,
+                  952.2006002469543
+                ],
+                [
+                  630.2658912458901,
+                  955.1305340123233
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 125,
+      "removed_count": 1,
+      "before_ice_point_count": 34,
+      "after_ice_point_count": 33,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000125.json",
+        "sha256": "3efc6602012696649aa582effa609ee33b5cf3a22a32c5079b00dbd5eed51e96"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000125.json",
+        "sha256": "b3663fd6f1ac4fad85f9abfc8e21327857d86d66d426824adb4641aa639cbfb7"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 5,
+          "vertex_index": 0,
+          "uv": [
+            636.2498,
+            943.8613
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 5,
+          "vertex_index": 0,
+          "uv": [
+            636.2498,
+            943.8613
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 3.8058833790107576,
+            "signed_interface_iqr_contrast": [
+              5.299297652571795,
+              5.299297652571795
+            ],
+            "transition_sigma_px": 4.087959369091321,
+            "query_index": 41,
+            "candidate_index": 50,
+            "candidate_flags": 8,
+            "query_uv": [
+              634.9899440949127,
+              940.2699773058845
+            ],
+            "profile_normal": [
+              0.33101749040408696,
+              0.9436246187158219
+            ],
+            "actual_source_sides_uv": [
+              [
+                636.2497580598035,
+                943.8613025582804
+              ],
+              [
+                636.2497580598035,
+                943.8613025582804
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  635.3648622842547,
+                  941.338748726499
+                ],
+                [
+                  636.2497580598035,
+                  943.8613025582804
+                ],
+                [
+                  637.1903102673647,
+                  946.5425150137272
+                ]
+              ],
+              [
+                [
+                  635.3648622842547,
+                  941.338748726499
+                ],
+                [
+                  636.2497580598035,
+                  943.8613025582804
+                ],
+                [
+                  637.1903102673647,
+                  946.5425150137272
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 127,
+      "removed_count": 1,
+      "before_ice_point_count": 41,
+      "after_ice_point_count": 40,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000127.json",
+        "sha256": "d5f3e012ea10392637fcbea0ac91833cdde7eb1d9c0e9c307515bf1a9ea26638"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000127.json",
+        "sha256": "9af386b5c4b60981fe3301d7b853c79ba9953a3d1f7e2ba7ff4726fee05ec9de"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 4,
+          "vertex_index": 0,
+          "uv": [
+            642.4325,
+            929.9371
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 4,
+          "vertex_index": 0,
+          "uv": [
+            642.4325,
+            929.9371
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 3.5155115377049797,
+            "signed_interface_iqr_contrast": [
+              5.5079771019349835,
+              5.5079771019349835
+            ],
+            "transition_sigma_px": 3.67561958300984,
+            "query_index": 42,
+            "candidate_index": 48,
+            "candidate_flags": 8,
+            "query_uv": [
+              641.267786720262,
+              926.6201851333855
+            ],
+            "profile_normal": [
+              0.3313095086842369,
+              0.9435221298175309
+            ],
+            "actual_source_sides_uv": [
+              [
+                642.4325091205928,
+                929.937148066839
+              ],
+              [
+                642.4325091205928,
+                929.937148066839
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  641.6719929692388,
+                  927.7713067611187
+                ],
+                [
+                  642.4325091205928,
+                  929.937148066839
+                ],
+                [
+                  643.3147616210327,
+                  932.449677096138
+                ]
+              ],
+              [
+                [
+                  641.6719929692388,
+                  927.7713067611187
+                ],
+                [
+                  642.4325091205928,
+                  929.937148066839
+                ],
+                [
+                  643.3147616210327,
+                  932.449677096138
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 128,
+      "removed_count": 2,
+      "before_ice_point_count": 31,
+      "after_ice_point_count": 29,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000128.json",
+        "sha256": "32c7c7b8b04db88db7b3517010883ca4e50ab91f71eb88a25696d8b930106b98"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000128.json",
+        "sha256": "28a4e6cae87a219bdff3a2e18507ee41a5c7f8789435e6ec875bd8fcd4d554bc"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 1,
+          "uv": [
+            645.8715,
+            901.2792
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        },
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 4,
+          "vertex_index": 0,
+          "uv": [
+            644.0281,
+            923.8239
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 1,
+          "uv": [
+            645.8715,
+            901.2792
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 5.038546767493689,
+            "signed_interface_iqr_contrast": [
+              6.0,
+              6.0
+            ],
+            "transition_sigma_px": 7.159159581769449,
+            "query_index": 41,
+            "candidate_index": 47,
+            "candidate_flags": 8,
+            "query_uv": [
+              644.1759565902684,
+              906.0238755973427
+            ],
+            "profile_normal": [
+              0.3365158182516131,
+              -0.941677813302643
+            ],
+            "actual_source_sides_uv": [
+              [
+                645.8715072785305,
+                901.2791878951061
+              ],
+              [
+                645.8715072785305,
+                901.2791878951061
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  644.0743911495579,
+                  906.3080878599707
+                ],
+                [
+                  645.8715072785305,
+                  901.2791878951061
+                ],
+                [
+                  647.3243620793947,
+                  897.2136401326495
+                ]
+              ],
+              [
+                [
+                  644.0743911495579,
+                  906.3080878599707
+                ],
+                [
+                  645.8715072785305,
+                  901.2791878951061
+                ],
+                [
+                  647.3243620793947,
+                  897.2136401326495
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        },
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 4,
+          "vertex_index": 0,
+          "uv": [
+            644.0281,
+            923.8239
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 3.944638222959202,
+            "signed_interface_iqr_contrast": [
+              5.199278419955505,
+              5.199278419955505
+            ],
+            "transition_sigma_px": 3.682183949666453,
+            "query_index": 43,
+            "candidate_index": 50,
+            "candidate_flags": 8,
+            "query_uv": [
+              642.8005638025368,
+              920.075108992881
+            ],
+            "profile_normal": [
+              0.31119629419934325,
+              0.9503456563148989
+            ],
+            "actual_source_sides_uv": [
+              [
+                644.0281205994787,
+                923.823878793804
+              ],
+              [
+                644.0281205994787,
+                923.823878793804
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  643.2314747929738,
+                  921.3910449331654
+                ],
+                [
+                  644.0281205994787,
+                  923.823878793804
+                ],
+                [
+                  644.7772696105644,
+                  926.1116647407723
+                ]
+              ],
+              [
+                [
+                  643.2314747929738,
+                  921.3910449331654
+                ],
+                [
+                  644.0281205994787,
+                  923.823878793804
+                ],
+                [
+                  644.7772696105644,
+                  926.1116647407723
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 129,
+      "removed_count": 1,
+      "before_ice_point_count": 34,
+      "after_ice_point_count": 33,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000129.json",
+        "sha256": "c75a131897c6ef8a5926f44bebaa20c07178ebc283c9e7a40f1f9d2c892481f7"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000129.json",
+        "sha256": "f7f1322b3f64f8e696c2440fe8a5a123b0311ec8a210e305e8f38f960d79e755"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 0,
+          "uv": [
+            647.2362,
+            917.0652
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 0,
+          "uv": [
+            647.2362,
+            917.0652
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 4.299898663851666,
+            "signed_interface_iqr_contrast": [
+              5.561779909525313,
+              5.561779909525313
+            ],
+            "transition_sigma_px": 4.308304219587231,
+            "query_index": 43,
+            "candidate_index": 48,
+            "candidate_flags": 8,
+            "query_uv": [
+              645.8119740383815,
+              913.008040122074
+            ],
+            "profile_normal": [
+              0.3312127289560578,
+              0.9435561075937567
+            ],
+            "actual_source_sides_uv": [
+              [
+                647.2361552090704,
+                917.0652357683855
+              ],
+              [
+                647.2361552090704,
+                917.0652357683855
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  646.3145640005705,
+                  914.4398142870749
+                ],
+                [
+                  647.2361552090704,
+                  917.0652357683855
+                ],
+                [
+                  648.239540052325,
+                  919.9236702859959
+                ]
+              ],
+              [
+                [
+                  646.3145640005705,
+                  914.4398142870749
+                ],
+                [
+                  647.2361552090704,
+                  917.0652357683855
+                ],
+                [
+                  648.239540052325,
+                  919.9236702859959
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 130,
+      "removed_count": 1,
+      "before_ice_point_count": 28,
+      "after_ice_point_count": 27,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000130.json",
+        "sha256": "261c1c0e74764b25c48c11c7ba65e3760e098c284ef4db2a8c1cd4b927cb6ad3"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000130.json",
+        "sha256": "c948c9b536ad9ad627483a42d6f3fb9980363b1a9db83bb08ad38159e4e66b87"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 1,
+          "vertex_index": 0,
+          "uv": [
+            651.2651,
+            909.9671
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 1,
+          "vertex_index": 0,
+          "uv": [
+            651.2651,
+            909.9671
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 4.277699898199887,
+            "signed_interface_iqr_contrast": [
+              5.486900499628632,
+              5.486900499628632
+            ],
+            "transition_sigma_px": 4.927382340459175,
+            "query_index": 43,
+            "candidate_index": 49,
+            "candidate_flags": 8,
+            "query_uv": [
+              649.8470586906683,
+              905.9312116512484
+            ],
+            "profile_normal": [
+              0.33148498165505164,
+              0.9434604956950504
+            ],
+            "actual_source_sides_uv": [
+              [
+                651.2650519629489,
+                909.9670525176388
+              ],
+              [
+                651.2650519629489,
+                909.9670525176388
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  649.8628416854926,
+                  905.976132636948
+                ],
+                [
+                  651.2650519629489,
+                  909.9670525176388
+                ],
+                [
+                  652.0662352126395,
+                  912.2473511366643
+                ]
+              ],
+              [
+                [
+                  649.8628416854926,
+                  905.976132636948
+                ],
+                [
+                  651.2650519629489,
+                  909.9670525176388
+                ],
+                [
+                  652.0662352126395,
+                  912.2473511366643
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 131,
+      "removed_count": 1,
+      "before_ice_point_count": 31,
+      "after_ice_point_count": 30,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000131.json",
+        "sha256": "147663ab5628a8088f92f0fa00abcb2d3a6b619ab30496e17fc29fb6b0587f17"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000131.json",
+        "sha256": "6e44481b3ea81ed8d33eae855787320895706694f43a7a444b93dfaf61e6f885"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 2,
+          "vertex_index": 0,
+          "uv": [
+            656.9222,
+            903.0854
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 2,
+          "vertex_index": 0,
+          "uv": [
+            656.9222,
+            903.0854
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 3.163663487810594,
+            "signed_interface_iqr_contrast": [
+              5.554412816925634,
+              5.554412816925634
+            ],
+            "transition_sigma_px": 4.073444949555488,
+            "query_index": 44,
+            "candidate_index": 49,
+            "candidate_flags": 8,
+            "query_uv": [
+              655.8729873034132,
+              900.1007737124048
+            ],
+            "profile_normal": [
+              0.331657245725213,
+              0.9433999530199086
+            ],
+            "actual_source_sides_uv": [
+              [
+                656.9222392221819,
+                903.0853736981761
+              ],
+              [
+                656.9222392221819,
+                903.0853736981761
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  655.9377371910467,
+                  900.2849549469138
+                ],
+                [
+                  656.9222392221819,
+                  903.0853736981761
+                ],
+                [
+                  657.760219372501,
+                  905.4690105540935
+                ]
+              ],
+              [
+                [
+                  655.9377371910467,
+                  900.2849549469138
+                ],
+                [
+                  656.9222392221819,
+                  903.0853736981761
+                ],
+                [
+                  657.760219372501,
+                  905.4690105540935
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 132,
+      "removed_count": 1,
+      "before_ice_point_count": 33,
+      "after_ice_point_count": 32,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000132.json",
+        "sha256": "74fe70915488e7f8713e261534b01ec48d6fe07e95d7d1f5dba277bd5d5333e4"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000132.json",
+        "sha256": "f39e1e59e68319ebc4096f040d8dc7b6b3d66db5d82c7d7dc165725b256dd2c9"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 0,
+          "uv": [
+            657.4034,
+            897.0464
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 3,
+          "vertex_index": 0,
+          "uv": [
+            657.4034,
+            897.0464
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 2.986317684194153,
+            "signed_interface_iqr_contrast": [
+              5.578758917817282,
+              5.578758917817282
+            ],
+            "transition_sigma_px": 3.2644612568909155,
+            "query_index": 44,
+            "candidate_index": 55,
+            "candidate_flags": 8,
+            "query_uv": [
+              656.4122801607251,
+              894.2293931988878
+            ],
+            "profile_normal": [
+              0.3318894792032315,
+              0.9433182779922202
+            ],
+            "actual_source_sides_uv": [
+              [
+                657.4034075816677,
+                897.0464412542796
+              ],
+              [
+                657.4034075816677,
+                897.0464412542796
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  656.7924254389374,
+                  895.309867307591
+                ],
+                [
+                  657.4034075816677,
+                  897.0464412542796
+                ],
+                [
+                  658.2539864662697,
+                  899.4640129430402
+                ]
+              ],
+              [
+                [
+                  656.7924254389374,
+                  895.309867307591
+                ],
+                [
+                  657.4034075816677,
+                  897.0464412542796
+                ],
+                [
+                  658.2539864662697,
+                  899.4640129430402
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 133,
+      "removed_count": 1,
+      "before_ice_point_count": 31,
+      "after_ice_point_count": 30,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000133.json",
+        "sha256": "c50a20718c08f1eed15499e9c51651d212d5b593cd4f13c9e4a1f11e19109cbb"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000133.json",
+        "sha256": "8583d63e625fde62de56fda120c1367bb9a96547c738be1ac1063761a8ce7228"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 1,
+          "vertex_index": 0,
+          "uv": [
+            665.9274,
+            891.6633
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 1,
+          "vertex_index": 0,
+          "uv": [
+            665.9274,
+            891.6633
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 3.2911098636307776,
+            "signed_interface_iqr_contrast": [
+              4.991113661797101,
+              4.991113661797101
+            ],
+            "transition_sigma_px": 3.010041520109913,
+            "query_index": 44,
+            "candidate_index": 48,
+            "candidate_flags": 8,
+            "query_uv": [
+              664.8353886978227,
+              888.5586765507799
+            ],
+            "profile_normal": [
+              0.3318184833972401,
+              0.9433432535805593
+            ],
+            "actual_source_sides_uv": [
+              [
+                665.9274397814664,
+                891.6633228374284
+              ],
+              [
+                665.9274397814664,
+                891.6633228374284
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  665.2349364548213,
+                  889.6945707215594
+                ],
+                [
+                  665.9274397814664,
+                  891.6633228374284
+                ],
+                [
+                  666.5823006738327,
+                  893.5250594065391
+                ]
+              ],
+              [
+                [
+                  665.2349364548213,
+                  889.6945707215594
+                ],
+                [
+                  665.9274397814664,
+                  891.6633228374284
+                ],
+                [
+                  666.5823006738327,
+                  893.5250594065391
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 134,
+      "removed_count": 2,
+      "before_ice_point_count": 37,
+      "after_ice_point_count": 35,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000134.json",
+        "sha256": "ccf8117ffc88b8ce56764c1d2d9143e86960ebd0f3f389f42aceec4b9efbdfb0"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000134.json",
+        "sha256": "aa9d790eb420b1eeb32b10124bb27f7d99c17d5c1da3fdc15547b4ea3d2cb9c4"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 1,
+          "vertex_index": 1,
+          "uv": [
+            665.9147,
+            866.569
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        },
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 1,
+          "vertex_index": 2,
+          "uv": [
+            670.5591,
+            887.154
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 1,
+          "vertex_index": 1,
+          "uv": [
+            665.9147,
+            866.569
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 4.355050013883954,
+            "signed_interface_iqr_contrast": [
+              5.866712078604195,
+              5.866712078604195
+            ],
+            "transition_sigma_px": 5.64402836334341,
+            "query_index": 43,
+            "candidate_index": 45,
+            "candidate_flags": 8,
+            "query_uv": [
+              664.4503711954158,
+              870.6704974197122
+            ],
+            "profile_normal": [
+              0.3362387470014402,
+              -0.9417767808854184
+            ],
+            "actual_source_sides_uv": [
+              [
+                665.9147077552127,
+                866.5690124370416
+              ],
+              [
+                665.9147077552127,
+                866.5690124370416
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  664.5815978384614,
+                  870.3029425006074
+                ],
+                [
+                  665.9147077552127,
+                  866.5690124370416
+                ],
+                [
+                  667.1416504810936,
+                  863.1324478500757
+                ]
+              ],
+              [
+                [
+                  664.5815978384614,
+                  870.3029425006074
+                ],
+                [
+                  665.9147077552127,
+                  866.5690124370416
+                ],
+                [
+                  667.1416504810936,
+                  863.1324478500757
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        },
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 1,
+          "vertex_index": 2,
+          "uv": [
+            670.5591,
+            887.154
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 5.597638323292855,
+            "signed_interface_iqr_contrast": [
+              4.789592323997709,
+              4.789592323997709
+            ],
+            "transition_sigma_px": 3.127375081647974,
+            "query_index": 44,
+            "candidate_index": 47,
+            "candidate_flags": 12,
+            "query_uv": [
+              668.2557559343043,
+              882.0522117062819
+            ],
+            "profile_normal": [
+              0.411489374831031,
+              0.9114145568297487
+            ],
+            "actual_source_sides_uv": [
+              [
+                670.5591246284863,
+                887.1539807579991
+              ],
+              [
+                670.5591246284863,
+                887.1539807579991
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  669.7384688368654,
+                  885.3362968021569
+                ],
+                [
+                  670.5591246284863,
+                  887.1539807579991
+                ],
+                [
+                  671.474472138481,
+                  889.1813989519916
+                ]
+              ],
+              [
+                [
+                  669.7384688368654,
+                  885.3362968021569
+                ],
+                [
+                  670.5591246284863,
+                  887.1539807579991
+                ],
+                [
+                  671.474472138481,
+                  889.1813989519916
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 135,
+      "removed_count": 2,
+      "before_ice_point_count": 45,
+      "after_ice_point_count": 43,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000135.json",
+        "sha256": "e0b9b5025bed2f446c7ea08fa524a065349022870c40c59bd2ef6634689438a6"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000135.json",
+        "sha256": "621b97c7fbb986f1ce64690dfecc2267db0ffbf742566d1980b7fe611d706427"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 4,
+          "vertex_index": 0,
+          "uv": [
+            665.4601,
+            861.6727
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        },
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 4,
+          "vertex_index": 1,
+          "uv": [
+            668.629,
+            882.2094
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 4,
+          "vertex_index": 0,
+          "uv": [
+            665.4601,
+            861.6727
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 4.282984206760334,
+            "signed_interface_iqr_contrast": [
+              5.664661899746022,
+              5.664661899746022
+            ],
+            "transition_sigma_px": 5.81480284026088,
+            "query_index": 43,
+            "candidate_index": 46,
+            "candidate_flags": 8,
+            "query_uv": [
+              664.0196034998959,
+              865.7061829218015
+            ],
+            "profile_normal": [
+              0.33632485239811466,
+              -0.9417460345864943
+            ],
+            "actual_source_sides_uv": [
+              [
+                665.460077531058,
+                861.6726995288884
+              ],
+              [
+                665.460077531058,
+                861.6726995288884
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  663.9619179743463,
+                  865.8677086447805
+                ],
+                [
+                  665.460077531058,
+                  861.6726995288884
+                ],
+                [
+                  666.6001069660554,
+                  858.4804935647279
+                ]
+              ],
+              [
+                [
+                  663.9619179743463,
+                  865.8677086447805
+                ],
+                [
+                  665.460077531058,
+                  861.6726995288884
+                ],
+                [
+                  666.6001069660554,
+                  858.4804935647279
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        },
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 4,
+          "vertex_index": 1,
+          "uv": [
+            668.629,
+            882.2094
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 5.113821034193647,
+            "signed_interface_iqr_contrast": [
+              5.532200058786117,
+              5.532200058786117
+            ],
+            "transition_sigma_px": 3.389156761652407,
+            "query_index": 44,
+            "candidate_index": 47,
+            "candidate_flags": 8,
+            "query_uv": [
+              666.6794642487729,
+              877.4817362562171
+            ],
+            "profile_normal": [
+              0.3812279089147406,
+              0.9244810876726978
+            ],
+            "actual_source_sides_uv": [
+              [
+                668.6289955482027,
+                882.209367088072
+              ],
+              [
+                668.6289955482027,
+                882.209367088072
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  667.8563889961405,
+                  880.3357892914545
+                ],
+                [
+                  668.6289955482027,
+                  882.209367088072
+                ],
+                [
+                  669.5993525010545,
+                  884.5624913746879
+                ]
+              ],
+              [
+                [
+                  667.8563889961405,
+                  880.3357892914545
+                ],
+                [
+                  668.6289955482027,
+                  882.209367088072
+                ],
+                [
+                  669.5993525010545,
+                  884.5624913746879
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 136,
+      "removed_count": 1,
+      "before_ice_point_count": 43,
+      "after_ice_point_count": 42,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000136.json",
+        "sha256": "5e04da9be606e8230cbd445d46cf26a34b6f41c7ee07841e4c491c6fbebb5983"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000136.json",
+        "sha256": "9d465adf424d435ad1acc3604262d52f8674d9047f77e1cdd0f685a2c6fb96dd"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 2,
+          "vertex_index": 0,
+          "uv": [
+            665.9133,
+            878.0749
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 2,
+          "vertex_index": 0,
+          "uv": [
+            665.9133,
+            878.0749
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 4.244139600292671,
+            "signed_interface_iqr_contrast": [
+              5.075007934518965,
+              5.075007934518965
+            ],
+            "transition_sigma_px": 3.609785159246882,
+            "query_index": 45,
+            "candidate_index": 48,
+            "candidate_flags": 8,
+            "query_uv": [
+              664.5909864730926,
+              874.0420476300683
+            ],
+            "profile_normal": [
+              0.311569099858491,
+              0.9502234979273927
+            ],
+            "actual_source_sides_uv": [
+              [
+                665.9133292280295,
+                878.0749288067506
+              ],
+              [
+                665.9133292280295,
+                878.0749288067506
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  665.2068900381767,
+                  875.9204304358918
+                ],
+                [
+                  665.9133292280295,
+                  878.0749288067506
+                ],
+                [
+                  666.7241069828751,
+                  880.5476389522721
+                ]
+              ],
+              [
+                [
+                  665.2068900381767,
+                  875.9204304358918
+                ],
+                [
+                  665.9133292280295,
+                  878.0749288067506
+                ],
+                [
+                  666.7241069828751,
+                  880.5476389522721
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 137,
+      "removed_count": 1,
+      "before_ice_point_count": 36,
+      "after_ice_point_count": 35,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000137.json",
+        "sha256": "1d2a983721b0dc259fb9b50d5d307ad041b48e7493edf8cc9a9d92a0434066b4"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000137.json",
+        "sha256": "6fa089ecb8396fb4062c83119a18157487e8088f5eaa2bdbaad8bcc7fed790e9"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 2,
+          "vertex_index": 0,
+          "uv": [
+            675.7454,
+            871.8396
+          ],
+          "reason": "User-rejected local right-tip material branch in frame 113; same native blurred mixed interior patch in subsequent frames, without a confirmed curved material boundary at this point. Real middle/inner arcs elsewhere retained.",
+          "basis": "same-shot native source visual review, not just being spatially inside R4 outer"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R4:middle",
+          "segment_index": 2,
+          "vertex_index": 0,
+          "uv": [
+            675.7454,
+            871.8396
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 2.7197596684927032,
+            "signed_interface_iqr_contrast": [
+              5.143347346815403,
+              5.143347346815403
+            ],
+            "transition_sigma_px": 4.22731714907178,
+            "query_index": 46,
+            "candidate_index": 54,
+            "candidate_flags": 8,
+            "query_uv": [
+              674.897279831375,
+              869.2554756943778
+            ],
+            "profile_normal": [
+              0.31183647348099974,
+              0.9501357870362181
+            ],
+            "actual_source_sides_uv": [
+              [
+                675.7454000951136,
+                871.8396166875505
+              ],
+              [
+                675.7454000951136,
+                871.8396166875505
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  674.6694504962106,
+                  868.561301590047
+                ],
+                [
+                  675.7454000951136,
+                  871.8396166875505
+                ],
+                [
+                  676.4477450218092,
+                  873.9795942284953
+                ]
+              ],
+              [
+                [
+                  674.6694504962106,
+                  868.561301590047
+                ],
+                [
+                  675.7454000951136,
+                  871.8396166875505
+                ],
+                [
+                  676.4477450218092,
+                  873.9795942284953
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    },
+    {
+      "index": 139,
+      "removed_count": 2,
+      "before_ice_point_count": 41,
+      "after_ice_point_count": 39,
+      "before": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\before\\ice_candidates\\000139.json",
+        "sha256": "1eedd434e3b2c5a9dbc06193adf7c19b805c5f00197e64c8b2a6f570d32c91fe"
+      },
+      "after": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\ice_candidates\\000139.json",
+        "sha256": "1cc6693d4185715dcfc50d63115ded98cc82f2d991220ebe96ff6f701ff753b8"
+      },
+      "remove": [
+        {
+          "feature_id": "ice.R3:middle",
+          "segment_index": 0,
+          "vertex_index": 0,
+          "uv": [
+            1649.3751,
+            1039.1141
+          ],
+          "reason": "用户第139帧截图红圈中明确否决的两个点",
+          "basis": "explicit user screenshot"
+        },
+        {
+          "feature_id": "ice.R3:middle",
+          "segment_index": 0,
+          "vertex_index": 1,
+          "uv": [
+            1688.8165,
+            1041.0752
+          ],
+          "reason": "用户第139帧截图红圈中明确否决的两个点",
+          "basis": "explicit user screenshot"
+        }
+      ],
+      "deleted_source_evidence": [
+        {
+          "feature_id": "ice.R3:middle",
+          "segment_index": 0,
+          "vertex_index": 0,
+          "uv": [
+            1649.3751,
+            1039.1141
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": 0.8341795396999667,
+            "signed_interface_iqr_contrast": [
+              3.9719574836351796,
+              3.9719574836351796
+            ],
+            "transition_sigma_px": 3.056298300344025,
+            "query_index": 22,
+            "candidate_index": 33,
+            "candidate_flags": 12,
+            "query_uv": [
+              1649.417372264849,
+              1039.9471921093952
+            ],
+            "profile_normal": [
+              -0.05062054519860233,
+              -0.9987179583865489
+            ],
+            "actual_source_sides_uv": [
+              [
+                1649.375145641756,
+                1039.1140820225783
+              ],
+              [
+                1649.375145641756,
+                1039.1140820225783
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  1649.5028362736643,
+                  1041.6333541225588
+                ],
+                [
+                  1649.375145641756,
+                  1039.1140820225783
+                ],
+                [
+                  1649.2941304787091,
+                  1037.5156935042587
+                ]
+              ],
+              [
+                [
+                  1649.5028362736643,
+                  1041.6333541225588
+                ],
+                [
+                  1649.375145641756,
+                  1039.1140820225783
+                ],
+                [
+                  1649.2941304787091,
+                  1037.5156935042587
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        },
+        {
+          "feature_id": "ice.R3:middle",
+          "segment_index": 0,
+          "vertex_index": 1,
+          "uv": [
+            1688.8165,
+            1041.0752
+          ],
+          "source_evidence": {
+            "native_profile_shift_px": -3.045406046212496,
+            "signed_interface_iqr_contrast": [
+              3.2659208009700933,
+              3.2659208009700933
+            ],
+            "transition_sigma_px": 4.911217352617952,
+            "query_index": 24,
+            "candidate_index": 37,
+            "candidate_flags": 12,
+            "query_uv": [
+              1688.6776207553355,
+              1038.0329978590173
+            ],
+            "profile_normal": [
+              -0.0456022946723162,
+              -0.9989596742214467
+            ],
+            "actual_source_sides_uv": [
+              [
+                1688.8164982592518,
+                1041.0752356908138
+              ],
+              [
+                1688.8164982592518,
+                1041.0752356908138
+              ]
+            ],
+            "actual_source_side_quantiles_uv": [
+              [
+                [
+                  1688.9682163579355,
+                  1044.398758410967
+                ],
+                [
+                  1688.8164982592518,
+                  1041.0752356908138
+                ],
+                [
+                  1688.6660905664826,
+                  1037.780418602141
+                ]
+              ],
+              [
+                [
+                  1688.9682163579355,
+                  1044.398758410967
+                ],
+                [
+                  1688.8164982592518,
+                  1041.0752356908138
+                ],
+                [
+                  1688.6660905664826,
+                  1037.780418602141
+                ]
+              ]
+            ],
+            "query_set": "current_source_curve_guided_refinement"
+          }
+        }
+      ]
+    }
+  ],
+  "schema": "rinkspace.user-reviewed-point-deletions.v1",
+  "optimization_performed": false,
+  "retained_coordinates_changed": false,
+  "source_images_changed": false,
+  "user_acceptance_of_corrected_batch": false,
+  "input_specification": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_review_correction_02\\deletion_specification.json",
+    "sha256": "da11c6dccfc08ed006c44695cb26f1de4bda82f35ef84885dc20c417056b5152"
+  },
+  "removed_point_count": 34
+}

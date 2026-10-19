@@ -1,0 +1,47 @@
+{
+  "base_observation_config": "configs/rink_model/ankara_v0_2_observations.json",
+  "base_model_revision": "v0.2",
+  "base_model_sha256": "966537d252b546efaa8f222e067584c30e697ba5e1c391416049401052149793",
+  "revision": "v0.3",
+  "script": "scripts/extend_model_reference_views.py",
+  "source_id": "ebihara",
+  "source_sha256": "8a86550ddaa2a1a76af99c2b25de19acc54cf3907bd87efb5564ae1b2768473e",
+  "start_pts": 780800,
+  "end_pts": 806400,
+  "time_base": "1/12800",
+  "decode_every_source_frame": true,
+  "source_frame_count": 101,
+  "reject_any_missing_pair": true,
+  "rebuild_commands": [
+    "python scripts/extend_model_reference_views.py --tracking",
+    "python scripts/extend_model_reference_views.py --publish"
+  ],
+  "view_ids": [
+    "ebihara_62_derived",
+    "ebihara_63_derived"
+  ],
+  "geometry_role": "propagated_or_reobserved_prior",
+  "query_use": "camera_initialization_only_requires_fresh_known_print_reobservation",
+  "new_independent_physical_constraints": 0,
+  "schema_version": "rinkspace.derived-model-extension.v1",
+  "model_id": "ankara_2026_shared",
+  "base_observation_manifest": "outputs/rink_model/ankara_2026_shared/v0.2/observation_inputs_manifest.json",
+  "base_model_file": "outputs/rink_model/ankara_2026_shared/v0.2/rink_model.json",
+  "saved_model_file": "outputs/rink_model/ankara_2026_shared/v0.3/rink_model.json",
+  "saved_chain_file": "outputs/rink_model/ankara_2026_shared/v0.3/evidence/adjacent_ice_chain.json",
+  "saved_model_sha256": "771493594537828fdabbb582369a27c576a95832a8aa908ab79abc161f7945da",
+  "saved_chain_sha256": "0eae6b84854d451c445a410141d66aabf4c20b666768d6c4f9496a685b6bddea",
+  "evaluation_lock_file": "configs/rink_model/ko_evaluation_lock.json",
+  "evaluation_lock_sha256": "31035721bb17afaeaed09123ebc852f0d66cf3406ff3c297f23fe177050c8d90",
+  "frozen_reference_asset_sha256": {
+    "outputs/rink_model/ankara_2026_shared/v0.3/views/survey_3610.jpg": "371c073e72e447d4883ab7c831a4a2516c68245dc9533bbd50cf486f75dd1886",
+    "outputs/rink_model/ankara_2026_shared/v0.3/views/ebihara_61.jpg": "1416d656cc8b6ae0547cce17a0d94cdd2d2931f142281bdbe209764c7252d155",
+    "outputs/rink_model/ankara_2026_shared/v0.3/views/broadcast_replay_7263.jpg": "0a4cf44a764fbe4ceede4402f37d66df181c5c2af27257c51053b259d025b8e1",
+    "outputs/rink_model/ankara_2026_shared/v0.3/views/broadcast_left_end_4560.jpg": "05262cf8aaec2095e00c5c9fe8b0b3c15d92141ccd4519b26eb42a495c73bae8",
+    "outputs/rink_model/ankara_2026_shared/v0.3/views/broadcast_end_warmup_6240.jpg": "80c37db087627ca12d7efdbd98d576301451ce509e21b06b891d4f4bed4d0617",
+    "outputs/rink_model/ankara_2026_shared/v0.3/views/ebihara_end_70.jpg": "db350b5e872fb3aead906e1c82011174266cc1453ee5e1e87105e9b6419d8892",
+    "outputs/rink_model/ankara_2026_shared/v0.3/views/ebihara_follow_150.jpg": "1c4ac360cffda4397f58cf899bc0d505e202d8028862701c2e2b9d98f499426f",
+    "outputs/rink_model/ankara_2026_shared/v0.3/views/ebihara_62_derived.jpg": "f43a90eeede4d7ed537cf7d0063b7503df1f52c333d9515de6a89933fc0c0f69",
+    "outputs/rink_model/ankara_2026_shared/v0.3/views/ebihara_63_derived.jpg": "4e5d1312ad36fe1c61b68db96c04170472c1736673216ae616ca29c644480f65"
+  }
+}

@@ -1,0 +1,253 @@
+{
+  "schema": "rinkspace.presentation-outro-stats.v1",
+  "event_id": "ankara_2026",
+  "programme_id": "okada_mei_sp",
+  "status": "integrated_into_final_demo",
+  "user_visual_review": "accepted",
+  "existing_full_demo": {
+    "video": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_full_20261016/v3/RinkSpace_full_demo_v3.mp4",
+    "sha256": "64b1ed50d25655a68fb56281e928dc5bd476c68279b256e0a97f11ce743a38c4",
+    "unchanged": true
+  },
+  "statistics": {
+    "version": "v3_outro_stats_v1",
+    "athlete": {
+      "name_zh": "冈田芽衣",
+      "name_latin": "Mei OKADA",
+      "nation_code": "JPN",
+      "nation_zh": "日本"
+    },
+    "event": {
+      "display_name": "2026 ISU 青年大奖赛安卡拉站",
+      "official_name": "ISU Figure Skating Junior Grand Prix Ankara 2026",
+      "discipline": "女子短节目",
+      "official_url": "https://www.isu-skating.com/en/figure-skating/events/eventdetail/isu-jgp-ankara-2026/?tab=overview_16055"
+    },
+    "programme_seconds": 166,
+    "programme_time_display": "2:46",
+    "active_seconds": 131.3,
+    "excluded_seconds": 34.69999999999999,
+    "active_distance_m": 552.6419006383322,
+    "average_speed_kmh": 15.15240550112716,
+    "max_speed_kmh": 29.24483812220924,
+    "max_speed_programme_seconds": 81.02,
+    "coverage_percent": 73.71650417059855,
+    "coverage": {
+      "sigma_m": 1.5,
+      "threshold": 0.2,
+      "route_radius_m": 1,
+      "definition": "union of 1m-radius route neighbourhood; Gaussian sigma1.5m; fraction of ice with numeric field >=0.20",
+      "threshold_basis": "fixed visual-demo contour; isolated straight pass has centre response about0.495 and contour about2.17m from route centre; not an international standard",
+      "isolated_pass_half_width_m": 2.172441950978514,
+      "isolated_pass_centre_value": 0.49501492490615406,
+      "ice_area_m2": 1738.987760571011,
+      "covered_area_m2": 1281.9209850475277,
+      "threshold_sensitivity_percent": {
+        "0.1": 80.19549386795273,
+        "0.15": 76.75220485044585,
+        "0.2": 73.71650417059855,
+        "0.25": 70.76475246657836,
+        "0.3": 67.72224611039425,
+        "0.4": 60.90494723495319
+      },
+      "full_source_coverage_percent": 73.71650417059855,
+      "full_source_minus_timer_percentage_points": 0,
+      "includes_spin_positions": true,
+      "dwell_time_weighted": false,
+      "texture_wh": [
+        1536,
+        780
+      ],
+      "boundary_rule": "fractional actual model ice-boundary mask, outside excluded"
+    },
+    "exclusion_intervals": [
+      {
+        "start_seconds": 59.28,
+        "end_seconds": 70.67999999999999,
+        "source_start_seconds": 81.4,
+        "source_end_seconds": 92.8,
+        "label": "旋转 1",
+        "boundary_uncertainty_seconds": 0.1,
+        "basis": "official source visual spin entry/step-out review"
+      },
+      {
+        "start_seconds": 134.28,
+        "end_seconds": 144.48,
+        "source_start_seconds": 156.4,
+        "source_end_seconds": 166.6,
+        "label": "旋转 2",
+        "boundary_uncertainty_seconds": 0.1,
+        "basis": "official source visual spin entry/step-out review"
+      },
+      {
+        "start_seconds": 149.78,
+        "end_seconds": 162.88,
+        "source_start_seconds": 171.9,
+        "source_end_seconds": 185,
+        "label": "旋转 3",
+        "boundary_uncertainty_seconds": 0.1,
+        "basis": "official source visual spin entry/step-out review"
+      }
+    ],
+    "clock": {
+      "source_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4",
+      "native_fps": 50,
+      "time_base": "1/12800",
+      "first_pts": 283136,
+      "last_pts": 2407936,
+      "source_start_seconds": 22.12,
+      "source_end_seconds": 188.12,
+      "duration_integration": "8300 native source intervals, endpoints included; exactly166s, no retiming",
+      "timer_evidence": [
+        "0:00 remains visible at source23.08; first0:01 at23.10",
+        "2:45 remains visible at188.10; first2:46 at188.12",
+        "166s window ends on first2:46 frame; start22.12 inferred by subtracting166s; initial0:01 phase differs by one native frame(20ms)",
+        "0:00 graphic animates in around22.40; its first visible frame is not assumed to be programme zero"
+      ],
+      "start_is_inferred": true,
+      "timer_phase_uncertainty_seconds": 0.02
+    },
+    "method": {
+      "distance": "trapezoid integral of V3 speed curve over active source intervals; spin distance and time both removed",
+      "average": "active_distance_m / active_seconds *3.6",
+      "speed_curve": "V3 existing speedometer: XY Gaussian sigma0.16s, native-clock gradient norm, speed Gaussian sigma0.26s",
+      "peak": "maximum of same smoothed speed curve outside grey exclusion intervals",
+      "stationary_dance_intervals": [],
+      "stationary_dance_policy": "no additional confirmed stationary-dance interval; no automatic low-speed exclusion",
+      "metres_per_scene_unit": 0.3082592551981685,
+      "scale_status": "inherited conditional model scale; not independently surveyed",
+      "all_source_distance_m": 567.4086127147643,
+      "timer_window_all_distance_m": 567.0512467040849,
+      "uses_final_v3_display_trajectory": true,
+      "trajectory_disclaimer": "includes previously documented inferred positions, spin contact proxies and local display corrections; no new model solve",
+      "timer_rows_inferred_in_source_packet": 471
+    },
+    "footer": "开发中版本 · 所示数据为模型估算，仅供参考",
+    "display_rounding": {
+      "distance_m_decimals": 0,
+      "speed_kmh_decimals": 1,
+      "coverage_percent_decimals": 0
+    }
+  },
+  "display": {
+    "header": "athlete Chinese and Latin name; nation; event; discipline",
+    "layout": "left full-rink map, right five metrics, bottom full-programme speed timeline",
+    "map_rect": [
+      74,
+      219,
+      1234,
+      725
+    ],
+    "turn_seconds": 3,
+    "broadcast_fade_seconds": 0.55,
+    "statistics_fade_seconds": [
+      2.35,
+      3.15
+    ],
+    "chart_draw_seconds": [
+      3,
+      4
+    ],
+    "complete_page_hold_seconds": 9,
+    "ending_seconds": 13,
+    "uniform_trajectory": true,
+    "trajectory_age_gradient": false,
+    "particles_after_transition": false
+  },
+  "runtime": {
+    "directory": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_outro_stats_20261016",
+    "preview": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\demo_outro_stats_20261016\\RinkSpace_stats_outro_preview.mp4",
+      "sha256": "575826b245cf630d8db764169230a73ddaeefcebee178ebd72de9108752bc807",
+      "bytes": 14762383,
+      "video_frames": 750,
+      "decoded_video_frames": 750,
+      "fps": 50,
+      "width": 1920,
+      "height": 1080,
+      "duration_seconds": 15,
+      "video_time_base": "1/12800",
+      "audio_packets": 705,
+      "audio_pts_step": 1024,
+      "audio_sample_rate": 48000
+    },
+    "ending_only": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\demo_outro_stats_20261016\\RinkSpace_stats_outro_only.mp4",
+      "sha256": "7b0d969bbeb9ea94e3058b7675a38a28c9d68e4173dc9023bf2a7bb246fbcd9c",
+      "bytes": 7823502,
+      "video_frames": 650,
+      "decoded_video_frames": 650,
+      "fps": 50,
+      "width": 1920,
+      "height": 1080,
+      "duration_seconds": 13,
+      "video_time_base": "1/12800",
+      "audio_packets": 611,
+      "audio_pts_step": 1024,
+      "audio_sample_rate": 48000
+    },
+    "stats_json": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_outro_stats_20261016/stats.json",
+    "speed_timeline": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_outro_stats_20261016/timeline.npz",
+    "coverage_field": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_outro_stats_20261016/coverage_field.npz",
+    "page": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_outro_stats_20261016/stats_page.png",
+    "render_report": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_outro_stats_20261016/render_report.json",
+    "statistics_qa": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_outro_stats_20261016/qa_stats_independent.json",
+    "encoded_qa": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_outro_stats_20261016/qa_encoded.json",
+    "context_source_first_pts": 2389760,
+    "context_source_last_pts": 2415104,
+    "context_source_time": "00:03:06.700–00:03:08.680",
+    "context_frames": 100,
+    "ending_frames": 650
+  },
+  "continuity": {
+    "t0_composite_max_byte_error": 0,
+    "summary_map_uses_timer_window": true
+  },
+  "future_integration": {
+    "performed": true,
+    "retain_video_before_seconds": 176.88,
+    "replace_existing_outro_seconds": 4.2,
+    "new_outro_seconds": 13,
+    "strategy": "Reuse existing intro and programme; replace old ending, with only a short junction encode if the existing non-IDR boundary requires it. No complete-programme rerender.",
+    "final_video": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\demo_full_20261016\\final\\RinkSpace_full_demo_final.mp4",
+    "final_sha256": "e7369ee17686945f674c7978d25d212342927017d32a1df89decf4e14c6a68d1",
+    "assembly_report": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_full_20261016/final/assembly_report.json",
+    "verification": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_full_20261016/final/qa_final.json",
+    "retained_prefix_frames": 8660,
+    "short_tail_transcoded_frames": 184,
+    "complete_programme_rerendered": false
+  },
+  "code": {
+    "demo_outro_stats.py": {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/demo_outro_stats.py",
+      "sha256": "b7b4c1e8142855c9426f7c3a19d65b789c565f2cc5daf78c96d1e4c832dc264d"
+    },
+    "demo_stats_layout.py": {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/demo_stats_layout.py",
+      "sha256": "404b3ccb1d4992295884c340f6dfb2d63d5f09bc4114cec78d1943e100e73ab2"
+    },
+    "render_demo_stats_outro.py": {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/render_demo_stats_outro.py",
+      "sha256": "531c5e34a8d3e073dec1b5c952acb38f6ca34a90c356483b185c0173a22dbc99"
+    }
+  },
+  "completed_at": "2026-10-16T14:17:10.521Z",
+  "verification": {
+    "status": "passed",
+    "statistics": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_outro_stats_20261016/qa_stats_independent.json",
+    "encoded": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_outro_stats_20261016/qa_encoded.json",
+    "encoded_visual": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_outro_stats_20261016/encoded_visual_qa.json",
+    "codec_join": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/demo_outro_stats_20261016/codec_join_check.json",
+    "previous_full_sha256_unchanged": true,
+    "onedrive_path_check": {
+      "checked_paths": 15244,
+      "violations": 0,
+      "read_errors": 0
+    }
+  },
+  "user_approval": {
+    "date_local": "2026-10-16",
+    "scope": "standalone data ending accepted; replace previous ending while preserving full intro and programme",
+    "request": "这一版可以，把这个片尾替换到之前的完整demo里，开头和比赛部分都保留，不用重新生成全片，给我最后的完整视频。"
+  }
+}

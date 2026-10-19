@@ -1,0 +1,70 @@
+{
+  "schema_version": "rinkspace.assumed-uniform-metric-scale.v1",
+  "scale_id": "ankara_2026_user_design_60x30_uniform_v1",
+  "geometry_level": "metric_assumed",
+  "unit": "m",
+  "native_unit": "conditional_scene_units",
+  "verified_metre_scale": false,
+  "source_coordinate_system_id": "ankara_user_ppt_z_up",
+  "source_span_xy_scene_units": [
+    189.88629711636727,
+    96.42739877526569
+  ],
+  "design_dimensions_m": [
+    60.0,
+    30.0
+  ],
+  "design_dimensions_status": "user_reported_design_parameters_not_actual_measurement",
+  "design_source": {
+    "path": "evidence/metric_scale_20261001/USER_DESIGN_ASSUMPTION.md",
+    "sha256": "cef253bed581b6d37af3d24984b9840a0df0ac69817f94b0ed70c85625b67fb8",
+    "authority": "current_user_conversation"
+  },
+  "scale_policy": "equal_weight_log_relative_dimension_error",
+  "scale_formula": "sqrt((60/native_length)*(30/native_width))",
+  "metres_per_scene_unit": 0.31353729994266055,
+  "conversion": "XYZ_m = uniform_scale * XYZ_scene",
+  "converted_span_xy_m": [
+    59.536436893975605,
+    30.233586252491016
+  ],
+  "native_aspect_ratio": 1.9692151766835222,
+  "metric_aspect_ratio": 1.9692151766835222,
+  "force_two_to_one_aspect_ratio": false,
+  "anisotropic_rescaling": false,
+  "relative_design_residuals": [
+    -0.007726051767073305,
+    0.007786208416367124
+  ],
+  "diagnostic_single_dimension_scales_m_per_unit": {
+    "length": 0.3159785667063192,
+    "width": 0.3111148945323952,
+    "statistical_confidence_interval": false
+  },
+  "uncertainty": {
+    "design_size_standard_deviation_m": null,
+    "construction_deviation_m": null,
+    "geometry_estimation_uncertainty": null,
+    "scale_standard_deviation_m_per_unit": null,
+    "independently_verified": false
+  },
+  "compatible_native_scenes": [
+    {
+      "path": "D:\\CodexData\\.codex\\visualizations\\2026\\10\\01\\private-thread-00010\\RinkSpace_tmp\\render_markings\\main7_geometry\\source_seen_row3_carrier_v1\\candidate_scene.json",
+      "sha256": "93c654360712be798e65aa83e587415fa2693008ee320ccbc1972299ead293bd",
+      "role": "current_hard_programme_scene"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\deliverables\\scene.json",
+      "sha256": "08b4e0f68340a279354f735e5b501a0a0a8e254f451caef0f431e3d29328215b",
+      "role": "current_shared_production_scene_same_unit_domain"
+    }
+  ],
+  "solver_policy": {
+    "existing_native_states_and_priors_unchanged": true,
+    "camera_translation_scales_with_world": true,
+    "intrinsics_rotation_Brown_and_PTS_unchanged": true,
+    "native_clipping_and_validity_thresholds_retained_via_inverse_unit_bridge": true
+  },
+  "geometry_accuracy_or_programme_alignment_promoted": false
+}

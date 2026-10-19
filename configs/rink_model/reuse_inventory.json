@@ -1,0 +1,577 @@
+{
+  "snapshot": "source_review.zip supplied in this conversation",
+  "files": [
+    {
+      "path": "src/rinkspace/workspace.py",
+      "sha256": "87c4d86d1e105c78f7f6fd1ed91c6af5f3effa962d1e3e150bf9c933823d0089",
+      "action": "直接复用并扩展",
+      "entry_points": [
+        {
+          "name": "_av",
+          "line": 24
+        },
+        {
+          "name": "load_config",
+          "line": 32
+        },
+        {
+          "name": "_key",
+          "line": 41
+        },
+        {
+          "name": "source_directory",
+          "line": 47
+        },
+        {
+          "name": "source_path",
+          "line": 51
+        },
+        {
+          "name": "import_source",
+          "line": 60
+        },
+        {
+          "name": "load_sources",
+          "line": 83
+        },
+        {
+          "name": "load_index",
+          "line": 101
+        },
+        {
+          "name": "source_frame_meta",
+          "line": 113
+        },
+        {
+          "name": "_role_candidates",
+          "line": 123
+        },
+        {
+          "name": "_make_shots",
+          "line": 137
+        },
+        {
+          "name": "prepare_source",
+          "line": 155
+        },
+        {
+          "name": "get_frame",
+          "line": 306
+        },
+        {
+          "name": "load_shots",
+          "line": 342
+        },
+        {
+          "name": "refine_shot_candidates",
+          "line": 353
+        },
+        {
+          "name": "save_shot_labels",
+          "line": 448
+        },
+        {
+          "name": "extract_window",
+          "line": 473
+        },
+        {
+          "name": "sample_source_window",
+          "line": 525
+        }
+      ],
+      "role": "登记多来源、原始帧身份、缓存和源时间；扩展赛事/场次/重复画面组信息，不重写播放器索引。"
+    },
+    {
+      "path": "src/rinkspace/media.py",
+      "sha256": "38386cfd6ffa5b9178f729518d9d76f011a59861dffc7babac7e00840dee8923",
+      "action": "直接复用",
+      "entry_points": [
+        {
+          "name": "_run",
+          "line": 18
+        },
+        {
+          "name": "timestamp_summary",
+          "line": 30
+        },
+        {
+          "name": "probe",
+          "line": 45
+        },
+        {
+          "name": "index_frames",
+          "line": 64
+        },
+        {
+          "name": "sample_window",
+          "line": 88
+        }
+      ],
+      "role": "读取与源PTS抽帧。包不要求把 PyAV 与 FFmpeg 两路强行统一，按当前可运行环境选择。"
+    },
+    {
+      "path": "src/rinkspace/web.py",
+      "sha256": "e5dc19690cddbc0ff715ccc0f5de1a190fc1632c33cb11998547218877eb4139",
+      "action": "扩展当前界面",
+      "entry_points": [
+        {
+          "name": "byte_range",
+          "line": 20
+        },
+        {
+          "name": "Workbench",
+          "line": 39
+        },
+        {
+          "name": "serve",
+          "line": 338
+        }
+      ],
+      "role": "增加模型查看与原片网格层，复用原来的本地服务、帧定位和编辑；不另造不相连网页应用。"
+    },
+    {
+      "path": "src/rinkspace/local_registration.py",
+      "sha256": "78e500bd98d1796fe6aab6132ef7d080e860dbf295e06d90134f32c4e4b66a68",
+      "action": "复用、补语义检查",
+      "entry_points": [
+        {
+          "name": "RegistrationConfig",
+          "line": 27
+        },
+        {
+          "name": "_regions_mask",
+          "line": 51
+        },
+        {
+          "name": "ice_mask",
+          "line": 70
+        },
+        {
+          "name": "_fit",
+          "line": 192
+        },
+        {
+          "name": "_features",
+          "line": 239
+        },
+        {
+          "name": "_sift_matches",
+          "line": 258
+        },
+        {
+          "name": "LocalRegistrar",
+          "line": 285
+        },
+        {
+          "name": "register_sequence",
+          "line": 453
+        },
+        {
+          "name": "render_fixed_frames",
+          "line": 531
+        }
+      ],
+      "role": "人物、字幕、围挡和保护域排除。白色不等于冰面，掩膜是可编辑观测而非真值。"
+    },
+    {
+      "path": "src/rinkspace/geometry.py",
+      "sha256": "d33c3160d6f391cace853fe0b3495bac1b2042a5d5c241323bb808606fc8a08d",
+      "action": "直接复用数值内核",
+      "entry_points": [
+        {
+          "name": "points",
+          "line": 9
+        },
+        {
+          "name": "homography",
+          "line": 16
+        },
+        {
+          "name": "project",
+          "line": 26
+        },
+        {
+          "name": "fit_homography",
+          "line": 35
+        },
+        {
+          "name": "source_pixel_errors",
+          "line": 50
+        },
+        {
+          "name": "heldout_audit",
+          "line": 58
+        },
+        {
+          "name": "PlaneMap",
+          "line": 81
+        }
+      ],
+      "role": "矩阵运算与几何等级；增加共享模型桥接，不能把局部H直接当全场H。"
+    },
+    {
+      "path": "src/rinkspace/continuous_registration.py",
+      "sha256": "2cab820a1dc20c44eb211d18a30ef38c3a9eae67ab7547e7879c36bbd6d01a53",
+      "action": "改为局部传播部件",
+      "entry_points": [
+        {
+          "name": "ContinuousConfig",
+          "line": 25
+        },
+        {
+          "name": "ContinuousRegistrar",
+          "line": 37
+        }
+      ],
+      "role": "关键帧间相对变换。模型锚定后传播，再由真实地标重新纠正；参考重置不是全场恢复。"
+    },
+    {
+      "path": "src/rinkspace/photometric_registration.py",
+      "sha256": "98576d513f33d6717213e8576a29c4c54f294b79540ca710752c1fd444fffafe",
+      "action": "保留候选后端",
+      "entry_points": [
+        {
+          "name": "PhotometricConfig",
+          "line": 25
+        },
+        {
+          "name": "PhotometricRegistrar",
+          "line": 30
+        }
+      ],
+      "role": "冰面掩膜内短段拟合，保留足迹与保护区隔离；不把光度低误差当全局定位正确。"
+    },
+    {
+      "path": "src/rinkspace/photometric_sequence.py",
+      "sha256": "7811abeaae5d7ce46fc5f63baa436d93de4422d461b961897f91858b7619895a",
+      "action": "适配编排，不替代全局定位",
+      "entry_points": [
+        {
+          "name": "_sha",
+          "line": 27
+        },
+        {
+          "name": "render_camera_frames",
+          "line": 31
+        },
+        {
+          "name": "register_photometric_sequence",
+          "line": 75
+        }
+      ],
+      "role": "复用源帧-掩膜-局部结果编排；参考选择仅用于历史显示，新增流程使用模型坐标。"
+    },
+    {
+      "path": "src/rinkspace/rotation_photometric.py",
+      "sha256": "d46b6f6dbbe39f4907f4f770fb0ca9e24b5282d019a373b2bd470f2443b51a6c",
+      "action": "实验路线，不作为已标定相机",
+      "entry_points": [
+        {
+          "name": "intrinsic",
+          "line": 23
+        },
+        {
+          "name": "camera_h",
+          "line": 28
+        },
+        {
+          "name": "estimate_rotation",
+          "line": 33
+        },
+        {
+          "name": "RotationPhotometricConfig",
+          "line": 179
+        },
+        {
+          "name": "RotationPhotometricRegistrar",
+          "line": 184
+        }
+      ],
+      "role": "固定光心等假设需由机位证据检验；初始焦距4倍画宽不是场地模型结果。"
+    },
+    {
+      "path": "src/rinkspace/landmark_diagnostics.py",
+      "sha256": "1b3764b3baa71bf6827ff3bbb62167af8ce99dcd0b21d77c4556b2016e1bb94e",
+      "action": "扩展检查对象",
+      "entry_points": [
+        {
+          "name": "correlate_patch",
+          "line": 21
+        },
+        {
+          "name": "protected_patch_diagnostic",
+          "line": 57
+        }
+      ],
+      "role": "按不同物理组和空间分布检查网格；一圆环多点仍是一组，曲线法向误差不冒充二维点误差。"
+    },
+    {
+      "path": "src/rinkspace/review.py",
+      "sha256": "4ba0f87de4599c8b85ac44957b6f311b14e61fe3f8071824a2e5a5894b78ac7a",
+      "action": "复用报告基础",
+      "entry_points": [
+        {
+          "name": "independent_audit",
+          "line": 17
+        },
+        {
+          "name": "_letterbox",
+          "line": 114
+        },
+        {
+          "name": "attach_independent_audit",
+          "line": 129
+        },
+        {
+          "name": "encode_comparison",
+          "line": 171
+        },
+        {
+          "name": "build_run_report",
+          "line": 215
+        }
+      ],
+      "role": "增加模型ID、实际接入证据、全时段状态和新源留出，不重做小包系统。"
+    },
+    {
+      "path": "src/rinkspace/bundle.py",
+      "sha256": "437283bc1674320b1ec0881ed84fa665137523669be1166c6407a54b3383895b",
+      "action": "直接复用",
+      "entry_points": [
+        {
+          "name": "Links",
+          "line": 19
+        },
+        {
+          "name": "make_bundle",
+          "line": 25
+        }
+      ],
+      "role": "白名单依赖、自包含、大小限制和校验。为新模型/网格资产补白名单。"
+    },
+    {
+      "path": "src/rinkspace/mosaic.py",
+      "sha256": "e8fc07da0c69a86eebf717f32236527951a44b0611376f42d0885dab7cfa55ee",
+      "action": "保留并扩展为参照材质层",
+      "entry_points": [
+        {
+          "name": "ProvenanceMosaic",
+          "line": 8
+        }
+      ],
+      "role": "保留每像素来源与透明缺口；分背景时期，拼图不是几何求解的替代品。"
+    },
+    {
+      "path": "src/rinkspace/motion.py",
+      "sha256": "efdc709023dc2693d4b32262dd1b01d1bc5897b860728ebeb7761263c032288b",
+      "action": "保留为后续，当前不启用实测声明",
+      "entry_points": [
+        {
+          "name": "split_segments",
+          "line": 12
+        },
+        {
+          "name": "kinematics",
+          "line": 43
+        },
+        {
+          "name": "window_sensitivity",
+          "line": 91
+        }
+      ],
+      "role": "等模型和接触观测可靠后再接轨迹与导数。不是当前进度，也不删除。"
+    },
+    {
+      "path": "scripts/acquire_sources.py",
+      "sha256": "a072bdf424e75aeb20f0422bfa697eaf749e42be45e0c1a839d47b4cb54f5948",
+      "action": "历史复现保留，新建通用事件入口",
+      "entry_points": [
+        {
+          "name": "main",
+          "line": 21
+        }
+      ],
+      "role": "当前固定两节目、格式399；新入口接受事件素材登记表，不继续硬编码名单。"
+    },
+    {
+      "path": "scripts/acquire_broadcast.py",
+      "sha256": "f67b073ddffdc9e8c5e46ba523432fd0490a01392eee7bfd9b990bafd490bc48",
+      "action": "缓存方法可复用；去掉专用限制",
+      "entry_points": [
+        {
+          "name": "CachedSourceReader",
+          "line": 31
+        },
+        {
+          "name": "source_path",
+          "line": 69
+        },
+        {
+          "name": "local_media_facts",
+          "line": 74
+        },
+        {
+          "name": "ranged_download",
+          "line": 96
+        },
+        {
+          "name": "inspect",
+          "line": 144
+        },
+        {
+          "name": "hms",
+          "line": 180
+        },
+        {
+          "name": "reviewed_epoch",
+          "line": 186
+        },
+        {
+          "name": "scout",
+          "line": 193
+        },
+        {
+          "name": "export_clip",
+          "line": 249
+        },
+        {
+          "name": "build_review",
+          "line": 324
+        },
+        {
+          "name": "main",
+          "line": 402
+        }
+      ],
+      "role": "当前固定全场ID和格式文件大小；新获取不能沿用这些常量推算未知视频。"
+    },
+    {
+      "path": "scripts/inventory_broadcast_wide.py",
+      "sha256": "6e2a8f1f5f98c148eb6847e136bae85cb9328bba1d10a2954b1f6ef6d214f358",
+      "action": "扩展为多视频候选盘点",
+      "entry_points": [
+        {
+          "name": "main",
+          "line": 15
+        }
+      ],
+      "role": "从固定全场扩成该赛事已登记来源，按缺口安排下一批清晰帧和桥接视角。"
+    },
+    {
+      "path": "scripts/reproduce_continuous_delivery.py",
+      "sha256": "06c1a2dc72223aca834b1ef7f592ca66bca9012e6f46a11e4cbbc16c62028fc3",
+      "action": "保持可复现，退出新主流程",
+      "entry_points": [
+        {
+          "name": "read",
+          "line": 24
+        },
+        {
+          "name": "sha",
+          "line": 25
+        },
+        {
+          "name": "main",
+          "line": 27
+        }
+      ],
+      "role": "保留 jin/okada 历史实验命令，另建 --model/--source 的通用定位入口。"
+    },
+    {
+      "path": "scripts/build_continuous_page.py",
+      "sha256": "ed0e1097ef1c07fd9fc49e0160a78b7397ec7c7a7ff81a1d308e7e4161e6f2af",
+      "action": "保留历史显示；复用组件",
+      "entry_points": [
+        {
+          "name": "read_json",
+          "line": 22
+        },
+        {
+          "name": "sha256",
+          "line": 26
+        },
+        {
+          "name": "affine_matrix",
+          "line": 30
+        },
+        {
+          "name": "projective_matrix",
+          "line": 44
+        },
+        {
+          "name": "map_observed_polygon",
+          "line": 57
+        },
+        {
+          "name": "xy_round",
+          "line": 74
+        },
+        {
+          "name": "frame_geometry",
+          "line": 78
+        },
+        {
+          "name": "encode_source",
+          "line": 110
+        },
+        {
+          "name": "build",
+          "line": 151
+        },
+        {
+          "name": "main",
+          "line": 279
+        }
+      ],
+      "role": "不再以两节目各自中间帧作为新主产品的全场参照。"
+    },
+    {
+      "path": "scripts/export_source_review.py",
+      "sha256": "746ffa7b90e8072e0c8d056d7eddb002273b4e3b204ce4f5f1be266bf9c5fe92",
+      "action": "扩展导出清单",
+      "entry_points": [
+        {
+          "name": "_json",
+          "line": 43
+        },
+        {
+          "name": "_hash",
+          "line": 47
+        },
+        {
+          "name": "_safe_name",
+          "line": 51
+        },
+        {
+          "name": "_source_file",
+          "line": 63
+        },
+        {
+          "name": "_selected_files",
+          "line": 71
+        },
+        {
+          "name": "_git_metadata",
+          "line": 105
+        },
+        {
+          "name": "_guide",
+          "line": 137
+        },
+        {
+          "name": "export_source_review",
+          "line": 182
+        },
+        {
+          "name": "verify_source_review",
+          "line": 243
+        },
+        {
+          "name": "main",
+          "line": 286
+        }
+      ],
+      "role": "包括本轮新增代码/技能/模型样例和测试；不要遗落共享模型模块。"
+    }
+  ]
+}

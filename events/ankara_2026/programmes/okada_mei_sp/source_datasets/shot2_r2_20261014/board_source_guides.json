@@ -1,0 +1,50 @@
+{
+  "schema": "rinkspace.selected-shot-board-source-guides.v1",
+  "event_id": "ankara_2026",
+  "programme_id": "okada_mei_sp",
+  "source_clock": "official_50fps_native_pts",
+  "initialization_is_not_an_observation": true,
+  "sport_holes": {
+    "source_frame": 1545,
+    "source_advertisement": 23,
+    "parent_target_prefix": "Ad23.print.Ad10:",
+    "source_roi_padding_px": 12,
+    "material": "SPORTOTO dark/red letters' visible white internal holes",
+    "source_selection_note_zh": "1545 的各字内孔无遮挡；1518 部分黑色 O 内孔受到人物遮挡，不能因初始化帧局部遮挡漏掉其它帧清楚的孔洞。"
+  },
+  "all_skating_tin": {
+    "source_frame": 1660,
+    "source_advertisement": 1,
+    "glyph_rois": [
+      {"glyph": "T", "source_roi_xyxy": [732, 504, 780, 565]},
+      {"glyph": "I", "source_roi_xyxy": [777, 504, 808, 565]},
+      {"glyph": "N", "source_roi_xyxy": [804, 504, 858, 566]}
+    ],
+    "superseded_fragment_targets": ["Ad1.print.shot2_native_component018", "Ad1.print.shot2_native_component019"],
+    "source_selection_note_zh": "1660 这三字无遮挡；旧 1670 初始化帧的人物遮挡曾造成 T/I/N 大笔画漏注册。ROI 裁切边不作为印刷实体边界。"
+  },
+  "red_shield": {
+    "source_frame": 1518,
+    "source_advertisement": 24,
+    "source_roi_xyxy": [142, 504, 234, 650],
+    "native_signal": "R-(B+G)/2",
+    "source_selection_note_zh": "仅取内部红盾本体与白底的颜色材料边界；不混入外围白徽、字、黑圈或人物。"
+  },
+  "candidate_update_frames": [1394, 1437, 1469, 1518, 1545, 1575, 1624, 1660, 1707],
+  "unresolved_source_regions": {
+    "1575": [
+      {"source_roi_xyxy": [0, 462, 269, 558], "note_zh": "Ad26 两行红色正文仍有横向拖影；没有把字间拖影连接成实体轮廓。"}
+    ],
+    "1624": [
+      {"source_roi_xyxy": [1510, 449, 1775, 556], "note_zh": "Ad26 两行正文横向拖影，尚无可稳定独立定位的字廓；此处保留缺失。"},
+      {"source_roi_xyxy": [472, 379, 787, 596], "note_zh": "两部蓝色手机长侧与细小 UI 对比弱且受拖影影响，仅保留当前源像素支持的实体边和白色页头，不补闭合边或细字。"}
+    ],
+    "1660": [
+      {"source_roi_xyxy": [1178, 443, 1550, 696], "note_zh": "蓝色手机长侧部分被人物遮挡且对比弱；仅保留当前像素支持的实体边和页头，不将屏幕内部纹理冒充外轮廓。"},
+      {"source_roi_xyxy": [575, 451, 790, 492], "note_zh": "ISU 右侧两行小字的字间过渡有拖影，当前未形成稳定逐字轮廓。"}
+    ],
+    "1707": [
+      {"source_roi_xyxy": [1575, 450, 1919, 520], "note_zh": "ISU 右侧两行小字及画面右侧印刷细节受裁切、拖影影响，未补成完整字廓。"}
+    ]
+  }
+}

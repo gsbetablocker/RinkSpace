@@ -1,0 +1,704 @@
+{
+  "schema": "rinkfit.independent_audit_followup.v1",
+  "date_local": "2026-10-18",
+  "status": "reviewable_candidate_not_accepted",
+  "request_authority": "current_user_priority_table",
+  "audit_zip": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\pro\\Okada_Shot1_Independent_Audit_20261018.zip",
+    "sha256": "6f4666e193c91b40b21c6d29e8b0c157757e441c905bb109e772e413aceab808",
+    "entries": 88,
+    "CRC_verified": true
+  },
+  "baseline": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\physical_i20_full_capture_main\\checkpoints\\i00020_1792282587350451200",
+    "model_sha256": "78e0f4cfb7254436163e8b8da75b4f8e007a6f5036aed94fe5328248c34bb31b",
+    "raw_rows": 182017,
+    "active_rows": 182016,
+    "W_rank": 214112,
+    "W_half_cost": 513378.1002686763,
+    "maximum_error_px": 21.9282318707364
+  },
+  "ad_chart": {
+    "report": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\ad_chart_20261018\\report.json",
+    "full_primary": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\ad_chart_20261018\\full_primary\\report.json",
+    "physical_dof_before": 4467,
+    "physical_dof_after": 4447,
+    "production_model_accepted": false,
+    "production_domain": {
+      "report": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\ad_chart_20261018\\production_domain\\report.json",
+      "determinant_floor": 0.000001,
+      "shared_LP_witness_required": true,
+      "SLP_witness_box_is_local_inner_approximation": true,
+      "global_allowed_domain_equivalence_claimed": false
+    }
+  },
+  "temporal": {
+    "directory": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018",
+    "padding_audit": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\padding_audit\\report.json",
+    "anomaly_resolved": true,
+    "local_time_family": {
+      "control_grid_seconds": 0.08,
+      "all_original_scene_DOF_released": true,
+      "new_shape_DOF_added": false,
+      "primary_full_state": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_allscene_primary_full\\complete_state_manifest.json",
+      "series": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_allscene_primary_evidence\\temporal_series.json",
+      "regression": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_allscene_primary_regression\\report.json",
+      "maximum_error_px": 21.7487790911,
+      "W_half_cost": 2497442.783869092,
+      "Ad2_all623_corner_RMS_px": 7.501,
+      "frame_135_to136_Ad2_left_top_predicted_u_change_px": -0.568,
+      "anomaly_resolved": false,
+      "accepted": false,
+      "reason": "W degrades and the original-boundary reversal remains; preserve as a complete intermediate state.",
+      "coarsening_support_time_window_seconds": [
+        2.42,
+        2.96
+      ],
+      "initial_projection_preserves_outside_fine_storage": true,
+      "subsequent_optimization_releases_all_time_coordinates_in_selected_family": true,
+      "optimized_controls_outside_window_are_not_fixed": true,
+      "retained_failed_intermediate": true
+    },
+    "current_W_intermediate_state": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_W_budget_full\\complete_state_manifest.json",
+    "current_W_intermediate_actual": {
+      "W_half_cost": 395227.6012680146,
+      "maximum_error_px": 22.50992960083421,
+      "median_error_px": 1.0069653406090446,
+      "over2": 52594,
+      "Ad2_u_135_140_all_forward": true,
+      "remaining_v_reversal_px": -0.761,
+      "board_summary_remaining_reversal_px": -0.289,
+      "anomaly_resolved": false,
+      "accepted": false
+    },
+    "latest_patched_state": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_iter2_Ad4_full2",
+    "latest_patched_actual": {
+      "active_rows": 182016,
+      "ordinary_recaptured": 179363,
+      "profile_roots_recomputed": 961,
+      "all_true_RS_valid": 182016,
+      "model_paths": 258,
+      "W_half_cost": 383300.7844400198,
+      "maximum_error_px": 22.1945176802,
+      "all623_corner_statistics_pending": false,
+      "frame135_to140_direction_conflict_resolved": true,
+      "scope_of_direction_result": "Ad2 left-top u/v and native board-top at u=960, frame135–140; expanded frame122–150 review saved separately",
+      "independent_whole_shot_accuracy_accepted": false,
+      "all623_corner_report": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_iter2_Ad4_regression\\report.json",
+      "Ad2_all623": {
+        "all": {
+          "n": 623,
+          "valid": 623,
+          "median": 3.3295788720358424,
+          "p95": 8.49388820893063,
+          "p99": 9.411853330250675,
+          "rms": 4.539722969111296,
+          "max": 9.882636667824316,
+          "mean_du": 1.562481595739612,
+          "mean_dv": -0.607990835287414,
+          "over2": 395,
+          "over10": 0,
+          "over20": 0
+        },
+        "periods": {
+          "opening": {
+            "n": 200,
+            "valid": 200,
+            "median": 6.427569332824209,
+            "p95": 9.330071363523405,
+            "p99": 9.728902423644138,
+            "rms": 6.783359129830287,
+            "max": 9.882636667824316,
+            "mean_du": 2.8702630458146334,
+            "mean_dv": -0.47818899549507193,
+            "over2": 200,
+            "over10": 0,
+            "over20": 0
+          },
+          "pre_spike": {
+            "n": 68,
+            "valid": 68,
+            "median": 3.4744540724543036,
+            "p95": 6.305394271349576,
+            "p99": 6.515354237751532,
+            "rms": 4.092918063295495,
+            "max": 6.833242357135857,
+            "mean_du": 2.173019284658419,
+            "mean_dv": -2.2351652453522517,
+            "over2": 40,
+            "over10": 0,
+            "over20": 0
+          },
+          "spike": {
+            "n": 12,
+            "valid": 12,
+            "median": 4.763860582678334,
+            "p95": 7.509269230902242,
+            "p99": 7.645188844783346,
+            "rms": 5.217472091475432,
+            "max": 7.6791687482536215,
+            "mean_du": 3.8946607297759024,
+            "mean_dv": -2.878737356074533,
+            "over2": 11,
+            "over10": 0,
+            "over20": 0
+          },
+          "post_spike": {
+            "n": 64,
+            "valid": 64,
+            "median": 3.2747812649053025,
+            "p95": 6.118665078679939,
+            "p99": 6.909066654077637,
+            "rms": 3.4491797317795143,
+            "max": 7.102011427120039,
+            "mean_du": 2.6672685893697707,
+            "mean_dv": -1.004242716923481,
+            "over2": 41,
+            "over10": 0,
+            "over20": 0
+          },
+          "full_board": {
+            "n": 279,
+            "valid": 279,
+            "median": 1.6225335239149474,
+            "p95": 3.981021125304781,
+            "p99": 5.120845022111803,
+            "rms": 2.2476359512720077,
+            "max": 9.076320084020837,
+            "mean_du": 0.12246234820467006,
+            "mean_dv": -0.11588843170284684,
+            "over2": 103,
+            "over10": 0,
+            "over20": 0
+          },
+          "later": {
+            "n": 0,
+            "valid": 0
+          }
+        }
+      }
+    },
+    "anomaly_resolution_scope": "frame135–140 Ad2 left-top u/v and native board-top diagnostic only; whole-shot accuracy is not accepted",
+    "affected_window_review": {
+      "directory": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_iter2_Ad4_window",
+      "frames": [
+        122,
+        150
+      ],
+      "new_monotonic_obligations_added": false,
+      "small_neighbor_direction_disagreement": "board 124→125 original -0.366px vs prediction +0.349px",
+      "Ad2_left_top_max_px": [
+        21.7282683,
+        7.67916875
+      ],
+      "board_top_max_px": [
+        17.589,
+        3.514
+      ],
+      "R4_max_px": [
+        21.79,
+        6.31
+      ]
+    },
+    "latest_source_scope_state": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_iter2_Ad4_scope_full4",
+    "latest_source_scope_actual": {
+      "active_rows": 182015,
+      "ordinary_recaptured": 179362,
+      "profile_roots_recomputed": 961,
+      "all_true_RS_valid": 182015,
+      "model_paths": 258,
+      "statistics_rank": 214111,
+      "W_half_cost": 383249.58656524506,
+      "maximum_error_px": 22.19451768015561,
+      "median_error_px": 0.9723033235553094,
+      "over2": 50945,
+      "independent_whole_shot_accuracy_accepted": false,
+      "all623_corner_report": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_iter2_Ad4_scope_regression\\report.json"
+    },
+    "scope_cost_decomposition": {
+      "report": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_iter2_scope_cost_decomposition.json",
+      "original182016": 383300.7844400198,
+      "same_predictions182015": 383264.5177541198,
+      "new_capture182015": 383249.58656524506,
+      "scope_change": -36.26668589998735,
+      "within_scope_new_capture_change": -14.931188874761574,
+      "original_decomposition_uses_full3": true,
+      "full4_packet_v2_recapture": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_iter2_Ad4_scope_full4\\report.json",
+      "full3_and_full4_cost_identical": true
+    },
+    "latest_first_frame_padding": {
+      "report": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_iter3_scope_padding\\report.json",
+      "camera_time_domain_seconds": [
+        -0.02,
+        24.96
+      ],
+      "frame1_full_sensor_readout_seconds": [
+        -0.009832903078417296,
+        0.009832903078417296
+      ],
+      "clamp": false,
+      "first60_RS_valid": 5181,
+      "first_frame_max_error_px": 17.627463499015967,
+      "padding_coverage_does_not_imply_frame1_accuracy": true
+    },
+    "latest_source_scope_regression": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_iter2_Ad4_scope_regression\\report.json",
+    "third_round": {
+      "state": "complete_full_RS_S_Q_verified",
+      "actual_state": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_iter3_scope_full2",
+      "typed_input": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_iter2_scope_fs1_v3\\input.json",
+      "primary_status": "NumericalError_finite_feasible_proposal_only",
+      "secondary_status": "AlmostSolved",
+      "primary_affine_q": 117.54443213824928,
+      "baseline_engineering_budget": 120.21183824419492,
+      "final_nonlinear_q": 120.96674984306348,
+      "nonlinear_budget_overshoot_explicit": true,
+      "maximum_error_relative_to_i20_px": 0.06874518003705177,
+      "scope_182015_only": true,
+      "old_duals_or_history_imported": false,
+      "report": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\ad_chart_20261018\\iteration3_results.json",
+      "window": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_iter3_scope_window",
+      "direction_min_step_px": {
+        "Ad2_u": 0.726,
+        "Ad2_v": 0.649,
+        "board_v": 1.409
+      },
+      "remaining_small_board_direction_disagreement": {
+        "frames": [
+          124,
+          125
+        ],
+        "original_delta_px": -0.366,
+        "predicted_delta_px": 0.397
+      },
+      "compared_to_iter2_tradeoffs": {
+        "spike12_corner_RMS_px": [
+          5.217472091475432,
+          5.7861968340196785
+        ],
+        "first_frame_max_px": [
+          17.3741,
+          17.627463499015967
+        ]
+      }
+    }
+  },
+  "regression": {
+    "module": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\rinkfit\\src\\rinkfit_start\\regression.py",
+    "baseline": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\regression_i20\\report.json"
+  },
+  "source_audit": {
+    "project_fact": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\source_audit_1018.json",
+    "report": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\source_audit_1018\\review.html",
+    "revised_semantic": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\source_audit_1018\\revision\\manifest.json",
+    "raw_rows": 182017,
+    "active_rows": 182015,
+    "newly_inactive_row": 34524,
+    "historical_human_authority_row": 25537,
+    "W_rank": 214111,
+    "W_half_cost_at_same_i20": 513353.41685181635,
+    "scope_change_separate_from_physical_improvement": true,
+    "Ad4_template_source_revision": {
+      "revision": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\src_rev1018\\ad4_v1.json",
+      "sha256": "2bd3d71f4da203ecd8be1c7444e4a092266c1e069f89f8d37347f2d683c0f76a",
+      "review": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\ad4_source_v1\\review.html",
+      "removed_old_K_edges": [
+        12,
+        13,
+        14,
+        15
+      ],
+      "retained_open_vertex_ranges": [
+        [
+          0,
+          12
+        ],
+        [
+          16,
+          19
+        ]
+      ],
+      "R_path_unchanged": true,
+      "new_DOF": 0,
+      "material_labels_and_parameter_blocks_unchanged": true,
+      "paths_before": 257,
+      "paths_after": 258,
+      "gap_source_rows_requiring_recapture": [
+        178500,
+        178648,
+        178789
+      ],
+      "raw_UV_unchanged": true,
+      "integrated_state_pending": false,
+      "first_integrated_state": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_iter2_Ad4_full2",
+      "latest_prepatch_gap_rows": [
+        178500,
+        178648,
+        178789,
+        181867
+      ],
+      "recapture_all_K_rows": 28,
+      "all_28_K_rows_recaptured": true,
+      "gap_rows_after_recapture": {
+        "rows": [
+          178500,
+          178648,
+          178789,
+          181867
+        ],
+        "errors_px": [
+          0.151,
+          0.591,
+          0.742,
+          0.655
+        ],
+        "all_on_retained_branch": true
+      },
+      "residual_source_review": {
+        "rows": [
+          181327,
+          180150,
+          180343
+        ],
+        "status": "completed_no_template_or_scope_change",
+        "report": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\ad4_residual3\\report.json",
+        "review": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\ad4_residual3\\review.html",
+        "project_fact": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\src_rev1018\\ad4_audit3.json",
+        "native_PTS_decode_BGR_bitexact": true,
+        "material_visible": true,
+        "foreground_contamination_evidence": false,
+        "source_UV_W_E_unchanged": true,
+        "independent_source_segment_correspondence_incomplete": true,
+        "affine_deficiency_or_missing_template_segment_uniquely_identified": false
+      }
+    }
+  },
+  "rings": {
+    "cross_view": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\cross_R3\\report.json",
+    "cross_view_not_calibrated_physical_camera": true,
+    "shared_radius_diagnostic_not_adopted": true,
+    "physical_refinement_in_progress": true,
+    "latest_diagnostic_candidate": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\rings_cross_temporal_r12_full\\complete_state_manifest.json",
+    "latest_regression": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\rings_cross_temporal_r12_regression\\report.json",
+    "W_half_cost_original_scope": 479779.90588,
+    "maximum_error_px_original_scope": 21.87396597,
+    "per_ring_RMS_lower_than_temporal_parent": true,
+    "some_per_ring_maxima_increase": true,
+    "latest_candidate_report": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\rings_cross_temporal_r12_full\\report.json",
+    "complete_state_receipt_pending": false,
+    "latest_candidate_sha256": "1b23cdff5610add0f69cafc1d44d5cf52ecd68119723a15f1a051acf1fc743d7",
+    "revised_182015_scope_report": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\rings_cross_temporal_r12_revision\\report.json",
+    "revised_182015_scope_W_half_cost": 479750.5795375,
+    "latest_time_branch_cross_diagnostic": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\cross_R3_iter2\\report.json",
+    "latest_time_branch_cross_W_half_cost": 43.2042148961973,
+    "cross_diagnostic_is_not_physical_camera_calibration": true,
+    "latest_time_branch_per_material_report": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_iter2_Ad4_scope_regression\\report.json",
+    "latest_time_branch_per_material_RMS": {
+      "R3_inner": [
+        6.82455,
+        2.2702038525
+      ],
+      "R3_middle": [
+        7.89036,
+        3.8638727669
+      ],
+      "R3_outer": [
+        5.94488,
+        1.5718073344
+      ],
+      "C0_centerline": [
+        4.3421,
+        3.6705930608
+      ]
+    },
+    "latest_time_branch_C0_max_px": [
+      21.6856,
+      21.933473219638216
+    ],
+    "selected_candidate_report": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_iter3_scope_regression\\report.json",
+    "selected_candidate_materials": {
+      "ice.R3:inner": {
+        "n": 1045,
+        "valid": 1045,
+        "median": 0.9361753347914584,
+        "p95": 4.7142185075125775,
+        "p99": 6.087491860795007,
+        "rms": 2.074169172771823,
+        "max": 11.912656093452817,
+        "mean_du": -0.12223135546873935,
+        "mean_dv": -0.01903044719262705,
+        "over2": 260,
+        "over10": 1,
+        "over20": 0
+      },
+      "ice.R3:middle": {
+        "n": 1940,
+        "valid": 1940,
+        "median": 1.4422676092751547,
+        "p95": 6.442275851346727,
+        "p99": 11.106423963531753,
+        "rms": 3.3272223531631067,
+        "max": 21.74515719571424,
+        "mean_du": -0.16210333778063782,
+        "mean_dv": -0.10055001459760855,
+        "over2": 789,
+        "over10": 42,
+        "over20": 1
+      },
+      "ice.R3:outer": {
+        "n": 2125,
+        "valid": 2125,
+        "median": 0.6785049686630139,
+        "p95": 3.4383742303714873,
+        "p99": 5.107992352383468,
+        "rms": 1.5564223024372426,
+        "max": 11.042963242596898,
+        "mean_du": -0.011444400364521832,
+        "mean_dv": 0.242037135499996,
+        "over2": 326,
+        "over10": 1,
+        "over20": 0
+      },
+      "ice.C0:outer": {
+        "n": 3018,
+        "valid": 3018,
+        "median": 2.347248035599158,
+        "p95": 6.4086746778285395,
+        "p99": 10.303203592998283,
+        "rms": 3.5299395738070682,
+        "max": 21.941023382746913,
+        "mean_du": 0.3876203987857028,
+        "mean_dv": -2.0387027762742553,
+        "over2": 1771,
+        "over10": 37,
+        "over20": 6
+      }
+    },
+    "old_r12_is_retained_diagnostic_not_selected": true,
+    "selected_cross_view": {
+      "report": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\cross_R3_final\\report.json",
+      "sha256": "aa93c3db24702acb504161a1d0bbe01e66f911a33dfbda8d4bc48ed5e4c1571c",
+      "baseline_cost": 53.791306555704416,
+      "iter2_cost": 43.2042148961973,
+      "selected_cost": 36.295463706945476,
+      "full_RS_Brown_physical_camera_calibrated": false,
+      "heldout_independent": false,
+      "tradeoffs": {
+        "frame1345_inner_RMS_px": [
+          1.212905,
+          1.250563
+        ],
+        "frame1811_middle_max_px": [
+          2.652902,
+          3.168219
+        ]
+      }
+    }
+  },
+  "limitations": [
+    "当前所有首镜头行曾用于拟合，不能称独立验收。",
+    "2px全源目标、PhaseII、全局profile证书仍未完成。",
+    "新视角projective诊断不含完整RS/Brown，不能认作已标定物理机位。"
+  ],
+  "measurement_roles": {
+    "user_confirmation": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\model_constraints\\paint_roles_1018.json",
+    "finite_width_circular_centerlines": [
+      "C0",
+      "A1",
+      "A2",
+      "A3",
+      "A4"
+    ],
+    "target_rings_only": [
+      "F1",
+      "F2",
+      "F3",
+      "F4",
+      "R1",
+      "R2",
+      "R3",
+      "R4"
+    ],
+    "C0_paint_center_source_definition_conflict": false,
+    "assistant_prior_conflict_interpretation_retracted": true,
+    "C0_exterior_boundary_migration": false,
+    "raw_UV_unchanged": true,
+    "C0_centerline_source_inventory": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\C0_centerline_sources\\report.json",
+    "withdrawn_prior_interpretation": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\C0_definition_correction.json",
+    "C0_historical_identity_failures_current_scope_intersection": 0,
+    "identity_scope_report": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\C0_identity_scope\\report.json"
+  },
+  "implementation_integrity": {
+    "source_report": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\interface_review",
+    "strict_state_SHA_and_arrays_validation": true,
+    "source_identity_and_full_covariance_marginal_validation": true,
+    "new_target_prepare_in_progress": false,
+    "new_target_initial_iteration": 0,
+    "old_history_or_duals_inherited": false,
+    "new_target_GPU_prepare": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\source_scope_gpu_prepare_v2\\prepared.json",
+    "new_target_id": "830e9ff301ab4c99d0de19c06b4c0afc637413999b4d01a3874f7343814063a3",
+    "GPU_QA": {
+      "nnz": 16770774,
+      "max_normalized_derivative_difference": 5.17e-12,
+      "comparison_gate": 2e-8,
+      "primal_and_W_arrays_byte_identical": true,
+      "CPU_operator_seconds": 27.83,
+      "warm_GPU_operator_seconds": 9.15,
+      "full_fit_speedup_claimed": false
+    },
+    "integration_report": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\source_scope_integration.json",
+    "result_page_independent_review": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\interface_review\\result_page_readonly_review.json"
+  },
+  "source_scope_comparison_baseline": {
+    "reference_model": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\physical_i20_full_capture_main\\checkpoints\\i00020_1792282587350451200",
+    "report": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_iter2_Ad4_scope_regression\\report.json",
+    "baseline_recomputed_RS": false,
+    "scope_only_original_i20_prediction_reweighting": true
+  },
+  "selected_candidate": {
+    "round": 3,
+    "state": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_iter3_scope_full2",
+    "complete_receipt": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_iter3_scope_full2\\complete_state_manifest.json",
+      "sha256": "3e04f3c2e4bb6b1a19989dc4b4f93ffa0f591e3c1a57c8162a67a60c054499d9"
+    },
+    "project_model": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\audit_model.json",
+      "sha256": "d78b7012c80664131f88134be0f9f868c1d6742ad7516155fc131b72ca3110e9"
+    },
+    "model_export_is_byte_identical": true,
+    "model_source": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_iter3_scope_full2\\model.json",
+      "sha256": "d78b7012c80664131f88134be0f9f868c1d6742ad7516155fc131b72ca3110e9"
+    },
+    "regression": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_iter3_scope_regression\\report.json",
+    "independent_NumPy": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_iter3_scope_full2\\independent_numpy_replay.json",
+    "all": {
+      "n": 182015,
+      "valid": 182015,
+      "median": 0.9607299775823791,
+      "p95": 6.581136484166567,
+      "p99": 11.14784442290796,
+      "rms": 2.9547807476472823,
+      "max": 21.996977050773452,
+      "mean_du": -0.0279650577487792,
+      "mean_dv": -0.00992592029857867,
+      "over2": 50305,
+      "over10": 2548,
+      "over20": 111
+    },
+    "whole_original_W_half_cost": 378729.3176771542,
+    "Ad2_all623": {
+      "all": {
+        "n": 623,
+        "valid": 623,
+        "median": 3.251733445946736,
+        "p95": 7.776464291706109,
+        "p99": 8.652648154183236,
+        "rms": 4.2709110266509,
+        "max": 9.167704865678964,
+        "mean_du": 1.065154920456726,
+        "mean_dv": -0.5669432722752235,
+        "over2": 388,
+        "over10": 0,
+        "over20": 0
+      },
+      "periods": {
+        "opening": {
+          "n": 200,
+          "valid": 200,
+          "median": 6.15394923640307,
+          "p95": 8.332812379311495,
+          "p99": 8.818548592610936,
+          "rms": 6.3345617418372,
+          "max": 9.167704865678964,
+          "mean_du": 1.5559347514161732,
+          "mean_dv": -0.4100518030337747,
+          "over2": 200,
+          "over10": 0,
+          "over20": 0
+        },
+        "pre_spike": {
+          "n": 68,
+          "valid": 68,
+          "median": 3.102280679456191,
+          "p95": 5.8226858331215725,
+          "p99": 6.078231660907459,
+          "rms": 3.8052438438976526,
+          "max": 6.2596180029842134,
+          "mean_du": 1.6997287422672551,
+          "mean_dv": -2.1499562997730153,
+          "over2": 39,
+          "over10": 0,
+          "over20": 0
+        },
+        "spike": {
+          "n": 12,
+          "valid": 12,
+          "median": 5.740471115991705,
+          "p95": 8.23558479852428,
+          "p99": 8.412529047882268,
+          "rms": 5.7861968340196785,
+          "max": 8.456765110221765,
+          "mean_du": 4.755584287979748,
+          "mean_dv": -2.5413385123616337,
+          "over2": 11,
+          "over10": 0,
+          "over20": 0
+        },
+        "post_spike": {
+          "n": 64,
+          "valid": 64,
+          "median": 2.8439239582804388,
+          "p95": 4.770491287862061,
+          "p99": 5.510042806062742,
+          "rms": 2.962680869390832,
+          "max": 6.509050789666947,
+          "mean_du": 2.2709750038459404,
+          "mean_dv": -0.9270377088875632,
+          "over2": 36,
+          "over10": 0,
+          "over20": 0
+        },
+        "full_board": {
+          "n": 279,
+          "valid": 279,
+          "median": 1.5748493908175683,
+          "p95": 3.9386258358884967,
+          "p99": 5.1639264739555575,
+          "rms": 2.2324251142229836,
+          "max": 8.905427118539153,
+          "mean_du": 0.12334623292199011,
+          "mean_dv": -0.1260637782043032,
+          "over2": 102,
+          "over10": 0,
+          "over20": 0
+        },
+        "later": {
+          "n": 0,
+          "valid": 0
+        }
+      }
+    },
+    "physical_fit_accepted": false,
+    "whole_shot_visual_accuracy_accepted": false,
+    "review_directory": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\iter3_review",
+    "review_status": "complete_all1248_clock_verified_NOT_ACCEPTED",
+    "temporal_final_receipt": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\temporal_final_receipt.json",
+    "public_source_closure": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\public_core_migration_final.json",
+    "review_manifest": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\iter3_review\\manifest.json",
+      "sha256": "6ad53ed969f6180429fd7b4eef84560367a99569177ac672bf548c72cf088a1d"
+    },
+    "review_video": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\iter3_review\\shot1_candidate_d78b7012c806_review.mp4",
+      "sha256": "f709adb46768228c15112d97cd7ff5db90ac40732d5fedc385e7003fc6b3b2e9"
+    },
+    "video_source_time_seconds": [
+      20.02,
+      44.96
+    ],
+    "video_native_points_total": 182015,
+    "full_continuous_visual_accuracy_acceptance_completed": false
+  },
+  "delivery_checks": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\audit_1018\\final_validation.json"
+}

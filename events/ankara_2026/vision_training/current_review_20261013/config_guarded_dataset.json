@@ -1,0 +1,78 @@
+{
+  "schema": "rinkspace.vision-training.v1",
+  "python": "D:/OneDrive/codex_projs/MotionTrail_Codex_Starter_v1/.venv-gpu/Scripts/python.exe",
+  "backbone": "D:/OneDrive/codex_projs/MotionTrail_Codex_Starter_v1/models/sam2.1-hiera-tiny",
+  "flow_weights": "models/cache/raft_large_C_T_SKHT_V2-ff5fadd5.pth",
+  "data_directory": "D:/CodexData/RinkSpace_Data/events/ankara_2026/observations/vision_training",
+  "source_video": "D:/CodexData/RinkSpace_Data/events/ankara_2026/media/originals/oxXu1avhrvs.mp4",
+  "source_clock_registry": "events/ankara_2026/model_constraints/source_clock_registry.json",
+  "user_boundary_supervision": "D:/CodexData/RinkSpace_Data/events/ankara_2026/observations/vision_training/user_boundary_supervision_samples.json",
+  "source_material_region_supervision": "D:/CodexData/RinkSpace_Data/events/ankara_2026/observations/vision_training/user_contact_material_region_supervision.json",
+  "source_semantic_rejections": "D:/CodexData/RinkSpace_Data/events/ankara_2026/observations/vision_training/source_material_semantic_rejections.json",
+  "development_source_pts": [
+    36188160
+  ],
+  "native_boundary_overlay": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\observations\\vision_training\\continuous_review\\native_source_boundary_overlay_20261007.json",
+  "final_model": "models/rink_vision.pt",
+  "classes": [
+    "background",
+    "ice_contact",
+    "board_top",
+    "ice_paint",
+    "ad_boundary",
+    "shadow_or_reflection"
+  ],
+  "crop_size": 512,
+  "full_frame_every": 4,
+  "training_steps": 400,
+  "learning_rate": 1E-05,
+  "seed": 20261006,
+  "device": "cuda",
+  "training_stage": "source_visual_supervision_user_annotations_highest_authority_then_original_RGB_reading",
+  "accuracy_accepted": false,
+  "pixel_ground_truth_from_model_projection": false,
+  "framework_sources": {
+    "sam2": "https://github.com/facebookresearch/sam2",
+    "boundary_architecture": "https://github.com/XuJiacong/PIDNet",
+    "dense_segmentation": "https://github.com/qubvel-org/segmentation_models.pytorch",
+    "temporal_points": "https://github.com/facebookresearch/co-tracker"
+  },
+  "native_boundary_overlay_sha256": "b28aaa78003fbf2e2d1fda59cf2f4c13572694daa6edfb9bd42646dc73642531",
+  "training_run_directory": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\observations\\vision_training\\current_fit_source_review_20261013_v1",
+  "training_update_scope": "semantic_head",
+  "strict_source_dataset_training": {
+    "fit_dataset": {
+      "path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/diagnostics/current56_shared_active_set_filter_20261009/systematic_continuation_20261010/full_programme_strict_source_review_20261012/current_source_pool_joint_qualified_20261013_v1/finite_fit_dataset_specific_inner_review_v6/fit_dataset.json",
+      "sha256": "a835599e7d7a1a0bcf9dcd92e90fd4ad160b01e60e99975ec977d5f250f69fd8"
+    },
+    "resume_checkpoint": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\observations\\vision_training\\checkpoint.pt",
+    "cpu_threads": 4,
+    "additional_current_pending_filters": [
+      {
+        "path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/diagnostics/current56_shared_active_set_filter_20261009/systematic_continuation_20261010/full_programme_strict_source_review_20261012/current_source_pool_joint_qualified_20261013_v1/source_scope_accuracy_review_v1/034_F3_all_37_exposures_190_exact_nested_identity_pending_filter.json",
+        "sha256": "1108f5bcad53434c55e2c74b1bed5de7721bec121857f3d03775ee1014ca537e"
+      },
+      {
+        "path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/diagnostics/current56_shared_active_set_filter_20261009/systematic_continuation_20261010/full_programme_strict_source_review_20261012/current_source_pool_joint_qualified_20261013_v1/source_scope_accuracy_review_v1/038_039_exact_specific_inner_material_pending_filter.json",
+        "sha256": "59ba7fff548d5dff11f169c9b7ff4bd817f25caf2577573ae33db8f1dbe2fff3"
+      },
+      {
+        "path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/diagnostics/current56_shared_active_set_filter_20261009/systematic_continuation_20261010/full_programme_strict_source_review_20261012/current_source_pool_joint_qualified_20261013_v1/source_scope_accuracy_review_v1/037_001_exact_specific_inner_material_pending_filter.json",
+        "sha256": "4d0721f16468de5d24676ef49b0c6847574309d9063ae1f80313c2a1823c8e00"
+      }
+    ],
+    "exact_current_review_training_admissions": [
+      {
+        "path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/observations/vision_training/current_fit_source_review_20261013_v1/B1_full_1097_exact_source_training_admission_v6.json",
+        "sha256": "4888be8a84a0f87936af96d93255b9823ff22c954dfa0e6d2f0ffe7207b434c2"
+      }
+    ],
+    "prepare_supervision_only": false,
+    "label_cache_adapter_compatibility": {
+      "path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/observations/vision_training/current_fit_source_review_20261013_v1/source_clock_review_schedule_and_inventory_counts_cache_adapter_compatibility.json",
+      "sha256": "0fa57c94108cae60de6453be5b03b614cdf0755ac5207196df27201b34f01411"
+    }
+  },
+  "parent_guarded_training_configuration": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\observations\\vision_training\\strict_corrected_first_shot_20261012\\config_guarded_head.json",
+  "current_named_pending_review_filters_required_before_launch": true
+}

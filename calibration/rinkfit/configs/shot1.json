@@ -1,0 +1,28 @@
+{
+  "schema": "rinkfit.start_config.v1.1",
+  "scope": "all_1248_native_frames_all_182017_reviewed_observations",
+  "engineering_budget_native_px": 2.0,
+  "budget_is_statistics_sigma": false,
+  "workers": 4,
+  "registration_options": {
+    "pyramid_scales": [0.125, 0.25, 0.5, 1.0],
+    "sigma_native_px": [64.0, 32.0, 8.0, 2.0],
+    "capture_iterations_per_stage": 12,
+    "native_iterations": 25,
+    "max_samples_per_material": 8193,
+    "max_sampling_rebuilds_per_stage": 2,
+    "engineering_residual_scale_native_px": 2.0
+  },
+  "diagnostic_options": {
+    "pyramid_scales": [0.25, 1.0],
+    "sigma_native_px": [32.0, 2.0],
+    "capture_iterations_per_stage": 1,
+    "native_iterations": 2
+  },
+  "graph_pair_offsets_frames": [1, 5, 25, 100],
+  "graph_diagnostic_cycle_limit": 128,
+  "graph_refinement_iterations": 10,
+  "final_physical_backend": "Ceres LM with SuiteSparse; no production SciPy fallback",
+  "runtime_output_root_windows": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11",
+  "registration_parameters_are_starting_values_not_permanent_resource_caps": true
+}

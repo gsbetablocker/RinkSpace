@@ -1,0 +1,74 @@
+{
+  "schema": "rinkspace.selected-native-ice-material-review.v1",
+  "event_id": "ankara_2026",
+  "programme_id": "okada_mei_sp",
+  "shot_index": 2,
+  "user_accepted": false,
+  "records": [
+    {
+      "programme_frame_index_1based": 1249,
+      "source_pts": 575744,
+      "decoded_BGR_sha256": "e998a55d15ab3611177e2121f39f515ffefe07d60a0c5d54408e04fe3dd6a44e",
+      "luminance_wide_targets": ["B1"],
+      "wide_material_note_zh": "本帧连续蓝灰漆带左侧约 y730 延伸至右侧约 y675，两侧漆/冰界面可见；黄色围挡反光压制蓝色差分。沿物理横向重新读取两侧界面，不沿用模型点。",
+      "unqualified_targets": [
+        {
+          "target_id": "ice.F3:outer",
+          "reason_zh": "本帧左上灰色模糊暗带的本体材料边界无法独立辨认；当前自由仿射圆拟合读数与灰雾相混，不能仅以椭圆/残差认定靶圈轮廓。"
+        },
+        {
+          "target_id": "ice.F3:middle",
+          "reason_zh": "本帧少数灰带亮度交界不能独立辨认为同一靶圈的中层实体材料边界，不能连接成圈。"
+        },
+        {
+          "target_id": "ice.F4:outer",
+          "reason_zh": "本帧右上暗带与 ISU 广告倒影重叠，当前读数没有独立可辨的靶圈实体边界依据；自由仿射拟合触限不能补足材料身份。"
+        },
+        {
+          "target_id": "ice.C0:outer",
+          "reason_zh": "当前零散暗斑与红漆带响应没有组成可独立辨认的同一实体圆轮廓；圆形仿射尺度触限，红带下白冰点不得转成圈观测。"
+        }
+      ],
+      "review_method": "native original frame, source actual side interfaces and direct material readouts, independently rechecked by two agents",
+      "review_evidence_relative_to_data": [
+        "ice_diagnostics/native_review/001249_actual_flanks.png",
+        "ice_diagnostics/native_review/001249_ice_contrast.png",
+        "ice_diagnostics/native_review/001249_B1_actual_sides.png"
+      ],
+      "contrast_view_is_display_only": true,
+      "user_confirmed": false
+    },
+    {
+      "programme_frame_index_1based": 1274,
+      "source_pts": 582144,
+      "decoded_BGR_sha256": "cd41e91edcb69b8132b484e19205c48718334a619b2c06ee13f866ab740ee579",
+      "luminance_wide_targets": ["B1"],
+      "wide_material_note_zh": "前帧已核实 B1 的相邻选中源曝光；本帧上侧灰蓝横带从左侧约 y590 延伸至右側約 y520，两侧漆/冰界面重新按物理横向读取。前帧材料形状与 8a28 仅导航，本帧人物和缺失处不补。",
+      "unqualified_targets": [
+        {
+          "target_id": "ice.F3:outer",
+          "reason_zh": "本帧 WYNDHAM 下方 x117–481、y458–479 灰横条与广告倒影混合；单凭模型圈身份和灰暗弧形不能独立辨认实体靶圈轮廓，两名代理回源检查后保留缺失。"
+        },
+        {
+          "target_id": "ice.C0:outer",
+          "reason_zh": "本帧 C0 当前读数散落在白冰暗斑和不同线带上，无法独立辨认为同一实体圆；自由仿射平移和尺度同时触限，不能以圈形状连接这些读数。"
+        }
+      ],
+      "review_method": "native original frame and actual source material overlay inspected",
+      "user_confirmed": false
+    },
+    {
+      "programme_frame_index_1based": 1314,
+      "source_pts": 592384,
+      "decoded_BGR_sha256": "3a3a54f38c7a24c38a2f9e2051433d2e2e3729b3f672480bd2dc451ae19c3a49",
+      "unqualified_targets": [
+        {
+          "target_id": "ice.C0:outer",
+          "reason_zh": "本帧 C0 在白冰灰雾和直线邻域的零散读数不构成独立可辨实体圆轮廓；仿射尺度和倾斜同时触限，无法确认材料归属。右下确实可见的 R2 靶圈按本帧外轮廓单独保留。"
+        }
+      ],
+      "review_method": "native original frame and actual source material overlay inspected",
+      "user_confirmed": false
+    }
+  ]
+}

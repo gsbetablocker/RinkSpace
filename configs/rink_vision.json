@@ -1,0 +1,41 @@
+{
+  "schema": "rinkspace.vision-training.v1",
+  "python": "D:/OneDrive/codex_projs/MotionTrail_Codex_Starter_v1/.venv-gpu/Scripts/python.exe",
+  "backbone": "D:/OneDrive/codex_projs/MotionTrail_Codex_Starter_v1/models/sam2.1-hiera-tiny",
+  "flow_weights": "models/cache/raft_large_C_T_SKHT_V2-ff5fadd5.pth",
+  "data_directory": "D:/CodexData/RinkSpace_Data/events/ankara_2026/observations/vision_training",
+  "source_video": "D:/CodexData/RinkSpace_Data/events/ankara_2026/media/originals/oxXu1avhrvs.mp4",
+  "source_clock_registry": "events/ankara_2026/model_constraints/source_clock_registry.json",
+  "user_boundary_supervision": "D:/CodexData/RinkSpace_Data/events/ankara_2026/observations/vision_training/user_boundary_supervision_samples.json",
+  "source_material_region_supervision": "D:/CodexData/RinkSpace_Data/events/ankara_2026/observations/vision_training/user_contact_material_region_supervision.json",
+  "source_semantic_rejections": "D:/CodexData/RinkSpace_Data/events/ankara_2026/observations/vision_training/source_material_semantic_rejections.json",
+  "development_source_pts": [
+    36188160
+  ],
+  "native_boundary_overlay": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\observations\\vision_training\\continuous_review\\native_source_boundary_overlay_20261007.json",
+  "final_model": "models/rink_vision.pt",
+  "classes": [
+    "background",
+    "ice_contact",
+    "board_top",
+    "ice_paint",
+    "ad_boundary",
+    "shadow_or_reflection"
+  ],
+  "crop_size": 512,
+  "full_frame_every": 4,
+  "training_steps": 400,
+  "learning_rate": 0.001,
+  "seed": 20261006,
+  "device": "cuda",
+  "training_stage": "source_visual_supervision_user_annotations_highest_authority_then_original_RGB_reading",
+  "accuracy_accepted": false,
+  "pixel_ground_truth_from_model_projection": false,
+  "framework_sources": {
+    "sam2": "https://github.com/facebookresearch/sam2",
+    "boundary_architecture": "https://github.com/XuJiacong/PIDNet",
+    "dense_segmentation": "https://github.com/qubvel-org/segmentation_models.pytorch",
+    "temporal_points": "https://github.com/facebookresearch/co-tracker"
+  },
+  "native_boundary_overlay_sha256": "b28aaa78003fbf2e2d1fda59cf2f4c13572694daa6edfb9bd42646dc73642531"
+}

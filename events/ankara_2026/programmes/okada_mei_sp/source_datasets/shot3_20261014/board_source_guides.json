@@ -1,0 +1,1864 @@
+{
+  "schema": "rinkspace.selected-shot-board-source-guides.v1",
+  "event_id": "ankara_2026",
+  "programme_id": "okada_mei_sp",
+  "shot_index": 3,
+  "source_clock": "official50_native_PTS",
+  "source_scope": {
+    "first_pts": 720896,
+    "stop_pts_exclusive": 745984,
+    "time_base": "1/12800"
+  },
+  "material_definitions": {
+    "board_top": "Visible top edge of the actual blue cap material on the board body",
+    "board_contact": "Visible lower material edge of the actual yellow kickplate band; reflected yellow on ice is excluded",
+    "advertisement_prints": "Declared actual exterior and hole boundaries of named printed entities; current pixels required, inherited charts only navigate identity"
+  },
+  "inherited_identity_chart_model": "events/ankara_2026/models/shot2_8a28_r2_20261014/model.json",
+  "identity_reuse_imports_no_observations": true,
+  "initialization_is_not_an_observation": true,
+  "unresolved_source_regions": {
+    "1816": [
+      {
+        "source_roi_xyxy": [
+          1780,
+          475,
+          1919,
+          522
+        ],
+        "visible_print_text": "INTERNATIONAL / SKATING UNION (right side cropped)",
+        "note_zh": "Ad1 ISU右侧两行小字与右边画外部分：大字文字身份可辨，细笔画横向拖影导致不能稳定逐字读廓；只保存当前清楚的ISU图形与其它大字边界。"
+      }
+    ],
+    "1851": [
+      {
+        "source_roi_xyxy": [
+          1793,
+          477,
+          1919,
+          522
+        ],
+        "visible_print_text": "INTERNATIONAL / SKATING UNION (right side cropped)",
+        "note_zh": "Ad1 ISU右侧两行小字右端出画；当前能识别文字身份，字间边界与细笔画有残留拖影，未虚构完整逐字闭合轮廓。"
+      }
+    ],
+    "1882": [
+      {
+        "source_roi_xyxy": [
+          1650,
+          411,
+          1828,
+          453
+        ],
+        "visible_print_text": "INTERNATIONAL / SKATING UNION",
+        "note_zh": "Ad1两行小字字间过渡横向拖影，未作为精确逐字点；二维码细模块也只取已确认定位框各材料边与独特中央图形。"
+      }
+    ],
+    "1909": [
+      {
+        "source_roi_xyxy": [
+          1050,
+          405,
+          1232,
+          449
+        ],
+        "visible_print_text": "INTERNATIONAL / SKATING UNION",
+        "note_zh": "Ad1两行小字能辨文字身份，细笔画拖影未形成稳定单字边界。"
+      },
+      {
+        "source_roi_xyxy": [
+          1623,
+          397,
+          1919,
+          628
+        ],
+        "note_zh": "两部蓝色手机和右侧白色页头被画面裁切或低对比拖影影响：只保留当前源支持的印刷片段；屏幕内小字和细UI不补成未知边界。"
+      }
+    ]
+  },
+  "named_current_source_entities": [
+    {
+      "target_id": "Ad1.print.shot3_ALL_A",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        929,
+        457,
+        980,
+        520
+      ],
+      "bright": true,
+      "hole": false,
+      "label_zh": "Ad1 ALL_A",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_ALL_A__part0",
+        "Ad1.print.shot3_ALL_A__part1"
+      ],
+      "search_roi_world_xyz": [
+        [
+          83.8421667720847,
+          44.82051837406575,
+          2.158477322027211
+        ],
+        [
+          84.34790774874675,
+          44.49758416197506,
+          2.159783896095989
+        ],
+        [
+          84.35543529143159,
+          44.492653218485245,
+          1.5400187118682918
+        ],
+        [
+          83.84976908026681,
+          44.815712380905694,
+          1.539751620476557
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_ALL_L1",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        974,
+        457,
+        1018,
+        520
+      ],
+      "bright": true,
+      "hole": false,
+      "label_zh": "Ad1 ALL_L1",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_ALL_L1"
+      ],
+      "search_roi_world_xyz": [
+        [
+          84.28921576298902,
+          44.53603055506688,
+          2.1596169257202202
+        ],
+        [
+          84.71716727630525,
+          44.25241267342196,
+          2.160892045784453
+        ],
+        [
+          84.72460014952645,
+          44.24737052983266,
+          1.5403821750749445
+        ],
+        [
+          84.29673418660889,
+          44.531105585052856,
+          1.5399716359089697
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_ALL_L2",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        1010,
+        457,
+        1055,
+        520
+      ],
+      "bright": true,
+      "hole": false,
+      "label_zh": "Ad1 ALL_L2",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_ALL_L2"
+      ],
+      "search_roi_world_xyz": [
+        [
+          84.64035567172388,
+          44.30451838383806,
+          2.160644538148314
+        ],
+        [
+          85.07019878876274,
+          44.009877214295145,
+          2.1620846631405333
+        ],
+        [
+          85.07753587168932,
+          44.00472575403009,
+          1.5408744500710567
+        ],
+        [
+          84.64777672029479,
+          44.29948426158625,
+          1.540289207764893
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_SKATING_S",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        1051,
+        457,
+        1101,
+        521
+      ],
+      "bright": true,
+      "hole": false,
+      "label_zh": "Ad1 SKATING_S",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_SKATING_S"
+      ],
+      "search_roi_world_xyz": [
+        [
+          85.03250064563058,
+          44.03634556532177,
+          2.1619487012753416
+        ],
+        [
+          85.5002093348542,
+          43.70319893304321,
+          2.1637193977140283
+        ],
+        [
+          85.50758169015987,
+          43.69784403767634,
+          1.53179781667559
+        ],
+        [
+          85.03994836356978,
+          44.03111642679177,
+          1.5309525617073987
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_SKATING_K",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        1094,
+        457,
+        1145,
+        521
+      ],
+      "bright": true,
+      "hole": false,
+      "label_zh": "Ad1 SKATING_K",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_SKATING_K__part0",
+        "Ad1.print.shot3_SKATING_K__part1",
+        "Ad1.print.shot3_SKATING_K__part2"
+      ],
+      "search_roi_world_xyz": [
+        [
+          85.435439668903,
+          43.75024424892073,
+          2.163460430761074
+        ],
+        [
+          85.90281620651865,
+          43.404812372156925,
+          2.1654341216050397
+        ],
+        [
+          85.91010400534228,
+          43.399338564984824,
+          1.532734203402952
+        ],
+        [
+          85.44279908199745,
+          43.74489875410278,
+          1.5316645333712522
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_SKATING_A",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        1134,
+        457,
+        1183,
+        521
+      ],
+      "bright": true,
+      "hole": false,
+      "label_zh": "Ad1 SKATING_A",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_SKATING_A__part0",
+        "Ad1.print.shot3_SKATING_A__part1"
+      ],
+      "search_roi_world_xyz": [
+        [
+          85.80291780172037,
+          43.47984526177142,
+          2.164994096165197
+        ],
+        [
+          86.24355672939012,
+          43.143156797455816,
+          2.167033794434615
+        ],
+        [
+          86.2507484121965,
+          43.137573347544226,
+          1.5336870371048095
+        ],
+        [
+          85.81018453648572,
+          43.47438727564436,
+          1.5324828153210017
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_SKATING_T",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        1180,
+        457,
+        1224,
+        521
+      ],
+      "bright": true,
+      "hole": false,
+      "label_zh": "Ad1 SKATING_T",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_SKATING_T"
+      ],
+      "search_roi_world_xyz": [
+        [
+          86.21682000324398,
+          43.16391454988396,
+          2.1669053077888383
+        ],
+        [
+          86.60433302687541,
+          42.85694824270885,
+          2.168877762168546
+        ],
+        [
+          86.6114329758913,
+          42.85125242777116,
+          1.5348591632866848
+        ],
+        [
+          86.22400556144844,
+          43.1583358549663,
+          1.5336072970905301
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_SKATING_I",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        1215,
+        457,
+        1243,
+        521
+      ],
+      "bright": true,
+      "hole": false,
+      "label_zh": "Ad1 SKATING_I",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_SKATING_I"
+      ],
+      "search_roi_world_xyz": [
+        [
+          86.52564713996259,
+          42.920072674878945,
+          2.1684658898199967
+        ],
+        [
+          86.76940701623441,
+          42.723083487419146,
+          2.169774154824629
+        ],
+        [
+          86.77638114794968,
+          42.71730403170097,
+          1.535449580660097
+        ],
+        [
+          86.53272990529936,
+          42.914390645259395,
+          1.5345879944568073
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_SKATING_N",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        1235,
+        457,
+        1288,
+        521
+      ],
+      "bright": true,
+      "hole": false,
+      "label_zh": "Ad1 SKATING_N",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_SKATING_N__part0",
+        "Ad1.print.shot3_SKATING_N__part1"
+      ],
+      "search_roi_world_xyz": [
+        [
+          86.70056113044265,
+          42.779750861643365,
+          2.169390014216946
+        ],
+        [
+          87.15339423146351,
+          42.402292430243165,
+          2.171998113922455
+        ],
+        [
+          87.16028162375568,
+          42.39639812445573,
+          1.5369799668108242
+        ],
+        [
+          86.70767546914004,
+          42.77404350282517,
+          1.5351907636179352
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_SKATING_G",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        1280,
+        457,
+        1344,
+        521
+      ],
+      "bright": true,
+      "hole": false,
+      "label_zh": "Ad1 SKATING_G",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_SKATING_G__part0",
+        "Ad1.print.shot3_SKATING_G__part1",
+        "Ad1.print.shot3_SKATING_G__part2"
+      ],
+      "search_roi_world_xyz": [
+        [
+          87.08615671499463,
+          42.45983503354528,
+          2.1715890009122174
+        ],
+        [
+          87.61993692441615,
+          41.99682630861527,
+          2.174951763433356
+        ],
+        [
+          87.62675566948047,
+          41.990801200448864,
+          1.5391206808709827
+        ],
+        [
+          87.09303425077921,
+          42.45394916306507,
+          1.5366922415414561
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_SKATING_dot",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        1340,
+        493,
+        1368,
+        524
+      ],
+      "bright": true,
+      "hole": false,
+      "label_zh": "Ad1 SKATING_dot",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_SKATING_dot"
+      ],
+      "search_roi_world_xyz": [
+        [
+          87.59077381382124,
+          42.022595111253686,
+          1.8171291929601023
+        ],
+        [
+          87.81995369407481,
+          41.817575492709786,
+          1.8184602864837505
+        ],
+        [
+          87.82319937699917,
+          41.814614982268814,
+          1.5102903208989764
+        ],
+        [
+          87.5940745744535,
+          42.01967852768099,
+          1.5091530504508488
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_ONE_O",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        921,
+        540,
+        963,
+        593
+      ],
+      "bright": true,
+      "hole": false,
+      "label_zh": "Ad1 ONE_O",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_ONE_O"
+      ],
+      "search_roi_world_xyz": [
+        [
+          83.77118797061154,
+          44.86394983951325,
+          1.3433424967393595
+        ],
+        [
+          84.19122135504118,
+          44.59985461011464,
+          1.3432146616515068
+        ],
+        [
+          84.19766882037206,
+          44.595778680339414,
+          0.8219402722500023
+        ],
+        [
+          83.77771124502705,
+          44.859972609060144,
+          0.8227979874688951
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_ONE_N",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        953,
+        540,
+        996,
+        593
+      ],
+      "bright": true,
+      "hole": false,
+      "label_zh": "Ad1 ONE_N",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_ONE_N__part0",
+        "Ad1.print.shot3_ONE_N__part1"
+      ],
+      "search_roi_world_xyz": [
+        [
+          84.09142118150213,
+          44.66294583713587,
+          1.343237857495763
+        ],
+        [
+          84.51449282934416,
+          44.38846201507213,
+          1.3432634681095446
+        ],
+        [
+          84.52085307469459,
+          44.38429571383447,
+          0.8214379464715958
+        ],
+        [
+          84.09785546210553,
+          44.658878242422645,
+          0.822137594663053
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_ONE_E",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        991,
+        540,
+        1039,
+        593
+      ],
+      "bright": true,
+      "hole": false,
+      "label_zh": "Ad1 ONE_E",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_ONE_E"
+      ],
+      "search_roi_world_xyz": [
+        [
+          84.4655169079649,
+          44.420543865789426,
+          1.3432542721388328
+        ],
+        [
+          84.92882978701884,
+          44.108829870415875,
+          1.3434856107303383
+        ],
+        [
+          84.93511599316341,
+          44.1045655767747,
+          0.820962464750357
+        ],
+        [
+          84.4718707432852,
+          44.4163817634647,
+          0.8215129532970922
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_APP_A",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        1039,
+        540,
+        1083,
+        593
+      ],
+      "bright": true,
+      "hole": false,
+      "label_zh": "Ad1 APP_A",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_APP_A__part0",
+        "Ad1.print.shot3_APP_A__part1"
+      ],
+      "search_roi_world_xyz": [
+        [
+          84.92882978701884,
+          44.108829870415875,
+          1.3434856107303383
+        ],
+        [
+          85.34323620637193,
+          43.8172160474636,
+          1.3439228001182257
+        ],
+        [
+          85.34931970863464,
+          43.812797307898,
+          0.8207182806872126
+        ],
+        [
+          84.93511599316341,
+          44.1045655767747,
+          0.820962464750357
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_APP_P1",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        1075,
+        540,
+        1117,
+        593
+      ],
+      "bright": true,
+      "hole": false,
+      "label_zh": "Ad1 APP_P1",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_APP_P1__part0",
+        "Ad1.print.shot3_APP_P1__part1"
+      ],
+      "search_roi_world_xyz": [
+        [
+          85.26854424833627,
+          43.870616316745874,
+          1.343829262029122
+        ],
+        [
+          85.65795641120447,
+          43.5886196631541,
+          1.3443867966688992
+        ],
+        [
+          85.66404535789505,
+          43.58415123911993,
+          0.8206710387628319
+        ],
+        [
+          85.27474785755854,
+          43.86626068294313,
+          0.8207456288349352
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_APP_P2",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        1110,
+        540,
+        1152,
+        593
+      ],
+      "bright": true,
+      "hole": false,
+      "label_zh": "Ad1 APP_P2",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_APP_P2"
+      ],
+      "search_roi_world_xyz": [
+        [
+          85.59310862856928,
+          43.63572171892702,
+          1.3442897630391186
+        ],
+        [
+          85.97588871897987,
+          43.3499281948527,
+          1.3449938536198438
+        ],
+        [
+          85.98193385189765,
+          43.3453877440633,
+          0.8207718394152458
+        ],
+        [
+          85.59922881235525,
+          43.63127633581115,
+          0.8206795929143705
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_APP_dot",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        1146,
+        565,
+        1171,
+        595
+      ],
+      "bright": true,
+      "hole": false,
+      "label_zh": "Ad1 APP_dot",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_APP_dot"
+      ],
+      "search_roi_world_xyz": [
+        [
+          85.92420316477207,
+          43.38874879955974,
+          1.0976684885245491
+        ],
+        [
+          86.14873733260961,
+          43.21677230120144,
+          1.0979881397018387
+        ],
+        [
+          86.15210220900143,
+          43.214159891936696,
+          0.8010938054279134
+        ],
+        [
+          85.92762123116292,
+          43.38618151734218,
+          0.8009725588804871
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_ISU_logo",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        928,
+        399,
+        1051,
+        455
+      ],
+      "bright": true,
+      "hole": false,
+      "label_zh": "Ad1 ISU_logo",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_ISU_logo"
+      ],
+      "search_roi_world_xyz": [
+        [
+          83.82499978371905,
+          44.83114085920747,
+          2.7279129893448277
+        ],
+        [
+          85.02575283883078,
+          44.04108328724113,
+          2.733645974987702
+        ],
+        [
+          85.03226793592977,
+          44.03650895379494,
+          2.181664663136548
+        ],
+        [
+          83.83189829304557,
+          44.826934848601944,
+          2.178092443174231
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_ONE_APP_blue_panel",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        905,
+        527,
+        1207,
+        612
+      ],
+      "bright": true,
+      "hole": false,
+      "label_zh": "Ad1 ONE_APP_blue_panel",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_ONE_APP_blue_panel"
+      ],
+      "search_roi_world_xyz": [
+        [
+          83.60701709355268,
+          44.96404457264263,
+          1.4710402320716007
+        ],
+        [
+          86.46347065432768,
+          42.96995271695539,
+          1.4749315915823389
+        ],
+        [
+          86.47286920771634,
+          42.962412885237725,
+          0.6329682565137976
+        ],
+        [
+          83.61744282099419,
+          44.957688022536814,
+          0.6366553424791918
+        ]
+      ],
+      "signal": "cyan"
+    },
+    {
+      "target_id": "Ad1.print.shot3_phone_white_screen",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        1445,
+        414,
+        1596,
+        601
+      ],
+      "bright": true,
+      "hole": false,
+      "label_zh": "Ad1 phone_white_screen",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_phone_white_screen__part0",
+        "Ad1.print.shot3_phone_white_screen__part1"
+      ],
+      "search_roi_world_xyz": [
+        [
+          88.42603810886888,
+          41.25293660666232,
+          2.6088371223521265
+        ],
+        [
+          89.56418226987954,
+          40.09600043805223,
+          2.619953882569499
+        ],
+        [
+          89.58246553091865,
+          40.076483446812205,
+          0.7529126431728527
+        ],
+        [
+          88.4450554932544,
+          41.23445983010839,
+          0.7469036295048336
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_ALL_A_inner",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        929,
+        457,
+        980,
+        520
+      ],
+      "bright": true,
+      "hole": true,
+      "label_zh": "Ad1 ALL_A_inner",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_ALL_A_inner"
+      ],
+      "search_roi_world_xyz": [
+        [
+          83.8421667720847,
+          44.82051837406575,
+          2.158477322027211
+        ],
+        [
+          84.34790774874675,
+          44.49758416197506,
+          2.159783896095989
+        ],
+        [
+          84.35543529143159,
+          44.492653218485245,
+          1.5400187118682918
+        ],
+        [
+          83.84976908026681,
+          44.815712380905694,
+          1.539751620476557
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_SKATING_A_inner",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        1134,
+        457,
+        1183,
+        521
+      ],
+      "bright": true,
+      "hole": true,
+      "label_zh": "Ad1 SKATING_A_inner",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_SKATING_A_inner"
+      ],
+      "search_roi_world_xyz": [
+        [
+          85.80291780172037,
+          43.47984526177142,
+          2.164994096165197
+        ],
+        [
+          86.24355672939012,
+          43.143156797455816,
+          2.167033794434615
+        ],
+        [
+          86.2507484121965,
+          43.137573347544226,
+          1.5336870371048095
+        ],
+        [
+          85.81018453648572,
+          43.47438727564436,
+          1.5324828153210017
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_ONE_O_inner",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        921,
+        540,
+        963,
+        593
+      ],
+      "bright": true,
+      "hole": true,
+      "label_zh": "Ad1 ONE_O_inner",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_ONE_O_inner"
+      ],
+      "search_roi_world_xyz": [
+        [
+          83.77118797061154,
+          44.86394983951325,
+          1.3433424967393595
+        ],
+        [
+          84.19122135504118,
+          44.59985461011464,
+          1.3432146616515068
+        ],
+        [
+          84.19766882037206,
+          44.595778680339414,
+          0.8219402722500023
+        ],
+        [
+          83.77771124502705,
+          44.859972609060144,
+          0.8227979874688951
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_APP_A_inner",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        1039,
+        540,
+        1083,
+        593
+      ],
+      "bright": true,
+      "hole": true,
+      "label_zh": "Ad1 APP_A_inner",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity"
+    },
+    {
+      "target_id": "Ad1.print.shot3_APP_P1_inner",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        1075,
+        540,
+        1117,
+        593
+      ],
+      "bright": true,
+      "hole": true,
+      "label_zh": "Ad1 APP_P1_inner",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_APP_P1_inner"
+      ],
+      "search_roi_world_xyz": [
+        [
+          85.26854424833627,
+          43.870616316745874,
+          1.343829262029122
+        ],
+        [
+          85.65795641120447,
+          43.5886196631541,
+          1.3443867966688992
+        ],
+        [
+          85.66404535789505,
+          43.58415123911993,
+          0.8206710387628319
+        ],
+        [
+          85.27474785755854,
+          43.86626068294313,
+          0.8207456288349352
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_APP_P2_inner",
+      "advertisement_number": 1,
+      "source_frame": 1909,
+      "source_roi_xyxy": [
+        1110,
+        540,
+        1152,
+        593
+      ],
+      "bright": true,
+      "hole": true,
+      "label_zh": "Ad1 APP_P2_inner",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_APP_P2_inner"
+      ],
+      "search_roi_world_xyz": [
+        [
+          85.59310862856928,
+          43.63572171892702,
+          1.3442897630391186
+        ],
+        [
+          85.97588871897987,
+          43.3499281948527,
+          1.3449938536198438
+        ],
+        [
+          85.98193385189765,
+          43.3453877440633,
+          0.8207718394152458
+        ],
+        [
+          85.59922881235525,
+          43.63127633581115,
+          0.8206795929143705
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_qr_left_top_outer",
+      "advertisement_number": 1,
+      "source_frame": 1851,
+      "source_roi_xyxy": [
+        1448,
+        481,
+        1500,
+        538
+      ],
+      "bright": false,
+      "hole": false,
+      "label_zh": "Ad1 qr_left_top_outer",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_qr_left_top_outer"
+      ],
+      "search_roi_world_xyz": [
+        [
+          81.37446255300816,
+          46.17867685470941,
+          2.615731286529315
+        ],
+        [
+          81.95909183676274,
+          45.887746949661256,
+          2.6167705981813962
+        ],
+        [
+          81.96696727541631,
+          45.88362535769301,
+          2.0577904665761944
+        ],
+        [
+          81.38259014856615,
+          46.17475919899132,
+          2.057868745497607
+        ]
+      ],
+      "whole_source_identity_requires_unoccluded_ROI": true,
+      "source_reference_roi_xyxy": [
+        1447,
+        477,
+        1605,
+        679
+      ],
+      "current_reference_target": "Ad1.print.shot2_native_component000",
+      "named_square_material_profile": true,
+      "source_material_box_xyxy": [
+        1456.0,
+        488.0,
+        1488.0,
+        530.0
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_qr_left_top_inner",
+      "advertisement_number": 1,
+      "source_frame": 1851,
+      "source_roi_xyxy": [
+        1448,
+        481,
+        1500,
+        538
+      ],
+      "bright": false,
+      "hole": true,
+      "label_zh": "Ad1 qr_left_top_inner",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_qr_left_top_inner"
+      ],
+      "search_roi_world_xyz": [
+        [
+          81.37446255300816,
+          46.17867685470941,
+          2.615731286529315
+        ],
+        [
+          81.95909183676274,
+          45.887746949661256,
+          2.6167705981813962
+        ],
+        [
+          81.96696727541631,
+          45.88362535769301,
+          2.0577904665761944
+        ],
+        [
+          81.38259014856615,
+          46.17475919899132,
+          2.057868745497607
+        ]
+      ],
+      "whole_source_identity_requires_unoccluded_ROI": true,
+      "source_reference_roi_xyxy": [
+        1447,
+        477,
+        1605,
+        679
+      ],
+      "current_reference_target": "Ad1.print.shot2_native_component000",
+      "named_square_material_profile": true,
+      "source_material_box_xyxy": [
+        1459.0,
+        493.0,
+        1485.0,
+        525.0
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_qr_left_top_centre",
+      "advertisement_number": 1,
+      "source_frame": 1851,
+      "source_roi_xyxy": [
+        1461,
+        496,
+        1485,
+        523
+      ],
+      "bright": false,
+      "hole": false,
+      "label_zh": "Ad1 qr_left_top_centre",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_qr_left_top_centre"
+      ],
+      "search_roi_world_xyz": [
+        [
+          81.52496229810593,
+          46.10613311372868,
+          2.4690944310187932
+        ],
+        [
+          81.79377752488574,
+          45.971403880088516,
+          2.469441492146554
+        ],
+        [
+          81.79757545585326,
+          45.96949524739693,
+          2.204809731765906
+        ],
+        [
+          81.52882466307085,
+          46.10427138031906,
+          2.204709691945683
+        ]
+      ],
+      "whole_source_identity_requires_unoccluded_ROI": true,
+      "source_reference_roi_xyxy": [
+        1447,
+        477,
+        1605,
+        679
+      ],
+      "current_reference_target": "Ad1.print.shot2_native_component000"
+    },
+    {
+      "target_id": "Ad1.print.shot3_qr_right_top_outer",
+      "advertisement_number": 1,
+      "source_frame": 1851,
+      "source_roi_xyxy": [
+        1558,
+        482,
+        1603,
+        538
+      ],
+      "bright": false,
+      "hole": false,
+      "label_zh": "Ad1 qr_right_top_outer",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_qr_right_top_outer"
+      ],
+      "search_roi_world_xyz": [
+        [
+          82.59099191296778,
+          45.55127284666226,
+          2.6083900650428915
+        ],
+        [
+          83.0691982221772,
+          45.28303466349682,
+          2.609690530170201
+        ],
+        [
+          83.07677501431664,
+          45.27874730097213,
+          2.0584923558729304
+        ],
+        [
+          82.59865910581232,
+          45.54709848783081,
+          2.0580518198586915
+        ]
+      ],
+      "whole_source_identity_requires_unoccluded_ROI": true,
+      "source_reference_roi_xyxy": [
+        1447,
+        477,
+        1605,
+        679
+      ],
+      "current_reference_target": "Ad1.print.shot2_native_component000",
+      "named_square_material_profile": true,
+      "source_material_box_xyxy": [
+        1562.0,
+        488.0,
+        1596.0,
+        530.0
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_qr_right_top_inner",
+      "advertisement_number": 1,
+      "source_frame": 1851,
+      "source_roi_xyxy": [
+        1558,
+        482,
+        1603,
+        538
+      ],
+      "bright": false,
+      "hole": true,
+      "label_zh": "Ad1 qr_right_top_inner",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_qr_right_top_inner"
+      ],
+      "search_roi_world_xyz": [
+        [
+          82.59099191296778,
+          45.55127284666226,
+          2.6083900650428915
+        ],
+        [
+          83.0691982221772,
+          45.28303466349682,
+          2.609690530170201
+        ],
+        [
+          83.07677501431664,
+          45.27874730097213,
+          2.0584923558729304
+        ],
+        [
+          82.59865910581232,
+          45.54709848783081,
+          2.0580518198586915
+        ]
+      ],
+      "whole_source_identity_requires_unoccluded_ROI": true,
+      "source_reference_roi_xyxy": [
+        1447,
+        477,
+        1605,
+        679
+      ],
+      "current_reference_target": "Ad1.print.shot2_native_component000",
+      "named_square_material_profile": true,
+      "source_material_box_xyxy": [
+        1566.0,
+        493.0,
+        1592.0,
+        525.0
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_qr_right_top_centre",
+      "advertisement_number": 1,
+      "source_frame": 1851,
+      "source_roi_xyxy": [
+        1568,
+        496,
+        1591,
+        524
+      ],
+      "bright": false,
+      "hole": false,
+      "label_zh": "Ad1 qr_right_top_centre",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_qr_right_top_centre"
+      ],
+      "search_roi_world_xyz": [
+        [
+          82.70081244778116,
+          45.49148744070369,
+          2.471041504261021
+        ],
+        [
+          82.94403290406717,
+          45.35386003185638,
+          2.4715974889062124
+        ],
+        [
+          82.94781034745324,
+          45.3517225482202,
+          2.1961086208009775
+        ],
+        [
+          82.70457336545832,
+          45.48935930821559,
+          2.195775051696007
+        ]
+      ],
+      "whole_source_identity_requires_unoccluded_ROI": true,
+      "source_reference_roi_xyxy": [
+        1447,
+        477,
+        1605,
+        679
+      ],
+      "current_reference_target": "Ad1.print.shot2_native_component000"
+    },
+    {
+      "target_id": "Ad1.print.shot3_qr_left_bottom_outer",
+      "advertisement_number": 1,
+      "source_frame": 1851,
+      "source_roi_xyxy": [
+        1451,
+        619,
+        1493,
+        671
+      ],
+      "bright": false,
+      "hole": false,
+      "label_zh": "Ad1 qr_left_bottom_outer",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_qr_left_bottom_outer"
+      ],
+      "search_roi_world_xyz": [
+        [
+          81.42838425472728,
+          46.152685568410504,
+          1.2647981666419088
+        ],
+        [
+          81.90071459682224,
+          45.917663147782996,
+          1.2634322257022625
+        ],
+        [
+          81.90804921128542,
+          45.91397717111193,
+          0.7533417217972507
+        ],
+        [
+          81.43581189503587,
+          46.14910530444197,
+          0.7555369051138178
+        ]
+      ],
+      "whole_source_identity_requires_unoccluded_ROI": true,
+      "source_reference_roi_xyxy": [
+        1447,
+        477,
+        1605,
+        679
+      ],
+      "current_reference_target": "Ad1.print.shot2_native_component000",
+      "named_square_material_profile": true,
+      "source_material_box_xyxy": [
+        1455.0,
+        623.0,
+        1487.0,
+        665.0
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_qr_left_bottom_inner",
+      "advertisement_number": 1,
+      "source_frame": 1851,
+      "source_roi_xyxy": [
+        1451,
+        619,
+        1493,
+        671
+      ],
+      "bright": false,
+      "hole": true,
+      "label_zh": "Ad1 qr_left_bottom_inner",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "whole_source_identity_requires_unoccluded_ROI": true,
+      "source_reference_roi_xyxy": [
+        1447,
+        477,
+        1605,
+        679
+      ],
+      "current_reference_target": "Ad1.print.shot2_native_component000",
+      "registered_targets": [
+        "Ad1.print.shot3_qr_left_bottom_inner"
+      ],
+      "search_roi_world_xyz": [
+        [
+          81.42838425472728,
+          46.152685568410504,
+          1.2647981666419088
+        ],
+        [
+          81.90071459682224,
+          45.917663147782996,
+          1.2634322257022625
+        ],
+        [
+          81.90804921128542,
+          45.91397717111193,
+          0.7533417217972507
+        ],
+        [
+          81.43581189503587,
+          46.14910530444197,
+          0.7555369051138178
+        ]
+      ],
+      "named_square_material_profile": true,
+      "source_material_box_xyxy": [
+        1458.0,
+        628.0,
+        1484.0,
+        660.0
+      ]
+    },
+    {
+      "target_id": "Ad1.print.shot3_qr_left_bottom_centre",
+      "advertisement_number": 1,
+      "source_frame": 1851,
+      "source_roi_xyxy": [
+        1460,
+        632,
+        1484,
+        658
+      ],
+      "bright": false,
+      "hole": false,
+      "label_zh": "Ad1 qr_left_bottom_centre",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_qr_left_bottom_centre"
+      ],
+      "search_roi_world_xyz": [
+        [
+          81.53299930322163,
+          46.10225912432762,
+          1.1371238821475054
+        ],
+        [
+          81.8017215102203,
+          45.96741166689646,
+          1.1362422164468147
+        ],
+        [
+          81.80538222825189,
+          45.96557198993301,
+          0.8812864438820438
+        ],
+        [
+          81.53671991690754,
+          46.10046571773182,
+          0.8824008020987651
+        ]
+      ],
+      "whole_source_identity_requires_unoccluded_ROI": true,
+      "source_reference_roi_xyxy": [
+        1447,
+        477,
+        1605,
+        679
+      ],
+      "current_reference_target": "Ad1.print.shot2_native_component000"
+    },
+    {
+      "target_id": "Ad1.print.shot3_qr_centre_logo_outer",
+      "advertisement_number": 1,
+      "source_frame": 1851,
+      "source_roi_xyxy": [
+        1499,
+        548,
+        1547,
+        608
+      ],
+      "bright": false,
+      "hole": false,
+      "label_zh": "Ad1 qr_centre_logo_outer",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "registered_targets": [
+        "Ad1.print.shot3_qr_centre_logo_outer"
+      ],
+      "search_roi_world_xyz": [
+        [
+          81.957377508037,
+          45.888644139496336,
+          1.9597119341706633
+        ],
+        [
+          82.48141890598833,
+          45.61092923703187,
+          1.9597288789062657
+        ],
+        [
+          82.48961638576608,
+          45.60646616654444,
+          1.370151677414546
+        ],
+        [
+          81.96566808954516,
+          45.88430528350885,
+          1.3711721782045228
+        ]
+      ],
+      "whole_source_identity_requires_unoccluded_ROI": true,
+      "source_reference_roi_xyxy": [
+        1447,
+        477,
+        1605,
+        679
+      ],
+      "current_reference_target": "Ad1.print.shot2_native_component000",
+      "maximum_identity_boundary_distance_px": 6.5
+    },
+    {
+      "target_id": "Ad1.print.shot3_qr_centre_logo_inner",
+      "advertisement_number": 1,
+      "source_frame": 1851,
+      "source_roi_xyxy": [
+        1499,
+        548,
+        1547,
+        608
+      ],
+      "bright": false,
+      "hole": true,
+      "label_zh": "Ad1 qr_centre_logo_inner",
+      "identity_authority": "Same static Ad1 confirmed from full scene plus official-source shot continuity; ROI only locates entity",
+      "whole_source_identity_requires_unoccluded_ROI": true,
+      "source_reference_roi_xyxy": [
+        1447,
+        477,
+        1605,
+        679
+      ],
+      "current_reference_target": "Ad1.print.shot2_native_component000",
+      "maximum_identity_boundary_distance_px": 6.5
+    },
+    {
+      "target_id": "Ad2.print.ISU_I",
+      "advertisement_number": 2,
+      "source_frame": 1851,
+      "source_roi_xyxy": [
+        134,
+        534,
+        157,
+        655
+      ],
+      "bright": true,
+      "hole": false,
+      "reuse_existing_target_geometry": true,
+      "label_zh": "Ad2.print.ISU_I",
+      "identity_authority": "Existing named Ad2 static glyph; current source ROI only navigates same visible entity",
+      "registered_targets": [
+        "Ad2.print.ISU_I"
+      ],
+      "search_roi_world_xyz": [
+        [
+          59.08831675867575,
+          48.635418319787746,
+          2.2418005234890113
+        ],
+        [
+          59.512075232090126,
+          48.63541831978774,
+          2.2382673799146415
+        ],
+        [
+          59.535108413556976,
+          48.63541831978774,
+          1.1672767431169468
+        ],
+        [
+          59.11116099497953,
+          48.635418319787746,
+          1.1731485070323127
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad2.print.SKATING_A_inner",
+      "advertisement_number": 2,
+      "source_frame": 1851,
+      "source_roi_xyxy": [
+        347,
+        534,
+        401,
+        649
+      ],
+      "bright": true,
+      "hole": true,
+      "reuse_existing_target_geometry": true,
+      "label_zh": "Ad2.print.SKATING_A_inner",
+      "identity_authority": "Existing named Ad2 static glyph; current source ROI only navigates same visible entity",
+      "registered_targets": [
+        "Ad2.print.SKATING_A_inner"
+      ],
+      "search_roi_world_xyz": [
+        [
+          63.08580026728245,
+          48.63541831978775,
+          2.2086045901756415
+        ],
+        [
+          64.12568202870091,
+          48.635418319787746,
+          2.1999154190225676
+        ],
+        [
+          64.14956405686013,
+          48.635418319787746,
+          1.157707072865922
+        ],
+        [
+          63.109240383330516,
+          48.635418319787746,
+          1.1718668651599624
+        ]
+      ]
+    },
+    {
+      "target_id": "Ad2.print.COM_O_inner",
+      "advertisement_number": 2,
+      "source_frame": 1816,
+      "source_roi_xyxy": [
+        576,
+        531,
+        642,
+        648
+      ],
+      "bright": true,
+      "hole": true,
+      "reuse_existing_target_geometry": true,
+      "label_zh": "Ad2.print.COM_O_inner",
+      "identity_authority": "Existing named Ad2 static glyph; current source ROI only navigates same visible entity",
+      "registered_targets": [
+        "Ad2.print.COM_O_inner"
+      ],
+      "search_roi_world_xyz": [
+        [
+          68.07461903382938,
+          48.635418319787746,
+          2.217705398413202
+        ],
+        [
+          69.41476635167109,
+          48.635418319787746,
+          2.20689050630013
+        ],
+        [
+          69.44158671113836,
+          48.63541831978774,
+          1.116495086495256
+        ],
+        [
+          68.10078304780458,
+          48.63541831978775,
+          1.1345181619156333
+        ]
+      ]
+    }
+  ],
+  "superseded_print_targets": [
+    "Ad1.print.shot2_native_component001",
+    "Ad1.print.shot2_native_component002",
+    "Ad1.print.shot2_native_component003",
+    "Ad1.print.shot2_native_component004",
+    "Ad1.print.shot2_native_component005",
+    "Ad1.print.shot2_native_component006_inner",
+    "Ad1.print.shot2_native_component007",
+    "Ad1.print.shot2_native_component008",
+    "Ad1.print.shot2_native_component009_inner",
+    "Ad1.print.shot2_native_component010_inner",
+    "Ad1.print.shot2_native_component011",
+    "Ad1.print.shot2_native_component012",
+    "Ad1.print.shot2_native_component013",
+    "Ad1.print.shot2_native_component014",
+    "Ad1.print.shot2_native_component015_inner",
+    "Ad1.print.shot2_native_component016_inner",
+    "Ad1.print.shot2_native_component017_inner",
+    "Ad1.print.shot2_native_component020",
+    "Ad1.print.shot2_native_component021",
+    "Ad1.print.shot2_native_component022",
+    "Ad1.print.shot2_native_component023",
+    "Ad1.print.shot2_native_component024",
+    "Ad1.print.shot2_native_component025",
+    "Ad1.print.shot2_native_component026_inner",
+    "Ad1.print.shot2_native_component027_inner",
+    "Ad1.print.shot2_native_component028_inner",
+    "Ad1.print.shot2_native_component029_inner",
+    "Ad1.print.shot2_native_component030_inner",
+    "Ad1.print.shot2_native_component033",
+    "Ad1.print.shot2_native_component034_inner",
+    "Ad1.print.shot2_native_component035_inner",
+    "Ad1.print.r2_qr_finder_left_top_00",
+    "Ad1.print.r2_qr_finder_left_top_01",
+    "Ad1.print.r2_qr_finder_right_top_00",
+    "Ad1.print.r2_qr_finder_right_top_01",
+    "Ad1.print.r2_qr_finder_right_top_02",
+    "Ad1.print.r2_qr_finder_left_bottom_00",
+    "Ad1.print.r2_qr_finder_left_bottom_01",
+    "Ad1.print.r2_qr_finder_left_bottom_02_inner",
+    "Ad1.print.r2_qr_centre_unique_00_inner",
+    "Ad1.print.r2_ALL_SKATING_T_00",
+    "Ad1.print.r2_ALL_SKATING_I_00",
+    "Ad1.print.r2_ALL_SKATING_N_00",
+    "Ad1.print.r2_ALL_SKATING_N_01"
+  ]
+}

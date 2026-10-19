@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rinkfit-start"
+version = "0.1.0"
+description = "Okada shot 1 registration-first fitting architecture and Codex handoff"
+requires-python = ">=3.11"
+dependencies = ["numpy>=1.26,<3", "scipy>=1.13,<2"]
+
+[project.scripts]
+rinkfit-start = "rinkfit_start.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+

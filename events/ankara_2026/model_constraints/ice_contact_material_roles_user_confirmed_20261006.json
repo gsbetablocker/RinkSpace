@@ -1,0 +1,46 @@
+{
+  "schema": "rinkspace.ice-contact-material-role-confirmation.v1",
+  "event_id": "ankara_2026",
+  "revision_id": "ice_contact_lower_yellow_foot_user_20261006",
+  "authority": {
+    "kind": "direct_user_drawing",
+    "human_authority": true,
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\observations\\vision_training\\continuous_review\\native_cut_pipeline\\user_ice_contact_correction\\iceedge_user_original.png",
+    "sha256": "e3724b9c02308c2987e9318dbe704691133ebf8386d31c6b10408c1e31d4c9a7",
+    "user_text": "你的接冰轮廓判断有问题，真正的接冰轮廓应该是我红线画的，你注意到围挡最靠近冰面的低端有一道很窄的浅黄色部分，你把这部分也划给冰面了"
+  },
+  "reference_source": {
+    "source_sha256": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891",
+    "source_pts": 36208896,
+    "time_base": "1/15360",
+    "source_time": "00:39:17.350",
+    "frame_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\observations\\vision_training\\continuous_review\\native_cut_pipeline\\end\\source_36208896.png",
+    "frame_sha256": "c27175919456b4825f00f1f2ac01e3d143e77810245a39c1606736dd632b25f8",
+    "decoded_native_RGB_sha256": "1e6cadd09d8ba5b315bb2d29e1ba10d886276b760017c9c92ff853ed2fa1220e"
+  },
+  "drawing": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\observations\\vision_training\\continuous_review\\native_cut_pipeline\\user_ice_contact_correction\\user_red_contact_uv.json",
+    "sha256": "5019b38118ede36972650c5a88fc5850877bce7a335334e5204785c92d230a42",
+    "point_count": 1920,
+    "original_attachment_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\observations\\vision_training\\continuous_review\\native_cut_pipeline\\user_ice_contact_correction\\iceedge_user_original.png",
+    "original_attachment_sha256": "e3724b9c02308c2987e9318dbe704691133ebf8386d31c6b10408c1e31d4c9a7"
+  },
+  "definition": {
+    "primary_boundary": "visible_lower_edge_of_board_bottom_strip_at_ice",
+    "bottom_strip_material_in_reference": "very_narrow_pale_yellow_board_bottom_strip",
+    "bottom_strip_region_belongs_to": "board",
+    "bottom_strip_is_ice": false,
+    "upper_strip_edge": "board_internal_material_interface_not_ice_contact",
+    "lower_strip_edge": "ice_contact_board_bottom_strip_to_ice",
+    "boundary_determined_by": "actual board structure and source RGB material order; never just highest gradient or ice mask contour",
+    "unseen_events": "reuse material-role distinction; identify actual local board materials instead of assuming every rink has yellow strip",
+    "missing_or_occluded_boundary": "retain user geometry authority; no invented visible source measurement"
+  },
+  "authority_scope": {
+    "user_native_boundary_locus_authoritative": true,
+    "semantic_role_authoritative": true,
+    "assistant_candidate_pixels_automatically_confirmed": false,
+    "historical_human_drawings_automatically_superseded": false,
+    "source_pixel_quality_and_visibility": "verify separately in original RGB"
+  }
+}

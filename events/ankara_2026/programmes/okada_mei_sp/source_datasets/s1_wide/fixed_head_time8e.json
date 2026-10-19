@@ -1,0 +1,133 @@
+{
+  "schema": "rinkspace.exact-current-native-time-continuation.v1",
+  "configuration_status": "ready",
+  "entry": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_time_cache.py",
+    "sha256": "b11df9b00822f7ab8d16cb8edb12c2cbfd1c4a0bdac87c65a99e18bd764417b5"
+  },
+  "cache_adapter": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\first_shot_joint_cache_resume.py",
+    "sha256": "c4f8e218cd41b3645e97e243f8811e4a19a89f7d3e59030e30d4977eddffa8ea"
+  },
+  "frozen_producers": [
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\first_shot_joint_cache_resume.py",
+      "sha256": "c4f8e218cd41b3645e97e243f8811e4a19a89f7d3e59030e30d4977eddffa8ea"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_time_cache.py",
+      "sha256": "b11df9b00822f7ab8d16cb8edb12c2cbfd1c4a0bdac87c65a99e18bd764417b5"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_time_source.py",
+      "sha256": "70e5cdfddd47faa646280c10795737135e2ab04c4cbe3e1294f177364a3d7f52"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_fixed_head_time.py",
+      "sha256": "1adb80f7ff1138547a41d0ec6ad2a1f61e06f2b5e7a58ebf9f064d8a4c98ba3a"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\first_shot_time_successor.py",
+      "sha256": "45f573b03d24f509741f43d309d0f1bbd70c2d41c3c290918ef49b9009c8a4d8"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\first_shot_joint_stage_runtime.py",
+      "sha256": "71f8736879334397febfe07f7305c9a5e5ac20b3612700f83eb7b0c43969a499"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\first_shot_jacobian_reuse.py",
+      "sha256": "e73d1f2c346c5a501429bd46e0693a5725dbb310a25d6ef4c7e57e84d91d9aac"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\first_shot_prediction_refresh.py",
+      "sha256": "d99f679c74cc0a18460395a886f3f8ce9114cb7da41e786d2e528a575285eff6"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\legacy\\structured_programme_source_candidate\\lagged_jacobian_source.py",
+      "sha256": "95579444c5bf806f263b99d00b406eaf414afb3e82ba2a4463bde9b45a6cd432"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\legacy\\snapshot\\three_frame_refit\\program_tracking\\z190_joint_source_solver.py",
+      "sha256": "f1a312495d31f31643084b641da5b99243da40805dc7937ad6fedd1fc62f27d0"
+    }
+  ],
+  "reconstruct_source_manifest": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\s1_wide\\fixed_head_time8d.json",
+    "sha256": "a1c59eafa7902db76731770365da317a94701db59dfe49e80a83d0a4328168d2"
+  },
+  "current_direction_configurations": [
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\s1_t8e_fd8.json",
+      "sha256": "28b8bc0b9fddc7cc20995dd464a83a9650118f9595bbc0352ea7d62966d8e4ff"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\s1_t8e_fd9.json",
+      "sha256": "4e8097a7a161f4391412a585cbd3cbae617cba92f0a631b795863ed0edcdd2bd"
+    }
+  ],
+  "completed_synthetic_contract_QA": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\time8e_QA2\\report.json",
+    "sha256": "efe3baa690c5a466340eab7b3d3e89f7698b211f61f0b035e0dc69e87c31a8f6"
+  },
+  "planned_output": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time8e",
+  "goal": "保留8d完整接受状态与所有历史修正，复用正常handoff刚生成的同q完整J，继续联合修复第一镜头真实时间相机运动与贴合；全镜头未验收。",
+  "policy": {
+    "source_facts_rows_weights_and_physical_parameter_domain_unchanged": true,
+    "all_final_q_aux_lambda_fraction_preserved_byte_exact": true,
+    "no_T_reinitialization_or_new_temporal_prior": true,
+    "cache_only_exact_q_and_no_profile_callback": true,
+    "full_current_r_W_masks_scales_ledgers_loss_shadow_required": true,
+    "actual_current_q_local_FD_steps": [
+      1e-08,
+      1e-09
+    ],
+    "original_FD_thresholds_unchanged": true,
+    "no_second_T_chain": true,
+    "no_duplicate_CSR_export": true,
+    "current_reduction_ratio": 0.25,
+    "no_J_age_or_iteration_cap": true,
+    "owner_or_optimizer_not_started": true,
+    "stop_or_control_not_sent_by_this_preparation": true
+  },
+  "completed_parent_branch": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time8d\\result.json",
+    "sha256": "827bb13536dd1fc8ba59404bdd2a6c99c4e99b77f284d89010cb85b40d164ea0"
+  },
+  "parent_owner_shutdown": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\time8d_shutdown.json",
+    "sha256": "0dd2bb68085aa39ca8996aaa8ea30b945ead2003ad24f1732af16a610622b3e0"
+  },
+  "parent_checkpoint": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time8d\\public_solver\\latest_accepted_state.npz",
+    "sha256": "e83cb95b8cd95fabb4630e97789a33b3f1bbf436308dc2941ede06c1a9271b64"
+  },
+  "parent_complete_state": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time8d\\final_complete_state.npz",
+    "sha256": "a65414bcd1b7c2d5b6bf1659a4f14cabc9d893b1d7a959ec83446136e13a1c21"
+  },
+  "parent_accepted_report": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time8d\\current.json",
+    "sha256": "9df5a15d88d42268811cacaeed2ca8a6861cabc2f4ac132bb78b22fab5167f9c"
+  },
+  "parent_source_cache": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time8d\\source_J_cache\\latest.json",
+    "sha256": "51a3f369ab49c7caa32fcc3883a48932c4760a9181c2b8310f4d81fa40fd7ccc"
+  },
+  "parent_source_inventory": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time8d\\immutable_programme_source_inventory.npz",
+    "sha256": "64ccb91aca92a51399f6a01c8fdd8ce8d1aa811274531843f2cfe5ca54e38449"
+  },
+  "parent_media_manifest": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time8d\\media_manifest.json",
+    "sha256": "096a22939cc0feaa155892c71806bf885c8d83a3f7e9c2db730d53bb84a7ebda"
+  },
+  "parent_q_sha256": "220e21438cd2ba62362cb11a06adfb8b2776a5d3cb153cf7282759a27ef16ab3",
+  "generator": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\prepare_time8e.py",
+    "sha256": "55e95abfa88e35c513d02ec7653b839499a57678c32d0f3b6eb51c2dc7824bb6"
+  },
+  "parent_damping": 1e-12,
+  "parent_next_line_search_fraction": 1.0,
+  "inherited_auxiliary_count": 386,
+  "no_profile_checkpoint_arrays": true
+}

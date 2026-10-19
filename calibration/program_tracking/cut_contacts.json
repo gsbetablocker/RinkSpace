@@ -1,0 +1,308 @@
+{
+  "schema": "rinkspace.program-cut-contacts.v1",
+  "source_sha256": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891",
+  "image_size_wh": [
+    1920,
+    1080
+  ],
+  "method": "Manual inspection of original native-resolution frames immediately across all nine reviewed cuts; candidate blade/ice pixels are approximate because the blades are motion blurred.",
+  "cuts": [
+    {
+      "cut_index": 0,
+      "before_pts": 229113856,
+      "after_pts": 229114112,
+      "before": {
+        "contact_state": "visible_contact",
+        "candidates": [
+          [
+            829,
+            912
+          ]
+        ],
+        "note": "one blade clearly down"
+      },
+      "after": {
+        "contact_state": "not_visible",
+        "candidates": [],
+        "note": "tight face/upper-body close-up excludes both skates"
+      },
+      "direct_ground_seam": "unusable"
+    },
+    {
+      "cut_index": 1,
+      "before_pts": 229497344,
+      "after_pts": 229497600,
+      "before": {
+        "contact_state": "visible_contact",
+        "candidates": [
+          [
+            844,
+            834
+          ],
+          [
+            971,
+            838
+          ]
+        ],
+        "note": "both blade candidates visible; load-bearing identity uncertain"
+      },
+      "after": {
+        "contact_state": "visible_contact",
+        "candidates": [
+          [
+            700,
+            926
+          ]
+        ],
+        "note": "one blade clearly down"
+      },
+      "direct_ground_seam": "candidate_set_only"
+    },
+    {
+      "cut_index": 2,
+      "before_pts": 229671424,
+      "after_pts": 229671680,
+      "before": {
+        "contact_state": "visible_contact",
+        "candidates": [
+          [
+            805,
+            806
+          ],
+          [
+            1074,
+            813
+          ]
+        ],
+        "note": "two blades near the ice; right blade contact uncertain"
+      },
+      "after": {
+        "contact_state": "visible_contact",
+        "candidates": [
+          [
+            676,
+            861
+          ],
+          [
+            882,
+            862
+          ]
+        ],
+        "note": "two blades near the ice; supporting foot not confidently matched across angles"
+      },
+      "direct_ground_seam": "candidate_set_only"
+    },
+    {
+      "cut_index": 3,
+      "before_pts": 229701888,
+      "after_pts": 229702144,
+      "before": {
+        "contact_state": "visible_contact",
+        "candidates": [
+          [
+            575,
+            910
+          ]
+        ],
+        "note": "single clear support blade; other leg extended behind",
+        "previous_agent_candidates": [
+          [
+            575,
+            899
+          ]
+        ],
+        "pixel_review": "Native-source enlarged blade review, 2026-09-25: choose blade lower ice-contact edge rather than holder. Still approximate under blur; not a user annotation."
+      },
+      "after": {
+        "contact_state": "visible_contact",
+        "candidates": [
+          [
+            907,
+            748
+          ]
+        ],
+        "note": "single clear support blade; other leg raised"
+      },
+      "direct_ground_seam": "usable_soft",
+      "selected_candidate_indices": [
+        0,
+        0
+      ]
+    },
+    {
+      "cut_index": 4,
+      "before_pts": 229945600,
+      "after_pts": 229945856,
+      "before": {
+        "contact_state": "visible_contact",
+        "candidates": [
+          [
+            1053,
+            964
+          ]
+        ],
+        "note": "front support blade down; trailing leg raised",
+        "previous_agent_candidates": [
+          [
+            1053,
+            961
+          ]
+        ],
+        "pixel_review": "Native-source enlarged blade review, 2026-09-25: choose blade lower ice-contact edge rather than holder. Still approximate under blur; not a user annotation."
+      },
+      "after": {
+        "contact_state": "visible_contact",
+        "candidates": [
+          [
+            980,
+            769
+          ]
+        ],
+        "note": "front support blade down; trailing blade near ice but not selected",
+        "previous_agent_candidates": [
+          [
+            980,
+            762
+          ]
+        ],
+        "pixel_review": "Native-source enlarged blade review, 2026-09-25: choose blade lower ice-contact edge rather than holder. Still approximate under blur; not a user annotation."
+      },
+      "direct_ground_seam": "usable_soft",
+      "selected_candidate_indices": [
+        0,
+        0
+      ]
+    },
+    {
+      "cut_index": 5,
+      "before_pts": 230368768,
+      "after_pts": 230369024,
+      "before": {
+        "contact_state": "ambiguous",
+        "candidates": [
+          [
+            891,
+            795
+          ],
+          [
+            958,
+            800
+          ]
+        ],
+        "note": "two overlapping feet at end of spin, motion blur obscures load and blade contact"
+      },
+      "after": {
+        "contact_state": "ambiguous",
+        "candidates": [
+          [
+            920,
+            934
+          ],
+          [
+            1008,
+            936
+          ]
+        ],
+        "note": "crossed blurred feet; contact and foot identity unresolved"
+      },
+      "direct_ground_seam": "candidate_set_only"
+    },
+    {
+      "cut_index": 6,
+      "before_pts": 230517760,
+      "after_pts": 230518016,
+      "before": {
+        "contact_state": "visible_contact",
+        "candidates": [
+          [
+            747,
+            1027
+          ],
+          [
+            889,
+            1036
+          ]
+        ],
+        "note": "two near-ice blades, load-bearing foot uncertain"
+      },
+      "after": {
+        "contact_state": "visible_contact",
+        "candidates": [
+          [
+            510,
+            866
+          ],
+          [
+            619,
+            870
+          ]
+        ],
+        "note": "two near-ice blades, same-foot correspondence uncertain"
+      },
+      "direct_ground_seam": "candidate_set_only"
+    },
+    {
+      "cut_index": 7,
+      "before_pts": 230898432,
+      "after_pts": 230898688,
+      "before": {
+        "contact_state": "visible_contact",
+        "candidates": [
+          [
+            1025,
+            827
+          ]
+        ],
+        "note": "single support blade; other foot raised"
+      },
+      "after": {
+        "contact_state": "visible_contact",
+        "candidates": [
+          [
+            657,
+            872
+          ]
+        ],
+        "note": "single support blade; other foot raised",
+        "previous_agent_candidates": [
+          [
+            657,
+            865
+          ]
+        ],
+        "pixel_review": "Native-source enlarged blade review, 2026-09-25: choose blade lower ice-contact edge rather than holder. Still approximate under blur; not a user annotation."
+      },
+      "direct_ground_seam": "usable_soft",
+      "selected_candidate_indices": [
+        0,
+        0
+      ]
+    },
+    {
+      "cut_index": 8,
+      "before_pts": 231012864,
+      "after_pts": 231013120,
+      "before": {
+        "contact_state": "visible_contact",
+        "candidates": [
+          [
+            1077,
+            938
+          ]
+        ],
+        "note": "single support blade, front free foot raised"
+      },
+      "after": {
+        "contact_state": "ambiguous",
+        "candidates": [
+          [
+            927,
+            723
+          ]
+        ],
+        "note": "apparent support skate at lower resolution; exact blade contact obscured"
+      },
+      "direct_ground_seam": "candidate_set_only"
+    }
+  ]
+}

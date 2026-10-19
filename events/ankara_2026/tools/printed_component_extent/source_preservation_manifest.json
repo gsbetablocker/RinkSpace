@@ -1,0 +1,456 @@
+{
+  "schema": "rinkspace.source-preservation.v1",
+  "preserved_on_client_date": "2026-10-11",
+  "status": "preserved_not_activated",
+  "original_directory": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\manual_constraint_dependency_fd_20261009\\printed_component_extent_candidate",
+  "preserved_directory": "events/ankara_2026/tools/printed_component_extent",
+  "scope": "Four project-owned Data-only helper sources required by existing diagnostics; original sources, runtime imports and solver registry are unchanged.",
+  "file_count": 4,
+  "all_source_states_stable": true,
+  "all_copies_byte_identical": true,
+  "static_project_import_closure_resolved": true,
+  "missing_project_source_dependencies": [],
+  "third_party_dependency_roots": [
+    "numpy",
+    "scipy"
+  ],
+  "dynamic_source_load": {
+    "loader_source": "verify_actual_printed_extent_candidate.py",
+    "relative_file": "native_board_edge_source.py",
+    "module_name": "structured_programme_source_candidate._data_printed_extent_candidate",
+    "preserved": true,
+    "formal_solver_source_replaced": false
+  },
+  "records": [
+    {
+      "original_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\manual_constraint_dependency_fd_20261009\\printed_component_extent_candidate\\native_board_edge_source.py",
+      "original_resolved_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\manual_constraint_dependency_fd_20261009\\printed_component_extent_candidate\\native_board_edge_source.py",
+      "preserved_path": "events/ankara_2026/tools/printed_component_extent/native_board_edge_source.py",
+      "sha256": "0390ff4df4f1c9188fddf9afcc7eb3d38c8ec85af4a06c829b4de7b31c238f1f",
+      "size_bytes": 36421,
+      "source_state_before_read": {
+        "size_bytes": 36421,
+        "mtime_ns": 1791500615249380100,
+        "device": 342099257,
+        "inode": 562949954572785
+      },
+      "source_state_after_read": {
+        "size_bytes": 36421,
+        "mtime_ns": 1791500615249380100,
+        "device": 342099257,
+        "inode": 562949954572785
+      },
+      "source_state_after_copy": {
+        "size_bytes": 36421,
+        "mtime_ns": 1791500615249380100,
+        "device": 342099257,
+        "inode": 562949954572785
+      },
+      "source_state_after_final_read": {
+        "size_bytes": 36421,
+        "mtime_ns": 1791500615249380100,
+        "device": 342099257,
+        "inode": 562949954572785
+      },
+      "source_read_and_copy_stable": true,
+      "original_sha256_after_copy": "0390ff4df4f1c9188fddf9afcc7eb3d38c8ec85af4a06c829b4de7b31c238f1f",
+      "preserved_sha256": "0390ff4df4f1c9188fddf9afcc7eb3d38c8ec85af4a06c829b4de7b31c238f1f",
+      "byte_identical": true,
+      "direct_imports": [
+        {
+          "module": "collections",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "copy",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "hashlib",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "json",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "numpy",
+          "kind": "third_party_environment_dependency"
+        },
+        {
+          "module": "pathlib",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "rinkspace.vision_camera_initialization",
+          "kind": "existing_owned_solver_source",
+          "path": "src/rinkspace/vision_camera_initialization.py",
+          "sha256": "76cd1679ae2cbfdd5bd08a97db223588081d38ba578fee3191acc1d90543a18f"
+        },
+        {
+          "module": "scipy.sparse",
+          "kind": "third_party_environment_dependency"
+        },
+        {
+          "module": "source_edge_intervals",
+          "kind": "existing_owned_solver_source",
+          "path": "calibration/solver_runtime/legacy/snapshot/three_frame_refit/program_tracking/source_edge_intervals.py",
+          "sha256": "c28bdce7806ad4e14f9f726043abe430a6678b91ea5c3dace2550b748da0f71e"
+        },
+        {
+          "module": "structured_programme_source_candidate.fixed_pivot_positive_domain_fd",
+          "kind": "existing_owned_solver_source",
+          "path": "calibration/solver_runtime/legacy/structured_programme_source_candidate/fixed_pivot_positive_domain_fd.py",
+          "sha256": "0c557568645eec2188b47e929e355e4cec6801ca49d7687dc8687d06211519a2"
+        },
+        {
+          "module": "structured_programme_source_candidate.native_camera_local",
+          "kind": "existing_owned_solver_source",
+          "path": "calibration/solver_runtime/legacy/structured_programme_source_candidate/native_camera_local.py",
+          "sha256": "2fefb0cf4dd99e1be07dd256e01b499c1093bbae40207b72292e4327ac681c71"
+        },
+        {
+          "module": "structured_programme_source_candidate.native_ice_curve_source",
+          "kind": "existing_owned_solver_source",
+          "path": "calibration/solver_runtime/legacy/structured_programme_source_candidate/native_ice_curve_source.py",
+          "sha256": "f1086a94335e4d7540d2f9940288d64641be45132725e0e3f83f04159c0e8d7d"
+        },
+        {
+          "module": "structured_programme_source_candidate.paired_programme_chart",
+          "kind": "existing_owned_solver_source",
+          "path": "calibration/solver_runtime/legacy/structured_programme_source_candidate/paired_programme_chart.py",
+          "sha256": "89bd3ae842992fd7698c691e69ed702ffb043135582487b4a5dc4413e4c1b571"
+        },
+        {
+          "module": "z190_source_camera_diagnostic",
+          "kind": "existing_owned_solver_source",
+          "path": "calibration/solver_runtime/legacy/snapshot/three_frame_refit/program_tracking/z190_source_camera_diagnostic.py",
+          "sha256": "3bbfd1654d5b80ce71850878dfa85ea44dc074a63479d2d2c4681e2ce2307046"
+        },
+        {
+          "module": "z190_streaming_source_normal",
+          "kind": "existing_owned_solver_source",
+          "path": "calibration/solver_runtime/legacy/snapshot/three_frame_refit/program_tracking/z190_streaming_source_normal.py",
+          "sha256": "cb166ffcf85abcbe44420e7493973b39cd88bf3fa9f78011a9fc83d205b15be0"
+        }
+      ]
+    },
+    {
+      "original_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\manual_constraint_dependency_fd_20261009\\printed_component_extent_candidate\\verify_actual_printed_extent_candidate.py",
+      "original_resolved_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\manual_constraint_dependency_fd_20261009\\printed_component_extent_candidate\\verify_actual_printed_extent_candidate.py",
+      "preserved_path": "events/ankara_2026/tools/printed_component_extent/verify_actual_printed_extent_candidate.py",
+      "sha256": "ea4e79143a9953726d64455520cd6f5bc39e63b1d84ffe8e2341baa4da730c0a",
+      "size_bytes": 13337,
+      "source_state_before_read": {
+        "size_bytes": 13337,
+        "mtime_ns": 1791507536325146900,
+        "device": 342099257,
+        "inode": 8444249302465092
+      },
+      "source_state_after_read": {
+        "size_bytes": 13337,
+        "mtime_ns": 1791507536325146900,
+        "device": 342099257,
+        "inode": 8444249302465092
+      },
+      "source_state_after_copy": {
+        "size_bytes": 13337,
+        "mtime_ns": 1791507536325146900,
+        "device": 342099257,
+        "inode": 8444249302465092
+      },
+      "source_state_after_final_read": {
+        "size_bytes": 13337,
+        "mtime_ns": 1791507536325146900,
+        "device": 342099257,
+        "inode": 8444249302465092
+      },
+      "source_read_and_copy_stable": true,
+      "original_sha256_after_copy": "ea4e79143a9953726d64455520cd6f5bc39e63b1d84ffe8e2341baa4da730c0a",
+      "preserved_sha256": "ea4e79143a9953726d64455520cd6f5bc39e63b1d84ffe8e2341baa4da730c0a",
+      "byte_identical": true,
+      "direct_imports": [
+        {
+          "module": "argparse",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "calibration.solver_runtime",
+          "kind": "existing_project_source",
+          "path": "calibration/solver_runtime/__init__.py",
+          "sha256": "336c8c01defb02e07dc9e7e57f9001980abc8e2377da02fd160cc6f21bdc8a5d"
+        },
+        {
+          "module": "collections",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "copy",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "hashlib",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "importlib.util",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "json",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "numpy",
+          "kind": "third_party_environment_dependency"
+        },
+        {
+          "module": "os",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "pathlib",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "rinkspace.vision_camera_initialization",
+          "kind": "existing_owned_solver_source",
+          "path": "src/rinkspace/vision_camera_initialization.py",
+          "sha256": "76cd1679ae2cbfdd5bd08a97db223588081d38ba578fee3191acc1d90543a18f"
+        },
+        {
+          "module": "structured_programme_source_candidate.native_board_edge_source",
+          "kind": "existing_owned_solver_source",
+          "path": "calibration/solver_runtime/legacy/structured_programme_source_candidate/native_board_edge_source.py",
+          "sha256": "417039194c1d608ef09c8004090b66abe072a382adb90837f444bde6da503bd9"
+        },
+        {
+          "module": "structured_programme_source_candidate.source_block_target_extension_replay",
+          "kind": "existing_owned_solver_source",
+          "path": "calibration/solver_runtime/legacy/structured_programme_source_candidate/source_block_target_extension_replay.py",
+          "sha256": "e35c323080a1f6300209ab1310b763a22591af59f531d3d298ca53d511e113aa"
+        },
+        {
+          "module": "sys",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "time",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "verify_current_native_primitives_20261007",
+          "kind": "existing_project_source",
+          "path": "scripts/diagnostics/verify_current_native_primitives_20261007.py",
+          "sha256": "4e977f7b046abde0d4010a9b174d07c4b2d05eec2300e22688600bdedd08c19a"
+        },
+        {
+          "module": "z190_source_camera_diagnostic",
+          "kind": "existing_owned_solver_source",
+          "path": "calibration/solver_runtime/legacy/snapshot/three_frame_refit/program_tracking/z190_source_camera_diagnostic.py",
+          "sha256": "3bbfd1654d5b80ce71850878dfa85ea44dc074a63479d2d2c4681e2ce2307046"
+        }
+      ]
+    },
+    {
+      "original_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\manual_constraint_dependency_fd_20261009\\printed_component_extent_candidate\\audit_user_left_goal_line_and_ad_edges_candidate.py",
+      "original_resolved_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\manual_constraint_dependency_fd_20261009\\printed_component_extent_candidate\\audit_user_left_goal_line_and_ad_edges_candidate.py",
+      "preserved_path": "events/ankara_2026/tools/printed_component_extent/audit_user_left_goal_line_and_ad_edges_candidate.py",
+      "sha256": "35072647f49b134390649cdae8f4ecd450499a5beedcad327aacec8463c48eb7",
+      "size_bytes": 17653,
+      "source_state_before_read": {
+        "size_bytes": 17653,
+        "mtime_ns": 1791511267956487000,
+        "device": 342099257,
+        "inode": 1688849861416611
+      },
+      "source_state_after_read": {
+        "size_bytes": 17653,
+        "mtime_ns": 1791511267956487000,
+        "device": 342099257,
+        "inode": 1688849861416611
+      },
+      "source_state_after_copy": {
+        "size_bytes": 17653,
+        "mtime_ns": 1791511267956487000,
+        "device": 342099257,
+        "inode": 1688849861416611
+      },
+      "source_state_after_final_read": {
+        "size_bytes": 17653,
+        "mtime_ns": 1791511267956487000,
+        "device": 342099257,
+        "inode": 1688849861416611
+      },
+      "source_read_and_copy_stable": true,
+      "original_sha256_after_copy": "35072647f49b134390649cdae8f4ecd450499a5beedcad327aacec8463c48eb7",
+      "preserved_sha256": "35072647f49b134390649cdae8f4ecd450499a5beedcad327aacec8463c48eb7",
+      "byte_identical": true,
+      "direct_imports": [
+        {
+          "module": "argparse",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "calibration.solver_runtime",
+          "kind": "existing_project_source",
+          "path": "calibration/solver_runtime/__init__.py",
+          "sha256": "336c8c01defb02e07dc9e7e57f9001980abc8e2377da02fd160cc6f21bdc8a5d"
+        },
+        {
+          "module": "copy",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "hashlib",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "json",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "numpy",
+          "kind": "third_party_environment_dependency"
+        },
+        {
+          "module": "os",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "pathlib",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "structured_programme_source_candidate.current_wide_source",
+          "kind": "existing_owned_solver_source",
+          "path": "calibration/solver_runtime/legacy/structured_programme_source_candidate/current_wide_source.py",
+          "sha256": "7d1b3830312654abd6214a8dc599d8612c07089cc034bbc65f01d64a0e641921"
+        },
+        {
+          "module": "structured_programme_source_candidate.human_stroke_truth",
+          "kind": "existing_owned_solver_source",
+          "path": "calibration/solver_runtime/legacy/structured_programme_source_candidate/human_stroke_truth.py",
+          "sha256": "c2afe29ac73b30d1b10f29c62fe9bcbfaed44ebe3454c54515782ee1952925d5"
+        },
+        {
+          "module": "structured_programme_source_candidate.native_board_edge_source",
+          "kind": "existing_owned_solver_source",
+          "path": "calibration/solver_runtime/legacy/structured_programme_source_candidate/native_board_edge_source.py",
+          "sha256": "417039194c1d608ef09c8004090b66abe072a382adb90837f444bde6da503bd9"
+        },
+        {
+          "module": "structured_programme_source_candidate.native_ice_curve_source",
+          "kind": "existing_owned_solver_source",
+          "path": "calibration/solver_runtime/legacy/structured_programme_source_candidate/native_ice_curve_source.py",
+          "sha256": "f1086a94335e4d7540d2f9940288d64641be45132725e0e3f83f04159c0e8d7d"
+        },
+        {
+          "module": "structured_programme_source_candidate.source_block_target_extension_replay",
+          "kind": "existing_owned_solver_source",
+          "path": "calibration/solver_runtime/legacy/structured_programme_source_candidate/source_block_target_extension_replay.py",
+          "sha256": "e35c323080a1f6300209ab1310b763a22591af59f531d3d298ca53d511e113aa"
+        },
+        {
+          "module": "sys",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "time",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "verify_actual_printed_extent_candidate",
+          "kind": "preserved_local_source",
+          "path": "events/ankara_2026/tools/printed_component_extent/verify_actual_printed_extent_candidate.py"
+        }
+      ]
+    },
+    {
+      "original_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\manual_constraint_dependency_fd_20261009\\printed_component_extent_candidate\\existing_LOW_circle_material_owner_light.py",
+      "original_resolved_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\manual_constraint_dependency_fd_20261009\\printed_component_extent_candidate\\existing_LOW_circle_material_owner_light.py",
+      "preserved_path": "events/ankara_2026/tools/printed_component_extent/existing_LOW_circle_material_owner_light.py",
+      "sha256": "fad6c48e692298b88bc6d1f1056a6211e212ff48fa8126490e8942e11bb43f58",
+      "size_bytes": 2558,
+      "source_state_before_read": {
+        "size_bytes": 2558,
+        "mtime_ns": 1791525543354515900,
+        "device": 342099257,
+        "inode": 11258999069580507
+      },
+      "source_state_after_read": {
+        "size_bytes": 2558,
+        "mtime_ns": 1791525543354515900,
+        "device": 342099257,
+        "inode": 11258999069580507
+      },
+      "source_state_after_copy": {
+        "size_bytes": 2558,
+        "mtime_ns": 1791525543354515900,
+        "device": 342099257,
+        "inode": 11258999069580507
+      },
+      "source_state_after_final_read": {
+        "size_bytes": 2558,
+        "mtime_ns": 1791525543354515900,
+        "device": 342099257,
+        "inode": 11258999069580507
+      },
+      "source_read_and_copy_stable": true,
+      "original_sha256_after_copy": "fad6c48e692298b88bc6d1f1056a6211e212ff48fa8126490e8942e11bb43f58",
+      "preserved_sha256": "fad6c48e692298b88bc6d1f1056a6211e212ff48fa8126490e8942e11bb43f58",
+      "byte_identical": true,
+      "direct_imports": [
+        {
+          "module": "numpy",
+          "kind": "third_party_environment_dependency"
+        },
+        {
+          "module": "pathlib",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "structured_programme_source_candidate.course_patterns_independent_placements",
+          "kind": "existing_owned_solver_source",
+          "path": "calibration/solver_runtime/legacy/structured_programme_source_candidate/course_patterns_independent_placements.py",
+          "sha256": "7f601ca2bb5533522f07288a15d741717bcaa2363cd32a3562bf76b45c358268"
+        },
+        {
+          "module": "structured_programme_source_candidate.current_full_source",
+          "kind": "existing_owned_solver_source",
+          "path": "calibration/solver_runtime/legacy/structured_programme_source_candidate/current_full_source.py",
+          "sha256": "f8d9f9e08665948e6828ac806a716a1cd128434643c83f2f765f4e25726a40de"
+        },
+        {
+          "module": "structured_programme_source_candidate.native_board_circle_source",
+          "kind": "existing_owned_solver_source",
+          "path": "calibration/solver_runtime/legacy/structured_programme_source_candidate/native_board_circle_source.py",
+          "sha256": "3c26578c67b9e35995f3aff5b764f590cbd535e82d7eac12ea6a2bf2dc71f057"
+        },
+        {
+          "module": "structured_programme_source_candidate.native_board_material_point_source",
+          "kind": "existing_owned_solver_source",
+          "path": "calibration/solver_runtime/legacy/structured_programme_source_candidate/native_board_material_point_source.py",
+          "sha256": "e2879516bc2b495f3a32bd8f31bdf819b4d819aadd136a4c167bce3806dad95d"
+        },
+        {
+          "module": "types",
+          "kind": "python_standard_library"
+        },
+        {
+          "module": "z190_shared_board_pattern_source",
+          "kind": "existing_owned_solver_source",
+          "path": "calibration/solver_runtime/legacy/snapshot/three_frame_refit/program_tracking/z190_shared_board_pattern_source.py",
+          "sha256": "c7ce7a0d7349ca86da5b1911a11e3fb249eafb299aa0ef6d41dbe40760df2596"
+        }
+      ]
+    }
+  ],
+  "activation_limits": [
+    "Existing diagnostics still import from original Data addresses.",
+    "Hardcoded project and Data resource addresses must be bridged before switching entries.",
+    "The dynamic candidate module must retain its structured_programme_source_candidate module identity for relative imports.",
+    "__file__-relative source/resource semantics need separate source and resource bindings.",
+    "These modules were not imported or executed for this audit; original diagnostic behavior and accuracy are unverified."
+  ]
+}

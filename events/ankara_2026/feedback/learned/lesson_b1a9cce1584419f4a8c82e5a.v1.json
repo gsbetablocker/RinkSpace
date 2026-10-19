@@ -1,0 +1,179 @@
+{
+  "assertions": {
+    "current_frame_native_reread_required": true,
+    "dimension_claims": {
+      "measurement_operator": {
+        "evidence_refs": [
+          "72587b1e9e8109c2e116a10b7886d6134ae9b22b3c176555f4f74740bfc4b0d9"
+        ],
+        "status": "verified",
+        "value": "paint_center_complete_two_flanks_requires_96px_halfwidth_here"
+      },
+      "physical_instance": {
+        "evidence_refs": [
+          "72587b1e9e8109c2e116a10b7886d6134ae9b22b3c176555f4f74740bfc4b0d9"
+        ],
+        "status": "verified",
+        "value": "ice.C:segment0_current_native_context"
+      },
+      "semantic_class": {
+        "evidence_refs": [
+          "72587b1e9e8109c2e116a10b7886d6134ae9b22b3c176555f4f74740bfc4b0d9"
+        ],
+        "status": "verified",
+        "value": "ordinary_finite_width_red_ice_paint"
+      },
+      "visibility": {
+        "evidence_refs": [
+          "72587b1e9e8109c2e116a10b7886d6134ae9b22b3c176555f4f74740bfc4b0d9"
+        ],
+        "status": "verified",
+        "value": "both_actual_red_stroke_flanks_visible"
+      }
+    },
+    "episode_resolution_type": "operator_error",
+    "episode_source": {
+      "coordinate_domain": "native_pixels",
+      "native_hw": [
+        1080,
+        1920
+      ],
+      "pts": 2178048,
+      "time_base": "1/12800",
+      "video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+    },
+    "generalization_status": "source_scoped_advisory_episode_only",
+    "lesson": {
+      "apply_only_after_current_C_identity_and_mask_check": true,
+      "minimum_search_change_is_not_identity_or_source_qualification": true,
+      "native_time_base": "1/12800",
+      "normal_search_halfwidth_px": 96,
+      "old_failure_retained": true,
+      "reader_check": "s09_complete_C_stroke_two_ordered_flanks_96px",
+      "reviewed_native_pts": [
+        1915392,
+        1923072,
+        2168576,
+        2178048,
+        2188032,
+        2198528,
+        2206464,
+        2217472,
+        2226944,
+        2233856,
+        2244608,
+        2255872,
+        2263552,
+        2273792,
+        2282496,
+        2291968,
+        2302976,
+        2310656,
+        2321408,
+        2330368,
+        2339072,
+        2350080,
+        2356736,
+        2366464,
+        2385664,
+        2397440,
+        2406144,
+        2414848
+      ],
+      "shot_id": "s09",
+      "source_video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "summary": "s09 current native C red stroke can exceed the narrow 48 px profile; acquire both complete material flanks with the separate 192 px profile before midpoint",
+      "target_id": "ice.C:segment0"
+    },
+    "next_matching_frame_action": "reread_unresolved_dimensions_keep_partial_claims",
+    "position_truth_for_future_frame": "unknown_until_current_native_review",
+    "regression_request": {
+      "expected_action": "preserve_verified_dimensions_without_inventing_position",
+      "source": {
+        "coordinate_domain": "native_pixels",
+        "native_hw": [
+          1080,
+          1920
+        ],
+        "pts": 2178048,
+        "time_base": "1/12800",
+        "video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+      },
+      "visual_regression_executed": false
+    },
+    "transfer_instance_identity_without_current_context": false,
+    "transfer_pixel_coordinates_to_new_frame": false,
+    "unresolved_dimensions": [
+      "position"
+    ],
+    "verified_dimensions": [
+      "semantic_class",
+      "physical_instance",
+      "measurement_operator",
+      "visibility"
+    ]
+  },
+  "case_id": "lesson_b1a9cce1584419f4a8c82e5a",
+  "evidence_refs": [
+    {
+      "current_frame": true,
+      "independent_of_model": true,
+      "kind": "native_pixels",
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint9_1018a\\native_selected_v2\\000176.png",
+      "sha256": "72587b1e9e8109c2e116a10b7886d6134ae9b22b3c176555f4f74740bfc4b0d9",
+      "source": {
+        "coordinate_domain": "native_pixels",
+        "native_hw": [
+          1080,
+          1920
+        ],
+        "pts": 2178048,
+        "time_base": "1/12800",
+        "video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+      }
+    },
+    {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\hist_s09_v1\\wide_C_failure_review.json",
+      "sha256": "115c3021e3a7adca308fc10658c51af2742a07560009056f6a27f87c897119b0"
+    },
+    {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\hist_s09_v1\\C_wide_review.png",
+      "sha256": "4451edc52bf6c6480d8375f39d179c0acbbae048c5ac09af2ceb5074718c1d4f"
+    }
+  ],
+  "fit_admissible": false,
+  "kind": "recipe",
+  "lineage": {
+    "source_key": "a1d958a030a181e4c0b62c2371a70db3e651e150e325ebae4e72477930448efa",
+    "source_video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+  },
+  "provenance": {
+    "authority": "source_review_declared_by_caller; not_user_confirmation",
+    "created_by": "FeedbackCycle.learn",
+    "evidence_assurance": "source identity and declarations checked; pixel interpretation is not verified by this ledger",
+    "finding_id": "finding_856525acdd29c65f13b30f1c",
+    "resolution_id": "resolution_bbf389945a410b898677057d",
+    "resolution_sha256": "bbf389945a410b898677057d6b1866703e9e45a8af7acd17f4a893a1cad7cb42"
+  },
+  "scope": {
+    "camera_id": "main",
+    "entity_ids": [
+      "ice.C:segment0"
+    ],
+    "event_id": "ankara_2026",
+    "source_video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+  },
+  "split_role": "development",
+  "status": "active",
+  "tags": [
+    "native_ice",
+    "operator_error",
+    "paint_center",
+    "source_reader",
+    "source_recheck",
+    "wide_C"
+  ],
+  "title": "s09 current native C red stroke can exceed the narrow 48 px profile; acquire both complete material flanks with the separate 192 px profile before midpoint",
+  "training_eligible": false,
+  "version": 1
+}

@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rinkspace"
+version = "0.4.0"
+description = "Local spatial analysis for figure skating broadcasts"
+requires-python = ">=3.11"
+dependencies = ["numpy>=1.26,<3", "opencv-python-headless>=4.10,<5", "Pillow>=10,<13", "av>=14,<19"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "PyYAML>=6,<7"]
+advanced = ["scipy>=1.13,<2", "quadprog==0.1.13", "clarabel==0.11.1"]
+acquisition = ["yt-dlp>=2026.8.19"]
+
+[project.scripts]
+rinkspace = "rinkspace.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+rinkspace = ["static/*.html", "static/*.css", "static/*.js"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"

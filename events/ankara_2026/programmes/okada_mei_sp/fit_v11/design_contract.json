@@ -1,0 +1,332 @@
+{
+  "schema_version": "1.1",
+  "artifact_kind": "implementation_contract",
+  "implementation_spec_only": true,
+  "fit_executed": false,
+  "authoritative_spec": "SPEC.html (source: source/spec_body.html)",
+  "precedence": "The integrated SPEC.html and this contract override alternative schedules in technical_notes/",
+  "task": "Okada Mei Turkey SP first shot: one physical camera and one shared scene",
+  "confirmed_facts": [
+    "Sony PXW-Z190",
+    "fixed tripod beside boards",
+    "fixed two-axis pan-tilt head",
+    "standing adult operator",
+    "all source material identities manually reviewed",
+    "all original per-frame UV observations manually reviewed and accepted as valid"
+  ],
+  "input": {
+    "inventory": "immutable_programme_source_inventory.npz",
+    "observations": 182017,
+    "input_snapshot": "input_snapshot.json",
+    "input_array_manifest_sha256": "d7b23de2799cf4da41376b1348da8a46f9d9d47a4b880ff32388010b2b2b3933",
+    "observation_primary_key": [
+      "shot_or_source_clock_id",
+      "native_pts",
+      "source_point_id"
+    ],
+    "within_shot_unique_key": [
+      "native_pts",
+      "source_point_id"
+    ],
+    "unique_source_point_id_only": 6203,
+    "unique_within_shot_composite_keys": 182017,
+    "repeated_source_id_semantics": "never deduplicate by source_point_id or infer a shared world station from repetition",
+    "frames": 1248,
+    "frame_index_inclusive": [
+      1,
+      1248
+    ],
+    "pts_inclusive": [
+      256256,
+      575488
+    ],
+    "time_base": {
+      "numerator": 1,
+      "denominator": 12800
+    },
+    "fps": 50,
+    "image_wh": [
+      1920,
+      1080
+    ],
+    "pixel_centers": "integer coordinates; x right, y down",
+    "geometric_image_center_xy": [
+      959.5,
+      539.5
+    ],
+    "reference_time_seconds": "(native_pts - 256256) / 12800",
+    "required_fields": [
+      "source_point_ids",
+      "source_target_labels",
+      "native_pts",
+      "frame_indices",
+      "source_uv"
+    ],
+    "unknown_metadata": null,
+    "identity_policy": "preserve all records, original UV, material IDs and PTS; no residual-based deletion or relabeling"
+  },
+  "observation_semantics": {
+    "ordinary_curve": "finite 2D localization with unknown legal continuous S; not a fabricated persistent point",
+    "physical_corner_or_endpoint": "fixed world identity; cannot slide along material",
+    "cropped_or_occluded_run_endpoint": "free material station unless independently confirmed as a physical endpoint",
+    "true_profile": "query equality + normal localization + finite query/material interval; no invented profile metadata",
+    "profile_units": "native error e_n in pixels; statistical residual r_n=e_n/sigma_n; pixel budget uses e_n only",
+    "profile_no_intersection_recovery": "retain explicit (s,alpha) with prediction-u-alpha*n=0 and finite interval via equality AL; restore before exact intersection/elimination",
+    "order": "only verified trace/run order; nondecreasing stations allow equality; unverified order stays a candidate",
+    "reverse_coverage": "only for confirmed completely visible and completely sampled contours",
+    "persistent_track": "shared material station only with evidence of the same physical point; repeated source_point_id alone is insufficient"
+  },
+  "pixel_budget": {
+    "frozen_before_optimization": true,
+    "no_profile_no_tolerance_default": {
+      "radius_px": 2,
+      "E_2d": [
+        [
+          4,
+          0
+        ],
+        [
+          0,
+          4
+        ]
+      ],
+      "meaning": "explicit engineering target; not measured sigma or a confidence interval"
+    },
+    "evidence_supported_anisotropy": "freeze from existing localization/profile evidence before any fit",
+    "raw_error": "e_i = native_forward_prediction_i - original_source_uv_i",
+    "normalized_squared_error": "q_i = e_i^T E_i^(-1) e_i",
+    "budget_sq": "b = t^2 >= 0",
+    "inequality": "g_i = q_i - b <= 0",
+    "actual_coverage": "t_hat = sqrt(max_i q_i), independently recomputed from raw predictions",
+    "prohibited": [
+      "fitting E or epsilon",
+      "writing b into E",
+      "subtracting fitted common mode from coverage",
+      "robust loss on support constraints"
+    ],
+    "profile_order_geometry_constraints": "never inflated by b"
+  },
+  "statistics": {
+    "default_loss": "squared error under existing valid grouped W or fixed covariance",
+    "preserve": "group membership, ordering, rank and covariance provenance",
+    "missing_statistics": "declare and freeze an uncalibrated engineering scale; do not call it measured sigma",
+    "robust_default": false,
+    "robust_allowed_only_if": "separate frozen evidence supports the heavy-tail model",
+    "common_mode": "finite declared covariance; use the hierarchical model OR equivalent full W, never both",
+    "motion_evidence": "do not independently reweight flow derived from the same original pixels"
+  },
+  "final_model": {
+    "scene": "one continuous shared ice/board/material scene; static shared logo shape blocks",
+    "gauge": "Z=0; named origin and long-axis direction; fixed handedness/mirror; rink length L=1 unless independently measured",
+    "angle_gauge": "alpha(t_ref)=beta(t_ref)=0 by exact function-value elimination, not one coefficient fixed to zero",
+    "camera": "exact fixed-head chain of spec_body.html; fixed P, shared axes and lever geometry",
+    "time_basis": "native-frame local cubic B-spline controls for alpha, beta, log focal",
+    "nominal_time_controls": "approximately 3*1248 plus boundary extension minus exact gauges",
+    "independent_per_frame_velocities": false,
+    "rolling_shutter": "shared tau; implicit predicted-row projection; safeguarded Newton/Brent; correct implicit derivatives",
+    "RS_missing_root_recovery": "retain explicit v with h_RS=v-pi_y(X,t_k(v))=0 via equality AL; positive depth and true arithmetic domains still checked",
+    "auxiliary_root_semantics": "equivalent equality auxiliaries, not image warp; must restore root/query equalities and pass true implicit non-singular-root replay",
+    "time_boundary": "cover half readout outside endpoint frame centers; no clamping and no interpolation across cuts",
+    "output_affine_or_image_warp": false,
+    "final_delta_xi_parameters": "absent; deleted from both state and factor graph",
+    "default_independent_OIS_or_focus_stream": false,
+    "curve_S": "explicit legal variables optimized jointly with the complete current AL objective"
+  },
+  "initialization": {
+    "seed_sources": [
+      "relative plane registration / supported rotation-zoom approximation",
+      "Euclidean directions and common-plane geometry with explicit atlas upgrade",
+      "independent installation/reference-focal coarse-to-fine search"
+    ],
+    "maximum_initial_seed_candidates": 12,
+    "target_distinct_valid_basins": 3,
+    "insufficient_seed_information": "record limitation; do not fabricate constraints or basins",
+    "bridge": "conditional fallback only; all frames share the scene and low-dimensional optics; first R/log f then supported center directions",
+    "direct_physical_branch": "retain independent installation/geometry fixed-head seeds; skip optional bridge if direct physical candidate passes",
+    "head_retraction": "fit axes/angles and [P,d,a] from bridge as initialization; finite continuation with Exp(delta_xi)*T_head",
+    "redundancy_control": "do not free redundant head and delta streams at zero penalty",
+    "final_retraction": "delete delta_xi, rebuild exact physical graph, reoptimize all original observations",
+    "comparison": "compare local H only on identical declared supports; complete physical states on all original obligations with fixed E/W",
+    "optical_candidates": "finite evidence-supported low-dimensional variants from the same baseline; no untracked parameter release",
+    "primary_route": "surface-specific registration -> offline keyframe graph -> explicit atlas metric upgrade and common camera -> exact fixed head -> full-source native feasibility",
+    "bridge_trigger": "unexplained native mechanical gap after matching optical/output assumptions, or degenerate planar metric upgrade with usable other 3D material support",
+    "physical_state_snapshot": "deep immutable whole-shot state including geometry/S/branches/optics/objective version and raw ledger; no mutable tensor aliases or best-frame splicing"
+  },
+  "phases": {
+    "phase_I": "min b subject to every q_i<=b, physical/support/order/query constraints",
+    "phase_I_budget_residual": "sqrt(2*b+1); half square = b+1/2; no robust loss",
+    "phase_I_secondary_terms": "no arbitrary weighted statistical/smoothing objective blocking feasibility; common mode inactive",
+    "phase_I_early_transition": "physical/support-valid actual t_hat<=1 is sufficient; no need to minimize noise to zero",
+    "phase_II": "fix b=1; minimize F_px + measured priors + time-smoothness, retaining all constraints",
+    "phase_II_multiplier_reset": true,
+    "phase_II_budget_semantics": "may use the original unit budget even if phase I achieved t_hat<1",
+    "completion": "after phase II, independently replay final state and complete acceptance plus exports; one iteration is not completion"
+  },
+  "numerical_backend": {
+    "language": "C++",
+    "scalar_type": "double",
+    "solver": "Ceres",
+    "trust_region_strategy": "LEVENBERG_MARQUARDT",
+    "linear_solver": "SPARSE_NORMAL_CHOLESKY",
+    "sparse_library": "SuiteSparse",
+    "general_constraints": "external PHR AL; not a native Ceres general-constraint solver",
+    "sparse_graph": "retain shared shape, long tracks and correlations; no claimed global banded/O(N) structure",
+    "local_elimination": "First version: Schur of the joint damped LM linear system only, with correct active constraints; leave coupled/active/ambiguous S explicit. A nonlinear S*(x) objective requires a separately derived inner KKT without automatically adding LM damping.",
+    "active_or_ambiguous_S": "keep explicit; finite bounds; verified non-strict order via inequality AL",
+    "jacobian_policy": "fresh at changed state/branch/model/outer lambda/rho; complete S dependence",
+    "trial_policy": "same-objective predicted/actual decrease; reject true-domain failures and shrink trust region; no post-step recovery"
+  },
+  "phr": {
+    "inequality_residual": "max(0,lambda_i+rho*g_i)/sqrt(rho)",
+    "inequality_update": "lambda_i=max(0,lambda_i+rho*g_i)",
+    "equality_residual_if_needed": "sqrt(rho)*(h_j+nu_j/rho); exact parameterization/intersection preferred",
+    "equality_update": "nu_j=nu_j+rho*h_j",
+    "initialization": {
+      "rho": 1,
+      "lambda": 0,
+      "b": ">= max_i q_i"
+    },
+    "progress": "V=max(norm_inf(max(g,-lambda_old/rho)), norm_inf(h_if_present))",
+    "penalty_update": "multiply rho by 5 if V exceeds 0.5*previous_V; otherwise retain",
+    "robust_loss": false,
+    "required_frozen_runtime_limits": [
+      "rho_max",
+      "inner/outer/time budgets",
+      "variable/constraint scales",
+      "primal/equality/complementarity/stationarity arithmetic tolerances"
+    ],
+    "inner_accuracy": "reach configured accuracy or explicitly log and handle declared inexact status before updating multipliers",
+    "stopping": "actual primal/equality violation, nonnegative lambda, complementarity, scaled projected Lagrangian gradient",
+    "phase_I_budget_stationarity": "if b>0, sum(pixel_constraint_lambda) approximately 1; include b-bound multiplier at b=0",
+    "rho_limit_or_factorization_failure": "numerically limited; never a success or global-infeasibility certificate",
+    "suggested_initial_runtime_defaults": {
+      "rho_max": 1000000,
+      "outer_iterations_per_phase": 24,
+      "inner_LM_steps_per_outer": 100,
+      "inner_scaled_stationarity_early": 0.001,
+      "inner_scaled_stationarity_late": 1e-06,
+      "final_q_violation": 0.0001,
+      "final_query_or_RS_equality_px": 0.01,
+      "final_scaled_stationarity_and_complementarity": 1e-05,
+      "meaning": "Engineering starting settings to validate and freeze before production; not measured convergence guarantees"
+    }
+  },
+  "acceptance": {
+    "mandatory": [
+      "all 182017 observations accounted for across 1248 frames",
+      "actual t_hat<=1 within separately logged frozen arithmetic tolerance",
+      "finite/profile/order constraints satisfied",
+      "exact physical graph with delta absent",
+      "outer numerical status independently reported"
+    ],
+    "independent_identifiability": "profile weak physical directions with nuisance reoptimization; data information excludes damping/priors",
+    "all_fit_sources_are_holdout": false,
+    "failures": "preserve best concrete physical state, complete violations and tested hypotheses; do not claim global nonexistence",
+    "one_iteration_only": "diagnostic checkpoint; automatically continue toward full phase II and final acceptance",
+    "final_outputs": [
+      "frozen_manifest",
+      "final_state",
+      "per_observation_and_frame_material_ledgers",
+      "physical_and_numerical_status",
+      "weak_direction_profiles_and_grid_envelope",
+      "native_full_shot_overlay",
+      "registration support/rank/graph provenance and same-support comparator ledger",
+      "immutable complete-state candidate snapshots"
+    ],
+    "rendering": "same forward model; adaptive curve tessellation chord error <=0.1 px"
+  },
+  "revision": "literature-informed registration-first initialization; 2026-10-17",
+  "registration_frontend": {
+    "homography_direction": "H_tp maps plane-component atlas coordinates to native image; G_ji maps native frame i to j",
+    "surfaces": "ice and genuine planar board faces; constant-height boundary curves may lie in parallel horizontal planes; curved board sheets remain 3D",
+    "raw_H_model": "explicit global-shutter/undistorted approximation, not a general physical lower bound",
+    "physical_cloud_restriction": "no independent per-frame/per-logo/per-patch world warp",
+    "atlas_gauge": "one reference H=I per genuine connected planar component; disconnected components remain unaligned; shared observed geometry determines connectivity",
+    "unknown_template": "one shared static shape with provenance; no old-q inverse projection frozen as true metric shape",
+    "metric_upgrade": "q=Q_p xi, physical embedding M_p, H_atlas Q_p ~ P_t M_p; A_p=M_p inverse(Q_p), not an arbitrary physical 4x3 block",
+    "IAC": "omega=K^-T K^-1; orthogonal/equal-norm column constraints only after Euclidean chart upgrade",
+    "rank": "normalized actual residual Jacobian; preserve weak directions; unknown-station circle alone cannot determine general H",
+    "parameterization": "nondegenerate virtual four-control-point or equivalent local projective chart; no new measurements",
+    "unsupported_records": "mark not_applicable for this local comparator; retain original obligations; no global t_hat from partial model",
+    "candidate_scoring": "identical frozen support set per comparator; snapshot native finite-material residual and query/support status",
+    "learned_model_required": false,
+    "varying_intrinsics": "do not stack zoom-varying H into fixed-K calibration; use shared low-dimensional K/f(t) with rank checks"
+  },
+  "capture_surrogate": {
+    "default": "normalized positive quadrature log-sum-exp finite same-material distance, sigma>0; initializer only",
+    "formula": "E_sigma_i=-2 sigma^2 log(sum_j a_j exp(-d_ij^2/(2 sigma^2))); a_j>0, sum a_j=1",
+    "source_group_normalization": "1/N_tm for capture only, not final statistical weights or coverage",
+    "fixed_within_trial": [
+      "legal material station sampling",
+      "positive quadrature weights",
+      "branch identity",
+      "support and visibility provenance",
+      "kernel and coordinate units"
+    ],
+    "state_dependent": "projected coordinates vary; never freeze projected samples while optimizing the camera",
+    "sampling_fill_distance_native": "<= sigma_native/4 in the actual support; rebuild local model after resampling/kernel/scale change",
+    "positive_bias": "finite sigma depends on quadrature and may be positive even on curve; not exact nearest distance or measured likelihood",
+    "alternative_distance_field": "separate surrogate_id with its own objective/gradient; ordinary EDT is not equivalent to the chosen soft-min",
+    "pyramid_scale": [
+      0.125,
+      0.25,
+      0.5,
+      1.0
+    ],
+    "sigma_native_px_suggested": [
+      64,
+      32,
+      8,
+      2
+    ],
+    "settings_status": "engineering capture settings to validate and freeze, not source-paper parameters or pixel budgets",
+    "pixel_centers": "u_s=s*(u+0.5)-0.5; T_s linear sI and translation (s-1)/2",
+    "transform_scaling": "H_s=T_s H for unchanged atlas; G_sj_si=T_sj G inverse(T_si)",
+    "units": "d_s=s*d_native; sigma_s=s*sigma_native; E_s=s^2 E",
+    "run_policy": "use only verified connectivity/order; no array-order polyline inference or crop-as-physical-endpoint",
+    "reverse_coverage": "only confirmed complete visible sampled runs",
+    "exit": "replay local native support, then exact continuous material residual before physical acceptance",
+    "native_objective_during_capture": "can worsen while exploring; keep best native-support snapshots; final physical acceptance uses all O"
+  },
+  "registration_graph": {
+    "scope_frames": 1248,
+    "anchor_choice": "information coverage, nonparallel directions, plane co-visibility, image quality, zoom span and true revisits; not first-frame-only",
+    "edge_families": [
+      "actual adjacent-frame static evidence",
+      "direct keyframe evidence",
+      "true revisits"
+    ],
+    "propagation": "multiple anchors, forwards and backwards, then global graph adjustment",
+    "loop_check": "independently estimated pairwise transforms evaluated as native point displacement; never edges synthesized from same H",
+    "statistical_caveat": "shared pixels are correlated; loops are consistency checks, not independent ground truth",
+    "persistence": "same physical point only with evidence; repeated IDs or sampling index insufficient",
+    "missing_support": "leave weak/unknown and obtain conditional initialization from other surfaces/global head; no fake successful propagation",
+    "final_factor_policy": "remove derived H/flow/pose pseudo-observations before final all-source physical solve",
+    "adaptive_template": "immutable structure and UV; shared external-appearance layer carries provenance/version/uncertainty and cannot self-certify",
+    "temporary_cross_prediction": "whole material/time blocks before final all-observation fitting"
+  },
+  "state_stages": {
+    "S0": "immutable inventory, semantics, budgets and full shared scene",
+    "S1": "surface-specific registration and capture candidates",
+    "S2": "offline keyframe graph with connected component gauges",
+    "S3": "explicit metric upgrade/common camera, exact fixed head, conditional bridge and exact retraction",
+    "S4": "min b subject to every q_i<=b, physical/support/order/query constraints",
+    "S5": "fix b=1; minimize F_px + measured priors + time-smoothness, retaining all constraints",
+    "S6": "independent physical replay, all native obligations, weak profiles and exports"
+  },
+  "source_audit": {
+    "manifest": "source_review.json",
+    "external_repository_commit": "93eba5f7cb8acbfbeb5c854c1b8e48d4ac1082b0",
+    "external_code_executed": false,
+    "weights_downloaded": false,
+    "foreign_source_or_weights_vendored": false,
+    "patent_formula_policy": "independently derive MI/IAC; printed formulas not copied",
+    "WACV2022_scope": "synthetic self-supervised pretraining; sports adaptation uses GT H; no claimed official implementation found in this review"
+  },
+  "registration_sampling_contract": {
+    "pixel_center": "native integer centers; u_s=s*(u+0.5)-0.5",
+    "explicit_interpolator_semantics": true,
+    "energy_scaling": "E_s=s^2*E_native for squared-distance capture; export native units",
+    "finite_kernel_bias": "broad normalized kernels may attract to a single long curve average or average across branches; native support replay remains required"
+  }
+}

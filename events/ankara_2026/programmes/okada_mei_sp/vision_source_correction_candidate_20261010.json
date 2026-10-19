@@ -1,0 +1,64 @@
+{
+  "schema": "rinkspace.vision-training.v1",
+  "python": "D:/OneDrive/codex_projs/MotionTrail_Codex_Starter_v1/.venv-gpu/Scripts/python.exe",
+  "backbone": "D:/OneDrive/codex_projs/MotionTrail_Codex_Starter_v1/models/sam2.1-hiera-tiny",
+  "flow_weights": "models/cache/raft_large_C_T_SKHT_V2-ff5fadd5.pth",
+  "data_directory": "D:/CodexData/RinkSpace_Data/events/ankara_2026/observations/vision_training",
+  "source_video": "D:/CodexData/RinkSpace_Data/events/ankara_2026/media/originals/oxXu1avhrvs.mp4",
+  "source_clock_registry": "events/ankara_2026/model_constraints/source_clock_registry.json",
+  "user_boundary_supervision": "D:/CodexData/RinkSpace_Data/events/ankara_2026/observations/vision_training/user_boundary_supervision_samples.json",
+  "source_material_region_supervision": "D:/CodexData/RinkSpace_Data/events/ankara_2026/observations/vision_training/user_contact_material_region_supervision.json",
+  "source_semantic_rejections": "D:/CodexData/RinkSpace_Data/events/ankara_2026/observations/vision_training/source_material_semantic_rejections.json",
+  "development_source_pts": [
+    36188160
+  ],
+  "native_boundary_overlay": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\observations\\vision_training\\continuous_review\\native_source_boundary_overlay_20261007.json",
+  "final_model": "models/rink_vision.pt",
+  "classes": [
+    "background",
+    "ice_contact",
+    "board_top",
+    "ice_paint",
+    "ad_boundary",
+    "shadow_or_reflection"
+  ],
+  "crop_size": 512,
+  "full_frame_every": 4,
+  "training_steps": 400,
+  "learning_rate": 0.001,
+  "seed": 20261006,
+  "device": "cuda",
+  "training_stage": "direct_user_ice_corrections_with_original_confirmed_source_retention",
+  "accuracy_accepted": false,
+  "pixel_ground_truth_from_model_projection": false,
+  "framework_sources": {
+    "sam2": "https://github.com/facebookresearch/sam2",
+    "boundary_architecture": "https://github.com/XuJiacong/PIDNet",
+    "dense_segmentation": "https://github.com/qubvel-org/segmentation_models.pytorch",
+    "temporal_points": "https://github.com/facebookresearch/co-tracker"
+  },
+  "native_boundary_overlay_sha256": "b28aaa78003fbf2e2d1fda59cf2f4c13572694daa6edfb9bd42646dc73642531",
+  "training_run_directory": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\observations\\vision_training\\continuous_review\\ice_source_correction_training_20261010",
+  "shot_plan": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\observations\\vision_training\\continuous_review\\ice_source_correction_training_20261010\\shot_plan.json",
+    "sha256": "8b210911c6ae9f52674dd0cbf3714e38e70a5ed0269afcd61ab7b5f6968020e7"
+  },
+  "additional_user_boundary_supervision": [
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\model_constraints\\user_ice_vision_supervision_20261010.json",
+      "sha256": "c333b760b43b4e5e4c87fd20ba811da9dbb4d9e3df87cefff4446566e1ce1d95"
+    }
+  ],
+  "training_annotation_authorities": [
+    "direct_user_confirmed_native_UV"
+  ],
+  "human_position_rank_weight": 1.0,
+  "training_update_scope": "all_trainable",
+  "source_support_integration": true,
+  "source_retention_guard_action": "record_candidate",
+  "intermediate_regressions_are_accepted_model": false,
+  "balanced_source_cycles": true,
+  "primitive_supervision_weight": 1.0,
+  "source_sampling_change_reason": "Same asymptotic shot/pool/frame budgets; finite cycles avoid leaving a directly corrected physical curve unconsumed",
+  "primitive_weight_change_reason": "Primitive identity is supervised alongside paint semantics; previous 0.2 auxiliary weight left old circles misclassified after line correction"
+}

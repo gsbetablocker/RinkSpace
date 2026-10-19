@@ -1,0 +1,108 @@
+{
+  "schema": "rinkspace.recovered-source-provenance.v1",
+  "preserved_on_client_date": "2026-10-11",
+  "purpose": "Restore the missing helper import used by scripts/extract_279_main_observations.py without modifying the importing script.",
+  "original_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\history\\legacy_project\\scripts\\track_scene3d_observations.py",
+  "original_resolved_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\history\\legacy_project\\scripts\\track_scene3d_observations.py",
+  "preserved_path": "scripts/track_scene3d_observations.py",
+  "source_sha256": "24dfacd15d3f7d12fd4e3e4a16bf4502a820f2f6389b40143b52929e9ae6ac52",
+  "preserved_sha256": "24dfacd15d3f7d12fd4e3e4a16bf4502a820f2f6389b40143b52929e9ae6ac52",
+  "byte_identical": true,
+  "source_state_before_read": {
+    "size_bytes": 21235,
+    "mtime_ns": 1790065376531132600,
+    "device": 342099257,
+    "inode": 2251799814845523
+  },
+  "source_state_after_read": {
+    "size_bytes": 21235,
+    "mtime_ns": 1790065376531132600,
+    "device": 342099257,
+    "inode": 2251799814845523
+  },
+  "source_state_after_copy": {
+    "size_bytes": 21235,
+    "mtime_ns": 1790065376531132600,
+    "device": 342099257,
+    "inode": 2251799814845523
+  },
+  "source_state_after_final_read": {
+    "size_bytes": 21235,
+    "mtime_ns": 1790065376531132600,
+    "device": 342099257,
+    "inode": 2251799814845523
+  },
+  "source_read_and_copy_stable": true,
+  "importing_source": "scripts/extract_279_main_observations.py",
+  "imported_helpers": [
+    "edge_resnap",
+    "motion",
+    "moving_occlusion_reject",
+    "normals",
+    "sample",
+    "warp"
+  ],
+  "static_direct_imports": [
+    {
+      "module": "__future__",
+      "kind": "python_standard_library"
+    },
+    {
+      "module": "argparse",
+      "kind": "python_standard_library"
+    },
+    {
+      "module": "av",
+      "kind": "third_party_environment_dependency"
+    },
+    {
+      "module": "copy",
+      "kind": "python_standard_library"
+    },
+    {
+      "module": "cv2",
+      "kind": "third_party_environment_dependency"
+    },
+    {
+      "module": "hashlib",
+      "kind": "python_standard_library"
+    },
+    {
+      "module": "json",
+      "kind": "python_standard_library"
+    },
+    {
+      "module": "numpy",
+      "kind": "third_party_environment_dependency"
+    },
+    {
+      "module": "pathlib",
+      "kind": "python_standard_library"
+    }
+  ],
+  "project_source_dependency_count": 0,
+  "module_level_behavior": "Imports, read-only Path constants, function definitions and an __main__ guard; no explicit module-level filesystem writes, extraction or source-media decoding.",
+  "cli_help_safety": "Argument parsing precedes cv2.setNumThreads, OUT.mkdir and resource reads in main; --help exits at the parser.",
+  "help_verification": {
+    "status": "passed",
+    "command": ".venv/Scripts/python.exe -B scripts/track_scene3d_observations.py --help",
+    "exit_code": 0,
+    "source_media_read": false,
+    "extraction_run": false,
+    "output_generation_run": false,
+    "scope": "Imports and argparse help only; no existing media or sample resource availability proved."
+  },
+  "legacy_resource_layout": {
+    "project_root": "Path(__file__).resolve().parents[1]",
+    "default_output": "outputs/calibration/ankara_2026_v015_joint/tracking",
+    "required_old_observations": "outputs/calibration/ankara_2026_v014_main/real_observations.json",
+    "optional_additional_seeds": "outputs/calibration/ankara_2026_v015_joint/additional_seeds.json",
+    "required_shot_inventory": "outputs/camera_classification/trial_010800_013600/result.json"
+  },
+  "limits": [
+    "Shared image-measurement helper functions are restored; the standalone main retains its legacy Ankara sample resource layout.",
+    "No original extraction was run and current source-media/resource availability was not verified.",
+    "The old standalone default output address needs resource-root routing before an actual extraction; do not run it as a generic new-event CLI.",
+    "CLI --publish-reviewed retains historical review text; preserving source does not newly establish that visual review or localization accuracy."
+  ]
+}

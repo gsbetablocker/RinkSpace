@@ -1,0 +1,53 @@
+{
+  "schema": "rinkspace.user-skate-effective-stature-lift-prior.v1",
+  "recorded_local_date": "2026-10-02",
+  "authority": "latest_explicit_user_working_initialization_and_sensitivity_request",
+  "athlete": "Mei Okada",
+  "event_equipment_measured": false,
+  "body_stature_m": 1.53,
+  "body_stature_status": "approximate ISU biographical stature; not a precise event-day measurement",
+  "body_stature_source_record": "okada_isu_stature_prior_20261002.json",
+  "effective_upright_stature_increment_m": 0.09,
+  "sensitivity_increment_m": [0.08, 0.09, 0.10],
+  "corresponding_fully_upright_head_to_ice_m": [1.61, 1.62, 1.63],
+  "quantity_semantics": "total effective upright stature increment from wearing the boots and blades, including sole, heel and foot posture inside the boot",
+  "not_blade_only_height": true,
+  "not_anatomical_ankle_height": true,
+  "not_direct_measurement_of_this_athlete_or_boot_model": true,
+  "body_skeleton_must_not_be_scaled_to_equipped_stature": true,
+  "equipment_metric_lengths_must_not_be_scaled_with_body": true,
+  "do_not_add_effective_increment_again_if_explicit_equipment_geometry_already_accounts_for_it": true,
+  "dynamic_knee_flexion_and_body_pose_handled_separately": true,
+  "does_not_imply_blade_contact_during_airborne_or_unknown_frames": true,
+  "boot_model_candidate": {
+    "brand": "Edea",
+    "model": "Ice Fly",
+    "status": "user_photo_identification_candidate_not_confirmed_equipment_declaration",
+    "photo_date_reported_by_user": "2026-07-24",
+    "identifying_features_reported_by_user": ["S-shaped mesh near ankle", "mesh below lace holes", "silver heel"],
+    "same_equipment_at_Ankara_confirmed": false,
+    "athlete_or_manufacturer_model_confirmation_found": false
+  },
+  "blade_model": null,
+  "blade_model_status": "unknown; visible support cutouts insufficient for reliable model identification",
+  "references": [
+    {
+      "url": "https://www.nikkansports.com/sports/figure/news/img/202607240001200-w1300_2.jpg",
+      "role": "user-provided athlete equipment photograph",
+      "assistant_access": "web open failed; no independent visual identification claimed"
+    },
+    {
+      "url": "https://edeaskates.com/en/ice/ice-fly/",
+      "role": "manufacturer model structure reference",
+      "assistant_access": "official text read 2026-10-02",
+      "supports": "Ice Fly mesh, heel pocket and sole structure; not athlete equipment identity or effective lift measurement"
+    },
+    {
+      "url": "https://www.jstage.jst.go.jp/article/yakushi/142/2/142_21-00169-2/_pdf",
+      "role": "user-provided generic skate shoe structure and heel reference, PDF page 2",
+      "assistant_access": "PDF text read; page screenshot failed with cache miss",
+      "supports": "text describes a nonflat sole and elevated heel; no exact heel dimension independently transcribed from the figure"
+    }
+  ],
+  "working_policy": "Continue camera and pelvis task using 8/9/10cm equipment sensitivity. Do not delay the task for equipment model identification. Preserve body stature, equipment lift, dynamic pose and pelvis vertical projection as distinct quantities."
+}

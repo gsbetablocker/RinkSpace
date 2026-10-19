@@ -1,0 +1,450 @@
+{
+  "schema_version": "rinkspace.user-confirmed-camera-knowledge.v1",
+  "event_id": "ankara_2026_user_scope",
+  "updated_local_date": "2026-09-23",
+  "provenance": {
+    "authority": "user_confirmed",
+    "task_id": "private-thread-00012",
+    "source": "本任务中用户关于机位、互拍图、位置草图及女单短节目时间段的直接说明；最新标注确认第四个机位为长边副机位。",
+    "automatic_match_required": false
+  },
+  "scope": {
+    "event": "本项目 Ankara 2026 同赛事冰场素材",
+    "criterion": "所有没有拍到这场比赛冰场的帧都忽略，不分镜头；专门拍裁判的镜头，即使带到少量冰面，也直接忽略。",
+    "ignored_subject_categories": [
+      {
+        "category_id": "judge_focused_shot",
+        "authority": "user_confirmed",
+        "statement": "这是一个专门看裁判的镜头，虽然会拍到一点冰场，但对我们的项目没有用，这类镜头也可以直接忽略",
+        "confirmed_local_date": "2026-09-22",
+        "application": "以裁判为主体的专门镜头不参与机位分组；不能因边缘存在少量冰面而纳入。此项是范围确认，不确认摄像机身份。",
+        "example_source_path": "data/input/oxXu1avhrvs.mp4",
+        "example_interval_seconds": [
+          5455.916666666667,
+          5471.133333333333
+        ],
+        "example_note": "用户在本次结果页查看裁判段后补充；区间时间来自助手已有源帧索引。"
+      }
+    ],
+    "camera_count": 4,
+    "camera_count_statement": "我明白了，还有第四个机位（第三个非广角机位，我也看到摄像机在哪了）",
+    "performance_camera_ids": [
+      "main_long_side",
+      "secondary_long_side",
+      "low_end"
+    ],
+    "performance_cut_relation": "用户明确确认：正式比赛转播的非回放画面，真实切镜在长边主机位、长边副机位、低位端部三个非广角机位之间互切。六分钟热身也完整分类；其中不涉及高位广角且不是回放的切镜，同样按这三个机位判断。清冰或六练涉及高位广角的切镜另行判断。",
+    "high_oblique_use": [
+      "清冰",
+      "六分钟热身"
+    ],
+    "cross_event_generalization": false,
+    "non_wide_camera_count": 3,
+    "possible_performance_camera_transitions": [
+      {
+        "from_camera_id": "main_long_side",
+        "to_camera_id": "secondary_long_side"
+      },
+      {
+        "from_camera_id": "main_long_side",
+        "to_camera_id": "low_end"
+      },
+      {
+        "from_camera_id": "secondary_long_side",
+        "to_camera_id": "main_long_side"
+      },
+      {
+        "from_camera_id": "secondary_long_side",
+        "to_camera_id": "low_end"
+      },
+      {
+        "from_camera_id": "low_end",
+        "to_camera_id": "main_long_side"
+      },
+      {
+        "from_camera_id": "low_end",
+        "to_camera_id": "secondary_long_side"
+      }
+    ],
+    "transition_possibility_provenance": "user_confirmed_possible_relations; 不表示每种方向都已有实片切点验证。"
+  },
+  "cameras": [
+    {
+      "camera_id": "main_long_side",
+      "label": "长边主机位",
+      "approximate_location": "用户示意图下侧长边外，接近中部。",
+      "location_precision": "qualitative_approximate",
+      "metric_position": null,
+      "calibrated_extrinsics": null
+    },
+    {
+      "camera_id": "low_end",
+      "label": "低位端部",
+      "approximate_location": "用户示意图左侧短边附近、偏下；拍到实体摄像机的照片显示它紧贴冰场边界，可能略微越界，但不应明显进入冰面。",
+      "location_precision": "qualitative_approximate",
+      "boundary_relation": "user_confirmed_near_boundary_possibly_slightly_inside; no hard outside-only constraint and no surveyed offset",
+      "metric_position": null,
+      "calibrated_extrinsics": null
+    },
+    {
+      "camera_id": "high_oblique_overview",
+      "label": "高位斜俯视",
+      "label_aliases": [
+        "高位斜俯全景",
+        "俯视广角"
+      ],
+      "approximate_location": "用户示意图右下角外侧的高处。",
+      "location_precision": "qualitative_approximate",
+      "metric_position": null,
+      "calibrated_extrinsics": null
+    },
+    {
+      "camera_id": "secondary_long_side",
+      "label": "长边副机位",
+      "existence_status": "user_confirmed",
+      "approximate_location": "用户示意图下侧长边外，在长边主机位右侧、偏向右端，仍位于右下角高位斜俯视机位的左侧。",
+      "location_status": "user_confirmed_approximate",
+      "location_precision": "qualitative_approximate",
+      "metric_position": null,
+      "calibrated_extrinsics": null,
+      "camera_id_aliases": [
+        "additional_non_wide"
+      ],
+      "evidence_asset_ids": [
+        "low_end_view_long_side_cameras",
+        "approximate_positions_four_cameras"
+      ]
+    }
+  ],
+  "interpretation": {
+    "camera_identity": "机位指固定拍摄位置；摇摄、变焦、远近景和背景变化不自动增加机位。",
+    "background_visibility": "同一个机位可拍到不同方向的墙面和看台。",
+    "old_candidates": "旧分类候选名称不是新增机位的事实依据；当前四机位总数来自用户最新更正。旧分类尚未据此重新核对。",
+    "performer_clothing": "本次观察提到的服装只帮助定位例子，不是机位识别规则。",
+    "tracked_subject_change": "用户再次指出：六分钟热身可以更换跟拍选手，比赛时场上只有一位选手。跟拍对象变化不是通用切镜判据；机位判断不能依赖换人或服装。",
+    "position_drawing_scope": "最新四点图补充长边副机位的位置；旧三点图保留为历史原图。两图只借用冰场轮廓，机位位置均为大致位置，不确认冰面圆圈、尺度或精确坐标。",
+    "long_side_pair_discrimination": {
+      "authority": "user_instruction",
+      "statement": "长边主、副机位互切更难判断，需重点注意。",
+      "application": "局部辨认时同时比较主、副机位；不能因为两帧都来自长边、背景相似或像拉镜，就直接归为同一机位。具体切点与归属仍依据真实画面及已确认参照判断。"
+    },
+    "replay_editing": {
+      "authority": "user_confirmed",
+      "statement": "回放由导播选取之前转播的片段重新剪辑；同一机位在不同时间拍到的两段也可能在回放里互切。",
+      "application": "分别记录剪辑切点和物理机位归属；回放发生硬切或叠化，不自动判为换机位，同机位非连续时间的片段也不合并成连续镜头。",
+      "specific_new_labels_confirmed": false
+    }
+  },
+  "evidence_assets": [
+    {
+      "asset_id": "mutual_view_1",
+      "path": "evidence/camera_teaching_20260922/mutual_view_1.png",
+      "original_name": "codex-clipboard-private-attachment-00014.png",
+      "meaning": "用户红圈指出画面中上方、选手身后围挡外的摄像机。",
+      "capturing_camera_id": null,
+      "visible_camera_id": null,
+      "source_time": null,
+      "sha256": "6ac25e5c1618a34aa9a3d3f91dbdfe4c95871ed564c306445d69e4bd23b4ce52",
+      "file_size_bytes": 1503735
+    },
+    {
+      "asset_id": "mutual_view_2",
+      "path": "evidence/camera_teaching_20260922/mutual_view_2.png",
+      "original_name": "codex-clipboard-private-attachment-00015.png",
+      "meaning": "用户后续在同一画面补充橙圈并标注名称：拍摄方为低位端部，原红圈摄像机为长边主机位。",
+      "capturing_camera_id": "low_end",
+      "visible_camera_id": "main_long_side",
+      "source_time": null,
+      "sha256": "0cfb490d1698d8edbecb60fc4a27f008b45aad090afecde3fdded4d23a9dac69",
+      "file_size_bytes": 1995456,
+      "camera_binding_source_asset_id": "low_end_view_long_side_cameras"
+    },
+    {
+      "asset_id": "approximate_positions",
+      "path": "evidence/camera_teaching_20260922/approximate_positions.png",
+      "original_name": "codex-clipboard-private-attachment-00016.png",
+      "meaning": "三个红点分别标出低位端部、长边主机位、高位斜俯视的大致位置。仅借用冰场轮廓；冰面圆圈是尚未准确建成的旧草模。",
+      "metric_coordinates_confirmed": false,
+      "rink_markings_confirmed": false,
+      "sha256": "6608dfdc717f61f8b623c685d65faef645941a86ce5b399abddf40f88dbd7a06",
+      "file_size_bytes": 431019,
+      "superseded_by_asset_id": "approximate_positions_four_cameras"
+    },
+    {
+      "asset_id": "low_end_view_long_side_cameras",
+      "path": "evidence/camera_teaching_20260922/low_end_view_long_side_cameras.png",
+      "original_name": "codex-clipboard-private-attachment-00017.png",
+      "sha256": "7e0806a8d1187bd19d6ddad2152c3ef004dca2a1f67eca89e5da11896990f018",
+      "file_size_bytes": 2000342,
+      "authority": "user_confirmed",
+      "meaning": "用户明确说明该画面由低位端部拍摄；橙圈标出长边副机位，红圈标出长边主机位。",
+      "capturing_camera_id": "low_end",
+      "visible_cameras": [
+        {
+          "camera_id": "secondary_long_side",
+          "annotation": "橙色圈，标注长边副机位"
+        },
+        {
+          "camera_id": "main_long_side",
+          "annotation": "红色圈，标注长边主机位"
+        }
+      ],
+      "source_time": null,
+      "related_original_asset_id": "mutual_view_2"
+    },
+    {
+      "asset_id": "approximate_positions_four_cameras",
+      "path": "evidence/camera_teaching_20260922/approximate_positions_four_cameras.png",
+      "original_name": "codex-clipboard-private-attachment-00018.png",
+      "sha256": "75a13f19615f331b14e00ae3eef6ded3375bc6021fdee76d5d0375d373b7184c",
+      "file_size_bytes": 434056,
+      "authority": "user_confirmed",
+      "meaning": "四个红点标出低位端部、长边主机位、长边副机位与高位斜俯视的大致位置；长边副机位与主机位在同一长边，按图方向位于主机位右侧。",
+      "camera_ids": [
+        "low_end",
+        "main_long_side",
+        "secondary_long_side",
+        "high_oblique_overview"
+      ],
+      "metric_coordinates_confirmed": false,
+      "rink_markings_confirmed": false,
+      "supersedes_asset_id": "approximate_positions"
+    },
+    {
+      "asset_id": "low_end_camera_near_boundary_photo",
+      "path": "teach_you_camaras/oxXu1avhrvs.mp4_20260921_234826.789.jpg",
+      "sha256": "0d5ff5365119319591fa63a325d387fa20b2f7e29d41c3d505747fb973626416",
+      "image_size_wh": [1920, 1080],
+      "authority": "user_confirmed_interpretation",
+      "meaning": "照片拍到低位端部实体摄像机；用户指出其非常靠近甚至可能略入冰场边界，位置约束不应硬设为完全在场外，也不能明显进入场内。",
+      "camera_id": "low_end",
+      "metric_coordinates_confirmed": false
+    }
+  ],
+  "mutual_visibility": {
+    "status": "user_confirmed",
+    "relation": "两个非广角机位分别拍到了对方的摄像机。",
+    "asset_ids": [
+      "mutual_view_1",
+      "mutual_view_2"
+    ],
+    "individual_image_camera_binding": "后续标注明确互拍图二由低位端部拍摄，原红圈为长边主机位，新增橙圈为长边副机位；互拍图一的逐图名称绑定仍保留未单独确认。"
+  },
+  "teaching_examples": [
+    {
+      "source_id": "oxXu1avhrvs",
+      "session": "女单短节目全场",
+      "source_path": "data/input/oxXu1avhrvs.mp4",
+      "user_supplied_path": "D:\\OneDrive\\codex\\_projs\\RinkSpace\\data\\input\\oxXu1avhrvs.mp4",
+      "path_note": "用户给出的目录写法与当前工作区不同；本次实际打开的是当前项目 data/input/oxXu1avhrvs.mp4。",
+      "source_properties": {
+        "width": 1920,
+        "height": 1080,
+        "frame_rate": "60",
+        "time_base": "1/15360",
+        "start_pts": 0,
+        "frame_step_pts": 256
+      },
+      "time_semantics": "保留用户提供的时间标记；不是已测得的精确帧 PTS。相邻标记之间的小间隙不据此新增镜头。实际抽帧时间独立保存在 observations.json。",
+      "first_target_rink": {
+        "user_time": "12:44:258",
+        "seconds": 764.258,
+        "approximate": true
+      },
+      "segments": [
+        {
+          "start_user_time": "12:44:258",
+          "end_user_time": "14:10:925",
+          "start_seconds": 764.258,
+          "end_seconds": 850.925,
+          "camera_id": "high_oblique_overview",
+          "continuous_without_internal_cut": true,
+          "authority": "user_confirmed",
+          "exact_boundary_pts_confirmed": false
+        },
+        {
+          "start_user_time": "14:10:958",
+          "end_user_time": "15:04:708",
+          "start_seconds": 850.958,
+          "end_seconds": 904.708,
+          "camera_id": "main_long_side",
+          "continuous_without_internal_cut": true,
+          "authority": "user_confirmed",
+          "exact_boundary_pts_confirmed": false
+        },
+        {
+          "start_user_time": "15:04:725",
+          "end_user_time": "15:47:543",
+          "start_seconds": 904.725,
+          "end_seconds": 947.543,
+          "camera_id": "low_end",
+          "continuous_without_internal_cut": true,
+          "authority": "user_confirmed",
+          "exact_boundary_pts_confirmed": false
+        }
+      ],
+      "following": {
+        "camera_id": "main_long_side",
+        "relation": "第三段之后切回长边主机位",
+        "exact_start_pts": null,
+        "end_seconds": null
+      },
+      "observations_path": "outputs/camera_classification/teaching_women_sp_20260922/observations.json",
+      "assistant_review": {
+        "decoded_frames": 11342,
+        "visually_inspected_observations": 65,
+        "method": "按约四秒间隔查看顺序抽帧，另查看切换邻帧；不是逐帧视觉检查。",
+        "conclusion": "能将已给答案的三段与真实画面对应，理解段内摇摄与背景变化。",
+        "independent_unseen_camera_test_performed": false
+      },
+      "old_survey_note": "旧 survey 使用 oxXu1avhrvs.f134.mp4（640×360、30 fps、512 PTS/帧）；这次带教使用 1080p60 原片，不能沿用旧帧格冒充精确切点。",
+      "source_file_size_bytes": 3392134310,
+      "source_sha256": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891",
+      "reconfirmation_after_fourth_camera": {
+        "status": "user_reconfirmed",
+        "context": "用户确认第四个机位为长边副机位之后，再次明确以下原有参照仍正确。",
+        "user_feedback": "12:44:258 - 14:10:925 高位斜俯视；14:10:958 - 15:04:708 长边主机位；15:04:725 - 15:47:543 低位端部；然后17:11.133，长边主机位 → 低位端部，这些也还是对的。",
+        "scope": "重新确认上述三段及17:11.133切点和方向；不据此扩展为15:47至17:11之间全部帧已经重新核验，也不确认21:03、21:07的机位归属。"
+      }
+    }
+  ],
+  "application_state": {
+    "knowledge_saved": true,
+    "classification_pipeline_automatically_loads_this_file": false,
+    "old_catalog_reclassified_from_this_knowledge": false,
+    "geometry_updated": false
+  },
+  "related_historical_evidence": [
+    "evidence/camera_teaching_20260922/human_confirmations_20260921.json",
+    "evidence/camera_teaching_20260922/user_instructions_20260921.md"
+  ],
+  "reading_guide": "evidence/camera_teaching_20260922/README.md",
+  "confirmed_followup_cases": [
+    {
+      "case_id": "next_cut_after_1547",
+      "status": "user_confirmed",
+      "source_id": "oxXu1avhrvs",
+      "source_path": "data/input/oxXu1avhrvs.mp4",
+      "source_sha256": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891",
+      "time_base": "1/15360",
+      "frame_rate": "60",
+      "transition": "hard_cut",
+      "before": {
+        "pts": 15837952,
+        "seconds": 1031.1166666666666,
+        "camera_id": "main_long_side",
+        "image_path": "evidence/camera_teaching_20260922/confirmed_cut_1711_before.jpg",
+        "image_sha256": "eddb2b715dc6385ab65eaff84e2eae825016547cf5e192627aa17d3cca7a86ad"
+      },
+      "after": {
+        "pts": 15838208,
+        "seconds": 1031.1333333333334,
+        "camera_id": "low_end",
+        "image_path": "evidence/camera_teaching_20260922/confirmed_cut_1711_after.jpg",
+        "image_sha256": "f3ea05b29398d5c9ef93a8cdcf35df861291f06adef3d87a83648250820bdd6a"
+      },
+      "user_feedback": "对了。不过我注意到你在拿跟拍的人不同了当依据。这是在六练的时候。在比赛的时候，场上只有一个选手。",
+      "scope": "用户确认这一处切点和方向；不自动确认整个后续镜头或全场分类。",
+      "reconfirmation_after_fourth_camera": {
+        "status": "user_reconfirmed",
+        "user_feedback": "然后17:11.133，长边主机位 → 低位端部，这些也还是对的。",
+        "scope": "17:11.133切点及长边主机位到低位端部的切换方向。"
+      }
+    },
+    {
+      "case_id": "next_cut_after_1926",
+      "status": "user_confirmed",
+      "source_id": "oxXu1avhrvs",
+      "source_path": "data/input/oxXu1avhrvs.mp4",
+      "source_sha256": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891",
+      "time_base": "1/15360",
+      "frame_rate": "60",
+      "transition": "hard_cut",
+      "before": {
+        "pts": 18224640,
+        "seconds": 1186.5,
+        "camera_id": "low_end",
+        "image_path": "evidence/camera_teaching_20260922/confirmed_cut_1946_before.jpg",
+        "image_sha256": "513b5ae3af2a23b72ad19ac168a266e2d7d2fd908302ce6a2eaa10b376bdd95d"
+      },
+      "after": {
+        "pts": 18224896,
+        "seconds": 1186.5166666666667,
+        "camera_id": "main_long_side",
+        "image_path": "evidence/camera_teaching_20260922/confirmed_cut_1946_after.jpg",
+        "image_sha256": "853bcc725a8190f67294041f8294a9d7449cf097ffbed6b1c6e15a44a93afe98"
+      },
+      "user_feedback": "嗯对的",
+      "scope": "本次19:46.516667切点及低位端部到长边主机位的切换方向。",
+      "observation": "相邻两帧为同一选手、同一姿势；观察方向和身后场馆结构改变。",
+      "reconfirmation_after_fourth_camera": {
+        "status": "user_reconfirmed",
+        "user_feedback": "你刚才判断的 19:46.517，由低位端部硬切到长边主机位，也是对的。",
+        "scope": "19:46.517切点及低位端部到长边主机位的硬切方向。"
+      }
+    }
+  ],
+  "confirmed_frame_examples": [
+    {
+      "source_path": "data/input/oxXu1avhrvs.mp4",
+      "source_sha256": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891",
+      "time_base": "1/15360",
+      "source_pts": 226160640,
+      "source_time": "04:05:24.000",
+      "camera_id": "low_end",
+      "authority": "user_confirmed",
+      "scope": "This one frame's camera identity only; not the entire surrounding shot or its exact camera pose.",
+      "native_frame": "evidence/photo_review_20260923/holdout/women_sp_lower_right_226160640.png",
+      "user_markup": "evidence/photo_review_20260923/user_marks/low_end_landmarks_user.png",
+      "feature_identity_record": "evidence/photo_review_20260923/holdout/women_sp_lower_right_226160640_user_semantics.json"
+    }
+  ],
+  "superseded_user_statements": [
+    {
+      "statement": "整个比赛只有三个摄像机位，选手比赛期间甚至只有两个（俯视广角只有在清冰/六分钟热身时才用到），所以比赛期间切镜一定是在这两个非广角镜头间切换。",
+      "superseded_by": "我明白了，还有第四个机位（第三个非广角机位，我也看到摄像机在哪了）",
+      "reason": "用户在21:00–21:10检查期间明确更正机位总数。此前三机位总数及两台非广角互切的排他性前提不再适用；保留历史原话。"
+    }
+  ],
+  "pending_inspections": [
+    {
+      "case_id": "zoom_2100_2110",
+      "source_id": "oxXu1avhrvs",
+      "range_seconds": [
+        1260,
+        1270
+      ],
+      "observed_visual_discontinuities_seconds": [
+        1263.8166666666666,
+        1267.7666666666667
+      ],
+      "evidence_index": "outputs/camera_classification/zoom_2100_2110/candidate_frames/frames.json",
+      "camera_assignment_status": "not_confirmed",
+      "note": "用户已确认第四个机位为长边副机位，且给出实体摄像机标注及大致位置；这两处跳变的具体切换方向尚未人工确认。"
+    }
+  ],
+  "confirmed_visibility_relations": [
+    {
+      "capturing_camera_id": "low_end",
+      "visible_camera_ids": [
+        "main_long_side",
+        "secondary_long_side"
+      ],
+      "asset_id": "low_end_view_long_side_cameras",
+      "status": "user_confirmed",
+      "user_feedback": "长边还有一个副机位，也被低位端部拍到了，你看第一张图橙色圈里也有个摄像机，然后看第二张图我加的它的大致位置"
+    }
+  ],
+  "trial_review_dispositions": [
+    {
+      "source_path": "data/input/oxXu1avhrvs.mp4",
+      "start_seconds": 4670.233333333334,
+      "end_seconds": 4671.45,
+      "authority": "user_instruction",
+      "status": "deferred_by_user",
+      "statement": "这段基本不重要可以先放着。",
+      "camera_identity_confirmed": false,
+      "note": "继续保留长边主/副待定及原始证据；暂放不等于确定机位或从范围中忽略。"
+    }
+  ]
+}

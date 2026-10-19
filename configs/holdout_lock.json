@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "status": "source_window_and_algorithm_frozen_before_evaluation",
+  "locked_at_utc": "2026-09-19T07:11:00.811293+00:00",
+  "source_key": "okada",
+  "source_sha256": "843e7490a38e0c856da057d6a1f871804f56ae2463c530c735ca524524309150",
+  "shot_id": "shot_0008",
+  "start_s": 144.84,
+  "end_s": 154.2,
+  "start_frame": 7242,
+  "end_frame_exclusive": 7710,
+  "sample_every_n": 5,
+  "sample_width": 960,
+  "algorithm_freeze_sha256": "78e500bd98d1796fe6aab6132ef7d080e860dbf295e06d90134f32c4e4b66a68",
+  "selection_basis": "Only the whole-video source contact sheet and automatic shot table were inspected. This complete 9.36s camera shot appears to contain ice line/circle texture. No registration, fitted error or success rate was used for selection.",
+  "protocol": "After algorithm freeze evaluate every sample, retain failures and disconnected components, and do not alter parameters using this holdout.",
+  "algorithm_freeze_config": {
+    "max_features": 1800,
+    "min_tracks": 18,
+    "min_inliers": 14,
+    "min_support_fraction": 0.025,
+    "min_support_width_fraction": 0.18,
+    "min_support_height_fraction": 0.12,
+    "ransac_threshold_px": 1.7,
+    "max_inlier_p95_px": 2.0,
+    "max_pair_displacement_fraction": 0.3,
+    "max_sample_gap_s": 0.6,
+    "forward_backward_px": 0.8,
+    "replenish_below": 140,
+    "direct_anchor_every": 10,
+    "dense_anchor_every": 1,
+    "max_canvas_pixels": 1800000
+  },
+  "algorithm_frozen_at_utc": "2026-09-19T07:11:58.776775+00:00",
+  "attempt_log": [
+    {
+      "status": "interrupted_before_result_review",
+      "at_utc": "2026-09-19T07:14:02.931855+00:00",
+      "scope": "An unprotected full-shot candidate run was started on root request and interrupted on subsequent instruction to coordinate independent-landmark protection. No registration.json or final report was produced, and no algorithm output was inspected or used for point selection."
+    }
+  ]
+}

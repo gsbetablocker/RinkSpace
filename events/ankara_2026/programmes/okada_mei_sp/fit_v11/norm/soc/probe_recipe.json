@@ -1,0 +1,54 @@
+{
+  "schema": "rinkfit.legal_unselected_native_full_probe_exporter_recipe.v1",
+  "entry": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\norm\\soc\\export_legal_unselected_full_probe.py",
+    "sha256": "044ccf958c2bd8695f864db159131e78a33aa7e3397fd886e700b4822c2ebe6a"
+  },
+  "source_origin": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\model_checks\\export_legal_unselected_full_probe.py",
+    "sha256": "044ccf958c2bd8695f864db159131e78a33aa7e3397fd886e700b4822c2ebe6a"
+  },
+  "reused_five_AST_state_writer_exporter": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\model_checks\\export_rejected_native_probe_v2.py",
+    "sha256": "111b47229c6de25a9a31a5ce49c43b0a91087d25cac9d0645808d9a6c1a2ddef"
+  },
+  "actual_NoSolve_QA": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\model_checks\\legal_unselected_full_probe_QA\\report.json",
+    "sha256": "64e3dd8419fde8befa79a356ac35a15e5a74cd8587c2530707c6de4dbf528022"
+  },
+  "actual_positive_input": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\model_checks\\legal_unselected_full_probe_i18_positive_input.json",
+    "sha256": "359a036dddee8866b80a20ccd231ef3f3ebd7d2f6cf0dc85d83226d12ff89794"
+  },
+  "actual_complete_unselected_probe": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\physical_legal_unselected_full_probe_i18_QA\\checkpoints\\i00017_1792283484369422300\\manifest.json",
+    "sha256": "f246ddc88c7e97e9dea4affab5e7ed2921b26cc6b83db7a59b17eff5b4d25429"
+  },
+  "input_schema": "rinkfit.legal_unselected_native_full_probe_export_input.v1",
+  "required_refs": [
+    "parent_checkpoint",
+    "actual_line_report",
+    "native_report",
+    "original_proposal",
+    "current_main_checkpoint"
+  ],
+  "required_fields": [
+    "trial_index",
+    "retained_for_correction_reason"
+  ],
+  "physical_iteration_and_TR_retained": true,
+  "source_native_finite_RS_Q_scene_template_four_aux_lineage_required": true,
+  "no_q_relative_to_parent_eligibility_comparison": true,
+  "no_main_adoption_or_projection_or_Solve": true,
+  "scope": "A complete lawful but explicitly unselected full native trial is a fresh-SOC origin even when it already descends parent q; original acceptance rules and current main are unchanged.",
+  "command": [
+    "PYTHON",
+    "-X",
+    "utf8",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\norm\\soc\\export_legal_unselected_full_probe.py",
+    "--input",
+    "TYPED_INPUT",
+    "--output",
+    "NEW_DATA_DIRECTORY"
+  ]
+}

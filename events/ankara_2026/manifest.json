@@ -1,0 +1,621 @@
+{
+  "schema_version": "rinkspace.event-core-model-manifest.v1",
+  "event_id": "ankara_2026",
+  "generated_at": "2026-10-06T07:05:19.289650+00:00",
+  "project_scope": "Reusable broadcast analysis across events; these numeric models and user facts belong only to ankara_2026.",
+  "storage_policy": {
+    "core_code_model_parameters_and_compact_user_facts": "OneDrive project",
+    "source_video_arrays_checkpoints_intermediate_and_run_history": "D:/CodexData/RinkSpace_Data",
+    "legacy_active_source_paths": "retained byte-identical; no active config or runtime paths rewritten"
+  },
+  "registered_model": {
+    "revision": "v0.25-three-frame-refit",
+    "canonical_directory": "models/registered/v0.25",
+    "status": "registered_three_source_fit_accuracy_not_accepted",
+    "accuracy_accepted": false,
+    "scope": "three fitted source frames and exported topology; no independent complete-shot accuracy acceptance"
+  },
+  "working_model": {
+    "q_sha256": "77bf5c2a81df2d8a8f3984c1465a17e411fb0fd819753ffcaa8e0706703b08c0",
+    "canonical_directory": "models/working/77bf5c2a81df",
+    "status": "immutable_snapshot_accuracy_not_accepted",
+    "accuracy_accepted": false,
+    "source_selector": "D:/OneDrive/codex_projs/RinkSpace/configs/solver_runtime/okada_named66.json",
+    "source_selector_sha256_at_capture": "7dd1e720cdbc33cd687ec169d11add215356a39cd86d8289820abf794404cba4",
+    "source_run": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\mainspin_all_tripods_outside_user_domain_v2_actual_fit_nodump_20261006",
+    "original_complete_checkpoint": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\mainspin_all_tripods_outside_user_domain_v2_actual_fit_nodump_20261006\\accepted_states\\77bf5c2a81df2d8a8f3984c1465a17e411fb0fd819753ffcaa8e0706703b08c0\\complete_state_UNACCEPTED.npz",
+    "checkpoint_policy": "Data only: 72 arrays, about82MB uncompressed with observation/scales/solver state; not a final model export"
+  },
+  "programmes": {
+    "okada_mei_sp": {
+      "event_id": "ankara_2026",
+      "review_model_directory": "programmes/okada_mei_sp/models/review_20261005",
+      "review_source_interval": "04:08:36.283–04:11:25.000 (end exclusive)",
+      "review_q_sha256": "4075e751934486feb5a9bcba71abf49c1f7040ace22b7c73d026c7884bce4a13",
+      "source_video": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\media\\originals\\oxXu1avhrvs.mp4",
+        "sha256_from_existing_verified_ledger": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891"
+      },
+      "video_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/shared_radius_05db_pelvis_priority_full_programme_20261005/grid_and_trajectory_WORKING.mp4",
+      "review_accuracy_accepted": false,
+      "body_semantics": "SMPL-X joint0 P; G copies world XY at Z0; neither measures blade contact",
+      "working_model_q_sha256": "77bf5c2a81df2d8a8f3984c1465a17e411fb0fd819753ffcaa8e0706703b08c0",
+      "review_matches_working_model": false,
+      "primary_processing_source_selection": "programmes/okada_mei_sp/primary_source_selection.json",
+      "primary_processing_source_id": "O6j8L8TmfKo",
+      "primary_processing_source_native_fps": "50/1",
+      "legacy_review_source_fields_status": "existing_review_source_video_and_interval_retained_for_historical_provenance; new_processing_uses_primary_processing_source_selection"
+    }
+  },
+  "resources": [
+    {
+      "id": "registered_v025_scene",
+      "role": "registered_shared_event_model",
+      "status": "registered_three_source_fit_accuracy_not_accepted",
+      "source_path": "D:/OneDrive/codex_projs/RinkSpace/calibration/deliverables/scene.json",
+      "canonical_path": "models/registered/v0.25/scene.json",
+      "project_path": "events/ankara_2026/models/registered/v0.25/scene.json",
+      "bytes": 1701823,
+      "sha256": "08b4e0f68340a279354f735e5b501a0a0a8e254f451caef0f431e3d29328215b"
+    },
+    {
+      "id": "registered_v025_fit",
+      "role": "registered_shared_event_model",
+      "status": "registered_three_source_fit_accuracy_not_accepted",
+      "source_path": "D:/OneDrive/codex_projs/RinkSpace/calibration/deliverables/fit.json",
+      "canonical_path": "models/registered/v0.25/fit.json",
+      "project_path": "events/ankara_2026/models/registered/v0.25/fit.json",
+      "bytes": 792650,
+      "sha256": "355f6a382d263bb9780e15179cf6af2fb1a9c8b541a6436dd013c4dd0263c43f"
+    },
+    {
+      "id": "registered_v025_release",
+      "role": "registered_shared_event_model",
+      "status": "registered_three_source_fit_accuracy_not_accepted",
+      "source_path": "D:/OneDrive/codex_projs/RinkSpace/calibration/deliverables/release.json",
+      "canonical_path": "models/registered/v0.25/release.json",
+      "project_path": "events/ankara_2026/models/registered/v0.25/release.json",
+      "bytes": 3093,
+      "sha256": "855fd7382ee227cb09bd13e41630b050559687148c9390159a485a183055bcc9"
+    },
+    {
+      "id": "registered_v025_verification",
+      "role": "registered_shared_event_model",
+      "status": "registered_three_source_fit_accuracy_not_accepted",
+      "source_path": "D:/OneDrive/codex_projs/RinkSpace/calibration/deliverables/verification.json",
+      "canonical_path": "models/registered/v0.25/verification.json",
+      "project_path": "events/ankara_2026/models/registered/v0.25/verification.json",
+      "bytes": 12983,
+      "sha256": "b968e28525c3ecea2aaadf1a30b937815ff0ea7067f057ee1b41572fcf6573f0"
+    },
+    {
+      "id": "registered_v025_input_annotation_inventory",
+      "role": "registered_model_source_and_observation_contract",
+      "status": "registered_three_source_fit_accuracy_not_accepted",
+      "source_path": "D:/OneDrive/codex_projs/RinkSpace/calibration/inputs/annotation_inventory.json",
+      "canonical_path": "models/registered/v0.25/inputs/annotation_inventory.json",
+      "project_path": "events/ankara_2026/models/registered/v0.25/inputs/annotation_inventory.json",
+      "bytes": 361396,
+      "sha256": "043f02756f09ac91ea999c49f6a8e59cc834b09ad4c8413944d3eb15f67a8c63"
+    },
+    {
+      "id": "registered_v025_input_effective_observations",
+      "role": "registered_model_source_and_observation_contract",
+      "status": "registered_three_source_fit_accuracy_not_accepted",
+      "source_path": "D:/OneDrive/codex_projs/RinkSpace/calibration/inputs/effective_observations.json",
+      "canonical_path": "models/registered/v0.25/inputs/effective_observations.json",
+      "project_path": "events/ankara_2026/models/registered/v0.25/inputs/effective_observations.json",
+      "bytes": 357707,
+      "sha256": "29bcdffa4b6093b1fd988b42cd0251c8470353c83634791c0890e544d3c45c69"
+    },
+    {
+      "id": "registered_v025_input_low_linear_strokes",
+      "role": "registered_model_source_and_observation_contract",
+      "status": "registered_three_source_fit_accuracy_not_accepted",
+      "source_path": "D:/OneDrive/codex_projs/RinkSpace/calibration/inputs/low_linear_strokes.json",
+      "canonical_path": "models/registered/v0.25/inputs/low_linear_strokes.json",
+      "project_path": "events/ankara_2026/models/registered/v0.25/inputs/low_linear_strokes.json",
+      "bytes": 695416,
+      "sha256": "badf9e07ae045ae7a172daaf7179b7e3e2248704dceea1b343d0a85e03cfe28c"
+    },
+    {
+      "id": "registered_v025_input_observation_route",
+      "role": "registered_model_source_and_observation_contract",
+      "status": "registered_three_source_fit_accuracy_not_accepted",
+      "source_path": "D:/OneDrive/codex_projs/RinkSpace/calibration/inputs/observation_route.json",
+      "canonical_path": "models/registered/v0.25/inputs/observation_route.json",
+      "project_path": "events/ankara_2026/models/registered/v0.25/inputs/observation_route.json",
+      "bytes": 4874,
+      "sha256": "ad27e408f597928d2fd75652dd24ae6fd26dcb4da21f0ba09a067378c81975b3"
+    },
+    {
+      "id": "registered_v025_input_source_manifest",
+      "role": "registered_model_source_and_observation_contract",
+      "status": "registered_three_source_fit_accuracy_not_accepted",
+      "source_path": "D:/OneDrive/codex_projs/RinkSpace/calibration/inputs/source_manifest.json",
+      "canonical_path": "models/registered/v0.25/inputs/source_manifest.json",
+      "project_path": "events/ankara_2026/models/registered/v0.25/inputs/source_manifest.json",
+      "bytes": 14308,
+      "sha256": "cfabadeec5514d4f7908611abb2aa93c2b1d1eaf4bee075b23a2a6c069d9dc7d"
+    },
+    {
+      "id": "registered_v025_input_step02_observations",
+      "role": "registered_model_source_and_observation_contract",
+      "status": "registered_three_source_fit_accuracy_not_accepted",
+      "source_path": "D:/OneDrive/codex_projs/RinkSpace/calibration/inputs/step02_observations.json",
+      "canonical_path": "models/registered/v0.25/inputs/step02_observations.json",
+      "project_path": "events/ankara_2026/models/registered/v0.25/inputs/step02_observations.json",
+      "bytes": 5269055,
+      "sha256": "2ebaa742175967477f9bd1b40a1d819a3e6e4ae3c55fb671b136f6e19c4d39f3"
+    },
+    {
+      "id": "registered_v025_input_user_contour_replacements",
+      "role": "registered_model_source_and_observation_contract",
+      "status": "registered_three_source_fit_accuracy_not_accepted",
+      "source_path": "D:/OneDrive/codex_projs/RinkSpace/calibration/inputs/user_contour_replacements.json",
+      "canonical_path": "models/registered/v0.25/inputs/user_contour_replacements.json",
+      "project_path": "events/ankara_2026/models/registered/v0.25/inputs/user_contour_replacements.json",
+      "bytes": 89807,
+      "sha256": "21f23a388b2fd3102e83ec0836ac0c84467e95fe157404f51320210597d3b676"
+    },
+    {
+      "id": "ankara_2026_advertisements_user_confirmed_20260924",
+      "role": "event_model_constraint",
+      "status": "confirmed_semantics_or_explicit_scale_assumption",
+      "source_path": "D:/OneDrive/codex_projs/RinkSpace/configs/rink_model/ankara_2026_advertisements_user_confirmed_20260924.json",
+      "canonical_path": "model_constraints/ankara_2026_advertisements_user_confirmed_20260924.json",
+      "project_path": "events/ankara_2026/model_constraints/ankara_2026_advertisements_user_confirmed_20260924.json",
+      "bytes": 13649,
+      "sha256": "a13ec1cde89f119413a30ad40b43b15f2a184ee442a39c2816c17621f4d28f4c"
+    },
+    {
+      "id": "ankara_2026_metric_scale_assumed_v1",
+      "role": "event_model_constraint",
+      "status": "confirmed_semantics_or_explicit_scale_assumption",
+      "source_path": "D:/OneDrive/codex_projs/RinkSpace/configs/rink_model/ankara_2026_metric_scale_assumed_v1.json",
+      "canonical_path": "model_constraints/ankara_2026_metric_scale_assumed_v1.json",
+      "project_path": "events/ankara_2026/model_constraints/ankara_2026_metric_scale_assumed_v1.json",
+      "bytes": 2786,
+      "sha256": "5e00fc72d0addad660d796f0925c8a91a648e1ccbc39c46b1b96655460cd31a2"
+    },
+    {
+      "id": "user_advertisement_pairs_20261005",
+      "role": "event_model_constraint",
+      "status": "direct_user_event_facts",
+      "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/model_constraints/user_advertisement_pairs_20261005.json",
+      "canonical_path": "model_constraints/user_advertisement_pairs_20261005.json",
+      "project_path": "events/ankara_2026/model_constraints/user_advertisement_pairs_20261005.json",
+      "bytes": 1040,
+      "sha256": "89f3dcf0580148e5be2eeeec9033c86ac73a12b2d7eb07ae86a0eb82b15020a0"
+    },
+    {
+      "id": "user_camera_setup_confirmed_20261006",
+      "role": "event_model_constraint",
+      "status": "direct_user_event_facts",
+      "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/model_constraints/user_camera_setup_confirmed_20261006.json",
+      "canonical_path": "model_constraints/user_camera_setup_confirmed_20261006.json",
+      "project_path": "events/ankara_2026/model_constraints/user_camera_setup_confirmed_20261006.json",
+      "bytes": 1289,
+      "sha256": "f5e019954afe1e715ac29e9d5db25db9ca8d89e589bb4fd05888c7c100777d12"
+    },
+    {
+      "id": "geometry_relations_current",
+      "role": "event_model_user_geometry_evidence",
+      "status": "direct_user_event_facts",
+      "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/user_contours_20261004/geometry_relations_current.json",
+      "canonical_path": "model_constraints/geometry_relations_current.json",
+      "project_path": "events/ankara_2026/model_constraints/geometry_relations_current.json",
+      "bytes": 4914,
+      "sha256": "581973cea538ab44c517cbe9ff8a38f3b155ba8fab14790a2b3f946d1a07c703"
+    },
+    {
+      "id": "user_corrections_current",
+      "role": "event_model_user_geometry_evidence",
+      "status": "direct_user_event_facts",
+      "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/user_contours_20261004/user_corrections_current.json",
+      "canonical_path": "model_constraints/user_corrections_current.json",
+      "project_path": "events/ankara_2026/model_constraints/user_corrections_current.json",
+      "bytes": 4389,
+      "sha256": "1742d7493fe95cfe06bf95e77f70c54d3d09a84ec81d9efc0581e2d110abeaf8"
+    },
+    {
+      "id": "user_four_house_connection_lines_original",
+      "role": "event_model_user_geometry_evidence",
+      "status": "direct_user_event_facts",
+      "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/user_contours_20261004/user_four_house_connection_lines_original.png",
+      "canonical_path": "model_constraints/user_four_house_connection_lines_original.png",
+      "project_path": "events/ankara_2026/model_constraints/user_four_house_connection_lines_original.png",
+      "bytes": 333499,
+      "sha256": "910f6862f1256a8171a712b6770e18632b0545536eb341cb2f28c24dd566d487"
+    },
+    {
+      "id": "user_lane_centrelines_original_20261005",
+      "role": "event_model_user_geometry_evidence",
+      "status": "direct_user_event_facts",
+      "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/user_contours_20261004/user_lane_centrelines_original_20261005.png",
+      "canonical_path": "model_constraints/user_lane_centrelines_original_20261005.png",
+      "project_path": "events/ankara_2026/model_constraints/user_lane_centrelines_original_20261005.png",
+      "bytes": 333499,
+      "sha256": "910f6862f1256a8171a712b6770e18632b0545536eb341cb2f28c24dd566d487"
+    },
+    {
+      "id": "user_camera_mount_and_height_20261006_v4",
+      "role": "event_camera_installation_fact_or_evidence",
+      "status": "direct_user_facts_with_declared_numeric_uncertainty",
+      "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/camera_hardware_20261001/user_camera_mount_and_height_20261006_v4.json",
+      "canonical_path": "model_constraints/camera_hardware/user_camera_mount_and_height_20261006_v4.json",
+      "project_path": "events/ankara_2026/model_constraints/camera_hardware/user_camera_mount_and_height_20261006_v4.json",
+      "bytes": 15400,
+      "sha256": "c1ca7ab570d60e02c54c5ce3e4a7493cdc076942447d880c2452272b29fb2b2b"
+    },
+    {
+      "id": "user_tripod_positions_20261006_v2",
+      "role": "event_camera_installation_fact_or_evidence",
+      "status": "direct_user_facts_with_declared_numeric_uncertainty",
+      "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/camera_hardware_20261001/user_tripod_positions_20261006_v2.json",
+      "canonical_path": "model_constraints/camera_hardware/user_tripod_positions_20261006_v2.json",
+      "project_path": "events/ankara_2026/model_constraints/camera_hardware/user_tripod_positions_20261006_v2.json",
+      "bytes": 3885,
+      "sha256": "a539dced58edec058e68e64c702999c4e0dafe210ed60b490a2c442f0d452a74"
+    },
+    {
+      "id": "user_tripod_positions_20261002",
+      "role": "event_camera_installation_fact_or_evidence",
+      "status": "direct_user_facts_with_declared_numeric_uncertainty",
+      "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/camera_hardware_20261001/user_tripod_positions_20261002.png",
+      "canonical_path": "model_constraints/camera_hardware/user_tripod_positions_20261002.png",
+      "project_path": "events/ankara_2026/model_constraints/camera_hardware/user_tripod_positions_20261002.png",
+      "bytes": 259349,
+      "sha256": "d6a1355ae1ecf2bdbf3ab3cfad4f4774b4d108744af4b71106c57109f2b058d5"
+    },
+    {
+      "id": "event_camera_classification",
+      "role": "event_camera_classification",
+      "status": "user_confirmed_event_camera_groups",
+      "source_path": "D:/OneDrive/codex_projs/RinkSpace/configs/camera_classification/ankara_2026_user_confirmed.json",
+      "canonical_path": "model_constraints/camera_hardware/ankara_2026_user_confirmed_classification.json",
+      "project_path": "events/ankara_2026/model_constraints/camera_hardware/ankara_2026_user_confirmed_classification.json",
+      "bytes": 21981,
+      "sha256": "37f11ddc1d131013f1e0bb8e713e910f7466398d390b4c05daf5eb391d4ace04"
+    },
+    {
+      "id": "user_work_priorities_20261005",
+      "role": "programme_task_constraint",
+      "status": "direct_user_programme_scope",
+      "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/model_constraints/user_work_priorities_20261005.json",
+      "canonical_path": "programmes/okada_mei_sp/model_constraints/user_work_priorities_20261005.json",
+      "project_path": "events/ankara_2026/programmes/okada_mei_sp/model_constraints/user_work_priorities_20261005.json",
+      "bytes": 3530,
+      "sha256": "1f4d8be1f8ade0d732ccaece86c353a2be3a3369480220c589d4a3ca3da3c943",
+      "association": "okada_mei_sp"
+    },
+    {
+      "id": "okada_isu_stature_prior_20261002",
+      "role": "programme_body_model_prior",
+      "status": "declared_prior_not_event_measurement",
+      "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/camera_hardware_20261001/okada_isu_stature_prior_20261002.json",
+      "canonical_path": "programmes/okada_mei_sp/model_constraints/okada_isu_stature_prior_20261002.json",
+      "project_path": "events/ankara_2026/programmes/okada_mei_sp/model_constraints/okada_isu_stature_prior_20261002.json",
+      "bytes": 1290,
+      "sha256": "2e73405aff6d9f32b012b6ae77fa71cd1b1b335137e65990a629b4dd6e15eaaa",
+      "association": "okada_mei_sp"
+    },
+    {
+      "id": "okada_skate_lift_prior_20261002",
+      "role": "programme_body_model_prior",
+      "status": "declared_prior_not_event_measurement",
+      "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/camera_hardware_20261001/okada_skate_lift_prior_20261002.json",
+      "canonical_path": "programmes/okada_mei_sp/model_constraints/okada_skate_lift_prior_20261002.json",
+      "project_path": "events/ankara_2026/programmes/okada_mei_sp/model_constraints/okada_skate_lift_prior_20261002.json",
+      "bytes": 3120,
+      "sha256": "ba06033d21a7c6f4461fb9ac672869f270bee2579515d14318c03cce783355b3",
+      "association": "okada_mei_sp"
+    },
+    {
+      "id": "working_scene",
+      "role": "immutable_working_shared_event_model",
+      "status": "accuracy_not_accepted",
+      "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/mainspin_all_tripods_outside_user_domain_v2_actual_fit_nodump_20261006/accepted_states/77bf5c2a81df2d8a8f3984c1465a17e411fb0fd819753ffcaa8e0706703b08c0/scene_UNACCEPTED.json",
+      "canonical_path": "models/working/77bf5c2a81df/scene_UNACCEPTED.json",
+      "project_path": "events/ankara_2026/models/working/77bf5c2a81df/scene_UNACCEPTED.json",
+      "bytes": 1080992,
+      "sha256": "5c6034c43701bee5bd59e869feb28a10d31612c4d092a59d0a0c5a343fa57280",
+      "association": "okada_mei_sp"
+    },
+    {
+      "id": "working_state_identity",
+      "role": "immutable_working_model_binding",
+      "status": "accuracy_not_accepted",
+      "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/mainspin_all_tripods_outside_user_domain_v2_actual_fit_nodump_20261006/accepted_states/77bf5c2a81df2d8a8f3984c1465a17e411fb0fd819753ffcaa8e0706703b08c0/state_identity.json",
+      "canonical_path": "models/working/77bf5c2a81df/state_identity.json",
+      "project_path": "events/ankara_2026/models/working/77bf5c2a81df/state_identity.json",
+      "bytes": 1245,
+      "sha256": "4044309ef3629c54f86f0586a9042c0855c3efe63cf1289346596855df855d97",
+      "association": "okada_mei_sp"
+    },
+    {
+      "id": "working_camera",
+      "role": "immutable_working_physical_camera_export",
+      "status": "accuracy_not_accepted",
+      "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/mainspin_all_tripods_outside_user_domain_v2_actual_fit_nodump_20261006/complete_physical_camera_model_UNACCEPTED_7fda90822c7f72a9.npz",
+      "canonical_path": "models/working/77bf5c2a81df/complete_physical_camera_model_UNACCEPTED_7fda90822c7f72a9.npz",
+      "project_path": "events/ankara_2026/models/working/77bf5c2a81df/complete_physical_camera_model_UNACCEPTED_7fda90822c7f72a9.npz",
+      "bytes": 790298,
+      "sha256": "e7a2df377c682777478882e6c64756ff019603ab89e58757914052f7240d6009",
+      "association": "okada_mei_sp"
+    },
+    {
+      "id": "review_frozen_inputs",
+      "role": "video_exact_original_model_binding",
+      "status": "accuracy_not_accepted",
+      "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/shared_radius_05db_pelvis_priority_full_programme_20261005/FROZEN_INPUTS_UNACCEPTED.json",
+      "canonical_path": "programmes/okada_mei_sp/models/review_20261005/FROZEN_INPUTS_UNACCEPTED.json",
+      "project_path": "events/ankara_2026/programmes/okada_mei_sp/models/review_20261005/FROZEN_INPUTS_UNACCEPTED.json",
+      "bytes": 3502,
+      "sha256": "92c2caf7ddb9b5aba63aeab51fca72683e4ce1ce8657b4b1e6819390c7310907",
+      "association": "okada_mei_sp"
+    },
+    {
+      "id": "review_scene",
+      "role": "video_actual_scene_model",
+      "status": "accuracy_not_accepted",
+      "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/shared_radius_05db_pelvis_priority_full_programme_20261005/frozen_shared_radius_scene_4075_UNACCEPTED.json",
+      "canonical_path": "programmes/okada_mei_sp/models/review_20261005/frozen_shared_radius_scene_4075_UNACCEPTED.json",
+      "project_path": "events/ankara_2026/programmes/okada_mei_sp/models/review_20261005/frozen_shared_radius_scene_4075_UNACCEPTED.json",
+      "bytes": 1073792,
+      "sha256": "092ec9d7e86c9c034b1d12565106c84a9b6cb6eb5202f4e71c1bb3ce5fe1a4c1",
+      "association": "okada_mei_sp"
+    },
+    {
+      "id": "review_camera",
+      "role": "video_actual_camera_model",
+      "status": "accuracy_not_accepted",
+      "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/okada_user_priorities_shared_actual_fit_fast_20261005/complete_physical_camera_model_UNACCEPTED_917c204dafde4027.npz",
+      "canonical_path": "programmes/okada_mei_sp/models/review_20261005/complete_physical_camera_model_UNACCEPTED_917c204dafde4027.npz",
+      "project_path": "events/ankara_2026/programmes/okada_mei_sp/models/review_20261005/complete_physical_camera_model_UNACCEPTED_917c204dafde4027.npz",
+      "bytes": 786174,
+      "sha256": "fdd0b66976f1df5b783882726d05bb6e84a719cf46c3d8dfa56bf721bcea6058",
+      "association": "okada_mei_sp"
+    },
+    {
+      "id": "review_body_parameters",
+      "role": "video_actual_body_model_parameter_subset",
+      "status": "accuracy_not_accepted",
+      "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/pelvis_source_priority_05db_20261005/actual_body_root_fit.npz",
+      "source_sha256": "a6d626f28b25f64dabfa5bdb1515d1c20a935845b8a46d4260a0f7818cf926af",
+      "source_bytes": 16799182,
+      "canonical_path": "programmes/okada_mei_sp/models/review_20261005/body_model_parameters_UNACCEPTED.npz",
+      "project_path": "events/ankara_2026/programmes/okada_mei_sp/models/review_20261005/body_model_parameters_UNACCEPTED.npz",
+      "bytes": 2624209,
+      "sha256": "83d688304c216672073c03e74d913d460e473f8285ed317d9ca66129820b169d",
+      "association": "okada_mei_sp",
+      "derivation": "Exact original NPY member bytes retained; residuals, source observations, solver history and caches remain in original Data archive. Renderer-required body keys included.",
+      "members": [
+        {
+          "name": "actual_pts",
+          "bytes": 68152,
+          "sha256": "f25123bb2af670353889408f6c7509f0e488c3512d2c0d67916339d725ea7db7"
+        },
+        {
+          "name": "source_native_pts",
+          "bytes": 68152,
+          "sha256": "f25123bb2af670353889408f6c7509f0e488c3512d2c0d67916339d725ea7db7"
+        },
+        {
+          "name": "P_world_m",
+          "bytes": 204200,
+          "sha256": "65677f658ff6b6853c32de299f9087a9eb13bd70f04722c68a3030c2c013af3b"
+        },
+        {
+          "name": "Q_world",
+          "bytes": 612344,
+          "sha256": "1770f74811587c06badc602579d31f2ca073cd8d36099e99695321fea8b6e2b5"
+        },
+        {
+          "name": "camera25",
+          "bytes": 1700728,
+          "sha256": "62052d28a319f15d44b913a9217df0a69105ffdf255f093de281bec328d3d60e"
+        },
+        {
+          "name": "valid",
+          "bytes": 8631,
+          "sha256": "787ee33b9128d891f776e9e5219f857e07a79ea7f6e4a3d83f8b4ea65486ddd9"
+        },
+        {
+          "name": "inferred",
+          "bytes": 8631,
+          "sha256": "069a2c1c939addb052c9d8e1106b8b52923d3f619f3df741f85d8adf569ab58d"
+        },
+        {
+          "name": "connect_from_previous",
+          "bytes": 8631,
+          "sha256": "469a4144f77c7768806a3a2c202277b41245f1aeb178ddb3bacca8134fc6d299"
+        },
+        {
+          "name": "G_world_m",
+          "bytes": 204200,
+          "sha256": "199404e499665aeb88ee37d0f6529fcc325b5d89e0df86b6a811c20ed1e60403"
+        },
+        {
+          "name": "G_native_uv",
+          "bytes": 136176,
+          "sha256": "356c06138b8fe722802a89f2c06c20f7b89a709a9b01b4720b54bbf128f2a18e"
+        },
+        {
+          "name": "body_scale",
+          "bytes": 136,
+          "sha256": "db6c3599d8cb4e03fd1438bb3277f8e37009ff1ae7e4ae8f42520b074414f370"
+        },
+        {
+          "name": "metres_per_scene_unit",
+          "bytes": 136,
+          "sha256": "620a2508f8173faf3fafee8db41a933f6429e1036065afbff3e263a375236fa0"
+        },
+        {
+          "name": "native_pts",
+          "bytes": 81112,
+          "sha256": "e91d0bc7482f2b917fd99a6b1ab37583eeb3c4e4abeac8aa3c4a5686fc92b513"
+        },
+        {
+          "name": "native_exposure_representative_pts",
+          "bytes": 81112,
+          "sha256": "5d1963001903914790d39a4a2b7636653f8985695ba3cb6c3d416c2a08270284"
+        },
+        {
+          "name": "native_actual_row",
+          "bytes": 81112,
+          "sha256": "950228365ef407107909006ca493d522679947bdd9e93146d24a2ce2feec264b"
+        },
+        {
+          "name": "native_P_world_m",
+          "bytes": 243080,
+          "sha256": "af9c382ae85524da49036502c0fd5f10f10991d3bfe177dc9fa0769f8eaa41a4"
+        },
+        {
+          "name": "native_Q_world",
+          "bytes": 728984,
+          "sha256": "3eb5c33fec4988e4db18428f8d8395ded1dd38f50eef657f459bf4fc9a604173"
+        },
+        {
+          "name": "native_G_world_m",
+          "bytes": 243080,
+          "sha256": "78745747540d0c07f27c0e29ce8c9b40ba9d7eab4d03afc3b1b8819664c4ac2d"
+        },
+        {
+          "name": "native_G_native_uv",
+          "bytes": 162096,
+          "sha256": "5de10bb01b0fcee7792660baa970a89efaaf613b55d06ed6959904ab3c018c37"
+        },
+        {
+          "name": "native_valid",
+          "bytes": 10251,
+          "sha256": "a5aff1c8d854d39001d10bb2895a04e50e5d04b13156fdf205e1e08d11fa3b1c"
+        },
+        {
+          "name": "native_inferred",
+          "bytes": 10251,
+          "sha256": "f8f71622c82c4d99149e7d1ccf629f611643b6ab95ec88d6ba02e0f9ee28160c"
+        },
+        {
+          "name": "shot_index",
+          "bytes": 17134,
+          "sha256": "70c729b26783465006a227daac0a41fa3e61a27ec826dc5c78bb5bbcf9f2cdb9"
+        }
+      ]
+    },
+    {
+      "id": "direct_cross_camera_user_confirmation",
+      "role": "event_direct_human_camera_confirmation",
+      "status": "direct_user_event_facts",
+      "scope": "Direct user confirmation of visible physical camera installations and cross-camera verification; numeric locations remain estimates.",
+      "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/camera_hardware_20261001/user_direct_cross_camera_validation_20261003.json",
+      "canonical_path": "model_constraints/evidence/user_direct_cross_camera_validation_20261003.json",
+      "project_path": "events/ankara_2026/model_constraints/evidence/user_direct_cross_camera_validation_20261003.json",
+      "bytes": 1768,
+      "sha256": "3bf1ac8067d4fc1a5383cdb7987e7a115e360265048c269b373bc538728b76ed"
+    },
+    {
+      "id": "direct_cross_camera_source_photo_1",
+      "role": "event_cross_camera_source_image_evidence",
+      "status": "actual_event_camera_identification_evidence",
+      "scope": "Actual event source image supporting user identification of cameras and operators; no invented landmark measurements.",
+      "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/observations/camera_teaching_originals/oxXu1avhrvs.mp4_20260921_234602.927.jpg",
+      "canonical_path": "model_constraints/evidence/oxXu1avhrvs.mp4_20260921_234602.927.jpg",
+      "project_path": "events/ankara_2026/model_constraints/evidence/oxXu1avhrvs.mp4_20260921_234602.927.jpg",
+      "bytes": 228632,
+      "sha256": "4e6ef03c3e6865fe75845db73a8f71ea545738c0976f8a1607b592fd00a9dd9d",
+      "public_distribution": {
+        "included": false,
+        "reason": "Local broadcast original; excluded from public Git by .gitignore, source record and local path retained."
+      }
+    },
+    {
+      "id": "direct_cross_camera_source_photo_2",
+      "role": "event_cross_camera_source_image_evidence",
+      "status": "actual_event_camera_identification_evidence",
+      "scope": "Actual event source image supporting user identification of cameras and operators; no invented landmark measurements.",
+      "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/observations/camera_teaching_originals/oxXu1avhrvs.mp4_20260921_234826.789.jpg",
+      "canonical_path": "model_constraints/evidence/oxXu1avhrvs.mp4_20260921_234826.789.jpg",
+      "project_path": "events/ankara_2026/model_constraints/evidence/oxXu1avhrvs.mp4_20260921_234826.789.jpg",
+      "bytes": 153850,
+      "sha256": "0d5ff5365119319591fa63a325d387fa20b2f7e29d41c3d505747fb973626416",
+      "public_distribution": {
+        "included": false,
+        "reason": "Local broadcast original; excluded from public Git by .gitignore, source record and local path retained."
+      }
+    },
+    {
+      "id": "camera_mount_mechanical_reference",
+      "role": "camera_mount_mechanical_reference_image",
+      "status": "mechanical_reference_only_not_event_landmark_or_dimension_measurement",
+      "scope": "User-provided mechanical mounting reference only; not Ankara event rink landmarks or perspective-corrected measured dimensions.",
+      "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/history/work_sessions/20261002_private-thread-00009/user_nonzero_mount_20261002_v3/mechanical_mount_reference_01.withheld",
+      "canonical_path": "model_constraints/evidence/mechanical_mount_reference_01.withheld",
+      "project_path": "events/ankara_2026/model_constraints/evidence/mechanical_mount_reference_01.withheld",
+      "bytes": 993754,
+      "sha256": "45b1e5b0a2d9b025a809e3bcfa85c731127ad938d175892258329c14aac81414"
+    }
+  ],
+  "verification": {
+    "copied_file_sha256_matches_source": true,
+    "body_original_npy_member_sha256_matches": true,
+    "source_files_preserved": true,
+    "active_config_was_not_modified": true,
+    "copied_and_derived_files": 37,
+    "canonical_bytes": 18044948,
+    "additional_user_evidence_source_target_sha256_matches": true
+  },
+  "code_ownership": {
+    "solver_source_manifest": "calibration/solver_runtime/source_manifest.json",
+    "solver_source_files_verified": 260,
+    "restored_tools": [
+      {
+        "source_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\same_exposure_direct_pose_cache_overlay_20261005\\rebind_after_new_camera.ps1",
+        "project_path": "scripts/rebind_body_after_camera.ps1",
+        "source_sha256": "eb918433efa6f6f292756d12eceaa696363b88848450d518acb80face35ea344",
+        "sha256": "2e34fbdcf0ccbd81203413cfceec588de8b4414175e2c72de694dbbc9168eda0",
+        "role": "reusable_body_camera_binding",
+        "data_source_retained_for_compatibility": true,
+        "output_policy": "Data only; no automatic execution"
+      },
+      {
+        "source_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\ads_actual_identity_correction_20261005\\Ad4_end_programme_singleton_source_candidate_20261005\\measure_Ad4_231705088_source_only.py",
+        "project_path": "events/ankara_2026/tools/source_observations/measure_Ad4_native_tail.py",
+        "source_sha256": "a9d7fb24c30bc0454f6274e71afad675855db662c4c0e8b7c9e0126fe77ae7c3",
+        "sha256": "6a85079905bacccf2d39b669a40bb391125ed289b5e31d1a818c164e7a3a8bba",
+        "role": "event_source_pixel_tool",
+        "data_source_retained_for_compatibility": true,
+        "output_policy": "Data only; no automatic execution"
+      },
+      {
+        "source_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\cut6_unused_actual_source_append_v9_20261005\\extract_cut6_exact_unused_raw_candidates.py",
+        "project_path": "events/ankara_2026/tools/source_observations/extract_cut6_exact_unused_raw_candidates.py",
+        "source_sha256": "1a7e2b93cf9f87a88fc587d8a272b688d96183a3a61fa2dcfd24381228f93e73",
+        "sha256": "b9395b12e823bd31a23ea42c51cc1e5890c034d5a9446fd032564c907f7710fc",
+        "role": "event_source_time_tool",
+        "data_source_retained_for_compatibility": true,
+        "output_policy": "Data only; no automatic execution"
+      },
+      {
+        "source_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\cut6_unused_actual_source_append_v9_20261005\\prepare_cut6_Ad11_circle_source_v5.py",
+        "project_path": "events/ankara_2026/tools/source_observations/prepare_cut6_Ad11_circle_source_v5.py",
+        "source_sha256": "640f177681a790f0387e9c3ccb0f883efd4158a28c1ddd6b553e55e2df0ed4e6",
+        "sha256": "fb688df0dfecdbdbbe489a7c4a2989e8cf28633cec6d2e54a4cb0ad28c5e949d",
+        "role": "event_source_curve_tool",
+        "data_source_retained_for_compatibility": true,
+        "output_policy": "Data only; no automatic execution"
+      }
+    ],
+    "entry_refresh_source": "scripts/refresh_project_entry.py",
+    "historical_sources_not_runtime": [
+      {
+        "source_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\build_catalog.py",
+        "source_sha256": "f83bcedb7c2a8530dc61771c505c61e64de45e24d688e0eefea1db980fc6ea4b",
+        "role": "superseded_catalog_generator_source_history",
+        "data_source_retained_for_compatibility": true,
+        "output_policy": "Data only; no automatic execution",
+        "replacement_project_path": "scripts/refresh_project_entry.py"
+      }
+    ]
+  }
+}

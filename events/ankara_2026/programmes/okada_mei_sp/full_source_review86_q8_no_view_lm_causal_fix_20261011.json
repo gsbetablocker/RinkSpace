@@ -1,0 +1,414 @@
+{
+  "schema": "rinkspace.reusable-solver-inputs.v1",
+  "resource_root": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003",
+  "driver": "named66",
+  "event_id": "ankara_2026",
+  "programme_id": "okada_mei_sp",
+  "source_clock": {
+    "time_base": "1/15360",
+    "native_start_inclusive": 229114112,
+    "native_stop_exclusive": 231705600,
+    "native_presentations": 10123,
+    "shots": 9
+  },
+  "source_options": {
+    "--world-init": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/user_corrected_programme_candidate/latest9a8c_world66_initialization_ONLY.json",
+    "--camera-seed": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_q276_vertical_print_station_one_cycle_20261011\\solver\\latest_accepted_state.npz",
+    "--additional-ice-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\F2_Ad24_26_sparse_temporal_actual_RGB_candidate\\FINAL_native_ice108_original101_plus7_actual_F2_filled_outer65_FIT_QUALIFIED_20261011.json",
+    "--additional-board-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\B2_original_center_and_LOW_Ad4_missing_anchor_systematic\\uniform_full_cut_actual_RGB_candidates\\FINAL_native_board191_original185_plus6_LOW_Ad4_actual_RGB_location_FIT_20261011.json",
+    "--additional-board-material-point-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\F2_Ad24_26_sparse_temporal_actual_RGB_candidate\\FINAL_native_board_material18_original15_plus3_Ad26_gray_outer9_FIT_quadratic_budget_20261011.json",
+    "--additional-board-circle-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\full_a13c816f_user_review_20261009\\user_reported_low_board_motion_20261009\\short_end_Ad24_25_26_native229604096_actual_source\\circle_parent_plus_Ad24_native229604096_broad_support_SOURCE_CANDIDATE_v2.json",
+    "--original-source-role-retirement-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\ads_actual_identity_correction_20261005\\Ad7_original_print_corner_role_correction_CANDIDATE_v1.json",
+    "--independent-board-pattern-placement-source": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/model_constraints/user_advertisement_pairs_20261005.json",
+    "--persistent-ice-long-baseline-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\spin_source_long_baseline_20261005\\spin_micro_actual_original_anchor_v3_20261005\\spin_reviewed_ice_long_baseline_FIT_HELD_v3_micro_actual.json",
+    "--serial-source": true,
+    "--serial-current-patterns": false,
+    "--geometry-fd-workers": "20",
+    "--normal-workers": "8",
+    "--reuse-source-jacobian": true,
+    "--residual-source-workers": "6",
+    "--adaptive-source-backtracking": true,
+    "--residual-native-threads": "3",
+    "--static-motion-source-role-retirement-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\full_a13c816f_user_review_20261009\\user_reported_low_board_motion_20261009\\Ad23_existing_original_motion_role_diagnostic\\original_UI_retirement_preserved_plus_actual_dynamic_foot2_validity_CANDIDATE.json",
+    "--camera-mount-constraint-source": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/camera_hardware_20261001/user_camera_mount_and_height_20261006_v4.json",
+    "--camera-pivot-exterior-constraint-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\camera_hardware_20261001\\user_tripod_positions_20261006_v2.json",
+    "--original-ice-pixel-correction-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\board_top_contact_material_semantics\\original_TOP_RGB_measured_anchor_revision\\original_ice_and_TOP_actual_RGB_corrected_source_WHOLE_SOURCE_REVIEW36_20261011.json",
+    "--roll-prior-sigma-degrees": "0.5",
+    "--additional-native-board-track-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\secondary_Ad22_23_absolute_source_candidate_20261009\\native_full_parent_plus_secondary_Ad22_23_absolute_ADMITTED_v1.json",
+    "--estimate-unverified-physical-geometry": true,
+    "--original-motion-far-board-role-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\original_LK_wholecut_material_review\\approved_original275_complete947_role_revision\\complete_previous31549_plus_actual_RGB947_far_board_roles_ADMITTED_CANDIDATE.json",
+    "--strict-half-circle-crease": true,
+    "--derive-hockey-center-from-course": true,
+    "--estimate-unverified-goal-crease-placement": true,
+    "--original-motion-low-compaction-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\physical_geometry_unlock_20261008\\low_original_Ad4_nearby_source_roles\\first_clock_duplicate_retirement_compaction_20261008\\first_source_clock_and_explicit_retirement_compaction_CANDIDATE_v1.json",
+    "--original-motion-main-compaction-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\physical_geometry_unlock_20261008\\low_original_Ad4_nearby_source_roles\\first_clock_duplicate_retirement_compaction_20261008\\main_exact_same_pair_UV_role_sigma_duplicates_CANDIDATE_v1.json",
+    "--physical-course-scope-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\user_video_review_20261008\\c134_full_programme\\registered_user_complete_stroke_source_append_20261008\\user20_existing_lower_long_side_connected_lower_right_scope_authority_v1.json",
+    "--direct-human-truth-authority": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\current_source_budget_append_fe074c6a\\human_same54_new_native_container_bindings.json",
+    "--direct-human-full-stroke-guard": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\current_source_budget_append_fe074c6a\\human_same54_full_guard.json",
+    "--original-wide-human-truth-authority": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\user_video_review_20261008\\c134_full_programme\\registered_user_complete_stroke_source_append_20261008\\human_original_wide_top_contours_hard_authority_v1.json",
+    "--direct-human-stroke-cap-support": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\current_source_budget_append_fe074c6a\\human_same54_stroke_caps.json",
+    "--practical-human-location-envelope": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\current_source_budget_append_fe074c6a\\human_same54_original_location_envelope.json",
+    "--user-confirmed-source-truth-authority": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\current_source_budget_append_fe074c6a\\confirmed_same30_new_native_container_bindings.json",
+    "--shared-hockey-curling-axis": true,
+    "--joint-source-truth-restoration": true,
+    "--direct-human-centre-target": true,
+    "--source-jacobian-refresh-ratio": "0.25",
+    "--truth-restoration-state": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_q276_vertical_print_station_one_cycle_20261011\\accepted_states\\8a15a4ed0c82beb490993db9c58294af592096e8159d9652b5bd5c50217c71eb\\truth_restoration_state.json",
+    "--truth-restoration-priority": true,
+    "--initial-damping": 0.00119804999763983,
+    "--original-source-point-qualification-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\main1_original_source_RGB_review\\original_absolute_same16_plus_main1_TOP1292_2288_observability18_CANDIDATE.json",
+    "--original-absolute-input-compaction-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\nearboard49_original_source_mass_coarsening_evidence_20261010.json",
+    "--principal-point-working-prior": true,
+    "--original-board-curve-integration-policy": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_board_curve_per_exposure_integration_POLICY_CANDIDATE_20261010_qualification18.json",
+    "--native-base-curve-integration-policy": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\F2_Ad24_26_sparse_temporal_actual_RGB_candidate\\FINAL_native_ice16_board134_authenticated_user_and_RGB_curve_budget_policy150_20261011.json",
+    "--original-ice-curve-integration-policy": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_ICE_all79_physical_curve_per_exposure_integration_POLICY_20261011.json",
+    "--save-complete-source-directions": true,
+    "--finite-rectangle-station-model": true,
+    "--schur-view-lm-ratio": 0.0
+  },
+  "continuation": {
+    "complete_accepted_state": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_q276_vertical_print_station_one_cycle_20261011\\solver\\latest_accepted_state.npz",
+    "checkpoint_file_sha256": "60859537ad96d81f5f41c42b00ba99a96a62fcd66f8d3f3d39120108437ea14b",
+    "truth_restoration_state": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_q276_vertical_print_station_one_cycle_20261011\\accepted_states\\8a15a4ed0c82beb490993db9c58294af592096e8159d9652b5bd5c50217c71eb\\truth_restoration_state.json",
+    "truth_restoration_state_sha256": "45e1b3ec6147f1c74354ff45f6444eeb5ed6614a32fb1a4964a0b9a1dc76e900",
+    "state": {
+      "q_sha256": "8a15a4ed0c82beb490993db9c58294af592096e8159d9652b5bd5c50217c71eb",
+      "parameters": 34340,
+      "fields": 77,
+      "frozen_profile_token": "43e920c14e0e190925321d5c291efca1e5e5f2dce80a3d18336b1035bf920116",
+      "damping": 0.00119804999763983
+    },
+    "previous_input_configuration": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\full_source_review86_q276_vertical_print_station_one_cycle_20261011.json",
+      "sha256": "304d986a1587c8df0142ee7307e41a48b5b76890d89431088ee6957cd291b745"
+    },
+    "current_truth_group_count": 86,
+    "expected_complete_active_source_scalars": 4502662,
+    "next_start_requires_fresh_source_J": true,
+    "original_manual_group_cap_and_uncertainty_identity": {
+      "native": {
+        "group_ids": [
+          "user_complete_yellow_contact_lower_long_side_native230024192",
+          "user_complete_red_TOP_lower_long_side_native230024192",
+          "user_orange_Ad18_internal_left_vertical_native230036992",
+          "user_orange_Ad18_internal_right_vertical_native230036992",
+          "user_orange_Ad18_internal_top_edge_native230036992",
+          "user_orange_Ad18_internal_bottom_edge_native230036992",
+          "user_yellow_Ad17_external_left_vertical_native230036992",
+          "user_native230501120_lane2_upper_long_20261007",
+          "user_native230501120_lane3_lower_long_20261007",
+          "user_complete_yellow_right_goal_baseline_native229618944",
+          "user_native230024192_B2_20261008",
+          "user_native230024192_C0_20261008",
+          "user_native230024192_B1_20261008",
+          "user_native230024192_Lane1_上长边_20261008",
+          "user_native230024192_Lane1_中线_20261008",
+          "user_native230024192_Lane1_下长边_20261008",
+          "user_native230024192_ad17_top_edge_20261008",
+          "user_native230024192_ad17_right_vertical_20261008",
+          "user_native230024192_ad17_bottom_edge_20261008",
+          "user_native230024192_ad17_left_vertical_20261008",
+          "user_native230024192_ad18_top_edge_20261008",
+          "user_native230024192_ad18_right_vertical_20261008",
+          "user_native230024192_ad18_bottom_edge_20261008",
+          "user_native230024192_ad18_left_vertical_20261008",
+          "user_native230024192_ad19_top_edge_20261008",
+          "user_native230024192_ad19_right_vertical_20261008",
+          "user_native230024192_ad19_bottom_edge_20261008",
+          "user_native230024192_ad19_left_vertical_20261008",
+          "user_native230024192_ad20_top_edge_20261008",
+          "user_native230024192_ad20_right_vertical_20261008",
+          "user_native230024192_ad20_bottom_edge_20261008",
+          "user_native230024192_ad20_left_vertical_20261008",
+          "user_native230024192_R2_outer_approx_20261008",
+          "user_native230024192_R1_outer_approx_20261008",
+          "user_native230024192_A4_visible_arc_20261008",
+          "user_complete_yellow_left_goal_baseline_native230995968",
+          "user_complete_yellow_C_centreline_native229246976",
+          "user_complete_yellow_F3_outer_native229342976",
+          "user_complete_yellow_F2_outer_native229989888",
+          "user_complete_position_C_centreline_native229799936",
+          "user_complete_position_Lane2_lower_long_native230093056",
+          "user_complete_position_Lane1_upper_long_native230093056",
+          "user_complete_position_C_04_10_00_433_native230406656",
+          "user_complete_position_B1_04_10_00_433_native230406656",
+          "user_complete_position_user_named_B2_actual_R2_outer_04_10_18_783_native230688512",
+          "user_complete_position_F3_outer_04_08_50_533_native229332992",
+          "user_complete_position_C0_rough_position_arc_source_window_v2_native229766912",
+          "user_complete_position_Lane3_upper_yellow_04_11_06_133_native231415808",
+          "user_complete_position_Lane3_lower_red_04_11_06_133_native231415808",
+          "user_complete_position_Ad4_right_red_native229766912",
+          "user_20261010_Lane3_lower_229530880_branch0",
+          "user_20261010_F2_outer_230390528_branch0",
+          "user_20261010_F2_outer_230390528_branch1",
+          "user_complete_red_TOP_blue_UPPER_native231678464"
+        ],
+        "authority": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\current_source_budget_append_fe074c6a\\human_same54_new_native_container_bindings.json",
+          "sha256": "5b28f89e653e585ee8c84b7f4e944e46acf59bcde77b5d29838f3d5f743d30d0"
+        },
+        "limits_float64_sha256": "17dc5dbaa9d80a2852e8e8d1cf3590ca5a47fa8b65b14ee693437ef0f5da3bee",
+        "uncertainties_float64_sha256": "c496a3356938e717500c2789bbe164ca4d05c68387c0b6b84fd2834dac7bef75",
+        "zero_limits": 43
+      },
+      "wide": {
+        "group_ids": [
+          "user_far_upper_left_rail_top",
+          "user_far_upper_right_rail_top"
+        ],
+        "authority": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\user_video_review_20261008\\c134_full_programme\\registered_user_complete_stroke_source_append_20261008\\human_original_wide_top_contours_hard_authority_v1.json",
+          "sha256": "68b5cce2c3ba9d05e72b406c13fb70da19564701e35bf0120f434c2569786519"
+        },
+        "limits_float64_sha256": "374708fff7719dd5979ec875d56cd2286f6d3cf7ec317a3b25632aab28ec37bb",
+        "uncertainties_float64_sha256": "f647dc0bc2dc865845cbd4872fc7f0ec253b60cbd27e33fe789ac3890a29dda3",
+        "zero_limits": 2
+      },
+      "confirmed": {
+        "group_ids": [
+          "clearer_late_230501120_Ad7_left_vertical_tinyfit",
+          "clearer_late_230501120_Ad7_top_edge_tinyfit",
+          "clearer_late_230501120_Ad7_bottom_edge_tinyfit",
+          "user_confirmed_RGB_230501120_top_material_edge",
+          "user_confirmed_RGB_230501120_contact_material_edge",
+          "native_F1_candidate_230547200",
+          "Ad4_left_vertical_actual_229464320_user_pan_source_only_FIT_20261009",
+          "Ad4_right_vertical_actual_229712896_user_pan_source_only_FIT_20261009",
+          "user_opening_Ad3_left_vertical_229210368_source_RGB_FIT_20261009",
+          "user_opening_Ad3_left_vertical_229217792_source_RGB_FIT_20261009",
+          "user_opening_Ad4_right_vertical_229210368_source_RGB_FIT_20261009",
+          "user_identified_R4_native229174016_middle_RGB_edge",
+          "user_identified_R4_native229174016_outer_RGB_edge",
+          "user_identified_R4_native229174016_middle_RGB_rightmost_extent",
+          "user_identified_R4_native229174016_outer_RGB_rightmost_extent",
+          "Ad4_external_left_vertical_unused_tail_native231705088",
+          "Ad4_external_right_vertical_unused_tail_native231705088",
+          "user_fullvideo_multitime_native231534080_Ad4_left_vertical_actual_RGB",
+          "user_fullvideo_multitime_native231534080_Ad4_right_vertical_actual_RGB",
+          "actual_Ad23_last_red_O_component9_right_extent_230098176_RGB_FIT",
+          "actual_short_end_Ad24_outer_stroke_229604096_broad_RGB_FIT",
+          "actual_short_end_Ad25_named_outline_points_229604096_broad_RGB_FIT",
+          "actual_short_end_Ad26_outer_stroke_229604096_broad_RGB_FIT",
+          "Ad4_left_vertical_actual_229464320_user_pan_source_only_FIT_20261009__original_optical_support_companion",
+          "Ad4_right_vertical_actual_229712896_user_pan_source_only_FIT_20261009__original_optical_support_companion",
+          "user_opening_Ad3_left_vertical_229210368_source_RGB_FIT_20261009__original_optical_support_companion",
+          "user_opening_Ad3_left_vertical_229217792_source_RGB_FIT_20261009__original_optical_support_companion",
+          "user_opening_Ad4_right_vertical_229210368_source_RGB_FIT_20261009__original_optical_support_companion",
+          "user_identified_R4_native229174016_middle_RGB_rightmost_extent__original_optical_support_companion",
+          "user_identified_R4_native229174016_outer_RGB_rightmost_extent__original_optical_support_companion"
+        ],
+        "authority": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\current_source_budget_append_fe074c6a\\confirmed_same30_new_native_container_bindings.json",
+          "sha256": "6a895f4a6446db5c9f394e8293fd89c041f59ee5df75bee039b28ccd31dcd3d4"
+        },
+        "limits_float64_sha256": "3541c8f8e9ab87326aea3f911f5ac25a0f9d74dfb07d3924eaa714e0db69cdba",
+        "uncertainties_float64_sha256": "efbdc77d33831e5bb79ecb4a9eec5e0876dabfe9fed860183bfbd9164a7d8b38",
+        "zero_limits": 20
+      }
+    },
+    "explicit_role_only_migration": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\current_samea454_actual947_roles_SOC_sufficient_continuation\\same_complete_q_original86_caps_actual947_role_migration_proof.json",
+      "sha256": "b4c7085796eff2ab0fe3123e271d8aadf3bbcf37c5456027ab278596275b5312"
+    },
+    "old_source_J_H_normals_not_reused": true,
+    "source_clock_UV_sigma_and_existing_compaction_maps_retained": true,
+    "no_new_source_scalar_or_parameter": true,
+    "no_step_or_runtime_limit_added": true,
+    "accuracy_accepted": false,
+    "published_same_q_complete_state_reference": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_q276_vertical_print_station_one_cycle_20261011\\accepted_states\\8a15a4ed0c82beb490993db9c58294af592096e8159d9652b5bd5c50217c71eb\\complete_state_UNACCEPTED.npz",
+      "sha256": "58a39cfa5f51e94ad0e2ee167c99531d42e285f836547d08314dbb0da94a18ab"
+    },
+    "latest_profile_array_references": [
+      {
+        "name": "weights_0",
+        "shape": [
+          246000,
+          2
+        ],
+        "dtype": "<f8",
+        "sha256": "3611ce2baa9e93e7644e6ae8930365a63645a2673dfbca7b327638fb7b1e3721"
+      },
+      {
+        "name": "present_0",
+        "shape": [],
+        "dtype": "|b1",
+        "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+      },
+      {
+        "name": "robust_0",
+        "shape": [],
+        "dtype": "|b1",
+        "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+      },
+      {
+        "name": "weights_1",
+        "shape": [
+          400539,
+          2
+        ],
+        "dtype": "<f8",
+        "sha256": "72cc7b068bed468473d98d0307b8effb1c6b6b9485b31b0575ff676d55694c6b"
+      },
+      {
+        "name": "present_1",
+        "shape": [],
+        "dtype": "|b1",
+        "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+      },
+      {
+        "name": "robust_1",
+        "shape": [],
+        "dtype": "|b1",
+        "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+      },
+      {
+        "name": "weights_2",
+        "shape": [
+          39679,
+          2
+        ],
+        "dtype": "<f8",
+        "sha256": "9ca9997f9d09679791eb2a678636b3febddb64fec4555324b68ee92d82e12b20"
+      },
+      {
+        "name": "present_2",
+        "shape": [],
+        "dtype": "|b1",
+        "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+      },
+      {
+        "name": "robust_2",
+        "shape": [],
+        "dtype": "|b1",
+        "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+      },
+      {
+        "name": "weights_3",
+        "shape": [
+          358749,
+          2
+        ],
+        "dtype": "<f8",
+        "sha256": "f487cd4eca6764f86a4a5df221015d1a045c9a01b8a70cc46effa73c29f48117"
+      },
+      {
+        "name": "present_3",
+        "shape": [],
+        "dtype": "|b1",
+        "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+      },
+      {
+        "name": "robust_3",
+        "shape": [],
+        "dtype": "|b1",
+        "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+      },
+      {
+        "name": "weights_4",
+        "shape": [
+          799480,
+          2
+        ],
+        "dtype": "<f8",
+        "sha256": "2062cf50937c66799be6c84b2014b4cb00d1a5bfbfc2c2a1c4a3b0c0262aa158"
+      },
+      {
+        "name": "present_4",
+        "shape": [],
+        "dtype": "|b1",
+        "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+      },
+      {
+        "name": "robust_4",
+        "shape": [],
+        "dtype": "|b1",
+        "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+      },
+      {
+        "name": "weights_5",
+        "shape": [
+          274041,
+          2
+        ],
+        "dtype": "<f8",
+        "sha256": "a81d7640f490ae2080c2ba52ecdb614c1932f71226e4dac80a03ed7041e03c92"
+      },
+      {
+        "name": "present_5",
+        "shape": [],
+        "dtype": "|b1",
+        "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+      },
+      {
+        "name": "robust_5",
+        "shape": [],
+        "dtype": "|b1",
+        "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+      }
+    ],
+    "source_scales_sha256": "9714722154df63bb5db48fede86ded76be8757170ef2f7a3bde5fc5926f50593",
+    "source_quadratic_mask_sha256": "16a3dc7d63176111fd9abf9a569fe44828deb2979bdae936ba75b0764c283c1a"
+  },
+  "source_manifest_sha256": "4c44eff49d4eb50599b0efc9a0a4d4c799efa9e6efe8d46b07e3cf1c733de71b",
+  "preparation_status": "Existing exact source-role proof prepared; production startup must independently authenticate the actual loaded new role contract and all original source/manual identities.",
+  "numerical_physical_endpoint_continuation": {
+    "previous_configuration": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\full_source_review86_same757_board185_constant_axes_20261011.json",
+      "sha256": "412491049423c40926d63e2eceaf0d969f122539536568ae32332c615104b4a2"
+    },
+    "actual_canonical_endpoint_event": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\native35_actual034757_canonical_trial_endpoint_event_helper_fixed_arithmetic_20261011.json",
+      "sha256": "ba7d0df54c932c74927293a1b3fedaefb4bb0a5407418de6f2dd7512232b1b75"
+    },
+    "actual_all86_event_guard": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\native35_actual034757_complete_event_all86_guard_20261011.json",
+      "sha256": "67e265912a09406ad4481f5f618e601bcc58da0c61b2d2472fb898a7cbbca9bc"
+    },
+    "event_step_is_not_a_geometric_solution": true,
+    "full_source_cost_and_physical_guard_still_required": true,
+    "event_acceptance_forces_next_complete_J_fresh": true,
+    "next_direction_must_allow_endpoint_release": true,
+    "full_source_initial_normal_reuse": false,
+    "continuous": true
+  },
+  "numerical_actual_SOC_progress": {
+    "implementation": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\optional_soc_runtime.py",
+      "sha256": "dd4d3c5cd96cc343edf972897534a4a4a8332b0a4635386feb6d5f990fbfe7c5"
+    },
+    "prediction_disagreement_only_holds_lambda": true,
+    "actual_maximum_and_total_merit_nonworsening_and_resolvable_progress_required": true,
+    "minimum_actual_to_predicted_merit_reduction_fraction": 0.25,
+    "sufficient_progress_distinct_from_symmetric_prediction_error_trust": true,
+    "original_complete_KKT_and_all_nonlinear_physical_source_truth_acceptance_gates_retained": true
+  },
+  "numerical_pivot_trial_retraction": {
+    "implementation": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\legacy\\installation_mount_candidate\\mount_graph.py",
+      "sha256": "3dd7d4818aa2dbcc6a6f2efefd55cf142d0f2005a4e9ca5e54c7ac01dcfc5793"
+    },
+    "driver": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\legacy\\run_current_named66_full_programme.py",
+      "sha256": "877fddc71f320e64597207605a30eb5db9156ee9428ab797602ae9eaceaaec34"
+    },
+    "trial_coordinate_FD_reserve": false,
+    "startup_coordinate_FD_reserve_unchanged": true,
+    "original_outside_or_on_domain_unchanged": true,
+    "only_invalid_pivot_XY_retracted_to_actual_nearest_course_point": true,
+    "all_original_complete_physical_truth_source_guards_required": true,
+    "tests": "6 meaningful tests PASS1.04s; 52 related tests PASS1.34s"
+  },
+  "one_complete_cycle_validation": {
+    "output": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_q8_no_view_lm_causal_fix_20261011",
+    "launcher": "scripts/diagnostics/start_solver_speed_candidate.ps1 -OneCompleteCycle",
+    "accepted_steps": 1,
+    "causal_change": "Use existing Schur ratio zero after actual motion J demonstrated excessive view diagonal LM on time/zoom collective modes",
+    "same_source_target": true,
+    "original_source_cost_and_physical_and_all86_caps_unchanged": true,
+    "shared_parameter_damping_retained": true,
+    "full_source_J_retained_in_RAM_not_saved": true,
+    "source_image_cache_writes": 0,
+    "accuracy_acceptance_requires_full_shot_real_source_comparison": true
+  }
+}

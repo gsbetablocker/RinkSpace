@@ -1,0 +1,196 @@
+{
+  "schema": "rinkspace.reusable-solver-inputs.v1",
+  "resource_root": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003",
+  "driver": "named66",
+  "event_id": "ankara_2026",
+  "programme_id": "okada_mei_sp",
+  "source_clock": {
+    "time_base": "1/15360",
+    "native_start_inclusive": 229114112,
+    "native_stop_exclusive": 231705600,
+    "native_presentations": 10123,
+    "shots": 9
+  },
+  "source_options": {
+    "--world-init": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/user_corrected_programme_candidate/latest9a8c_world66_initialization_ONLY.json",
+    "--camera-seed": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_full9_review82_speed_candidate_20261010_101450_850\\accepted_states\\e2165dc71142efa7436ec20d10cb97b1a7b9bcb69ec373e3f2b2ac9bcca7c739\\complete_state_UNACCEPTED.npz",
+    "--additional-ice-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\user_video_review_20261009\\a13_complete_programme\\combined_current_review_20261009\\new_C0_C_Lane_user_strokes_20261009\\Lane3_lower_red_04_11_06_133\\full_truth_append_candidate\\native_ice_curve_parent78_plus_user_Lane3_lower_red_04_11_06_133_complete_v1_CANDIDATE.json",
+    "--additional-board-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\user_video_review_20261009\\a13_complete_programme\\combined_current_review_20261009\\new_C0_C_Lane_user_strokes_20261009\\Ad4_right_red\\full_truth_append_candidate\\native_board_edge_parent103_plus_user_Ad4_right_red_complete_v1_CANDIDATE.json",
+    "--additional-board-material-point-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\full_a13c816f_user_review_20261009\\user_reported_low_board_motion_20261009\\short_end_Ad24_25_26_native229604096_actual_source\\material_parent_plus_Ad25_Ad26_native229604096_broad_support_SOURCE_CANDIDATE_v2.json",
+    "--additional-board-circle-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\full_a13c816f_user_review_20261009\\user_reported_low_board_motion_20261009\\short_end_Ad24_25_26_native229604096_actual_source\\circle_parent_plus_Ad24_native229604096_broad_support_SOURCE_CANDIDATE_v2.json",
+    "--original-source-role-retirement-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\ads_actual_identity_correction_20261005\\Ad7_original_print_corner_role_correction_CANDIDATE_v1.json",
+    "--independent-board-pattern-placement-source": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/model_constraints/user_advertisement_pairs_20261005.json",
+    "--persistent-ice-long-baseline-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\spin_source_long_baseline_20261005\\spin_micro_actual_original_anchor_v3_20261005\\spin_reviewed_ice_long_baseline_FIT_HELD_v3_micro_actual.json",
+    "--serial-source": true,
+    "--serial-current-patterns": false,
+    "--geometry-fd-workers": "8",
+    "--normal-workers": "8",
+    "--reuse-source-jacobian": true,
+    "--residual-source-workers": "6",
+    "--adaptive-source-backtracking": true,
+    "--residual-native-threads": "3",
+    "--static-motion-source-role-retirement-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\full_a13c816f_user_review_20261009\\user_reported_low_board_motion_20261009\\Ad23_existing_original_motion_role_diagnostic\\original_UI_retirement_preserved_plus_actual_dynamic_foot2_validity_CANDIDATE.json",
+    "--camera-mount-constraint-source": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/camera_hardware_20261001/user_camera_mount_and_height_20261006_v4.json",
+    "--camera-pivot-exterior-constraint-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\camera_hardware_20261001\\user_tripod_positions_20261006_v2.json",
+    "--original-ice-pixel-correction-source": "D:/CodexData/RinkSpace_Data/events/ankara_2026/observations/vision_training/continuous_review/F2_inner_native_source_correction_CPU_20261007/F2_inner_FIT_5632_first2_source_pixel_correction.json",
+    "--roll-prior-sigma-degrees": "0.5",
+    "--additional-native-board-track-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\secondary_Ad22_23_absolute_source_candidate_20261009\\native_full_parent_plus_secondary_Ad22_23_absolute_ADMITTED_v1.json",
+    "--estimate-unverified-physical-geometry": true,
+    "--original-motion-far-board-role-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\full_a13c816f_user_review_20261009\\user_reported_low_board_motion_20261009\\whole_cut1_original_long_baseline_role_candidate\\compaction_source_identity_repair\\complete_preserved29156_plus_active_LOW_and_main1_alias_safe31549_roles_ADMITTED_CANDIDATE.json",
+    "--strict-half-circle-crease": true,
+    "--derive-hockey-center-from-course": true,
+    "--estimate-unverified-goal-crease-placement": true,
+    "--original-motion-low-compaction-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\physical_geometry_unlock_20261008\\low_original_Ad4_nearby_source_roles\\first_clock_duplicate_retirement_compaction_20261008\\first_source_clock_and_explicit_retirement_compaction_CANDIDATE_v1.json",
+    "--original-motion-main-compaction-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\physical_geometry_unlock_20261008\\low_original_Ad4_nearby_source_roles\\first_clock_duplicate_retirement_compaction_20261008\\main_exact_same_pair_UV_role_sigma_duplicates_CANDIDATE_v1.json",
+    "--physical-course-scope-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\user_video_review_20261008\\c134_full_programme\\registered_user_complete_stroke_source_append_20261008\\user20_existing_lower_long_side_connected_lower_right_scope_authority_v1.json",
+    "--direct-human-truth-authority": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\user_video_review_20261009\\a13_complete_programme\\combined_current_review_20261009\\new_C0_C_Lane_user_strokes_20261009\\Ad4_right_red\\full_truth_append_candidate\\human_parent49_plus_user_Ad4_right_red_complete_v1_CANDIDATE.json",
+    "--direct-human-full-stroke-guard": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\user_video_review_20261009\\a13_complete_programme\\combined_current_review_20261009\\new_C0_C_Lane_user_strokes_20261009\\Ad4_right_red\\full_truth_append_candidate\\human_parent49_plus_user_Ad4_right_red_full_guard_v1_CANDIDATE.json",
+    "--original-wide-human-truth-authority": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\user_video_review_20261008\\c134_full_programme\\registered_user_complete_stroke_source_append_20261008\\human_original_wide_top_contours_hard_authority_v1.json",
+    "--direct-human-stroke-cap-support": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\user_video_review_20261009\\a13_complete_programme\\combined_current_review_20261009\\new_C0_C_Lane_user_strokes_20261009\\Ad4_right_red\\full_truth_append_candidate\\human_parent98_caps_plus_user_Ad4_right_red_source_footprints_v1_CANDIDATE.json",
+    "--practical-human-location-envelope": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\user_video_review_20261009\\a13_complete_programme\\combined_current_review_20261009\\new_C0_C_Lane_user_strokes_20261009\\Ad4_right_red\\full_truth_append_candidate\\location_parent51_plus_user_Ad4_right_red_fixed_policy_v1_CANDIDATE.json",
+    "--user-confirmed-source-truth-authority": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\user_video_review_20261009\\a13_complete_programme\\combined_current_review_20261009\\new_C0_C_Lane_user_strokes_20261009\\Ad4_right_red\\full_truth_append_candidate\\confirmed_same30_with_exact_Ad4_right_red_appended_packet_binding_v1_CANDIDATE.json",
+    "--shared-hockey-curling-axis": true,
+    "--joint-source-truth-restoration": true,
+    "--direct-human-centre-target": true,
+    "--source-jacobian-refresh-ratio": "0.25",
+    "--truth-restoration-state": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_full9_review82_speed_candidate_20261010_101450_850\\accepted_states\\e2165dc71142efa7436ec20d10cb97b1a7b9bcb69ec373e3f2b2ac9bcca7c739\\truth_restoration_state.json",
+    "--truth-restoration-priority": true,
+    "--accepted-steps": "1"
+  },
+  "continuation": {
+    "complete_accepted_state": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_full9_review82_speed_candidate_20261010_101450_850\\accepted_states\\e2165dc71142efa7436ec20d10cb97b1a7b9bcb69ec373e3f2b2ac9bcca7c739\\complete_state_UNACCEPTED.npz",
+    "checkpoint_file_sha256": "9dd6aa30998fe0b76e74446488555cf8c051a635eae1c409710b9d4fb53d5cbe",
+    "truth_restoration_state": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_full9_review82_speed_candidate_20261010_101450_850\\accepted_states\\e2165dc71142efa7436ec20d10cb97b1a7b9bcb69ec373e3f2b2ac9bcca7c739\\truth_restoration_state.json",
+    "truth_restoration_state_sha256": "ec875490e247bf612909e3c49c1f6645a7bf4d57a50562d0c944485aceb0138d",
+    "state": {
+      "q_sha256": "e2165dc71142efa7436ec20d10cb97b1a7b9bcb69ec373e3f2b2ac9bcca7c739",
+      "parameters": 34340,
+      "damping": 7.289999999999998e-07,
+      "next_line_search_fraction": 1.0,
+      "fields": 77,
+      "profiles": 18,
+      "profile_array_signatures": {
+        "profile__weights_0": {
+          "dtype": "<f8",
+          "shape": [
+            246000,
+            2
+          ],
+          "sha256": "d78c5d7c6a7ccee87e7bf3990231db579d2f0cc7fea605b605f0683238cced3c"
+        },
+        "profile__present_0": {
+          "dtype": "|b1",
+          "shape": [],
+          "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+        },
+        "profile__robust_0": {
+          "dtype": "|b1",
+          "shape": [],
+          "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+        },
+        "profile__weights_1": {
+          "dtype": "<f8",
+          "shape": [
+            400539,
+            2
+          ],
+          "sha256": "1c42328f049cb25d233688bc8e559bc30591182c94b86ca09b5190de3fbdc162"
+        },
+        "profile__present_1": {
+          "dtype": "|b1",
+          "shape": [],
+          "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+        },
+        "profile__robust_1": {
+          "dtype": "|b1",
+          "shape": [],
+          "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+        },
+        "profile__weights_2": {
+          "dtype": "<f8",
+          "shape": [
+            39679,
+            2
+          ],
+          "sha256": "4a7a2e3633e4d03997c52b554022322f8934e4b033783088a258276c97cb90b5"
+        },
+        "profile__present_2": {
+          "dtype": "|b1",
+          "shape": [],
+          "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+        },
+        "profile__robust_2": {
+          "dtype": "|b1",
+          "shape": [],
+          "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+        },
+        "profile__weights_3": {
+          "dtype": "<f8",
+          "shape": [
+            358749,
+            2
+          ],
+          "sha256": "d2e2eb9ac7560bb941909996e4c108de15a627bc1cb2664bff90eadfade24d97"
+        },
+        "profile__present_3": {
+          "dtype": "|b1",
+          "shape": [],
+          "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+        },
+        "profile__robust_3": {
+          "dtype": "|b1",
+          "shape": [],
+          "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+        },
+        "profile__weights_4": {
+          "dtype": "<f8",
+          "shape": [
+            799480,
+            2
+          ],
+          "sha256": "2062cf50937c66799be6c84b2014b4cb00d1a5bfbfc2c2a1c4a3b0c0262aa158"
+        },
+        "profile__present_4": {
+          "dtype": "|b1",
+          "shape": [],
+          "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+        },
+        "profile__robust_4": {
+          "dtype": "|b1",
+          "shape": [],
+          "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+        },
+        "profile__weights_5": {
+          "dtype": "<f8",
+          "shape": [
+            274041,
+            2
+          ],
+          "sha256": "0e4930bb5bff7475c82d8d9976e888801984acf8cf1c809b66133a9d576605dd"
+        },
+        "profile__present_5": {
+          "dtype": "|b1",
+          "shape": [],
+          "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+        },
+        "profile__robust_5": {
+          "dtype": "|b1",
+          "shape": [],
+          "sha256": "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a"
+        }
+      }
+    },
+    "checkpoint_damping_and_next_fraction_inherited_without_cli_reset": true,
+    "all_original_source_options_preserved_except_explicit_single_cycle_AB": true,
+    "removed_options": {
+      "--initial-damping": 2.4299999999999996e-06,
+      "--verify-source-blocks-from": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_full9_review82_remaining_fixes_20261010_091826_128\\current_complete_linearization_cache"
+    },
+    "accepted_steps": 1,
+    "complete_original_cycle_AB_authorized": true,
+    "no_cached_J_normal_or_prefix_imported": true,
+    "baseline_geometry_fd_workers": 8,
+    "candidate_geometry_fd_workers": 20,
+    "accuracy_accepted": false
+  }
+}

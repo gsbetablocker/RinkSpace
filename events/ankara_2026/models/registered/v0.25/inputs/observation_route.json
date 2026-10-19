@@ -1,0 +1,173 @@
+{
+  "schema_version": "rinkspace.three_frame_refit.step01_observation_route.v1",
+  "status": "rework_complete_pending_user_visual_acceptance_no_fit_or_accuracy_check_run",
+  "historical_input": "evidence/three_view_joint_20260924/input_observations.json",
+  "effective_input": "three_frame_refit/inputs/effective_observations.json",
+  "rejected_groups": [
+    {
+      "id": "low3_205992960:old_red_contact_22_points",
+      "source": "outputs/calibration/ankara_2026_low_end_single_205992960_native_20260924/diagnostics/board_corner_read/frame3_board_corner_independent_points.json",
+      "source_sha256": "19b849233781565b6ea833f7f8ee9ddc25f3235d773c3cd9dd12a71c57b5f8c1",
+      "pixel_pointers": [
+        "/groups/*/contact_pixels_uv",
+        "/unassigned_transition_pixels/*/contact_pixels_uv"
+      ],
+      "pixels_uv_sorted_by_x": [
+        [
+          10,
+          440
+        ],
+        [
+          80,
+          441
+        ],
+        [
+          160,
+          441
+        ],
+        [
+          240,
+          442
+        ],
+        [
+          320,
+          443
+        ],
+        [
+          450,
+          443
+        ],
+        [
+          650,
+          447
+        ],
+        [
+          850,
+          451
+        ],
+        [
+          1050,
+          456
+        ],
+        [
+          1250,
+          460
+        ],
+        [
+          1400,
+          464
+        ],
+        [
+          1500,
+          467
+        ],
+        [
+          1550,
+          470
+        ],
+        [
+          1600,
+          480
+        ],
+        [
+          1650,
+          490
+        ],
+        [
+          1700,
+          502
+        ],
+        [
+          1750,
+          514
+        ],
+        [
+          1800,
+          526
+        ],
+        [
+          1825,
+          533
+        ],
+        [
+          1850,
+          539
+        ],
+        [
+          1900,
+          551
+        ],
+        [
+          1915,
+          555
+        ]
+      ],
+      "pixel_fingerprint_sha256": "f4748b062bbf3ff22ed7f689d8f7dcd02d92b7c2ffc8d24f76a83c1789315f8c",
+      "historical_role": "diagnostic_native_pixel_read_not_merged_into_fit; shown as old red dots in failed QA",
+      "effective_status": "disabled_user_rejected",
+      "allow_fit": false,
+      "allow_check": false
+    },
+    {
+      "id": "women_sp_low_205992960:frame3_native_F1_outer_tentative_20260924",
+      "source": "evidence/low_end_reference_review_20260923/frame3_native_landmarks_user_contact_F1_outer_20260924.json#/observations/17",
+      "historical_joint_pointer": "/observations/65",
+      "pixels_uv": [
+        [
+          1100,
+          1035
+        ],
+        [
+          1200,
+          1033
+        ],
+        [
+          1400,
+          1042
+        ],
+        [
+          1500,
+          1054
+        ]
+      ],
+      "pixel_fingerprint_sha256": "f413ba9d056351434342de2f5a2d69109c50286e85b9fc180e6224070de87778",
+      "historical_use": "check",
+      "effective_status": "disabled_user_rejected",
+      "allow_fit": false,
+      "allow_check": false
+    }
+  ],
+  "selected_user_contours": [
+    {
+      "id": "low3_205992960:user_board_contact_full_stroke",
+      "source": "evidence/low_end_reference_review_20260923/frame3_user_far_board_edges_trace.json#/lower_y_by_x",
+      "point_count": 1920,
+      "status": "primary_user_contour_pending_visual_acceptance_no_fit_or_check_assignment"
+    },
+    {
+      "id": "low3_205992960:user_F1_outer_stroke",
+      "source": "three_frame_refit/inputs/user_contour_replacements.json#/F1_extraction/rings_outer_to_inner/0",
+      "status": "mapped_user_contour_pending_visual_acceptance_no_fit_or_check_assignment"
+    }
+  ],
+  "revised_user_contact_samples": {
+    "source": "evidence/low_end_reference_review_20260923/frame3_user_contact_sparse_samples_20260924.json",
+    "observation_ids": [
+      "women_sp_low_205992960:user_contact:upper_right_corner_contact",
+      "women_sp_low_205992960:user_contact:right_end_contact",
+      "women_sp_low_205992960:user_contact:right_end_to_lower_right_contact",
+      "women_sp_low_205992960:user_contact:lower_right_corner_contact",
+      "women_sp_low_205992960:user_contact:lower_right_to_lower_side_contact",
+      "women_sp_low_205992960:user_contact:lower_long_side_contact"
+    ],
+    "pixel_fingerprint_sha256": "899660a28370f9ffbfcb388da64cd8bf284f80a29465d2c921c5e4badb64bd80",
+    "status": "derived_from_selected_user_stroke_not_the_rejected_red_diagnostic",
+    "old_red_to_revised_user_stroke_vertical_distance_px": {
+      "min": 1.0,
+      "median": 9.75,
+      "max": 23.0,
+      "meaning": "Difference from the user's revised stroke at the same x; this is not a measured video-edge accuracy error."
+    }
+  },
+  "unaffected_group_policy": "All other historical groups retain their identities and pixels for later review; no other group is rejected by this feedback."
+}

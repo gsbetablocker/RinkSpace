@@ -1,0 +1,214 @@
+{
+  "schema": "rinkspace.observed-native-build-recipes.v1",
+  "observed_date": "2026-10-11",
+  "method": "Read existing build.json files and byte hashes of the current OneDrive C/CUDA sources and Data DLLs; did not load or compile libraries.",
+  "not_a_portable_build_system": true,
+  "reconstruction_tested": false,
+  "required_named66_contract": [
+    "nearest_segment",
+    "motion",
+    "projection_guard",
+    "csr_scatter",
+    "central_brown4"
+  ],
+  "notes": [
+    "Historical source paths are retained as provenance; project_source names the current owned source.",
+    "For all build.json records, current source and binary hashes match the recorded manifest.",
+    "central_brown4 predates build.json and its wrapper requires the exact historical DLL SHA. A new compiler build cannot be presumed acceptable.",
+    "Compiler setup paths identify the installed toolchain location, not a portable installation command or a complete compiler version lock.",
+    "motion_cuda is an observed experimental build, not evidence that the complete production solver uses CUDA."
+  ],
+  "kernels": [
+    {
+      "kernel": "nearest_segment",
+      "project_source": "calibration/solver_runtime/legacy/snapshot/three_frame_refit/program_tracking/native/nearest_segment.c",
+      "source_sha256": "47458edf85cbf70a3ccbf2f732823ab98d3d36ca27f7e8bd8b3dc517eccff00c",
+      "observed_build_manifest": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration_native\\build.json",
+      "observed_binary": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration_native\\nearest_segment.dll",
+      "dll_sha256": "9736a91bfafe1d69f0b8629bd30d603aa1e1872788a66e91ec2079749bbeb54d",
+      "source_matches_build": true,
+      "binary_matches_build": true,
+      "compiler_flags": [
+        "/nologo",
+        "/O2",
+        "/fp:strict",
+        "/LD",
+        "/TC"
+      ],
+      "compiler_setup": "D:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat",
+      "cuda_nvcc": null,
+      "historical_manifest_source": "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\program_tracking\\native\\nearest_segment.c"
+    },
+    {
+      "kernel": "motion",
+      "project_source": "calibration/solver_runtime/legacy/snapshot/three_frame_refit/program_tracking/native/moving_center_motion.c",
+      "source_sha256": "1d0250b18df27f549c354b482edd7103f18b82cc6ba7cde003df0609bf932342",
+      "observed_build_manifest": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\native_motion\\build.json",
+      "observed_binary": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\native_motion\\moving_center_motion_1d0250b18df2.dll",
+      "dll_sha256": "163b7fa82fadd859a71c3c0bacf3b7406a3c8de0ae0b8c726dc0f9dc09c15acf",
+      "source_matches_build": true,
+      "binary_matches_build": true,
+      "compiler_flags": [
+        "/nologo",
+        "/O2",
+        "/fp:strict",
+        "/openmp",
+        "/LD",
+        "/TC",
+        "/std:c11"
+      ],
+      "compiler_setup": "D:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat",
+      "cuda_nvcc": null,
+      "historical_manifest_source": "D:\\CodexData\\.codex\\visualizations\\2026\\10\\03\\private-thread-00013\\RinkSpace_tmp\\solver_acceleration_1003\\snapshot\\three_frame_refit\\program_tracking\\native\\moving_center_motion.c"
+    },
+    {
+      "kernel": "csr_scatter",
+      "project_source": "calibration/solver_runtime/legacy/snapshot/three_frame_refit/program_tracking/native/fixed_xyz_csr_scatter.c",
+      "source_sha256": "90a32ff72c1bdc935e4dc41c8dcc4bde051e26bae9141f79b83b7a7f54b609d5",
+      "observed_build_manifest": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\native_scatter\\build.json",
+      "observed_binary": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\native_scatter\\fixed_xyz_csr_scatter.dll",
+      "dll_sha256": "cc476e8cea1b9c8157009743bf6d25255e81e8bda92597b44ba75d3dab60984c",
+      "source_matches_build": true,
+      "binary_matches_build": true,
+      "compiler_flags": [
+        "/nologo",
+        "/O2",
+        "/fp:strict",
+        "/openmp",
+        "/LD",
+        "/TC",
+        "/std:c11"
+      ],
+      "compiler_setup": "D:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat",
+      "cuda_nvcc": null,
+      "historical_manifest_source": "D:\\CodexData\\.codex\\visualizations\\2026\\10\\03\\private-thread-00013\\RinkSpace_tmp\\solver_acceleration_1003\\snapshot\\three_frame_refit\\program_tracking\\native\\fixed_xyz_csr_scatter.c"
+    },
+    {
+      "kernel": "projection_guard",
+      "project_source": "calibration/solver_runtime/legacy/snapshot/three_frame_refit/program_tracking/native/central_projection_guard.c",
+      "source_sha256": "2b120daa8b179908e92e031808ab783646fae14dd65a94c484133d5bc0fa27dc",
+      "observed_build_manifest": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\native_projection\\build.json",
+      "observed_binary": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\native_projection\\central_projection_guard_v2.dll",
+      "dll_sha256": "2d11727e7e9507669d494a5c17953478b59da4c22dd2d361f38374c57256bf35",
+      "source_matches_build": true,
+      "binary_matches_build": true,
+      "compiler_flags": [
+        "/nologo",
+        "/O2",
+        "/fp:strict",
+        "/LD",
+        "/TC",
+        "/std:c11"
+      ],
+      "compiler_setup": "D:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat",
+      "cuda_nvcc": null,
+      "historical_manifest_source": "D:\\CodexData\\.codex\\visualizations\\2026\\10\\03\\private-thread-00013\\RinkSpace_tmp\\solver_acceleration_1003\\snapshot\\three_frame_refit\\program_tracking\\native\\central_projection_guard.c"
+    },
+    {
+      "kernel": "projection_value",
+      "project_source": "calibration/solver_runtime/legacy/snapshot/three_frame_refit/program_tracking/native/projection_value.c",
+      "source_sha256": "671eef1031c4a876f89606eb3364f68237a9f0a6c4a6382037a6a32be060a17c",
+      "observed_build_manifest": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\native_projection_value\\build.json",
+      "observed_binary": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\native_projection_value\\projection_value.dll",
+      "dll_sha256": "50361e5846242226028a894fc47e10492cff5dea6694c75619b2f8493274a143",
+      "source_matches_build": true,
+      "binary_matches_build": true,
+      "compiler_flags": [
+        "/nologo",
+        "/O2",
+        "/fp:strict",
+        "/LD",
+        "/TC",
+        "/std:c11"
+      ],
+      "compiler_setup": "D:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat",
+      "cuda_nvcc": null,
+      "historical_manifest_source": "D:\\CodexData\\.codex\\visualizations\\2026\\10\\03\\private-thread-00013\\RinkSpace_tmp\\solver_acceleration_1003\\snapshot\\three_frame_refit\\program_tracking\\native\\projection_value.c"
+    },
+    {
+      "kernel": "motion_cuda",
+      "project_source": "calibration/solver_runtime/legacy/snapshot/three_frame_refit/program_tracking/native/moving_center_motion_cuda.cu",
+      "source_sha256": "f830ff6e8676c9b7012c528163a772c51d841c83e9c295639d712cfa7c38e87d",
+      "observed_build_manifest": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\native_motion_cuda\\build.json",
+      "observed_binary": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\native_motion_cuda\\moving_center_motion_cuda_f830ff6e8676.dll",
+      "dll_sha256": "2c0c180df467f83fa1d02933a37c592375309d08ab1868ec2e0763b4c835904a",
+      "source_matches_build": true,
+      "binary_matches_build": true,
+      "compiler_flags": [
+        "-shared",
+        "-O3",
+        "-arch=sm_120",
+        "--fmad=false",
+        "--prec-div=true",
+        "--prec-sqrt=true",
+        "-Xcompiler=/MD,/O2,/fp:strict",
+        "--cudart=shared"
+      ],
+      "compiler_setup": "D:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat",
+      "cuda_nvcc": "D:\\Program Files\\CUDA\\bin\\nvcc.exe",
+      "historical_manifest_source": "D:\\CodexData\\.codex\\visualizations\\2026\\10\\03\\private-thread-00013\\RinkSpace_tmp\\solver_acceleration_1003\\snapshot\\three_frame_refit\\program_tracking\\native\\moving_center_motion_cuda.cu"
+    },
+    {
+      "kernel": "normal_scanline_human_query",
+      "project_source": "calibration/solver_runtime/legacy/structured_programme_source_candidate/native/normal_scanline_human_query.c",
+      "source_sha256": "015f33ebecb547a8857d66c889b6e51a76d4115bf06662afab0f06c2e045bec2",
+      "observed_build_manifest": "D:\\CodexData\\RinkSpace_Data\\native\\solver_runtime\\normal_scanline_human_query\\015f33ebecb547a8857d66c889b6e51a76d4115bf06662afab0f06c2e045bec2\\build.json",
+      "observed_binary": "D:\\CodexData\\RinkSpace_Data\\native\\solver_runtime\\normal_scanline_human_query\\015f33ebecb547a8857d66c889b6e51a76d4115bf06662afab0f06c2e045bec2\\normal_scanline_human_query.dll",
+      "dll_sha256": "588acdc087fb8c00e45e367edc437640494921e90968d675bbf697240ce78755",
+      "source_matches_build": true,
+      "binary_matches_build": true,
+      "compiler_flags": [
+        "/nologo",
+        "/O2",
+        "/fp:strict",
+        "/openmp",
+        "/LD",
+        "/TC"
+      ],
+      "compiler_setup": "D:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat",
+      "cuda_nvcc": null,
+      "historical_manifest_source": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\legacy\\structured_programme_source_candidate\\native\\normal_scanline_human_query.c"
+    },
+    {
+      "kernel": "programme_csr_three_span_merge",
+      "project_source": "calibration/solver_runtime/native/programme_csr_three_span_merge.c",
+      "source_sha256": "03e5e1693638f028789acd49073e2dbf846961173fb98c0f8c25e4d2af815d1b",
+      "observed_build_manifest": "D:\\CodexData\\RinkSpace_Data\\native\\solver_runtime\\programme_csr_three_span_merge\\03e5e1693638f028789acd49073e2dbf846961173fb98c0f8c25e4d2af815d1b\\build.json",
+      "observed_binary": "D:\\CodexData\\RinkSpace_Data\\native\\solver_runtime\\programme_csr_three_span_merge\\03e5e1693638f028789acd49073e2dbf846961173fb98c0f8c25e4d2af815d1b\\programme_csr_three_span_merge.dll",
+      "dll_sha256": "870706087e1b5268ccc636f09374c6229138135781e16d84bc27ef1b4028e90a",
+      "source_matches_build": true,
+      "binary_matches_build": true,
+      "compiler_flags": [
+        "/nologo",
+        "/O2",
+        "/fp:strict",
+        "/openmp",
+        "/LD",
+        "/TC",
+        "/std:c11"
+      ],
+      "compiler_setup": "D:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat",
+      "cuda_nvcc": null,
+      "historical_manifest_source": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\native\\programme_csr_three_span_merge.c"
+    },
+    {
+      "kernel": "central_brown4",
+      "project_source": "calibration/solver_runtime/legacy/snapshot/three_frame_refit/program_tracking/central_brown4_axis_domain.c",
+      "source_sha256": "ec467f9aa2a67e41b1dc6417e851f5d29b0313617fd755905ba008391a276473",
+      "observed_build_manifest": null,
+      "observed_binary": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\central_brown4_optin\\central_brown4.dll",
+      "dll_sha256": "9d169a82f3f6e6b4641b6ecd8310965bd5124c195943f986348f1460a844b6c2",
+      "source_matches_pinned_wrapper": true,
+      "binary_matches_pinned_wrapper": true,
+      "compiler_flags": [
+        "/nologo",
+        "/O2",
+        "/fp:strict",
+        "/LD",
+        "/TC"
+      ],
+      "recipe_source": "calibration/program_tracking/build_central_brown4_optin.bat",
+      "fixed_binary_hash_required": true
+    }
+  ]
+}

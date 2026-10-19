@@ -1,0 +1,43 @@
+{
+  "schema": "rinkspace.event-board-physical-boundary-confirmation.v1",
+  "event_id": "ankara_2026",
+  "authority": {
+    "kind": "direct_user_confirmation",
+    "date": "2026-10-10",
+    "top_user_text": "围挡上沿是垂直围挡的最上端（蓝边上端，我图中红线标的位置）",
+    "bottom_user_text": "对，相应的围挡下沿也就是接冰轮廓是围挡底部黄边的下端（我之前给你标注过的）"
+  },
+  "definitions": {
+    "board_top": "upper edge of blue rim, top of vertical board",
+    "board_bottom_ice_contact": "lower edge of yellow bottom strip at the ice",
+    "band_center_is_boundary": false,
+    "yellow_bottom_strip_belongs_to": "board",
+    "ordinary_ice_paint_strokes": "paint centreline; paint width is not a free position tolerance",
+    "curling_target_rings": "each declared nested physical material boundary; do not replace with stroke centrelines"
+  },
+  "evidence": {
+    "existing_bottom_user_drawing_and_source": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\model_constraints\\ice_contact_material_roles_user_confirmed_20261006.json",
+      "sha256": "b65df1cf63f9c0b702332b7690c2e1f900814996c021f37928909b7d0c13dad8"
+    },
+    "latest_top_original_annotation": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\board_top_contact_material_semantics\\USER_board_top_blue_UPPER_edge_native231678464_ORIGINAL.png",
+      "sha256": "74cfbd5a28e397e403b16d8129dd43c13a3f8e1600551f702b9c99aa4fd7c229"
+    },
+    "top_native_registration": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\board_top_contact_material_semantics\\231678464_user_board_top_blue_upper_registered.json",
+      "sha256": "50e520345f85a5b66251b9f5f2a40856f284715933ff88f594d6235ab377dcfb"
+    },
+    "top_location_without_extra_expansion": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\board_top_contact_material_semantics\\human_parent53_plus_BLUE_UPPER_TOP_location_NO_EXTRA_EXPANSION.json",
+      "sha256": "19cb7596446aeb926a651790f2a60d2f3f24e9655377d52cd7aec6a34d143a99"
+    }
+  },
+  "scope": {
+    "historical_user_annotations_preserved": true,
+    "assistant_extracted_pixels_automatically_confirmed": false,
+    "new_bottom_pixels_inferred_from_text": false,
+    "camera_or_geometry_accuracy_claimed": false,
+    "other_events_require_their_own_material_identification": true
+  }
+}

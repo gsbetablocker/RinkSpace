@@ -1,0 +1,33 @@
+{
+  "schema": "rinkspace.visual-boundary-role-confirmation.v1",
+  "event_id": "ankara_2026",
+  "authority": {
+    "kind": "direct_user_confirmation",
+    "date": "2026-10-06",
+    "user_text": "实际印刷图案的外轮廓；整体占据范围另记，内部孔洞另记"
+  },
+  "reference_source": {
+    "video_id": "oxXu1avhrvs",
+    "source_pts": 226160640,
+    "time_base": "1/15360",
+    "source_time": "04:05:24.000",
+    "frame_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/photo_review_20260923/holdout/women_sp_lower_right_226160640.png",
+    "advertisement_numbers": [23, 21],
+    "advertisement_contents": ["SPORTOTO", "WYNDHAM"]
+  },
+  "definition": {
+    "condition": "advertisement_has_no_visible_enclosing_frame",
+    "primary_visual_boundary": "actual_printed_graphic_outer_contours",
+    "disconnected_print_components": "retain_each_actual_outer_contour_under_the_same_confirmed_advertisement_instance",
+    "internal_holes": "record_separately_as_printed_graphic_hole_contours",
+    "overall_occupied_extent": "record_separately_as_region_extent_not_a_measured_edge",
+    "missing_or_occluded_print": "do_not_invent_a_boundary",
+    "visible_rectangle_required": false
+  },
+  "authority_scope": {
+    "boundary_role_confirmed": true,
+    "existing_human_confirmed_positions_preserved": true,
+    "assistant_extracted_pixel_precision_confirmed_by_this_reply": false,
+    "source_pixel_reading_quality": "verify_against_original_RGB_separately"
+  }
+}

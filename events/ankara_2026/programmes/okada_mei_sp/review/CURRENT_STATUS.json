@@ -1,0 +1,294 @@
+{
+  "status": "STOPPED_AT_USER_REQUEST_FOR_PRO_AUDIT",
+  "utc": "2026-10-19T09:25:07.659442+00:00",
+  "git_HEAD": "86db28e68e6128de875ed011f7c5d3f6ebccda16",
+  "actual_untracked_sources_bundled": true,
+  "full9_success": false,
+  "new_accepted_full9_video": false,
+  "source_clock": {
+    "youtube_id": "O6j8L8TmfKo",
+    "fps": "50/1",
+    "time_base": "1/12800",
+    "first_pts": 256256,
+    "last_pts": 2415104,
+    "step_pts": 256,
+    "frames": 8434,
+    "rigs": 3,
+    "shots": 9
+  },
+  "latest_full_state": {
+    "model_sha256": "42bae4e2a75ab9af91f7591ffb9c02ef797dcca820d7eebdcda2996547969c96",
+    "checkpoint_sha256": "6806b7a8190719c3d893bd6ebbc695a146f1e6ff4bf4a22c34fbed60749be24e",
+    "source_packet_sha256": "856fd7a939ce674e10494fbc32cf20023333f02150cae6af2a5937598b842a49",
+    "configuration_sha256": "5613dd5c1550c2b1448e85571ccaca7573e549d9a6bee083e0e7676cf08046d0",
+    "iterations": 16,
+    "stopped": true,
+    "initial_original_contributions": {
+      "RS_Query_half_cost": 56131654.41661224,
+      "outer_iteration": 0,
+      "physical_half_cost": 1.0370555871647495,
+      "pixel_half_cost": 53457539.03697856,
+      "rho": 10
+    },
+    "final_original_contributions": {
+      "RS_Query_half_cost": 53522553.051361404,
+      "outer_iteration": 0,
+      "physical_half_cost": 17576.90668997873,
+      "pixel_half_cost": 50479653.168219835,
+      "rho": 10
+    },
+    "constraint_debt": {
+      "g_max_positive": 3.661857223369707,
+      "g_over_1e_minus8": 5623,
+      "g_positive_l2": 59.290651354119454,
+      "h_l2": 3271.774841010977,
+      "h_max_abs": 219.4889959091903,
+      "original_g_count": 1189466,
+      "original_h_count": 379412,
+      "state_token": "49ce0138ed80de4f"
+    },
+    "original_W_likelihood_consumed": false,
+    "formal_acceptance": false,
+    "last_solver_summary_included_numerical_grid_navigation": true,
+    "timing_seconds": {
+      "Jacobian": 317.0603817998781,
+      "linear": 16.66731580000487,
+      "residual": 16.229694400070002,
+      "total": 356.7852641000063
+    }
+  },
+  "known_failures": [
+    "Screen Demo grid is not an initialized physical camera.",
+    "Final run still began from physical 9664534b, not matching Demo screen grid.",
+    "Iteration cost includes virtual navigation.",
+    "Raw constraints and independent RS/Query replay not closed.",
+    "S01 exact import does not prove preservation after shared optics solve.",
+    "No accepted independent continuous full9 visual result or improved complete video."
+  ],
+  "historical_executions": [
+    {
+      "stage": "motion_g1",
+      "execution": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/motion_g1/execution.json",
+      "command": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\build_v4\\joint_fit.exe",
+        "--engineering-recovery",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_full9_recovery_1019\\baseline_import_gpu32_v1\\source_supported_model.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\scope_ready\\packet.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\motion_g1",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\motion_config.json"
+      ],
+      "backend_sha256": "9097b6d0c1813b1f4c7b08fa1635189f00fc7a0ed77abc779d8b34e1266b49d8",
+      "model_sha256": "5241deabbf4cb70b1d2135f74fd6a1ed0b46bdd41a965c5a5f71196237fbe756",
+      "packet_sha256": "41aa4860f50b3aaebd3f89acf6b22040005149891bcb4531158a50824e823083",
+      "returncode": 1
+    },
+    {
+      "stage": "motion_g2",
+      "execution": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/motion_g2/execution.json",
+      "command": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\build_v5\\joint_fit.exe",
+        "--engineering-recovery",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recovery_input_model.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\g4_entities\\packet.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\motion_g2",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\motion_g2_config.json"
+      ],
+      "backend_sha256": "d0124dae78a16e9e29737c98584ecfcb10a6e14ed080f8661b6a0a444affc56c",
+      "model_sha256": "1cba23e6f26134016722183645a0bf283d68567254aa3b0e8c2e07387572ad27",
+      "packet_sha256": "a6a9539332d1c5c41c5f8b2d94e18e879df7a485d85fd252aa2441dcfc38d06f",
+      "returncode": 0
+    },
+    {
+      "stage": "motion_g3",
+      "execution": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/motion_g3/execution.json",
+      "command": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\build_v7\\joint_fit.exe",
+        "--engineering-recovery",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recovery_input_g5_model.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\g5_ice\\packet.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\motion_g3",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\motion_g3_config.json"
+      ],
+      "backend_sha256": "abac57a5b4484df3e692a53f7babd4d8ca74c683695d38ae22d48008c61dfd83",
+      "model_sha256": "28556a47ddeaec9a59731b893dd8ceee2932b007dd9f2a193f530891699432cf",
+      "packet_sha256": "a5e83beb94f67e032070768585a4a5c5b5b92b1b84a8314c5f0ed75ed2e11b57",
+      "returncode": 0
+    },
+    {
+      "stage": "shared_g4",
+      "execution": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/shared_g4/execution.json",
+      "command": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\build_v9\\joint_fit.exe",
+        "--engineering-recovery",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recovery_input_g6_model.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\g6_bound\\packet.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\shared_g4",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\shared_g4_config.json"
+      ],
+      "backend_sha256": "1af7c491c142231ea495da4dc673da51598a8f9cec527523da367dcb656cea6f",
+      "model_sha256": "b9370b73f2e77c4cf7822d77cd860252ec5bcefe56ce05a6c369857b699b4958",
+      "packet_sha256": "0d63cd94f0178449862a478bd4769c3fb2bfb373a504d4b50dbb8704906441cf",
+      "returncode": 0
+    },
+    {
+      "stage": "init_g6_v1",
+      "execution": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/init_g6_v1/execution.json",
+      "command": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\build_v8\\joint_fit.exe",
+        "--engineering-recovery",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recovery_input_g6_model.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\g6_bound\\packet.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\init_g6_v1",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\init_g6_config.json"
+      ],
+      "backend_sha256": "3e420866f8e9da8c95922f8ed702e4249626973acda425ad365f9ff3eadff0e7",
+      "model_sha256": "b9370b73f2e77c4cf7822d77cd860252ec5bcefe56ce05a6c369857b699b4958",
+      "packet_sha256": "0d63cd94f0178449862a478bd4769c3fb2bfb373a504d4b50dbb8704906441cf",
+      "returncode": 1
+    },
+    {
+      "stage": "init_g6_v2",
+      "execution": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/init_g6_v2/execution.json",
+      "command": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\build_v9\\joint_fit.exe",
+        "--engineering-recovery",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recovery_input_g6_model.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\g6_bound\\packet.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\init_g6_v2",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\init_g6_resume_config.json"
+      ],
+      "backend_sha256": "1af7c491c142231ea495da4dc673da51598a8f9cec527523da367dcb656cea6f",
+      "model_sha256": "b9370b73f2e77c4cf7822d77cd860252ec5bcefe56ce05a6c369857b699b4958",
+      "packet_sha256": "0d63cd94f0178449862a478bd4769c3fb2bfb373a504d4b50dbb8704906441cf",
+      "returncode": 0
+    },
+    {
+      "stage": "shared_g7",
+      "execution": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/shared_g7/execution.json",
+      "command": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\build_v9\\joint_fit.exe",
+        "--engineering-recovery",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recovery_input_g7_model.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\g7_bound\\packet.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\shared_g7",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\shared_g7_config.json"
+      ],
+      "backend_sha256": "1af7c491c142231ea495da4dc673da51598a8f9cec527523da367dcb656cea6f",
+      "model_sha256": "9842d8505228a823db4a079d64317e721eebc0bbd82dba1d4a192579080b06a5",
+      "packet_sha256": "cd0203a9549129c9a1ea37103ab49615884ca9c8dc8a2f8d51cdd1ec702c9046",
+      "returncode": 0
+    },
+    {
+      "stage": "shared_g8",
+      "execution": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/shared_g8/execution.json",
+      "command": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\build_v11\\joint_fit.exe",
+        "--engineering-recovery",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recovery_input_g8_model.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\g8_bound\\packet.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\shared_g8",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\shared_g8_config.json"
+      ],
+      "backend_sha256": "a48c51ebdcdf39a8b6e9addced5e331f0d6bd024e1fe19566a4e55d131f1c6a2",
+      "model_sha256": "81c3e018240c654e722eda803786861eada1364dec45e5100ac18655ddceaf68",
+      "packet_sha256": "4bae5bfd7890afe9358f700e2e438a553e01c71ce77ff25e6a77095e2380cc62",
+      "returncode": 0
+    },
+    {
+      "stage": "optics_g8",
+      "execution": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/optics_g8/execution.json",
+      "command": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\build_v11\\joint_fit.exe",
+        "--engineering-recovery",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recovery_input_g8_model.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\g8_bound\\packet.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\optics_g8",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\optics_g8_config.json"
+      ],
+      "backend_sha256": "a48c51ebdcdf39a8b6e9addced5e331f0d6bd024e1fe19566a4e55d131f1c6a2",
+      "model_sha256": "81c3e018240c654e722eda803786861eada1364dec45e5100ac18655ddceaf68",
+      "packet_sha256": "4bae5bfd7890afe9358f700e2e438a553e01c71ce77ff25e6a77095e2380cc62",
+      "returncode": 1
+    },
+    {
+      "stage": "optics_g8_v2",
+      "execution": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/optics_g8_v2/execution.json",
+      "command": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\build_v11\\joint_fit.exe",
+        "--engineering-recovery",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recovery_input_g8_model.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\g8_bound\\packet.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\optics_g8_v2",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\optics_g8_v2_config.json"
+      ],
+      "backend_sha256": "a48c51ebdcdf39a8b6e9addced5e331f0d6bd024e1fe19566a4e55d131f1c6a2",
+      "model_sha256": "81c3e018240c654e722eda803786861eada1364dec45e5100ac18655ddceaf68",
+      "packet_sha256": "4bae5bfd7890afe9358f700e2e438a553e01c71ce77ff25e6a77095e2380cc62",
+      "returncode": 0
+    },
+    {
+      "stage": "repair_g8",
+      "execution": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/repair_g8/execution.json",
+      "command": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\build_v12\\joint_fit.exe",
+        "--engineering-recovery",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recovery_input_g8_model.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\g8_bound\\packet.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\repair_g8",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\repair_g8_config.json"
+      ],
+      "backend_sha256": "13fe89d4612a57a0bf5898323fca6db2c925a2983f58ec57059496fad846ebdd",
+      "model_sha256": "81c3e018240c654e722eda803786861eada1364dec45e5100ac18655ddceaf68",
+      "packet_sha256": "4bae5bfd7890afe9358f700e2e438a553e01c71ce77ff25e6a77095e2380cc62",
+      "returncode": 0
+    },
+    {
+      "stage": "shared_g9",
+      "execution": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/shared_g9/execution.json",
+      "command": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\build_v13\\joint_fit.exe",
+        "--engineering-recovery",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recovery_input_g9_model.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\g9_bound\\packet.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\shared_g9",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\shared_g9_config.json"
+      ],
+      "backend_sha256": "1e2d451603158abaa8d4f7b298e45faf080b166c983f93911acce2eb854d931d",
+      "model_sha256": "be66dcbfa5823f48884fa014b8d0560d20b5cd32edc42d0c2593e6c6b3ebccb9",
+      "packet_sha256": "c33853f94bee5a2589f3a22cbef1a0adb30755fef204058cd83f4fb38fb2a347",
+      "returncode": 0
+    },
+    {
+      "stage": "camera_g9",
+      "execution": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/camera_g9/execution.json",
+      "command": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\build_v14\\joint_fit.exe",
+        "--engineering-recovery",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recovery_input_g9_model.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\g9_bound\\packet.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\camera_g9",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\camera_g9_config.json"
+      ],
+      "backend_sha256": "366377d042b342c4e0feba6c32d725e31f998d4eeccac4c3e6971fce449b5752",
+      "model_sha256": "be66dcbfa5823f48884fa014b8d0560d20b5cd32edc42d0c2593e6c6b3ebccb9",
+      "packet_sha256": "c33853f94bee5a2589f3a22cbef1a0adb30755fef204058cd83f4fb38fb2a347",
+      "returncode": 0
+    },
+    {
+      "stage": "demo_grid_recovery_v1",
+      "execution": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/demo_grid_recovery_v1/execution.json",
+      "command": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\build_v16\\joint_fit.exe",
+        "--engineering-recovery",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\grid_input_v1\\model.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\g9_ice\\packet.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\demo_grid_recovery_v1",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\demo_grid_recovery_v1_config.json"
+      ],
+      "backend_sha256": "3505d877f1e871fff8c75394e271342d8b809ab62403250944db434e08e7e252",
+      "model_sha256": "9664534b60625127acc882293f5fe90425a99a2ea59812853207fc4bf6f73c4d",
+      "packet_sha256": "856fd7a939ce674e10494fbc32cf20023333f02150cae6af2a5937598b842a49",
+      "returncode": 0
+    }
+  ]
+}

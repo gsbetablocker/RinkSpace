@@ -1,0 +1,90 @@
+{
+  "schema": "rinkspace.user-tripod-position-evidence.v1",
+  "authority": "current_user_direct_annotation",
+  "date": "2026-10-02",
+  "user_text": "长边主副机位的三脚架基本就固定在你画的位置附近，我用红点画出了低位端部摄像机的三脚架大致位置，三脚架明确是假设在围挡外（几乎贴着围挡但肯定不在冰场内）",
+  "source_sha256": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891",
+  "annotated_image": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\evidence\\camera_hardware_20261001\\user_tripod_positions_20261002.png",
+    "sha256": "d6a1355ae1ecf2bdbf3ab3cfad4f4774b4d108744af4b71106c57109f2b058d5",
+    "size_wh": [
+      1682,
+      1125
+    ],
+    "red_dot_centroid_native_image_xy": [
+      239.5,
+      758.5
+    ]
+  },
+  "base_plan": {
+    "path": "D:/CodexData/.codex/visualizations/2026/10/02/private-thread-00009/RinkSpace_tmp/current_rink_plan_for_user/rink_plan_ads_three_z190_current_positions.png",
+    "size_wh": [
+      3200,
+      2140
+    ],
+    "origin_pixel_xy": [
+      1600,
+      1020
+    ],
+    "pixels_per_assumed_m": 39.0,
+    "sha256": "863f86f398f233c1be6510bd07bb9441193e429297702054f86bb1729dca5c29"
+  },
+  "metres_per_scene_unit": 0.31353729994266055,
+  "scene_sha256": "93c654360712be798e65aa83e587415fa2693008ee320ccbc1972299ead293bd",
+  "low_end": {
+    "installation_id": 2,
+    "nominal_pivot_xy_assumed_m": [
+      -29.34235799871947,
+      -10.841937321937325
+    ],
+    "nominal_pivot_xy_scene_units": [
+      -93.5849036273693,
+      -34.57941789994393
+    ],
+    "position_accuracy": "user approximate drawn tripod/pan-head location; not survey",
+    "outside_ice_boundary": true,
+    "near_board": true,
+    "nominal_height_assumed_m": 1.6,
+    "height_accuracy": "standing adult head estimate; floor-to-ice offset unknown"
+  },
+  "long_side_main": {
+    "installation_id": 0,
+    "position_status": "user confirmed near current saved position",
+    "current_nominal_pivot_xy_assumed_m": [
+      0.6963981628842771,
+      -15.517046616327887
+    ],
+    "outside_ice_boundary": true,
+    "near_board": true,
+    "current_outside_authority": "current_user_amendment.user_text"
+  },
+  "long_side_secondary": {
+    "installation_id": 1,
+    "position_status": "user confirmed near current saved position",
+    "current_nominal_pivot_xy_assumed_m": [
+      17.45117369606771,
+      -15.449578349316953
+    ],
+    "outside_ice_boundary": true,
+    "near_board": true,
+    "current_outside_authority": "current_user_amendment.user_text"
+  },
+  "camera_geometry_semantics": "User annotates tripod/pan-head installation position. Optical-centre motion requires explicit modeled lever/axial support; no per-frame unrestricted camera translation is authorized by this annotation.",
+  "no_new_user_tolerance_inferred": true,
+  "current_user_amendment": {
+    "recorded_local_date": "2026-10-06",
+    "authority": "current_user_explicit_instruction",
+    "user_text": "长边的两个支点有进入冰场吗？这两个支点应该也是几乎贴着围挡但在围挡外的",
+    "source_thread_id": "private-thread-00016",
+    "source_message_id": null,
+    "near_board_numerical_tolerance_supplied": false,
+    "drawn_XY_is_not_a_hard_parameter_box": true,
+    "outside_relation_applies_to_tripod_head_pivot_not_rotating_optical_centre": true
+  },
+  "parent_user_tripod_position_evidence": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\camera_hardware_20261001\\user_tripod_positions_20261002.json",
+    "sha256": "2975563b431fb452fa06b8b4815b03566c2089cf7b210d2c08f925be6f8982ec"
+  },
+  "numeric_coordinate_or_height_values_reestimated": false,
+  "near_board_numeric_offset_or_upper_bound_created": false
+}

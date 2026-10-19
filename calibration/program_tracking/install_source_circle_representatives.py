@@ -1,0 +1,13 @@
+from pathlib import Path
+p=Path('calibration/program_tracking/extract_first_shot_ice.py');s=p.read_text();a=s.index(' def nested_house_features(');b=s.index(' def family_audit(',a);z=s[a:b]
+z=z.replace("rows=result['rows'];parts=[];part=[];last=None","rows=result['rows'];parts=[];part=[];last=None\n     group_id='native_circle_'+str(native.frame.binding['source_pts'])+'_'+path['curve_id']")
+z=z.replace("for row in rows:\n      qi=row['query_index']", "for row in rows:\n      representative=np.asarray(row['representative_uv']);ip=np.rint(representative).astype(int)\n      if (representative<[0,0]).any() or (representative>[1919,1079]).any() or native.mask[ip[1],ip[0]]:continue\n      qi=row['query_index']")
+z=z.replace("uv=np.array([r['uv'] for r in part]);take=simplify(uv,tolerance=2.0,maximum_gap=160,closed=False);selected=[part[k] for k in take]", "uv=np.array([r['representative_uv'] for r in part]);take=simplify(uv,tolerance=2.0,maximum_gap=160,closed=False);selected=[part[k] for k in take]")
+z=z.replace("uv=[r['uv'] for r in selected]", "uv=[r['representative_uv'] for r in selected]")
+z=z.replace("source_evidence=[r['source_evidence'] for r in selected]", "source_evidence=[dict(r['source_evidence'],kind='shared_current_source_circle_representative',actual_native_readout_uv=r['uv'],\n         representative_to_actual_material_px=r['representative_to_actual_material_px'],source_evidence_group_id=group_id,individual_native_pixel_readout=False) for r in selected]")
+z=z.replace("measurement_origin='current_native_declared_house_material_interface',pixels_measured_in_this_frame=True,", "measurement_origin='same_frame_joint_physical_circle_family_fit',pixels_measured_in_this_frame=False,\n        representative_points_share_circle_family_estimate=True,source_evidence_group_id=group_id,")
+z=z.replace("individual_native_pixel_readouts=True,hidden_span_filled=False", "individual_native_pixel_readouts=False,hidden_span_filled=False")
+z=z.replace("f.update(joint_group_navigation=result['joint_group_navigation'],", "f.update(joint_group_navigation=result['joint_group_navigation'],source_evidence_group_id=group_id,\n       source_circle_fit=dict(current_frame_only=True,direct_readouts=rows,actual_native_readout_count=len(rows),\n         shared_physical_family_projection=True,material_readouts_are_not_model_or_temporal_pixels=True),")
+z=z.replace("inferred_uv_not_emitted_as_source_points=True", "inferred_uv_not_emitted_as_direct_material_readouts=True")
+z=z.replace("只有本帧对应暗填充/亮环的材料交界读数成为点，独立圈心/尺度及色带中点禁止。", "各代表点只在本帧已确认材料站位取样并共享本帧源圆拟合；原始材料读数单独保留，遮挡/缺失不补，独立圈心/尺度及靶圈填充色带中点禁止。")
+s=s[:a]+z+s[b:];p.write_text(s)

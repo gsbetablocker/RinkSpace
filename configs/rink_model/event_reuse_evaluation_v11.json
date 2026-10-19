@@ -1,0 +1,287 @@
+{
+  "schema_version": "rinkspace.event-reuse-evaluation.v1",
+  "created_at_utc": "2026-09-21T02:41:13.391525+00:00",
+  "event_id": "ankara_2026_user_scope",
+  "shared_model_id": "ankara_2026_shared",
+  "frozen_baseline_model": {
+    "path": "outputs/rink_model/ankara_2026_shared/v0.7/rink_model.json",
+    "sha256": "3712afb6b3e2eb49c08aa8855f92d661613659acd2133d7b3ad413ff3e46935b"
+  },
+  "preserved_inputs": [
+    {
+      "path": "outputs/rink_model/ankara_2026_shared/v0.7/rink_model.json",
+      "sha256": "3712afb6b3e2eb49c08aa8855f92d661613659acd2133d7b3ad413ff3e46935b"
+    },
+    {
+      "path": "outputs/landmark_v10/intervention/sparse_source_observations.json",
+      "sha256": "3049ef308543a7385a041d0598a7fd3f1ec20babf48ea70cf2ebf0bc9ca576d9"
+    },
+    {
+      "path": "configs/rink_model/ankara_whole_v07.json",
+      "sha256": "143ed0783c1d07660220eacdcf7ecbadf9d1c7e72fb84842d1044449bb33036d"
+    },
+    {
+      "path": "configs/rink_model/confirmed_ring_layout.json",
+      "sha256": "27a2847d4e03ecd4e89a6a2587dd7a6c02fec49a694f4a76eedd07cd34da2f01"
+    },
+    {
+      "path": "configs/rink_model/confirmed_layout_v2.json",
+      "sha256": "ca3ce8a8b03cdd3e486b79769c938497375b7a295b8d2433d1444274d57692d2"
+    },
+    {
+      "path": "configs/rink_model/confirmed_layout_v3.json",
+      "sha256": "a007a9ec19c482d729e240cdff426e038b22baadf970718fc4233ff1f2c21f0d"
+    },
+    {
+      "path": "outputs/landmark_checkpoint_v10/README.md",
+      "sha256": "975676c8c803ca7bc444598f83245f360f5baf3aa7a2ac65126fe121732f5fc8"
+    },
+    {
+      "path": "outputs/landmark_checkpoint_v10/failed_experiments.json",
+      "sha256": "498a06d18665c1f0554fb5c18684fc7cd795f457677f430094e965db6b4d845b"
+    }
+  ],
+  "regression_windows": [
+    {
+      "source_id": "ebihara",
+      "role": "development_regression_never_new_blind",
+      "baseline": {
+        "path": "outputs/whole_rink_localization/ebihara_multisurface_v09_c_v6_components/localization.json",
+        "sha256": "866f98540ca82a4674ac1eeca9adf11623a8002f4e1bbbf7fb695d1c33dbb2b5"
+      },
+      "source_sha256": "8a86550ddaa2a1a76af99c2b25de19acc54cf3907bd87efb5564ae1b2768473e",
+      "selected_window": {
+        "start_s": 132.04,
+        "end_s": 154.08,
+        "first_pts": 1690112,
+        "last_pts": 1971968,
+        "time_base": "1/12800",
+        "frame_count": 1102,
+        "selection_basis": "whole-rink development full source shot; not a blind test"
+      },
+      "cut_times_s": [
+        148.46,
+        154.06
+      ],
+      "complete_source_clock_sha256": "07be4000bc30b113d06faa3ecfab5b99b1f01103b3ee75c0a9ef069be91fca48",
+      "source_proxy": {
+        "path": "outputs/whole_rink_localization/ebihara_multisurface_v09_c_v6_components/source.mp4",
+        "sha256": "aae36d02531f18d5af3182b9c647126938766a2b3f7e7cdea81dd890c2a5f088"
+      },
+      "source_pts_map": {
+        "path": "outputs/whole_rink_localization/ebihara_multisurface_v09_c_v6_components/source_pts_map.json",
+        "sha256": "8931539bddca6652ae3b995b57934063d6967471198aaa8e5f4aa4a15fa69dbd"
+      },
+      "baseline_overlay": {
+        "path": "outputs/whole_rink_localization/ebihara_multisurface_v09_c_v6_components/whole_rink_overlay.mp4",
+        "sha256": "50a60be2aed07fda2ebea78262a7442c7c6f404af5f4f0556ed6645ff6a12f25"
+      },
+      "sparse_reading_pts": [
+        1753600,
+        1792000,
+        1817600
+      ]
+    },
+    {
+      "source_id": "okada",
+      "role": "development_regression_never_new_blind",
+      "baseline": {
+        "path": "outputs/whole_rink_localization/okada_multisurface_v09_c_v6_components/localization.json",
+        "sha256": "3df193516fcd11ee67b0963d8ae87c70af8d96f9174a6710371585b9cd0c7c28"
+      },
+      "source_sha256": "843e7490a38e0c856da057d6a1f871804f56ae2463c530c735ca524524309150",
+      "selected_window": {
+        "start_s": 18.44,
+        "end_s": 51.48,
+        "first_pts": 236032,
+        "last_pts": 658688,
+        "time_base": "1/12800",
+        "frame_count": 1652,
+        "selection_basis": "whole-rink development full source shot; not a blind test"
+      },
+      "cut_times_s": [
+        51.46
+      ],
+      "complete_source_clock_sha256": "3e16e85701a6c04f5999fdf720446fc334dd4e998c43abd6c5ebd0951f7b9097",
+      "source_proxy": {
+        "path": "outputs/whole_rink_localization/okada_multisurface_v09_c_v6_components/source.mp4",
+        "sha256": "7853af5c718a29b2d4e4afc355e268e04719f5ef3fb9baadfd8f7e68fcbf830f"
+      },
+      "source_pts_map": {
+        "path": "outputs/whole_rink_localization/okada_multisurface_v09_c_v6_components/source_pts_map.json",
+        "sha256": "5b565722a1171b7fb50d774c78f3b68c883c5ca5d9aef7eb3fe212919614317b"
+      },
+      "baseline_overlay": {
+        "path": "outputs/whole_rink_localization/okada_multisurface_v09_c_v6_components/whole_rink_overlay.mp4",
+        "sha256": "7f863e95f43d07528fdb2c24c479876a0bbdff97161508edf674133a5be4ff61"
+      },
+      "sparse_reading_pts": [
+        358400,
+        409600,
+        435200,
+        512000,
+        588800
+      ]
+    }
+  ],
+  "historical_regressions": [
+    {
+      "source_id": "jin",
+      "start_s": 183.84,
+      "end_s": 202.96,
+      "cuts": [],
+      "role": "development_regression",
+      "reason": "Complete existing shot_0012, visibly changing framing and multiple right-end painted rings; source-only views already used for development, never blind."
+    },
+    {
+      "source_id": "okada",
+      "start_s": 201.44,
+      "end_s": 214.36,
+      "cuts": [
+        205.0
+      ],
+      "role": "development_regression",
+      "reason": "Two complete existing shots_0011/0012 with actual camera cut at205 and changing view; previously seen source, never new blind."
+    },
+    {
+      "source_id": "ko",
+      "start_s": 74.54,
+      "end_s": 112.32,
+      "cuts": [
+        96.76
+      ],
+      "role": "new_source_inference_after_freeze",
+      "reason": "Two full shots selected by source-only observability and hard-cut review before localization; no KO pixels enter model or parameter tuning."
+    },
+    {
+      "source_id": "jin",
+      "start_s": 108.44,
+      "end_s": 118.62,
+      "cuts": [],
+      "role": "historical_failure_regression",
+      "reason": "Preserved historical509-frame window. New failure is retained, no promotion of oldA."
+    },
+    {
+      "source_id": "okada",
+      "start_s": 75.5,
+      "end_s": 89.28,
+      "cuts": [
+        75.52
+      ],
+      "role": "historical_failure_regression",
+      "reason": "Preserved historical689-frame window; source boundary75.52 kept explicitly; no oldA promotion."
+    }
+  ],
+  "historical_holdout_status": {
+    "ko": "Already inferred and failed in v0.3; not a new v11 blind programme.",
+    "okada_60_70": "Already frozen and decoded in v0.9; 500 frames, three failed initialization probes; not a new programme.",
+    "okada_94_104": "v10 result already inspected; failed development history.",
+    "okada_112_122": "v10 source-only preparation exists; familiar programme and not new-source blind."
+  },
+  "registry_to_workspace_aliases": {
+    "jin": "PVXWd7nLt8Q",
+    "okada": "HZQx6HK8zR8",
+    "broadcast_scout": "oxXu1avhrvs",
+    "broadcast": "oxXu1avhrvs",
+    "ko": "gnskF9dQwJo",
+    "ebihara": "GY6bDwCGjKg",
+    "cetin": "EJV9lyZ7D28"
+  },
+  "new_programme_holdout": {
+    "source_id": "EJV9lyZ7D28",
+    "title": "Leyla CETIN (TUR) | Junior Women Free Skating | Ankara 2026",
+    "url": "https://www.youtube.com/watch?v=EJV9lyZ7D28",
+    "session_id": "women_fs",
+    "source_sha256": "bccfa5f7b04c5ef93b737c02a3ca2ba011c67b023b6ac4f1a3feb9fbedeae3a8",
+    "reservation_status": "ready_for_first_frozen_inference_not_yet_run",
+    "selection_basis": "Existing official same-event registry entry with no local pixel assets or prior inference found; selected before new-camera results.",
+    "prior_usage_scan": "Exact source ID/name hits confined to registry/search JSON and archived copies of registry.",
+    "quarantined_source_ids": [
+      "EJV9lyZ7D28",
+      "Rd66CneD9io"
+    ],
+    "quarantine_reason": "Individual programme may duplicate women_fs broadcast; exact programme and replay offsets remain unresolved. The whole broadcast is excluded from training until a versioned visual duplicate map excludes all matching programme/replay frames.",
+    "source_only_survey_allowed": true,
+    "source_only_survey_is_not_unseen_pixels": true,
+    "training_includes": [
+      "shared_installation_calibration",
+      "reference_selection",
+      "model_geometry",
+      "threshold_tuning",
+      "semantic_identity_adjustment"
+    ],
+    "window_selection_rule": "After download and before inference, keep the full source programme video with all PTS; source-only role/shot annotation may partition on-ice playback from replay/off-ice, but no failed frame may be removed.",
+    "required_before_inference": [
+      "source SHA and full decoded PTS manifest",
+      "new shared-model, camera-library and solver/config SHA freeze",
+      "versioned duplicate exclusion map or whole-broadcast quarantine",
+      "source-read check contours frozen without looking at predictions"
+    ],
+    "independent_test_executed": false,
+    "workspace_source_id": "cetin",
+    "local_path": "data/input/EJV9lyZ7D28.398.mp4",
+    "representation": {
+      "format_id": "398",
+      "source_width": 1280,
+      "source_height": 720,
+      "source_rate": "50"
+    },
+    "full_decoded_frame_count": 21821,
+    "source_pts_extent_s": [
+      0.0,
+      436.4
+    ],
+    "window": {
+      "start_s": 82.68,
+      "end_s": 139.2,
+      "first_pts": 1058304,
+      "last_pts": 1781504,
+      "time_base": "1/12800",
+      "frame_count": 2826,
+      "selection_basis": "Two complete source-only reviewed moving shots, including camera cut116.84; frozen before inference"
+    },
+    "cut_times_s": [
+      116.84
+    ],
+    "source_window_freeze": {
+      "path": "outputs/event_reuse_v11/cetin_holdout_intake/freeze.json",
+      "sha256": "76aee8ea14b1c2ee94e452f6755ae9fb94e400177da8781659085240343e41aa"
+    },
+    "final_model_library_solver_freeze": "outputs/event_reuse_v11/final_pre_inference_freeze.json"
+  },
+  "evaluation": {
+    "error_domain": "960-wide sample image pixels, additionally reported in source pixels by declared scaling; not metres",
+    "metrics": [
+      "complete-window candidate duration",
+      "longest continuous candidate interval",
+      "per-physical-group ice contour median/p95/max",
+      "missing-check and missing-pose counts",
+      "cut-recovery delay",
+      "model/source/camera-installation identity binding"
+    ],
+    "contour_checks": {
+      "path": "outputs/landmark_v10/intervention/sparse_source_observations.json",
+      "sha256": "3049ef308543a7385a041d0598a7fd3f1ec20babf48ea70cf2ebf0bc9ca576d9"
+    },
+    "withheld_from_new_semantic_constraints": [
+      "blue_left"
+    ],
+    "historical_leakage": "blue_left appeared in older reference fits. Sparse v10 readings are development checks and not independent full-window geometry truth.",
+    "acceptance_thresholds": null,
+    "acceptance_reason": "No pre-existing scientifically validated all-rink threshold is invented. Publish candidate coverage and measured errors separately; no pass is assigned by this intake.",
+    "fitting_residual_is_not_validation": true,
+    "automatic_v10_v5_v6_identity_decisions_rejected": true
+  },
+  "reusable_api": {
+    "contours": "rinkspace.landmark_camera.observations_to_curves(frame_index, observations, model, scale=.5)",
+    "camera": "rinkspace.multisurface_camera.Camera(rotation, centre, focal, principal, size, radial_ray_k1)",
+    "overlay": "scripts.solve_multisurface_v09.render(root, record, model, out, baseline_directory)",
+    "evaluation": "scripts.evaluate_landmark_v10.evaluate(run, sparse_observations, model)",
+    "guard": "scripts.prepare_event_reuse_evaluation.assert_training_eligible(rows, config)"
+  },
+  "reservation_history": {
+    "path": "outputs/event_reuse_v11/intake_pre_acquisition_reservation_config.json",
+    "sha256": "1001766bcb40ac0adfe9206e6716ab34ca145c6c59d175d82bc1cde04a1a2ee7",
+    "reason": "Preserve the original pre-acquisition reservation, including source selection and whole-broadcast quarantine. Later state update records acquisition and source-only selection without looking at inference."
+  }
+}

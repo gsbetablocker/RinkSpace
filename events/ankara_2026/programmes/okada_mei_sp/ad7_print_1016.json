@@ -1,0 +1,51 @@
+{
+  "schema": "rinkspace.explicit-disjoint-print-successor.v1",
+  "runtime_producer": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\first_shot_disjoint_print.py",
+    "sha256": "332bcf73e09d9a161e6b54aa981e1658bafc85c8c9be069d80dded8c408809dc"
+  },
+  "material_override": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\models\\ad7_shape_1016.json",
+    "sha256": "6230fb34a20def98aef6e3e7cfaedb72e691e526257d1731135e11144aa31717"
+  },
+  "changed_advertisement_ids": [
+    7
+  ],
+  "base_producers": [
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\first_shot_row_source.py",
+      "sha256": "a34ba70b8bf924e9c61ce47f8c2b524e14474f199bd09d55a26557359081c30d"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\first_shot_source_kernel.py",
+      "sha256": "3b870ab6fba5938567cb810fa7a6233b8589fa96a9d921cc7afb7444e5d1fdf4"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\first_shot_physical_state.py",
+      "sha256": "80ade6a1a3528c1ee6e3d7ea81cb4064115d68d4544ca58dc3a4c53db36163d6"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\framewise_model.py",
+      "sha256": "c1b9aa45a08cd73422b475148373a9ee4e60c89adc19395a613ccb742c1e3f22"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\first_shot_print_layout.py",
+      "sha256": "469456c78efa5e31190b18237a97b5a2cff613942dea48203f3c7047fe7eb703"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\first_shot_print_halfspaces.py",
+      "sha256": "616f4de2462469f367ff04698bb010ff4029e9fcc53a1a3e92149516226ba1f8"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\first_shot_alignment_monitor.py",
+      "sha256": "91256acf8b48684f69d27273fbb6db0e6c1fe85e759e474fbad188c1aa5ebc8c"
+    }
+  ],
+  "user_authority": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\model_constraints\\ad7_user_1016.json",
+    "sha256": "1a9e244d236960fdcd4b17549ad0bc1dd9ba6fd3b7a29f5b301538b1f60086e5"
+  },
+  "transition_scope": "Ad7 art/path topology successor only; full parent q/H8 and all other material/camera coordinates retained",
+  "install_order": "original value/raw/fused/camera installation and historical construction first; install_successor(...,transform_source_targets=False), original source deltas inside historical_source_templates(programme), restore new bank, refresh_source_targets; new H8 halfspaces and fresh world/source J",
+  "safe_snapshot_restore": "authenticate historical source metadata and original deltas, then explicitly install/refresh this independent material successor"
+}

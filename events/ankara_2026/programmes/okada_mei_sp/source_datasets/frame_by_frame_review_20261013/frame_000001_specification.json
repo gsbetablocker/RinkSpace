@@ -1,0 +1,318 @@
+{
+  "frame_pts": 229114112,
+  "print_roi": [
+    1190,
+    345,
+    1920,
+    685
+  ],
+  "features": [
+    {
+      "id": "board_top",
+      "label_zh": "围挡上沿",
+      "world_curve": "board_surface.top_edge_xyz",
+      "scans": [
+        {
+          "signal": "blue",
+          "navigation_xy": [
+            [
+              0,
+              119
+            ],
+            [
+              500,
+              110
+            ],
+            [
+              850,
+              108
+            ],
+            [
+              878,
+              107
+            ]
+          ],
+          "axis": 0,
+          "normal_radius_px": 24
+        },
+        {
+          "signal": "blue",
+          "navigation_xy": [
+            [
+              1162,
+              100
+            ],
+            [
+              1600,
+              86
+            ],
+            [
+              1919,
+              85
+            ]
+          ],
+          "axis": 0,
+          "normal_radius_px": 24
+        }
+      ],
+      "visual_review_segments": [
+        {
+          "uv": [
+            [
+              880,
+              110
+            ],
+            [
+              940,
+              108
+            ]
+          ],
+          "source_y_interval_px": [
+            [
+              104,
+              117
+            ],
+            [
+              101,
+              111
+            ]
+          ],
+          "note": "原生图放大逐点视觉读数；左邻蓝色顶缘可见且虚焦，未沿模型或直线补点"
+        },
+        {
+          "uv": [
+            [
+              1100,
+              103
+            ],
+            [
+              1160,
+              102
+            ]
+          ],
+          "source_y_interval_px": [
+            [
+              96,
+              110
+            ],
+            [
+              94,
+              110
+            ]
+          ],
+          "note": "原生图放大逐点视觉读数；右邻蓝色顶缘可见且虚焦，未沿模型或直线补点"
+        }
+      ]
+    },
+    {
+      "id": "board_contact",
+      "label_zh": "围挡接冰下沿",
+      "world_curve": "ice_boundary.points_xyz",
+      "scans": [
+        {
+          "signal": "yellow",
+          "navigation_xy": [
+            [
+              0,
+              1014
+            ],
+            [
+              600,
+              998
+            ],
+            [
+              1300,
+              980
+            ],
+            [
+              1919,
+              967
+            ]
+          ],
+          "axis": 0,
+          "normal_radius_px": 28
+        }
+      ]
+    },
+    {
+      "id": "Ad2.top_edge",
+      "label_zh": "Ad2上边框",
+      "world_curve": "Ad2.top_edge",
+      "scans": [
+        {
+          "signal": "magenta",
+          "navigation_xy": [
+            [
+              552,
+              230
+            ],
+            [
+              823,
+              226
+            ]
+          ],
+          "axis": 0,
+          "normal_radius_px": 24
+        },
+        {
+          "signal": "magenta",
+          "navigation_xy": [
+            [
+              1176,
+              220
+            ],
+            [
+              1250,
+              217
+            ]
+          ],
+          "axis": 0,
+          "normal_radius_px": 24
+        },
+        {
+          "signal": "magenta",
+          "navigation_xy": [
+            [
+              1397,
+              213
+            ],
+            [
+              1919,
+              203
+            ]
+          ],
+          "axis": 0,
+          "normal_radius_px": 24
+        }
+      ]
+    },
+    {
+      "id": "Ad2.left_vertical",
+      "label_zh": "Ad2左边框",
+      "world_curve": "Ad2.left_vertical",
+      "scans": [
+        {
+          "signal": "magenta",
+          "navigation_xy": [
+            [
+              541,
+              248
+            ],
+            [
+              545,
+              550
+            ],
+            [
+              548,
+              847
+            ]
+          ],
+          "axis": 1,
+          "normal_radius_px": 24
+        }
+      ]
+    },
+    {
+      "id": "Ad2.bottom_edge",
+      "label_zh": "Ad2下边框",
+      "world_curve": "Ad2.bottom_edge",
+      "scans": [
+        {
+          "signal": "magenta",
+          "navigation_xy": [
+            [
+              561,
+              864
+            ],
+            [
+              766,
+              858
+            ]
+          ],
+          "axis": 0,
+          "normal_radius_px": 24
+        },
+        {
+          "signal": "magenta",
+          "navigation_xy": [
+            [
+              1290,
+              843
+            ],
+            [
+              1919,
+              826
+            ]
+          ],
+          "axis": 0,
+          "normal_radius_px": 24
+        }
+      ]
+    }
+  ],
+  "ad_corner_boxes": [
+    [
+      526,
+      215,
+      563,
+      252
+    ],
+    [
+      531,
+      847,
+      575,
+      884
+    ]
+  ],
+  "excluded_features_by_user": [
+    {
+      "id": "board_blue_lower_material_edge",
+      "reason": "用户明确：非现有冰场模型特征，本帧不需要提取"
+    },
+    {
+      "id": "board_yellow_upper_material_edge",
+      "reason": "用户明确：非现有冰场模型特征，本帧不需要提取"
+    },
+    {
+      "id": "board_left_panel_lower_seam",
+      "reason": "用户明确：非现有冰场模型特征，本帧不需要提取"
+    }
+  ],
+  "unresolved_source_regions": [
+    {
+      "feature": "board_top",
+      "bbox_xyxy": [
+        942,
+        94,
+        1098,
+        114
+      ],
+      "status": "user_confirmed_head_occlusion_retained",
+      "note_zh": "围挡上沿按本帧原片边缘统一估计直线；保留用户确认正确的头部遮挡缺口，不在缺口内取点或连线。"
+    }
+  ],
+  "rectangular_advertisement_corners": [
+    "Ad2"
+  ],
+  "maximum_review_points": 99,
+  "maximum_visible_boundary_spacing_px": 250,
+  "user_line_sampling_instruction": "长直线段不能只取端点，要按一定间距取中间点，明确角点和所属边；仍只修第一帧并等待验收。",
+  "user_corner_instruction": "ad2边框不用圆弧转角，模型是长方形，直接取角点。",
+  "user_density_instruction": "总取点压到100以内，关键特征不丢失。",
+  "straight_source_boundaries": {
+    "board_top": {
+      "visible_x_intervals": [
+        [
+          0,
+          940
+        ],
+        [
+          1100,
+          1919
+        ]
+      ],
+      "user_instruction": "围挡上边沿应是直的，保留选手头部遮挡的段落。",
+      "head_occlusion_review": "user_confirmed_this_gap_is_correct"
+    }
+  }
+}

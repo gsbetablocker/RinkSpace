@@ -1,0 +1,124 @@
+{
+  "assertions": {
+    "current_frame_native_reread_required": true,
+    "dimension_claims": {
+      "measurement_operator": {
+        "evidence_refs": [
+          "9328acc4870686f5c2b3c8e702de6bf16761f6e81be19a8adae0ab436b790484"
+        ],
+        "reasons": [
+          "unchanged_mean_inside_board_body_or_print_above_observed_yellow_strip"
+        ],
+        "status": "verified",
+        "value": "ordered_board_material_flanks"
+      }
+    },
+    "episode_resolution_type": "operator_error",
+    "episode_source": {
+      "coordinate_domain": "native_pixels",
+      "native_hw": [
+        1080,
+        1920
+      ],
+      "pts": 621312,
+      "time_base": "1/12800",
+      "video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+    },
+    "generalization_status": "source_scoped_advisory_episode_only",
+    "lesson": {
+      "original_49Q_operator_requalification_still_required": true,
+      "reader_check": "ordered_board_material_flanks",
+      "summary": "Compare current board material flanks; keep wrong-role means outside fit until the original operator is requalified"
+    },
+    "next_matching_frame_action": "reread_unresolved_dimensions_keep_partial_claims",
+    "position_truth_for_future_frame": "unknown_until_current_native_review",
+    "regression_request": {
+      "expected_action": "preserve_verified_dimensions_without_inventing_position",
+      "source": {
+        "coordinate_domain": "native_pixels",
+        "native_hw": [
+          1080,
+          1920
+        ],
+        "pts": 621312,
+        "time_base": "1/12800",
+        "video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+      },
+      "visual_regression_executed": false
+    },
+    "transfer_instance_identity_without_current_context": false,
+    "transfer_pixel_coordinates_to_new_frame": false,
+    "unresolved_dimensions": [
+      "semantic_class",
+      "physical_instance",
+      "visibility",
+      "position"
+    ],
+    "verified_dimensions": [
+      "measurement_operator"
+    ]
+  },
+  "case_id": "lesson_ad2bde7df0bf5342541b1f28",
+  "evidence_refs": [
+    {
+      "current_frame": true,
+      "independent_of_model": true,
+      "kind": "native_pixels",
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\real_run_final_a\\native.png",
+      "sha256": "9328acc4870686f5c2b3c8e702de6bf16761f6e81be19a8adae0ab436b790484",
+      "source": {
+        "coordinate_domain": "native_pixels",
+        "native_hw": [
+          1080,
+          1920
+        ],
+        "pts": 621312,
+        "time_base": "1/12800",
+        "video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+      }
+    },
+    {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\real_run_final_a\\review.json",
+      "sha256": "86361f284563819eae1b05e1b40bb1186168a3456187c775d37912a2628158ec"
+    },
+    {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\real_run_final_a\\profiles\\621312_material_profiles.npz",
+      "role": "one_actual_RGB_material_profile_evidence_per_exposure",
+      "sha256": "c29c0628bc27c7981b3c0d455da5144b732563304f48f7520699a24c295113dd"
+    }
+  ],
+  "fit_admissible": false,
+  "kind": "recipe",
+  "lineage": {
+    "source_key": "3e16ba6c923e45cec274a0bfdfd064971053398505f957f2b987a619922ebe24",
+    "source_video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+  },
+  "provenance": {
+    "authority": "source_review_declared_by_caller; not_user_confirmation",
+    "created_by": "FeedbackCycle.learn",
+    "evidence_assurance": "source identity and declarations checked; pixel interpretation is not verified by this ledger",
+    "finding_id": "finding_da4bea9c0db42922cf701ac2",
+    "resolution_id": "resolution_3b1ce8cab24ab4373a0c04e2",
+    "resolution_sha256": "3b1ce8cab24ab4373a0c04e2abf79c46bc30c80e81129e66dd543750496ecbe9"
+  },
+  "scope": {
+    "camera_id": "secondary",
+    "entity_ids": [
+      "board.contact"
+    ],
+    "event_id": "ankara_2026",
+    "source_video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+  },
+  "split_role": "development",
+  "status": "active",
+  "tags": [
+    "fit_checkpoint",
+    "material_boundary",
+    "native_source_recheck",
+    "operator_error",
+    "source_recheck"
+  ],
+  "title": "Compare current board material flanks; keep wrong-role means outside fit until the original operator is requalified",
+  "training_eligible": false,
+  "version": 1
+}

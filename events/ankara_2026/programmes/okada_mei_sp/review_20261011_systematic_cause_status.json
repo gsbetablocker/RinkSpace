@@ -1,0 +1,2146 @@
+{
+  "schema": "rinkspace.systematic-cause-review-status.v1",
+  "updated_local_date": "2026-10-12",
+  "user_direction": "实际定位并修复剩余系统偏差；不以局部数值改善充当完成，不堆报告或重复源图缓存。",
+  "status": "已按用户要求导出最新 8a28afed 状态完整视频；求解与核查子代理已停止。视频供用户检查，准确性未验收。",
+  "accuracy_accepted": false,
+  "current_delivered_full_video_model_q": "8a28afed8f9f896112e5b2f64be515b2bc02019e10e09c7e0eda2598579d4891",
+  "latest_diagnostic_model": {
+    "q_sha256": "8a28afed8f9f896112e5b2f64be515b2bc02019e10e09c7e0eda2598579d4891",
+    "state_identity": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_current_points_ready_20261012\\accepted_states\\8a28afed8f9f896112e5b2f64be515b2bc02019e10e09c7e0eda2598579d4891\\state_identity.json",
+      "sha256": "5ac4f0f58c4bf24520a12ddbdca1396d1b9bc6356b38b8c3bfa23153ac4dea25"
+    },
+    "model_promoted": false
+  },
+  "solver_exit": 0,
+  "causal_findings": [
+    {
+      "status": "历史局部反例保留；本轮已按完整局部坐标重验",
+      "finding": "历史广告竖边的原导数与SOC实际回放使用了不同的线段位置消元坐标；旧约340倍来自不同响应定义的比较。最终同坐标保存方向回放才是当前数值回归依据，不能用该比值解释所有历史画面偏差。",
+      "scope": "8组经原材料生产器证明完整物理竖边的广告约束；原UV、支持、真实cap与非线性保护保持。",
+      "tests": "27项相关测试通过；6保存方向×12步长，新约束实际违规与原动态guard最大差1.16e-13 px。",
+      "ratio_interpretation": "旧约340倍涉及旧冻结切向响应与真实动态守护的不同坐标，不能当成同坐标曲率直接相除。最终历史native29回归明确保留旧量，固定足点同坐标方向差分经核验，原真实违规仍拒绝。",
+      "final_saved_direction_regression": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\historical_a454_native29_fixed_foot_directional_value_regression_20261011.json",
+        "sha256": "7384b2405561b25ed678faaa6d47f714f5deaac4269bfe2f4cc91ae6c7be35cd"
+      }
+    },
+    {
+      "status": "覆盖事实已核实；不能由此推定全部未知点都是围挡",
+      "finding": "新增947个围挡角色仅覆盖25对、35次真实曝光，占8503次的0.41%；原2118488运动点中2085511仍为未知深度。相机RF4逐曝光独立，未知深度具备吸收真实运动误差的能力。"
+    },
+    {
+      "status": "第8镜头反例已核实",
+      "finding": "全镜头372对有有限围挡点，6374个原有限点的同起点深层LK重放与原始结果接近，profile为1；不能把其剩余偏差直接归因于旧LK或robust降权。"
+    },
+    {
+      "status": "只读真实成本分解已完成；不支持全镜头目标反拉猜测",
+      "finding": "第8镜头同profile原Huber2成本，6374有限围挡点26.3183356→24.4966399，62482未知深度点226.3091232→225.9150289；两类总成本都下降。局部144对围挡降/unknown升、66对相反，不能由有限位移成本推断梯度冲突。全部373曝光更新同样乘全局0.5，受其他镜头保护牵制。",
+      "report": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\current_cut8_same_original_Huber2_material_cost_q276_to_q8a15_readonly_20261011.json",
+        "sha256": "adfee4eaf950ce2da23e9576a4690006cf99276ae82372f89d808ba1ac99ea36"
+      },
+      "limitation": "新run未保存actor输入数组hash；重放继承此前已认证原数组，核对相同roles/compaction/clock，不冒称重新独立认证。尚不能定位第8镜头全部剩余偏差。"
+    },
+    {
+      "status": "局部案例成立；已修复全86审计发现的错误通用扩展，未再拟合",
+      "finding": "C完整物理直线的内部采样cell原先未进入station消元；名义normal贴上界导致normal J为零，实际trial切换到normal/tangent共同约束时仍用旧tangent坐标作SOC，低估约49.5倍。与广告竖边属同一数值表示错误。",
+      "scope": "只扩展已有producer及真实course端点证书的整条boundary-clipped物理直线，不按C名称特判，不扩展未认证曲线。",
+      "validation": "本次同一个保存完整方向，404原源顶点变为2424一致局部约束面；11档步长的新面最大实际违规与原动态guard差小于9e-16 px。全步仍按原guard拒绝，半步仍可行；源、支持、状态、方向、旧guard分支逐值保持。未生成新的优化方向或启动拟合。",
+      "before_evidence": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_q276_vertical_print_station_one_cycle_20261011.bootstrap\\native36_saved_direction_station_causal_audit.json",
+        "sha256": "dce31cf0e79081e094bec8682e7d0bbf834acb679fbae9473b5b60995631b384"
+      },
+      "after_evidence": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_q276_vertical_print_station_one_cycle_20261011.bootstrap\\native36_saved_direction_station_repaired_audit.json",
+        "sha256": "dceb11a43375e4e404785eb1505a16b0ef6425c0cab81b91a71866ffed1b8be7"
+      },
+      "verification_summary": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_q276_vertical_print_station_one_cycle_20261011.bootstrap\\native36_station_repair_verification_summary.json",
+        "sha256": "2c824f4d2e74f98ed38225d0e23ce02288fc7d50deec88c27bceb43d93db4c10"
+      },
+      "later_complete_domain_counterexample": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_q276_vertical_print_station_one_cycle_20261011.bootstrap\\q8a15_complete_truth_phase_I_readonly\\all86_nominal_exclusion_causal_evidence.json",
+        "sha256": "ce57bbbdd9a2dc048b1e83c53f46e7c0e1cff979484a2e0526ddee4542f5294b"
+      },
+      "validation_limit": "旧31项测试与单一C方向仅是历史局部证据。本轮覆盖q276/q8全54native组，17认证直线组11757顶点；没有证明未来所有非线性分支或历史画面偏差已解决。",
+      "later_repair": "撤回Brown投影下用真实远端点替换局部切线面的错误表示；仅用原名义投影足点和真实物理端点的局部切向锥。内部采样结点保持可沿线移动，真实全局端点单侧可行。每个新面必须逐顶点不排除原名义见证。",
+      "final_all_native_value_regression": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\repaired_native54_station_nominal_value_audit_20261011.json",
+        "sha256": "30de19836c69620ac9d5e31283c3f957ac5819a13eb98fb0d2ce01dc00d72731"
+      }
+    },
+    {
+      "id": "all86_false_remote_station_faces",
+      "status": "原因已定位并修复",
+      "finding": "Brown畸变下整条物理直线不等于屏幕局部直线。错误远端面在6组冰线形成5282条假排除，最大873.189px；修复后完整86组及原物理域t=1、零步检查假排除为0。该扩展发生在q8之后，不是历史20–45px偏差的证据。",
+      "evidence": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_q276_vertical_print_station_one_cycle_20261011.bootstrap\\q8a15_complete_truth_phase_I_readonly\\all86_nominal_exclusion_causal_evidence.json",
+        "sha256": "ce57bbbdd9a2dc048b1e83c53f46e7c0e1cff979484a2e0526ddee4542f5294b"
+      },
+      "repaired_complete_domain": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_q276_vertical_print_station_one_cycle_20261011.bootstrap\\q8a15_complete_truth_phase_I_readonly\\station_tangent_cone_repaired\\complete_domain_assembly.json",
+        "sha256": "9c8653c0057c660444d7a9a262f32e359cdc6ab6c841a94e82d0ecae90c6f155"
+      }
+    },
+    {
+      "id": "native_same_chart_true_guard_SOC",
+      "status": "原因已定位并修复",
+      "finding": "非FM原J使用冻结查询公式，FM使用固定名义足点，实际响应必须各自同坐标。SOC是否切面及实际进展另由原动态group guard与同parent target判断。F2/R1/A4换见证且真实合格时不再产生假cut；保存全步唯一真实失败native36仍得到cut并被原guard拒绝。",
+      "evidence": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\repaired_native_mixed_chart_saved_direction_audit_20261011.json",
+        "sha256": "884c5b79651ee306f5c00a02f4d45c3909fd81a1754ed634b1d560facf1be970"
+      },
+      "limit": "7组小truth局部导数检查，无完整源J；未添加分支变更后的matrix刷新，最终真实guard仍权威。"
+    },
+    {
+      "id": "phase_I_primary_false_success",
+      "status": "原因已定位并修复",
+      "finding": "原主路径只信HiGHS success与finite；全86原LP成功返回但全行归一primal约−3.11e−6，不满足原1e−9。现主路径、fallback及实际midpoint均核完整原域与t box；同式conic给出合法共同改善见证t=.9768832593，返回midpoint=.9884416297。",
+      "evidence": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_q276_vertical_print_station_one_cycle_20261011.bootstrap\\q8a15_complete_truth_phase_I_readonly\\station_tangent_cone_repaired\\complete_original_phase_I_primal_witness.json",
+        "sha256": "194a37c2718553a947ceb259011008d16ace3187b222abdaefae26540d87c4fd"
+      },
+      "final_saved_mapping_verification": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_q276_vertical_print_station_one_cycle_20261011.bootstrap\\q8a15_complete_truth_phase_I_readonly\\station_tangent_cone_repaired\\final_saved_primal_mapping_verification.json",
+        "sha256": "a2d033f725b8ccba1190bac9b06307e33971cea670012834370e3912886040c8"
+      },
+      "limit": "LP full dual KKT未认证，fraction不是已证最小值，不做dual瓶颈归因；既有conic dual finite/sign检查保留，源QP完整KKT及真实非线性接受未放宽。"
+    },
+    {
+      "id": "saved_objective_and_absolute_tradeoff",
+      "status": "已确认机制与反例，物理根因未闭合",
+      "finding": "33原家族总cost下降273.861时，部分绝对材料项变差；某些F2旧支持内残差不受罚，但新增F2/B2及LOW Ad4大残差正常受罚。相机与共享几何在部分曝光强烈抵消；45px LOW Ad4例两者却同向改善，故补偿不是统一解释。未证明权重算错、局部最优或场地/rig结构错。",
+      "evidence": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_q276_vertical_print_station_one_cycle_20261011.bootstrap\\saved_complete_target_cost_budget_causal_evidence.json",
+        "sha256": "d396b219516e8db6756a43e61a69e7d039cb2d105b1d6d7fe8152bb62b0a6c72"
+      },
+      "absolute_operator_evidence": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\current_absolute_F2_B2_related_ads_saved_step_q276_q8a15_causal_response_20261011.json",
+        "sha256": "3c8d561318cbfac799aa2ad6f8969a9ffec4d7529ed0af772a5f8dd7215838a3"
+      }
+    }
+  ],
+  "full_programme_motion_check": {
+    "report": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\all9_276645_8a15a4_vertical_station_causal_comparison_20261011.json",
+      "sha256": "6e50b098b4a968577a0094ec2967d97fd015ee389f04a05b8d19b4986fbbb64e"
+    },
+    "comparison_to_delivered_video_model": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\all9_a454_8a15a4_vertical_station_causal_comparison_20261011.json",
+      "sha256": "bd3f02001971d431e69c7b3392566e1da89fc061e06dfa396ca4a9d1cb428051"
+    },
+    "all_original_adjacent_actual_pairs": 8494,
+    "source_supported_pairs": 6741,
+    "common_model_valid_supported_pairs": 6711,
+    "source_missing_or_sparse_pairs": 1753,
+    "model_domain_failure_pairs_before": 29,
+    "model_domain_failure_pairs_after": 30,
+    "aggregate_pair_median_px_before": 0.2319012419104353,
+    "aggregate_pair_median_px_after": 0.23283554853984506,
+    "pair_median_p95_px_before": 1.2691111989354553,
+    "pair_median_p95_px_after": 1.281378701199114,
+    "shot_medians_improved": 4,
+    "shot_medians_worsened": 5,
+    "verdict": "无一致整段改善，不能晋升；原缺失与新增domain失败均未填零。",
+    "limitations": [
+      "同源逐帧对运动诊断不是绝对冰线/广告贴合，也不是连续全模型视觉验收。",
+      "这些是开发材料，不能称独立未使用留出。",
+      "源围挡导航不等于逐点材料资格；domain失败必须保留，但不能单凭此认定源点都是真围挡。"
+    ]
+  },
+  "remaining_read_only_audits": [],
+  "unresolved_visible_biases": [
+    "F2与广告兼顾",
+    "B2",
+    "部分广告边界",
+    "整段运动偏差",
+    "Lane3及围挡细节"
+  ],
+  "source_cache": {
+    "new_full_source_images_written": 0,
+    "behavior": "复用既有源图与认证数据。本轮因果检查未解码/写新源PNG；既有认证缓存工具仍在缺图时按原身份与PTS内存重建并核hash。",
+    "historical_files_removed": false,
+    "current_causal_stage": {
+      "source_images_written": 0,
+      "source_frames_decoded": 0,
+      "existing_original_PNG_viewed": 1,
+      "full_source_J_built": false,
+      "full_video_generated": false,
+      "historical_files_removed": false,
+      "duplicate_full_matrix_A_saved": false,
+      "note": "小truth局部域和原LP仅用于因果诊断；LP候选/原行映射NPZ约5.34MB，复用原域约3.02MB，不复制A。"
+    },
+    "joint_diagnostic_source_image_cache_files_added": 0,
+    "joint_diagnostic_full_videos_added": 0,
+    "root_existing_original_images_viewed_this_causal_stage": 2,
+    "joint_diagnostic_arrays_bytes": 4050924,
+    "joint_diagnostic_note": "No source-image decode in numerical scripts; root viewed two existing originals, no copies.",
+    "wide45_optional_integration_stage": {
+      "new_source_images": 0,
+      "new_full_video": 0,
+      "new_persistent_J_arrays": 0,
+      "historical_files_removed": false,
+      "actual_same_q_wide_J_only": true
+    },
+    "LOW6_response_stage": {
+      "new_source_images": 0,
+      "new_full_videos": 0,
+      "compact_arrays_bytes": 512491,
+      "new_complete_source_J": false,
+      "new_fitted_state": false,
+      "historical_files_removed": false
+    },
+    "new_source_image_cache_files_this_continuation": 0,
+    "source_images_reused": true
+  },
+  "new_full_video_generated": true,
+  "code_and_evidence": {
+    "source_coverage_audit": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\current_motion_role_whole_programme_exact_947_20261011.json",
+      "sha256": "664094b03a6ec0f8d1beafd9c6dd5e03c616c66a7aaf7ea6c11ebbc88740c754"
+    },
+    "vertical_station_implementation": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\finite_rectangle_station_step_constraints.py",
+      "sha256": "870303c41aa8ad5602be4769d022464d70a2f114282e5b98230a48eada6f62d9"
+    },
+    "vertical_station_projection": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\finite_rectangle_projection_fd.py",
+      "sha256": "2918ee1ac2088f1755522573b904e7e4f0321967d46a0fba03249360c6f20762"
+    },
+    "whole_programme_compare_tool": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\tools\\compare_continuous_native_board_motion.py",
+      "sha256": "32dc3a8caa4179027b795567a34726122aaf9330f019b9ab41b66671f5c2a996"
+    },
+    "new_straight_line_regression": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\tests\\test_boundary_clipped_station_branch_response.py",
+      "sha256": "f40fae481e02c0c8cae073f7b0d9971b339f36c72eadede5af10046580b424d5"
+    },
+    "source_cache_implementation": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rinkspace\\native_source_cache.py",
+      "sha256": "539babfe2b142e7cd51f7af4955cc28937903ed39b68a34a1a0c86eaa6845344"
+    },
+    "source_review_reuse_tool": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\tools\\review_native_state_frames.py",
+      "sha256": "da03f4a18516270d00912fd74af423d40f80c871f27ac76c0fc2bf617bcd3310"
+    },
+    "station_faces": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\finite_rectangle_station_faces.py",
+      "sha256": "2671772c20ce6447b01dc569a5771982a883105d4c8ac3c32840dba9e82905ba"
+    },
+    "native_nominal_chart": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\native_truth_nominal_chart.py",
+      "sha256": "9466b678ff6dea1ce6ccc2f5d251a77b1d9a91afba3828c9025d52538a0ab0c9"
+    },
+    "dynamic_guard_SOC": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\legacy\\structured_programme_source_candidate\\source_step_curvature_tightening.py",
+      "sha256": "5bdac4e71dadb85a58884defd83873d6068ed5db514815f629fdad89b81fe788"
+    },
+    "same_chart_driver": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\legacy\\run_current_named66_full_programme.py",
+      "sha256": "1d760a87bb6d95a06c1d3957406861297601581996af98d16686f7acc7a8eb25"
+    },
+    "optional_SOC_runtime": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\optional_soc_runtime.py",
+      "sha256": "70bb062a26b56d8db764a4096fdb7976aec7097c3107bc73715421b212c39be4"
+    },
+    "phase_I_complete_original_primal": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\legacy\\structured_programme_source_candidate\\feasibility_priority_restoration.py",
+      "sha256": "b77dca72f6de596791f41353c0737dc87ec66c888e437c3c499d07008e356c85"
+    },
+    "phase_I_primal_witness_runtime": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\priority_feasibility_witness_runtime.py",
+      "sha256": "fa0c5ef071c9729a2670240fa88f711a8d03b87975edebfca040021a95ebdbf5"
+    },
+    "joint_absolute_sensitivity": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\joint_absolute_q8a15_local_sensitivity_20261011.json",
+      "sha256": "e553e671a4535623ad5849af648fb5a90a7bd780be8e40380a6c652b539efef2"
+    },
+    "joint_absolute_interpretation": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\joint_absolute_q8a15_local_interpretation_20261011.json",
+      "sha256": "4023978e41823232a49463ce47720f1395598cf3dcc34d7cd9dce34a0a2b8657"
+    },
+    "joint_absolute_subspace_implementation": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\scripts\\diagnostics\\joint_absolute_subspace_diagnostics_20261011.py",
+      "sha256": "8f92211b6c05c8ff0b820e8505e2d73a5a03bc22acd295b6b57343a444d0a10c"
+    },
+    "joint_absolute_subspace_tests": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\tests\\test_joint_absolute_subspace_diagnostics.py",
+      "sha256": "e5858c4d0e29e50fa9be8d712b6d585be43b84dd1a10c978526386040805aeaa"
+    },
+    "wide_source_sampling_audit": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\current_wide_source_semantics_and_sampling_budget_20261011.json",
+      "sha256": "da79f45945deb52f89a312d7bc0ce7aa479cb085c5f162cf6cb26f15ad34a454"
+    },
+    "optional_wide45_integration": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\optional_wide45_same_q8_actual_stream_verified_20261011.json",
+      "sha256": "29bcd532efee3f38ebb697547d33667d958483a3f7dfde5713f3eafb80005406"
+    },
+    "LOW6_private_RF4_causal_response": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\LOW6_private_RF4_frozen_q8_absolute_and_incident_motion_20261011.json",
+      "sha256": "541456485eeb1d301e1645846076506fd5ba450593fef6638792bd3ccc754a27"
+    }
+  },
+  "solver_running": false,
+  "single_validation_cycle": {
+    "output": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_q091f_saved_location_verified_phaseI_20261011",
+    "started_utc": "2026-10-11T10:46:11.4098486Z",
+    "solver_process_id": 24668,
+    "config": "events/ankara_2026/programmes/okada_mei_sp/full_source_review86_q091f_original_saved_locations_and_F3_fix_20261011.json",
+    "pending": false,
+    "exit_code": 0,
+    "exit_utc": "2026-10-11T10:56:41.3191649Z",
+    "all_owned_processes_absent_utc": "2026-10-11T10:56:43.3429256Z",
+    "accepted_trial": 11,
+    "cost": 7604.275052543013,
+    "next_cost": 7603.378993258628,
+    "visual_improvement_established": false
+  },
+  "absolute_geometry_cause_status": "剩余系统性偏差尚未消除，也未被排除。实现修复及优化目标下降没有证明冰场几何、相机物理参数正确；现有开发证据仍不足以在物理模型、源观测/可辨识性与目标分配之间完成归因。不能宣称模型无解，也不能将残差全部解释为随机像素误差。",
+  "verification": {
+    "independent_station_review": "通过原名义足点/切向锥逐顶点合法性、同J坐标响应、动态真实guard独立门控；不要求无关远端保持局部切线几何。",
+    "cache_and_observer_related_tests_passed": 16,
+    "cache_test_subtests": 5,
+    "full_programme_accuracy_accepted": false,
+    "new_complete_visual_review_generated": false,
+    "historical_station_related_tests_passed": 31,
+    "current_combined_related_tests_passed": 106,
+    "current_test_seconds": 2.33,
+    "independent_phase_I_review": "通过；原全部faces、boxes、constant行、t box、原单位回填及midpoint，阈值不变。有效primary保持，无dual最优性冒充。",
+    "scope": "数值接口/保存状态与方向核验，不等于九镜头绝对精度验收。",
+    "joint_subspace_math_tests_passed": 5,
+    "joint_subspace_independent_review_passed": true,
+    "joint_saved_arrays_independent_root_replay_passed": true
+  },
+  "current_causal_work": {
+    "status": "stopped_at_user_request_after_complete_video_export",
+    "run": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_current_points_ready_20261012",
+    "config": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\full_source_review86_q32_current_RGB_20261012.json",
+    "complete_seed_q_sha256": "917c0fa45f80af8e16c74d0f2d56486fdb500b591357add3dc2b240b3de64cdf",
+    "start_log": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_current_points_ready_20261012.launch.log",
+    "accepted_iterations": 19,
+    "accuracy_accepted": false,
+    "new_complete_video_generated": true,
+    "previous_branches_preserved": true,
+    "observed_utc": "2026-10-12T01:57:11.972735+00:00",
+    "restricted_execution_write_error_resolved_by_approved_escalation": true,
+    "exec_session_id": 57320,
+    "first_new_accepted_q_sha256": "551fc0983b11f27b9e460b11804361b91725dd18ac52bc8bb21552c8f433b773",
+    "first_new_visual_comparison": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\reviewed_source13_q551fc098_current_points_20261012\\actual_visual_comparison_q551_vs_q32.json",
+      "sha256": "89d8bbcaeb709c5a65f5039af87d2f5edb7969506bd301928c8580a83a6648f5"
+    },
+    "latest_reviewed_q_sha256": "5df50acd3ef0d86c0099f43bb16cdd7a2bc9f33b7eb6730035949ea3bf6ca99a",
+    "latest_new_visual_comparison": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\reviewed_source13_q5df50acd_current_points_20261012\\actual_visual_comparison_q5df_vs_q32.json",
+      "sha256": "0d174847526e5be7bdae344392d2a168473e32bc9ad10a1d9d6aa1528b40b56a"
+    },
+    "board_point_suspicion_resolution": {
+      "status": "withdrawn_after_actual_RAW_review_original_points_retained",
+      "raw_conclusion": "Blue upper boundary is near original y264-270; y258-261 was not established from source. CONTACT points near actual yellow lower/ice interface. No model-directed point movement.",
+      "receipt": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_board_FIT_RGB_review\\230507264_secondary_board_TOP_CONTACT_priority_actual_RGB_review_20261012.json",
+        "sha256": "c5b89de845e700c27133f63be829060b213ac31e770edd3856e0c0d3a9f28a74"
+      },
+      "model_board_alignment_still_requires_comparison": true
+    },
+    "solver_running": false,
+    "stop_reason": "no_accepted_trial",
+    "final_q_sha256": "8a28afed8f9f896112e5b2f64be515b2bc02019e10e09c7e0eda2598579d4891"
+  },
+  "mount_range_question_20261011": {
+    "authority": "现用户要求允许解除无准确测量依据的照片工作范围；历史实测标志为false。",
+    "config": "events/ankara_2026/programmes/okada_mei_sp/full_source_review86_q091f_photo_mount_range_ablation_20261011.json",
+    "control_q": "f9d83084051c0c5498ed01646f2fd4b8ef64dd15e46f8ec471eb5fba5ec97496",
+    "same_initial_q": "091f7278c5c601208c168fdbf9b560f227503d2d2dfd6fd0f3a10a7568fb16c8",
+    "all86_original_caps_pass": true,
+    "nine_shot_motion_cost_all_lower": true,
+    "native_ice_cost_delta": 1.290299,
+    "accuracy_accepted": false,
+    "current_axial_zoom_terms": "全部为零且不参与优化；通用相机接口已有支持。原用户要求仅第一版固定，需检验其是否造成跨帧偏差。",
+    "new_source_images_or_videos": 0
+  },
+  "current_autonomous_continuation": {
+    "seed_q_sha256": "11c84ac8596e4e14f42268051b68d3128d8bc9c0a909bf4366bc52171988b36b",
+    "run": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/okada_review86_q11_continuation_20261012",
+    "config": "events/ankara_2026/programmes/okada_mei_sp/full_source_review86_q11_continuation_20261012.json",
+    "accepted_steps_limit": 0,
+    "termination": "original_solver_stop_condition",
+    "visual_accuracy_accepted": false,
+    "status": "stopped_by_control_for_explicit_policy_comparison",
+    "accepted_iterations": 3,
+    "final_q_sha256": "8014e09b4d385ec7a860ce452f7c6c68080995c6caff06366658857d0bb49bcf",
+    "numerical_convergence_claimed": false,
+    "source_cost_start": 7403.803376245334,
+    "source_cost_final": 7315.12216207138
+  },
+  "current_body_parameters": "events/ankara_2026/programmes/okada_mei_sp/models/a45436f5/binding.json",
+  "interpretation_correction_20261012": "先前一两步的局部数值改善或恶化不构成系统模型兼容性结论；历史cap是优化机制，不自动等于人工定位精度。当前照片偏心范围已解除这一实现事实仍成立，全部残留偏差原因未确定。",
+  "current_policy_comparison": {
+    "config": "events/ankara_2026/programmes/okada_mei_sp/full_source_review86_q11_fixed_seed_existing_position6_20261012.json",
+    "status": "historical_policy_sequence_closed_with_no_model_promotion; latest branch is guarded_scaled_resume",
+    "seed_q_sha256": "11c84ac8596e4e14f42268051b68d3128d8bc9c0a909bf4366bc52171988b36b",
+    "protected_seed_groups": 68,
+    "unresolved_seed_groups": 18,
+    "original_pixels_supports_fit_sigmas_and_physical_domains_unchanged": true,
+    "engineering_scale_is_measured_precision": false,
+    "accuracy_accepted": false,
+    "run": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/okada_q11_fixed_seed_existing_position6_accelerated_20261012",
+    "historical_group_minimum_limits_preserved": false,
+    "each_unresolved_group_required_to_improve_each_iteration": false,
+    "source_cost_decrease_required": true,
+    "numerical_convergence_claimed": false,
+    "accepted_iterations": 1,
+    "error_is_new_adapter_not_model_or_policy_failure": true,
+    "adapter_repair": "Use supported source_objective acceptance mode while reporting fixed_seed_envelope policy separately",
+    "restart_will_reuse_existing_source_jacobian_acceleration": false,
+    "failed_adapter_run": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/okada_q11_fixed_seed_existing_position6_20261012",
+    "adapter_acceptance_mode": "source_objective",
+    "source_jacobian_reuse_requested": true,
+    "actual_lagged_jacobian_reuse": false,
+    "actual_lagged_jacobian_reuse_limit": "Existing bounded nuisance row replacement requires same-state source J; flag alone does not restore lagged reuse.",
+    "speedup_claimed": false,
+    "latest_accepted_q": "ce235f1442cb0cbe8627802ec46790018ca4f48f3489602fe98a2d4b96a35c53",
+    "source_cost_start": 7403.803376245334,
+    "source_cost_latest": 7354.107628004939,
+    "first_cycle_cold_start_seconds": 387.67742509997333,
+    "speed_regression_observed": {
+      "baseline_recent_accepted_intervals_seconds": [
+        368,
+        380
+      ],
+      "baseline_shared_constraint_build_seconds": [
+        125.587,
+        124.939
+      ],
+      "baseline_bounded_motion_solve_seconds": [
+        141.43,
+        153.29
+      ],
+      "baseline_fresh_J_normal_seconds": [
+        58.83,
+        54.19
+      ],
+      "existing_20_worker_native_and_confirmed_FD_active": true,
+      "projected_station_FD_not_connected_to_existing_pool": true,
+      "no_actual_acceleration_claimed": true
+    },
+    "termination": "user_rejected_current_runtime",
+    "exit_code": 0,
+    "complete_accepted_checkpoint_preserved": true,
+    "resumed_run": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/okada_ce235f_resume_existing_acceleration_20261012",
+    "performance_resume": {
+      "config": "events/ankara_2026/programmes/okada_mei_sp/full_source_review86_ce235f_performance_resume_20261012.json",
+      "status": "no_accepted_trial",
+      "existing_independent_startup_diagnostics_reused": true,
+      "station_original_FD_columns_actual_workers": 20,
+      "first_station_parallel_seconds": 13.886723700008588,
+      "whole_iteration_speedup_verified": false,
+      "old_baseline_reexecuted": false,
+      "complete_qp_seed_from_unconstrained_violations": true,
+      "source_math_and_fixed_envelopes_retained": true,
+      "accepted_iterations": 0,
+      "solver_seconds": 366.7680002999841,
+      "accepted_model_unchanged": true,
+      "source_cost_evaluations": 0,
+      "actual_trials": 12,
+      "all_trials_rejected_by_original_guards": true,
+      "next_change": "Reuse same-model verified nuisance working set and inspect original scaled candidate before repeated independent short-scale QP; original guards and cost remain authoritative.",
+      "actual_qp_calls": 146
+    },
+    "guarded_scaled_resume": {
+      "run": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/okada_ce235f_reuse_feasible_backtrack_20261012",
+      "config": "events/ankara_2026/programmes/okada_mei_sp/full_source_review86_ce235f_feasible_backtrack_20261012.json",
+      "status": "stopped_and_not_promoted_due_mixed_cross_time_accuracy",
+      "source_math_and_fixed_envelopes_retained": true,
+      "same_model_verified_nuisance_activity_reused": true,
+      "original_scaled_candidate_guard_before_fraction_QP": true,
+      "fallback_retained": true,
+      "old_baseline_reexecuted": false,
+      "accuracy_accepted": false,
+      "complete_step_speedup_claimed": false,
+      "accepted_iterations": 6,
+      "latest_accepted_q": "4798d01d4c98e65259e559dab1e8e381a8d24ddcaa83566c48d79e54dc203fc1",
+      "source_cost_before": 7354.107627981861,
+      "source_cost_after": 6962.031935815171,
+      "first_cold_start_to_accepted_export_seconds": 414.8149006999738,
+      "first_solver_elapsed_seconds": 158.8467212000105,
+      "accepted_scaled_fraction": 0.03125,
+      "first_complete_source_J_and_normal_seconds": 49.47846079998999,
+      "continuous_accepted_interval_seconds": [
+        134.31659080000827,
+        154.88146180001786,
+        135.19992729998194,
+        144.76734160000342,
+        147.0581200000015
+      ],
+      "independent_startup_diagnostic_reused": false,
+      "startup_diagnostic_repeat_reason": "fixed_seed_policy_implementation full file SHA changed due new candidate scheduling flag; source/FD formulas and source observations unchanged",
+      "complete_continuous_interval_observed": true,
+      "interval_includes_source_J_constraints_guards_cost_checkpoint_review": true,
+      "visual_review_status": {
+        "candidate_q": "4798d01d4c98e65259e559dab1e8e381a8d24ddcaa83566c48d79e54dc203fc1",
+        "native_feedback_frames_rendered": 62,
+        "existing_source_cache_frames_used": 54,
+        "source_frames_decoded_in_memory": 8,
+        "new_source_images_written": 0,
+        "root_directly_viewed_frames": 2,
+        "root_directly_viewed_page": "q4798d01d_feedback62/cached54/all_model_contact_page_013.png",
+        "delegated_viewed_frame_count_confirmed": false,
+        "all62_visually_reviewed_claimed": false,
+        "reason_additional_review_stopped": "Existing same-observation saved reports already show substantial F3/Lane3 and cross-time regressions; do not spend additional work trying to certify an unpromoted candidate.",
+        "complete_shot_visual_accuracy_review_completed": false,
+        "delegated_review_status": "interrupted; no further work queued",
+        "scope": "Rendered contact sheets are not evidence that all frames were visually examined. Final refusal to promote rests on recorded conflicting same-observation accuracy results, not a claim of complete visual validation."
+      },
+      "exit_code": 0,
+      "owned_main_pid_33672_and_direct_workers_absent": true,
+      "checkpoint": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_ce235f_reuse_feasible_backtrack_20261012\\solver\\latest_accepted_state.npz",
+      "checkpoint_identity": {
+        "q_sha256": "4798d01d4c98e65259e559dab1e8e381a8d24ddcaa83566c48d79e54dc203fc1",
+        "parameter_count": 34340,
+        "field_count": 76,
+        "damping": 0.0008639999999999999,
+        "next_line_search_fraction": 1.0,
+        "checkpoint_sha256": "f556ccf81aaca8abb8df0e88456f87ff27a92f5f52afc2d73001814d6017c851"
+      },
+      "numerical_convergence_claimed": false,
+      "visual_accuracy_accepted": false,
+      "final_delivery_decision": "retain a454 working model and trajectory"
+    },
+    "latest_branch_field": "guarded_scaled_resume"
+  },
+  "historical_status_before_final_review_20261012": {
+    "latest_diagnostic_model": {
+      "q_sha256": "11c84ac8596e4e14f42268051b68d3128d8bc9c0a909bf4366bc52171988b36b",
+      "state_identity": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_q091f_photo_mount_box_release_20261011\\accepted_states\\11c84ac8596e4e14f42268051b68d3128d8bc9c0a909bf4366bc52171988b36b\\state_identity.json",
+        "sha256": "c0da7dbe511014a19057bff9fd1ee1b6222640d22bb9e7f3b52bbec0570f4368"
+      },
+      "immutable_published_state_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_q091f_photo_mount_box_release_20261011\\accepted_states\\11c84ac8596e4e14f42268051b68d3128d8bc9c0a909bf4366bc52171988b36b\\complete_state_UNACCEPTED.npz",
+      "model_promoted": false
+    },
+    "absolute_geometry_cause_status": "查因取得新的区分：LOW Ad4及多数F2/B2偏差可由现有相机的局部响应解释；联合余量97.35%位于wide参考。已确认wide逐点计票与programme曲线积分的口径差异，正在核其实际影响与材料边界，不以继续拟合或总分下降代替症结定位。整段偏差仍未解决。",
+    "current_causal_work": {
+      "cause": "post_SOC_pivot_retraction_mismatch",
+      "implementation": "existing physical rows corrected inside the original complete QP/SOC; final recovery must be identity",
+      "targeted_tests_passed": 107,
+      "actual_saved_trial3_physical_rows_bitwise_verified": true,
+      "validation_output": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_q091f_coupled_pivot_source_SOC_20261011",
+      "validation_started_utc": "2026-10-11T11:20:30.3167805Z",
+      "source_image_cache_writes": 0,
+      "complete_validation_passed": true,
+      "all_owned_processes_absent_utc": "2026-10-11T11:30:04.8776465Z",
+      "accepted_fraction": 0.25,
+      "final_recovery_changed_q": false,
+      "original_86_guards_passed": true,
+      "all_original_QP_rows": 127847,
+      "real_original_full_KKT_passed": true,
+      "cost_before": 7604.275052543013,
+      "cost_after": 7456.92377,
+      "accuracy_accepted": false,
+      "next_causal_question": "Separate actual camera and common physical geometry contributions to BOARD improvement versus B1/F3 regression before any further solve."
+    },
+    "remaining_read_only_audits": [
+      "宽景逐点与节目按物理曲线积分的表示一致性及真实支持，不能直接照搬历史step02宽泛分组。",
+      "蓝色栏杆冰侧TOP与上沿轮廓的物理边身份；单图尚不足以认定固定厚度或改标签。",
+      "节目相机/运动/保护约束为何保留局部可解释的跨时刻偏差；不得由wide余量占比归因全部节目问题。"
+    ]
+  },
+  "current_final_assessment": {
+    "status": "in_progress_not_final",
+    "working_model_q": "a45436f5f77f959644262ea6141f2cbcd8615578d32747a484905cfb89b65caf",
+    "current_candidate_q": "917c0fa45f80af8e16c74d0f2d56486fdb500b591357add3dc2b240b3de64cdf",
+    "candidate_promoted": false,
+    "source_cost_does_not_prove_accuracy": true,
+    "all_current_saved_reports_are_development_evidence": true,
+    "systemic_bias_eliminated": false,
+    "systemic_bias_ruled_out": false,
+    "full_shot_and_independent_accuracy_validation_completed": false,
+    "main_solver_running": false,
+    "body_working_trace_retained_until_camera_model_selected": true,
+    "no_new_complete_video_generated": true,
+    "last_visually_reviewed_candidate_q": "4d757131ae29f127c3a649ed201ced376d31bd5723ebe987b50d8f346d492c84",
+    "last_targeted_visually_reviewed_candidate_q": "917c0fa45f80af8e16c74d0f2d56486fdb500b591357add3dc2b240b3de64cdf",
+    "last_visually_reviewed_candidate_q_scope": "全62反馈帧审阅的最后候选为q17；后续q24/q32仅四处定点对照，不代表完整镜头。"
+  },
+  "causal_findings_scope": "历史实现修复及开发审计记录；修复数量、局部响应或总分下降不能合并成物理模型正确或系统性偏差已消除的结论。",
+  "code_and_evidence_scope": "历史阶段对应的源文件与证据哈希；最新运行的实际源身份以其保存的runtime/source manifest为准。",
+  "wide_curve_budget_continuation_20261012": {
+    "previous_production_policy_enabled": false,
+    "existing_adapter_unique_and_expanded_same_state_evidence_reused": true,
+    "policy_groups": 40,
+    "source_rows": 45,
+    "same_curve_group_merges": [
+      "A1 three arcs",
+      "A2 three arcs",
+      "C0 two arcs"
+    ],
+    "cross_region_board_identity_claimed": false,
+    "original_UV_working_sigma_literal_weights_outer4_and_all_guards_unchanged": true,
+    "new_objective_fresh_cost_required": true,
+    "old_cost_comparable_to_new": false,
+    "all_visible_biases_explained": false,
+    "new_benchmarks_requested": false,
+    "goal_complete": false,
+    "prior_startup_rejection": {
+      "session": 30013,
+      "exit_code": 1,
+      "reason": "mathematical source target changed; no accepted step",
+      "preserved_run": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_ce235f_wide_curve_budget_20261012"
+    },
+    "authenticated_loss_continuation": {
+      "implementation": "calibration/solver_runtime/original_wide_curve_integration.py:authenticate_wide_sampling_truth_continuation",
+      "actual_source_contract_difference": "only evaluation_source_contract/original_wide_curve_integration added",
+      "all_original_manual_and_physical_guard_contracts_compared": true,
+      "original_limits_uncertainties_fixed_seed_envelopes_retained": true,
+      "actual_saved_manifest_check_passed": true,
+      "non_loss_source_guard_parameter_mutations_rejected": true,
+      "new_full_source_benchmark_run": false
+    },
+    "first_cold_accepted_seconds": 380.7362879999855,
+    "observed_continuous_accepted_intervals_seconds": [
+      176.94922520002,
+      192.5704896999814,
+      167.89171570001054,
+      246.98247529999935,
+      128.76913820000482,
+      124.30389399998239,
+      153.04625760001363,
+      143.652983100008,
+      164.9591113999777,
+      170.44462420002674,
+      147.26078539999435,
+      168.86537089999183,
+      176.92595050000818,
+      192.29057379998267,
+      178.02149899999495,
+      188.6475731000246,
+      193.92272370000137,
+      183.66515970000182,
+      156.2027751999849,
+      164.04813879998983
+    ],
+    "accepted_iterations": 21,
+    "latest_accepted_q": "d013875d1962fdfb7b1d4b118360acce1228e210a6fbfd90b3f82c2a07e7c2b9",
+    "accuracy_accepted": false,
+    "original_full_source_rows": 4502662,
+    "continuous_interval_summary_seconds": {
+      "minimum": 124.30389399998239,
+      "median": 169.65499755000928,
+      "maximum": 246.98247529999935
+    },
+    "fixed_q12_saved_feedback_metrics": {
+      "q": "38e3e1e66587d575063c1aff6f73e8a7d0f24d96526ad3479842f7a2165c120a",
+      "rows": [
+        {
+          "id": "user_complete_position_F3_outer_04_08_50_533_native229332992",
+          "pts": 229332992,
+          "mean_native_px": 4.54018525359385,
+          "mean_raw_native_px": 7.116546730049712,
+          "native_metric_is_outside_optical_support": true
+        },
+        {
+          "id": "user_complete_position_Lane3_upper_yellow_04_11_06_133_native231415808",
+          "pts": 231415808,
+          "mean_native_px": 4.859158895931893,
+          "mean_raw_native_px": 7.649160240200286,
+          "native_metric_is_outside_optical_support": true
+        },
+        {
+          "id": "cut6_source_230506752_F3_outer_holdout",
+          "pts": 230506752,
+          "mean_native_px": 14.327055018392969
+        }
+      ],
+      "raw_and_support_metrics_separate": true,
+      "not_a_visual_review": true
+    }
+  },
+  "acceptance_scope_audit_20261012": {
+    "F3_pts230506752": "development HELD; not in86 hard guard groups; original blur-smeared source has broad optical localization uncertainty; observed metric increase is not a mathematical incompatibility proof",
+    "F3_pts230507776": "FIT soft objective; not in native54 guards",
+    "Lane3_upper_pts231415808": {
+      "native_group_index": 47,
+      "protected_zero": false,
+      "original_q11_seed_violation": 4.65972529694,
+      "existing_engineering_scale": 6.0,
+      "unchanged_limit": 10.65972529694,
+      "engineering_scale_is_user_allowed_error": false
+    },
+    "Lane3_lower_pts231415808": {
+      "native_group_index": 48,
+      "protected_zero": true,
+      "unchanged_limit": 0.0,
+      "zero_guard_means_zero_Euclidean_pixel_error": false
+    },
+    "guard_operator": "dynamic full finite curve versus original normal*tangent support rectangle; minimum L-infinity excess, not Euclidean UV residual",
+    "frozen_foot_skip_or_guard_bug_found": false,
+    "accepted4798branch_increased_group_counts": [
+      14,
+      16,
+      15,
+      16,
+      15,
+      10
+    ],
+    "all_evidence_is_development_not_independent_accuracy": true
+  },
+  "working_body_overall_continuity_audit_20261012": {
+    "model_q": "a45436f5f77f959644262ea6141f2cbcd8615578d32747a484905cfb89b65caf",
+    "canonical_G_inside_same_model_ice": 8503,
+    "native_P_G_exactly_follow_canonical_alias": true,
+    "cut_count": 8,
+    "cut_neighbor_XY_step_conditional_scene_scaled_units_min_max": [
+      0.067,
+      0.125
+    ],
+    "cut_connections_retained": true,
+    "max_noncut_neighbor_XY_step_conditional_scene_scaled_units": 0.233,
+    "max_noncut_pair_pts": [
+      230567424,
+      230567680
+    ],
+    "native_inferred_frames": 581,
+    "inferred_intervals": 83,
+    "opening_inferred_pts": [
+      229114112,
+      229181952
+    ],
+    "opening_inferred_frames": 266,
+    "explicit_time_binding_or_global_translation_error_found": false,
+    "independent_world_accuracy_proven": false,
+    "body_detail_fitting_or_rendering_run": false
+  },
+  "previous_closed_branch_assessment_4798d": {
+    "numerical_acceptance_is_visual_acceptance": false,
+    "systemic_bias_eliminated": false,
+    "systemic_bias_ruled_out": false,
+    "physical_model_impossibility_proved": false,
+    "working_model_q": "a45436f5f77f959644262ea6141f2cbcd8615578d32747a484905cfb89b65caf",
+    "candidate_model_q": "4798d01d4c98e65259e559dab1e8e381a8d24ddcaa83566c48d79e54dc203fc1",
+    "candidate_promoted": false,
+    "evidence_scope": "Existing saved development records. Historical holdout labels have been used during ongoing tuning and are not independent validation.",
+    "same_original225_packet_fixture_and_all_observation_signatures": true,
+    "ice_mean_rows": {
+      "valid_rows": 106,
+      "improved": 52,
+      "worsened": 53,
+      "same": 1,
+      "other_rows_missing_metric": 2
+    },
+    "board_raw_median_rows": {
+      "rows": 191,
+      "improved": 140,
+      "worsened": 51
+    },
+    "original225_median_rows": {
+      "rows": 225,
+      "improved": 103,
+      "worsened": 96,
+      "same": 26,
+      "median_before_px": 2.3259,
+      "median_after_px": 2.4007
+    },
+    "specific_observations_px": [
+      {
+        "name": "F3",
+        "pts": 230506752,
+        "development_role": "historical holdout",
+        "metric": "mean",
+        "before": 12.2855,
+        "after": 17.22,
+        "max_before": 19.8175,
+        "max_after": 26.0952
+      },
+      {
+        "name": "F3",
+        "pts": 230507776,
+        "development_role": "FIT",
+        "metric": "mean",
+        "before": 8.0514,
+        "after": 10.18
+      },
+      {
+        "name": "Lane3",
+        "pts": 231415808,
+        "development_role": "FIT",
+        "metric": "mean",
+        "before": 3.0819,
+        "after": 7.1992,
+        "max_before": 3.7674,
+        "max_after": 8.468
+      },
+      {
+        "name": "Ad4",
+        "pts": 230306816,
+        "metric": "raw median",
+        "before": 29.3239,
+        "after": 12.2967
+      },
+      {
+        "name": "Ad4",
+        "pts": 230474752,
+        "development_role": "historical holdout",
+        "metric": "raw median",
+        "before": 29.1085,
+        "after": 20.5345
+      },
+      {
+        "name": "Ad4",
+        "pts": 230314496,
+        "metric": "raw median",
+        "before": 2.7183,
+        "after": 6.6393
+      },
+      {
+        "name": "Ad4",
+        "pts": 229464320,
+        "metric": "raw median",
+        "before": 11.3434,
+        "after": 14.0797
+      }
+    ],
+    "motion_development_per_shot_row_median_aggregate_px": {
+      "before": [
+        1.7796,
+        1.4925,
+        0.5012,
+        0.7539,
+        3.6907,
+        2.1739,
+        0.4594,
+        1.0586,
+        0.7004
+      ],
+      "after": [
+        1.393,
+        1.5556,
+        0.5036,
+        0.7099,
+        3.0251,
+        2.0643,
+        0.4558,
+        0.864,
+        0.2449
+      ],
+      "shot2_worst_pair_max_before": 3.7873,
+      "shot2_worst_pair_max_after": 4.1333,
+      "absolute_geometry_accuracy_proven": false
+    },
+    "recorded_fixed_envelope_audit": {
+      "protected_zero_groups": 68,
+      "native": 43,
+      "wide": 2,
+      "confirmed": 23,
+      "same_groups_limits_uncertainties_and_envelopes_as_ce235f": true,
+      "seed_q": "11c84ac8596e4e14f42268051b68d3128d8bc9c0a909bf4366bc52171988b36b",
+      "full_physical_source_guards_required": true,
+      "source_report": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_ce235f_reuse_feasible_backtrack_20261012\\accepted_states\\4798d01d4c98e65259e559dab1e8e381a8d24ddcaa83566c48d79e54dc203fc1\\truth_restoration_state.json"
+    },
+    "source_reports": [
+      "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_ce235f_reuse_feasible_backtrack_20261012\\accepted_states\\4798d01d4c98e65259e559dab1e8e381a8d24ddcaa83566c48d79e54dc203fc1\\source_review_UNACCEPTED.json",
+      "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_ce235f_reuse_feasible_backtrack_20261012\\accepted_states\\4798d01d4c98e65259e559dab1e8e381a8d24ddcaa83566c48d79e54dc203fc1\\original225_review_UNACCEPTED.json"
+    ],
+    "continuous_accepted_cycle_timing_report": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_ce235f_reuse_feasible_backtrack_20261012\\actual_accepted_cycle_performance.json",
+    "visual_review_status": {
+      "candidate_q": "4798d01d4c98e65259e559dab1e8e381a8d24ddcaa83566c48d79e54dc203fc1",
+      "native_feedback_frames_rendered": 62,
+      "existing_source_cache_frames_used": 54,
+      "source_frames_decoded_in_memory": 8,
+      "new_source_images_written": 0,
+      "root_directly_viewed_frames": 2,
+      "root_directly_viewed_page": "q4798d01d_feedback62/cached54/all_model_contact_page_013.png",
+      "delegated_viewed_frame_count_confirmed": false,
+      "all62_visually_reviewed_claimed": false,
+      "reason_additional_review_stopped": "Existing same-observation saved reports already show substantial F3/Lane3 and cross-time regressions; do not spend additional work trying to certify an unpromoted candidate.",
+      "complete_shot_visual_accuracy_review_completed": false,
+      "delegated_review_status": "interrupted; no further work queued",
+      "scope": "Rendered contact sheets are not evidence that all frames were visually examined. Final refusal to promote rests on recorded conflicting same-observation accuracy results, not a claim of complete visual validation."
+    },
+    "delivery_decision": "Retain a454 working grid and its same-model body trajectory; do not promote4798d.",
+    "capability_limit": "目前未能消除或排除剩余系统性偏差；没有证据宣布模型无解或残差永远不可修复。当前只能交付标明限制的工作版，不能把它认证为跨节目可靠的准确模型。",
+    "independent_whole_shot_accuracy_validation_completed": false,
+    "additional_experiments_queued": false,
+    "process_exit_check": "Read-only CIM check found no owned final-run33672/direct worker or q4798d feedback Python renderer process."
+  },
+  "wide_saved_source_comparison_20261012": {
+    "candidate_q": "03ebcb12809c0d4bc5cad65418db5cb32ddace2b5fd843eab839673304974df1",
+    "baseline_q": "ce235f1442cb0cbe8627802ec46790018ca4f48f3489602fe98a2d4b96a35c53",
+    "read_saved_reports_only": true,
+    "new_source_evaluations": 0,
+    "metrics_not_interchangeable": true,
+    "all_development_evidence": true,
+    "improved_worse_equal": {
+      "ice_raw_mean": [
+        56,
+        50,
+        0
+      ],
+      "ice_outside_optical_support": [
+        10,
+        12,
+        1
+      ],
+      "board_raw_median": [
+        153,
+        38,
+        0
+      ],
+      "board_outside_support": [
+        147,
+        41,
+        3
+      ],
+      "original225_raw_median": [
+        129,
+        95,
+        0
+      ],
+      "original225_typed_operator": [
+        119,
+        77,
+        29
+      ],
+      "original225_F2_raw": [
+        7,
+        12,
+        0
+      ],
+      "original225_F3_raw": [
+        8,
+        2,
+        0
+      ]
+    },
+    "all9_motion_development_medians_improved": true,
+    "all_observations_improved": false,
+    "accuracy_accepted": false
+  },
+  "wide_candidate_visual_review_20261012": {
+    "candidate_q": "19869c1405ecc82ee17d0b6921dbf8401599fb0e27a6d6b7f9806237346df3f5",
+    "baseline_q": "ce235f1442cb0cbe8627802ec46790018ca4f48f3489602fe98a2d4b96a35c53",
+    "source_presentations_actually_viewed": 62,
+    "contact_pages_per_state": 16,
+    "same_actual_scene_camera_all_markings_and_ads": true,
+    "review_receipts": [
+      "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\q19869c14_feedback62\\cached54\\review_identity.json",
+      "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\q19869c14_feedback62\\memory8\\review_identity.json"
+    ],
+    "visual_conclusion": "大多数反馈时刻基本不变；Ad4左边230307840、Ad7右边230995968局部小改善，仍有缺口；未见冰线一致改善。",
+    "static_feedback_review_only": true,
+    "continuous_complete_shots_reviewed": false,
+    "independent_validation": false,
+    "promoted": false,
+    "new_complete_video_generated": false
+  },
+  "current_f2_step_restriction_20261012": {
+    "event_iteration": 4,
+    "native_group": 52,
+    "id": "user_20261010_F2_outer_230390528_branch1",
+    "constraint": "original zero-excess optical support retained",
+    "all127769_original_linear_rows_primal_passed": true,
+    "actual_guard_failed": true,
+    "SOC_generated_compensated_face_for_this_group": false,
+    "finite_rectangle_station_path_did_not_cover_this_house_ring": true,
+    "proven_implementation_bug": false,
+    "physical_model_infeasibility_proven": false,
+    "real_group_directional_derivative_and_trial_branch_records_unavailable": false,
+    "accepted_original_step_fractions": [
+      0.0009765625,
+      0.001953125,
+      0.00390625
+    ],
+    "interpretation": "单次原查询回放已定位：原顶点464跨过圆弧内部计算结点后，真实查询从68段转到67段，冻结68段延长线仍给零carrier，实际有限曲线guard超限。原分支FD错误和物理模型不可行均未证实；后续较大步已恢复，不据此扩写求解器。",
+    "code_review_followup": {
+      "existing_generic_actual_guard_branch_reselection_to_SOC_adapter_found": false,
+      "reusable_parts": [
+        "arbitrary-state complete finite-curve truth query",
+        "dependency-aware finite differences",
+        "existing local constraint rows and SOC solver"
+      ],
+      "missing_connection": "Actual violating group/vertex and trial chart to candidate-specific local SOC rows when the nominal carrier reports zero excess.",
+      "key_risk": "Finite-curve branches are nonconvex alternatives; a selected branch cut cannot be certified as a mandatory constraint for every original branch.",
+      "implemented": false,
+      "new_tests_run": false,
+      "visual_improvement_promised": false,
+      "production_runtime_unmodified": true
+    },
+    "single_query_reproduction": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\native52_saved_direction_probe_20261012.json",
+      "source_vertex": 464,
+      "source_uv": [
+        1819,
+        781.5347793473111
+      ],
+      "base_segment": 68,
+      "trial_actual_segment": 67,
+      "frozen_nominal_segment": 68,
+      "trial_alpha": 0.125,
+      "trial_actual_excess_px": 0.008362078191241,
+      "frozen_station": -0.068589754,
+      "original_trial_q_identity_matched": true,
+      "accepted_one_over1024_q_identity_matched": true,
+      "full_source_graph_or_J_loaded": false,
+      "production_code_modified": false,
+      "established": "跨圆弧内部计算结点后，冻结名义延长线carrier与真实有限曲线guard失配；没有证实原分支FD导数错误。",
+      "current_late_step_rejections_not_dominated_by_native52": true,
+      "followup": "不要把计算结点当物理端点；当前证据不支持为此扩写求解器或承诺视觉收益。"
+    },
+    "prior_to_single_query_reproduction": {
+      "trial_branch_records_unavailable": true,
+      "interpretation": "局部预测可行而真实guard超限；现有SOC未为该组产生有效补偿。不能进一步归因于代码错误或圆弧正常非线性。"
+    },
+    "actual_trial_branch_records_available": true,
+    "original_nominal_branch_FD_error_proven": false,
+    "local_frozen_carrier_actual_finite_curve_mismatch_proven": true,
+    "new_full_source_or_benchmark_evaluations": 0,
+    "precise_original_query_replays": 1
+  },
+  "fixed_q13_existing_source_assessment_20261012": {
+    "q": "ddbe2acd5c3a82f9d99c7037439b91f1dc5a626b6b9adac58d8bb9a512326685",
+    "all_development_evidence": true,
+    "raw_and_support_metrics_separate": true,
+    "ice_raw_improved_worse": [
+      52,
+      54
+    ],
+    "board_raw_improved_worse": [
+      153,
+      38
+    ],
+    "original225_raw_improved_worse": [
+      120,
+      104
+    ],
+    "raw_original225_row_metric_medians": {
+      "ce": 3.998,
+      "q03": 3.893,
+      "q198": 3.926,
+      "q13": 4.087
+    },
+    "F2_original225_active_and_historical_source_semantics_under_review": false,
+    "recent_steps7_to13_all_first_trial_accepted": true,
+    "native52_not_current_rejection_dominator": true,
+    "new_visual_review_or_source_evaluation": false,
+    "accuracy_accepted": false,
+    "F2_observation_semantics_correction": {
+      "original225_F2_19_all_Held_preserved_not_directly_revised_or_retired": true,
+      "original19_includes_identity_pending": 4,
+      "original19_other_unconfirmed_development": 1,
+      "original19_diagnostic_only_branch": 1,
+      "raw5_improved14_worse_is_mixed_historical_inventory_not19_confirmed_RGB_truths": true,
+      "retained13_original_operator_support_median_improved_worse_equal": [
+        4,
+        6,
+        3
+      ],
+      "current_RGB_corrected_FIT_count": 9,
+      "current_RGB_corrected_FIT_raw_mean_improved_worse": [
+        7,
+        2
+      ],
+      "current_RGB_corrected_FIT_support_max_improved_worse_equal": [
+        5,
+        2,
+        2
+      ],
+      "all_four_current_corrected_inner_FIT_rows_improved": true,
+      "comparability": "不同源时刻/内外圈/算子；不能把全部F2或全部inner说成变差。",
+      "actual_support_changes": [
+        {
+          "id": "inner:right",
+          "pts": 230362112,
+          "ce": 5.448,
+          "q13": 6.15
+        },
+        {
+          "id": "inner:right",
+          "pts": 230368768,
+          "ce": 5.945,
+          "q13": 7.136
+        },
+        {
+          "id": "whole_right_extent",
+          "pts": 230362112,
+          "ce": 0,
+          "q13": 2.151
+        },
+        {
+          "id": "whole_right_extent",
+          "pts": 230368768,
+          "ce": 0,
+          "q13": 0
+        }
+      ]
+    }
+  },
+  "wide_candidate17_visual_review_20261012": {
+    "candidate_q": "4d757131ae29f127c3a649ed201ced376d31bd5723ebe987b50d8f346d492c84",
+    "baseline_q": "ce235f1442cb0cbe8627802ec46790018ca4f48f3489602fe98a2d4b96a35c53",
+    "accepted_state_number": 17,
+    "source_presentations_actually_viewed": 62,
+    "contact_pages_per_state": 16,
+    "same_actual_scene_camera_all_markings_and_ads": true,
+    "review_receipts": [
+      "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\q4d757131_feedback62\\cached54\\review_identity.json",
+      "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\q4d757131_feedback62\\memory8\\review_identity.json"
+    ],
+    "review_allocation": {
+      "root_memory8": 8,
+      "systemic_evidence_review_cached000_to006": 28,
+      "objective_source_balance_cached007_to013": 26
+    },
+    "visual_conclusion": "部分广告边界更靠近原片，少数前景红线略改善但远端不一致；清楚蓝线偏差基本保留，末段两处红线小幅退步。整体网格改善仍未成立。",
+    "local_ad_improvements": [
+      {
+        "native_pts": 230307840,
+        "actual_pts": 230307584,
+        "source_time": "04:09:54.000",
+        "feature": "Ad4 left"
+      },
+      {
+        "native_pts": 230995968,
+        "actual_pts": 230995712,
+        "source_time": "04:10:38.800",
+        "feature": "Ad7 right"
+      },
+      {
+        "native_pts": 231137792,
+        "source_time": "04:10:48.033",
+        "feature": "Ad4 right"
+      },
+      {
+        "native_pts": 231259648,
+        "source_time": "04:10:55.967",
+        "feature": "Ad4 right"
+      }
+    ],
+    "small_front_red_line_improvements_but_far_end_inconsistent": [
+      230823424,
+      231101184
+    ],
+    "clear_blue_line_biases_basically_retained": [
+      230548992,
+      230718208
+    ],
+    "small_late_red_line_regressions": [
+      {
+        "native_pts": 231541248,
+        "actual_pts": 231540992,
+        "source_time": "04:11:14.300"
+      },
+      {
+        "native_pts": 231678464,
+        "source_time": "04:11:23.233"
+      }
+    ],
+    "Lane3_231415808_visual_better_or_worse_uncertain": true,
+    "static_feedback_review_only": true,
+    "continuous_complete_shots_reviewed": false,
+    "independent_validation": false,
+    "promoted": false,
+    "new_complete_video_generated": false
+  },
+  "current_run_natural_exit_audit_20261012": {
+    "observed_utc": "2026-10-11T19:44:21.686346+00:00",
+    "mode": "read_only_actual_runtime_and_code_inspection",
+    "previous_goal_turn_classification": "progress: completed candidate17 all62 same-model source comparison and saved evidence, without promotion.",
+    "current_goal_turn_classification": "verified_wait: exec session78712 returned live source/solver events; existing numerical run continues, no terminal result.",
+    "outer_loop_has_fixed_iteration_or_wall_time_limit": false,
+    "accepted_steps_default": 0,
+    "accepted_steps_in_config": false,
+    "additional_CLI_override_independently_verified": false,
+    "numerical_success_condition": "fresh source J: maximum original-native displacement of undamped GN direction < 0.05 px; reused J reaching threshold first requires refresh",
+    "failure_condition": "fresh J: all original whole-step backtracking candidates rejected; reused-J failure first refreshes the same q/profile",
+    "numerical_success_is_accuracy_acceptance": false,
+    "visual_no_improvement_is_automatic_stop_condition": false,
+    "watch_native_evidence_enabled_in_actual_manifest": false,
+    "last_read_complete_iteration_number": 22,
+    "last_read_complete_iteration_max_GN_native_px_approx": 253.99,
+    "no_evidence_of_imminent_natural_exit": true,
+    "no_stop_policy_or_threshold_modified": true,
+    "no_new_tests_or_benchmarks": true,
+    "no_new_model_or_video_render": true,
+    "accepted_state_count_at_record": 24,
+    "source_locations": {
+      "loop": "calibration/solver_runtime/legacy/snapshot/three_frame_refit/program_tracking/z190_joint_source_solver.py:751",
+      "numerical_exit": "calibration/solver_runtime/legacy/snapshot/three_frame_refit/program_tracking/z190_joint_source_solver.py:1265",
+      "cost_acceptance": "calibration/solver_runtime/fixed_seed_truth_envelope.py:162",
+      "optional_review_stop_switch": "calibration/solver_runtime/legacy/run_current_named66_full_programme.py:1981"
+    }
+  },
+  "fixed_candidate24_source_and_targeted_visual_review_20261012": {
+    "baseline_q": "4d757131ae29f127c3a649ed201ced376d31bd5723ebe987b50d8f346d492c84",
+    "candidate_q": "d6a5191e9881043a985167f96f2278a1b8eb0b9f93177c033f0c87e082da85cc",
+    "accepted_state_number": 24,
+    "saved_report_comparison_only_no_new_residual_evaluation": true,
+    "current_corrected_F2_FIT9": {
+      "raw_mean_improved": 8,
+      "raw_mean_worsened": 1,
+      "support_max_improved": 6,
+      "support_max_worsened": 1,
+      "support_max_unchanged": 2,
+      "all_four_inner_FIT_improved": true,
+      "outer_lower_230390528_raw_mean_before_after": [
+        1.952,
+        2.131
+      ],
+      "outer_lower_230390528_support_max_before_after": [
+        1.217,
+        1.402
+      ]
+    },
+    "fixed_observations": [
+      {
+        "feature": "Ad4 opening right",
+        "pts": 229210368,
+        "raw_metric": "median",
+        "raw_px": [
+          8.172,
+          3.038
+        ],
+        "support_metric": "mean",
+        "support_outside_px": [
+          0.092,
+          0.031
+        ]
+      },
+      {
+        "feature": "Ad4 left",
+        "pts": 230474752,
+        "raw_metric": "median",
+        "raw_px": [
+          20.587,
+          18.081
+        ],
+        "support_metric": "mean",
+        "support_outside_px": [
+          3.626,
+          1.122
+        ]
+      },
+      {
+        "feature": "Ad4 late right",
+        "pts": 231534080,
+        "raw_metric": "median",
+        "raw_px": [
+          4.353,
+          6.232
+        ],
+        "support_metric": "mean",
+        "support_outside_px": [
+          0.202,
+          1.687
+        ]
+      },
+      {
+        "feature": "Ad4 final right",
+        "pts": 231678464,
+        "raw_metric": "median",
+        "raw_px": [
+          3.439,
+          6.646
+        ],
+        "support_metric": "mean",
+        "support_outside_px": [
+          0.106,
+          0.191
+        ]
+      },
+      {
+        "feature": "Ad7 top",
+        "pts": 230501120,
+        "raw_metric": "median",
+        "raw_px": [
+          3.147,
+          3.626
+        ],
+        "support_metric": "mean",
+        "support_outside_px": [
+          1.817,
+          2.296
+        ]
+      },
+      {
+        "feature": "Ad7 top tail",
+        "pts": 230508032,
+        "raw_metric": "median",
+        "raw_px": [
+          4.094,
+          4.418
+        ],
+        "support_metric": "mean",
+        "support_outside_px": [
+          0.309,
+          0.633
+        ]
+      },
+      {
+        "feature": "Lane3 upper yellow",
+        "pts": 231415808,
+        "raw_metric": "mean",
+        "raw_px": [
+          9.3,
+          9.396
+        ],
+        "support_metric": "mean",
+        "support_outside_px": [
+          6.51,
+          6.606
+        ]
+      },
+      {
+        "feature": "red C current RGB revised FIT",
+        "pts": 231678464,
+        "raw_metric": "mean",
+        "raw_px": [
+          16.633,
+          16.147
+        ],
+        "support_metric": "max",
+        "support_outside_px": [
+          31.131,
+          30.761
+        ]
+      }
+    ],
+    "exact_PTS_not_present_in_allowed_saved_reports": [
+      230548992,
+      230718208,
+      231541248
+    ],
+    "targeted_visual_review": {
+      "reason": "Exact blue/red moments lack saved metrics; opening Ad4 has a material existing-report change, requiring actual RGB confirmation.",
+      "review_receipt": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\qd6a5191e_feedback4\\review_identity.json",
+      "source_presentations_actually_viewed": 4,
+      "native_PTS": [
+        229210368,
+        230548992,
+        230718208,
+        231541248
+      ],
+      "actual_exposure_PTS": [
+        229210368,
+        230548736,
+        230718208,
+        231540992
+      ],
+      "comparison_reused_q17_contact_pages": [
+        0,
+        10,
+        13
+      ],
+      "same_actual_model_all_paths_and_ads_enabled": true,
+      "opening_Ad4_right_visibly_closer": true,
+      "both_blue_line_biases_still_visible": true,
+      "late_red_line_bias_still_visible": true,
+      "small_ice_shift_not_claimed_as_consistent_improvement": true,
+      "new_contact_pages": 1,
+      "new_source_images_written": 0,
+      "renderer_exit_code": 0,
+      "renderer_wall_seconds": 2.2012196
+    },
+    "entire_candidate24_feedback62_visually_reviewed": false,
+    "full_shot_or_independent_validation": false,
+    "candidate_promoted": false,
+    "new_full_video_generated": false,
+    "conclusion": "后续有真实的局部广告改善；已有报告仍双向变化，补看的关键蓝线和末段红线未解决。不能由此认定整体网格改善，未替换a454工作模型。"
+  },
+  "checkpoint_history_overflow_20261012": {
+    "process_lifecycle": {
+      "finished_utc": "2026-10-11T20:09:21.5092707Z",
+      "exit_code": 1,
+      "started_utc": "2026-10-11T18:31:06.6632025Z",
+      "wrapper_pid": 9328,
+      "wall_seconds": 5894.8460682
+    },
+    "error": "TypeError: string too large to store inside array.",
+    "source": "z190_joint_source_solver.save: history_json=np.array(_json_text(history))",
+    "last_complete_accepted_state_number": 32,
+    "last_complete_q": "917c0fa45f80af8e16c74d0f2d56486fdb500b591357add3dc2b240b3de64cdf",
+    "failed_iteration": 33,
+    "latest_npz_file_bytes": 52087279,
+    "history_npy_uncompressed_bytes": 2125028184,
+    "latest_npz_zip_crc_passed": true,
+    "checkpoint_fields": 76,
+    "parameters": 34340,
+    "all_18_profile_fields_present": true,
+    "main_and_python_worker_processes_absent_after_exit": true,
+    "full_history_preserved": true,
+    "repair_status": "public_segmented_history_and_reviews_implemented_actual_q32_migration_verified_public_entrypoint_help_passed",
+    "new_fit_started": false,
+    "numerical_or_accuracy_success": false,
+    "recovery_verification": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\checkpoint_history_recovery_q32_20261012\\complete_state_verified_migration.json",
+      "sha256": "6e88307de652e10ebcda1badb0c0329ae47e851cb1be49a606badf3a0bfa0e27"
+    },
+    "recovered_checkpoint": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\checkpoint_history_recovery_q32_20261012\\complete_state_UNACCEPTED.npz",
+      "sha256": "5067d2ba734ddf6f8aca9c24d8cc2ffa59464883d14a93431529d5991ee1f818"
+    },
+    "unchanged_non_history_NPY_members": 74,
+    "history_records_verified": 32,
+    "recovery_checkpoint_bytes": 1324441,
+    "original_checkpoint_bytes": 52087279,
+    "history_preserved_outside_small_npz": true,
+    "end_to_end_new_solver_step_timing_measured": false,
+    "public_entrypoint_validation": {
+      "command": "python -X utf8 -B -m calibration.solver_runtime named66 --output <recovery_directory>/assembly_only_not_a_solver_run --help",
+      "exit_code": 0,
+      "execution_scheduling_installed": true,
+      "trial_precheck_inserted_sites": 1,
+      "argument_help_reached": true,
+      "solver_or_source_assembly_executed": false,
+      "log": "D:/CodexData/RinkSpace_Data/events/ankara_2026/diagnostics/current56_shared_active_set_filter_20261009/systematic_continuation_20261010/checkpoint_history_recovery_q32_20261012/runtime_assembly_help.log",
+      "scope": "Public runtime installation and argument parsing only; no claim of a new end-to-end solve or measured step speed."
+    }
+  },
+  "three_biased_exposure_motion_source_20261012": {
+    "evidence": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\motion_three_actual_exposures_original_rows_20261012.json",
+      "sha256": "70d72ab477fd508931c4808e1e213d3e4244b8435d8618b58c53c2f2325c5784"
+    },
+    "actual_pts": [
+      230548736,
+      230718208,
+      231540992
+    ],
+    "all_original_incident_pairs": 6,
+    "all_original_rows": 1331,
+    "all_rows_current_active": true,
+    "all_existing_roles_unknown": true,
+    "both_endpoint_source_material_review_complete": false,
+    "source_rows_roles_sigma_changed": false,
+    "new_RGB_decode_or_image_files": false,
+    "ice_plane_operator_already_exists": true,
+    "unused_authenticated_ice_motion_source_found": false,
+    "causation_of_visible_bias_proven": false,
+    "targeted_dual_endpoint_review": {
+      "qualified_ice_rows": 19,
+      "unqualified_detail_candidates": 15,
+      "other_original_rows_not_reclassified": 1297,
+      "material_qualification": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\three_motion_pairs_RGB_20261012\\motion_three_actual_exposures_ice_z0_material_qualification_20261012.json",
+        "sha256": "cf42044936ede856e051e249b311328eb0585c849e3c46d65c9cc33490758f59"
+      },
+      "all_original_rows_not_claimed_reviewed": true,
+      "runtime_admission": false
+    }
+  },
+  "wide_candidate32_targeted_visual_review_20261012": {
+    "evidence": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\q917c0fa4_feedback4\\visual_comparison_q32_vs_q24.json",
+      "sha256": "5133253fa886faae54a9f520652e801e9557219d075bf4f31807e3b4d01a19b4"
+    },
+    "baseline_q": "d6a5191e9881043a985167f96f2278a1b8eb0b9f93177c033f0c87e082da85cc",
+    "candidate_q": "917c0fa45f80af8e16c74d0f2d56486fdb500b591357add3dc2b240b3de64cdf",
+    "native_pts": [
+      229210368,
+      230548992,
+      230718208,
+      231541248
+    ],
+    "all_model_markings": 65,
+    "all_advertisements": 26,
+    "source_moments_actually_viewed": 4,
+    "three_key_ice_lines_substantially_improved": false,
+    "opening_ad4_substantially_improved": false,
+    "new_basis_for_same_objective_run": false,
+    "complete_shots_or_independent_validation": false
+  },
+  "qualified19_current_camera_transfer_20261012": {
+    "material_qualification": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\three_motion_pairs_RGB_20261012\\motion_three_actual_exposures_ice_z0_material_qualification_20261012.json",
+      "sha256": "cf42044936ede856e051e249b311328eb0585c849e3c46d65c9cc33490758f59"
+    },
+    "query": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\three_motion_pairs_RGB_20261012\\q32_qualified19_ice_transfer.json",
+      "sha256": "e8bb2a9edc9108b379742eea09d8ef36c6d3374224f2bd6f8d3573a2581ab85e"
+    },
+    "point_count": 19,
+    "adjacent_pairs": 6,
+    "original_source_sigma_range": [
+      3.3166247903554,
+      7.06320670013903
+    ],
+    "source_sigmas_are_not_new_accuracy_acceptance_bounds": true,
+    "ice_error_median_px": 0.6452140177954763,
+    "ice_error_maximum_px": 2.7902854011520057,
+    "main9_two_errors_px": [
+      0.15982984974238787,
+      0.02992342360585915
+    ],
+    "ice_vs_infinite_limit_difference_range_px": [
+      0.023609474459568566,
+      2.1201403567892125
+    ],
+    "production_roles_or_model_changed": false,
+    "systematic_cause_demonstrated": false,
+    "new_fit_started": false,
+    "conclusion": "关键画面的绝对冰线偏差仍在；这19点相邻Z=0转移已经较小，不能由角色缺失推定补点可修复整体偏差。"
+  },
+  "last_goal_turn_classification": {
+    "classification": "progress",
+    "evidence": "Restored user-rejected R4 original point; kept candidate80 and qualification36 explicit; confirmed two further moving-skate queries still active in q32, bound their exclusions through the existing public source validator. Native and original board/ice material review continues; no fit or new full video.",
+    "remaining_goal": "Correct actual source observations, then resume the existing accelerated complete model and validate grid and trajectory against entire original shots and unused evidence."
+  },
+  "saved_objective_tradeoff_and_step_20261012": {
+    "family_cost_report": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\saved_family_cost_q24_q32_20261012.json",
+      "sha256": "a154960547a1aa28d27e3c35b8da861cc43026634c1ac9b1b4c4d8f7b2787da9"
+    },
+    "saved_last_step_report": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\q32_saved_step_acceptance_causal_reading_20261012.json",
+      "sha256": "f415641df865c805d2be9cf06d1cbd036be204f42eeecf79296424a363281b16"
+    },
+    "q24_to_q32_cost_delta": -21.25547782121521,
+    "actual_motion_vs_absolute_tradeoff": {
+      "main1": {
+        "motion_cost_delta": -9.110068,
+        "absolute_FIT_cost_delta": 0.77983
+      },
+      "main7": {
+        "motion_cost_delta": -6.274569,
+        "absolute_FIT_cost_delta": 1.794852
+      }
+    },
+    "finding": "已接受位移中，运动项改善伴随部分绝对冰线/围挡项恶化；总cost下降没有对应关键蓝线、末红线实质改善。",
+    "last_step": {
+      "fresh_J": true,
+      "full_QP_original_KKT_passed": true,
+      "maximum_full_direction_same_parent_guard_excess_px": 0.00012331590040304263,
+      "optional_SOC_numerical_failure": true,
+      "accepted_learned_initial_fraction": 0.0625,
+      "largest_feasible_fraction_determined": false
+    },
+    "not_established": [
+      "梯度支配或全局目标不兼容",
+      "物理模型无解",
+      "放大步长或修复SOC会改善关键冰线"
+    ],
+    "no_same_objective_restart_justified_by_this_evidence": true
+  },
+  "wide_TOP_actual_source_identity_review_20261012": {
+    "evidence": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\wide_TOP_source_identity_20261012\\source_RGB_TOP_identity_receipt.json",
+      "sha256": "0f15607cc897ccb1b04f478449f0858a92ed38e2c55fc8057069bf4c1e7f61cc"
+    },
+    "native_pts": 56218880,
+    "actual_original_and_two_detail_sheets_viewed": true,
+    "finding": "近右蓝栏帽有可见宽度和多条边；当前模型TOP与contact同XY，只改变board_height。现有原图不能认证远端上轮廓与近右朝冰面边为同一实体边，也不能据此判定源错误。",
+    "source_roles_changed": false,
+    "fit_started_for_this_hypothesis": false,
+    "source_identity_status": "unresolved_no_correction_supported"
+  },
+  "same_frame_two_plane_camera_condition_20261012": {
+    "status": "completed_conditional_diagnostic_no_model_promotion",
+    "evidence": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\q32_231678464_fixed_world_RF4_freeC7_condition_comparison_20261012.json",
+      "sha256": "7391d22fb09c25cb13bf7f8a1b62ae2f957b8116b4cd0e9c26cab3301962cce2"
+    },
+    "actual_same_scene_visual_review": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\q32_231678464_same_scene_camera_condition_all_geometry.json",
+      "sha256": "177c8d545e2eb97e772de44f549841e18e73305e07360b5a8857fa4dd9a699bd"
+    },
+    "pts": 231678464,
+    "source_time": "04:11:23.233",
+    "same_current_source_operator_pixels_masks_and_curve_budgets": true,
+    "source_UV_count": 355,
+    "physical_source_rows": 15,
+    "natural_termination": {
+      "fixed_rig_RF4": "ftol, 4 function evaluations",
+      "free_C_R_f7": "ftol, 12 function evaluations"
+    },
+    "actual_solver_seconds": {
+      "RF4": 0.5,
+      "free_C_R_f7": 1.57
+    },
+    "complete_programme_speed_claim": false,
+    "raw_pixel_mean_examples": {
+      "lane1_upper": [
+        8.287,
+        7.521,
+        1.254
+      ],
+      "lane2_upper": [
+        3.952,
+        3.884,
+        0.818
+      ],
+      "C": [
+        15.542,
+        14.634,
+        3.826
+      ],
+      "Ad4_right": [
+        7.513,
+        10.4,
+        1.21
+      ],
+      "C0_right_extent": [
+        4.677,
+        1.401,
+        8.094
+      ],
+      "Ad4_bottom": [
+        0.409,
+        0.927,
+        1.827
+      ]
+    },
+    "example_order": [
+      "q32",
+      "RF4",
+      "free_C_R_f7"
+    ],
+    "free_C_displacement_scene_units": [
+      0.33498,
+      -1.62948,
+      0.21579
+    ],
+    "free_C_gap_from_fixed_rig_same_R_f_scene_units": 1.67791,
+    "finding": "冻结当前世界和光学后，RF4优化改善小，自由C/R/f能使多条真实冰线和Ad4竖边明显更贴近；同scene全开65标线及广告框实际查看支持局部改善。但C0右极值与Ad4底边恶化。",
+    "interpretation": "当前安装/rig与冻结世界之间的条件兼容性存在明确值得追查的差异；不能据单帧判断是共同几何、共享安装数值还是rig结构本身错误，更不能直接增加逐帧平移或晋升该相机。",
+    "limits": [
+      "全部为FIT/development材料，非独立留出",
+      "没有完整节目运动目标或86保护验证",
+      "完整周界背后顶点不等于当前可见观测无效",
+      "局部收敛不是全局可兼容或无解证明"
+    ],
+    "preparation_failure_retained": "首次适配将C0极值2个quadratic标量误当Huber，已作废；最终直接使用saved scalar mask切片。",
+    "existing_model_algebra_scope": {
+      "code": "calibration/solver_runtime/legacy/snapshot/three_frame_refit/program_tracking/z190_physical_camera.py:268",
+      "relation": "C = pivot_xyz + R.T @ lever",
+      "interpretation": "单帧自由光心差异在代数上可由已有共享pivot平移表示，不证明需要新增逐帧平移参数；共享pivot会影响同机位其他曝光，并仍受原安装物理域约束。",
+      "actual_shared_installation_change_applied": false
+    },
+    "remaining_causal_question": "该单帧改善方向能否由同机位共享安装参数在多帧中同时实现，还是要靠局部相机补偿共同几何/光学/源身份误差。"
+  },
+  "four_frame_existing_shared_pivot_condition_20261012": {
+    "status": "completed_and_visually_rejected_no_production_promotion",
+    "report": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\q32_four_existing_frames_fixed_pivot_shared_pivot_condition_comparison_20261012.json",
+      "sha256": "c6a84ee5df1a7ff608ea14be333897a35bdc4dcf2494b31563c5a6a8c8eef3b5"
+    },
+    "actual_same_scene_visual_review": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\q32_shared_pivot_four_all_geometry_review_20261012.json",
+      "sha256": "c435f65ec4cc8ab25d4e3c449ce865691730a5771c52f0ef8bf7fee836ceb135"
+    },
+    "previous_slow_route_preserved": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\q32_four_existing_frames_SHARED_PIVOT_LSMR_ABORTED_ROUTE_HISTORY_20261012.json",
+      "sha256": "6c9256e15c60e5fbd27c7b13165d5910818a3960f037e65eb3105d3a641c0e05"
+    },
+    "source_exposure_pts": [
+      229702144,
+      230571776,
+      230717696,
+      231678464
+    ],
+    "current_FIT_source_rows": 36,
+    "UV_count": 615,
+    "source_math_pixels_masks_supports_budgets_unchanged": true,
+    "new_camera_parameters_added": false,
+    "solve_seconds": {
+      "fixed_pivot_RF4": 0.9467965000076219,
+      "existing_shared_pivot3_RF4": 2.437012800015509
+    },
+    "prepare_seconds": 14.786787499993807,
+    "total_seconds": 18.263425100012682,
+    "termination": {
+      "fixed_pivot": "`ftol` termination condition is satisfied.",
+      "shared_pivot": "`ftol` termination condition is satisfied."
+    },
+    "original_pivot_hard_domain_passed": true,
+    "same_start_conditional_costs": [
+      32.312871692493204,
+      29.03004024083343,
+      17.078745118345925
+    ],
+    "shared_pivot_delta_scene_units": [
+      0.24053201197712126,
+      -0.767534602289615,
+      0.02804817997196052
+    ],
+    "raw_pixel_examples_baseline_shared": {
+      "late_C": [
+        15.5417,
+        3.9428
+      ],
+      "late_Lane1_upper": [
+        8.2873,
+        2.552
+      ],
+      "early_C0": [
+        11.723,
+        22.4198
+      ],
+      "middle_B2": [
+        7.1058,
+        7.7984
+      ],
+      "late_Ad4_bottom": [
+        0.4093,
+        3.3045
+      ]
+    },
+    "actual_visual_failure": "PTS230717696 的 A/B 广告Ad1/Ad26相对q32出现明显横向漂移；所选目标未含这些广告，局部代价不足以约束所有可见结构。",
+    "finding": "本次共享pivot候选没有同时改善四帧，不支持采用或追加整节目运行；不能据局部解证明不存在更好共享参数，也不能将局部改善归结为rig结构错误。",
+    "omitted_original_factors": [
+      "main0 reference PTS229114112 optical-height soft prior Cz*SCENE_UNIT_M=1.6 +/-0.18 conditional working metres",
+      "original roll priors and complete motion/profile",
+      "other same-installation absolute exposures",
+      "low5 to main_B three physical source observations and external_main_to_low",
+      "86 human guards and full source depth-domain checks"
+    ],
+    "full_programme_speed_claim": false,
+    "complete_shot_review": false,
+    "independent_validation": false,
+    "accuracy_accepted": false,
+    "all_diagnostic_processes_exited": true,
+    "new_full_video_generated": false
+  },
+  "source_RGB_correction_20261012": {
+    "known_contaminated_original_FIT_rows": [
+      10396,
+      10397,
+      11488,
+      10398
+    ],
+    "original_C0_all10_previously_active_FIT": true,
+    "all_frame_all_line_review_complete": false,
+    "geometry_release_reverted_without_fit": true,
+    "hard_relations": [
+      "Lane等宽、右边线共线；等长不恢复",
+      "C0居中、C中线、B1/B2对称",
+      "两端靶圈共线等间距、方向平行短边、F/R对应连线平行长边"
+    ],
+    "public_input_installation": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_source_81records_public_sampling_installation_20261012.json",
+      "sha256": "baf5d62504b9684569c4c3a08f7eb76f8e1ca3bfc3f49975774252700c9ad61a"
+    },
+    "correction": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_source_81records_current_RGB_with_sampling_receipt_20261012.json",
+      "sha256": "a04c8261740caeb0d924def996165bb419c2617f4b991c2005e417c7d0069e17"
+    },
+    "qualification": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_absolute_same35_plus_B2_point4_material_overlap36_qualification_20261012.json",
+      "sha256": "d01cc40d95e2807dd6b707d64193eaea08f832be7040ed6032033911c05c5c08"
+    },
+    "admission_scope": "公共实际absolute FIT输入/CSR接入已验证；未启用新生产拟合，整个数据集仍待逐帧复查",
+    "historical_C0_camera_geometry_tradeoff_inference_retracted": true,
+    "prior_diagnostics_retained_as_history_not_geometric_incompatibility_proof": true,
+    "future_video_current_observed_points_only": true,
+    "raw_source_and_checkpoints_preserved": true,
+    "accuracy_accepted": false,
+    "B2_separate_correction_source": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\same_manual_B2_contact_RGB_review_20261012\\original_B2_10398_four_actual_RGB_centers_source_correction_20261012.json",
+      "sha256": "1cec8df0f19c7384c19c0cc900965e387753051400dac52eb32f93d6ebdeaca6"
+    },
+    "B2_merged_public_input_verified": true,
+    "current_video_observation_policy": {
+      "only_current_active_source_points": true,
+      "historical_points": false,
+      "retired_points": false,
+      "before_after_comparison": false,
+      "extra_point_numbers": false
+    },
+    "user_rejected_automatic_R4_point5": {
+      "original_packet_row_index": 10397,
+      "point_index": 5,
+      "retained_original_uv": [
+        1865.0,
+        665.0
+      ],
+      "rejected_uv": [
+        1864.388574516084,
+        672.1332973123541
+      ],
+      "exact_user_quote": "[private conversation text omitted]",
+      "user_evidence": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\user_R4_10397_point5_original_preferred_20261012.png",
+        "sha256": "8fa937bd28e79a8b0a09763f6afade37120658a0767f4f9dfabc7b92bb1371ee"
+      },
+      "original_point_is_retained_in_current_correction": true,
+      "profile_acceptance_is_not_pixel_accuracy": true,
+      "finding": "Signed luminance mass included blurred adjacent material variation; a continuous monotonic transition did not establish a single outer interface."
+    },
+    "current_pending_candidate": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_source_81records_current_RGB_with_sampling_receipt_20261012.json",
+      "sha256": "a04c8261740caeb0d924def996165bb419c2617f4b991c2005e417c7d0069e17"
+    },
+    "R4_additional_unproven_changes_withdrawn": [
+      {
+        "original_packet_row_index": 10397,
+        "original_point_index": 0,
+        "retained_original_uv": [
+          1225.0,
+          681.0
+        ],
+        "withdrawn_candidate_uv": [
+          1246.1665641516083,
+          681.0
+        ],
+        "decision": "retain_original_while_automatic_replacement_physical_boundary_is_unproven",
+        "reason": "blurred tip location lacks independent physical interface support",
+        "original_point_accuracy_certified": false,
+        "original_coordinate_not_regenerated": true,
+        "source_review": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_ice_FIT_RGB_review\\current_active_source_review_20261012\\all225_ring_wide_context_physical_role_recheck.json",
+          "sha256": "274f7939a8be37c798de45130be3ad0a1b93f19d7a7e8caf1a3a3805f8e74057"
+        }
+      },
+      {
+        "original_packet_row_index": 10397,
+        "original_point_index": 2,
+        "retained_original_uv": [
+          1450.0,
+          654.0
+        ],
+        "withdrawn_candidate_uv": [
+          1450.0990019867431,
+          656.3925480129576
+        ],
+        "decision": "retain_original_while_automatic_replacement_physical_boundary_is_unproven",
+        "reason": "same inward-displacement ambiguity as user-rejected point 5",
+        "original_point_accuracy_certified": false,
+        "original_coordinate_not_regenerated": true,
+        "source_review": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_ice_FIT_RGB_review\\current_active_source_review_20261012\\all225_ring_wide_context_physical_role_recheck.json",
+          "sha256": "274f7939a8be37c798de45130be3ad0a1b93f19d7a7e8caf1a3a3805f8e74057"
+        }
+      },
+      {
+        "original_packet_row_index": 10397,
+        "original_point_index": 3,
+        "retained_original_uv": [
+          1610.0,
+          652.0
+        ],
+        "withdrawn_candidate_uv": [
+          1609.9775810084996,
+          655.4749436825775
+        ],
+        "decision": "retain_original_while_automatic_replacement_physical_boundary_is_unproven",
+        "reason": "same inward-displacement ambiguity as user-rejected point 5",
+        "original_point_accuracy_certified": false,
+        "original_coordinate_not_regenerated": true,
+        "source_review": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_ice_FIT_RGB_review\\current_active_source_review_20261012\\all225_ring_wide_context_physical_role_recheck.json",
+          "sha256": "274f7939a8be37c798de45130be3ad0a1b93f19d7a7e8caf1a3a3805f8e74057"
+        }
+      },
+      {
+        "original_packet_row_index": 10397,
+        "original_point_index": 4,
+        "retained_original_uv": [
+          1760.0,
+          656.0
+        ],
+        "withdrawn_candidate_uv": [
+          1759.795560028567,
+          660.0101686704165
+        ],
+        "decision": "retain_original_while_automatic_replacement_physical_boundary_is_unproven",
+        "reason": "same inward-displacement ambiguity as user-rejected point 5",
+        "original_point_accuracy_certified": false,
+        "original_coordinate_not_regenerated": true,
+        "source_review": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_ice_FIT_RGB_review\\current_active_source_review_20261012\\all225_ring_wide_context_physical_role_recheck.json",
+          "sha256": "274f7939a8be37c798de45130be3ad0a1b93f19d7a7e8caf1a3a3805f8e74057"
+        }
+      },
+      {
+        "original_packet_row_index": 10397,
+        "original_point_index": 6,
+        "retained_original_uv": [
+          1885.0,
+          679.0
+        ],
+        "withdrawn_candidate_uv": [
+          1896.7499521877182,
+          679.0
+        ],
+        "decision": "retain_original_while_automatic_replacement_physical_boundary_is_unproven",
+        "reason": "blurred tip location lacks independent physical interface support",
+        "original_point_accuracy_certified": false,
+        "original_coordinate_not_regenerated": true,
+        "source_review": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_ice_FIT_RGB_review\\current_active_source_review_20261012\\all225_ring_wide_context_physical_role_recheck.json",
+          "sha256": "274f7939a8be37c798de45130be3ad0a1b93f19d7a7e8caf1a3a3805f8e74057"
+        }
+      }
+    ],
+    "qualification_candidate": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_absolute_same35_plus_B2_point4_material_overlap36_qualification_20261012.json",
+      "sha256": "d01cc40d95e2807dd6b707d64193eaea08f832be7040ed6032033911c05c5c08"
+    },
+    "B2_current_source_decisions": {
+      "retained_original_indices": [
+        1,
+        2,
+        3
+      ],
+      "excluded_original_indices": [
+        0,
+        4
+      ],
+      "measurement": "two actual paint interfaces geometric midpoint",
+      "source": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\vision_public_source_reread4_context_verified_20261012\\B2_p3_p4_full_paint_context_preserved_side_candidates.json",
+        "sha256": "2b2dbf3102992b6c1178760ebe3fa6b7be55defd703e905014c0ab11b5e3dae6"
+      },
+      "fit_run_started": false
+    },
+    "current_point_video_implementation": {
+      "producer": "calibration/program_tracking/current_source_point_collection.py",
+      "draw": "calibration/program_tracking/current_source_points.py",
+      "complete_export_requires_input_manifest_q_camera_binding": true,
+      "current_points_only": true,
+      "extra_labels": false,
+      "actual_single_frame_recovery": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\current_source_points_one_exposure_cache_recovery_20261012\\q32_current_source_pixels_actual229702144_ONLY_receipt.json",
+        "sha256": "7c14fd30415b81d8d8990301edae14b7d3c472135aab347c7675751a13187345"
+      },
+      "production_full_archive_not_yet_generated": true,
+      "no_new_full_video": true
+    },
+    "public_visual_reader_actual_verification": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\vision_public_source_reread4_context_verified_20261012\\actual_source_reread_receipt.json",
+      "sha256": "ed6e722f6d3a1f58e5876e9bafcbb4696326bbea192179f90c333971937d2125"
+    },
+    "historical_verified_candidate_references": [
+      {
+        "correction": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_ice_TOP_65records_C0_R4_R3_B2_user_R4_point5_retained_20261012.json",
+          "sha256": "a5a8300ed0935e1311b40e8c98f08db4d6b4f2c9682c47222f0dbed2dfaf6fb4"
+        },
+        "qualification": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_absolute_C0_B2_same18_plus_five_unresolved23_qualification_20261012.json",
+          "sha256": "8b1e7acb2b75043d6ab2e20696ebc216a0fa953a181a8a824751898f338c1749"
+        },
+        "public_input_installation": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_65records_user_R4_point5_retained_public_inputs_20261012.json",
+          "sha256": "32eea52a7b08c690387148baa2f9f4a3d2cc3c55553547523fbf1e0506fcc23c"
+        }
+      },
+      {
+        "correction": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_source_80records_B2_three_centres_ad_corners_R4_review_retained_20261012.json",
+          "sha256": "f0ee23362804e08590120b16ab62f316cb35e211a0dc9e0fc2968304f10974c3"
+        },
+        "qualification": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_absolute_same35_plus_B2_point4_material_overlap36_qualification_20261012.json",
+          "sha256": "d01cc40d95e2807dd6b707d64193eaea08f832be7040ed6032033911c05c5c08"
+        },
+        "public_input_installation": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_source_80records_public_installation_actual_absolute_inputs_20261012.json",
+          "sha256": "af7eca62442ee4fe327228f9418cd891662d0860ee35933933c6294125c7a790"
+        }
+      }
+    ],
+    "candidate_not_active_in_fitted_model": true,
+    "B2_separate_correction_source_role": "historical four-centre draft; current candidate retains only 1,2,3 and retires 0,4",
+    "motion_skate_point_validity_revision": {
+      "candidate": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_UI_retirement_plus_current_four_skate_points_20261012.json",
+        "sha256": "b60d87e8d15a1d91b1afcf95eab29ed97437f413d94619f3a1304ad379d1806e"
+      },
+      "source_packet": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_motion_current_four_reviewed_skate_points_validity_20261012.json",
+        "sha256": "a749b9aa3cd4017f6893fe9972435e14862ba79948dded03cf63c30aa1d2f023"
+      },
+      "receipt": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_motion_four_skate_points_public_source_validation_20261012.json",
+        "sha256": "e221f4de9e74ae7895e5935d107921b7c0d3355c02864eba8f625d338103e533"
+      },
+      "retained_previously_retired_points": 2,
+      "additional_source_confirmed_skate_points": 2,
+      "new_original_prefix_indices": [
+        154804,
+        155102
+      ],
+      "root_viewed_both_native_endpoint_montage_and_magnified_detail": true,
+      "public_original_UV_clock_sigma_compaction_validator_passed": true,
+      "authenticated_current_role_packets_checked": 31,
+      "new_two_points_have_no_current_finite_board_role_assignment": true,
+      "production_fit_not_started": true
+    },
+    "original_TOP_wrong_background_point_revision": {
+      "original_packet_row_index": 3804,
+      "point_index": 0,
+      "original_uv": [
+        44.0,
+        288.0
+      ],
+      "corrected_uv": [
+        44.0,
+        299.5618079259779
+      ],
+      "root_actual_RAW_review": true,
+      "correction_is_to_same_blue_upper_boundary": true,
+      "source_broad_competitors_retained": true,
+      "subpixel_precision_not_certified": true,
+      "original_sigma_world_and_other_points_unchanged": true
+    },
+    "native_circle_C001_outer_interface_revision": {
+      "candidate": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\native_board_material_circle_RGB_review_20261012\\native_circle16_C001_outer_interface_RAW_reviewed_UV_revision_NOT_FITTED.json",
+        "sha256": "b6b6480ccf0da328ecec8cc35358380db61c40f0df9f1c8a38d324c120766c3b"
+      },
+      "public_input_installation": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\native_board_material_circle_RGB_review_20261012\\native_circle16_C001_outer_interface_public_installation_receipt.json",
+        "sha256": "3a7d52545b8be22e95f52a7739efba817af7bacae7e4035f76a1f8e03be02c4c"
+      },
+      "actual_source_root_viewed": true,
+      "changed_current_UV": 10,
+      "sigma_world_and_other_rows_unchanged": true,
+      "automatic_role_flags_retained": true,
+      "fit_run_started": false
+    },
+    "prepared_source_resume_config": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\full_source_review86_q32_current_RGB_20261012.json",
+      "sha256": "885fbf7d050603d15c500cf251ceaada750464cf429fa1d849a4b5785529b27c",
+      "status": "fresh_source_computation_running_after_authentication_with_current_point_export_fix",
+      "production_fit_started": true,
+      "first_new_target_J_or_iteration_started": true
+    },
+    "actual_sampling_policy_installation_verified": true,
+    "sampling_receipt_only_parent": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original_source_81records_B2_ad_corners_TOP_R4_user_retained_20261012.json",
+      "sha256": "7c6334eb9c0b4de57be16d7cf6fba7a67c27763dea2fb01c6a0aff4b3d5b964d"
+    },
+    "native_ice_paired_centre_revision": {
+      "candidate": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\observations\\source_packets\\ice108_Lane2_RGB_paired_centres_qualified_20261012\\packet.json",
+        "sha256": "3a6bcc96a697421d927b40cc39b747c219c44255d0d6fc933f1826151df01057"
+      },
+      "source_options_and_public_reader_receipt": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\native_ice_current_remaining_actual_RGB_review_20261012\\reviewed_native_ice108_source_revision_source_options.json",
+        "sha256": "a3de974c37426a969b01e2b20ef13f136f7204fc2d678a1946f260232a13d7e3"
+      },
+      "actual_per_point_RGB_review": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\source_pixel_review_additional\\native_ice_current_remaining_actual_RGB_review_20261012\\actual_current_native_ice_remaining_perpoint_RGB_review_receipt_20261012.json",
+        "sha256": "a9d700743ad9dbd4f517aecd854c863d18fe691fe7d0f3526da6ac3d5b00dd33"
+      },
+      "changed_source_points": 4,
+      "new_unreadable_point_exclusions": 3,
+      "old_user_strokes_and_sampling_budget_unchanged": true,
+      "fit_run_started": false
+    },
+    "fit_run_started": false,
+    "public_measured_location_dependency_check": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\original81_qualification36_saved_measured_location_dependency_check_20261012.json",
+      "sha256": "4311a4e4882373cd9f2b0d58c2aedf2de9174011bdac8c7ec5b3a785743870d3"
+    },
+    "source_revisions_activated_in_new_run_startup": true,
+    "new_accepted_state_available": false,
+    "actual_new_run_active_R4_user_point_verified": {
+      "actual_pts": 229702144,
+      "original_row": 10397,
+      "original_point": 5,
+      "retained_UV": [
+        1865.0,
+        665.0
+      ],
+      "rejected_UV_present": false,
+      "rejected_to_retained_distance_px": 7.159453307957264,
+      "actual_current_point_archive": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_current_points_ready_20261012\\current_source_points_UNACCEPTED_917c0fa45f80af8e.npz",
+      "point_overlay_review": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\current_active_points_actual_initial_q32_20261012\\review_identity.json",
+        "sha256": "fb743ad1d3bbe3fea0fea6157962b152ba4e0529fa681e267131308d664ddcde"
+      }
+    }
+  },
+  "confirmed_user_line_semantics": {
+    "thread_id": "private-thread-00039",
+    "user_message_id": "private-message-00015",
+    "verbatim": "所有这些实际在画面中有明显宽度的线，我们的模型里默认都是取它们的中心线，不是说整个宽度都是允许的范围，我以为这是一件很清楚的事",
+    "layered_targets_keep_outer_inner_boundaries": true
+  },
+  "before_reviewed_source_startup_20261012": {
+    "status": "stopped_branch_preserved_user_confirmed_shared_pivot_candidate_rejected",
+    "run": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_ce235f_wide_curve_budget_resume_20261012",
+    "config": "events/ankara_2026/programmes/okada_mei_sp/full_source_review86_ce235f_wide_curve_budget_20261012.json",
+    "exec_session_id": 78712,
+    "last_goal_turn_classification": "progress: existing shared-pivot four-exposure candidate completed on unchanged selected source objective and original domain; actual all-scene review rejected it for cross-frame and advertisement regressions. No production accuracy improvement or full solver restart.",
+    "accuracy_accepted": false,
+    "prior4798_branch_remains_stopped": true,
+    "new_complete_video_generated": false,
+    "accepted_iterations": 32,
+    "latest_accepted_q": "917c0fa45f80af8e16c74d0f2d56486fdb500b591357add3dc2b240b3de64cdf",
+    "main_pid": 17988,
+    "complete_checkpoint": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_ce235f_wide_curve_budget_resume_20261012\\solver\\latest_accepted_state.npz",
+    "branch_stop_request": {
+      "reason": "No overall visible grid improvement in same-model feedback62 review; later saved metrics retain or increase specific regressions.",
+      "control_file_written": false,
+      "automatic_review_rejected": true,
+      "reviewer_reason": "持续自主推进要求被解释为未授权停止当前主求解分支",
+      "user_confirmation_requested": true,
+      "process_left_running": false,
+      "goal_paused": false,
+      "user_confirmation_pending": false,
+      "resolved_by": "Main process had already exited with checkpoint TypeError; user subsequently explicitly authorized branch stop. All results retained, branch will not be resumed; no further termination necessary.",
+      "resolved_utc": "2026-10-11T20:09:21.5092707Z",
+      "user_explicit_confirmation": true,
+      "user_confirmation_text": "同意停止当前分支并保留结果",
+      "already_exited_before_confirmation": true,
+      "branch_will_not_be_resumed": true,
+      "post_exit_control_write_attempt": "PermissionError; no file written, no retry required because process already exited"
+    },
+    "previous_recorded_source_cost": {
+      "q": "38e3e1e66587d575063c1aff6f73e8a7d0f24d96526ad3479842f7a2165c120a",
+      "value": 5006.434811571573,
+      "not_accuracy_measurement": true
+    },
+    "observed_utc": "2026-10-11T20:17:51.222475+00:00",
+    "previous_goal_turn_classification": "progress: fixed candidate24 existing-report comparison identified missing exact-time metrics and bidirectional changes; actual same-model four-frame comparison confirmed opening Ad4 benefit and persistent blue/late red line errors. No new fit, benchmark, full feedback rerender, full video or promotion.",
+    "solver_exit": 1,
+    "diagnostic_processes_running": false
+  },
+  "reviewed_source_startup_failures_20261012": [
+    {
+      "run": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_20261012",
+      "log": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_20261012.launch.log",
+      "bootstrap": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_20261012.bootstrap",
+      "exit_code": 1,
+      "stage": "before_first_J_or_iteration",
+      "error": "Confirmed source packet identity differs",
+      "reason": "Confirmed authority record20 protected circle row15 still referenced old circle packet; complete protected row and all UV/sigma/support unchanged. C001 changed row1 is not protected."
+    },
+    {
+      "run": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_circle_ref_rebound_20261012",
+      "log": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_circle_ref_rebound_20261012.launch.log",
+      "exit_code": 1,
+      "stage": "same_q_input_contract_authentication_before_J",
+      "error": "Reviewed source revision changed an unapproved model/layout/input: original_motion_input_compaction",
+      "actual_input_manifest": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_circle_ref_rebound_20261012\\input_manifest.json"
+    },
+    {
+      "run": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_contract_authenticated_20261012",
+      "log": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_contract_authenticated_20261012.launch.log",
+      "exit_code": 1,
+      "stage": "initial_state_current_source_point_export_after_actual_source_and_initial_normal_evaluation",
+      "error": "Unenumerated installed pixel source family: material_factor",
+      "actual_input_and_truth_authentication_passed": true,
+      "accepted_iterations": 0
+    }
+  ],
+  "user_requested_final_export_and_stop_20261012": {
+    "user_request": "你直接生成最新状态的完整视频让我检查，然后全部停下",
+    "status": "complete_video_exported_stop_requested",
+    "output": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/full_8a28afed_user_requested_20261012",
+    "all_source_audit_subagents_interrupted": true,
+    "no_new_fitting": true,
+    "trajectory": "saved a454 pelvis trace reexpressed in latest camera preserving its native model P projection and conditional metric height; not newly fitted or accuracy accepted",
+    "current_user_R4_point": [
+      1865,
+      665
+    ],
+    "rejected_green_point_absent_from_current_inputs": true,
+    "video": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\full_8a28afed_user_requested_20261012\\grid_and_trajectory_WORKING.mp4",
+    "render_receipt": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\full_8a28afed_user_requested_20261012\\render.json",
+    "export_receipt": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\full_8a28afed_user_requested_20261012\\export_status.json"
+  }
+}

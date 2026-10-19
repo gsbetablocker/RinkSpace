@@ -1,0 +1,59 @@
+diff --git a/hmr4d/utils/geo_transform.py b/hmr4d/utils/geo_transform.py
+index 028cc35..28df207 100644
+--- a/hmr4d/utils/geo_transform.py
++++ b/hmr4d/utils/geo_transform.py
+@@ -4,7 +4,6 @@ import torch
+ import torch.nn.functional as F
+ from pytorch3d.transforms import so3_exp_map, so3_log_map
+ from pytorch3d.transforms import matrix_to_quaternion, quaternion_to_axis_angle, matrix_to_rotation_6d
+-import pytorch3d.ops.knn as knn
+ from hmr4d.utils.pylogger import Log
+ from pytorch3d.transforms import euler_angles_to_matrix
+ import hmr4d.utils.matrix as matrix
+@@ -293,6 +292,7 @@ def get_nearby_points(points, query_verts, padding=0.0, p=1):
+         idx = (((points - min_xyz) > 0).all(dim=-1) * ((points - max_xyz) < 0).all(dim=-1)).nonzero().squeeze(-1)
+         nearby_points = points[idx]
+     elif p == 2:
++        import pytorch3d.ops.knn as knn
+         squared_dist, _, _ = knn.knn_points(points[None], query_verts[None], K=1, return_nn=False)
+         mask = squared_dist[0, :, 0] < padding**2  # (S,)
+         nearby_points = points[mask]
+diff --git a/hmr4d/utils/preproc/__init__.py b/hmr4d/utils/preproc/__init__.py
+index 6ef3897..36f0bed 100644
+--- a/hmr4d/utils/preproc/__init__.py
++++ b/hmr4d/utils/preproc/__init__.py
+@@ -1,9 +1,15 @@
+ from hmr4d.utils.preproc.tracker import Tracker
+ from hmr4d.utils.preproc.vitfeat_extractor import Extractor
+ from hmr4d.utils.preproc.vitpose import VitPoseExtractor
+-from hmr4d.utils.preproc.relpose.simple_vo import SimpleVO
+ 
+ try:
+     from hmr4d.utils.preproc.slam import SLAMModel
+ except:
+     pass
++
++
++def __getattr__(name):
++    if name == "SimpleVO":
++        from hmr4d.utils.preproc.relpose.simple_vo import SimpleVO
++        return SimpleVO
++    raise AttributeError(name)
+diff --git a/hmr4d/utils/wis3d_utils.py b/hmr4d/utils/wis3d_utils.py
+index df54d8b..4bf5251 100644
+--- a/hmr4d/utils/wis3d_utils.py
++++ b/hmr4d/utils/wis3d_utils.py
+@@ -1,4 +1,3 @@
+-from wis3d import Wis3D
+ from pathlib import Path
+ from datetime import datetime
+ import torch
+@@ -13,6 +12,8 @@ def make_wis3d(output_dir="outputs/wis3d", name="debug", time_postfix=False):
+         from hmr4d.utils.wis3d_utils import make_wis3d
+         wis3d = make_wis3d(time_postfix=True)
+     """
++    from wis3d import Wis3D
++
+     output_dir = Path(output_dir)
+     output_dir.mkdir(parents=True, exist_ok=True)
+     if time_postfix:

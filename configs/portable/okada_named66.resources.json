@@ -1,0 +1,180 @@
+{
+  "schema": "rinkspace.portable-input-template.v1",
+  "source_profile": {
+    "project_path": "configs/solver_runtime/okada_named66.json",
+    "sha256": "7dd1e720cdbc33cd687ec169d11add215356a39cd86d8289820abf794404cba4"
+  },
+  "driver": "named66",
+  "resource_root": "@data/events/ankara_2026/calibration/runs/solver_acceleration_20261003",
+  "source_options": {
+    "--world-init": "@project/events/ankara_2026/models/initializations/latest9a8c_world66_initialization_ONLY.json",
+    "--camera-seed": "@data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/mainspin_all_tripods_outside_user_domain_v2_actual_fit_nodump_20261006/accepted_states/77bf5c2a81df2d8a8f3984c1465a17e411fb0fd819753ffcaa8e0706703b08c0/complete_state_UNACCEPTED.npz",
+    "--additional-ice-source": "@project/events/ankara_2026/observations/source_packets/calibration/runs/cut6_unused_actual_source_append_v9_20261005/additional_user_reported_ice_source_admitted_v9_cut6_B1_unused_actual.json",
+    "--additional-board-source": "@project/events/ankara_2026/observations/p/7f1fb9019c1a/additional_user_reported_board_edges_v8_Ad4_clear_unused_tail_FIT_append.json",
+    "--additional-board-material-point-source": "@project/events/ankara_2026/observations/source_packets/calibration/runs/solver_acceleration_20261003/structured_programme_source_candidate/additional_Ad12_25_native_material_points_FIT_v1.json",
+    "--additional-board-circle-source": "@project/events/ankara_2026/observations/source_packets/calibration/runs/cut6_unused_actual_source_append_v9_20261005/additional_native_board_circles_Ad11_Ad24_shared_radius_FIT_v5_cut6_Ad11.json",
+    "--original-source-role-retirement-source": "@project/events/ankara_2026/observations/source_packets/calibration/runs/solver_acceleration_20261003/ads_actual_identity_correction_20261005/Ad7_original_print_corner_role_correction_CANDIDATE_v1.json",
+    "--independent-board-pattern-placement-source": "@project/events/ankara_2026/model_constraints/user_advertisement_pairs_20261005.json",
+    "--persistent-ice-long-baseline-source": "@project/events/ankara_2026/observations/source_packets/calibration/runs/spin_source_long_baseline_20261005/spin_micro_actual_original_anchor_v3_20261005/spin_reviewed_ice_long_baseline_FIT_HELD_v3_micro_actual.json",
+    "--serial-source": true,
+    "--serial-current-patterns": false,
+    "--geometry-fd-workers": "8",
+    "--normal-workers": "8",
+    "--reuse-source-jacobian": true,
+    "--residual-source-workers": "6",
+    "--adaptive-source-backtracking": true,
+    "--residual-native-threads": "3",
+    "--static-motion-source-role-retirement-source": "@project/events/ankara_2026/observations/source_packets/calibration/runs/spin_source_long_baseline_20261005/actual50_jitter_source_diagnostic_20261005/spin_micro_broadcast_overlay_original_motion_role_retirement_SOURCE_ONLY_v1.json",
+    "--camera-mount-constraint-source": "@project/events/ankara_2026/model_constraints/camera_hardware/user_camera_mount_and_height_20261006_v4.json",
+    "--reinitialize-invalid-mounts": true,
+    "--initial-pose-feasibility-source": "@project/events/ankara_2026/observations/source_packets/calibration/runs/solver_acceleration_20261003/mainspin_user_mount_bounds_v4_actual_fit_nodump_20261006/single_secondary_RF4_domain_feasible_initializer_candidate.json",
+    "--camera-pivot-exterior-constraint-source": "@project/events/ankara_2026/model_constraints/camera_hardware/user_tripod_positions_20261006_v2.json",
+    "--reinitialize-invalid-pivot-positions": true
+  },
+  "resources": [
+    {
+      "field": "resource_root",
+      "original_reference": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003",
+      "reference": "@data/events/ankara_2026/calibration/runs/solver_acceleration_20261003",
+      "root_kind": "data",
+      "relative_path": "events/ankara_2026/calibration/runs/solver_acceleration_20261003",
+      "expected_sha256": null,
+      "alias_registered": false,
+      "exists_at_capture": true
+    },
+    {
+      "field": "--world-init",
+      "original_reference": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/user_corrected_programme_candidate/latest9a8c_world66_initialization_ONLY.json",
+      "reference": "@project/events/ankara_2026/models/initializations/latest9a8c_world66_initialization_ONLY.json",
+      "root_kind": "project",
+      "relative_path": "events/ankara_2026/models/initializations/latest9a8c_world66_initialization_ONLY.json",
+      "expected_sha256": "48ec149a8d5edab9e60246ddcb28d7a4fdaddb3b7e1d711fe4c951bdd6d3a4b5",
+      "alias_registered": true,
+      "exists_at_capture": true
+    },
+    {
+      "field": "--camera-seed",
+      "original_reference": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\mainspin_all_tripods_outside_user_domain_v2_actual_fit_nodump_20261006\\accepted_states\\77bf5c2a81df2d8a8f3984c1465a17e411fb0fd819753ffcaa8e0706703b08c0\\complete_state_UNACCEPTED.npz",
+      "reference": "@data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/mainspin_all_tripods_outside_user_domain_v2_actual_fit_nodump_20261006/accepted_states/77bf5c2a81df2d8a8f3984c1465a17e411fb0fd819753ffcaa8e0706703b08c0/complete_state_UNACCEPTED.npz",
+      "root_kind": "data",
+      "relative_path": "events/ankara_2026/calibration/runs/solver_acceleration_20261003/mainspin_all_tripods_outside_user_domain_v2_actual_fit_nodump_20261006/accepted_states/77bf5c2a81df2d8a8f3984c1465a17e411fb0fd819753ffcaa8e0706703b08c0/complete_state_UNACCEPTED.npz",
+      "expected_sha256": null,
+      "alias_registered": false,
+      "exists_at_capture": true
+    },
+    {
+      "field": "--additional-ice-source",
+      "original_reference": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/cut6_unused_actual_source_append_v9_20261005/additional_user_reported_ice_source_admitted_v9_cut6_B1_unused_actual.json",
+      "reference": "@project/events/ankara_2026/observations/source_packets/calibration/runs/cut6_unused_actual_source_append_v9_20261005/additional_user_reported_ice_source_admitted_v9_cut6_B1_unused_actual.json",
+      "root_kind": "project",
+      "relative_path": "events/ankara_2026/observations/source_packets/calibration/runs/cut6_unused_actual_source_append_v9_20261005/additional_user_reported_ice_source_admitted_v9_cut6_B1_unused_actual.json",
+      "expected_sha256": "0d116e4e917df09379390517f8dc6bdc703565770f4080e48f7c1555c7b08e4a",
+      "alias_registered": true,
+      "exists_at_capture": true
+    },
+    {
+      "field": "--additional-board-source",
+      "original_reference": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/ads_actual_identity_correction_20261005/Ad4_end_programme_singleton_source_candidate_20261005/additional_user_reported_board_edges_v8_Ad4_clear_unused_tail_FIT_append.json",
+      "reference": "@project/events/ankara_2026/observations/p/7f1fb9019c1a/additional_user_reported_board_edges_v8_Ad4_clear_unused_tail_FIT_append.json",
+      "root_kind": "project",
+      "relative_path": "events/ankara_2026/observations/p/7f1fb9019c1a/additional_user_reported_board_edges_v8_Ad4_clear_unused_tail_FIT_append.json",
+      "expected_sha256": "947cf358308a2a67ccb6df439e545d4480f259e31673f5fe7d6df2c8797b364e",
+      "alias_registered": true,
+      "exists_at_capture": true
+    },
+    {
+      "field": "--additional-board-material-point-source",
+      "original_reference": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/structured_programme_source_candidate/additional_Ad12_25_native_material_points_FIT_v1.json",
+      "reference": "@project/events/ankara_2026/observations/source_packets/calibration/runs/solver_acceleration_20261003/structured_programme_source_candidate/additional_Ad12_25_native_material_points_FIT_v1.json",
+      "root_kind": "project",
+      "relative_path": "events/ankara_2026/observations/source_packets/calibration/runs/solver_acceleration_20261003/structured_programme_source_candidate/additional_Ad12_25_native_material_points_FIT_v1.json",
+      "expected_sha256": "02904ce16ded8ad5ae792c1580a09220df1cd762280a6dcc9736b21572f00595",
+      "alias_registered": true,
+      "exists_at_capture": true
+    },
+    {
+      "field": "--additional-board-circle-source",
+      "original_reference": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/cut6_unused_actual_source_append_v9_20261005/additional_native_board_circles_Ad11_Ad24_shared_radius_FIT_v5_cut6_Ad11.json",
+      "reference": "@project/events/ankara_2026/observations/source_packets/calibration/runs/cut6_unused_actual_source_append_v9_20261005/additional_native_board_circles_Ad11_Ad24_shared_radius_FIT_v5_cut6_Ad11.json",
+      "root_kind": "project",
+      "relative_path": "events/ankara_2026/observations/source_packets/calibration/runs/cut6_unused_actual_source_append_v9_20261005/additional_native_board_circles_Ad11_Ad24_shared_radius_FIT_v5_cut6_Ad11.json",
+      "expected_sha256": "15df41056ee2a7dac710283f6a4aa8b9bd2df0df76a85b8e50245a827d21a853",
+      "alias_registered": true,
+      "exists_at_capture": true
+    },
+    {
+      "field": "--original-source-role-retirement-source",
+      "original_reference": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\ads_actual_identity_correction_20261005\\Ad7_original_print_corner_role_correction_CANDIDATE_v1.json",
+      "reference": "@project/events/ankara_2026/observations/source_packets/calibration/runs/solver_acceleration_20261003/ads_actual_identity_correction_20261005/Ad7_original_print_corner_role_correction_CANDIDATE_v1.json",
+      "root_kind": "project",
+      "relative_path": "events/ankara_2026/observations/source_packets/calibration/runs/solver_acceleration_20261003/ads_actual_identity_correction_20261005/Ad7_original_print_corner_role_correction_CANDIDATE_v1.json",
+      "expected_sha256": "427893fe8a865ca1fe8afff44c12f49f76ace9c049a99572d9fdba558d022d1e",
+      "alias_registered": true,
+      "exists_at_capture": true
+    },
+    {
+      "field": "--independent-board-pattern-placement-source",
+      "original_reference": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/model_constraints/user_advertisement_pairs_20261005.json",
+      "reference": "@project/events/ankara_2026/model_constraints/user_advertisement_pairs_20261005.json",
+      "root_kind": "project",
+      "relative_path": "events/ankara_2026/model_constraints/user_advertisement_pairs_20261005.json",
+      "expected_sha256": "89f3dcf0580148e5be2eeeec9033c86ac73a12b2d7eb07ae86a0eb82b15020a0",
+      "alias_registered": true,
+      "exists_at_capture": true
+    },
+    {
+      "field": "--persistent-ice-long-baseline-source",
+      "original_reference": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\spin_source_long_baseline_20261005\\spin_micro_actual_original_anchor_v3_20261005\\spin_reviewed_ice_long_baseline_FIT_HELD_v3_micro_actual.json",
+      "reference": "@project/events/ankara_2026/observations/source_packets/calibration/runs/spin_source_long_baseline_20261005/spin_micro_actual_original_anchor_v3_20261005/spin_reviewed_ice_long_baseline_FIT_HELD_v3_micro_actual.json",
+      "root_kind": "project",
+      "relative_path": "events/ankara_2026/observations/source_packets/calibration/runs/spin_source_long_baseline_20261005/spin_micro_actual_original_anchor_v3_20261005/spin_reviewed_ice_long_baseline_FIT_HELD_v3_micro_actual.json",
+      "expected_sha256": "ad45e180545ea67f7ad60545198ed18d91b2b4fde3179e3dadb0785397934064",
+      "alias_registered": true,
+      "exists_at_capture": true
+    },
+    {
+      "field": "--static-motion-source-role-retirement-source",
+      "original_reference": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/spin_source_long_baseline_20261005/actual50_jitter_source_diagnostic_20261005/spin_micro_broadcast_overlay_original_motion_role_retirement_SOURCE_ONLY_v1.json",
+      "reference": "@project/events/ankara_2026/observations/source_packets/calibration/runs/spin_source_long_baseline_20261005/actual50_jitter_source_diagnostic_20261005/spin_micro_broadcast_overlay_original_motion_role_retirement_SOURCE_ONLY_v1.json",
+      "root_kind": "project",
+      "relative_path": "events/ankara_2026/observations/source_packets/calibration/runs/spin_source_long_baseline_20261005/actual50_jitter_source_diagnostic_20261005/spin_micro_broadcast_overlay_original_motion_role_retirement_SOURCE_ONLY_v1.json",
+      "expected_sha256": "408af8ab7b2a39cc97bcebb572fbca5abdb0323d123784f3ebc05eb9917bae44",
+      "alias_registered": true,
+      "exists_at_capture": true
+    },
+    {
+      "field": "--camera-mount-constraint-source",
+      "original_reference": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/camera_hardware_20261001/user_camera_mount_and_height_20261006_v4.json",
+      "reference": "@project/events/ankara_2026/model_constraints/camera_hardware/user_camera_mount_and_height_20261006_v4.json",
+      "root_kind": "project",
+      "relative_path": "events/ankara_2026/model_constraints/camera_hardware/user_camera_mount_and_height_20261006_v4.json",
+      "expected_sha256": "c1ca7ab570d60e02c54c5ce3e4a7493cdc076942447d880c2452272b29fb2b2b",
+      "alias_registered": true,
+      "exists_at_capture": true
+    },
+    {
+      "field": "--initial-pose-feasibility-source",
+      "original_reference": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/mainspin_user_mount_bounds_v4_actual_fit_nodump_20261006/single_secondary_RF4_domain_feasible_initializer_candidate.json",
+      "reference": "@project/events/ankara_2026/observations/source_packets/calibration/runs/solver_acceleration_20261003/mainspin_user_mount_bounds_v4_actual_fit_nodump_20261006/single_secondary_RF4_domain_feasible_initializer_candidate.json",
+      "root_kind": "project",
+      "relative_path": "events/ankara_2026/observations/source_packets/calibration/runs/solver_acceleration_20261003/mainspin_user_mount_bounds_v4_actual_fit_nodump_20261006/single_secondary_RF4_domain_feasible_initializer_candidate.json",
+      "expected_sha256": "18b5d87f97e3f958d3d06f5d4c498d5fd43626f86621fc306a21307ae4d8916a",
+      "alias_registered": true,
+      "exists_at_capture": true
+    },
+    {
+      "field": "--camera-pivot-exterior-constraint-source",
+      "original_reference": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\camera_hardware_20261001\\user_tripod_positions_20261006_v2.json",
+      "reference": "@project/events/ankara_2026/model_constraints/camera_hardware/user_tripod_positions_20261006_v2.json",
+      "root_kind": "project",
+      "relative_path": "events/ankara_2026/model_constraints/camera_hardware/user_tripod_positions_20261006_v2.json",
+      "expected_sha256": "a539dced58edec058e68e64c702999c4e0dafe210ed60b490a2c442f0d452a74",
+      "alias_registered": true,
+      "exists_at_capture": true
+    }
+  ],
+  "unresolved_direct_references": [],
+  "runtime_activated": false,
+  "portable_complete_run_verified": false,
+  "scope": "Only explicit profile options and resource_root. Immutable source JSON contents, pickle identities and native contracts are unchanged."
+}

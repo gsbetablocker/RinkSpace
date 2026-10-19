@@ -1,0 +1,52 @@
+{
+  "schema": "rinkspace.model-source-window-selection.v1",
+  "selected_before_full_localization": true,
+  "windows": [
+    {
+      "source_id": "jin",
+      "start_s": 183.84,
+      "end_s": 202.96,
+      "cuts": [],
+      "role": "development_regression",
+      "reason": "Complete existing shot_0012, visibly changing framing and multiple right-end painted rings; source-only views already used for development, never blind."
+    },
+    {
+      "source_id": "okada",
+      "start_s": 201.44,
+      "end_s": 214.36,
+      "cuts": [
+        205.0
+      ],
+      "role": "development_regression",
+      "reason": "Two complete existing shots_0011/0012 with actual camera cut at205 and changing view; previously seen source, never new blind."
+    },
+    {
+      "source_id": "ko",
+      "start_s": 74.54,
+      "end_s": 112.32,
+      "cuts": [
+        96.76
+      ],
+      "role": "new_source_inference_after_freeze",
+      "reason": "Two full shots selected by source-only observability and hard-cut review before localization; no KO pixels enter model or parameter tuning."
+    },
+    {
+      "source_id": "jin",
+      "start_s": 108.44,
+      "end_s": 118.62,
+      "cuts": [],
+      "role": "historical_failure_regression",
+      "reason": "Preserved historical509-frame window. New failure is retained, no promotion of oldA."
+    },
+    {
+      "source_id": "okada",
+      "start_s": 75.5,
+      "end_s": 89.28,
+      "cuts": [
+        75.52
+      ],
+      "role": "historical_failure_regression",
+      "reason": "Preserved historical689-frame window; source boundary75.52 kept explicitly; no oldA promotion."
+    }
+  ]
+}

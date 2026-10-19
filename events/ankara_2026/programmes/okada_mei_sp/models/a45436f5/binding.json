@@ -1,0 +1,776 @@
+{
+  "schema": "rinkspace.programme-body-model-parameter-subset.v1",
+  "status": "UNACCEPTED",
+  "accuracy_accepted": false,
+  "output": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\models\\a45436f5\\body_model_parameters_UNACCEPTED.npz",
+    "sha256": "7c2adad6a16cc86936cb9d84a298457d7759868adfa7879c00d3a4b332b1869c",
+    "bytes": 2728557
+  },
+  "original_fitted_body": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\full_a45436f5_current_review_20261011\\body\\actual_body_root_fit.npz",
+    "sha256": "09d8def47edf70f4596b0f09f1d98a0ae55c38ec89c564ef769a0be641a9cffb",
+    "bytes": 16792371
+  },
+  "original_body_report": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\full_a45436f5_current_review_20261011\\body\\report.json",
+    "sha256": "33e58b5e6a40e8aa049dd6ef9bdc0db0d7f5d08f4e373581caddf7ea256f1950",
+    "bytes": 18070
+  },
+  "original_source_observations": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\full_a45436f5_current_review_20261011\\body\\fullprogramme_body_source_input.npz",
+    "sha256": "fa06cdbdada0051a5489edc4d3ec86b55b8bcb39eb52fafed2d355eb3fe76803",
+    "bytes": 9661136
+  },
+  "camera": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_sameccbd_finite_station_SOC_retention_20261011_0725\\complete_physical_camera_model_UNACCEPTED_f876fe4daad81d3a.npz",
+    "sha256": "9f19e491f433c63ba43800a3f2cd4a2d991e4371dee82b96aa401a795c8a9a7b",
+    "bytes": 791126
+  },
+  "scene": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_sameccbd_finite_station_SOC_retention_20261011_0725\\accepted_states\\a45436f5f77f959644262ea6141f2cbcd8615578d32747a484905cfb89b65caf\\scene_UNACCEPTED.json",
+    "sha256": "74ffaa43e6e868690eeb1da26cad95c2063ba16d578859ac2087ccf27dd1a834",
+    "bytes": 1606770
+  },
+  "complete_state_identity": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_review86_sameccbd_finite_station_SOC_retention_20261011_0725\\accepted_states\\a45436f5f77f959644262ea6141f2cbcd8615578d32747a484905cfb89b65caf\\state_identity.json",
+    "sha256": "b83ce32f6e10073db5c6a9dde7781a44e006ffbf08b957166c13a8f78946dd0e",
+    "bytes": 1253
+  },
+  "complete_q_sha256": "a45436f5f77f959644262ea6141f2cbcd8615578d32747a484905cfb89b65caf",
+  "source_shots": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\source_shots.json",
+    "sha256": "5932fdd51cc33eaf3b40d5c2e8ec9cba758c23292bf70c6b9614936e6b6aad3b",
+    "bytes": 50634
+  },
+  "source_video_sha256": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891",
+  "source_time_base": "1/15360",
+  "source_pts_first": 229114112,
+  "source_pts_last_inclusive": 231705344,
+  "source_pts_end_exclusive": 231705600,
+  "native_presentations": 10123,
+  "canonical_camera_exposures": 8503,
+  "distinct_body_fit_times": 8497,
+  "shots": 9,
+  "source_presentation_elapsed_seconds": 168.7,
+  "body_fit_elapsed_seconds": 169.16666666667976,
+  "time_semantics": {
+    "native_pts": "Original video presentation PTS; retain repeated presentations",
+    "source_native_pts": "Original pixel observation PTS of each canonical body row",
+    "native_actual_row": "Native presentation to canonical camera/body exposure alias",
+    "fit_time_seconds": "Retained fit basis from verified official exposures and explicit presentation approximations; distinct from original presentation elapsed time",
+    "edge_time_origin": "Per-edge provenance of that retained fit basis",
+    "actual_speed_or_original_clock_derivative_accepted": false
+  },
+  "P_semantics": "Estimated SMPL-X native joint0 in fitted 3D body; conditional body geometry and calibration",
+  "G_semantics": "G=(P.x,P.y,0), world vertical projection of the estimated P; not a bone-pixel ray intersection with ice or blade contact",
+  "source_hip_pixels_and_local_pose_are_in_original_source_observations": true,
+  "scale": {
+    "metres_per_scene_unit": 0.3082592551981685,
+    "status": "declared_uniform_working_scale_not_measured_calibration",
+    "scale_source": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\full_a45436f5_current_review_20261011\\body\\uniform_scale_v2.json",
+      "sha256": "c20251d9adf5728414b1a3b1307eb74c60aba24eea846db141002bb3a1996730"
+    },
+    "coordinate_domain": "conditional_euclidean_rink"
+  },
+  "native_numeric_valid": 10123,
+  "canonical_inferred": 497,
+  "native_inferred": 581,
+  "inferred_native_intervals": [
+    {
+      "first_source_pts": 229114112,
+      "last_source_pts_inclusive": 229181952,
+      "native_presentations": 266,
+      "shot_index": 1
+    },
+    {
+      "first_source_pts": 229182976,
+      "last_source_pts_inclusive": 229184256,
+      "native_presentations": 6,
+      "shot_index": 1
+    },
+    {
+      "first_source_pts": 229184768,
+      "last_source_pts_inclusive": 229185024,
+      "native_presentations": 2,
+      "shot_index": 1
+    },
+    {
+      "first_source_pts": 229256192,
+      "last_source_pts_inclusive": 229257216,
+      "native_presentations": 5,
+      "shot_index": 1
+    },
+    {
+      "first_source_pts": 229572608,
+      "last_source_pts_inclusive": 229572608,
+      "native_presentations": 1,
+      "shot_index": 2
+    },
+    {
+      "first_source_pts": 229588224,
+      "last_source_pts_inclusive": 229588992,
+      "native_presentations": 4,
+      "shot_index": 2
+    },
+    {
+      "first_source_pts": 229751552,
+      "last_source_pts_inclusive": 229751808,
+      "native_presentations": 2,
+      "shot_index": 4
+    },
+    {
+      "first_source_pts": 229825280,
+      "last_source_pts_inclusive": 229825536,
+      "native_presentations": 2,
+      "shot_index": 4
+    },
+    {
+      "first_source_pts": 229964032,
+      "last_source_pts_inclusive": 229964544,
+      "native_presentations": 3,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230075136,
+      "last_source_pts_inclusive": 230075392,
+      "native_presentations": 2,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230080000,
+      "last_source_pts_inclusive": 230080000,
+      "native_presentations": 1,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230118400,
+      "last_source_pts_inclusive": 230119680,
+      "native_presentations": 6,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230123008,
+      "last_source_pts_inclusive": 230123008,
+      "native_presentations": 1,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230123776,
+      "last_source_pts_inclusive": 230123776,
+      "native_presentations": 1,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230134784,
+      "last_source_pts_inclusive": 230135808,
+      "native_presentations": 5,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230138112,
+      "last_source_pts_inclusive": 230138112,
+      "native_presentations": 1,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230143744,
+      "last_source_pts_inclusive": 230144256,
+      "native_presentations": 3,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230151936,
+      "last_source_pts_inclusive": 230153216,
+      "native_presentations": 6,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230155264,
+      "last_source_pts_inclusive": 230155264,
+      "native_presentations": 1,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230161152,
+      "last_source_pts_inclusive": 230162176,
+      "native_presentations": 5,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230170880,
+      "last_source_pts_inclusive": 230171904,
+      "native_presentations": 5,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230173952,
+      "last_source_pts_inclusive": 230174208,
+      "native_presentations": 2,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230180864,
+      "last_source_pts_inclusive": 230181888,
+      "native_presentations": 5,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230184448,
+      "last_source_pts_inclusive": 230184448,
+      "native_presentations": 1,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230191360,
+      "last_source_pts_inclusive": 230192128,
+      "native_presentations": 4,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230194944,
+      "last_source_pts_inclusive": 230195200,
+      "native_presentations": 2,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230200832,
+      "last_source_pts_inclusive": 230201088,
+      "native_presentations": 2,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230202368,
+      "last_source_pts_inclusive": 230203648,
+      "native_presentations": 6,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230206208,
+      "last_source_pts_inclusive": 230206464,
+      "native_presentations": 2,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230213888,
+      "last_source_pts_inclusive": 230215168,
+      "native_presentations": 6,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230226176,
+      "last_source_pts_inclusive": 230227456,
+      "native_presentations": 6,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230243072,
+      "last_source_pts_inclusive": 230243328,
+      "native_presentations": 2,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230309888,
+      "last_source_pts_inclusive": 230309888,
+      "native_presentations": 1,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230310400,
+      "last_source_pts_inclusive": 230310400,
+      "native_presentations": 1,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230365184,
+      "last_source_pts_inclusive": 230365184,
+      "native_presentations": 1,
+      "shot_index": 5
+    },
+    {
+      "first_source_pts": 230554880,
+      "last_source_pts_inclusive": 230561536,
+      "native_presentations": 27,
+      "shot_index": 7
+    },
+    {
+      "first_source_pts": 230626816,
+      "last_source_pts_inclusive": 230626816,
+      "native_presentations": 1,
+      "shot_index": 7
+    },
+    {
+      "first_source_pts": 230632960,
+      "last_source_pts_inclusive": 230632960,
+      "native_presentations": 1,
+      "shot_index": 7
+    },
+    {
+      "first_source_pts": 230679296,
+      "last_source_pts_inclusive": 230679552,
+      "native_presentations": 2,
+      "shot_index": 7
+    },
+    {
+      "first_source_pts": 230749696,
+      "last_source_pts_inclusive": 230749696,
+      "native_presentations": 1,
+      "shot_index": 7
+    },
+    {
+      "first_source_pts": 230750464,
+      "last_source_pts_inclusive": 230750464,
+      "native_presentations": 1,
+      "shot_index": 7
+    },
+    {
+      "first_source_pts": 230958592,
+      "last_source_pts_inclusive": 230959104,
+      "native_presentations": 3,
+      "shot_index": 8
+    },
+    {
+      "first_source_pts": 231009024,
+      "last_source_pts_inclusive": 231009792,
+      "native_presentations": 4,
+      "shot_index": 8
+    },
+    {
+      "first_source_pts": 231198208,
+      "last_source_pts_inclusive": 231198976,
+      "native_presentations": 4,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231216896,
+      "last_source_pts_inclusive": 231217152,
+      "native_presentations": 2,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231223552,
+      "last_source_pts_inclusive": 231223552,
+      "native_presentations": 1,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231268096,
+      "last_source_pts_inclusive": 231268096,
+      "native_presentations": 1,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231269888,
+      "last_source_pts_inclusive": 231269888,
+      "native_presentations": 1,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231272960,
+      "last_source_pts_inclusive": 231272960,
+      "native_presentations": 1,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231282944,
+      "last_source_pts_inclusive": 231283200,
+      "native_presentations": 2,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231285760,
+      "last_source_pts_inclusive": 231285760,
+      "native_presentations": 1,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231289856,
+      "last_source_pts_inclusive": 231289856,
+      "native_presentations": 1,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231296000,
+      "last_source_pts_inclusive": 231320064,
+      "native_presentations": 95,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231321856,
+      "last_source_pts_inclusive": 231322112,
+      "native_presentations": 2,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231329536,
+      "last_source_pts_inclusive": 231329536,
+      "native_presentations": 1,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231332096,
+      "last_source_pts_inclusive": 231332352,
+      "native_presentations": 2,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231334912,
+      "last_source_pts_inclusive": 231334912,
+      "native_presentations": 1,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231339008,
+      "last_source_pts_inclusive": 231339520,
+      "native_presentations": 3,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231362560,
+      "last_source_pts_inclusive": 231362560,
+      "native_presentations": 1,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231410176,
+      "last_source_pts_inclusive": 231411200,
+      "native_presentations": 5,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231413248,
+      "last_source_pts_inclusive": 231413248,
+      "native_presentations": 1,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231458816,
+      "last_source_pts_inclusive": 231459840,
+      "native_presentations": 5,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231463424,
+      "last_source_pts_inclusive": 231464448,
+      "native_presentations": 5,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231468800,
+      "last_source_pts_inclusive": 231469568,
+      "native_presentations": 4,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231470080,
+      "last_source_pts_inclusive": 231470080,
+      "native_presentations": 1,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231475712,
+      "last_source_pts_inclusive": 231475712,
+      "native_presentations": 1,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231479552,
+      "last_source_pts_inclusive": 231479808,
+      "native_presentations": 2,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231480320,
+      "last_source_pts_inclusive": 231480320,
+      "native_presentations": 1,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231485696,
+      "last_source_pts_inclusive": 231485952,
+      "native_presentations": 2,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231500800,
+      "last_source_pts_inclusive": 231500800,
+      "native_presentations": 1,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231504128,
+      "last_source_pts_inclusive": 231504384,
+      "native_presentations": 2,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231516928,
+      "last_source_pts_inclusive": 231517184,
+      "native_presentations": 2,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231590656,
+      "last_source_pts_inclusive": 231590656,
+      "native_presentations": 1,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231601664,
+      "last_source_pts_inclusive": 231601920,
+      "native_presentations": 2,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231604992,
+      "last_source_pts_inclusive": 231604992,
+      "native_presentations": 1,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231611392,
+      "last_source_pts_inclusive": 231611392,
+      "native_presentations": 1,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231614720,
+      "last_source_pts_inclusive": 231614976,
+      "native_presentations": 2,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231618560,
+      "last_source_pts_inclusive": 231618560,
+      "native_presentations": 1,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231623424,
+      "last_source_pts_inclusive": 231623424,
+      "native_presentations": 1,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231625472,
+      "last_source_pts_inclusive": 231626240,
+      "native_presentations": 4,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231633152,
+      "last_source_pts_inclusive": 231633664,
+      "native_presentations": 3,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231645952,
+      "last_source_pts_inclusive": 231646208,
+      "native_presentations": 2,
+      "shot_index": 9
+    },
+    {
+      "first_source_pts": 231659776,
+      "last_source_pts_inclusive": 231660288,
+      "native_presentations": 3,
+      "shot_index": 9
+    }
+  ],
+  "numeric_validity_is_not_world_accuracy": true,
+  "blade_contact": {
+    "left": "not_estimated",
+    "right": "not_estimated",
+    "airborne_vs_contact_state": "unknown",
+    "missing_or_inferred_frames_are_not_contact": true
+  },
+  "original_NPY_member_bytes_retained": true,
+  "members": [
+    {
+      "name": "actual_pts",
+      "bytes": 68152,
+      "sha256": "f25123bb2af670353889408f6c7509f0e488c3512d2c0d67916339d725ea7db7"
+    },
+    {
+      "name": "source_native_pts",
+      "bytes": 68152,
+      "sha256": "f25123bb2af670353889408f6c7509f0e488c3512d2c0d67916339d725ea7db7"
+    },
+    {
+      "name": "P_world_m",
+      "bytes": 204200,
+      "sha256": "dd8bd9d5354dab87aa4c1a537476d8f50cb9322bbd04de12ea2678b38f1d4276"
+    },
+    {
+      "name": "Q_world",
+      "bytes": 612344,
+      "sha256": "397b702c4dfe457c0e04709501276a96dbb4992ff3b35f581c6df915f667708d"
+    },
+    {
+      "name": "camera25",
+      "bytes": 1700728,
+      "sha256": "cb0c0c5820c727690b915f48b7eaf4564fd57b603f69f29a8afc21325a5e6587"
+    },
+    {
+      "name": "valid",
+      "bytes": 8631,
+      "sha256": "787ee33b9128d891f776e9e5219f857e07a79ea7f6e4a3d83f8b4ea65486ddd9"
+    },
+    {
+      "name": "inferred",
+      "bytes": 8631,
+      "sha256": "069a2c1c939addb052c9d8e1106b8b52923d3f619f3df741f85d8adf569ab58d"
+    },
+    {
+      "name": "connect_from_previous",
+      "bytes": 8631,
+      "sha256": "469a4144f77c7768806a3a2c202277b41245f1aeb178ddb3bacca8134fc6d299"
+    },
+    {
+      "name": "G_world_m",
+      "bytes": 204200,
+      "sha256": "a177637f8f36b1fa3d86c00319990f46f4c6857539ad22e4909bc434950ea7da"
+    },
+    {
+      "name": "G_native_uv",
+      "bytes": 136176,
+      "sha256": "3e363926d10ed9fc4aceff140d80570166a78a592ae38a643d34575edb4555cf"
+    },
+    {
+      "name": "body_scale",
+      "bytes": 136,
+      "sha256": "db6c3599d8cb4e03fd1438bb3277f8e37009ff1ae7e4ae8f42520b074414f370"
+    },
+    {
+      "name": "metres_per_scene_unit",
+      "bytes": 136,
+      "sha256": "a611bc16fea312c02c0e2ad29cc289d12c6efaa875bef43a263cd56c8334d342"
+    },
+    {
+      "name": "native_pts",
+      "bytes": 81112,
+      "sha256": "e91d0bc7482f2b917fd99a6b1ab37583eeb3c4e4abeac8aa3c4a5686fc92b513"
+    },
+    {
+      "name": "native_exposure_representative_pts",
+      "bytes": 81112,
+      "sha256": "5d1963001903914790d39a4a2b7636653f8985695ba3cb6c3d416c2a08270284"
+    },
+    {
+      "name": "native_actual_row",
+      "bytes": 81112,
+      "sha256": "950228365ef407107909006ca493d522679947bdd9e93146d24a2ce2feec264b"
+    },
+    {
+      "name": "native_P_world_m",
+      "bytes": 243080,
+      "sha256": "a7fd519ebb36171e712cd6be577befc737f92d9fe557e0573cb61137785d3ec6"
+    },
+    {
+      "name": "native_Q_world",
+      "bytes": 728984,
+      "sha256": "10dfefd5d02314eed5b8da8e686d27e75901047f893bb5701749aaa265dede1c"
+    },
+    {
+      "name": "native_G_world_m",
+      "bytes": 243080,
+      "sha256": "e623d277e09919213b5d4a918586b8340c9f1d343b75ba1c588406514d372363"
+    },
+    {
+      "name": "native_G_native_uv",
+      "bytes": 162096,
+      "sha256": "dfc54669483467502ada35c733613e67dba218d2f2cb2f7ea34244187ca37bff"
+    },
+    {
+      "name": "native_valid",
+      "bytes": 10251,
+      "sha256": "a5aff1c8d854d39001d10bb2895a04e50e5d04b13156fdf205e1e08d11fa3b1c"
+    },
+    {
+      "name": "native_inferred",
+      "bytes": 10251,
+      "sha256": "f8f71622c82c4d99149e7d1ccf629f611643b6ab95ec88d6ba02e0f9ee28160c"
+    },
+    {
+      "name": "shot_index",
+      "bytes": 17134,
+      "sha256": "70c729b26783465006a227daac0a41fa3e61a27ec826dc5c78bb5bbcf9f2cdb9"
+    },
+    {
+      "name": "fit_time_seconds",
+      "bytes": 68152,
+      "sha256": "4c0368d9aaf67e4ce101617a872d74a88eca019a7d995473bcf5e00f668e4027"
+    },
+    {
+      "name": "edge_dt_seconds",
+      "bytes": 68144,
+      "sha256": "4f5093f519fa2c9fdb5dd77d5d5f83a74d5acd3d5d1ec23c463cce662e6145ec"
+    },
+    {
+      "name": "edge_time_origin",
+      "bytes": 5441408,
+      "sha256": "12101f09ff3d902cbcdeaec47eb63d4c9d878d3a6aa5893e3f7a7e8d533810a8"
+    },
+    {
+      "name": "body_root_position_source_mode",
+      "bytes": 748392,
+      "sha256": "1fa09f0e41626e3f8c45629759f4a3c917d34396bf89ec8bb9c001f7118649ec"
+    },
+    {
+      "name": "local_pose_origin",
+      "bytes": 3265280,
+      "sha256": "56c0009f41910bfc75595e53635d9ed96d9f565a133e614b29765bd21b172584"
+    },
+    {
+      "name": "source_hip_status",
+      "bytes": 2448992,
+      "sha256": "518260004c0150c4fa0816537efe3b0dd107ba79542567bd019d7b986b1eee5d"
+    },
+    {
+      "name": "source_hip_proxy_valid",
+      "bytes": 8631,
+      "sha256": "61969991256b5febfd186bec016cc64ca8975768c5183a3ee3e4354974c14eb9"
+    },
+    {
+      "name": "body_local_pose_inferred",
+      "bytes": 8631,
+      "sha256": "921d24b7ad54281b75ea9dd727411f02f81cebbcebf9580b6579235e12125224"
+    },
+    {
+      "name": "body_geometry_source_fit_enabled",
+      "bytes": 8631,
+      "sha256": "0457de6f1727f83942cc280b8b55a10ee30bc88c5c99dc242022c6c0a39cdf2d"
+    },
+    {
+      "name": "source_original_truncated",
+      "bytes": 8631,
+      "sha256": "d628c85d04750a626c2c7b9804ded4a25c08b021c122a4a8051988b353d53d7d"
+    },
+    {
+      "name": "unique_world_G_known",
+      "bytes": 8631,
+      "sha256": "0cd5bc50bf6d0d04841703f9ac7d2468598e4a7fefe376afafeadf4e83208e04"
+    },
+    {
+      "name": "unique_world_G_m",
+      "bytes": 204200,
+      "sha256": "5ecc70809a79754ad15acd0798cf321aabe6f06819c98f2bb1186b6242d75b40"
+    }
+  ],
+  "refit_filter_pose_inference_source_decode_or_video_generation_run": false,
+  "code": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\export_parameters.py",
+    "sha256": "a34bf834099b992102567a374fe5db2196390ba3801b81c302ef434d917ed591",
+    "bytes": 11473
+  },
+  "final_camera_parameters": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\models\\a45436f5\\complete_physical_camera_model_UNACCEPTED_f876fe4daad81d3a.npz",
+    "sha256": "9f19e491f433c63ba43800a3f2cd4a2d991e4371dee82b96aa401a795c8a9a7b",
+    "bytes": 791126
+  },
+  "final_scene": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\models\\a45436f5\\scene_UNACCEPTED.json",
+    "sha256": "74ffaa43e6e868690eeb1da26cad95c2063ba16d578859ac2087ccf27dd1a834",
+    "bytes": 1606770
+  }
+}

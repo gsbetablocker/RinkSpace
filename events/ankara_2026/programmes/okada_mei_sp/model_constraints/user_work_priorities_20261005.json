@@ -1,0 +1,47 @@
+{
+  "schema": "rinkspace.programme.user-work-priorities.v1",
+  "event_id": "ankara_2026",
+  "programme_id": "okada_mei_sp",
+  "authority": "Direct user instructions in the main task, 2026-10-05",
+  "opening_upper_body_segment": {
+    "user_statement": "开头选手只露出上半身那段时间基本下半身就没有动",
+    "work_directive": "停止开头人体和骨盆的继续调参、专项修复与专项检查",
+    "priority": "deferred_by_user"
+  },
+  "active_work": {
+    "priority": "此前明确指出的八处冰面标志物和广告问题；旋转完整镜头的网格漂移",
+    "spin_user_source_time": "04:09:43.350",
+    "spin_user_native_pts": 230144256,
+    "latest_user_feedback": "如果是1像素左右的抖动你不能直接平滑解决掉吗？如果这种再去纠结拟合已经没有工程上的价值了。还不如去修误差更明显的地方",
+    "acceptance": "按最新工程取舍允许约1像素显示抖动轻量平滑；不再为微抖动补观测或磨求解。优先修复明显冰面标记和广告贴合偏差，保持同一共同模型、实际曝光与完整镜头；显示平滑与原始求解状态分开记录。",
+    "previous_acceptance": "此前指出的冰面标记及广告对齐，旋转期间网格与真实原片相对运动稳定；完整镜头成立，不以平滑或小残差代替"
+  },
+  "scope": "This programme only; not a general project rule or an added approval requirement",
+  "video_delivery": {
+    "directive": "只在要求的贴合和旋转网格抖动解决后生成交付视频，不再生成中途诊断视频",
+    "existing_rejected_intermediate_video": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/spin_Ad24_v3_e25f_grid_trace_improvement_20261005/grid_and_trajectory_WORKING.mp4",
+    "authority": "Direct user instruction in main task, 2026-10-05",
+    "user_statement": "以后没有做好就不要生成中途视频",
+    "existing_video_status": "用户已指出贴合和抖动缺陷，保留历史，不作完成或验收证据"
+  },
+  "solver_optimization_scope": {
+    "authority": "direct_user_latest",
+    "user_quote": "[private conversation text omitted]",
+    "current_attempt": "adaptive whole-source step reuse plus one RAM lagged Jacobian, actual existing input continuation",
+    "after_attempt": "Return to static ice markings, Ad4/Ad24 advertising alignment and spin grid jitter. No further expansion of solver optimization unless explicitly requested or actual execution fails.",
+    "reusable_interface": "D:/OneDrive/codex_projs/RinkSpace/START_FAST_SOLVER.ps1",
+    "default_config": "D:/OneDrive/codex_projs/RinkSpace/configs/solver_runtime/okada_named66.json"
+  },
+  "small_display_jitter_policy": {
+    "authority": "direct_user_latest",
+    "user_quote": "[private conversation text omitted]",
+    "approximate_native_pixel_scale": 1.0,
+    "display_smoothing_authorized": true,
+    "additional_micro_jitter_fitting_deprioritized": true,
+    "primary_remaining_work": "明显B1/Lane2冰面错位与Ad4广告边界偏差；F3模糊代理不能冒充精确圈边观测",
+    "raw_model_and_solver_state_preserved": true,
+    "distinct_actual_exposures_share_native_alias_display_pose": true,
+    "reset_at_camera_cuts": true,
+    "no_new_intermediate_video_authorized": true
+  }
+}

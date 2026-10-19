@@ -1,0 +1,191 @@
+{
+  "schema": "rinkspace.reusable-solver-inputs.v1",
+  "resource_root": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003",
+  "driver": "named66",
+  "source_options": {
+    "--world-init": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/user_corrected_programme_candidate/latest9a8c_world66_initialization_ONLY.json",
+    "--camera-seed": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_global_geometry_boardtracks_midtime_absolute_20261007\\accepted_states\\696fd93d920fe5ebd3590d707ed03196587e779a48f661fd9124df6c31b50351\\complete_state_UNACCEPTED.npz",
+    "--additional-ice-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\observations\\vision_training\\continuous_review\\cut6_clear_source_constraints\\complete_source_clear_anchor_append_20261007\\ice_clear_anchors_lane23_trace_and_goal_crease_v2_20261007.json",
+    "--additional-board-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\observations\\vision_training\\continuous_review\\Ad4_17_18_19_source_absolute_20261007\\board_parent_plus_Ad4_17_19_actual_RGB_multicut_v1.json",
+    "--additional-board-material-point-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\short_board_global_source_20261007\\independent_midtime_source\\material_parent_plus_short_board_independent_midtime_FIT_20261007.json",
+    "--additional-board-circle-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\external_expert_20261007\\short_board_global_source_20261007\\independent_midtime_source\\circle_parent_plus_short_board_independent_midtime_FIT_20261007.json",
+    "--original-source-role-retirement-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\ads_actual_identity_correction_20261005\\Ad7_original_print_corner_role_correction_CANDIDATE_v1.json",
+    "--independent-board-pattern-placement-source": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/model_constraints/user_advertisement_pairs_20261005.json",
+    "--persistent-ice-long-baseline-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\spin_source_long_baseline_20261005\\spin_micro_actual_original_anchor_v3_20261005\\spin_reviewed_ice_long_baseline_FIT_HELD_v3_micro_actual.json",
+    "--serial-source": true,
+    "--serial-current-patterns": false,
+    "--geometry-fd-workers": "8",
+    "--normal-workers": "8",
+    "--reuse-source-jacobian": true,
+    "--residual-source-workers": "6",
+    "--adaptive-source-backtracking": true,
+    "--residual-native-threads": "3",
+    "--static-motion-source-role-retirement-source": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/spin_source_long_baseline_20261005/actual50_jitter_source_diagnostic_20261005/spin_micro_broadcast_overlay_original_motion_role_retirement_SOURCE_ONLY_v1.json",
+    "--camera-mount-constraint-source": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/camera_hardware_20261001/user_camera_mount_and_height_20261006_v4.json",
+    "--camera-pivot-exterior-constraint-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\camera_hardware_20261001\\user_tripod_positions_20261006_v2.json",
+    "--original-ice-pixel-correction-source": "D:/CodexData/RinkSpace_Data/events/ankara_2026/observations/vision_training/continuous_review/F2_inner_native_source_correction_CPU_20261007/F2_inner_FIT_5632_first2_source_pixel_correction.json",
+    "--roll-prior-sigma-degrees": "0.5",
+    "--additional-native-board-track-source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\irregular_six_ads_source_revisit_20261007\\native_board_tracks_plus_six_irregular_ads_source_FIT_HELD_v1.json"
+  },
+  "complete_parent_state_identity": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_global_geometry_boardtracks_midtime_absolute_20261007\\accepted_states\\696fd93d920fe5ebd3590d707ed03196587e779a48f661fd9124df6c31b50351\\complete_state_UNACCEPTED.npz",
+    "container_field": "identity_json",
+    "q_sha256": "696fd93d920fe5ebd3590d707ed03196587e779a48f661fd9124df6c31b50351"
+  },
+  "complete_parent_run": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_global_geometry_boardtracks_midtime_absolute_20261007",
+  "checkpoint_role": "Complete current legal696f state used only as numerical initialization; every34306 parent parameter,18 frozen profiles and43 auxiliary fields remain traceable. No physical reinitialization on legal state. New frozen target starts fresh complete J. Accuracy unaccepted.",
+  "checkpoint_at_registration": {
+    "q_sha256": "696fd93d920fe5ebd3590d707ed03196587e779a48f661fd9124df6c31b50351",
+    "parameter_count": 34306,
+    "profile_count": 18,
+    "aux_count": 43,
+    "origin": "Legal stopped complete current state; next common frozen source target fresh J",
+    "damping": 0.0005990249988199175,
+    "next_line_search_fraction": 1.0
+  },
+  "checkpoint_sha256_at_registration": "1aa44c0be7ae0077043b53e45b91941c58f8b5902f3305d0142af8c727b506d8",
+  "additional_ice_source_packet_sha256": "f633c8b96dd331151d3f988f23cff764bbe51932c7ef7b9ec7e80b117e59a35c",
+  "board_edge_source_packet_sha256": "ba51916525ebeea5b52eded653bf2da53ba92d49e7ea095cee28e290b066ff47",
+  "solver_source_manifest_sha256": "4b0f81d7c5c431b135eb5d6efe20055b031ac14853c86cbba2be34c67313e5fd",
+  "source_accuracy_accepted": false,
+  "source_revision": "Retain original all-source ice/board/circle/material, every physical camera domain and current0.5-degree engineering roll prior. Frozen six-ad track target keeps all44 parent groups515FIT+542HELD byte-exact, adds393 realFIT points786scalars and203 source-selected developmentHELD points through3 confirmed same-print templates. Frozen Ad4/17/19 target keeps all32 parent rows and140FITscalars byte-exact, adds31FIT points62scalars and11HELD points. No new parameter; complete target34306 parameters/4651164 scalars. Old source rows, sigma, roles, original frame bytes and weights retained. DevelopmentHELD is not untouched validation.",
+  "planned_parameter_count": 34306,
+  "planned_source_rows": 4651164,
+  "execution_revision": "Reuse existing fastest complete-source interface: FD8/residual6/native3/patterns4/Gram8, adaptive same-run RAM J reuse, original nonlinear print/mount/pivot guards and feasible shared LM step. Start new source target with fresh complete J; source derivatives, profiles, real residuals, masks, sigmas and true-cost acceptance preserved. Run seed alternatives serially. No arbitrary accepted-step/time cap; stop only numerical convergence, actual source QA failure/stagnation, or explicit user interruption. Record preparation, first full J+normal and real accepted wall intervals separately.",
+  "performance_acceptance": "Record actual cold preparation, first complete J+normal and accepted wall intervals on this new target; numerical cost is not visual alignment. Largest true native source errors drive correction.",
+  "current_task": "Finish fully aligned continuous nine-shot Okada overlay video from all actual native source and explicit latest user manual lane evidence.",
+  "resume_requires_user_instruction": false,
+  "board_material_source_packet_sha256": "7b92f0cf7ddf7ef09a1b1672f13b8cf19441ba3dfec77da5ac8acf0cf316f602",
+  "board_circle_source_packet_sha256": "eef5718b6bb5671b974a5f2e2ee79e4e5fae09c219abbc4e074322f6e09538a9",
+  "additional_native_board_track_source_packet_sha256": "f8fe66db3e0cce5693e2df6b0e8a21a52716c296fbdf6eae360bba26ac8034ef",
+  "not_started": false,
+  "must_compare_with_complete_current_candidate": "696fd93d920fe5ebd3590d707ed03196587e779a48f661fd9124df6c31b50351",
+  "comparison_alternative_configuration": "D:\\OneDrive\\codex_projs\\RinkSpace\\configs\\solver_runtime\\okada_alternative_4075_legal_shared_joint_20261007.json",
+  "source_freeze_status": "FROZEN_PACKETS_AND_SUPPORT_J_VERIFIED_MAIN_AGENT_AUTHORIZED_SERIAL_RUN",
+  "frozen_target_append_verification": {
+    "six_ad_tracks": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\irregular_six_ads_source_revisit_20261007\\native_board_tracks_plus_six_irregular_ads_source_FIT_HELD_v1.json",
+      "sha256": "f8fe66db3e0cce5693e2df6b0e8a21a52716c296fbdf6eae360bba26ac8034ef",
+      "parent_groups": 44,
+      "parent_FIT_points": 515,
+      "parent_HELD_points": 542,
+      "new_FIT_points": 393,
+      "new_FIT_scalars": 786,
+      "new_development_HELD_points": 203,
+      "source_FIT_scalar_rows": 1816,
+      "new_parameters": 0,
+      "verification_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\irregular_six_ads_source_revisit_20261007\\actual_shared_print_complete_q_FD_verification_696f.json",
+      "verification_sha256": "809435c362f82994ca9d48f80e8b7752276dcd22b6ff31d5578571eb5dfdc5fa",
+      "full_current_q_directional_FD_max_error": 1.024e-08
+    },
+    "Ad4_17_19_edges": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\observations\\vision_training\\continuous_review\\Ad4_17_18_19_source_absolute_20261007\\board_parent_plus_Ad4_17_19_actual_RGB_multicut_v1.json",
+      "sha256": "ba51916525ebeea5b52eded653bf2da53ba92d49e7ea095cee28e290b066ff47",
+      "parent_rows": 32,
+      "parent_FIT_scalars": 140,
+      "new_FIT_points": 31,
+      "new_FIT_scalars": 62,
+      "new_HELD_points": 11,
+      "source_FIT_scalar_rows": 202,
+      "new_parameters": 0,
+      "verification_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\observations\\vision_training\\continuous_review\\Ad4_17_18_19_source_absolute_20261007\\Ad4_17_19_actual_q_support_nominal_J_check_v2.json",
+      "verification_sha256": "0f720c4ee2ad7f81db9099cc6fed05df04c0b57b2a5e99aa78e8c74a221fe3e1",
+      "new_source_full_current_q_directional_FD_max_error": 5.99e-09,
+      "inherited_partial_bottom_row_directional_FD_limitation": "Historical1e-6 central FD crossed nominal normal-support boundary; existing factor now differentiates raw geometry then applies exact nominal SourceNormalIntervals derivative. Pixel residuals and every source/scale/mask unchanged.",
+      "support_J_repair_verification": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\observations\\vision_training\\continuous_review\\Ad4_17_18_19_source_absolute_20261007\\Ad4_17_19_actual_q_support_nominal_J_check_v2.json",
+        "sha256": "0f720c4ee2ad7f81db9099cc6fed05df04c0b57b2a5e99aa78e8c74a221fe3e1",
+        "factor_sha256": "1ec2fe6302e9e02559566ce023c5a2ebcb719a16b5428db032cb05b0d613791e",
+        "current_complete_q": "696fd93d920fe5ebd3590d707ed03196587e779a48f661fd9124df6c31b50351",
+        "full202_FIT_scalar_FD_errors_by_h": {
+          "1e-4": 1.105127e-08,
+          "1e-5": 8.258282e-08,
+          "1e-6": 2.510258e-06
+        },
+        "original_tolerance": 0.002,
+        "original_r_scales_masks_UV_sigma_roles_frame_bytes_unchanged": true
+      },
+      "original_append_certificate_before_support_J_repair": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\observations\\vision_training\\continuous_review\\Ad4_17_18_19_source_absolute_20261007\\Ad4_17_19_actual_q_admission_check_v1.json",
+        "sha256": "28bd47c12fa184e1d84d97e6dca0cbc617c76b1a660030ac9d916bfce5e506cb"
+      }
+    }
+  },
+  "current_actual_run": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_shared_prints_current_696f_20261007",
+  "execution_status": "STOPPED_BY_ACTUAL_COMMON_SOURCE_QA_UNACCEPTED",
+  "local_support_gate_repair": {
+    "native_board_factor_sha256": "3c94b20523bd03eac96313a92d9e500938f04b918e807e054524ffc049d1f7d2",
+    "driver_sha256": "4758023c0cd4a767b916eabd9fc505bac06be8ccd742cda6576db2cd939fe6c1",
+    "initial_h": 1e-06,
+    "step_selection": "shrink only when actual plus/minus SourceNormalIntervals branch differs from nominal",
+    "original_L2_direction_and_tolerance_preserved": true,
+    "source_support_objective_nominal_J_unchanged": true,
+    "original_failed_run_preserved": true,
+    "actual_696f_startup_certificate": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_shared_prints_current_696f_local_branch_gate_20261007\\actual_additional_native_board_source_check.json",
+      "sha256": "a335b23d5a497de44cdf1674f873f5b3563a0ebcd82dd9c5065befac44a2f5dd",
+      "initial_h": 1e-06,
+      "final_h": 1e-07,
+      "same_support_branch_step_found": true,
+      "actual_error": 1.8773683450490353e-05,
+      "unchanged_allowed": 0.009152954043476713,
+      "passed": true
+    }
+  },
+  "previous_failed_output": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/okada_shared_prints_current_696f_20261007",
+  "next_output": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/okada_shared_prints_current_696f_local_branch_gate_20261007",
+  "actual_output": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_shared_prints_current_696f_local_branch_gate_20261007",
+  "actual_solver_session_id": 49004,
+  "safe_stop_result": {
+    "accepted_iterations": 19,
+    "accuracy_accepted": false,
+    "checkpoint": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_shared_prints_current_696f_local_branch_gate_20261007\\solver\\latest_accepted_state.npz",
+    "damping": 0.00038698352639999985,
+    "goal_paused": false,
+    "seconds": 1308.9734199000013,
+    "source_sigma_roles_and_geometry_owned_by_caller": true,
+    "status": "stopped_by_control",
+    "stop_reason": {
+      "control": {
+        "accuracy_accepted": false,
+        "actual_new_source_metrics": [
+          {
+            "id": "actual_multicut_native230469376_Ad4_left_vertical_source",
+            "max_outside_source_support_px": 11.45608043674627,
+            "split": "fit"
+          },
+          {
+            "id": "actual_multicut_native230474752_Ad4_left_vertical_source",
+            "max_outside_source_support_px": 53.8064941469556,
+            "split": "holdout"
+          },
+          {
+            "id": "source_review_goal_crease_left_230955776_20261007",
+            "mean_native_px": 13.1954602463378,
+            "split": "fit"
+          },
+          {
+            "id": "source_review_goal_crease_left_230967552_20261007",
+            "mean_native_px": 18.540766436606646,
+            "split": "fit"
+          },
+          {
+            "id": "source_review_goal_crease_left_230979840_20261007",
+            "mean_native_px": 22.339729944521533,
+            "split": "holdout"
+          }
+        ],
+        "actual_source_evidence_at_request_q": "06205a94a7a713489a024e90aa81f0777195d40b96a2280b895c3cf426956a6e",
+        "original_low_ad4_HELD_native229961216_p95_at7b87": 27.040613541995324,
+        "original_low_ad4_HELD_native229961216_p95_baseline696f": 16.115837554856515,
+        "reason": "Actual frozen new-source HELD remains strongly displaced while original low-camera Ad4 HELD and goal-crease source errors regress; small latest FIT improvement does not establish common alignment. Stop by actual source QA, not iteration count or wall-time cap.",
+        "source_weights_roles_support_and_physical_guards_unchanged": true,
+        "stop_branch": true
+      },
+      "goal_paused": false,
+      "origin": "control.json",
+      "reason": "Actual frozen new-source HELD remains strongly displaced while original low-camera Ad4 HELD and goal-crease source errors regress; small latest FIT improvement does not establish common alignment. Stop by actual source QA, not iteration count or wall-time cap."
+    }
+  },
+  "restart_only_after_actual_source_or_model_conflict_explanation": true
+}

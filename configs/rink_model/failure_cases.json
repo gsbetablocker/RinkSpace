@@ -1,0 +1,149 @@
+{
+  "schema_version": "rinkspace.failure-case-registry.v1",
+  "created_at_utc": "2026-09-21T04:04:25.647244+00:00",
+  "cases": [
+    {
+      "case_id": "men_fs_15557_visible_ring_without_localization",
+      "status": "reproduction_case_registered_repair_in_progress_not_validated",
+      "source_id": "2U7RhoKchXA",
+      "official_url": "https://www.youtube.com/watch?v=2U7RhoKchXA",
+      "source_role": "men_free_skating_group_warmup_not_individual_programme",
+      "source_format_id": "399",
+      "source_time_base": "1/15360",
+      "whole_source_sha256": null,
+      "source_identity_rule": "original partial byte ranges and recorded per-range SHA; do not substitute low-resolution full-track SHA",
+      "reproduction_window": {
+        "start_s": 15555,
+        "end_exclusive_s": 15565,
+        "first_pts": 238924800,
+        "last_pts": 239078144,
+        "end_exclusive_pts": 239078400,
+        "step_pts": 256,
+        "frame_rate": 60,
+        "frame_count": 600,
+        "source_clock": {
+          "path": "outputs/event_reuse_v11/failures/men15557/baseline_source_clock.json",
+          "sha256": "86f01d4dafca6465ef83f73b3955f5050af342dd05a169dd9a267e89c2935c34"
+        },
+        "all_failed_frames_in_denominator": true,
+        "15555_is_artificial_boundary_not_camera_cut": true
+      },
+      "focal_source_frame": {
+        "source_time_s": 15557,
+        "pts": 238955520,
+        "time_base": "1/15360",
+        "native_image": {
+          "path": "outputs/event_reuse_v11/failures/men15557/source_15557_native.png",
+          "sha256": "a3f5f4bc29c05f5b90242da3a455edd9ca3c80655d0749fc808d89c9be146f64"
+        },
+        "source_image_size": [
+          1920,
+          1080
+        ],
+        "original_status": "unavailable",
+        "original_visible_grid_pixels": 0
+      },
+      "user_report_reference": {
+        "image": {
+          "path": "outputs/event_reuse_v11/failures/men15557/user_report_reference.jpg",
+          "sha256": "68e908f3bad20465066435d9393e0a8ae289e0a7746dd7914b4cca4815797cf3"
+        },
+        "role": "user manual highlight identifies the reported failure only",
+        "is_program_detection": false,
+        "allowed_as_detector_input": false,
+        "allowed_as_geometry_measurement": false
+      },
+      "original_failed_run": {
+        "path": "outputs/fixed_camera_v11/evidence_video/men_fs_final/localization.json",
+        "sha256": "8ce6aeb62f61fda6b61c4e51216ac11a91819967e7dfd09ca9aac694629a4b29"
+      },
+      "original_image_evidence": {
+        "path": "outputs/fixed_camera_v11/evidence_video/men_fs_final/image_evidence.npz",
+        "sha256": "e67bb5b1e23c77fa2ca060c858b76239869e62da5c63460e1bb2e1c5e4961b96"
+      },
+      "original_rendered_video": {
+        "path": "outputs/fixed_camera_v11/evidence_video/men_fs_final/comparison.mp4",
+        "sha256": "2346e67ca2b55514a92b5b294ab7e88373d502cf346e70112943878f2c863d10"
+      },
+      "original_source_range_provenance": {
+        "path": "outputs/fixed_camera_v11/evidence_video/men_fs_final/used_original_ranges.json",
+        "sha256": "3dc33fee2c4bfb45610da99bc6d81788dc29c34c1b5299319e03d63896c447a6"
+      },
+      "intake": {
+        "path": "outputs/event_reuse_v11/failures/men15557/intake.json",
+        "sha256": "1d968620d34f0468ce57f498888a9e8b9a377fb916d08151ef5945b99e5a26c9"
+      },
+      "containing_true_shot": {
+        "format_id": "399",
+        "first_new_pts": 238497280,
+        "start_s": 15527.166666666666,
+        "previous_shot_last_pts": 238497024,
+        "last_pts": 239107584,
+        "last_s": 15566.9,
+        "next_shot_first_pts": 239107840,
+        "end_exclusive_s": 15566.916666666666,
+        "time_base": "1/15360",
+        "frame_rate": 60,
+        "frame_count": 2385,
+        "status": "exact_HD_neighbour_frames_visually_confirmed",
+        "15555_is_artificial_window_boundary": true,
+        "target_to_anchor_15560_crosses_no_cut": true,
+        "actual_HD_decoded_frame_count": 2385,
+        "all_HD_pts_steps_256": true,
+        "decoded_pts_index": {
+          "path": "outputs/event_reuse_v11/men_15557_shot_review/HD_complete_shot_source_pts.npz",
+          "sha256": "1e657c43c255f387fef93055f527d034ce7336ab63403abc7c29fb0918574e3c"
+        },
+        "boundary_review": {
+          "path": "outputs/event_reuse_v11/men_15557_shot_review/shot_boundary_review.json",
+          "sha256": "9533b016b685c204ca09b502055a1e5ebb2a9e7a49d7b8d0b63575044fe8cc11"
+        }
+      },
+      "same_type_second_window": {
+        "role": "separate_after_cut_source_selected_check_window_not_a_new_programme_blind_test",
+        "selection_freeze": {
+          "path": "outputs/event_reuse_v11/men_15557_shot_review/adjacent_warmup/selected_check_window.json",
+          "sha256": "3fecda78c0ce29fa399be1273490ef3917a365faf317ec5db2266e1e437797b5"
+        },
+        "start_s": 15580,
+        "end_exclusive_s": 15585,
+        "first_pts": 239308800,
+        "last_pts": 239385344,
+        "end_exclusive_pts": 239385600,
+        "frame_count": 300,
+        "source_pts": {
+          "path": "outputs/event_reuse_v11/men_15557_shot_review/adjacent_warmup/decoded_300_source_pts.npz",
+          "sha256": "15fb3592e82ace229a4fa0d7bf1b72f9ffc45e6160248658660de907c1621b87"
+        },
+        "original_range_manifest": {
+          "path": "outputs/event_reuse_v11/men_15557_shot_review/adjacent_warmup/source_hd_ranges_snapshot.json",
+          "sha256": "3e77c085ad8ff2891f8260064130a8d539f2036efed8d60f708c980119b6cc20"
+        },
+        "selection_precedes_new_window_geometry_inference": true,
+        "fully_pixel_blind": false,
+        "do_not_use_for_primary_case_geometry_or_threshold_tuning": true
+      },
+      "person_mask_input": {
+        "metadata": {
+          "path": "outputs/event_reuse_v11/failures/men15557/men600_sam2_center_people.json",
+          "sha256": "f445d90a6bd0a1e57fb03297639f0ec81aaea4582ecee89417b3658734c7d2f3"
+        },
+        "input_resolution": [
+          960,
+          540
+        ],
+        "role": "candidate person exclusion only; never native circle measurements",
+        "png_preserves_holes": true,
+        "quality_is_not_fully_validated": true
+      },
+      "required_regression_checks": [
+        "Detect actual native source contours despite coarse ice excluding visible arc.",
+        "Explicit person occlusion retains masked_out separately from detected_unidentified.",
+        "Changing scene model does not change image-measured points; only identity candidates may change.",
+        "Context-assisted backward localization must declare future evidence and stay within verified shot.",
+        "Preserve all600original sourcePTS including failure frames and evaluate distinct300frame second window."
+      ],
+      "repair_outputs": []
+    }
+  ]
+}

@@ -1,0 +1,650 @@
+{
+  "schema": "rinkspace.third-party-assets.v1",
+  "observed_date": "2026-10-11",
+  "purpose": "Read-only source, model identity and license evidence inventory; not runtime configuration or an installation lock.",
+  "coverage": "External assets referenced by body_prior.py, observations.py, bootstrap.py and historical GTSAM native build recipes. Full installed package versions remain in observed-python311-windows.json. This is not an exhaustive legal audit of all transitive dependencies.",
+  "method": "Read local source, package metadata, Git HEAD and tracked file changes without optional locks; hash small source/license files and the 6.3 MB YOLO model only. Large model hashes are inherited from existing resource records; current existence and byte count checked, large files not rehashed. No package import, install, training, environment change, download, relocation or Git mutation. Additional byte preservation of the standalone helper and source-only GVHMR local diff uses stable source stat/hash checks. Saved patch passed git apply --reverse --check against current tree; no patch was applied.",
+  "project_license": {
+    "status": "component_specific_rights_notice",
+    "notice": "LICENSE.md",
+    "effective_date": "2026-10-19",
+    "repository_wide_open_source_grant": false,
+    "note": "Project-owned content not otherwise licensed receives no additional grant; existing third-party permissions and applicable legal/platform rights remain unaffected. Unresolved public-redistribution permissions are not supplied by this notice.",
+    "previous_observation": {
+      "date": "2026-10-11",
+      "value": {
+        "status": "not_selected",
+        "note": "This inventory does not choose the RinkSpace license or establish permission to redistribute third-party code, models or footage."
+      }
+    }
+  },
+  "wrappers": [
+    {
+      "path": "calibration/program_tracking/body_tracking/body_prior.py",
+      "present_in_project": true,
+      "sha256": "b9c87cbe9fbea82961bdddc4e9f515f03c06b6f5528b8e248b3d634dd58bdd39",
+      "role": "RinkSpace source-time GVHMR/SMPL-X integration wrapper; external interpreter and source paths remain hardcoded."
+    },
+    {
+      "path": "calibration/program_tracking/body_tracking/observations.py",
+      "present_in_project": true,
+      "sha256": "4d65eb53af6273673478f7413f446c84a8ce5c3641e56e0dcb3124abe638881c",
+      "role": "RinkSpace original-source identity/keypoint wrapper; defaults to external ViTPose helper, weights and FSpathing packages."
+    },
+    {
+      "path": "calibration/program_tracking/runtime/bootstrap.py",
+      "present_in_project": true,
+      "sha256": "9fe1f9f5b1caf11a666751c7182306186a7cc8ac0f8ec45a68241990b74b166d",
+      "role": "RinkSpace geometry dependency bridge to main and sibling CUDA site-packages."
+    },
+    {
+      "path": "calibration/program_tracking/runtime/environment.yml",
+      "present_in_project": true,
+      "sha256": "92855687aca89a7dca148179d695b08960afe3ca38fe00ffa5008e6229fa1ac1",
+      "role": "RinkSpace historical GTSAM conda environment definition."
+    },
+    {
+      "path": "src/rinkspace/vision.py",
+      "present_in_project": true,
+      "sha256": "e60add09956f911937e3d3ebb154ba136ca9aca8d89224cdadddec12f41d4799",
+      "role": "RinkSpace vision training/inference wrapper, needs external torch installation."
+    },
+    {
+      "path": "src/rinkspace/vision_network.py",
+      "present_in_project": true,
+      "sha256": "a7dbea6173340fa5a30d388ba962af22a744ecf4f45db38666612eba3229319e",
+      "role": "RinkSpace vision network definitions."
+    }
+  ],
+  "source_trees": [
+    {
+      "id": "gvhmr",
+      "local_path": "D:/OneDrive/codex_projs/FSrotation/cache/g0_gvhmr_runtime/GVHMR",
+      "present_in_rinkspace_project": false,
+      "upstream": "https://github.com/zju3dv/GVHMR",
+      "git_head": "6ec3ca39336c50492c0fae65fba2fb831fc7d866",
+      "local_tracked_changes": [
+        {
+          "path": "hmr4d/utils/geo_transform.py",
+          "sha256": "f2c9746c8d9c5fbf9a59afdbb80a7e993edf0966d0f10df73696696332df02f6"
+        },
+        {
+          "path": "hmr4d/utils/preproc/__init__.py",
+          "sha256": "2047b037763950bb3c3a9e9d81b7a82a0f359a72d77e9518d77d83c3f123009a"
+        },
+        {
+          "path": "hmr4d/utils/wis3d_utils.py",
+          "sha256": "4e0a3e974be88d3edbf38c8f312865cacd0a5822b664f20ad3c5ea41dc43ced9"
+        }
+      ],
+      "untracked_paths": [],
+      "license_label": "custom_research_education_nonprofit",
+      "license_evidence": {
+        "path": "D:/OneDrive/codex_projs/FSrotation/cache/g0_gvhmr_runtime/GVHMR/LICENSE",
+        "sha256": "39ada5d55fa388ae354b06f952865129cf4f8c60e0948b51a6887efa088c1ce6"
+      },
+      "distribution_permission_review": "not_completed",
+      "embedded_components": [
+        {
+          "id": "hmr2_integration",
+          "path": "hmr4d/network/hmr2",
+          "provenance_reference": "https://github.com/shubham-goel/4D-Humans",
+          "evidence": "GVHMR README acknowledgement; hmr2.py states it has been modified. Independent upstream revision and separately applicable license not established."
+        },
+        {
+          "id": "vitpose_integration",
+          "path": "hmr4d/utils/preproc/vitpose_pytorch",
+          "provenance_reference": "https://github.com/gpastal24/ViTPose-Pytorch",
+          "original_model_project": "https://github.com/ViTAE-Transformer/ViTPose",
+          "evidence": "GVHMR README acknowledgement and the actual helper imports. Independent ViTPose-Pytorch revision and license not established from this checkout."
+        },
+        {
+          "id": "body_model_utilities",
+          "path": "hmr4d/utils/body_model",
+          "provenance": "HuMoR",
+          "evidence": {
+            "path": "D:/OneDrive/codex_projs/FSrotation/cache/g0_gvhmr_runtime/GVHMR/hmr4d/utils/body_model/README.md",
+            "sha256": "b948b4a9f0d2762c494dd109a8f306307f54691d01a1d2e668ab2af60c1e8255"
+          },
+          "note": "README states this directory is modified from HuMoR. Independent source revision and applicable component license remain unknown."
+        },
+        {
+          "id": "dpvo_optional_submodule",
+          "upstream": "https://github.com/princeton-vl/DPVO",
+          "path": "third-party/DPVO",
+          "present": false,
+          "evidence": {
+            "path": "D:/OneDrive/codex_projs/FSrotation/cache/g0_gvhmr_runtime/GVHMR/.gitmodules",
+            "sha256": "eb8fb2950caa3ee7c27d09f0a02ff922b78426ceaea41674ee69a546e42d8368"
+          },
+          "required_by_reviewed_rinkspace_body_path": false,
+          "note": "Local directory is empty. GVHMR install documentation labels DPVO optional; body_prior.py uses supplied RinkSpace camera inputs."
+        }
+      ],
+      "preserved_local_patch": {
+        "path": "environments/third_party_patches/gvhmr-local.patch",
+        "sha256": "0b1ff6e654a618ea85bc9eabe2facccf2dbbfd0d1378bae7c16c570c97e0d2f7",
+        "size_bytes": 2367,
+        "base_git_head": "6ec3ca39336c50492c0fae65fba2fb831fc7d866",
+        "upstream": "https://github.com/zju3dv/GVHMR",
+        "files": [
+          "hmr4d/utils/geo_transform.py",
+          "hmr4d/utils/preproc/__init__.py",
+          "hmr4d/utils/wis3d_utils.py"
+        ],
+        "working_source_unchanged_during_capture": true,
+        "read_only_reverse_apply_check_passed": true,
+        "license_scope": "Patch is derived from GVHMR source; retain upstream custom noncommercial license and attribution. Inventory does not assert general public redistribution permission.",
+        "purpose": "Preserves only the three current tracked lazy-import modifications; apply to exact base revision in an independent checkout, never to the live modified tree.",
+        "attribution": {
+          "title": "World-Grounded Human Motion Recovery via Gravity-View Coordinates",
+          "authors": "Zehong Shen et al.",
+          "venue": "SIGGRAPH Asia Conference Proceedings",
+          "year": 2024,
+          "url": "https://arxiv.org/abs/2409.06662"
+        }
+      },
+      "tracked_worktree_matches_head": false,
+      "head_identity_scope": "Git tracked source only; does not identify compiled binaries, package builds, ignored runtime assets or the full environment."
+    },
+    {
+      "id": "pytorch3d",
+      "local_path": "D:/OneDrive/codex_projs/FSrotation/cache/g0_gvhmr_runtime/pytorch3d",
+      "present_in_rinkspace_project": false,
+      "upstream": "https://github.com/facebookresearch/pytorch3d",
+      "git_head": "75ebeeaea0908c5527e7b1e305fbc7681382db47",
+      "local_tracked_changes": [],
+      "untracked_paths": [],
+      "license_label": "BSD-3-Clause",
+      "license_evidence": {
+        "path": "D:/OneDrive/codex_projs/FSrotation/cache/g0_gvhmr_runtime/pytorch3d/LICENSE",
+        "sha256": "60fa54e4d13278810b2f92ecba0c06558f08f22edaa23b21231b298188f9ce3f"
+      },
+      "distribution_permission_review": "not_completed",
+      "tracked_worktree_matches_head": true,
+      "head_identity_scope": "Git tracked source only; does not identify compiled binaries, package builds, ignored runtime assets or the full environment."
+    },
+    {
+      "id": "vitpose_h_local_helper",
+      "local_path": "D:/OneDrive/codex_projs/SkatePoseSingles/tools/run_vitpose_h.py",
+      "present_in_rinkspace_project": true,
+      "sha256": "8da96207e0c5a4f20a6d43aacb3f718d3d86c265716ae1fd23b2b166d1a4c172",
+      "sibling_git_head": "7473ad671fdef812455fe18fd2c3149e7d6bdf36",
+      "helper_tracked_in_sibling_git": false,
+      "upstream": null,
+      "license_label": null,
+      "distribution_permission_review": "unknown",
+      "role": "Required default --h-code in observations.py; imports GVHMR embedded pose builder and UDP decoder and checks the fixed H checkpoint hash.",
+      "preserved_path": "calibration/program_tracking/body_tracking/source_helpers/run_vitpose_h.py",
+      "preserved_sha256": "8da96207e0c5a4f20a6d43aacb3f718d3d86c265716ae1fd23b2b166d1a4c172",
+      "preservation_provenance": "calibration/program_tracking/body_tracking/source_helpers/run_vitpose_h.provenance.json",
+      "runtime_switched": false,
+      "origin_update": {
+        "date": "2026-10-19",
+        "source": "Owner confirms ChatGPT output",
+        "current_notice": "LICENSE.md"
+      }
+    },
+    {
+      "id": "smplx_python_package",
+      "installed_version": "0.1.28",
+      "local_path": "D:/OneDrive/codex_projs/FSrotation/cache/g0_gvhmr_runtime/venv/Lib/site-packages/smplx-0.1.28.dist-info",
+      "present_in_rinkspace_project": false,
+      "upstream": "https://github.com/vchoutas/smplx",
+      "git_head": null,
+      "metadata_license_field": "UNKNOWN",
+      "license_evidence": {
+        "path": "D:/OneDrive/codex_projs/FSrotation/cache/g0_gvhmr_runtime/venv/Lib/site-packages/smplx-0.1.28.dist-info/LICENSE",
+        "sha256": "2232f2f9c8f6229c579c4515ac4b541824c9cef597d39c0dc4c17eacbf60114c"
+      },
+      "license_label": "custom_noncommercial_research_education_art",
+      "note": "Installed license contains non-transferable use and no-distribution restrictions. Package metadata label UNKNOWN does not override the actual license text. Exact source commit/wheel identity not established."
+    },
+    {
+      "id": "ultralytics_fspathing",
+      "installed_version": "8.4.131",
+      "local_path": "D:/OneDrive/codex_projs/FSpathing/.venv/Lib/site-packages/ultralytics-8.4.131.dist-info",
+      "present_in_rinkspace_project": false,
+      "upstream": "https://github.com/ultralytics/ultralytics",
+      "git_head": null,
+      "license_label_from_metadata": "AGPL-3.0",
+      "metadata_evidence": {
+        "path": "D:/OneDrive/codex_projs/FSpathing/.venv/Lib/site-packages/ultralytics-8.4.131.dist-info/METADATA",
+        "sha256": "558d67796a6524bb5429fdd740c52508e3bf7215c2ffd3453475671e43cdb4f1"
+      },
+      "gvhmr_environment_version": "8.2.42",
+      "note": "observations.py prepends FSpathing site-packages for recovery. Runtime package precedence can differ if ultralytics is already imported. No execution or license-compliance determination performed."
+    },
+    {
+      "id": "motiontrail_cuda_environment",
+      "local_path": "D:/OneDrive/codex_projs/MotionTrail_Codex_Starter_v1/.venv-gpu",
+      "present_in_rinkspace_project": false,
+      "upstream": null,
+      "revision": null,
+      "package_version_evidence": "environments/observed-python311-windows.json: environments.vision_cuda",
+      "note": "bootstrap.py appends only this environment site-packages; no evidence that MotionTrail application code itself is imported by this bridge. A self-contained RinkSpace CUDA environment definition still needs validation."
+    }
+  ],
+  "models": [
+    {
+      "id": "GVHMR",
+      "local_path": "D:/OneDrive/codex_projs/FSrotation/cache/g0_gvhmr_runtime/GVHMR/inputs/checkpoints/gvhmr/gvhmr_siga24_release.ckpt",
+      "present_in_rinkspace_project": false,
+      "exists_observed": true,
+      "observed_size_bytes": 163508011,
+      "recorded_sha256": "4fae7da2de388d5da3514cb27a2d003f364dacb280e9cf88972b710e589c6b91",
+      "recorded_size_bytes": 163508011,
+      "sha256_evidence": "D:/OneDrive/codex_projs/FSrotation/artifacts/v03/pretrained_body_pilot/run01/g1/resources.json",
+      "sha256_verified_during_this_inventory": false,
+      "official_publisher_sha256": null,
+      "mirror_revision": "21b32d5389e2e59c0737d4c4095bbc0b8c23f66b",
+      "license_for_this_model": "not_established",
+      "distribution_permission_review": "not_completed",
+      "download_record": {
+        "path": "D:/OneDrive/codex_projs/FSrotation/artifacts/v03/pretrained_body_pilot/run01/g1/weight_download_gvhmr.json",
+        "sha256": "5f8687b51c769724e267f96d254d6d80fcdf82fab55b446a69a6c42f48fb0165"
+      },
+      "recorded_acquisition": {
+        "official_folder_url": "https://drive.google.com/drive/folders/1bU4MJz-hMjo6BB9362SLszvvKwbgeO__",
+        "mirror_url": "https://huggingface.co/camenduru/GVHMR/resolve/21b32d5389e2e59c0737d4c4095bbc0b8c23f66b/gvhmr/gvhmr_siga24_release.ckpt",
+        "mirror_revision": "21b32d5389e2e59c0737d4c4095bbc0b8c23f66b",
+        "source_chain": "Frozen zju3dv/GVHMR README -> LittleFrog/GVHMR official linked demo app.py -> camenduru/GVHMR exact four weight URLs",
+        "identity_limit": "Verify full file against separately fetched mirror Git LFS SHA256; no original Drive publisher hash available"
+      },
+      "official_install_reference": "https://github.com/zju3dv/GVHMR/blob/6ec3ca39336c50492c0fae65fba2fb831fc7d866/docs/INSTALL.md",
+      "used_by_reviewed_rinkspace_path": true
+    },
+    {
+      "id": "HMR2",
+      "local_path": "D:/OneDrive/codex_projs/FSrotation/cache/g0_gvhmr_runtime/GVHMR/inputs/checkpoints/hmr2/epoch=10-step=25000.ckpt",
+      "present_in_rinkspace_project": false,
+      "exists_observed": true,
+      "observed_size_bytes": 2709494041,
+      "recorded_sha256": "2dcf79638109781d1ae5f5c44fee5f55bc83291c210653feead9b7f04fa6f20e",
+      "recorded_size_bytes": 2709494041,
+      "sha256_evidence": "D:/OneDrive/codex_projs/FSrotation/artifacts/v03/pretrained_body_pilot/run01/g1/resources.json",
+      "sha256_verified_during_this_inventory": false,
+      "official_publisher_sha256": null,
+      "mirror_revision": "21b32d5389e2e59c0737d4c4095bbc0b8c23f66b",
+      "license_for_this_model": "not_established",
+      "distribution_permission_review": "not_completed",
+      "download_record": {
+        "path": "D:/OneDrive/codex_projs/FSrotation/artifacts/v03/pretrained_body_pilot/run01/g1/weight_download_hmr2.json",
+        "sha256": "ef4a010047f9510451ff45569f5a5055424391592fb2ffb9123facd23bda45df"
+      },
+      "recorded_acquisition": {
+        "official_folder_url": "https://drive.google.com/drive/folders/18w9RoK1xW5Ka34WDtfsTLaNe_VFfa4o-",
+        "mirror_url": "https://huggingface.co/camenduru/GVHMR/resolve/21b32d5389e2e59c0737d4c4095bbc0b8c23f66b/hmr2/epoch%3D10-step%3D25000.ckpt",
+        "mirror_revision": "21b32d5389e2e59c0737d4c4095bbc0b8c23f66b",
+        "source_chain": "Frozen zju3dv/GVHMR README -> LittleFrog/GVHMR official linked demo app.py -> camenduru/GVHMR exact four weight URLs",
+        "identity_limit": "Verify full file against separately fetched mirror Git LFS SHA256; no original Drive publisher hash available"
+      },
+      "official_install_reference": "https://github.com/zju3dv/GVHMR/blob/6ec3ca39336c50492c0fae65fba2fb831fc7d866/docs/INSTALL.md",
+      "used_by_reviewed_rinkspace_path": true
+    },
+    {
+      "id": "ViTPose",
+      "local_path": "D:/OneDrive/codex_projs/FSrotation/cache/g0_gvhmr_runtime/GVHMR/inputs/checkpoints/vitpose/vitpose-h-multi-coco.pth",
+      "present_in_rinkspace_project": false,
+      "exists_observed": true,
+      "observed_size_bytes": 2549075546,
+      "recorded_sha256": "50e33f4077ef2a6bcfd7110c58742b24c5859b7798fb0eedd6d2215e0a8980bc",
+      "recorded_size_bytes": 2549075546,
+      "sha256_evidence": "D:/OneDrive/codex_projs/FSrotation/artifacts/v03/pretrained_body_pilot/run01/g1/resources.json",
+      "sha256_verified_during_this_inventory": false,
+      "official_publisher_sha256": null,
+      "mirror_revision": "21b32d5389e2e59c0737d4c4095bbc0b8c23f66b",
+      "license_for_this_model": "not_established",
+      "distribution_permission_review": "not_completed",
+      "download_record": {
+        "path": "D:/OneDrive/codex_projs/FSrotation/artifacts/v03/pretrained_body_pilot/run01/g1/weight_download_vitpose.json",
+        "sha256": "a1ad767159b52eaf929fc44141fe7a29c0c25f940b5a43a8ec0dbcd27f6d83b6"
+      },
+      "recorded_acquisition": {
+        "official_folder_url": "https://drive.google.com/drive/folders/1ZjyrQRo911EAIzulR2c4U35zPIzxdaqR",
+        "mirror_url": "https://huggingface.co/camenduru/GVHMR/resolve/21b32d5389e2e59c0737d4c4095bbc0b8c23f66b/vitpose/vitpose-h-multi-coco.pth",
+        "mirror_revision": "21b32d5389e2e59c0737d4c4095bbc0b8c23f66b",
+        "source_chain": "Frozen zju3dv/GVHMR README -> LittleFrog/GVHMR official linked demo app.py -> camenduru/GVHMR exact four weight URLs",
+        "identity_limit": "Verify full file against separately fetched mirror Git LFS SHA256; no original Drive publisher hash available"
+      },
+      "official_install_reference": "https://github.com/zju3dv/GVHMR/blob/6ec3ca39336c50492c0fae65fba2fb831fc7d866/docs/INSTALL.md",
+      "used_by_reviewed_rinkspace_path": true
+    },
+    {
+      "id": "YOLO",
+      "local_path": "D:/OneDrive/codex_projs/FSrotation/cache/g0_gvhmr_runtime/GVHMR/inputs/checkpoints/yolo/yolov8x.pt",
+      "present_in_rinkspace_project": false,
+      "exists_observed": true,
+      "observed_size_bytes": 136867539,
+      "recorded_sha256": "c4d5a3f000d771762f03fc8b57ebd0aae324aeaefdd6e68492a9c4470f2d1e8b",
+      "recorded_size_bytes": 136867539,
+      "sha256_evidence": "D:/OneDrive/codex_projs/FSrotation/artifacts/v03/pretrained_body_pilot/run01/g1/resources.json",
+      "sha256_verified_during_this_inventory": false,
+      "official_publisher_sha256": null,
+      "mirror_revision": "21b32d5389e2e59c0737d4c4095bbc0b8c23f66b",
+      "license_for_this_model": "not_established",
+      "distribution_permission_review": "not_completed",
+      "download_record": {
+        "path": "D:/OneDrive/codex_projs/FSrotation/artifacts/v03/pretrained_body_pilot/run01/g1/weight_download_yolo.json",
+        "sha256": "ce1a14a191f689ef38810cfc15c872f0d243b33c38bcdb5132de84768fa328d9"
+      },
+      "recorded_acquisition": {
+        "official_folder_url": "https://drive.google.com/drive/folders/15FtyelZEwC03KNV4NhxqtOUF7JQoLmnP",
+        "mirror_url": "https://huggingface.co/camenduru/GVHMR/resolve/21b32d5389e2e59c0737d4c4095bbc0b8c23f66b/yolo/yolov8x.pt",
+        "mirror_revision": "21b32d5389e2e59c0737d4c4095bbc0b8c23f66b",
+        "source_chain": "Frozen zju3dv/GVHMR README -> LittleFrog/GVHMR official linked demo app.py -> camenduru/GVHMR exact four weight URLs",
+        "identity_limit": "Verify full file against separately fetched mirror Git LFS SHA256; no original Drive publisher hash available"
+      },
+      "official_install_reference": "https://github.com/zju3dv/GVHMR/blob/6ec3ca39336c50492c0fae65fba2fb831fc7d866/docs/INSTALL.md",
+      "used_by_reviewed_rinkspace_path": false,
+      "note": "Historical GVHMR upstream detector is yolov8x.pt; observations.py recovery uses a different yolo11n-pose.pt file."
+    },
+    {
+      "id": "SMPL-X neutral",
+      "local_path": "D:/OneDrive/codex_projs/FSrotation/cache/g0_gvhmr_runtime/GVHMR/inputs/checkpoints/body_models/smplx/SMPLX_NEUTRAL.npz",
+      "present_in_rinkspace_project": false,
+      "exists_observed": true,
+      "observed_size_bytes": 108752058,
+      "recorded_sha256": "376021446ddc86e99acacd795182bbef903e61d33b76b9d8b359c2b0865bd992",
+      "recorded_size_bytes": 108752058,
+      "sha256_evidence": "D:/OneDrive/codex_projs/FSrotation/artifacts/v03/pretrained_body_pilot/run01/g1/resources.json",
+      "sha256_verified_during_this_inventory": false,
+      "official_publisher_sha256": null,
+      "mirror_revision": null,
+      "license_for_this_model": "not_established",
+      "distribution_permission_review": "not_completed",
+      "official_acquisition": "https://smpl-x.is.tue.mpg.de/",
+      "license_reference": "https://smpl-x.is.tue.mpg.de/modellicense.html",
+      "note": "Account-based upstream model download. This record is not permission to redistribute the model. Current bytes were not rehashed."
+    },
+    {
+      "id": "smplx2smpl_sparse.pt",
+      "local_path": "D:/OneDrive/codex_projs/FSrotation/cache/g0_gvhmr_runtime/GVHMR/hmr4d/utils/body_model/smplx2smpl_sparse.pt",
+      "present_in_rinkspace_project": false,
+      "exists_observed": true,
+      "observed_size_bytes": 208935,
+      "recorded_sha256": "0fc821a9e79ec3e76d6a9796b96d5bef8cd67055e18497bbe370d8aed9e07e06",
+      "recorded_size_bytes": 208935,
+      "sha256_evidence": "D:/OneDrive/codex_projs/FSrotation/artifacts/v03/pretrained_body_pilot/run01/g1/resources.json",
+      "sha256_verified_during_this_inventory": true,
+      "official_publisher_sha256": null,
+      "mirror_revision": null,
+      "license_for_this_model": "not_established",
+      "distribution_permission_review": "not_completed",
+      "acquisition": "Bundled auxiliary data in the exact GVHMR Git checkout; preserve the applicable component notices and identity, not only Python files."
+    },
+    {
+      "id": "smpl_coco17_J_regressor.pt",
+      "local_path": "D:/OneDrive/codex_projs/FSrotation/cache/g0_gvhmr_runtime/GVHMR/hmr4d/utils/body_model/smpl_coco17_J_regressor.pt",
+      "present_in_rinkspace_project": false,
+      "exists_observed": true,
+      "observed_size_bytes": 469227,
+      "recorded_sha256": "bacdaf756629493994cc869f4c27d179f5e4a5d06b8797ee3dcb94571522079f",
+      "recorded_size_bytes": 469227,
+      "sha256_evidence": "D:/OneDrive/codex_projs/FSrotation/artifacts/v03/pretrained_body_pilot/run01/g1/resources.json",
+      "sha256_verified_during_this_inventory": true,
+      "official_publisher_sha256": null,
+      "mirror_revision": null,
+      "license_for_this_model": "not_established",
+      "distribution_permission_review": "not_completed",
+      "acquisition": "Bundled auxiliary data in the exact GVHMR Git checkout; preserve the applicable component notices and identity, not only Python files."
+    },
+    {
+      "id": "smplx_verts437.pt",
+      "local_path": "D:/OneDrive/codex_projs/FSrotation/cache/g0_gvhmr_runtime/GVHMR/hmr4d/utils/body_model/smplx_verts437.pt",
+      "present_in_rinkspace_project": false,
+      "exists_observed": true,
+      "observed_size_bytes": 4203,
+      "recorded_sha256": "ef0ea64c470a1fea80adb5e4b866c78a792a04f5f98744c9367b15e57bfb4a4d",
+      "recorded_size_bytes": 4203,
+      "sha256_evidence": "D:/OneDrive/codex_projs/FSrotation/artifacts/v03/pretrained_body_pilot/run01/g1/resources.json",
+      "sha256_verified_during_this_inventory": true,
+      "official_publisher_sha256": null,
+      "mirror_revision": null,
+      "license_for_this_model": "not_established",
+      "distribution_permission_review": "not_completed",
+      "acquisition": "Bundled auxiliary data in the exact GVHMR Git checkout; preserve the applicable component notices and identity, not only Python files."
+    },
+    {
+      "id": "smpl_mean_params.npz",
+      "local_path": "D:/OneDrive/codex_projs/FSrotation/cache/g0_gvhmr_runtime/GVHMR/hmr4d/network/hmr2/configs/smpl_mean_params.npz",
+      "present_in_rinkspace_project": false,
+      "exists_observed": true,
+      "observed_size_bytes": 1310,
+      "recorded_sha256": "6fd6dd687800da946d0a0492383f973b92ec20f166a0b829775882868c35fcdd",
+      "recorded_size_bytes": 1310,
+      "sha256_evidence": "D:/OneDrive/codex_projs/FSrotation/artifacts/v03/pretrained_body_pilot/run01/g1/resources.json",
+      "sha256_verified_during_this_inventory": true,
+      "official_publisher_sha256": null,
+      "mirror_revision": null,
+      "license_for_this_model": "not_established",
+      "distribution_permission_review": "not_completed",
+      "acquisition": "Bundled auxiliary data in the exact GVHMR Git checkout; preserve the applicable component notices and identity, not only Python files."
+    },
+    {
+      "id": "coco_aug_dict.pth",
+      "local_path": "D:/OneDrive/codex_projs/FSrotation/cache/g0_gvhmr_runtime/GVHMR/hmr4d/utils/body_model/coco_aug_dict.pth",
+      "present_in_rinkspace_project": false,
+      "exists_observed": true,
+      "observed_size_bytes": 1759,
+      "recorded_sha256": "9d045cc3e507e1f7d91ef89904cdfa26e29cf18710f52f9fd305a88ae5d4e539",
+      "recorded_size_bytes": 1759,
+      "sha256_evidence": "D:/OneDrive/codex_projs/FSrotation/artifacts/v03/pretrained_body_pilot/run01/g1/resources.json",
+      "sha256_verified_during_this_inventory": true,
+      "official_publisher_sha256": null,
+      "mirror_revision": null,
+      "license_for_this_model": "not_established",
+      "distribution_permission_review": "not_completed",
+      "acquisition": "Bundled auxiliary data in the exact GVHMR Git checkout; preserve the applicable component notices and identity, not only Python files."
+    },
+    {
+      "id": "yolo11n_pose_fspathing",
+      "local_path": "D:/OneDrive/codex_projs/FSpathing/models/yolo11n-pose.pt",
+      "present_in_rinkspace_project": false,
+      "exists_observed": true,
+      "observed_size_bytes": 6255593,
+      "recorded_sha256": "869e83fcdffdc7371fa4e34cd8e51c838cc729571d1635e5141e3075e9319dc0",
+      "sha256_verified_during_this_inventory": true,
+      "revision": null,
+      "acquisition_reference": "https://docs.ultralytics.com/models/yolo11/",
+      "license_for_this_model": "not_established",
+      "distribution_permission_review": "not_completed",
+      "note": "Filename/model-family and current file hash known; original acquisition record and exact upstream assets release not established. Do not substitute a current release silently."
+    }
+  ],
+  "native_build_dependencies": [
+    {
+      "id": "gtsam",
+      "package_identity": {
+        "name": "gtsam",
+        "version": "4.2.2",
+        "build": "py311h69872ac_0",
+        "subdir": "win-64",
+        "url": "https://conda.anaconda.org/conda-forge/win-64/gtsam-4.2.2-py311h69872ac_0.conda",
+        "sha256": "c0ed7e5ced629ff88f9fd232ca875c9330e544868c318f214587393ae7983afe",
+        "license": "BSD-3-Clause"
+      },
+      "evidence": {
+        "path": "D:/CodexData/RinkSpace_program_tracking_tmp/gtsam-env/conda-meta/gtsam-4.2.2-py311h69872ac_0.json",
+        "sha256": "84d02b83180b9d727c2b47cfc5333273620abc328cc9c67686765e1bff0e7edd"
+      },
+      "source_commit": null,
+      "present_in_rinkspace_project": false,
+      "note": "Observed installed conda record; the package archive was not downloaded or rehashed by this inventory.",
+      "upstream": "https://github.com/borglab/gtsam",
+      "license_note": "Conda record labels BSD-3-Clause; installed Python METADATA says Simplified BSD. This difference remains explicit; a full binary bundled-component license audit has not been completed."
+    },
+    {
+      "id": "tbb_runtime",
+      "package_identity": {
+        "name": "tbb",
+        "version": "2023.1.0",
+        "build": "hdcfe883_0",
+        "subdir": "win-64",
+        "url": "https://conda.anaconda.org/conda-forge/win-64/tbb-2023.1.0-hdcfe883_0.conda",
+        "sha256": "7a65accbe954d0304b9056005f59fbee8b3928ceced38b1e3e8272aa1af0b750",
+        "license": "Apache-2.0"
+      },
+      "evidence": {
+        "path": "D:/CodexData/RinkSpace_program_tracking_tmp/gtsam-env/conda-meta/tbb-2023.1.0-hdcfe883_0.json",
+        "sha256": "66f78cf6ceb0371898435e9abd0fd9f77d103bec8cf90885f32e5e78c779f853"
+      },
+      "source_commit": null,
+      "present_in_rinkspace_project": false,
+      "note": "Observed installed conda record; the package archive was not downloaded or rehashed by this inventory."
+    },
+    {
+      "id": "eigen_headers",
+      "observed_package_directory": "eigen-5.0.1-h5112557_0",
+      "local_path": "D:/CodexData/RinkSpace_program_tracking_tmp/solver_acceleration/round3/native/reference_callback/vendor/eigen-5.0.1-h5112557_0",
+      "present_in_rinkspace_project": false,
+      "license_label": "MPL-2.0 header notice; aggregate archive license not audited",
+      "license_evidence": {
+        "path": "D:/CodexData/RinkSpace_program_tracking_tmp/solver_acceleration/round3/native/reference_callback/vendor/eigen-5.0.1-h5112557_0/Library/include/eigen3/Eigen/Core",
+        "sha256": "267988e70f30e9a4e27b41541e162c4d0610480f63649994156c135d8a1e658f"
+      },
+      "source_commit": null,
+      "upstream": "https://gitlab.com/libeigen/eigen",
+      "archive_identity": "Local .conda filename exists; package URL and archive SHA-256 not established in this inventory."
+    },
+    {
+      "id": "boost_headers",
+      "observed_package_directory": "libboost-headers-1.90.0-h57928b3_1",
+      "local_path": "D:/CodexData/RinkSpace_program_tracking_tmp/solver_acceleration/round3/native/reference_callback/vendor/libboost-headers-1.90.0-h57928b3_1",
+      "present_in_rinkspace_project": false,
+      "license_label": "BSL-1.0",
+      "license_evidence": {
+        "path": "D:/CodexData/RinkSpace_program_tracking_tmp/solver_acceleration/round3/native/reference_callback/vendor/libboost-headers-1.90.0-h57928b3_1/info/licenses/LICENSE_1_0.txt",
+        "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566"
+      },
+      "source_commit": null,
+      "upstream": "https://www.boost.org/",
+      "archive_identity": "Local .conda filename exists; package URL and archive SHA-256 not established in this inventory."
+    },
+    {
+      "id": "pybind11_headers",
+      "observed_package_directory": "pybind11-global-3.0.3-pyhc8003f9_0",
+      "local_path": "D:/CodexData/RinkSpace_program_tracking_tmp/solver_acceleration/round3/native/reference_callback/vendor/pybind11-global-3.0.3-pyhc8003f9_0",
+      "present_in_rinkspace_project": false,
+      "license_label": "BSD-3-Clause",
+      "license_evidence": {
+        "path": "D:/CodexData/RinkSpace_program_tracking_tmp/solver_acceleration/round3/native/reference_callback/vendor/pybind11-global-3.0.3-pyhc8003f9_0/site-packages/pybind11_global-3.0.3.dist-info/licenses/LICENSE",
+        "sha256": "83965b843b98f670d3a85bd041ed4b372c8ec50d7b4a5995a83ac697ba675dcb"
+      },
+      "source_commit": null,
+      "upstream": "https://github.com/pybind/pybind11",
+      "archive_identity": "Local .conda filename exists; package URL and archive SHA-256 not established in this inventory."
+    },
+    {
+      "id": "onetbb_headers_import_libraries",
+      "version_from_header": "2023.1.0",
+      "interface_version": 12190,
+      "local_path": "D:/CodexData/RinkSpace_program_tracking_tmp/solver_acceleration/round3/native/tbb_control",
+      "present_in_rinkspace_project": false,
+      "license_label": "Apache-2.0",
+      "license_evidence": {
+        "path": "D:/CodexData/RinkSpace_program_tracking_tmp/solver_acceleration/round3/native/tbb_control/LICENSE.txt",
+        "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+      },
+      "source_record": {
+        "path": "D:/CodexData/RinkSpace_program_tracking_tmp/solver_acceleration/round3/native/tbb_control/README.md",
+        "sha256": "d80ff93bbdf2141d56871ce2f81620a8db9a6276a4b36a0fce36269dfb78c99b"
+      },
+      "official_release": "https://github.com/uxlfoundation/oneTBB/releases/tag/v2023.1.0",
+      "note": "Existing README records official Windows archive provenance; no archive download or ABI verification performed here."
+    }
+  ],
+  "rebuild_gaps": [
+    "The RinkSpace OneDrive project contains its integration wrappers and a byte-preserved standalone ViTPose-H helper, but not complete GVHMR/PyTorch3D source trees, external package installations or model files.",
+    "GVHMR has three current tracked local modifications. Their paths, hashes and a source-only patch against the exact Git HEAD are preserved; applying the patch to an independent clean clone and full runtime validation remain undone.",
+    "The external run_vitpose_h.py helper is byte-preserved in source_helpers with provenance; observations.py still defaults to the sibling path. Author/license and public redistribution permission are unknown.",
+    "body_prior.py checks the exact FSrotation interpreter prefix and changes cwd to its external GVHMR root. observations.py and bootstrap.py retain external absolute or sibling paths. No path refactor was made.",
+    "Current CUDA package versions differ from the frozen upstream GVHMR requirements (which name Python 3.10, torch 2.3.0+cu121 and a Linux PyTorch3D wheel). Neither recipe is a verified portable Windows rebuild of the current runtime.",
+    "GTSAM native build.bat references separate Data vendor headers/import libraries and hardcoded MSVC/conda paths. environment.yml alone does not supply the complete build toolchain.",
+    "Model byte identity records and download links do not establish redistribution rights. Exact model licenses, embedded upstream component notices and the project owner license selection remain separate public-release questions."
+  ],
+  "references": [
+    {
+      "url": "https://github.com/zju3dv/GVHMR/tree/6ec3ca39336c50492c0fae65fba2fb831fc7d866",
+      "verified_date": "2026-10-11",
+      "status": "opened"
+    },
+    {
+      "url": "https://github.com/zju3dv/GVHMR/blob/6ec3ca39336c50492c0fae65fba2fb831fc7d866/docs/INSTALL.md",
+      "verified_date": "2026-10-11",
+      "status": "opened"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zju3dv/GVHMR/6ec3ca39336c50492c0fae65fba2fb831fc7d866/LICENSE",
+      "verified_date": "2026-10-11",
+      "status": "opened"
+    },
+    {
+      "url": "https://github.com/facebookresearch/pytorch3d/tree/75ebeeaea0908c5527e7b1e305fbc7681382db47",
+      "verified_date": "2026-10-11",
+      "status": "opened"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/facebookresearch/pytorch3d/75ebeeaea0908c5527e7b1e305fbc7681382db47/LICENSE",
+      "verified_date": "2026-10-11",
+      "status": "opened"
+    },
+    {
+      "url": "https://smpl-x.is.tue.mpg.de/modellicense.html",
+      "verified_date": "2026-10-11",
+      "status": "opened"
+    },
+    {
+      "url": "https://github.com/vchoutas/smplx/blob/main/LICENSE",
+      "verified_date": "2026-10-11",
+      "status": "opened_current_text_not_installed_source_revision"
+    },
+    {
+      "url": "https://docs.ultralytics.com/models/yolo11/",
+      "verified_date": "2026-10-11",
+      "status": "opened"
+    },
+    {
+      "url": "https://github.com/borglab/gtsam/blob/develop/LICENSE",
+      "verified_date": "2026-10-11",
+      "status": "opened_current_text_not_installed_source_revision"
+    },
+    {
+      "url": "https://www.boost.org/LICENSE_1_0.txt",
+      "verified_date": "2026-10-11",
+      "status": "opened"
+    },
+    {
+      "url": "https://github.com/uxlfoundation/oneTBB/releases/tag/v2023.1.0",
+      "verified_date": "2026-10-11",
+      "status": "opened"
+    },
+    {
+      "url": "https://eigen.tuxfamily.org/index.php?title=Main_Page#License",
+      "verified_date": "2026-10-11",
+      "status": "web_fetch_failed_local_header_notice_used"
+    },
+    {
+      "url": "https://github.com/pybind/pybind11/blob/v3.0.3/LICENSE",
+      "verified_date": "2026-10-11",
+      "status": "web_fetch_failed_local_license_used"
+    }
+  ],
+  "public_distribution_review": {
+    "date": "2026-10-19",
+    "scope": "Current published files; historical external inventory remains below",
+    "project_notice": "LICENSE.md",
+    "model_provenance": "models/rink_vision.provenance.json",
+    "code_origin": "Owner confirms run_vitpose_h.py and two calibration companion helpers were generated using ChatGPT",
+    "project_plan_origin": "Owner confirms Codex generated the plans during this project; may include owner annotations",
+    "broadcast_image_files": {
+      "excluded": 27,
+      "archived": 25,
+      "loose_gitignored": 2,
+      "review_manifest": "events/ankara_2026/programmes/okada_mei_sp/review/manifest.json",
+      "private_preservation": "Data/maintenance/license_20261019/media_originals"
+    },
+    "measurement_data": "Source JSON/NPZ/GZ and numerical arrays remain unchanged; colour samples/profiles/ROI measurements retain source provenance and are not a blanket rights grant",
+    "existing_broadcast_permission_reported": false
+  }
+}

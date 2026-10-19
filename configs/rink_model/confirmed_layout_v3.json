@@ -1,0 +1,23 @@
+{
+  "schema_version": "rinkspace.user-confirmed-geometry.v1",
+  "evidence_kind": "user_statement_not_image_measurement",
+  "date": "2026-09-20",
+  "extends": "configs/rink_model/confirmed_layout_v2.json",
+  "statement_zh": "R1到冰场场边的距离和R4到冰场另一场边的距离应该是差不多的",
+  "confirmed_constraints": [{
+    "id": "approximately_equal_outer_ring_side_margins",
+    "kind": "approximate_relationship",
+    "method": "shared row midpoint approximately at y=0; retain equal spacing, equal radii and paired transverse coordinates",
+    "measurement_tolerance": null,
+    "user_supplied_numeric_tolerance": false
+  }],
+  "implementation_weight": {
+    "row_midpoint_prior_mean_model_units": 0.0,
+    "row_midpoint_prior_sigma_model_units": 0.5,
+    "model_width": 100.0,
+    "meaning": "declared soft optimization weight, not a measured error bound or a statistical confidence interval"
+  },
+  "supersedes": "The previous lack of confirmation for approximate transverse centring of the four rings",
+  "not_asserted": ["exactly equal side margins", "R and F rows equally distant from C", "metre distances", "independent geometry validation"],
+  "independent_geometry_validation": false
+}

@@ -1,0 +1,120 @@
+{
+  "assertions": {
+    "current_frame_native_reread_required": true,
+    "dimension_claims": {
+      "measurement_operator": {
+        "evidence_refs": [
+          "d0214bef7d22d26d7debfd2c3ca8d230a8be11e3d3407794a4fc1cf38a46e23e"
+        ],
+        "status": "verified",
+        "value": "C0 finite-width gray circular stroke paint_center; actual two flanks return to ice; red straight C and filled F/R interfaces are distinct"
+      },
+      "semantic_class": {
+        "evidence_refs": [
+          "d0214bef7d22d26d7debfd2c3ca8d230a8be11e3d3407794a4fc1cf38a46e23e"
+        ],
+        "status": "verified",
+        "value": "current ice painted finite-width line"
+      }
+    },
+    "episode_resolution_type": "operator_error",
+    "episode_source": {
+      "coordinate_domain": "native_pixels",
+      "native_hw": [
+        1080,
+        1920
+      ],
+      "pts": 1637376,
+      "time_base": "1/12800",
+      "video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+    },
+    "generalization_status": "source_scoped_advisory_episode_only",
+    "lesson": {
+      "current_source_remeasurement_required": true,
+      "reader_check": "single_actual_stroke_two_flanks_topology",
+      "source_qualification_granted": false,
+      "summary": "C0 是灰色有限宽中心圆，红直线是 C；用真实同一笔画两侧中线，不能把 C0 当靶圈外缘、不能以颜色猜身份。固定 C0 实体和圆形类别，后续当前RGB重新测两侧。"
+    },
+    "next_matching_frame_action": "reread_unresolved_dimensions_keep_partial_claims",
+    "position_truth_for_future_frame": "unknown_until_current_native_review",
+    "regression_request": {
+      "expected_action": "preserve_verified_dimensions_without_inventing_position",
+      "source": {
+        "coordinate_domain": "native_pixels",
+        "native_hw": [
+          1080,
+          1920
+        ],
+        "pts": 1637376,
+        "time_base": "1/12800",
+        "video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+      },
+      "visual_regression_executed": false
+    },
+    "transfer_instance_identity_without_current_context": false,
+    "transfer_pixel_coordinates_to_new_frame": false,
+    "unresolved_dimensions": [
+      "physical_instance",
+      "visibility",
+      "position"
+    ],
+    "verified_dimensions": [
+      "semantic_class",
+      "measurement_operator"
+    ]
+  },
+  "case_id": "lesson_722e9dac9322e8d0ce1696a6",
+  "evidence_refs": [
+    {
+      "current_frame": true,
+      "independent_of_model": true,
+      "kind": "native_pixels",
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint9_1018a\\native_selected_v2\\000117.png",
+      "sha256": "d0214bef7d22d26d7debfd2c3ca8d230a8be11e3d3407794a4fc1cf38a46e23e",
+      "source": {
+        "coordinate_domain": "native_pixels",
+        "native_hw": [
+          1080,
+          1920
+        ],
+        "pts": 1637376,
+        "time_base": "1/12800",
+        "video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+      }
+    }
+  ],
+  "fit_admissible": false,
+  "kind": "recipe",
+  "lineage": {
+    "source_key": "3f648d5dd37bf169d41291648fe3f5a87808fe50e0728bfffaf4e79fc9eb8a5d",
+    "source_video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+  },
+  "provenance": {
+    "authority": "source_review_declared_by_caller; not_user_confirmation",
+    "created_by": "FeedbackCycle.learn",
+    "evidence_assurance": "source identity and declarations checked; pixel interpretation is not verified by this ledger",
+    "finding_id": "finding_0d47e9f096747a58aad22e5b",
+    "resolution_id": "resolution_6b918bd42e9744f793d43298",
+    "resolution_sha256": "6b918bd42e9744f793d4329805a523743ce887c6c1042333ee62d06a53fbff2c"
+  },
+  "scope": {
+    "camera_id": null,
+    "entity_ids": [
+      "ice.C0:outer"
+    ],
+    "event_id": "ankara_2026",
+    "source_video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+  },
+  "split_role": "development",
+  "status": "active",
+  "tags": [
+    "finite_width_ice_stroke",
+    "operator_error",
+    "paint_center",
+    "physical_identity",
+    "source_recheck"
+  ],
+  "title": "C0 是灰色有限宽中心圆，红直线是 C；用真实同一笔画两侧中线，不能把 C0 当靶圈外缘、不能以颜色猜身份。固定 C0 实体和圆形类别，后续当前RGB重新测两侧。",
+  "training_eligible": false,
+  "version": 1
+}

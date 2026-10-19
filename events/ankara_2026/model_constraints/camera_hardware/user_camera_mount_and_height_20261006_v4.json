@@ -1,0 +1,272 @@
+{
+  "schema_version": "rinkspace.user-camera-facts.v1",
+  "recorded_local_date": "2026-10-02",
+  "authority": "latest_explicit_user_fixed_mount_nonzero_optical_offset_and_lens_height_clarification",
+  "programme_source_sha256": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891",
+  "camera_groups": [
+    "main_long_side",
+    "secondary_long_side",
+    "low_end"
+  ],
+  "camera_model": "Sony PXW-Z190",
+  "model_authority": "production_team_reply_relayed_and_confirmed_by_user",
+  "installation_facts": {
+    "at_rinkside": true,
+    "fixed_tripods": true,
+    "standing_camera_operators": true,
+    "observation_authority": "user_explicit_observation_of_broadcast_images"
+  },
+  "height_estimate": {
+    "description": "approximately adult male head height",
+    "numerical_range_supplied_by_user": true,
+    "user_tentative_range_above_operator_ground_m": [
+      1.5,
+      1.7
+    ],
+    "range_status": "user_tentative_visual_estimate_not_measured_or_hard_bounds",
+    "exact_measured_height": false,
+    "ground_to_ice_height_offset_measured": false,
+    "source_thread_id": "private-source-01",
+    "source_host_id": "private-source-02",
+    "source_turn_id": "private-source-03",
+    "source_message_id": "private-source-04",
+    "estimated_object": "camera lens / equivalent optical projection centre, not the tripod or tilt axis",
+    "tentative_tilt_axis_height_above_operator_ground_m": [
+      1.3,
+      1.5
+    ],
+    "tentative_axis_below_lens_m": 0.2,
+    "pivot_height_range_status": "rough initial estimate; not a measured interval or ice-relative hard bound",
+    "source_technical_summary": "三个固定机位的镜头/等效投影中心高度暂按成人头部高度作目视估计，用户给出的工作范围为距操作员地面约 1.5–1.7 m；云台俯仰支点暂估比镜头低约 0.2 m。操作员地面与冰面的高差未测量，这些数值不是精确测量或冰面基准硬边界。"
+  },
+  "installation_height_policy": {
+    "one_constant_height_per_physical_installation_across_its_own_cuts": true,
+    "independent_height_parameters_for_three_installations": true,
+    "equality_across_three_installations_required": false,
+    "equality_across_three_installations_confirmed_by_user": false,
+    "modelling_authority": "fixed_tripods_with_separate_installation_parameters",
+    "fixed_height_parameter_refers_to": "tripod_head_tilt_pivot",
+    "optical_centre_height_may_change_with_camera_rotation": true,
+    "zero_lever_fixed_optical_centre_default_rejected_by_user": true,
+    "source_technical_summary": "每个物理安装点在自身镜头序列中采用独立固定高度；三台安装的高度不要求相同。"
+  },
+  "working_height_prior": {
+    "nominal_m_per_installation": 1.6,
+    "sigma_m_per_installation": 0.18,
+    "authority": "assistant_working_gaussian_from_user_head_height_estimate_and_unmeasured_ground_offset",
+    "three_independent_priors_not_a_cross_installation_equality_constraint": true,
+    "numerical_camera_or_prior_values_changed_by_this_provenance_correction": false,
+    "applies_to": "reference-pose lens/optical-centre height with unmeasured operator-floor-to-ice offset",
+    "pivot_initialization": "Pz = reference optical Cz - (R_reference.T @ lever_camera)_z",
+    "pivot_height_is_independent_per_installation": true
+  },
+  "metres_per_original_scene_unit": 0.31353729994266055,
+  "task_instruction": "Continue the original full programme using three independent fixed pivots and shared nonzero camera-local offsets, with rotation-driven optical centres; first version keeps offsets constant in zoom.",
+  "field_settings": "Selected modelling settings were not supplied by the production team.",
+  "source_attribution_correction": {
+    "supersedes_path": "D:/OneDrive/codex_projs/RinkSpace/evidence/camera_hardware_20261001/user_camera_height_clarification_20261002.json",
+    "supersedes_sha256": "c125f20c7a1f444b81d1db79247f7316a799e32f9e5c0d9f6e0f633644866aee",
+    "correction": "The referenced research thread contains the user's tentative 150-170cm estimate. The previous record incorrectly stated that no numerical range had been supplied. Historical records and existing v5 camera/body bindings are preserved unchanged; this correction changes attribution only."
+  },
+  "rigid_mount_offset": {
+    "authority": "user_adopted_photo_based_initialization_and_bounds_from_dot",
+    "coordinate_frame": "camera-local OpenCV x right, y down, z forward",
+    "initial_camera_xyz_m": [
+      0,
+      -0.2,
+      0.1
+    ],
+    "lower_camera_xyz_m": [
+      -0.05,
+      -0.3,
+      -0.05
+    ],
+    "upper_camera_xyz_m": [
+      0.05,
+      -0.1,
+      0.25
+    ],
+    "descriptive_initial_right_up_forward_m": [
+      0,
+      0.2,
+      0.1
+    ],
+    "bounds_are_user_working_search_ranges_not_measurements": true,
+    "shared_across_same_installation_exposures": true,
+    "separate_offset_for_each_installation": true,
+    "first_version_zoom_dependent_offset_enabled": false,
+    "per_frame_free_optical_centre_enabled": false,
+    "fixed_pivot_xy_source": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\evidence\\camera_hardware_20261001\\user_tripod_positions_20261002.json",
+      "sha256": "2975563b431fb452fa06b8b4815b03566c2089cf7b210d2c08f925be6f8982ec"
+    },
+    "world_optical_centre_formula": "C = P + R_world_to_camera.T @ lever_camera",
+    "source_photo": {
+      "scope": "user-provided mechanical mount reference; not current-event rink landmarks or measured dimensions",
+      "photo_perspective_corrected_measurement": false,
+      "private_source_alias": "mechanical_mount_reference_01",
+      "public_media_included": false,
+      "verification_limit": "Original image and private location retained only in local private preservation; image pixels are not public evidence."
+    },
+    "units_conversion": "convert metric offsets to scene units once using the current uniform metric scale",
+    "source_technical_summary": "每台机位分别保留固定云台基座及非零相机局部杆臂，由云台旋转驱动投影中心；杆臂由同一机位多帧共同约束，第一版采用不随变焦变化的工作假设，禁止逐帧任意漂移。既有初值和搜索范围是工作设定而非机械测量。"
+  },
+  "supersedes_user_camera_facts": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\evidence\\camera_hardware_20261001\\user_camera_height_clarification_20261002_v2.json",
+    "sha256": "b758a378be2760d89866fde021ca5030be04679a29f9b4f46270fdba89b3cb7c"
+  },
+  "current_camera_numeric_files_modified_by_recording": false,
+  "facts_revision": "v4-20261006",
+  "v4_parent_user_camera_facts": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\camera_hardware_20261001\\user_camera_mount_and_height_20261002_v3.json",
+    "sha256": "e42424eb9f0830336cc44cd9b5d24fa0808eba2186eea00662df25b886fee3e4"
+  },
+  "v4_amendment": {
+    "recorded_local_date": "2026-10-06",
+    "timezone": "Asia/Shanghai",
+    "authority": "current_human_user_messages_received_in_root_chat_and_forwarded_verbatim_to_source_review",
+    "source_thread_id": "private-source-05",
+    "source_host_id": "private-source-02",
+    "source_message_ids": null,
+    "source_message_ids_not_supplied": true,
+    "confirmed_user_facts": {
+      "broadcast_images_show_rinkside_camera_operated_by_standing_operator": true,
+      "fixed_tripod_not_a_new_hypothesis": true,
+      "pivot_above_ice_is_confirmed_physical_fact": true,
+      "positive_pivot_guard_retained": true,
+      "near_zero_pivot_and_1_74_working_m_lever_rejected_by_user": true,
+      "latest_confirmation_does_not_create_a_new_exact_height_measurement": true
+    },
+    "repeated_photo": {
+      "bytes": 993754,
+      "sha256_actually_read_from_current_Downloads_file": true,
+      "locally_opened_for_mechanical_reference": true,
+      "same_bytes_as_v3_source_photo": true,
+      "scope": "user-provided mechanical camera/tripod/pan-tilt-head reference only; not Ankara2026 rink landmarks or current-event geometry evidence",
+      "perspective_corrected_dimensions_measured": false,
+      "private_source_alias": "mechanical_mount_reference_01",
+      "public_media_included": false,
+      "verification_limit": "Original image and private location retained only in local private preservation; image pixels are not public evidence."
+    },
+    "working_mount_range": {
+      "coordinate_frame": "camera-local OpenCV x right, y down, z forward",
+      "initial_camera_xyz_m": [
+        0,
+        -0.2,
+        0.1
+      ],
+      "lower_camera_xyz_m": [
+        -0.05,
+        -0.3,
+        -0.05
+      ],
+      "upper_camera_xyz_m": [
+        0.05,
+        -0.1,
+        0.25
+      ],
+      "original_authority": "user_adopted_photo_based_initialization_and_bounds_from_dot",
+      "user_adopted_working_search_ranges_retained": true,
+      "precise_hardware_measurement": false,
+      "metre_scale_verified": false,
+      "no_new_numerical_bounds_invented": true,
+      "one_constant_lever_per_installation": true,
+      "separate_levers_for_three_installations": true,
+      "no_per_frame_free_C": true,
+      "no_zoom_dependent_lever_in_first_version": true
+    },
+    "height_policy": {
+      "existing_1_5_to_1_7_lens_estimate_remains_tentative": true,
+      "existing_approximately_0_2_pivot_below_lens_estimate_retained": true,
+      "new_1_5_to_1_7_hard_height_bound_added": false,
+      "positive_pivot_required": true,
+      "operator_floor_to_ice_offset_not_measured": true,
+      "three_installation_heights_not_forced_equal": true
+    },
+    "observed_rejected_numeric_state": {
+      "q_sha256": "705fff93f2d217739d58958bf5058f0710ccb921d5038ac5a9c3002844c068c0",
+      "state_identity": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\mainspin_Ad4clear_v8_cut6_directionbranch_actual_fit_nodump_20261006\\accepted_states\\705fff93f2d217739d58958bf5058f0710ccb921d5038ac5a9c3002844c068c0\\state_identity.json",
+        "sha256": "badc36efaeb5a1037bb9077d2745a762cebc82a96c597d3a7957db5dd74c672d"
+      },
+      "frozen_complete_state": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\mainspin_Ad4clear_v8_cut6_directionbranch_actual_fit_nodump_20261006\\accepted_states\\705fff93f2d217739d58958bf5058f0710ccb921d5038ac5a9c3002844c068c0\\complete_state_UNACCEPTED.npz",
+        "sha256": "4fa59ff118ae7f6030a17627079b30a4a68b36c75083ac8270cb0fca7d89b201"
+      },
+      "camera": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\mainspin_Ad4clear_v8_cut6_directionbranch_actual_fit_nodump_20261006\\complete_physical_camera_model_UNACCEPTED_58996285a15a77f5.npz",
+        "sha256": "6ea01e3c8b8f9086a4be07e28dda5ffe0e20d9f85838ea38edf831ba1ae9e2dc"
+      },
+      "installation_id": "okada_sp_installation_1_conditional_z190",
+      "world_length_unit": "scene_units_metric_scale_unverified",
+      "existing_metres_per_scene_unit": 0.31353729994266055,
+      "unit_is_working_conversion_not_verified_measurement": true,
+      "q10_pivot_height_working_m": 3.124306028146983e-14,
+      "pivot_xyz_working_m": [
+        18.07445399976755,
+        -16.085562866702805,
+        3.124306028146983e-14
+      ],
+      "lever_camera_xyz_working_m": [
+        0.34340047314169597,
+        -1.5012072534610652,
+        0.8142689892257047
+      ],
+      "lever_norm_working_m": 1.7420049051632163,
+      "optical_Cz_range_working_m": [
+        1.435591199727752,
+        1.4881008110419336
+      ],
+      "abnormal_mount_pivot_decomposition": true,
+      "apparently_plausible_optical_height_does_not_validate_pivot_or_lever": true,
+      "accuracy_accepted": false
+    },
+    "current_implementation_gap_at_q705_review": {
+      "source": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\legacy\\installation_mount_candidate\\mount_graph.py",
+        "sha256": "9620b6901f90312899faa9735d0a03c960c1d8ae65d27f951f5a6e597ee6ffee"
+      },
+      "function": "validate_mounts",
+      "source_line": 200,
+      "observed_function": "def validate_mounts(state,q):\n    for name,chart in state.installation_optics.items():\n        member = next(b for b in state.blocks if b.bundle.calibration.installation_id == name)\n        lever = np.asarray(chart.calibration(member.optics_base_calibration,q).lever_xyz)*SCENE_UNIT_M\n        if not np.isfinite(lever).all() or np.linalg.norm(lever) <= 1e-8:\n            raise ValueError('One finite nonzero physical lever per installation required')",
+      "hard_mount_guard": "finite lever and norm > 1e-8 only",
+      "working_lower_upper_photo_ranges_enforced": false,
+      "lever_magnitude_upper_bound_enforced": false,
+      "new_mount_prior_rows": 0,
+      "unguarded_shared_lever_increments_can_trade_against_pivot_height": true,
+      "reference_optical_height_prior_only_constrains_C": true,
+      "related_model_entry": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\legacy\\run_shared_print_pairs_and_mount_full_source_candidate.py",
+        "source_lines": [
+          1,
+          7,
+          39,
+          46
+        ]
+      },
+      "range_removal_rationale_declared_by_current_entry": "Original photo search ranges were working initializations, not measurements, and are not hard constraints",
+      "this_model_choice_does_not_make_near_zero_pivot_or_1_74_m_lever_user_confirmed": true
+    },
+    "reference_C_preserving_working_initialization": {
+      "formula": "P_new = C_old_reference - R_reference.T @ lever_new",
+      "lever_new_is_original_v3_working_initial": [
+        0,
+        -0.2,
+        0.1
+      ],
+      "reference_camera_and_actual_alias_must_come_from_exact_same_immutable_state": true,
+      "one_fixed_XYZ_per_installation_not_per_frame_reexpression": true,
+      "pivot_must_remain_above_ice": true,
+      "other_views_C_will_change_with_new_shared_lever_and_require_complete_source_re_evaluation": true,
+      "initialization_not_an_accepted_state_or_accuracy_claim": true
+    },
+    "original_v3_fields_and_quoted_encoding_not_repaired": true,
+    "no_AGENTS_or_config_or_solver_or_camera_modified": true,
+    "source_technical_summary": "人工确认的技术事实为：转播机位由站立操作员使用固定三脚架，支点应高于冰面；近零支点与约 1.74 m 杆臂的分解已被人工否定。提供的参考图片仅说明相机、三脚架及云台的机械形态，不能用于当前赛事场地定位或透视校正尺寸测量。本次确认没有增加新的精确高度或硬数值边界。"
+  },
+  "publication_derivative": {
+    "privacy_redacted": true,
+    "original_sha256": "c1ca7ab570d60e02c54c5ce3e4a7493cdc076942447d880c2452272b29fb2b2b",
+    "retained": "Technical values, manual confirmations, rejected/unknown states and original image measurement limits; private quotations and source identifiers omitted."
+  }
+}

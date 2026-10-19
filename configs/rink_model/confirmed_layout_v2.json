@@ -1,0 +1,17 @@
+{
+  "schema_version": "rinkspace.user-confirmed-geometry.v1",
+  "evidence_kind": "user_statement_not_image_measurement",
+  "date": "2026-09-20",
+  "extends": "configs/rink_model/confirmed_ring_layout.json",
+  "statement_zh": "环间距离相等 然后 F0-R1 F1-R2 F2-R3 F3-R4 这四条连线也是和长边平行的，还有一个严重问题，中央圆C0是真的在冰场中央的 线段C是冰场中线，B1、B2是相对C对称的两条线",
+  "confirmed_constraints": [
+    {"id":"equal_ring_spacing", "method":"both rows share y_start + index * spacing"},
+    {"id":"paired_centres_parallel_long_sides", "pairs":[["F0","R1"],["F1","R2"],["F2","R3"],["F3","R4"]], "method":"paired centres share transverse coordinate"},
+    {"id":"C0_at_rink_centre", "method":"centre_circle centre fixed at [0,0]; end coordinates are -half_length and +half_length; sides remain -50 and +50"},
+    {"id":"C_at_rink_midline", "method":"red_center x fixed at 0"},
+    {"id":"B1_B2_symmetric_about_C", "method":"blue_left x=-blue_offset; blue_right x=+blue_offset"}
+  ],
+  "supersedes": ["Previous lack of confirmation for equal spacing and cross-row alignment", "F3 transverse position was prior-only; it is now inferred through confirmed relationships"],
+  "not_asserted": ["ring rows equally distant from C", "four rings centred symmetrically across the rink width", "A1-A4 identities or mirrored positions", "verified corner radii", "metre dimensions", "calibrated lens distortion"],
+  "independent_geometry_validation": false
+}

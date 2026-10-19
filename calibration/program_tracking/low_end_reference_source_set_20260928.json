@@ -1,0 +1,106 @@
+{
+  "schema": "rinkspace.low_end_reference_source_set.v1",
+  "status": "source_only_candidate_not_fitted_in_current_rig",
+  "source_video": "data/input/oxXu1avhrvs.mp4",
+  "source_sha256": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891",
+  "time_base": "1/15360",
+  "pixel_domain": "native_1920x1080",
+  "world_binding": "Resolve each named target against the current data.scene at build time; never use old fitted XYZ or camera projections as source UV.",
+  "world_binding_revision": {
+    "previous_manifest_sha256": "43aae95d3710a56e393480e6bb3a3024677a66afa1ac9858904f0a9f7b99d8b8",
+    "scope": "Only the six 205992960 user-contact groups change from the full closed board perimeter to one connected right-side contact course in the same current scene.",
+    "physical_course": "Entire lower long straight from its left tangent, lower-right corner, right-end straight, and upper-right corner through the upper-long right tangent. Tangencies come from scene extrema; no annotation transition pixel or world cutpoint is invented.",
+    "source_uv_sigma_grouping_changed": false,
+    "original_source_measurement_sha256": "59db94040b18f540800e632a83d5522d38f30ab3df25522a8972611784c23936"
+  },
+  "selection_policy": "Existing unannotated-native image reads and the user's corrected low3 contact stroke, with directly user-confirmed camera and feature identities. Low3 contact uses exactly one sparse sample set from the accepted stroke, not the rejected old red diagnostic or a second copy of the same stroke. Ambiguous hard corner membership, faint ring candidates, duplicate board reads, and historical contact holdout are excluded.",
+  "optional_user_F1": {
+    "status": "explicit_opt_in_only; current scene ring roles; original Step02 correlated quadrature weights required",
+    "step02_observations": "three_frame_refit/inputs/step02_observations.json",
+    "step02_sha256": "2ebaa742175967477f9bd1b40a1d819a3e6e4ae3c55fb671b136f6e19c4d39f3",
+    "user_contour_replacements": "three_frame_refit/inputs/user_contour_replacements.json",
+    "user_contour_sha256": "21f23a388b2fd3102e83ec0836ac0c84467e95fe157404f51320210597d3b676",
+    "source_pts": 205992960,
+    "ids_by_ring_role": {
+      "outer": "low3_205992960:user_F1_outer_full",
+      "middle": "low3_205992960:user_F1_middle_full",
+      "inner": "low3_205992960:user_F1_inner_full"
+    },
+    "historical_active_sample_counts": [384, 268, 144],
+    "historical_full_source_stroke_counts": [2544, 1753, 896],
+    "weight_policy": "Three rings are one physical group F1. Step02 each has observation_share=1/3 and a per-point arc-length integration vector whose sum is 1/3. Old fit_joint.py used residual sqrt(weight_i)*signed_nearest_projected_curve_delta_i with sigma_px=1 numerical pixel unit, linear loss (optional polish tail_scale). Step02 uncertainty.sigma_px is null: this numerical unit is not calibrated measurement sigma."
+  },
+  "frames": [
+    {
+      "source_pts": 14177280,
+      "source_time": "00:15:23.000",
+      "image_path": "evidence/low_end_reference_review_20260923/low_end_pts_14177280.png",
+      "image_sha256": "2eb4ef9ff09ada454332a73752930d8ebd01425e4a5fa816d94bafe00c1915f5",
+      "camera_identity_file": "evidence/low_end_reference_review_20260923/selected_frames.json",
+      "feature_identity_file": "evidence/low_end_reference_review_20260923/frame1_user_review.json",
+      "measurement_file": "evidence/low_end_reference_review_20260923/frame1_native_landmarks_final_candidate.json",
+      "measurement_sha256": "074810d6c79facfb5aba2d077dee1806035641a42857b0f2a4a6d1f095372860",
+      "groups": [
+        {"collection": "observations", "id": "frame1_native_B2"},
+        {"collection": "observations", "id": "frame1_native_C"},
+        {"collection": "observations", "id": "frame1_native_B1"},
+        {"collection": "observations", "id": "frame1_native_lane2_lower_visible"},
+        {"collection": "observations", "id": "frame1_native_lane1_upper_visible"}
+      ],
+      "deferred_same_frame": ["frame1_native_far_right_board_top", "frame1_native_far_right_board_contact", "frame1_native_R3_outer_visible", "frame1_native_R2_outer_visible", "frame1_native_R1_outer_visible"],
+      "deferred_reason": "Far board identity is right side including possible adjacent corners, without segment membership; ring edge selections are provisional and sometimes incomplete. Source UV remain available in the measurement file."
+    },
+    {
+      "source_pts": 205992960,
+      "source_time": "03:43:31.000",
+      "image_path": "evidence/low_end_reference_review_20260923/low_end_pts_205992960.png",
+      "image_sha256": "583b56e1bc433af0126726817db9bc2c41ad388db56188ca21d806df3cd4e7f2",
+      "camera_identity_file": "evidence/low_end_reference_review_20260923/selected_frames.json",
+      "feature_identity_file": "evidence/low_end_reference_review_20260923/frame3_user_review.json",
+      "measurement_files": [
+        {"path": "evidence/low_end_reference_review_20260923/frame3_native_landmarks_user_contact_F1_outer_20260924.json", "sha256": "501d15ce18b50d087a5360b9e2e53820882f2cd6ae6df955d9557cce14a00703"},
+        {"path": "evidence/low_end_reference_review_20260923/frame3_user_contact_sparse_samples_20260924.json", "sha256": "59db94040b18f540800e632a83d5522d38f30ab3df25522a8972611784c23936"}
+      ],
+      "groups": [
+        {"collection": "observations", "id": "frame3_right_end_top_20260924"},
+        {"collection": "neutral_ice_lines", "id": "frame3_native_far_transverse", "target": {"kind": "line_segment", "feature_id": "C"}},
+        {"collection": "neutral_ice_lines", "id": "frame3_native_middle_transverse", "target": {"kind": "line_segment", "feature_id": "B1"}},
+        {"collection": "observations", "id": "frame3_native_lane2_lower_visible"},
+        {"collection": "observations", "id": "frame3_native_lane1_upper_visible"},
+        {"file_index": 1, "collection": "groups", "id": "upper_right_corner_contact", "target": {"kind": "board_contact_course", "side": "right", "edge": "contact"}},
+        {"file_index": 1, "collection": "groups", "id": "right_end_contact", "target": {"kind": "board_contact_course", "side": "right", "edge": "contact"}},
+        {"file_index": 1, "collection": "groups", "id": "right_end_to_lower_right_contact", "target": {"kind": "board_contact_course", "side": "right", "edge": "contact"}},
+        {"file_index": 1, "collection": "groups", "id": "lower_right_corner_contact", "target": {"kind": "board_contact_course", "side": "right", "edge": "contact"}},
+        {"file_index": 1, "collection": "groups", "id": "lower_right_to_lower_side_contact", "target": {"kind": "board_contact_course", "side": "right", "edge": "contact"}},
+        {"file_index": 1, "collection": "groups", "id": "lower_long_side_contact", "target": {"kind": "board_contact_course", "side": "right", "edge": "contact"}}
+      ],
+      "deferred_same_frame": ["frame3_upper_right_top_20260924", "frame3_lower_right_top_20260924", "frame3_lower_long_side_top_20260924", "frame3_native_F1_outer_upper_left_visible_20260924", "frame3_native_F1_outer_upper_right_visible_20260924", "frame3_native_F1_outer_visible_20260924"],
+      "user_contact_policy": "These six groups are exactly the 22 existing sparse samples of one user stroke, with original group sigma 12/16/18 px and one shared correlation group. They are user observations, not independent unannotated-native rereads. Their shared world target is the connected right-side course bounded by existing current-scene tangencies; approximate group transition labels do not impose separate segment cuts. Old red diagnostic contact points stay rejected. FEEDBACK.md and checkpoint.json record the user's later statement that annotations were made as precisely as possible and must not be dismissed merely as hand drawing.",
+      "user_contact_trace": "evidence/low_end_reference_review_20260923/frame3_user_contact_sparse_samples_20260924.json"
+    },
+    {
+      "source_pts": 226160640,
+      "source_time": "04:05:24.000",
+      "image_path": "evidence/photo_review_20260923/holdout/women_sp_lower_right_226160640.png",
+      "image_sha256": "0093a12cc9ca3b882eab84f5b03a9aaa8bbc0a5804d108084b3ec582aead120a",
+      "camera_identity_file": "evidence/photo_review_20260923/holdout/women_sp_lower_right_226160640_user_semantics.json",
+      "feature_identity_file": "evidence/photo_review_20260923/holdout/women_sp_lower_right_226160640_user_semantics.json",
+      "measurement_files": [
+        {"path": "evidence/photo_review_20260923/work/low_end_off_corner_board_observations.json", "sha256": "54ce9bca58554d9f0c6de3b3eb9634b4c83b012613574138b1ea3dfdbb9bdeb5"},
+        {"path": "evidence/photo_review_20260923/holdout/women_sp_lower_right_226160640_user_landmarks_provisional.json", "sha256": "fd80ab1990d91e1104f1f10be4f98cdfd1a0925526c62fd381a29317adeacd98"}
+      ],
+      "groups": [
+        {"file_index": 0, "collection": "observations", "id": "right_end_top_straight", "target": {"kind": "board_side", "side": "right_end", "edge": "top"}},
+        {"file_index": 0, "collection": "observations", "id": "right_end_contact_straight", "target": {"kind": "board_side", "side": "right_end", "edge": "contact"}},
+        {"file_index": 0, "collection": "observations", "id": "lower_long_top_straight", "target": {"kind": "board_side", "side": "lower_long_side", "edge": "top"}},
+        {"file_index": 0, "collection": "observations", "id": "lower_long_contact_straight", "target": {"kind": "board_side", "side": "lower_long_side", "edge": "contact"}},
+        {"file_index": 1, "collection": "observations", "id": "low_B2_ice_paint"},
+        {"file_index": 1, "collection": "observations", "id": "low_C_ice_paint_user_C1"},
+        {"file_index": 1, "collection": "observations", "id": "low_B1_ice_paint"}
+      ],
+      "deferred_same_frame": ["low_lane1_upper_long_side", "low_lane1_lower_long_side", "low_R2_outer_visible", "low_R1_outer_visible", "low_F1_outer_near_arc", "low_F1_inner_near_arc_weak"],
+      "historical_check_only": "The rounded lower-right contact segment native x=850..1360 is not an input group. It was used in earlier historical holdout/sensitivity checks, so is not a fresh blind validation set.",
+      "contact_trace": "evidence/photo_review_20260923/holdout/women_sp_lower_right_226160640_contact_trace_provisional.json"
+    }
+  ]
+}

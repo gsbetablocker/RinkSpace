@@ -1,0 +1,148 @@
+{
+  "assertions": {
+    "current_frame_native_reread_required": true,
+    "dimension_claims": {
+      "measurement_operator": {
+        "evidence_refs": [
+          "8dae0802c1ba5269ecef7c8b5ce4ca2521fc3abab7a95d1ac7e0ee8b929d5036"
+        ],
+        "status": "verified",
+        "value": "declared actual target material interface; not stroke center"
+      },
+      "physical_instance": {
+        "evidence_refs": [
+          "8dae0802c1ba5269ecef7c8b5ce4ca2521fc3abab7a95d1ac7e0ee8b929d5036"
+        ],
+        "status": "verified",
+        "value": "ice.F2:outer"
+      },
+      "position": {
+        "evidence_refs": [
+          "8dae0802c1ba5269ecef7c8b5ce4ca2521fc3abab7a95d1ac7e0ee8b929d5036"
+        ],
+        "status": "verified",
+        "value": "actual current RGB signed cubic interface mean; statistical precision unknown"
+      },
+      "semantic_class": {
+        "evidence_refs": [
+          "8dae0802c1ba5269ecef7c8b5ce4ca2521fc3abab7a95d1ac7e0ee8b929d5036"
+        ],
+        "status": "verified",
+        "value": "static printed ice target material"
+      },
+      "visibility": {
+        "evidence_refs": [
+          "8dae0802c1ba5269ecef7c8b5ce4ca2521fc3abab7a95d1ac7e0ee8b929d5036"
+        ],
+        "status": "verified",
+        "value": "visible current interface outside independent actor/reflection exclusions"
+      }
+    },
+    "episode_resolution_type": "coverage_gap",
+    "episode_source": {
+      "coordinate_domain": "native_pixels",
+      "native_hw": [
+        1080,
+        1920
+      ],
+      "pts": 1301248,
+      "time_base": "1/12800",
+      "video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+    },
+    "generalization_status": "source_scoped_advisory_episode_only",
+    "lesson": {
+      "continuous_native_frame_identity_navigation_required": true,
+      "current_source_reread_required": true,
+      "operator": "material_interface",
+      "reader_check": "declared_target_material_interface",
+      "summary": "F2靶圈各层是实际材料界面；沿原生帧连续追踪同一实体和层，仅导航ROI，每到读数曝光重新读当前RGB，遮挡或换层保持缺失。"
+    },
+    "next_matching_frame_action": "propose_measurement_of_current_visible_material",
+    "position_truth_for_future_frame": "unknown_until_current_native_review",
+    "regression_request": {
+      "expected_action": "propose_measurement_of_current_visible_material",
+      "source": {
+        "coordinate_domain": "native_pixels",
+        "native_hw": [
+          1080,
+          1920
+        ],
+        "pts": 1301248,
+        "time_base": "1/12800",
+        "video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+      },
+      "visual_regression_executed": false
+    },
+    "transfer_instance_identity_without_current_context": false,
+    "transfer_pixel_coordinates_to_new_frame": false,
+    "unresolved_dimensions": [],
+    "verified_dimensions": [
+      "semantic_class",
+      "physical_instance",
+      "measurement_operator",
+      "visibility",
+      "position"
+    ]
+  },
+  "case_id": "lesson_e46966af812eeb2b107622d1",
+  "evidence_refs": [
+    {
+      "current_frame": true,
+      "independent_of_model": true,
+      "kind": "native_pixels",
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\hist_short_v1\\ring_pilot\\native\\1301248.png",
+      "sha256": "8dae0802c1ba5269ecef7c8b5ce4ca2521fc3abab7a95d1ac7e0ee8b929d5036",
+      "source": {
+        "coordinate_domain": "native_pixels",
+        "native_hw": [
+          1080,
+          1920
+        ],
+        "pts": 1301248,
+        "time_base": "1/12800",
+        "video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+      }
+    },
+    {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\hist_short_v1\\ring_anchor_review.json",
+      "sha256": "9d39686c378a9607b24037f6e12fd1a62848b0c650954a12b7198a6742415a38"
+    }
+  ],
+  "fit_admissible": false,
+  "kind": "recipe",
+  "lineage": {
+    "source_key": "ca56b2f8fe3d526590dd5a05aa76e4a9308d6e0a742b3171d545e7e7c5122daa",
+    "source_video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+  },
+  "provenance": {
+    "authority": "source_review_declared_by_caller; not_user_confirmation",
+    "created_by": "FeedbackCycle.learn",
+    "evidence_assurance": "source identity and declarations checked; pixel interpretation is not verified by this ledger",
+    "finding_id": "finding_4ae5855e41fdbe19a08a8b36",
+    "resolution_id": "resolution_41b6d3e90767423835a1b1ce",
+    "resolution_sha256": "41b6d3e90767423835a1b1ce9b664d246db225c26827075f4346e328a44c3c15"
+  },
+  "scope": {
+    "camera_id": null,
+    "entity_ids": [
+      "ice.F2:inner",
+      "ice.F2:middle",
+      "ice.F2:outer"
+    ],
+    "event_id": "ankara_2026",
+    "source_video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+  },
+  "split_role": "development",
+  "status": "active",
+  "tags": [
+    "coverage_gap",
+    "finite_physical_identity",
+    "material_interface",
+    "outer_ring",
+    "source_recheck",
+    "target_ring"
+  ],
+  "title": "F2靶圈各层是实际材料界面；沿原生帧连续追踪同一实体和层，仅导航ROI，每到读数曝光重新读当前RGB，遮挡或换层保持缺失。",
+  "training_eligible": false,
+  "version": 1
+}

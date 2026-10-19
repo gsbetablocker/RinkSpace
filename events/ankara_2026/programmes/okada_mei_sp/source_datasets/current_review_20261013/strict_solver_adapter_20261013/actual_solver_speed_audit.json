@@ -1,0 +1,1201 @@
+{
+  "schema": "rinkspace.strict-reviewed-dataset-actual-solver-speed-audit.v1",
+  "event_id": "ankara_2026",
+  "programme_id": "okada_mei_sp",
+  "scope": "实际运行阶段与加速接入审计；不代表定位准确性验收或已接受迭代速度",
+  "last_measured_run": "okada_strict_v6_828b_refined_v10_20261013",
+  "archived_graph_metadata_is_not_strict_activity": {
+    "source_file": "actual_backend_and_source_continuity.json",
+    "obsolete_raw_graph_fields": {
+      "actual_resident_source_actors": true,
+      "actual_active_motion_pairs": 2118488,
+      "original_motion_pairs": 2195232,
+      "original_motion_scalar_rows": 4390464,
+      "actual_active_motion_scalar_rows": 4236976
+    },
+    "note": "上述字段来自保留的历史raw graph缓存，不代表本轮strict实际消费的FIT像素、motion残差或已启动actor进程。不能将其命名中的actual解释为strict实际活动目标。",
+    "strict_actual_motion_FIT_points": 0,
+    "strict_actual_FIT_pixels": 1282102,
+    "strict_consumed_source_blocks": 23,
+    "strict_dataset_FIT_families": 6,
+    "nonpixel_engineering_prior_blocks": 17,
+    "authority_for_active_target": "first_complete_source_normal.json完整行块签名及actual_family_rows中的23块实际shape/nnz；strict dataset库存合同；进程只以固定PID/creation_token所属树核查",
+    "v5_observed_owned_processes_during_FD": 21,
+    "v5_observed_residual_actor_workers": 0,
+    "guard_or_explicit_human_constraints_are_separate_from_soft_FIT_pixel_blocks": true
+  },
+  "v5": {
+    "run_directory": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/okada_strict_v6_8a28_fast_v5_20261013",
+    "initial_complete_q_sha256": "8a28afed8f9f896112e5b2f64be515b2bc02019e10e09c7e0eda2598579d4891",
+    "dataset_sha256": "a835599e7d7a1a0bcf9dcd92e90fd4ad160b01e60e99975ec977d5f250f69fd8",
+    "original_FIT_points": 1282102,
+    "compact_primitive_groups": 30466,
+    "reader": {
+      "actual_full_inventory_consumption_seconds": 123.5969739999855,
+      "single_pass_FIT_HELD_validation_and_original_source_points_preserved": true
+    },
+    "first_complete_fresh_J_and_H_g": {
+      "precise_source_J_and_normal_seconds": 51.141746299981605,
+      "cold_start_seconds_at_normal_ready": 507.68961910001235,
+      "normal_ready_log_seconds_is_cold_start_total_not_J_time": true,
+      "complete_normalized_scalar_rows": 2572778,
+      "source_blocks": 23,
+      "source_jacobian_nonzeros": 53394613,
+      "normal_nonzeros": 1309079,
+      "initial_source_cost": 12022999.677314293,
+      "fresh_complete_q_not_a_previous_target_matrix": true,
+      "six_FIT_family_Gram": {
+        "actual_route": "contiguous_row_threads",
+        "requested_and_actual_jobs_per_family": 8,
+        "total_seconds": 0.6522565000341274,
+        "family_scalar_rows": [
+          169322,
+          95208,
+          95898,
+          1228900,
+          717934,
+          256942
+        ],
+        "single_row_engineering_priors_use_original_single_job": true
+      }
+    },
+    "actual_execution": {
+      "geometry_FD_requested_workers": 20,
+      "authenticated_owned_tree_observed_processes": 21,
+      "owned_parent_identity": {
+        "pid": 23776,
+        "creation_token": 134363345709993450
+      },
+      "owned_tree_sample_complete": true,
+      "sample_RSS_GiB_not_process_peak": 15.717,
+      "execution_source_snapshots": 63,
+      "execution_source_snapshot_SHA_checks_passed": 63,
+      "installed_source_snapshot_count_is_not_an_actual_used_helper_count": true,
+      "initial_normal_reused_in_RAM_at_exact_q_and_frozen_profile": true,
+      "initial_profiles_and_complete_shared_domain_reused_at_exact_q": true,
+      "persistent_full_source_matrix_files": 0,
+      "lagged_J_enabled": true,
+      "prediction_refresh_ratio": 0.25,
+      "lagged_J_at_a_new_accepted_state_not_observed_in_v5": true,
+      "adaptive_source_backtracking_enabled": true,
+      "initial_line_search_fraction": 1.0,
+      "residual_actor_workers_in_strict_graph": 0,
+      "archived_original_pixel_helpers_do_not_run_on_retired_rows": true,
+      "original_32_block_same_q_audit_is_not_the_current_23_block_strict_inventory": true
+    },
+    "QP_and_Schur": {
+      "actual_restricted_affine_backend_end_events": 58,
+      "recorded_backend_seconds_including_final_control_interruption": 90.20543520018691,
+      "measured_optional_SOC_backend_events": 4,
+      "full_diagonal_or_full_affine_fallback_events": 0,
+      "constrained_Schur_and_original_full_KKT_checks_observed": true,
+      "optional_SOC_actual_face_progress_observed": true,
+      "persistent_SOC_observed_row_hint_loaded_and_saved": true,
+      "linear_solver_backend": "faer",
+      "linear_solver_threads": 1,
+      "fixed_original_separation_batch_for_285_parameters": 142,
+      "geometric_expansion_candidate_enabled": false,
+      "forced_parallel_factorization_candidate_enabled": false,
+      "disabled_candidates_are_explicit_formal_entry_policy_not_a_runtime_fallback": true,
+      "policy_evidence": "calibration/solver_runtime/execution_acceleration.py; calibration/solver_runtime/README.md:62",
+      "forced_20_thread_QP_had_been_withdrawn_after_previous_complete_performance_trial": true
+    },
+    "confirmed_acceleration_admission_gap": {
+      "finite_station_actual_route": "original_serial",
+      "finite_station_reason": "Existing owned material pool lacks idle execution admission",
+      "confirmed_constraint_actual_route": "original_serial",
+      "confirmed_constraint_reason": "Existing owned material executor has no complete zero-pending-job receipt",
+      "cause": "新的strict ice FD直接submit并drain全部jobs后，未发布现有pool消费者识别的idle receipt；已结束的20 worker executor未获两个现有约束列加速器准入",
+      "gate_retained_original_serial_math_on_missing_receipt": true,
+      "preserved_complete_state_for_boundary_repair": true,
+      "producer_or_constraint_mathematics_changed_in_v5": false
+    },
+    "safe_stop": {
+      "status": "stopped_by_control",
+      "accepted_iterations": 0,
+      "solver_seconds": 123.07816840003943,
+      "unaccepted_trial_discarded": true,
+      "complete_checkpoint_preserved": true,
+      "reason": "在完整首轮J/Hg实测后安全保存状态，以接回已有pool idle准入；本次尚无接受周期速度或改善结论"
+    },
+    "evidence": {
+      "launch_log": {
+        "path": "../okada_strict_v6_8a28_fast_v5_20261013.launch.log",
+        "sha256": "d0755b06cce67f5bb7c8eb0b1354a59ea70bd2fca23cd4ec7217c6c67c6a5df3",
+        "relative_to": "v5.run_directory"
+      },
+      "first_complete_source_normal": {
+        "file": "first_complete_source_normal.json",
+        "sha256": "c786353e61b3b101501e1c81b2157e6e02cc4684219766d2cc9104ce665f4b7b"
+      },
+      "input_manifest": {
+        "file": "input_manifest.json",
+        "sha256": "ed0d9421cb91dc491439ee0f35326f3ae4ce6c5883fe867e4c270515b4a7a79d"
+      },
+      "actual_complete_source_preflight": {
+        "file": "strict_dataset_source_value_J_preflight.json",
+        "sha256": "01efeff3f768787c4620eac28d03a4a21a3c6f207b78d8357e250bd6786c9e06"
+      },
+      "matrix_storage_policy": {
+        "file": "matrix_storage_policy.json",
+        "sha256": "d7f46442c8a95bef1cb347d9549d77d1da8be509f9e5e008e8a794323297cf85"
+      },
+      "execution_receipt": {
+        "path": "../okada_strict_v6_8a28_fast_v5_20261013.bootstrap/execution_acceleration_receipt.json",
+        "sha256": "ae94e3ad7775de1caddade2fe3254f8c317c49059d44473a6fd2bd50442d916c",
+        "relative_to": "v5.run_directory"
+      },
+      "solver_result": "solver/solver_result.json",
+      "complete_saved_state": "solver/latest_accepted_state.npz"
+    }
+  },
+  "v6": {
+    "run_directory": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/okada_strict_v6_8a28_fast_v6_20261013",
+    "owned_parent_identity": {
+      "pid": 13104,
+      "creation_token": 134363356319973638
+    },
+    "boundary_repair_readonly_review": {
+      "strict_dataset_execution_runtime_sha256": "9a4fa8128536f9fda0d1df06b44f0f0348bbf327ea33b464687c341330c35730",
+      "strict_dataset_camera_runtime_sha256": "0ba22f8052df92f77cbf420e89c379e24ae3c69148c5c1b586851bd7d1237225",
+      "independent_selected_regression_tests_passed": 26,
+      "test_files": [
+        "tests/test_strict_dataset_pool_admission.py",
+        "tests/test_strict_dataset_camera_runtime.py",
+        "tests/test_strict_source_direction_piecewise_probe.py",
+        "tests/test_strict_reviewed_programme_source.py"
+      ],
+      "actual_executor_queue_must_be_known_empty_before_admission_and_after_consumption": true,
+      "all_submitted_futures_done_own_pending_zero_same_executor_required_before_idle_receipt": true,
+      "failure_cancels_or_consumes_pending_jobs_then_releases_owned_executor_without_idle_receipt": true,
+      "original_worker_nominal_world_and_parent_column_checks_retained": true,
+      "camera_switch_requires_all_13_original_FD_columns_and_nominal_bytes_across_six_families": true,
+      "every_new_q_camera_value_still_calls_original_producer_and_checks_exact_bytes": true,
+      "FIT_rows_sigma_model_parameter_layout_and_nonlinear_trial_operator_unchanged": true
+    },
+    "actual_measurements_available": true,
+    "actual_full_inventory_consumption_seconds": 122.93377100001089,
+    "current_material_and_source_J_preflight": {
+      "passed": true,
+      "seconds": 6.780543100030627,
+      "complete_targets": 135,
+      "source_kind_installation_directional_checks": 11,
+      "camera_FD_qualification_exposures": 18,
+      "original_camera_global_columns_per_exposure": 13,
+      "six_FIT_family_first_middle_last_exposures_qualified": true,
+      "nominal_camera25_bytes_identical": true,
+      "maximum_camera_mapping_absolute_FD_error": 7.484004527213983e-10,
+      "prepared_camera_mapping_installed_after_qualification": true,
+      "evidence": {
+        "file": "strict_dataset_source_value_J_preflight.json",
+        "sha256": "7ccda0ef05ff028a594b22742bb5175e1d03860df3ed522a313782ef4784e358"
+      }
+    },
+    "existing_material_pool_constraint_acceleration": {
+      "finite_station": {
+        "actual_route": "original_FD_private_columns",
+        "succeeded": true,
+        "workers": 20,
+        "FD_columns": 158,
+        "station_points": 11757,
+        "seconds": 9.54180589999305,
+        "pending_jobs_at_finish": 0,
+        "complete_nominal_arrays_and_physical_proof_byte_checked": true,
+        "original_caller_last_column_byte_checked": true,
+        "source_values_supports_guards_and_FD_math_changed": false
+      },
+      "confirmed_constraint": {
+        "actual_route": "original_FD_private_columns",
+        "succeeded": true,
+        "workers": 20,
+        "FD_columns": 189,
+        "source_records": 30,
+        "complete_scalar_carrier_rows": 122,
+        "original_column_math_bounds_faces_group_order_and_queries_retained": true,
+        "original_caller_final_column_and_camera_binding_replayed": true,
+        "successful_idle_executor_retained_for_original_next_stage": true
+      },
+      "v5_missing_idle_receipt_serial_fallbacks_resolved_in_actual_v6": true,
+      "evidence": [
+        "../okada_strict_v6_8a28_fast_v6_20261013.launch.log",
+        "../okada_strict_v6_8a28_fast_v6_20261013.bootstrap/station_columns_execution/actual_station_private_column_execution.jsonl",
+        "../okada_strict_v6_8a28_fast_v6_20261013.bootstrap/confirmed_constraint_columns_execution/actual_confirmed_private_column_execution.jsonl"
+      ],
+      "evidence_paths_relative_to": "v6.run_directory"
+    },
+    "first_complete_fresh_J_and_H_g_candidate_only": {
+      "source_J_and_normal_seconds": 33.94009180000285,
+      "cold_start_seconds_at_normal_ready": 359.7964979999815,
+      "complete_normalized_scalar_rows": 2572778,
+      "source_blocks": 23,
+      "source_jacobian_nonzeros": 53394613,
+      "normal_nonzeros": 1309079,
+      "initial_source_cost": 12022999.677314293,
+      "six_FIT_family_Gram_jobs": 8,
+      "six_FIT_family_Gram_total_seconds": 0.6523141000070609,
+      "initial_complete_normal_and_frozen_profile_reused_in_RAM": true,
+      "evidence": {
+        "file": "first_complete_source_normal.json",
+        "sha256": "4d9c28b741b720238384b8b76d36e6ca1294e2a0da602e364029416a4cc8475c"
+      },
+      "timing_is_not_accepted_iteration_throughput": true
+    },
+    "complete_solver_gate_failure": {
+      "exception": "RuntimeError: Actual full source Schur and sparse GN steps disagree",
+      "occurred_after_complete_fresh_normal_before_any_accepted_iteration": true,
+      "accepted_iterations": 0,
+      "new_accepted_q": false,
+      "process_exit_code": 1,
+      "complete_initial_state_preserved": true,
+      "camera_candidate_local_FD_checks_are_not_complete_solver_acceptance": true,
+      "new_camera_mapping_installer_withdrawn_after_full_gate_failure": true,
+      "original_camera_FD_restored_for_next_run": true,
+      "full_Schur_GN_native_difference_threshold_not_changed": true,
+      "successfully_executed_pool_idle_repair_retained": true
+    },
+    "pending": "v6解析camera候选已因完整Schur/GN一致性失败撤回；33.94s仅保留为失败候选局部阶段记录，不能称完整求解速度改善"
+  },
+  "v7": {
+    "run_directory": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/okada_strict_v6_8a28_fast_v7_20261013",
+    "original_camera_FD_retained": true,
+    "new_camera_mapping_candidate_enabled": false,
+    "existing_pool_idle_protocol_repair_retained": true,
+    "actual_measurements_available": true,
+    "pending": "原FD在首接受后亦触发完整Schur/GN门槛；已保存828b完整状态。新增failure-only完整q/H/g/J capture以诊断相同原方程，不能将局部51s或首接受解读为后续完整周期已正常。",
+    "owned_parent_identity": {
+      "pid": 33972,
+      "creation_token": 134363361758484010
+    },
+    "actual_complete_source_preflight": {
+      "passed": true,
+      "seconds": 7.131379599974025,
+      "complete_targets": 135,
+      "source_kind_installation_directional_checks": 11,
+      "camera_analytical_candidate_installed": false,
+      "evidence": {
+        "file": "strict_dataset_source_value_J_preflight.json",
+        "sha256": "7e8f4ddc8a31ce31daa9a139f050da732d74b09c9d902e4b24f4eab9aa465137"
+      }
+    },
+    "actual_finite_station_parallel": {
+      "workers": 20,
+      "FD_columns": 158,
+      "station_points": 11757,
+      "seconds": 9.087404500052799,
+      "succeeded": true,
+      "pending_jobs": 0
+    },
+    "actual_confirmed_constraint_parallel": {
+      "workers": 20,
+      "FD_columns": 189,
+      "source_records": 30,
+      "route": "original_FD_private_columns"
+    },
+    "first_complete_fresh_J_and_H_g": {
+      "source_J_and_normal_seconds": 50.567378799954895,
+      "cold_start_seconds_at_normal_ready": 375.3703572000377,
+      "initial_source_cost": 12022999.677314293,
+      "complete_normalized_scalar_rows": 2572778,
+      "source_blocks": 23,
+      "source_jacobian_nonzeros": 53394613,
+      "normal_nonzeros": 1309079,
+      "six_FIT_family_Gram_jobs": 8,
+      "six_FIT_family_Gram_total_seconds": 0.6377061000093818,
+      "evidence": {
+        "file": "first_complete_source_normal.json",
+        "sha256": "698e87a1cf442d083e9bf81328b207ad3fd8f564b2ce64470393de423e8439d8"
+      }
+    },
+    "complete_Schur_sparse_GN_consistency_gate_passed": true,
+    "initial_complete_normal_and_profile_reused_in_RAM": true,
+    "QP_started_after_original_GN_and_Schur_native_checks": true,
+    "actual_accepted_cycle_measurements_available": true,
+    "first_accepted": {
+      "q_sha256": "828b09ae9c5b32a586652b53594dd61f5fe954cbf1e7cb0b7eb4043055d731fb",
+      "derivative_model": "fresh_source_J",
+      "cold_start_seconds": 515.6411284000496,
+      "solver_seconds": 137.6009117999929,
+      "source_cost_before": 12022999.677314293,
+      "source_cost_after": 12007707.874908675,
+      "source_cost_reduction": 15291.802405618131,
+      "complete_Schur_GN_reference_difference_native_px": 0.0008463453406670558,
+      "original_reference_threshold_native_px": 0.001,
+      "damping": 0.512,
+      "trial": 10,
+      "stage_seconds": {
+        "constrained_schur_solve_total_seconds": 104.69091339997249,
+        "shared_curvature_measurement_total_seconds": 12.941310900030658,
+        "trial_source_cost_total_seconds": 12.292894400015939,
+        "checkpoint_write_total_seconds": 0.7447187000070699
+      }
+    },
+    "accepted_cycle_evidence": {
+      "file": "actual_accepted_cycle_performance.json",
+      "sha256_at_recorded_cycle_count": "c4c87471383aecd6eda5b8e964a083b8bd74cd99ff001efee4c94af2fc7c47b9",
+      "recorded_cycles": 1,
+      "includes_profiles_J_H_g_current_nonlinear_cost_review_and_checkpoint": true,
+      "first_accepted_includes_preparation": true
+    },
+    "subsequent_complete_gate_failure": {
+      "exception": "RuntimeError: Actual full source Schur and sparse GN steps disagree",
+      "occurred_after_first_accepted_state": true,
+      "accepted_iterations_before_failure": 1,
+      "latest_accepted_q_sha256": "828b09ae9c5b32a586652b53594dd61f5fe954cbf1e7cb0b7eb4043055d731fb",
+      "new_accepted_q_after_failure": false,
+      "original_camera_FD_was_in_use": true,
+      "camera_analytical_candidate_is_not_the_only_context_in_which_gate_failure_occurs": true,
+      "no_complete_accepted_to_accepted_wall_cycle_available": true,
+      "threshold_not_changed": true,
+      "complete_latest_accepted_state_preserved": true
+    }
+  },
+  "v9": {
+    "run_directory": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_828b_reference_v9_20261013",
+    "latest_accepted_q_sha256": "828b09ae9c5b32a586652b53594dd61f5fe954cbf1e7cb0b7eb4043055d731fb",
+    "original_camera_FD_retained": true,
+    "new_camera_mapping_candidate_enabled": false,
+    "existing_pool_idle_protocol_repair_retained": true,
+    "archived_original_motion_compaction": {
+      "original_source_bytes_maps_and_finite_duplicate_certificates_authenticated": true,
+      "admitted_motion_points": 0,
+      "retired_r_J_numeric_check": "NOT_APPLICABLE_RETIRED_PIXEL_OBJECTIVE"
+    },
+    "optimizer_continuation": {
+      "damping": 0.512,
+      "damping_inherited": true,
+      "next_fraction": 0.00390625,
+      "full_strict_human_caps_restoration_passed": true
+    },
+    "first_complete_fresh_J_and_H_g": {
+      "source_J_and_normal_seconds": 49.72967740002787,
+      "stage_ready_to_done_wall_seconds": 50.2682023,
+      "source_cost": 12007707.874908675,
+      "complete_normalized_scalar_rows": 2572778,
+      "source_blocks": 23,
+      "source_jacobian_nonzeros": 53291298,
+      "normal_nonzeros": 1299743,
+      "evidence": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_828b_reference_v9_20261013\\first_complete_source_normal.json",
+        "sha256": "c40ea641de7b491523333e4bc0b7419d3537c22ffd343cb4cf98add6fca828fc"
+      },
+      "cold_start_seconds_through_first_normal": 437.9412108999677
+    },
+    "complete_Schur_sparse_GN_consistency_gate_passed": false,
+    "new_accepted_state": false,
+    "exact_failure_capture": {
+      "directory": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_828b_reference_v9_20261013\\solver\\failed_native_reference\\828b09ae9c5b32a5_1791866513534280600",
+      "all_original_source_blocks_rows_r_J_H_g_scales_masks_and_ledgers_sealed": true,
+      "seal": {
+        "complete": true,
+        "metadata_sha256": "78e7f47b7ec13fefdd8d6d53be351f7fdbbe9eb1cbff89969781906e2143c430",
+        "numerical_state_sha256": "40c28247becc8e7a4e66dc2ad03672cf086764725c065645075896ffd0d4198c",
+        "q_sha256": "828b09ae9c5b32a586652b53594dd61f5fe954cbf1e7cb0b7eb4043055d731fb",
+        "schema": "rinkspace.complete-native-reference-capture-seal.v1",
+        "source_blocks": 23,
+        "source_rows": 2572778
+      },
+      "seal_evidence": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_828b_reference_v9_20261013\\solver\\failed_native_reference\\828b09ae9c5b32a5_1791866513534280600\\capture_complete.json",
+        "sha256": "5e201222f5aaf43d131b15f8b622971e324aa1d9a077a20b3261bc9fbd05f837"
+      },
+      "derivative_model": "fresh_source_J",
+      "lagged_J": false,
+      "iteration": 0,
+      "original_reference_error_native_px": 0.006172500681189456,
+      "original_threshold_native_px": 0.001,
+      "offline_original_source_replay_identical": true
+    },
+    "independent_same_equation_repair_qualification": {
+      "actual_production_wrapper_offline_full_source_replay_passed": true,
+      "original_native_error_px": 0.006172500681189456,
+      "refined_native_error_px": 3.978726113018638e-07,
+      "original_ridge_factor": 1e-08,
+      "coordinate_equilibration_used": false,
+      "independent_full_LU_and_Schur_residual_corrections": true,
+      "fixed_step_columns_exact_zero": 5,
+      "original_QP_source_cost_and_threshold_unchanged": true,
+      "evidence": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_828b_reference_v9_20261013\\solver\\failed_native_reference\\828b09ae9c5b32a5_1791866513534280600\\production_helper_real_fixture_audit.json",
+        "sha256": "495fbffb8ea44c52b8a65bab121a6b5a3c045a0448234d6e1ea87e88a3112677"
+      },
+      "actual_live_repaired_iteration_pending": true
+    }
+  },
+  "v10": {
+    "run_directory": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_828b_refined_v10_20261013",
+    "production_source_frozen_during_actual_run": true,
+    "original_camera_FD_retained": true,
+    "new_camera_mapping_candidate_enabled": false,
+    "existing_pool_idle_protocol_repair_retained": true,
+    "optimizer_seed": {
+      "q_sha256": "828b09ae9c5b32a586652b53594dd61f5fe954cbf1e7cb0b7eb4043055d731fb",
+      "inherited_damping": 0.512,
+      "inherited_line_search_fraction": 0.00390625
+    },
+    "first_complete_fresh_J_and_H_g": {
+      "source_J_and_normal_seconds": 49.5338189000031,
+      "cold_start_seconds_through_first_normal": 435.9680810000282,
+      "cost": 12007707.874908675,
+      "source_rows": 2572778,
+      "source_blocks": 23,
+      "J_nonzeros": 53291298,
+      "H_nonzeros": 1299743,
+      "FIT_Gram_workers": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "six_FIT_family_Gram_total_seconds": 0.6236626001191325,
+      "evidence": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_828b_refined_v10_20261013\\first_complete_source_normal.json",
+        "sha256": "2dc6286850fa1e825b175e58fdc7e1c04d3c8732fe72747ae3e2e285edd12e1c"
+      }
+    },
+    "same_equation_original_gate_refinement": [
+      {
+        "iteration": 0,
+        "q_sha256": "828b09ae9c5b32a586652b53594dd61f5fe954cbf1e7cb0b7eb4043055d731fb",
+        "derivative_model": "fresh_source_J",
+        "original_error_native_px": 0.006172500681189456,
+        "refined_error_native_px": 3.978726113018638e-07,
+        "original_threshold_native_px": 0.001,
+        "passed": true,
+        "seconds": 5.160151300020516,
+        "evidence": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_828b_refined_v10_20261013\\solver\\native_reference_refinement_000000.json",
+          "sha256": "0fc8fe30e50d03aafd2c06c7017176a9d15e7d458ea65ccc1ba0f7e086e9b37b"
+        }
+      },
+      {
+        "iteration": 1,
+        "q_sha256": "bd14ef0769ec2507ea2f117c4e658e536d28d9d31006e05e322eb1c57b3f8458",
+        "derivative_model": "lagged_J",
+        "original_error_native_px": 0.005887064674249931,
+        "refined_error_native_px": 3.23442834768694e-07,
+        "original_threshold_native_px": 0.001,
+        "passed": true,
+        "seconds": 5.459049700002652,
+        "evidence": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_828b_refined_v10_20261013\\solver\\native_reference_refinement_000001.json",
+          "sha256": "054864197be6aaa885ed2ef0d97518b7623489d354c88156baa35bed85a43696"
+        }
+      },
+      {
+        "iteration": 2,
+        "q_sha256": "ea21f043e5fb4eda250f7eb272519eb7ea935a8311706866083d3f440ae4d16c",
+        "derivative_model": "lagged_J",
+        "original_error_native_px": 0.007300674610692602,
+        "refined_error_native_px": 9.95418092063212e-07,
+        "original_threshold_native_px": 0.001,
+        "passed": true,
+        "seconds": 5.386597400007304,
+        "evidence": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_828b_refined_v10_20261013\\solver\\native_reference_refinement_000002.json",
+          "sha256": "229eb9fe7323b9f1c6286ea8f3a263cd643cdc43f4e81f6c0dfea054b0ede70f"
+        }
+      },
+      {
+        "iteration": 3,
+        "q_sha256": "485236317f191e1c66d8a496200748d8bf33365ba64a2df7acbe0b649bb3621f",
+        "derivative_model": "lagged_J",
+        "original_error_native_px": 0.0027717888180229014,
+        "refined_error_native_px": 1.752625697261112e-06,
+        "original_threshold_native_px": 0.001,
+        "passed": true,
+        "seconds": 5.368758199969307,
+        "evidence": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_828b_refined_v10_20261013\\solver\\native_reference_refinement_000003.json",
+          "sha256": "709047446ca1ba77ca345ad4c6a58d2d24a9242f562f451a14d5faa23903a7b2"
+        }
+      },
+      {
+        "iteration": 4,
+        "q_sha256": "f24e669ddf0eed3f089934ca73d9773714aa26799006a92bf1242fd995439392",
+        "derivative_model": "lagged_J",
+        "original_error_native_px": 0.005664118424288993,
+        "refined_error_native_px": 5.247278931122544e-07,
+        "original_threshold_native_px": 0.001,
+        "passed": true,
+        "seconds": 5.480894299980719,
+        "evidence": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_828b_refined_v10_20261013\\solver\\native_reference_refinement_000004.json",
+          "sha256": "dc1a61683ce0ad15a8052d559b92f38b118d5759cdd54c747fcfb03acfe00bab"
+        }
+      },
+      {
+        "iteration": 5,
+        "q_sha256": "a30b7baa7d533659f9a95d653a43455842bfb8c50f808870684cad6d52d1c35e",
+        "derivative_model": "lagged_J",
+        "original_error_native_px": 0.0076390777498949155,
+        "refined_error_native_px": 1.0492742367621122e-06,
+        "original_threshold_native_px": 0.001,
+        "passed": true,
+        "seconds": 5.68407809996279,
+        "evidence": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_828b_refined_v10_20261013\\solver\\native_reference_refinement_000005.json",
+          "sha256": "39b1273e0f821d01a704747a20e3471a2bdc9aff9268a55455d7a053539c30f3"
+        }
+      },
+      {
+        "iteration": 6,
+        "q_sha256": "8db01d7e741cc89c3224cf7994f50b8f153b0bd7d4b87c7fefd0c236c438f57e",
+        "derivative_model": "lagged_J",
+        "original_error_native_px": 0.009785171205157659,
+        "refined_error_native_px": 8.055891075575052e-07,
+        "original_threshold_native_px": 0.001,
+        "passed": true,
+        "seconds": 5.305796300002839,
+        "evidence": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_828b_refined_v10_20261013\\solver\\native_reference_refinement_000006.json",
+          "sha256": "af4493bf861ca1cbcb102deba71239ae23dfd253c7988406b6f6a6b2461d65f6"
+        }
+      },
+      {
+        "iteration": 7,
+        "q_sha256": "685c8a77677079d90acde4ee85dcb8a9e9a1a93ad555551ac0443a3eac8fc7f7",
+        "derivative_model": "lagged_J",
+        "original_error_native_px": 0.010989118032311986,
+        "refined_error_native_px": 2.99233023873765e-07,
+        "original_threshold_native_px": 0.001,
+        "passed": true,
+        "seconds": 5.36159939999925,
+        "evidence": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_828b_refined_v10_20261013\\solver\\native_reference_refinement_000007.json",
+          "sha256": "39e6311c34207e18f4c2d49ca06a44454d78271d5b4f1cc45ce896ee51e1c239"
+        }
+      }
+    ],
+    "complete_original_source_gate_passed_and_constrained_QP_entered": true,
+    "actual_owned_process_tree_observed": {
+      "parent_pid": 19560,
+      "parent_creation_token": 134363405916920575,
+      "owned_process_count": 21,
+      "geometry_FD_worker_process_count": 20,
+      "retired_residual_actor_processes": 0
+    },
+    "actual_accepted_cycles": [
+      {
+        "q_sha256": "bd14ef0769ec2507ea2f117c4e658e536d28d9d31006e05e322eb1c57b3f8458",
+        "derivative_model": "fresh_source_J",
+        "elapsed_from_run_start_seconds": 510.2627671000082,
+        "accepted_to_accepted_wall_seconds": null,
+        "solver_elapsed_seconds": 71.67372850002721,
+        "source_stage_timing_seconds": {
+          "profile_update_seconds": 0.007865599996875972,
+          "source_linearization_and_normal_seconds": 0.01716569997370243,
+          "undamped_GN_solve_seconds": 0.9632964999764226,
+          "undamped_global_reference_solve_seconds": 0.2365659999777563,
+          "native_step_replay_seconds": 8.420688699989114,
+          "shared_constraint_build_total_seconds": 0.00788210000609979,
+          "shared_constraint_build_total_calls": 1,
+          "constrained_schur_solve_total_seconds": 42.1470229998813,
+          "constrained_schur_solve_total_calls": 6,
+          "shared_curvature_measurement_total_seconds": 4.033939100045245,
+          "shared_curvature_measurement_total_calls": 5,
+          "physical_endpoint_event_seconds": 0.19041199999628589,
+          "trial_feasibility_recovery_total_seconds": 0.031921699992381036,
+          "trial_feasibility_recovery_total_calls": 5,
+          "trial_physical_guard_total_seconds": 0.2801154999178834,
+          "trial_physical_guard_total_calls": 5,
+          "trial_fraction_source_QP_and_SOC_total_seconds": 19.616471999965142,
+          "trial_fraction_source_QP_and_SOC_total_calls": 2,
+          "trial_necessary_precheck_total_seconds": 0.00029259995790198445,
+          "trial_necessary_precheck_total_calls": 2,
+          "trial_acceptance_total_seconds": 0.4669327000156045,
+          "trial_acceptance_total_calls": 1,
+          "trial_source_cost_total_seconds": 13.047464000002947,
+          "checkpoint_write_total_seconds": 0.7394300000160001,
+          "checkpoint_write_total_calls": 1,
+          "accepted_source_review_total_seconds": 2.350438399997074,
+          "accepted_source_review_total_calls": 1
+        }
+      },
+      {
+        "q_sha256": "ea21f043e5fb4eda250f7eb272519eb7ea935a8311706866083d3f440ae4d16c",
+        "derivative_model": "lagged_J",
+        "elapsed_from_run_start_seconds": 596.9531652000151,
+        "accepted_to_accepted_wall_seconds": 86.69039810000686,
+        "solver_elapsed_seconds": 158.41704210004536,
+        "source_stage_timing_seconds": {
+          "profile_update_seconds": 0.0026363999932073057,
+          "source_linearization_and_normal_seconds": 15.894043600012083,
+          "undamped_GN_solve_seconds": 0.9674528000177816,
+          "undamped_global_reference_solve_seconds": 0.22315259999595582,
+          "native_step_replay_seconds": 8.690999099984765,
+          "shared_constraint_build_total_seconds": 21.21656279999297,
+          "shared_constraint_build_total_calls": 1,
+          "constrained_schur_solve_total_seconds": 18.751484900014475,
+          "constrained_schur_solve_total_calls": 5,
+          "shared_curvature_measurement_total_seconds": 3.1130025000311434,
+          "shared_curvature_measurement_total_calls": 4,
+          "physical_endpoint_event_seconds": 0.17481390002649277,
+          "trial_feasibility_recovery_total_seconds": 0.031999099999666214,
+          "trial_feasibility_recovery_total_calls": 5,
+          "trial_physical_guard_total_seconds": 0.28706109995255247,
+          "trial_physical_guard_total_calls": 5,
+          "trial_fraction_source_QP_and_SOC_total_seconds": 10.174314100004267,
+          "trial_fraction_source_QP_and_SOC_total_calls": 2,
+          "trial_necessary_precheck_total_seconds": 0.0002992000081576407,
+          "trial_necessary_precheck_total_calls": 2,
+          "trial_acceptance_total_seconds": 0.45711620000656694,
+          "trial_acceptance_total_calls": 1,
+          "trial_source_cost_total_seconds": 12.767449799983297,
+          "checkpoint_write_total_seconds": 0.9328825999982655,
+          "checkpoint_write_total_calls": 1,
+          "accepted_source_review_total_seconds": 2.297551499970723,
+          "accepted_source_review_total_calls": 1
+        }
+      },
+      {
+        "q_sha256": "485236317f191e1c66d8a496200748d8bf33365ba64a2df7acbe0b649bb3621f",
+        "derivative_model": "lagged_J",
+        "elapsed_from_run_start_seconds": 715.0689305000124,
+        "accepted_to_accepted_wall_seconds": 118.11576529999729,
+        "solver_elapsed_seconds": 276.53537759999745,
+        "source_stage_timing_seconds": {
+          "profile_update_seconds": 0.0031063000205904245,
+          "source_linearization_and_normal_seconds": 16.5867780999979,
+          "undamped_GN_solve_seconds": 1.0555938999750651,
+          "undamped_global_reference_solve_seconds": 0.2629429000080563,
+          "native_step_replay_seconds": 8.693800200009719,
+          "shared_constraint_build_total_seconds": 21.08751129999291,
+          "shared_constraint_build_total_calls": 1,
+          "constrained_schur_solve_total_seconds": 46.46677800006,
+          "constrained_schur_solve_total_calls": 8,
+          "shared_curvature_measurement_total_seconds": 6.51198940014001,
+          "shared_curvature_measurement_total_calls": 8,
+          "physical_endpoint_event_seconds": 0.17232610000064597,
+          "trial_feasibility_recovery_total_seconds": 0.03100979997543618,
+          "trial_feasibility_recovery_total_calls": 5,
+          "trial_physical_guard_total_seconds": 0.27249420003499836,
+          "trial_physical_guard_total_calls": 5,
+          "trial_fraction_source_QP_and_SOC_total_seconds": 4.716214700078126,
+          "trial_fraction_source_QP_and_SOC_total_calls": 2,
+          "trial_necessary_precheck_total_seconds": 0.000532599980942905,
+          "trial_necessary_precheck_total_calls": 2,
+          "trial_acceptance_total_seconds": 0.4631828999845311,
+          "trial_acceptance_total_calls": 1,
+          "trial_source_cost_total_seconds": 12.46502290002536,
+          "checkpoint_write_total_seconds": 0.8842675999621861,
+          "checkpoint_write_total_calls": 1,
+          "accepted_source_review_total_seconds": 2.2949724999489263,
+          "accepted_source_review_total_calls": 1
+        }
+      },
+      {
+        "q_sha256": "f24e669ddf0eed3f089934ca73d9773714aa26799006a92bf1242fd995439392",
+        "derivative_model": "lagged_J",
+        "elapsed_from_run_start_seconds": 805.5134435000364,
+        "accepted_to_accepted_wall_seconds": 90.44451300002402,
+        "solver_elapsed_seconds": 366.9945631000446,
+        "source_stage_timing_seconds": {
+          "profile_update_seconds": 0.002873099991120398,
+          "source_linearization_and_normal_seconds": 16.071857000002638,
+          "undamped_GN_solve_seconds": 0.9483948999550194,
+          "undamped_global_reference_solve_seconds": 0.23919089999981225,
+          "native_step_replay_seconds": 8.594761899963487,
+          "shared_constraint_build_total_seconds": 26.25102289998904,
+          "shared_constraint_build_total_calls": 1,
+          "constrained_schur_solve_total_seconds": 16.88393479998922,
+          "constrained_schur_solve_total_calls": 5,
+          "shared_curvature_measurement_total_seconds": 3.9368406999856234,
+          "shared_curvature_measurement_total_calls": 5,
+          "physical_endpoint_event_seconds": 0.18551089998800308,
+          "trial_feasibility_recovery_total_seconds": 0.04265570017741993,
+          "trial_feasibility_recovery_total_calls": 7,
+          "trial_physical_guard_total_seconds": 0.3064218999934383,
+          "trial_physical_guard_total_calls": 7,
+          "trial_fraction_source_QP_and_SOC_total_seconds": 6.8625263999565504,
+          "trial_fraction_source_QP_and_SOC_total_calls": 3,
+          "trial_necessary_precheck_total_seconds": 0.0004472999135032296,
+          "trial_necessary_precheck_total_calls": 3,
+          "trial_acceptance_total_seconds": 0.4641479999991134,
+          "trial_acceptance_total_calls": 1,
+          "trial_source_cost_total_seconds": 12.511481699999422,
+          "checkpoint_write_total_seconds": 0.8684249999932945,
+          "checkpoint_write_total_calls": 1,
+          "accepted_source_review_total_seconds": 2.2803198999608867,
+          "accepted_source_review_total_calls": 1
+        }
+      },
+      {
+        "q_sha256": "a30b7baa7d533659f9a95d653a43455842bfb8c50f808870684cad6d52d1c35e",
+        "derivative_model": "lagged_J",
+        "elapsed_from_run_start_seconds": 882.5692592000123,
+        "accepted_to_accepted_wall_seconds": 77.05581569997594,
+        "solver_elapsed_seconds": 443.98003530001733,
+        "source_stage_timing_seconds": {
+          "profile_update_seconds": 0.0029039999935775995,
+          "source_linearization_and_normal_seconds": 15.862621800042689,
+          "undamped_GN_solve_seconds": 0.9470016999985091,
+          "undamped_global_reference_solve_seconds": 0.22828989999834448,
+          "native_step_replay_seconds": 8.76060249999864,
+          "shared_constraint_build_total_seconds": 20.021666200016625,
+          "shared_constraint_build_total_calls": 1,
+          "constrained_schur_solve_total_seconds": 9.951100400008727,
+          "constrained_schur_solve_total_calls": 4,
+          "shared_curvature_measurement_total_seconds": 3.1423721999744885,
+          "shared_curvature_measurement_total_calls": 4,
+          "physical_endpoint_event_seconds": 0.17219310003565624,
+          "trial_feasibility_recovery_total_seconds": 0.029857899935450405,
+          "trial_feasibility_recovery_total_calls": 5,
+          "trial_physical_guard_total_seconds": 0.2908389000222087,
+          "trial_physical_guard_total_calls": 5,
+          "trial_fraction_source_QP_and_SOC_total_seconds": 4.582140299957246,
+          "trial_fraction_source_QP_and_SOC_total_calls": 2,
+          "trial_necessary_precheck_total_seconds": 0.0002927000168710947,
+          "trial_necessary_precheck_total_calls": 2,
+          "trial_acceptance_total_seconds": 0.44681329996092245,
+          "trial_acceptance_total_calls": 1,
+          "trial_source_cost_total_seconds": 13.132836000004318,
+          "checkpoint_write_total_seconds": 0.8992445999756455,
+          "checkpoint_write_total_calls": 1,
+          "accepted_source_review_total_seconds": 2.3507055999943987,
+          "accepted_source_review_total_calls": 1
+        }
+      },
+      {
+        "q_sha256": "8db01d7e741cc89c3224cf7994f50b8f153b0bd7d4b87c7fefd0c236c438f57e",
+        "derivative_model": "lagged_J",
+        "elapsed_from_run_start_seconds": 971.5218251000042,
+        "accepted_to_accepted_wall_seconds": 88.9525658999919,
+        "solver_elapsed_seconds": 532.9908809000044,
+        "source_stage_timing_seconds": {
+          "profile_update_seconds": 0.0028142999508418143,
+          "source_linearization_and_normal_seconds": 17.383689999987837,
+          "undamped_GN_solve_seconds": 0.9833313999697566,
+          "undamped_global_reference_solve_seconds": 0.24331879999954253,
+          "native_step_replay_seconds": 9.016577300033532,
+          "shared_constraint_build_total_seconds": 23.407867399975657,
+          "shared_constraint_build_total_calls": 1,
+          "constrained_schur_solve_total_seconds": 13.627782800060231,
+          "constrained_schur_solve_total_calls": 6,
+          "shared_curvature_measurement_total_seconds": 5.449836699932348,
+          "shared_curvature_measurement_total_calls": 6,
+          "physical_endpoint_event_seconds": 0.20047199999680743,
+          "trial_feasibility_recovery_total_seconds": 0.06137519999174401,
+          "trial_feasibility_recovery_total_calls": 9,
+          "trial_physical_guard_total_seconds": 0.32562530011637136,
+          "trial_physical_guard_total_calls": 9,
+          "trial_fraction_source_QP_and_SOC_total_seconds": 10.331077399896458,
+          "trial_fraction_source_QP_and_SOC_total_calls": 4,
+          "trial_necessary_precheck_total_seconds": 0.0005920000839978456,
+          "trial_necessary_precheck_total_calls": 4,
+          "trial_acceptance_total_seconds": 0.4767392000067048,
+          "trial_acceptance_total_calls": 1,
+          "trial_source_cost_total_seconds": 13.717148899973836,
+          "checkpoint_write_total_seconds": 0.8801673999987543,
+          "checkpoint_write_total_calls": 1,
+          "accepted_source_review_total_seconds": 2.292435100011062,
+          "accepted_source_review_total_calls": 1
+        }
+      },
+      {
+        "q_sha256": "685c8a77677079d90acde4ee85dcb8a9e9a1a93ad555551ac0443a3eac8fc7f7",
+        "derivative_model": "lagged_J",
+        "elapsed_from_run_start_seconds": 1038.4373675000388,
+        "accepted_to_accepted_wall_seconds": 66.91554240003461,
+        "solver_elapsed_seconds": 599.8846562000108,
+        "source_stage_timing_seconds": {
+          "profile_update_seconds": 0.0026104000280611217,
+          "source_linearization_and_normal_seconds": 16.138560999999754,
+          "undamped_GN_solve_seconds": 0.9450020000222139,
+          "undamped_global_reference_solve_seconds": 0.22584759996971115,
+          "native_step_replay_seconds": 8.566607600019779,
+          "shared_constraint_build_total_seconds": 20.488503700005822,
+          "shared_constraint_build_total_calls": 1,
+          "constrained_schur_solve_total_seconds": 1.903919899952598,
+          "constrained_schur_solve_total_calls": 1,
+          "shared_curvature_measurement_total_seconds": 0.7951182000106201,
+          "shared_curvature_measurement_total_calls": 1,
+          "physical_endpoint_event_seconds": 0.17912470002193004,
+          "trial_feasibility_recovery_total_seconds": 0.03966670000227168,
+          "trial_feasibility_recovery_total_calls": 6,
+          "trial_necessary_precheck_total_seconds": 0.0008911999175325036,
+          "trial_necessary_precheck_total_calls": 6,
+          "trial_physical_guard_total_seconds": 0.2956248000264168,
+          "trial_physical_guard_total_calls": 6,
+          "trial_acceptance_total_seconds": 0.45518980000633746,
+          "trial_acceptance_total_calls": 1,
+          "trial_source_cost_total_seconds": 12.908244099991862,
+          "checkpoint_write_total_seconds": 0.8804630999802612,
+          "checkpoint_write_total_calls": 1
+        }
+      }
+    ],
+    "actual_accepted_cost_steps": [
+      {
+        "iteration": 0,
+        "cost": 12007707.874908675,
+        "next_cost": 11999510.254907614,
+        "damping": 2.048,
+        "trial": 3,
+        "actual_full_GN_reference_difference_native_px": 3.978726113018638e-07,
+        "source_cost_decrease": 8197.620001060888,
+        "relative_source_cost_decrease": 0.0006826964884939155
+      },
+      {
+        "iteration": 1,
+        "cost": 11999510.254907614,
+        "next_cost": 11995367.189773949,
+        "damping": 8.192,
+        "trial": 3,
+        "actual_full_GN_reference_difference_native_px": 3.23442834768694e-07,
+        "source_cost_decrease": 4143.065133664757,
+        "relative_source_cost_decrease": 0.00034526951897643555
+      },
+      {
+        "iteration": 2,
+        "cost": 11995367.189773949,
+        "next_cost": 11993279.039601749,
+        "damping": 32.768,
+        "trial": 3,
+        "actual_full_GN_reference_difference_native_px": 9.95418092063212e-07,
+        "source_cost_decrease": 2088.150172200054,
+        "relative_source_cost_decrease": 0.000174079720875923
+      },
+      {
+        "iteration": 3,
+        "cost": 11993279.039601749,
+        "next_cost": 11992758.447328066,
+        "damping": 262.144,
+        "trial": 4,
+        "actual_full_GN_reference_difference_native_px": 1.752625697261112e-06,
+        "source_cost_decrease": 520.5922736823559,
+        "relative_source_cost_decrease": 4.340700086801639e-05
+      },
+      {
+        "iteration": 4,
+        "cost": 11992758.447328066,
+        "next_cost": 11992497.615554225,
+        "damping": 1048.576,
+        "trial": 3,
+        "actual_full_GN_reference_difference_native_px": 5.247278931122544e-07,
+        "source_cost_decrease": 260.8317738417536,
+        "relative_source_cost_decrease": 2.174910592815832e-05
+      },
+      {
+        "iteration": 5,
+        "cost": 11992497.615554225,
+        "next_cost": 11992465.00908356,
+        "damping": 16777.216,
+        "trial": 5,
+        "actual_full_GN_reference_difference_native_px": 1.0492742367621122e-06,
+        "source_cost_decrease": 32.606470664963126,
+        "relative_source_cost_decrease": 2.718905745094554e-06
+      },
+      {
+        "iteration": 6,
+        "cost": 11992465.00908356,
+        "next_cost": 11992462.970892513,
+        "damping": 536870.912,
+        "trial": 6,
+        "actual_full_GN_reference_difference_native_px": 8.055891075575052e-07,
+        "source_cost_decrease": 2.038191046565771,
+        "relative_source_cost_decrease": 1.6995597193921066e-07
+      }
+    ],
+    "accepted_cycle_evidence": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_828b_refined_v10_20261013\\actual_accepted_cycle_performance.json",
+      "sha256": "e568317a0580b4e12b2bcc5799de43c15e8e18a149291ea467a749eec02c87a0",
+      "recorded_cycles": 7,
+      "file_can_grow_during_run": false
+    },
+    "continued_real_solver_iteration": false,
+    "source_cost_plateau_or_accuracy_acceptance_claimed": false,
+    "user_requested_stop_after_completed_step": true,
+    "final_accepted_state": {
+      "q_sha256": "685c8a77677079d90acde4ee85dcb8a9e9a1a93ad555551ac0443a3eac8fc7f7",
+      "source_cost": 11992462.970892513,
+      "accepted_steps": 7,
+      "last_step_cost_decrease": 2.038191046565771,
+      "last_step_relative_cost_decrease": 1.6995597193921066e-07
+    },
+    "stop_reason": "User explicitly requested stopping after this completed step and exporting the complete review video",
+    "stopped_by_control_evidence": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_828b_refined_v10_20261013\\solver\\control.json",
+      "sha256": "a640d9a3aeeab900280a99cda143f81f0d8f8c88a9a74c4ec381c69646f994ec"
+    },
+    "stopped_processes": {
+      "parent_pid": 19560,
+      "parent_creation_token": 134363405916920575,
+      "parent_absent": true,
+      "owned_tree_count": 0,
+      "all_previously_observed_20_FD_worker_PIDs_absent": true,
+      "verification": "WinAPI process_identity plus token-bound sample_owned_tree; no process termination by audit"
+    },
+    "numerical_GN_convergence_claimed": false,
+    "visual_accuracy_accepted": false,
+    "plateau_context": {
+      "observed_cost_decrease_trend": [
+        8197.620001060888,
+        4143.065133664757,
+        2088.150172200054,
+        520.5922736823559,
+        260.8317738417536,
+        32.606470664963126,
+        2.038191046565771
+      ],
+      "observed_relative_cost_decrease_trend": [
+        0.0006826964884939155,
+        0.00034526951897643555,
+        0.000174079720875923,
+        4.340700086801639e-05,
+        2.174910592815832e-05,
+        2.718905745094554e-06,
+        1.6995597193921066e-07
+      ],
+      "latest_native_undamped_GN_step_remains_large": true,
+      "near_existing_focal_domain_boundary": {
+        "programme_family": "low",
+        "actual_pts": 230903040,
+        "canonical_logf_index": 20301,
+        "existing_focal_upper_limit": 50000.0,
+        "first_four_accepted_focal_values": [
+          24082.19,
+          37095.55,
+          46064.01,
+          48573.13
+        ],
+        "not_in_285_shared_parameters": true,
+        "QP_original_box_applies_to_shared_parameters": true,
+        "no_existing_full_view_box_QP_hook_was_omitted": true,
+        "focal_values_rounded_to_two_decimals": true
+      },
+      "exact_rejection_offender_not_saved": true,
+      "all_rejections_not_attributed_to_this_single_exposure": true,
+      "new_QP_prior_or_domain_added": false,
+      "visual_or_numeric_convergence_not_inferred_from_cost_plateau": true
+    },
+    "final_read_only_model_and_HELD_audit": {
+      "schema": "rinkspace.final-read-only-model-and-held-audit.v1",
+      "scope": "Read-only authentication and unchanged-HELD comparison after user-directed solver stop; no fit, source selection or parameter adjustment.",
+      "solver_continued": false,
+      "production_sources_changed": false,
+      "accuracy_accepted": false,
+      "visual_accuracy_accepted": false,
+      "metric_accuracy_accepted": false,
+      "initial_V7_8a_state": {
+        "q_sha256": "8a28afed8f9f896112e5b2f64be515b2bc02019e10e09c7e0eda2598579d4891",
+        "parameter_count": 34340,
+        "q_bytes_sha256_matches": true,
+        "state_identity": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_8a28_fast_v7_20261013\\initial_states\\8a28afed8f9f896112e5b2f64be515b2bc02019e10e09c7e0eda2598579d4891\\state_identity.json",
+          "sha256": "47215ae210e177e383b066f54583728f2eb2ab4da0b2bb06b957f71ed4e0d6a6"
+        },
+        "files": {
+          "state_npz": {
+            "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_8a28_fast_v7_20261013\\initial_states\\8a28afed8f9f896112e5b2f64be515b2bc02019e10e09c7e0eda2598579d4891\\complete_state_UNACCEPTED.npz",
+            "sha256": "12f5e64fddeeb119d5e54aa704197a2c2dffe0169bb66e02029127be5d4ba1f2",
+            "matches_state_identity": true
+          },
+          "scene": {
+            "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_8a28_fast_v7_20261013\\initial_states\\8a28afed8f9f896112e5b2f64be515b2bc02019e10e09c7e0eda2598579d4891\\scene_UNACCEPTED.json",
+            "sha256": "34871722b9cf5b3cc728ccd9ce2c4f33c55ef56e7d2ad3dd4f717eee20623753",
+            "matches_state_identity": true
+          },
+          "source_review": {
+            "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_8a28_fast_v7_20261013\\initial_states\\8a28afed8f9f896112e5b2f64be515b2bc02019e10e09c7e0eda2598579d4891\\source_review_UNACCEPTED.json",
+            "sha256": "75abc21048c6689e8c145cd62267152f0f683b8c7c6edd17b1005061489485d6",
+            "matches_state_identity": true
+          },
+          "camera": {
+            "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_8a28_fast_v7_20261013\\complete_physical_camera_model_UNACCEPTED_ddff0a574df9f9a6.npz",
+            "sha256": "0428e5cfcad7ab6b40077c0d49ca4d8118a57d1fb219c1b0bd025b4c989fe949",
+            "matches_state_identity": true
+          },
+          "input_manifest": {
+            "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_8a28_fast_v7_20261013\\input_manifest.json",
+            "sha256": "88a1c4192e1440d7ea331430b748e5e8f48555d3f2d9c91832e5ebded2345050",
+            "matches_state_identity": true
+          }
+        },
+        "accuracy_accepted": false,
+        "accepted_state_J_status": null,
+        "boundary_focal": 8468.385658042294,
+        "boundary_log_upper_margin": 1.7756831102022268
+      },
+      "final_V10_state": {
+        "q_sha256": "685c8a77677079d90acde4ee85dcb8a9e9a1a93ad555551ac0443a3eac8fc7f7",
+        "parameter_count": 34340,
+        "q_bytes_sha256_matches": true,
+        "state_identity": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_828b_refined_v10_20261013\\accepted_states\\685c8a77677079d90acde4ee85dcb8a9e9a1a93ad555551ac0443a3eac8fc7f7\\state_identity.json",
+          "sha256": "28d02dce4923eb8e41bab935a5f8b44b8e95b7d50005e9612611440e04c4944f"
+        },
+        "files": {
+          "state_npz": {
+            "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_828b_refined_v10_20261013\\accepted_states\\685c8a77677079d90acde4ee85dcb8a9e9a1a93ad555551ac0443a3eac8fc7f7\\complete_state_UNACCEPTED.npz",
+            "sha256": "f4b561156b6505534ae53b0207879567090c263d4d19ab9205efb7bca8977bc8",
+            "matches_state_identity": true
+          },
+          "scene": {
+            "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_828b_refined_v10_20261013\\accepted_states\\685c8a77677079d90acde4ee85dcb8a9e9a1a93ad555551ac0443a3eac8fc7f7\\scene_UNACCEPTED.json",
+            "sha256": "6f57ef53c2fd75d34b92be52df73a1d7bc8f06f86bd758484a14a6c4517a4ef9",
+            "matches_state_identity": true
+          },
+          "source_review": {
+            "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_828b_refined_v10_20261013\\accepted_states\\685c8a77677079d90acde4ee85dcb8a9e9a1a93ad555551ac0443a3eac8fc7f7\\source_review_UNACCEPTED.json",
+            "sha256": "f069c155ec007687c5a4a6bb959e501d286c52c8124aa91d186f6b0216baebb9",
+            "matches_state_identity": true
+          },
+          "camera": {
+            "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_828b_refined_v10_20261013\\complete_physical_camera_model_UNACCEPTED_ef9c112c4a2060d6.npz",
+            "sha256": "95882386edc956879d822733c677938a3d52652d1aeb025720c859ca63dfed1d",
+            "matches_state_identity": true
+          },
+          "input_manifest": {
+            "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_strict_v6_828b_refined_v10_20261013\\input_manifest.json",
+            "sha256": "62c4614e0af4592ee02f6b111ba56cd0d9a6fe6918b4ec516e171f73d349969d",
+            "matches_state_identity": true
+          }
+        },
+        "accuracy_accepted": false,
+        "accepted_state_J_status": "Generated and frozen by the following actual optimizer linearization; pending if directed review stops before then",
+        "boundary_focal": 49993.46190128612,
+        "boundary_log_upper_margin": 0.00013077052437004966
+      },
+      "same_dataset_reference": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\current_review_20261013\\specific_inner_review_v6\\fit_dataset.json",
+        "sha256": "a835599e7d7a1a0bcf9dcd92e90fd4ad160b01e60e99975ec977d5f250f69fd8"
+      },
+      "same_dataset_file_sha256_verified": true,
+      "same_source_loss_policy": true,
+      "final_camera_coverage": {
+        "native_presentations": 10123,
+        "actual_exposures": 8503,
+        "first_native_pts": 229114112,
+        "last_native_pts": 231705344,
+        "source_time_base": "1/15360",
+        "source_sha256": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891",
+        "first_source_time": "04:08:36.283333",
+        "last_source_time": "04:11:24.983333"
+      },
+      "HELD_comparison": {
+        "statistic": "Unweighted Euclidean distance in original native1920x1080 pixels; no sigma normalization or missing-sigma filling.",
+        "same_observation_actual_pts_model_target_source_locators_point_count_missing_sigma_order": true,
+        "points": 2368,
+        "compact_groups": 79,
+        "actual_exposures": 17,
+        "missing_original_sigma_points": 314,
+        "held_used_in_fit": false,
+        "HELD_used_for_parameter_adjustment": false,
+        "HELD_used_for_stop_or_state_selection": false,
+        "initial_V7_8a": {
+          "mean_px": 3.5458887770271117,
+          "median_px": 0.5140138612509516,
+          "p95_px": 9.1277783074976,
+          "max_px": 680.475829765636
+        },
+        "final_V10": {
+          "mean_px": 3.5413825226318996,
+          "median_px": 0.5154983152509016,
+          "p95_px": 9.158731411700169,
+          "max_px": 680.1885545718607
+        },
+        "mean_delta_px": -0.004506254395212103,
+        "improved_points": 1257,
+        "worsened_points": 1111,
+        "unchanged_points": 0,
+        "maximum_point_improvement_px": 1.3539035044567527,
+        "maximum_point_worsening_px": 0.903861054538222,
+        "persistent_maximum": {
+          "actual_pts": 230382336,
+          "model_target": {
+            "kind": "current_scene_ice_curve",
+            "curve_id": "F2:center",
+            "feature_id": "F2",
+            "world_curve_role": "center"
+          },
+          "query_index_within_original_group": 0,
+          "group_points": 25,
+          "source_time": "04:09:58.850",
+          "programme_video_time": "01:22.566667",
+          "raw_native_distance_px_initial": 680.475829765636,
+          "raw_native_distance_px_final": 680.1885545718607
+        },
+        "interpretation": "Mean changes slightly downward while median and p95 change slightly upward; the large F2:center outlier persists. These statistics do not establish complete-shot visual or metric accuracy."
+      },
+      "final_focal_boundary": {
+        "programme_family": "low",
+        "installation_id": [
+          "okada_sp_installation_2_conditional_z190"
+        ],
+        "actual_pts": 230903040,
+        "canonical_and_evaluation_logf_column": 20301,
+        "initial_V7_8a_focal": 8468.385658042294,
+        "V10_seed_828b_focal": 10159.196545700313,
+        "V10_accepted_focal_sequence": [
+          {
+            "q_sha256": "bd14ef0769ec2507ea2f117c4e658e536d28d9d31006e05e322eb1c57b3f8458",
+            "focal": 24082.190192119815
+          },
+          {
+            "q_sha256": "ea21f043e5fb4eda250f7eb272519eb7ea935a8311706866083d3f440ae4d16c",
+            "focal": 37095.5476555454
+          },
+          {
+            "q_sha256": "485236317f191e1c66d8a496200748d8bf33365ba64a2df7acbe0b649bb3621f",
+            "focal": 46064.012211173795
+          },
+          {
+            "q_sha256": "f24e669ddf0eed3f089934ca73d9773714aa26799006a92bf1242fd995439392",
+            "focal": 48573.129267972305
+          },
+          {
+            "q_sha256": "a30b7baa7d533659f9a95d653a43455842bfb8c50f808870684cad6d52d1c35e",
+            "focal": 49827.65505538599
+          },
+          {
+            "q_sha256": "8db01d7e741cc89c3224cf7994f50b8f153b0bd7d4b87c7fefd0c236c438f57e",
+            "focal": 49983.71486565339
+          },
+          {
+            "q_sha256": "685c8a77677079d90acde4ee85dcb8a9e9a1a93ad555551ac0443a3eac8fc7f7",
+            "focal": 49993.46190128612
+          }
+        ],
+        "final_focal": 49993.46190128612,
+        "existing_upper_limit": 50000.0,
+        "final_linear_upper_margin": 6.538098713877844,
+        "final_log_upper_margin": 0.00013077052437004966,
+        "source_time_seconds": 15032.75,
+        "source_time": "04:10:32.750",
+        "programme_video_seconds": 116.46666666666667,
+        "programme_video_time": "01:56.466667",
+        "not_in_285_shared_parameter_QP_chart": true,
+        "existing_original_QP_box_is_shared_only": true,
+        "no_existing_full_view_box_QP_hook_was_omitted": true,
+        "exact_rejection_offender_not_saved": true,
+        "focal_upper_boundary_is_only_possible_progress_decay_context": true,
+        "all_rejections_attributed_to_this_exposure": false,
+        "physical_domain_or_prior_changed": false,
+        "numerical_convergence_proven": false
+      },
+      "source_clock_evidence": {
+        "profile": {
+          "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\complete_review_export_profile.json",
+          "sha256": "1edc138aca52cd61fe23781dd7f674defa24c9be29bc835f2f7ba540a5a99684"
+        },
+        "source_path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/media/originals/oxXu1avhrvs.mp4",
+        "source_video_sha256_from_authenticated_profile_and_camera": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891",
+        "large_video_sha256_recomputed_in_this_lightweight_audit": false,
+        "direct_video_header_and_first_decoded_frame": {
+          "format_start_time_us": 0,
+          "video_start_time_pts": 0,
+          "first_decoded_pts": 0,
+          "video_time_base": "1/15360"
+        }
+      },
+      "limitations": [
+        "No complete-shot visual accuracy approval has been made; the final review video remains for user inspection.",
+        "Camera export declares scene_units_metric_scale_unverified and conditional_final_effective_proxy_not_identified_optical_zoom; focal values are effective final-image parameters, not a measured optical zoom calibration.",
+        "HELD results are only unchanged-input diagnostics. The persistent large F2:center discrepancy requires original-source visual inspection; no observation was removed or tuned in this audit.",
+        "The diminishing accepted cost decreases and nearby focal bound do not prove numerical GN convergence or identify every rejected exposure."
+      ]
+    }
+  }
+}

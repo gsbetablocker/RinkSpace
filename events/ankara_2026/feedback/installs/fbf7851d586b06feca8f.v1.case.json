@@ -1,0 +1,86 @@
+{
+  "assertions": {
+    "counterexample": "Installing a bounded correction does not establish new-frame visual improvement or model accuracy.",
+    "installation": {
+      "applicability": "exact_source_snapshot_and_locators_only",
+      "formal_dataset_promotion": false,
+      "packet_reference": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\test_installer_isolated\\test_source_only_single_stroke0\\correction.json",
+        "sha256": "fbf7851d586b06feca8f9176e0671a894c313b43e495ed451c3aaaf4091fefa2"
+      },
+      "qualification_and_compaction_completion_not_inferred": true,
+      "rows": [
+        {
+          "locator": {
+            "block": "low",
+            "collection_role": "FIT",
+            "group_actual_pts": 230365184,
+            "group_order": 0,
+            "row_order": 0
+          },
+          "measurement_role": "painted_line_center",
+          "physical_edge_role": "painted_line_center",
+          "point_indices": [
+            0,
+            1,
+            2
+          ],
+          "retired_original_point_indices": [],
+          "retired_points_require_verified_physical_input_compaction": false
+        }
+      ],
+      "runtime_rows_installed": true
+    },
+    "position": {
+      "current_frame_positions_must_be_read_from_original_RGB": true,
+      "pixel_ground_truth": false
+    }
+  },
+  "case_id": "source_install:fbf7851d586b06feca8f9176e0671a894c313b43e495ed451c3aaaf4091fefa2",
+  "evidence_refs": [
+    {
+      "kind": "installed_source_revision",
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\test_installer_isolated\\test_source_only_single_stroke0\\correction.json",
+      "sha256": "fbf7851d586b06feca8f9176e0671a894c313b43e495ed451c3aaaf4091fefa2"
+    },
+    {
+      "kind": "original_observation_snapshot",
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\test_installer_isolated\\test_source_only_single_stroke0\\original.pkl",
+      "sha256": "303838d10a2a0098a18418da1e5ca30b5875a76a9c584ba6a422906c3a237000"
+    },
+    {
+      "kind": "native_image",
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\test_installer_isolated\\test_source_only_single_stroke0\\source.png",
+      "pts": 230365184,
+      "sha256": "a77f603851a131880e15e8aaf645f4d038bc7176dd8c1be656e3d3462ae3f2a1"
+    }
+  ],
+  "lineage_ids": [
+    "capture:f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891"
+  ],
+  "provenance": {
+    "authority": "existing_source_observation_installer",
+    "implementation": "original_ice_pixel_correction.install_original_ice_pixel_correction",
+    "source": {
+      "coordinate_domain": "native_pixels",
+      "pts": 230365184,
+      "time_base": "1/15360",
+      "video_sha256": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891"
+    }
+  },
+  "scope": {
+    "camera_id": null,
+    "entity_ids": [],
+    "event_id": "ankara_2026",
+    "source_video_sha256": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891"
+  },
+  "split_role": "development",
+  "status": "active",
+  "tags": [
+    "source_installation",
+    "exact_observation_version",
+    "visual_accuracy_unknown"
+  ],
+  "title": "已认证原片观测修订已进入运行状态；精度和完整安装链另行验收",
+  "version": 1
+}

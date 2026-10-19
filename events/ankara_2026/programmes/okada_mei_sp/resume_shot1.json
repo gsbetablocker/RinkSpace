@@ -1,0 +1,1025 @@
+{
+  "schema": "rinkspace.user-requested-shot1-handoff.v1",
+  "recorded_at_utc": "2026-10-16 02:04:31 UTC",
+  "status": "active_user_resumed",
+  "user_request": "尽快停下并记录继续的明确入口，现在这个对话太长了，要在新对话继续。",
+  "entry": "D:\\OneDrive\\codex_projs\\RinkSpace\\START_HERE.html",
+  "goal": "保留已修好的材料、广告与场地问题，修好官方50fps节目第一镜头的相机物理、时间连续性和残存实体贴合。广角只作冰场几何参考，不再单独拟合广角相机。",
+  "constraints": [
+    "不重新初始化项目，不回滚全部修正，不重复启动已有任务；先核文件、最近改动和真实进程实例。",
+    "遵守项目AGENTS.md、docs/VALIDATION.md；仅核实静止冰面/围挡材料入拟合。",
+    "用户已提供机身/云台/摄影师画面和摄制团队型号回复；主长边机位Sony PXW-Z190，其他安装独立，广角型号未确认。",
+    "整镜头同一固定安装的真实摇镜、俯仰、变焦；有PTS和帧间插值不能代替运动符合原片的验证。",
+    "最接近60×30的条件米制换算不是实测；整体工作单位缩放不能解释相对位置、比例或局部旧单位错误。",
+    "仅明显改善的实际叠加画面才进入整镜头视频；视频只给本地路径和源时钟供PotPlayer，当前没有新验收视频。"
+  ],
+  "source": {
+    "programme": "Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026",
+    "fps": "50/1",
+    "time_base": "1/12800",
+    "native_exposures": 1248,
+    "source_seconds": [
+      20.02,
+      44.96
+    ],
+    "native_pts": [
+      256256,
+      575488
+    ],
+    "pts_step": 256,
+    "note": "假60帧问题已由用户换原生50帧消除；当前异常不应再归咎重复曝光。",
+    "source_identity_manifest": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_jointf\\media_manifest.json"
+  },
+  "stopped_fit": {
+    "branch": "fixed_head_jointj",
+    "directory": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_jointj",
+    "latest_accepted_directory": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_jointj\\accepted_states\\0024_8f28cdafe19e",
+    "q_sha256": "8f28cdafe19ee7eac05554ebeccbc18a45db24f4dbbf038cb37ee2db30dfbdce",
+    "canonical": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_jointj\\accepted_states\\0024_8f28cdafe19e\\canonical.npz",
+    "complete_state": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_jointj\\final_complete_state.npz",
+    "parent_QA": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\native_time_parent_QA.json",
+    "parent_QA_sha256": "1583b07a296296fc4d9c468cb42d9bbe57cc5534a1f5c08105f68fb8061bbaee",
+    "shutdown": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\j_owner_shutdown.json",
+    "shutdown_sha256": "41dd8228ed4e3cfe900799c744c133d5f92aaaa34e6e136c255530414857a803",
+    "final_status": "stopped_by_control; no kill; no new owner launched",
+    "inherited_aux_arrays": 131,
+    "parent_damping": 1e-12,
+    "parent_next_fraction": 1,
+    "programme_cost": 523695.9482,
+    "wide_cost": 2725.471,
+    "accuracy_accepted": false,
+    "note": "canonical、公用checkpoint、final payload的q/全部aux/λ/fraction已逐位认证；history/reviews/elapsed非数值不同的原文件均保留。新accepted不等于fresh J。",
+    "J_cache": {
+      "directory": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_jointj\\source_J_cache\\generation_000000",
+      "anchor_q_sha256": "5a7bdda39cd1fab9395f01e71195ca0947c2cad886326ca8998aa746c09e242c",
+      "shape": [
+        225211,
+        7700
+      ],
+      "note": "唯一fresh anchor为i7/j0；j1至j24使用lagged J配合实际当前r/cost/原guard，不能当j24 fresh J复用到新模型。"
+    }
+  },
+  "preserved_work": {
+    "model": "7700完整参数/7687节目参数；当前j共享172、固定3784；同一R2安装，两轴摇镜+俯仰，独立native PP和第三姿态槽全零，未知全镜头常数PP可估，四个PP变焦项精确零。",
+    "optics": "共享Brown、光心随姿态/变焦、安装杆臂及连续总偏移原工作范围均保留；范围不是实测硬件尺寸。",
+    "print_QP": "原16489顶点域精确压为368支持半空间接入QP；原严格分母/正行列式/材料与物理guard全部保留，不放宽印刷边界。",
+    "materials": "全部1248原UV/fullW/源时钟保留；C0 334–459的126归属不明完整组隔离；Ad5 4977点中3116保留、1817实体ID修正、44不明普通点隔离，原235孔洞保留；不按误差挑删点。",
+    "source_authentication": "I/full_material_frames_QA.json、source_snapshot/source.json、fixed_head_jointf/actual_source_QA/proof.json等已有完整证明。新T模型须算fresh当前r/J，但无需重放旧7分钟rawshadow身份审计。",
+    "wide": "44组/4278 formal rows仅几何参考，独立相机与时钟；不重开wide_only44。"
+  },
+  "current_evidence": {
+    "j10_directory": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_jointj\\accepted_states\\0010_0639fd50d0cf\\review",
+    "actual_viewed": "physical_stills/programme/frame_0201.png、frame_1248.png：201广告外框收回但字形仍偏，1248中线方向/近端和广告仍有残差；未验收。",
+    "native_78_82": "j10 native_samples/五图已生成、尚未逐图审阅，receipt SHA55d0ffab93cbd0238ef950bc59191e9950d8468aed23643cf5d94f21abef6f0b；j1相邻5图已实看且有模型跳动。",
+    "full_physical_audit": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_jointj\\accepted_states\\0008_76a9b4dcb6fb\\root_physical_audit.json",
+    "physical_issue": "j24的78–82已连续单调，不能继续沿用j8交替结论；当前实查最大logf邻跳在864–867附近约3%，1237→1238亦有2.65%焦距跳和光心跳，正结合静止材料RGB核实。",
+    "Brown_audit": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_jointj\\accepted_states\\0001_f97d1874a3a9\\Brown_sensor_field.json",
+    "j16_layout": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_jointj\\accepted_states\\0016_fcca3eaa5dca\\review\\j16_vs_q0.json",
+    "layout_warning": "j16对q0归一后A1/A2中心约42cm、A3/A4约85cm；不是单纯统一单位换算可抵消。是否实际纠正或被错误牵动尚未归因；不能泛称全部小幅。",
+    "A_dependency": "latent48 structured_shared_ice_template.py 172–190: A=goal_anchor+inward*p4±transverse*p5，goal_anchor由当前wall±p7/p8与共享轴构成；p4 inward距离、p5横向半距、p7/8 goal-to-wall。已释放p4/p5/p8的真实canonical链、共同yaw与各漂移分量尚未核清，未冻结或新拟合。",
+    "heldout_inventory": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\validation_inventory_audit.json",
+    "heldout_note": "177节目target覆盖1248曝光均参与拟合；尚无严格provenance闭合的独立heldout认证。52 expected marks是未观测示意，不可充作真实证据。白色围挡板垂直接缝的独立验证可行性调查尚未完成。",
+    "j24_actual_viewed": "同q physical_stills/programme/frame_0201.png、frame_1248.png已实际审阅；保留中线近端/方向及字形残差，未验收。",
+    "j24_physical_audit": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\a24\\audit.json",
+    "j24_actual_motion_issue": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\a24\\visual_motion_review.json",
+    "time_source_FD_diagnostic": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\time8_direction_QA2\\direction_diagnostic.json",
+    "pure_time_camera_FD": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\time_camera_direction_QA.json"
+  },
+  "prepared_time_model": {
+    "launched": true,
+    "public_adapter": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\first_shot_native_time_stage.py",
+    "adapter_sha256": "034917ba2a942f66c095c13a6f3eed4500ef0738617fe551f9dd1c50db0921ec",
+    "adapter_QA": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\native_time_stage_QA.json",
+    "adapter_QA_sha256": "8f21f3b764f691c01f887aae986b0af49adbb1c018d074ad12382df091269fea",
+    "intended_basis": "nativePTS clamped cubic；stride8原生曝光，每轴159控制量，总477；完整q仍7700、共享172，非控制native槽保留并固定历史。",
+    "basis_selection": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\native_time_capacity_j10_final.json",
+    "basis_arrays": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\native_time_capacity_j10_final_arrays.npz",
+    "selection_limit": "对j10已拟合PTZ及旧gen0条件信息的4fold代理，一SE容量启发式选最粗stride8；不是Sony带宽、统计置信界或独立原片验收。",
+    "mathematics": "T展开native PTZ，再原derived chart一次；源J右乘链、guard/恢复/scene/raw/safe一致。原native间RS角插值仍保留，不能称真正C2行时轨迹。完整稀疏D用SPLU，支持跨帧控制耦合。",
+    "order": "先构造Derived→ConstantPP→原printQP base，再最外NativeTime wrapper，然后Runner安装J reuse和prediction refresh；不能包已绑定旧q回调的base。",
+    "entry": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_fixed_head_time.py",
+    "entry_sha256": "1adb80f7ff1138547a41d0ec6ad2a1f61e06f2b5e7a58ebf9f064d8a4c98ba3a",
+    "draft_manifest": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\s1_wide\\fixed_head_time_draft.json",
+    "draft_manifest_sha256": "8f657aba22b8d413f848b7239f28e22df8f26a6ea5ff6d41f9d2036f5e9f8052",
+    "status": "active_b_local_FD_step1e-7_original_thresholds_and_source_equations_unchanged",
+    "initialization_script": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\prepare_native_time8.py",
+    "initialization_script_sha256": "08d6964dbce0882459befca2231718ac0674f86836c814c17fca7baae839673f",
+    "initialization_complete": true,
+    "absent_outputs": [],
+    "initializer_plan": "从不可变j24完整父与同B/gen0 H/S做加权LS；Greville最近native曝光作159个各型control slot，非control父值逐位保留。会改变预测，必须明确模型转换、fresh r/fullJ并做实际source/RS方向FD。",
+    "numerical_policy": "父λ1e-12/fraction1归档保留；新模型执行拟用原公共solver默认λ1e-3/fraction1并显式声明。entry最新这项修改尚未重做QA；旧entry69c…的QA不能冒充当前634a…通过。",
+    "startup_bug_to_fix": "已修复并在全机进程域核验，使用CreationDate/name/原命令行识别实例，拒绝重复owner；PID复用单独登记。",
+    "initialization_arrays": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/shot1_physical_fit_20261014/zoom_poly_72ac/id_ad5/native_time8_initial.npz",
+    "initialization_receipt": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/shot1_physical_fit_20261014/zoom_poly_72ac/id_ad5/native_time8_initialization.json",
+    "recipe": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\native_time8.json",
+    "A_reference_policy": "经release_rows真实实体FD和j24场景依赖核实，保留j24共同几何与172共享自由度继续联合；q14为实际共同yaw，未发现单位错或误释放。左A3/A4为共同模板推断，不当实测或留出。",
+    "current_entry_QA": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\time_entry_current_QA.json"
+  },
+  "next_when_user_resumes": [
+    "Wait for the user to resume after updating Codex; inspect saved shutdown proof and process identity before any restart.",
+    "Load completed joint_full_J and saved whole-W focus; inspect the saved solver stage for completed versus unfinished whole-segment-mode work.",
+    "Continue whole-shot joint physical repair, including early/late C0, Ad7 continuous regressions, long lane displacement and actual pan/zoom image motion; do not preserve only selected tail-frame improvements.",
+    "Evaluate any new candidate with the same full model/all1248 native exposures; generate a full diagnostic video only after meaningful whole-model improvement."
+  ],
+  "process_state": "Stopped: existing QA owner13536, launcher35848 and all6 source workers confirmed gone after normal close; geometry workers already normally joined. Solver own QP exited0, new20mode solve not started. No new formal fit launched; no forced termination or unrelated processes touched.",
+  "worktree": "保留全部既有改动；本轮未提交、未推送、未清理历史、未重初始化。",
+  "final_verification": {
+    "onedrive_paths_checked": 14877,
+    "path_overlength": 0,
+    "path_read_errors": 0,
+    "owned_fit_or_initialization_process_matches": 0,
+    "saved_reference_missing": 0
+  },
+  "resumed_at_utc": "2026-10-16T02:19:06.320189+00:00",
+  "current_user_request": "用户要求为更新Codex立即停止；保留整个第一镜头联合修复成果，未获恢复指令前不继续计算。",
+  "active_run": {
+    "directory": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time4b2",
+    "status": "no_accepted_trial",
+    "owner_pid": 32180,
+    "launcher_pid": 21520,
+    "launch": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time4b2.launch.json",
+    "manifest": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\s1_wide\\fixed_head_time4b2.json",
+      "sha256": "64ce6308f4b28b1cb6ebd1ea55333b5a650dc5bca589f1d1f019457b0aa353cf"
+    },
+    "parent_q_sha256": "06d1e8b9dbcff8c89d46a44bed971879a66e3c7ae59c9bcd0fbac79303ca3168",
+    "inherited_auxiliary_count": 402,
+    "parent_damping": 1.96608e-8,
+    "parent_next_fraction": 1,
+    "nonzero_B4_restored": true,
+    "unsupported_text_parameters_fixed": 5,
+    "shared_count": 167,
+    "accuracy_accepted": false,
+    "fit_started": true,
+    "source_clock": "official50 nativePTS1/12800;20.020–44.960s;1248 exposures",
+    "latest_accepted_index": 0,
+    "q_sha256": "957b053d1f00a154c6eeabe4647cd572fad4efe8b21ff4462fb4bc2b156381bc",
+    "latest_combined_source_cost": 313711.97936856124,
+    "process_exited": true,
+    "final_parent_binding": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time4b2_parent.json"
+  },
+  "source_correction_in_progress": {
+    "completed_source_manifest": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\s1_t8c_source.json",
+    "ordinary_facts": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\s1_t8c_points.json",
+    "complete_real_source_QA": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\time8c_source_QA\\report.json",
+    "counts": {
+      "source_points": 182038,
+      "programme_formal_rows": 214133,
+      "wide_formal_rows": 4278,
+      "complete_formal_rows": 218411
+    },
+    "identity_corrections": 56,
+    "complete_quarantined_groups": 670,
+    "ordinary_quarantines": 131,
+    "preserve_prior_material_corrections": true,
+    "no_more_local_audit_expansion_this_stage": true
+  },
+  "current_next_steps": [
+    "完成原片身份隔离后的同态重放，继承body2完整414辅助数组，重建完整J。",
+    "按现有完整物理域和有限广告支持恢复，检查真实试步。",
+    "有实际改善再进行同模型全开标线、广告边界编号的全镜头连续检查；未完成准确性验收。"
+  ],
+  "updated_at_utc": "2026-10-17T09:31:10.774Z",
+  "camera_time_readonly_audits": [
+    "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\C_source_audit.json",
+    "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\time_chart_RS_audit.json",
+    "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\time_tau_source_QA.json"
+  ],
+  "current_camera_motion_evidence": {
+    "frozen_contract": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\t8a3\\motion_frozen_contract.json",
+    "all1247_native_neighbour_RGB_pairs_scanned": true,
+    "strict_same_Ad_supported_pairs": 1230,
+    "matched_Ad_groups": 1680,
+    "parent_T3_max_disagreements_px": [
+      4.952,
+      4.755,
+      4.696,
+      3.592
+    ],
+    "not_converged_or_accuracy_accepted": true,
+    "surface_prototype_d2": {
+      "receipt": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\motion_surface_proto_d2\\receipt.json",
+      "receipt_sha256": "c538dc1f9c111b3c3d7c7a8a613508518ec8a6310929c783a2b3d2e6422d90ba",
+      "actual_source_tracks": 1018,
+      "all_conditional_unique_first_hits": true,
+      "from_frames": [
+        707,
+        977,
+        1236
+      ],
+      "median_endpoint_errors_px": [
+        4.634,
+        5.313,
+        3.89
+      ],
+      "world_intersections_are_current_model_conditional_not_measured_depth": true
+    }
+  },
+  "failed_time8c_startup": {
+    "failure": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time8c\\run_failure.json",
+    "diagnostic": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\time8c_direction_QA\\direction_diagnostic.json",
+    "nearest_branch": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\time8c_direction_QA\\nearest_branch.json",
+    "shutdown": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\time8c_direction_QA\\shutdown.json",
+    "no_optimization_or_T_initialization_repeated": true
+  },
+  "current_fullshot_diagnostic": {
+    "directory": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\t8d6_full",
+    "immutable_candidate": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time8d\\accepted_states\\0006_147fe629ea83",
+    "media_manifest": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time8d\\media_manifest.json",
+    "all1248_PNG_contact_render_in_progress": false,
+    "video_generated": false,
+    "accuracy_accepted": false,
+    "all1248_actually_reviewed": true,
+    "actual_review_index": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\t8d6_full\\actual_review_index.json",
+      "sha256": "5e4fe5e87057a98eca35dd270ba4e2da7e00b6c4ce716dffe8d9f798f6b8f6c9"
+    }
+  },
+  "current_model_repair_findings": {
+    "ad7_old_template": "Low-resolution other-programme planar rectification predates current curved-board model; prototype fragments and large shared H deformation persist at accepted58. Current public finite material lifting matches existing feature_world. Do not reset H or remove observations; shared reference-camera/material relation is under diagnostic repair.",
+    "time_capacity": "Nonzero B4 time detail was numerically accepted at4a2 q1 and is retained byte-exact for continuation. Current row interpolation discrepancy versus continuous same controls is below0.4px in conditional board probe; whole-shot real-image accuracy remains unaccepted.",
+    "ad7_user_authority": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\model_constraints\\ad7_user_1016.json",
+    "ad7_official_vector": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\ad7_official\\sources.json",
+    "ad7_current_action": "Final grouped physical chart current-model world/source FD, full1248 raw shadow and fresh spawn passed. True logo proportions retained; three supported logo slots free, five unsupported text slots fixed as candidates. All source UV/W/PTS, including user-confirmed C0 paint midpoint, preserved.",
+    "latest_actual_visual_failure": "q1: Ad7 still sheared at707/751/977; tail1248 redC near-end18–23nativepx rightward despite nearby board/blue-line fit; no whole-shot acceptance.",
+    "tailC_raw_and_loss_audit": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\t4a2_tailC_saved_J_v2.json",
+    "c0_user_measurement": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\model_constraints\\c0_measure_1016.json",
+    "c0_outer_edge_hypothesis": "Retracted: user manually confirmed C0 paint-width midpoint; current direct zero-width radius has no half-width offset. Preserve all current C0 UV/W.",
+    "tailC_existing_camera_descent": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\t4a2_tailC_direction.json",
+    "tailC_geometry_human_authority": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\t4a2_tailC_human_authority.json",
+    "tailC_current_conclusion": "q6 tail C RMS 14.396154px/max22.885008px remains wrong. A five-existing-time-control local diagnostic lowers frame1248 objective and C/B2/lane/board costs, but other groups worsen and frames1241-1247 were not evaluated; no candidate adopted.",
+    "ad7_group_final_QA": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\ad7_group_final_QA.json",
+    "ad7_text_native_candidate": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\ad7_text_native_1016\\candidate_uv.json",
+    "ad7_text_noise_limits": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\ad7_text_native_1016\\noise_roi\\review.md",
+    "ad7_text_candidate_not_admitted": "740 source34.800s has clear actual text edges. Candidate UV/profile replay exact, but plateau noise is heteroscedastic and correlated beyond12px; no covariance/W invented, allowed_for_fit=false, current4b source unchanged.",
+    "geometry_confirmation_scope": {
+      "scope": "User has not confirmed fitted dimensions or positions. Preserve existing common-centre, parallel and symmetric structural relationships; this is not permission to disorder rink geometry.",
+      "wide_role": "Use visibly obvious relative rink-line positions only; do not calibrate or fit the wide camera.",
+      "accuracy_accepted": false
+    },
+    "ad7_text_initializer_candidate": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\ad7_init_1016\\receipt.json",
+    "ad7_text_initializer_scope": "ISU logo plus INTERNATIONAL / SKATING UNION is trusted. Source740 unweighted text-layout seed and source751 visual improvement are retained. V2 continuation is being bound to all final q6/402 auxiliary arrays; no invented W, no new text source observations, five unsupported text slots remain fixed.",
+    "C0_definition": "User-reviewed source points are paint-width midpoints; UV/W and operator unchanged.",
+    "camera_priority": "Audit the complete native-time motion as one fixed rink-side tripod/pan-tilt head operated by a standing camera operator. Per-frame parameters, smoothness, FD and loss do not certify physics.",
+    "proven_solver_failure": {
+      "report": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\solver_descent_1016\\report.json",
+      "cause": "Mount QP exists but freezes geometry-dependent metric scale in its tangent. Actual feasibility recovery changes lever_y and turns the final source descent direction uphill.",
+      "original_gradient_dot_direction": -4782.536024004533,
+      "recovered_gradient_dot_direction_limit": 307.39305022017714,
+      "physical_camera_or_whole_shot_accuracy_proved": false
+    },
+    "mount_scale_repair_actual": {
+      "public_runtime": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\first_shot_mount_scale_tangent.py",
+      "actual_full_source_trials": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\ad7_public_1016b\\actual_direction_trials.json",
+      "scope": "Proven missing scale tangent corrected; original bounds retained; actual complete source descent restored. This is solver repair, not accuracy acceptance."
+    },
+    "current_physical_motion_audit": {
+      "report": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\camera_phys_1016\\time_motion.json",
+      "scope": "Shared fixed pivot and orthogonal pan/tilt model, full6240 row camera/time replay checked. No PTS/rowtime/axis sign bug found. Effective-focal driven optical axial/Brown proxy remains unmeasured; camera replay is not independent hardware calibration."
+    },
+    "latest_user_bias_requirement": {
+      "scope": "Prioritize persistent systematic model bias over isolated one/two-pixel differences. Do not rank near/far errors by pixels or require accuracy beyond source picking uncertainty.",
+      "retracted_interpretation": "22.885 to22.900px is not evidence of meaningful deterioration.",
+      "evaluation": "Compare material identity, spatial coherent offset/angle/scale and time persistence; use source uncertainty and local projection sensitivity; conditional world conversion is not measured metric accuracy."
+    },
+    "systematic_bias_q6": {
+      "report": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\bias_1016\\q6.json",
+      "C1248": "15/15 same normal side, approximately1.76deg directional mismatch across600px; source TLS scatter1.5px. Bulk position/angle modes dominate. Only saved safe exposures are covered by this report.",
+      "near_far": "At q6, far B2 local world-normal sensitivity differs strongly from near C; no universal pixel-to-metre factor."
+    },
+    "source_competition": {
+      "report": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\solver_descent_1016\\source_conflict\\ad_time_conflict.json",
+      "constrained_profile": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\solver_descent_1016\\source_conflict\\constrained_print_profile.json",
+      "scope": "Ad4 print and tail C drive opposing existing camera directions; whole scalar point loss is not the accuracy criterion. Original source UV/W retained; no new point approvals requested."
+    },
+    "systematic_joint_candidates": {
+      "actual_trials": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\ad7_public_1016b\\systemic_direction_QA.json",
+      "scope": "All existing camera/geometry/print freedoms jointly used, wide13 fixed, original physical domains retained. beta0.5 fullstep halves visible C offset/angle with other tail material improvements, but increases scalar source loss. Preserve as candidate; assess whole-shot systematic changes, not rejection solely from dense contour total. Backtracking and nonlinear correction are in progress.",
+      "accuracy_accepted": false
+    },
+    "ad7_current_model_actual_QA": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\ad7_public_1016b\\current_model_QA.json",
+    "programme_objective_current_QA": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\ad7_public_1016b\\programme_guard_QA.json",
+    "wide_current_scope": "Reference visibly clear rink-line relationships only. New explicit objective retires4278 wide pixel rows and fixes13 old wide-camera coordinates; common venue remains adjustable.",
+    "whole_original_W_observable_diagnostic": {
+      "report": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\bias_1016\\observable_whole\\summary.json",
+      "exposures": 1248,
+      "source_points": 182038,
+      "entities": 171,
+      "entity_exposure_records": 22189,
+      "raw_decomposition": "Every complete original correlated W group projected as W+W; raw null components separately retained. Original source UV, ID, sigma, native PTS and W unchanged.",
+      "replay_max_absolute": 6.394884621840902e-14,
+      "precision": "Original sigma and spatial/time evidence describe scale; no independent-point significance or new accuracy threshold. Sparse affine interpolation with zero residual degrees of freedom is not evidence of coherence.",
+      "accuracy_accepted": false
+    },
+    "current_actual_candidate_findings": {
+      "actual_exports": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\ad7_public_1016b\\systemic_actual_export_QA.json",
+      "camera_physics": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\bias_1016\\candidate_physics.json",
+      "same_model_visual": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\ad7_public_1016b\\systemic_visual2\\visual_findings.json",
+      "C0": "At42.94–43.06s observable error remains30–40px. Right arc is close; left arc increasingly misses below the image. This is not uniform translation and not a raw tangential-null artefact. Cause not uniquely assigned to radius or camera.",
+      "C": "Tail1248 angular mismatch visibly reduced from1.76deg to0.88deg in beta0.5 fullstep, but all130 observed C exposures contain both improvements and regressions; not whole-shot acceptance.",
+      "Ad6": "Fullstep introduces sustained observable error in component001 and004. Component001 40.74–41.26s all27 exposures worsen; middle RMS3.57 to7.23px. SOC camera correction lowers this to5.38px, still unresolved.",
+      "F1": "36.62–37.10s25 consecutive source exposures improve observable RMS median4.36 to0.66px; retained as useful candidate evidence, not independent validation.",
+      "Ad7": "User-specified logo plus INTERNATIONAL/SKATING UNION adopted. Current two text rows visually have correct layout; logo751 still visibly offset and not solved.",
+      "physics": "All current6240 camera samples replay shared fixed head consistently. Fullstep increases terminal pan rate25.52 to30.90deg/s and leaves optical axial/effective-focal hypothesis unidentified; static C improvement does not prove physical repair.",
+      "candidate_status": "Preserved development candidates. Scalar F is a search aid, not acceptance. No new full video or accepted final model.",
+      "accuracy_accepted": false
+    },
+    "current_nonlinear_joint_work": {
+      "fresh_full_J": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\ad7_public_1016b\\current_full_J\\completion.json",
+        "sha256": "09263ac2aa6e696930a70d7d4eeb971c89d89124f2a262dfbbf88ac77e43ee82"
+      },
+      "derivative_anchor": "current_profile_fullstep; 214133 programme rows x 7700 canonical columns; all six source blocks freshly differentiated, all actual residuals replay byte-exact. Not a fresh joint-point J.",
+      "profile": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\ad7_public_1016b\\systemic_actual\\current_profile_fullstep\\completion.json",
+        "sha256": "4910acb93f70f5d1929081f7b77da4979c49379948b400893c2cf8b51ee9c377"
+      },
+      "joint": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\ad7_public_1016b\\systemic_actual\\fresh_joint_fullstep\\completion.json",
+        "sha256": "d915794c896c35dfdf9e72930e18680b839829de0c57da899cce254aeb767ffb"
+      },
+      "profile_result": "Tail C angular mismatch approximately halved; the earlier large sustained Ad6 print regression was recovered. C0 late arc-shape error remains.",
+      "joint_result": "C0 observable error reduced16–23% at late diagnostic exposures and tail C further improved. Whole-source nonlinear defects in lane, boards and other ice remain; this candidate is not accepted.",
+      "C0_geometry": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\bias_1016\\c0_geometry_links.json",
+        "sha256": "53af9dcc6fde712308dd52b21cff165bfa0be783c954c8a428bc5447186e217e"
+      },
+      "geometry_definition": "C0 remains paint-width centreline; original human source UV/W unchanged. C0/common hockey radius remains a free parameter. Shared centres, parallels and symmetry are preserved; no user confirmation of dimensions is inferred.",
+      "numerical_work": "Full1099-free-variable nonlinear correction uses actual joint residuals and explicitly lagged profile source J, refreshed physical tangent, exact joint row-camera/J and actual board motion modes. Geometry and advertisements remain jointly adjustable.",
+      "process": "One existing actual QA service owns the heavy state and six source workers. Twenty idle geometry workers were closed through their normal pool shutdown after full J; they can be recreated for a necessary next J. No new formal main fit launched.",
+      "accuracy_accepted": false
+    },
+    "actual_board_motion": {
+      "source_diagnostic": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\bias_1016\\terminal_board_motion\\report.json",
+        "sha256": "b6af22c3a8b572bbaff03615d5ce6b2c16915c4bea98ab732f73828d9d5d2240"
+      },
+      "material_review": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\bias_1016\\terminal_board_motion\\entity_check.json",
+        "sha256": "23823f026e5d711c8f38c3bfc7989ab5d75f2f2cdf8780dbecfc0eadae7e15ff"
+      },
+      "sensitivity": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\bias_1016\\terminal_board_motion\\sensitivity_report.json",
+        "sha256": "c565593fa91f56589af99e3c1c721ffea8cb97b587f27f3cee60fa0c1aa67cdd"
+      },
+      "joint_camera_J": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\ad7_public_1016b\\board_track_camera_J_joint_safe80\\manifest.json",
+        "sha256": "95b29b0bcc9911637f9f1e9b949eb0e8397246fbec69986f96a4651a2274f4c7"
+      },
+      "exposures": [
+        1244,
+        1245,
+        1246,
+        1247,
+        1248
+      ],
+      "source_seconds": [
+        44.88,
+        44.96
+      ],
+      "finding": "Source board motion is approximately steady over the last four native intervals, while the profile model slows then accelerates. Narrow single-scale board-only patch refinement and exclusion near the player retain the discrepancy: last-interval profile minus real horizontal median about−6.05px on left and−3.92px on right.",
+      "physical_cause": "Reducing native pan-rate change alone did not repair real projected motion; focal and other coupled camera variables compensated. Real material warp must be checked jointly with pan, tilt, zoom and venue.",
+      "role": "Development evidence only, not new formal manually reviewed points, unchanged original W/source inventory, not independent acceptance. Left/right modes have equal regional importance rather than point-count voting.",
+      "pending": "Compare full joint nonlinear correction and half joint step with actual full source, whole-field biases, and exact row-timed board motion.",
+      "accuracy_accepted": false
+    },
+    "bias_interpretation_current_request": {
+      "primary": "Persistent signed displacement, angle and shape differences by physical entity and time interval, interpreted with source picking uncertainty and local projection.",
+      "scale": "Pixels, model scene units, conditional Euclidean units and verified metres remain distinct. A one-pixel change is not equally meaningful at every depth, nor is an unverified model scale ground truth.",
+      "numerical": "Original scalar Huber loss, smoothness and derivative/KKT checks aid the search; they do not establish physical accuracy. Tiny score differences or subpixel changes do not determine acceptance."
+    }
+  },
+  "process_evidence": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time4b2_shutdown.json",
+  "continuation_audit": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\time_resume_readonly_audit.json",
+  "image_review_context_policy": {
+    "authority": "用户在引用会话明确要求，及现AGENTS.md",
+    "fresh_reviewer_without_parent_image_history": true,
+    "continuous_segment_review_required": true,
+    "details_in_Data": true,
+    "root_receives_only_conclusions_paths_and_essential_key_images": true,
+    "do_not_reuse_image_heavy_agents": true
+  },
+  "completed_time8d": {
+    "directory": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time4a2",
+    "status": "normally_completed_exact_current_J_handoff",
+    "owner_pid": 25508,
+    "manifest": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\s1_wide\\fixed_head_time4a2.json",
+    "parent_q_sha256": "faa7aa6f8943ac1f14fcca40975d4a9e3896dff1e363c2f6d5c47cd767fb1a46",
+    "inherited_auxiliary_count": 386,
+    "accuracy_accepted": false,
+    "latest_accepted_index": 107,
+    "q_sha256": "220e21438cd2ba62362cb11a06adfb8b2776a5d3cb153cf7282759a27ef16ab3",
+    "latest_combined_source_cost": 323520.3643699478,
+    "latest_accepted_directory": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time8d\\accepted_states\\0107_220e21438cd2",
+    "latest_report_checked_at_utc": "2026-10-16T10:04:25.877055+00:00",
+    "final_result": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time8d\\result.json",
+    "normal_shutdown": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\time8d_shutdown.json",
+    "final_complete_state": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time8d\\final_complete_state.npz",
+    "exact_current_source_cache": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time8d\\source_J_cache\\generation_000003\\manifest.json"
+  },
+  "latest_same_q_keyframe_review": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\t4a2_1_review\\actual_review.json",
+  "whole_shot_motion107_comparison": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\motion107_comparison.json",
+  "camera_time_detail_candidate": {
+    "diagnostic": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\t4_nested_107\\receipt.json",
+    "q_and_all1248_times5_row_camera_byte_exact_at_zero_details": true,
+    "representation_only_not_data_identifiability_or_accuracy": true,
+    "actual_model_released_or_fit_started": true,
+    "next": "Implement explicit reusable hierarchical native-time stage; fresh extra time source derivatives and original full guards required before fit.",
+    "public_runtime": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\first_shot_time_detail_stage.py",
+    "protocol_QA": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\time_detail_protocol_QA.json"
+  },
+  "completed_time8e": {
+    "directory": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time8e",
+    "manifest": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\s1_wide\\fixed_head_time8e.json",
+    "launch": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time8e.launch.json",
+    "owner_pid": 26364,
+    "launcher_pid": 7304,
+    "status": "no_accepted_trial",
+    "accuracy_accepted": false,
+    "source_clock": "official50 nativePTS 1/12800;20.020–44.960s;1248 exposures",
+    "parent_accepted_index": 107,
+    "parent_q_sha256": "220e21438cd2ba62362cb11a06adfb8b2776a5d3cb153cf7282759a27ef16ab3",
+    "inherited_auxiliary_count": 386,
+    "parent_damping": 1e-12,
+    "parent_next_fraction": 1,
+    "current_q_FD_and_full_source_shadow_passed": true,
+    "latest_accepted_index": 1,
+    "current_state_kind": "accepted",
+    "q_sha256": "faa7aa6f8943ac1f14fcca40975d4a9e3896dff1e363c2f6d5c47cd767fb1a46",
+    "latest_combined_source_cost": 323268.7618635712,
+    "latest_report_checked_at_utc": "2026-10-16T10:04:25.877055+00:00",
+    "final_result": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time8e\\result.json",
+    "final_complete_state": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time8e\\final_complete_state.npz",
+      "sha256": "c318467083dfd3b015e76832db02f6e11e47727f2631e5e522cb361853f04549"
+    },
+    "process_exited": true
+  },
+  "camera_whole_shot_parameter_audit": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\camera_motion_audit\\results",
+  "Ad7_projective_warp_model_finding": "Existing H8 warps only ink and permits projective/shear within unchanged outer canvas; explicit grouped physical ink chart candidate is being checked. Whole-shot source/camera repair remains primary.",
+  "completed_time4a2": {
+    "directory": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time4a2",
+    "status": "stopped_by_control",
+    "owner_pid": 25508,
+    "manifest": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\s1_wide\\fixed_head_time4a2.json",
+    "parent_q_sha256": "faa7aa6f8943ac1f14fcca40975d4a9e3896dff1e363c2f6d5c47cd767fb1a46",
+    "inherited_auxiliary_count": 386,
+    "accuracy_accepted": false,
+    "latest_accepted_index": 1,
+    "q_sha256": "06d1e8b9dbcff8c89d46a44bed971879a66e3c7ae59c9bcd0fbac79303ca3168",
+    "latest_combined_source_cost": 343671.91689408803,
+    "final_result": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time4a2\\result.json",
+    "final_complete_state": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time4a2\\final_complete_state.npz",
+      "sha256": "ea401fa3fc486bdcc968ac67fc03aee0c4ab121eed81e87eb48415f471dd1e60"
+    },
+    "process_exited": true
+  },
+  "current_parent_binding": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time4a2_parent.json",
+  "camera_whole_shot_parameter_audit_latest": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\camera_motion_audit\\results\\a2.json",
+  "prepared_time4b_execution_entry": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_time_grouped_print.py",
+  "prepared_time4b_not_launched": false,
+  "completed_failed_time4b": {
+    "directory": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time4b",
+    "status": "failed_before_iteration",
+    "owner_pid": 30484,
+    "launcher_pid": 2044,
+    "launch": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time4b.launch.json",
+    "manifest": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\s1_wide\\fixed_head_time4b.json",
+      "sha256": "ffee953c336af8888a853f7f4e22bfda859747800bf9ef370752b6876603366b"
+    },
+    "parent_q_sha256": "06d1e8b9dbcff8c89d46a44bed971879a66e3c7ae59c9bcd0fbac79303ca3168",
+    "inherited_auxiliary_count": 400,
+    "parent_damping": 2.56e-10,
+    "parent_next_fraction": 1,
+    "nonzero_B4_restored": true,
+    "unsupported_text_parameters_fixed": 5,
+    "shared_count": 167,
+    "accuracy_accepted": false,
+    "fit_started": false,
+    "source_clock": "official50 nativePTS1/12800;20.020–44.960s;1248 exposures",
+    "failure": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\fixed_head_time4b\\run_failure.json",
+    "process_exited": true,
+    "no_new_iteration_or_acceptance": true
+  },
+  "latest_user_instruction": "尽快停下，我要更新一下codex",
+  "app_update_stop": {
+    "requested": true,
+    "shutdown": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\ad7_public_1016b\\shutdown_1016.json",
+      "exists": true,
+      "sha256": "9d5484b81eb83cbfa2188cdd694089f6d15506a6d775a0d8a2103e4aeeba8618"
+    },
+    "solver_stop": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\solver_descent_1016\\STOP_1016.json",
+      "exists": true,
+      "sha256": "b03228e3e6a12620f2cb1b2c7130c74309ee378a11d7bf141255d52125f2427a"
+    },
+    "whole_W_reusable_cache": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\bias_1016\\whole_w\\manifest.json",
+      "exists": true,
+      "sha256": "4b08f5c4388d10d07f61a4ec4e5379d18773ff4fe64df57b44f2034feff5e4ae"
+    },
+    "whole_W_cache_entry": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\bias_1016\\whole_w_cache.py",
+    "latest_completed_full_J": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\ad7_public_1016b\\joint_full_J\\completion.json",
+      "exists": true,
+      "sha256": "171c93e90711fbb3a9e463ef93bf0e6b4477424a7ed8c4e7ff3a0c0092f127c1"
+    },
+    "fresh_J_index": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\ad7_public_1016b\\joint_full_J\\source_J_cache\\latest.json",
+      "exists": true,
+      "sha256": "67be51b88da1eec821b3d6ad2876be4b3d441641003810ad5a856702df7bc015"
+    },
+    "restart_anchor": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\ad7_public_1016b\\systemic_actual\\fresh_joint_fullstep\\completion.json",
+      "exists": true,
+      "sha256": "d915794c896c35dfdf9e72930e18680b839829de0c57da899cce254aeb767ffb"
+    },
+    "whole_W_evidence": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\bias_1016\\observable_candidates\\profile_joint_half_warpSOC\\summary.json",
+      "exists": true,
+      "sha256": "ca67447c86d98ad3d90c09322837143f1e62439ea7cdc36c61ec28b566f980ae"
+    },
+    "whole_W_focus": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\bias_1016\\observable_candidates\\profile_joint_half_warpSOC\\focus.json",
+      "exists": true,
+      "sha256": "61930677a6b0ef0ef50175dc833d864e46e9ad3bb4c11a0727c70855cabb3523"
+    },
+    "motion_evidence": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\bias_1016\\terminal_board_motion\\sensitivity_report.json",
+      "exists": true,
+      "sha256": "c565593fa91f56589af99e3c1c721ffea8cb97b587f27f3cee60fa0c1aa67cdd"
+    },
+    "exact_joint_motion_J": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\ad7_public_1016b\\board_track_camera_J_joint_safe80\\manifest.json",
+      "exists": true,
+      "sha256": "95b29b0bcc9911637f9f1e9b949eb0e8397246fbec69986f96a4651a2274f4c7"
+    },
+    "numerical_work_directory": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\zoom_poly_72ac\\id_ad5\\solver_descent_1016\\fresh_1016\\current_joint_LM1e4_20",
+    "numerical_stage": "20mode inputs complete/QA passed; solve not started. Old16mode result is superseded and must not be sent to actual owner. Original lambda1.96608e-8 and proposed LM1e-4 recorded. See STOP_1016.json for H/source_normal_path reuse.",
+    "preserved": "Original accepted q6, all7700 parameters/402 original auxiliary arrays,405 current auxiliary arrays, all actual candidates, original sourceUV/W/PTS, current full J/cache and historical failures.",
+    "latest_actual_result": "warp_SOC_fullstep passed physical guard but clearly regressed whole-field alignment; it is not accepted. Fresh joint_full_J subsequently completed at fresh_joint_fullstep with byte-exact source residual replay.",
+    "important_unresolved": "EarlyC0 25.90–26.66 and29.20–30.34 worsened substantially despite lateC0 improvement; Ad7comp00133.92–34.14 andlane3edge2 42.94–43.06 also have sustained regressions. Nativepan-only smoothing did not repair actual board motion. These must be solved jointly, not just tail frames.",
+    "next_numeric": "Continue from true joint fullJ/currentactual r and all1099 free variables/full original physical domain. Preserve whole-shot earlyC0/Ad7/lane relationships while correcting lateC0/C and real board motion; local old-J SOC is inadequate. Proposed whole-segment modes and LM search are numerical strategies, not new physical bounds.",
+    "constraints": "No source repicking, no wide-camera calibration, no geometry confirmation inferred, no full video for scalar loss alone. Follow latest image-context rules and use fresh visual agents when needed.",
+    "accuracy_accepted": false
+  },
+  "latest_status_record": "measured_motion_joint_20261017",
+  "independent_audit_20261017": {
+    "recorded_at_utc": "2026-10-16T17:28:48.240Z",
+    "status": "audit_and_numerical_repairs_validated_fullshot_accuracy_unaccepted",
+    "user_authorized": "持续独立审查，发现问题直接介入解决",
+    "report": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/audit_1017.html",
+    "entry": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/s1_full_phys.py",
+    "recipe": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/source_datasets/s1_wide/fullphys.json",
+    "latest_numerical_q_sha256": "389897fa643b20b0cb2119a288248c7e89394df9c01d2695b43de53a28ad6097",
+    "latest_numerical_aux_count": 405,
+    "construction_baseline_q_sha256": "957b053d1f00a154c6eeabe4647cd572fad4efe8b21ff4462fb4bc2b156381bc",
+    "construction_aux_count": 402,
+    "probe_q_sha256": "5aec96b1c81ead62b97dc84ca629a74c73d50504b63777ff6133114c13ffd792",
+    "probe_accepted": false,
+    "accuracy_accepted": false,
+    "actual_objective": {
+      "q6": 312570.4513285683,
+      "fresh": 354303.1192339032,
+      "physical_half": 328725.4551086181,
+      "guard_half": 328654.7188590961
+    },
+    "targeted_pytest_passed": 44,
+    "live_validation": {
+      "first": "D:/CodexData/RinkSpace_Data/audit_1017/actual20/result.json",
+      "second": "D:/CodexData/RinkSpace_Data/audit_1017/fullphys/result.json",
+      "whole_original_W": "D:/CodexData/RinkSpace_Data/audit_1017/whole_w_guard/summary.json",
+      "shutdown": "D:/CodexData/RinkSpace_Data/audit_1017/fullphys/shutdown_QA.json",
+      "live_private_QP_helper_called": false,
+      "optimizer_loop_started": false,
+      "new_J_built": false
+    },
+    "preserved": "源UV/ID/W、人工事实、原数值盒与非线性guard、原片PTS、历史状态均保留；q6不是最新数值父点，5aec不是接续验收状态。",
+    "remaining": "已知116实体曝光仍对q6退步；完整镜头未验收；不可辨识性、观测关联与未测硬件/场地假设仍须区分。"
+  },
+  "recovery_20261017": {
+    "recorded_at_utc": "2026-10-17T01:00:30.289Z",
+    "status": "recovered_continuing_physical_transfer_and_fullshot_validation",
+    "predecessor_thread": "private-thread-00038",
+    "old_agents_running": 0,
+    "recovery_receipt": "D:/CodexData/RinkSpace_Data/audit_1017/recovery_1017.json",
+    "latest_main_q_sha256": "51693e47eb7f6aa843cf8c301d1245eabbe9ddca1ca739eca3acb19bde73121c",
+    "latest_main_complete_state": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\audit_1017\\solve6\\accepted_states\\0005_accepted_51693e47eb7f\\complete_state.npz",
+      "sha256": "b825fc8e96ba71e5ccc9bf51adbea90f44784064dd4b5487f289d90a28a62b30"
+    },
+    "complete_aux_count": 406,
+    "accepted_iterations": 5,
+    "main_cost": 303315.3652143838,
+    "main_owner_closed": "D:/CodexData/RinkSpace_Data/audit_1017/solve6/owner_closed.json",
+    "main_frozen_review": "D:/CodexData/RinkSpace_Data/audit_1017/solve6/frozen_review.json",
+    "source_scope": {
+      "native_exposures": 1248,
+      "source_points": 182017,
+      "formal_rows": 214112,
+      "quarantined_frames": [
+        1147,
+        1148,
+        1149,
+        1150,
+        1151,
+        1152,
+        1153
+      ],
+      "preserved_human_identity_frames": [
+        526,
+        582,
+        583,
+        587
+      ],
+      "identity_fact": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/source_datasets/shot1_fit_20261014/identity_fix2.json"
+    },
+    "motion_branch": {
+      "path": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_v5",
+      "status": "failed_before_value_J_during_physical_identity_check",
+      "cause": "Equivalent canonical expansion and physical delta arithmetic differ by <=1.3322676295501878e-15 in native PTZ only; exact canonical transport repair in progress",
+      "original_absolute_canonical_sha256": "b616595e4ededcdb963c44a6029fc2f007428ff56bbeb2c7a001bc58a04b999e"
+    },
+    "accuracy_accepted": false,
+    "full_continuous_visual_review_completed": false,
+    "confirmed_camera_setup": "固定三脚架云台、场边站立摄影师、三个独立机位、随云台旋转的非零光心偏移是已确认事实。",
+    "next": "认证原生参数展开与完整guard后接运动初始化分支；用同一源合同和全1248曝光比较几何及真实材料运动；全模型原片审阅。"
+  },
+  "measured_motion_joint_20261017": {
+    "recorded_at_utc": "2026-10-17T02:08:56.523Z",
+    "status": "body13_constraint_world_fix_preflight",
+    "user_instruction": "查清拟合代码和模型关键问题，验证先恢复相机运动再拟合是否有效并直接修复，用完整第一镜头及未参与拟合的真实证据验证。",
+    "confirmed_camera_setup": "固定三脚架云台、场边站立摄影师、三个独立机位、非零光心偏移是已确认事实。",
+    "entry": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_measured_motion.py",
+    "entry_sha256": "fd0e29d8eb1b243d0f3ebd383afc75f703dc83dd8a6239f3c40debc530198f73",
+    "launch_receipt": "D:/CodexData/RinkSpace_Data/audit_1017/motion_body13_launch.json",
+    "output": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body13",
+    "seed": "motion_joint_body2 accepted2 c85634; full414, saved damping and fraction",
+    "old_v5_latest": "accepted9 2b292502，未含新增材料运动目标，保留为历史对照",
+    "new_objective": "完整原源前缀＋已核实围挡本体跨帧真实像素运动；两端实际行相机和当前围挡几何联合导数",
+    "motion_packet": "D:/CodexData/RinkSpace_Data/audit_1017/motion/board_body_safe_packet_with_chain_v3.json",
+    "complete_parent_aux_count": 414,
+    "accuracy_accepted": false,
+    "full_continuous_visual_review_completed": false,
+    "validation_limits": "705条新轨迹71对邻帧只作同一围挡内新局部运动检验；全部源选择冻结在看模型前，未加入拟合，不称705独立地标，也不认证冰面绝对定位。",
+    "image_context": "复用已审阅结论和路径，仅为当前必要问题载入新画面；新子代理不携带历史图片。",
+    "last_checked_utc": "2026-10-17T09:31:10.774Z",
+    "actual_source_prefix_cost": 303315.3652143838,
+    "actual_source_prefix_points": 182017,
+    "real_owner_started": false,
+    "original_guard_and_all_motion_domains_at_parent_passed": true,
+    "optimizer_started": false,
+    "failure_receipt": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body/failure.json",
+    "owner_closed": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body/owner_closed.json",
+    "next": "当前运行自行完成新的真实源、完整导数与原物理域核验；有接受步后进行相同保留源与完整W比较，再做完整镜头画面核实。",
+    "previous_failure_preserved": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body/failure.json",
+    "boundary_derivative_QA": "D:/CodexData/RinkSpace_Data/audit_1017/motion/boundary_chain_QA.json",
+    "boundary_derivative_repair": "复用实际course解析链；171个world列仅5列影响围挡，其余166明确为0；真实480点边界逐字节一致，直接导数核对8.33e-10。完整物理域和真实试步guard保留。",
+    "validation_only_packet": "D:/CodexData/RinkSpace_Data/audit_1017/validate/new_board_source/validation_packet.json",
+    "validation_baseline": "D:/CodexData/RinkSpace_Data/audit_1017/validate/new_board_source/baseline_evaluation.json",
+    "validation_baseline_rms_px": 1.0982413602317291,
+    "joint_preflight": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body2/joint_preflight.json",
+    "directional_check": {
+      "max_absolute": 0.0002497171835784684,
+      "relative_norm": 1.6545379422161393e-7,
+      "method": "first_order_one_sided_feasible_canonical",
+      "epsilon": 6.25e-8
+    },
+    "costs_initial": {
+      "original_source": 303315.36521438387,
+      "measured_motion": 22102.26494483997
+    },
+    "complete_aux_count": 414,
+    "current_numerical_state": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body11/current.json",
+    "new_accepted_state_available": false,
+    "last_closed_output": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body2",
+    "last_closed_q_sha256": "c85634b23207319a735ba2f03859392af28a590ffa2854c7b0fbe82ad91b7891",
+    "last_closed_accepted_index": 2,
+    "costs_second": {
+      "original_source": 303803.9361939775,
+      "measured_motion": 11267.342491413001,
+      "joint": 315071.2786853905
+    },
+    "validation_new_board_rms_before_px": 1.0982413602317291,
+    "validation_new_board_rms_after_px": 0.854,
+    "valid_C0_after_rms_px": 6.90218739673205,
+    "resume_fix": {
+      "QA": "D:/CodexData/RinkSpace_Data/audit_1017/motion_resume_QA.json",
+      "from": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body2/current.json",
+      "complete_parent_aux_count": 414,
+      "base_aux_count": 406,
+      "authenticated_motion_aux_count": 8,
+      "wrong_packet_rejected": true
+    },
+    "previous_resume_attempt": {
+      "output": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body3",
+      "accepted_new_steps": 0,
+      "normal_close": true,
+      "failure": "Finite-difference direction crossed active readout/mount constraints; accepted h=7.629e-12 produced cancellation noise, not a proven factor derivative defect.",
+      "preflight": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body3/joint_preflight.json"
+    },
+    "new_repairs": {
+      "complete_resume_414": true,
+      "measurable_feasible_derivative_probe": "Previous accepted secant; semantic pan controls fallback; all original nonlinear guards retained; 15 integrated tests passed.",
+      "exact_batch_factor": {
+        "QA": "D:/CodexData/RinkSpace_Data/audit_1017/motion_batch_live_QA/report.json",
+        "all35376_R_byte_exact": true,
+        "selected_camera_and_surface_J_byte_exact": true,
+        "full_motion_R_seconds": 21.9155006,
+        "selected_speed_ratio": 8.6176230873
+      },
+      "reviewed_I": {
+        "mapping": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/s1_ad7_i_1017.json",
+        "points": 34,
+        "frames": [
+          760,
+          765,
+          766,
+          767,
+          768,
+          769,
+          770,
+          771,
+          772,
+          773,
+          774,
+          775,
+          776,
+          777,
+          778,
+          779,
+          780
+        ],
+        "physical_identity": "ISU upper I existing logo_part01; no corner correspondences or new geometry",
+        "fault": "Same real I upper source segment was assigned to different S/I paths; one wrong match had only 0.5147 px error at f760.",
+        "actual_replay": "D:/CodexData/RinkSpace_Data/audit_1017/ad7_U_probe.json"
+      },
+      "motion_information": "D:/CodexData/RinkSpace_Data/audit_1017/motion_information_QA.json"
+    },
+    "single_agent_serial": true,
+    "pro_audit": {
+      "original_report": "C:/Users/REDACTED/Downloads/Okada_Shot1_Independent_Audit.html",
+      "evidence_archive": "C:/Users/REDACTED/Downloads/Okada_Shot1_Audit_Evidence.zip",
+      "evidence_extracted": "D:/CodexData/RinkSpace_Data/audit_1017/pro_audit",
+      "full_report_and_three_specialist_reports_read": true,
+      "local_replay": "D:/CodexData/RinkSpace_Data/audit_1017/pro_replay_geometry/independent_geometry_observations.json",
+      "alias": {
+        "producer": "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/first_shot_ordered_contours.py",
+        "replay": "D:/CodexData/RinkSpace_Data/audit_1017/ordered_alias_probe5.json",
+        "actual_points": 678,
+        "qualified_points": 651,
+        "associated_contiguous_runs": 154,
+        "retained_singletons": 27,
+        "no_unqualified_arcs_after_authenticated_ancestry": true,
+        "original_UV_labels_and_W_preserved": true,
+        "full_production_replay_pending": false,
+        "point_lineage_repair": {
+          "replay": "D:/CodexData/RinkSpace_Data/audit_1017/ordered_alias_probe6.json",
+          "actual_whole_frame_root_reproduced": true,
+          "before_failed_arcs": 60,
+          "after_associated_arcs": 154,
+          "qualified_points": 651,
+          "singletons_kept": 27,
+          "formal_all1248_worker_repeat_pending": true
+        },
+        "newer_material_identity_review": {
+          "quarantine": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/s1_arc_q_1017.json",
+          "source_frames": 57,
+          "ordinary_points": 367,
+          "removed_formal_rows": 734,
+          "known_correct_previous_identity_members_preserved": 3,
+          "retained_source_W_QA": "D:/CodexData/RinkSpace_Data/audit_1017/arc_ordinary_actual_QA.json",
+          "retained_source_R_J_transport_max_difference": 0,
+          "ordinary_quarantine_producer": "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/first_shot_ordinary_quarantine.py",
+          "material_side_producer": "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/first_shot_arc_polarity.py",
+          "source_gradients": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/s1_arc_dir_1017.json",
+          "final_frozen_replay": "D:/CodexData/RinkSpace_Data/audit_1017/ordered_alias_probe9.json",
+          "new_acceptance_state": false,
+          "reason": "点序不是材料方向；局部梯度不证明实体身份。原片核对混合提取弧后，仅剩已保留内孔观测允许按白色内侧关联。"
+        }
+      },
+      "finite_ad_support": {
+        "producer": "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/first_shot_finite_ad_coverage.py",
+        "replay": "D:/CodexData/RinkSpace_Data/audit_1017/finite_ad_334_probe2.json",
+        "f334_top_missing_px": 82.86968127381765,
+        "f334_bottom_missing_px": 78.40744318254407,
+        "stage": "integrated into body5 using original full physical domain and per-group phase-I/truth-restoration gates; real full-shot run pending",
+        "new_corner_or_tangent_likelihood": false,
+        "full_shot_frozen": {
+          "report": "D:/CodexData/RinkSpace_Data/audit_1017/finite_ad_full_frozen.json",
+          "frames": 1248,
+          "current_ad_edge_points": 10505,
+          "supported_sections": 2203,
+          "support_queries": 5385,
+          "failing_queries": 477,
+          "failing_frames": 263,
+          "maximum_uncovered_px": 82.86968127381765,
+          "unsupported_sections": 1833,
+          "unsupported_reason": "Original source estimator is not the explicit straight-edge/native-support contract.",
+          "scope": "Necessary finite support in the existing observed-row FIT operator; normal fit, actual material identity and exact corners remain separate."
+        }
+      },
+      "C0_native_profiles": {
+        "producer": "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/first_shot_native_circle.py",
+        "replay": "D:/CodexData/RinkSpace_Data/audit_1017/C0_native_counterfactual4.json",
+        "same_states": [
+          "solve6",
+          "motion_joint_body2"
+        ],
+        "frames": [
+          315,
+          1239,
+          1248
+        ],
+        "early_raw_normal_rms_before_after": [
+          7.044824528456454,
+          6.984778875936019
+        ],
+        "last_raw_normal_rms_before_after": [
+          4.781978984803605,
+          4.895041267225727
+        ],
+        "f1239_failure": "One actual model intersection lies outside original query support: -8.526 px vs [-8,50] at body2",
+        "still_prototype_only": true,
+        "complete_raw_noise_and_implicit_RS_root_certificate_pending": true,
+        "original_support_not_relaxed": true
+      },
+      "value_J_contract": {
+        "strategy": "full fresh source J at every state, including complete correlated W groups; no lagged branch derivative used in body5",
+        "individual_all_nearest_branch_audit_pending": true
+      },
+      "joint_derivatives": {
+        "replay": "D:/CodexData/RinkSpace_Data/audit_1017/motion_QA6_results.json",
+        "actual_joint_nonzero_world_direction_passed_at_two_steps": true,
+        "relative_norms": [
+          3.4868231878373538e-9,
+          5.151827763641756e-9
+        ],
+        "camera_pan_relative": 1.02212151224806e-8,
+        "pure_world_44_45_blocked_by_original_domain": true,
+        "pure_world_48_unobservable_at_sample_pairs": true,
+        "full_static_source_J_not_independently_certified": true,
+        "diagnostic_final_report_failure": "Circular JSON packaging failed after results had been saved separately; no numerical state or fit was changed."
+      },
+      "recovery_trace": {
+        "producer": "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/first_shot_full_physical.py",
+        "implemented": "QP proposed versus recovered q hashes, changed values, norms and same-H/g source predictions; no final-step KKT overclaim"
+      },
+      "motion_noise_and_correlation": {
+        "report": "D:/CodexData/RinkSpace_Data/audit_1017/motion_density_correlation.json",
+        "objective_changed": false,
+        "exact_endpoint_reuse": 4607,
+        "unique_endpoints": 66145,
+        "overlapping_35px_support_pairs": 299907,
+        "unique_endpoints_with_overlap": 65207,
+        "full_fit_motion_rms_before_after": [
+          1.5898483891827373,
+          0.9334422294936744
+        ],
+        "one_per_source_35px_cell_rms_before_after": [
+          1.7222713022846046,
+          0.986265528152772
+        ],
+        "gap1_rms_before_after": [
+          1.1485832098264708,
+          0.7276057859744294
+        ],
+        "gap10_rms_before_after": [
+          3.2416496648227824,
+          1.7690141158310715
+        ],
+        "apparent_sigma_median_px": 0.027867248973113087,
+        "warning": "Apparent photometric sigma is not calibrated localization covariance; overlaps and exact reuse rule out independent-row interpretation, but do not identify full covariance. These are training-data slices, not new holdout."
+      },
+      "parameter_profiles": "cy, readout, axial motion and installation/scene compensation after source support/identity comparisons become stable; no new measured hardware numbers or optical freedom claimed",
+      "validation": "No full continuous same-model original-shot visual acceptance; no complete new video generated; no fresh blind check claimed.",
+      "producer_transition": {
+        "passed_manifest": "D:/CodexData/RinkSpace_Data/audit_1017/motion_manifest_QA7/identity_transition2.json",
+        "changed_manifest_occurrences": 5,
+        "changed_modules": [
+          "first_shot_jacobian_reuse.py",
+          "first_shot_native_circle.py",
+          "previously certified first_shot_prediction_refresh.py"
+        ],
+        "historical_parent_transitions_explicit": true,
+        "source_snapshot_producer_count": 23,
+        "source_snapshot_producers_all_current": true,
+        "failed_preowner_runs": [
+          "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body5",
+          "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body6"
+        ],
+        "historical_files_or_SHA_claims_not_rewritten": true
+      },
+      "latest_passed_real_preflight": {
+        "output": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body9",
+        "receipt": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body9/joint_preflight.json",
+        "prefix_cost": 304570.8868674896,
+        "motion_cost": 11267.34249141303,
+        "complete_aux": 414,
+        "joint_derivative_relative": 2.460256682477904e-7,
+        "policy_failure": "Old lagged prediction refresh required J reuse; body10 uses full fresh J with the independently tested original LM retry."
+      },
+      "ordered_loader_QA": "D:/CodexData/RinkSpace_Data/audit_1017/ordered_successor_actual_smoke.json",
+      "complete_source_QA": {
+        "producer": "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/first_shot_source_directional_QA.py",
+        "enabled_in": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body11",
+        "scope": "All original formal W groups plus motion, actual nonzero camera/world direction; original full guard at both steps.",
+        "steps": [
+          0.00002,
+          0.00001
+        ],
+        "prior_actual_failure": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body10/full_source_directional_QA.json",
+        "reproduced_joint_failure": "D:/CodexData/RinkSpace_Data/audit_1017/source10_joint697.json",
+        "branch_replay": "D:/CodexData/RinkSpace_Data/audit_1017/source10_branch697.json",
+        "diagnosis": "f697 ice.F3:middle segment0 vertex0 changes closest edge 3 to 2 between +5e-5 and +1e-4; entire 6x26 W group affected. Same actual model raw replay exact; joint local finite source replay max2.49e-14. Both smaller stencils preserve branch and original error gates.",
+        "full_production_QA_pending": false,
+        "passed_full_production": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body11/full_source_directional_QA.json",
+        "accuracy_or_source_identity_certified_by_derivatives": false
+      },
+      "motion_row_pixel_noise": {
+        "report": "D:/CodexData/RinkSpace_Data/audit_1017/motion_row_pixel_noise_QA.json",
+        "actual_pairs": 12,
+        "source_and_target_row_timing": true,
+        "target_matrix_departure_max": 0.0307521682408123,
+        "weights_or_sigma_changed": false
+      }
+    },
+    "body10_actual_failure": {
+      "receipt": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body10/full_source_directional_QA.json",
+      "failed_frames_top": [
+        697,
+        709,
+        963
+      ],
+      "max_derivative_error": 0.29712793684270306,
+      "actual_ordered_arcs": 94,
+      "expected_ordered_arcs": 154,
+      "preserved_full_state": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body2/current.json"
+    },
+    "latest_started_output": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body13",
+    "latest_valid_complete_parent": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body2/current.json",
+    "body11_closed": {
+      "output": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body11",
+      "normal_close": true,
+      "accepted_iterations": 0,
+      "reason": "修复点级身份谱系后发现旧点序方向策略产生跨孔错配；已在试步前正常停止。",
+      "full_current_source_QA_passed": true,
+      "max_absolute": 0.000766996367,
+      "relative_norm": 0.0000236424882,
+      "actual_associated_arcs": 154,
+      "qualified_points": 651,
+      "accuracy_accepted": false
+    },
+    "material_identity_repair": {
+      "quarantine": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/s1_arc_q_1017.json",
+      "source_frames": 57,
+      "ordinary_points": 367,
+      "removed_formal_rows": 734,
+      "known_correct_previous_identity_members_preserved": 3,
+      "retained_source_W_QA": "D:/CodexData/RinkSpace_Data/audit_1017/arc_ordinary_actual_QA.json",
+      "retained_source_R_J_transport_max_difference": 0,
+      "ordinary_quarantine_producer": "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/first_shot_ordinary_quarantine.py",
+      "material_side_producer": "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/first_shot_arc_polarity.py",
+      "source_gradients": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/s1_arc_dir_1017.json",
+      "final_frozen_replay": "D:/CodexData/RinkSpace_Data/audit_1017/ordered_alias_probe9.json",
+      "new_acceptance_state": false,
+      "reason": "点序不是材料方向；局部梯度不证明实体身份。原片核对混合提取弧后，仅剩已保留内孔观测允许按白色内侧关联。",
+      "associated_arcs": 76,
+      "associated_points": 285,
+      "retained_singletons": 26,
+      "actual_worker_pixel_replay": "D:/CodexData/RinkSpace_Data/audit_1017/material_side_actual_production_QA.json",
+      "actual_worker_max_pixel_difference": 0
+    },
+    "body12_closed": {
+      "output": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body12",
+      "normal_close": true,
+      "accepted_iterations": 0,
+      "full_source_QA": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body12/full_source_directional_QA.json",
+      "full_source_QA_passed": true,
+      "all1248_associated_arcs": 76,
+      "qualified_points": 285,
+      "singletons_retained": 26,
+      "max_absolute": 0.0007669963670483004,
+      "relative_norm": 0.000023676322250030122,
+      "full_W_preflight": "D:/CodexData/RinkSpace_Data/audit_1017/body12_fullW_preflight/preflight.json",
+      "human_confirmed_points_retained": 21,
+      "failure": "FiniteAdCoveragePolicy used unshifted bundle.world166 with state.world_parameter_indices171; 206 local derivatives mismatched 211 columns; failed before first trial.",
+      "exact_source_J": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body12/source_J_cache/generation_000000/manifest.json"
+    },
+    "source_anchor_reuse": {
+      "scope": "Exact body2 numerical q and all414 auxiliary arrays; original source R/W/loss/ledger checked; original first-J verifier remains active; both full-source stencils required again; new q fresh",
+      "producer": "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/first_shot_exact_source_anchor.py",
+      "current_execution_QA_pending": true
+    },
+    "finite_ad_world_repair": {
+      "producer": "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/first_shot_finite_ad_coverage.py",
+      "uses_actual_programme_world171": true,
+      "uncorrected_copy": "D:/CodexData/RinkSpace_Data/audit_1017/finite_ad_before_world_fix.py",
+      "additional_full_camera_world_directional_QA_required_before_solver": true,
+      "regression_tests": 30
+    }
+  }
+}

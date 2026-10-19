@@ -1,0 +1,153 @@
+{
+  "schema": "rinkspace.okada-shot1-source-audit-facts.v1",
+  "created_local_date": "2026-10-18",
+  "review_origin": "Codex原片审计；不是用户亲自确认像素",
+  "scope": "row34524；U/K共享模板来源；Ad4 K_arc1/R_arc1来源与退化",
+  "baseline_model_sha256": "78e0f4cfb7254436163e8b8da75b4f8e007a6f5036aed94fe5328248c34bb31b",
+  "actual_scene_source": {
+    "path": "D:/CodexData/RinkSpace_Data/audit_1017/motion_joint_body2/actual_geometry_final/actual_scene.json",
+    "sha256": "e95634c8d8691129a517fe4f7f411580bfbb292e0607fa83af12b49d22283ea4",
+    "old_address_retained": true
+  },
+  "row34524": {
+    "frame_1based": 209,
+    "native_pts": 309504,
+    "time_base": "1/12800",
+    "source_seconds": 24.18,
+    "source_uv": [
+      1296.8791129340266,
+      259.8791334614735
+    ],
+    "source_label": "Ad2.top_edge",
+    "point_id": "Ad2.top_edge/segment/1/vertex/0",
+    "native_PTS_redecoded_BGR_bitexact": true,
+    "classification": "原点位于前臂运动模糊边缘，真实广告上沿在此遮挡；旧前景mask漏检（0）",
+    "new_branch_only_exclusion": true,
+    "new_exclusions": [
+      34524
+    ],
+    "historical_human_exclusions": [
+      25537
+    ],
+    "raw_rows": 182017,
+    "new_active_rows": 182015,
+    "other_same_segment_rows_not_automatically_excluded": true,
+    "formal_W_rank_before": 214112,
+    "formal_W_rank_after": 214111,
+    "physical_model_unchanged": true
+  },
+  "UK": {
+    "original_source_frame_index_205_field_semantics": "此处source_native_uv映回205的等效坐标，并非每点的真实曝光来源",
+    "actual_construction_frames": [
+      {
+        "frame": 205,
+        "pts": 308480,
+        "seconds": 24.1
+      },
+      {
+        "frame": 225,
+        "pts": 313600,
+        "seconds": 24.5
+      },
+      {
+        "frame": 258,
+        "pts": 322048,
+        "seconds": 25.16
+      }
+    ],
+    "U": {
+      "template_edges": 71,
+      "source_frames": [
+        205,
+        258
+      ],
+      "contributor_runs": "约43.07%展开像素弧长来自205+258平均，其余仅258；逐边细分见Data表",
+      "no_source_samples": 0,
+      "source_visibility": "205右侧被身体遮挡，225整U被身体遮挡，258整圈可见但模糊"
+    },
+    "K": {
+      "template_edges": 68,
+      "source_frames": [
+        225,
+        258
+      ],
+      "contributor_runs": "全部边均来自225+258平均；205没有参与K的有效像素",
+      "no_source_samples": 0,
+      "source_visibility": "225清晰可见；258可见但模糊；205被身体遮挡"
+    },
+    "shape_extension_decision": "目前不扩展共享形状自由度。互补源图齐备；先解决时间相机和安装冲突，再用未调参的可见边界判断低维局部宽度/曲率需求。1.5px来源不确定性和混合模糊仍在，来源闭合不等于模板精度验收。"
+  },
+  "Ad4": {
+    "K_arc1": {
+      "points": 20,
+      "edges": 19,
+      "source_frames": [
+        400,
+        440
+      ],
+      "source_seconds": [
+        28,
+        28.8
+      ],
+      "exact_atlas_sample_matches": {
+        "400": 196,
+        "440": 401,
+        "400_border_padding": 11
+      },
+      "border_padding_edges": [
+        13,
+        14
+      ],
+      "finding": "源图左边界拼接缝处部分模板轮廓进入f400图外warp padding；这部分不具备实际材料边界来源。原片两帧底笔画可见但模糊。",
+      "singular_values": [
+        1.0651783479903996,
+        0.0048710658795063965
+      ],
+      "singular_ratio": 218.67459285899417
+    },
+    "R_arc1": {
+      "points": 13,
+      "edges": 12,
+      "source_frames": [
+        400
+      ],
+      "source_seconds": [
+        28
+      ],
+      "exact_atlas_sample_matches": {
+        "400": 496
+      },
+      "singular_values": [
+        0.971574478507312,
+        0.018769481473668508
+      ],
+      "singular_ratio": 51.763522602919146
+    },
+    "cause_limit": "K存在可复现的拼缝/边界padding伪形状；两个arc都只约束字母下方短开放轮廓，不能代表整字。退化方向与来源/短弧弱约束一致，但未证明是优化退化的唯一原因。",
+    "shape_extension_decision": "先修K来源拼缝并以完整同实体可见轮廓约束，再判断低维扩展；不把压扁结果当物理字形，也不据此直接释放所有顶点。"
+  },
+  "assets": {
+    "data_report": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/okada_s1_r11/source_audit_1018/source_report.json",
+      "sha256": "2fd11ffe2a7d97f54d2214eb8cc1531ed1a156729b61c25590cbd7dd67030c3a"
+    },
+    "UK_segment_sources": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/okada_s1_r11/source_audit_1018/UK_segment_sources.json",
+      "sha256": "2abac53dfff29929de72543a72efe90dd6e3a8a528d4acffb0c837ed6e041c85"
+    },
+    "revision_manifest": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/okada_s1_r11/source_audit_1018/revision/manifest.json",
+      "sha256": "161a80dc27681cafd2c2da04138328c1e2d8fe53f3ea462226335bcd055b2a5c"
+    },
+    "validation": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/okada_s1_r11/source_audit_1018/revision/validation.json",
+      "sha256": "6183a5b3b2735685120b8ece1f366a1327cc69327bc58bbd4e665c849e32e1f3"
+    },
+    "visuals": "D:/CodexData/RinkSpace_Data/runs/okada_s1_r11/source_audit_1018/",
+    "review_html": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/okada_s1_r11/source_audit_1018/review.html",
+      "sha256": "65809c98a5857e759992a6e679db9b9c16f48804dcf324cb2836b0e1cbf9d613"
+    }
+  },
+  "unchanged": "原始视频、UV/ID/标签、原W/E、25537人工authority、原i20与历史文件保留；本轮不更改共享模板几何"
+}

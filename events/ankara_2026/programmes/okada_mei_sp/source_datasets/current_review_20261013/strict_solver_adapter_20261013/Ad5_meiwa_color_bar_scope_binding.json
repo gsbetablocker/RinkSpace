@@ -1,0 +1,39 @@
+{
+  "schema": "rinkspace.exact-source-Ad5-meiwa-colour-envelope-target-label-binding.v1",
+  "dataset_reference": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\current_review_20261013\\specific_inner_review_v6\\fit_dataset.json",
+    "sha256": "a835599e7d7a1a0bcf9dcd92e90fd4ad160b01e60e99975ec977d5f250f69fd8"
+  },
+  "source_pack": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\diagnostics\\current56_shared_active_set_filter_20261009\\systematic_continuation_20261010\\full_programme_strict_source_review_20261012\\source_full_precision_spill_retry3_v1\\223403520_R0402_034.npz",
+    "sha256": "c12b0c15d4e37da80ec76570d6f3eec7d0ff41791c70ddf1b963df544b60ae8b"
+  },
+  "corner_annotation_reference": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\history\\tracking_runs\\program_ad_corners_native\\corners.json",
+    "sha256": "f11ae9b3901219baa4627401dd8991a6bf18f48388faabdfb4edcec92171cdfa"
+  },
+  "source_frame_reference": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\strict_v6_read_speed_audit_20261013\\Ad5_scope_source_229301504.png",
+    "sha256": "2d72d38276a351b345fca0a763175a808db95a2fd77bfd64a1f467d61f7c39ad"
+  },
+  "source_native_pts": 229301504,
+  "source_actual_pts": 229301504,
+  "decoded_BGR_sha256": "7906c146ad4122516629b6f010e308f6f642310dc5a038b5da98a35ddf10373d",
+  "original_Ad5_annotation_observations": 60,
+  "expected_finite_FIT_points": 20072,
+  "original_scope": "external_border",
+  "effective_scope": "internal_graphic_only",
+  "original_annotation_component": "meiwa_color_bar_envelope",
+  "reviewed_annotation_native_pts": 229301760,
+  "reviewed_annotation_actual_pts": 229301504,
+  "reviewed_corner_bounds_native_px": [
+    1121.51,
+    496.85,
+    1366.8,
+    636.69
+  ],
+  "source_image_review": "Exact original frame and original four corner annotations jointly identify the upper blue and lower green MEIWA internal colour-bar envelope; no whole white panel border is identified.",
+  "label_error_origin": "src/rinkspace/vision_programme_board_review.py:_load_corner_annotations unconditionally assigned external_border without consuming original measurement_component",
+  "scope_is_not_a_general_Ad5_alias": true,
+  "UV_sigma_point_indices_source_paths_and_FIT_HELD_roles_changed": false
+}

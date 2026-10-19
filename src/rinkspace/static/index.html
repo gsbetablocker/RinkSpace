@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RinkSpace · 冰面参照工作台</title>
+  <link rel="stylesheet" href="/static/workbench.css">
+  <script src="/static/workbench.js" defer></script>
+  <script src="/static/model_grid.js" defer></script>
+</head>
+<body>
+  <header class="masthead">
+    <a class="brand" href="/" aria-label="RinkSpace 工作台"><span class="brand-mark">R</span><span>RinkSpace<small>共同冰场模型 / 原片定位</small></span></a>
+    <div class="header-status"><span class="status-dot"></span>本地研究环境<span class="separator">/</span><span id="projectName">正在打开项目</span></div>
+    <div class="header-actions"><span id="revision" class="muted">版本 —</span><button id="undoButton" class="quiet" disabled>撤销修改</button><button id="saveButton" class="primary" disabled>保存项目</button></div>
+  </header>
+
+  <main>
+    <section class="intro"><div><div class="eyebrow">ONE EVENT / SHARED RINK MODEL</div><h1>在同一冰场里，看原片。</h1><p>共同模型参与定位，源帧、证据和缺口一起保留。</p></div><div class="scope"><span class="tag">模型定位候选</span><span>位置坐标网不代表等距或米制<br>独立精度状态另行显示</span></div></section>
+    <p><a href="/assets/outputs/event_reuse_v11/failures/men15557/context_diagnostic_v12_centre/comparison.mp4" target="_blank" rel="noopener">15555–15565秒：实测轮廓、身份候选与修订网格</a> · <a href="/assets/outputs/event_reuse_v11/failures/men15557/same_observations_revised_geometry.jpg" target="_blank" rel="noopener">圆环与中线：共同参数修改前后</a> · <a href="/assets/outputs/event_reuse_v11/README.md" target="_blank" rel="noopener">全赛事覆盖与本轮结果</a> · <a href="/assets/outputs/fixed_camera_v11/evidence_video/men_fs_final/comparison.mp4" target="_blank" rel="noopener">旧版同10秒失败对照</a></p>
+    <div id="notice" class="notice" role="status" hidden></div>
+
+    <section class="source-bar" aria-label="输入视频">
+      <div class="field source-select"><label for="videoSelect">研究视频</label><select id="videoSelect"><option>正在读取本地输入…</option></select></div>
+      <div id="sourceSummary" class="source-summary">保留源帧身份与原始 PTS</div>
+      <button id="pathToggle" class="quiet">配置本地路径</button>
+    </section>
+    <form id="pathForm" class="path-form" hidden><div class="field"><label for="sourcePath">本地文件完整路径 · 原片只读</label><input id="sourcePath" type="text" placeholder="D:\视频\节目.mp4" autocomplete="off" required></div><button class="primary" type="submit">应用路径</button><button id="pickPath" class="quiet" type="button">本机选择文件</button><span class="helper">只更新本地项目配置，不上传原片。</span></form>
+
+    <details id="mediaBrowser" class="card model-player-card" open hidden>
+      <summary>原视频 + 共同模型网格</summary>
+      <p id="mediaInfo" class="helper">播放器时间用于取材定位；精确源帧与PTS在下方已索引视图中检查。</p>
+      <div class="model-toolbar"><div class="field"><label for="rinkModelSelect">同一赛事模型</label><select id="rinkModelSelect"><option value="">读取模型…</option></select></div><div class="field"><label for="localizationSelect">当前原片定位运行</label><select id="localizationSelect"><option value="">尚未选择</option></select></div><label class="grid-switch"><input id="detectedContourToggle" type="checkbox" checked> 真实检测轮廓</label><label class="grid-switch"><input id="predictedContourToggle" type="checkbox" checked> 模型预测轮廓（粉）</label><label class="grid-switch"><input id="gridToggle" type="checkbox" checked> 坐标网（浅蓝）</label><label class="grid-switch"><input id="landmarkToggle" type="checkbox"> 地标编号</label><button id="refreshModels" class="quiet">刷新模型</button></div>
+      <div class="model-toolbar" aria-label="实际图像观测"><span>实际观测：</span><label class="grid-switch"><input id="iceObservationToggle" type="checkbox"> 冰面点线（粉）</label><label class="grid-switch"><input id="contactObservationToggle" type="checkbox"> 接地边候选（黄）</label><label class="grid-switch"><input id="boardObservationToggle" type="checkbox"> 广告板面（绿）</label></div>
+      <div class="model-player-layout"><div><div id="modelVideoStage" class="model-video-stage"><video id="sourcePlayer" controls muted preload="metadata" playsinline></video><canvas id="videoGridCanvas" aria-label="原片共同模型坐标网"></canvas></div><div class="model-status-line"><strong id="localizationStatus" data-state="unavailable">无法定位</strong><span id="gridGeometryLabel">位置坐标网（非等距）</span></div><p id="localizationFrame" class="helper">当前原片时间没有模型定位。</p><p id="localizationReason" class="helper">未沿用相邻帧或其它视频的矩阵。</p><p id="landmarkObservationSummary" class="helper" aria-live="off">逐帧地标观测待读取。</p><div class="model-actions"><button id="seekLocalization" class="text-button" disabled>跳至本次定位开始</button><button id="inspectLocalizationFrame" class="text-button" disabled>在下方检查此源帧</button><button id="showFrameProvenance" class="text-button">查看当前帧来源链</button><a id="localizationDocument" target="_blank" rel="noopener" hidden>定位记录 ↗</a></div></div><aside class="model-assist"><div class="section-heading"><h2>共同模型 · 辅助视图</h2><a id="modelEvidenceLink" target="_blank" rel="noopener" hidden>证据 ↗</a></div><div id="modelMapStage" class="model-map-stage"><canvas id="modelMapCanvas" width="720" height="430" aria-label="模型已知区域与当前可见冰面"></canvas></div><p id="modelSummary" class="helper">模型尚未生成。</p><div id="modelCoverage" class="model-coverage"></div><div class="model-actions"><a id="modelOverviewLink" target="_blank" rel="noopener" hidden>实拍概览 ↗</a><a id="modelDocumentLink" target="_blank" rel="noopener" hidden>模型记录 ↗</a></div><div id="modelLandmarks" class="model-landmarks"></div></aside></div>
+      <div class="frame-jump"><label for="mediaSeekSeconds">跳至原片秒数</label><input id="mediaSeekSeconds" type="number" min="0" step="0.001" value="3610" aria-label="跳至原片秒数"><button id="mediaSeekButton" type="button" disabled>跳至原片时间</button><span id="mediaTime" class="helper">播放器时长待读取；不是源帧索引。</span></div>
+      <p class="helper">三层可分别开关：真实轮廓只画本帧读到的弧段，绿为参与求解、黄为身份未知、红为冲突；粉色虚线是模型预测，浅蓝是坐标网。绿色不代表独立精度通过。无相机时仍可查看真实轮廓。下排观测开关继续显示冰面跟踪点、接地候选和广告板面。方框是重新匹配参考画面的点，黄色描边是实际参与求解的边界候选。人物作粗排除；原视频只读，下方保留源帧、掩膜和历史误差。</p>
+    </details>
+    <div class="workspace">
+      <div class="viewer-column">
+        <section class="transport card" aria-label="源帧控制">
+          <div class="transport-buttons"><button id="prevFrame" title="前一源帧（←）" aria-label="前一源帧" disabled>←</button><button id="playButton" class="primary" disabled>播放</button><button id="nextFrame" title="后一源帧（→）" aria-label="后一源帧" disabled>→</button><select id="playMode" aria-label="播放采样方式"><option value="source">逐一源帧</option><option value="evidence" disabled>证据同步播放</option></select></div>
+          <div class="frame-readout"><span>源帧 <strong id="frameIndex">未索引</strong></span><span>源时间 <strong id="sourceTime">—</strong></span><span>PTS <strong id="sourcePTS">—</strong></span></div>
+          <div class="frame-jump"><label for="frameInput">跳至帧</label><input id="frameInput" type="number" min="0" step="1" value="0" aria-label="源帧号" disabled><button id="goFrame" disabled>定位</button></div>
+          <input id="frameRange" class="frame-range" type="range" min="0" max="0" value="0" aria-label="源帧时间轴" disabled>
+          <div class="transport-note"><span id="decodeNote">播放逐一读取真实源帧；速度受本地解码限制。</span><span id="frameDimensions">源像素 —</span></div>
+        </section>
+
+        <div class="view-grid">
+          <section class="view-card"><div class="view-title"><span><b>01</b> 原片</span><span id="sourceViewLabel" class="small-tag">源图 image_px</span></div><div id="sourceStage" class="image-stage"><img id="sourceImage" alt="当前源帧" draggable="false"><canvas id="sourceCanvas" aria-label="源图掩膜和独立检查点编辑"></canvas><div class="empty-state" id="sourceEmpty"><span>◎</span><strong>等待源帧</strong><p>选择本地视频后，浏览真实解码帧。</p></div></div><div class="view-caption"><span id="sourceCaption">源坐标 / 左上原点，x 向右，y 向下</span><button id="markKeyframe" class="text-button" disabled>标记关键帧</button></div></section>
+          <section class="view-card"><div class="view-title"><span><b>02</b> <span id="fixedHeading">固定冰面</span></span><span class="small-tag amber">local_projective · 非米制</span></div><div id="fixedStage" class="image-stage checkerboard"><img id="fixedImage" alt="固定冰面候选预览" draggable="false"><canvas id="fixedCanvas" aria-label="参考图地标配对"></canvas><div class="empty-state" id="fixedEmpty"><span>⌖</span><strong>当前帧没有有效映射</strong><p>运行局部镜头分析，查看有证据支持的参照。</p></div></div><div class="view-caption"><span id="fixedCaption">无观测区域保持缺失，不补出冰面。</span><button id="referenceToggle" class="text-button" disabled>查看参考帧</button></div></section>
+          <section class="view-card"><div class="view-title"><span><b>03</b> 可用掩膜</span><span class="small-tag">人物 / 字幕 / 非冰面排除</span></div><div id="maskStage" class="image-stage"><img id="maskImage" alt="当前源帧可用于配准的冰面掩膜"><div class="empty-state" id="maskEmpty"><span>▧</span><strong>尚无掩膜证据</strong><p>自动候选生成后，可在原片上修正排除区。</p></div></div><div class="view-caption"><span id="maskCaption">冰面平面配准仅用冰面；板面另入相机观测。</span><span id="maskCount"></span></div></section>
+          <section class="view-card"><div class="view-title"><span><b>04</b> 独立静止地标误差</span><span id="errorTag" class="small-tag">等待检查点</span></div><div id="errorStage" class="image-stage"><img id="errorImage" alt="未参与拟合的静止冰面地标误差"><div class="empty-state" id="errorEmpty"><span>⌁</span><strong>尚无独立误差证据</strong><p>拟合残差与平滑预览不能代替独立验收。</p></div></div><div class="view-caption"><span id="errorCaption">检查点必须与拟合地标相互独立。</span></div></section>
+        </div>
+
+        <section class="timeline card"><div class="section-heading"><div><h2>镜头时间线</h2><p id="shotHelp">候选分镜与角色可修正；切镜后不继承旧映射。</p></div><button id="scanButton" class="quiet" disabled>扫描镜头</button></div><div id="shotTimeline" class="shot-timeline"><div class="timeline-empty">暂无镜头记录</div></div><div class="timeline-legend"><span><i class="live"></i>节目候选</span><span><i class="replay"></i>回放候选</span><span><i class="other"></i>非节目 / 未定</span><span class="muted">候选标签需结合原片确认</span></div><div id="shotEditor" class="shot-editor" hidden><div class="field"><label for="shotLabel">镜头角色</label><select id="shotLabel"><option value="programme">节目</option><option value="replay">回放</option><option value="non_programme">非节目</option><option value="unknown">未定</option></select></div><div class="field"><label for="shotStart">起始源帧</label><input id="shotStart" type="number" min="0" step="1"></div><div class="field"><label for="shotEnd">结束源帧（含）</label><input id="shotEnd" type="number" min="0" step="1"></div><button id="saveShot" class="quiet">保存镜头修正</button><button id="compareBoundary" class="text-button">检查切点前后</button></div></section>
+      </div>
+
+      <aside class="inspector">
+        <section class="card quality-card"><div class="section-heading"><h2>局部组件与历史证据</h2><span class="eyebrow">QUALITY</span></div><div id="qualitySummary"><div class="quality-row"><span class="quality-dot unknown"></span><div><strong>局部配准 <em>未运行</em></strong><p>选择有静止冰面纹理的短镜头。</p></div></div></div><div class="quality-row"><span class="quality-dot unknown"></span><div><strong>共同模型 / 米制尺度</strong><p>模型定位见上方原片；局部跟踪用于锚定之间传播。位置坐标不直接用于物理速度。</p></div></div><div class="quality-row"><span class="quality-dot unknown"></span><div><strong>接触轨迹 / 节目统计 <em>后续交付</em></strong><p>尚未建立逐脚接触与全节目覆盖证据。</p></div></div><details class="metrics"><summary>当前帧证据数值</summary><dl id="qualityMetrics"><dt>独立检查点</dt><dd>—</dd></dl></details></section>
+
+        <section class="card run-card">
+          <div class="section-heading"><h2>局部镜头分析</h2><span class="step-number">A</span></div>
+          <p class="helper">以源 PTS 指定完整连续镜头。冰面纹理与人工掩膜仍需目视检查。</p>
+          <div class="range-fields"><div class="field"><label for="runStart">起始秒</label><input id="runStart" type="number" min="0" step="0.02" value="0"></div><span>—</span><div class="field"><label for="runEnd">结束秒</label><input id="runEnd" type="number" min="0" step="0.02" value="4"></div></div>
+          <div class="inline-actions"><button id="setRunStart" class="text-button" disabled>当前帧设为起点</button><button id="setRunEnd" class="text-button" disabled>当前帧设为终点</button></div>
+          <div class="field run-role"><label for="runBackend">配准方法</label><select id="runBackend" disabled><option value="photometric_affine">Affine 光度候选（冻结参数）</option><option value="rotation_zoom_experimental">相机旋转与变焦（实验）</option><option value="baseline">旧基线（复现既有运行）</option></select></div>
+          <div class="field run-role"><label for="runEveryN">源帧采样</label><select id="runEveryN" disabled><option value="1">逐源帧（建议）</option><option value="5">每 5 个源帧（旧采样对照）</option></select></div>
+          <p id="runBackendNote" class="helper">Affine 是近似模型；完整拟合足迹保存在本机。运行完成不代表独立精度通过。</p>
+          <div class="field run-role"><label for="runRole">本次镜头用途</label><select id="runRole"><option value="development">开发镜头</option><option value="held_out">未参与调参的验证镜头</option><option value="failure_control">切镜 / 低纹理失败对照</option></select></div>
+          <button id="runButton" class="primary full-width" disabled>生成掩膜与局部配准</button><p id="runStatus" class="helper">完成后在左侧同步查看候选和独立证据。</p><progress id="runProgress" hidden></progress>
+        </section>
+
+        <section class="card edit-card"><div class="section-heading"><h2>修正与检查点</h2><span class="step-number">B</span></div><div class="mode-tabs" role="group" aria-label="标注工具"><button data-mode="inspect" class="selected">浏览</button><button data-mode="rectangle">矩形排除</button><button data-mode="polygon">多边形</button><button data-mode="landmark">地标配对</button></div><p id="editInstructions" class="helper">在原片上查看已保存的修正。所有坐标存为原图像素。</p><div id="maskControls" hidden><div class="field"><label for="maskReason">排除原因</label><select id="maskReason"><option value="person">人物 / 冰刀上方</option><option value="overlay">字幕 / 转播图形</option><option value="non_ice">非冰面</option><option value="unreliable">反射 / 不可靠区域</option><option value="heldout_protection">检查地标整体保护区</option></select></div><div id="maskGroupField" class="field" hidden><label for="maskGroupId">要整体保护的物理标志组 ID</label><input id="maskGroupId" placeholder="与地标配对中的组 ID 一致" autocomplete="off"></div><div class="inline-actions"><button id="saveMask" class="primary" disabled>保存排除区</button><button id="clearDrawing" class="quiet">清除草稿</button></div></div><div id="landmarkControls" hidden><div class="field"><label for="landmarkId">物理标志组 ID（完整 logo / 线段）</label><input id="landmarkId" placeholder="例如：中心标志" autocomplete="off"></div><div class="field"><label for="landmarkPointId">检查点 ID（组内同一个可辨认点）</label><input id="landmarkPointId" placeholder="例如：中心标志左端" autocomplete="off"></div><div class="field"><label for="landmarkRole">证据用途</label><select id="landmarkRole"><option value="development_check">开发检查点（不参与拟合）</option><option value="heldout_locked">锁定验收检查点（不参与拟合）</option><option value="training">训练候选（仅记录，本轮不用于拟合）</option></select></div><p class="helper landmark-warning">检查点保存后仍是候选。重新运行前，请用排除区完整圈住对应物理标志，避免同一标志的邻近纹理参与拟合。</p><p id="pairReadout" class="coordinate-readout">源图 — / 参考图 —</p><button id="saveLandmark" class="primary full-width" disabled>保存地标配对</button></div><div id="annotationList" class="annotation-list"></div></section>
+
+        <section class="card provenance"><h2>来源与保存</h2><p id="provenanceText">本地项目保留视频身份、源帧、掩膜与修正版本。</p><code id="sourceHash">SHA-256 尚未读取</code></section>
+      </aside>
+    </div>
+
+    <section class="card evidence-section"><div class="section-heading"><div><div class="eyebrow">REVIEW & HANDOFF</div><h2>运行记录与小型验收包</h2><p>开发镜头、独立验证镜头与失败对照一起保留。候选结果不自动视为通过。</p></div><button id="refreshRuns" class="quiet">刷新记录</button></div><div id="runList" class="run-list"><p class="muted">正在读取本次运行记录…</p></div></section>
+    <footer><span>RinkSpace · 原片只读 · 计算在本机进行</span><span>共享赛事模型 / 原片网格 / 历史审计保留</span></footer>
+  </main>
+
+  <dialog id="boundaryDialog"><div class="section-heading"><div><h2>切点前后源帧</h2><p id="boundaryTitle"></p></div><button id="closeBoundary" class="quiet">关闭</button></div><div id="boundaryImages" class="boundary-grid"></div></dialog>
+  <dialog id="modelProvenanceDialog"><div class="section-heading"><h2 id="modelProvenanceTitle">模型来源链</h2><button id="closeModelProvenance" class="quiet">关闭</button></div><div id="modelProvenanceBody"></div></dialog>
+</body>
+</html>

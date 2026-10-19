@@ -1,0 +1,235 @@
+{
+  "schema_version": "rinkspace.refit.three_frame_delivery.v1",
+  "complete": true,
+  "user_accepted": false,
+  "scope": "three listed source frames only",
+  "selected_fit": {
+    "source_path": "three_frame_refit/work/camera_repair/current.json",
+    "source_sha256": "ca1ffaf2f0462a9942bb98b04a1e5a7e8b3faf2767c31194bee6806fbe9a8a3c",
+    "frozen_sha256": "355f6a382d263bb9780e15179cf6af2fb1a9c8b541a6436dd013c4dd0263c43f",
+    "parameter_count": 257
+  },
+  "observations": {
+    "source_path": "three_frame_refit/inputs/step02_observations.json",
+    "sha256": "2ebaa742175967477f9bd1b40a1d819a3e6e4ae3c55fb671b136f6e19c4d39f3",
+    "fit_observation_count": 115,
+    "calculation_sample_count": 5928,
+    "calculation_samples_are_not_all_original_stroke_points": true,
+    "full_original_curve_stroke_point_count": 23677,
+    "original_ad_corner_count": 55,
+    "max_calculation_sample_coordinate_change_px": 0.0,
+    "source_observation_file_unchanged_during_finalization": true
+  },
+  "checks": {
+    "structural_failures": [],
+    "all_rendered_points_and_51x29_sensor_inverse_passed": true,
+    "shared_scene_export": "passed"
+  },
+  "agent_visual_review": {
+    "report": "../work/visual_review.json",
+    "report_sha256": "af75b8b4bcd19e0f757fbd3b772f8884e489b67b0a0da2850bed2ed21da426fe",
+    "agent_visual_review_passed": true
+  },
+  "numerical_stability": {
+    "report": "../work/validated_robustness/diagnostic.json",
+    "report_sha256": "197a59c45d79a2f8dae1aec67bfd5fe3279e25e5a228227add7c247c9731e509",
+    "baseline_file": "../work/validated_robustness/baseline.json",
+    "baseline_file_sha256": "ca1ffaf2f0462a9942bb98b04a1e5a7e8b3faf2767c31194bee6806fbe9a8a3c",
+    "baseline_sha256": "ca1ffaf2f0462a9942bb98b04a1e5a7e8b3faf2767c31194bee6806fbe9a8a3c",
+    "selected_fit_relation": {
+      "selected_fit_sha256": "ca1ffaf2f0462a9942bb98b04a1e5a7e8b3faf2767c31194bee6806fbe9a8a3c",
+      "stability_baseline_sha256": "ca1ffaf2f0462a9942bb98b04a1e5a7e8b3faf2767c31194bee6806fbe9a8a3c",
+      "selected_fit_is_stability_baseline": true,
+      "changed_parameter_count": 0,
+      "parameter_deltas_from_stability_baseline": [],
+      "interpretation": "stability diagnostic applies to its frozen baseline; selected fit may differ"
+    },
+    "cases": {
+      "20260925": {
+        "status": "finished_diagnostic_not_video_accuracy_validation",
+        "optimizer_success": true
+      }
+    }
+  },
+  "weight_sensitivity": {
+    "report": "../work/validated_weight_check/diagnostic.json",
+    "report_sha256": "0207b143407037148191daa6442c750f081342ff507931494222f72e481ddbb2",
+    "baseline_sha256": "ca1ffaf2f0462a9942bb98b04a1e5a7e8b3faf2767c31194bee6806fbe9a8a3c",
+    "status": "finished_diagnostic_not_video_accuracy_validation",
+    "conclusion": "physical_solution_not_unique",
+    "optimizer_success": false,
+    "optimizer_message": "Stopped by root after weight sensitivity exposed non-unique physical calibration; not converged.",
+    "scope": "similar three-frame fits do not establish unique physical calibration"
+  },
+  "frames": [
+    {
+      "id": "high_56218880",
+      "pts": 56218880,
+      "source_time": "01:01:00.083",
+      "source_image": "outputs/rink_model/ankara_2026_shared/v0.13-women-sp/evidence/survey/survey_3660.png",
+      "source_image_sha256": "ccd92c70eaa4a8b410808ad0372dba4ce0fb7ba30de4a75ef0368459f32a86e5",
+      "overlay": "high_56218880.png",
+      "fit_evidence_curve_distance_px": {
+        "count": 2271,
+        "rms_px": 1.4385431095961168,
+        "p95_px": 3.1077336190475147,
+        "max_px": 7.494323681499975
+      },
+      "fit_evidence_ad_corner_2d_distance_px": {
+        "count": 26,
+        "rms_px": 1.0741980370823598,
+        "p95_px": 1.7656005137815216,
+        "max_px": 1.8111526343297033
+      },
+      "full_original_stroke_curve_distance_px": {
+        "count": 2144,
+        "rms_px": 1.2773272668145952,
+        "p95_px": 2.836118765541607,
+        "max_px": 7.494323681499975
+      }
+    },
+    {
+      "id": "low2_104693760",
+      "pts": 104693760,
+      "source_time": "01:53:36.000",
+      "source_image": "evidence/low_end_reference_review_20260923/low_end_pts_104693760.png",
+      "source_image_sha256": "049529de9fb3994f0a3fe3d9780e4190d9081d328ade85471236694663b9cc98",
+      "overlay": "low2_104693760.png",
+      "fit_evidence_curve_distance_px": {
+        "count": 1175,
+        "rms_px": 1.9263081957641424,
+        "p95_px": 3.9762938750314234,
+        "max_px": 6.642878669063948
+      },
+      "fit_evidence_ad_corner_2d_distance_px": {
+        "count": 13,
+        "rms_px": 0.9563098975440865,
+        "p95_px": 1.369557239059723,
+        "max_px": 1.538658096078335
+      },
+      "full_original_stroke_curve_distance_px": {
+        "count": 6045,
+        "rms_px": 1.7168590659311378,
+        "p95_px": 3.7470439250463796,
+        "max_px": 6.642878669063948
+      }
+    },
+    {
+      "id": "low3_205992960",
+      "pts": 205992960,
+      "source_time": "03:43:31.000",
+      "source_image": "evidence/low_end_reference_review_20260923/low_end_pts_205992960.png",
+      "source_image_sha256": "583b56e1bc433af0126726817db9bc2c41ad388db56188ca21d806df3cd4e7f2",
+      "overlay": "low3_205992960.png",
+      "fit_evidence_curve_distance_px": {
+        "count": 2427,
+        "rms_px": 1.9215765321266547,
+        "p95_px": 3.8604698749417636,
+        "max_px": 5.955099515785821
+      },
+      "fit_evidence_ad_corner_2d_distance_px": {
+        "count": 16,
+        "rms_px": 0.729645793894734,
+        "p95_px": 1.2142468856902364,
+        "max_px": 1.4168581991772378
+      },
+      "full_original_stroke_curve_distance_px": {
+        "count": 15488,
+        "rms_px": 1.9809949300722056,
+        "p95_px": 3.8973824960731918,
+        "max_px": 6.1608476912000185
+      }
+    }
+  ],
+  "full_source_curve_errors": {
+    "scope": "same original fit strokes against dense fitted curves; not independent validation",
+    "frame_stats_px": {
+      "56218880": {
+        "count": 2144,
+        "rms_px": 1.2773272668145952,
+        "p95_px": 2.836118765541607,
+        "max_px": 7.494323681499975
+      },
+      "104693760": {
+        "count": 6045,
+        "rms_px": 1.7168590659311378,
+        "p95_px": 3.7470439250463796,
+        "max_px": 6.642878669063948
+      },
+      "205992960": {
+        "count": 15488,
+        "rms_px": 1.9809949300722056,
+        "p95_px": 3.8973824960731918,
+        "max_px": 6.1608476912000185
+      }
+    },
+    "stroke_vertex_count_including_repeated_junctions": 23677
+  },
+  "artifact_sha256": {
+    "fit.json": "355f6a382d263bb9780e15179cf6af2fb1a9c8b541a6436dd013c4dd0263c43f",
+    "scene.json": "08b4e0f68340a279354f735e5b501a0a0a8e254f451caef0f431e3d29328215b",
+    "model.svg": "d10a68dc8abd7b126a3b6d1d990b5475a8c920e449a4103b4fd07a623b720873",
+    "index.html": "88e723ce7bdf9d358dfcd861878bc680b28294d95ffd0ae5f7c4b4d473843b63",
+    "high_56218880.png": "86b6ef08cec1b404afebcd44742d7d606d35125ee8e0fc6fa8081e1324451032",
+    "low2_104693760.png": "41b90f6e6d46176666bd5053b44a63d45bab242420e8b206bde57dbf1cca0240",
+    "low3_205992960.png": "f3bf3ccc4650d0c1b80d76f3d3609b78ffd6d802d5f76c0fe9898d4d70093e88"
+  },
+  "reproduction": {
+    "python": "3.11.0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "opencv": "4.14.0",
+    "task_python_files_sha256": {
+      "three_frame_refit/work/build_final_viewer.py": "7b3a5bf54860fd99d47ca354dac85660cd947203fd3e09213f581d0eb6a7df3f",
+      "three_frame_refit/work/build_step01.py": "ea0026bc4f2b0e56b39bb1531e886babce000c85fbaa9ee2e8876c41d2bceae6",
+      "three_frame_refit/work/build_step02.py": "d777c4a072cb96590f7a915f4d1850694726e8dc62dafd9a9615c611903da297",
+      "three_frame_refit/work/build_step02_viewer.py": "7f73ced9bbd15c05637643373917d50384a9af7bed34dfc3200971ba67cb2359",
+      "three_frame_refit/work/check_full_render.py": "60dbcbc246053616b0d3f3aa01a365bcb515bbff4ba34e5ef045742b0ea50407",
+      "three_frame_refit/work/check_marker_solver.py": "bc6fefd1c3247c96653589ed1f35c11bded3f99358f7aaf438e474ed8cc419c5",
+      "three_frame_refit/work/check_ring_solver.py": "81f072898a90ce56a13c59527e4cedde096b0e7ac565fac2e97e0243151a41e8",
+      "three_frame_refit/work/check_step02.py": "52785a054a454065c0322f8e2501c03504084567164d1800a11f90296c4b0b93",
+      "three_frame_refit/work/curve_sampling.py": "8e52f1e94c0b96bba8825543faa3d300a6d6e946a611b73c3b732bece57cb6c9",
+      "three_frame_refit/work/export_final_scene.py": "58d14faf4ab06464420592e205883bdb14d680651775d6e4327cb76398e591b5",
+      "three_frame_refit/work/extract_user_contours.py": "a8555bcfa1628c3c07b8a17554b91cd5c6880cc218be2b9734cc89b333299e2f",
+      "three_frame_refit/work/f1_radius_trial.py": "fce1629678fb9110a139e32544e3d473ff0e67d48f4052640ccb0751d0a653d1",
+      "three_frame_refit/work/finalize_delivery.py": "2e88aaf0b8209e7582bf95c04a4d7fdf59d5b95d4e57926b7dcf4865f51f4cee",
+      "three_frame_refit/work/fit_joint.py": "3aebd652841f8f5b35fbc9920fe7fd2cced5089d1f0145acef8fdb3ae98ac613",
+      "three_frame_refit/work/fit_marker_refinement.py": "4992a915ab2c9111163f144def08c12b2e9231c81ab66f3c068afd88653acbcc",
+      "three_frame_refit/work/fit_ring_refinement.py": "558420c5a58c75990842a56de1ca2c159928d6d6e57361e5a081c6ef093e70c5",
+      "three_frame_refit/work/high_profile_probe.py": "6b811131520f73fa402fedeb83232e3789e7662021e52609ea812aae3419b7a1",
+      "three_frame_refit/work/physical_projection.py": "0b6c66fecbbba0e4f254464f92503f492f80ce0616eaad263904dda4a4bef925",
+      "three_frame_refit/work/prepare_fit_inputs.py": "3b1a188c1b6c4767e0e92702f4904f4969bb93463580a58277fc45450ddd561a",
+      "three_frame_refit/work/projection_probe.py": "048fc5003035a9ebc2d30fbd5a3e7cfb227a32e4b386d829c84f7a0b38749ef7",
+      "three_frame_refit/work/read_low3_raw_edges.py": "3bbe69736ed8ed670565d4a60485faa77cc545c0695938dc64b6c3a5f0d8cd9d",
+      "three_frame_refit/work/recover_low_linear_strokes.py": "851b00df831dcf5d8caa0f1b761ecb83ff1a9f2369a57f37c216cbfc8265b1c8",
+      "three_frame_refit/work/relaxed_markers.py": "d4f9604177b726a201cdb6231464343df0d77a9863c71a1d4aeaaca79804d0e3",
+      "three_frame_refit/work/relaxed_rings.py": "a866c9ed50d3c7c09482bf502e8487411cbd7ade4be2ee503dd0dc829f5e03de",
+      "three_frame_refit/work/render_complete.py": "776f71df2a56da01ae12082655abef9bfa7e051588db61407cb4ead5fd099079",
+      "three_frame_refit/work/render_fit.py": "79deb37661053a091afd172a74d1fbc3af91c5ece73d79b82814ea34d82b7cfe",
+      "three_frame_refit/work/render_step02_review.py": "26b19bd198f1de2fc375bb5c0448eef0db1e2d24912d8d5f24e3f279b2cba833",
+      "three_frame_refit/work/render_worst_crops.py": "a5cbb3c37f9ccfb2b3499828e4f73d00f447f4a7192536d3c1be93ec89c0d346",
+      "three_frame_refit/work/repair_camera.py": "b351e5dfff7ab259d146d94cea6e8eb65bbf8c9a3d104f9c40c5e580e52634a3",
+      "three_frame_refit/work/ring_weight_check.py": "e23a1c75284ce0d79f7ecfdfb0167092e6a560cfdfc06d8303590c302002cc43",
+      "three_frame_refit/work/robustness_check.py": "a27d3df91d7a2e7f788db1ff9786de2a372ccc21bff751724da953f2347d6169",
+      "three_frame_refit/work/robustness_ring_check.py": "a13b90d6ff8a1086620f70682a65005d75fece5b5bca4c7e6665bb8052e60f5d",
+      "three_frame_refit/work/shared_corner.py": "889829272f18abf1571b8d422fcdb9432e6db0dd8910409ddf2c76b641b73832",
+      "three_frame_refit/work/solve_low3.py": "87e6ddb7e6ecc0d5d2287c1bf6bcbddd4410a6a9b234b7e76dbe2c624f55a4ea",
+      "three_frame_refit/work/test_curve_sampling.py": "da16a371fe2b5539b78874468d29c998e78f71dc92b97ec50c8de94f3effd771",
+      "three_frame_refit/work/test_physical_projection.py": "33079fafde23592ca40d9d9af3d081f3c1a9f65950f3e1e2d5423c4c8c712a08",
+      "three_frame_refit/work/test_relaxed_markers.py": "d6412a763a4c8886a8d53a146d4ffa7ee5f1d5993d84f0570e6f86dac6b12b9c",
+      "three_frame_refit/work/test_relaxed_rings.py": "cb358cf318c856b0e04732c25ee76a78d39fcd2c4638a1d68ee131f8211e4982",
+      "three_frame_refit/work/test_shared_corner.py": "f9ddad956d70a2230e107953b1a82c95996324ba4a7bb49323aab284c7bf2cb0",
+      "three_frame_refit/work/validate_fit.py": "b5bb1f526267c3efda55f2cd6fdaf168192acb99068466766e059f1adcf0e23e"
+    },
+    "readonly_parameterization_sha256": {
+      "scripts/fit_v024_three_view_rink_ads.py": "dad4b447292f987f27eee3ca0074be4068fa861afcdc25e7b645adb2b6852a50",
+      "src/rinkspace/calibration_companion/wide_angle_camera.py": "571434ddb6c5fcc3b04197d04331b90ac7a60da62a11a76ff2ba2565caa4297d",
+      "outputs/rink_model/ankara_2026_shared/v0.23-high-view-ad-corners/scene.json": "b4680728c8952807dcc2db88e00af39518345e9555b0a02a1e2164dc687db96f"
+    }
+  },
+  "limits": {
+    "verified_metre_scale": false,
+    "physical_solution_unique": false,
+    "automatic_video_localization_validated": false
+  }
+}

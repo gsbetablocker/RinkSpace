@@ -1,0 +1,53 @@
+{
+  "actual_installer_must_be_reused": true,
+  "case_id": "source_install:2f7729a05a00e5f6bec1f52f9378c99c04c7e17819d4d37eca69badd0324a7b9",
+  "evidence_refs": [
+    {
+      "kind": "installed_source_revision",
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\test_installer_isolated\\test_certified_top_pixels_pres0\\correction.json",
+      "sha256": "2f7729a05a00e5f6bec1f52f9378c99c04c7e17819d4d37eca69badd0324a7b9"
+    },
+    {
+      "kind": "original_observation_snapshot",
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\test_installer_isolated\\test_certified_top_pixels_pres0\\original.pkl",
+      "sha256": "9130cab1d0f634051df8fd2918da955aeb9260cb7d75f1f87843b52ded206bb6"
+    },
+    {
+      "kind": "native_image",
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\test_installer_isolated\\test_certified_top_pixels_pres0\\source.png",
+      "pts": 230365184,
+      "sha256": "a77f603851a131880e15e8aaf645f4d038bc7176dd8c1be656e3d3462ae3f2a1"
+    }
+  ],
+  "new_frame_visual_improvement_verified": false,
+  "packet_reference": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\feedback\\test_installer_isolated\\test_certified_top_pixels_pres0\\correction.json",
+    "sha256": "2f7729a05a00e5f6bec1f52f9378c99c04c7e17819d4d37eca69badd0324a7b9"
+  },
+  "required_checks": [
+    "immutable_original_snapshot",
+    "native_clock_and_exact_locators",
+    "same_registered_physical_material",
+    "qualified_retirement_and_compaction_if_declared"
+  ],
+  "rows": [
+    {
+      "locator": {
+        "block": "low",
+        "collection_role": "FIT",
+        "group_actual_pts": 230365184,
+        "group_order": 0,
+        "row_order": 0
+      },
+      "measurement_role": "board_top_boundary",
+      "physical_edge_role": "vertical_board_blue_upper_boundary",
+      "point_indices": [
+        0,
+        1
+      ],
+      "retired_original_point_indices": [],
+      "retired_points_require_verified_physical_input_compaction": false
+    }
+  ],
+  "schema": "rinkspace.source-installation-regression.v1"
+}

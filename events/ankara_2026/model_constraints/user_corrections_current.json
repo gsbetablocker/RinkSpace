@@ -1,0 +1,56 @@
+{
+  "schema": "rinkspace.direct_user_corrections.v1",
+  "user_instruction_date": "2026-10-04",
+  "status": "recorded_user_requirements; model_and_solver_not_modified_by_this_record",
+  "corrections": [
+    {
+      "id": "no_geometry_rollback",
+      "user_quote": "[private conversation text omitted]",
+      "requirement": "不得通过回退到b691旧冰面几何来绕过共同几何错误；保留已明确的用户纠正。"
+    },
+    {
+      "id": "programme_is_delivery_mainline",
+      "user_quote": "[private conversation text omitted]",
+      "requirement": "最终交付是节目原片各完整镜头中的网格拟合；广角用于共同几何证据，不能把广角局部优化当作最终目标。"
+    },
+    {
+      "id": "wide_visible_geometry_must_be_respected",
+      "user_quote": "[private conversation text omitted]",
+      "requirement": "共同几何必须符合广角中明确可见的轮廓、标线和相对位置；模糊部分结合清楚的同赛事节目及其他机位画面判断。"
+    },
+    {
+      "id": "one_global_metric_conversion",
+      "user_quote": "[private conversation text omitted]",
+      "requirement": "按真实画面解出几何与比例；用一个全局统一转米制系数使换算后的长宽整体最接近60×30m，不通过独立轴缩放或硬尺寸约束改变几何。",
+      "agent_explanation_previously_given": "长宽等权平方误差的一种具体实现为 s=(60L+30W)/(L²+W²)；这是代理对最近的实现解释，不替代用户的统一系数要求。"
+    },
+    {
+      "id": "retain_four_observed_house_connections",
+      "user_quote": "[private conversation text omitted]",
+      "requirement": "保留用户标出的F1–R1、F2–R2、F3–R3、F4–R4四条靶圈连接线；去除未现场确认的标准模板线不能扩大为删除真实可见线。",
+      "user_term": "tee line",
+      "original_annotation": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\user_contours_20261004\\user_four_house_connection_lines_original.png"
+    },
+    {
+      "id": "user_corner_top_contours",
+      "user_quote": "[private conversation text omitted]",
+      "requirement": "远侧左右两个转角的围挡上沿以用户两段紫色描线为人工依据；保留原始图层与1920×1080像素坐标；与冰面接触边区分。",
+      "source_pts": 56218880,
+      "source_time": "01:01:00.083",
+      "time_base": "1/15360",
+      "user_layer": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\user_contours_20261004\\edge1_2e2bd471877d\\edge1_original.png",
+      "user_layer_sha256": "2e2bd471877d43bc0b0b3dc3c0c6bf0cd0cacccb512f95ccae2f14d20be0e647"
+    },
+    {
+      "id": "corner_shape_quality",
+      "user_quote": "[private conversation text omitted]",
+      "requirement": "非正圆弧不授权任意畸形转角；共同冰场边界需合理、连续、平顺并符合真实画面。"
+    },
+    {
+      "id": "retain_existing_programme_progress",
+      "user_quote": "[private conversation text omitted]",
+      "requirement": "保留b691已有的节目拟合进展，将可靠广角证据加入共同几何修复，并回到节目完整镜头检验改善；不得把保留进展解释为冻结或回退错误几何。",
+      "programme_video": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\b691\\full_programme_GRID_BOARDGRID_ADS_b691_UNACCEPTED.mp4"
+    }
+  ]
+}

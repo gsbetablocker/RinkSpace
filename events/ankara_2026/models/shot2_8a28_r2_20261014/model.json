@@ -1,0 +1,314 @@
+{
+  "schema": "rinkspace.framewise-reconstruction-model.v1",
+  "model_id": "ankara_2026.shot2_8a28_r2_20261014",
+  "event_id": "ankara_2026",
+  "created_date_local": "2026-10-14",
+  "parent": {
+    "q_sha256": "8a28afed8f9f896112e5b2f64be515b2bc02019e10e09c7e0eda2598579d4891",
+    "scene": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_current_points_ready_20261012\\accepted_states\\8a28afed8f9f896112e5b2f64be515b2bc02019e10e09c7e0eda2598579d4891\\scene_UNACCEPTED.json",
+      "sha256": "c99e4005f0dbeb836e5eeab76a095f40c43c008c674f62f430b0dcd466251c6e"
+    },
+    "complete_state": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_current_points_ready_20261012\\accepted_states\\8a28afed8f9f896112e5b2f64be515b2bc02019e10e09c7e0eda2598579d4891\\complete_state_UNACCEPTED.npz",
+      "sha256": "0a3c36496187467d6aff1b49db9d367626ec5c42b8dc42ca870996bb694d4ca8"
+    },
+    "input_manifest": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_current_points_ready_20261012\\input_manifest.json",
+      "sha256": "9154f12ac3af650b5a2fec83d58b0203584cb76c8da4c2931bde7db5971c4405"
+    },
+    "state_identity": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_current_points_ready_20261012\\accepted_states\\8a28afed8f9f896112e5b2f64be515b2bc02019e10e09c7e0eda2598579d4891\\state_identity.json",
+      "sha256": "5ac4f0f58c4bf24520a12ddbdca1396d1b9bc6356b38b8c3bfa23153ac4dea25"
+    }
+  },
+  "scene": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\models\\shot2_8a28_r2_20261014\\scene.json",
+    "sha256": "9df7582d9ad4e78cf0189f719f0259559bf4f4fa4fe4028d03371b373b0cf4fd"
+  },
+  "feature_registry": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\models\\shot2_8a28_r2_20261014\\feature_registry.json",
+    "sha256": "b2e9815309710303961eb22558178ce625d1d6271a1b8e51f33eb6d093cfec3e"
+  },
+  "material_templates": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\models\\shot2_8a28_r2_20261014\\ad2_material_template.json",
+    "sha256": "0c1da8ba237fe2f959cda45bf4d8c15904826a73e48b98ff212433f8f038a589"
+  },
+  "seed_parameters": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\models\\shot2_8a28_r2_20261014\\seed_parameters.json",
+    "sha256": "2078648568f44a5d60b9255eba830127786d6dba946f609a5a4944edb5accf91"
+  },
+  "camera_seed": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot2_review_20261014\\r2\\camera_seeds.npz",
+    "sha256": "05161990e424eaa610c7ce7469002a603a807d86c93250d14d79446b7476716c"
+  },
+  "implementation": "calibration.program_tracking.framewise_model",
+  "residual_entry": "z190_source_camera_diagnostic.absolute_value_jac15",
+  "strict_v6_used": false,
+  "historical_observation_rows_imported": 0,
+  "source_point_count": 4674,
+  "accepted_source_frame_count": 0,
+  "model_accuracy_accepted": false,
+  "optimization_performed": false,
+  "next_frame_processed": true,
+  "coordinate_system": {
+    "id": "ankara_user_ppt_z_up",
+    "handedness": "right",
+    "origin": "user_PPT_ice_outline_center",
+    "x_axis": "right in user plan",
+    "y_axis": "up in user plan",
+    "z_axis": "above ice",
+    "ice_z": 0.0,
+    "unit": "conditional_scene_units",
+    "metres_per_unit": null,
+    "verified_metre_scale": false
+  },
+  "accepted_source_point_count": 0,
+  "candidate_source_frame_count": 16,
+  "candidate_source_point_count": 4674,
+  "candidate_user_acceptance_pending": true,
+  "candidate_batch_datasets": [
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\shot2_r2_20261014\\batch_manifest.json",
+      "frame_count": 16,
+      "point_count": 4674,
+      "status": "awaiting_user_selected_frame_review"
+    }
+  ],
+  "accepted_batch_datasets": [],
+  "candidate_frame_datasets": [],
+  "advertisement_surface_semantics": {
+    "parameterization": "continuous_full_board_perimeter_arc_length_s_and_height_z",
+    "unwrapped_shape": "rectangle",
+    "three_dimensional_support": "same_continuous_board_surface",
+    "may_cross_straight_and_corner_segments": true,
+    "restricted_to_one_boundary_part": false,
+    "planar_rectangle_in_3d_required": false,
+    "user_clarification_zh": "围挡像环形纸带，剪断摊平后广告是长方形；贴回三维围挡时可跨直线与圆弧交界，不要求广告面共面。",
+    "current_geometry_changed": false,
+    "scope": "all_board_advertisements"
+  },
+  "derived_model_role": "selected_second_shot_source_review",
+  "parent_framewise_model": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\models\\framewise_8a28_20261013\\model.json",
+    "sha256": "67354b8cec23fe26c6ff37102ae5fe1acc6a5f6c25221283b3be862a92f9fbe4"
+  },
+  "geometry_values_inherited_unchanged": true,
+  "new_material_initialization_accuracy_accepted": false,
+  "repair_of_model_record": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\models\\framewise_8a28_first_shot_20261014\\model.json",
+    "sha256": "ed57d6fdcaf21da673b210a404d700dabab52ca4e52b516ee2bc2df22c83c960"
+  },
+  "geometry_and_targets_unchanged": false,
+  "repair_physical_topology_correction": {
+    "schema": "rinkspace.user-authorized-duplicate-physical-ice-feature-retirement.v1",
+    "date_local": "2026-10-14",
+    "retired_feature_id": "curling_centerline_row3",
+    "canonical_feature_id": "house_connection_F3_R3",
+    "reason": "Both named the same user-confirmed F3-R3 material centreline; the duplicate retained a longer unrelated Lane3 core extent and was independently rendered as a ghost continuation",
+    "user_authorized_physical_topology_correction": true,
+    "canonical_geometry_parameters_changed": false,
+    "canonical_right_endpoint_remains_estimated_not_measured": true,
+    "new_terminal_source_observation_created": false,
+    "preserved_canonical_right_extent_current": {
+      "fraction_of_current_FR_separation": 0.11428571428573897,
+      "role": "current_independent_geometry_parameter",
+      "common_scene_field": "independent_lane_right_extent_fractions",
+      "independent_parameter_supplied": true,
+      "other_Lane_extents_tied": false,
+      "actual_video_terminal_endpoint_identified": false,
+      "used_as_source_observation_or_fit_prior": false
+    },
+    "wide_original": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\photo_review_20260923\\Ankara2026_photo_review_Codex_bundle\\input\\evidence\\wide_original_010100083.png",
+      "sha256": "ccd92c70eaa4a8b410808ad0372dba4ce0fb7ba30de4a75ef0368459f32a86e5",
+      "source_time": "01:01:00.083"
+    },
+    "user_drawing": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\user_contours_20261004\\user_lane_centrelines_original_20261005.png",
+      "sha256": "910f6862f1256a8171a712b6770e18632b0545536eb341cb2f28c24dd566d487"
+    },
+    "historical_source_alias_record_preserved": true,
+    "model_fitting_performed": false,
+    "receipt_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\models\\framewise_8a28_first_shot_20261014\\repair_20261014\\duplicate_centerline_retirement_receipt.json",
+    "prior_scene_sha256": "ea9e9a98060f996db070fc59f0d71982ad4bb75759a9f7fbac9cef96b6913371",
+    "prior_registry_sha256": "f4e9a8d67c414e9486eb09e28fc55fbcb9a82db26de6e928a6df38ef22ddc633"
+  },
+  "parent_model": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\models\\framewise_8a28_first_shot_20261014\\repair_20261014\\model.json",
+    "sha256": "cbfd235bba669a897a0f264bad1f647db1cf3d6053455abb0d4035cfafd23d0e"
+  },
+  "current_selected_source_material_charts": [
+    {
+      "advertisement_number": 1,
+      "source_frame_index": 1670,
+      "components": 36
+    },
+    {
+      "advertisement_number": 2,
+      "source_frame_index": 1746,
+      "components": 34
+    },
+    {
+      "advertisement_number": 3,
+      "source_frame_index": 1811,
+      "components": 21
+    },
+    {
+      "advertisement_number": 7,
+      "source_frame_index": 1249,
+      "components": 19
+    }
+  ],
+  "current_selected_source_end_print_charts": [
+    {
+      "advertisement_number": 22,
+      "source_frame_index": 1469,
+      "components": 27,
+      "initializer_only": true
+    },
+    {
+      "advertisement_number": 24,
+      "source_frame_index": 1469,
+      "components": 12,
+      "initializer_only": true
+    },
+    {
+      "advertisement_number": 25,
+      "source_frame_index": 1469,
+      "components": 17,
+      "initializer_only": true
+    }
+  ],
+  "inherited_base_ice_board_ad_geometry_unchanged": true,
+  "new_print_initializers_accuracy_accepted": false,
+  "user_accepted": false,
+  "inherited_first_shot_programme_binding": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\frame_by_frame_review_20261013\\frame_000001_model_binding.json",
+    "sha256": "669db4ee6b9ac516062527cbe5e7cba6b2f565edad4f4b48ccc1abe9d072fdfc"
+  },
+  "inherited_first_shot_camera_seed": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot2_review_20261014\\camera_seeds.npz",
+    "sha256": "e6648b05e925d50a0dbe3239c9f789094cde7592a3bc689ef48b4884e70e214e"
+  },
+  "inherited_first_shot_acceptance_context": {
+    "source_point_count": 99,
+    "accepted_source_frame_count": 200,
+    "accepted_source_point_count": 32883,
+    "accepted_batch_datasets": [
+      {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\frame_by_frame_review_20261013\\opening_100_50fps\\batch_manifest.json",
+        "sha256": "84b8c13423011f12119c07640c24d0cabfb2027b547a77ba299e8a1befa0fb33",
+        "user_acceptance": {
+          "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\frame_by_frame_review_20261013\\opening_100_50fps\\user_acceptance.json",
+          "sha256": "104dd6dba37a7532257aaf7f19a2a4684d8d227b31b5486a8811bb7aa8902de3"
+        },
+        "frame_count": 100,
+        "point_count": 11134
+      },
+      {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\batch_manifest.json",
+        "sha256": "c7603c30d3d426e982958f2fd02011c72bd0428cd0394daa092987b567928f0d",
+        "user_acceptance": {
+          "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\frame_by_frame_review_20261013\\continuation_101_200_50fps\\user_acceptance.json",
+          "sha256": "8d41f0f7d176a092682197373c8ff9cc3ab57f4054a094c658b91eb44d8d3eff"
+        },
+        "frame_count": 100,
+        "point_count": 21749,
+        "programme_frame_range": [
+          101,
+          200
+        ],
+        "status": "user_accepted_after_manual_page_edits",
+        "source_fps": "50/1"
+      }
+    ]
+  },
+  "parent_rejected_source_model": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\models\\shot2_8a28_20261014\\model.json",
+    "sha256": "b20a11c42a719dfbac748c31ef8ee3498de77ea84c2b762eeeba33167fcbd14f"
+  },
+  "r2_whole_print_source_charts": [
+    {
+      "advertisement": 7,
+      "source_index": 1249,
+      "whole_named_components": 35
+    },
+    {
+      "advertisement": 8,
+      "source_index": 1249,
+      "whole_named_components": 19
+    },
+    {
+      "advertisement": 22,
+      "source_index": 1469,
+      "whole_named_components": 24
+    },
+    {
+      "advertisement": 24,
+      "source_index": 1518,
+      "whole_named_components": 14
+    },
+    {
+      "advertisement": 25,
+      "source_index": 1469,
+      "whole_named_components": 41
+    },
+    {
+      "advertisement": 1,
+      "source_index": 1660,
+      "whole_named_components": 9
+    }
+  ],
+  "final_clear_holes_and_tin": [
+    {
+      "target_id": "Ad23.print.r2_component3_hole00_inner",
+      "source_index": 1545,
+      "source_contour_points": 8
+    },
+    {
+      "target_id": "Ad23.print.r2_component5_hole00_inner",
+      "source_index": 1545,
+      "source_contour_points": 8
+    },
+    {
+      "target_id": "Ad23.print.r2_component7_hole00_inner",
+      "source_index": 1545,
+      "source_contour_points": 10
+    },
+    {
+      "target_id": "Ad23.print.r2_component9_hole00_inner",
+      "source_index": 1545,
+      "source_contour_points": 9
+    },
+    {
+      "target_id": "Ad1.print.r2_ALL_SKATING_T_00",
+      "source_index": 1660,
+      "source_contour_points": 8
+    },
+    {
+      "target_id": "Ad1.print.r2_ALL_SKATING_I_00",
+      "source_index": 1660,
+      "source_contour_points": 5
+    },
+    {
+      "target_id": "Ad1.print.r2_ALL_SKATING_N_00",
+      "source_index": 1660,
+      "source_contour_points": 6
+    },
+    {
+      "target_id": "Ad1.print.r2_ALL_SKATING_N_01",
+      "source_index": 1660,
+      "source_contour_points": 8
+    },
+    {
+      "target_id": "Ad24.print.r2_red_shield_body",
+      "source_index": 1518,
+      "source_contour_points": 12
+    }
+  ],
+  "board_source_guides": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\shot2_r2_20261014\\board_source_guides.json",
+    "sha256": "b2c0a9f7187d10df1cc23f92b6cf2fe857ef257f5aacd73cf02d80092e185c63"
+  }
+}

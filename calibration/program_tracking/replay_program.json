@@ -1,0 +1,40 @@
+{
+  "keyframe_fit_config": "D:/CodexData/RinkSpace_program_tracking_tmp/joint_programme_corners_v10_config.json",
+  "prepared_keyframes": "D:/CodexData/RinkSpace_program_tracking_tmp/joint_programme_corners_v10",
+  "temp_root": "D:/CodexData/RinkSpace_program_tracking_tmp/programme_native_evidence_v13",
+  "runtimes": {
+    "gtsam_python": "D:/CodexData/RinkSpace_program_tracking_tmp/gtsam-env/python.exe",
+    "main_python": "D:/OneDrive/codex_projs/RinkSpace/.venv/Scripts/python.exe"
+  },
+  "scene": "D:/OneDrive/codex_projs/RinkSpace/three_frame_refit/deliverables/scene.json",
+  "release": "D:/OneDrive/codex_projs/RinkSpace/three_frame_refit/deliverables/release.json",
+  "source_shots": "D:/OneDrive/codex_projs/RinkSpace/three_frame_refit/program_tracking/source_shots.json",
+  "motion_index": "D:/OneDrive/codex_projs/RinkSpace/three_frame_refit/program_tracking/motion_index.json",
+  "people": "D:/CodexData/RinkSpace_program_tracking_tmp/people/boxes.json",
+  "masks": "D:/CodexData/RinkSpace_program_tracking_tmp/people/masks",
+  "track_options": {
+    "window_size": 120,
+    "max_matches": 120,
+    "motion_model": "fixed_mount_rays",
+    "solver_mode": "dogleg",
+    "focal_sigma_log": 0.02,
+    "aspect_sigma_log": 0.001,
+    "pair_sigma_px": 0.5,
+    "solver_refinement_updates": 8,
+    "update_strategy": "deferred_whole",
+    "deferred_refinement_updates": 30,
+    "temporal_prior_sigmas": [15, 0.01, 5, 5, 20],
+    "inherit_joint_landmarks": true,
+    "graph_scope": "whole_shot",
+    "lens_sigma_px": [8, 8, 20],
+    "update_stride": 30,
+    "source_edges": "D:/CodexData/RinkSpace_program_tracking_tmp/native_edges_v6",
+    "source_edges_by_shot": {
+      "0": "D:/CodexData/RinkSpace_program_tracking_tmp/native_edges_sourcefix_v3/shot00.npz",
+      "2": "D:/CodexData/RinkSpace_program_tracking_tmp/native_edges_sourcefix_v3_local_corr/shot02.npz",
+      "6": "D:/CodexData/RinkSpace_program_tracking_tmp/native_edges_sourcefix_v3_local_corr/shot06.npz",
+      "7": "D:/CodexData/RinkSpace_program_tracking_tmp/native_edges_sourcefix_v3/shot07.npz",
+      "9": "D:/CodexData/RinkSpace_program_tracking_tmp/native_edges_corrected/shot09.npz"
+    }
+  }
+}

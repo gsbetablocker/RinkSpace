@@ -1,0 +1,20 @@
+{
+  "schema": "rinkspace.preserved_build_driver.v1",
+  "preserved_at_utc": "2026-10-19T10:02:02.565Z",
+  "source": "D:/CodexData/RinkSpace_Data/runs/okada_s1_r11/model_checks/build_event_backend.py",
+  "repository_file": "events/ankara_2026/tools/build_event_backend.py",
+  "source_bytes": 3216,
+  "sha256": "b7c6e8d6284961d39d627eecf0a008b8e011f9844fd6f107c1fd4516ba1c2d09",
+  "source_stat_stable": true,
+  "bytes_unchanged": true,
+  "runtime_consumer": "calibration/rinkfit/src/rinkfit_joint/joint_solver.py",
+  "consumer_behavior": "Build initialization reads the preserved file from the repository; source prefix before sources= retains original Windows toolchain setup. sys.argv is restored even if initialization raises.",
+  "external_build_dependencies": {
+    "compiler_and_vcvars": "Original observed MSVC 14.44.35207 / Visual Studio 2022 BuildTools paths; not bundled",
+    "ceres_eigen_glog_gflags_nlohmann": "D:/CodexData/RinkSpace_Data/runtime_tools/rf_deps; install and adapt on another machine",
+    "legacy_runtime_bin": "D:/CodexData/RinkSpace_program_tracking_tmp/gtsam-env/Library/bin; original runtime path retained"
+  },
+  "portable_build_claimed": false,
+  "actual_compilation_performed": false,
+  "note_zh": "保全不可替代的小型构建源码；不复制编译器、第三方库、DLL或缓存。本文件保留历史本机路径以维持来源字节；独立机器需配置对应构建依赖。未变更模型、求解参数或源数据。"
+}

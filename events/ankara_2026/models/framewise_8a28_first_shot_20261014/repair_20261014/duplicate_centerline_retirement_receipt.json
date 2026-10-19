@@ -1,0 +1,233 @@
+{
+  "schema": "rinkspace.repair-model-exact-duplicate-retirement-receipt.v1",
+  "model_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\models\\framewise_8a28_first_shot_20261014\\repair_20261014",
+  "scene_before_sha256": "ea9e9a98060f996db070fc59f0d71982ad4bb75759a9f7fbac9cef96b6913371",
+  "scene_after_sha256": "4160b79d2836342cc818e7062f56ac34fa9e234b4bb26e238b93f2cacefc1b76",
+  "registry_before_sha256": "f4e9a8d67c414e9486eb09e28fc55fbcb9a82db26de6e928a6df38ef22ddc633",
+  "registry_after_sha256": "fbb564d8db9a7bd6799348b0ea2376755ee6afb5a75a0111edd71754f3f7c01d",
+  "metadata_before_sha256": "f8b96cea3011c063828e9a941775e479a36cab9a661e9eb8b816eab92b6bdafb",
+  "metadata_after_sha256": "5a63180cb782486aef17fbe4a655599601a098920edede3cc79cc2bbff730277",
+  "exact_scene_diff": {
+    "active_ice_features_removed": [
+      "curling_centerline_row3"
+    ],
+    "active_ice_features_added": [],
+    "other_active_ice_features_changed": [],
+    "appended_keys": [
+      "superseded_duplicate_ice_features",
+      "superseded_ice_feature_aliases",
+      "physical_topology_corrections"
+    ]
+  },
+  "exact_registry_diff": {
+    "active_targets_removed": [
+      "ice.curling_centerline_row3:segment0"
+    ],
+    "active_targets_added": [],
+    "other_active_targets_changed": [],
+    "inherited_feature_removed": "curling_centerline_row3",
+    "derived_scene_pointer_index_updates": [
+      {
+        "id": "A3",
+        "before": "/ice_features/23",
+        "after": "/ice_features/22"
+      },
+      {
+        "id": "A4",
+        "before": "/ice_features/24",
+        "after": "/ice_features/23"
+      },
+      {
+        "id": "goal_trapezoid_left_lower_outer",
+        "before": "/ice_features/25",
+        "after": "/ice_features/24"
+      },
+      {
+        "id": "goal_trapezoid_left_upper_outer",
+        "before": "/ice_features/26",
+        "after": "/ice_features/25"
+      },
+      {
+        "id": "goal_trapezoid_right_lower_outer",
+        "before": "/ice_features/27",
+        "after": "/ice_features/26"
+      },
+      {
+        "id": "goal_trapezoid_right_upper_outer",
+        "before": "/ice_features/28",
+        "after": "/ice_features/27"
+      },
+      {
+        "id": "house_connection_F1_R1",
+        "before": "/ice_features/29",
+        "after": "/ice_features/28"
+      },
+      {
+        "id": "house_connection_F2_R2",
+        "before": "/ice_features/30",
+        "after": "/ice_features/29"
+      },
+      {
+        "id": "house_connection_F3_R3",
+        "before": "/ice_features/31",
+        "after": "/ice_features/30"
+      },
+      {
+        "id": "house_connection_F4_R4",
+        "before": "/ice_features/32",
+        "after": "/ice_features/31"
+      }
+    ],
+    "appended_keys": [
+      "retired_duplicate_targets",
+      "superseded_target_aliases"
+    ]
+  },
+  "original_duplicate_feature": {
+    "id": "curling_centerline_row3",
+    "label": "靶圈第3行灰中心线",
+    "kind": "polyline",
+    "surface_id": "ice_surface",
+    "segments_xyz": [
+      [
+        [
+          -71.33085625169635,
+          10.93701611646217,
+          0.0
+        ],
+        [
+          60.04029944971926,
+          10.685705295188802,
+          0.0
+        ]
+      ]
+    ],
+    "geometry_status": "source_seen_carrier_world_derived_from_common_FR_row_candidate",
+    "relation": {
+      "through": [
+        "F3",
+        "R3"
+      ],
+      "common_y": 10.212724787356896,
+      "relation_status": "user hard row relation"
+    },
+    "finite_extent_status": "existing Lane3 guaranteed core only; endpoints not newly measured",
+    "source": {
+      "packet_path": "D:\\CodexData\\.codex\\visualizations\\2026\\10\\01\\private-thread-00010\\RinkSpace_tmp\\pelvis\\main4_geometry\\main4_native_missing_centerline_rows.json",
+      "packet_sha256": "ab1c2900a65fa3e3642b537d7f970bad580504b9298976cfcf72cbb4a91f8c9b",
+      "native_source_pts": [
+        229702144,
+        229842432
+      ],
+      "unchanged_uv": true,
+      "identity_status": "assistant reviewed native gray carrier and R3 house crossing"
+    },
+    "fit_status": "not in any camera fit",
+    "accuracy_accepted": false,
+    "structured_material_relation": "rinkspace.direct-coupled-physical-hockey-curling-template-latent48.v1"
+  },
+  "canonical_feature_unchanged": {
+    "id": "house_connection_F3_R3",
+    "kind": "polyline",
+    "surface_id": "ice_surface",
+    "label": "F3–R3",
+    "segments_xyz": [
+      [
+        [
+          -66.03894654591357,
+          10.926892781798909,
+          0.0
+        ],
+        [
+          56.230801543431966,
+          10.692992800900058,
+          0.0
+        ]
+      ]
+    ],
+    "physical_kind": "user_confirmed_longitudinal_lane_centreline",
+    "house_ids": [
+      "F3",
+      "R3"
+    ],
+    "passes_through_house_centres_xyz": [
+      [
+        -66.03894654591357,
+        10.926892781798909,
+        0.0
+      ],
+      [
+        43.690314559906916,
+        10.716982542530713,
+        0.0
+      ]
+    ],
+    "endpoint_scope": "F centre to estimated rightward continuation beyond R centre",
+    "right_extent_initializer": {
+      "fraction_of_current_FR_separation": 0.11428571428571428,
+      "role": "approximate_user_drawing_initializer_not_measured_video_endpoint",
+      "user_drawing": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/user_contours_20261004/user_lane_centrelines_original_20261005.png",
+      "user_drawing_sha256": "910f6862f1256a8171a712b6770e18632b0545536eb341cb2f28c24dd566d487",
+      "actual_video_terminal_endpoint_identified": false,
+      "tied_to_Lane_rectangular_end": false,
+      "tied_to_standard_centreline_extension": false,
+      "physical_transverse_cap_added": false,
+      "used_as_source_observation_or_fit_prior": false
+    },
+    "right_extent_current": {
+      "fraction_of_current_FR_separation": 0.11428571428573897,
+      "role": "current_independent_geometry_parameter",
+      "common_scene_field": "independent_lane_right_extent_fractions",
+      "independent_parameter_supplied": true,
+      "other_Lane_extents_tied": false,
+      "actual_video_terminal_endpoint_identified": false,
+      "used_as_source_observation_or_fit_prior": false
+    },
+    "geometry_source": "current scene house centres; user-confirmed real line identity",
+    "authority": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/user_contours_20261004/user_corrections_current.json",
+    "standard_template_used": false,
+    "forces_geometry": false
+  },
+  "correction": {
+    "schema": "rinkspace.user-authorized-duplicate-physical-ice-feature-retirement.v1",
+    "date_local": "2026-10-14",
+    "retired_feature_id": "curling_centerline_row3",
+    "canonical_feature_id": "house_connection_F3_R3",
+    "reason": "Both named the same user-confirmed F3-R3 material centreline; the duplicate retained a longer unrelated Lane3 core extent and was independently rendered as a ghost continuation",
+    "user_authorized_physical_topology_correction": true,
+    "canonical_geometry_parameters_changed": false,
+    "canonical_right_endpoint_remains_estimated_not_measured": true,
+    "new_terminal_source_observation_created": false,
+    "preserved_canonical_right_extent_current": {
+      "fraction_of_current_FR_separation": 0.11428571428573897,
+      "role": "current_independent_geometry_parameter",
+      "common_scene_field": "independent_lane_right_extent_fractions",
+      "independent_parameter_supplied": true,
+      "other_Lane_extents_tied": false,
+      "actual_video_terminal_endpoint_identified": false,
+      "used_as_source_observation_or_fit_prior": false
+    },
+    "wide_original": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\photo_review_20260923\\Ankara2026_photo_review_Codex_bundle\\input\\evidence\\wide_original_010100083.png",
+      "sha256": "ccd92c70eaa4a8b410808ad0372dba4ce0fb7ba30de4a75ef0368459f32a86e5",
+      "source_time": "01:01:00.083"
+    },
+    "user_drawing": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\user_contours_20261004\\user_lane_centrelines_original_20261005.png",
+      "sha256": "910f6862f1256a8171a712b6770e18632b0545536eb341cb2f28c24dd566d487"
+    },
+    "historical_source_alias_record_preserved": true,
+    "model_fitting_performed": false
+  },
+  "original_all_1248_frame_source_packets_scanned": true,
+  "original_source_point_count": 310981,
+  "duplicate_point_references": [],
+  "canonical_endpoint_not_tied_to_lane_end": true,
+  "actual_terminal_endpoint_new_measurement": false,
+  "historical_model_sha256": {
+    "scene.json": "ea9e9a98060f996db070fc59f0d71982ad4bb75759a9f7fbac9cef96b6913371",
+    "feature_registry.json": "f4e9a8d67c414e9486eb09e28fc55fbcb9a82db26de6e928a6df38ef22ddc633",
+    "model.json": "ed57d6fdcaf21da673b210a404d700dabab52ca4e52b516ee2bc2df22c83c960"
+  },
+  "historical_model_files_unchanged": true
+}

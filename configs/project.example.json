@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0",
+  "project_name": "RinkSpace",
+  "configuration_status": "active_local_workbench_defaults",
+  "sources": {
+    "jin": {
+      "path": "data/input/PVXWd7nLt8Q.mp4",
+      "role": "broadcast_with_unreviewed_roles",
+      "read_only": true,
+      "url": "https://www.youtube.com/watch?v=PVXWd7nLt8Q",
+      "title": "Shuxian JIN / Ankara 2026"
+    },
+    "okada": {
+      "path": "data/input/HZQx6HK8zR8.mp4",
+      "role": "broadcast_with_unreviewed_roles",
+      "read_only": true,
+      "url": "https://www.youtube.com/watch?v=HZQx6HK8zR8",
+      "title": "Mei OKADA / Ankara 2026"
+    },
+    "broadcast": {
+      "path": "data/input/oxXu1avhrvs.mp4",
+      "role": "broadcast_with_unreviewed_roles",
+      "read_only": true,
+      "url": "https://www.youtube.com/watch?v=oxXu1avhrvs",
+      "title": "全场女单短节目 / 5小时26分 / 1080p"
+    },
+    "broadcast_scout": {
+      "path": "data/input/oxXu1avhrvs.f134.mp4",
+      "role": "broadcast_with_unreviewed_roles",
+      "read_only": true,
+      "url": "https://www.youtube.com/watch?v=oxXu1avhrvs",
+      "title": "全场女单短节目 / 5小时26分 / 360p取材轨"
+    }
+  },
+  "rink": {
+    "length_m": null,
+    "width_m": null,
+    "corner_radius_m": null,
+    "scale_evidence": null,
+    "geometry_level": "projective",
+    "orientation_evidence": null
+  },
+  "timing": {
+    "use_source_pts": true,
+    "allow_frame_over_average_fps_fallback": false,
+    "source_frame_numbering": "zero_based_decoded_order"
+  },
+  "registration": {
+    "default_candidate_backend": "local_ice_tracks_with_masked_reference_ECC",
+    "fallback_backend": "masked_sift",
+    "independent_validation_required_for_acceptance": true,
+    "keyframe_graph_and_cut_handling": "local_components_with_explicit_breaks; global_graph_deferred"
+  },
+  "validation_proposal": {
+    "thresholds_are_project_defaults_not_external_standards": true,
+    "pixel_error_reference_resolution": [
+      1920,
+      1080
+    ],
+    "independent_median_error_px_max": 4,
+    "independent_p95_error_px_max": 10,
+    "minimum_visible_check_landmarks": 4
+  },
+  "runtime": {
+    "preferred_device": "cpu",
+    "allow_cloud_upload": false,
+    "allow_paid_api": false,
+    "output_directory": "outputs"
+  },
+  "warnings": [
+    "No verified rink dimensions were supplied.",
+    "Do not apply projective coordinates to curvature, angles or physical speed."
+  ]
+}

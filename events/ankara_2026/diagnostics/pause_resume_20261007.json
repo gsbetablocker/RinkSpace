@@ -1,0 +1,27 @@
+{
+  "schema": "rinkspace.user-requested-pause.v1",
+  "date": "2026-10-07",
+  "reason": "用户要求先暂停，更新 Codex",
+  "resume_requires_user_instruction": true,
+  "all_three_subagents_interrupted": true,
+  "python_ffmpeg_process_check": "No matching processes at pause; read-only Win32_Process check succeeded",
+  "accuracy_accepted": false,
+  "video_export": "禁止因时限导出明显未修好的完整视频；ddf7 历史中间成片不交付",
+  "last_complete_state": {
+    "run": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003/okada_global_geometry_boardtracks_midtime_absolute_20261007",
+    "q_sha256": "696fd93d920fe5ebd3590d707ed03196587e779a48f661fd9124df6c31b50351",
+    "status": "36 accepted; safely stopped; unaccepted geometry"
+  },
+  "unfinished": [
+    "广告8/9/10与21/22/23已找回同赛事清晰原片、实际不规则轮廓及跨帧源候选；build_six_irregular_ad_source_20261007.py尚需追加用户明确同印刷同尺寸的3组shared_print_templates及跨实例真实材质对应，逐组目视核对，生产接入前须实际完整q FD与旧源保留验证。当前packet仍CANDIDATE。",
+    "native_board_track_source.py 已实现共享展开板材坐标模板的条件放置与scene export，尚未用新shared模板packet验证；manifest当前56056702acf8f497a758d60845837c16a5d52e4accc140c33c7c10a8c08cf860。export counterpart anchor_actual_pts元数据仍须修正，不能冒称完成。",
+    "video_evidence已完成Ad4/17/19真实RGB 31 FIT+11 HELD候选，拟适配既有源接口；Ad18整组墨迹不可冒充现internal_graphic_only矩形，待核同Ad5材料角色。",
+    "solver_fast备好合法旧4075第二basin配置okada_alternative_4075_legal_shared_joint_20261007.json，尚未运行；等6广告和Ad4/17/19源验证冻结后接入，保留全部旧源与原参数域。wide私有25 optics异常自由度只诊断未改。",
+    "visual_correction已核全部12220原绝对源，225 HELD一致；Ad1/Ad3宽度与station冲突只读probe_original_ad_width_conflicts_20261007.py暂停时可能尚未完成。",
+    "用户04:10:38.817底线仍偏；与04:10:36.950、蓝色门区、广告共同验收。现goal crease FIT12.53/17.89px HELD22.14，Lane2 tail HELD9.13，Ad7原501120 HELD12.62/13.94，有明显退步；不可声称已修复。"
+  ],
+  "source_candidate_directory": "D:/CodexData/RinkSpace_Data/events/ankara_2026/diagnostics/irregular_six_ads_source_revisit_20261007",
+  "new_ad_source_directory": "D:/CodexData/RinkSpace_Data/events/ankara_2026/observations/vision_training/continuous_review/Ad4_17_18_19_source_absolute_20261007",
+  "body": "ddf7整段原人体源refit已完成8503真实曝光出界0，非裁剪；不代表场地准确，新几何通过后需对新相机再次真实refit",
+  "preserve": "不删源、不清理历史、不停止其他会话、不自动继续工作、不导出坏视频"
+}

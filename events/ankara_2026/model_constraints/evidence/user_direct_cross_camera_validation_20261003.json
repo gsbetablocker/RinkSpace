@@ -1,0 +1,28 @@
+{
+  "schema": "rinkspace.direct-visible-cross-camera-user-authority.v1",
+  "date": "2026-10-03",
+  "authority": "user_direct_identification_and_cross_validation_instruction",
+  "user_statements": [
+    "我这张图是让你看这两个摄像机的位置",
+    "长边主副机位也可以看到低位端部的摄像机，原来的全场视频里有很多类似镜头，你完全可以交叉验证把摄像机的位置基本确定"
+  ],
+  "photos": [
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\teach_you_camaras\\oxXu1avhrvs.mp4_20260921_234602.927.jpg",
+      "sha256": "4e6ef03c3e6865fe75845db73a8f71ea545738c0976f8a1607b592fd00a9dd9d"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\teach_you_camaras\\oxXu1avhrvs.mp4_20260921_234826.789.jpg",
+      "sha256": "0d5ff5365119319591fa63a325d387fa20b2f7e29d41c3d505747fb973626416"
+    }
+  ],
+  "direct_facts": [
+    "Two actual long-side cameras and their operators are visible behind the same long-side boards in first image.",
+    "The actual low-end camera and operator are visible above boards in second image."
+  ],
+  "old_long_side_XY_authority": "user confirmed near old saved plan positions; numeric coordinates are estimates, not surveyed exact coordinates",
+  "required_model": "One constant pivot XYZ per installation, existing nonzero constant camera-local lever, Z190 mechanics and latest metric; no per-frame free translation",
+  "source_observation_policy": "Qualify actual tripod/pan-head pivot support separately from rotating camera body or lens; preserve unknown occluded parts. Camera projections must not generate source pixel identities.",
+  "status": "actual reciprocal source qualification in progress",
+  "accuracy_accepted": false
+}

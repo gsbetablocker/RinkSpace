@@ -1,0 +1,765 @@
+{
+  "schema": "rinkspace.framewise-camera-seed.v1",
+  "native_pts": 229114112,
+  "exposure_representative_pts": 229114112,
+  "source_time_base": "1/15360",
+  "installation_id": "okada_sp_installation_0_conditional_z190",
+  "camera25": [
+    2.5332039998857008,
+    -49.426443775637416,
+    5.41280986697406,
+    1.5602814024421126,
+    -0.4183697512040022,
+    0.3981664088416689,
+    10.31695894765436,
+    10.31695894765436,
+    934.4970806038764,
+    455.34783150611037,
+    0.0,
+    4.450288514012274e-05,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "camera25_float64_sha256": "fb740030c885fa391157cdaa176c8351c226d32aa76d59ebd8d19cafe0aee3a8",
+  "view_state4": [
+    1.5602814024421126,
+    -0.4183697512040022,
+    0.3981664088416689,
+    2.7568784826325325
+  ],
+  "effective_pp_offset_px": [
+    0.0,
+    0.0
+  ],
+  "shared_calibration": {
+    "installation_id": "okada_sp_installation_0_conditional_z190",
+    "world_length_unit": "scene_units_metric_scale_unverified",
+    "output_mode_id": "unknown_final_output",
+    "focal_domain": "final_effective",
+    "domain_wh": [
+      1920,
+      1080
+    ],
+    "final_wh": [
+      1920,
+      1080
+    ],
+    "A_source_to_final": null,
+    "output_chain_provenance": "unknown",
+    "zoom_driver_interpretation": "conditional_final_effective_proxy_not_identified_optical_zoom",
+    "focal_parameter": "log(geometric_f_domain_px/domain_width)",
+    "q_reference": 0.7396291767793697,
+    "pivot_xyz": [
+      1.8738655767901988,
+      -50.70537812738105,
+      3.966141524209755
+    ],
+    "lever_xyz": [
+      -0.06923325210937635,
+      -1.4891239915452736,
+      1.3931855658177852
+    ],
+    "axial_coefficients": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "aspect_fx_over_fy_in_domain": 1.0,
+    "principal_x_fraction_coefficients": [
+      0.4867172294811856
+    ],
+    "principal_y_fraction_coefficients": [
+      0.42161836250565776
+    ],
+    "k1_coefficients": [
+      4.450288514012274e-05
+    ],
+    "k2_coefficients": [
+      0.0
+    ],
+    "tangential_p1_p2": [
+      0.0,
+      0.0
+    ],
+    "Brown14_order": [
+      "k1",
+      "k2",
+      "p1",
+      "p2",
+      "k3",
+      "k4",
+      "k5",
+      "k6",
+      "s1",
+      "s2",
+      "s3",
+      "s4",
+      "tauX",
+      "tauY"
+    ],
+    "other_Brown_terms": "fixed_zero",
+    "field_settings": {
+      "steadyshot": {
+        "value": "off",
+        "status": "presumed_not_confirmed"
+      },
+      "digital_extender": {
+        "value": "off",
+        "status": "presumed_not_confirmed"
+      },
+      "focus": {
+        "value": "MF",
+        "status": "presumed_not_confirmed"
+      },
+      "recording_format": {
+        "value": "1920x1080/50p",
+        "status": "presumed_not_confirmed"
+      },
+      "camera_output_format": {
+        "value": "1920x1080/50p",
+        "status": "presumed_not_confirmed"
+      },
+      "zoom_control": {
+        "value": "manual_operator_servo_zoom",
+        "status": "presumed_not_confirmed"
+      },
+      "temporary_focus": {
+        "value": "occasional_Push_AF",
+        "status": "presumed_not_confirmed"
+      },
+      "focus_assist": {
+        "value": "peaking",
+        "status": "presumed_not_confirmed"
+      },
+      "iris_control": {
+        "value": "manual",
+        "status": "presumed_not_confirmed"
+      },
+      "aperture_f_number": {
+        "value": 4.0,
+        "status": "presumed_not_confirmed"
+      },
+      "nd_filter": {
+        "value": "Clear",
+        "status": "presumed_not_confirmed"
+      },
+      "shutter_seconds": {
+        "value": 0.01,
+        "status": "presumed_50p_180_degree"
+      },
+      "working_hypothesis": {
+        "schema_version": "rinkspace.z190-standing-tripod-hypothesis.v1",
+        "status": "presumed_not_confirmed",
+        "camera_id": 0,
+        "presumed_role": "main",
+        "presumed_camera_model": "Sony PXW-Z190",
+        "scene_unit_m": 0.31353729994266055,
+        "metric_scale_status": "user_working_approximation_not_measured_calibration",
+        "lens_height_above_ground_m": 1.6,
+        "ground_minus_ice_m": 0.0,
+        "ground_minus_ice_status": "unknown_working_value",
+        "height_sigma_m": 0.18,
+        "height_prior_type": "soft_gaussian_Cz_ice_z_zero_no_hard_bounds",
+        "height_sigma_rationale": "approx_0.18m_from_lens_about_1.5_to_1.7m_and_ground_offset_about_plus_minus_0.15m",
+        "default_motion_model": "fixed_C_zero_lever_zero_axial",
+        "default_fixed_shared_parameters": {
+          "lever_xyz": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "axial": [
+            0.0
+          ]
+        },
+        "numeric_working_priors": {
+          "camera_height": {
+            "target_m_above_ice": 1.6,
+            "sigma_m": 0.18,
+            "applies_to": "optical_centre_Cz_ice_z_zero"
+          },
+          "principal_point": {
+            "target_final_image_fraction": [
+              0.5,
+              0.5
+            ],
+            "sigma_final_px": 32.0
+          },
+          "roll": {
+            "target_degrees": 0.0,
+            "sigma_degrees": 0.5,
+            "parameter": "optical_axis_roll_relative_to_world_vertical_not_Rodrigues_z"
+          },
+          "residual_distortion_at_wide_seed_corner": {
+            "sample_radius_fractions": [
+              0.5,
+              0.75,
+              1.0
+            ],
+            "sigma_final_px": 8.0,
+            "radius_reference": "fixed_wide_seed_full_image_corner_normalized_ray_radius",
+            "seed_policy": "fixed_per_installation_not_recomputed_with_optimized_focal",
+            "effect": "Brown_radial_pixel_displacement_relative_to_zero_distortion",
+            "status": "modelling_choice_not_Sony_measurement"
+          },
+          "k2": {
+            "fixed_value": 0.0,
+            "fitted": false,
+            "status": "source_diagnostic_modelling_choice_not_Sony_measurement"
+          }
+        },
+        "professional_settings_status": "presumed_not_confirmed",
+        "professional_settings": {
+          "recording_format": "1920x1080/50p",
+          "camera_output_format": "1920x1080/50p",
+          "steadyshot": "off",
+          "digital_extender": "off",
+          "zoom_control": "manual_operator_servo_zoom",
+          "focus": "MF",
+          "temporary_focus": "occasional_Push_AF",
+          "focus_assist": "peaking",
+          "iris_control": "manual",
+          "aperture_f_number": 4.0,
+          "nd_filter": "Clear"
+        },
+        "professional_primary_sources": {
+          "manual": "https://pro.sony/support/res/manuals/4740/1bf6ebbd9def311f789db07687817956/47407001M.pdf",
+          "shutter_guidance": "https://www.sony.co.uk/electronics/support/articles/00268256",
+          "specifications": "https://www.sony.jp/xdcam/products/PXW-Z190/spec.html"
+        },
+        "professional_primary_basis": {
+          "focus": "manual_page_30_MF_supports_Push_AF_Full_MF_disables_it",
+          "shutter": "Sony_general_movie_guidance_lists_1_over_100_for_50Hz_lighting",
+          "capability_vs_preset": "official_sources_support_controls_and_capabilities_not_the_presumed_event_settings"
+        },
+        "official_exposure_rate_hz": 50.0,
+        "container_display_rate_hz": 60.0,
+        "exposure_alias_policy": "requires_explicit_source_exposure_identity_no_rate_based_aliases",
+        "shutter_seconds": 0.01,
+        "shutter_status": "presumed_50p_180_degree",
+        "rolling_shutter_readout_seconds": null,
+        "shutter_equals_readout": false
+      },
+      "height_fit_policy": "soft_gaussian_working_prior",
+      "optimized_shared_state_columns": [
+        0,
+        1,
+        8,
+        9,
+        10
+      ],
+      "fixed_shared_state_columns": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        11,
+        12,
+        13
+      ],
+      "hardware_context": {
+        "camera_group_id": "main_long_side",
+        "installation_id": "okada_sp_main_long_side_source_f685d278",
+        "calibration_installation_slot": 0,
+        "hardware_model_id": "sony_pxw_z190",
+        "association_status": "production_team_model_user_confirmed_for_current_three_installations",
+        "manufacturer_capabilities": {
+          "schema_version": "rinkspace.camera-hardware-model.v1",
+          "model_id": "sony_pxw_z190",
+          "manufacturer": "Sony",
+          "model_family": "PXW-Z190",
+          "reported_short_name": "Z190",
+          "regional_variant": null,
+          "status": "model_family_reported_by_user_from_production_team_reply",
+          "recorded_local_date": "2026-10-01",
+          "team_reply_provenance": {
+            "authority": "user_relayed_production_team_information",
+            "reported_content_summary": "The production team named Z190; individual physical units and their settings were not individually confirmed.",
+            "original_reply_quote": null,
+            "original_attachment_path": null,
+            "original_attachment_sha256": null,
+            "record_scope": "current user conversation; no claim derived from fuzzy camera photos",
+            "evidence_grade": "user_report_not_original_email",
+            "evidence_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\evidence\\camera_hardware_20261001\\user_report.md",
+            "evidence_sha256": "ced2fe67064c14a022417cb5337da5e5cef6efd3885293584369f473bf5bac43",
+            "original_email_received_by_agent": false
+          },
+          "official_sources": [
+            {
+              "id": "sony_jp_spec",
+              "url": "https://www.sony.jp/xdcam/products/PXW-Z190/spec.html",
+              "verified_local_date": "2026-10-01",
+              "authority": "manufacturer_documentation"
+            },
+            {
+              "id": "sony_product",
+              "url": "https://pro.sony/ue_US/products/handheld-camcorders/pxw-z190",
+              "verified_local_date": "2026-10-01",
+              "authority": "manufacturer_documentation"
+            },
+            {
+              "id": "sony_manual",
+              "url": "https://pro.sony/support/res/manuals/4740/1bf6ebbd9def311f789db07687817956/47407001M.pdf",
+              "verified_local_date": "2026-10-01",
+              "authority": "manufacturer_documentation"
+            }
+          ],
+          "sensor": {
+            "nominal_type": "1/3-type",
+            "technology": "Exmor R back-illuminated CMOS",
+            "rgb_sensor_count": 3,
+            "effective_pixels_nominal_wh": [
+              3840,
+              2160
+            ],
+            "effective_pixel_count_mode_dependent": true,
+            "physical_sensor_width_mm": null,
+            "physical_sensor_height_mm": null,
+            "effective_readout_window_mm": null,
+            "source_id": "sony_jp_spec"
+          },
+          "lens": {
+            "construction": "fixed integrated zoom",
+            "optical_zoom_ratio": 25.0,
+            "physical_focal_length_range_mm": [
+              3.7,
+              92.5
+            ],
+            "equivalent_35mm_focal_length_range_mm": [
+              28.8,
+              720.0
+            ],
+            "source_id": "sony_jp_spec",
+            "calibrated_focal_length_px": null,
+            "physical_mm_to_effective_video_pixels_conversion": null,
+            "brown_distortion_coefficients": null,
+            "distortion_status": "not published in the referenced official material; not zero by implication",
+            "optical_center_offset_mm": null
+          },
+          "stabilization": {
+            "mechanism": "shift-lens",
+            "supported_modes": [
+              "Off",
+              "Standard",
+              "Active"
+            ],
+            "active_mode_limitations": [
+              "not available at 3840x2160",
+              "not available during Slow and Quick Motion recording"
+            ],
+            "tripod_manual_recommendation": "Off",
+            "manual_printed_page": 37,
+            "manual_pdf_page_index": 36,
+            "source_ids": [
+              "sony_jp_spec",
+              "sony_manual"
+            ],
+            "status": "capability documented; field setting unknown; tripod recommendation is not field evidence",
+            "field_setting": null
+          },
+          "digital_extender": {
+            "supported": true,
+            "maximum_hd_zoom_equivalent": 50.0,
+            "documented_magnification": 2.0,
+            "video_crop_factor": null,
+            "source_id": "sony_product",
+            "field_enabled": null
+          },
+          "readout": {
+            "rolling_shutter_readout_seconds": null,
+            "readout_direction": null,
+            "shutter_duration_seconds": null,
+            "status": "no readout timing measured or published in the cited source"
+          },
+          "calibration_use": {
+            "numeric_intrinsics_or_geometry_supplied": false,
+            "independent_installation_parameters_required": true,
+            "effective_focal_px_not_mm": true,
+            "sensor_type_fraction_is_not_physical_width": true,
+            "family_match_does_not_confirm_shared_distortion_or_center": true,
+            "unknown_field_settings_do_not_enable_free_per_frame_parameters": true,
+            "source_validation_required": true,
+            "parameter_identifiability": {
+              "fitted_quantity": "effective final-source focal length in pixels",
+              "physical_focal_mm_from_video": null,
+              "field_digital_gain": null,
+              "field_crop_scale": null,
+              "simultaneously_free_physical_focal_digital_gain_and_effective_focal": false,
+              "unknown_shift_lens_mode_does_not_supply_per_frame_principal_offsets": true,
+              "hardware_metadata_does_not_change_existing_pivot_offset_structure": true
+            }
+          },
+          "field_output": {
+            "recording_mode": null,
+            "output_format": null,
+            "capture_frame_rate": null,
+            "scan_mode": null,
+            "camera_output_resolution_wh": null,
+            "delivery_crop_or_resize": null,
+            "firmware_version": null
+          }
+        },
+        "field_settings": {
+          "steadyshot": null,
+          "digital_extender_enabled": null,
+          "crop_factor": null,
+          "camera_output_format": null,
+          "capture_frame_rate": null,
+          "readout_seconds": null
+        },
+        "latest_user_camera_confirmation": {
+          "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\evidence\\camera_hardware_20261001\\user_camera_mount_and_height_20261002_v3.json",
+          "sha256": "e42424eb9f0830336cc44cd9b5d24fa0808eba2186eea00662df25b886fee3e4"
+        },
+        "installation_height_policy": {
+          "one_constant_height_per_physical_installation_across_its_own_cuts": true,
+          "independent_height_parameters_for_three_installations": true,
+          "equality_across_three_installations_required": false,
+          "equality_across_three_installations_confirmed_by_user": false,
+          "modelling_authority": "fixed_tripods_with_separate_installation_parameters",
+          "user_clarification_quote": "[private conversation text omitted]",
+          "fixed_height_parameter_refers_to": "tripod_head_tilt_pivot",
+          "optical_centre_height_may_change_with_camera_rotation": true,
+          "zero_lever_fixed_optical_centre_default_rejected_by_user": true
+        },
+        "lens_and_pivot_height_estimates": {
+          "description": "approximately adult male head height",
+          "numerical_range_supplied_by_user": true,
+          "user_tentative_range_above_operator_ground_m": [
+            1.5,
+            1.7
+          ],
+          "range_status": "user_tentative_visual_estimate_not_measured_or_hard_bounds",
+          "exact_measured_height": false,
+          "ground_to_ice_height_offset_measured": false,
+          "source_thread_id": "private-thread-00011",
+          "source_host_id": "private-host-00001",
+          "source_turn_id": "private-turn-00002",
+          "source_message_id": "private-message-00002",
+          "source_user_quote": "[private conversation text omitted]",
+          "estimated_object": "camera lens / equivalent optical projection centre, not the tripod or tilt axis",
+          "current_user_quote": "[private conversation text omitted]",
+          "tentative_tilt_axis_height_above_operator_ground_m": [
+            1.3,
+            1.5
+          ],
+          "tentative_axis_below_lens_m": 0.2,
+          "pivot_height_range_status": "rough initial estimate; not a measured interval or ice-relative hard bound"
+        },
+        "working_height_prior": {
+          "nominal_m_per_installation": 1.6,
+          "sigma_m_per_installation": 0.18,
+          "authority": "assistant_working_gaussian_from_user_head_height_estimate_and_unmeasured_ground_offset",
+          "three_independent_priors_not_a_cross_installation_equality_constraint": true,
+          "numerical_camera_or_prior_values_changed_by_this_provenance_correction": false,
+          "applies_to": "reference-pose lens/optical-centre height with unmeasured operator-floor-to-ice offset",
+          "pivot_initialization": "Pz = reference optical Cz - (R_reference.T @ lever_camera)_z",
+          "pivot_height_is_independent_per_installation": true
+        },
+        "rigid_mount_offset": {
+          "authority": "user_adopted_photo_based_initialization_and_bounds_from_dot",
+          "user_instruction_quote": "[private conversation text omitted]",
+          "coordinate_frame": "camera-local OpenCV x right, y down, z forward",
+          "initial_camera_xyz_m": [
+            0.0,
+            -0.2,
+            0.1
+          ],
+          "lower_camera_xyz_m": [
+            -0.05,
+            -0.3,
+            -0.05
+          ],
+          "upper_camera_xyz_m": [
+            0.05,
+            -0.1,
+            0.25
+          ],
+          "descriptive_initial_right_up_forward_m": [
+            0.0,
+            0.2,
+            0.1
+          ],
+          "bounds_are_user_working_search_ranges_not_measurements": true,
+          "shared_across_same_installation_exposures": true,
+          "separate_offset_for_each_installation": true,
+          "first_version_zoom_dependent_offset_enabled": false,
+          "per_frame_free_optical_centre_enabled": false,
+          "fixed_pivot_xy_source": {
+            "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\evidence\\camera_hardware_20261001\\user_tripod_positions_20261002.json",
+            "sha256": "2975563b431fb452fa06b8b4815b03566c2089cf7b210d2c08f925be6f8982ec"
+          },
+          "world_optical_centre_formula": "C = P + R_world_to_camera.T @ lever_camera",
+          "source_photo": {
+            "path": "D:\\CodexData\\.codex\\visualizations\\2026\\10\\02\\private-thread-00009\\RinkSpace_tmp\\user_nonzero_mount_20261002_v3\\mechanical_mount_reference_01.withheld",
+            "sha256": "45b1e5b0a2d9b025a809e3bcfa85c731127ad938d175892258329c14aac81414",
+            "original_path": "C:\\Users\\REDACTED\\Downloads\\mechanical_mount_reference_01.withheld",
+            "scope": "user-provided mechanical mount reference; not current-event rink landmarks or measured dimensions",
+            "photo_perspective_corrected_measurement": false
+          },
+          "units_conversion": "convert metric offsets to scene units once using the current uniform metric scale"
+        },
+        "latest_user_tripod_positions": {
+          "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\evidence\\camera_hardware_20261001\\user_tripod_positions_20261002.json",
+          "sha256": "2975563b431fb452fa06b8b4815b03566c2089cf7b210d2c08f925be6f8982ec",
+          "authority": "current_user_direct_annotation",
+          "recorded_local_date": "2026-10-02"
+        },
+        "tripod_position_observation": {
+          "installation_id": 0,
+          "position_status": "user confirmed near current saved position",
+          "current_nominal_pivot_xy_assumed_m": [
+            0.6963981628842771,
+            -15.517046616327887
+          ]
+        },
+        "final_source_video": {
+          "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\data\\input\\oxXu1avhrvs.mp4",
+          "sha256": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891",
+          "final_video_resolution_wh": [
+            1920,
+            1080
+          ],
+          "final_video_rate": "60/1",
+          "final_video_time_base": "1/15360",
+          "frame_step_pts": 256,
+          "capture_frame_rate": null,
+          "camera_output_format": null,
+          "interpretation": "final video display clock and dimensions; no capture-rate inference from device capability"
+        },
+        "metadata_input_manifest": {
+          "D:\\OneDrive\\codex_projs\\RinkSpace\\configs\\camera_hardware\\sony_pxw_z190.json": "5803c46eaf1a1f84bd885a2aa8cfe0e65b2d1e174d380baa869f332d0251de4d",
+          "D:\\OneDrive\\codex_projs\\RinkSpace\\configs\\camera_hardware\\okada_sp_installations_z190_v1.json": "e73bdb6bbaf07bade9750770483638af6575d184c79002ba8670b0e342c825c2",
+          "D:\\OneDrive\\codex_projs\\RinkSpace\\three_frame_refit\\program_tracking\\source_shots.json": "5932fdd51cc33eaf3b40d5c2e8ec9cba758c23292bf70c6b9614936e6b6aad3b",
+          "D:\\OneDrive\\codex_projs\\RinkSpace\\configs\\camera_classification\\ankara_2026_user_confirmed.json": "37f11ddc1d131013f1e0bb8e713e910f7466398d390b4c05daf5eb391d4ace04",
+          "D:\\OneDrive\\codex_projs\\RinkSpace\\evidence\\camera_hardware_20261001\\user_report.md": "ced2fe67064c14a022417cb5337da5e5cef6efd3885293584369f473bf5bac43",
+          "D:\\OneDrive\\codex_projs\\RinkSpace\\evidence\\camera_hardware_20261001\\user_camera_mount_and_height_20261002_v3.json": "e42424eb9f0830336cc44cd9b5d24fa0808eba2186eea00662df25b886fee3e4",
+          "D:\\CodexData\\.codex\\visualizations\\2026\\10\\02\\private-thread-00009\\RinkSpace_tmp\\user_nonzero_mount_20261002_v3\\mechanical_mount_reference_01.withheld": "45b1e5b0a2d9b025a809e3bcfa85c731127ad938d175892258329c14aac81414",
+          "D:\\OneDrive\\codex_projs\\RinkSpace\\evidence\\camera_hardware_20261001\\user_tripod_positions_20261002.json": "2975563b431fb452fa06b8b4815b03566c2089cf7b210d2c08f925be6f8982ec",
+          "D:\\OneDrive\\codex_projs\\RinkSpace\\evidence\\camera_hardware_20261001\\user_tripod_positions_20261002.png": "d6a1355ae1ecf2bdbf3ab3cfad4f4774b4d108744af4b71106c57109f2b058d5"
+        },
+        "independent_installation_parameters_required": true,
+        "numeric_camera_values_modified": false,
+        "effective_focal_unit": "source video pixels; physical-mm conversion unavailable"
+      },
+      "source_authority_admission": {
+        "path": "D:\\CodexData\\.codex\\visualizations\\2026\\10\\02\\private-thread-00009\\RinkSpace_tmp\\z190_main_source_authority_v1\\source_authority_admission.json",
+        "sha256": "9e876ecaf14b587cc23466c63063cb1cb26114f79f739f3f3bab5912eb744c41",
+        "unconfirmed_ice_proposals_excluded_from_fit": true
+      },
+      "active_motion_model": "fixed_tripod_pivot_shared_constant_nonzero_camera_local_lever",
+      "active_mount_parameters": {
+        "source": {
+          "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\evidence\\camera_hardware_20261001\\user_camera_mount_and_height_20261002_v3.json",
+          "sha256": "e42424eb9f0830336cc44cd9b5d24fa0808eba2186eea00662df25b886fee3e4"
+        },
+        "initial_camera_xyz_m": [
+          0.0,
+          -0.2,
+          0.1
+        ],
+        "reference_exposure_pts": 229114112,
+        "fixed_pivot_xy_scene_units": [
+          2.221101486207969,
+          -49.49027314825264
+        ],
+        "pivot_initialization": "old reference optical Cz-(R_reference.T@lever)_z",
+        "per_frame_unrestricted_C": false,
+        "offset_zoom_dependent": false,
+        "independent_installation": true,
+        "fitted_camera_xyz_m": [
+          -0.006940172934920115,
+          -0.198551881868106,
+          0.02219238174889656
+        ],
+        "fitted_pivot_xyz_scene_units": [
+          2.221101486207969,
+          -49.49027314825264,
+          4.5423131792138705
+        ]
+      },
+      "reference_optical_height_prior": {
+        "reference_exposure_pts": 229114112,
+        "target_above_ice_working_m": 1.6,
+        "sigma_m": 0.18,
+        "operator_ground_minus_ice_unknown": true,
+        "pivot_height_is_not_lens_height": true,
+        "counted_once_per_installation": true
+      },
+      "current_user_pivot_outside_constraints": {
+        "schema": "rinkspace.explicit-user-fixed-tripod-outside-current-course.v1",
+        "facts": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\evidence\\camera_hardware_20261001\\user_tripod_positions_20261006_v2.json",
+          "sha256": "a539dced58edec058e68e64c702999c4e0dafe210ed60b490a2c442f0d452a74",
+          "authority": "current_user_direct_annotation",
+          "source_sha256": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891"
+        },
+        "by_installation": {
+          "okada_sp_installation_2_conditional_z190": {
+            "pivot_parameter_indices": [
+              11,
+              12,
+              13
+            ],
+            "user_fact_field": "low_end.outside_ice_boundary",
+            "relation": "pivot_outside_or_on_current_actual_board_course"
+          },
+          "okada_sp_installation_0_conditional_z190": {
+            "pivot_parameter_indices": [
+              5,
+              6,
+              7
+            ],
+            "user_fact_field": "long_side_main.outside_ice_boundary",
+            "relation": "pivot_outside_or_on_current_actual_board_course"
+          },
+          "okada_sp_installation_1_conditional_z190": {
+            "pivot_parameter_indices": [
+              8,
+              9,
+              10
+            ],
+            "user_fact_field": "long_side_secondary.outside_ice_boundary",
+            "relation": "pivot_outside_or_on_current_actual_board_course"
+          }
+        },
+        "world_parameter_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          34189,
+          34190,
+          34191,
+          34192,
+          34193,
+          34194,
+          34213,
+          34214,
+          34215,
+          34216,
+          34217,
+          34218,
+          34219,
+          34220,
+          34221,
+          34222,
+          34223,
+          34224,
+          34225,
+          34226,
+          34227,
+          34228,
+          34229,
+          34230,
+          34231,
+          34232,
+          34233,
+          34234,
+          34235,
+          34236,
+          34237,
+          34238,
+          34239,
+          34240,
+          34241,
+          34242,
+          34243,
+          34244,
+          34245,
+          34246,
+          34247,
+          34248,
+          34249,
+          34250,
+          34251,
+          34252,
+          34253,
+          34254,
+          34255,
+          34256,
+          34257,
+          34258,
+          34259,
+          34260,
+          34261,
+          34262,
+          34263,
+          34264,
+          34265,
+          34266,
+          34267,
+          34268,
+          34269,
+          34270,
+          34271,
+          34272,
+          34273,
+          34274,
+          34275,
+          34276,
+          34277,
+          34278,
+          34279,
+          34280,
+          34281,
+          34282,
+          34283,
+          34284,
+          34285,
+          34286,
+          34287,
+          34288,
+          34289,
+          34290,
+          34291,
+          34292,
+          34293,
+          34294,
+          34295,
+          34296,
+          34297,
+          34298,
+          34299,
+          34300,
+          34301
+        ],
+        "current_course_provider": "actual geometry.current.print_course_binding/sample_perimeter",
+        "scene_unit_working_m": 0.31353729994266055,
+        "outside_margin_positive": true,
+        "on_boundary_allowed": true,
+        "hard_inside_rejection": true,
+        "marked_nominal_XY_or_tolerance_not_a_constraint": true,
+        "optical_centre_not_constrained_outside": true,
+        "numerical_world_derivative_step": 1e-06,
+        "new_source_or_prior_rows": 0,
+        "nominal_q_changed": false,
+        "measured_offset_or_metric_calibration_claim": false,
+        "accuracy_accepted": false
+      },
+      "physical_source_core_q_sha256": "ddff0a574df9f9a69976d8694a281610c1e6436ba1b857948917c43ce2efb995"
+    },
+    "allow_effective_pp_offset": false,
+    "effective_offset_identified_as_OIS": false,
+    "accuracy_accepted": false
+  },
+  "inherited_camera_archive": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_current_points_ready_20261012\\complete_physical_camera_model_UNACCEPTED_ddff0a574df9f9a6.npz",
+    "sha256": "0428e5cfcad7ab6b40077c0d49ca4d8118a57d1fb219c1b0bd025b4c989fe949"
+  },
+  "source_q_sha256": "8a28afed8f9f896112e5b2f64be515b2bc02019e10e09c7e0eda2598579d4891"
+}

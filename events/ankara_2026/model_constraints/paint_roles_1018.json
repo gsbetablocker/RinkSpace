@@ -1,0 +1,54 @@
+{
+  "schema": "rinkspace.user-confirmed-ice-measurement-roles.v1",
+  "event_id": "ankara_2026",
+  "authority": {
+    "kind": "direct_user_clarification",
+    "date_local": "2026-10-18",
+    "user_text": "C0的本来定义就不该是靶圈，而是“有宽度的线”，只不过这条不是直的是圆形的，同理还有A1-A4，靶圈只是指F1-F4和R1-R4"
+  },
+  "definitions": {
+    "finite_width_circular_lines": {
+      "ids": [
+        "C0",
+        "A1",
+        "A2",
+        "A3",
+        "A4"
+      ],
+      "model_representation": "zero-width circular centreline",
+      "measurement_operator": "paint_center",
+      "position_definition": "midline between the two actual material edges of the finite-width painted line"
+    },
+    "target_rings": {
+      "ids": [
+        "F1",
+        "F2",
+        "F3",
+        "F4",
+        "R1",
+        "R2",
+        "R3",
+        "R4"
+      ],
+      "measurement_operator": "declared_physical_material_interface",
+      "position_definition": "each declared actual material boundary; never substitute paint-width centreline"
+    }
+  },
+  "legacy_names": {
+    "ice.C0:outer": "historical curve-role identifier only; does not turn C0 into a target-ring exterior boundary"
+  },
+  "correction": {
+    "retracted_interpretation": "The assistant incorrectly inferred a C0 source-definition conflict from paint_center readings and proposed exterior-boundary migration.",
+    "paint_center_is_consistent_with_user_definition": true,
+    "raw_UV_changed": false,
+    "model_values_changed": false,
+    "source_material_identity_audit_remains_required": true,
+    "historical_packets_and_failed_diagnostics_preserved": true,
+    "exterior_boundary_migration_required": false
+  },
+  "prior_C0_confirmation": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\model_constraints\\c0_measure_1016.json",
+    "sha256": "1b548d5089ecf3488fd4962077c4ec02f08d2e55d440f8eeb97b9a193d288905",
+    "classification_correction_not_new_C0_measurement_convention": true
+  }
+}

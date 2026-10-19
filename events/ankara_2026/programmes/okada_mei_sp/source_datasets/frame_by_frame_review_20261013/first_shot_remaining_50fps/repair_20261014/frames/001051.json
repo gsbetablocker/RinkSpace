@@ -1,0 +1,5102 @@
+{
+  "schema": "rinkspace.single-frame-source-review.v1",
+  "source": {
+    "schema": "rinkspace.exact-single-native-source-frame.v1",
+    "event_id": "ankara_2026",
+    "programme_id": "okada_mei_sp",
+    "programme_frame_index_1based": 1051,
+    "native_frame_index_1based": 2052,
+    "native_frame_index_0based": 2051,
+    "native_pts": 525056,
+    "actual_pts": 525056,
+    "time_base": "1/12800",
+    "source_time": "00:00:41.020",
+    "source_time_seconds": 41.02,
+    "source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4",
+    "source_video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+    "image_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\frames\\001051.png",
+    "png_sha256": "9ae751149faa3fbe15e2f8f8077d04057dd0a948435e215c67cb0b5e672fd7e5",
+    "decoded_BGR_sha256": "7c02a234714d6f8166e28fd6a41b119b87812e18203164339eb4855f3a07ce13",
+    "decoded_RGB_sha256": "b9190837fc10136142ee4643d0731165e9d82378b9bd463d6e6e17626ce025be",
+    "native_hw": [
+      1080,
+      1920
+    ],
+    "original_PTS_verified": true,
+    "PNG_roundtrip_lossless_verified": true,
+    "optimization_performed": false,
+    "mask_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\masks_current\\001051.png",
+    "mask_sha256": "ccc1ad22d24ed8a5f5ab2a3acc1a348c7ac5a936cc0a7796b1dfe5708b445230",
+    "navigation_overlay_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\repair_20261014\\navigation\\001051.png",
+    "source_points_extracted": true,
+    "broadcast_timer_exclusion": {
+      "actual_native_rectangle_xyxy_inclusive": [
+        1692,
+        944,
+        1864,
+        1002
+      ],
+      "current_source_timer_present": true,
+      "edge_halo_px": 4,
+      "method": "same-shot fixed source timer region confirmed by current grey digit mass and rectangle background; union with legacy components",
+      "current_source_glyph_dark_pixel_count": 1110,
+      "current_source_glyph_extent_px": [
+        111,
+        36
+      ],
+      "current_source_timer_background_q85": 216.0,
+      "legacy_component_detector": {
+        "actual_native_rectangle_xyxy_inclusive": null,
+        "edge_halo_px": 4,
+        "method": "current-native white timer component rectangle with dark text, no historical timer mask",
+        "current_source_timer_present": false,
+        "applied_to_source_readouts_and_line_visibility": true
+      },
+      "applied_to_source_readouts_and_line_visibility": true
+    },
+    "ice_visible_domain": {
+      "method": "piecewise_current_native_board_contact_material_polylines_lower_envelope_with_conservative_occluded_gaps",
+      "board_contact_candidate_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\board_candidates\\001051.json",
+      "native_source_pts": 525056,
+      "current_source_contact_readout_count": 144,
+      "current_source_contact_material_uv_sha256": "02610cfa1a9e28bb94e0d626feb3dc49068704368e064eb4481d6fde8e6f9bc2",
+      "source_contact_parts": [
+        {
+          "target_id": "board.contact.upper_long_side",
+          "segment_index": 0,
+          "native_readout_count": 58,
+          "source_x_interval": [
+            1231.71,
+            1915.003
+          ]
+        },
+        {
+          "target_id": "board.contact.upper_long_side",
+          "segment_index": 1,
+          "native_readout_count": 2,
+          "source_x_interval": [
+            1087.858,
+            1099.852
+          ]
+        },
+        {
+          "target_id": "board.contact.upper_long_side",
+          "segment_index": 2,
+          "native_readout_count": 77,
+          "source_x_interval": [
+            69.027,
+            979.974
+          ]
+        },
+        {
+          "target_id": "board.contact.upper_left",
+          "segment_index": 0,
+          "native_readout_count": 7,
+          "source_x_interval": [
+            2.342,
+            69.024
+          ]
+        }
+      ],
+      "unsupported_x_intervals_used_only_as_conservative_exclusion": [
+        [
+          0,
+          2
+        ],
+        [
+          980,
+          1087
+        ],
+        [
+          1100,
+          1231
+        ],
+        [
+          1916,
+          1919
+        ]
+      ],
+      "representatives_and_all_signed_interface_context_must_be_below_source_contact": true,
+      "model_projection_used_for_domain": false,
+      "straight_and_arc_parts_preserved": true,
+      "exclusion_gap_coordinates_emitted_as_observations": false
+    }
+  },
+  "source_pts": 525056,
+  "programme_frame_index_1based": 1051,
+  "batch_sequence_index_1based": 1051,
+  "frame_count": 1,
+  "features": [
+    {
+      "id": "board_top.upper_long_side",
+      "label_zh": "board.top.upper_long_side",
+      "physical_surface": "board",
+      "target_id": "board.top.upper_long_side",
+      "world_curve": "board.top.upper_long_side",
+      "review_layer": "board_top",
+      "segments": [
+        {
+          "uv": [
+            [
+              1915.0020053148835,
+              470.10636750597564
+            ],
+            [
+              1732.116330290186,
+              467.9276140165596
+            ],
+            [
+              1549.2306552654886,
+              465.74886052714356
+            ],
+            [
+              1366.344980240791,
+              463.57010703772755
+            ],
+            [
+              1183.4593052160935,
+              461.39135354831154
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 5,
+          "measurement_origin": "current_native_joint_straight_material_edge_fit",
+          "representative_points_share_line_estimate": true,
+          "pixels_measured_in_this_frame": false,
+          "source_evidence_measured_in_this_frame": true,
+          "source_native_readout_uv": [
+            [
+              1915.0,
+              470.281
+            ],
+            [
+              1903.008,
+              470.122
+            ],
+            [
+              1891.014,
+              470.088
+            ],
+            [
+              1879.023,
+              469.783
+            ],
+            [
+              1867.028,
+              469.929
+            ],
+            [
+              1855.036,
+              469.667
+            ],
+            [
+              1843.046,
+              469.308
+            ],
+            [
+              1831.052,
+              469.288
+            ],
+            [
+              1819.06,
+              469.153
+            ],
+            [
+              1807.066,
+              469.142
+            ],
+            [
+              1795.079,
+              468.46
+            ],
+            [
+              1783.086,
+              468.396
+            ],
+            [
+              1771.095,
+              468.097
+            ],
+            [
+              1759.102,
+              467.962
+            ],
+            [
+              1747.108,
+              467.939
+            ],
+            [
+              1735.116,
+              467.746
+            ],
+            [
+              1723.124,
+              467.629
+            ],
+            [
+              1711.132,
+              467.376
+            ],
+            [
+              1699.141,
+              467.107
+            ],
+            [
+              1687.146,
+              467.223
+            ],
+            [
+              1675.153,
+              467.1
+            ],
+            [
+              1663.16,
+              467.027
+            ],
+            [
+              1651.166,
+              467.012
+            ],
+            [
+              1639.174,
+              466.819
+            ],
+            [
+              1627.184,
+              466.415
+            ],
+            [
+              1615.19,
+              466.468
+            ],
+            [
+              1603.193,
+              466.744
+            ],
+            [
+              1591.203,
+              466.344
+            ],
+            [
+              1579.209,
+              466.345
+            ],
+            [
+              1567.218,
+              466.117
+            ],
+            [
+              1555.225,
+              466.015
+            ],
+            [
+              1543.236,
+              465.528
+            ],
+            [
+              1531.242,
+              465.52
+            ],
+            [
+              1519.248,
+              465.486
+            ],
+            [
+              1507.256,
+              465.361
+            ],
+            [
+              1495.267,
+              464.824
+            ],
+            [
+              1483.274,
+              464.731
+            ],
+            [
+              1471.284,
+              464.322
+            ],
+            [
+              1459.288,
+              464.574
+            ],
+            [
+              1447.297,
+              464.303
+            ],
+            [
+              1435.305,
+              464.072
+            ],
+            [
+              1423.31,
+              464.136
+            ],
+            [
+              1411.317,
+              464.089
+            ],
+            [
+              1399.327,
+              463.73
+            ],
+            [
+              1387.33,
+              464.007
+            ],
+            [
+              1375.338,
+              463.826
+            ],
+            [
+              1363.346,
+              463.637
+            ],
+            [
+              1351.354,
+              463.459
+            ],
+            [
+              1339.36,
+              463.378
+            ],
+            [
+              1327.366,
+              463.405
+            ],
+            [
+              1315.376,
+              462.998
+            ],
+            [
+              1303.384,
+              462.881
+            ],
+            [
+              1291.392,
+              462.658
+            ],
+            [
+              1279.399,
+              462.531
+            ],
+            [
+              1267.407,
+              462.394
+            ],
+            [
+              1255.415,
+              462.189
+            ],
+            [
+              1243.422,
+              462.089
+            ],
+            [
+              1231.429,
+              461.977
+            ],
+            [
+              1219.435,
+              461.951
+            ],
+            [
+              1207.442,
+              461.866
+            ],
+            [
+              1195.451,
+              461.616
+            ],
+            [
+              1183.458,
+              461.466
+            ]
+          ],
+          "source_native_transition_iqr_px": [
+            2.744,
+            2.752,
+            2.59,
+            2.742,
+            3.039,
+            2.941,
+            2.692,
+            2.715,
+            2.779,
+            3.003,
+            2.718,
+            2.777,
+            2.734,
+            2.607,
+            2.571,
+            2.47,
+            2.519,
+            2.729,
+            2.462,
+            2.621,
+            2.686,
+            2.743,
+            2.392,
+            2.289,
+            2.679,
+            2.648,
+            2.635,
+            2.683,
+            2.749,
+            2.932,
+            2.788,
+            2.682,
+            2.812,
+            2.716,
+            2.7,
+            2.885,
+            3.045,
+            2.731,
+            2.881,
+            2.724,
+            2.543,
+            2.577,
+            2.783,
+            2.65,
+            3.019,
+            3.093,
+            3.022,
+            2.952,
+            2.853,
+            3.016,
+            2.933,
+            2.79,
+            2.645,
+            2.779,
+            2.715,
+            2.684,
+            2.656,
+            2.661,
+            2.728,
+            2.492,
+            2.369,
+            2.399
+          ],
+          "source_line_fit_max_perpendicular_px": 0.4983361198591007,
+          "source_query_count": 62,
+          "point_bindings": [
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.top.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.top.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.top.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.top.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.top.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            }
+          ]
+        },
+        {
+          "uv": [
+            [
+              1087.5163739993354,
+              460.4544375219832
+            ],
+            [
+              1027.5577564070265,
+              459.3489396025605
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 2,
+          "measurement_origin": "current_native_joint_straight_material_edge_fit",
+          "representative_points_share_line_estimate": true,
+          "pixels_measured_in_this_frame": false,
+          "source_evidence_measured_in_this_frame": true,
+          "source_native_readout_uv": [
+            [
+              1087.518,
+              460.368
+            ],
+            [
+              1075.527,
+              460.124
+            ],
+            [
+              1063.532,
+              460.214
+            ],
+            [
+              1051.54,
+              459.956
+            ],
+            [
+              1039.551,
+              459.506
+            ],
+            [
+              1027.56,
+              459.244
+            ]
+          ],
+          "source_native_transition_iqr_px": [
+            2.721,
+            2.721,
+            2.625,
+            3.091,
+            2.656,
+            2.688
+          ],
+          "source_line_fit_max_perpendicular_px": 0.20160035278243565,
+          "source_query_count": 6,
+          "point_bindings": [
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.top.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.top.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            }
+          ]
+        },
+        {
+          "uv": [
+            [
+              847.6608843100871,
+              458.1990966827399
+            ],
+            [
+              652.7788653859111,
+              456.2589696630255
+            ],
+            [
+              457.8968464617351,
+              454.31884264331114
+            ],
+            [
+              263.01482753755914,
+              452.37871562359675
+            ],
+            [
+              68.13280861338308,
+              450.4385886038824
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 5,
+          "measurement_origin": "current_native_joint_straight_material_edge_fit",
+          "representative_points_share_line_estimate": true,
+          "pixels_measured_in_this_frame": false,
+          "source_evidence_measured_in_this_frame": true,
+          "source_native_readout_uv": [
+            [
+              847.661,
+              458.187
+            ],
+            [
+              835.667,
+              458.229
+            ],
+            [
+              823.677,
+              457.788
+            ],
+            [
+              811.686,
+              457.474
+            ],
+            [
+              799.691,
+              457.635
+            ],
+            [
+              787.697,
+              457.642
+            ],
+            [
+              775.705,
+              457.445
+            ],
+            [
+              763.715,
+              457.015
+            ],
+            [
+              751.727,
+              456.507
+            ],
+            [
+              739.733,
+              456.464
+            ],
+            [
+              727.736,
+              456.712
+            ],
+            [
+              715.742,
+              456.726
+            ],
+            [
+              703.752,
+              456.346
+            ],
+            [
+              691.762,
+              455.982
+            ],
+            [
+              679.77,
+              455.843
+            ],
+            [
+              667.77,
+              456.4
+            ],
+            [
+              655.777,
+              456.281
+            ],
+            [
+              643.785,
+              456.088
+            ],
+            [
+              631.792,
+              455.983
+            ],
+            [
+              619.798,
+              455.97
+            ],
+            [
+              607.803,
+              456.084
+            ],
+            [
+              595.812,
+              455.85
+            ],
+            [
+              583.818,
+              455.853
+            ],
+            [
+              571.826,
+              455.667
+            ],
+            [
+              559.836,
+              455.269
+            ],
+            [
+              547.841,
+              455.311
+            ],
+            [
+              535.849,
+              455.112
+            ],
+            [
+              523.856,
+              455.012
+            ],
+            [
+              511.859,
+              455.354
+            ],
+            [
+              499.866,
+              455.268
+            ],
+            [
+              487.874,
+              455.063
+            ],
+            [
+              475.88,
+              455.029
+            ],
+            [
+              463.888,
+              454.874
+            ],
+            [
+              451.894,
+              454.925
+            ],
+            [
+              439.901,
+              454.792
+            ],
+            [
+              427.912,
+              454.329
+            ],
+            [
+              415.922,
+              453.892
+            ],
+            [
+              403.927,
+              453.982
+            ],
+            [
+              391.934,
+              453.879
+            ],
+            [
+              379.939,
+              453.994
+            ],
+            [
+              367.946,
+              453.933
+            ],
+            [
+              355.953,
+              453.825
+            ],
+            [
+              343.961,
+              453.62
+            ],
+            [
+              331.969,
+              453.455
+            ],
+            [
+              319.976,
+              453.376
+            ],
+            [
+              307.98,
+              453.546
+            ],
+            [
+              295.988,
+              453.37
+            ],
+            [
+              284.006,
+              452.237
+            ],
+            [
+              272.014,
+              452.046
+            ],
+            [
+              260.019,
+              452.059
+            ],
+            [
+              248.029,
+              451.739
+            ],
+            [
+              236.036,
+              451.595
+            ],
+            [
+              224.041,
+              451.75
+            ],
+            [
+              212.045,
+              451.885
+            ],
+            [
+              200.052,
+              451.854
+            ],
+            [
+              188.058,
+              451.804
+            ],
+            [
+              176.066,
+              451.636
+            ],
+            [
+              164.077,
+              451.156
+            ],
+            [
+              152.088,
+              450.693
+            ],
+            [
+              140.095,
+              450.629
+            ],
+            [
+              128.101,
+              450.537
+            ],
+            [
+              116.109,
+              450.375
+            ],
+            [
+              104.117,
+              450.166
+            ],
+            [
+              92.124,
+              450.081
+            ],
+            [
+              80.13,
+              450.087
+            ],
+            [
+              68.138,
+              449.875
+            ]
+          ],
+          "source_native_transition_iqr_px": [
+            2.511,
+            2.688,
+            2.57,
+            2.521,
+            2.427,
+            2.303,
+            2.453,
+            2.342,
+            2.827,
+            2.891,
+            2.265,
+            2.344,
+            2.935,
+            3.084,
+            3.177,
+            2.541,
+            2.632,
+            2.606,
+            2.462,
+            2.522,
+            2.689,
+            2.639,
+            2.802,
+            2.839,
+            2.769,
+            2.844,
+            2.79,
+            2.631,
+            2.395,
+            2.098,
+            2.128,
+            2.129,
+            2.267,
+            2.495,
+            2.49,
+            2.626,
+            3.054,
+            3.194,
+            2.992,
+            3.032,
+            2.895,
+            2.832,
+            2.903,
+            2.898,
+            2.789,
+            2.791,
+            2.666,
+            2.676,
+            2.596,
+            2.861,
+            2.765,
+            2.992,
+            2.846,
+            3.121,
+            3.138,
+            3.169,
+            3.269,
+            2.997,
+            3.152,
+            3.132,
+            2.83,
+            2.888,
+            2.954,
+            2.882,
+            2.795,
+            2.783
+          ],
+          "source_line_fit_max_perpendicular_px": 0.73731557072893,
+          "source_query_count": 66,
+          "point_bindings": [
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.top.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.top.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.top.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.top.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.top.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            }
+          ]
+        }
+      ],
+      "allowed_for_fit": false
+    },
+    {
+      "id": "board_contact.upper_long_side",
+      "label_zh": "board.contact.upper_long_side",
+      "physical_surface": "board",
+      "target_id": "board.contact.upper_long_side",
+      "world_curve": "board.contact.upper_long_side",
+      "review_layer": "board_contact",
+      "segments": [
+        {
+          "uv": [
+            [
+              1914.9769667611145,
+              816.1894085374748
+            ],
+            [
+              1744.1558812776125,
+              811.2021727344699
+            ],
+            [
+              1573.3347957941107,
+              806.2149369314649
+            ],
+            [
+              1402.513710310609,
+              801.2277011284599
+            ],
+            [
+              1231.692624827107,
+              796.2404653254549
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 5,
+          "measurement_origin": "current_native_joint_straight_material_edge_fit",
+          "representative_points_share_line_estimate": true,
+          "pixels_measured_in_this_frame": false,
+          "source_evidence_measured_in_this_frame": true,
+          "source_native_readout_uv": [
+            [
+              1915.003,
+              815.291
+            ],
+            [
+              1903.0,
+              815.502
+            ],
+            [
+              1891.01,
+              815.229
+            ],
+            [
+              1878.968,
+              816.807
+            ],
+            [
+              1867.037,
+              814.489
+            ],
+            [
+              1855.058,
+              813.825
+            ],
+            [
+              1843.065,
+              813.682
+            ],
+            [
+              1831.058,
+              813.999
+            ],
+            [
+              1819.063,
+              813.947
+            ],
+            [
+              1807.068,
+              813.843
+            ],
+            [
+              1795.084,
+              813.361
+            ],
+            [
+              1783.129,
+              811.88
+            ],
+            [
+              1771.132,
+              811.847
+            ],
+            [
+              1759.169,
+              810.644
+            ],
+            [
+              1747.161,
+              811.024
+            ],
+            [
+              1735.176,
+              810.596
+            ],
+            [
+              1723.188,
+              810.262
+            ],
+            [
+              1711.195,
+              810.108
+            ],
+            [
+              1699.186,
+              810.53
+            ],
+            [
+              1687.202,
+              810.036
+            ],
+            [
+              1675.22,
+              809.52
+            ],
+            [
+              1663.226,
+              809.377
+            ],
+            [
+              1651.231,
+              809.299
+            ],
+            [
+              1639.241,
+              809.042
+            ],
+            [
+              1627.308,
+              806.777
+            ],
+            [
+              1615.311,
+              806.742
+            ],
+            [
+              1603.304,
+              807.104
+            ],
+            [
+              1591.315,
+              806.813
+            ],
+            [
+              1579.324,
+              806.572
+            ],
+            [
+              1567.335,
+              806.283
+            ],
+            [
+              1555.328,
+              806.608
+            ],
+            [
+              1543.35,
+              805.931
+            ],
+            [
+              1531.374,
+              805.175
+            ],
+            [
+              1519.382,
+              804.987
+            ],
+            [
+              1507.392,
+              804.726
+            ],
+            [
+              1495.416,
+              803.983
+            ],
+            [
+              1483.423,
+              803.832
+            ],
+            [
+              1471.434,
+              803.534
+            ],
+            [
+              1459.444,
+              803.286
+            ],
+            [
+              1447.464,
+              802.665
+            ],
+            [
+              1435.478,
+              802.251
+            ],
+            [
+              1423.488,
+              802.007
+            ],
+            [
+              1411.49,
+              802.03
+            ],
+            [
+              1399.544,
+              800.205
+            ],
+            [
+              1387.549,
+              800.106
+            ],
+            [
+              1375.547,
+              800.273
+            ],
+            [
+              1363.562,
+              799.831
+            ],
+            [
+              1351.582,
+              799.226
+            ],
+            [
+              1339.61,
+              798.344
+            ],
+            [
+              1327.621,
+              798.045
+            ],
+            [
+              1315.632,
+              797.759
+            ],
+            [
+              1303.621,
+              798.214
+            ],
+            [
+              1291.639,
+              797.696
+            ],
+            [
+              1279.652,
+              797.305
+            ],
+            [
+              1267.653,
+              797.378
+            ],
+            [
+              1255.672,
+              796.819
+            ],
+            [
+              1243.683,
+              796.521
+            ],
+            [
+              1231.71,
+              795.639
+            ]
+          ],
+          "source_native_transition_iqr_px": [
+            3.025,
+            2.797,
+            3.04,
+            3.08,
+            3.32,
+            3.323,
+            3.478,
+            3.361,
+            2.703,
+            2.876,
+            2.973,
+            3.406,
+            3.287,
+            2.979,
+            2.956,
+            3.051,
+            3.394,
+            3.304,
+            3.377,
+            3.311,
+            3.138,
+            2.81,
+            2.358,
+            2.681,
+            2.987,
+            2.789,
+            3.118,
+            2.781,
+            2.737,
+            2.789,
+            3.312,
+            3.429,
+            3.09,
+            2.892,
+            2.781,
+            3.067,
+            3.132,
+            2.758,
+            2.917,
+            3.063,
+            3.132,
+            3.055,
+            3.008,
+            2.996,
+            3.06,
+            2.974,
+            3.066,
+            3.133,
+            2.954,
+            2.491,
+            2.449,
+            2.733,
+            2.724,
+            3.058,
+            2.647,
+            2.623,
+            2.706,
+            3.294
+          ],
+          "source_line_fit_max_perpendicular_px": 1.6679442957124044,
+          "source_query_count": 58,
+          "point_bindings": [
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.contact.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.contact.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.contact.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.contact.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.contact.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            }
+          ]
+        },
+        {
+          "uv": [
+            [
+              1099.85238962758,
+              791.6431967929078
+            ],
+            [
+              1087.8584776352338,
+              791.5190339252982
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 2,
+          "measurement_origin": "current_native_joint_straight_material_edge_fit",
+          "representative_points_share_line_estimate": true,
+          "pixels_measured_in_this_frame": false,
+          "source_evidence_measured_in_this_frame": true,
+          "source_native_readout_uv": [
+            [
+              1099.852,
+              791.641
+            ],
+            [
+              1087.858,
+              791.522
+            ]
+          ],
+          "source_native_transition_iqr_px": [
+            2.183,
+            2.448
+          ],
+          "source_line_fit_max_perpendicular_px": 0.0025386328271953824,
+          "source_query_count": 2,
+          "point_bindings": [
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.contact.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.contact.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            }
+          ]
+        },
+        {
+          "uv": [
+            [
+              979.9742565623258,
+              788.2709811445087
+            ],
+            [
+              797.781715052822,
+              782.3447709947687
+            ],
+            [
+              615.5891735433183,
+              776.4185608450288
+            ],
+            [
+              433.3966320338146,
+              770.4923506952888
+            ],
+            [
+              251.2040905243109,
+              764.5661405455488
+            ],
+            [
+              69.0115490148072,
+              758.6399303958088
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 6,
+          "measurement_origin": "current_native_joint_straight_material_edge_fit",
+          "representative_points_share_line_estimate": true,
+          "pixels_measured_in_this_frame": false,
+          "source_evidence_measured_in_this_frame": true,
+          "source_native_readout_uv": [
+            [
+              979.974,
+              788.271
+            ],
+            [
+              967.996,
+              787.61
+            ],
+            [
+              955.993,
+              787.799
+            ],
+            [
+              944.002,
+              787.577
+            ],
+            [
+              932.004,
+              787.608
+            ],
+            [
+              919.998,
+              787.902
+            ],
+            [
+              908.02,
+              787.217
+            ],
+            [
+              896.058,
+              785.95
+            ],
+            [
+              884.075,
+              785.456
+            ],
+            [
+              872.077,
+              785.476
+            ],
+            [
+              860.116,
+              784.179
+            ],
+            [
+              848.123,
+              784.055
+            ],
+            [
+              836.139,
+              783.575
+            ],
+            [
+              824.151,
+              783.248
+            ],
+            [
+              812.179,
+              782.337
+            ],
+            [
+              800.187,
+              782.149
+            ],
+            [
+              788.203,
+              781.688
+            ],
+            [
+              776.204,
+              781.749
+            ],
+            [
+              764.211,
+              781.569
+            ],
+            [
+              752.256,
+              780.093
+            ],
+            [
+              740.261,
+              780.011
+            ],
+            [
+              728.27,
+              779.766
+            ],
+            [
+              716.275,
+              779.688
+            ],
+            [
+              704.281,
+              779.587
+            ],
+            [
+              692.29,
+              779.349
+            ],
+            [
+              680.338,
+              777.754
+            ],
+            [
+              668.337,
+              777.875
+            ],
+            [
+              656.351,
+              777.495
+            ],
+            [
+              644.362,
+              777.176
+            ],
+            [
+              632.399,
+              775.969
+            ],
+            [
+              620.412,
+              775.588
+            ],
+            [
+              608.421,
+              775.388
+            ],
+            [
+              596.415,
+              775.7
+            ],
+            [
+              584.462,
+              774.1
+            ],
+            [
+              572.437,
+              775.1
+            ],
+            [
+              560.469,
+              774.063
+            ],
+            [
+              548.446,
+              774.98
+            ],
+            [
+              536.495,
+              773.312
+            ],
+            [
+              524.49,
+              773.595
+            ],
+            [
+              512.503,
+              773.233
+            ],
+            [
+              500.526,
+              772.495
+            ],
+            [
+              488.545,
+              771.935
+            ],
+            [
+              476.558,
+              771.55
+            ],
+            [
+              464.596,
+              770.323
+            ],
+            [
+              452.602,
+              770.179
+            ],
+            [
+              440.615,
+              769.839
+            ],
+            [
+              428.619,
+              769.769
+            ],
+            [
+              416.625,
+              769.664
+            ],
+            [
+              404.636,
+              769.352
+            ],
+            [
+              392.647,
+              769.075
+            ],
+            [
+              380.651,
+              769.036
+            ],
+            [
+              368.661,
+              768.756
+            ],
+            [
+              356.677,
+              768.289
+            ],
+            [
+              344.675,
+              768.446
+            ],
+            [
+              332.673,
+              768.626
+            ],
+            [
+              320.682,
+              768.409
+            ],
+            [
+              308.72,
+              767.164
+            ],
+            [
+              296.731,
+              766.839
+            ],
+            [
+              284.761,
+              765.884
+            ],
+            [
+              272.772,
+              765.593
+            ],
+            [
+              260.794,
+              764.898
+            ],
+            [
+              248.802,
+              764.712
+            ],
+            [
+              236.847,
+              763.221
+            ],
+            [
+              224.86,
+              762.868
+            ],
+            [
+              212.861,
+              762.906
+            ],
+            [
+              200.842,
+              763.67
+            ],
+            [
+              188.849,
+              763.509
+            ],
+            [
+              176.872,
+              762.804
+            ],
+            [
+              164.906,
+              761.705
+            ],
+            [
+              152.942,
+              760.504
+            ],
+            [
+              140.927,
+              761.129
+            ],
+            [
+              128.928,
+              761.208
+            ],
+            [
+              116.944,
+              760.716
+            ],
+            [
+              104.97,
+              759.888
+            ],
+            [
+              92.989,
+              759.323
+            ],
+            [
+              81.002,
+              758.959
+            ],
+            [
+              69.027,
+              758.167
+            ]
+          ],
+          "source_native_transition_iqr_px": [
+            3.216,
+            3.304,
+            2.662,
+            2.528,
+            2.741,
+            2.968,
+            2.86,
+            3.369,
+            3.267,
+            3.231,
+            3.087,
+            3.205,
+            3.109,
+            3.439,
+            3.492,
+            3.389,
+            3.314,
+            3.451,
+            3.351,
+            2.925,
+            3.305,
+            3.349,
+            3.355,
+            3.206,
+            3.267,
+            3.341,
+            3.215,
+            3.126,
+            3.146,
+            3.5,
+            3.628,
+            3.402,
+            3.302,
+            3.515,
+            3.539,
+            3.331,
+            3.108,
+            3.143,
+            3.209,
+            3.231,
+            3.117,
+            3.194,
+            3.301,
+            2.973,
+            2.828,
+            2.759,
+            2.575,
+            2.776,
+            2.512,
+            2.511,
+            2.391,
+            2.36,
+            2.252,
+            1.976,
+            2.2,
+            2.425,
+            2.872,
+            2.954,
+            3.393,
+            3.343,
+            2.931,
+            2.957,
+            3.076,
+            2.97,
+            2.909,
+            2.868,
+            3.111,
+            3.437,
+            3.477,
+            2.765,
+            3.255,
+            3.0,
+            2.727,
+            2.926,
+            2.864,
+            2.83,
+            2.87
+          ],
+          "source_line_fit_max_perpendicular_px": 1.5819880030146445,
+          "source_query_count": 77,
+          "point_bindings": [
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.contact.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.contact.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.contact.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.contact.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.contact.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.contact.upper_long_side",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            }
+          ]
+        }
+      ],
+      "allowed_for_fit": false
+    },
+    {
+      "id": "board_top.upper_left",
+      "label_zh": "board.top.upper_left",
+      "physical_surface": "board",
+      "target_id": "board.top.upper_left",
+      "world_curve": "board.top.upper_left",
+      "review_layer": "board_top",
+      "segments": [
+        {
+          "uv": [
+            [
+              68.13896772996264,
+              449.99065490185853
+            ],
+            [
+              2.029967719009484,
+              449.6136339913176
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 2,
+          "measurement_origin": "current_native_joint_smooth_material_curve_fit",
+          "representative_points_share_line_estimate": true,
+          "pixels_measured_in_this_frame": false,
+          "source_evidence_measured_in_this_frame": true,
+          "source_native_readout_uv": [
+            [
+              68.138,
+              449.875
+            ],
+            [
+              57.117,
+              450.198
+            ],
+            [
+              46.098,
+              450.29
+            ],
+            [
+              35.082,
+              450.057
+            ],
+            [
+              24.065,
+              449.873
+            ],
+            [
+              13.048,
+              449.759
+            ],
+            [
+              2.03,
+              449.709
+            ]
+          ],
+          "source_native_transition_iqr_px": [
+            2.783,
+            2.807,
+            2.8,
+            2.647,
+            2.791,
+            2.932,
+            2.731
+          ],
+          "source_curve_degree": 2,
+          "source_curve_fit_max_residual_px": 0.16170824741992731,
+          "source_query_count": 7,
+          "point_bindings": [
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.top.upper_left",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_smooth_material_curve_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.top.upper_left",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_smooth_material_curve_fit"
+            }
+          ]
+        }
+      ],
+      "allowed_for_fit": false
+    },
+    {
+      "id": "board_contact.upper_left",
+      "label_zh": "board.contact.upper_left",
+      "physical_surface": "board",
+      "target_id": "board.contact.upper_left",
+      "world_curve": "board.contact.upper_left",
+      "review_layer": "board_contact",
+      "segments": [
+        {
+          "uv": [
+            [
+              69.01877809984876,
+              758.3070388392547
+            ],
+            [
+              2.3437370202802907,
+              756.061642260374
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 2,
+          "measurement_origin": "current_native_joint_smooth_material_curve_fit",
+          "representative_points_share_line_estimate": true,
+          "pixels_measured_in_this_frame": false,
+          "source_evidence_measured_in_this_frame": true,
+          "source_native_readout_uv": [
+            [
+              69.024,
+              758.167
+            ],
+            [
+              57.908,
+              757.983
+            ],
+            [
+              46.796,
+              757.583
+            ],
+            [
+              35.691,
+              756.878
+            ],
+            [
+              24.579,
+              756.477
+            ],
+            [
+              13.458,
+              756.374
+            ],
+            [
+              2.342,
+              756.104
+            ]
+          ],
+          "source_native_transition_iqr_px": [
+            2.87,
+            2.992,
+            2.94,
+            2.713,
+            2.597,
+            2.657,
+            2.685
+          ],
+          "source_curve_degree": 2,
+          "source_curve_fit_max_residual_px": 0.20302991796239683,
+          "source_query_count": 7,
+          "point_bindings": [
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.contact.upper_left",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_smooth_material_curve_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "board.contact.upper_left",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_smooth_material_curve_fit"
+            }
+          ]
+        }
+      ],
+      "allowed_for_fit": false
+    },
+    {
+      "id": "Ad6.top_edge",
+      "label_zh": "Ad6.top_edge",
+      "physical_surface": "board",
+      "target_id": "Ad6.top_edge",
+      "world_curve": "Ad6.top_edge",
+      "review_layer": "ad2_border",
+      "segments": [
+        {
+          "uv": [
+            [
+              104.97203826904297,
+              492.40478515625
+            ],
+            [
+              279.10219259609397,
+              494.49227918395536
+            ],
+            [
+              461.30717795523583,
+              496.70691798573614
+            ],
+            [
+              643.5121633143777,
+              498.92155678751686
+            ],
+            [
+              825.7171486735197,
+              501.13619558929764
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 5,
+          "measurement_origin": "current_native_joint_straight_material_edge_fit",
+          "representative_points_share_line_estimate": true,
+          "pixels_measured_in_this_frame": false,
+          "source_evidence_measured_in_this_frame": true,
+          "source_native_readout_uv": [
+            [
+              96.888,
+              493.043
+            ],
+            [
+              108.848,
+              492.237
+            ],
+            [
+              120.79,
+              492.805
+            ],
+            [
+              132.738,
+              492.997
+            ],
+            [
+              144.687,
+              493.014
+            ],
+            [
+              156.637,
+              493.016
+            ],
+            [
+              168.585,
+              493.122
+            ],
+            [
+              180.533,
+              493.254
+            ],
+            [
+              192.48,
+              493.498
+            ],
+            [
+              204.427,
+              493.693
+            ],
+            [
+              216.376,
+              493.756
+            ],
+            [
+              228.329,
+              493.479
+            ],
+            [
+              240.278,
+              493.531
+            ],
+            [
+              252.226,
+              493.679
+            ],
+            [
+              264.167,
+              494.339
+            ],
+            [
+              276.114,
+              494.571
+            ],
+            [
+              288.063,
+              494.657
+            ],
+            [
+              300.01,
+              494.845
+            ],
+            [
+              311.957,
+              495.075
+            ],
+            [
+              323.906,
+              495.132
+            ],
+            [
+              335.855,
+              495.174
+            ],
+            [
+              347.803,
+              495.346
+            ],
+            [
+              359.75,
+              495.508
+            ],
+            [
+              371.698,
+              495.631
+            ],
+            [
+              383.647,
+              495.728
+            ],
+            [
+              395.597,
+              495.723
+            ],
+            [
+              407.544,
+              495.878
+            ],
+            [
+              419.494,
+              495.897
+            ],
+            [
+              431.44,
+              496.161
+            ],
+            [
+              443.388,
+              496.331
+            ],
+            [
+              455.337,
+              496.346
+            ],
+            [
+              467.287,
+              496.339
+            ],
+            [
+              479.226,
+              497.209
+            ],
+            [
+              491.174,
+              497.279
+            ],
+            [
+              503.128,
+              496.967
+            ],
+            [
+              515.073,
+              497.383
+            ],
+            [
+              527.021,
+              497.47
+            ],
+            [
+              538.972,
+              497.361
+            ],
+            [
+              550.919,
+              497.583
+            ],
+            [
+              562.867,
+              497.697
+            ],
+            [
+              574.815,
+              497.891
+            ],
+            [
+              586.763,
+              497.996
+            ],
+            [
+              598.71,
+              498.2
+            ],
+            [
+              610.656,
+              498.523
+            ],
+            [
+              622.606,
+              498.509
+            ],
+            [
+              634.553,
+              498.684
+            ],
+            [
+              646.496,
+              499.177
+            ],
+            [
+              658.445,
+              499.302
+            ],
+            [
+              670.393,
+              499.413
+            ],
+            [
+              682.34,
+              499.642
+            ],
+            [
+              694.288,
+              499.766
+            ],
+            [
+              706.238,
+              499.709
+            ],
+            [
+              718.188,
+              499.734
+            ],
+            [
+              730.131,
+              500.208
+            ],
+            [
+              742.078,
+              500.418
+            ],
+            [
+              754.028,
+              500.453
+            ],
+            [
+              765.977,
+              500.512
+            ],
+            [
+              777.927,
+              500.437
+            ],
+            [
+              789.874,
+              500.698
+            ],
+            [
+              801.819,
+              501.028
+            ],
+            [
+              813.768,
+              501.133
+            ],
+            [
+              825.716,
+              501.23
+            ]
+          ],
+          "source_native_transition_iqr_px": [
+            2.41,
+            2.255,
+            2.623,
+            2.684,
+            2.579,
+            2.632,
+            2.457,
+            2.534,
+            2.503,
+            2.465,
+            2.447,
+            2.474,
+            2.45,
+            2.514,
+            2.557,
+            2.509,
+            2.558,
+            2.689,
+            2.447,
+            2.378,
+            2.131,
+            2.163,
+            2.177,
+            2.225,
+            2.172,
+            2.267,
+            2.301,
+            2.311,
+            2.327,
+            2.397,
+            2.423,
+            2.401,
+            2.565,
+            2.543,
+            2.636,
+            2.784,
+            2.666,
+            2.704,
+            2.619,
+            2.506,
+            2.414,
+            2.365,
+            2.501,
+            2.531,
+            2.635,
+            2.643,
+            2.503,
+            2.491,
+            2.513,
+            2.589,
+            2.566,
+            2.485,
+            2.404,
+            2.333,
+            2.757,
+            2.588,
+            2.826,
+            2.532,
+            2.643,
+            2.494,
+            2.651,
+            2.847
+          ],
+          "source_line_fit_max_perpendicular_px": 0.7649764224056951,
+          "source_query_count": 62,
+          "point_bindings": [
+            {
+              "kind": "corner",
+              "physical_target": "Ad6.left_top",
+              "required_residual": "point_to_corresponding_model_corner_2d",
+              "measurement_origin": "current_source_measured_adjacent_edge_intersection"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "Ad6.top_edge",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "Ad6.top_edge",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "Ad6.top_edge",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "Ad6.top_edge",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            }
+          ],
+          "corner_vertex_indices": {
+            "left_top": 0
+          }
+        },
+        {
+          "uv": [
+            [
+              1148.3106668382636,
+              504.9570152310049
+            ],
+            [
+              1176.601806640625,
+              505.3115844726563
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 2,
+          "measurement_origin": "current_native_joint_straight_material_edge_fit",
+          "representative_points_share_line_estimate": true,
+          "pixels_measured_in_this_frame": false,
+          "source_evidence_measured_in_this_frame": true,
+          "source_native_readout_uv": [
+            [
+              1148.31,
+              504.987
+            ],
+            [
+              1160.259,
+              505.034
+            ],
+            [
+              1172.206,
+              505.245
+            ]
+          ],
+          "source_native_transition_iqr_px": [
+            2.479,
+            2.712,
+            2.633
+          ],
+          "source_line_fit_max_perpendicular_px": 0.054868665828428274,
+          "source_query_count": 3,
+          "point_bindings": [
+            {
+              "kind": "edge_sample",
+              "physical_target": "Ad6.top_edge",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "corner",
+              "physical_target": "Ad6.right_top",
+              "required_residual": "point_to_corresponding_model_corner_2d",
+              "measurement_origin": "current_source_measured_adjacent_edge_intersection"
+            }
+          ],
+          "corner_vertex_indices": {
+            "right_top": 1
+          }
+        }
+      ],
+      "allowed_for_fit": false
+    },
+    {
+      "id": "Ad6.bottom_edge",
+      "label_zh": "Ad6.bottom_edge",
+      "physical_surface": "board",
+      "target_id": "Ad6.bottom_edge",
+      "world_curve": "Ad6.bottom_edge",
+      "review_layer": "ad2_border",
+      "segments": [
+        {
+          "uv": [
+            [
+              97.02538299560545,
+              721.5366210937499
+            ],
+            [
+              269.34392300597335,
+              725.8749955254219
+            ],
+            [
+              441.33487663577046,
+              730.2051451583005
+            ],
+            [
+              613.3258302655677,
+              734.5352947911792
+            ],
+            [
+              785.3167838953647,
+              738.865444424058
+            ],
+            [
+              957.3077375251618,
+              743.1955940569367
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 6,
+          "measurement_origin": "current_native_joint_straight_material_edge_fit",
+          "representative_points_share_line_estimate": true,
+          "pixels_measured_in_this_frame": false,
+          "source_evidence_measured_in_this_frame": true,
+          "source_native_readout_uv": [
+            [
+              97.343,
+              721.952
+            ],
+            [
+              109.295,
+              721.942
+            ],
+            [
+              121.246,
+              721.927
+            ],
+            [
+              133.192,
+              722.141
+            ],
+            [
+              145.126,
+              722.851
+            ],
+            [
+              157.075,
+              722.936
+            ],
+            [
+              169.019,
+              723.251
+            ],
+            [
+              180.96,
+              723.637
+            ],
+            [
+              192.9,
+              724.079
+            ],
+            [
+              204.85,
+              724.155
+            ],
+            [
+              216.783,
+              724.881
+            ],
+            [
+              228.731,
+              725.012
+            ],
+            [
+              240.677,
+              725.236
+            ],
+            [
+              252.622,
+              725.475
+            ],
+            [
+              264.563,
+              725.882
+            ],
+            [
+              276.496,
+              726.616
+            ],
+            [
+              288.438,
+              726.996
+            ],
+            [
+              300.399,
+              726.605
+            ],
+            [
+              312.339,
+              727.073
+            ],
+            [
+              324.281,
+              727.445
+            ],
+            [
+              336.228,
+              727.634
+            ],
+            [
+              348.172,
+              727.891
+            ],
+            [
+              360.119,
+              728.097
+            ],
+            [
+              372.062,
+              728.406
+            ],
+            [
+              384.002,
+              728.861
+            ],
+            [
+              395.947,
+              729.112
+            ],
+            [
+              407.887,
+              729.556
+            ],
+            [
+              419.832,
+              729.832
+            ],
+            [
+              431.786,
+              729.734
+            ],
+            [
+              443.729,
+              730.061
+            ],
+            [
+              455.676,
+              730.25
+            ],
+            [
+              467.623,
+              730.435
+            ],
+            [
+              479.576,
+              730.356
+            ],
+            [
+              491.504,
+              731.269
+            ],
+            [
+              503.447,
+              731.607
+            ],
+            [
+              515.396,
+              731.709
+            ],
+            [
+              527.339,
+              732.033
+            ],
+            [
+              539.287,
+              732.175
+            ],
+            [
+              551.229,
+              732.548
+            ],
+            [
+              563.183,
+              732.446
+            ],
+            [
+              575.107,
+              733.536
+            ],
+            [
+              587.054,
+              733.693
+            ],
+            [
+              599.0,
+              733.909
+            ],
+            [
+              610.944,
+              734.215
+            ],
+            [
+              622.875,
+              735.007
+            ],
+            [
+              634.818,
+              735.335
+            ],
+            [
+              646.762,
+              735.622
+            ],
+            [
+              658.707,
+              735.891
+            ],
+            [
+              670.658,
+              735.899
+            ],
+            [
+              682.604,
+              736.123
+            ],
+            [
+              694.547,
+              736.476
+            ],
+            [
+              706.479,
+              737.23
+            ],
+            [
+              718.425,
+              737.454
+            ],
+            [
+              730.373,
+              737.566
+            ],
+            [
+              742.323,
+              737.651
+            ],
+            [
+              754.266,
+              737.952
+            ],
+            [
+              766.211,
+              738.214
+            ],
+            [
+              778.157,
+              738.439
+            ],
+            [
+              790.087,
+              739.291
+            ],
+            [
+              802.031,
+              739.561
+            ],
+            [
+              813.974,
+              739.888
+            ],
+            [
+              825.931,
+              739.678
+            ],
+            [
+              837.88,
+              739.771
+            ],
+            [
+              849.817,
+              740.343
+            ],
+            [
+              861.753,
+              740.942
+            ],
+            [
+              873.698,
+              741.235
+            ],
+            [
+              885.635,
+              741.768
+            ],
+            [
+              897.584,
+              741.89
+            ],
+            [
+              909.536,
+              741.86
+            ],
+            [
+              921.463,
+              742.827
+            ],
+            [
+              933.411,
+              742.95
+            ],
+            [
+              945.358,
+              743.142
+            ],
+            [
+              957.3,
+              743.513
+            ]
+          ],
+          "source_native_transition_iqr_px": [
+            2.123,
+            2.231,
+            2.407,
+            2.502,
+            2.467,
+            2.539,
+            2.724,
+            2.632,
+            2.562,
+            2.389,
+            2.477,
+            2.644,
+            2.803,
+            2.881,
+            2.82,
+            2.66,
+            2.639,
+            2.434,
+            2.47,
+            2.483,
+            2.361,
+            2.425,
+            2.36,
+            2.283,
+            2.468,
+            2.857,
+            2.81,
+            2.911,
+            2.799,
+            2.481,
+            2.41,
+            2.582,
+            2.33,
+            2.835,
+            2.521,
+            2.452,
+            2.391,
+            2.39,
+            2.629,
+            2.338,
+            2.94,
+            2.395,
+            2.309,
+            2.675,
+            2.65,
+            2.534,
+            2.48,
+            2.569,
+            2.274,
+            2.466,
+            2.604,
+            2.518,
+            2.434,
+            2.554,
+            2.586,
+            2.571,
+            2.455,
+            2.681,
+            2.447,
+            2.764,
+            2.775,
+            2.846,
+            2.538,
+            2.566,
+            2.538,
+            2.634,
+            2.674,
+            2.787,
+            2.933,
+            2.628,
+            2.721,
+            2.571,
+            2.654
+          ],
+          "source_line_fit_max_perpendicular_px": 0.8267978635173007,
+          "source_query_count": 73,
+          "point_bindings": [
+            {
+              "kind": "corner",
+              "physical_target": "Ad6.left_bottom",
+              "required_residual": "point_to_corresponding_model_corner_2d",
+              "measurement_origin": "current_source_measured_adjacent_edge_intersection"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "Ad6.bottom_edge",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "Ad6.bottom_edge",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "Ad6.bottom_edge",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "Ad6.bottom_edge",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "Ad6.bottom_edge",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            }
+          ],
+          "corner_vertex_indices": {
+            "left_bottom": 0
+          }
+        }
+      ],
+      "allowed_for_fit": false
+    },
+    {
+      "id": "Ad6.left_vertical",
+      "label_zh": "Ad6.left_vertical",
+      "physical_surface": "board",
+      "target_id": "Ad6.left_vertical",
+      "world_curve": "Ad6.left_vertical",
+      "review_layer": "ad2_border",
+      "segments": [
+        {
+          "uv": [
+            [
+              97.08702563268706,
+              718.9445372997326
+            ],
+            [
+              100.83280047917182,
+              683.4205343605631
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 2,
+          "measurement_origin": "current_native_joint_straight_material_edge_fit",
+          "representative_points_share_line_estimate": true,
+          "pixels_measured_in_this_frame": false,
+          "source_evidence_measured_in_this_frame": true,
+          "source_native_readout_uv": [
+            [
+              97.61,
+              719.0
+            ],
+            [
+              97.606,
+              707.154
+            ],
+            [
+              99.451,
+              695.304
+            ],
+            [
+              101.153,
+              683.454
+            ]
+          ],
+          "source_native_transition_iqr_px": [
+            3.933,
+            3.475,
+            3.401,
+            3.382
+          ],
+          "source_line_fit_max_perpendicular_px": 0.7202072193636421,
+          "source_query_count": 4,
+          "point_bindings": [
+            {
+              "kind": "edge_sample",
+              "physical_target": "Ad6.left_vertical",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "Ad6.left_vertical",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            }
+          ]
+        },
+        {
+          "uv": [
+            [
+              95.79833681971442,
+              659.8355728797541
+            ],
+            [
+              104.69102629422424,
+              505.7276853344256
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 2,
+          "measurement_origin": "current_native_joint_straight_material_edge_fit",
+          "representative_points_share_line_estimate": true,
+          "pixels_measured_in_this_frame": false,
+          "source_evidence_measured_in_this_frame": true,
+          "source_native_readout_uv": [
+            [
+              94.808,
+              659.778
+            ],
+            [
+              100.177,
+              647.92
+            ],
+            [
+              101.42,
+              636.071
+            ],
+            [
+              97.925,
+              624.234
+            ],
+            [
+              98.013,
+              612.388
+            ],
+            [
+              98.125,
+              600.543
+            ],
+            [
+              97.109,
+              576.854
+            ],
+            [
+              99.431,
+              565.003
+            ],
+            [
+              103.378,
+              553.148
+            ],
+            [
+              103.381,
+              541.302
+            ],
+            [
+              103.433,
+              529.456
+            ],
+            [
+              103.494,
+              517.61
+            ],
+            [
+              105.262,
+              505.761
+            ]
+          ],
+          "source_native_transition_iqr_px": [
+            3.867,
+            3.462,
+            3.619,
+            3.223,
+            3.56,
+            3.231,
+            3.803,
+            3.539,
+            3.38,
+            3.53,
+            3.723,
+            3.511,
+            3.632
+          ],
+          "source_line_fit_max_perpendicular_px": 4.243666355118747,
+          "source_query_count": 15,
+          "point_bindings": [
+            {
+              "kind": "edge_sample",
+              "physical_target": "Ad6.left_vertical",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "Ad6.left_vertical",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            }
+          ]
+        }
+      ],
+      "allowed_for_fit": false
+    },
+    {
+      "id": "Ad6.right_vertical",
+      "label_zh": "Ad6.right_vertical",
+      "physical_surface": "board",
+      "target_id": "Ad6.right_vertical",
+      "world_curve": "Ad6.right_vertical",
+      "review_layer": "ad2_border",
+      "segments": [
+        {
+          "uv": [
+            [
+              1173.3885756635489,
+              746.6005626482456
+            ],
+            [
+              1175.4719407744683,
+              615.218588297867
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 2,
+          "measurement_origin": "current_native_joint_straight_material_edge_fit",
+          "representative_points_share_line_estimate": true,
+          "pixels_measured_in_this_frame": false,
+          "source_evidence_measured_in_this_frame": true,
+          "source_native_readout_uv": [
+            [
+              1173.911,
+              746.609
+            ],
+            [
+              1172.626,
+              734.665
+            ],
+            [
+              1173.774,
+              722.72
+            ],
+            [
+              1173.789,
+              710.775
+            ],
+            [
+              1174.309,
+              698.83
+            ],
+            [
+              1175.259,
+              686.885
+            ],
+            [
+              1175.251,
+              674.941
+            ],
+            [
+              1173.184,
+              662.998
+            ],
+            [
+              1175.107,
+              651.052
+            ],
+            [
+              1175.249,
+              639.107
+            ],
+            [
+              1173.945,
+              627.163
+            ],
+            [
+              1175.427,
+              615.218
+            ]
+          ],
+          "source_native_transition_iqr_px": [
+            2.83,
+            3.776,
+            3.601,
+            3.49,
+            3.651,
+            3.738,
+            3.738,
+            3.534,
+            3.589,
+            3.732,
+            3.077,
+            3.767
+          ],
+          "source_line_fit_max_perpendicular_px": 1.529826915024009,
+          "source_query_count": 13,
+          "point_bindings": [
+            {
+              "kind": "edge_sample",
+              "physical_target": "Ad6.right_vertical",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "Ad6.right_vertical",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            }
+          ]
+        },
+        {
+          "uv": [
+            [
+              1175.7572575521535,
+              579.3861133041236
+            ],
+            [
+              1176.18949952997,
+              519.6617302608479
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 2,
+          "measurement_origin": "current_native_joint_straight_material_edge_fit",
+          "representative_points_share_line_estimate": true,
+          "pixels_measured_in_this_frame": false,
+          "source_evidence_measured_in_this_frame": true,
+          "source_native_readout_uv": [
+            [
+              1175.497,
+              579.384
+            ],
+            [
+              1176.047,
+              567.439
+            ],
+            [
+              1176.117,
+              555.495
+            ],
+            [
+              1175.989,
+              543.55
+            ],
+            [
+              1176.087,
+              531.606
+            ],
+            [
+              1176.104,
+              519.661
+            ]
+          ],
+          "source_native_transition_iqr_px": [
+            3.643,
+            2.858,
+            2.845,
+            3.099,
+            3.163,
+            2.876
+          ],
+          "source_line_fit_max_perpendicular_px": 0.26072603866101574,
+          "source_query_count": 7,
+          "point_bindings": [
+            {
+              "kind": "edge_sample",
+              "physical_target": "Ad6.right_vertical",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            },
+            {
+              "kind": "edge_sample",
+              "physical_target": "Ad6.right_vertical",
+              "required_residual": "point_to_named_finite_model_edge",
+              "measurement_origin": "current_native_joint_straight_material_edge_fit"
+            }
+          ]
+        }
+      ],
+      "allowed_for_fit": false
+    },
+    {
+      "id": "Ad6.print.component001",
+      "target_id": "Ad6.print.component001",
+      "label": "component001",
+      "label_zh": "Ad6.print.component001",
+      "physical_surface": "board",
+      "review_layer": "ad2_print",
+      "world_correspondence_status": "named_same_physical_print_component",
+      "segments": [
+        {
+          "uv": [
+            [
+              382.32561792348986,
+              582.4614885937656
+            ],
+            [
+              403.0885183263049,
+              582.1419812089633
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 2,
+          "transition_iqr_px": [
+            1.7923385712888429,
+            1.0772230555569982
+          ],
+          "localization_sigma_px": [
+            1.3286423804958065,
+            0.7985345111615998
+          ],
+          "measurement_origin": "current_native_material_normal_half_transition",
+          "pixels_measured_in_this_frame": true,
+          "source_query_count": 6,
+          "native_simplification_tolerance_px": 2.0
+        },
+        {
+          "uv": [
+            [
+              391.7955210238065,
+              606.255700855163
+            ],
+            [
+              389.92697731919804,
+              633.0724338480179
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 2,
+          "transition_iqr_px": [
+            5.91297697715853,
+            5.042859994336717
+          ],
+          "localization_sigma_px": [
+            4.383229782919592,
+            3.738220900175476
+          ],
+          "measurement_origin": "current_native_material_normal_half_transition",
+          "pixels_measured_in_this_frame": true,
+          "source_query_count": 9,
+          "native_simplification_tolerance_px": 3.1074183855825455
+        },
+        {
+          "uv": [
+            [
+              371.3260671075737,
+              650.2148391986772
+            ],
+            [
+              416.7524728512999,
+              651.2609311972265
+            ],
+            [
+              442.8689716876056,
+              652.3761721914576
+            ],
+            [
+              425.08018937313574,
+              651.4380797456845
+            ],
+            [
+              417.8910729602784,
+              651.2391252145148
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 5,
+          "transition_iqr_px": [
+            1.5504665344404907,
+            1.6216389345046798,
+            2.6786454419770944,
+            1.6814591593854864,
+            1.717825707281662
+          ],
+          "localization_sigma_px": [
+            1.1493450959529212,
+            1.2021044733170347,
+            1.9856526626961413,
+            1.2464485985066616,
+            1.2734067511354055
+          ],
+          "measurement_origin": "current_native_material_normal_half_transition",
+          "pixels_measured_in_this_frame": true,
+          "source_query_count": 29,
+          "native_simplification_tolerance_px": 2.0
+        },
+        {
+          "uv": [
+            [
+              402.52462223273193,
+              644.0410572262332
+            ],
+            [
+              403.19403012176065,
+              599.6614696934057
+            ],
+            [
+              403.22517388805454,
+              585.714889631192
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 3,
+          "transition_iqr_px": [
+            3.312338867599315,
+            3.7543325954830595,
+            3.326989255451939
+          ],
+          "localization_sigma_px": [
+            2.455403163528032,
+            2.783048625265426,
+            2.466263347258665
+          ],
+          "measurement_origin": "current_native_material_normal_half_transition",
+          "pixels_measured_in_this_frame": true,
+          "source_query_count": 17,
+          "native_simplification_tolerance_px": 2.1534789766290787
+        },
+        {
+          "uv": [
+            [
+              421.9602089688914,
+              563.0641626182378
+            ],
+            [
+              427.09326516822273,
+              563.9149448027435
+            ],
+            [
+              387.80580954556046,
+              562.9987915431255
+            ],
+            [
+              370.3472482547874,
+              562.7683848944811
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 4,
+          "transition_iqr_px": [
+            1.2067344765743533,
+            1.715727578478523,
+            1.6586735966874961,
+            1.5966492892138682
+          ],
+          "localization_sigma_px": [
+            0.8945400122863998,
+            1.2718514295615442,
+            1.2295578922813166,
+            1.1835799030495686
+          ],
+          "measurement_origin": "current_native_material_normal_half_transition",
+          "pixels_measured_in_this_frame": true,
+          "source_query_count": 18,
+          "native_simplification_tolerance_px": 2.0
+        }
+      ],
+      "allowed_for_fit": false,
+      "current_source_only_readout": true,
+      "model_or_template_generated_observation": false
+    },
+    {
+      "id": "Ad6.print.component003",
+      "target_id": "Ad6.print.component003",
+      "label": "component003",
+      "label_zh": "Ad6.print.component003",
+      "physical_surface": "board",
+      "review_layer": "ad2_print",
+      "world_correspondence_status": "named_same_physical_print_component",
+      "segments": [
+        {
+          "uv": [
+            [
+              611.3867719655956,
+              669.0162981429215
+            ],
+            [
+              599.7002291879863,
+              682.0865424022991
+            ],
+            [
+              596.502911960924,
+              681.8386210216166
+            ],
+            [
+              597.9706062536372,
+              684.4018531804719
+            ],
+            [
+              606.0717913103044,
+              677.4709094524052
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 5,
+          "transition_iqr_px": [
+            1.4889513670019996,
+            3.429186630272876,
+            5.505954339379379,
+            4.480636078712948,
+            5.951975294100947
+          ],
+          "localization_sigma_px": [
+            1.1037445270585615,
+            2.5420212233305235,
+            4.0815080351218525,
+            3.3214500212846167,
+            4.4121388392149345
+          ],
+          "measurement_origin": "current_native_material_normal_half_transition",
+          "pixels_measured_in_this_frame": true,
+          "source_query_count": 11,
+          "native_simplification_tolerance_px": 2.0575119781637254
+        }
+      ],
+      "allowed_for_fit": false,
+      "current_source_only_readout": true,
+      "model_or_template_generated_observation": false
+    },
+    {
+      "id": "Ad6.print.component004",
+      "target_id": "Ad6.print.component004",
+      "label": "component004",
+      "label_zh": "Ad6.print.component004",
+      "physical_surface": "board",
+      "review_layer": "ad2_print",
+      "world_correspondence_status": "named_same_physical_print_component",
+      "segments": [
+        {
+          "uv": [
+            [
+              716.1476945871459,
+              562.0067438349553
+            ],
+            [
+              706.6431523725296,
+              561.4513590166835
+            ],
+            [
+              710.0773335297011,
+              579.9240777252603
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 3,
+          "transition_iqr_px": [
+            4.030635289422969,
+            4.6007169000024835,
+            2.1333204137183435
+          ],
+          "localization_sigma_px": [
+            2.9878690062438618,
+            3.410464714605251,
+            1.5814087573894318
+          ],
+          "measurement_origin": "current_native_material_normal_half_transition",
+          "pixels_measured_in_this_frame": true,
+          "source_query_count": 8,
+          "native_simplification_tolerance_px": 2.0
+        },
+        {
+          "uv": [
+            [
+              709.8785940860865,
+              586.8770990715575
+            ],
+            [
+              706.4399623088838,
+              632.0238092015759
+            ],
+            [
+              705.8097202078582,
+              635.4868570048973
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 3,
+          "transition_iqr_px": [
+            2.345552265060708,
+            5.465796532906001,
+            5.974742896621236
+          ],
+          "localization_sigma_px": [
+            1.738734073432697,
+            4.051739461012603,
+            4.429016231742947
+          ],
+          "measurement_origin": "current_native_material_normal_half_transition",
+          "pixels_measured_in_this_frame": true,
+          "source_query_count": 15,
+          "native_simplification_tolerance_px": 2.397498882264541
+        },
+        {
+          "uv": [
+            [
+              767.8707140315364,
+              657.4349463948712
+            ],
+            [
+              780.3645452416602,
+              640.7202757258685
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 2,
+          "transition_iqr_px": [
+            5.359697336445631,
+            4.988070241751707
+          ],
+          "localization_sigma_px": [
+            3.973089204185049,
+            3.6976058130109024
+          ],
+          "measurement_origin": "current_native_material_normal_half_transition",
+          "pixels_measured_in_this_frame": true,
+          "source_query_count": 7,
+          "native_simplification_tolerance_px": 2.7257326991597015
+        },
+        {
+          "uv": [
+            [
+              743.9656559034876,
+              548.3751573162882
+            ],
+            [
+              722.5361992497377,
+              546.9753255458644
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 2,
+          "transition_iqr_px": [
+            1.9525738518981086,
+            3.5710030280634886
+          ],
+          "localization_sigma_px": [
+            1.447423166714684,
+            2.647148278772045
+          ],
+          "measurement_origin": "current_native_material_normal_half_transition",
+          "pixels_measured_in_this_frame": true,
+          "source_query_count": 7,
+          "native_simplification_tolerance_px": 2.0
+        }
+      ],
+      "allowed_for_fit": false,
+      "current_source_only_readout": true,
+      "model_or_template_generated_observation": false
+    },
+    {
+      "id": "Ad6.print.component007",
+      "target_id": "Ad6.print.component007",
+      "label": "component007",
+      "label_zh": "Ad6.print.component007",
+      "physical_surface": "board",
+      "review_layer": "ad2_print",
+      "world_correspondence_status": "named_same_physical_print_component",
+      "segments": [
+        {
+          "uv": [
+            [
+              1113.4277236298828,
+              679.0777532089494
+            ],
+            [
+              1117.681874100547,
+              679.0782809951561
+            ],
+            [
+              1121.361461922475,
+              639.7774853305516
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 3,
+          "transition_iqr_px": [
+            4.2451729859427765,
+            5.763549078164646,
+            3.8907989269346004
+          ],
+          "localization_sigma_px": [
+            3.14690362189976,
+            4.272460398935986,
+            2.8842097308633066
+          ],
+          "measurement_origin": "current_native_material_normal_half_transition",
+          "pixels_measured_in_this_frame": true,
+          "source_query_count": 14,
+          "native_simplification_tolerance_px": 3.303503445710668
+        },
+        {
+          "uv": [
+            [
+              1109.1071106469246,
+              545.4821356813344
+            ],
+            [
+              1106.5239932781303,
+              543.070037535037
+            ],
+            [
+              1109.6273554613538,
+              548.6584343373779
+            ],
+            [
+              1108.2478621877588,
+              562.388444215146
+            ]
+          ],
+          "closed": false,
+          "vertex_count": 4,
+          "transition_iqr_px": [
+            4.848134767399216,
+            2.8429093589439294,
+            3.4842310047250376,
+            2.183247104871488
+          ],
+          "localization_sigma_px": [
+            3.5938730670120207,
+            2.10741983613338,
+            2.5828250590993607,
+            1.618418906502215
+          ],
+          "measurement_origin": "current_native_material_normal_half_transition",
+          "pixels_measured_in_this_frame": true,
+          "source_query_count": 7,
+          "native_simplification_tolerance_px": 2.015090201051127
+        }
+      ],
+      "allowed_for_fit": false,
+      "current_source_only_readout": true,
+      "model_or_template_generated_observation": false
+    },
+    {
+      "id": "ice.F4:outer",
+      "target_id": "ice.F4:outer",
+      "label_zh": "F4 外层材料界面",
+      "world_curve": "F4:outer",
+      "measurement_operator": "material_interface",
+      "material_signal": "dark",
+      "material_transition": "dark_to_light",
+      "segments": [
+        {
+          "uv": [
+            [
+              176.9761,
+              862.2393
+            ],
+            [
+              251.8184,
+              856.0613
+            ]
+          ],
+          "vertex_count": 2,
+          "closed": false,
+          "sigma_px": [
+            6.494663819930913,
+            11.659876382354954
+          ],
+          "source_evidence": [
+            {
+              "packet_reference": "ice_source_readout_packet",
+              "source_feature_id": "ice.F4:outer",
+              "source_segment_index": 0,
+              "source_vertex_index": 0
+            },
+            {
+              "packet_reference": "ice_source_readout_packet",
+              "source_feature_id": "ice.F4:outer",
+              "source_segment_index": 0,
+              "source_vertex_index": 1
+            }
+          ],
+          "measurement_origin": "same_frame_joint_physical_circle_family_fit",
+          "pixels_measured_in_this_frame": false,
+          "representative_points_share_circle_family_estimate": true,
+          "source_evidence_group_id": "native_circle_525056_F4:outer",
+          "source_evidence_measured_in_this_frame": true,
+          "individual_native_pixel_readouts": false,
+          "hidden_span_filled": false,
+          "current_native_query_index_interval": [
+            0,
+            2
+          ],
+          "missing_material_station_spanned": false
+        },
+        {
+          "uv": [
+            [
+              181.851,
+              824.2917
+            ],
+            [
+              27.4594,
+              814.2679
+            ]
+          ],
+          "vertex_count": 2,
+          "closed": false,
+          "sigma_px": [
+            3.153425793136755,
+            2.182027597315602
+          ],
+          "source_evidence": [
+            {
+              "packet_reference": "ice_source_readout_packet",
+              "source_feature_id": "ice.F4:outer",
+              "source_segment_index": 1,
+              "source_vertex_index": 0
+            },
+            {
+              "packet_reference": "ice_source_readout_packet",
+              "source_feature_id": "ice.F4:outer",
+              "source_segment_index": 1,
+              "source_vertex_index": 1
+            }
+          ],
+          "measurement_origin": "same_frame_joint_physical_circle_family_fit",
+          "pixels_measured_in_this_frame": false,
+          "representative_points_share_circle_family_estimate": true,
+          "source_evidence_group_id": "native_circle_525056_F4:outer",
+          "source_evidence_measured_in_this_frame": true,
+          "individual_native_pixel_readouts": false,
+          "hidden_span_filled": false,
+          "current_native_query_index_interval": [
+            6,
+            10
+          ],
+          "missing_material_station_spanned": false
+        },
+        {
+          "uv": [
+            [
+              18.2903,
+              868.1832
+            ],
+            [
+              167.6055,
+              862.778
+            ]
+          ],
+          "vertex_count": 2,
+          "closed": false,
+          "sigma_px": [
+            2.6494095051539706,
+            6.165563253353073
+          ],
+          "source_evidence": [
+            {
+              "packet_reference": "ice_source_readout_packet",
+              "source_feature_id": "ice.F4:outer",
+              "source_segment_index": 2,
+              "source_vertex_index": 0
+            },
+            {
+              "packet_reference": "ice_source_readout_packet",
+              "source_feature_id": "ice.F4:outer",
+              "source_segment_index": 2,
+              "source_vertex_index": 1
+            }
+          ],
+          "measurement_origin": "same_frame_joint_physical_circle_family_fit",
+          "pixels_measured_in_this_frame": false,
+          "representative_points_share_circle_family_estimate": true,
+          "source_evidence_group_id": "native_circle_525056_F4:outer",
+          "source_evidence_measured_in_this_frame": true,
+          "individual_native_pixel_readouts": false,
+          "hidden_span_filled": false,
+          "current_native_query_index_interval": [
+            13,
+            17
+          ],
+          "missing_material_station_spanned": false
+        }
+      ],
+      "point_count": 6,
+      "source_evidence_measured_in_this_frame": true,
+      "projected_uv_used_as_observations": false,
+      "user_confirmed": false,
+      "physical_identity_evidence": "same-shot physical template and each current native material readout",
+      "status": "current_source_candidates_waiting_visual_and_user_review",
+      "source_schematic_material_signal": "dark",
+      "extraction_diagnostic": {
+        "query_count": 18,
+        "eligible_native_material_readouts": 14,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "joint_group_navigation": {
+        "kind": "shared_current_source_ground_circle_family_affine_projection_correction",
+        "house_id": "F4",
+        "source_clock_anchor": 681,
+        "source_identity_authority": "8a28_circle_with_one_current_camera_ground_plane_projection",
+        "common_world_circle_center": [
+          -65.99607010350313,
+          33.34028414825885
+        ],
+        "common_radius_scale": 1.0,
+        "shared_source_affine_parameters": [
+          39.99999999999999,
+          29.99999999855208,
+          -0.05999999999994598,
+          0.049999999999999996,
+          0.019114203742250854,
+          -0.023615590403045107
+        ],
+        "source_projection_correction_fitted_only_to_current_native_material": true,
+        "scene_radius_ratios": {
+          "outer": 1.0,
+          "middle": 0.6722234383826573,
+          "inner": 0.3400676092609255
+        },
+        "no_ring_independent_center_or_scale": true,
+        "maximum_normal_material_to_shared_circle_px": 2.165420863762656,
+        "raw_material_residuals_before_rejection_px": [
+          1.8304278861024872,
+          2.165420863762656,
+          1.2872263936022632,
+          12.865377269004885,
+          0.33200767919502544,
+          0.8399997260476304,
+          0.3058367782381661,
+          0.09796602894729373,
+          0.03231720012302455,
+          0.9747684081921928,
+          0.05941458356198694,
+          0.6958026125731192,
+          0.08927015823572054,
+          0.302239434431771
+        ],
+        "maximum_true_euclidean_material_to_fitted_curve_px": 2.1653976217184487,
+        "inferred_projected_uv_not_emitted": true
+      },
+      "source_evidence_group_id": "native_circle_525056_F4:outer",
+      "source_circle_fit": {
+        "current_frame_only": true,
+        "actual_native_readout_count": 13,
+        "shared_physical_family_projection": true,
+        "material_readouts_are_not_model_or_temporal_pixels": true,
+        "direct_readouts_reference": {
+          "packet_reference": "ice_source_readout_packet",
+          "source_feature_id": "ice.F4:outer",
+          "field": "source_circle_fit.direct_readouts"
+        }
+      },
+      "geometric_interpretation": {
+        "kind": "projected_physical_circle_ellipse",
+        "inference_only": true,
+        "center_uv": [
+          -325.4034729003906,
+          836.5584716796875
+        ],
+        "axes_px": [
+          65.26129913330078,
+          1242.146728515625
+        ],
+        "angle_degrees": 90.74295043945312,
+        "maximum_readout_to_ellipse_px": 2.165420863762656,
+        "inferred_uv_not_emitted_as_direct_material_readouts": true
+      },
+      "navigation_origin": "8a28_circle_with_one_current_camera_ground_plane_projection",
+      "note_zh": "各层共同使用同一冰平面投影下的实体圆心及场景半径比例；各代表点只在本帧已确认材料站位取样并共享本帧源圆拟合；原始材料读数单独保留，遮挡/缺失不补，独立圈心/尺度及靶圈填充色带中点禁止。",
+      "native_visibility_segmentation": {
+        "any_missing_source_query_splits_arc": true,
+        "no_raw_material_readout_changed": true,
+        "no_curve_geometry_changed": true,
+        "single_station_segments_are_correlated_source_supported_points": true
+      }
+    },
+    {
+      "id": "ice.lane4:edge2",
+      "target_id": "ice.lane4:edge2",
+      "label_zh": "lane4 edge2",
+      "world_curve": "lane4:edge2",
+      "measurement_operator": "paint_center",
+      "material_signal": "dark",
+      "material_transition": null,
+      "segments": [
+        {
+          "uv": [
+            [
+              351.7361,
+              932.4557
+            ],
+            [
+              415.6916,
+              934.8426
+            ]
+          ],
+          "vertex_count": 2,
+          "closed": false,
+          "sigma_px": [
+            1.0,
+            1.0
+          ],
+          "measurement_origin": "same_frame_joint_straight_edge_fit",
+          "representative_points_share_line_estimate": true,
+          "source_evidence_group_id": "native_line_525056_lane4:edge2",
+          "pixels_measured_in_this_frame": false,
+          "source_evidence_measured_in_this_frame": true,
+          "individual_native_pixel_readouts": false,
+          "hidden_span_filled": false,
+          "source_evidence": [
+            {
+              "packet_reference": "ice_source_readout_packet",
+              "source_feature_id": "ice.lane4:edge2",
+              "source_segment_index": 0,
+              "source_vertex_index": 0
+            },
+            {
+              "packet_reference": "ice_source_readout_packet",
+              "source_feature_id": "ice.lane4:edge2",
+              "source_segment_index": 0,
+              "source_vertex_index": 1
+            }
+          ]
+        }
+      ],
+      "point_count": 2,
+      "source_evidence_measured_in_this_frame": true,
+      "projected_uv_used_as_observations": false,
+      "user_confirmed": false,
+      "physical_identity_evidence": "same-shot physical template and each current native material readout",
+      "status": "current_source_candidates_waiting_visual_and_user_review",
+      "native_static_line_identity_policy": {
+        "current_identity_constrained": true,
+        "identity_source": "previous_native_material_with_current_source_image_motion",
+        "native_image_coordinates_not_generated": true,
+        "reference_frame": 1050,
+        "normal_identity_tolerance_px": 7.867061138153076,
+        "search_radius_px": 15.867061138153076,
+        "registration_error_px": 0.9335305690765381,
+        "maximum_registration_p95_px": 0.9335305690765381,
+        "motion_quality_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\repair_20261014\\temporal_diagnostics\\all_source_motion_baseline.json",
+        "current_source_motion_support_hull_uv": [
+          [
+            1191.2637403721226,
+            1041.3434287481568
+          ],
+          [
+            1183.323087728676,
+            1069.3150764940897
+          ],
+          [
+            1159.3618006917884,
+            1070.3175719090332
+          ],
+          [
+            87.44277825968315,
+            1057.451557849554
+          ],
+          [
+            63.499728472545414,
+            1005.388149105963
+          ],
+          [
+            51.87818460548234,
+            848.3084942567036
+          ],
+          [
+            68.05373034572747,
+            796.3307092401839
+          ],
+          [
+            92.1156928316955,
+            793.3436483360815
+          ],
+          [
+            1187.254263623778,
+            1031.3556127888812
+          ]
+        ],
+        "motion_outside_support_is_not_validation": true
+      },
+      "extraction_diagnostic": {
+        "query_count": 59,
+        "measured_count": 4,
+        "eligible_native_material_readouts": 4,
+        "acceptance": "current source two-sided material contrast plus coherent straight source family; absence is not filled from a guide"
+      },
+      "source_evidence_group_id": "native_line_525056_lane4:edge2",
+      "source_line_fit": {
+        "point_origin": [
+          -120.0,
+          914.2297332828203
+        ],
+        "unit_tangent": [
+          0.9992618174804284,
+          0.03841640438291094
+        ],
+        "unit_normal": [
+          -0.03841640438291094,
+          0.9992618174804284
+        ],
+        "normal_offset_coefficients": [
+          -0.0011215841276006866,
+          0.61954994322741
+        ],
+        "current_frame_only": true,
+        "actual_native_readout_count": 4,
+        "residual_max_px": 0.5574553254212123,
+        "parallel_family_direction_used_for_candidate_disambiguation": false,
+        "parallel_family_source_slope": null,
+        "direct_readouts_reference": {
+          "packet_reference": "ice_source_readout_packet",
+          "source_feature_id": "ice.lane4:edge2",
+          "field": "source_line_fit.direct_readouts"
+        }
+      },
+      "geometric_interpretation": {
+        "kind": "straight_ice_paint_centerline",
+        "inference_only": true,
+        "current_frame_native_measurement": true
+      },
+      "note_zh": "当前帧原图的双边材料读数共同确定直线；均匀稀疏代表点共享同一估计，人物和字幕遮挡不补点。",
+      "navigation_origin": "previous_native_material_with_current_source_image_motion",
+      "parallel_family_geometry_check": {
+        "reference_origin": "camera_parallel_direction_stabilised_by_current_source_human_labelled_lines",
+        "expected_image_slope": 0.03701041314652838,
+        "orientation_departure_over_readout_span_px": 0.2784884381063112,
+        "current_frame_material_support_required": true
+      }
+    },
+    {
+      "id": "ice.lane3:edge0",
+      "target_id": "ice.lane3:edge0",
+      "label_zh": "lane3 edge0",
+      "world_curve": "lane3:edge0",
+      "measurement_operator": "paint_center",
+      "material_signal": "dark",
+      "material_transition": null,
+      "segments": [
+        {
+          "uv": [
+            [
+              63.8937,
+              998.1852
+            ],
+            [
+              159.813,
+              1002.1243
+            ]
+          ],
+          "vertex_count": 2,
+          "closed": false,
+          "sigma_px": [
+            1.3608783234374369,
+            1.3608783234374369
+          ],
+          "measurement_origin": "same_frame_joint_straight_edge_fit",
+          "representative_points_share_line_estimate": true,
+          "source_evidence_group_id": "native_line_525056_lane3:edge0",
+          "pixels_measured_in_this_frame": false,
+          "source_evidence_measured_in_this_frame": true,
+          "individual_native_pixel_readouts": false,
+          "hidden_span_filled": false,
+          "source_evidence": [
+            {
+              "packet_reference": "ice_source_readout_packet",
+              "source_feature_id": "ice.lane3:edge0",
+              "source_segment_index": 0,
+              "source_vertex_index": 0
+            },
+            {
+              "packet_reference": "ice_source_readout_packet",
+              "source_feature_id": "ice.lane3:edge0",
+              "source_segment_index": 0,
+              "source_vertex_index": 1
+            }
+          ]
+        },
+        {
+          "uv": [
+            [
+              576.4624,
+              1019.2348
+            ],
+            [
+              671.3825,
+              1023.1329
+            ]
+          ],
+          "vertex_count": 2,
+          "closed": false,
+          "sigma_px": [
+            1.3608783234374369,
+            1.3608783234374369
+          ],
+          "measurement_origin": "same_frame_joint_straight_edge_fit",
+          "representative_points_share_line_estimate": true,
+          "source_evidence_group_id": "native_line_525056_lane3:edge0",
+          "pixels_measured_in_this_frame": false,
+          "source_evidence_measured_in_this_frame": true,
+          "individual_native_pixel_readouts": false,
+          "hidden_span_filled": false,
+          "source_evidence": [
+            {
+              "packet_reference": "ice_source_readout_packet",
+              "source_feature_id": "ice.lane3:edge0",
+              "source_segment_index": 1,
+              "source_vertex_index": 0
+            },
+            {
+              "packet_reference": "ice_source_readout_packet",
+              "source_feature_id": "ice.lane3:edge0",
+              "source_segment_index": 1,
+              "source_vertex_index": 1
+            }
+          ]
+        },
+        {
+          "uv": [
+            [
+              1024.0857,
+              1037.6174
+            ],
+            [
+              1119.0059,
+              1041.5155
+            ]
+          ],
+          "vertex_count": 2,
+          "closed": false,
+          "sigma_px": [
+            1.3608783234374369,
+            1.3608783234374369
+          ],
+          "measurement_origin": "same_frame_joint_straight_edge_fit",
+          "representative_points_share_line_estimate": true,
+          "source_evidence_group_id": "native_line_525056_lane3:edge0",
+          "pixels_measured_in_this_frame": false,
+          "source_evidence_measured_in_this_frame": true,
+          "individual_native_pixel_readouts": false,
+          "hidden_span_filled": false,
+          "source_evidence": [
+            {
+              "packet_reference": "ice_source_readout_packet",
+              "source_feature_id": "ice.lane3:edge0",
+              "source_segment_index": 2,
+              "source_vertex_index": 0
+            },
+            {
+              "packet_reference": "ice_source_readout_packet",
+              "source_feature_id": "ice.lane3:edge0",
+              "source_segment_index": 2,
+              "source_vertex_index": 1
+            }
+          ]
+        }
+      ],
+      "point_count": 6,
+      "source_evidence_measured_in_this_frame": true,
+      "projected_uv_used_as_observations": false,
+      "user_confirmed": false,
+      "physical_identity_evidence": "same-shot physical template and each current native material readout",
+      "status": "current_source_candidates_waiting_visual_and_user_review",
+      "native_static_line_identity_policy": {
+        "current_identity_constrained": true,
+        "identity_source": "previous_native_material_with_current_source_image_motion",
+        "native_image_coordinates_not_generated": true,
+        "reference_frame": 1050,
+        "normal_identity_tolerance_px": 7.867061138153076,
+        "search_radius_px": 15.867061138153076,
+        "registration_error_px": 0.9335305690765381,
+        "maximum_registration_p95_px": 0.9335305690765381,
+        "motion_quality_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\repair_20261014\\temporal_diagnostics\\all_source_motion_baseline.json",
+        "current_source_motion_support_hull_uv": [
+          [
+            1191.2637403721226,
+            1041.3434287481568
+          ],
+          [
+            1183.323087728676,
+            1069.3150764940897
+          ],
+          [
+            1159.3618006917884,
+            1070.3175719090332
+          ],
+          [
+            87.44277825968315,
+            1057.451557849554
+          ],
+          [
+            63.499728472545414,
+            1005.388149105963
+          ],
+          [
+            51.87818460548234,
+            848.3084942567036
+          ],
+          [
+            68.05373034572747,
+            796.3307092401839
+          ],
+          [
+            92.1156928316955,
+            793.3436483360815
+          ],
+          [
+            1187.254263623778,
+            1031.3556127888812
+          ]
+        ],
+        "motion_outside_support_is_not_validation": true
+      },
+      "extraction_diagnostic": {
+        "query_count": 55,
+        "measured_count": 10,
+        "eligible_native_material_readouts": 10,
+        "acceptance": "current source two-sided material contrast plus coherent straight source family; absence is not filled from a guide"
+      },
+      "source_evidence_group_id": "native_line_525056_lane3:edge0",
+      "source_line_fit": {
+        "point_origin": [
+          -120.0,
+          990.1873855618164
+        ],
+        "unit_tangent": [
+          0.9990868093521267,
+          0.04272642482805059
+        ],
+        "unit_normal": [
+          -0.04272642482805059,
+          0.9990868093521267
+        ],
+        "normal_offset_coefficients": [
+          -0.001695498860476621,
+          0.44544730331173527
+        ],
+        "current_frame_only": true,
+        "actual_native_readout_count": 10,
+        "residual_max_px": 3.371574653045773,
+        "parallel_family_direction_used_for_candidate_disambiguation": false,
+        "parallel_family_source_slope": null,
+        "direct_readouts_reference": {
+          "packet_reference": "ice_source_readout_packet",
+          "source_feature_id": "ice.lane3:edge0",
+          "field": "source_line_fit.direct_readouts"
+        }
+      },
+      "geometric_interpretation": {
+        "kind": "straight_ice_paint_centerline",
+        "inference_only": true,
+        "current_frame_native_measurement": true
+      },
+      "note_zh": "当前帧原图的双边材料读数共同确定直线；均匀稀疏代表点共享同一估计，人物和字幕遮挡不补点。",
+      "navigation_origin": "previous_native_material_with_current_source_image_motion",
+      "parallel_family_geometry_check": {
+        "reference_origin": "camera_parallel_direction_stabilised_by_current_source_human_labelled_lines",
+        "expected_image_slope": 0.04137817838643192,
+        "orientation_departure_over_readout_span_px": 0.32813431412078553,
+        "current_frame_material_support_required": true
+      }
+    }
+  ],
+  "point_count": 102,
+  "status": "awaiting_user_review_of_first_shot",
+  "user_accepted": false,
+  "user_hard_point_ceiling": 500,
+  "observation_coordinates_from_projection": false,
+  "optimization_performed": false,
+  "excluded_features_by_user": [
+    "blue_strip_lower_edge",
+    "yellow_strip_upper_edge",
+    "board_panel_seam"
+  ],
+  "unresolved_source_regions": [],
+  "source_correlated_groups": [
+    {
+      "id": "board.top.upper_long_side_current_source_shared_line",
+      "feature_id": "board_top.upper_long_side",
+      "source": "same_current_native_edge_joint_line_fit",
+      "representative_points_share_line_estimate": true
+    },
+    {
+      "id": "board.contact.upper_long_side_current_source_shared_line",
+      "feature_id": "board_contact.upper_long_side",
+      "source": "same_current_native_edge_joint_line_fit",
+      "representative_points_share_line_estimate": true
+    },
+    {
+      "id": "board.top.upper_left_current_source_shared_line",
+      "feature_id": "board_top.upper_left",
+      "source": "same_current_native_edge_joint_line_fit",
+      "representative_points_share_line_estimate": true
+    },
+    {
+      "id": "board.contact.upper_left_current_source_shared_line",
+      "feature_id": "board_contact.upper_left",
+      "source": "same_current_native_edge_joint_line_fit",
+      "representative_points_share_line_estimate": true
+    },
+    {
+      "id": "Ad6.top_edge_current_source_shared_line",
+      "feature_id": "Ad6.top_edge",
+      "source": "same_current_native_edge_joint_line_fit",
+      "representative_points_share_line_estimate": true
+    },
+    {
+      "id": "Ad6.bottom_edge_current_source_shared_line",
+      "feature_id": "Ad6.bottom_edge",
+      "source": "same_current_native_edge_joint_line_fit",
+      "representative_points_share_line_estimate": true
+    },
+    {
+      "id": "Ad6.left_vertical_current_source_shared_line",
+      "feature_id": "Ad6.left_vertical",
+      "source": "same_current_native_edge_joint_line_fit",
+      "representative_points_share_line_estimate": true
+    },
+    {
+      "id": "Ad6.right_vertical_current_source_shared_line",
+      "feature_id": "Ad6.right_vertical",
+      "source": "same_current_native_edge_joint_line_fit",
+      "representative_points_share_line_estimate": true
+    },
+    {
+      "group_id": "native_circle_525056_F4:outer",
+      "target_id": "ice.F4:outer",
+      "native_source_pts": 525056,
+      "representative_point_count": 6,
+      "correlation_reason": "same current-frame measured physical curve estimate; representatives are not independent measurements",
+      "native_individual_readout_count": 13
+    },
+    {
+      "group_id": "native_line_525056_lane4:edge2",
+      "target_id": "ice.lane4:edge2",
+      "native_source_pts": 525056,
+      "representative_point_count": 2,
+      "correlation_reason": "same current-frame measured physical curve estimate; representatives are not independent measurements",
+      "native_individual_readout_count": 4
+    },
+    {
+      "group_id": "native_line_525056_lane3:edge0",
+      "target_id": "ice.lane3:edge0",
+      "native_source_pts": 525056,
+      "representative_point_count": 6,
+      "correlation_reason": "same current-frame measured physical curve estimate; representatives are not independent measurements",
+      "native_individual_readout_count": 10
+    }
+  ],
+  "diagnostics": {
+    "board_point_count": 50,
+    "printed_point_count": 38,
+    "material_targets": [
+      "Ad6.bottom_edge",
+      "Ad6.left_vertical",
+      "Ad6.print.component000",
+      "Ad6.print.component001",
+      "Ad6.print.component002",
+      "Ad6.print.component003",
+      "Ad6.print.component004",
+      "Ad6.print.component005",
+      "Ad6.print.component007",
+      "Ad6.right_vertical",
+      "Ad6.top_edge",
+      "board.contact.upper_left",
+      "board.contact.upper_long_side",
+      "board.top.upper_left",
+      "board.top.upper_long_side"
+    ],
+    "native_readout_admits_only_clear_profile_pairs": true,
+    "source_blur_suppresses_unresolved_glyph_detail": true
+  },
+  "source_unknown_print_rejections": [
+    {
+      "target_id": "Ad6.print.component000",
+      "reason": "short_isolated_print_fragment_has_insufficient_current_source_shape_to_identify_named_letter_side",
+      "uv": [
+        [
+          195.1795402409442,
+          659.0397621574473
+        ],
+        [
+          195.69755241358325,
+          648.560285732041
+        ]
+      ],
+      "points": 2
+    },
+    {
+      "target_id": "Ad6.print.component000",
+      "reason": "short_isolated_print_fragment_has_insufficient_current_source_shape_to_identify_named_letter_side",
+      "uv": [
+        [
+          196.41627992622452,
+          588.1670619951009
+        ],
+        [
+          209.87119912901008,
+          587.5607196082885
+        ]
+      ],
+      "points": 2
+    },
+    {
+      "target_id": "Ad6.print.component000",
+      "reason": "short_isolated_print_fragment_has_insufficient_current_source_shape_to_identify_named_letter_side",
+      "uv": [
+        [
+          217.18567637842435,
+          568.7785666980985
+        ],
+        [
+          201.14697291663123,
+          568.0682986359075
+        ]
+      ],
+      "points": 2
+    },
+    {
+      "target_id": "Ad6.print.component002",
+      "reason": "short_isolated_print_fragment_has_insufficient_current_source_shape_to_identify_named_letter_side",
+      "uv": [
+        [
+          541.7414430161062,
+          615.2087408160791
+        ],
+        [
+          530.3029004565224,
+          628.5242841087947
+        ]
+      ],
+      "points": 2
+    },
+    {
+      "target_id": "Ad6.print.component003",
+      "reason": "short_isolated_print_fragment_has_insufficient_current_source_shape_to_identify_named_letter_side",
+      "uv": [
+        [
+          616.0508255144267,
+          642.0513729790192
+        ],
+        [
+          609.3536014828447,
+          650.1266872791947
+        ]
+      ],
+      "points": 2
+    },
+    {
+      "target_id": "Ad6.print.component003",
+      "reason": "short_isolated_print_fragment_has_insufficient_current_source_shape_to_identify_named_letter_side",
+      "uv": [
+        [
+          625.7373308938847,
+          662.9489808857069
+        ],
+        [
+          633.1533629250006,
+          653.9305390877095
+        ]
+      ],
+      "points": 2
+    },
+    {
+      "target_id": "Ad6.print.component003",
+      "reason": "short_isolated_print_fragment_has_insufficient_current_source_shape_to_identify_named_letter_side",
+      "uv": [
+        [
+          625.9229370653084,
+          543.9609695141379
+        ],
+        [
+          615.7608579825412,
+          541.3930896577768
+        ]
+      ],
+      "points": 2
+    },
+    {
+      "target_id": "Ad6.print.component005",
+      "reason": "short_isolated_print_fragment_has_insufficient_current_source_shape_to_identify_named_letter_side",
+      "uv": [
+        [
+          912.4761413070504,
+          645.2140312249933
+        ],
+        [
+          909.2051459218615,
+          627.667326457301
+        ]
+      ],
+      "points": 2
+    },
+    {
+      "target_id": "Ad6.print.component007",
+      "reason": "short_isolated_print_fragment_has_insufficient_current_source_shape_to_identify_named_letter_side",
+      "uv": [
+        [
+          1078.6013710408624,
+          603.0582736025543
+        ],
+        [
+          1087.5023266292353,
+          603.505570158581
+        ]
+      ],
+      "points": 2
+    },
+    {
+      "target_id": "Ad6.print.component007",
+      "reason": "short_isolated_print_fragment_has_insufficient_current_source_shape_to_identify_named_letter_side",
+      "uv": [
+        [
+          1106.8480383637,
+          661.8348174174772
+        ],
+        [
+          1109.301760461179,
+          667.7301350961287
+        ],
+        [
+          1105.7737879562421,
+          679.392236745199
+        ]
+      ],
+      "points": 3
+    },
+    {
+      "target_id": "Ad6.print.component002",
+      "reason": "isolated_component_remnant_without_enough_shape_to_confirm_its_print_identity",
+      "uv": [
+        [
+          508.5769583569277,
+          629.9680485711203
+        ],
+        [
+          480.353354942502,
+          655.7323417158495
+        ]
+      ],
+      "points": 2
+    }
+  ],
+  "repair_baseline_candidate_sha256": "2ef3b04a891a3184de1d8a42991e7d3f54ddc44d153e0085775f81b059d2f221",
+  "static_material_identity_policy": "retain_source_identifiable_entities_and_reject_unresolved_fragments_candidate_not_accuracy_acceptance",
+  "board_source_readout_packet": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\repair_20261014\\board_candidates\\001051.json",
+    "sha256": "f96626be31b997c78aac48281fba68e97643e8aa9633d0814a51144d309c44d9"
+  },
+  "ice_source_readout_packet": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\repair_20261014\\ice_candidates\\001051.json",
+    "sha256": "4f5926bfc46f704df9de531f6850886a42df81dd65bb938f37394a896125903d"
+  },
+  "inferred_segments": [],
+  "ice_feature_coverage": [
+    {
+      "target_id": "ice.F4:outer",
+      "points": 6,
+      "navigation_origin": "8a28_circle_with_one_current_camera_ground_plane_projection",
+      "native_material_diagnostic": {
+        "query_count": 18,
+        "eligible_native_material_readouts": 14,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": null
+    },
+    {
+      "target_id": "ice.F4:middle",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 7,
+        "eligible_native_material_readouts": 2,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.F4:inner",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.R4:outer",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.R4:middle",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.R4:inner",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.F3:outer",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.F3:middle",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.F3:inner",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.R3:outer",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.R3:middle",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.R3:inner",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.F2:outer",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.F2:middle",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.F2:inner",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.R2:outer",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.R2:middle",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.R2:inner",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.F1:outer",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.F1:middle",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.F1:inner",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.R1:outer",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.R1:middle",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.R1:inner",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.C0:outer",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.A1:outer",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.A2:outer",
+      "points": 0,
+      "missing_reason": "Fragmented grey-band readouts did not establish a visible circular paint material or independent physical identity",
+      "query_qualification_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\repair_20261014\\temporal_diagnostics\\extra_ice_unqualified_query_domains.json",
+      "physical_model_target_removed": false
+    },
+    {
+      "target_id": "ice.lane4:edge0",
+      "points": 0,
+      "missing_reason": "The short-side/near-board line query crossed grey advertising reflections; no identified straight material boundary or named paint strip",
+      "query_qualification_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\repair_20261014\\temporal_diagnostics\\extra_ice_unqualified_query_domains.json",
+      "physical_model_target_removed": false
+    },
+    {
+      "target_id": "ice.lane4:edge1",
+      "points": 0,
+      "missing_reason": "The short-side/near-board line query crossed grey advertising reflections; no identified straight material boundary or named paint strip",
+      "query_qualification_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\repair_20261014\\temporal_diagnostics\\extra_ice_unqualified_query_domains.json",
+      "physical_model_target_removed": false
+    },
+    {
+      "target_id": "ice.lane4:edge2",
+      "points": 2,
+      "navigation_origin": "previous_native_material_with_current_source_image_motion",
+      "native_material_diagnostic": {
+        "query_count": 59,
+        "measured_count": 4,
+        "eligible_native_material_readouts": 4,
+        "acceptance": "current source two-sided material contrast plus coherent straight source family; absence is not filled from a guide"
+      },
+      "missing_reason": null
+    },
+    {
+      "target_id": "ice.lane3:edge0",
+      "points": 6,
+      "navigation_origin": "previous_native_material_with_current_source_image_motion",
+      "native_material_diagnostic": {
+        "query_count": 55,
+        "measured_count": 10,
+        "eligible_native_material_readouts": 10,
+        "acceptance": "current source two-sided material contrast plus coherent straight source family; absence is not filled from a guide"
+      },
+      "missing_reason": null
+    },
+    {
+      "target_id": "ice.goal_line_left:segment0",
+      "points": 0,
+      "missing_reason": "Only smooth grey/blue advertising reflection or ambiguous brightness bands were visible near the model query; no identified goal-line paint",
+      "query_qualification_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\repair_20261014\\temporal_diagnostics\\extra_ice_unqualified_query_domains.json",
+      "physical_model_target_removed": false
+    },
+    {
+      "target_id": "ice.A3:outer",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 38,
+        "eligible_native_material_readouts": 2,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.A4:outer",
+      "points": 0,
+      "navigation_origin": "shared_nested_world_circle_family",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current native narrow-paint midpoint or declared filled-house material interface, jointly consistent with one physical circle family"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.house_connection_F3_R3:segment0",
+      "points": 0,
+      "navigation_origin": "user_manual_annotation_20261014:500:distortion_aware_ground_transport",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current source two-sided material contrast plus coherent straight source family; absence is not filled from a guide"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.house_connection_F4_R4:segment0",
+      "points": 0,
+      "navigation_origin": "8a28_full_model_shape",
+      "native_material_diagnostic": {
+        "query_count": 59,
+        "measured_count": 5,
+        "eligible_native_material_readouts": 5,
+        "acceptance": "current source two-sided material contrast plus coherent straight source family; absence is not filled from a guide"
+      },
+      "missing_reason": "no_coherent_unmasked_current_native_material_readouts_under_line_or_circle_acceptance"
+    },
+    {
+      "target_id": "ice.B1:segment0",
+      "points": 0,
+      "navigation_origin": "user_manual_annotation_20261014:500:distortion_aware_ground_transport",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "measured_count": 0,
+        "operator": "physical_transverse_current_material_two_interfaces_ground_midpoint",
+        "rejections": [],
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current source two-sided material contrast plus coherent straight source family; absence is not filled from a guide"
+      }
+    },
+    {
+      "target_id": "ice.B2:segment0",
+      "points": 0,
+      "navigation_origin": "explicit_user_drawn_yellow_width_centreline_20261014:1248:distortion_aware_ground_transport",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "measured_count": 0,
+        "operator": "physical_transverse_current_material_two_interfaces_ground_midpoint",
+        "rejections": [],
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current source two-sided material contrast plus coherent straight source family; absence is not filled from a guide"
+      }
+    },
+    {
+      "target_id": "ice.C:segment0",
+      "points": 0,
+      "navigation_origin": "recovered_user_hand_trace:229246976:433:distortion_aware_ground_transport",
+      "native_material_diagnostic": {
+        "query_count": 0,
+        "measured_count": 0,
+        "operator": "physical_transverse_current_material_two_interfaces_ground_midpoint",
+        "rejections": [],
+        "eligible_native_material_readouts": 0,
+        "acceptance": "current source two-sided material contrast plus coherent straight source family; absence is not filled from a guide"
+      }
+    }
+  ],
+  "ice_parallel_family_audit": {
+    "status": "checked",
+    "reference_origin": "camera_parallel_direction_stabilised_by_current_source_human_labelled_lines",
+    "slope_vs_y960": [
+      5.471433375133127e-05,
+      -0.015250367467696459
+    ],
+    "reference_target_ids": [
+      "ice.lane4:edge2",
+      "ice.lane3:edge0"
+    ],
+    "rule": "long lane boundaries and F-R centres share one source vanishing point and ordered distinct source rows; B/C cross-lines excluded",
+    "rejected_candidate_count": 0
+  },
+  "measurement_definitions": {
+    "wide_straight_ice_lines": "Both material sides measured; midpoint denotes zero-width model line.",
+    "target_rings": "Declared physical material contour; never substitute paint width center for a target boundary.",
+    "advertisement": "Contours on continuous unwrapped board material surface; may span straight and curved portions."
+  },
+  "repair_of_packet": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\frames\\001051.json",
+    "sha256": "5b2be17ef11f0ccccf7cf0cfb86fc60e0dd01e3d781461d8ae926f5006c0a51e"
+  },
+  "repair_scope": "Current native source remeasurement of identified geometry and material failures; original delivery preserved."
+}

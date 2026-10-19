@@ -1,0 +1,94 @@
+--- a/internal/ceres/evaluator.h
++++ b/internal/ceres/evaluator.h
+@@ -147,6 +147,13 @@
+                     const double* delta,
+                     double* state_plus_delta) const = 0;
+ 
++  // Actual tangent displacement between two ambient states.  Implemented by
++  // ProgramEvaluator for the projected trust-region model.  Other evaluators
++  // may opt out by returning false.
++  virtual bool Minus(const double* y, const double* x, double* y_minus_x) const {
++    return false;
++  }
++
+   // The number of parameters in the optimization problem.
+   virtual int NumParameters() const = 0;
+ 
+--- a/internal/ceres/program_evaluator.h
++++ b/internal/ceres/program_evaluator.h
+@@ -307,6 +307,27 @@
+         state, delta, state_plus_delta, options_.context, options_.num_threads);
+   }
+ 
++  bool Minus(const double* y, const double* x, double* y_minus_x) const final {
++    std::atomic<bool> abort(false);
++    const auto& blocks = program_->parameter_blocks();
++    ParallelFor(options_.context, 0, blocks.size(), options_.num_threads,
++                [&](int block_id) {
++      if (abort) return;
++      const auto* block = blocks[block_id];
++      if (block->TangentSize() == 0) return;
++      const double* bx = x + block->state_offset();
++      const double* by = y + block->state_offset();
++      double* bd = y_minus_x + block->delta_offset();
++      if (const auto* manifold = block->manifold()) {
++        if (!manifold->Minus(by, bx, bd)) abort = true;
++      } else {
++        VectorRef(bd, block->Size()) =
++            ConstVectorRef(by, block->Size()) - ConstVectorRef(bx, block->Size());
++      }
++    });
++    return !abort;
++  }
++
+   int NumParameters() const final { return program_->NumParameters(); }
+   int NumEffectiveParameters() const final {
+     return program_->NumEffectiveParameters();
+--- a/internal/ceres/trust_region_minimizer.cc
++++ b/internal/ceres/trust_region_minimizer.cc
+@@ -106,6 +106,10 @@
+     }
+ 
+     ComputeCandidatePointAndEvaluateCost();
++    if (!iteration_summary_.step_is_valid) {
++      RETURN_IF_ERROR_AND_LOG(HandleInvalidStep());
++      continue;
++    }
+     DoInnerIterationsIfNeeded();
+ 
+     if (atleast_one_successful_step && ParameterToleranceReached()) {
+@@ -777,6 +781,34 @@
+     }
+     candidate_cost_ = std::numeric_limits<double>::max();
+     return;
++  }
++
++  // Bounds (and optional line search) change the proposed step.  Evaluate
++  // the same existing Gauss-Newton model at the step actually taken, rather
++  // than attributing its clipped-away part to poor model agreement.
++  if (options_.is_constrained) {
++    if (!evaluator_->Minus(candidate_x_.data(), x_.data(), delta_.data()) ||
++        !delta_.allFinite()) {
++      iteration_summary_.step_is_valid = false;
++      candidate_cost_ = std::numeric_limits<double>::max();
++      return;
++    }
++    ParallelAssign(options_.context, options_.num_threads, trust_region_step_,
++                   (delta_.array() / jacobian_scaling_.array()));
++    ParallelSetZero(options_.context, options_.num_threads, model_residuals_);
++    jacobian_->RightMultiplyAndAccumulate(trust_region_step_.data(),
++                                         model_residuals_.data(),
++                                         options_.context,
++                                         options_.num_threads);
++    model_cost_change_ = -Dot(model_residuals_,
++                             residuals_ + model_residuals_ / 2.0,
++                             options_.context, options_.num_threads);
++    iteration_summary_.step_is_valid =
++        std::isfinite(model_cost_change_) && model_cost_change_ > 0.0;
++    if (!iteration_summary_.step_is_valid) {
++      candidate_cost_ = std::numeric_limits<double>::max();
++      return;
++    }
+   }
+ 
+   if (!evaluator_->Evaluate(

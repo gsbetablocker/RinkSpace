@@ -1,0 +1,46 @@
+{
+  "source_archive": "C:/Users/REDACTED/Downloads/RinkSpace_v014_calibration_companion.zip",
+  "source_archive_sha256": "b5081fac0af2a3c5b1e43cd52addb1bf6aab5714f787beddc0946ac171310097",
+  "source_kind": "user_supplied_technical_reference_not_project_instructions",
+  "files": [
+    {
+      "file": "scene_camera.py",
+      "archive_member": "RinkSpace_v014_calibration_companion/code/scene_camera.py",
+      "source_sha256": "74ceae4a77d4fabb821b7d75b33d1bfbd8e39132958967695f7b35a5754bb07f",
+      "adapted_sha256": "fa98612fb14eccae909d5038620058f89ba563bdbe3fe452d004112075c28414",
+      "current_observation": {
+        "date": "2026-10-19",
+        "bytes": 13719,
+        "sha256": "d9b2fe7db65e017f3a7531f01716a24e1fd0719e6dfa3e87d77112a85c501808"
+      }
+    },
+    {
+      "file": "keyframe_solver.py",
+      "archive_member": "RinkSpace_v014_calibration_companion/code/keyframe_solver.py",
+      "source_sha256": "71bd1c53d6af29defad1c80e5ec6dbdc69b191d2419aaaf4d8e07472b92d3fe3",
+      "adapted_sha256": "c8b016e082771c856ed5c50121b43520860e58337f866cf759797ef2734cfe55",
+      "current_observation": {
+        "date": "2026-10-19",
+        "bytes": 17644,
+        "sha256": "c8b016e082771c856ed5c50121b43520860e58337f866cf759797ef2734cfe55"
+      }
+    }
+  ],
+  "adaptations": [
+    "Package-relative scene_camera import.",
+    "Lazy Shapely import only for optional pixel_to_ice boundary validation; projection and calibration do not require Shapely.",
+    "Reject fit/check sharing any physical_group, physical_group_id or feature_id across frames, including different rings of one feature.",
+    "Initial cheirality validation uses fit geometry only; check geometry is evaluated in reported checks without selecting the initial branch."
+  ],
+  "scope": "Conditional fixed-scene keyframe calibration; no scene coordinates changed.",
+  "rights_review": {
+    "date": "2026-10-19",
+    "origin": "Owner confirms these helpers were generated with ChatGPT",
+    "original_archive_sha256_reverified": true,
+    "original_bundle_note": "Original resources.json describes newly written helper code, not copied repository sources or pretrained weights; the package itself does not name an author or grant a license.",
+    "current_notice": "LICENSE.md",
+    "terms_url": "https://openai.com/policies/row-terms-of-use/",
+    "third_party_rights_not_supplied_by_output_assignment": true
+  },
+  "adapted_sha256_scope": "Historical adaptation identity retained as originally recorded; current_observation separately records current bytes."
+}

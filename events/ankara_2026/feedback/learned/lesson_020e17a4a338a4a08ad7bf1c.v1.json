@@ -1,0 +1,164 @@
+{
+  "assertions": {
+    "current_frame_native_reread_required": true,
+    "dimension_claims": {
+      "measurement_operator": {
+        "evidence_refs": [
+          "4af48dbd45cada3574229146e1f1a22993741b36cf6ce8eff0e56a92937015a5",
+          "6e3028b68b36b2e0cb2d9735011f1b0c7a19484e7bcb58e2a9e50029abf8e5cd"
+        ],
+        "status": "verified",
+        "value": "existing printed material boundary, unchanged"
+      },
+      "physical_instance": {
+        "evidence_refs": [
+          "4af48dbd45cada3574229146e1f1a22993741b36cf6ce8eff0e56a92937015a5",
+          "6e3028b68b36b2e0cb2d9735011f1b0c7a19484e7bcb58e2a9e50029abf8e5cd"
+        ],
+        "status": "verified",
+        "value": "existing exact-exposure Ad2 U identity, current native context checked"
+      },
+      "position": {
+        "evidence_refs": [
+          "4af48dbd45cada3574229146e1f1a22993741b36cf6ce8eff0e56a92937015a5",
+          "6e3028b68b36b2e0cb2d9735011f1b0c7a19484e7bcb58e2a9e50029abf8e5cd"
+        ],
+        "status": "verified",
+        "value": "original UV retained on the lower U contour; assistant current-pixel review, no new subpixel certificate"
+      },
+      "semantic_class": {
+        "evidence_refs": [
+          "4af48dbd45cada3574229146e1f1a22993741b36cf6ce8eff0e56a92937015a5",
+          "6e3028b68b36b2e0cb2d9735011f1b0c7a19484e7bcb58e2a9e50029abf8e5cd"
+        ],
+        "status": "verified",
+        "value": "static printed board material"
+      },
+      "visibility": {
+        "evidence_refs": [
+          "4af48dbd45cada3574229146e1f1a22993741b36cf6ce8eff0e56a92937015a5",
+          "6e3028b68b36b2e0cb2d9735011f1b0c7a19484e7bcb58e2a9e50029abf8e5cd"
+        ],
+        "status": "verified",
+        "value": "original lower U boundary visible outside skater/graphics/reflection"
+      }
+    },
+    "episode_resolution_type": "model_mismatch",
+    "episode_source": {
+      "coordinate_domain": "native_pixels",
+      "native_hw": [
+        1080,
+        1920
+      ],
+      "pts": 282368,
+      "time_base": "1/12800",
+      "video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+    },
+    "generalization_status": "source_scoped_advisory_episode_only",
+    "lesson": {
+      "UV_or_observation_reinstallation_authorized": false,
+      "current_source_reread_required": true,
+      "solver_check": "same_finite_path_station_restart_with_complete_current_objective_acceptance",
+      "source_identity_or_pixels_transferred_to_future_frame": false,
+      "summary": "已核实的U轮廓原UV保持；大残差先区分同一有限曲线上的辅助station跳支与真实相机/几何误差，不能让好点迁就模型。"
+    },
+    "next_matching_frame_action": "retain_source_UV_and_diagnose_model",
+    "position_truth_for_future_frame": "unknown_until_current_native_review",
+    "regression_request": {
+      "expected_action": "retain_source_UV_and_diagnose_model",
+      "source": {
+        "coordinate_domain": "native_pixels",
+        "native_hw": [
+          1080,
+          1920
+        ],
+        "pts": 282368,
+        "time_base": "1/12800",
+        "video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+      },
+      "visual_regression_executed": false
+    },
+    "transfer_instance_identity_without_current_context": false,
+    "transfer_pixel_coordinates_to_new_frame": false,
+    "unresolved_dimensions": [],
+    "verified_dimensions": [
+      "semantic_class",
+      "physical_instance",
+      "measurement_operator",
+      "visibility",
+      "position"
+    ]
+  },
+  "case_id": "lesson_020e17a4a338a4a08ad7bf1c",
+  "evidence_refs": [
+    {
+      "current_frame": true,
+      "independent_of_model": true,
+      "kind": "native_pixels",
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\s01_worst_station_v1\\native_282368.png",
+      "sha256": "4af48dbd45cada3574229146e1f1a22993741b36cf6ce8eff0e56a92937015a5",
+      "source": {
+        "coordinate_domain": "native_pixels",
+        "native_hw": [
+          1080,
+          1920
+        ],
+        "pts": 282368,
+        "time_base": "1/12800",
+        "video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+      }
+    },
+    {
+      "current_frame": true,
+      "independent_of_model": true,
+      "kind": "current_source_review",
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\s01_worst_station_v1\\Ad2_U_source_review.json",
+      "sha256": "6e3028b68b36b2e0cb2d9735011f1b0c7a19484e7bcb58e2a9e50029abf8e5cd",
+      "source": {
+        "coordinate_domain": "native_pixels",
+        "native_hw": [
+          1080,
+          1920
+        ],
+        "pts": 282368,
+        "time_base": "1/12800",
+        "video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+      }
+    }
+  ],
+  "fit_admissible": false,
+  "kind": "recipe",
+  "lineage": {
+    "source_key": "e35f6e60c5ca7a73076d315e87fe7a7ca37c0ac9ce24d3ee10dc60111cf88ee9",
+    "source_video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+  },
+  "provenance": {
+    "authority": "source_review_declared_by_caller; not_user_confirmation",
+    "created_by": "FeedbackCycle.learn",
+    "evidence_assurance": "source identity and declarations checked; pixel interpretation is not verified by this ledger",
+    "finding_id": "finding_e8fdb03b575c186459c56b65",
+    "resolution_id": "resolution_a523999fea3172a1e9ad44c2",
+    "resolution_sha256": "a523999fea3172a1e9ad44c2ad30b20caa36f011b23ee8db6fbd52dcd17c85e8"
+  },
+  "scope": {
+    "camera_id": "main",
+    "entity_ids": [
+      "Ad2.print.U"
+    ],
+    "event_id": "ankara_2026",
+    "source_video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+  },
+  "split_role": "development",
+  "status": "active",
+  "tags": [
+    "advertisement",
+    "fit_checkpoint",
+    "model_mismatch",
+    "native_source_recheck",
+    "physical_instance",
+    "source_recheck"
+  ],
+  "title": "已核实的U轮廓原UV保持；大残差先区分同一有限曲线上的辅助station跳支与真实相机/几何误差，不能让好点迁就模型。",
+  "training_eligible": false,
+  "version": 1
+}

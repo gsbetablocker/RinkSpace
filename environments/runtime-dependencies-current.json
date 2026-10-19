@@ -1,0 +1,709 @@
+{
+  "schema": "rinkspace.runtime-dependencies-metadata-check.v1",
+  "observed_date": "2026-10-13",
+  "inspection_mode": "metadata_only_for_runtime_resources; byte_preservation_for_seven_small_support_definitions",
+  "scope": "Exact previously registered native paths, independent CPU interpreter, declared local build definitions, selected profile/policy and existing preservation records.",
+  "operations": {
+    "file_metadata": true,
+    "read_small_json_source_recipe": true,
+    "path_lookup": true,
+    "native_import": false,
+    "numpy_import": false,
+    "torch_import": false,
+    "environment_freeze": false,
+    "dll_or_weight_hashing": false,
+    "installation": false,
+    "compilation": false,
+    "tests": false,
+    "solver": false,
+    "media_decode": false,
+    "whole_data_walk": false,
+    "active_file_changes": false,
+    "small_support_definition_byte_preservation": true,
+    "small_support_definition_hashing": true
+  },
+  "conclusion": "Code and reconstruction definitions are preserved separately from external runtime products. Exists and stored manifest fields do not establish current byte identity, ABI compatibility, loading success or a complete portable run.",
+  "evidence_boundaries": [
+    "2026-10-11 CPU validation is inherited from environments/reconstruction-validation.json; no repeat smoke check was run today.",
+    "2026-10-11 native recipe hashes are inherited from environments/native-build-recipes-observed.json; today's check reads only stats and small build.json fields.",
+    "The selected strict_v6 profile is a captured declared input, not a claim about the neighboring chat's live process or latest accepted model.",
+    "The portable template reports zero unresolved direct references, but nested references, serialization identities and producer contracts remain outside its activation scope.",
+    "2026-10-13 seven small native support definition files were byte-preserved and hashed separately; DLL, weight, array and prior native recipe identity were not rehashed or loaded."
+  ],
+  "preserved_definitions": [
+    {
+      "kind": "cpu",
+      "records": [
+        "environments/install_cpu_isolated.ps1",
+        "environments/requirements-cpu-validated-windows-lock.txt",
+        "environments/reconstruction-validation.json"
+      ],
+      "status": "prior_independent_cpu_dependency_cli_smoke_recorded"
+    },
+    {
+      "kind": "native_cpu_cuda",
+      "records": [
+        "environments/native-build-recipes-observed.json",
+        "calibration/solver_runtime/config.py",
+        "calibration/solver_runtime/source_manifest.json",
+        "calibration/solver_runtime/event_factories_manifest.json"
+      ],
+      "status": "owned_sources_and_prior_recipes_preserved_no_native_rebuild_today"
+    },
+    {
+      "kind": "vision",
+      "records": [
+        "environments/requirements-vision-torch-cu128.txt",
+        "environments/observed-python311-windows.json"
+      ],
+      "status": "candidate_definition_no_gpu_reconstruction_verified"
+    },
+    {
+      "kind": "body",
+      "records": [
+        "environments/third-party-assets.json",
+        "environments/body-upstream-provenance.json",
+        "environments/third_party_patches/gvhmr-local.patch",
+        "calibration/program_tracking/body_tracking/source_helpers/run_vitpose_h.py",
+        "calibration/program_tracking/body_tracking/source_helpers/run_vitpose_h.provenance.json"
+      ],
+      "status": "upstream_identities_local_patch_and_helper_preserved_full_external_runtime_unverified"
+    },
+    {
+      "kind": "gtsam",
+      "records": [
+        "calibration/program_tracking/runtime/environment.yml",
+        "environments/gtsam-reconstruction-candidate.yml",
+        "calibration/program_tracking/native/reference_callback.cpp",
+        "calibration/program_tracking/native/round6_source_edge/build.bat"
+      ],
+      "status": "source_and_partial_build_definitions_preserved_vendor_and_abi_external"
+    },
+    {
+      "kind": "resource_resolution",
+      "records": [
+        "src/rinkspace/resource_registry.py",
+        "scripts/prepare_portable_profile.py",
+        "docs/PORTABLE_RESOURCES.md",
+        "events/ankara_2026/asset_preservation_manifest.json",
+        "events/ankara_2026/external_resource_preservation.json"
+      ],
+      "status": "opt_in_preparation_only_no_active_solver_or_AssetStore_activation"
+    },
+    {
+      "kind": "parameter_delta_20261013",
+      "records": [
+        "events/ankara_2026/asset_preservation_manifest_20261013.json"
+      ],
+      "status": "25_small_policy_binding_JSONs_byte_preserved_by_separate_inventory; nested paths and active profile stay Data"
+    },
+    {
+      "kind": "complete_cycle_baseline_20261010",
+      "records": [
+        "calibration/solver_runtime_preserved/complete_cycle_baseline_20261010/README.md"
+      ],
+      "status": "historical_source_definition_preservation; no automatic active producer binding"
+    }
+  ],
+  "intentionally_external": [
+    {
+      "kind": "raw_media_and_frames",
+      "reason": "Source media and bulk image evidence remain Data resources; their absence from Git is not missing source code."
+    },
+    {
+      "kind": "large_observation_motion_training_arrays",
+      "reason": "Exact source clocks, roles, splits, identities and array manifests must remain bound; arrays themselves stay Data."
+    },
+    {
+      "kind": "full_solver_state_and_caches",
+      "reason": "Complete checkpoints, large linearizations, memo/pickle caches, logs and diagnostics stay Data; project parameter summaries do not substitute for full continuation state."
+    },
+    {
+      "kind": "native_binary_cache",
+      "reason": "Existing DLL/PYD files stay at registered runtime/build paths; build definitions are project assets. They are not discarded or assumed regenerable without ABI/contract validation."
+    },
+    {
+      "kind": "third_party_models_vendor_and_installs",
+      "reason": "External installations, licensed body models, GPU weights and vendor archives are separately registered, not automatically public repository content."
+    }
+  ],
+  "native": [
+    {
+      "kernel": "nearest_segment",
+      "source": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\legacy\\snapshot\\three_frame_refit\\program_tracking\\native\\nearest_segment.c",
+        "exists": true,
+        "size_bytes": 2745,
+        "mtime_ns": 1791179387350720000
+      },
+      "binary": {
+        "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration_native\\nearest_segment.dll",
+        "exists": true,
+        "size_bytes": 104448,
+        "mtime_ns": 1790391157767719000
+      },
+      "expected_sha256_provenance": "environments/native-build-recipes-observed.json; not rehashed today",
+      "build_manifest": {
+        "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration_native\\build.json",
+        "exists": true,
+        "size_bytes": 705,
+        "mtime_ns": 1790391157818273800
+      },
+      "stored_source_sha_matches_prior_recipe": true,
+      "stored_dll_sha_matches_prior_recipe": true,
+      "stored_flags_match_prior_recipe": true
+    },
+    {
+      "kernel": "motion",
+      "source": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\legacy\\snapshot\\three_frame_refit\\program_tracking\\native\\moving_center_motion.c",
+        "exists": true,
+        "size_bytes": 13782,
+        "mtime_ns": 1791704674455043300
+      },
+      "binary": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\native_motion\\moving_center_motion_1d0250b18df2.dll",
+        "exists": true,
+        "size_bytes": 119808,
+        "mtime_ns": 1791036004070514200
+      },
+      "expected_sha256_provenance": "environments/native-build-recipes-observed.json; not rehashed today",
+      "build_manifest": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\native_motion\\build.json",
+        "exists": true,
+        "size_bytes": 973,
+        "mtime_ns": 1791036004117511200
+      },
+      "stored_source_sha_matches_prior_recipe": true,
+      "stored_dll_sha_matches_prior_recipe": true,
+      "stored_flags_match_prior_recipe": true
+    },
+    {
+      "kernel": "csr_scatter",
+      "source": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\legacy\\snapshot\\three_frame_refit\\program_tracking\\native\\fixed_xyz_csr_scatter.c",
+        "exists": true,
+        "size_bytes": 2578,
+        "mtime_ns": 1791179387334212600
+      },
+      "binary": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\native_scatter\\fixed_xyz_csr_scatter.dll",
+        "exists": true,
+        "size_bytes": 107520,
+        "mtime_ns": 1791035430854491400
+      },
+      "expected_sha256_provenance": "environments/native-build-recipes-observed.json; not rehashed today",
+      "build_manifest": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\native_scatter\\build.json",
+        "exists": true,
+        "size_bytes": 921,
+        "mtime_ns": 1791035430904070700
+      },
+      "stored_source_sha_matches_prior_recipe": true,
+      "stored_dll_sha_matches_prior_recipe": true,
+      "stored_flags_match_prior_recipe": true
+    },
+    {
+      "kernel": "projection_guard",
+      "source": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\legacy\\snapshot\\three_frame_refit\\program_tracking\\native\\central_projection_guard.c",
+        "exists": true,
+        "size_bytes": 2810,
+        "mtime_ns": 1791179387329213700
+      },
+      "binary": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\native_projection\\central_projection_guard_v2.dll",
+        "exists": true,
+        "size_bytes": 110592,
+        "mtime_ns": 1791038068525168000
+      },
+      "expected_sha256_provenance": "environments/native-build-recipes-observed.json; not rehashed today",
+      "build_manifest": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\native_projection\\build.json",
+        "exists": true,
+        "size_bytes": 964,
+        "mtime_ns": 1791038068573437200
+      },
+      "stored_source_sha_matches_prior_recipe": true,
+      "stored_dll_sha_matches_prior_recipe": true,
+      "stored_flags_match_prior_recipe": true
+    },
+    {
+      "kernel": "projection_value",
+      "source": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\legacy\\snapshot\\three_frame_refit\\program_tracking\\native\\projection_value.c",
+        "exists": true,
+        "size_bytes": 1158,
+        "mtime_ns": 1791179387360721400
+      },
+      "binary": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\native_projection_value\\projection_value.dll",
+        "exists": true,
+        "size_bytes": 103936,
+        "mtime_ns": 1791037519686536000
+      },
+      "expected_sha256_provenance": "environments/native-build-recipes-observed.json; not rehashed today",
+      "build_manifest": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\native_projection_value\\build.json",
+        "exists": true,
+        "size_bytes": 909,
+        "mtime_ns": 1791037519737730800
+      },
+      "stored_source_sha_matches_prior_recipe": true,
+      "stored_dll_sha_matches_prior_recipe": true,
+      "stored_flags_match_prior_recipe": true
+    },
+    {
+      "kernel": "motion_cuda",
+      "source": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\legacy\\snapshot\\three_frame_refit\\program_tracking\\native\\moving_center_motion_cuda.cu",
+        "exists": true,
+        "size_bytes": 13708,
+        "mtime_ns": 1791179387344720000
+      },
+      "binary": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\native_motion_cuda\\moving_center_motion_cuda_f830ff6e8676.dll",
+        "exists": true,
+        "size_bytes": 399872,
+        "mtime_ns": 1791036433051949600
+      },
+      "expected_sha256_provenance": "environments/native-build-recipes-observed.json; not rehashed today",
+      "build_manifest": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\native_motion_cuda\\build.json",
+        "exists": true,
+        "size_bytes": 1214,
+        "mtime_ns": 1791036433096516400
+      },
+      "stored_source_sha_matches_prior_recipe": true,
+      "stored_dll_sha_matches_prior_recipe": true,
+      "stored_flags_match_prior_recipe": true
+    },
+    {
+      "kernel": "normal_scanline_human_query",
+      "source": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\legacy\\structured_programme_source_candidate\\native\\normal_scanline_human_query.c",
+        "exists": true,
+        "size_bytes": 5285,
+        "mtime_ns": 1791648553296397600
+      },
+      "binary": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\native\\solver_runtime\\normal_scanline_human_query\\015f33ebecb547a8857d66c889b6e51a76d4115bf06662afab0f06c2e045bec2\\normal_scanline_human_query.dll",
+        "exists": true,
+        "size_bytes": 108544,
+        "mtime_ns": 1791649065349204200
+      },
+      "expected_sha256_provenance": "environments/native-build-recipes-observed.json; not rehashed today",
+      "build_manifest": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\native\\solver_runtime\\normal_scanline_human_query\\015f33ebecb547a8857d66c889b6e51a76d4115bf06662afab0f06c2e045bec2\\build.json",
+        "exists": true,
+        "size_bytes": 1118,
+        "mtime_ns": 1791649065393894700
+      },
+      "stored_source_sha_matches_prior_recipe": true,
+      "stored_dll_sha_matches_prior_recipe": true,
+      "stored_flags_match_prior_recipe": true
+    },
+    {
+      "kernel": "programme_csr_three_span_merge",
+      "source": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\native\\programme_csr_three_span_merge.c",
+        "exists": true,
+        "size_bytes": 5794,
+        "mtime_ns": 1791615760688521700
+      },
+      "binary": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\native\\solver_runtime\\programme_csr_three_span_merge\\03e5e1693638f028789acd49073e2dbf846961173fb98c0f8c25e4d2af815d1b\\programme_csr_three_span_merge.dll",
+        "exists": true,
+        "size_bytes": 112128,
+        "mtime_ns": 1791616119686754000
+      },
+      "expected_sha256_provenance": "environments/native-build-recipes-observed.json; not rehashed today",
+      "build_manifest": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\native\\solver_runtime\\programme_csr_three_span_merge\\03e5e1693638f028789acd49073e2dbf846961173fb98c0f8c25e4d2af815d1b\\build.json",
+        "exists": true,
+        "size_bytes": 1034,
+        "mtime_ns": 1791616119733850400
+      },
+      "stored_source_sha_matches_prior_recipe": true,
+      "stored_dll_sha_matches_prior_recipe": true,
+      "stored_flags_match_prior_recipe": true
+    },
+    {
+      "kernel": "central_brown4",
+      "source": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solver_runtime\\legacy\\snapshot\\three_frame_refit\\program_tracking\\central_brown4_axis_domain.c",
+        "exists": true,
+        "size_bytes": 1946,
+        "mtime_ns": 1791179629122345500
+      },
+      "binary": {
+        "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\central_brown4_optin\\central_brown4.dll",
+        "exists": true,
+        "size_bytes": 105984,
+        "mtime_ns": 1790515528148602400
+      },
+      "expected_sha256_provenance": "environments/native-build-recipes-observed.json; not rehashed today",
+      "build_manifest": null,
+      "fixed_wrapper_hash_required": true
+    }
+  ],
+  "executables": {
+    "main_python": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\.venv\\Scripts\\python.exe",
+      "exists": true,
+      "size_bytes": 268152,
+      "mtime_ns": 1789800174073986800
+    },
+    "cpu_independent_python": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runtime_tools\\repository_validation\\cpu-python311-20261011\\Scripts\\python.exe",
+      "exists": true,
+      "size_bytes": 268152,
+      "mtime_ns": 1791691066944712200
+    },
+    "cpu_independent_pyvenv_cfg": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runtime_tools\\repository_validation\\cpu-python311-20261011\\pyvenv.cfg",
+      "exists": true,
+      "size_bytes": 266,
+      "mtime_ns": 1791691066887353600
+    },
+    "base_python": {
+      "path": "D:\\Python\\Python311\\python.exe",
+      "exists": true,
+      "size_bytes": 101760,
+      "mtime_ns": 1666607690000000000
+    },
+    "gtsam_python": {
+      "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\gtsam-env\\python.exe",
+      "exists": true,
+      "size_bytes": 93184,
+      "mtime_ns": 1788391923326159000
+    },
+    "vision_python": {
+      "path": "D:\\OneDrive\\codex_projs\\MotionTrail_Codex_Starter_v1\\.venv-gpu\\Scripts\\python.exe",
+      "exists": true,
+      "size_bytes": 268152,
+      "mtime_ns": 1789714097113970700
+    },
+    "body_python": {
+      "path": "D:\\OneDrive\\codex_projs\\FSrotation\\cache\\g0_gvhmr_runtime\\venv\\Scripts\\python.exe",
+      "exists": true,
+      "size_bytes": 268152,
+      "mtime_ns": 1789022441360994300
+    }
+  },
+  "vendor_definitions": [
+    {
+      "id": "gtsam",
+      "previous_record": "environments/third-party-assets.json",
+      "installed_record": {
+        "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\gtsam-env\\conda-meta\\gtsam-4.2.2-py311h69872ac_0.json",
+        "exists": true,
+        "size_bytes": 307059,
+        "mtime_ns": 1790303809226262800
+      }
+    },
+    {
+      "id": "tbb_runtime",
+      "previous_record": "environments/third-party-assets.json",
+      "installed_record": {
+        "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\gtsam-env\\conda-meta\\tbb-2023.1.0-hdcfe883_0.json",
+        "exists": true,
+        "size_bytes": 3030,
+        "mtime_ns": 1790303806945997600
+      }
+    },
+    {
+      "id": "eigen_headers",
+      "previous_record": "environments/third-party-assets.json",
+      "external_directory": {
+        "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\reference_callback\\vendor\\eigen-5.0.1-h5112557_0",
+        "exists": true
+      },
+      "small_definition_candidates": [
+        {
+          "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\reference_callback\\vendor\\eigen-5.0.1-h5112557_0\\info\\index.json",
+          "exists": false
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\reference_callback\\vendor\\eigen-5.0.1-h5112557_0\\info\\repodata_record.json",
+          "exists": false
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\reference_callback\\vendor\\eigen-5.0.1-h5112557_0\\README.md",
+          "exists": false
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\reference_callback\\vendor\\eigen-5.0.1-h5112557_0\\LICENSE.txt",
+          "exists": false
+        }
+      ]
+    },
+    {
+      "id": "boost_headers",
+      "previous_record": "environments/third-party-assets.json",
+      "external_directory": {
+        "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\reference_callback\\vendor\\libboost-headers-1.90.0-h57928b3_1",
+        "exists": true
+      },
+      "small_definition_candidates": [
+        {
+          "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\reference_callback\\vendor\\libboost-headers-1.90.0-h57928b3_1\\info\\index.json",
+          "exists": false
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\reference_callback\\vendor\\libboost-headers-1.90.0-h57928b3_1\\info\\repodata_record.json",
+          "exists": false
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\reference_callback\\vendor\\libboost-headers-1.90.0-h57928b3_1\\README.md",
+          "exists": false
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\reference_callback\\vendor\\libboost-headers-1.90.0-h57928b3_1\\LICENSE.txt",
+          "exists": false
+        }
+      ]
+    },
+    {
+      "id": "pybind11_headers",
+      "previous_record": "environments/third-party-assets.json",
+      "external_directory": {
+        "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\reference_callback\\vendor\\pybind11-global-3.0.3-pyhc8003f9_0",
+        "exists": true
+      },
+      "small_definition_candidates": [
+        {
+          "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\reference_callback\\vendor\\pybind11-global-3.0.3-pyhc8003f9_0\\info\\index.json",
+          "exists": false
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\reference_callback\\vendor\\pybind11-global-3.0.3-pyhc8003f9_0\\info\\repodata_record.json",
+          "exists": false
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\reference_callback\\vendor\\pybind11-global-3.0.3-pyhc8003f9_0\\README.md",
+          "exists": false
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\reference_callback\\vendor\\pybind11-global-3.0.3-pyhc8003f9_0\\LICENSE.txt",
+          "exists": false
+        }
+      ]
+    },
+    {
+      "id": "onetbb_headers_import_libraries",
+      "previous_record": "environments/third-party-assets.json",
+      "external_directory": {
+        "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\tbb_control",
+        "exists": true
+      },
+      "small_definition_candidates": [
+        {
+          "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\tbb_control\\info\\index.json",
+          "exists": false
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\tbb_control\\info\\repodata_record.json",
+          "exists": false
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\tbb_control\\README.md",
+          "exists": true,
+          "size_bytes": 2429,
+          "mtime_ns": 1790408472640963000
+        },
+        {
+          "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\tbb_control\\LICENSE.txt",
+          "exists": true,
+          "size_bytes": 11357,
+          "mtime_ns": 1780380908000000000
+        }
+      ]
+    }
+  ],
+  "ffmpeg_path_resolution": {
+    "ffmpeg": null,
+    "ffprobe": null,
+    "executed": false,
+    "scope": "PATH of this read-only Python process"
+  },
+  "imageio_ffmpeg_binaries": [
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\.venv\\Lib\\site-packages\\imageio_ffmpeg\\binaries\\ffmpeg-win-x86_64-v7.1.exe",
+      "exists": true,
+      "size_bytes": 87638016,
+      "mtime_ns": 1789800353785784300
+    }
+  ],
+  "selected_profile": {
+    "project_path": "events/ankara_2026/programmes/okada_mei_sp/strict_v6_source_fit_20261013.json",
+    "driver": "named66",
+    "resource_root": "D:/CodexData/RinkSpace_Data/events/ankara_2026/calibration/runs/solver_acceleration_20261003",
+    "strict_model_scope_policy": {
+      "schema": "rinkspace.strict-finite-dataset-startup-policy.v2",
+      "allowed_static_surfaces": [
+        "ice",
+        "board"
+      ],
+      "unknown_or_unreviewed_default": "excluded",
+      "fit_dataset": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\current_review_20261013\\specific_inner_review_v6\\fit_dataset.json",
+        "sha256": "a835599e7d7a1a0bcf9dcd92e90fd4ad160b01e60e99975ec977d5f250f69fd8"
+      },
+      "motion_inputs": {
+        "path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/diagnostics/current56_shared_active_set_filter_20261009/systematic_continuation_20261010/full_programme_strict_source_review_20261012/motion_scope/strict_motion_inputs.json",
+        "sha256": "9c978987e72d492be439c585d8b9387e2b4f08214b61b1d76eb7613fcd61b2cf"
+      }
+    },
+    "continuation": {
+      "q_sha256": "8a28afed8f9f896112e5b2f64be515b2bc02019e10e09c7e0eda2598579d4891",
+      "complete_checkpoint": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_q32_reviewed_source_pixels_current_points_ready_20261012\\accepted_states\\8a28afed8f9f896112e5b2f64be515b2bc02019e10e09c7e0eda2598579d4891\\complete_state_UNACCEPTED.npz",
+      "complete_checkpoint_sha256": "0a3c36496187467d6aff1b49db9d367626ec5c42b8dc42ca870996bb694d4ca8",
+      "fresh_J_required": true
+    },
+    "startup_diagnostic_evidence": null,
+    "observation_semantics": "small profile read only; no dataset, checkpoint, pickle or producer loading"
+  },
+  "default_profile": {
+    "project_path": "configs/solver_runtime/okada_named66.json",
+    "schema": "rinkspace.strict-model-scope-startup-policy.v1",
+    "all_pixel_families_routed_to_strict_input": false,
+    "source_review_ready_for_fit": false
+  },
+  "portable_template": {
+    "project_path": "configs/portable/strict_v6_source_fit_20261013.resources.json",
+    "resource_entries": 35,
+    "unresolved_direct_references": 0,
+    "runtime_activated": false,
+    "portable_complete_run_verified": false,
+    "source_eligibility_certified_by_preparation": false,
+    "registered_asset_verification_performed": false,
+    "scope": "Only explicit profile options and resource_root. Immutable source JSON contents, pickle identities and native contracts are unchanged.",
+    "snapshot_before_parameter_preservation_delta": true,
+    "automatically_refreshed_after_parameter_preservation": false
+  },
+  "small_external_definitions": [
+    {
+      "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\reference_callback\\build.bat",
+      "size_bytes": 886,
+      "mtime_ns": 1790409092628435000,
+      "purpose": "small source/build/provenance/license definition; not compiler output",
+      "preservation_status": "byte_preserved_in_project",
+      "preserved_path": "environments/native_support_preserved/round3_legacy/reference_callback/build.bat",
+      "sha256": "908607abb6eb41f1cf1ae2c7b73c3c56e835c40bed02044cbd8b32744d60e853",
+      "source_preservation_manifest": "environments/native_support_preserved/round3_legacy/source_preservation_manifest.json",
+      "runtime_activated": false
+    },
+    {
+      "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\reference_callback\\build_manifest.json",
+      "size_bytes": 880,
+      "mtime_ns": 1790409479731744300,
+      "purpose": "small source/build/provenance/license definition; not compiler output",
+      "preservation_status": "byte_preserved_in_project",
+      "preserved_path": "environments/native_support_preserved/round3_legacy/reference_callback/build_manifest.json",
+      "sha256": "ff598116db7999a0cc9154b5f8ae1fe7d3e0025e2a2eaddefa37e9c70d66c4ba",
+      "source_preservation_manifest": "environments/native_support_preserved/round3_legacy/source_preservation_manifest.json",
+      "runtime_activated": false
+    },
+    {
+      "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\reference_callback\\README.md",
+      "size_bytes": 3151,
+      "mtime_ns": 1790409909211412000,
+      "purpose": "small source/build/provenance/license definition; not compiler output",
+      "preservation_status": "byte_preserved_in_project",
+      "preserved_path": "environments/native_support_preserved/round3_legacy/reference_callback/README.md",
+      "sha256": "4c6c63cdf44471eb93ba68b9334f2d7dee7d76b13891b5a9845d9e8bda97a1a5",
+      "source_preservation_manifest": "environments/native_support_preserved/round3_legacy/source_preservation_manifest.json",
+      "runtime_activated": false
+    },
+    {
+      "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\tbb_control\\tbb_control.cpp",
+      "size_bytes": 987,
+      "mtime_ns": 1790408367143492600,
+      "purpose": "small source/build/provenance/license definition; not compiler output",
+      "preservation_status": "byte_preserved_in_project",
+      "preserved_path": "environments/native_support_preserved/round3_legacy/tbb_control/tbb_control.cpp",
+      "sha256": "63a67386992583de96df64dfdebb43bafb5b3bc2aed2fd0c89f68dde1d60aa72",
+      "source_preservation_manifest": "environments/native_support_preserved/round3_legacy/source_preservation_manifest.json",
+      "runtime_activated": false
+    },
+    {
+      "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\tbb_control\\build.bat",
+      "size_bytes": 279,
+      "mtime_ns": 1790408378468167200,
+      "purpose": "small source/build/provenance/license definition; not compiler output",
+      "preservation_status": "byte_preserved_in_project",
+      "preserved_path": "environments/native_support_preserved/round3_legacy/tbb_control/build.bat",
+      "sha256": "0b4a91f899a851bf44e18429d419d60d6ac964552847baa993bb135ecf505c90",
+      "source_preservation_manifest": "environments/native_support_preserved/round3_legacy/source_preservation_manifest.json",
+      "runtime_activated": false
+    },
+    {
+      "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\tbb_control\\README.md",
+      "size_bytes": 2429,
+      "mtime_ns": 1790408472640963000,
+      "purpose": "small source/build/provenance/license definition; not compiler output",
+      "preservation_status": "byte_preserved_in_project",
+      "preserved_path": "environments/native_support_preserved/round3_legacy/tbb_control/README.md",
+      "sha256": "d80ff93bbdf2141d56871ce2f81620a8db9a6276a4b36a0fce36269dfb78c99b",
+      "source_preservation_manifest": "environments/native_support_preserved/round3_legacy/source_preservation_manifest.json",
+      "runtime_activated": false
+    },
+    {
+      "path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\tbb_control\\LICENSE.txt",
+      "size_bytes": 11357,
+      "mtime_ns": 1780380908000000000,
+      "purpose": "small source/build/provenance/license definition; not compiler output",
+      "preservation_status": "byte_preserved_in_project",
+      "preserved_path": "environments/native_support_preserved/round3_legacy/tbb_control/LICENSE.txt",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "source_preservation_manifest": "environments/native_support_preserved/round3_legacy/source_preservation_manifest.json",
+      "runtime_activated": false
+    }
+  ],
+  "reference_callback_build_identity_record": {
+    "record_path": "D:\\CodexData\\RinkSpace_program_tracking_tmp\\solver_acceleration\\round3\\native\\reference_callback\\build_manifest.json",
+    "record_contents": {
+      "module": "reference_callback",
+      "gtsam_version": "4.2.2",
+      "python_version": "3.11",
+      "eigen_host": "5.0.1 h5112557_0",
+      "boost_headers_host": "1.90.0 h57928b3_1",
+      "pybind11_host": "3.0.3 pyhc8003f9_0",
+      "source_sha256": "a66674661578929fce8305b4c548043341365035a7e918598f4640e0e20e158b",
+      "module_sha256": "954a31a0c8816bed055df5f301b965efd1b35be23f05fd203d175d1f09f02cb3",
+      "build_script_sha256": "908607abb6eb41f1cf1ae2c7b73c3c56e835c40bed02044cbd8b32744d60e853",
+      "eigen_package_sha256": "a99c0cc584abb5bb4f0279ec1566cd63a4f943244b3cfdb0064b94eb37a80104",
+      "boost_headers_package_sha256": "532af7c91e6d1b51aadb377331f9da0f6f1d5d8bf7a7bde1319a5de669300e24",
+      "pybind11_package_sha256": "6f6b9aec0005352240da53247fe772c60350f28314d4697db36a20f0ab642965",
+      "gtsam_dll_sha256": "dba35653cdd9f143093163bb671975238b93febc01a3be7e421a9d2e88c16e18"
+    },
+    "hash_verification_today": false,
+    "preserved_record_path": "environments/native_support_preserved/round3_legacy/reference_callback/build_manifest.json",
+    "source_preservation_manifest": "environments/native_support_preserved/round3_legacy/source_preservation_manifest.json",
+    "record_file_bytes_verified_today": true
+  },
+  "remaining_integration_requirements": [
+    "Select a profile whose actual strict graph consumes only original-video-confirmed ice/board static entities and materials; never use the blocked old default route to bypass the v2 adapter.",
+    "Make relocation explicit for resource_root, native cache, nested source JSON, source references, saved checkpoint provenance and exact legacy pickle/module identities.",
+    "Preserve source_manifest and event factory authentication; an alias registration or byte-preserved copied file does not automatically change a runtime's registered producer.",
+    "Rebuild and validate native libraries on an independent environment without bypassing strict floats, source identity, full ABI or Brown4's fixed DLL hash.",
+    "Provide PATH-resolvable ffmpeg and ffprobe to src/rinkspace/media.py; imageio_ffmpeg's bundled executable is not automatically the CLI's ffmpeg/ffprobe route.",
+    "Complete independent GPU/body and GTSAM/vendor definitions and validation; package version lists are not complete source or compiler identities."
+  ],
+  "gtsam_definition_notes": [
+    "reference_callback/build_manifest.json supplies historical Eigen/Boost/pybind11 archive hashes absent from the earlier third-party asset inventory's established identities. These inherited fields were read, not checked against archive bytes today.",
+    "Header package URLs/source revisions and complete package license identity remain incomplete; info/index.json and info/repodata_record.json were absent at the exact extracted vendor directory paths checked.",
+    "oneTBB README records official v2023.1.0 Windows archive SHA and existing conda runtime provenance; the tbb_control helper is a historical independent experiment, not an additional named66 production backend.",
+    "reference_callback.cpp is already in OneDrive; seven small external reference_callback build/provenance and tbb_control source/build/README/LICENSE definitions are byte-preserved under environments/native_support_preserved/round3_legacy with a source-preservation manifest. Runtime paths are unchanged."
+  ],
+  "small_external_definition_preservation": {
+    "date": "2026-10-13",
+    "manifest": "environments/native_support_preserved/round3_legacy/source_preservation_manifest.json",
+    "file_count": 7,
+    "size_bytes": 19969,
+    "source_stat_and_byte_checks": true,
+    "scope": "The seven small source/build/provenance/license files only; prior DLL/weight/array metadata-only evidence remains unchanged.",
+    "runtime_activated": false
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "schema": "rinkspace.actual-native-board-track-verification.v1",
+  "state": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\okada_lane23_Ad7_fast_complete_20261007\\accepted_states\\478afaf776150c398c48e7492da911e1219036cfad3295629a3df309b7d1089c\\complete_state_UNACCEPTED.npz",
+  "source_packet": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\aligned_complete_20261007_478afaf77615\\nine_shot_motion_regression_v2\\native_board_motion_cut3_typed_source.json",
+  "physical_camera_archive_max_error": 0.0,
+  "J_shape": [
+    60,
+    34304
+  ],
+  "coupled_world_camera_J_max_error": 6.335558633274729e-09,
+  "source_role_and_raw_UV_preserved": true,
+  "review": {
+    "contract": {
+      "schema": "rinkspace.native-current-board-track-factor.v1",
+      "packet_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\aligned_complete_20261007_478afaf77615\\nine_shot_motion_regression_v2\\native_board_motion_cut3_typed_source.json",
+      "packet_sha256": "d4db65ec4cee6bb43ca9a5681862ea4a442eb7db9b02136e64ce7f075167222d",
+      "source_operator": "current full-Brown anchor ray -> current finite far board course -> current target full-Brown projection",
+      "new_camera_or_world_or_depth_parameters": 0,
+      "held_used_in_fit": false,
+      "anchor_z_not_clamped": true,
+      "observed_world_xyz_supplied": false,
+      "correlated_texture_points_not_independent_measurements": true,
+      "sigma_is_engineering_weight_not_calibrated_noise": true,
+      "all_original_source_and_parameter_prefix_preserved": true,
+      "fit_groups": 1,
+      "held_groups": 1,
+      "scalar_rows": 60,
+      "accuracy_accepted": false
+    },
+    "rows": [
+      {
+        "id": "native_board_motion_cut3_229694208_229701888_fit",
+        "split": "fit",
+        "source_pts": 229694208,
+        "target_pts": 229701888,
+        "points": 30,
+        "median_native_px": 86.72770988771013,
+        "maximum_native_px": 88.6113544124437,
+        "signed_median_xy_px": [
+          86.71818774544158,
+          1.4197353267378503
+        ],
+        "anchor_height_scene_units_minmax": [
+          0.911504054241985,
+          2.621842258558333
+        ]
+      },
+      {
+        "id": "native_board_motion_cut3_229694208_229701888_holdout",
+        "split": "holdout",
+        "source_pts": 229694208,
+        "target_pts": 229701888,
+        "points": 18,
+        "median_native_px": 86.77617948161611,
+        "maximum_native_px": 87.57126015078931,
+        "signed_median_xy_px": [
+          86.7647371475959,
+          1.3959838342963167
+        ],
+        "anchor_height_scene_units_minmax": [
+          0.7152223274697134,
+          2.613497129215232
+        ]
+      }
+    ],
+    "accuracy_accepted": false
+  }
+}

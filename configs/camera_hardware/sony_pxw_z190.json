@@ -1,0 +1,136 @@
+{
+  "schema_version": "rinkspace.camera-hardware-model.v1",
+  "model_id": "sony_pxw_z190",
+  "manufacturer": "Sony",
+  "model_family": "PXW-Z190",
+  "reported_short_name": "Z190",
+  "regional_variant": null,
+  "status": "model_family_reported_by_user_from_production_team_reply",
+  "recorded_local_date": "2026-10-01",
+  "team_reply_provenance": {
+    "authority": "user_relayed_production_team_information",
+    "reported_content_summary": "The production team named Z190; individual physical units and their settings were not individually confirmed.",
+    "original_reply_quote": null,
+    "original_attachment_path": null,
+    "original_attachment_sha256": null,
+    "record_scope": "current user conversation; no claim derived from fuzzy camera photos",
+    "evidence_grade": "user_report_not_original_email",
+    "evidence_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\evidence\\camera_hardware_20261001\\user_report.md",
+    "evidence_sha256": "ced2fe67064c14a022417cb5337da5e5cef6efd3885293584369f473bf5bac43",
+    "original_email_received_by_agent": false
+  },
+  "official_sources": [
+    {
+      "id": "sony_jp_spec",
+      "url": "https://www.sony.jp/xdcam/products/PXW-Z190/spec.html",
+      "verified_local_date": "2026-10-01",
+      "authority": "manufacturer_documentation"
+    },
+    {
+      "id": "sony_product",
+      "url": "https://pro.sony/ue_US/products/handheld-camcorders/pxw-z190",
+      "verified_local_date": "2026-10-01",
+      "authority": "manufacturer_documentation"
+    },
+    {
+      "id": "sony_manual",
+      "url": "https://pro.sony/support/res/manuals/4740/1bf6ebbd9def311f789db07687817956/47407001M.pdf",
+      "verified_local_date": "2026-10-01",
+      "authority": "manufacturer_documentation"
+    }
+  ],
+  "sensor": {
+    "nominal_type": "1/3-type",
+    "technology": "Exmor R back-illuminated CMOS",
+    "rgb_sensor_count": 3,
+    "effective_pixels_nominal_wh": [
+      3840,
+      2160
+    ],
+    "effective_pixel_count_mode_dependent": true,
+    "physical_sensor_width_mm": null,
+    "physical_sensor_height_mm": null,
+    "effective_readout_window_mm": null,
+    "source_id": "sony_jp_spec"
+  },
+  "lens": {
+    "construction": "fixed integrated zoom",
+    "optical_zoom_ratio": 25.0,
+    "physical_focal_length_range_mm": [
+      3.7,
+      92.5
+    ],
+    "equivalent_35mm_focal_length_range_mm": [
+      28.8,
+      720.0
+    ],
+    "source_id": "sony_jp_spec",
+    "calibrated_focal_length_px": null,
+    "physical_mm_to_effective_video_pixels_conversion": null,
+    "brown_distortion_coefficients": null,
+    "distortion_status": "not published in the referenced official material; not zero by implication",
+    "optical_center_offset_mm": null
+  },
+  "stabilization": {
+    "mechanism": "shift-lens",
+    "supported_modes": [
+      "Off",
+      "Standard",
+      "Active"
+    ],
+    "active_mode_limitations": [
+      "not available at 3840x2160",
+      "not available during Slow and Quick Motion recording"
+    ],
+    "tripod_manual_recommendation": "Off",
+    "manual_printed_page": 37,
+    "manual_pdf_page_index": 36,
+    "source_ids": [
+      "sony_jp_spec",
+      "sony_manual"
+    ],
+    "status": "capability documented; field setting unknown; tripod recommendation is not field evidence",
+    "field_setting": null
+  },
+  "digital_extender": {
+    "supported": true,
+    "maximum_hd_zoom_equivalent": 50.0,
+    "documented_magnification": 2.0,
+    "video_crop_factor": null,
+    "source_id": "sony_product",
+    "field_enabled": null
+  },
+  "readout": {
+    "rolling_shutter_readout_seconds": null,
+    "readout_direction": null,
+    "shutter_duration_seconds": null,
+    "status": "no readout timing measured or published in the cited source"
+  },
+  "calibration_use": {
+    "numeric_intrinsics_or_geometry_supplied": false,
+    "independent_installation_parameters_required": true,
+    "effective_focal_px_not_mm": true,
+    "sensor_type_fraction_is_not_physical_width": true,
+    "family_match_does_not_confirm_shared_distortion_or_center": true,
+    "unknown_field_settings_do_not_enable_free_per_frame_parameters": true,
+    "source_validation_required": true,
+    "parameter_identifiability": {
+      "fitted_quantity": "effective final-source focal length in pixels",
+      "physical_focal_mm_from_video": null,
+      "field_digital_gain": null,
+      "field_crop_scale": null,
+      "simultaneously_free_physical_focal_digital_gain_and_effective_focal": false,
+      "unknown_shift_lens_mode_does_not_supply_per_frame_principal_offsets": true,
+      "hardware_metadata_does_not_change_existing_pivot_offset_structure": true
+    }
+  },
+  "field_output": {
+    "recording_mode": null,
+    "output_format": null,
+    "capture_frame_rate": null,
+    "scan_mode": null,
+    "camera_output_resolution_wh": null,
+    "delivery_crop_or_resize": null,
+    "firmware_version": null
+  }
+}
