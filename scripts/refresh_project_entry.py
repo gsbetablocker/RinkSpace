@@ -183,7 +183,15 @@ function navigate(){
 window.addEventListener('hashchange',navigate);navigate();
 })();
 document.querySelectorAll('[data-copy-path]').forEach(b=>b.addEventListener('click',async()=>{let ok=false;try{await navigator.clipboard.writeText(b.dataset.copyPath);ok=true}catch{let t=document.createElement('textarea');t.value=b.dataset.copyPath;document.body.append(t);t.select();ok=document.execCommand('copy');t.remove()}let s=b.closest('.surface')?.querySelector('.copy-status');if(s)s.textContent=ok?'路径已复制，可粘贴到 PotPlayer。':'请选中路径复制。'}));
-if(location.protocol!=='file:')document.querySelectorAll('a[href],img[src]').forEach(el=>{let attr=el.tagName==='IMG'?'src':'href';let h=el.getAttribute(attr);if(h&&!h.startsWith('#')&&!/^[a-z]+:/i.test(h)&&!h.startsWith('/'))el.setAttribute(attr,'/assets/project/'+h);else if(h&&h.startsWith('file:///D:/CodexData/RinkSpace_Data/'))el.setAttribute(attr,'/data/'+h.slice('file:///D:/CodexData/RinkSpace_Data/'.length));});
+const projectRoot=__PROJECT_URI__+'/', dataRoot=__DATA_URI__+'/';
+document.querySelectorAll('a[href],img[src]').forEach(el=>{
+  const attr=el.tagName==='IMG'?'src':'href', h=el.getAttribute(attr);
+  if(!h||h.startsWith('#')||h.startsWith('/')||(/^[a-z]+:/i.test(h)&&!h.startsWith('file:')))return;
+  const url=new URL(h,projectRoot).href;
+  if(location.protocol==='file:')el.setAttribute(attr,url);
+  else if(url.startsWith(projectRoot))el.setAttribute(attr,'/assets/project/'+url.slice(projectRoot.length));
+  else if(url.startsWith(dataRoot))el.setAttribute(attr,'/assets/data/'+url.slice(dataRoot.length));
+});
 </script>'''
 
 
@@ -230,8 +238,8 @@ def refresh():
             raise FileNotFoundError("Local panel needs an existing entry-data binding; the public CLI works without it")
         with target.open("xb") as handle:
             handle.write(legacy.read_bytes())
-    store = read(ROOT/"configs/storage.json")
-    temp_root = Path(store["data_root"])/"tmp"
+    store = AssetStore(ROOT)
+    temp_root = store.data / "tmp" if store.configured else store.project / "outputs/tmp"
     temp_root.mkdir(parents=True, exist_ok=True)
     original = target.read_bytes()
     expected = original
@@ -246,14 +254,13 @@ def refresh():
         head = re.sub(r'<!-- LOCAL_ENTRY_BASE_BEGIN -->.*?<!-- LOCAL_ENTRY_BASE_END -->', "", head, flags=re.S)
         head = head.replace('<script>if(location.protocol!=="file:")document.querySelector("base").href="/assets/project/";</script>', "")
         head = re.sub(r'<base[^>]*>', "", head, flags=re.I)
-        head += f'<!-- LOCAL_ENTRY_BASE_BEGIN --><base href="{ROOT.as_uri()}/"><script>if(location.protocol!=="file:")document.querySelector("base").href="/assets/project/";</script><!-- LOCAL_ENTRY_BASE_END -->'
         head = re.sub(r'<!-- PROJECT_ENTRY_STYLE_BEGIN -->.*?<!-- PROJECT_ENTRY_STYLE_END -->', '', head, flags=re.S)
         head += '<!-- PROJECT_ENTRY_STYLE_BEGIN --><style>.rink-plan{width:100%;display:block;max-height:450px;background:#fff}.model{margin-top:12px}summary{cursor:pointer}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;margin:6px 0}table{width:100%;border-collapse:collapse}td,th{text-align:left;vertical-align:top;padding:8px;border-bottom:1px solid #e1e9ec}.model>summary{font-size:15px}details.surface>summary{list-style-position:inside}.entry-view[hidden]{display:none!important}.entry-view>h1:focus{outline:none}.entry-link{display:flex;justify-content:space-between;align-items:center;gap:16px;text-decoration:none;margin-top:10px}.entry-link strong{font-size:18px}.entry-link span{font-size:14px;color:var(--muted)}.entry-link:hover{border-color:var(--accent)}#entry-breadcrumb{display:block;font-size:14px}header>a{font-size:23px;font-weight:700;text-decoration:none;color:var(--ink)}@media(max-width:650px){.entry-link{align-items:flex-start;flex-direction:column}}</style><!-- PROJECT_ENTRY_STYLE_END --></head>'
         sections = content(json.loads(data.group(1)), current.group())
         body = ('<body><main><header><a href="#/">RinkSpace</a><nav id="entry-breadcrumb" aria-label="当前位置">RinkSpace</nav></header>'
                 +sections
                 +'<footer>唯一入口：START_HERE.html · <a href="README.md">项目说明</a> · <a href="calibration/solver_runtime/README.md">求解接口</a> · <a href="CHECK_PATHS.cmd">OneDrive 路径检查</a></footer>'
-                +'<script type="application/json" id="entry-data">'+data.group(1)+'</script>'+JS+'</main></body></html>')
+                +'<script type="application/json" id="entry-data">'+data.group(1)+'</script>'+JS.replace('__PROJECT_URI__', json.dumps(ROOT.as_uri())).replace('__DATA_URI__', json.dumps(AssetStore(ROOT).data.as_uri()))+'</main></body></html>')
         output = (head+body).encode("utf-8")
         with tempfile.NamedTemporaryFile(dir=temp_root, suffix=".entry.html", delete=False) as handle:
             temporary = Path(handle.name)

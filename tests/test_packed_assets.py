@@ -70,6 +70,6 @@ def test_normal_io_keeps_cwd_semantics(tmp_path,monkeypatch):
 
 def test_direct_materialization_rejects_relative_data_root(tmp_path):
     root,data,logical,value=setup_bundle(tmp_path)
-    (root/'configs/storage.json').write_text(json.dumps(dict(data_root='relative_data')))
+    (root/'configs/storage.json').write_text(json.dumps(dict(schema_version='rinkspace.storage.v1',data_root='relative_data')))
     with pytest.raises(ValueError,match='absolute Data root'):
         materialize_project_asset(logical,project_root=root)

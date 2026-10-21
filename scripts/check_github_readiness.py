@@ -14,9 +14,10 @@ from datetime import datetime, timezone
 import json
 from pathlib import Path, PurePosixPath
 import re
+import posixpath
 import subprocess
 import sys
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, unquote
 
 # Also works when loaded directly by importlib for focused tests.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -29,7 +30,7 @@ LOCAL_NAMES = {"local.json", "credentials.json", "token.json", ".npmrc", ".pypir
 
 
 LOCAL_ONLY = {
-    "START_HERE.html", "calibration/rinkfit/START_HERE.md", "calibration/rinkfit/CODEX_START.md",
+    "configs/storage.json", "START_HERE.html", "calibration/rinkfit/START_HERE.md", "calibration/rinkfit/CODEX_START.md",
     "docs/REPOSITORY_GUIDE.md", "docs/PUBLIC_REPOSITORY_CONTENTS.md", "docs/PRIVACY_REVIEW.md",
     "docs/RUNTIME_DEPENDENCIES.md", "docs/rink_model/VALIDATION.md",
     "events/ankara_2026/diagnostics/external_review_20261007.html",
@@ -40,7 +41,7 @@ LOCAL_ONLY = {
     "events/ankara_2026/programmes/okada_mei_sp/fit_v11/audit_1018.html",
     "events/ankara_2026/programmes/okada_mei_sp/fit_v11/status.html",
 }
-PUBLIC_GUIDES = ("README.md", "MAINTENANCE.md", "environments/README.md",
+PUBLIC_GUIDES = ("AGENTS.md", "LICENSE.md", "README.md", "MAINTENANCE.md", "environments/README.md",
                  "docs/ARCHITECTURE.md", "docs/GITHUB_REVIEW.md", "docs/VALIDATION.md",
                  "calibration/rinkfit/README.md", "calibration/solver_runtime/README.md")
 QUICKSTART_FILES = ("src/rinkspace/cli.py", "src/rinkspace/demo.py", "tests/test_geometry.py",
@@ -54,25 +55,45 @@ def local_publication_path(path: str) -> bool:
             or ("source_datasets" in value.parts and value.name in {"review.html", "whole_first_shot_review.html"}))
 
 
-def public_entry_findings(root: Path, candidates: set[str]) -> list[dict]:
+def public_entry_findings(root: Path, candidates: set[str], *, text_reader=None) -> list[dict]:
+    """Check worktree guides, or exact staged text supplied by the index reader."""
+    root = root.resolve()
     findings = []
     for name in PUBLIC_GUIDES + QUICKSTART_FILES:
-        if name not in candidates or not (root / name).is_file():
+        if name not in candidates or (text_reader is None and not (root / name).is_file()):
             findings.append({"path": name, "reason": "missing_public_entry_or_quickstart_file"})
     for name in PUBLIC_GUIDES:
-        path = root / name
-        if not path.is_file():
+        if name not in candidates:
             continue
-        text = path.read_text(encoding="utf-8-sig")
+        try:
+            text = text_reader(name) if text_reader else (root / name).read_text(encoding="utf-8-sig")
+        except OSError:
+            continue
+        # Code examples are not Markdown links (e.g. C++ lambda signatures).
+        text = re.sub(r"```[\s\S]*?```|~~~[\s\S]*?~~~", "", text)
         if re.search(r"file:/+|\]\([A-Za-z]:[/\\]", text, re.I):
             findings.append({"path": name, "reason": "public_guide_depends_on_machine_file_link"})
-        for target in re.findall(r"\]\(([^)#]+)(?:#[^)]*)?\)", text):
-            if "://" in target:
+        for target in re.findall(r"\]\(<?([^\n)>]+)>?\)", text):
+            parsed = urlsplit(target.strip())
+            if parsed.scheme or parsed.netloc or not parsed.path:
                 continue
-            linked = (path.parent / target).resolve()
-            if linked.is_relative_to(root) and local_publication_path(linked.relative_to(root).as_posix()):
-                findings.append({"path": name, "reason": "public_guide_links_to_local_only_entry"})
+            linked = posixpath.normpath(posixpath.join(posixpath.dirname(name), unquote(parsed.path)))
+            if linked == ".." or linked.startswith("../") or linked.startswith("/"):
+                findings.append({"path": name, "target": target, "reason": "public_guide_target_outside_repository"})
+            elif local_publication_path(linked):
+                findings.append({"path": name, "target": target, "reason": "public_guide_links_to_local_only_entry"})
+            elif linked not in candidates and not any(p.startswith(linked.rstrip("/") + "/") for p in candidates):
+                findings.append({"path": name, "target": target, "reason": "public_guide_target_not_in_publication"})
+            elif text_reader is None and not (root / linked).exists():
+                findings.append({"path": name, "target": target, "reason": "public_guide_target_missing"})
     return findings
+
+
+def index_public_entry_findings(root: Path, index: list[dict]) -> list[dict]:
+    objects = {row["path"]: row["object_id"] for row in index}
+    with blob_reader(root) as read:
+        return public_entry_findings(root, set(objects),
+            text_reader=lambda name: read(objects[name]).decode("utf-8-sig"))
 
 
 def size_class(size: int) -> str:
@@ -287,10 +308,13 @@ def audit(root: Path, *, review_only: bool, max_text_bytes: int) -> dict:
                       for row in index if (reasons := tracked_review_reasons(row["path"]))]
     lfs_raw = [row for row in lfs_rows if row["state"] == "raw_blob_despite_lfs_attribute"]
     public_findings = public_entry_findings(root, {row["path"] for row in candidates})
+    staged_public_findings = index_public_entry_findings(root, index)
     local_tracked = [row for row in index if local_publication_path(row["path"])]
     blockers = []
     if public_findings:
         blockers.append("public_entry_or_quickstart_incomplete")
+    if staged_public_findings:
+        blockers.append("index_public_entry_incomplete")
     if local_tracked:
         blockers.append("local_work_material_tracked_for_publication")
     if index_large:
@@ -319,6 +343,8 @@ def audit(root: Path, *, review_only: bool, max_text_bytes: int) -> dict:
                     "raw_lfs_attribute_blobs_in_index_or_HEAD": len(lfs_raw), "blocking_checks": blockers,
                     "remote_count": len(git_state["remotes"]), "lfs_available": git_state["lfs_available"]},
         "public_entry_findings": public_findings,
+        "public_entry_layer": "worktree",
+        "index_public_entry_findings": staged_public_findings,
         "local_work_material_in_index": local_tracked,
         "git": git_state, "candidates": candidates,
         "index_above_ordinary_limit": index_large, "HEAD_above_ordinary_limit": head_large,

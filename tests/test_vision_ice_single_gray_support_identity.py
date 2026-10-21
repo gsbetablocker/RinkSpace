@@ -1,6 +1,7 @@
 import copy,hashlib,importlib.util,json
 from pathlib import Path
 import numpy as np
+import pytest
 from rinkspace.vision_ice_model_context_identity import SameStateIceModelContextIdentity
 from rinkspace.vision_ice_single_gray_support_identity import ConfirmedSingleGraySupportModelContextIdentity,_same_navigation_carrier,F3,DISPLAY_ROW3
 from test_vision_ice_model_context_identity import source
@@ -39,6 +40,7 @@ def literal(v):
     if isinstance(v,(list,tuple)):return [literal(x) for x in v]
     return v
 
+@pytest.mark.skipif(not PREDECESSOR.is_file(), reason="Requires the recorded predecessor source; not distributed in the public fixture")
 def test_default_context_two_exposures_is_bitexact_to_saved_predecessor(tmp_path):
     spec=importlib.util.spec_from_file_location('rinkspace._single_gray_saved_predecessor',PREDECESSOR)
     old=importlib.util.module_from_spec(spec);spec.loader.exec_module(old)

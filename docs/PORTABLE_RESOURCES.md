@@ -21,14 +21,14 @@
 | [okada_named66.resources.json](../configs/portable/okada_named66.resources.json) | 2026-10-11 的旧默认 profile 地址样本；保留历史，不当作符合现行 strict 源筛选规则的运行入口 |
 | [strict_v6_source_fit_20261013.resources.json](../configs/portable/strict_v6_source_fit_20261013.resources.json) | 2026-10-13 所选 strict v6 profile 的直接资源与政策快照；使用元数据模式生成，没有重读参数、检查点或数组内容 |
 
-v6 的原 profile 与冻结数据集仍各在原位置，模板不会替换它们。捕获之后隔壁会话可能更新实现或配置；模板中的 source SHA 只标识被捕获的那个版本，不能冒称实时“最新”。`source_eligibility_certified_by_preparation=false` 保留了数据准入与准确性验收的边界。
+v6 的原 profile 与冻结数据集仍各在原位置，模板不会替换它们。后续版本可能更新实现或配置；模板中的 source SHA 只标识被捕获的那个版本，不能冒称实时“最新”。`source_eligibility_certified_by_preparation=false` 保留了数据准入与准确性验收的边界。
 
 ## 轻量使用方式
 
 以下是将来显式调用的方式。模板只允许写入 `configs/portable/`，解析结果只允许写入 Data 的独立验证目录；不同内容的已有文件会被拒绝覆盖。
 
 ```powershell
-& D:\Python\Python311\python.exe -B scripts\prepare_portable_profile.py template `
+python -B scripts\prepare_portable_profile.py template `
   --metadata-only `
   --profile events\ankara_2026\programmes\okada_mei_sp\strict_v6_source_fit_20261013.json `
   --output configs\portable\strict_v6_source_fit_20261013.resources.json

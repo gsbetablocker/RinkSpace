@@ -17,7 +17,7 @@
 | `programmes/okada_mei_sp/` | 节目运行 profile、相机与模型绑定、审阅状态和节目人工约束 |
 | `programmes/okada_mei_sp/source_datasets/` | 冻结源清单与交付摘要；source pack、支持索引和过滤大数组保留在 Data |
 
-2026-10-13 已整理的 [v6 源清单](programmes/okada_mei_sp/source_datasets/current_review_20261013/specific_inner_review_v6/fit_dataset.json) 登记 1,282,102 个 FIT 候选、2,368 个 HELD；待核支持与待核归属不进入 FIT。镜头、曝光和缺失分母见 [交付摘要](programmes/okada_mei_sp/source_datasets/current_review_20261013/specific_inner_review_v6/delivery_summary.json)。冻结数据的交付状态、隔壁正在进行的求解接入、优化器接受状态及整镜头准确性验收分别追踪；本页不改写冻结记录或选择新模型。
+2026-10-13 已整理的 [v6 源清单](programmes/okada_mei_sp/source_datasets/current_review_20261013/specific_inner_review_v6/fit_dataset.json) 登记 1,282,102 个 FIT 候选、2,368 个 HELD；待核支持与待核归属不进入 FIT。镜头、曝光和缺失分母见 [交付摘要](programmes/okada_mei_sp/source_datasets/current_review_20261013/specific_inner_review_v6/delivery_summary.json)。该冻结版本的源数据交付、后续求解接入、优化器接受状态及整镜头准确性验收分别追踪；本页不改写冻结记录或选择新模型。
 
 场地拟合只允许原片核实属于冰面或围挡本体的静止实体与材料。人物、看台、字幕、倒影等范围外点及归属未确认点排除，不能借未知深度参与。待核点保留来源，不自动视作已确认的负例。
 

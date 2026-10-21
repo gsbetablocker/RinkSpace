@@ -8,9 +8,12 @@ import hashlib
 import json
 from pathlib import Path, PureWindowsPath
 import subprocess
+import sys
 
 
 PROJECT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT / "src"))
+from rinkspace.storage import load_storage_config, configured_data_root
 EXCLUDED = {".git", ".venv", "__pycache__", ".pytest_cache", "node_modules"}
 CODE_SUFFIXES = {".py", ".ps1", ".cmd", ".bat", ".c", ".cpp", ".h", ".cu"}
 
@@ -98,7 +101,7 @@ def check_sources(root: Path):
 def input_references(root: Path, data_root: Path):
     """Declared profile paths only; existence does not prove full dependency closure."""
     references = []
-    old_data = read_json(root / "configs/storage.json").get("data_root", "")
+    old_data = load_storage_config(root).get("data_root", "")
     prefix = old_data.replace("\\", "/").rstrip("/") + "/"
     for base in (root / "configs/solver_runtime", root / "events"):
         if not base.is_dir():
@@ -194,7 +197,7 @@ def main():
     parser.add_argument("--output", type=Path, help="Optional JSON report under Data; default is stdout.")
     options = parser.parse_args()
     root = options.project.resolve()
-    data = (options.data_root or Path(read_json(root / "configs/storage.json")["data_root"])).resolve()
+    data = configured_data_root(root, data_root=options.data_root)
     report = audit(root, data)
     rendered = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     if options.output:

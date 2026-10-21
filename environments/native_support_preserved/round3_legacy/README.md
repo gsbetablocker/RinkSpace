@@ -1,6 +1,6 @@
 # 历史原生支持定义保全
 
-返回 [运行依赖说明](../../../docs/RUNTIME_DEPENDENCIES.md)。逐项来源、SHA-256、字节数与源 stat 稳定性见 [source_preservation_manifest.json](source_preservation_manifest.json)。
+返回 [当前环境说明](../../README.md)。逐项来源、SHA-256、字节数与源 stat 稳定性见 [source_preservation_manifest.json](source_preservation_manifest.json)。
 
 2026-10-13 按原始字节保全 Data 中七个小型文件。复制前后核对源 stat，重读原件并逐字节比较副本；原件保持原位。目标已存在时只接受完全相同内容，不覆盖不同内容。
 

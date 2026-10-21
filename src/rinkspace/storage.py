@@ -6,6 +6,7 @@ are resolved here, while new runs and disposable caches use the data root.
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path, PureWindowsPath
 import re
 from urllib.parse import quote
@@ -13,17 +14,48 @@ from urllib.parse import quote
 from .path_policy import guard_project_write
 
 
+def load_storage_config(project: str | Path, *, data_root: str | Path | None = None) -> dict:
+    """Shared mappings plus optional, untracked machine roots; explicit root wins."""
+    project = Path(project).resolve()
+    config = {}
+    for name in ("storage.defaults.json", "storage.json"):
+        path = project / "configs" / name
+        if path.is_file():
+            values = json.loads(path.read_text(encoding="utf-8-sig"))
+            # Older local mapping files predate the explicit schema field.
+            schema = values.get("schema_version", "rinkspace.storage.v1" if name == "storage.json" else None)
+            if schema != "rinkspace.storage.v1":
+                raise ValueError("Unsupported storage configuration")
+            config.update(values)
+    selected = data_root if data_root is not None else os.environ.get("RINKSPACE_DATA_ROOT")
+    if selected is not None:
+        config["data_root"] = str(selected)
+    if config.get("data_root") and not Path(config["data_root"]).is_absolute():
+        raise ValueError("Storage requires an absolute Data root; set RINKSPACE_DATA_ROOT or configs/storage.json")
+    return config
+
+
+def configured_data_root(project: str | Path, *, data_root: str | Path | None = None) -> Path:
+    config = load_storage_config(project, data_root=data_root)
+    if not config.get("data_root"):
+        raise ValueError("Set RINKSPACE_DATA_ROOT or copy configs/storage.example.json to configs/storage.json and set data_root")
+    return Path(config["data_root"]).resolve()
+
+
+def storage_cache_root(project: str | Path) -> Path:
+    """Resolve pytest/disposable caches by the same machine-root policy."""
+    import tempfile
+    config = load_storage_config(project)
+    return (Path(config["data_root"]).resolve() if config.get("data_root") else
+            Path(tempfile.gettempdir()) / "RinkSpace_Data")
+
+
 class AssetStore:
-    def __init__(self, root: str | Path):
+    def __init__(self, root: str | Path, *, data_root: str | Path | None = None):
         self.project = Path(root).resolve()
-        config_path = self.project / "configs/storage.json"
-        self.configured = config_path.is_file()
-        config = json.loads(config_path.read_text(encoding="utf-8-sig")) if self.configured else {}
-        if self.configured and config.get("schema_version") != "rinkspace.storage.v1":
-            raise ValueError("Unsupported storage configuration")
+        config = load_storage_config(self.project, data_root=data_root)
+        self.configured = bool(config.get("data_root"))
         self.data = Path(config["data_root"]).resolve() if self.configured else self.project
-        if self.configured and not Path(config["data_root"]).is_absolute():
-            raise ValueError("Storage data_root must be absolute")
         self.event = self._under(self.data, config.get("event_root", "."))
         self.legacy_root = Path(config.get("legacy_root", self.project)).resolve()
         self.path_aliases = load_project_path_aliases(self.project)
@@ -32,12 +64,12 @@ class AssetStore:
             self.project_paths.append((self._relative(prefix), self._under(self.project, target)))
         self.project_paths.sort(key=lambda row: len(row[0].parts), reverse=True)
         self.legacy_paths = []
-        for prefix, target in config.get("legacy_paths", {}).items():
+        for prefix, target in (config.get("legacy_paths", {}) if self.configured else {}).items():
             prefix_path = self._relative(prefix)
             self.legacy_paths.append((prefix_path, self._under(self.data, target)))
         self.legacy_paths.sort(key=lambda row: len(row[0].parts), reverse=True)
         self.fallback_paths = []
-        for prefix, target in config.get("fallback_paths", {}).items():
+        for prefix, target in (config.get("fallback_paths", {}) if self.configured else {}).items():
             self.fallback_paths.append((self._relative(prefix), self._under(self.data, target)))
         self.fallback_paths.sort(key=lambda row: len(row[0].parts), reverse=True)
         self.public_project_paths = tuple(

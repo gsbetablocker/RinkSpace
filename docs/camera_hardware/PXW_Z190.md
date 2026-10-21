@@ -8,7 +8,7 @@
 
 - [型号注册表](../../configs/camera_hardware/sony_pxw_z190.json) 保存厂家能力。
 - [样本机位关联](../../configs/camera_hardware/okada_sp_installations_z190_v1.json) 保存来源、安装身份与历史散列。
-- [用户转述原记录](D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/camera_hardware_20261001/user_report.md) 保留原证据等级。
+- 用户转述原记录（本地保存，未随仓库分发）：`D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/camera_hardware_20261001/user_report.md` 保留原证据等级。
 - [样本现行求解输入](../../configs/solver_runtime/okada_named66.json) 指向实际采用的机位安装与围挡外位置事实；关联表中的旧记录不代表最新运行采用值。
 
 厂家给出的固定镜头为 25 倍光学变焦，物理焦距 3.7–92.5 mm，35 mm 等效范围 28.8–720 mm；“1/3 型”三片 CMOS 不等于已测得感光宽度。[Sony 规格](https://www.sony.jp/xdcam/products/PXW-Z190/spec.html)
@@ -29,4 +29,4 @@
 
 [camera_hardware_metadata.py](../../calibration/program_tracking/camera_hardware_metadata.py) 提供 load_metadata() 与 calibration_context()：验证源身份与安装关联，返回设备上下文，不生成标定系数。其默认镜头表与部分注册记录仍含迁移前路径，调用者需要显式提供并核对真实输入；本页不声称该旧默认加载器已完成迁移。
 
-[旧设备候选线索](D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/history/tracking_runs/solver_acceleration/round7_repair/before/camera_hardware_leads.md) 保留失败历史。旧共享 K4／零 Brown 对照出现副机位退步及异常 skew，不能称为已接受的设备标定。组件投影或导数检查通过，也不等于现场设置已确认或完整节目已贴合。
+旧设备候选线索（本地保存，未随仓库分发）：`D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/history/tracking_runs/solver_acceleration/round7_repair/before/camera_hardware_leads.md` 保留失败历史。旧共享 K4／零 Brown 对照出现副机位退步及异常 skew，不能称为已接受的设备标定。组件投影或导数检查通过，也不等于现场设置已确认或完整节目已贴合。

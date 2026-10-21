@@ -253,11 +253,12 @@ def test_workbench_serves_external_panel_and_falls_back_to_generic_ui(stored_pro
     import threading
     from rinkspace import web
 
-    project, _ = stored_project
+    project, data = stored_project
     (project / "START_HERE.html").write_bytes(b"legacy panel must not become the public homepage")
     panel = AssetStore(project).project_entry()
     panel.parent.mkdir(parents=True)
-    panel.write_bytes(b"<title>External local panel</title>")
+    from test_project_entry import build_panel
+    panel = build_panel(project, data)
     original = web.ThreadingHTTPServer
     ready = threading.Event()
     servers = []
@@ -293,3 +294,38 @@ def test_workbench_serves_external_panel_and_falls_back_to_generic_ui(stored_pro
         instance.shutdown()
         instance.server_close()
         worker.join(5)
+
+
+def test_shared_storage_defaults_do_not_select_a_machine_root(tmp_path, monkeypatch):
+    from rinkspace.storage import storage_cache_root
+    import tempfile
+    monkeypatch.delenv("RINKSPACE_DATA_ROOT", raising=False)
+    project = tmp_path / "clone"
+    (project / "configs").mkdir(parents=True)
+    (project / "configs/storage.defaults.json").write_text(json.dumps(dict(
+        schema_version="rinkspace.storage.v1", event_root="events/example",
+        project_paths={"old-model": "events/example/models"},
+        legacy_paths={"outputs": "events/example/history"})), encoding="utf-8")
+    store = AssetStore(project)
+    assert not store.configured
+    assert store.output("runs").is_relative_to(project / "outputs")
+    assert storage_cache_root(project) == Path(tempfile.gettempdir()) / "RinkSpace_Data"
+
+
+def test_explicit_and_environment_data_roots_work_without_local_config(tmp_path, monkeypatch):
+    from rinkspace.storage import storage_cache_root
+    from rinkspace.web import Workbench
+    project = tmp_path / "clone"
+    (project / "configs").mkdir(parents=True)
+    shared = project / "configs/storage.defaults.json"
+    shared.write_text(json.dumps(dict(schema_version="rinkspace.storage.v1",
+                      event_root="events/example")), encoding="utf-8")
+    original = shared.read_bytes()
+    data, override = tmp_path / "data", tmp_path / "override"
+    monkeypatch.setenv("RINKSPACE_DATA_ROOT", str(data))
+    store = AssetStore(project)
+    assert store.data == data and store.event == data / "events/example"
+    assert storage_cache_root(project) == data
+    assert Workbench(project).path.is_relative_to(data)
+    assert AssetStore(project, data_root=override).data == override
+    assert shared.read_bytes() == original and not (project / "configs/storage.json").exists()

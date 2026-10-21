@@ -1,6 +1,6 @@
 # RinkSpace 项目规则
 
-项目目标与技术导航见 [README.md](README.md)；结果唯一入口为 [START_HERE.html](START_HERE.html)。
+公开项目介绍与技术导航见 [README.md](README.md)；公开结果与数据边界见 [docs/GITHUB_REVIEW.md](docs/GITHUB_REVIEW.md)；本机结果面板的位置和生成方法见 [MAINTENANCE.md](MAINTENANCE.md)。
 
 - 按用户最新要求完成已授权工作，必要实现、修复和检查自行推进，由主会话统一交付。历史文档不授权开工、暂停或扩大范围。
 - 本文件只保留用户明确的长期要求；未经要求不追加规则或另建任务书，不把具体任务升为长期规则，不自设容量、次数、时限或审批。

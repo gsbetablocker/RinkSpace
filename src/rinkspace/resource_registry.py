@@ -196,7 +196,8 @@ class ResourceRegistry:
     @classmethod
     def from_project(cls, project_root: str | Path, data_root: str | Path) -> "ResourceRegistry":
         registry = cls(project_root, data_root)
-        config = json.loads((registry.project / "configs/storage.json").read_text(encoding="utf-8-sig"))
+        from .storage import load_storage_config
+        config = load_storage_config(registry.project)
         old_project = config.get("legacy_root", str(registry.project))
         registry._load_privacy_derivatives()
         registry.path_aliases = load_project_path_aliases(registry.project)
@@ -211,7 +212,7 @@ class ResourceRegistry:
             registry.add_prefix(old_project.rstrip("/\\") + "/" + prefix, root_kind="data", relative_path=target)
         for prefix, target in config.get("project_paths", {}).items():
             registry.add_prefix(old_project.rstrip("/\\") + "/" + prefix, root_kind="project", relative_path=target)
-        registry.add_prefix(config["data_root"], root_kind="data")
+        registry.add_prefix(config.get("data_root", str(registry.data)), root_kind="data")
         registry.add_prefix(old_project, root_kind="project")
         registry.add_prefix(str(registry.project), root_kind="project")
         registry.add_prefix(str(registry.data), root_kind="data")

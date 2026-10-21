@@ -67,8 +67,45 @@ def test_public_guides_cannot_require_local_panels_or_missing_demo(tmp_path):
     assert readiness.public_entry_findings(tmp_path, names) == []
     (tmp_path / "START_HERE.html").write_text("local task state", encoding="utf-8")
     (tmp_path / "README.md").write_text("[results](START_HERE.html)", encoding="utf-8")
-    assert {"path": "README.md", "reason": "public_guide_links_to_local_only_entry"} in readiness.public_entry_findings(tmp_path, names)
+    assert any(row["path"] == "README.md" and row["reason"] == "public_guide_links_to_local_only_entry" for row in readiness.public_entry_findings(tmp_path, names))
     (tmp_path / "src/rinkspace/demo.py").unlink()
     assert {"path": "src/rinkspace/demo.py", "reason": "missing_public_entry_or_quickstart_file"} in readiness.public_entry_findings(tmp_path, names)
     assert readiness.tracked_review_reasons("events/example/programmes/test/source_datasets/batch/review.html")
     assert not readiness.tracked_review_reasons("src/rinkspace/static/frame_point_editor.html")
+
+
+def test_general_links_must_exist_in_publication_and_staged_text_is_independent(tmp_path):
+    names = set(readiness.PUBLIC_GUIDES + readiness.QUICKSTART_FILES)
+    for name in names:
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("# entry", encoding="utf-8")
+    staged = {name: (tmp_path / name).read_text(encoding="utf-8") for name in names}
+    staged["README.md"] = "[lost](docs/missing.md)"
+    found = readiness.public_entry_findings(tmp_path, names, text_reader=staged.__getitem__)
+    assert any(x["target"] == "docs/missing.md" for x in found)
+    assert readiness.public_entry_findings(tmp_path, names) == []
+    (tmp_path / "local-only.md").write_text("exists only locally", encoding="utf-8")
+    (tmp_path / "AGENTS.md").write_text("[local](local-only.md)", encoding="utf-8")
+    assert any(x.get("target") == "local-only.md" for x in readiness.public_entry_findings(tmp_path, names))
+    (tmp_path / "AGENTS.md").write_text("[sources](src/rinkspace/)", encoding="utf-8")
+    assert readiness.public_entry_findings(tmp_path, names) == []
+
+
+def test_staged_navigation_is_read_from_git_not_the_fixed_worktree(tmp_path):
+    import subprocess
+    def git(*args):
+        return subprocess.run(["git", "-C", str(tmp_path), *args], check=True, capture_output=True)
+    git("init", "--quiet")
+    names = set(readiness.PUBLIC_GUIDES + readiness.QUICKSTART_FILES)
+    for name in names:
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("# public", encoding="utf-8")
+    readme = tmp_path / "README.md"
+    readme.write_text("[bad](docs/absent.md)", encoding="utf-8")
+    git("add", ".")
+    readme.write_text("# fixed working copy", encoding="utf-8")
+    index, _, _ = readiness.inventory.current_index_paths(tmp_path)
+    assert readiness.public_entry_findings(tmp_path, names) == []
+    assert any(row.get("target") == "docs/absent.md" for row in readiness.index_public_entry_findings(tmp_path, index))

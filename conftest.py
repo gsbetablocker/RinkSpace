@@ -1,21 +1,17 @@
 """Keep pytest's disposable cache outside the synchronized checkout."""
 from __future__ import annotations
 
-import json
 from pathlib import Path
-import tempfile
-
+import sys
 import pytest
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
+from rinkspace.storage import storage_cache_root
 
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_configure(config):
-    root = Path(__file__).resolve().parent
-    storage = root / "configs/storage.json"
-    if storage.is_file():
-        registered = json.loads(storage.read_text(encoding="utf-8-sig"))
-        data = Path(registered["data_root"]).resolve()
-    else:
-        data = Path(tempfile.gettempdir()) / "RinkSpace_Data"
-    # Explicit user overrides still follow pytest's normal configuration rules.
+    if not config.pluginmanager.hasplugin("cacheprovider"):
+        return
+    data = storage_cache_root(Path(__file__).resolve().parent)
     config.inicfg.setdefault("cache_dir", str(data / "cache" / "pytest"))

@@ -1,4 +1,4 @@
-"""Standard-library-only package checks; no original media or runtime deps."""
+"""Package checks use stdlib and Git; standalone verification needs only stdlib."""
 from __future__ import annotations
 
 import importlib.util
@@ -7,6 +7,8 @@ from pathlib import Path
 import tempfile
 import unittest
 import zipfile
+import subprocess
+import sys
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,6 +23,8 @@ class SourceReviewTests(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         files = {'README.md': '# Test project', 'pyproject.toml': '[project]\nname="fixture"',
+                 'LICENSE.md': '# Fixture licence', 'MAINTENANCE.md': '# Maintenance',
+                 'environments/README.md': '# Environment', 'calibration/example.py': 'value = 1',
                  'START_LOCAL.cmd': '@echo off', 'INSTALL_LOCAL.cmd': '@echo off',
                  'src/fixture.py': 'value = 1\n', 'tests/test_fixture.py': 'assert True\n',
                  'docs/ARCHITECTURE.md': '# Public architecture', 'docs/PRIVACY_REVIEW.md': 'LOCAL_WORK_RECORD',
@@ -29,10 +33,16 @@ class SourceReviewTests(unittest.TestCase):
                  'data/input/source.mp4': 'DO_NOT_PACKAGE', '.venv/private.py': 'DO_NOT_PACKAGE',
                  'outputs/private.json': 'DO_NOT_PACKAGE', '.git/private': 'DO_NOT_PACKAGE',
                  'evidence/tests/current.json': '{"passed":1}'}
+        files['.gitignore'] = '.venv/\noutputs/\ndata/input/\nconfigs/local.json\nconfigs/storage.json\nSTART_CODEX.md\ntasks/\n'
         for name, content in files.items():
             path = self.root / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(content, encoding='utf-8')
+
+        subprocess.run(['git', 'init', '--quiet', str(self.root)], check=True, capture_output=True)
+        script = self.root / 'scripts/export_source_review.py'
+        script.parent.mkdir(parents=True, exist_ok=True)
+        script.write_bytes((ROOT / 'scripts/export_source_review.py').read_bytes())
 
     def export(self, **kwargs):
         return exporter.export_source_review(self.root, test_records=['evidence/tests/current.json'], **kwargs)
@@ -77,6 +87,32 @@ class SourceReviewTests(unittest.TestCase):
             archive.writestr('extra.txt', 'not in manifest')
         with self.assertRaisesRegex(ValueError, 'undeclared'):
             exporter.verify_source_review(result['path'])
+
+
+    def test_external_data_snapshot_retains_entries_and_verifies_without_project_imports(self):
+        with tempfile.TemporaryDirectory() as folder:
+            data = Path(folder)
+            (self.root / 'configs/storage.json').write_text(json.dumps(dict(
+                schema_version='rinkspace.storage.v1', data_root=str(data))), encoding='utf-8')
+            (self.root / 'START_CODEX.md').write_text('LOCAL_WORK_RECORD', encoding='utf-8')
+            (self.root / 'tasks').mkdir()
+            (self.root / 'tasks/old.md').write_text('LOCAL_WORK_RECORD', encoding='utf-8')
+            result = self.export()
+            self.assertTrue(Path(result['path']).is_relative_to(data))
+            unpacked = data / 'unpacked'
+            with zipfile.ZipFile(result['path']) as archive:
+                names = set(archive.namelist())
+                for name in ('LICENSE.md', 'MAINTENANCE.md', 'environments/README.md', 'calibration/example.py'):
+                    self.assertIn(name, names)
+                for name in ('START_CODEX.md', 'tasks/old.md', 'configs/storage.json', 'START_HERE.html'):
+                    self.assertNotIn(name, names)
+                self.assertNotIn('pytest -q', archive.read('SOURCE_REVIEW.md').decode('utf-8'))
+                archive.extractall(unpacked)
+            verified = subprocess.run([sys.executable, '-I', '-S',
+                str(unpacked / 'scripts/export_source_review.py'), '--verify', str(unpacked)],
+                cwd=unpacked, capture_output=True, text=True, check=False)
+            self.assertEqual(verified.returncode, 0, verified.stderr)
+            self.assertTrue(json.loads(verified.stdout)['verified'])
 
 
 if __name__ == '__main__':

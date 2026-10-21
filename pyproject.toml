@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rinkspace"
-version = "0.4.0"
+dynamic = ["version"]
 description = "Local spatial analysis for figure skating broadcasts"
 requires-python = ">=3.11"
 dependencies = ["numpy>=1.26,<3", "opencv-python-headless>=4.10,<5", "Pillow>=10,<13", "av>=14,<19"]
@@ -16,6 +16,9 @@ acquisition = ["yt-dlp>=2026.8.19"]
 
 [project.scripts]
 rinkspace = "rinkspace.cli:main"
+
+[tool.setuptools.dynamic]
+version = {attr = "rinkspace.__version__"}
 
 [tool.setuptools.packages.find]
 where = ["src"]

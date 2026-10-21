@@ -120,11 +120,11 @@ def materialize_project_asset(path: str | Path, *, project_root=DEFAULT_PROJECT)
     row = packed_asset_reference(logical, project_root=root)
     if row is None:
         return logical
-    config = json.loads((root / 'configs/storage.json').read_text(encoding='utf-8-sig'))
-    configured_data = Path(config['data_root'])
-    if not configured_data.is_absolute():
-        raise ValueError('Packed assets require an absolute Data root')
-    data = configured_data.resolve()
+    from .storage import load_storage_config
+    config = load_storage_config(root)
+    if not config.get('data_root'):
+        raise ValueError('Packed assets require an absolute external Data root; set RINKSPACE_DATA_ROOT')
+    data = Path(config['data_root']).resolve()
     if data.is_relative_to(root):
         raise ValueError('Packed assets require a separate external Data root')
     target = data / 'cache/packed_assets' / (row['sha256'] + logical.suffix)

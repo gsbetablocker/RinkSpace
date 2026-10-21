@@ -1,8 +1,8 @@
 """Read-only publication inventory; writes its report only beneath external Data.
 
-This script never stages files, changes Git configuration, loads project modules,
-reads source media, or scans other projects. It is a preparation report, not a
-public-release security or licence certificate.
+This script never stages files, changes Git configuration, reads source media,
+or scans other projects. Metadata-only mode needs no project runtime imports.
+It is a preparation report, not a public-release security or licence certificate.
 """
 from __future__ import annotations
 
@@ -14,6 +14,7 @@ from pathlib import Path
 import re
 import stat
 import subprocess
+import sys
 
 
 PROJECT = Path(__file__).resolve().parents[1]
@@ -382,7 +383,7 @@ def audit(root: Path, max_text_bytes: int) -> dict:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--data-root", type=Path, help="External Data root; required for --metadata-only. Full mode defaults to configs/storage.json.")
+    parser.add_argument("--data-root", type=Path, help="External Data root; required for --metadata-only. Full mode uses the configured local Data root.")
     parser.add_argument("--output", type=Path, help="JSON report destination beneath Data only.")
     parser.add_argument("--metadata-only", action="store_true", help="Low-load names/attributes/stat only; skip blob, history, credential/content scans and hashes.")
     parser.add_argument("--max-text-bytes", type=int, default=4 * MIB, help="Per-file bounded text scan; skipped files are listed.")
@@ -395,8 +396,9 @@ def main():
     if options.data_root:
         data = options.data_root.resolve()
     else:
-        config = json.loads((root / "configs/storage.json").read_text(encoding="utf-8-sig"))
-        data = Path(config["data_root"]).resolve()
+        sys.path.insert(0, str(PROJECT / "src"))
+        from rinkspace.storage import configured_data_root
+        data = configured_data_root(root)
     if data.is_relative_to(root) or root.is_relative_to(data):
         parser.error("Data and the source worktree must be separate directories")
     local_date = datetime.now(timezone(timedelta(hours=8))).strftime("%Y%m%d")

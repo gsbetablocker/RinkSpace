@@ -48,6 +48,8 @@ solver_runtime 先核对源码 SHA，再查找 RINKSPACE_SOLVER_NATIVE_CACHE_ROO
 
 源身份、PTS、资格、完整 q/profile、统计 W、物理 guard、producer 与原生身份均须对应所选运行。旧 import/pickle 名称由 source_manifest 加载；复制文件或更换根目录不会自动改写这些契约。[可选 ResourceRegistry](../docs/PORTABLE_RESOURCES.md)仍是独立准备接口，尚未替代活动 AssetStore 和完整运行路径。
 
-历史原生支持 README 按来源清单保留原字节，其中 smoke_report、synthetic_scaling 和旧第三轮报告不随公开仓库提供；其旧相对链接属于历史资源布局。构建身份可从 source_preservation_manifest 和各 build_manifest 查询，不能将缺失报告当作当前复现依赖。
+历史原生支持内层七份原文件按来源清单保留原字节，其中 smoke_report、synthetic_scaling 和旧第三轮报告不随公开仓库提供；其旧相对链接属于历史资源布局。构建身份可从 source_preservation_manifest 和各 build_manifest 查询，不能将缺失报告当作当前复现依赖。
 
 历史 solver_runtime 的 source_manifest 固定原始源码身份，部分公开脱敏字节会被原校验拒绝。依赖该运行时的测试需准备匹配原件；纯代价保护测试按需加载 legacy，不为测试绕过生产身份检查。
+
+共享映射在 [storage.defaults.json](../configs/storage.defaults.json)，本机根目录由忽略的 configs/storage.json 或 RINKSPACE_DATA_ROOT 提供；示例见 [storage.example.json](../configs/storage.example.json)。普通 clone 不读取作者盘符。AssetStore 和 pytest 缓存使用同一解析器；需要外部资源的工具在缺少 Data 根时给出设置方法。

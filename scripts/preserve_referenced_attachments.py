@@ -9,6 +9,7 @@ import sys
 
 PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT / "src"))
+from rinkspace.storage import configured_data_root
 from rinkspace.resource_registry import ResourceRegistry, reference_key, sha256
 
 
@@ -18,8 +19,7 @@ def state(path: Path):
 
 
 def main():
-    storage = json.loads((PROJECT / "configs/storage.json").read_text(encoding="utf-8-sig"))
-    data = Path(storage["data_root"]).resolve()
+    data = configured_data_root(PROJECT)
     registry = ResourceRegistry.from_project(PROJECT, data)
     manifest_path = PROJECT / "events/ankara_2026/asset_preservation_manifest.json"
     output = PROJECT / "events/ankara_2026/external_resource_preservation.json"

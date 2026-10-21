@@ -12,7 +12,7 @@
 | [START_FAST_SOLVER.ps1](START_FAST_SOLVER.ps1) | 现有样本配置的便利入口；输入、完整状态和后端须与所选 profile 相符 |
 | [solver_runtime](calibration/solver_runtime/README.md)、[rinkfit](calibration/rinkfit/README.md) | 求解与后端接口 |
 
-`configs/storage.json` 是现有机器的资源桥配置；新机器须调整 Data 根和实际资源。AssetStore.project_entry() 将面板定位到 Data/workbench/START_HERE.html；Web 服务的 / 路由在该页面存在时显示它，否则使用通用工作台。审阅页按 source_datasets → results 定位到 Data，源观测和人工确认仍留原目录。
+共享资源映射保存在 [storage.defaults.json](configs/storage.defaults.json)。本机 `configs/storage.json` 被 Git 忽略；新机器可复制 [storage.example.json](configs/storage.example.json) 并填入绝对 Data 根，或设置 `RINKSPACE_DATA_ROOT`。显式 `AssetStore(root, data_root=...)` 优先于环境变量和本机文件；未配置 Data 时，通用工作台只使用受忽略的 outputs，本机 pytest 缓存使用系统临时目录。AssetStore.project_entry() 将面板定位到 Data/workbench/START_HERE.html；Web 服务的 / 路由在该页面存在时显示它，否则使用通用工作台。审阅页按 source_datasets → results 定位到 Data，源观测和人工确认仍留原目录。
 
 旧根页面、镜头专用快捷方式及历史交接材料在本机保留并忽略，不作为公开入口。它们可能仍被已有对话使用。刷新器可从旧根页面首次初始化 Data 面板；本机无冻结绑定时无需生成该面板，基础 CLI 和通用工作台可独立使用。
 

@@ -199,6 +199,9 @@ def compact_redundant_points(features, ceiling=500):
     return removed
 
 def run():
+    # Check a requested publication before modifying observations.
+    if PUBLISH_ENTRY:
+        AssetStore(ROOT).project_entry().read_text(encoding='utf-8')
     if (OUT / 'user_acceptance.json').exists() or any(read(p).get('manual_editor') for p in (OUT / 'frames').glob('*.json')):
         raise ValueError('User-reviewed or manually edited packets must not be overwritten by automatic assembly')
     manifest = read(DATA / 'frame_manifest.json')
@@ -207,7 +210,9 @@ def run():
         raise ValueError('Selected manifest does not match the requested shot')
     label = {1:'第一镜头',2:'第二镜头',3:'第三镜头'}.get(shot,f'第{shot}镜头')
     marker_name = f'SHOT{shot}_SELECTED_REVIEW_20261014'
-    restart_link = f'START_SHOT{shot}_REVIEW.cmd'
+    restart = ROOT / f'START_SHOT{shot}_REVIEW.cmd'
+    restart_html = (f'<a href="{restart.as_uri()}">重启{label}审阅后端</a> · ' if restart.is_file() else
+        f'<a href="{(ROOT / "START_POINT_EDITOR.ps1").as_uri()}">通用点位编辑器（指定 Dataset、Media、Model）</a> · ')
     entry_label = label + ('返修版' if '_r2_' in OUT.name else '')
     selected_pts = [r['source']['native_pts'] for r in manifest['frames']]
     intervals = np.diff(selected_pts) / 12800
@@ -424,24 +429,25 @@ def run():
     text = text.replace('帧取点审阅', f'帧 · {label} {len(rows)} 张选中帧审阅')
     text = text.replace('<p class="meta" id="meta">', f'<p>仅列出每 0.5–1 秒挑选的尽量清晰帧；快速摇镜段仍有残留拖影，逐帧注明读取限制。全镜头其余帧没有读点数据。<a href="{EDITOR_URL}">进入可加点、删点审阅页</a></p><p class="meta" id="meta">')
     page.write_text(text, encoding='utf-8')
-    entry = AssetStore(ROOT).project_entry()
-    current_entry = entry.read_text(encoding='utf-8')
-    block = (f'<!-- {marker_name}_BEGIN --><section class="surface" id="shot{shot}-selected-review-20261014">'
-        f'<h3>冈田芽衣：{entry_label} {len(rows)} 张选帧取点，等待人工审核</h3>'
-        f'<p>官方50fps原生PTS：{rows[0]["source_time"]}–{rows[-1]["source_time"]}。相邻选帧间隔'
-        f'{intervals.min():.2f}–{intervals.max():.2f}秒，每个时间段均选尽量清晰的帧；快速摇镜帧保留残留运动模糊说明。</p>'
-        f'<p>冰面直线、靶圈、其它已确认场地标识，围挡上下沿，广告边界、文字与图案。'
-        f'每帧{min(numbers)}–{max(numbers)}点，总计{sum(numbers)}点；上限500，尚未人工验收、未重新拟合。</p>'
-        f'<p><a href="{EDITOR_URL}">打开{label}可加点、删点审阅页</a> · '
-        f'<a href="{restart_link}">重启{label}审阅后端</a> · '
-        f'<a href="{AssetStore(ROOT).review_page(OUT).as_uri()}">静态审阅页</a></p>'
-        f'</section><!-- {marker_name}_END -->\n')
-    marker = rf'<!-- {marker_name}_BEGIN -->.*?<!-- {marker_name}_END -->\s*'
-    if re.search(marker, current_entry, flags=re.S):
-        current_entry = re.sub(marker, lambda _: block, current_entry, count=1, flags=re.S)
-    else:
-        current_entry = current_entry.replace('<!-- CURRENT_TASK_BEGIN -->', '<!-- CURRENT_TASK_BEGIN -->\n' + block, 1)
-    if PUBLISH_ENTRY:entry.write_text(current_entry, encoding='utf-8')
+    if PUBLISH_ENTRY:
+        entry = AssetStore(ROOT).project_entry()
+        current_entry = entry.read_text(encoding='utf-8')
+        block = (f'<!-- {marker_name}_BEGIN --><section class="surface" id="shot{shot}-selected-review-20261014">'
+            f'<h3>冈田芽衣：{entry_label} {len(rows)} 张选帧取点，等待人工审核</h3>'
+            f'<p>官方50fps原生PTS：{rows[0]["source_time"]}–{rows[-1]["source_time"]}。相邻选帧间隔'
+            f'{intervals.min():.2f}–{intervals.max():.2f}秒，每个时间段均选尽量清晰的帧；快速摇镜帧保留残留运动模糊说明。</p>'
+            f'<p>冰面直线、靶圈、其它已确认场地标识，围挡上下沿，广告边界、文字与图案。'
+            f'每帧{min(numbers)}–{max(numbers)}点，总计{sum(numbers)}点；上限500，尚未人工验收、未重新拟合。</p>'
+            f'<p><a href="{EDITOR_URL}">打开{label}可加点、删点审阅页</a> · '
+            + restart_html +
+            f'<a href="{AssetStore(ROOT).review_page(OUT).as_uri()}">静态审阅页</a></p>'
+            f'</section><!-- {marker_name}_END -->\n')
+        marker = rf'<!-- {marker_name}_BEGIN -->.*?<!-- {marker_name}_END -->\s*'
+        if re.search(marker, current_entry, flags=re.S):
+            current_entry = re.sub(marker, lambda _: block, current_entry, count=1, flags=re.S)
+        else:
+            current_entry = current_entry.replace('<!-- CURRENT_TASK_BEGIN -->', '<!-- CURRENT_TASK_BEGIN -->\n' + block, 1)
+        entry.write_text(current_entry, encoding='utf-8')
     write(DATA / 'assembly_validation.json', dict(frame_count=len(rows), point_count=sum(numbers),
         all_source_hashes_and_typed_targets_verified=True, model_entry_finite=True,
         accuracy_or_user_acceptance_claimed=False, optimization_performed=False, review_html=str(page)))

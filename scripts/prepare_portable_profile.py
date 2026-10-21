@@ -11,6 +11,7 @@ PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT / "src"))
 from rinkspace.resource_registry import ResourceRegistry, sha256
 from rinkspace.path_policy import guard_project_write
+from rinkspace.storage import configured_data_root
 
 
 def json_read(path: Path):
@@ -136,7 +137,7 @@ def main():
     parser.add_argument("--metadata-only", action="store_true", help="Read the selected profile and resource metadata; skip hashing registered asset contents.")
     args = parser.parse_args()
     root = args.project_root.resolve()
-    data = (args.data_root or Path(json_read(root / "configs/storage.json")["data_root"])).resolve()
+    data = configured_data_root(root, data_root=args.data_root)
     registry = ResourceRegistry.from_project(root, data)
     output = (args.output if args.output.is_absolute() else (root if args.mode == "template" else data) / args.output).resolve()
     if args.mode == "template":

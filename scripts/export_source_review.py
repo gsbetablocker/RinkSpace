@@ -1,20 +1,19 @@
 """Build or verify an explicit source snapshot without media or secrets.
 
 This script uses only Python's standard library. The media review ZIP is a
-separate artifact: source snapshots intentionally contain no original inputs,
+separate artifact: source snapshots intentionally contain no original source media,
 derived videos, virtual environments, Git objects, local configuration, remote
 URLs from Git, or raw diff content.
 """
 from __future__ import annotations
-from rinkspace.storage import resolve_asset as _resolve_asset
 
 import argparse
 from datetime import datetime, timezone
 import hashlib
-import html
 import json
 from pathlib import Path, PurePosixPath
 import subprocess
+import sys
 import tempfile
 import zipfile
 
@@ -23,23 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = "rinkspace.source-review.v1"
 MANIFEST = "SOURCE_MANIFEST.json"
 CHECKSUMS = "SHA256SUMS"
-ROOT_FILES = ("README.md", "pyproject.toml", "START_LOCAL.cmd", "INSTALL_LOCAL.cmd",
-              "AGENTS.md", "START_CODEX.md", ".gitignore", ".gitattributes")
-CONFIG_FILES = ("project.example.json", "rink_model.example.json", "benchmark_windows.json")
-TREE_TYPES = {
-    "src": {".py", ".html", ".css", ".js"}, "tests": {".py"}, "scripts": {".py"},
-    "docs": {".md"}, "tasks": {".md"},
-}
-DEFAULT_TEST_RECORDS = (
-    "evidence/tests/broadcast_correction_tests.json",
-    "evidence/tests/broadcast_delivery_ui.json",
-    "evidence/tests/delivery_a_junit.xml",
-    "evidence/tests/long_shot_review.json",
-    "evidence/tests/wide_static_protected_review.json",
-)
-LOCAL_DOCUMENTS = {"docs/REPOSITORY_GUIDE.md", "docs/PUBLIC_REPOSITORY_CONTENTS.md",
-                   "docs/PRIVACY_REVIEW.md", "docs/RUNTIME_DEPENDENCIES.md", "docs/rink_model/VALIDATION.md"}
-BLOCKED_PARTS = {".git", ".venv", "__pycache__", ".pytest_cache", "node_modules", "outputs", "models"}
+BLOCKED_PARTS = {".git", ".venv", "__pycache__", ".pytest_cache", "node_modules", "outputs", ".private", ".codex", ".agents"}
 
 
 def _json(value):
@@ -57,7 +40,7 @@ def _safe_name(name):
     path = PurePosixPath(name)
     if path.is_absolute() or ".." in path.parts or any(p in BLOCKED_PARTS for p in path.parts):
         raise ValueError(f"Forbidden source-package path: {name!r}")
-    if name == "configs/local.json" or path.parts[:2] == ("data", "input"):
+    if name in {"configs/local.json", "configs/storage.json"} or path.parts[:2] == ("data", "input"):
         raise ValueError(f"Private configuration or original input is forbidden: {name}")
     return name
 
@@ -71,37 +54,41 @@ def _source_file(root, relative):
 
 
 def _selected_files(root, test_records):
-    names = {name for name in ROOT_FILES if (root / name).is_file()}
-    for required in ("README.md", "pyproject.toml", "START_LOCAL.cmd", "INSTALL_LOCAL.cmd"):
+    # Use the same Git candidate and local-artifact policy as publication review.
+    # No filesystem walk can resurrect ignored tasks, machine roots or handoffs.
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import audit_public_repository as inventory
+    from check_github_readiness import tracked_review_reasons
+    try:
+        top = Path(inventory.decode(inventory.git(root, "rev-parse", "--show-toplevel")).strip()).resolve()
+        if top != root:
+            raise ValueError("Export requires a Git checkout rooted at --root")
+        _, _, candidates = inventory.current_index_paths(root)
+    except RuntimeError as error:
+        raise ValueError("Export requires a Git checkout rooted at --root; --verify does not require Git") from error
+    names = set()
+    for name in candidates:
+        path = inventory.allowed(root, name)
+        if path is None or not path.is_file() or path.is_symlink() or tracked_review_reasons(name):
+            continue
+        try:
+            _safe_name(name)
+        except ValueError:
+            continue
+        if path.suffix.lower() in {".mp4", ".mov", ".webm", ".mkv", ".avi"}:
+            raise ValueError("Original or derived video cannot enter a public source snapshot: " + name)
+        names.add(name)
+    names.difference_update({MANIFEST, CHECKSUMS, "SOURCE_REVIEW.md"})
+    for required in ("README.md", "LICENSE.md", "pyproject.toml"):
         if required not in names:
-            raise ValueError(f"Required source entry is missing: {required}")
-    for tree, suffixes in TREE_TYPES.items():
-        for path in (root / tree).rglob("*"):
-            if path.is_file() and path.suffix.lower() in suffixes:
-                relative = path.relative_to(root).as_posix()
-                if not any(part in BLOCKED_PARTS for part in PurePosixPath(relative).parts):
-                    names.add(relative)
-    if not any(name.startswith("src/") for name in names) or not any(name.startswith("tests/") for name in names):
-        raise ValueError("A source review needs both src/ and tests/ files")
-    names.update("configs/" + name for name in CONFIG_FILES if (root / "configs" / name).is_file())
-    # Explicit source-only annotation inputs, never video/model/iteration caches.
-    for name in ('manifest.json','jin_inputs.json','okada_inputs.json','jin_observations.json.gz','okada_observations.json.gz'):
-        relative = 'configs/continuous_inputs/' + name
-        if (root / relative).is_file():
-            names.add(relative)
-    names.update(path.relative_to(root).as_posix() for path in (root / "configs").glob("*lock*.json") if path.is_file())
-    if "configs/project.example.json" not in names:
-        raise ValueError("Required public default configuration is missing")
-    names.update(path.name for path in root.glob("requirements*.txt") if path.is_file())
-    selected_records = list(test_records) if test_records is not None else [
-        name for name in DEFAULT_TEST_RECORDS if (root / name).is_file()]
-    for name in selected_records:
+            raise ValueError(f"Required public source entry is missing: {required}")
+    for name in test_records or ():
         relative = PurePosixPath(_safe_name(name))
         if relative.parts[:2] != ("evidence", "tests") or relative.suffix.lower() not in {".json", ".xml", ".txt", ".log"}:
             raise ValueError("Test records must be explicit text records under evidence/tests/")
-        _source_file(root, name)
-        names.add(name)
-    return {name: _source_file(root, name) for name in sorted(names) if name not in LOCAL_DOCUMENTS}
+        if name not in names:
+            raise ValueError("Test record is not a public Git candidate: " + name)
+    return {name: _source_file(root, name) for name in sorted(names)}
 
 
 def _git_metadata(root, included):
@@ -116,9 +103,8 @@ def _git_metadata(root, included):
         if head.returncode:
             return {"available": False, "reason": "No readable Git HEAD; per-file SHA-256 remains authoritative."}
         # Do not capture author, email, remote URL, Git config, or patch text.
-        selected = sorted(included)
-        diff = git("diff", "--no-renames", "--numstat", "-z", "HEAD", "--", *selected)
-        untracked = git("ls-files", "--others", "--exclude-standard", "-z", "--", *selected)
+        diff = git("diff", "--no-renames", "--numstat", "-z", "HEAD", "--")
+        untracked = git("ls-files", "--others", "--exclude-standard", "-z")
         if diff.returncode or untracked.returncode:
             return {"available": False, "head_commit": head.stdout.strip(), "reason": "Git working-tree summary unavailable."}
         changes = []
@@ -137,105 +123,84 @@ def _git_metadata(root, included):
 
 
 def _guide():
-    return """# RinkSpace 源码审阅包
+    return """# 源码快照说明
 
-这个包提供当前源码、测试、公开配置、锁定记录和测试记录，供独立审阅与复现。
-它不是实片验收结果；`review.zip` 是另一个媒体证据包。没有输入原片、虚拟环境、
-本机 `configs/local.json` 或 `.git` 数据库。README 和 docs 是该次源码快照的项目说明；
-其中提到的本机已安装环境和媒体输出不会自动出现在本包。
+本包保存当前公开 Git 候选文件（含必要公开数据），不是实片验收结果。
+项目介绍、安装、合成 demo、基础测试及高级依赖统一见 [README.md](README.md)；
+许可见 [LICENSE.md](LICENSE.md)，本机资源准备见 [MAINTENANCE.md](MAINTENANCE.md)。
 
-## 不安装第三方依赖的检查（Python 3.11+）
-
-在解压目录运行：
-
-```
+无需安装项目或第三方包，可在解压目录运行：
+~~~console
 python scripts/export_source_review.py --verify .
-python -m unittest discover -s tests -p test_source_review.py -v
-```
-
-第一条校验全部源文件 SHA-256 与安全路径；第二条检查打包排除、篡改检测和源码快照
-边界，不依赖原片、NumPy、OpenCV、PyAV 或 pytest。它们不证明配准精度。
-
-## 安装并运行合成 / 临时媒体测试
-
-```
-python -m venv .venv
-.venv\\Scripts\\python.exe -m pip install -e ".[dev]"
-.venv\\Scripts\\python.exe -m pytest -q
-```
-
-macOS/Linux 将 `.venv\\Scripts\\python.exe` 换成 `.venv/bin/python`。
-安装依赖需要可用的软件包来源。测试自行创建临时夹具，不需要用户视频；系统未安装
-FFmpeg/ffprobe 时，旧 CLI 解码测试会明确跳过。测试记录对应记录中注明的版本与时间，
-不能视为后来源码改动已重新测试的证明。
-
-## 启动工作台
-
-安装后运行 `START_LOCAL.cmd`，或 `python -m rinkspace serve --root . --port 8765 --open`。
-没有原片时工作台会显示缺少输入；须导入自己的授权本地视频才能做实片分析。可在
-安装时另加 `[acquisition]` 以使用包内获取脚本。原片不上传。
-
-`SOURCE_MANIFEST.json` 区分原样复制的文件与本包生成的入口，保存 Git HEAD、已打包
-路径的 dirty diff 行数摘要和各文件哈希。源码快照可能含未提交修改，具体以清单为准。
-`SHA256SUMS` 同时覆盖清单自身；摘要只证明完整性，不是签名或科学验收。
+~~~
+此命令只用 Python 标准库，核对路径、清单和文件 SHA，不要求 Git。
+创建新快照需要 Git；导出采用工作区候选字节，可能包含未提交修改。
+SOURCE_MANIFEST.json 记录来源和身份，SHA256SUMS 同时覆盖清单。
+完整性校验不是签名、许可或科学验收；原始比赛视频、截图和本机安装不随包提供。
 """.encode("utf-8")
 
 
 def export_source_review(root, out=None, test_records=None, limit_mib=None):
     root = Path(root).resolve(strict=True)
-    output = _resolve_asset(root, root / "outputs")
-    output.mkdir(exist_ok=True)
-    if not output.resolve().is_relative_to(root):
-        raise ValueError("Project outputs directory must not redirect outside the project")
+    # Lazy source loading keeps --help/--verify standard-library-only.
+    sys.path.insert(0, str(ROOT / "src"))
+    from rinkspace.storage import AssetStore
+    store = AssetStore(root)
+    output = store.output("source_review") if store.configured else root / "outputs"
+    allowed_output = store.data if store.configured else output
+    if store.configured and (allowed_output.is_relative_to(root) or root.is_relative_to(allowed_output)):
+        raise ValueError("Data and source checkout must be separate")
     out = Path(out) if out is not None else output / "source_review.zip"
     if not out.is_absolute():
-        out = root / out
-    if out.is_symlink() or not out.resolve().is_relative_to(output.resolve()) or out.suffix.lower() != ".zip":
-        raise ValueError("Source-review destination must be a ZIP within this project's outputs/")
+        out = output / out
+    if out.is_symlink() or not out.resolve().is_relative_to(allowed_output.resolve()) or out.suffix.lower() != ".zip":
+        raise ValueError("Source-review destination must be a ZIP within configured Data (or local outputs without Data)")
     if limit_mib is not None and limit_mib <= 0:
         raise ValueError("Size limit must be positive")
     sources = _selected_files(root, test_records)
-    payload = {name: path.read_bytes() for name, path in sources.items()}
-    payload["SOURCE_REVIEW.md"] = _guide()
-    payload["START_HERE.html"] = ("<!doctype html><html lang='zh-CN'><meta charset='utf-8'>"
-        "<title>RinkSpace 源码审阅包</title><style>body{font:17px/1.8 system-ui;max-width:880px;margin:50px auto;padding:20px}"
-        "pre{white-space:pre-wrap;background:#eef4f4;padding:20px}</style><h1>RinkSpace 源码审阅包</h1>"
-        "<p>这个入口属于轻量源码包。实片证据在单独的 review.zip；本包不含原片或安装环境。</p>"
-        "<p><a href='SOURCE_REVIEW.md'>完整安装与验证说明</a> · <a href='SOURCE_MANIFEST.json'>快照与哈希清单</a></p>"
-        "<h2>无需第三方依赖，先检查源码包</h2><pre>python scripts/export_source_review.py --verify .\n"
-        "python -m unittest discover -s tests -p test_source_review.py -v</pre>"
-        "<h2>安装与合成测试</h2><pre>python -m venv .venv\n"
-        + html.escape('.venv\\Scripts\\python.exe -m pip install -e ".[dev]"')
-        + "\n.venv\\Scripts\\python.exe -m pytest -q</pre><p>安装后运行 START_LOCAL.cmd。没有输入原片时，"
-        "工作台显示缺少媒体；合成测试不需要原片。测试通过不等于实片配准精度通过。</p></html>").encode("utf-8")
-    entries = [{"path": name, "sha256": _hash(data), "size_bytes": len(data),
-                "origin": "repository_verbatim" if name in sources else "generated_source_package_entry"}
-               for name, data in sorted(payload.items())]
+    entries = []
     manifest = {"schema_version": SCHEMA, "created_at_utc": datetime.now(timezone.utc).isoformat(),
-                "entrypoint": "START_HERE.html", "source_media_included": False,
-                "scope": "Source snapshot, tests and explicit text evidence; separate from media review and scientific acceptance.",
+                "entrypoint": "README.md", "source_media_included": False,
+                "scope": "Current public Git candidate snapshot, including public data; separate from source media and scientific acceptance.",
                 "git": _git_metadata(root, set(sources)), "files": entries,
-                "excluded": ["data/input", "configs/local.json", "outputs", ".venv", ".git objects/config/remotes", "unselected evidence", "neighboring projects"],
+                "excluded": ["data/input", "configs/local.json", "configs/storage.json", "outputs", ".venv", ".git objects/config/remotes", "neighboring projects"],
                 "test_records": sorted(name for name in sources if name.startswith('evidence/tests/')),
-                "generated_entry_note": "START_HERE.html is a source-package-specific entry, not the repository media-report redirect.",
+                "generated_entry_note": "Installation and testing instructions remain in the repository README; no second HTML entry is generated.",
                 "limit_mib": limit_mib}
-    payload[MANIFEST] = _json(manifest)
-    payload[CHECKSUMS] = "".join(f"{_hash(data)}  {name}\n" for name, data in sorted(payload.items())).encode("utf-8")
     out.parent.mkdir(parents=True, exist_ok=True)
     temporary = None
     try:
         with tempfile.NamedTemporaryFile(prefix=".source-review-", suffix=".zip", dir=out.parent, delete=False) as stream:
             temporary = Path(stream.name)
         with zipfile.ZipFile(temporary, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as archive:
-            for name, data in sorted(payload.items()):
-                archive.writestr(name, data)
+            for name, path in sources.items():
+                before = path.stat()
+                digest, length = hashlib.sha256(), 0
+                with path.open("rb") as source, archive.open(name, "w", force_zip64=True) as target:
+                    for block in iter(lambda: source.read(1024 * 1024), b""):
+                        target.write(block)
+                        digest.update(block)
+                        length += len(block)
+                after = path.stat()
+                if (before.st_size, before.st_mtime_ns, before.st_ino) != (after.st_size, after.st_mtime_ns, after.st_ino):
+                    raise ValueError("Source changed during export: " + name)
+                entries.append(dict(path=name, sha256=digest.hexdigest(), size_bytes=length, origin="repository_verbatim"))
+            guide = _guide()
+            archive.writestr("SOURCE_REVIEW.md", guide)
+            entries.append(dict(path="SOURCE_REVIEW.md", sha256=_hash(guide), size_bytes=len(guide), origin="generated_source_package_entry"))
+            entries.sort(key=lambda row: row["path"])
+            manifest_bytes = _json(manifest)
+            archive.writestr(MANIFEST, manifest_bytes)
+            checks = {row["path"]: row["sha256"] for row in entries}
+            checks[MANIFEST] = _hash(manifest_bytes)
+            archive.writestr(CHECKSUMS, "".join(f"{digest}  {name}\n" for name, digest in sorted(checks.items())).encode("utf-8"))
         size = temporary.stat().st_size
         if limit_mib is not None and size > limit_mib * 1024 ** 2:
             raise ValueError(f"Source package exceeds {limit_mib} MiB ({size} bytes); no files were silently omitted")
         verified = verify_source_review(temporary)
         temporary.replace(out)
         temporary = None
-        return {"path": str(out), "size_bytes": size, "file_count": len(payload),
+        return {"path": str(out), "size_bytes": size, "file_count": len(entries) + 2,
                 "head_commit": manifest['git'].get('head_commit'), "verified": verified['verified']}
     finally:
         if temporary is not None:
