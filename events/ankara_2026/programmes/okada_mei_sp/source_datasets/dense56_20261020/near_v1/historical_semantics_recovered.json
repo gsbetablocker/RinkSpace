@@ -1,0 +1,162 @@
+{
+  "schema": "rinkspace.recovered_user_near_board_semantics.v1",
+  "created_utc": "2026-10-20T15:59:54.543Z",
+  "direct_user_statements": [
+    {
+      "date": "2026-10-03",
+      "quote": "这些都是我们定义的围挡上沿，围挡是没有厚度的",
+      "definition": "Near gray ice-facing diagonal edge and far blue upper edge are one shared board upper boundary; do not add board width/thickness or assign another upper height."
+    },
+    {
+      "date": "2026-09-27",
+      "quote": "这个是冰场下长边围挡的上沿",
+      "source_identity": "Old source 60fps/1/15360 PTS230416128 left foreground gray diagonal, existing raw image SHA 596e5289e15563a146fad7cf212c2a40e5f719da17903df736d656caa3b02e7b."
+    },
+    {
+      "date": "2026-09-28",
+      "quote": "是，下长边围挡顶面朝冰一侧的边缘",
+      "source_identity": "Old source PTS230545920, main view blue diagonal. Identity confirmation, not direct exact UV or metric dimensions."
+    },
+    {
+      "date": "2026-10-10",
+      "quote": "围挡上沿是垂直围挡的最上端（蓝边上端，我图中红线标的位置）"
+    },
+    {
+      "date": "2026-10-10",
+      "quote": "对，相应的围挡下沿也就是接冰轮廓是围挡底部黄边的下端（我之前给你标注过的）"
+    }
+  ],
+  "actual_reusable_source_observations": {
+    "old_secondary_gray_edge": {
+      "frames": 82,
+      "native_observed_frames": 78,
+      "measured_scan_rows": 491,
+      "measurement": "Actual source gray-to-ice transition q10/q90 supports, not sigma. Original source UV remain unchanged and cannot be copied to official50 by fixed PTS offset.",
+      "example_pts230416128": {
+        "y": [
+          700,
+          750,
+          800,
+          850,
+          900,
+          950,
+          1000,
+          1050
+        ],
+        "x_intervals": [
+          [
+            209,
+            225
+          ],
+          [
+            238,
+            250
+          ],
+          [
+            264,
+            284
+          ],
+          [
+            288,
+            303
+          ],
+          [
+            317,
+            332
+          ],
+          [
+            344,
+            360
+          ],
+          [
+            372,
+            385
+          ],
+          [
+            395,
+            407
+          ]
+        ]
+      }
+    },
+    "old_red_complete_stroke": {
+      "source_pts": 230024192,
+      "time_base": "1/15360",
+      "native_columns": 490,
+      "annotation_sha256": "c82bb6f93af09f5fffb0af741a26e0d292aaf8f763452da6be048186e79a69d0",
+      "scope": "Complete lower long-side top stroke from another camera view. Definition/navigation evidence; it is not a current S06 exact source UV trace."
+    }
+  },
+  "referenced_chats_read": [
+    {
+      "record_alias": "local-history-a1f46d3d567d",
+      "title": "继续重建冈田芽衣短节目数据集"
+    },
+    {
+      "record_alias": "local-history-2c581d2013d9",
+      "title": "重建冈田芽衣短节目第二镜头数据集"
+    },
+    {
+      "record_alias": "local-history-740a6fcb669c",
+      "title": "彻底重修数据集"
+    }
+  ],
+  "evidence": [
+    {
+      "file": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/model_constraints/user_board_edge_semantics_20261010.json",
+      "sha256": "2f4a091f49ff8ae457f624101c68f0d477acb08bc857ca95ade0af36489d918b"
+    },
+    {
+      "file": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/model_constraints/ice_contact_material_roles_user_confirmed_20261006.json",
+      "sha256": "b65df1cf63f9c0b702332b7690c2e1f900814996c021f37928909b7d0c13dad8"
+    },
+    {
+      "file": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/secondary_visibility_domain_20260927/user_unified_board_top_definition_20261003.json",
+      "sha256": "c7a1234d96ac888ca803e6c6f680ad173e98ecd1003e56b5bf848a2c8cf25e40"
+    },
+    {
+      "file": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/secondary_visibility_domain_20260927/user_confirmed_lower_board_top.json",
+      "sha256": "8925a96443ca3751e0ffc81c6c8f249b4e1727a64b7a3be5cb3e7c2ff3d23d86"
+    },
+    {
+      "file": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/secondary_visibility_domain_20260927/shot06_pts230416128_raw_full.png",
+      "sha256": "596e5289e15563a146fad7cf212c2a40e5f719da17903df736d656caa3b02e7b"
+    },
+    {
+      "file": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/secondary_visibility_domain_20260927/nearboard_top_source_review/source_observations.json",
+      "sha256": "fa6446daeccb8c6d18dc4807ce3f270976490a5dc022ccea4ef45ffe098886ad"
+    },
+    {
+      "file": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/main_nearboard_source_candidates_20260928/user_confirmed_main_lower_board_top.json",
+      "sha256": "935836b7300f93f50f512e0e7c55344c272ca4d0cabfe640438db619080e5d3f"
+    },
+    {
+      "file": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/round10_tail_user_issue_20260928/user_ad4_top_identity_correction.json",
+      "sha256": "81842f05611326209a0f3d68acc844d5eb0446a94a2e4920de659ba556b9e1f0"
+    },
+    {
+      "file": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/user_video_review_20261008/c134_full_programme/20_lower_long_side_board_top_registered_user_curve.json",
+      "sha256": "c83e563be312dae6e018e65c2556896cd6d6419085c37709a045a5335e65025a"
+    },
+    {
+      "file": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/user_video_review_20261008/c134_full_programme/20_lower_long_side_board_top_user_correct_red_curve.png",
+      "sha256": "c82bb6f93af09f5fffb0af741a26e0d292aaf8f763452da6be048186e79a69d0"
+    }
+  ],
+  "missing_originals": [
+    {
+      "file": "C:/Users/REDACTED/AppData/Local/Temp/codex-clipboard-bc046314-d81b-4108-89d5-f70b3d05d59d.png",
+      "recorded_sha256": "87698197417a85bcdceebe9bca0599a90eef1a30bb5fdf22329f395e210cdad9",
+      "current_file_exists": false,
+      "definition_record_preserved": true
+    },
+    {
+      "file": "C:/Users/REDACTED/AppData/Local/Temp/codex-clipboard-f3163b00-d63a-4e4e-84e5-fbb4f490f578.png",
+      "recorded_sha256": "e995fbe5085ddea8103375bc19f80b2b4f2915ca240fb34f9527fe30b05010dd",
+      "current_file_exists": false,
+      "definition_record_preserved": true
+    }
+  ],
+  "current_source_uv_not_inferred_from_historical_model_or_screenshot": true,
+  "current_videos_quality_status": "previous_S05_S06_source_quality_rejected_due_to_current_near_board_counterexample_technical_clock_receipt_preserved"
+}

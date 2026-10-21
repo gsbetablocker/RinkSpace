@@ -46,6 +46,8 @@ def camera_from_event(model,state=None):
        "optics":{"f_ref":model["f_ref"],"radius_max":model["radius_max"],"principal_point":g[20:22].tolist(),"eta":g[22],
             "principal_linear":g[23:25].tolist(),"k1":g[25:27].tolist(),"k2":g[27:29].tolist(),"p1":g[29],"p2":g[30]},
        "rolling_shutter":{"signed_readout_seconds":g[31]}}
+    if model.get('brown_wide_extension') is not None:
+        camera['optics']['brown_wide_extension'] = model['brown_wide_extension']
     return NativeCamera(camera)
 
 

@@ -1,0 +1,602 @@
+{
+  "schema": "rinkspace.actual_incremental_print_input_effect_audit.v1",
+  "complete": true,
+  "source_manifest_ref": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/print_requal_v2/s05_local_v2/manifest.json",
+    "sha256": "660824d819eac49f95779b484684157281ec80d6925a32aff8e51182d4544542"
+  },
+  "actual_changed_source_domain_frames": 107,
+  "actual_requalified_frames": 209,
+  "actual_motion_proof_files": 163,
+  "eligible_status_type_array_bytes_all_unchanged": true,
+  "body_bitmap_all_changed_frames_unchanged": false,
+  "body_pixels_removed": 184,
+  "real_retained_LK_FB_coordinates_all_changed_pairs_unchanged": true,
+  "added_unknown_pixels": 209805,
+  "all_previous_material_pixels_intersect_unknown_guard": 184,
+  "all_raw_source_rows_intersect_unknown_guard": 428,
+  "all_previous_eligible_rows_intersect_unknown_guard": 0,
+  "no_new_eligible_or_removed_eligible_print_rows": true,
+  "explanation": "The precise new unknown bitmap and 8px guard are actually intersected with prior advertisement material. Any removed body pixels support no formerly eligible source rows or accepted LK patches; existing advertisement status/type and eligible arrays remain byte-identical. No removed-point correction effect is claimed from execution counts.",
+  "ledger_ref": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\qa_s05_local_v2b\\all_changed_input_effects.json",
+    "sha256": "ee571caa9d11173ba5c7ec617f00dc251827099bcfb40bd7823acc00b5a8ffd1"
+  },
+  "cases": [
+    {
+      "native_pts": 948992,
+      "added_unknown_pixels": 8087,
+      "previous_material_pixels_intersect_added_unknown": 0,
+      "previous_material_pixels_intersect_unknown_8px_guard": 0,
+      "source_rows_inside_new_unknown": 0,
+      "source_rows_inside_new_unknown_guard": 13,
+      "previously_eligible_rows_inside_new_unknown_guard": 0,
+      "body_bitmap_bitwise_equal": true,
+      "body_pixels_removed": 0,
+      "original_source_rows": 5847,
+      "source_UV_or_ID_changed": false,
+      "source_BGR_sha256": "1f1c30ff9fe9d685a54d397f20dd3c5f342a5485a7d1bf63d7e213a7489bf193",
+      "frame_ref": {
+        "native_pts": 948992,
+        "shot_id": "s05",
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\s05_local_v2\\frames\\948992.json",
+        "sha256": "0c1633e721eb01c17e68ebb3f03ac715e5a32043ee128716399555905ba2f39d",
+        "source_row_count": 5847,
+        "eligible_rows": 2804,
+        "decoded_native_BGR_sha256": "1f1c30ff9fe9d685a54d397f20dd3c5f342a5485a7d1bf63d7e213a7489bf193",
+        "decoded_native_RGB_sha256": "b9a173432e9b9c3b2c07aaf801240587be0c75498edead2e1fa0a3028c32e5e5",
+        "final_board_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_board_v1\\material_v5\\anchored_frames\\948992.json",
+          "sha256": "a9de5f5e34d4e139204d4e26f84218620151ccce82d751f11016d4af3eab4daa"
+        },
+        "mask_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\effective_v1\\person\\948992.png",
+          "sha256": "c580bba355ccb1080e6519607f5dafbc2cfdae5c7fb701cb5bc983f4d0f8cc24"
+        },
+        "unknown_exclusion_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\effective_v2\\unknown\\948992.png",
+          "sha256": "ea75a74a18a191c2804a81f192a84a2769e8bd44ab0b7bfaa99bd1097f0ef946",
+          "native_pts": 948992,
+          "shot_id": "s05",
+          "source_BGR_sha256": "1f1c30ff9fe9d685a54d397f20dd3c5f342a5485a7d1bf63d7e213a7489bf193",
+          "source_RGB_sha256": "b9a173432e9b9c3b2c07aaf801240587be0c75498edead2e1fa0a3028c32e5e5",
+          "type": "preserved_source_unknown_OR_source_uncertain_person_instance_SAM_component",
+          "reason": "Source-qualified independent exclusion; no new person or static-scene truth asserted.",
+          "pixel_count": 8087,
+          "visibility_guard_pixels": 8,
+          "parent_unknown_exclusion_ref": null,
+          "component_source_proofs": [
+            {
+              "native_pts": 948992,
+              "object_index": 5,
+              "component": 1,
+              "bbox_xywh": [
+                1855,
+                221,
+                65,
+                172
+              ],
+              "pixels": 8087,
+              "raw_source_mask_ref": {
+                "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\background_v1\\instances\\948992_5.png",
+                "sha256": "ea75a74a18a191c2804a81f192a84a2769e8bd44ab0b7bfaa99bd1097f0ef946"
+              },
+              "source_BGR_sha256": "1f1c30ff9fe9d685a54d397f20dd3c5f342a5485a7d1bf63d7e213a7489bf193",
+              "source_RGB_sha256": "b9a173432e9b9c3b2c07aaf801240587be0c75498edead2e1fa0a3028c32e5e5",
+              "source_type": "source_uncertain_foreground_component_not_scene_observation",
+              "reason": "Semantically reviewed person instance; automatic prompt overlap failure cannot certify that its exact SAM component exposes static scene material.",
+              "unknown_is_not_person_pixel_certificate": true,
+              "model_or_pose_pixels_issued": false
+            }
+          ]
+        },
+        "body_material_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\s05_local_v2\\body\\948992.json",
+          "sha256": "cfd08bbe5e0bf781f9572d55be93a93350eb399f49ccca9cb08e92d3abfb016f"
+        },
+        "static_motion_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\s05_local_v2\\motion\\948992.json",
+          "sha256": "f4de6f41a925afe587087a888794472a249f9adb438de44f3cba4abad67d2b9a"
+        },
+        "source_parts_binding_sha256": "a2f590999b7158939928a30192011fea4f9c360092ea7e55d3368980c2b77d99"
+      },
+      "image_ref": {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\qa_s05_local_v2b\\948992_unknown_print.jpg",
+        "sha256": "44fcb10a836e40c7f21d788b5ebe744070e324271a61f650bff43e6236c45b63"
+      }
+    },
+    {
+      "native_pts": 1014016,
+      "added_unknown_pixels": 38,
+      "previous_material_pixels_intersect_added_unknown": 0,
+      "previous_material_pixels_intersect_unknown_8px_guard": 0,
+      "source_rows_inside_new_unknown": 1,
+      "source_rows_inside_new_unknown_guard": 15,
+      "previously_eligible_rows_inside_new_unknown_guard": 0,
+      "body_bitmap_bitwise_equal": true,
+      "body_pixels_removed": 0,
+      "original_source_rows": 5252,
+      "source_UV_or_ID_changed": false,
+      "source_BGR_sha256": "45d231bc36720d8ec125a36a6afb8da6939674cb53cb9be8000d9d8a7c5823c1",
+      "frame_ref": {
+        "native_pts": 1014016,
+        "shot_id": "s05",
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\s05_local_v2\\frames\\1014016.json",
+        "sha256": "022e8555ad6aa2e67b138de5d425d7748c07e5f907520ffa2d8418db2e24c00b",
+        "source_row_count": 5252,
+        "eligible_rows": 3838,
+        "decoded_native_BGR_sha256": "45d231bc36720d8ec125a36a6afb8da6939674cb53cb9be8000d9d8a7c5823c1",
+        "decoded_native_RGB_sha256": "7e766cf7380876c4901f28f1647611f8b614158847caabe0ac0cd31f630ca332",
+        "final_board_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_board_v1\\material_v5\\anchored_frames\\1014016.json",
+          "sha256": "13f14fba1e2341d38ce8beccf4448ae9180e273616d4bf20e1aa53ee071ab99a"
+        },
+        "mask_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\effective_v1\\person\\1014016.png",
+          "sha256": "99def68aad0a255781670c66b755ffc709effbea1f6dace08fb0d90aa47d7dd2"
+        },
+        "unknown_exclusion_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\effective_v2\\unknown\\1014016.png",
+          "sha256": "09bc098030aeb62ccd1fbf9fa4d537f2a03d0ff0a83af72f29f9ed47cbdde2e4",
+          "native_pts": 1014016,
+          "shot_id": "s05",
+          "source_BGR_sha256": "45d231bc36720d8ec125a36a6afb8da6939674cb53cb9be8000d9d8a7c5823c1",
+          "source_RGB_sha256": "7e766cf7380876c4901f28f1647611f8b614158847caabe0ac0cd31f630ca332",
+          "type": "preserved_source_unknown_OR_source_uncertain_person_instance_SAM_component",
+          "reason": "Source-qualified independent exclusion; no new person or static-scene truth asserted.",
+          "pixel_count": 38,
+          "visibility_guard_pixels": 8,
+          "parent_unknown_exclusion_ref": null,
+          "component_source_proofs": [
+            {
+              "native_pts": 1014016,
+              "object_index": 2,
+              "component": 2,
+              "bbox_xywh": [
+                1804,
+                405,
+                12,
+                4
+              ],
+              "pixels": 38,
+              "raw_source_mask_ref": {
+                "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\background_v1\\instances\\1014016_2.png",
+                "sha256": "0a62bff492c0008e2f516b84eb26bd20e90562fefaac71cf3b70445fd48c0bad"
+              },
+              "source_BGR_sha256": "45d231bc36720d8ec125a36a6afb8da6939674cb53cb9be8000d9d8a7c5823c1",
+              "source_RGB_sha256": "7e766cf7380876c4901f28f1647611f8b614158847caabe0ac0cd31f630ca332",
+              "source_type": "source_uncertain_foreground_component_not_scene_observation",
+              "reason": "Semantically reviewed person instance; automatic prompt overlap failure cannot certify that its exact SAM component exposes static scene material.",
+              "unknown_is_not_person_pixel_certificate": true,
+              "model_or_pose_pixels_issued": false
+            }
+          ]
+        },
+        "body_material_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\s05_local_v2\\body\\1014016.json",
+          "sha256": "738bfe6b180300c8d942e751faa83af11ff9db5cab954e0ac69f650f6afd3eab"
+        },
+        "static_motion_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\s05_local_v2\\motion\\1014016.json",
+          "sha256": "8f38bb888b0e2a42fa251a3e38a306ed2830b234b9431c24523bdae67687a7ef"
+        },
+        "source_parts_binding_sha256": "03b82f6c7265412e9c70fd0e4481af0065dfee0e9184a95b224f56b4ac9c6cc8"
+      },
+      "image_ref": {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\qa_s05_local_v2b\\1014016_unknown_print.jpg",
+        "sha256": "b813d17bb50123ac71c95cbd5112e38f7d0c1c23aa7c83e7f0299e8e042abf68"
+      }
+    },
+    {
+      "native_pts": 1202688,
+      "added_unknown_pixels": 4749,
+      "previous_material_pixels_intersect_added_unknown": 0,
+      "previous_material_pixels_intersect_unknown_8px_guard": 0,
+      "source_rows_inside_new_unknown": 0,
+      "source_rows_inside_new_unknown_guard": 0,
+      "previously_eligible_rows_inside_new_unknown_guard": 0,
+      "body_bitmap_bitwise_equal": true,
+      "body_pixels_removed": 0,
+      "original_source_rows": 2950,
+      "source_UV_or_ID_changed": false,
+      "source_BGR_sha256": "ec24a9a606b1082ab1470318eae3a06b41f56467a892b4e0cf8afd36f7e2cc15",
+      "frame_ref": {
+        "native_pts": 1202688,
+        "shot_id": "s05",
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\s05_local_v2\\frames\\1202688.json",
+        "sha256": "53dfbf5e9b07add7af12c76c02c36cbf5f87bf9280bdf7b91803dba3814199e2",
+        "source_row_count": 2950,
+        "eligible_rows": 1878,
+        "decoded_native_BGR_sha256": "ec24a9a606b1082ab1470318eae3a06b41f56467a892b4e0cf8afd36f7e2cc15",
+        "decoded_native_RGB_sha256": "69d9df1c08981504ec689ac59fdc777ddc00fac7c7007c05fad815a1f3abd70a",
+        "final_board_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_board_v1\\material_v5\\anchored_frames\\1202688.json",
+          "sha256": "1f574eb704082b0691f959eccf8d4760d38448dfbc2c0e5ec412ed07094b73f0"
+        },
+        "mask_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\full_v3\\masks\\1202688.png",
+          "sha256": "cbe9f107c93e3a635c635b16027d22d2fa9da10038ee22b9d67da41ad0fd4a86"
+        },
+        "unknown_exclusion_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\effective_v2\\unknown\\1202688.png",
+          "sha256": "14dc1687f41941d3c34c31d9d837254209e65984eb9b927a4575efc4894fc4a6",
+          "native_pts": 1202688,
+          "shot_id": "s05",
+          "source_BGR_sha256": "ec24a9a606b1082ab1470318eae3a06b41f56467a892b4e0cf8afd36f7e2cc15",
+          "source_RGB_sha256": "69d9df1c08981504ec689ac59fdc777ddc00fac7c7007c05fad815a1f3abd70a",
+          "type": "preserved_source_unknown_OR_source_uncertain_person_instance_SAM_component",
+          "reason": "Source-qualified independent exclusion; no new person or static-scene truth asserted.",
+          "pixel_count": 16770,
+          "visibility_guard_pixels": 8,
+          "parent_unknown_exclusion_ref": {
+            "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\effective_v1\\unknown\\1202688.png",
+            "sha256": "2090d2529e2ebd013b87e78c9a2b4ee48d4267a0fa4b4465e3a906e6bb7b491e",
+            "native_pts": 1202688,
+            "shot_id": "s05",
+            "source_BGR_sha256": "ec24a9a606b1082ab1470318eae3a06b41f56467a892b4e0cf8afd36f7e2cc15",
+            "source_RGB_sha256": "69d9df1c08981504ec689ac59fdc777ddc00fac7c7007c05fad815a1f3abd70a",
+            "type": "current_source_original_unknown_OR_source_verified_external_occluder_or_person_mixed_silhouette_uncertainty",
+            "reason": "Old unknown preserved; separately reviewed camera/person, tabletop/person, or person-wall silhouette uncertainty; not a true person pixel certificate or scene observation.",
+            "pixel_count": 12021,
+            "visibility_guard_pixels": 8,
+            "parent_unknown_exclusion_ref": {
+              "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_footwear_v1\\source_unknown_masks\\1202688.png",
+              "sha256": "11f68c3b48d0c2dfb245f5f4ff37e697bf5a2d08c0b72e9ac180b3f2b9ade0d3",
+              "source_RGB_sha256": "69d9df1c08981504ec689ac59fdc777ddc00fac7c7007c05fad815a1f3abd70a",
+              "source_BGR_sha256": "ec24a9a606b1082ab1470318eae3a06b41f56467a892b4e0cf8afd36f7e2cc15",
+              "native_pts": 1202688,
+              "shot_id": "s05",
+              "type": "current_source_reflection_or_motion_blurred_mixed_material_unknown",
+              "reason": "current visible shoe-adjacent grey reflection or motion-blurred mixed material unresolved as static rink surface; never claim true person pixels",
+              "pixel_count": 3803,
+              "visibility_guard_pixels": 8,
+              "not_true_person_pixels": true,
+              "source_layers": [
+                {
+                  "stage": "initial",
+                  "native_pts": 1202688,
+                  "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_footwear_v1\\delta_masks\\1202688.png",
+                  "sha256": "4c3e0fe9cc51be47c6d7a3c8402df84eb131989d0204ab9e5d939bc9cae6bb0d",
+                  "qualification": "unknown",
+                  "source_RGB_sha256": "69d9df1c08981504ec689ac59fdc777ddc00fac7c7007c05fad815a1f3abd70a"
+                }
+              ]
+            },
+            "source_qualification_ref": {
+              "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\effective_v1\\source_qualification.json",
+              "sha256": "665ea4c6d86588ec43c8193f721103e591b6c47016ddc859108e9743974c0991"
+            }
+          },
+          "component_source_proofs": [
+            {
+              "native_pts": 1202688,
+              "object_index": 1,
+              "component": 1,
+              "bbox_xywh": [
+                0,
+                121,
+                54,
+                102
+              ],
+              "pixels": 4749,
+              "raw_source_mask_ref": {
+                "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\background_v1\\instances\\1202688_1.png",
+                "sha256": "fdf6481b1e90d692b6f9ccc54ea51909016a3ca1304c4c989052298be85e29e0"
+              },
+              "source_BGR_sha256": "ec24a9a606b1082ab1470318eae3a06b41f56467a892b4e0cf8afd36f7e2cc15",
+              "source_RGB_sha256": "69d9df1c08981504ec689ac59fdc777ddc00fac7c7007c05fad815a1f3abd70a",
+              "source_type": "source_uncertain_foreground_component_not_scene_observation",
+              "reason": "Semantically reviewed person instance; automatic prompt overlap failure cannot certify that its exact SAM component exposes static scene material.",
+              "unknown_is_not_person_pixel_certificate": true,
+              "model_or_pose_pixels_issued": false
+            }
+          ]
+        },
+        "body_material_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\s05_local_v2\\body\\1202688.json",
+          "sha256": "024249572cf2603614000b63bb0e55f97e614737e7cc05b9407a2917b04b889a"
+        },
+        "static_motion_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\s05_local_v2\\motion\\1202688.json",
+          "sha256": "ae9554be8cc17dc1322fa2fc6dc0e7aeefbefdf9cc33da4a16d696daacd589ab"
+        },
+        "source_parts_binding_sha256": "b5b23df482e62b8cf2149a756a7d7598d0b2142aed1075ef9af4f1be02eaccc0"
+      },
+      "image_ref": {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\qa_s05_local_v2b\\1202688_unknown_print.jpg",
+        "sha256": "b83a92af2d483dc3971eb38cddcbfd62887bee9bd30d1a1d10685df0ff4c6d7b"
+      }
+    },
+    {
+      "native_pts": 1244928,
+      "added_unknown_pixels": 10436,
+      "previous_material_pixels_intersect_added_unknown": 0,
+      "previous_material_pixels_intersect_unknown_8px_guard": 0,
+      "source_rows_inside_new_unknown": 0,
+      "source_rows_inside_new_unknown_guard": 0,
+      "previously_eligible_rows_inside_new_unknown_guard": 0,
+      "body_bitmap_bitwise_equal": true,
+      "body_pixels_removed": 0,
+      "original_source_rows": 3898,
+      "source_UV_or_ID_changed": false,
+      "source_BGR_sha256": "9947cba5644aa0cf62e8219983775b069188301c89befd66e3a509f30e223499",
+      "frame_ref": {
+        "native_pts": 1244928,
+        "shot_id": "s05",
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\s05_local_v2\\frames\\1244928.json",
+        "sha256": "a00fd04443e32c49d5a2072592fe3b4ad773b44c3fef136d896449e8daa5f7ca",
+        "source_row_count": 3898,
+        "eligible_rows": 2538,
+        "decoded_native_BGR_sha256": "9947cba5644aa0cf62e8219983775b069188301c89befd66e3a509f30e223499",
+        "decoded_native_RGB_sha256": "5e502c3194f0ebb709d303f35e59dcc076de639f9b4386c91adadc56c27caf37",
+        "final_board_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_board_v1\\material_v5\\anchored_frames\\1244928.json",
+          "sha256": "309474964ad4a2723b4a54db27b89ab364fe07f9537edbd24bc79c84a1df7c61"
+        },
+        "mask_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\effective_v1\\person\\1244928.png",
+          "sha256": "72c3113348099496ebc9e58a0cd4b82906f6da91280b83cf1ab2e352aec1e879"
+        },
+        "unknown_exclusion_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\effective_v2\\unknown\\1244928.png",
+          "sha256": "7616c61f0729a8a67a11a6d42a801c0117c6127434fe0b65ab6a199780b81a07",
+          "native_pts": 1244928,
+          "shot_id": "s05",
+          "source_BGR_sha256": "9947cba5644aa0cf62e8219983775b069188301c89befd66e3a509f30e223499",
+          "source_RGB_sha256": "5e502c3194f0ebb709d303f35e59dcc076de639f9b4386c91adadc56c27caf37",
+          "type": "preserved_source_unknown_OR_source_uncertain_person_instance_SAM_component",
+          "reason": "Source-qualified independent exclusion; no new person or static-scene truth asserted.",
+          "pixel_count": 10436,
+          "visibility_guard_pixels": 8,
+          "parent_unknown_exclusion_ref": null,
+          "component_source_proofs": [
+            {
+              "native_pts": 1244928,
+              "object_index": 1,
+              "component": 1,
+              "bbox_xywh": [
+                197,
+                257,
+                119,
+                66
+              ],
+              "pixels": 6765,
+              "raw_source_mask_ref": {
+                "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\background_v1\\instances\\1244928_1.png",
+                "sha256": "2a7be69010c370acff42d022aaf95fb8ed5d94465acb06256cc86db245edd095"
+              },
+              "source_BGR_sha256": "9947cba5644aa0cf62e8219983775b069188301c89befd66e3a509f30e223499",
+              "source_RGB_sha256": "5e502c3194f0ebb709d303f35e59dcc076de639f9b4386c91adadc56c27caf37",
+              "source_type": "source_uncertain_foreground_component_not_scene_observation",
+              "reason": "Semantically reviewed person instance; automatic prompt overlap failure cannot certify that its exact SAM component exposes static scene material.",
+              "unknown_is_not_person_pixel_certificate": true,
+              "model_or_pose_pixels_issued": false
+            },
+            {
+              "native_pts": 1244928,
+              "object_index": 4,
+              "component": 1,
+              "bbox_xywh": [
+                1875,
+                191,
+                45,
+                131
+              ],
+              "pixels": 3404,
+              "raw_source_mask_ref": {
+                "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\background_v1\\instances\\1244928_4.png",
+                "sha256": "0c9a4ca62f0565b0d3d9003025080e590f210a1f2eb1403882f921346b9ee727"
+              },
+              "source_BGR_sha256": "9947cba5644aa0cf62e8219983775b069188301c89befd66e3a509f30e223499",
+              "source_RGB_sha256": "5e502c3194f0ebb709d303f35e59dcc076de639f9b4386c91adadc56c27caf37",
+              "source_type": "source_uncertain_foreground_component_not_scene_observation",
+              "reason": "Semantically reviewed person instance; automatic prompt overlap failure cannot certify that its exact SAM component exposes static scene material.",
+              "unknown_is_not_person_pixel_certificate": true,
+              "model_or_pose_pixels_issued": false
+            },
+            {
+              "native_pts": 1244928,
+              "object_index": 5,
+              "component": 1,
+              "bbox_xywh": [
+                1874,
+                189,
+                46,
+                138
+              ],
+              "pixels": 3660,
+              "raw_source_mask_ref": {
+                "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\background_v1\\instances\\1244928_5.png",
+                "sha256": "74f59e5672368707c9c31f5ebc0e5476e66f959d0079db7944aee44594f547b2"
+              },
+              "source_BGR_sha256": "9947cba5644aa0cf62e8219983775b069188301c89befd66e3a509f30e223499",
+              "source_RGB_sha256": "5e502c3194f0ebb709d303f35e59dcc076de639f9b4386c91adadc56c27caf37",
+              "source_type": "source_uncertain_foreground_component_not_scene_observation",
+              "reason": "Semantically reviewed person instance; automatic prompt overlap failure cannot certify that its exact SAM component exposes static scene material.",
+              "unknown_is_not_person_pixel_certificate": true,
+              "model_or_pose_pixels_issued": false
+            }
+          ]
+        },
+        "body_material_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\s05_local_v2\\body\\1244928.json",
+          "sha256": "eb669b8d4ac098e2878d687e4b8b61b092905868ef7d824f8c228546f49ef450"
+        },
+        "static_motion_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\s05_local_v2\\motion\\1244928.json",
+          "sha256": "0e6e8a9d21f553a89d9783d704be0edf2b3281712582f14959d5af7f66a0a182"
+        },
+        "source_parts_binding_sha256": "b31890f548c5830e9d09063c38f11005be3d9752f3ea3f7b869cfdadaa151194"
+      },
+      "image_ref": {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\qa_s05_local_v2b\\1244928_unknown_print.jpg",
+        "sha256": "3bcb068dd3a6d6c0c244e06025e0ed033acb26fb289e0a64fcd6fa33cfa1d720"
+      }
+    },
+    {
+      "native_pts": 1259776,
+      "added_unknown_pixels": 8866,
+      "previous_material_pixels_intersect_added_unknown": 0,
+      "previous_material_pixels_intersect_unknown_8px_guard": 0,
+      "source_rows_inside_new_unknown": 0,
+      "source_rows_inside_new_unknown_guard": 9,
+      "previously_eligible_rows_inside_new_unknown_guard": 0,
+      "body_bitmap_bitwise_equal": true,
+      "body_pixels_removed": 0,
+      "original_source_rows": 3392,
+      "source_UV_or_ID_changed": false,
+      "source_BGR_sha256": "8ea1c4867d54e6ad94ecc6c2d7c2f4873c838779614f02d1926e7d9d63ca260c",
+      "frame_ref": {
+        "native_pts": 1259776,
+        "shot_id": "s05",
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\s05_local_v2\\frames\\1259776.json",
+        "sha256": "67e791481d1050e7df828eb8c174d7014dd5b6ed318726a7809d45e90d83a35d",
+        "source_row_count": 3392,
+        "eligible_rows": 2107,
+        "decoded_native_BGR_sha256": "8ea1c4867d54e6ad94ecc6c2d7c2f4873c838779614f02d1926e7d9d63ca260c",
+        "decoded_native_RGB_sha256": "9d710493ad3e4e670a575f709026e09a1399156b73b63cf57c05adbbdcaeb071",
+        "final_board_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_board_v1\\material_v5\\anchored_frames\\1259776.json",
+          "sha256": "af34191c9f7a1ec9a170a35a3040baae14ab8f81a6714fb7a2aac302c10ded33"
+        },
+        "mask_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\effective_v1\\person\\1259776.png",
+          "sha256": "1ad11a0ac968749bf4ada107886140440a85dc46ae0cf32fb51ca771f136bb41"
+        },
+        "unknown_exclusion_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\effective_v2\\unknown\\1259776.png",
+          "sha256": "8afda9656d7bdaf5334945c1a08c0e88f9ab5093b2333d3618f2d8a8d49a507c",
+          "native_pts": 1259776,
+          "shot_id": "s05",
+          "source_BGR_sha256": "8ea1c4867d54e6ad94ecc6c2d7c2f4873c838779614f02d1926e7d9d63ca260c",
+          "source_RGB_sha256": "9d710493ad3e4e670a575f709026e09a1399156b73b63cf57c05adbbdcaeb071",
+          "type": "preserved_source_unknown_OR_source_uncertain_person_instance_SAM_component",
+          "reason": "Source-qualified independent exclusion; no new person or static-scene truth asserted.",
+          "pixel_count": 8866,
+          "visibility_guard_pixels": 8,
+          "parent_unknown_exclusion_ref": null,
+          "component_source_proofs": [
+            {
+              "native_pts": 1259776,
+              "object_index": 1,
+              "component": 1,
+              "bbox_xywh": [
+                1802,
+                178,
+                118,
+                147
+              ],
+              "pixels": 8866,
+              "raw_source_mask_ref": {
+                "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\background_v1\\instances\\1259776_1.png",
+                "sha256": "8afda9656d7bdaf5334945c1a08c0e88f9ab5093b2333d3618f2d8a8d49a507c"
+              },
+              "source_BGR_sha256": "8ea1c4867d54e6ad94ecc6c2d7c2f4873c838779614f02d1926e7d9d63ca260c",
+              "source_RGB_sha256": "9d710493ad3e4e670a575f709026e09a1399156b73b63cf57c05adbbdcaeb071",
+              "source_type": "source_uncertain_foreground_component_not_scene_observation",
+              "reason": "Semantically reviewed person instance; automatic prompt overlap failure cannot certify that its exact SAM component exposes static scene material.",
+              "unknown_is_not_person_pixel_certificate": true,
+              "model_or_pose_pixels_issued": false
+            }
+          ]
+        },
+        "body_material_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\s05_local_v2\\body\\1259776.json",
+          "sha256": "d9d4438c7d5cea32a5c0261f21241f428c6ad09d012f4b9bfe2b30abf2239898"
+        },
+        "static_motion_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\s05_local_v2\\motion\\1259776.json",
+          "sha256": "e1bf8e7f4f032605713e892bcc95c5218cf64657eebe825ad86613e71f7dcefa"
+        },
+        "source_parts_binding_sha256": "0c13f79576ee862e0eb464ce185ae1e7d8a0832288ef15903e6def461be31586"
+      },
+      "image_ref": {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\qa_s05_local_v2b\\1259776_unknown_print.jpg",
+        "sha256": "390e05151f603b1d31945e65dcb693b0df2d64eb88538305f0a9d14608c99d04"
+      }
+    },
+    {
+      "native_pts": 1287168,
+      "added_unknown_pixels": 2,
+      "previous_material_pixels_intersect_added_unknown": 0,
+      "previous_material_pixels_intersect_unknown_8px_guard": 0,
+      "source_rows_inside_new_unknown": 0,
+      "source_rows_inside_new_unknown_guard": 0,
+      "previously_eligible_rows_inside_new_unknown_guard": 0,
+      "body_bitmap_bitwise_equal": true,
+      "body_pixels_removed": 0,
+      "original_source_rows": 3005,
+      "source_UV_or_ID_changed": false,
+      "source_BGR_sha256": "017f19bcf0bb8ab52bd1018e0467c5223b5afdfd7f2a3060340b9995b8bdab32",
+      "frame_ref": {
+        "native_pts": 1287168,
+        "shot_id": "s05",
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\s05_local_v2\\frames\\1287168.json",
+        "sha256": "95b7e0efed179ec88554c1b0885cd64db74a7cfbc4a9eb9ba4b68075e978064a",
+        "source_row_count": 3005,
+        "eligible_rows": 2235,
+        "decoded_native_BGR_sha256": "017f19bcf0bb8ab52bd1018e0467c5223b5afdfd7f2a3060340b9995b8bdab32",
+        "decoded_native_RGB_sha256": "9942f1272148fcd02b6eae1759b502e329a7cf7afb68414f8b385771dfe753a7",
+        "final_board_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_board_v1\\material_v5\\anchored_frames\\1287168.json",
+          "sha256": "ce58ab9ab63bdcd201990268e9c613b8b0bcf32c9f68e6cf187d939098ffea1d"
+        },
+        "mask_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\effective_v1\\person\\1287168.png",
+          "sha256": "2001764546a66ddd0eb1c996409383d215b182d8783e914b5ab8045b368df6f4"
+        },
+        "unknown_exclusion_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\effective_v2\\unknown\\1287168.png",
+          "sha256": "496fdbce3a32d85fdc024475f2fef5878725b582414173043005c7c21090b754",
+          "native_pts": 1287168,
+          "shot_id": "s05",
+          "source_BGR_sha256": "017f19bcf0bb8ab52bd1018e0467c5223b5afdfd7f2a3060340b9995b8bdab32",
+          "source_RGB_sha256": "9942f1272148fcd02b6eae1759b502e329a7cf7afb68414f8b385771dfe753a7",
+          "type": "preserved_source_unknown_OR_source_uncertain_person_instance_SAM_component",
+          "reason": "Source-qualified independent exclusion; no new person or static-scene truth asserted.",
+          "pixel_count": 2,
+          "visibility_guard_pixels": 8,
+          "parent_unknown_exclusion_ref": null,
+          "component_source_proofs": [
+            {
+              "native_pts": 1287168,
+              "object_index": 0,
+              "component": 2,
+              "bbox_xywh": [
+                1383,
+                356,
+                2,
+                1
+              ],
+              "pixels": 2,
+              "raw_source_mask_ref": {
+                "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\background_v1\\instances\\1287168_0.png",
+                "sha256": "6d1395aae3a6ec88cf20cbc4ea2d856d7ca738971a2d3b8f38ba53d491d85d22"
+              },
+              "source_BGR_sha256": "017f19bcf0bb8ab52bd1018e0467c5223b5afdfd7f2a3060340b9995b8bdab32",
+              "source_RGB_sha256": "9942f1272148fcd02b6eae1759b502e329a7cf7afb68414f8b385771dfe753a7",
+              "source_type": "source_uncertain_foreground_component_not_scene_observation",
+              "reason": "Semantically reviewed person instance; automatic prompt overlap failure cannot certify that its exact SAM component exposes static scene material.",
+              "unknown_is_not_person_pixel_certificate": true,
+              "model_or_pose_pixels_issued": false
+            }
+          ]
+        },
+        "body_material_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\s05_local_v2\\body\\1287168.json",
+          "sha256": "126944a8dda6f35c560dc654c10d9ec32d88f5a28d52faec33925111b6c8a6ec"
+        },
+        "static_motion_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\s05_local_v2\\motion\\1287168.json",
+          "sha256": "e6676a5965ce68032cab018503fcc4659f921780719bb56531c48886f39ddf18"
+        },
+        "source_parts_binding_sha256": "5286e63273bfdcab87362b508c9131df9b089e7b7b67a1a8eed7f90e1761ed4a"
+      },
+      "image_ref": {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\qa_s05_local_v2b\\1287168_unknown_print.jpg",
+        "sha256": "74babae7292498387629df6083002370070bbbf7c7864fadb34a31be379d0046"
+      }
+    }
+  ],
+  "full_shot_visual_release_or_physical_quality_not_issued": true
+}

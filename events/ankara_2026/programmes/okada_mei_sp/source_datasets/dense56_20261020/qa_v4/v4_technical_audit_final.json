@@ -1,0 +1,451 @@
+{
+  "schema": "rinkspace.v4_independent_video_clock_audit.v1",
+  "created_utc": "2026-10-20T18:35:45.557660+00:00",
+  "generation_manifest": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\generation_v4\\manifest.json",
+  "renderer_assembly": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\videos_v4",
+  "method": "Read only the final explicit video assembly child refs and gzip frame ledgers; verify all five merged gzip byte members, frozen selected IDs/UV and actual MP4 packet clocks via ffprobe. Public renderer source-pixel/full-output decode checks are pinned production evidence, not independently repeated here. No source or output video decoding.",
+  "image_quality_accepted": false,
+  "physical_model_accepted": false,
+  "all_frames_manually_viewed": false,
+  "no_video_decoder_used": true,
+  "errors": [],
+  "warnings": [],
+  "accepted_S06_image_QA_binding": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\qa_independent\\v2_s06_image_review.json",
+    "sha256": "4a438490a756e08577391635261bdb843193411e291bbe631a4ea9694d133c01",
+    "structural_file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\qa_independent\\v2_s06_structural.json",
+    "structural_sha256": "ccba53a46a87e74e0e878783c7422cfe9aaa06ebd59a633a7c64bc79cb62517c",
+    "images_loaded": false,
+    "scope": "Existing source image review reused only for its exact immutable S06 generation; does not accept S05 or certify all frames"
+  },
+  "public_renderer_production_evidence": {
+    "producer_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\rinkfit\\src\\rinkfit_joint\\dense_source_review.py",
+    "producer_sha256": "cc5ccaba94a0bfabf992139ed42f8d84b49f1ddac4a62540321c416207dc2f70",
+    "per_frame_source_BGR_hash_checked_in_producer": true,
+    "full_encoded_native_clock_decode_checked_in_producer": true,
+    "independent_video_decode_repeated": false
+  },
+  "frozen_child_generations": [
+    {
+      "shot_id": "s05",
+      "manifest": {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v4\\s05\\manifest.json",
+        "sha256": "2e86e7acdd8c558adef746b448e15daf43dcabb7846998284663432a24bc9f0c"
+      },
+      "selected_frames": {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v4\\s05\\selected_frames.jsonl.gz",
+        "sha256": "2bd4b6f7be0887a7c1d7eef1fd0460c838c82c89f7d6d275b707332883f9f40e"
+      },
+      "selected_rows": {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v4\\s05\\selected_rows.jsonl.gz",
+        "sha256": "9bfdaf2e83dfd9ea16d03009e9c990764ad631ad1ec79f3eb3ffc3ec7ecb772f"
+      }
+    },
+    {
+      "shot_id": "s06",
+      "manifest": {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v2\\s06\\manifest.json",
+        "sha256": "0db0b91dbb668c895e65cd5cb07563711e1241b9e1d94304a9bf3475061a181b"
+      },
+      "selected_frames": {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v2\\s06\\selected_frames.jsonl.gz",
+        "sha256": "7c33c9862fa4ab6d89404607e46bdd9e667f6816d0adc7c263cc22c540a4a47e"
+      },
+      "selected_rows": {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v2\\s06\\selected_rows.jsonl.gz",
+        "sha256": "e38e80af6776e9647a9d78b41b1f83488cdb7c3c1602a8c366cd20d966b681cd"
+      }
+    }
+  ],
+  "merge_gzip_byte_members": [
+    {
+      "merged_file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\generation_v4\\consumer_bindings.jsonl.gz",
+      "member_source": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v4\\s05\\consumer_bindings.jsonl.gz",
+      "offset": 0,
+      "length": 885650,
+      "expected_sha256": "20d160d931281af06054535d5d95b4f753d6c7c35f967fa670be569d70c85dc4",
+      "actual_merged_segment_sha256": "20d160d931281af06054535d5d95b4f753d6c7c35f967fa670be569d70c85dc4"
+    },
+    {
+      "merged_file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\generation_v4\\consumer_bindings.jsonl.gz",
+      "member_source": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v2\\s06\\consumer_bindings.jsonl.gz",
+      "offset": 885650,
+      "length": 314359,
+      "expected_sha256": "5388dad4cb5369775bbb562c4daab5a75a4bd4278730bce44344cb3ec225f8f3",
+      "actual_merged_segment_sha256": "5388dad4cb5369775bbb562c4daab5a75a4bd4278730bce44344cb3ec225f8f3"
+    },
+    {
+      "merged_file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\generation_v4\\coverage.jsonl.gz",
+      "member_source": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v4\\s05\\coverage.jsonl.gz",
+      "offset": 0,
+      "length": 1404152,
+      "expected_sha256": "16687270a518b9643327c793ba0fa95e4650cd1422842684586ef5e9c8b2a116",
+      "actual_merged_segment_sha256": "16687270a518b9643327c793ba0fa95e4650cd1422842684586ef5e9c8b2a116"
+    },
+    {
+      "merged_file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\generation_v4\\coverage.jsonl.gz",
+      "member_source": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v2\\s06\\coverage.jsonl.gz",
+      "offset": 1404152,
+      "length": 493651,
+      "expected_sha256": "64fb7b4c1e0141b427f748ee72f3e72a577da1c39de773fd3dd9f97073a42d3e",
+      "actual_merged_segment_sha256": "64fb7b4c1e0141b427f748ee72f3e72a577da1c39de773fd3dd9f97073a42d3e"
+    },
+    {
+      "merged_file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\generation_v4\\excluded.jsonl.gz",
+      "member_source": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v4\\s05\\excluded.jsonl.gz",
+      "offset": 0,
+      "length": 1744213,
+      "expected_sha256": "7cf740f614f54a963e420dfa7a8c8650150969b2897d501a2dd54bb3a44184af",
+      "actual_merged_segment_sha256": "7cf740f614f54a963e420dfa7a8c8650150969b2897d501a2dd54bb3a44184af"
+    },
+    {
+      "merged_file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\generation_v4\\excluded.jsonl.gz",
+      "member_source": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v2\\s06\\excluded.jsonl.gz",
+      "offset": 1744213,
+      "length": 199607,
+      "expected_sha256": "2fd75e526b0b7eaa33204aa0495d1b2ac638eab2682b0b8746ba34770671f4e2",
+      "actual_merged_segment_sha256": "2fd75e526b0b7eaa33204aa0495d1b2ac638eab2682b0b8746ba34770671f4e2"
+    },
+    {
+      "merged_file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\generation_v4\\selected_frames.jsonl.gz",
+      "member_source": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v4\\s05\\selected_frames.jsonl.gz",
+      "offset": 0,
+      "length": 15376030,
+      "expected_sha256": "2bd4b6f7be0887a7c1d7eef1fd0460c838c82c89f7d6d275b707332883f9f40e",
+      "actual_merged_segment_sha256": "2bd4b6f7be0887a7c1d7eef1fd0460c838c82c89f7d6d275b707332883f9f40e"
+    },
+    {
+      "merged_file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\generation_v4\\selected_frames.jsonl.gz",
+      "member_source": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v2\\s06\\selected_frames.jsonl.gz",
+      "offset": 15376030,
+      "length": 5201924,
+      "expected_sha256": "7c33c9862fa4ab6d89404607e46bdd9e667f6816d0adc7c263cc22c540a4a47e",
+      "actual_merged_segment_sha256": "7c33c9862fa4ab6d89404607e46bdd9e667f6816d0adc7c263cc22c540a4a47e"
+    },
+    {
+      "merged_file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\generation_v4\\selected_rows.jsonl.gz",
+      "member_source": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v4\\s05\\selected_rows.jsonl.gz",
+      "offset": 0,
+      "length": 40775488,
+      "expected_sha256": "9bfdaf2e83dfd9ea16d03009e9c990764ad631ad1ec79f3eb3ffc3ec7ecb772f",
+      "actual_merged_segment_sha256": "9bfdaf2e83dfd9ea16d03009e9c990764ad631ad1ec79f3eb3ffc3ec7ecb772f"
+    },
+    {
+      "merged_file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\generation_v4\\selected_rows.jsonl.gz",
+      "member_source": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v2\\s06\\selected_rows.jsonl.gz",
+      "offset": 40775488,
+      "length": 14575351,
+      "expected_sha256": "e38e80af6776e9647a9d78b41b1f83488cdb7c3c1602a8c366cd20d966b681cd",
+      "actual_merged_segment_sha256": "e38e80af6776e9647a9d78b41b1f83488cdb7c3c1602a8c366cd20d966b681cd"
+    }
+  ],
+  "selected_frames": 1862,
+  "selected_rows": 929463,
+  "point_count_by_shot": {
+    "s05": 686463,
+    "s06": 243000
+  },
+  "point_count_per_native_frame": {
+    "min": 480,
+    "max": 500
+  },
+  "auxiliary_native_clock_checks": {
+    "consumer_bindings.jsonl.gz": {
+      "frames": 1862,
+      "native_clock_exact": true
+    },
+    "coverage.jsonl.gz": {
+      "frames": 1862,
+      "native_clock_exact": true
+    }
+  },
+  "excluded_source_rows_actual": {
+    "total": 58928,
+    "by_shot": {
+      "s05": 51276,
+      "s06": 7652
+    },
+    "by_reason": {
+      "current_actor_silhouette_and_blur_support_guard": 39366,
+      "current_source_reflection_or_mixed_material_identity_unknown": 3230,
+      "actual_current_red_mixture_prevents_independent_bluegray_two_edge_qualification": 1218,
+      "above_actual_current_board_contact_not_visible_ice_surface": 18,
+      "new_continuous_raised_shoe_source_uncertainty_guard": 133,
+      "new_shoe_two_exposure_or_current_material_qualification_status_6": 137,
+      "new_shoe_two_exposure_or_current_material_qualification_status_5": 15,
+      "actual_current_broadcast_graphics_occludes_complete_source_profile": 11987,
+      "new_shoe_two_exposure_or_current_material_qualification_status_0": 20,
+      "current_continuous_actor_source_uncertainty_guard": 3,
+      "current_actor_two_exposure_or_material_qualification_status_5": 2,
+      "current_actor_two_exposure_or_material_qualification_status_6": 9,
+      "actual_near_board_top_or_external_non_surface_domain": 2789,
+      "outside_actual_visible_ice_surface": 1
+    },
+    "native_clock_backsteps": 0,
+    "outside_native_clock": 0,
+    "prior_rejections_and_new_corrections_preserved_by_frozen_child_byte_binding": true
+  },
+  "explicit_video_assembly": {
+    "schema": "rinkspace.native_source_points_only_video_assembly.v3",
+    "generation_id": "dense56_v4",
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\videos_v4\\manifest.json",
+    "sha256": "4001d4f32f2df0dbfe7f0a38b8b508dac1da01bcab606a2433aaa70eca7c498d",
+    "child_video_exports": [
+      {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\videos_v4\\s05\\manifest.json",
+        "sha256": "543cd08288fd99c11bf056a62aec291f7b48821449c00ce17cb68c854ccb85f6",
+        "selected_frame_file": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v4\\s05\\selected_frames.jsonl.gz",
+          "sha256": "2bd4b6f7be0887a7c1d7eef1fd0460c838c82c89f7d6d275b707332883f9f40e"
+        },
+        "frame_ledger_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\videos_v4\\s05\\frame_ledger.jsonl.gz",
+          "sha256": "d44d36872eda29f54bc8885c84655d5038e6f29e6d35b26d48c5519e3b4bb4c1"
+        }
+      },
+      {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\videos_v2\\s06\\manifest.json",
+        "sha256": "c0404386849a6d227f8e7e30b2181f8cd7aff2e5b709a86f56e11cd96a9d3493",
+        "selected_frame_file": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v2\\s06\\selected_frames.jsonl.gz",
+          "sha256": "7c33c9862fa4ab6d89404607e46bdd9e667f6816d0adc7c263cc22c540a4a47e"
+        },
+        "frame_ledger_ref": {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\videos_v2\\s06\\frame_ledger.jsonl.gz",
+          "sha256": "7e266cfe7df426c9a15c678dd00b4f89442e5d07059e981ba09641d7444ef0cf"
+        }
+      }
+    ],
+    "no_recursive_renderer_search": true
+  },
+  "renderer_manifests": [
+    {
+      "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\videos_v4\\s05\\manifest.json",
+      "sha256": "543cd08288fd99c11bf056a62aec291f7b48821449c00ce17cb68c854ccb85f6",
+      "ledger": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\videos_v4\\s05\\frame_ledger.jsonl.gz",
+      "frames": 1376,
+      "local_clock_rows": 1376
+    },
+    {
+      "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\videos_v2\\s06\\manifest.json",
+      "sha256": "c0404386849a6d227f8e7e30b2181f8cd7aff2e5b709a86f56e11cd96a9d3493",
+      "ledger": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\videos_v2\\s06\\frame_ledger.jsonl.gz",
+      "frames": 486,
+      "local_clock_rows": 486
+    }
+  ],
+  "videos": [
+    {
+      "shot_id": "s05",
+      "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\videos_v4\\s05\\s05_original_ALL_source_points.mp4",
+      "sha256": "7f0ad9f1299861ccf920f8efc3aab44c76f248531c650c963c5b9d6523ac0497",
+      "frames_expected": 1376,
+      "source_pts": [
+        948992,
+        1300992
+      ],
+      "source_seconds": [
+        74.14,
+        101.66
+      ],
+      "ffprobe_file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\qa_independent\\v4_technical_audit_final_s05_ffprobe.json",
+      "video": {
+        "codec": "h264",
+        "time_base": "1/12800",
+        "packets": 1376,
+        "first_packet_time": 0.0,
+        "last_packet_time": 27.5,
+        "duration": 27.52,
+        "frame_clock_exact": true
+      },
+      "audio": {
+        "codec": "aac",
+        "sample_rate": 48000,
+        "time_base": "1/48000",
+        "playable_stream_start": 0.0,
+        "duration": 27.52,
+        "expected_segment_duration": 27.52,
+        "duration_error_seconds": 0.0,
+        "packets": 1291,
+        "first_packet_pts": -1024,
+        "last_packet_end": 1320960,
+        "first_packet_side_data": [
+          {
+            "side_data_type": "Skip Samples",
+            "skip_samples": 1024,
+            "discard_padding": 0
+          }
+        ],
+        "playable_stream_clock_matches_native_segment": true,
+        "source_audio_waveform_content_correlation_run": false
+      }
+    },
+    {
+      "shot_id": "s06",
+      "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\videos_v2\\s06\\s06_original_ALL_source_points.mp4",
+      "sha256": "e052e40a8f357c14c5c3701af6b38317fdc21c7a98b35cd110cf77b25acfd47f",
+      "frames_expected": 486,
+      "source_pts": [
+        1301248,
+        1425408
+      ],
+      "source_seconds": [
+        101.66,
+        111.38
+      ],
+      "ffprobe_file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\qa_independent\\v4_technical_audit_final_s06_ffprobe.json",
+      "video": {
+        "codec": "h264",
+        "time_base": "1/12800",
+        "packets": 486,
+        "first_packet_time": 0.0,
+        "last_packet_time": 9.7,
+        "duration": 9.72,
+        "frame_clock_exact": true
+      },
+      "audio": {
+        "codec": "aac",
+        "sample_rate": 48000,
+        "time_base": "1/48000",
+        "playable_stream_start": 0.0,
+        "duration": 9.72,
+        "expected_segment_duration": 9.72,
+        "duration_error_seconds": 0.0,
+        "packets": 457,
+        "first_packet_pts": -1024,
+        "last_packet_end": 466560,
+        "first_packet_side_data": [
+          {
+            "side_data_type": "Skip Samples",
+            "skip_samples": 1024,
+            "discard_padding": 0
+          }
+        ],
+        "playable_stream_clock_matches_native_segment": true,
+        "source_audio_waveform_content_correlation_run": false
+      }
+    }
+  ],
+  "official_source_streams": [
+    {
+      "index": 0,
+      "codec_name": "av1",
+      "codec_type": "video",
+      "width": 1920,
+      "height": 1080,
+      "r_frame_rate": "50/1",
+      "avg_frame_rate": "50/1",
+      "time_base": "1/12800",
+      "start_pts": 0,
+      "start_time": "0.000000",
+      "duration_ts": 4099328,
+      "duration": "320.260000",
+      "nb_frames": "16013",
+      "disposition": {
+        "default": 1,
+        "dub": 0,
+        "original": 0,
+        "comment": 0,
+        "lyrics": 0,
+        "karaoke": 0,
+        "forced": 0,
+        "hearing_impaired": 0,
+        "visual_impaired": 0,
+        "clean_effects": 0,
+        "attached_pic": 0,
+        "timed_thumbnails": 0,
+        "non_diegetic": 0,
+        "captions": 0,
+        "descriptions": 0,
+        "metadata": 0,
+        "dependent": 0,
+        "still_image": 0,
+        "multilayer": 0
+      },
+      "tags": {
+        "language": "und",
+        "handler_name": "ISO Media file produced by Google Inc."
+      }
+    },
+    {
+      "index": 1,
+      "codec_name": "opus",
+      "codec_type": "audio",
+      "sample_rate": "48000",
+      "channels": 2,
+      "r_frame_rate": "0/0",
+      "avg_frame_rate": "0/0",
+      "time_base": "1/48000",
+      "start_pts": 0,
+      "start_time": "0.000000",
+      "duration_ts": 15374112,
+      "duration": "320.294000",
+      "nb_frames": "16015",
+      "disposition": {
+        "default": 1,
+        "dub": 0,
+        "original": 0,
+        "comment": 0,
+        "lyrics": 0,
+        "karaoke": 0,
+        "forced": 0,
+        "hearing_impaired": 0,
+        "visual_impaired": 0,
+        "clean_effects": 0,
+        "attached_pic": 0,
+        "timed_thumbnails": 0,
+        "non_diegetic": 0,
+        "captions": 0,
+        "descriptions": 0,
+        "metadata": 0,
+        "dependent": 0,
+        "still_image": 0,
+        "multilayer": 0
+      },
+      "tags": {
+        "language": "eng",
+        "handler_name": "SoundHandler"
+      }
+    }
+  ],
+  "pins": {
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\generation_v4\\manifest.json": "1d3f4ac6077f27a86f83e47977d80b7ac89cc95a307fa51a6bdf190a464b59b4",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\qa_independent\\v2_s06_image_review.json": "4a438490a756e08577391635261bdb843193411e291bbe631a4ea9694d133c01",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\qa_independent\\v2_s06_structural.json": "ccba53a46a87e74e0e878783c7422cfe9aaa06ebd59a633a7c64bc79cb62517c",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\rinkfit\\src\\rinkfit_joint\\dense_source_review.py": "cc5ccaba94a0bfabf992139ed42f8d84b49f1ddac4a62540321c416207dc2f70",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v4\\s05\\manifest.json": "2e86e7acdd8c558adef746b448e15daf43dcabb7846998284663432a24bc9f0c",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v2\\s06\\manifest.json": "0db0b91dbb668c895e65cd5cb07563711e1241b9e1d94304a9bf3475061a181b",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v4\\s05\\consumer_bindings.jsonl.gz": "20d160d931281af06054535d5d95b4f753d6c7c35f967fa670be569d70c85dc4",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v2\\s06\\consumer_bindings.jsonl.gz": "5388dad4cb5369775bbb562c4daab5a75a4bd4278730bce44344cb3ec225f8f3",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\generation_v4\\consumer_bindings.jsonl.gz": "04f456f494021889abd311fdb9ec5edb19da1c87ad56826270c4685611f0b6e0",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v4\\s05\\coverage.jsonl.gz": "16687270a518b9643327c793ba0fa95e4650cd1422842684586ef5e9c8b2a116",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v2\\s06\\coverage.jsonl.gz": "64fb7b4c1e0141b427f748ee72f3e72a577da1c39de773fd3dd9f97073a42d3e",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\generation_v4\\coverage.jsonl.gz": "c6a7980ed9451725c19d1023f3c956e9b1ee77452d432f0972c08628862dec01",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v4\\s05\\excluded.jsonl.gz": "7cf740f614f54a963e420dfa7a8c8650150969b2897d501a2dd54bb3a44184af",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v2\\s06\\excluded.jsonl.gz": "2fd75e526b0b7eaa33204aa0495d1b2ac638eab2682b0b8746ba34770671f4e2",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\generation_v4\\excluded.jsonl.gz": "460362739e571e54dff0892b160f86c09f75978fb14359661c0e22984f981f6f",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v4\\s05\\selected_frames.jsonl.gz": "2bd4b6f7be0887a7c1d7eef1fd0460c838c82c89f7d6d275b707332883f9f40e",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v2\\s06\\selected_frames.jsonl.gz": "7c33c9862fa4ab6d89404607e46bdd9e667f6816d0adc7c263cc22c540a4a47e",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\generation_v4\\selected_frames.jsonl.gz": "8c9ebae508307ee03976840253a6d2c9f88e00c7fca7999c3533cd14cd52c44f",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v4\\s05\\selected_rows.jsonl.gz": "9bfdaf2e83dfd9ea16d03009e9c990764ad631ad1ec79f3eb3ffc3ec7ecb772f",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\parts_v2\\s06\\selected_rows.jsonl.gz": "e38e80af6776e9647a9d78b41b1f83488cdb7c3c1602a8c366cd20d966b681cd",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\generation_v4\\selected_rows.jsonl.gz": "ef05b009369b051ba7322ee68cea8041c4bb56646c568d0719018700151aaaf8",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\videos_v4\\manifest.json": "4001d4f32f2df0dbfe7f0a38b8b508dac1da01bcab606a2433aaa70eca7c498d",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\videos_v4\\s05\\manifest.json": "543cd08288fd99c11bf056a62aec291f7b48821449c00ce17cb68c854ccb85f6",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\videos_v4\\s05\\frame_ledger.jsonl.gz": "d44d36872eda29f54bc8885c84655d5038e6f29e6d35b26d48c5519e3b4bb4c1",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\videos_v2\\s06\\manifest.json": "c0404386849a6d227f8e7e30b2181f8cd7aff2e5b709a86f56e11cd96a9d3493",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\videos_v2\\s06\\frame_ledger.jsonl.gz": "7e266cfe7df426c9a15c678dd00b4f89442e5d07059e981ba09641d7444ef0cf",
+    "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\videos_v4\\s05\\s05_original_ALL_source_points.mp4": "7f0ad9f1299861ccf920f8efc3aab44c76f248531c650c963c5b9d6523ac0497",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\qa_independent\\v4_technical_audit_final_s05_ffprobe.json": "bdfbce3f8ae017a8f1ad693f3d6399bd7e84dcff666956e9faca4c9451eaab46",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\videos_v2\\s06\\s06_original_ALL_source_points.mp4": "e052e40a8f357c14c5c3701af6b38317fdc21c7a98b35cd110cf77b25acfd47f",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\qa_independent\\v4_technical_audit_final_s06_ffprobe.json": "0592e5bf7ff6ce39166979018c8d18938bc3416676f884cf862c2b3ead299afe"
+  },
+  "technical_checks_passed": true,
+  "conclusion": "technical_clock_and_binding_passed_image_quality_separate",
+  "limitations": [
+    "Packet clocks and renderer source bindings do not certify the drawn material ownership, pixel accuracy or full-frame manual viewing.",
+    "Audio source identity and playable segment clock are checked; waveform content alignment is not independently measured.",
+    "Source RGB and full encoded decoder checks are reused from the pinned public renderer manifest and production code; this metadata-only audit does not independently decode pixels."
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "schema": "rinkspace.dense56_source_material_visual_review.v1",
+  "physical_model_accuracy_accepted": false,
+  "scope": "development source-material qualification and current pixel candidate review, not full-shot solved-model acceptance",
+  "native_current_RGB_material_profiles_read_all_1862": true,
+  "source_sequence": {
+    "pages": [
+      "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/source_sequence_00.jpg",
+      "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/source_sequence_01.jpg",
+      "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/source_sequence_02.jpg",
+      "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/source_sequence_03.jpg"
+    ],
+    "native_pts_step": 8192,
+    "observed": "S05暗灰/宽蓝横带、纵向细线、填色靶圈与扁平红漆可见；S05旋转段亮粉红电子计时器倒影与暗红静止漆独立；S06末段拉近，冰面可见域变窄。"
+  },
+  "red_material_sequence": {
+    "pages": [
+      "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/material_sequence_review/red_00.jpg",
+      "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/material_sequence_review/red_01.jpg",
+      "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/material_sequence_review/red_02.jpg",
+      "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/material_sequence_review/red_03.jpg"
+    ],
+    "index": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/material_sequence_review/red_index.json",
+    "native_pts_step": 2048,
+    "observed": "中段红漆为同一紧凑扁椭圆静止材料，越过手脚时只取当前可见签名界面。进入/退出弱片段不因旧ROI有名称自动具备正式资格。"
+  },
+  "goal_blue_sequence": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/material_sequence_review/goal_blue_sequence.jpg",
+    "observed_native_pts": [
+      1273856,
+      1287680
+    ],
+    "observed": "左下蓝填充区域有当前蓝—冰界面，单独filled_blue_goal_area_material_boundary；不作普通红半圆/靶圈/有宽线中点。"
+  },
+  "foot_shadow_review": {
+    "pages": [
+      "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/foot_material_review/feet_00.jpg",
+      "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/foot_material_review/feet_01.jpg",
+      "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/foot_material_review/feet_02.jpg"
+    ],
+    "index": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/foot_material_review/index.json",
+    "native_pts": [
+      967168,
+      997632,
+      1044992,
+      1071616,
+      1099776,
+      1301248,
+      1332736,
+      1368832,
+      1376000,
+      1406720,
+      1425408
+    ],
+    "observed": "B1沿跨画面真实整带，越过人物时使用当前两侧材料及整带分支；当前冰刀灰晕/灰影大部分区域无B1/C0点，未用整个人物xbox下延作禁区。1406720单独回看原生004495.png，C0是跨画面浅灰圆弧，当前候选位于该弧而不是即刻脚下灰团。",
+    "additional_targeted_low_contrast_audit_found_missing_footwear": true,
+    "status": "initial sparse source QA superseded by targeted minimum-contrast audit for footwear"
+  },
+  "historical_user_guidance_review": {
+    "registration_file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/historical_guidance_registered.json",
+    "registration_sha256": "337bd8d7bfeea356103dd6f66572b7d9dad2c19005134599be26c463fd6ba1e8",
+    "anchor_images": [
+      "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/historical_guidance_delta/1071616.jpg",
+      "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/historical_guidance_delta/1332736.jpg"
+    ],
+    "observed": "用户旧图以实际图像匹配回官方原生曝光。Lane1/Lane2与B1/C黄色/粉色中点来自新原画双侧读数，绿色为实际双侧界面；旧手绘只导航。"
+  },
+  "final_surface_board_binding": "pending accepted board generation; do not consume a stale board domain",
+  "old_project_source_UV_packets_or_models_modified": false,
+  "lowest_contrast_C0_foot_review": {
+    "pages": [
+      "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/foot_material_review/weakest_00.jpg",
+      "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/foot_material_review/weakest_01.jpg",
+      "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/foot_material_review/weakest_02.jpg",
+      "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/foot_material_review/weakest_03.jpg"
+    ],
+    "records_file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/foot_material_review/weakest_current_foot_records.json",
+    "selection": "minimum signed material IQR contrast under 3.5 among near-foot dark-profile B1/C0 current readings, ranked by contrast plus foot distance",
+    "near_foot_rows": {
+      "ice.B1:segment0": 10527,
+      "ice.C0:outer": 3237
+    },
+    "selected": 24,
+    "native_pts_span": [
+      1376000,
+      1408512
+    ],
+    "observed": "最弱24条均为C0，跨人物脚下的浅灰弧带在连续原片中延伸，点的上下两材料边界在当前同条灰带，脚下局部灰团与冰刀位于邻近上方；此项为源材料开发核查，非拟合精度验收。"
+  },
+  "footwear_missing_SAM_finding": {
+    "native_pts": [
+      1135104,
+      1161216,
+      1161472,
+      1170944
+    ],
+    "source_evidence": [
+      "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/foot_material_review/SAM_footwear_00.jpg",
+      "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/foot_material_review/SAM_footwear_01.jpg",
+      "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/foot_material_review/SAM_footwear_02.jpg"
+    ],
+    "finding": "原SAM部分帧在踝部截断，白冰鞋不在8px guard内，少数B1弱读数在鞋身；必须加入当前原图SAM鞋面delta后最终资格，不能复用这些点为冰面材料。",
+    "original_masks_preserved": true,
+    "repair_status": "current native RGB actual footwear positive-point SAM2 probe v3, no ROI as hard exclusion"
+  }
+}

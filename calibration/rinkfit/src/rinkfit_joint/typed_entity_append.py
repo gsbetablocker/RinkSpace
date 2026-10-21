@@ -17,6 +17,27 @@ def load_qualification(reference,verify):
             combined.update(rows);sources.extend(refs)
         return combined,sources
     manifest_file=verify(reference);manifest=read_json(manifest_file)
+    if manifest.get('schema')=='rinkfit.exact_typed_source_suffix_rebase.v4':
+        from .typed_source_rebase_v4 import load_rebased_qualification
+        return load_rebased_qualification(manifest_file,manifest,reference,verify)
+    if manifest.get('schema')=='rinkfit.exact_typed_source_suffix_rebase.v3':
+        from .typed_source_rebase_v3 import load_rebased_qualification
+        return load_rebased_qualification(manifest_file,manifest,reference,verify)
+    if manifest.get('schema')=='rinkfit.exact_typed_source_suffix_rebase.v2':
+        from .typed_source_rebase_v2 import load_rebased_qualification
+        return load_rebased_qualification(manifest_file,manifest,reference,verify)
+    if manifest.get('schema')=='rinkfit.exact_typed_source_suffix_rebase.v1':
+        from .typed_source_rebase_v1 import load_rebased_qualification
+        return load_rebased_qualification(manifest_file,manifest,reference,verify)
+    if manifest.get('schema')=='rinkfit.known_corner_source_support_qualification.v1':
+        from .known_entity_tracklet_append import load_source_support_qualification
+        return load_source_support_qualification(manifest_file,manifest,reference,verify)
+    if manifest.get('schema')=='rinkfit.static_board_tracklet_point_qualification.v1':
+        from .static_board_tracklet_append import load_point_qualification
+        return load_point_qualification(manifest_file,manifest,reference,verify)
+    if manifest.get('schema')=='rinkfit.static_ice_tracklet_point_qualification.v1':
+        from .static_ice_tracklet_append import load_point_qualification
+        return load_point_qualification(manifest_file,manifest,reference,verify)
     if manifest.get('schema')!='rinkfit.new_actual_type1_source_qualification_gate.v1':
         raise ValueError('Explicit new physical entity qualification required')
     for name in ('input_cumulative_journal','qualification_receipts','current_model','source_mean_and_floating_estimator_replay_QA'):
@@ -36,6 +57,15 @@ def load_qualification(reference,verify):
 
 def validate_new_entity(row,receipt,material,material_index):
     if receipt is None:raise ValueError('No source qualification for physical entity measurement')
+    if receipt.get('schema')=='rinkfit.source_supported_known_corner_qualification.v1':
+        from .known_entity_tracklet_append import validate_source_support_receipt
+        return validate_source_support_receipt(row,receipt,material,material_index)
+    if receipt.get('schema')=='rinkfit.static_board_tracklet_point_receipt.v1':
+        from .static_board_tracklet_append import validate_point_receipt
+        return validate_point_receipt(row,receipt,material,material_index)
+    if receipt.get('schema')=='rinkfit.static_ice_tracklet_point_receipt.v1':
+        from .static_ice_tracklet_append import validate_point_receipt
+        return validate_point_receipt(row,receipt,material,material_index)
     if not row.get('point_correspondence')or row.get('measurement_operator_resolved')!='physical_corner':
         raise ValueError('Entity adapter requires the actual corresponding-corner source operator')
     expected=object_sha256(dict(source_row_id=row['source_row_id'],native_pts=row['native_pts'],

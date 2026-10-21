@@ -10,8 +10,16 @@ import numpy as np
 
 class NVRTCModule:
     def __init__(self,source=None,*,ptx=None,name="kernel.cu",output=None,options=(),
-                 runtime_bin="D:/OneDrive/codex_projs/MotionTrail_Codex_Starter_v1/.venv-gpu/Lib/site-packages/torch/lib"):
+                 runtime_bin=None):
         if (source is None)==(ptx is None):raise ValueError("supply exactly one of source or PTX")
+        if runtime_bin is None:
+            # Reuse the production source-reader runtime resolver: the GPU
+            # environment was moved out of OneDrive and must not be rebuilt.
+            from .feedback_dispatch import source_reader_python
+            runtime_bin=source_reader_python().parents[1]/'Lib/site-packages/torch/lib'
+        runtime_bin=Path(runtime_bin)
+        if not (runtime_bin/'nvrtc64_120_0.dll').is_file() or not (runtime_bin/'nvrtc-builtins64_128.dll').is_file():
+            raise FileNotFoundError('Existing CUDA NVRTC runtime DLLs missing: '+str(runtime_bin))
         self._dll_dir=os.add_dll_directory(str(runtime_bin))
         self._builtins=C.WinDLL(str(Path(runtime_bin)/"nvrtc-builtins64_128.dll"))
         self.nvrtc=C.WinDLL(str(Path(runtime_bin)/"nvrtc64_120_0.dll"))

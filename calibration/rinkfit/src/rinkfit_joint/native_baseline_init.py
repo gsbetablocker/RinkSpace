@@ -48,9 +48,16 @@ def _physical(q,h,o,meta,X=None):
     safe=np.where(np.abs(depth)>1e-9,depth,np.where(depth>=0,1e-9,-1e-9))
     xx=Y[...,0]/safe; yy=Y[...,1]/safe; r2=xx*xx+yy*yy
     k1=o[5]+o[6]*z; k2=o[7]+o[8]*z
+    extension=meta.get('brown_wide_extension')
+    if extension:
+        basis=np.maximum(float(extension['activation_log_f_native'])-q[:,2],0.)**2
+        ec=np.asarray(extension['coefficients'])
+        k1=k1+ec[0]*basis;k2=k2+ec[1]*basis
+        p1=o[9]+ec[2]*basis;p2=o[10]+ec[3]*basis
+    else:p1=np.full(len(q),o[9]);p2=np.full(len(q),o[10])
     radial=1+k1[:,None]*r2+k2[:,None]*r2*r2
-    xd=xx*radial+2*o[9]*xx*yy+o[10]*(r2+2*xx*xx)
-    yd=yy*radial+o[9]*(r2+2*yy*yy)+2*o[10]*xx*yy
+    xd=xx*radial+2*p1[:,None]*xx*yy+p2[:,None]*(r2+2*xx*xx)
+    yd=yy*radial+p1[:,None]*(r2+2*yy*yy)+2*p2[:,None]*xx*yy
     f=np.exp(q[:,2]); pp=o[:2]+z[:,None]*o[3:5]
     uv=pp[:,None,:]+np.stack((f[:,None]*np.exp(o[2]/2)*xd,f[:,None]*np.exp(-o[2]/2)*yd),axis=-1)
     return uv,depth,np.sqrt(r2),R,C

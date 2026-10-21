@@ -47,7 +47,7 @@ def _ncc(a, b):
     return float(a@b/d) if d > 1e-9 else -1.
 
 
-def read_material_corner(rgb, mask, seed_uv, edge_tangents):
+def read_material_corner(rgb, mask, seed_uv, edge_tangents, *, channels=None):
     """Two-edge reacquisition followed by the unchanged production operator."""
     rgb = np.asarray(rgb, np.uint8); mask = np.asarray(mask, bool)
     q = np.asarray(seed_uv, float)
@@ -66,7 +66,7 @@ def read_material_corner(rgb, mask, seed_uv, edge_tangents):
         return dict(valid=False, reason=reacquired['reason'], reacquisition=reacquired)
     nav = np.asarray(reacquired['current_intersection_uv'])+origin
     directions = [f['tangent'] for f in reacquired['edge_fits']]
-    actual = remeasure_corner(_channels(rgb), nav, directions, mask)
+    actual = remeasure_corner(_channels(rgb) if channels is None else channels, nav, directions, mask)
     if not actual.get('valid'):
         return dict(valid=False, reason=actual['reason'], reacquisition=reacquired, source_operator=actual)
     return dict(valid=True, reason='two_current_material_edges_intersection',
@@ -78,7 +78,7 @@ def read_material_corner(rgb, mask, seed_uv, edge_tangents):
         statistical_objective_eligible=False, source_identity_inherited_not_established=True)
 
 
-def track_material_corner(previous_rgb, current_rgb, previous_uv, edge_tangents, mask):
+def track_material_corner(previous_rgb, current_rgb, previous_uv, edge_tangents, mask, *, current_channels=None):
     """One same-shot native step; failure remains an explicit terminal reason."""
     old = _gray(previous_rgb); now = _gray(current_rgb)
     p = np.asarray(previous_uv,np.float32).reshape(1,1,2)
@@ -100,7 +100,7 @@ def track_material_corner(previous_rgb, current_rgb, previous_uv, edge_tangents,
     if correlation < NAVIGATION['patch_ncc_min']:
         return dict(valid=False, reason='actual_native_patch_navigation_below_existing075',
             patch_ncc=correlation, reciprocal_error_px=reciprocal)
-    result = read_material_corner(current_rgb,mask,seed,edge_tangents)
+    result = read_material_corner(current_rgb,mask,seed,edge_tangents,channels=current_channels)
     result.update(navigation_seed_uv=seed.tolist(), reciprocal_error_px=reciprocal,
         patch_ncc=correlation, actual_previous_uv=np.asarray(previous_uv).tolist(),
         navigation_configuration=NAVIGATION)

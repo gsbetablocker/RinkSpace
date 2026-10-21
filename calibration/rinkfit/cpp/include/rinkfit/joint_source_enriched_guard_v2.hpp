@@ -1,0 +1,27 @@
+#pragma once
+#include "rinkfit/joint_source_enriched_guard_v1.hpp"
+namespace rinkfit {
+inline eventio::Json joint_source_math_guard_snapshot_v1(const eventio::Json&doc,const std::filesystem::path&){
+ auto guard=joint_source_guard_snapshot(doc);if(doc.contains("source_math_source_authority"))guard["source_math_source_authority"]=doc.at("source_math_source_authority");return guard;
+}
+class JointSourceMathRecallPinV1 {
+ std::filesystem::path canonical_;std::string sha_;std::uintmax_t size_=0;std::filesystem::file_time_type modified_{};bool active_=false;
+ public:
+ static JointSourceMathRecallPinV1 capture(const eventio::Json&doc,const std::filesystem::path&packet){
+  JointSourceMathRecallPinV1 out;if(!doc.contains("source_math_source_authority"))return out;const auto&r=doc.at("source_math_source_authority").at("canonical_source_packet");auto p=std::filesystem::path(r.at("file").get<std::string>());if(p.is_relative())p=packet.parent_path()/p;out.canonical_=std::filesystem::absolute(p);out.sha_=r.at("sha256");out.size_=std::filesystem::file_size(out.canonical_);out.modified_=std::filesystem::last_write_time(out.canonical_);eventio::verify(out.canonical_,out.sha_);if(std::filesystem::file_size(out.canonical_)!=out.size_||std::filesystem::last_write_time(out.canonical_)!=out.modified_)throw std::runtime_error("canonical source changed during initial SHA verification");out.active_=true;return out;
+ }
+ void assert_metadata_pin()const{if(active_&&(!std::filesystem::exists(canonical_)||std::filesystem::file_size(canonical_)!=size_||std::filesystem::last_write_time(canonical_)!=modified_))throw std::runtime_error("canonical numerical source immutable file pin changed");}
+ std::filesystem::path marker(const eventio::Json&guard,const std::filesystem::path&packet,bool verify_old_dependencies=true)const{
+  const auto old=joint_source_recall_marker(guard,packet,verify_old_dependencies);if(!old.empty())return old;assert_metadata_pin();if(active_)for(const char*k:{"SOURCE_IDENTITY_CERTIFICATE_RECALLED.json","SOURCE_IDENTITY_EVIDENCE_RECALL.json"})if(std::filesystem::exists(canonical_.parent_path()/k))return canonical_.parent_path()/k;return {};
+ }
+ eventio::Json report()const{return {{"schema","rinkfit.source_math_canonical_recall_pin.v1"},{"active",active_},{"canonical_packet",canonical_.u8string()},{"expected_sha256",sha_},{"initial_full_SHA_verified",active_},{"subsequent_canonical_checks","exact file size and last-write-time plus directory recall markers"},{"canonical_byte_hash_on_every_iteration",false},{"original_source_watchlist_or_strong_rules_changed",false}};}
+};
+inline bool joint_enriched_query_equal_v1(const std::shared_ptr<const JointQuery>&a,const std::shared_ptr<const JointQuery>&b){if(bool(a)!=bool(b))return false;if(!a)return true;return a->alpha==b->alpha&&a->uv==b->uv&&a->nx==b->nx&&a->ny==b->ny&&a->den==b->den&&a->origin==b->origin&&a->scale==b->scale;}
+template<class Packet,class Model>inline void assert_joint_source_identity_current_v3(const Packet&p,const std::filesystem::path&path,const Model&model){
+ if(p.source_json.contains("source_math_source_authority")){const auto&a=p.source_json.at("source_math_source_authority");const auto pp=joint_qualification_ref(a.at("canonical_source_packet"),path.parent_path());const auto raw=eventio::read_json(pp);const bool enriched=a.at("numerical_state_kind")=="source_enriched_complete_primal";if(accepted_aux_detail::digest(joint_source_math_wrapper_view(p.source_json,enriched))!=accepted_aux_detail::digest(joint_source_math_wrapper_view(raw,enriched)))throw std::runtime_error("canonical non-aux source JSON or floating bits differ");}
+ assert_joint_source_identity_current_v2(p,path,model);if(!p.source_json.contains("source_math_source_authority"))return;
+ const auto&a=p.source_json.at("source_math_source_authority");const auto pp=joint_qualification_ref(a.at("canonical_source_packet"),path.parent_path()),mp=joint_qualification_ref(a.at("canonical_source_model"),path.parent_path());const auto cm=Model::load(mp.u8string());const auto c=Packet::load(pp.u8string(),cm);auto require=[](bool b,const char*s){if(!b)throw std::runtime_error(std::string("typed numerical source wrapper: ")+s);};require(p.rows.size()==c.rows.size(),"source row denominator");const bool branch=p.source_json.contains("source_query_branch_registry");
+ for(std::size_t i=0;i<p.rows.size();++i){const auto&x=p.rows[i];const auto&y=c.rows[i];require(x.source_dataset_id==y.source_dataset_id&&x.source_row_id==y.source_row_id&&x.shot_id==y.shot_id&&x.pts==y.pts&&!std::memcmp(x.uv.data(),y.uv.data(),sizeof(double)*2)&&!std::memcmp(x.normal.data(),y.normal.data(),sizeof(double)*2)&&x.material==y.material&&x.kind==y.kind&&x.width_block==y.width_block&&x.width_sign==y.width_sign&&x.stroke_pair_index==y.stroke_pair_index&&x.stroke_source_side==y.stroke_source_side&&x.E==y.E&&x.active==y.active&&x.fit_role==y.fit_role&&x.station_domain_path==y.station_domain_path&&x.source_station_intervals==y.source_station_intervals,"loaded source UV/ID/PTS/operator/domain differs");if(!(branch&&i>=JointSourceQueryBranchRegistry::first&&i<JointSourceQueryBranchRegistry::stop))require(joint_enriched_query_equal_v1(x.query,y.query),"loaded finite Query differs");}
+ require(accepted_aux_detail::group_digest(p,p.groups.size(),p.rows.size())==accepted_aux_detail::group_digest(c,c.groups.size(),c.rows.size()),"loaded exact W/group differs");
+}
+}

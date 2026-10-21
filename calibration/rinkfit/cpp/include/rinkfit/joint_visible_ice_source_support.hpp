@@ -1,0 +1,68 @@
+#pragma once
+#include "rinkfit/joint_visible_ice_ray.hpp"
+#include "rinkfit/event_factors.hpp"
+#include <fstream>
+#include <set>
+namespace rinkfit {
+// Four physical inequalities per externally source-qualified sensor ray. This
+// set is deliberately not a JointPacket point/curve/statistical row appender.
+struct JointVisibleIceSourceRow {std::string id,family,shot;std::int64_t pts=0;Vec2<double>uv{};eventio::Json evidence;};
+inline JointRowLayout joint_visible_ice_camera_layout(const JointEventModel&m,const JointVisibleIceSourceRow&r){
+ const int si=m.shot_map.at(r.shot);if(r.pts<m.shots[si].first_pts||r.pts>m.shots[si].last_pts)throw std::runtime_error("visible-ice source outside shot/native PTS");
+ // layout() supplies the genuine full RS-halo spline dependency allocation.
+ // No material is evaluated; remove the temporary material slots immediately.
+ auto l=m.layout(si,0,0,r.pts);std::set<int>needed={l.scene_slot,l.rig_slot,l.optics_slot,l.reference_angles_slot};for(int k:l.control_slots)needed.insert(k);std::vector<int>map(l.block_ids.size(),-1),ids;
+ for(int i=0;i<int(l.block_ids.size());++i)if(needed.count(i)){map[i]=int(ids.size());ids.push_back(l.block_ids[i]);}
+ auto re=[&](int i){if(i<0||map.at(i)<0)throw std::runtime_error("missing source ray camera dependency");return map[i];};l.scene_slot=re(l.scene_slot);l.rig_slot=re(l.rig_slot);l.optics_slot=re(l.optics_slot);l.reference_angles_slot=re(l.reference_angles_slot);for(auto&i:l.control_slots)i=re(i);l.block_ids=std::move(ids);l.geometry_slot=l.advertisement_slot=l.width_slot=-1;l.material=l.path=-1;l.geometry_indices.clear();l.geometry_offset=0;l.width_sign=0;return l;
+}
+struct JointVisibleIceSourceFactor {
+ const JointEventModel*model=nullptr;JointRowLayout layout;Vec2<double>uv{};int kind=0;
+ template<class T>bool operator()(T const*const*p,T*r)const{try{const auto v=joint_visible_ice_sensor_ray(*model,layout,uv,p);if(!v.arithmetic_valid||!v.inverse_valid||!v.finite_ice||!v.visibility_evaluated)return false;
+  r[0]=kind==0?v.rink_g:kind==1?v.camera_above_ice_g:kind==2?v.forward_depth_g:v.occlusion_g;return finite_scalar(r[0]);}catch(...){return false;}}
+};
+struct JointVisibleIceSourceCost {std::unique_ptr<ceres::CostFunction>cost;std::vector<std::size_t>ids;};
+class JointVisibleIceSourceSupport {
+ eventio::Json config_,receipt_;std::vector<eventio::Json>dependencies_;std::vector<JointVisibleIceSourceRow>rows_;std::vector<std::string>ids_;std::string identity_,source_video_sha_;
+ static std::string path(const eventio::Json&r){if(r.contains("file"))return r.at("file");return r.at("path");}
+ eventio::Json verify_ref(const eventio::Json&r){const auto p=path(r);verify_ref_bytes(r);return eventio::read_json(p);}
+ static void require(bool v,const std::string&message){if(!v)throw std::runtime_error("visible-ice source qualification: "+message);}
+ public:
+ const auto&rows()const{return rows_;}const auto&ids()const{return ids_;}const auto&identity()const{return identity_;}const auto&receipt()const{return receipt_;}std::size_t inequality_count()const{return ids_.size();}
+ // config must be pinned by its caller/configuration identity. qualification is
+ // the separate source-only receipt, not the recalled gray-cap point issuer.
+ static JointVisibleIceSourceSupport load(const JointEventModel&m,const eventio::Json&config){
+  JointVisibleIceSourceSupport out;out.config_=config;require(config.at("schema")=="rinkfit.visible_ice_source_constraint_consumer.v1","wrong consumer schema");auto contract=out.verify_ref(config.at("contract"));auto replay=out.verify_ref(config.at("source_replay"));auto qualification=out.verify_ref(config.at("source_qualification"));
+  require(contract.at("schema")=="rinkfit.visible_ice_sensor_ray_free_space_contract.v1","wrong source contract");require(replay.at("schema")=="rinkfit.visible_ice_ray_source_replay.v1"&&replay.at("passed").get<bool>(),"current source replay is not passed");
+  require(qualification.at("schema")=="rinkfit.visible_ice_ray_source_qualification.v1"&&qualification.at("ray_feasibility_consumer_eligible").get<bool>(),"source-only eligibility receipt missing");
+  require(replay.at("source_UV_unchanged").get<bool>()&&replay.at("all_support_patches_exclusion_clear").get<bool>()&&replay.at("all_source_uvs_beyond_entire_conservative_cap_profile_window").get<bool>()&&!replay.at("cap_inner_physical_edge_mean_qualified").get<bool>(),"source replay does not preserve visible ice only");
+  require(qualification.at("source_geometry_point_fit_rows")==0&&qualification.at("statistical_rank_added")==0,"source incorrectly promoted to point likelihood");
+  for(const auto&r:qualification.at("producer_references"))out.verify_ref_bytes(r);for(const auto&r:qualification.at("reader_module_refs"))out.verify_ref_bytes(r);const auto independent=out.verify_ref(qualification.at("independent_source_replay"));require(independent.at("passed").get<bool>()&&independent.at("source_support_count")==qualification.at("source_support_count")&&independent.at("source_UV_and_native_PTS_unchanged").get<bool>()&&independent.at("original_three_frozen_files_unchanged").get<bool>()&&!independent.at("top757_point_qualification_revived").get<bool>(),"independent same-source replay failed");out.verify_ref_bytes(independent.at("programme_scope"));out.verify_ref_bytes(independent.at("frame_roles"));out.verify_ref_bytes(independent.at("actual_source_replay_script"));
+  out.verify_ref_bytes(contract.at("source_rows"));const auto generation=out.verify_ref(contract.at("source_generation"));out.verify_ref_bytes(contract.at("cap_uncertainty"));
+  const auto video_sha=generation.at("source_video").at("sha256").get<std::string>();out.source_video_sha_=video_sha;require(m.source_json.at("source_clock").at("source_video_sha256")==video_sha,"model/source video mismatch");
+  require(qualification.at("contract_sha256")==config.at("contract").at("sha256")&&qualification.at("source_rows_sha256")==contract.at("source_rows").at("sha256")&&qualification.at("source_replay_sha256")==config.at("source_replay").at("sha256"),"qualification does not pin actual contract/rows/replay");
+  std::ifstream f(path(contract.at("source_rows")));if(!f)throw std::runtime_error("visible-ice source rows unavailable");std::string line;std::set<std::string>unique;eventio::Json inventory=eventio::Json::array();
+  while(std::getline(f,line)){if(line.empty())continue;const auto r=eventio::Json::parse(line);require(r.at("schema")=="rinkfit.visible_static_ice_sensor_ray_source_support.v1","wrong row schema");JointVisibleIceSourceRow row;row.id=r.at("source_ray_id");row.family=r.at("source_family_id");row.shot=r.value("shot_id",generation.at("source_shot").get<std::string>());row.pts=r.at("native_pts");row.uv=r.at("source_uv").get<Vec2<double>>();row.evidence=r;
+   require(unique.insert(row.id).second,"duplicate ray identity");require(r.at("actual_pts")==row.pts&&r.at("time_base")==eventio::Json::array({1,12800})&&r.at("source_video_sha256")==video_sha,"clock/video changed");require(replay.at("original_video_redecoded_at_native_pts")==row.pts,"source replay uses different native exposure");
+   require(row.pts%256==0&&finite_array(row.uv)&&row.uv[0]>=0&&row.uv[0]<=1919&&row.uv[1]>=0&&row.uv[1]<=1079,"invalid actual native source UV/PTS");
+   require(r.at("surface_class")=="ice"&&r.at("physical_ground_support").get<bool>()&&r.at("visible_ice_body_and_not_actor_or_reflection").get<bool>()&&r.at("physical_visible_ice_ray_support_qualified").get<bool>(),"source ice/visibility unqualified");
+   require(r.at("current_exclusion_clear_9x9").get<bool>()&&r.at("mask_nonzero_means")=="excluded"&&r.at("minimum_x_clearance_from_entire_cap_profile_window_px").get<double>()>0,"source UV not clear of mask/cap uncertainty");
+   require(!r.at("point_correspondence").get<bool>()&&!r.at("known_world_corner").get<bool>()&&r.at("world_XYZ").is_null()&&!r.at("world_depth_allocated").get<bool>()&&!r.at("source_geometry_point_fit_qualified").get<bool>()&&!r.at("source_covariance_issued").get<bool>()&&!r.at("statistical_objective_eligible").get<bool>(),"source falsely claims geometry/depth/statistics");
+   require(r.at("world_point_is_free_ray_ice_intersection_not_material_station").get<bool>()&&r.at("exact_source_row_time_required").get<bool>()&&!r.at("source_UV_from_model").get<bool>()&&!r.at("old_B1_station_used_to_define_ray").get<bool>()&&!r.at("source_rim_or_board_height_measured").get<bool>(),"forbidden model station/top substitution");
+   out.verify_ref_bytes(r.at("native_image"));out.verify_ref_bytes(r.at("current_exclusion_mask"));out.verify_ref_bytes(r.at("cap_uncertainty"));require(r.at("current_decoded_native_BGR_sha256")==replay.at("current_RGB_hash"),"RGB replay/row mismatch");
+   const auto&patch=r.at("native_BGR_support_patch");require(patch.size()==9,"support patch height changed");std::vector<std::uint8_t>bytes;for(const auto&y:patch){require(y.size()==9,"support patch width changed");for(const auto&p:y){require(p.size()==3,"support patch BGR channels changed");for(const auto&c:p){const int v=c;require(v>=0&&v<=255,"support patch value invalid");bytes.push_back(std::uint8_t(v));}}}require(eventio::sha256(bytes)==r.at("native_BGR_support_patch_sha256"),"support patch bytes changed");
+   const auto l=joint_visible_ice_camera_layout(m,row);for(int bi:l.block_ids){const auto&name=m.blocks.at(bi).name;require(name.rfind("ice/",0)!=0&&name.rfind("print/",0)!=0&&name.rfind("ad/",0)!=0,"source ray unexpectedly depends on material geometry");}
+   for(const char*k:{"finite_ice","camera_above_ice","forward_depth","near_board_occlusion"})out.ids_.push_back("source_visible_ice/"+row.id+"/"+k);
+   inventory.push_back({{"source_ray_id",row.id},{"source_family_id",row.family},{"shot_id",row.shot},{"native_pts",row.pts},{"source_uv",row.uv},{"native_RGB_sha256",r.at("current_decoded_native_BGR_sha256")},{"native_image",r.at("native_image")},{"mask",r.at("current_exclusion_mask")},{"camera_only_block_ids",l.block_ids}});out.rows_.push_back(std::move(row));
+  }
+  require(out.rows_.size()==contract.at("source_support_count").get<std::size_t>()&&out.rows_.size()==qualification.at("source_support_count").get<std::size_t>()&&out.rows_.size()==replay.at("source_rows").get<std::size_t>(),"complete source-ray denominator changed");
+  std::set<std::string>wanted,families;std::set<std::int64_t>exposures;for(const auto&r:out.rows_){families.insert(r.family);exposures.insert(r.pts);}require(exposures.size()==contract.at("source_exposures").get<std::size_t>(),"complete source exposure denominator changed");for(const auto&id:qualification.at("qualified_source_ray_ids"))require(wanted.insert(id).second,"duplicate qualified source ray ID");require(wanted==unique,"qualified source-ray exact inventory mismatch");
+  const auto encoded=config.dump();out.identity_=eventio::sha256(std::vector<std::uint8_t>(encoded.begin(),encoded.end()));
+  out.receipt_={{"schema","rinkfit.visible_ice_source_constraint_set_receipt.v1"},{"consumer_config",config},{"source_identity",out.identity_},{"source_support_count",out.rows_.size()},{"physical_inequality_count",out.ids_.size()},{"source_exposures",exposures.size()},{"source_families",families.size()},{"source_world_points_issued",0},{"statistical_rank_added",0},{"source_UV_and_native_clock_fixed",true},{"no_station_row_alpha_or_material_dependency",true},{"inventory",inventory}};return out;
+ }
+ void verify_ref_bytes(const eventio::Json&r){const auto p=path(r);for(const auto&q:dependencies_)if(path(q)==p){require(q.at("sha256")==r.at("sha256"),"conflicting immutable dependency SHA");return;}eventio::verify(p,r.at("sha256"));dependencies_.push_back(r);}
+ void assert_model_clock(const JointEventModel&m)const{require(m.source_json.at("source_clock").at("source_video_sha256")==source_video_sha_,"attached model/source video mismatch");}
+ void assert_dependencies()const{for(const auto&r:dependencies_)eventio::verify(path(r),r.at("sha256"));}
+ JointVisibleIceSourceCost factor(const JointEventModel&m,std::size_t i)const{const auto&r=rows_.at(i/4);const auto l=joint_visible_ice_camera_layout(m,r);JointVisibleIceSourceCost out;std::vector<int>sizes;for(int bi:l.block_ids){out.ids.push_back(bi);sizes.push_back(int(m.blocks.at(bi).values.size()));}out.cost=event_autodiff_cost(JointVisibleIceSourceFactor{&m,l,r.uv,int(i%4)},sizes,1);return out;}
+ eventio::Json evaluate(const JointEventModel&m)const{eventio::Json rows=eventio::Json::array();std::size_t invalid=0,violated=0;for(const auto&r:rows_){const auto l=joint_visible_ice_camera_layout(m,r);const auto p=m.pointers(l);const auto v=joint_visible_ice_sensor_ray(m,l,r.uv,p.data());const bool ok=v.arithmetic_valid&&v.inverse_valid&&v.finite_ice&&v.visibility_evaluated;if(!ok)++invalid;else if(!v.feasible())++violated;rows.push_back({{"source_ray_id",r.id},{"native_pts",r.pts},{"source_uv",r.uv},{"arithmetic_valid",v.arithmetic_valid},{"inverse_valid",v.inverse_valid},{"finite_ice",v.finite_ice},{"visibility_evaluated",v.visibility_evaluated},{"feasible",v.feasible()},{"reason",v.reason},{"g",ok?eventio::Json::array({v.rink_g,v.camera_above_ice_g,v.forward_depth_g,v.occlusion_g}):eventio::Json(nullptr)},{"derived_trial_C",v.inverse_valid?eventio::Json(v.C):eventio::Json(nullptr)},{"derived_trial_ice_intersection_not_observation",v.inverse_valid&&v.finite_ice?eventio::Json(v.ice_intersection):eventio::Json(nullptr)}});}return{{"source_identity",identity_},{"source_support_count",rows_.size()},{"physical_inequality_count",ids_.size()},{"invalid_sources_retained",invalid},{"physical_inequality_violating_sources",violated},{"statistical_rank_added",0},{"rows",rows}};}
+};
+}

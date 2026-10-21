@@ -1,0 +1,264 @@
+{
+  "schema": "rinkspace.okada_source_storage_recovery.v1",
+  "complete": true,
+  "created_at_utc": "2026-10-21T02:46:01.923Z",
+  "request_scope": "先治理逐点重复元数据、多份整表与完全相同副本；取点与物理拟合保持停止。",
+  "storage": {
+    "existing_allocation_released_bytes": 16608639045,
+    "existing_ntfs_compression_released_bytes": 16065886277,
+    "exact_copy_retirement_released_after_compression_bytes": 542752768,
+    "new_store_and_audit_allocation_bytes": 328207816,
+    "net_before_small_project_reports_bytes": 16280431229,
+    "net_reduction_GiB_rounded": 15.16,
+    "accounting_scope": "Existing dense JSON compaction + exact-copy retirement, charging all storage_v1 artifact allocation including source.sqlite. Final small project/report additions stated separately. NTFS stream allocation excludes filesystem metadata; unrelated volume writes excluded.",
+    "source_store_bytes": 261533696,
+    "compression_counts": {
+      "compressed_bytes_verified": 94629,
+      "skip_one_cluster_or_smaller": 18839,
+      "already_compressed_unchanged": 1
+    },
+    "original_JSON_bytes_paths_and_mtimes_unchanged_by_compression": true,
+    "duplicates_retired": 1420,
+    "retired_duplicate_logical_bytes": 1413388642,
+    "retirement_and_compression_not_double_counted": true,
+    "actual_single_file_restore_and_re_retirement_passed": true,
+    "retained_failed_snapshots": {
+      "logical_bytes": 11571130850,
+      "allocated_bytes_now": 5534076448,
+      "roots": [
+        {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_board_v1\\rejected_global_curve",
+          "files": 3290,
+          "logical_bytes": 2396964941,
+          "allocated_bytes_now": 1144316240
+        },
+        {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_board_v1\\shape_v2",
+          "files": 3204,
+          "logical_bytes": 2370735980,
+          "allocated_bytes_now": 1140023632
+        },
+        {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_board_v1\\shape_v3",
+          "files": 4275,
+          "logical_bytes": 3532015132,
+          "allocated_bytes_now": 1685603416
+        },
+        {
+          "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_board_v1\\shape_v4",
+          "files": 3761,
+          "logical_bytes": 3271414797,
+          "allocated_bytes_now": 1564133160
+        }
+      ],
+      "policy": "保留必要失败与父状态的原字节、原路径；以NTFS压缩保留，不整目录删除。"
+    },
+    "original_video_images_masks_and_user_annotations_not_deleted": true,
+    "git_and_other_tasks_not_touched": true
+  },
+  "source_storage": {
+    "bindings": {
+      "file": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/source_datasets/storage_20261021/bindings.json",
+      "sha256": "cc14acee0b3cc8abdc872cd47afafbf9912c9b40fcfc9b5cccd39353444ee048"
+    },
+    "entry": {
+      "file": "D:/OneDrive/codex_projs/RinkSpace/scripts/source_storage.py",
+      "sha256": "583c932de93a95ee7f1d609626630f1acb2e97246cdff825cfce6ae5a6db2c21"
+    },
+    "store_module": {
+      "file": "D:/OneDrive/codex_projs/RinkSpace/calibration/rinkfit/src/rinkfit_joint/source_record_store.py",
+      "sha256": "ac6029b0d3a58cf760c9f4e267cc480df34197d0e41ecb5283c1d6559dacdb6a"
+    },
+    "reader_module": {
+      "file": "D:/OneDrive/codex_projs/RinkSpace/calibration/rinkfit/src/rinkfit_joint/source_record_io.py",
+      "sha256": "117c419af62a72bb5bab63be966e44bf8fbc0bf78774025d511de2161a38659b"
+    },
+    "database": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/storage_v1/source.sqlite",
+    "sealed_streams": 27,
+    "representation": "源ID/UV与共同元数据共用压缩块；资格和成员变动保存差量；预览按同一源点投影读取；合并镜头引用子流。",
+    "actual_public_delta_replay": {
+      "basis": "已交付S05 v3→v4真实纠错的存储重放，未新增像素纠错。",
+      "frames_changed": 33,
+      "removed_rows": 14,
+      "qualification_reference_updates": 2919,
+      "added_rows": 0,
+      "retained_source_UV_unchanged": true,
+      "full_point_table_files_written": 0,
+      "row_frame_overrides": 33,
+      "preview_header_overrides": 0,
+      "sqlite_increment_bytes": 4096,
+      "increment_scope": "本次变更内容已在迁移流中，复用了已有压缩块；不是任意未来纠错大小承诺。",
+      "published_manifest": {
+        "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/storage_v1/commit_v4_manifest.json",
+        "sha256": "7076ffcbd4b52e92d00c1c5794b4dd5fb8e9543095c42ed9aedce3e9fdced1b3"
+      }
+    }
+  },
+  "validation": {
+    "production_consumer_s02_s06": {
+      "frames": 3320,
+      "displayed_source_rows": 1641840,
+      "all_actual_legacy_values_types_ID_UV_colors_order_equal": true
+    },
+    "actual_native_board_frames": {
+      "frames": 1862,
+      "rows": 1598534,
+      "all_actual_original_JSON_values_and_raw_file_SHAs_verified": true,
+      "public_read_json_frame_refs_passed": true
+    },
+    "old_configs_after_database_append_unchanged_and_revalidated": true,
+    "published_new_S05_ref_actually_consumed": true,
+    "delivered_S02_S06_videos_raw_SHA_unchanged": [
+      {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense234_v1\\FINAL_SOURCE.json",
+        "sha256": "7990997939a9446ac877ecdb7beea213dad91414bb8bed850d77f291f098b0d6",
+        "videos": [
+          {
+            "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense234_v1\\videos_v1\\s02_original_ALL_source_points.mp4",
+            "sha256": "7c3068bccf93fdbf915616d6067fb3154ba25a577956cd75d46844c4b011ac7b",
+            "bytes": 21129612,
+            "unchanged": true
+          },
+          {
+            "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense234_v1\\videos_v1\\s03_original_ALL_source_points.mp4",
+            "sha256": "85392f78646d899cc06af66c0165ef760e92e53025b4a592b07b05be39d7d5a1",
+            "bytes": 4027537,
+            "unchanged": true
+          },
+          {
+            "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense234_v1\\videos_v1\\s04_original_ALL_source_points.mp4",
+            "sha256": "350b32b70aec503c5299b9cde65b7cb6c250bb2e5d8620e0a3f6df1c877e551a",
+            "bytes": 29685430,
+            "unchanged": true
+          }
+        ]
+      },
+      {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\FINAL_SOURCE_V4.json",
+        "sha256": "3fcd44fa5bfe9c477f0d00d012db60e4f463b23ac6c3105f0bbf3132c4fa75e9",
+        "videos": [
+          {
+            "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\videos_v4\\s05\\s05_original_ALL_source_points.mp4",
+            "sha256": "7f0ad9f1299861ccf920f8efc3aab44c76f248531c650c963c5b9d6523ac0497",
+            "bytes": 45147752,
+            "unchanged": true
+          },
+          {
+            "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\videos_v2\\s06\\s06_original_ALL_source_points.mp4",
+            "sha256": "e052e40a8f357c14c5c3701af6b38317fdc21c7a98b35cd110cf77b25acfd47f",
+            "bytes": 18417967,
+            "unchanged": true
+          }
+        ]
+      }
+    ],
+    "source_video_decoded": false,
+    "new_videos_generated": 0,
+    "point_quality_or_model_accuracy_reassessed": false,
+    "path_scan": {
+      "root": "D:\\OneDrive\\codex_projs\\RinkSpace",
+      "checked_paths": 14502,
+      "violations": [],
+      "skipped_links": [],
+      "errors": [],
+      "ok": true,
+      "report": {
+        "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/storage_v1/onedrive_paths_final.json",
+        "sha256": "b84198aaaf0678ba5ca924679309276a6d3d09c67e5a0088a582d9668f68f56e"
+      },
+      "includes_ignored_environment_and_cache": true
+    },
+    "necessary_tests": {
+      "passed": 12,
+      "reused_same_code_bytes": true,
+      "receipt": {
+        "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/storage_v1/necessary_tests_reuse.json",
+        "sha256": "53298700f208987bf65442f25a9934ea10332d8bd08885f75efb1773c367752a"
+      }
+    }
+  },
+  "remaining_limits": [
+    "历史实验脚本仍存在直接读取旧路径与写全表的实现；未改写它们的历史身份。新资格提交已走公开差量入口，当前预览/公共IO已实际验证。",
+    "必要父状态、失败证据与原gzip尚保留；本次没有把全部历史表示删除。",
+    "仍有原交付记录中的模糊材料归属和推定曲线；显示点数不等于独立二维锚点。",
+    "本次没有改善或验收网格。共同物理拟合仍停止，S01未修改。"
+  ],
+  "evidence": {
+    "ntfs_dense_summary.json": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/storage_v1/ntfs_dense_summary.json",
+      "sha256": "6cda57643eb245a5e36050049bfe43b732e47676e720fd08d301013a5d5ea8af"
+    },
+    "ntfs_dense_plan.json": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/storage_v1/ntfs_dense_plan.json",
+      "sha256": "2b5ab2bd9706e329ca5aee5e4b0d09f083c06edb7a3740cc2dc78b92e9815cc1"
+    },
+    "ntfs_dense_receipt.jsonl": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/storage_v1/ntfs_dense_receipt.jsonl",
+      "sha256": "909fbb4dea7cf8739a72fd57e170f2e513774824537d73e78220fd21291422bc"
+    },
+    "retire_result.json": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/storage_v1/retire_result.json",
+      "sha256": "439c46476e9b92de99659b7d405c1f472bb7b8cb712c0e3a1abe283207ea6bda"
+    },
+    "retired_exact_files.json": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/storage_v1/retired_exact_files.json",
+      "sha256": "67d165c62a9822b769c7e0692960a10859e9955e3fe9bedf122f4ac93700294e"
+    },
+    "restore_575744_cycle_result.json": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/storage_v1/restore_575744_cycle_result.json",
+      "sha256": "447873b3cc722007fa9c6ad530c5b8880a9fff56adaf36542a125689798a2c92"
+    },
+    "exact_copy_dependency_review.json": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/storage_v1/exact_copy_dependency_review.json",
+      "sha256": "d70d5369ed62aeb43eb869541ee3b49dd6ade6c953850cb7553be22b014c7893"
+    },
+    "migration.json": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/storage_v1/migration.json",
+      "sha256": "8fa7ec0db51f08818894091b36637e724bc7002d022e6a35c0c6aaaa08c32038"
+    },
+    "native_board_aliases.json": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/storage_v1/native_board_aliases.json",
+      "sha256": "367ecf0f39d1a93a231c89799591636ca6af0cb1c4194298ebbe04423630359f"
+    },
+    "commit_v4_manifest.json": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/storage_v1/commit_v4_manifest.json",
+      "sha256": "7076ffcbd4b52e92d00c1c5794b4dd5fb8e9543095c42ed9aedce3e9fdced1b3"
+    },
+    "commit_v4_result.json": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/storage_v1/commit_v4_result.json",
+      "sha256": "ccb9ed5b83daa66bc1b7f9cea754fa0423d698e150d5b927af2eacd7afefee02"
+    },
+    "consumer_validation.json": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/storage_v1/consumer_validation.json",
+      "sha256": "cc02617cca2dcb2c29cf048ea904860a72fd07e9e68b4a2c420d85e74acd9007"
+    },
+    "consumer_validation_234.json": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/storage_v1/consumer_validation_234.json",
+      "sha256": "0249bc17ad7e7cc8e7bdfcaa5ff94be60dbeed97f2a77bdfcb120d31b65dc409"
+    },
+    "consumer_validation_after_append.json": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/storage_v1/consumer_validation_after_append.json",
+      "sha256": "8a41bfc4625e40e5a99d456c167347018b36af57da6d0c4bcc59669604e2c45d"
+    },
+    "consumer_validation_release.json": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/storage_v1/consumer_validation_release.json",
+      "sha256": "2bde601415796a1776058784c459e3bf54804a56dfd61c0006301d5629bd4564"
+    },
+    "preserved_integrity.json": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/storage_v1/preserved_integrity.json",
+      "sha256": "a657370cbececed8d1b22c19e0a4cd6c5204122cfe2826fc148f6c125199ddb8"
+    },
+    "allocation_accounting.json": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/storage_v1/allocation_accounting.json",
+      "sha256": "1675d7cbcbbc93cdb72444f9ffb65c4e2a47c2fec06dd91ce50affdc07f9a8ea"
+    },
+    "audit_compaction.json": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/storage_v1/audit_compaction.json",
+      "sha256": "d0da29337adc513b024e2274a3c7b35e4df0d1b3f750bd12d8c05b0532f304b9"
+    },
+    "necessary_tests_reuse.json": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/storage_v1/necessary_tests_reuse.json",
+      "sha256": "53298700f208987bf65442f25a9934ea10332d8bd08885f75efb1773c367752a"
+    }
+  }
+}

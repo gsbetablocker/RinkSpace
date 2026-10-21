@@ -1,0 +1,7 @@
+exec(open(r'D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_footwear_v1/build.py',encoding='utf8').read().split('def main():')[0])
+f=O/'manual_arm_foot_source_v4/delta_masks/1187840.png';m=cv2.imread(str(f),0)>0;n,lab,stats,cen=cv2.connectedComponentsWithStats(m.astype('u1'),8);unknown=np.zeros_like(m);components=[]
+for k,(x,y,w,h,area)in enumerate(stats[1:],1):
+ role='actual_hand_motion_blur_mixed_with_print_unknown'if cen[k,0]<730 and cen[k,1]<330 else'current_visible_black_sleeve_person'
+ if role.startswith('actual_hand'):unknown|=lab==k
+ components.append(dict(component_id=k,bbox_xywh=[int(x),int(y),int(w),int(h)],area=int(area),qualification=role))
+person=m&~unknown;pf=O/'manual_arm_foot_source_v4/1187840_person.png';uf=O/'manual_arm_foot_source_v4/1187840_source_unknown.png';cv2.imwrite(str(pf),person.astype('u1')*255);cv2.imwrite(str(uf),unknown.astype('u1')*255);r=dict(native_pts=1187840,source_raw_mask_file=str(f),source_raw_mask_sha256=TH(f.read_bytes()).hexdigest(),person_mask_file=str(pf),person_mask_sha256=TH(pf.read_bytes()).hexdigest(),unknown_mask_file=str(uf),unknown_mask_sha256=TH(uf.read_bytes()).hexdigest(),components=components,source_evidence=str(O/'manual_arm_foot_source_v4/QA_00.jpg'),clear_visible_logo_not_excluded=True,component_classification_from_actual_source_visual_review=True);(O/'manual_arm_foot_source_v4/qualified_component_split.json').write_text(json.dumps(r,indent=2),encoding='utf8');print(json.dumps(r),flush=True)

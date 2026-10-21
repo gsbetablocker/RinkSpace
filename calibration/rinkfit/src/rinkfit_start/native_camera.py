@@ -53,6 +53,16 @@ class NativeCamera:
         self.R0=np.asarray(self.head["R0"],float);self.n=np.asarray(self.head["n"],float);self.b=np.asarray(self.head["b"],float)
         self.P=np.asarray(self.head["P"],float);self.d=np.asarray(self.head["d"],float);self.a=float(self.head["a"])
         self.tau=float(camera["rolling_shutter"]["signed_readout_seconds"])
+        self.wide=self.optics.get('brown_wide_extension')
+        self.wide_boundary=0.
+        self.wide_coefficients=np.zeros(4)
+        if self.wide is not None:
+            if self.wide.get('schema')!='rinkfit.source_supported_wide_brown_hinge.v1' or self.wide.get('power')!=2:
+                raise ValueError('Unsupported wide Brown extension')
+            self.wide_boundary=float(self.wide['activation_log_f_native'])
+            self.wide_coefficients=np.asarray(self.wide['coefficients'],float)
+            if not np.isfinite(self.wide_boundary) or self.wide_coefficients.shape!=(4,) or not np.isfinite(self.wide_coefficients).all():
+                raise ValueError('Nonfinite wide Brown extension')
         self.gauge_error=max(abs(np.linalg.norm(self.n)-1),abs(np.linalg.norm(self.b)-1),
           abs(self.b@self.R0@self.n),float(np.max(np.abs(self.R0@self.R0.T-np.eye(3)))),abs(np.linalg.det(self.R0)-1))
         if self.dt<=0 or self.gauge_error>1e-8: raise ValueError("fixed-head SO3/orthogonal-axis domain")
@@ -91,7 +101,11 @@ class NativeCamera:
             xy=Y[...,:2]/depth[...,None];xx,yy=np.moveaxis(xy,-1,0);r2=xx*xx+yy*yy
             k1=np.polynomial.polynomial.polyval(z,self.optics["k1"])
             k2=np.polynomial.polynomial.polyval(z,self.optics["k2"])
-            p1=float(self.optics["p1"]);p2=float(self.optics["p2"])
+            basis=np.maximum(self.wide_boundary-logf,0.)**2
+            k1=k1+self.wide_coefficients[0]*basis
+            k2=k2+self.wide_coefficients[1]*basis
+            p1=float(self.optics["p1"])+self.wide_coefficients[2]*basis
+            p2=float(self.optics["p2"])+self.wide_coefficients[3]*basis
             radial=1+k1*r2+k2*r2*r2
             xd=xx*radial+2*p1*xx*yy+p2*(r2+2*xx*xx)
             yd=yy*radial+p1*(r2+2*yy*yy)+2*p2*xx*yy
@@ -118,11 +132,33 @@ class NativeCamera:
         radius=float(self.optics['radius_max']);q=radius*radius
         if not (np.isfinite(radius) and radius>0):return {'passed':False,'reason':'unbounded_or_invalid_Brown_disk'}
         a=np.polynomial.polynomial.polyval(z,k1);b=np.polynomial.polynomial.polyval(z,k2)
+        tangential_p1=abs(float(self.optics['p1']));tangential_p2=abs(float(self.optics['p2']))
+        if self.wide is not None:
+            # Enclose each continuous piecewise quadratic coefficient over the
+            # full cubic log-f hull, including its active-branch vertex.
+            def interval(base, slope, coefficient):
+                candidates=[low,high]
+                if low<self.wide_boundary<high:candidates.append(self.wide_boundary)
+                if coefficient:
+                    vertex=self.wide_boundary-slope/(2*coefficient)
+                    if low<vertex<min(high,self.wide_boundary):candidates.append(vertex)
+                t=np.asarray(candidates)
+                values=base+slope*(t-np.log(float(self.optics['f_ref'])))+coefficient*np.maximum(self.wide_boundary-t,0.)**2
+                return float(values.min()),float(values.max())
+            k1lo,k1hi=interval(k1[0],k1[1] if len(k1)>1 else 0.,self.wide_coefficients[0])
+            k2lo,k2hi=interval(k2[0],k2[1] if len(k2)>1 else 0.,self.wide_coefficients[1])
+            a=np.array([k1lo,k1hi]);b=np.array([k2lo,k2hi])
+            p1lo,p1hi=interval(float(self.optics['p1']),0.,self.wide_coefficients[2])
+            p2lo,p2hi=interval(float(self.optics['p2']),0.,self.wide_coefficients[3])
+            tangential_p1=max(abs(p1lo),abs(p1hi));tangential_p2=max(abs(p2lo),abs(p2hi))
+            # For r²>=0 the coefficient-wise lower endpoint is conservative.
+            # Independent coefficient extrema need not occur at one zoom.
+            a=np.array([k1lo]);b=np.array([k2lo])
         def lower(c1,c2):
             out=np.minimum(1.,1+c1*q+c2*q*q)
             vertex=np.divide(-c1,2*c2,out=np.zeros_like(c1),where=c2!=0)
             return np.minimum(out,np.where((c2>0)&(vertex>0)&(vertex<q),1+c1*vertex+c2*vertex*vertex,np.inf))
-        tangential=6*np.hypot(float(self.optics['p1']),float(self.optics['p2']))*radius
+        tangential=6*np.hypot(tangential_p1,tangential_p2)*radius
         scale=1+np.max(abs(a)*q+abs(b)*q*q)+tangential
         bound=float(min(lower(a,b).min(),lower(3*a,5*b).min())-tangential-1e-10*scale)
         with np.errstate(over='ignore'):focal=np.exp(np.array([low,high]))
@@ -198,11 +234,21 @@ class NativeCamera:
         k1p=sum(j*abs(v)*zabs**(j-1) for j,v in enumerate(self.optics["k1"][1:],1))
         k2p=sum(j*abs(v)*zabs**(j-1) for j,v in enumerate(self.optics["k2"][1:],1))
         p1=abs(float(self.optics["p1"]));p2=abs(float(self.optics["p2"]))
+        hinge_max=np.maximum(self.wide_boundary-(mid['logf']-zd*half),0.)
+        basis_max=hinge_max**2
+        k1a=k1a+abs(self.wide_coefficients[0])*basis_max
+        k2a=k2a+abs(self.wide_coefficients[1])*basis_max
+        k1p=k1p+2*abs(self.wide_coefficients[0])*hinge_max
+        k2p=k2p+2*abs(self.wide_coefficients[1])*hinge_max
+        p1=p1+abs(self.wide_coefficients[2])*basis_max
+        p2=p2+abs(self.wide_coefficients[3])*basis_max
+        p1p=2*abs(self.wide_coefficients[2])*hinge_max
+        p2p=2*abs(self.wide_coefficients[3])*hinge_max
         L=1+k1a*r2+k2a*r2*r2
         Jyx=2*x*y*(k1a+2*k2a*r2)+2*p1*x+2*p2*y
         Jyy=L+2*y*y*(k1a+2*k2a*r2)+6*p1*y+2*p2*x
         ybrown=y*L+p1*(r2+2*y*y)+2*p2*x*y
-        direct=y*(k1p*r2+k2p*r2*r2)*zd
+        direct=(y*(k1p*r2+k2p*r2*r2)+p1p*(r2+2*y*y)+2*p2p*x*y)*zd
         fymax=np.exp(mid["logf"]+zd*half-float(self.optics.get("eta",0.))/2)
         ppprime=abs(self.optics.get("principal_linear",[0.,0.])[1])*zd
         speed=fymax*(ybrown*zd+Jyx*xyprime[...,0]+Jyy*xyprime[...,1]+direct)+ppprime
@@ -211,6 +257,9 @@ class NativeCamera:
         # Conservative symmetric coefficient uncertainty around mid zoom.
         k1mid=np.polynomial.polynomial.polyval(mid["z"],self.optics["k1"])
         k2mid=np.polynomial.polynomial.polyval(mid["z"],self.optics["k2"])
+        midbasis=np.maximum(self.wide_boundary-mid['logf'],0.)**2
+        k1mid=k1mid+self.wide_coefficients[0]*midbasis
+        k2mid=k2mid+self.wide_coefficients[1]*midbasis
         k1lo=k1mid-k1p*zd*half;k2lo=k2mid-k2p*zd*half
         # If negative quadratic: its minimum is at an interval endpoint;
         # positive quadratic also checks its interior vertex.

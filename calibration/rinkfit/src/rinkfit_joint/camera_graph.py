@@ -166,6 +166,11 @@ class CameraGraph:
             if not np.isfinite(float(head.get(key, 0.0))):
                 raise GraphError(f"{shot_id}: nonfinite shared head {key}")
         for key, value in rig["optics"].items():
+            # This is a structured optical extension with source metadata.
+            # NativeCamera validates its numeric coefficients and schema while
+            # retaining the dictionary; it is not a flat scalar/array field.
+            if key == "brown_wide_extension":
+                continue
             if not np.isfinite(np.asarray(value, float)).all():
                 raise GraphError(f"{shot_id}: nonfinite optical parameter {key}")
         if float(rig["optics"]["f_ref"]) <= 0:

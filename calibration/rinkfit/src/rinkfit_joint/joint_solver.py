@@ -16,6 +16,145 @@ def _source_membership_fingerprint(packet):
     for ref in packet.get('source_manifests',[]):value+='|source_manifest='+ref.get('sha256','missing')
     return hashlib.sha256(value.encode()).hexdigest()
 
+def _assert_first4_source_identity_current(doc,path):
+    """Consume the explicitly bound first4 reader and existing typed appends.
+
+    The source-generation reader owns the original QP rows. Later typed source
+    chunks retain their own original UV/clock/identity receipts; they are not
+    fabricated rows of that older reader input.
+    """
+    import numpy as np
+    from .io_utils import read_json,read_jsonl,file_sha256
+    from .source_generation_input_v2 import QualifiedSourceGenerationInput
+    from .typed_entity_append import load_qualification,validate_new_entity
+    base=Path(path).resolve().parent;seen={};needed={}
+    def pin(ref):
+        p=Path(ref.get('file',ref.get('path','')));p=(p if p.is_absolute()else base/p).resolve();expected=ref.get('sha256')
+        if not expected or len(expected)!=64:raise ValueError('first4 source requires exact file/SHA reference')
+        if p in seen and seen[p]!=expected:raise ValueError('conflicting first4 source dependency '+str(p))
+        if p not in seen:
+            if file_sha256(p)!=expected:raise ValueError('changed first4 source dependency '+str(p))
+            seen[p]=expected
+        return p
+    declared=doc.get('engineering_scope',{})
+    if (doc.get('shot_ids')!=['s01','s02','s03','s04'] or declared.get('shot_ids')!=doc['shot_ids']
+        or declared.get('schema')!='rinkfit.engineering_active_shots.v1' or declared.get('three_rigs_one_scene')is not True):
+        raise ValueError('explicit first4 source guard requires the bound three-rig first4 scope')
+    listed={}
+    for ref in doc.get('source_manifests',[]):listed[pin(ref)]=ref['sha256']
+    arrays={}
+    for name,ref in doc['arrays'].items():
+        p=pin(ref);arrays[name]=np.memmap(p,dtype=ref['dtype'],mode='r',shape=tuple(ref['shape']),offset=int(ref.get('offset_bytes',0)))
+    sg=doc['first4_source_generation'];ip=pin(sg['input_binding']);q=QualifiedSourceGenerationInput(ip)
+    if q.identity!=sg['input_binding']['sha256']:raise ValueError('first4 QP input identity differs')
+    for folder in (ip.parent,Path(q.binding['generation']['path']).parent):
+        for marker in ('SOURCE_IDENTITY_CERTIFICATE_RECALLED.json','SOURCE_IDENTITY_EVIDENCE_RECALL.json'):
+            if (folder/marker).exists():raise ValueError('first4 source generation recalled '+str(folder/marker))
+    for p,h in q._refs.items():
+        if listed.get(p.resolve())!=h:raise ValueError('first4 QP dependency absent from native source_manifests '+str(p))
+    qm=read_json(pin(sg['query_manifest']));sm=read_json(pin(sg['statistics_manifest']))
+    if (qm['input_binding']['input_binding']['sha256']!=q.identity
+        or qm['statistics_manifest']['sha256']!=sg['statistics_manifest']['sha256']):raise ValueError('first4 QP Query/statistics source binding differs')
+    qt={r['source_row_id']:r for r in read_jsonl(pin(qm['queries']))};source=list(q.rows());n0=int(doc['new_source_start']);end=n0+len(source)
+    if set(qt)!={r['source_row_id']for r in source} or end>doc['row_count']:raise ValueError('first4 QP full source denominator differs')
+    if doc['source_row_ids'][n0:end]!=[r['source_row_id']for r in source]:raise ValueError('first4 QP original source ID/order changed')
+    for i,r in enumerate(source,n0):
+        x=qt[r['source_row_id']]
+        if (int(arrays['native_pts'][i])!=r['native_pts'] or doc['shot_ids'][int(arrays['shot_index'][i])]!=r['shot_id']
+            or arrays['uv'][i].tolist()!=x['engineering_pixel_uv']):raise ValueError('first4 QP original source UV/clock/shot changed')
+    # Every actual appended-source input must also be a direct native manifest
+    # dependency. Native JointPacket::load verifies these exact files at entry.
+    def metadata(value):
+        if isinstance(value,dict):
+            if 'sha256'in value and ('file'in value or 'path'in value):
+                p=pin(value);needed[p]=value['sha256'];return
+            if 'source_crop_file'in value and 'source_crop_sha256'in value:
+                ref=dict(file=value['source_crop_file'],sha256=value['source_crop_sha256']);p=pin(ref);needed[p]=ref['sha256']
+            for v in value.values():metadata(v)
+        elif isinstance(value,list):
+            for v in value:metadata(v)
+    def document(ref):
+        p=pin(ref);needed[p]=ref['sha256']
+        for marker in ('SOURCE_IDENTITY_CERTIFICATE_RECALLED.json','SOURCE_IDENTITY_EVIDENCE_RECALL.json'):
+            if (p.parent/marker).exists():raise ValueError('first4 typed source recalled '+str(p.parent/marker))
+        v=read_json(p);metadata(v);return v
+    extra=int(doc['row_count'])-end;typed_count=0
+    if extra:
+        app=doc.get('first4_native_motion_source_append',{})
+        if app.get('source_rows')!=extra or not app.get('source_bundles'):raise ValueError('first4 extra source rows require exact existing typed source bundles')
+        index=read_json(pin(doc['additional_source_chunk_index']));allrows=[];gates=[]
+        for ref in app['source_bundles']:
+            bundle=document(ref)
+            for key in ('source_generation','static_surface_qualification','ownership_review','source_mean_replay_QA','numeric_source_replay','current_RGB_receipt'):
+                if key in bundle:
+                    value=document(bundle[key])
+                    if key=='source_generation':
+                        for sub in ('source_seed_review',):
+                            if sub in value:document(value[sub])
+            # The known-corner scoped replay and its controls are actual source
+            # inputs, whereas its source model provides only material topology.
+            for chunkref in bundle['closed_chunks']:
+                chunk=document(chunkref);gate=document(chunk['source_gate_manifest']);gates.append(chunk['source_gate_manifest'])
+                ledger=pin(chunk['source_rows_ref']);metadata(list(read_jsonl(ledger)));allrows.extend(read_jsonl(ledger))
+            for ref2 in bundle.get('reader_module_refs',[]):metadata(ref2)
+            own=bundle.get('ownership_review')
+            if own:
+                ov=read_json(pin(own))
+                if ov.get('source_crop_controls'):document(ov['source_crop_controls'])
+            # These are fixed outputs of the actual scoped source replay, not
+            # inferred masks or new source-generation rows.
+            replay=Path(bundle['source_rows_ref']['file']).parent/'native_input_replay.json'
+            if replay.is_file():
+                ref2=dict(file=str(replay),sha256=file_sha256(replay));document(ref2)
+        qualification,proofs=load_qualification(gates,pin)
+        if len(allrows)!=extra or len(qualification)!=extra:raise ValueError('first4 typed append source denominator differs')
+        model=read_json(pin(doc['material_binding']['model_topology_ref']))
+        pending_ids={r['source_row_id'] for r in allrows if r.get('numeric_initialization_status')=='pending_numeric_initialization'}
+        if pending_ids:
+            selection=document(doc.get('first4_source_numeric_activation',{}))
+            selected=list(read_jsonl(pin(selection['pending_numeric_source_rows_ref'])))
+            expected_indices=[i for i,r in enumerate(allrows,end) if r['source_row_id'] in pending_ids]
+            if (selection.get('schema')!='rinkfit.aggregate_source_numeric_activation.v1'
+                or selection.get('pending_packet_row_indices')!=expected_indices
+                or selected!=[r for r in allrows if r['source_row_id'] in pending_ids]
+                or {r['source_row_id'] for r in selected}!=pending_ids
+                or len(selected)!=len(pending_ids)
+                or any(not r.get('numeric_initialization_failure_reasons') or r.get('source_geometry_eligible') is not True for r in selected)):
+                raise ValueError('first4 numeric pending must retain the exact qualified source and failure ledger')
+        for i,r in enumerate(allrows,end):
+            rid=r['source_row_id'];mi=int(r['joint_material_index']);receipt=qualification.get(rid)
+            if (rid!=doc['source_row_ids'][i] or r['current_uv']!=arrays['uv'][i].tolist() or r['source_uv']!=r['current_uv']
+                or r['native_pts']!=int(arrays['native_pts'][i]) or r['shot_id']!=doc['shot_ids'][int(arrays['shot_index'][i])]
+                or int(arrays['kind'][i])!=1 or int(arrays['material_index'][i])!=mi or int(arrays['admission'][i])!=1
+                or int(arrays['fit_role'][i])!=(2 if rid in pending_ids else 1)):
+                raise ValueError('first4 typed source row UV/clock/identity/admission differs')
+            pi=validate_new_entity(r,receipt,model['materials'][mi],mi)
+            if int(arrays['path'][i])!=pi or float(arrays['station'][i])!=0.:raise ValueError('first4 fixed physical entity became sliding')
+        row_unit={}
+        for unit in doc['engineering_pixel_dependency_groups']['groups']:
+            for i in unit['rows']:
+                if i in row_unit:raise ValueError('first4 source E dependency group overlap')
+                row_unit[i]=unit['id']
+        current_by_pts={};source_frame_RGB={}
+        for r in source:current_by_pts.setdefault(r['native_pts'],[]).append(r)
+        for pts in {r['native_pts']for r in allrows}:
+            new=[i for i,r in enumerate(allrows,end)if r['native_pts']==pts and r['source_row_id'] not in pending_ids]
+            old=np.flatnonzero((arrays['native_pts'][:end]==pts)&(arrays['admission'][:end]==1)&(arrays['fit_role'][:end]==1)).tolist()
+            if old and new:
+                if len({row_unit.get(i)for i in old+new})!=1 or None in {row_unit.get(i)for i in old+new}:raise ValueError('first4 old/new same RGB exposure lacks one conservative source E dependency closure')
+            if old:
+                rgb={r['current_rgb_sha256']for r in allrows if r['native_pts']==pts}
+                for sr in current_by_pts.get(pts,[]):
+                    key=sr['source_packet']
+                    if key not in source_frame_RGB:
+                        source_frame_RGB[key]=read_json(q.generation['references'][key]['path'])['source']['decoded_RGB_sha256']
+                    if source_frame_RGB[key]not in rgb:raise ValueError('first4 old/new exposure RGB source differs')
+        for p,h in needed.items():
+            if listed.get(p)!=h:raise ValueError('first4 typed source dependency absent from native source_manifests '+str(p))
+        typed_count=len(allrows)
+    return dict(QP_input_sha256=q.identity,QP_rows=len(source),typed_rows=typed_count,authenticated_dependencies=len(seen),native_flat_source_dependencies=len(listed))
+
+
 def assert_source_identity_current(packet,*,return_verified_packet=False):
     """Check this source generation and explicitly same-membership aux wrappers.
 
@@ -44,8 +183,23 @@ def assert_source_identity_current(packet,*,return_verified_packet=False):
                 try:reason=json.loads(marker.read_text(encoding='utf8'))
                 except (ValueError,OSError):reason='source recall marker exists; see the named file'
                 raise ValueError('Source physical identity certificate has been recalled: '+str(marker)+'; '+json.dumps(reason,ensure_ascii=False))
-    from .board_source_qualification_guard import assert_board_material_source_qualification
-    assert_board_material_source_qualification(doc,path)
+    if 'first4_source_generation'in doc:
+        _assert_first4_source_identity_current(doc,path)
+    # New certificate dispatch belongs to the current runner; frozen historical
+    # V3/V4/V5 issuers keep their exact source and cache dependencies.
+    qualification=doc.get('board_material_source_qualification')
+    certificate_schema=None
+    if qualification is not None:
+        certpath=Path(qualification.get('file',qualification.get('path')))
+        if not certpath.is_absolute():certpath=path.parent/certpath
+        if sha(certpath)!=qualification['sha256']:raise ValueError('changed source qualification certificate '+str(certpath))
+        certificate_schema=json.loads(certpath.read_text(encoding='utf8')).get('schema')
+    if certificate_schema=='rinkfit.board_material_fit_qualification.v6_static_board_prefix':
+        from .static_board_prefix_qualification import assert_static_board_prefix_qualification
+        assert_static_board_prefix_qualification(doc,path)
+    else:
+        from .source_enriched_current_v1 import assert_board_source_qualification_current
+        assert_board_source_qualification_current(doc,path)
     return doc if return_verified_packet else None
 
 def _inherit_source_recall_marker(source_packet,destination_packet):
@@ -105,8 +259,102 @@ def build(output, *, ceres_install=None):
     if r.returncode:raise RuntimeError('joint backend build failed: '+str(out/'build.log'))
     print(json.dumps(dict(executable=str(out/'joint_fit.exe'),sha256=recipe['executable_sha256'])))
     return out/'joint_fit.exe'
-def execute(executable,model,packet,output,iterations=0,threads=8,fixed_prefixes=None,fixed_shot_nuisance=None,recapture_new_sources=False,observed_row_time_new_sources=False):
-    if iterations or recapture_new_sources:assert_source_identity_current(packet)
+def _coarse_nuisance_seed_refs(seed):
+    """Bind the actual capture run, including its failure ledger, by immutable SHA."""
+    if not isinstance(seed,dict) or not {'manifest','binding'} <= set(seed):
+        raise ValueError('coarse_nuisance_seed requires manifest and binding file/SHA references')
+    refs={}
+    def verified(ref):
+        if not isinstance(ref,dict) or set(ref)!={'file','sha256'}:
+            raise ValueError('coarse seed reference requires exactly file and sha256')
+        file=Path(ref['file']).resolve()
+        if sha(file)!=ref['sha256']:raise ValueError('changed coarse seed dependency '+str(file))
+        return dict(file=str(file),sha256=ref['sha256'])
+    refs['manifest']=verified(seed['manifest']);refs['binding']=verified(seed['binding'])
+    manifest=Path(refs['manifest']['file']);run=manifest.parent.parent
+    execution=run/'execution.json'
+    command=json.loads(execution.read_text(encoding='utf8'))['command']
+    evidence=dict(execution=execution,recapture_report=run/'initial_nuisance_recapture.json',recapture_ledger=run/'initial_nuisance_recapture.jsonl',stage=Path(command[6]))
+    for key,file in evidence.items():
+        refs[key]=verified(seed[key]) if key in seed else dict(file=str(file.resolve()),sha256=sha(file))
+    if set(seed)-set(refs):raise ValueError('unknown coarse seed dependency keys')
+    return refs
+
+
+def _source_capture_checkpoint_ref(reference):
+    if not isinstance(reference,dict) or not {'file','sha256'} <= set(reference) or set(reference)-{'file','sha256','size_bytes'}:
+        raise ValueError('source_capture_checkpoint requires an exact file/SHA reference')
+    file=Path(reference['file']).resolve()
+    if sha(file)!=reference['sha256']:raise ValueError('changed source capture checkpoint '+str(file))
+    if 'size_bytes' in reference and file.stat().st_size!=reference['size_bytes']:
+        raise ValueError('source capture checkpoint byte size changed')
+    return dict(file=str(file),sha256=reference['sha256'],size_bytes=file.stat().st_size)
+
+
+def pin_source_capture_checkpoint(reference,output):
+    """Freeze one genuine rotating accepted primal; copy only model+station."""
+    ref=_source_capture_checkpoint_ref(reference);source=Path(ref['file']);original=source.read_bytes()
+    if hashlib.sha256(original).hexdigest()!=ref['sha256']:raise ValueError('checkpoint rotated while pinning manifest')
+    cp=json.loads(original)
+    if cp.get('schema')!='rinkfit.joint_source_capture_checkpoint.v1' or cp.get('quality_accepted') is not False:
+        raise ValueError('pinning requires an actual source-capture primal checkpoint')
+    out=Path(output).resolve()
+    if out.exists():raise FileExistsError('immutable pinned source checkpoint exists')
+    source_files={}
+    for name,d in cp['files'].items():
+        f=Path(d['file']);f=f if f.is_absolute() else source.parent/f
+        if sha(f)!=d['sha256'] or f.stat().st_size!=d['size_bytes']:
+            raise ValueError('source checkpoint rotated or dependency changed '+name)
+        source_files[name]=f.resolve()
+    # Capture and validate rotating payloads before creating the destination.
+    payload={name:source_files[name].read_bytes() for name in ('model.json','station.f64')}
+    for name,data in payload.items():
+        if hashlib.sha256(data).hexdigest()!=cp['files'][name]['sha256']:
+            raise ValueError('checkpoint rotated while pinning '+name)
+    if sha(source)!=ref['sha256']:raise ValueError('checkpoint generation changed while pinning')
+    out.mkdir(parents=True)
+    for name,data in payload.items():
+        f=out/name;f.write_bytes(data);cp['files'][name]={**cp['files'][name],'file':str(f)}
+    for name,f in source_files.items():
+        if name not in payload:cp['files'][name]={**cp['files'][name],'file':str(f)}
+    archived=out/'source_manifest.json';archived.write_bytes(original)
+    cp['pinned_original_manifest']=dict(file=str(archived),sha256=ref['sha256'],size_bytes=len(original))
+    cp['source_live_manifest_path_at_pin']=str(source)
+    cp['pin_does_not_reproject_or_modify_primal']=True
+    manifest=out/'manifest.json';manifest.write_text(json.dumps(cp,indent=2),encoding='utf8')
+    return dict(checkpoint=dict(file=str(manifest),sha256=sha(manifest),size_bytes=manifest.stat().st_size),model=dict(file=str(out/'model.json'),sha256=cp['files']['model.json']['sha256']),copied_payload_bytes=sum(map(len,payload.values())),source_UV_W_or_Query_changed=False)
+
+
+def execute(executable,model,packet,output,iterations=0,threads=8,fixed_prefixes=None,fixed_shot_nuisance=None,recapture_new_sources=False,observed_row_time_new_sources=False,source_capture_engineering=False,coarse_nuisance_seed=None,recapture_rows_override=None,source_capture_feasibility=False,source_capture_checkpoint=None,append_capture_seed=None):
+    if source_capture_feasibility and not source_capture_engineering:
+        raise ValueError('E-only geometry capture requires the protected full source capture contract')
+    if source_capture_engineering and ((not recapture_new_sources and source_capture_checkpoint is None) or observed_row_time_new_sources):
+        raise ValueError('source capture requires genuine fresh capture or an exact current-model primal checkpoint')
+    append_ref=None
+    if append_capture_seed is not None:
+        if not source_capture_engineering or not recapture_new_sources or observed_row_time_new_sources or coarse_nuisance_seed is not None or recapture_rows_override is not None or source_capture_checkpoint is not None:
+            raise ValueError('appended source capture requires its own protected fresh recapture scope')
+        append_ref=_source_capture_checkpoint_ref(append_capture_seed)
+        append_binding=json.loads(Path(append_ref['file']).read_text(encoding='utf8'))
+        if append_binding.get('schema')!='rinkfit.joint_append_capture_seed.v1' or append_binding.get('accepted_checkpoint_claimed') is not False:
+            raise ValueError('appended source capture requires an honest numerical initial prefix')
+    checkpoint_ref=None
+    if source_capture_checkpoint is not None:
+        if not source_capture_engineering or observed_row_time_new_sources or recapture_new_sources or coarse_nuisance_seed is not None or recapture_rows_override is not None:
+            raise ValueError('checkpoint resume requires protected source capture, no old seed/recapture overwrite and fresh Ceres history')
+        checkpoint_ref=_source_capture_checkpoint_ref(source_capture_checkpoint)
+        checkpoint=json.loads(Path(checkpoint_ref['file']).read_text(encoding='utf8'))
+        mode='source_capture_feasibility' if source_capture_feasibility else 'source_capture_engineering'
+        if checkpoint.get('schema')!='rinkfit.joint_source_capture_checkpoint.v1' or checkpoint['objective_mode']!=mode or sha(model)!=checkpoint['files']['model.json']['sha256'] or sha(packet)!=checkpoint['source_packet_sha256']:
+            raise ValueError('source checkpoint model/packet/objective must match the actual resumed primal')
+    seed_refs=None
+    if coarse_nuisance_seed is not None or recapture_rows_override is not None:
+        if not source_capture_engineering or not recapture_new_sources or observed_row_time_new_sources or coarse_nuisance_seed is None or recapture_rows_override is None:
+            raise ValueError('coarse seed and subset recapture require the protected source_capture_engineering stage')
+        if not isinstance(recapture_rows_override,(list,tuple)) or not recapture_rows_override or any(type(i) is not int or i<0 for i in recapture_rows_override) or len(set(recapture_rows_override))!=len(recapture_rows_override):
+            raise ValueError('recapture_rows_override must contain unique nonnegative integer source rows')
+        seed_refs=_coarse_nuisance_seed_refs(coarse_nuisance_seed)
+    if iterations or recapture_new_sources or checkpoint_ref is not None:assert_source_identity_current(packet)
     exe=Path(executable).resolve();recipe=json.loads((exe.parent/'recipe.json').read_text(encoding='utf8'))
     if sha(exe)!=recipe['executable_sha256']:raise ValueError('compiled backend SHA changed')
     env=os.environ.copy();env['PATH']=';'.join(recipe['runtime_bin_paths'])+';'+env.get('PATH','');env.update(OMP_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1',MKL_NUM_THREADS='1')
@@ -114,10 +362,18 @@ def execute(executable,model,packet,output,iterations=0,threads=8,fixed_prefixes
     if out.exists():raise FileExistsError('immutable generation exists')
     log=out.parent/(out.name+'.log');log.parent.mkdir(parents=True,exist_ok=True)
     command=[str(exe),str(Path(model).resolve()),str(Path(packet).resolve()),str(out),str(iterations),str(threads)]
-    if fixed_prefixes or fixed_shot_nuisance or recapture_new_sources or observed_row_time_new_sources:
-        stage=out.parent/(out.name+'.stage.json');stage.write_text(json.dumps(dict(fix_prefixes=fixed_prefixes or [],fix_shot_nuisance=fixed_shot_nuisance or [],recapture_new_sources=recapture_new_sources,observed_row_time_new_sources=observed_row_time_new_sources),indent=2),encoding='utf8');command.append(str(stage))
+    if fixed_prefixes or fixed_shot_nuisance or recapture_new_sources or observed_row_time_new_sources or source_capture_engineering or seed_refs or checkpoint_ref:
+        stage=out.parent/(out.name+'.stage.json')
+        config=dict(fix_prefixes=fixed_prefixes or [],fix_shot_nuisance=fixed_shot_nuisance or [],recapture_new_sources=recapture_new_sources,observed_row_time_new_sources=observed_row_time_new_sources,source_capture_engineering=source_capture_engineering,source_capture_feasibility=source_capture_feasibility)
+        if seed_refs is not None:config.update(coarse_nuisance_seed=seed_refs,recapture_rows_override=list(recapture_rows_override))
+        if checkpoint_ref is not None:config['source_capture_checkpoint']=checkpoint_ref
+        if append_ref is not None:config['append_capture_seed']=append_ref
+        stage.write_text(json.dumps(config,indent=2),encoding='utf8');command.append(str(stage))
     with log.open('w',encoding='utf8') as f:r=subprocess.run(command,env=env,stdout=f,stderr=subprocess.STDOUT)
-    result=dict(schema='rinkfit.joint_backend_execution.v1',command=command,backend_sha256=sha(exe),model_sha256=sha(model),packet_sha256=sha(packet),returncode=r.returncode,log=str(log),formal_Phase_I_II_passed=False)
+    result=dict(schema='rinkfit.joint_backend_execution.v1',command=command,backend_sha256=sha(exe),model_sha256=sha(model),packet_sha256=sha(packet),returncode=r.returncode,log=str(log),source_capture_engineering=source_capture_engineering,source_capture_feasibility=source_capture_feasibility,physical_factor_evaluation_device='CPU Ceres DynamicAutoDiff',GPU_pixel_backend_invoked=False,formal_Phase_I_II_passed=False)
+    if seed_refs is not None:result.update(coarse_nuisance_seed=seed_refs,recapture_rows_override=list(recapture_rows_override))
+    if checkpoint_ref is not None:result['source_capture_checkpoint']=checkpoint_ref
+    if append_ref is not None:result['append_capture_seed']=append_ref
     if out.exists():(out/'execution.json').write_text(json.dumps(result,indent=2),encoding='utf8')
     print(json.dumps(result));return r.returncode
 
@@ -147,15 +403,20 @@ def execute_explicit(executable,model,packet,output,*,config=None,geometry_initi
     mode='--engineering-recovery' if engineering_recovery else '--formal-audit' if audit_only else ('--geometry-phr' if geometry_initializer else '--formal')
     command=[str(exe),mode,str(Path(model).resolve()),str(Path(packet).resolve()),str(out)]
     if config:command.append(str(Path(config).resolve()))
-    from .feedback_checkpoint import CheckpointObserver
-    with CheckpointObserver(out, packet) as observer:
+    from .feedback_checkpoint import CheckpointObserver, infer_context
+    observer_context=infer_context(packet,out)
+    if cfg.get('checkpoint_source_review'):
+        actual_review_config=Path(cfg['checkpoint_source_review']['run']).resolve()/'source_review_config.json'
+        if not actual_review_config.is_file():raise FileNotFoundError('Configured current source reader inputs are missing: '+str(actual_review_config))
+        observer_context['source_review_configuration']=dict(file=str(actual_review_config),sha256=sha(actual_review_config))
+    with CheckpointObserver(out, packet, context=observer_context) as observer:
         with log.open('w',encoding='utf8') as stream:r=subprocess.run(command,env=env,stdout=stream,stderr=subprocess.STDOUT)
     if engineering_recovery and config:
         cfg=json.loads(Path(config).read_text(encoding='utf8'))
         if cfg.get('checkpoint_source_review') and observer.consumed_task_documents:
             from .feedback_dispatch import dispatch_checkpoint_reviews
             review=cfg['checkpoint_source_review']
-            dispatch_checkpoint_reviews(observer.consumed_task_documents,review['run'],out/'source_reviews',device=review.get('device','cuda'))
+            dispatch_checkpoint_reviews(observer.consumed_task_documents,review['run'],out/'source_reviews',device=review.get('device','cuda'),packet_path=packet)
     result=dict(schema='rinkfit.joint_explicit_backend_execution.v1',command=command,backend_sha256=sha(exe),model_sha256=sha(model),packet_sha256=sha(packet),returncode=r.returncode,log=str(log),geometry_initialization_only=bool(geometry_initializer),engineering_recovery=bool(engineering_recovery),objective_id='engineering_recovery_native_pixel_v1' if engineering_recovery else None,certificate_in_native_and_formal_receipts=not engineering_recovery)
     if out.exists():(out/'execution.json').write_text(json.dumps(result,indent=2),encoding='utf8')
     print(json.dumps(result));return r.returncode
@@ -211,14 +472,15 @@ def rebind_current_auxiliaries(packet_path,state_path,output_path,*,state_packet
     _inherit_source_recall_marker(src,out)
     return dict(packet=str(out),sha256=sha(out),current_state=str(state),row_count=n)
 
-def rebind_explicit_nuisance(packet_path,accepted_state,output_path):
+def rebind_explicit_nuisance(packet_path,accepted_state,output_path,*,current_model_path=None):
     """Bind the complete accepted explicit state without claiming a native replay."""
     import numpy as np
     src=Path(packet_path).resolve();state=Path(accepted_state).resolve();out=Path(output_path).resolve()
     if out.exists():raise FileExistsError('immutable explicit state packet exists')
     if (state.parent/'engineering_receipt.json').exists() and not (state/'accepted_state_receipt.json').exists() and not (state/'formal_receipt.json').exists():
         from .accepted_aux_prefix import rebind_engineering_nuisance
-        return rebind_engineering_nuisance(src,state,out)
+        return rebind_engineering_nuisance(src,state,out,current_model_path=current_model_path)
+    if current_model_path is not None:raise ValueError('qualified physical suffix is currently supported only for an exact engineering candidate CP')
     packet=json.loads(src.read_text(encoding='utf8'));receipt_path=state/'accepted_state_receipt.json';complete_checkpoint=None
     if not receipt_path.exists():
         receipt_path=state/'formal_receipt.json';value_report=json.loads((state/'value_report.json').read_text(encoding='utf8'));formal_checkpoint=state/'formal_checkpoint.json'
@@ -372,3 +634,69 @@ def bind_captured_nuisance(packet_path,capture_state,source_packet,output_path,*
     if topology_recapture_rows is not None:packet['source_topology_recapture_rows']=list(map(int,topology_recapture_rows));packet['recapture_rows']=sorted(set(packet.get('recapture_rows',[]))|set(map(int,topology_recapture_rows)))
     out.write_text(json.dumps(packet,indent=2),encoding='utf8');_inherit_source_recall_marker(src,out)
     return dict(packet=str(out),sha256=sha(out),new_query_rows=len(new_query_rows),reused_raw_rows=old_n)
+
+
+def rebind_source_capture_auxiliaries(packet_path,state_manifest,output_path):
+    """Bind actual coarse auxiliaries without claiming finite Query closure.
+
+    This accepts the authoritative capture writer only, never the legacy
+    independently profiled replay or an incomplete accepted-step checkpoint.
+    The same-source qualification/watch is retained; new pixels need new data.
+    """
+    import numpy as np
+    src=Path(packet_path).resolve();manifest=Path(state_manifest).resolve();out=Path(output_path).resolve()
+    if out.exists():raise FileExistsError('immutable numerical packet exists')
+    packet=assert_source_identity_current(src,return_verified_packet=True)
+    report=json.loads(manifest.read_text(encoding='utf8'));n=int(packet['row_count'])
+    if report.get('schema')!='rinkfit.actual_source_capture_state.v1' or report.get('source_packet_sha256')!=sha(src) or report.get('raw_rows')!=n:
+        raise ValueError('authoritative coarse capture identity is incomplete')
+    if report.get('true_RS_invalid_rows')!=0 or report.get('invalid_rows')!=[] or report.get('physical_visibility_invalid_rows')!=0 or report.get('nonprotected_physical_visibility_checked') is not True or report.get('source_UV_E_W_and_frozen_Query_changed')is not False:
+        raise ValueError('coarse state has invalid true RS/source changes; keep candidate for diagnosis')
+    if report.get('station_is_actual_coarse_solution_not_profiled_Query_replay')is not True:
+        raise ValueError('profiled replay may not replace actual fitted stations')
+    files=report['files'];model=manifest.parent/'model.json'
+    if sha(model)!=files['model.json']['sha256']:raise ValueError('coarse physical model changed')
+    checked=set()
+    def absolute(d):
+        q=Path(d['file']);q=q if q.is_absolute()else src.parent/q;q=q.resolve()
+        key=(str(q),d['sha256'])
+        if key not in checked:
+            if sha(q)!=d['sha256']:raise ValueError('changed immutable packet dependency '+str(q))
+            checked.add(key)
+        return {**d,'file':str(q)}
+    packet['arrays']={k:absolute(d)for k,d in packet['arrays'].items()}
+    for group in packet['groups']:
+        if isinstance(group['W'],dict):group['W']=absolute(group['W'])
+    for ref in packet.get('source_manifests',[]):ref.update(absolute(ref))
+    original={k:packet['arrays'][k]for k in ('station','row','alpha','path')}
+    start=int(packet['new_source_start']);active=None;bindings={}
+    for key,name,dtype in [('station','station.f64','<f8'),('row','row.f64','<f8'),('alpha','alpha.f64','<f8'),('path','path.u32','<u4')]:
+        q=manifest.parent/name
+        if sha(q)!=files[name]['sha256']:raise ValueError('changed actual fitted auxiliary '+name)
+        value=np.fromfile(q,dtype)
+        if value.shape!=(n,)or not np.isfinite(value).all():raise ValueError('incomplete actual auxiliary '+name)
+        if key=='station'and np.any((value<0)|(value>1)):raise ValueError('station outside finite carrier')
+        if key=='row'and np.any((value<0)|(value>1079)):raise ValueError('RS row outside source sensor')
+        old=original[key];before=np.fromfile(old['file'],old['dtype'],count=n,offset=old.get('offset_bytes',0))
+        if before[:start].tobytes()!=value[:start].tobytes():raise ValueError('actual capture changed protected S01 auxiliary '+key)
+        descriptor=dict(file=str(q),sha256=sha(q),dtype=dtype,shape=[n])
+        packet['arrays'][key]=descriptor;bindings[key]=descriptor
+    valid_file=manifest.parent/'RS_valid.u8'
+    if sha(valid_file)!=files['RS_valid.u8']['sha256']:raise ValueError('changed actual RS validity ledger')
+    valid=np.fromfile(valid_file,'u1')
+    admission=np.fromfile(packet['arrays']['admission']['file'],'u1',count=n,offset=packet['arrays']['admission'].get('offset_bytes',0))
+    role=np.fromfile(packet['arrays']['fit_role']['file'],'u1',count=n,offset=packet['arrays']['fit_role'].get('offset_bytes',0))
+    active=(admission==1)&(role==1)
+    if valid.shape!=(n,)or not valid[active].all()or int(active.sum())!=report['active_rows']:
+        raise ValueError('incomplete whole active true-RS capture ledger')
+    packet['actual_source_capture_auxiliary_binding']=dict(
+        schema='rinkfit.actual_source_capture_auxiliary_binding.v1',parent_packet=dict(file=str(src),sha256=sha(src)),
+        state_manifest=dict(file=str(manifest),sha256=sha(manifest)),model=dict(file=str(model),sha256=sha(model)),
+        arrays=bindings,all_active_true_RS_rebound=True,source_UV_E_W_roles_admission_and_frozen_Query_changed=False,
+        original_S01_auxiliary_prefix_bitwise_equal=True,strict_Query_closure_claimed=False,
+        alpha_is_bounded_navigation_seed_not_success_certificate=True)
+    out.parent.mkdir(parents=True,exist_ok=True)
+    out.write_text(json.dumps(packet,ensure_ascii=False,indent=2),encoding='utf8')
+    _inherit_source_recall_marker(src,out)
+    assert_source_identity_current(out)
+    return out

@@ -1,0 +1,34 @@
+{
+  "schema": "rinkspace.current_source_leg_visibility_qualification.v1",
+  "complete": true,
+  "accepted": true,
+  "accepted_for_source_exclusion": true,
+  "reviewed_native_frame_count": 33,
+  "first_native_pts": 1070080,
+  "last_native_pts": 1078272,
+  "native_frame_step_pts": 256,
+  "source_video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "time_base": "1/12800",
+  "source_decisions_ref": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\leg_fix_v1\\source_decisions.json",
+    "sha256": "bdb8d7fb8a30008e929d21f89a249a5620a07fd09ca3bbbb5df6ff3ab168eafc"
+  },
+  "current_source_prompt_ref": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\leg_fix_v1\\source_prompts.json",
+    "sha256": "8887d0c8ba09fc701b3d39a8aa5d4700de5b2b62f172d0190f9e1bfb4758181d"
+  },
+  "current_source_SAM_reader_ref": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\leg_fix_v1\\read_source_sam.py",
+    "sha256": "e291660a52731254f18f5b748fd122aa8b95e1709199365d5d7ed9ecbab62177"
+  },
+  "review_method": "All 33 current native RGB crops with old person+unknown and new SAM-delta contours visually inspected; 54 source overviews of the full 260-frame spin phase used to select this continuous current-source reread interval.",
+  "new_pixels_only_independent_unknown": true,
+  "old_person_and_old_unknown_preserved": true,
+  "no_2D_or_physical_scene_correspondence_issued": true,
+  "no_bbox_dilation_ellipse_polygon_interpolated_mask": true,
+  "limitations": [
+    "Current source segmentation excludes visible actor and uncertain silhouette/blur from ice and board observations; added pixels do not certify body, contact or metric truth.",
+    "No whole-scene perfect segmentation assertion.",
+    "Two candidate frames that mixed static logo/board were rejected in full; their original actor layers remain."
+  ]
+}

@@ -10,6 +10,17 @@ def source_from_existing(path):
         nonlocal text
         if text.count(a)!=1:raise ValueError('GPU joint math source anchor changed: '+a[:90])
         text=text.replace(a,b,1)
+    # Keep the archived single-shot CUDA implementation immutable. Extend only
+    # the generated joint evaluator and its metadata ABI with the same C1 hinge
+    # consumed by Python/C++ production projection and their derivatives.
+    once('T p1=T(0), p2=T(0), radius_max=T(2);',
+         'T p1=T(0), p2=T(0), radius_max=T(2); double wide_log_f_boundary=0; std::array<double,4> wide_coefficients{};')
+    once('out.brown={optics.k1+optics.k1_linear*out.z,optics.k2+optics.k2_linear*out.z,\n             optics.p1,optics.p2,optics.radius_max};',
+         'const T hinge=log_f<T(optics.wide_log_f_boundary)?T(optics.wide_log_f_boundary)-log_f:T(0);const T basis=hinge*hinge;out.brown={optics.k1+optics.k1_linear*out.z+T(optics.wide_coefficients[0])*basis,optics.k2+optics.k2_linear*out.z+T(optics.wide_coefficients[1])*basis,optics.p1+T(optics.wide_coefficients[2])*basis,optics.p2+T(optics.wide_coefficients[3])*basis,optics.radius_max};')
+    once('double f_ref,radius_max,dt,first_control_time;int n_controls,control_block_begin,dependent_control;',
+         'double f_ref,radius_max,dt,first_control_time,wide_log_f_boundary;std::array<double,4>wide_coefficients{};int n_controls,control_block_begin,dependent_control;')
+    once('ZoomOptics<T> o;o.f_ref=f_ref;o.radius_max=T(radius_max);',
+         'ZoomOptics<T> o;o.f_ref=f_ref;o.radius_max=T(radius_max);o.wide_log_f_boundary=wide_log_f_boundary;o.wide_coefficients=wide_coefficients;')
     once('if(l.control_ids[k]==j)return pars[l.control_slots[k]][channel];','if(l.control_ids[k]==j)return pars[l.control_slots[k]][l.control_offsets[k]+channel];')
     begin=text.index('template<class T> HD std::array<T,3> trajectory(');end=text.index('template<class T> HD FixedHead<T> head(',begin)
     tr=text[begin:end]
@@ -39,7 +50,7 @@ template<class T>HD T maximum(T a,T b){return a<b?b:a;}template<class T>HD T min
 '''
     text=text[:at]+pre+text[at:]
     abi='''
-struct GPUMeta {double R0[9],n[3],b[3],t1[3],t2[3],fref,Rmax,dt,first,refw[4];int nc,cb,dep,ref[4];};
+struct GPUMeta {double R0[9],n[3],b[3],t1[3],t2[3],fref,Rmax,wide_boundary,wide_coefficients[4],dt,first,refw[4];int nc,cb,dep,ref[4];};
 struct GPUPath {int kind,geom,ad,ri,bs,begin,count;double a0,a1,h;};
 struct UVRow {double t,s,v,alpha,budget;};
 struct UVLayout {int global,geom,ad,ref,path,block_begin,block_count,control_begin,control_count,geometry_begin,geometry_count,geometry_offset;};
@@ -52,10 +63,10 @@ extern "C" __global__ void joint_raw_uv(GPUMeta meta,const int*offsets,const dou
  for(int k=0;k<l.block_count;++k){int b=block_ids[l.block_begin+k];ptrs[k]=storage+cursor;for(int j=0;j<dims[b];++j){storage[cursor]=ge::Jet(values[offsets[b]+j],cursor==job.column?1.:0.);++cursor;}}
  for(int k=0;k<4;++k){ptrs[l.block_count+k]=storage+cursor;storage[cursor]=ge::Jet(k==0?row.s:k==1?row.v:k==2?row.alpha:row.budget,cursor==job.column?1.:0.);++cursor;}
  const auto&src=paths[l.path];ge::Path path{};path.kind=src.kind;path.radius_index=src.ri;path.boundary_segment=src.bs;path.start_angle=src.a0;path.end_angle=src.a1;path.fixed_height_fraction=src.h;path.points={reinterpret_cast<const ge::Vec2<double>*>(points+2*src.begin),src.count};
- ge::Model model{};for(int i=0;i<9;++i)model.R0_seed[i]=meta.R0[i];for(int i=0;i<3;++i){model.n_seed[i]=meta.n[i];model.b_seed[i]=meta.b[i];model.n_tangent1[i]=meta.t1[i];model.n_tangent2[i]=meta.t2[i];}for(int i=0;i<4;++i){model.reference_indices[i]=meta.ref[i];model.reference_weights[i]=meta.refw[i];}model.f_ref=meta.fref;model.radius_max=meta.Rmax;model.dt=meta.dt;model.first_control_time=meta.first;model.n_controls=meta.nc;model.control_block_begin=meta.cb;model.dependent_control=meta.dep;model.paths=&path;
+ ge::Model model{};for(int i=0;i<9;++i)model.R0_seed[i]=meta.R0[i];for(int i=0;i<3;++i){model.n_seed[i]=meta.n[i];model.b_seed[i]=meta.b[i];model.n_tangent1[i]=meta.t1[i];model.n_tangent2[i]=meta.t2[i];}for(int i=0;i<4;++i){model.reference_indices[i]=meta.ref[i];model.reference_weights[i]=meta.refw[i];model.wide_coefficients[i]=meta.wide_coefficients[i];}model.wide_log_f_boundary=meta.wide_boundary;model.f_ref=meta.fref;model.radius_max=meta.Rmax;model.dt=meta.dt;model.first_control_time=meta.first;model.n_controls=meta.nc;model.control_block_begin=meta.cb;model.dependent_control=meta.dep;model.paths=&path;
  ge::Layout local{};local.global_slot=l.global;local.geometry_slot=l.geom;local.advertisement_slot=l.ad;local.reference_angles_slot=l.ref;local.flatpath=0;local.frame_time=row.t;local.control_ids={controls+l.control_begin,l.control_count};local.control_slots={slots+l.control_begin,l.control_count};local.control_offsets={control_offsets+l.control_begin,l.control_count};local.geometry_indices={geometry_indices+l.geometry_begin,l.geometry_count};local.geometry_offset=l.geometry_offset;
  const auto pred=model.predict_for_al(local,ptrs[l.block_count][0],ptrs[l.block_count+1][0],ptrs);UVPartial r{};r.arithmetic=pred.arithmetic_valid;r.status=int(pred.physical_status);if(pred.arithmetic_valid){r.u=job.column<0?pred.uv[0].a:pred.uv[0].v;r.v=job.column<0?pred.uv[1].a:pred.uv[1].v;if(!::isfinite(r.u)||!::isfinite(r.v))r.arithmetic=0;}out[index]=r;
 }
 '''
     if 'std::' in text:raise ValueError('Unadapted standard library operation')
-    return abi+text+'\n'+kernel,dict(original_math_file=str(Path(path).resolve()),original_math_sha256=hashlib.sha256(original).hexdigest(),adaptations=['joint reference_angles trajectory addition','shared-control offsets','finite geometry indices/offset','optional shared board-height path','device array view; scalar math operation order retained'],old_CUDA_ABI_or_source_modified=False,raw_UV_J_only=True,CPU_primal_domain_W_PHR_authoritative=True)
+    return abi+text+'\n'+kernel,dict(original_math_file=str(Path(path).resolve()),original_math_sha256=hashlib.sha256(original).hexdigest(),adaptations=['source-supported wide Brown C1 hinge and log-f Jet derivative; GPUMeta 304 bytes','joint reference_angles trajectory addition','shared-control offsets','finite geometry indices/offset','optional shared board-height path','device array view; unchanged base scalar math operation order retained'],old_CUDA_ABI_or_source_modified=False,derived_joint_CUDA_ABI_bytes=304,raw_UV_J_only=True,CPU_primal_domain_W_PHR_authoritative=True)

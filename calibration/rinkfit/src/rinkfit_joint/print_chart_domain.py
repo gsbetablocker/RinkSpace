@@ -10,6 +10,41 @@ from pathlib import Path
 import numpy as np
 from scipy.optimize import linprog
 
+def affine_between_installations(values, source_installation, target_installation):
+    """Change an ink chart while preserving its physical perimeter s and z.
+
+    The installation and its affine are a coupled coordinate representation.
+    This performs no source projection, fitting, or shape/topology change.
+    """
+    v=np.asarray(values,float);a=np.asarray(source_installation,float);b=np.asarray(target_installation,float)
+    if v.shape!=(6,) or a.shape!=(4,) or b.shape!=(4,) or not np.isfinite(np.r_[v,a,b]).all():raise ValueError('invalid finite print chart')
+    da=a[3]-a[2];db=b[3]-b[2]
+    if min(a[1],b[1],da,db)<=0:raise ValueError('nonpositive print chart scale')
+    return np.r_[a[1]*v[:2]/b[1],(a[0]+a[1]*v[2]-b[0])/b[1],da*v[3:5]/db,(a[2]+da*v[5]-b[2])/db].tolist()
+
+def rebase_surviving_print_affines(current, restored, restored_blocks):
+    """Keep added ink in place when a baseline restores its installation.
+
+    Baseline-owned shape blocks have already been restored and stay untouched.
+    Only surviving added affines are expressed in the restored chart.
+    """
+    protected=set(restored_blocks);owners={};report=[]
+    for material in current['materials']:
+        for path in material['paths']:
+            gi=path.get('geometry_block',-1);ai=path.get('advertisement_block',-1)
+            if path['kind']==2 and gi>=0:owners.setdefault(gi,set()).add(ai)
+    for gi,ads in owners.items():
+        if gi in protected:continue
+        changed=[ai for ai in ads if ai in protected and current['blocks'][ai]['values']!=restored['blocks'][ai]['values']]
+        if not changed:continue
+        if len(ads)!=1:raise ValueError('surviving print affine has multiple installation owners')
+        ai=changed[0];before=current['blocks'][gi]['values'];source=current['blocks'][ai]['values'];target=restored['blocks'][ai]['values']
+        after=affine_between_installations(before,source,target);block=restored['blocks'][gi]
+        if np.any(np.asarray(after)<np.asarray(block['lower'])-1e-12) or np.any(np.asarray(after)>np.asarray(block['upper'])+1e-12):raise ValueError('restored print affine lies outside its existing domain')
+        block['values']=after
+        report.append(dict(block=block['name'],installation=restored['blocks'][ai]['name'],source_installation=source,target_installation=target,before=before,after=after,physical_s_z_preserved=True))
+    return report
+
 def decode_common_witness(model,advertisement_ids=(8,9,10,11,12)):
     q=copy.deepcopy(model);report=[];seen=set()
     scene=np.asarray(q['blocks'][q['scene_block']]['values']);H=float(scene[4])

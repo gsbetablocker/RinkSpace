@@ -1,0 +1,30 @@
+#pragma once
+#include "rinkfit/joint_source_guard.hpp"
+#include "rinkfit/joint_aux_prefix_current_v3.hpp"
+namespace rinkfit {
+// Preserve the exact V9 parent contract through a pure R33 source append. The
+// previous issuer's 13 widths / 26 actual flanks equation remains untouched.
+inline JointAcceptedAuxiliaryPreservation preserve_joint_R_inner_inherited_auxiliary_prefix(JointProblemBuilder&core,const std::filesystem::path&input_model,const std::filesystem::path&input_packet){
+ using namespace accepted_aux_detail;const auto&binding=core.packet.source_json.at("accepted_explicit_state_binding");
+ require(binding.at("schema")=="rinkfit.accepted_R_inner_source_append_state_packet_binding.v1"&&binding.at("state_kind")=="engineering_candidate"&&!binding.value("native_replay_pass_claimed",true)&&!binding.value("formal_acceptance_claimed",true)&&!binding.value("old_AL_duals_resumed",true)&&binding.value("source_UV_W_E_unchanged",false),"unsupported R33 inherited complete-state binding/claims");
+ eventio::verify(input_packet,core.packet.source_hash);const auto state=eventio::read_json(verified(binding.at("prefix_contract")));const auto pp=verified(binding.at("parent_packet"));auto parent=eventio::read_json(pp);const auto&pb=parent.at("accepted_explicit_state_binding");
+ const std::size_t n=parent.at("row_count"),m=core.packet.rows.size(),old_n=pb.at("preserved_raw_rows");
+ require(state.at("schema")=="rinkfit.R_inner_append_inherited_engineering_state_contract.v1"&&state.at("parent_packet")==binding.at("parent_packet")&&state.at("parent_accepted_binding")==pb&&pb.at("schema")=="rinkfit.accepted_operator_transition_state_packet_binding.v1","R33 inherited exact parent contract differs");
+ require(m==n+33&&state.at("inherited_parent_raw_rows")==n&&state.at("new_raw_rows")==m&&state.at("preserved_complete_CP_raw_rows")==old_n&&state.at("inherited_fresh_rows")==n-old_n&&state.at("new_R_fresh_rows")==33&&binding.at("preserved_raw_rows")==old_n&&binding.at("inherited_parent_raw_rows")==n&&binding.at("fresh_appended_rows")==m-old_n&&binding.at("state_token")==pb.at("state_token"),"R33 inherited complete/fresh row denominator differs");
+ require(state.value("old_physical_values_exact",false)&&state.value("all_parent_four_auxiliary_values_exact",false)&&!state.value("old_AL_duals_resumed",true)&&!state.value("formal_acceptance_claimed",true),"R33 inherited physical/auxiliary claims differ");
+ require(state.at("new_source_qualification")==core.packet.source_json.at("board_material_source_qualification")&&state.at("current_model")==binding.at("current_model")&&state.at("current_model")==pb.at("qualified_physical_suffix").at("current_model"),"R33 inherited model/source authority differs");
+ const auto cert=eventio::read_json(verified(state.at("new_source_qualification")));require(cert.at("schema")=="rinkfit.actual_R_inner_source_after_bound_V9_prefix.v1"&&cert.at("parent_packet")==binding.at("parent_packet")&&cert.at("parent_model")==state.at("current_model"),"R33 inherited strict source scope differs");
+ require(verified(state.at("current_model"))==std::filesystem::absolute(input_model),"R33 inherited current model path differs");const auto model=eventio::read_json(input_model);require(model.at("blocks").size()==core.model.blocks.size(),"R33 inherited physical count differs");
+ for(std::size_t i=0;i<core.model.blocks.size();++i)require(core.model.blocks[i].name==model.at("blocks")[i].at("name")&&core.model.blocks[i].values==model.at("blocks")[i].at("values").get<std::vector<double>>(),"R33 inherited physical value changed");
+ const auto station=prefix<double>(parent.at("arrays").at("station"),n),row=prefix<double>(parent.at("arrays").at("row"),n),alpha=prefix<double>(parent.at("arrays").at("alpha"),n);const auto path=prefix<std::uint32_t>(parent.at("arrays").at("path"),n);
+ for(std::size_t i=0;i<n;++i)require(core.station[i]==station[i]&&core.row[i]==row[i]&&core.alpha[i]==alpha[i]&&core.packet.rows[i].path==int(path[i]),"R33 inherited parent four-auxiliary prefix changed");
+ // Keep actual current pair metadata: a missing compact key is a hard failure.
+ require(core.packet.source_json.at("stroke_pairs")==parent.at("stroke_pairs"),"R33 compact runtime actual pair metadata changed");
+ auto parent_guard=joint_source_guard_snapshot(parent);parent_guard["accepted_explicit_state_binding"]=pb;parent_guard["stroke_pairs"]=parent.at("stroke_pairs");parent_guard["schema"]=parent.at("schema");parent=eventio::Json();
+ const auto original_hash=core.packet.source_hash;auto original_document=std::move(core.packet.source_json);std::vector<JointObservation>tail;tail.reserve(m-n);for(std::size_t i=n;i<m;++i)tail.push_back(std::move(core.packet.rows[i]));core.packet.rows.resize(n);core.packet.source_json=std::move(parent_guard);core.packet.source_hash=eventio::file_sha256(pp);
+ auto restore=[&](){for(auto&r:tail)core.packet.rows.push_back(std::move(r));core.packet.source_json=std::move(original_document);core.packet.source_hash=original_hash;};
+ JointAcceptedAuxiliaryPreservation inherited;try{inherited=preserve_joint_accepted_auxiliary_prefix_current_v3(core,input_model,pp);}catch(...){restore();throw;}restore();
+ const auto parent_receipt=inherited.receipt;inherited.preserved.resize(m,0);for(std::size_t i=old_n;i<m;++i)require(!inherited.preserved[i],"R33 new or inherited-fresh row restored from old CP");
+ inherited.receipt={{"schema","rinkfit.production_R_inner_append_inherited_auxiliary_prefix.v1"},{"source_packet_sha256",original_hash},{"accepted_candidate_state_token",binding.at("state_token")},{"preserved_raw_rows",old_n},{"inherited_parent_raw_rows",n},{"fresh_appended_rows",m-old_n},{"inherited_V9_fresh_rows",n-old_n},{"new_R_fresh_rows",33},{"parent_packet",binding.at("parent_packet")},{"parent_restore",parent_receipt},{"old_physical_values_exact",true},{"all_parent_four_auxiliary_values_exact",true},{"complete_four_auxiliary_prefix_exact",true},{"fresh_initializer_must_skip_preserved_rows",true},{"old_AL_duals_or_objective_resumed",false},{"source_qualification_issued",false},{"formal_acceptance_claimed",false}};return inherited;
+}
+}

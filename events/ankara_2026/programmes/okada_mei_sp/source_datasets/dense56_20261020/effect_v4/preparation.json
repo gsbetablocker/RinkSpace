@@ -1,0 +1,70 @@
+{
+  "schema": "rinkspace.final_source_diff_preparation.v4",
+  "prepared": true,
+  "final_diff_executed": false,
+  "global_generation_schema": "rinkspace.source_only_dense56_generation.v3",
+  "generation_id": "dense56_v4",
+  "prior_global_generation": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/generation_v3/manifest.json",
+    "sha256": "7ad095fc2aca1072337b13ceb27250a6dc55f9d22f8699d568218674af4cf86a"
+  },
+  "prior_s05_child": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/parts_v3/s05/manifest.json",
+    "sha256": "1c1761bb80c9d74a85bf8e76148fa7e61d5f8832d89a3a4956a66725a34cc5b3"
+  },
+  "new_generation_file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/generation_v4/manifest.json",
+  "new_generation_sha256_required_from_frozen_final_parent": true,
+  "command_argv": [
+    "D:/OneDrive/codex_projs/RinkSpace/.venv/Scripts/python.exe",
+    "-X",
+    "utf8",
+    "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/run_final_diff_v4.py",
+    "--root",
+    "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1",
+    "--new-sha256",
+    "<actual_final_generation_SHA256>"
+  ],
+  "output": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/source_diff_v4",
+  "no_overwrite": true,
+  "exact_leg_blocker_from_frozen_v3_child": {
+    "native_pts": 1071872,
+    "selected_row_id": "dense56_v2/s05/1071872/8",
+    "source_point_id": "dense56_board/1071872/board.contact/1142",
+    "feature_id": "board.contact",
+    "uv": [
+      1142,
+      355.5
+    ],
+    "display_class": "board_contact_inferred",
+    "source_UV_is_direct_measurement": false
+  },
+  "critical_cases": [
+    1038592,
+    1057792,
+    1068032,
+    1071872,
+    1078272,
+    1093632,
+    1096192,
+    1342208
+  ],
+  "near_display_expected": {
+    "frames": 68,
+    "points": 1193,
+    "screenshot_points": 24
+  },
+  "additional_v3_subset_requirements": [
+    "all1862_same_RGB_BGR",
+    "retained_source_ID_UV_exact",
+    "no_added_source_ID",
+    "removed_rows_actual_source_reason",
+    "changed_per_native_PTS",
+    "reusable_frames_same_effective_input_SHA_and_entire_overlay_records"
+  ],
+  "driver": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/run_final_diff_v4.py",
+    "sha256": "c32db1e70cc4a1af1d40ff67e07ca15bd7bfef273045da7c8f270ba9a3a0314d"
+  },
+  "source_UV_or_model_changed": false,
+  "image_QA_not_replaced": true
+}

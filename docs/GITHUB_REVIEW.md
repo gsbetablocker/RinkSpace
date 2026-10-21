@@ -29,6 +29,14 @@ review 目录直接提供可读的状态、当前模型、配置、材料映射�
 
 完整源视频、批量解码帧、安装环境、编译中间件、可重建的 4.7 GB 屏幕网格数组和大批诊断视频仍在 Data。仓库保留数值审阅数据，比赛截图与叠加图不公开；完整 8434 帧的独立视觉验收仍需官方源视频。旧 60 帧全场来源只保留历史对齐事实，不用作本节目的新处理源。
 
+## 后续开发进度（2026-10-21）
+
+S02–S06 已交付 3320 个原生帧、1,641,840 个显示源点的提取与资格修订。来源、推定、已知问题和生成代码分别见 [S02–S04](../events/ankara_2026/programmes/okada_mei_sp/source_datasets/dense234_20261020/result.json) 与 [S05–S06](../events/ankara_2026/programmes/okada_mei_sp/source_datasets/dense56_20261020/result_v4.json)。这些是源点交付计数，不能解释为已确认的物理对应点数。
+
+共享源记录与资格差量化的入口见 [存储绑定](../events/ankara_2026/programmes/okada_mei_sp/source_datasets/storage_20261021/bindings.json) 和 [完成记录](../events/ankara_2026/programmes/okada_mei_sp/source_datasets/storage_20261021/result.json)。大规模逐帧点流和数据库留在本机 Data，不包含在上述 10 月 19 日的离线 review 包内；新增代码、资格修订、汇总及恢复参数随仓库保存。
+
+[恢复参数清单](../events/ankara_2026/programmes/okada_mei_sp/fit_joint9/rec1019/artifacts.json)登记了仓库内完整的 physical_seed.json 和 physical_start.json。它们是恢复初值，尚未成为通过独立视觉验证的物理解。本次提交不包含新启动的 1–6 镜头联合拟合工作。
+
 ## 离线读取，无需本机 Data
 
 下载完整仓库后，审阅归档本身只需 Python 3.11 标准库，无需安装求解器或访问网络：

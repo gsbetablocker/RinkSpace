@@ -1,0 +1,41 @@
+from pathlib import Path
+from collections import Counter
+import json,sys,hashlib
+import numpy as np
+sys.path.insert(0,str(Path(__file__).parent))
+from source_registry import SourceBranchRegistry,sha,object_sha
+P=Path(r'D:/OneDrive/codex_projs/RinkSpace');R=Path(r'D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2');O=R/'c_local_v1';CP=R/'gpu_recovery_v6c/candidate';packet_path=R/'accepted_C_width_prefix_v1/packet.json';p=json.loads(packet_path.read_text(encoding='utf8'));out=O/'source_branch_registry.json'
+if out.exists():raise FileExistsError('registry generation immutable')
+def ref(f):return dict(file=str(f),sha256=sha(f))
+def write(f,x):f.write_text(json.dumps(x,ensure_ascii=False,indent=2,allow_nan=False)+'\n',encoding='utf8')
+policy=json.loads((O/'source_branch_policy.json').read_text(encoding='utf8'));br=[json.loads(x)for x in (O/'source_branch_rows.jsonl').read_text(encoding='utf8').splitlines()];pr=[json.loads(x)for x in (O/'local_root_rows.jsonl').read_text(encoding='utf8').splitlines()];sr=[json.loads(x)for x in (R/'tail_C_source_paired_v1/source_rows.jsonl').read_text(encoding='utf8').splitlines()];query={x['row_index']:x for x in p['queries']};assert len(br)==len(pr)==len(sr)==6328
+allowed=[];seeds={k:[]for k in ['path','station','row','alpha']};negative=Counter();stats=Counter();widths=[]
+for j,(b,z,s) in enumerate(zip(br,pr,sr)):
+ i=910012+j;assert i==b['raw_row_index']==z['raw_row_index'] and b['source_row_id']==s['source_row_id']==p['source_row_ids'][i]==z['source_row_id'];lo,hi=b['candidate_branch_alpha'];ma=b['source_measured_alpha'];assert lo<=ma<=hi and s['source_measured_alpha']==ma and s['source_uv']==b['source_uv'];original=query[i]['alpha'];assert original[0]<=lo<hi<=original[-1]
+ alternates=[x for x in b['all_matching_signed_gradient_lobes']if x!=[lo,hi]];stats['rows_with_other_same_polarity_lobes']+=bool(alternates);stats['other_same_polarity_lobes_retained']+=len(alternates);widths.append(hi-lo)
+ allowed.append(dict(row_index=i,source_row_id=s['source_row_id'],native_pts=s['native_pts'],source_uv=s['source_uv'],material_index=145,source_side_index=s['source_side_index'],source_measured_alpha=ma,allowed_alpha=[lo,hi],original_acquisition_alpha=original,original_full_Query_sha256=object_sha(query[i]),source_RGB_sha256=s['current_rgb_sha256'],status='source_identity_branch_qualified',qualification_scope='frozen observed q50 belongs to this selected-color-component same-polarity connected gradient lobe; independent physical accuracy is not certified',other_same_polarity_lobes_pending=alternates))
+ for key in seeds:seeds[key].append(ma if key=='alpha'else z['numerical_seed'][key])
+ nav=z['source_capture_navigation'];stats['true_physical_curve_RS_numeric_navigation_valid']+=nav['valid'];stats['strict_local_root_closed_before_measured_alpha_rebind']+=z['result']['valid'];stats['complete_Query_capture_pending_rows']+=not z['result']['valid'];stats['current_CP_alpha_outside_own_branch']+=not z['current_CP_alpha_inside_branch']
+ # Negative branch examples use actual source alternatives, not synthetic pixels.
+ other=s['source_flanks_uv'][1-s['source_side_index']];otheralpha=ma+float(np.dot(np.asarray(other)-np.asarray(s['source_uv']),np.asarray(s['normal'])));negative['opposite_flank_measured_alpha_rejected']+=not lo<=otheralpha<=hi;negative['original_ROI_lower_rejected']+=not lo<=original[0]<=hi;negative['original_ROI_upper_rejected']+=not lo<=original[-1]<=hi
+ for alt in alternates:negative['other_same_polarity_lobe_midpoints_rejected']+=not lo<=.5*(alt[0]+alt[1])<=hi
+for j in range(0,6328,2):
+ left=allowed[j];right=allowed[j+1];assert left['source_side_index']==0 and right['source_side_index']==1 and left['allowed_alpha'][1]<=right['allowed_alpha'][0];stats['two_flank_pairs_no_branch_interior_overlap']+=1
+arrays={}
+for key,values in seeds.items():
+ a=np.asarray(values,dtype='<u4'if key=='path'else'<f8');f=O/('C_seed_'+key+('.u32'if key=='path'else'.f64'));a.tofile(f);arrays[key]=dict(**ref(f),dtype=a.dtype.str,shape=list(a.shape))
+reg=dict(schema='rinkfit.C_source_branch_registry.v1',base_packet=ref(packet_path),base_model=ref(CP/'model.json'),base_complete_CP=ref(CP/'engineering_checkpoint.json'),base_authoritative_aux=ref(CP/'explicit_nuisance/manifest.json'),base_state_token='50eb1f3a56ddb5f0',scope=dict(first_raw_row=910012,stop_raw_row_exclusive=916340,rows=6328,shot_id='s09',material_index=145,operator='actual_two_material_boundary_separate_RS_local_width_v1'),source_branch_policy=ref(O/'source_branch_policy.json'),source_branch_rows=ref(O/'source_branch_rows.jsonl'),true_current_parameter_root_probe=ref(O/'local_root_report.json'),frozen_source=ref(R/'tail_C_source_paired_v1/source_rows.jsonl'),parent_source_qualification=policy['parent_qualification'],alpha_domains=allowed,numerical_seed_overlay=dict(arrays=arrays,all6328_alpha_rebound_to_original_measured_alpha=True,station_row_from_true_physical_curve_RS_navigation=True,Query_closure_claimed=False,pending_source_capture_rows=5017,unaffected_raw_rows=[0,910012],unaffected_four_aux_must_remain_bitwise_equal=True,parent_complete_CP_immutable=True,old_AL_duals_must_not_be_restored=True),original_full_Query_arrays_UV_admission_E_W_or_source_clock_changed=False,range_is_association_domain_not_noise_sigma_or_zero_loss_allowance=True,manual_physical_branch_or_geometry_accuracy_claimed=False,source_gate_status='qualified_for_frozen_source_identity_alpha_domain_and_numerical_seed_overlay',registry_implementation=ref(Path(__file__).parent/'source_registry.py'),exporter=ref(Path(__file__)))
+write(out,reg);registry=SourceBranchRegistry(out);validation=registry.validate_packet(packet_path)
+# Apply the delta to private copies only and compare the full unaffected prefix.
+auxman=json.loads((CP/'explicit_nuisance/manifest.json').read_text(encoding='utf8'));checks={};newdomainoutside=0
+for key,d in arrays.items():
+ ext='.u32'if key=='path'else'.f64';oldfile=CP/'explicit_nuisance'/(key+ext);assert sha(oldfile)==auxman['files'][oldfile.name]['sha256'];old=np.memmap(oldfile,dtype=d['dtype'],mode='r',shape=(916340,));new=np.asarray(old).copy();new[910012:916340]=registry.seeds[key];assert new[:910012].tobytes()==np.asarray(old[:910012]).tobytes();checks[key]=dict(outside_C_prefix_bitwise_equal=True,changed_C_rows=int(np.count_nonzero(new[910012:]!=old[910012:])),all_C_values_finite=bool(np.isfinite(new[910012:]).all()))
+for j,x in enumerate(allowed):
+ seed=registry.numeric_seed(x['row_index'],x['source_row_id']);assert seed['alpha']==x['source_measured_alpha'] and registry.allows(x['row_index'],x['source_row_id'],seed['alpha']);assert 0<=seed['station']<=1 and 0<=seed['row']<=1079;newdomainoutside+=not x['allowed_alpha'][0]<=seed['alpha']<=x['allowed_alpha'][1]
+wrong_id_rejected=False
+try:registry.alpha_domain(910012,'wrong-source-id',[-256,256])
+except ValueError:wrong_id_rejected=True
+negative['wrong_source_identity_rejected']=wrong_id_rejected;negative['branch_without_production_model_change']=True
+assert negative['opposite_flank_measured_alpha_rejected']==6328 and negative['original_ROI_lower_rejected']==6328 and negative['original_ROI_upper_rejected']==6328 and newdomainoutside==0
+sourcegate=dict(schema='rinkfit.C_source_branch_overlay_gate.v1',registry=ref(out),full_source_rows_retained=6328,accepted_for_source_identity_domain=True,source_UV_ID_native_clock_Query_or_E_W_modified=False,physical_capture_complete=False,source_capture_pending_rows=5017,full_local_operator_RMS=None,all6328_source_q50_replayed=True,source_q50_replay_max_abs_diff=policy['source_q50_replay_max_abs_diff'],actual_RGB_profile_replay=policy['actual_RGB_replays'],statistics=dict(stats),branch_width_alpha_px=dict(min=float(np.min(widths)),median=float(np.median(widths)),max=float(np.max(widths))),negative_cases=dict(negative),all_other_four_aux_proposed_overlay_QA=checks,registry_packet_validation=validation,proposed_alpha_seed_outside_own_branch=0,Solve_started=False,quality_accepted=False)
+write(O/'source_gate.json',sourcegate);print(json.dumps(dict(registry=ref(out),source_gate=ref(O/'source_gate.json'),statistics=dict(stats),negative_cases=dict(negative),four_aux_QA=checks),ensure_ascii=False),flush=True)

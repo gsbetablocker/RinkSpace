@@ -1,0 +1,48 @@
+{
+  "schema": "rinkfit.screen_recovery_state.v1",
+  "state_kind": "image_plane_recovery",
+  "compact_seed": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recovery_pkg\\compact_seed\\seed.json",
+    "sha256": "1dab26c1b310d4956cf8db847e73acfef991410b44fadab14a2b6d45c342bd96"
+  },
+  "s01_complete_state": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_s1_r11\\temporal_1018\\local_m4_iter3_scope_full2\\complete_state_manifest.json",
+    "sha256": "3e04f3c2e4bb6b1a19989dc4b4f93ffa0f591e3c1a57c8162a67a60c054499d9"
+  },
+  "source_video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "time_base": [
+    1,
+    12800
+  ],
+  "native_step_pts": 256,
+  "image_size": [
+    1920,
+    1080
+  ],
+  "s02_s09_world_chart_sha256": "11c0955bbd7819f55745886115a2e4f109d3c38e99f3f73c75caf37c86638fc1",
+  "corrections": {},
+  "source_generations": [],
+  "initial_state": "exact_compact_H_and_complete_d78",
+  "physical_checkpoint_initialized": false,
+  "source_UV_created_from_projection": false,
+  "s01_projection_dependencies_frozen": true,
+  "consumer_entry": "rinkfit_joint.screen_registration",
+  "implementation": {
+    "screen_recovery_state.py": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\rinkfit\\src\\rinkfit_joint\\screen_recovery_state.py",
+      "sha256": "49dbe74962169aa1ad6a3b872dc33b4110f3bd4ceab073b6c5a55ee91557e06e"
+    },
+    "compact_screen_seed.py": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\rinkfit\\src\\rinkfit_joint\\compact_screen_seed.py",
+      "sha256": "2089087c6494a52ce28ec49bdaeb4e0d04535477ffd91db9a1ee1ccd01a59487"
+    },
+    "screen_registration.py": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\rinkfit\\src\\rinkfit_joint\\screen_registration.py",
+      "sha256": "8808d7ad4599c8eda7810d3bccef3d044b6646f6d89b064872de0d6e3ac88873"
+    },
+    "screen_tracklet_registration.py": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\rinkfit\\src\\rinkfit_joint\\screen_tracklet_registration.py",
+      "sha256": "e1291b0d77131afe2bf73f07c2c5c12543fb603f421471178b94e9bdd6c5aa7c"
+    }
+  }
+}

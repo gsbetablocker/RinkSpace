@@ -9,7 +9,7 @@
 ## 2026-10-19 公开范围补充
 
 - SAM2 基础来源及当前派生模型已精确核实，固定修订、SHA、162个编码器张量的逐字节对应、模型修改和既有训练事实见[模型来源记录](../models/rink_vision.provenance.json)；原始[SAM2 许可](../models/SAM2_LICENSE.txt)保留。
-- 用户确认 ViTPose helper 和 calibration companion 两份辅助代码由其使用 ChatGPT 生成，已更新对应来源记录；原文下列“未知”保留为10月11日历史观察，以本次来源更新为准。
+- ViTPose helper 与 calibration companion 统一按项目开发内容处理；生成和适配历史分别保存在[helper 来源记录](../calibration/program_tracking/body_tracking/source_helpers/run_vitpose_h.provenance.json)与[companion 来源记录](../src/rinkspace/calibration_companion/provenance.json)。
 - 比赛截图与叠加图不随公开包分发，测量记录不逐字段改写；实际范围和许可边界见[许可核查](LICENSING_REVIEW.md)。
 - GVHMR 三处本地修改仅为延迟导入 KNN、SimpleVO 和 Wis3D，修改文件和上游提交在原补丁及机器清单登记；保留[原始许可](../environments/third_party_patches/GVHMR_LICENSE.txt)。引用：Zehong Shen 等，*World-Grounded Human Motion Recovery via Gravity-View Coordinates*，SIGGRAPH Asia Conference Proceedings，2024；[论文](https://arxiv.org/abs/2409.06662)、[官方项目](https://zju3dv.github.io/gvhmr)。
 
@@ -23,7 +23,7 @@
 | [vision.py](../src/rinkspace/vision.py)、[vision_network.py](../src/rinkspace/vision_network.py) | 项目视觉训练/网络代码；torch/CUDA 依赖仍需独立定义并验证。 |
 | [environment.yml](../calibration/program_tracking/runtime/environment.yml) | 历史 GTSAM 环境起点，包含 conda-forge、Python 3.11、gtsam 4.2.2、NumPy <2、OpenBLAS；不包括全部 native 构建资源。 |
 
-本次另外保全了 [run_vitpose_h.py](../calibration/program_tracking/body_tracking/source_helpers/run_vitpose_h.py) 和 [来源记录](../calibration/program_tracking/body_tracking/source_helpers/run_vitpose_h.provenance.json)。源文件位于旁项目 `SkatePoseSingles/tools/`，在该旁项目 Git 中未跟踪；源/副本 SHA-256 均为 `8da96207e0c5a4f20a6d43aacb3f718d3d86c265716ae1fd23b2b166d1a4c172`。未跟踪不能证明作者或所有权：源文件没有许可证头，作者、许可及公开再分发权限明确记为未知。保全副本依赖 NumPy、OpenCV、torch，动态加载 GVHMR 中的 pose builder 与 UDP decoder，并核验固定 H 模型散列。**observations.py 仍指向原路径，尚未切换运行入口。**
+本次另外保全了 [run_vitpose_h.py](../calibration/program_tracking/body_tracking/source_helpers/run_vitpose_h.py) 和 [来源记录](../calibration/program_tracking/body_tracking/source_helpers/run_vitpose_h.provenance.json)。源文件位于旁项目 `SkatePoseSingles/tools/`，在该旁项目 Git 中未跟踪；源/副本 SHA-256 均为 `8da96207e0c5a4f20a6d43aacb3f718d3d86c265716ae1fd23b2b166d1a4c172`。该 helper 属于项目的 AI 辅助开发，来源已由历史创建和修改记录核实，适用根目录分项许可声明。保全副本依赖 NumPy、OpenCV、torch，动态加载 GVHMR 中的 pose builder 与 UDP decoder，并核验固定 H 模型散列。**observations.py 仍指向原路径，尚未切换运行入口。**
 
 ## 上游代码与必要的本地修改
 

@@ -1,0 +1,93 @@
+{
+  "schema": "rinkspace.reviewed_actual_print_local_source_effects.v1",
+  "complete": true,
+  "review_scope": "S05 local effective_v2 versus sealed effective_v1; 107 actual changed source domains, 209 requalified frames, all 163 real motion proof files mechanically compared; 6 full-frame source examples and all 4 body-guard-change source views visually inspected.",
+  "source_manifest_ref": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/print_requal_v2/s05_local_v2/manifest.json",
+    "sha256": "660824d819eac49f95779b484684157281ec80d6925a32aff8e51182d4544542"
+  },
+  "mechanical_audit_ref": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/print_requal_v2/qa_s05_local_v2b/manifest.json",
+    "sha256": "b355ea1d02a87413d06769101c024b3e4deab946f8f98157c0ff78feeca49d3b"
+  },
+  "body_guard_views_ref": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/print_requal_v2/qa_s05_body_guard_views/manifest.json",
+    "sha256": "109b113927993085ccb1d16c94ef23e06ac28509c76eed339bdab2bd796b99db"
+  },
+  "actual_effect": {
+    "added_source_unknown_pixels": 209805,
+    "body_material_pixels_removed": 184,
+    "body_material_changed_frames": [
+      976128,
+      988928,
+      989440,
+      995328
+    ],
+    "raw_source_rows_inside_added_unknown_guard": 428,
+    "old_eligible_rows_inside_added_unknown_guard": 0,
+    "old_eligible_new_excluded": 0,
+    "old_excluded_new_eligible": 0,
+    "retained_real_LK_FB_coordinate_or_error_changes": 0
+  },
+  "cases": [
+    {
+      "native_pts": 948992,
+      "image_ref": {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\qa_s05_local_v2b\\948992_unknown_print.jpg",
+        "sha256": "44fcb10a836e40c7f21d788b5ebe744070e324271a61f650bff43e6236c45b63"
+      },
+      "source_BGR_sha256": "1f1c30ff9fe9d685a54d397f20dd3c5f342a5485a7d1bf63d7e213a7489bf193",
+      "conclusion": "Right-edge partial foreground silhouette above cap has no eligible print points; actual ANKARA and the adjacent logo/detail edges remain dense."
+    },
+    {
+      "native_pts": 1014016,
+      "image_ref": {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\qa_s05_local_v2b\\1014016_unknown_print.jpg",
+        "sha256": "b813d17bb50123ac71c95cbd5112e38f7d0c1c23aa7c83e7f0299e8e042abf68"
+      },
+      "source_BGR_sha256": "45d231bc36720d8ec125a36a6afb8da6939674cb53cb9be8000d9d8a7c5823c1",
+      "conclusion": "Tiny hand/component near commentator desk above far cap is excluded; visible real WYNDHAM, ISU, vertical ads and their material details remain source-qualified."
+    },
+    {
+      "native_pts": 1202688,
+      "image_ref": {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\qa_s05_local_v2b\\1202688_unknown_print.jpg",
+        "sha256": "b83a92af2d483dc3971eb38cddcbfd62887bee9bd30d1a1d10685df0ff4c6d7b"
+      },
+      "source_BGR_sha256": "ec24a9a606b1082ab1470318eae3a06b41f56467a892b4e0cf8afd36f7e2cc15",
+      "conclusion": "Left partial silhouette above cap becomes unknown; source logo/text edges on the far face remain qualified."
+    },
+    {
+      "native_pts": 1244928,
+      "image_ref": {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\qa_s05_local_v2b\\1244928_unknown_print.jpg",
+        "sha256": "3bcb068dd3a6d6c0c244e06025e0ed033acb26fb289e0a64fcd6fa33cfa1d720"
+      },
+      "source_BGR_sha256": "9947cba5644aa0cf62e8219983775b069188301c89befd66e3a509f30e223499",
+      "conclusion": "Yellow-vest torso above far board and right-edge partial silhouette are typed unknown; detailed source print contours below cap remain eligible with original UV."
+    },
+    {
+      "native_pts": 1259776,
+      "image_ref": {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\qa_s05_local_v2b\\1259776_unknown_print.jpg",
+        "sha256": "390e05151f603b1d31945e65dcb693b0df2d64eb88538305f0a9d14608c99d04"
+      },
+      "source_BGR_sha256": "8ea1c4867d54e6ad94ecc6c2d7c2f4873c838779614f02d1926e7d9d63ca260c",
+      "conclusion": "Right-edge background silhouette becomes unknown; actual Chinese advertisement strokes remain source-qualified with the actor occlusion gap."
+    },
+    {
+      "native_pts": 1287168,
+      "image_ref": {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\print_requal_v2\\qa_s05_local_v2b\\1287168_unknown_print.jpg",
+        "sha256": "74babae7292498387629df6083002370070bbbf7c7864fadb34a31be379d0046"
+      },
+      "source_BGR_sha256": "017f19bcf0bb8ab52bd1018e0467c5223b5afdfd7f2a3060340b9995b8bdab32",
+      "conclusion": "Tiny component at far cap is independent unknown; background body above cap contributes no print points; actual near far-face text stays eligible."
+    }
+  ],
+  "body_guard_conclusion": "All four changed body bitmaps shrink only along the engineering 8px margin of actual source silhouettes at the far blue-cap boundary. No previously eligible print UV or accepted complete 21px LK window lies in the newly excluded pixels. The 184 material pixels are not presented as deleted erroneous observations.",
+  "source_UV_or_ID_changed": false,
+  "all_original_raw_members_preserved": true,
+  "physical_scene_truth_or_world_identity_or_weight_not_issued": true,
+  "full_shot_video_release_acceptance_not_issued": true
+}

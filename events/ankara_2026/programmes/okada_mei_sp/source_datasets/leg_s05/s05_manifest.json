@@ -1,0 +1,156 @@
+{
+  "schema": "rinkspace.current_native_source_person_and_typed_unknown_effective.v4",
+  "complete": true,
+  "sealed": true,
+  "accepted": true,
+  "accepted_for_final_source_qualification": true,
+  "shot_id": "s05",
+  "frame_count": 1376,
+  "frames": 1376,
+  "first_native_pts": 948992,
+  "last_native_pts": 1300992,
+  "time_base": "1/12800",
+  "native_frame_step_pts": 256,
+  "source_video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "index": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\leg_fix_v1\\s05_index.jsonl.gz",
+    "sha256": "8bcd183aa0ffaabda3bfb808e094e0a3039a78cc64d65fe0ee3f634bb927819b"
+  },
+  "index_file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\leg_fix_v1\\s05_index.jsonl.gz",
+  "index_sha256": "8bcd183aa0ffaabda3bfb808e094e0a3039a78cc64d65fe0ee3f634bb927819b",
+  "parent_manifest": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\raisedshoe_v1\\s05_manifest.json",
+    "sha256": "05f03d89202ea210df58cd60ec6dc2520dc03ca89b8e93ba2e390db636a903fd"
+  },
+  "parent_index": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\raisedshoe_v1\\s05_index.jsonl.gz",
+    "sha256": "6592082a125b214b8dd900e1b973698a32ec8a0e62cc77d21f46fda4ac021672"
+  },
+  "source_qualification_ref": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\leg_fix_v1\\source_qualification.json",
+    "sha256": "ae326a16445f18cfcfd50832d4bf55f0124d54a6860bc4c10e474e4b00006e19"
+  },
+  "source_proof_index": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\leg_fix_v1\\source_proof.jsonl.gz",
+    "sha256": "1a4e4b2a4db11cde8c1706d53361e81dfdd207230483a6c8cc26d9407cb946e9"
+  },
+  "changed_native_pts": [
+    1070080,
+    1070336,
+    1070592,
+    1070848,
+    1071104,
+    1071360,
+    1071616,
+    1071872,
+    1072128,
+    1072384,
+    1072640,
+    1072896,
+    1073152,
+    1073664,
+    1073920,
+    1074688,
+    1074944,
+    1075456,
+    1075712,
+    1075968,
+    1076224,
+    1076480,
+    1076736,
+    1078016,
+    1078272
+  ],
+  "changed_native_frame_count": 25,
+  "unchanged_native_frame_count": 1351,
+  "reviewed_phase_native_pts": [
+    1070080,
+    1070336,
+    1070592,
+    1070848,
+    1071104,
+    1071360,
+    1071616,
+    1071872,
+    1072128,
+    1072384,
+    1072640,
+    1072896,
+    1073152,
+    1073408,
+    1073664,
+    1073920,
+    1074176,
+    1074432,
+    1074688,
+    1074944,
+    1075200,
+    1075456,
+    1075712,
+    1075968,
+    1076224,
+    1076480,
+    1076736,
+    1076992,
+    1077248,
+    1077504,
+    1077760,
+    1078016,
+    1078272
+  ],
+  "counts": {
+    "reviewed_native_source_frames": 33,
+    "rejected_entire_candidates": 2,
+    "added_unknown_pixels": 23513
+  },
+  "all_source_BGR_RGB_verified": true,
+  "old_true_person_pixels_preserved": true,
+  "old_unknown_pixels_preserved": true,
+  "person_layer_files_and_hashes_unchanged": true,
+  "both_person_and_unknown_layers_required": true,
+  "person_guard_pixels": 8,
+  "source_unknown_guard_pixels": 8,
+  "all_new_masks_are_current_source_SAM_pixels": true,
+  "all_new_layer_is_independent_unknown": true,
+  "box_pose_anchor_interpolation_is_navigation_only": true,
+  "no_dilation_bbox_ellipse_or_model_fill": true,
+  "source_original_UV_unchanged": true,
+  "physical_fitting_unchanged": true,
+  "s06_unchanged": true,
+  "source_reader": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\leg_fix_v1\\seal_source_unknown.py",
+    "sha256": "d5b1596a992b2c0ef20739aeb2480d147fa091f1c9bd0862cc17a06e14cfcd07"
+  },
+  "known_source_failure_and_counterexamples": [
+    {
+      "native_pts": 1071872,
+      "uv": [
+        1142,
+        355.5
+      ],
+      "inside_old_true_person": false,
+      "inside_old_unknown": false,
+      "inside_new_unknown": true,
+      "distance_to_new_actor_or_unknown_px": 0.0,
+      "excluded_by_current_eight_pixel_source_guard": true
+    },
+    {
+      "native_pts": 1071872,
+      "source_counterexample_uv": [
+        1350,
+        420
+      ],
+      "source_semantics": "visible board_or_ice_below_raised_leg_not_added_as_unknown",
+      "inside_new_delta": false
+    },
+    {
+      "native_pts": 1071872,
+      "source_counterexample_uv": [
+        1142,
+        430
+      ],
+      "source_semantics": "visible board_or_ice_below_raised_leg_not_added_as_unknown",
+      "inside_new_delta": false
+    }
+  ]
+}

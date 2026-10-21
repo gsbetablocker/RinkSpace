@@ -1,0 +1,42 @@
+{
+  "schema": "rinkspace.independent_source_point_review_facts.v3",
+  "shot_id": "s05",
+  "verdict": "FAIL",
+  "source_review_receipt": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/qa_independent/v3_s05_image_review.json",
+    "sha256": "6c44b3f5e100546211f02270dfeba9e416e269206ac6236816a8e47d8b4d6130"
+  },
+  "generation_manifest": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/parts_v3/s05/manifest.json",
+    "sha256": "1c1761bb80c9d74a85bf8e76148fa7e61d5f8832d89a3a4956a66725a34cc5b3"
+  },
+  "qa_index": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/QA_v3_s05/index.json",
+    "sha256": "f2d1b396a1f4e3a108998105e0ce29f8eedbf4019228537db825de6f196e806d"
+  },
+  "actual_reviewed_pages": 13,
+  "actual_reviewed_native_exposures": 78,
+  "actual_native_pair_crops": 19,
+  "native_pair_crop_exposures": 17,
+  "confirmed_blocker": {
+    "native_pts": 1071872,
+    "source_seconds": 83.74,
+    "selected_row_id": "dense56_v2/s05/1071872/8",
+    "uv": [
+      1142,
+      355.5
+    ],
+    "display_class": "board_contact_inferred",
+    "reason_zh": "暗橙推定点显示在原片抬起小腿实体；不能放行当前源点视频。"
+  },
+  "known_bad_source_rows_removed": 8,
+  "true_blue_source_point_retained_original_uv": "dense56_ice/s05/1096192/lane1:edge0/60",
+  "uncertain_edge_context_native_pts": [
+    1068032,
+    1153792,
+    1188352
+  ],
+  "all_1376_frames_manually_accepted": false,
+  "all_points_or_physical_model_accepted": false,
+  "s06_reviewed_or_changed": false
+}

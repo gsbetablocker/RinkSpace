@@ -1,0 +1,359 @@
+{
+  "schema": "rinkspace.source_points_review_delivery.v4",
+  "status": "delivered_source_point_videos_with_explicit_uncertainty",
+  "created_utc": "2026-10-20T18:38:52.120Z",
+  "scope": "冈田芽衣短节目第5、6完整镜头：原片与源取点；共同物理拟合保持停止。",
+  "source": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4",
+    "sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+    "native_fps": "50/1",
+    "time_base": "1/12800",
+    "native_frame_step_pts": 256,
+    "image_size_hw": [
+      1080,
+      1920
+    ]
+  },
+  "source_generation": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/generation_v4/manifest.json",
+    "sha256": "1d3f4ac6077f27a86f83e47977d80b7ac89cc95a307fa51a6bdf190a464b59b4"
+  },
+  "source_shot_generations": {
+    "s05": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/parts_v4/s05/manifest.json",
+      "sha256": "2e86e7acdd8c558adef746b448e15daf43dcabb7846998284663432a24bc9f0c"
+    },
+    "s06": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/parts_v2/s06/manifest.json",
+      "sha256": "0db0b91dbb668c895e65cd5cb07563711e1241b9e1d94304a9bf3475061a181b"
+    }
+  },
+  "source_statistics": {
+    "native_frames": 1862,
+    "drawn_source_point_rows": 929463,
+    "per_frame": {
+      "min": 480,
+      "max": 500
+    },
+    "by_part": {
+      "board": 159189,
+      "ice": 542511,
+      "print": 227763
+    },
+    "by_shot": {
+      "s05": {
+        "board": 107821,
+        "ice": 421805,
+        "print": 156837
+      },
+      "s06": {
+        "board": 51368,
+        "ice": 120706,
+        "print": 70926
+      }
+    },
+    "source_UV_moved": false,
+    "refilled_to_500": false,
+    "independent_2D_or_physical_anchor_count_not_equal_to_displayed_rows": true
+  },
+  "videos": [
+    {
+      "shot_id": "s05",
+      "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\videos_v4\\s05\\s05_original_ALL_source_points.mp4",
+      "sha256": "7f0ad9f1299861ccf920f8efc3aab44c76f248531c650c963c5b9d6523ac0497",
+      "frames": 1376,
+      "source_seconds": [
+        74.14,
+        101.66
+      ],
+      "source_pts": [
+        948992,
+        1300992
+      ],
+      "output_frame_times_verified": true,
+      "drawn_point_rows": 686463
+    },
+    {
+      "shot_id": "s06",
+      "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\videos_v2\\s06\\s06_original_ALL_source_points.mp4",
+      "sha256": "e052e40a8f357c14c5c3701af6b38317fdc21c7a98b35cd110cf77b25acfd47f",
+      "frames": 486,
+      "source_seconds": [
+        101.66,
+        111.38
+      ],
+      "source_pts": [
+        1301248,
+        1425408
+      ],
+      "output_frame_times_verified": true,
+      "drawn_point_rows": 243000
+    }
+  ],
+  "video_assembly": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/videos_v4/manifest.json",
+    "sha256": "4001d4f32f2df0dbfe7f0a38b8b508dac1da01bcab606a2433aaa70eca7c498d"
+  },
+  "source_image_reviews": {
+    "s05": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/qa_independent/v4_s05_image_review.json",
+      "sha256": "8f533623f6ee8eeb16407f42fbf5ec91ca8a10951955aadaead0694aa7ddd2d4"
+    },
+    "s06": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/qa_independent/v2_s06_image_review.json",
+      "sha256": "4a438490a756e08577391635261bdb843193411e291bbe631a4ea9694d133c01"
+    },
+    "root_neighbors": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/qa_independent/v4_root_neighbor_review.json",
+      "sha256": "08b9a5354f313cf9bec72587f47b217d7512ba04a3aaef35bf93e1bb6f4d974b"
+    }
+  },
+  "technical_video_review": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/qa_independent/v4_technical_audit_final.json",
+    "sha256": "a3bc9d9d00ab7b368a1d09193971e47d0da07f24bd1c08b475d49c122bb097cb"
+  },
+  "corrections": {
+    "s06_near_board": {
+      "definition": "近侧灰色盖板靠冰一侧的上沿；同一零厚度board.top。外侧设备、广告不可见区域不作为广告或围挡本体取点。",
+      "source": {
+        "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/near_board_v1/manifest.json",
+        "sha256": "796495b6e66790b90a8553dee77a45ce053ce3994ad4f9e93e6e0a132c0a2917"
+      },
+      "actual_displayed_near_top_frames": 68,
+      "actual_displayed_near_top_rows": 1193,
+      "user_screenshot_native_pts": 1342208,
+      "user_screenshot_clip_seconds": 3.2,
+      "user_screenshot_actual_near_top_rows": 24
+    },
+    "s05_raised_shoe": {
+      "source": {
+        "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/raisedshoe_v1/s05_manifest.json",
+        "sha256": "05f03d89202ea210df58cd60ec6dc2520dc03ca89b8e93ba2e390db636a903fd"
+      },
+      "source_index": {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\raisedshoe_v1\\s05_index.jsonl.gz",
+        "sha256": "6592082a125b214b8dd900e1b973698a32ec8a0e62cc77d21f46fda4ac021672"
+      },
+      "reviewed_continuous_native_frames": 260,
+      "changed_unknown_frames": 196,
+      "added_source_unknown_pixels": 256304,
+      "sealed_audit": {
+        "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/raisedshoe_v1/sealed_source_audit.json",
+        "sha256": "0de1ba7e307a90eec583652a02cd6263e15ec56e24fdd53784a1d07686b58384"
+      }
+    },
+    "s05_raised_leg": {
+      "source": {
+        "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/leg_fix_v1/s05_manifest.json",
+        "sha256": "14dbfaf3e515c0590b700a05100f5a03d4f6a5ed90479fc31304bfa000f319a0"
+      },
+      "source_index": {
+        "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\leg_fix_v1\\s05_index.jsonl.gz",
+        "sha256": "8bcd183aa0ffaabda3bfb808e094e0a3039a78cc64d65fe0ee3f634bb927819b"
+      },
+      "source_native_interval": [
+        1070080,
+        1078272
+      ],
+      "source_reviewed_frames": 33,
+      "changed_unknown_frames": 25,
+      "added_source_unknown_pixels": 23513,
+      "sealed_audit": {
+        "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/leg_fix_v1/sealed_source_audit.json",
+        "sha256": "348b6dd7d4e92be136fab16c82e5a4e9cb605e92ea5520e1d5dcbbffbdd5de0e"
+      },
+      "known_inferred_leg_source_ID": "dense56_board/1071872/board.contact/1142",
+      "known_inferred_leg_uv": [
+        1142,
+        355.5
+      ],
+      "known_inferred_leg_removed_from_video": true
+    },
+    "s05_material_qualification": {
+      "source": {
+        "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/reflection_v1/manifest.json",
+        "sha256": "b32c8f701f1584edee68a8ca983bb9404b9b8cbcd38ce0503778c9db57f7e6eb"
+      },
+      "raw_source_uncertain_rows": 4931,
+      "removed_from_v2_display": 1218,
+      "clear_blue_anchor_source_ID": "dense56_ice/s05/1096192/lane1:edge0/60",
+      "clear_blue_anchor_uv": [
+        1332.4743228478233,
+        1026.4686834119811
+      ],
+      "clear_blue_anchor_preserved": true
+    },
+    "print_reader_actual_effects": {
+      "raised_shoe": {
+        "manifest": {
+          "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/print_requal_v2/s05_shoe_v3/manifest.json",
+          "sha256": "c970d9aabefdc255268c72ff97f18278a8cd8385de1c3ef739af06c7e05c539f"
+        },
+        "actual_RGB_context_frames": 245,
+        "requalified_frames": 230,
+        "newly_ineligible_raw_source_rows": 1587,
+        "new_UV_rows": 0
+      },
+      "raised_leg": {
+        "manifest": {
+          "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/print_requal_v2/s05_leg_v4/manifest.json",
+          "sha256": "e80f370e6092600b6ea0ca98d8123a167254aa5dbf091df960908012f6c1bb14"
+        },
+        "actual_RGB_context_frames": 37,
+        "requalified_frames": 33,
+        "newly_ineligible_raw_source_rows": 87,
+        "new_UV_rows": 0
+      }
+    }
+  },
+  "actual_source_generation_diff": {
+    "old_v1_to_final": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/source_diff_v4/manifest.json",
+      "sha256": "182daf3efd6204db2f30eb86a98e830af09efaafffc7c0987073aff90251005d"
+    },
+    "execution": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/source_diff_v4/execution_receipt.json",
+      "sha256": "390df97ba097233bb06a2fb9b9375d78bde4a413ac439da397968b8d5ec7b50d"
+    },
+    "critical_cases": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/source_diff_v4/critical_cases.json",
+      "sha256": "6ed94e9f023a62100e1bbc949337511c155b9ae449354df94a49a623aeeacf93"
+    },
+    "source_rows_retained_exact_UV": 837848,
+    "old_display_rows_removed": 93152,
+    "new_display_rows_added": 91615,
+    "removed_due_only_to_500_ceiling_display_selection": 73610,
+    "removed_with_actual_source_qualification_or_visibility_reason": 19542,
+    "all_removed_rows_are_not_claimed_to_be_corrections": true
+  },
+  "actual_v3_to_v4_reuse": {
+    "proof": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/source_diff_v4/v3_to_v4_subset.json",
+      "sha256": "8dcb31daf7f51bc45c2cb05acd264a078f16cba17033a334d6ce4cb36dd8a2d7"
+    },
+    "reused_unchanged_source_evidence_frames": 1829,
+    "effective_input_files_actually_SHA_checked": 21648,
+    "new_source_IDs": 0,
+    "removed_selected_rows": 14,
+    "retained_UV_exactly_equal": true,
+    "fresh_native_exposures_reviewed": 35,
+    "old_good_exposures_reused": 73,
+    "total_distinct_current_visual_review_exposures": 108,
+    "all_1376_s05_exposures_manually_viewed": false,
+    "visual_review_shot_id": "s05",
+    "source_evidence_reuse_frame_count_includes_unchanged_S06": true
+  },
+  "manual_intervention_and_reuse": {
+    "latest_user_S06_screenshot_used": true,
+    "additional_user_per_frame_review_requests": 0,
+    "existing_annotation_semantics_and_navigation_reused": true,
+    "old_person_and_old_unknown_pixels_preserved": true,
+    "existing_source_video_and_unaffected_masks_and_source_readouts_reused": true
+  },
+  "remaining_uncertainties": {
+    "source_blur_contexts": [
+      {
+        "native_pts": 1068032,
+        "selected_row_ids": [
+          "dense56_v2/s05/1068032/8",
+          "dense56_v2/s05/1068032/9"
+        ],
+        "uvs": [
+          [
+            1037,
+            392.5
+          ],
+          [
+            1043,
+            393.5
+          ]
+        ],
+        "finding": "暗橙推定点在模糊颈/下颌边缘邻域；tight原生局部未能肯定点属于人体实体，不能将此项列作确定新blocker，也未签像素归属精度。"
+      },
+      {
+        "native_pts": 1153792,
+        "selected_row_ids": [
+          "dense56_v2/s05/1153792/6",
+          "dense56_v2/s05/1153792/7"
+        ],
+        "uvs": [
+          [
+            893,
+            431.5
+          ],
+          [
+            897,
+            431.5751676559448
+          ]
+        ],
+        "finding": "暗橙推定点在模糊垂臂旁；tight局部未确认落入实体。旧大腿/裙部错误的直接冰面点未复发。"
+      },
+      {
+        "native_pts": 1188352,
+        "selected_row_ids": [
+          "dense56_v2/s05/1188352/7",
+          "dense56_v2/s05/1188352/221",
+          "dense56_v2/s05/1188352/238",
+          "dense56_v2/s05/1188352/370"
+        ],
+        "uvs": [
+          [
+            667,
+            427.4999993145466
+          ],
+          [
+            572,
+            423.91890716552734
+          ],
+          [
+            524,
+            424.1838130950928
+          ],
+          [
+            604,
+            425.5
+          ]
+        ],
+        "finding": "暗橙推定点在横臂下方模糊轮廓邻域；tight局部未确认落入实体。旧手臂上的直接场地取点未复发。"
+      }
+    ],
+    "source_unknowns_are_not_certified_as_scene_or_person_truth": true,
+    "dark_inferred_points_are_not_independent_2D_measurements": true,
+    "all_visible_features_complete_and_pixel_perfect_not_claimed": true,
+    "physical_world_or_template_correspondence_and_independent_weights_not_issued": true
+  },
+  "physical_work": {
+    "S01_unchanged": true,
+    "physical_fitting_still_stopped": true,
+    "physical_seed_or_new_shared_scene_checkpoint_not_issued": true,
+    "solver_packet_changed": false,
+    "full_nine_physical_model_not_accepted": true
+  },
+  "history_preserved": {
+    "v1_source_review": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/REVIEW_STATUS.json",
+      "sha256": "49968b3b4c65876bac92e94ad6d3eb83be9aeed0df24560932a6ae28813ba6be"
+    },
+    "v2_source_failure": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/SOURCE_REVIEW_V2_FAILED.json",
+      "sha256": "c55db8d02b2248a9804741ef8ece9a1a3d34f2f23ddb346a286e9ab6366725b1"
+    },
+    "v3_source_failure": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/SOURCE_REVIEW_V3_FAILED.json",
+      "sha256": "a0ed5607df36f057b2ebdaf768440e9f008880bbfe65d9bb88215ddd0c2588c4"
+    },
+    "v3_independent_image_FAIL": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/qa_independent/v3_s05_image_review.json",
+      "sha256": "6c44b3f5e100546211f02270dfeba9e416e269206ac6236816a8e47d8b4d6130"
+    },
+    "initial_technical_checker_schema_failure": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/qa_independent/v4_technical_audit.json",
+      "sha256": "82db75592eaa9e4c2475cab38eeee9726949c5953b6aab3325209a0986a700da"
+    }
+  },
+  "storage": {
+    "heavy_source_arrays_masks_logs_and_videos_stay_in_Data": true,
+    "small_reusable_source_and_facts_mirrored_in_programme": true,
+    "giant_legacy_cache_not_regenerated": true
+  }
+}

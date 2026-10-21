@@ -1,0 +1,15 @@
+from pathlib import Path
+import os,sys,json,subprocess,hashlib,time
+P=Path(r'D:/OneDrive/codex_projs/RinkSpace');R=Path(r'D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2');O=R/'c_local_v1';N=R/'native_source_v10c';S=Path(__file__).parent
+setup={};driver=P/'events/ankara_2026/tools/build_event_backend.py';save=sys.argv
+try:
+ sys.argv=[str(driver),str(O)];exec(compile(driver.read_text(encoding='utf8').split('sources=')[0],str(driver),'exec'),setup)
+finally:sys.argv=save
+recipe=json.loads((N/'recipe.json').read_text(encoding='utf8'));flags=[x for x in recipe['commands'][0]['command'][1:] if x.startswith(('/nologo','/std:','/EH','/O2','/MD','/utf-8','/bigobj','/D','/I'))];flags.append('/I'+str(S));libs=[x for x in recipe['commands'][-1]['command'] if x.endswith('.lib')];env=dict(setup['env']);env['PATH']=';'.join(recipe['runtime_bin_paths'])+';'+env.get('PATH','')
+cmd=[str(setup['cl']),*flags,str(S/'registry_probe.cpp'),*[str(N/(n+'.obj')) for n in ['event_model','joint_model','joint_packet']],'/Fo:'+str(O/'registry_probe.obj'),'/Fe:'+str(O/'registry_probe.exe'),*libs]
+t=time.perf_counter();run=subprocess.run(cmd,cwd=O,env=env,capture_output=True,text=True,errors='replace');(O/'registry_build.log').write_text(run.stdout+run.stderr,encoding='utf8');(O/'registry_build_recipe.json').write_text(json.dumps(dict(command=cmd,returncode=run.returncode,seconds=time.perf_counter()-t,source_sha256={x.name:hashlib.sha256(x.read_bytes()).hexdigest() for x in [S/'registry_probe.cpp',S/'c_source_branch.hpp']},reused_frozen_objects=True,Solve_linked_or_started=False),indent=2),encoding='utf8')
+if run.returncode:raise RuntimeError('independent math probe compile failed, see '+str(O/'registry_build.log'))
+binding=dict(registry=dict(file=str(O/'source_branch_registry_v2.json'),sha256=hashlib.sha256((O/'source_branch_registry_v2.json').read_bytes()).hexdigest()),source_gate=dict(file=str(O/'source_gate_v2.json'),sha256=hashlib.sha256((O/'source_gate_v2.json').read_bytes()).hexdigest()));(O/'production_binding.json').write_text(json.dumps(binding,indent=2),encoding='utf8')
+cmd=[str(O/'registry_probe.exe'),str(R/'gpu_recovery_v6c/candidate/model.json'),str(R/'accepted_C_width_prefix_v1/packet.json'),str(O/'production_binding.json'),str(R/'gpu_recovery_v6c/candidate/explicit_nuisance'),str(O/'registry_native_QA.json')]
+t=time.perf_counter();run=subprocess.run(cmd,cwd=O,env=env,capture_output=True,text=True,errors='replace');(O/'registry_stdout.json').write_text(run.stdout,encoding='utf8');(O/'registry_stderr.log').write_text(run.stderr,encoding='utf8');print(json.dumps(dict(returncode=run.returncode,seconds=time.perf_counter()-t,report=str(O/'registry_native_QA.json'),stderr=run.stderr[-2000:])),flush=True)
+if run.returncode:raise RuntimeError('independent math probe failed')

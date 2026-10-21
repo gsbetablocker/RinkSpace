@@ -1,0 +1,89 @@
+{
+  "complete": true,
+  "passed": true,
+  "parent_manifest_sha256": "05f03d89202ea210df58cd60ec6dc2520dc03ca89b8e93ba2e390db636a903fd",
+  "parent_index_sha256": "6592082a125b214b8dd900e1b973698a32ec8a0e62cc77d21f46fda4ac021672",
+  "manifest_sha256": "14dbfaf3e515c0590b700a05100f5a03d4f6a5ed90479fc31304bfa000f319a0",
+  "index_sha256": "8bcd183aa0ffaabda3bfb808e094e0a3039a78cc64d65fe0ee3f634bb927819b",
+  "all_old_person_files_and_SHA_unchanged": true,
+  "all_old_person_and_unknown_pixels_preserved": true,
+  "all_new_unknown_pixels_actual_current_RGB_SAM_subset": true,
+  "all_33_native_BGR_RGB_crop_SHA_redecoded_and_verified": true,
+  "checks": {
+    "native_rows_checked": 1376,
+    "old_person_pixels_lost": 0,
+    "old_unknown_pixels_lost": 0,
+    "added_unknown_pixels": 23513,
+    "actual_changed_frames": 25,
+    "rejected_candidates_with_zero_added_pixels": 2
+  },
+  "changed_native_pts": [
+    1070080,
+    1070336,
+    1070592,
+    1070848,
+    1071104,
+    1071360,
+    1071616,
+    1071872,
+    1072128,
+    1072384,
+    1072640,
+    1072896,
+    1073152,
+    1073664,
+    1073920,
+    1074688,
+    1074944,
+    1075456,
+    1075712,
+    1075968,
+    1076224,
+    1076480,
+    1076736,
+    1078016,
+    1078272
+  ],
+  "source_visual_review_pages": [
+    "attempt_v1/QA_00.jpg",
+    "attempt_v1/QA_01.jpg",
+    "attempt_v1/QA_02.jpg"
+  ],
+  "known_failure_and_counterexamples": [
+    {
+      "native_pts": 1071872,
+      "uv": [
+        1142,
+        355.5
+      ],
+      "inside_old_true_person": false,
+      "inside_old_unknown": false,
+      "inside_new_unknown": true,
+      "distance_to_new_actor_or_unknown_px": 0.0,
+      "excluded_by_current_eight_pixel_source_guard": true
+    },
+    {
+      "native_pts": 1071872,
+      "source_counterexample_uv": [
+        1350,
+        420
+      ],
+      "source_semantics": "visible board_or_ice_below_raised_leg_not_added_as_unknown",
+      "inside_new_delta": false
+    },
+    {
+      "native_pts": 1071872,
+      "source_counterexample_uv": [
+        1142,
+        430
+      ],
+      "source_semantics": "visible board_or_ice_below_raised_leg_not_added_as_unknown",
+      "inside_new_delta": false
+    }
+  ],
+  "source_UV_world_contact_or_physical_model_not_modified": true,
+  "audit_reader": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\leg_fix_v1\\audit_sealed.py",
+    "sha256": "393abf1a7573bb98eb508d8fd12c0d901c4c31e28816b9558a1035b362e8099e"
+  }
+}

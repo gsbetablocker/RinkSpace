@@ -10,6 +10,8 @@ struct JointUVCacheView {
  const JointUVPartial*partials=nullptr; // derivative column zero, primal excluded
  const std::vector<int>*block_column_starts=nullptr;
  int station_column=-1,row_column=-1;
+ bool implicit_RS_capture=false,implicit_RS_valid=false;double implicit_RS_row=0,implicit_RS_denominator=0;
+ int sensor_station_active=0;double implicit_station=0,sensor_station_dv_ds=0;
  bool jacobians_ready=false;
 };
 class JointUVCache:public ceres::EvaluationCallback{

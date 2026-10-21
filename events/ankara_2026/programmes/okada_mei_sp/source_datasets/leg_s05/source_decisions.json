@@ -1,0 +1,38 @@
+{
+  "complete": true,
+  "reviewed_current_native_frames": 33,
+  "first_native_pts": 1070080,
+  "last_native_pts": 1078272,
+  "step": 256,
+  "source_visual_review_pages": [
+    "attempt_v1/QA_00.jpg",
+    "attempt_v1/QA_01.jpg",
+    "attempt_v1/QA_02.jpg"
+  ],
+  "rejected_entire_new_candidate_native_pts": [
+    1074176,
+    1074432
+  ],
+  "rejection_reasons": {
+    "1074176": "Actual current source SAM candidate swallows static board federation logo and under-arm board; old person and independent unknown already preserve visible actor. Reject all new pixels.",
+    "1074432": "Actual current source SAM candidate includes under-arm static board triangle. Existing actor layers cover actor; reject all new pixels."
+  },
+  "accepted_other_new_candidate_semantics": "Only current source actor lifted leg/footwear or actor silhouette/blur, typed independent exclusion unknown; not certified body/contact/world correspondence.",
+  "known_failure": {
+    "native_pts": 1071872,
+    "uv": [
+      1142,
+      355.5
+    ],
+    "selected_row_id": "dense56_v2/s05/1071872/8",
+    "source_judgement": "Unambiguously raised calf interior, missing from both prior person/unknown; source SAM now covers it."
+  },
+  "navigation_and_scope_review": {
+    "source_overview_frames": 54,
+    "full_260_phase_first_native_pts": 1036800,
+    "full_260_phase_last_native_pts": 1103104,
+    "scope_reason": "Source overview found central gaps when leg is horizontal; actual every native frame of continuous right-facing through left-facing revolution interval 1070080..1078272 read anew; other phase retains frozen prior accepted layers. No claim of complete perfect person segmentation."
+  },
+  "no_mask_bbox_ellipse_or_polygon_fill": true,
+  "physical_fitting_unchanged": true
+}

@@ -106,6 +106,8 @@ class EventModel {
   Mat3<double> R0_seed=identity3<double>();
   Vec3<double> n_seed{0,0,1},b_seed{1,0,0},n_tangent1{1,0,0},n_tangent2{0,1,0};
   double f_ref=1, radius_max=.5,dt=.02,first_control_time=-.04;
+  double wide_log_f_boundary=0;
+  std::array<double,4> wide_coefficients{};
   int n_controls=0,control_block_begin=1,dependent_control=2;
   std::array<int,4> reference_indices{1,2,3,4};
   std::array<double,4> reference_weights{1./6,4./6,1./6,0};
@@ -177,7 +179,7 @@ class EventModel {
     h.pupil_linear=g[18];h.pupil_quadratic=g[19];return h;
   }
   template<class T> ZoomOptics<T> optics(const T* g) const {
-    ZoomOptics<T> o;o.f_ref=f_ref;o.radius_max=T(radius_max);
+    ZoomOptics<T> o;o.f_ref=f_ref;o.radius_max=T(radius_max);o.wide_log_f_boundary=wide_log_f_boundary;o.wide_coefficients=wide_coefficients;
     o.cx=g[20];o.cy=g[21];o.eta=g[22];o.cx_linear=g[23];o.cy_linear=g[24];
     o.k1=g[25];o.k1_linear=g[26];o.k2=g[27];o.k2_linear=g[28];o.p1=g[29];o.p2=g[30];return o;
   }

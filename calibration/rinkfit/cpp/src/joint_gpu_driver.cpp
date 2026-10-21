@@ -84,14 +84,15 @@ struct DriverContext::Impl {
   if(driver)FreeLibrary(driver);
  }
 };
-DriverContext::DriverContext(const std::string& ptx_file,int ordinal):impl_(new Impl) {
+DriverContext::DriverContext(const std::string& ptx_file,int ordinal):DriverContext(ptx_file,ordinal,"joint_raw_uv"){}
+DriverContext::DriverContext(const std::string& ptx_file,int ordinal,const char* kernel_symbol):impl_(new Impl) {
  auto& x=*impl_;x.driver=LoadLibraryExW(L"nvcuda.dll",nullptr,LOAD_LIBRARY_SEARCH_SYSTEM32);
  if(!x.driver)throw std::runtime_error("Joint GPU: cannot load installed NVIDIA system driver");
  x.bind(x.init,"cuInit");x.bind(x.device_get,"cuDeviceGet");x.bind(x.context_create,"cuCtxCreate_v2");x.bind(x.context_set,"cuCtxSetCurrent");x.bind(x.context_get,"cuCtxGetCurrent");x.bind(x.context_destroy,"cuCtxDestroy_v2");x.bind(x.context_sync,"cuCtxSynchronize");x.bind(x.event_create,"cuEventCreate");x.bind(x.event_destroy,"cuEventDestroy_v2");x.bind(x.event_record,"cuEventRecord");x.bind(x.event_elapsed,"cuEventElapsedTime");x.bind(x.module_load,"cuModuleLoadDataEx");x.bind(x.module_unload,"cuModuleUnload");x.bind(x.function_get,"cuModuleGetFunction");x.bind(x.memory_allocate,"cuMemAlloc_v2");x.bind(x.memory_free,"cuMemFree_v2");x.bind(x.copy_htod,"cuMemcpyHtoD_v2");x.bind(x.copy_dtoh,"cuMemcpyDtoH_v2");x.bind(x.launch,"cuLaunchKernel");x.bind(x.error_name,"cuGetErrorName");x.bind(x.error_string,"cuGetErrorString");
  x.check(x.init(0),"initialize");const Impl::SavedContext caller(x);int device=-1;x.check(x.device_get(&device,ordinal),"get device");
  x.check(x.context_create(&x.context,4u,device),"create blocking-sync context");
  x.check(x.event_create(&x.kernel_begin,0),"create begin timing event");x.check(x.event_create(&x.kernel_end,0),"create end timing event");
- const auto ptx=read_ptx(ptx_file);x.check(x.module_load(&x.module,ptx.data(),0,nullptr,nullptr),"load reviewed PTX");x.check(x.function_get(&x.kernel,x.module,"joint_raw_uv"),"resolve joint_raw_uv");
+ const auto ptx=read_ptx(ptx_file);x.check(x.module_load(&x.module,ptx.data(),0,nullptr,nullptr),"load reviewed PTX");if(!kernel_symbol||std::string(kernel_symbol)!="joint_raw_uv"&&std::string(kernel_symbol)!="joint_raw_uv_width_v1")throw std::runtime_error("Joint GPU: unsupported explicit kernel ABI symbol");x.check(x.function_get(&x.kernel,x.module,kernel_symbol),"resolve reviewed raw UV ABI symbol");
 }
 DriverContext::~DriverContext()=default;
 void DriverContext::set_current(){impl_->current();}

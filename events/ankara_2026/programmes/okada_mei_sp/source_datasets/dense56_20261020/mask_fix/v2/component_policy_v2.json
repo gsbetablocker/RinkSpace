@@ -1,0 +1,34 @@
+{
+  "source_semantics_qualification_complete": true,
+  "purpose": "Close all frozen source-reviewed foreground components omitted only by the automatic prompt-overlap gate.",
+  "source_scope_ref": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/shoe_fix/effective_v1/unqualified_component_change_scope.json",
+    "sha256": "e7de3ad8669a7520fde233e3ec473bf40c81669bc65f2403c8e2f660c57fdffd"
+  },
+  "rejected_source_components": [
+    {
+      "native_pts": 970240,
+      "object_index": 2,
+      "component": 1,
+      "reason": "Source-reviewed isolated upper strip, not person silhouette; raw retained."
+    },
+    {
+      "native_pts": 995328,
+      "object_index": 0,
+      "component": 1,
+      "reason": "Source-reviewed small floating upper fragment, not person silhouette; raw retained."
+    },
+    {
+      "native_pts": 995328,
+      "object_index": 0,
+      "component": 2,
+      "reason": "Source-reviewed upper static/UI rectangle, not person silhouette; raw retained."
+    }
+  ],
+  "other_default_predicate_components": "Independent source-uncertain silhouette exclusion; no true-person pixel or static-scene measurement certificate.",
+  "T84_explicit_logo_reason_excluded_from_default_predicate": true,
+  "graphics_pixels_excluded_by_same_current_source_reader": true,
+  "source_UV_unchanged": true,
+  "reviewer": "s05_shoe_mask_fix actual source component review; root production implementation",
+  "all_existing_masks_unchanged": true
+}

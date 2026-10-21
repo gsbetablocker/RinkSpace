@@ -12,9 +12,10 @@ from .io_utils import file_sha256,object_sha256
 
 SCHEMA='rinkfit.actual_board_material_role_requalification.v1'
 VERSION='ordered_same_board_material_roles_v1'
-CONFIG=dict(version=VERSION,profile_radius_px=128.,profile_spacing_px=8.,
+CONFIG=dict(version=VERSION,strategy_revision='true_yellow_RGB_plateau_v2',profile_radius_px=128.,profile_spacing_px=8.,
     blue_entry_and_exit_are_separate_roles=True,old_source_certificate_is_authority=False,
     model_or_logit_identity_authority=False,mean_or_window_changed=False,
+    yellow_colour_floor_8bit=4.,yellow_red_green_imbalance_max_ratio=1.,
     body_neutral_chroma_range=0.20,body_luminance_min=0.28,body_white_flanks_required=True,global_body_white_fraction_is_diagnostic_only=True)
 
 def _np(v):
@@ -240,7 +241,23 @@ class BoardMaterialRoleRequalifier:
                     foot_profile_entry_index=int(_np(foot['same_material_band_pair_evidence']['entry_index'])[fi]),
                     foot_profile_exit_index=int(_np(foot['same_material_band_pair_evidence']['exit_index'])[fi]))
                 if role=='board.contact':
-                    if _support_contains(mu,fend[fi],fn[fi]):
+                    # B-(R+G)/2 alone calls a saturated red logo warm. Read the
+                    # actual selected band in RGB: yellow requires BOTH R and G
+                    # above B. A red-dominant SPOR TOTO plateau is a counterexample,
+                    # even when its lower print edge has a strong warm fall.
+                    ei=ev['foot_profile_entry_index'];zi=ev['foot_profile_exit_index']
+                    samples=_np(foot['original_RGB_profiles']['rgb_profile'])[fi,ei:zi+1]
+                    colour=np.median(samples.reshape(-1,3),axis=0)*255.
+                    yellow=float(min(colour[0],colour[1])-colour[2])
+                    imbalance=float(abs(colour[0]-colour[1]))
+                    true_yellow=yellow>CONFIG['yellow_colour_floor_8bit'] and imbalance<=CONFIG['yellow_red_green_imbalance_max_ratio']*yellow
+                    red_print=colour[0]-colour[1]>max(CONFIG['yellow_colour_floor_8bit'],yellow)
+                    ev['actual_selected_band_colour']=dict(median_RGB_8bit=colour.tolist(),min_RG_minus_B_8bit=yellow,
+                        red_green_imbalance_8bit=imbalance,true_yellow_supported=bool(true_yellow),red_print_supported=bool(red_print))
+                    if not true_yellow:
+                        status='wrong_role' if red_print else 'unresolved'
+                        reasons.append('red_print_warm_edge_is_not_yellow_board_bottom_strip' if red_print else 'selected_warm_band_has_no_true_yellow_RGB_support')
+                    elif _support_contains(mu,fend[fi],fn[fi]):
                         status='pass';reasons.append('unchanged_mean_in_same_strip_first_iceward_material_fall_support')
                     elif relation['top_exit_uv'][1]<mu[1]<relation['yellow_entry_uv'][1]-2:
                         status='wrong_role';reasons.append('unchanged_mean_inside_board_body_or_print_above_observed_yellow_strip')

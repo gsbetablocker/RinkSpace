@@ -7,8 +7,34 @@ from pathlib import Path
 from collections import defaultdict,Counter
 import json,shutil
 import numpy as np
-from .io_utils import file_sha256,read_jsonl,write_json
+from .io_utils import file_sha256,read_jsonl,write_json,object_sha256
 from .packet_storage import write_packet
+
+
+def extend_shared_point_material_binding(parent,packet,model_path,material_map,qualification):
+    """Freeze newly qualified active point identities in the native binding ABI.
+
+    Allowing unused model suffixes is not enough: JointPacket requires every
+    active material to be inside its exact bound table. Old identities remain
+    the same prefix; only source-qualified shared point identities extend it.
+    """
+    old=parent['material_binding'];n=len(old['materials'])
+    receipts=[r for r in qualification.values()if r.get('schema') in ('rinkfit.static_ice_tracklet_point_receipt.v1','rinkfit.static_board_tracklet_point_receipt.v1')
+        and r.get('new_material_suffix') and r['existing_material_index']>=n]
+    if not receipts:return packet
+    model=json.loads(Path(model_path).read_text(encoding='utf8'))
+    suffix={r['existing_material_index']for r in receipts}
+    if not old.get('allow_append_only_model_material_suffix') or suffix!=set(range(n,len(model['materials']))):
+        raise ValueError('Active material binding extension must be the exact qualified shared-point suffix')
+    table=[dict(index=i,label=m['label'],paths=[dict(index=j,id=p['id'],physical_point=bool(p.get('physical_point',False)))
+        for j,p in enumerate(m['paths'])])for i,m in enumerate(model['materials'])]
+    if table[:n]!=old['materials']:raise ValueError('Shared point binding changed inherited material identities')
+    def ref(f):return dict(file=str(Path(f).resolve()),sha256=file_sha256(f))
+    packet['material_binding']={**old,'materials':table,'model_material_prefix_count':len(table),
+        'model_topology_ref':ref(model_path),'topological_identity_table_sha256':object_sha256(table),
+        'additional_source_material_maps':old.get('additional_source_material_maps',[])+[ref(material_map)],
+        'inherited_material_prefix_count':n,'new_active_point_materials_source_qualified':True}
+    return packet
 
 
 def append_constraint_source_chunks(parent_packet,closed_chunks,model_path,material_map,roles_file,output,*,finalize_packet=None,typed_entity_qualification=None,finalize_packet_with_parent=None):
@@ -64,12 +90,23 @@ def append_constraint_source_chunks(parent_packet,closed_chunks,model_path,mater
             if ok:
                 if not g.get('source_geometry_eligible')or g.get('numeric_statistics_ready')is not False or g.get('statistical_objective_eligible')is not False or g.get('solver_eligible')is not False:raise ValueError('unknown noise source qualification is not explicit')
                 if any(r.get(k)!=g.get(k)for k in ('source_uv','current_uv','native_pts','joint_material_id')):raise ValueError('source chunk gate redirects actual mean/operator')
-                if not desc.get('geometry_ready')or r.get('joint_material_index')!=mi or mi>=len(table):raise ValueError('new actual source has no frozen physical material binding')
+                if not desc.get('geometry_ready')or r.get('joint_material_index')!=mi or mi>=len(model['materials']):raise ValueError('new actual source has no frozen physical material binding')
+                if mi>=len(table):
+                    receipt=entity_qualification.get(rid,{})
+                    if (receipt.get('schema') not in ('rinkfit.static_ice_tracklet_point_receipt.v1','rinkfit.static_board_tracklet_point_receipt.v1')
+                        or not receipt.get('new_material_suffix')
+                        or not p['material_binding'].get('allow_append_only_model_material_suffix')):
+                        raise ValueError('New material suffix requires exact qualified shared physical point')
                 if r.get('point_correspondence'):
                     if not any(q.get('role')=='qualified_current_entity_source_journal'and ref(ledger)['sha256']==q['sha256']for q in entity_source_refs):raise ValueError('Entity append ledger is not a source-qualified current journal')
                     # The original flags remain in the parent journal; only this
                     # source-qualified new current measurement version is appended.
                     full={**r,'measurement_operator_resolved':x.get('measurement_operator_resolved')}
+                    if entity_qualification.get(rid,{}).get('schema')=='rinkfit.static_board_tracklet_point_receipt.v1':
+                        # Its unknown shared-surface qualifier needs the actual
+                        # current source ownership/track fields, not only the
+                        # compact numerical packet row.
+                        full=x
                     entity_path=validate_new_entity(full,entity_qualification.get(rid),model['materials'][mi],mi)
                 if roles.get(str(pts),{}).get('role')!='development_candidate'or not(r.get('fit_role')=='development'or r.get('frame_role')=='development_candidate'):raise ValueError('protected/external exposure must not enter source engineering factors')
                 family=(r['shot_id'],pts,r['source_family_id']);families[family].append(n0+len(raw));family_refs[family]=refs
@@ -115,6 +152,7 @@ def append_constraint_source_chunks(parent_packet,closed_chunks,model_path,mater
         'source_noise_statistics_supplied_for_appended_rows':False,'unknown_noise_source_rows_keep_engineering_constraints':True,
         'unknown_noise_source_statistical_precision_supplied':False,'all_new_source_nuisance_requires_fresh_physical_capture':True,
         'formal_new_source_statistical_optimum_claimed':False,'physical_total_error_accuracy_claimed':False}
+    result=extend_shared_point_material_binding(p,result,model_path,material_map,entity_qualification)
     if finalize_packet is not None and finalize_packet_with_parent is not None:raise ValueError('Choose one source finalizer')
     if finalize_packet_with_parent is not None:
         # Reuse the already parsed immutable parent; do not materialize the

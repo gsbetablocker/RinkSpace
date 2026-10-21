@@ -29,7 +29,8 @@ struct JointQueryRestartRow {
 };
 struct JointQueryRestartPlan {
   std::string source_packet_sha256,physical_values_token;
-  std::size_t raw_rows=0,eligible_queries=0,searched_queries=0;
+  std::size_t raw_rows=0,eligible_queries=0,searched_queries=0,protected_queries=0;
+  std::vector<std::string> protected_shots;
   std::vector<JointQueryRestartRow> rows;
   double elapsed_seconds=0;
   bool applied=false;
@@ -82,6 +83,7 @@ inline std::vector<double> station_grid(const JointEventModel&m,const JointRowLa
 inline void check_plan(const JointALBuilder&b,const JointQueryRestartPlan&p,bool proposed){
   if(b.core.packet.source_hash!=p.source_packet_sha256||b.core.packet.rows.size()!=p.raw_rows||physical_token(b.core.model)!=p.physical_values_token)throw std::runtime_error("Query restart plan source/model changed");
   for(const auto&c:p.rows){const auto&r=b.core.packet.rows.at(c.row_index);
+    if(std::binary_search(p.protected_shots.begin(),p.protected_shots.end(),r.shot_id))throw std::runtime_error("Query restart would change a protected shot");
     if(!r.active||!r.query||r.path!=(proposed?c.path:c.old_path)||
        !same(b.core.station[c.row_index],proposed?c.station:c.old_station)||!same(b.core.row[c.row_index],proposed?c.row:c.old_row)||!same(b.core.alpha[c.row_index],proposed?c.alpha:c.old_alpha)||
        !same(r.station,proposed?(r.kind==1?c.old_source_station:c.station):c.old_source_station)||!same(r.row,proposed?c.row:c.old_source_row)||!same(r.alpha,proposed?c.alpha:c.old_source_alpha))throw std::runtime_error("Query restart row changed after proposal");
@@ -104,13 +106,22 @@ inline JointQueryRestartPlan propose_joint_query_restart(
   using Key=std::tuple<int,int,std::int64_t>;std::map<Key,std::size_t>counts;std::map<std::pair<int,int>,std::size_t>exposures;std::map<int,std::set<int>>families;
   std::size_t active=0;for(const auto&r:b.core.packet.rows)if(r.active){++active;const int shot=b.core.model.shot_map.at(r.shot_id),f=family(b.core.model.materials.at(r.material).label);if(++counts[{shot,f,r.pts}]==1)++exposures[{shot,f}];families[shot].insert(f);}
   const double total_weight=cfg.value("pixel_total_weight",double(active));if(!(total_weight>0&&std::isfinite(total_weight)))throw std::runtime_error("invalid Query restart pixel weight");
+  // A restart changes auxiliaries outside Ceres. Parameter-block constants alone
+  // cannot protect a shot here, so honor the same explicit production scope.
+  const auto protected_list=cfg.value("temporary_runtime_fixed_nuisance_shots",std::vector<std::string>{});
+  const std::set<std::string>protected_shots(protected_list.begin(),protected_list.end());
+  for(const auto&sid:protected_shots)if(!b.core.model.shot_map.count(sid))throw std::runtime_error("Query restart names an unknown protected shot");
+  plan.protected_shots.assign(protected_shots.begin(),protected_shots.end());
   struct Work{std::size_t i;double weight,nu_RS,nu_u,nu_v;};std::vector<Work>work;std::size_t equality=0;
   for(std::size_t i=0;i<b.core.packet.rows.size();++i){const auto&r=b.core.packet.rows[i];if(!r.active)continue;const auto RS=equality++;
     if(r.query){const int shot=b.core.model.shot_map.at(r.shot_id),f=family(b.core.model.materials.at(r.material).label);
       const double weight=total_weight*(1./b.core.model.shots.size())*(1./families.at(shot).size())*(1./exposures.at({shot,f}))/counts.at({shot,f,r.pts});
-      work.push_back({i,weight,equality_nu.empty()?0:equality_nu.at(RS),equality_nu.empty()?0:equality_nu.at(equality),equality_nu.empty()?0:equality_nu.at(equality+1)});equality+=2;
+      if(protected_shots.count(r.shot_id))++plan.protected_queries;
+      else work.push_back({i,weight,equality_nu.empty()?0:equality_nu.at(RS),equality_nu.empty()?0:equality_nu.at(equality),equality_nu.empty()?0:equality_nu.at(equality+1)});
+      equality+=2;
     }
   }
+  if(equality!=b.schema().equality_ids.size())throw std::runtime_error("Query restart original equality indexing differs");
   plan.eligible_queries=work.size();std::atomic<std::size_t>next{0},searched{0};std::atomic<bool>failed{false};std::mutex mutex;std::string error;
   auto worker=[&](){try{for(;;){const auto wi=next.fetch_add(1);if(wi>=work.size())return;const auto&w=work[wi];const auto i=w.i;const auto&r=b.core.packet.rows[i];
     if(!(r.E>0)||r.query->alpha.size()<2)throw std::runtime_error("invalid original Query support");
@@ -185,6 +196,10 @@ inline eventio::Json write_joint_query_restart_result(JointALBuilder&b,const Joi
   if(accepted&&(!plan.applied||plan.rows.empty()||!std::isfinite(full_cost_before)||!std::isfinite(full_cost_candidate)||!(full_cost_candidate<full_cost_before)))throw std::runtime_error("Query restart acceptance lacks strict complete current PHR decrease");
   if(!accepted&&plan.applied)throw std::runtime_error("rejected Query restart was not rolled back");joint_query_restart_detail::check_plan(b,plan,accepted);
   eventio::Json receipt={{"schema","rinkfit.same_finite_Query_auxiliary_restart.v1"},{"source_packet_sha256",plan.source_packet_sha256},{"raw_rows",plan.raw_rows},{"eligible_active_Query_rows",plan.eligible_queries},{"searched_rows",plan.searched_queries},{"proposed_rows",plan.rows.size()},{"numerical_chart_changes",plan.path_changes()},{"applied_rows",accepted?plan.rows.size():0},{"accepted",accepted},{"full_current_PHR_cost_before",std::isfinite(full_cost_before)?eventio::Json(full_cost_before):eventio::Json()},{"full_current_PHR_cost_candidate",std::isfinite(full_cost_candidate)?eventio::Json(full_cost_candidate):eventio::Json()},{"original_constraint_debt_before",debt_before},{"original_constraint_debt_candidate",debt_candidate},{"navigation_score_is_not_full_problem_acceptance",true},{"source_UV_ID_material_Query_operator_normal_alpha_support_W_E_or_physical_parameters_changed",false},{"chart_policy","Only original eight kind3 whole board.top/contact charts without source station intervals; same native-domain schema. All other materials, including closed C0, stay on their original finite path."},{"graph_and_GPU_layout_must_be_rebuilt_after_apply_or_rollback",true},{"discrete_path_checkpoint_required","finite_material_paths_RLE_u32_v1"},{"no_source_qualification_or_statistics_granted",true},{"proposed_rows_file_sha256",eventio::file_sha256(out/"proposed_rows.jsonl")},{"proposal_elapsed_seconds",plan.elapsed_seconds}};
+  receipt["protected_nuisance_shots"]=plan.protected_shots;
+  receipt["protected_active_Query_rows"]=plan.protected_queries;
+  receipt["all_active_Query_rows"]=plan.eligible_queries+plan.protected_queries;
+  receipt["complete_graph_and_equality_denominator_retained"]=true;
   eventio::atomic_json(out/"receipt.json",receipt);return receipt;
 }
 } // namespace rinkfit

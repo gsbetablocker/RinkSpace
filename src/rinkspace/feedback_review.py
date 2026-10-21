@@ -62,7 +62,7 @@ def review_existing_board_frame(run, pts, output, *, device='cpu', predecessor_f
     Image.fromarray(rgb).save(output / 'native.png')
     native = _ref(output / 'native.png')
     context = dict(native_video_decode_receipt=decode, current_mask_ref=dict(path=str(maskpath), sha256=file_sha(maskpath)),
-        evidence_directory=str(output / 'profiles'), feedback_run_id=output.name)
+        evidence_directory=str(output / 'profiles'), feedback_run_id=output.parent.name+"_"+output.name)
     before = object_sha256(rows)
     engine = BoardMaterialRoleRequalifier(ROOT, device=device, use_frozen_visual_model=False)
     result = engine.evaluate(rgb, mask > 0, canonical, context)

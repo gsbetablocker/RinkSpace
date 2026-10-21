@@ -1,0 +1,52 @@
+#pragma once
+#include "rinkfit/augmented_lagrangian.hpp"
+#include "rinkfit/event_io.hpp"
+#include <ceres/ceres.h>
+#include <algorithm>
+#include <cmath>
+#include <cstring>
+#include <numeric>
+#include <unordered_map>
+#include <set>
+namespace rinkfit {
+// A numerical coordinate change only. The original scalar buffers remain the
+// public complete-state/CP registry. Source rows, W, bounds and manifolds are not edited.
+class JointNuisanceComponentPackV1 {
+ public:
+ struct Member {ParameterBlockBinding binding;const ceres::Manifold*manifold=nullptr;std::vector<double>lower,upper;int tangent=0,component=-1,offset=0,tangent_offset=0;};
+ struct Component {std::vector<std::size_t>members;std::vector<double>values,accepted;int tangent=0;std::unique_ptr<ceres::Manifold>manifold;};
+ struct Location {int component=-1,offset=0,size=0;};
+ private:
+ ceres::Problem*source_;std::vector<Member>members_;std::vector<Component>components_;std::unordered_map<const double*,std::size_t>member_index_;std::size_t skipped_constant_=0;
+ class Product final:public ceres::Manifold {const JointNuisanceComponentPackV1*pack_;std::size_t component_;public:Product(const JointNuisanceComponentPackV1*p,std::size_t c):pack_(p),component_(c){}int AmbientSize()const override{return int(pack_->components_[component_].values.size());}int TangentSize()const override{return pack_->components_[component_].tangent;}
+ bool Plus(const double*x,const double*d,double*y)const override{for(auto i:pack_->components_[component_].members){const auto&m=pack_->members_[i];if(m.manifold){if(!m.manifold->Plus(x+m.offset,d+m.tangent_offset,y+m.offset))return false;}else for(std::size_t j=0;j<m.binding.size;++j)y[m.offset+j]=x[m.offset+j]+d[m.tangent_offset+j];}return true;}
+ bool Minus(const double*y,const double*x,double*d)const override{for(auto i:pack_->components_[component_].members){const auto&m=pack_->members_[i];if(m.manifold){if(!m.manifold->Minus(y+m.offset,x+m.offset,d+m.tangent_offset))return false;}else for(std::size_t j=0;j<m.binding.size;++j)d[m.tangent_offset+j]=y[m.offset+j]-x[m.offset+j];}return true;}
+ bool PlusJacobian(const double*x,double*J)const override{return jacobian(x,J,true);}bool MinusJacobian(const double*x,double*J)const override{return jacobian(x,J,false);}
+ bool jacobian(const double*x,double*J,bool plus)const{const int a=AmbientSize(),t=TangentSize();std::fill_n(J,a*t,0.);for(auto i:pack_->components_[component_].members){const auto&m=pack_->members_[i];const int n=int(m.binding.size),k=m.tangent;std::vector<double>v(n*k,0.);if(m.manifold){if(!(plus?m.manifold->PlusJacobian(x+m.offset,v.data()):m.manifold->MinusJacobian(x+m.offset,v.data())))return false;}else for(int j=0;j<n;++j)v[j*n+j]=1.;if(plus)for(int r=0;r<n;++r)for(int c=0;c<k;++c)J[(m.offset+r)*t+m.tangent_offset+c]=v[r*k+c];else for(int r=0;r<k;++r)for(int c=0;c<n;++c)J[(m.tangent_offset+r)*a+m.offset+c]=v[r*n+c];}return true;}
+ };
+ public:
+ JointNuisanceComponentPackV1(ceres::Problem&source,const std::vector<ParameterBlockBinding>&candidates,const std::vector<std::vector<double*>>&indivisible_groups={}):source_(&source){
+  for(const auto&b:candidates){if(!b.data||!b.size||!source.HasParameterBlock(b.data)||source.ParameterBlockSize(b.data)!=int(b.size))throw std::runtime_error("pack candidate is not an exact original registered block");if(member_index_.count(b.data))throw std::runtime_error("duplicate pack candidate");if(source.IsParameterBlockConstant(b.data)||source.ParameterBlockTangentSize(b.data)==0){++skipped_constant_;continue;}Member m;m.binding=b;m.manifold=source.GetManifold(b.data);m.tangent=source.ParameterBlockTangentSize(b.data);for(std::size_t j=0;j<b.size;++j){m.lower.push_back(source.GetParameterLowerBound(b.data,int(j)));m.upper.push_back(source.GetParameterUpperBound(b.data,int(j)));}member_index_[b.data]=members_.size();members_.push_back(std::move(m));}
+  std::vector<std::size_t>parent(members_.size());std::iota(parent.begin(),parent.end(),0);auto find=[&](std::size_t x){while(parent[x]!=x){parent[x]=parent[parent[x]];x=parent[x];}return x;};auto unite=[&](std::size_t a,std::size_t b){a=find(a);b=find(b);if(a!=b)parent[b]=a;};auto join_ptrs=[&](const auto&ptrs){std::size_t first=members_.size();for(auto*p:ptrs){auto it=member_index_.find(p);if(it==member_index_.end())continue;if(first==members_.size())first=it->second;else unite(first,it->second);}};
+  std::vector<ceres::ResidualBlockId>residuals;source.GetResidualBlocks(&residuals);std::vector<double*>ptrs;for(auto r:residuals){ptrs.clear();source.GetParameterBlocksForResidualBlock(r,&ptrs);join_ptrs(ptrs);}for(const auto&g:indivisible_groups)join_ptrs(g);
+  std::map<std::size_t,std::size_t>map;for(std::size_t i=0;i<members_.size();++i){auto root=find(i);auto it=map.find(root);if(it==map.end()){map[root]=components_.size();components_.emplace_back();it=map.find(root);}auto&m=members_[i];m.component=int(it->second);auto&c=components_[it->second];m.offset=int(c.values.size());m.tangent_offset=c.tangent;c.members.push_back(i);c.values.insert(c.values.end(),m.binding.data,m.binding.data+m.binding.size);c.tangent+=m.tangent;}
+  for(std::size_t i=0;i<components_.size();++i){auto&c=components_[i];c.accepted=c.values;c.manifold=std::make_unique<Product>(this,i);}assert_original_metadata();assert_incidence(source);
+ }
+ JointNuisanceComponentPackV1(const JointNuisanceComponentPackV1&)=delete;JointNuisanceComponentPackV1&operator=(const JointNuisanceComponentPackV1&)=delete;
+ const auto&members()const{return members_;}const auto&components()const{return components_;}auto&components(){return components_;}ceres::Problem&source_problem()const{return *source_;}
+ bool locate(const double*p,Location*out)const{auto it=member_index_.find(p);if(it==member_index_.end())return false;const auto&m=members_.at(it->second);*out={m.component,m.offset,int(m.binding.size)};return true;}
+ const double*view(const double*p)const{Location l;if(!locate(p,&l))return p;return components_.at(l.component).values.data()+l.offset;}double*component_data(std::size_t i){return components_.at(i).values.data();}
+ void assert_original_metadata()const{for(const auto&m:members_){const auto&b=m.binding;if(source_->IsParameterBlockConstant(b.data)||source_->ParameterBlockSize(b.data)!=int(b.size)||source_->ParameterBlockTangentSize(b.data)!=m.tangent||source_->GetManifold(b.data)!=m.manifold)throw std::runtime_error("original packed candidate flags/dimension/manifold changed");for(std::size_t j=0;j<b.size;++j)if(source_->GetParameterLowerBound(b.data,int(j))!=m.lower[j]||source_->GetParameterUpperBound(b.data,int(j))!=m.upper[j])throw std::runtime_error("original packed bounds changed");}}
+ void assert_incidence(const ceres::Problem&p)const{std::vector<ceres::ResidualBlockId>rs;p.GetResidualBlocks(&rs);std::vector<double*>ptrs;for(auto r:rs){ptrs.clear();p.GetParameterBlocksForResidualBlock(r,&ptrs);int found=-1;for(auto*x:ptrs){Location l;if(!locate(x,&l))continue;if(found>=0&&found!=l.component)throw std::runtime_error("residual crosses two elimination components");found=l.component;}}}
+ bool validate_values(std::string*why=nullptr)const{for(const auto&m:members_){const auto*x=view(m.binding.data);for(std::size_t j=0;j<m.binding.size;++j)if(!std::isfinite(x[j])||x[j]<m.lower[j]||x[j]>m.upper[j]){if(why)*why="nonfinite/out-of-original-bound packed value: "+m.binding.name;return false;}}return true;}
+ // Validation completes for every component before a single original buffer is changed.
+ bool sync_original_from_packed(std::string*why=nullptr){if(!validate_values(why))return false;for(const auto&m:members_)std::memcpy(m.binding.data,view(m.binding.data),m.binding.size*sizeof(double));return true;}
+ void pull_from_original(){for(auto&m:members_)std::memcpy(components_.at(m.component).values.data()+m.offset,m.binding.data,m.binding.size*sizeof(double));}
+ void capture_accepted(){for(auto&c:components_)c.accepted=c.values;}
+ void restore_accepted(){for(auto&c:components_)std::copy(c.accepted.begin(),c.accepted.end(),c.values.begin());std::string why;if(!sync_original_from_packed(&why))throw std::runtime_error(why);}
+ // target must use DO_NOT_TAKE_OWNERSHIP for manifolds. source and this pack outlive target.
+ void register_parameters(ceres::Problem&target){assert_original_metadata();std::vector<double*>original;source_->GetParameterBlocks(&original);for(auto*p:original){Location l;if(locate(p,&l))continue;int n=source_->ParameterBlockSize(p);target.AddParameterBlock(p,n);if(auto*m=source_->GetManifold(p))target.SetManifold(p,const_cast<ceres::Manifold*>(m));for(int j=0;j<n;++j){target.SetParameterLowerBound(p,j,source_->GetParameterLowerBound(p,j));target.SetParameterUpperBound(p,j,source_->GetParameterUpperBound(p,j));}if(source_->IsParameterBlockConstant(p))target.SetParameterBlockConstant(p);}for(auto&c:components_){target.AddParameterBlock(c.values.data(),int(c.values.size()));target.SetManifold(c.values.data(),c.manifold.get());for(auto i:c.members){const auto&m=members_[i];for(std::size_t j=0;j<m.binding.size;++j){target.SetParameterLowerBound(c.values.data(),m.offset+int(j),m.lower[j]);target.SetParameterUpperBound(c.values.data(),m.offset+int(j),m.upper[j]);}}}}
+ std::shared_ptr<ceres::ParameterBlockOrdering>ordering(const ceres::Problem&target)const{auto o=std::make_shared<ceres::ParameterBlockOrdering>();std::set<const double*>packed;for(const auto&c:components_)packed.insert(c.values.data());std::vector<double*>all;target.GetParameterBlocks(&all);for(auto*p:all)if(!target.IsParameterBlockConstant(p))o->AddElementToGroup(p,packed.count(p)?0:1);return o;}
+ eventio::Json report()const{std::map<std::size_t,std::size_t>hist;std::size_t n=0,t=0,max=0;long double square=0;for(const auto&c:components_){++hist[c.values.size()];n+=c.values.size();t+=c.tangent;max=std::max(max,c.values.size());square+=static_cast<long double>(c.values.size())*c.values.size();}eventio::Json h=eventio::Json::array();for(auto q:hist)h.push_back({{"dimension",q.first},{"components",q.second}});return {{"schema","rinkfit.same_objective_nuisance_component_pack.v1"},{"components",components_.size()},{"free_original_blocks",members_.size()},{"ambient_scalars",n},{"tangent_scalars",t},{"skipped_constant_or_zero_tangent_blocks",skipped_constant_},{"maximum_component",max},{"dimension_histogram",h},{"dense_B_bytes",double(square*8)},{"source_W_or_state_registry_changed",false},{"original_manifolds_preserved_as_dynamic_product",true}};}
+};
+} // namespace rinkfit

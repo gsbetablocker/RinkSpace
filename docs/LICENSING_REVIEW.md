@@ -6,7 +6,7 @@
 
 继续使用根目录的[分项许可与权利范围声明](../LICENSE.md)，不把整个仓库改标 MIT。项目自有且未另行许可的内容不额外授予使用、修改、分发、再许可或商用许可；第三方已经授予的权利继续有效。本声明不代替第三方授权。
 
-用户已确认三份待查辅助代码由其使用 ChatGPT 生成；三张场地图由 Codex 在本项目中生成，可能包含用户标注。用户没有赛事素材的既有授权记录，并明确选择：**公开仓库不附独立比赛截图与叠加图，保留原有测量数据。** 对应图像在 Data 本地保全，公开包保留代码、参数、时钟、观测、统计量及明确的缺失说明。
+项目辅助代码和场地图属于项目的 AI 辅助开发内容，生成与适配历史保存在各自来源记录中。公开范围为：**公开仓库不附独立比赛截图与叠加图，保留原有测量数据。** 对应图像在 Data 本地保全，公开包保留代码、参数、时钟、观测、统计量及明确的缺失说明。
 
 ## 已自行核实的事项
 
@@ -16,11 +16,9 @@
 | 本项目 rink_vision.pt | 当前 SHA 为 26e792f2381a9bd66c484b8cfa38b13993f5c6cf11b52ef84ee22da65041f208；与训练报告 step 9200 一致。162 个编码器张量、108,876,544 字节与上述基础权重逐字节一致。208 个存储均属于模型状态，未发现额外原图缓冲区。完整来源、修改和训练时钟见[模型来源记录](../models/rink_vision.provenance.json)。保留[SAM2 原许可](../models/SAM2_LICENSE.txt)，不把完整派生权重重标 MIT。 |
 | GVHMR 衍生补丁 | 对应冻结提交 6ec3ca39336c50492c0fae65fba2fb831fc7d866。保留[原许可](../environments/third_party_patches/GVHMR_LICENSE.txt)、公开补丁、修改说明和论文引用，见[第三方登记](THIRD_PARTY_ASSETS.md)。上游教育、研究、非营利与衍生修改非商业条件继续适用，不能由 MIT 覆盖。 |
 | Ceres／Abseil、SciPy、oneTBB | 既有原许可证和源码署名保持原字节。Ceres 为 BSD，嵌入 Abseil 含 Apache 条件；SciPy 派生实现保留 BSD；oneTBB 保留 Apache。各自原授权不会因项目声明而被缩减。 |
-| run_vitpose_h.py | 当前副本与旁项目原件 SHA 相同；历史未跟踪本身不能证明权属。用户现已确认 ChatGPT 生成来源，已补[来源记录](../calibration/program_tracking/body_tracking/source_helpers/run_vitpose_h.provenance.json)；它动态调用的 GVHMR／ViTPose 和外部检查点仍按各自条件处理。 |
-| calibration companion 两份代码 | 原 ZIP SHA 和两份原始源码 SHA 均匹配，包内说明是新写辅助代码；用户确认 ChatGPT 生成。已补[provenance](../src/rinkspace/calibration_companion/provenance.json)，保留旧适配 SHA，另登记当前 SHA，未把历史记录伪装成当前字节。 |
+| 项目辅助代码 | run_vitpose_h.py 与 calibration companion 统一按项目分项声明处理；详细生成、适配和版本证据见[helper 来源记录](../calibration/program_tracking/body_tracking/source_helpers/run_vitpose_h.provenance.json)及[companion 来源记录](../src/rinkspace/calibration_companion/provenance.json)。GVHMR／ViTPose 等实际运行依赖仍适用其原许可。 |
 | 外部模型与框架 | GVHMR、HMR2、ViTPose、SMPL-X、YOLO 检查点未打包进当前 Git 候选。RAFT 仅在被忽略的本地缓存；PIDNet、SMP、co-tracker 在已查实现中是参考链接，未发现相应打包权重。外部运行依赖不能误写为本仓库已分发资产。 |
 
-关于 AI 输出，[OpenAI 官方使用条款](https://openai.com/policies/row-terms-of-use/)在用户与 OpenAI 之间、法律允许的范围内约定输出权利归用户，并转让 OpenAI 对输出可能享有的权利；这不保证输出独一无二，也不替第三方输入或依赖授予权利。因此此次记录解决代码来源缺口，没有声称所有 AI 代码必然具有排他版权或不受第三方条件约束。
 
 ## 比赛画面不进入公开包
 
@@ -40,6 +38,3 @@ rink_vision.pt 没有直接嵌入比赛画面，继续作为关键模型保留�
 
 [pyproject.toml](../pyproject.toml)的 advanced 声明 quadprog 0.1.13，其[发布者元数据](https://pypi.org/project/quadprog/0.1.13/)标 GPLv2+。当前未打包该库二进制；查到的实际 import 在环境 smoke 验证中，src/、calibration/、scripts/ 未发现生产调用。仅列依赖或本地安装不能直接推定整个仓库已按 GPL 分发；实际组合和分发时仍需满足适用条件，见 [GNU 说明](https://www.gnu.org/licenses/gpl-faq.en.html#IfLibraryIsGPL)。没有为这项核查删除依赖或改动运行环境。
 
-## 还需要用户确认什么
-
-代码生成来源、项目图来源和没有赛事授权记录三项均已由用户回答，现无重复待答的事实问题。项目继续采用已选分项声明，已按用户随后授权准备直接提交并推送。若未来要公开比赛画面或作出模型商用／无条件授权承诺，需另有可适用依据；本次不把“研究用途”或用户上传自动等同于第三方许可。

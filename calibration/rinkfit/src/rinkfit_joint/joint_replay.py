@@ -29,13 +29,36 @@ def camera_ledger(model_file,scope_file,output):
  receipt=dict(schema='rinkfit.joint9.full_camera_replay.v1',model=dict(path=str(Path(model_file).resolve()),sha256=file_sha256(model_file)),scope=dict(path=str(Path(scope_file).resolve()),sha256=file_sha256(scope_file)),graph_schema=validation,physical_domain=physical,frames=total,all8434_camera_states_present=True,per_shot=certs,all_optical_domains_passed=all(c['optical']['passed'] for c in certs),all_full_tau_halos_covered=all(c['full_allowed_tau_halo'] for c in certs),source_pixel_accuracy_verified=False,independent_metre_scale=False,coordinate_gauge='L=1 full rink length',arrays_sha256=file_sha256(out/'cameras.npz'),ledger_sha256=file_sha256(out/'camera_rows.jsonl.gz'))
  write_json(out/'manifest.json',receipt);return receipt
 
+def _display_board_closure(scene,path):
+ """Sample a declared closing ink edge on the actual curved board surface.
+
+ kind=2's observation station remains the original finite N-1-edge path.
+ Display must still honour closed=True when the first vertex is not repeated.
+ """
+ points=np.asarray(path['points'],float)
+ uv=np.linspace(points[-1],points[0],33)[1:]
+ block=int(path.get('geometry_block',-1))
+ if block>=0:
+  q=scene.values[block];uv=uv@np.array([[q[0],q[3]],[q[1],q[4]]])+q[[2,5]]
+ ad=scene.values[int(path['advertisement_block'])]
+ return scene.board(ad[0]+ad[1]*uv[:,0],ad[2]+(ad[3]-ad[2])*uv[:,1])
+
+def _source_track_unknown_point(path):
+ """Latent track coordinates are not current-exposure source dots or grid ink."""
+ if not path.get('physical_point'):return False
+ provenance=path.get('provenance',{})
+ if isinstance(provenance,str):
+  try:provenance=json.loads(provenance)
+  except (ValueError,TypeError):return False
+ return bool(isinstance(provenance,dict) and provenance.get('track_id') and provenance.get('geometry_role') in ('shared_unknown_ice_XY_z0','unknown_shared_material_uv_on_existing_continuous_board_ad'))
+
 def inventory(model):
  scene=NativeScene(as_event_view(model,'s01'));xyz=[];records=[]
  for mi,m in enumerate(scene.materials):
   for pi,pa in enumerate(m['paths']):
    kind=pa['kind'];n=1 if pa.get('physical_point') else (257 if kind in (1,7) else max(33,min(1025,4*len(pa.get('points',[])))) if kind==2 else 129)
    if kind==6 and not pa.get('physical_point'):
-    block=model['blocks'][pa['geometry_block']]['values'];indices=pa.get('geometry_indices');coordinates=len(indices) if indices else len(block)-pa.get('geometry_offset',0);vertices=coordinates//2;edges=vertices if pa.get('closed',False) else vertices-1
+    block=scene.values[pa['geometry_block']];indices=pa.get('geometry_indices');coordinates=len(indices) if indices else len(block)-pa.get('geometry_offset',0);vertices=coordinates//2;edges=vertices if pa.get('closed',False) else vertices-1
     if coordinates%2 or edges<1:raise ValueError('Shared board print path lacks complete finite vertices')
     n=max(4,int(np.ceil(128/edges)))*edges+1
    grid=np.linspace(0,1,n)
@@ -52,7 +75,9 @@ def inventory(model):
    for interval in intervals:
     lo,hi=map(float,interval)
     if not np.isfinite([lo,hi]).all() or not 0.<=lo<=hi<=1. or lo<previous:raise ValueError('Invalid material finite station interval union')
-    previous=hi;stations=np.array([lo]) if pa.get('physical_point') else np.unique(np.r_[lo,grid[(grid>=lo)&(grid<=hi)],hi]);q=scene.world(mi,pi,stations);label=m['label'];color=(40,225,240) if label.startswith(('Ad','print_component.')) else (80,230,80) if label.startswith('board') else (255,140,50);start=sum(len(x) for x in xyz);xyz.append(q);records.append(dict(material_index=mi,path=pi,label=label,begin=start,end=start+len(q),closed=bool(pa.get('closed',False) and lo==0. and hi==1.),original_path_closed=pa.get('closed',False),station_domain_interval=[lo,hi],station_samples=stations.tolist() if 'allowed_station_intervals'in pa else None,source_station_domain_applied='allowed_station_intervals'in pa,board_material_surface=bool(kind in (2,3,6,7) or label.startswith(('Ad','board.','print_component.'))),color=color))
+    previous=hi;stations=np.array([lo]) if pa.get('physical_point') else np.unique(np.r_[lo,grid[(grid>=lo)&(grid<=hi)],hi]);q=scene.world(mi,pi,stations)
+    if kind==2 and pa.get('closed',False) and lo==0. and hi==1. and len(pa['points'])>1 and not np.array_equal(pa['points'][0],pa['points'][-1]):q=np.concatenate((q,_display_board_closure(scene,pa)))
+    label=m['label'];color=(40,225,240) if label.startswith(('Ad','print_component.')) else (80,230,80) if label.startswith('board') else (255,140,50);start=sum(len(x) for x in xyz);xyz.append(q);records.append(dict(material_index=mi,path=pi,label=label,begin=start,end=start+len(q),closed=bool(pa.get('closed',False) and lo==0. and hi==1.),original_path_closed=pa.get('closed',False),station_domain_interval=[lo,hi],station_samples=stations.tolist() if 'allowed_station_intervals'in pa else None,source_station_domain_applied='allowed_station_intervals'in pa,latent_source_track_point=_source_track_unknown_point(pa),board_material_surface=bool(kind in (2,3,6,7) or label.startswith(('Ad','board.','print_component.'))),color=color))
  # Actual ad labels follow the solved surfaces, once per physical panel.
  byad={};allxyz=np.concatenate(xyz,axis=0)
  for r in records:
@@ -63,7 +88,7 @@ def inventory(model):
  # Ice identifiers use only the currently solved material paths; this adds no geometry.
  byice={}
  for r in records:
-  if r['label'].startswith('ice.') and r['material_index']>=0:
+  if r['label'].startswith('ice.') and '.tracklet.' not in r['label'] and r['material_index']>=0:
    feature=r['label'][4:].split(':')[0];byice.setdefault(feature,[]).append(allxyz[r['begin']:r['end']])
  for feature,points in byice.items():
   q=np.concatenate(points);centre=((q.min(axis=0)+q.max(axis=0))/2)[None];start=sum(len(x) for x in xyz);xyz.append(centre);label=feature.replace('house_connection_','').replace('_','-');records.append(dict(material_index=-1,path=-1,label=label,label_kind='ice',begin=start,end=start+1,closed=False,color=(255,190,90)))
@@ -107,6 +132,7 @@ This changes display visibility only, never source identity or fit admission.
 def draw(bgr,uv,valid,records,title):
  image=bgr.copy();paths=0;labels=0
  for r in records:
+  if r.get('latent_source_track_point',False):continue
   q=uv[r['begin']:r['end']];g=valid[r['begin']:r['end']]
   if r['material_index']<0:
    if g[0] and 0<=q[0,0]<1920 and 0<=q[0,1]<1080:
@@ -127,6 +153,7 @@ def draw_fast(bgr,uv,valid,records,title):
  """Draw the same finite runs with OpenCV polylines instead of per-edge calls."""
  image=bgr.copy();paths=0;labels=0
  for r in records:
+  if r.get('latent_source_track_point',False):continue
   q=uv[r['begin']:r['end']];g=valid[r['begin']:r['end']].copy()
   g &= np.isfinite(q).all(axis=1)&(np.max(np.abs(q),axis=1)<1e7)
   if r['material_index']<0:
@@ -144,24 +171,28 @@ def draw_fast(bgr,uv,valid,records,title):
  cv2.rectangle(image,(0,1038),(1920,1080),(12,23,28),-1);cv2.putText(image,title,(18,1067),cv2.FONT_HERSHEY_SIMPLEX,.55,(240,245,245),1,cv2.LINE_AA)
  return image,dict(visible_subsegments_bbox_intersecting=paths,visible_ad_labels=labels,physical_runs_drawn_with_clipped_OpenCV_polylines=True)
 
-def render_snapshots(model_file,scope_file,output,pick_pts=None,*,shots=None,compiled_dir=None,gpu_dll=None,gpu_validation=None,packet_file=None,top_view=False):
+def render_snapshots(model_file,scope_file,output,pick_pts=None,*,shots=None,compiled_dir=None,gpu_dll=None,gpu_validation=None,packet_file=None,top_view=False,only_pick_pts=False):
  out=Path(output)
  if out.exists():raise ValueError('New immutable review generation required')
  model=read_json(model_file);scope=read_json(scope_file);cg=CameraGraph(graph_from_joint(model));world,records=inventory(model);scene=NativeScene(as_event_view(model,'s01'));sha=file_sha256(model_file);wanted={}
  for s in scope['shots']:
   if shots is not None and s['id'] not in shots:continue
   pp=np.arange(s['first_pts'],s['last_pts']+1,256,dtype=np.int64)
-  for k in np.unique(np.linspace(0,len(pp)-1,5).round().astype(int)):wanted[int(pp[k])]=s['id']
+  if not only_pick_pts:
+   for k in np.unique(np.linspace(0,len(pp)-1,5).round().astype(int)):wanted[int(pp[k])]=s['id']
  if pick_pts:
   for p in pick_pts:
-   sid=next(s['id'] for s in scope['shots'] if s['first_pts']<=p<=s['last_pts']);wanted[p]=sid
+   sid=next(s['id'] for s in scope['shots'] if s['first_pts']<=p<=s['last_pts'])
+   if shots is not None and sid not in shots:raise ValueError('Requested snapshot is outside selected shots')
+   cg.local_seconds(sid,np.asarray([p],np.int64));wanted[p]=sid
+ if not wanted:raise ValueError('Snapshot selection is empty')
  if file_sha256(scope['source']['path'])!=scope['source']['sha256']:raise ValueError('Source SHA changed')
  out.mkdir(parents=True);frames=[];tiles=[]
  from .joint_display import CurrentSourcePoints,SharedModelTopView
  points=CurrentSourcePoints(packet_file,model,scope) if packet_file else None;top=SharedModelTopView(world,records,scene) if top_view else None
  if compiled_dir:
   from .joint_acceleration import install
-  install(cg,model_file,out/'acceleration',world,compiled_dir,gpu_dll=gpu_dll,gpu_validation=gpu_validation)
+  install(cg,model_file,out/'acceleration',world,compiled_dir,gpu_dll=gpu_dll,gpu_validation=gpu_validation,shots=list(dict.fromkeys(wanted.values())))
  with av.open(scope['source']['path']) as cont:
   st=cont.streams.video[0]
   if Fraction(st.time_base)!=Fraction(1,12800):raise ValueError('Native time base changed')
@@ -179,7 +210,7 @@ def render_snapshots(model_file,scope_file,output,pick_pts=None,*,shots=None,com
   for j,t in enumerate(tiles[i:i+12]):y,x=divmod(j,4);canvas[y*270:(y+1)*270,x*480:(x+1)*480]=t
   cv2.imwrite(str(out/f'page_{i//12+1:02d}.png'),canvas)
  if len(frames)!=len(wanted):raise ValueError('Review missing a requested native exposure')
- receipt=dict(schema='rinkfit.joint9.same_model_native_snapshot_review.v1',model=dict(path=str(Path(model_file).resolve()),sha256=sha),source=scope['source'],frames=frames,all_material_paths_enabled=True,all_ad_labels_enabled=True,all_ice_lines_and_board_paths_enabled=True,physical_state_shared=True,current_actual_source_points_enabled=points is not None,current_actual_source_packet=points.packet_ref if points is not None else None,same_world_top_view_enabled=top is not None,inner_board_backfaces_and_occluding_near_board_culled=True,metric_scale_verified=False,visual_review_complete=False,video_generated=False);write_json(out/'manifest.json',receipt);return receipt
+ receipt=dict(schema='rinkfit.joint9.same_model_native_snapshot_review.v1',reviewed_shot_ids=list(dict.fromkeys(wanted.values())),snapshot_selection_only=True,model=dict(path=str(Path(model_file).resolve()),sha256=sha),source=scope['source'],frames=frames,all_material_paths_enabled=True,latent_track_predictions_drawn=False,current_dots_only_from_source_packet=True,all_ad_labels_enabled=True,all_ice_lines_and_board_paths_enabled=True,physical_state_shared=True,current_actual_source_points_enabled=points is not None,current_actual_source_packet=points.packet_ref if points is not None else None,same_world_top_view_enabled=top is not None,inner_board_backfaces_and_occluding_near_board_culled=True,metric_scale_verified=False,visual_review_complete=False,video_generated=False);write_json(out/'manifest.json',receipt);return receipt
 
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('command',choices=['cameras','snapshots']);p.add_argument('--model',required=True);p.add_argument('--scope',required=True);p.add_argument('--out',required=True);p.add_argument('--pts',type=int,nargs='*');p.add_argument('--shots',nargs='+');p.add_argument('--compiled-dir');p.add_argument('--gpu-dll');p.add_argument('--gpu-validation');a=p.parse_args();print(json.dumps(camera_ledger(a.model,a.scope,a.out) if a.command=='cameras' else render_snapshots(a.model,a.scope,a.out,a.pts,shots=a.shots,compiled_dir=a.compiled_dir,gpu_dll=a.gpu_dll,gpu_validation=a.gpu_validation),ensure_ascii=False))

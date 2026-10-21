@@ -6,13 +6,13 @@
 
 namespace rinkfit::joint_gpu {
 using DevicePtr = std::uint64_t;
-struct GPUMeta { double R0[9], n[3], b[3], t1[3], t2[3], fref, Rmax, dt, first, refw[4]; int nc, cb, dep, ref[4]; };
+struct GPUMeta { double R0[9], n[3], b[3], t1[3], t2[3], fref, Rmax, wide_boundary, wide_coefficients[4], dt, first, refw[4]; int nc, cb, dep, ref[4]; };
 struct GPUPath { int kind, geom, ad, ri, bs, begin, count; double a0, a1, h; };
 struct UVRow { double t, s, v, alpha, budget; };
 struct UVLayout { int global, geom, ad, ref, path, block_begin, block_count, control_begin, control_count, geometry_begin, geometry_count, geometry_offset; };
 struct UVJob { int row, column; };
 struct UVPartial { double u, v; int arithmetic, status; };
-static_assert(sizeof(GPUMeta)==264 && sizeof(GPUPath)==56 && sizeof(UVRow)==40 && sizeof(UVLayout)==48 && sizeof(UVJob)==8 && sizeof(UVPartial)==24, "Joint raw CUDA ABI differs");
+static_assert(sizeof(GPUMeta)==304 && sizeof(GPUPath)==56 && sizeof(UVRow)==40 && sizeof(UVLayout)==48 && sizeof(UVJob)==8 && sizeof(UVPartial)==24, "Joint raw CUDA ABI differs");
 struct RawArrays {
  DevicePtr offsets=0, values=0, dims=0, paths=0, points=0, rows=0, block_ids=0, controls=0, slots=0, control_offsets=0, geometry_indices=0, layouts=0, jobs=0, output=0;
 };
@@ -30,6 +30,7 @@ struct DriverTelemetry {
 class DriverContext {
  public:
  explicit DriverContext(const std::string& ptx_file, int device_ordinal=0);
+ DriverContext(const std::string& ptx_file, int device_ordinal, const char* kernel_symbol);
  ~DriverContext();
  DriverContext(const DriverContext&)=delete;
  DriverContext& operator=(const DriverContext&)=delete;

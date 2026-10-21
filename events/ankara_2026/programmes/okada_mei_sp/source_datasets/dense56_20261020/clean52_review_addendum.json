@@ -1,0 +1,30 @@
+{
+  "schema": "rinkspace.clean_person_base_source_review_addendum.v1",
+  "base_index": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_footwear_v1/clean_parent52_v2/index.jsonl.gz",
+    "sha256": "fe65600f2e61333d0c9c5e99bf20c0fc613ae06477290a0681a05a7a948fcd7b"
+  },
+  "scope": "base mask for refinement, not final all-consumer source domain",
+  "source_findings": [
+    {
+      "native_pts": 1188352,
+      "finding": "new full-body SAM missed actual left sleeve/hand though original source scene mask had a correct detached arm component; discovered in full-native review after cropped base QA",
+      "actual_source_crop": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/crop_1188352.png",
+      "action": "current actual RGB positive-point segmentation across source-continuous 17-frame arm interval; unrelated visible printed logo must remain outside person mask"
+    },
+    {
+      "native_pts": 1235200,
+      "finding": "raised white skate front extends outside base and 8px guard",
+      "actual_source_crop": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/crop_1235200.png",
+      "action": "actual source positive-point SAM footwear refinement, no bbox hard exclusion"
+    }
+  ],
+  "automatic_proposals_rejected": [
+    "tracked arm proposals that drifted onto stationary logo",
+    "SAM masks swallowing clearly visible printed circle/red flag",
+    "whole legacy scene mask union including graphics, reflections, rectangular shoe pads"
+  ],
+  "reviewed_corrections": "final composite generation must bind its actual selected source-mask versions and separate person/unknown masks; root assembly pins only that accepted composite",
+  "old_source_UV_moved": false,
+  "physical_solver_or_packet_changed": false
+}

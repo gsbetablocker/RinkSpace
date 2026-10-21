@@ -1,0 +1,21 @@
+#pragma once
+#include "rinkfit/joint_al.hpp"
+#include <cstring>
+namespace rinkfit {
+struct JointCapturePrimalPrefixV1 {
+ std::size_t count=0;eventio::Json binding;std::vector<double>station,row,alpha;std::vector<std::uint32_t>path;
+ static JointCapturePrimalPrefixV1 load(JointProblemBuilder&b){
+  JointCapturePrimalPrefixV1 d;if(!b.packet.source_json.contains("source_capture_complete_state_binding"))return d;
+  d.binding=b.packet.source_json.at("source_capture_complete_state_binding");const auto&br=d.binding.at("contract");eventio::verify(br.at("file").get<std::string>(),br.at("sha256"));auto j=eventio::read_json(br.at("file").get<std::string>());
+  if(j.at("schema")!="rinkfit.selected_true_RS_capture_primal_prefix_binding.v2"||d.binding.at("schema")!=j.at("schema")||!j.at("all_physical_values_exact").get<bool>()||!j.at("all_old_four_auxiliary_values_exact").get<bool>()||!j.at("only_new_rows_may_be_profiled").get<bool>()||j.at("old_checkpoint_graph_resumed").get<bool>()||j.at("old_AL_duals_resumed").get<bool>())throw std::runtime_error("invalid selected capture complete-primal prefix contract");
+  const auto&s=j.at("selected_complete_capture");for(const char*k:{"model","checkpoint","capture_state_binding","explicit_nuisance_manifest","actual_RS_status","capture_receipt"})eventio::verify(s.at(k).at("file").get<std::string>(),s.at(k).at("sha256"));
+  std::ifstream in(s.at("checkpoint").at("file").get<std::string>());auto state=read_checkpoint(in);if(state.state.token()!=s.at("state_token")||d.binding.at("state_token")!=s.at("state_token")||s.at("objective_id")!="rinkfit.sourceUV_trueRS_finite_capture.v2")throw std::runtime_error("selected capture primal CP token/mode mismatch");
+  std::map<std::string,std::vector<double>>parameters;for(const auto&p:state.state.data().parameters)parameters[p.name]=p.values;for(const auto&v:b.model.blocks){const auto it=parameters.find(v.name);if(it==parameters.end()||it->second.size()!=v.values.size()||std::memcmp(it->second.data(),v.values.data(),v.values.size()*sizeof(double)))throw std::runtime_error("capture prefix physical values differ: "+v.name);}
+  d.count=j.at("preserved_raw_rows");if(d.count!=j.at("first_new_raw_row")||d.count!=d.binding.at("old_raw_rows")||j.at("current_raw_rows")!=b.packet.rows.size()||d.count>b.packet.rows.size())throw std::runtime_error("capture prefix row scope mismatch");
+  auto read=[&](const char*k,const char*dt){const auto&v=j.at("primal_auxiliary_prefixes").at(k);eventio::verify(v.at("selected_descriptor").at("file").get<std::string>(),v.at("selected_descriptor").at("sha256"));eventio::verify(v.at("current_descriptor").at("file").get<std::string>(),v.at("current_descriptor").at("sha256"));const auto a=eventio::bytes(v.at("selected_descriptor").at("file").get<std::string>()),c=eventio::bytes(v.at("current_descriptor").at("file").get<std::string>());const std::size_t n=std::string(dt)=="<u4"?4:8;if(v.at("selected_descriptor").at("dtype")!=dt||v.at("current_descriptor").at("dtype")!=dt||a.size()!=d.count*n||c.size()!=b.packet.rows.size()*n||std::memcmp(a.data(),c.data(),a.size())||eventio::sha256(a)!=v.at("selected_prefix_sha256"))throw std::runtime_error("capture prefix exact four-aux bytes mismatch");return a;};
+  auto ds=read("station","<f8"),dr=read("row","<f8"),da=read("alpha","<f8"),dp=read("path","<u4");d.station.resize(d.count);d.row.resize(d.count);d.alpha.resize(d.count);d.path.resize(d.count);std::memcpy(d.station.data(),ds.data(),ds.size());std::memcpy(d.row.data(),dr.data(),dr.size());std::memcpy(d.alpha.data(),da.data(),da.size());std::memcpy(d.path.data(),dp.data(),dp.size());d.assert_unchanged(b);return d;
+ }
+ void assert_unchanged(const JointProblemBuilder&b)const{if(!count)return;for(std::size_t i=0;i<count;++i){const auto&o=b.packet.rows.at(i);if(std::memcmp(&b.station.at(i),&station[i],8)||std::memcmp(&b.row.at(i),&row[i],8)||std::memcmp(&b.alpha.at(i),&alpha[i],8)||o.path!=int(path[i]))throw std::runtime_error("selected capture old four-aux prefix changed at row "+std::to_string(i));}}
+ eventio::Json report()const{return {{"schema","rinkfit.native_selected_capture_primal_prefix.v1"},{"binding",binding},{"preserved_raw_rows",count},{"first_new_raw_row",count},{"old_four_auxiliary_bytes_exact",true},{"old_AL_or_checkpoint_graph_resumed",false},{"old_corrected_source_rows_not_reseeded",true}};}
+};
+}

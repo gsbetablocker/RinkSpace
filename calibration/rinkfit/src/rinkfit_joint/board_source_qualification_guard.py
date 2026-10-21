@@ -44,6 +44,8 @@ def assert_board_material_source_qualification(packet,packet_path,*,verified_dep
     cert_path=_load_ref(ref,base,seen);cert=json.loads(cert_path.read_text(encoding='utf8'))
     for name in ('SOURCE_IDENTITY_CERTIFICATE_RECALLED.json','SOURCE_IDENTITY_EVIDENCE_RECALL.json'):
         if (cert_path.parent/name).exists():raise ValueError('Board material requalification certificate recalled: '+str(cert_path.parent/name))
+    if cert.get('schema') == 'rinkfit.board_material_fit_qualification.v3_reviewed_revision':
+        return _assert_reviewed_revision(packet,Path(packet_path),cert,cert_path,seen)
     incremental = cert.get('schema') == 'rinkfit.board_material_fit_qualification.v2'
     if cert.get('schema') not in (CERTIFICATE_SCHEMA, 'rinkfit.board_material_fit_qualification.v2'):raise ValueError('Unsupported board physical requalification certificate')
     if incremental:
@@ -101,3 +103,60 @@ def assert_board_material_source_qualification(packet,packet_path,*,verified_dep
     if native_stream.read().strip():raise ValueError('Extra native board qualification ledger rows')
     native_stream.close()
     if position!=len(active):raise ValueError('Incomplete board source audit coverage')
+
+
+def _assert_reviewed_revision(packet,packet_path,cert,cert_path,seen):
+    """Recheck unchanged inherited claims and every newly read source interval.
+
+    This is an incremental measurement migration, not a new certificate for
+    previous unknown rows or a way to bypass the old qualification audit.
+    """
+    parent_path=_load_ref(cert['parent_packet'],cert_path.parent,seen)
+    parent=json.loads(parent_path.read_text(encoding='utf8'))
+    assert_board_material_source_qualification(parent,parent_path,verified_dependency_cache=seen)
+    generation_path=_load_ref(cert['observation_generation'],cert_path.parent,seen)
+    generation=json.loads(generation_path.read_text(encoding='utf8'))
+    _load_ref(generation['parent_packet'],generation_path.parent,seen)
+    if generation['parent_packet']['sha256']!=cert['parent_packet']['sha256']:raise ValueError('Reviewed revision parent differs')
+    _load_ref(generation['proposals'],generation_path.parent,seen)
+    for ref in cert['producer_refs']:_load_ref(ref,cert_path.parent,seen)
+    changes={int(r['row_index']):r for r in generation['rows']}
+    if len(changes)!=len(generation['rows'])or sorted(changes)!=sorted(generation['changed_row_indices']):raise ValueError('Reviewed exact-ID scope differs')
+    if parent['row_count']!=packet['row_count']:raise ValueError('This reviewed migration preserves row count')
+    n=packet['row_count'];unchanged=np.ones(n,bool);unchanged[list(changes)]=False
+    def array(doc,name,base):
+        d=doc['arrays'][name];p=_load_ref(d,base,seen)
+        return np.memmap(p,dtype=d['dtype'],mode='r',offset=d.get('offset_bytes',0),shape=tuple(d['shape']))
+    old={k:array(parent,k,parent_path.parent)for k in BOUND_ARRAYS}
+    new={k:array(packet,k,packet_path.parent)for k in BOUND_ARRAYS}
+    for k in BOUND_ARRAYS:
+        if cert['membership_array_sha256'].get(k)!=packet['arrays'][k]['sha256']:raise ValueError('Reviewed source array binding differs')
+        if not np.array_equal(old[k][unchanged],new[k][unchanged]):raise ValueError('Review changed an unreviewed inherited row: '+k)
+    for key in ('source_row_ids','source_dataset_ids'):
+        if len(parent[key])!=n or len(packet[key])!=n:raise ValueError('Reviewed source registry missing')
+        if any(parent[key][i]!=packet[key][i]for i in np.flatnonzero(unchanged)):raise ValueError('Review redirected an inherited source registry')
+        if key=='source_row_ids'and parent[key]!=packet[key]:raise ValueError('Raw source locator changed')
+        digest=hashlib.sha256(json.dumps(packet[key],ensure_ascii=False,separators=(',',':')).encode()).hexdigest()
+        if digest!=cert[key+'_sha256']:raise ValueError('Reviewed source registry hash differs')
+    queries={r['row_index']:r for r in packet.get('queries',[])}
+    for i,r in changes.items():
+        if old['admission'][i]==1 or new['admission'][i]!=1 or new['fit_role'][i]!=1:raise ValueError('Review can only restore previously inactive sources')
+        for k in ('native_pts','shot_index','material_index','kind','fit_role'):
+            if not np.array_equal(old[k][i],new[k][i]):raise ValueError('Review changed clock/surface/operator domain')
+        if not np.array_equal(old['uv'][i],r['old_packet_uv'])or not np.array_equal(new['uv'][i],r['current_uv']):raise ValueError('Reviewed measurement mean mismatch')
+        if not np.array_equal(new['profile_normal'][i],r['source_measurement_direction']):raise ValueError('Reviewed source measurement direction differs')
+        if not all(r['checks'].get(k)is True for k in ('semantic_class','physical_surface','physical_instance','measurement_operator','visibility','position_support')):raise ValueError('A source dimension remains unknown')
+        for ref in r['evidence_refs']:_load_ref(ref,generation_path.parent,seen)
+        locator=r['source_reading_locator'];review_path=_load_ref(locator['review'],generation_path.parent,seen)
+        review=json.loads(review_path.read_text(encoding='utf8'))
+        source=review['source']
+        if source['source_video_sha256']!='e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d'or source['native_pts']!=int(new['native_pts'][i])or source['time_base']!='1/12800'or source['native_RGB_resampled']is not False:raise ValueError('Reviewed native source binding differs')
+        reading=next((c for c in review['results']['board_broad_candidates']['columns']if c['column']==locator['column']),None)
+        if not reading or reading['status']!='unique_current_optical_candidate':raise ValueError('Reviewed RGB candidate is not unique')
+        candidate=next((c for c in reading['candidates']if c['candidate_id']==reading['selected_candidate_id']),None)
+        if not candidate or candidate['selection_status']!='ordered_material_candidate'or candidate['policy_reasons']:raise ValueError('Reviewed RGB material policy does not pass')
+        if not np.array_equal(candidate['lower_optical_uv'],new['uv'][i])or not np.array_equal(candidate['lower_optical_interval_uv'],r['source_query_native_uv']):raise ValueError('Packet does not consume the measured native candidate')
+        q=queries.get(i)
+        if not q or not np.array_equal(q['native_uv'],candidate['lower_optical_interval_uv']):raise ValueError('New Query differs from actual source optical interval')
+    active=np.fromiter((i for i,sid in enumerate(packet['source_row_ids'])if str(sid).startswith(FAMILY_PREFIXES)and new['admission'][i]==1 and new['fit_role'][i]==1),dtype='<i8')
+    if len(active)!=cert['count']or hashlib.sha256(active.tobytes()).hexdigest()!=cert['active_board_rows_sha256']:raise ValueError('Reviewed active board coverage differs')

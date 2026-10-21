@@ -9,7 +9,7 @@ import numpy as np
 from .io_utils import file_sha256,write_json
 from rinkfit_start.native_camera import NativeCamera
 
-def install(graph,model_file,output,world,compiled_dir,*,gpu_dll=None,gpu_validation=None):
+def install(graph,model_file,output,world,compiled_dir,*,gpu_dll=None,gpu_validation=None,shots=None):
  directory=Path(compiled_dir).resolve();out=Path(output);out.mkdir(exist_ok=False)
  for f in ('bound_camera_sensor.py','compiled_camera_guarded_sensor.py','camera_at.dll'):
   if not (directory/f).is_file():raise ValueError('Existing compiled ABI is missing: '+str(directory/f))
@@ -18,7 +18,9 @@ def install(graph,model_file,output,world,compiled_dir,*,gpu_dll=None,gpu_valida
  reference=dict(path=str(Path(model_file).resolve()),sha256=file_sha256(model_file))
  import json
  model=json.loads(Path(model_file).read_text(encoding='utf8'));reports=[]
- for sid in graph.graph['shots']:
+ selected=list(graph.graph['shots']) if shots is None else list(shots)
+ if len(selected)!=len(set(selected)) or set(selected)-set(graph.graph['shots']):raise ValueError('Unknown or duplicated acceleration shot')
+ for sid in selected:
   camera=graph.native_camera(sid);original=NativeCamera.at.__get__(camera,NativeCamera)
   # Three source exposures and the complete same-model path inventory test the
   # active display domain, cut-back reference angles and off-screen predicates.

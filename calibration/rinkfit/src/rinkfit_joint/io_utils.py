@@ -7,6 +7,16 @@ from pathlib import Path
 
 
 def read_json(path):
+    if isinstance(path, dict):
+        from .source_record_io import checked_records
+        records = checked_records(path); missing = object()
+        try:
+            value = next(records, missing)
+            if value is missing or next(records, missing) is not missing:
+                raise ValueError("A JSON reference must contain exactly one checked record")
+            return value
+        finally:
+            records.close()
     return json.loads(Path(path).read_text(encoding="utf-8-sig"))
 
 
@@ -16,6 +26,10 @@ def write_json(path, value):
 
 
 def read_jsonl(path):
+    if isinstance(path, dict):
+        from .source_record_io import checked_records
+        yield from checked_records(path)
+        return
     p = Path(path)
     op = gzip.open if p.suffix == ".gz" else open
     with op(p, "rt", encoding="utf-8") as f:

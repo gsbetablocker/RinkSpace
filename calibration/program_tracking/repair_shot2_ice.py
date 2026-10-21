@@ -26,6 +26,8 @@ from .extract_shot2_ice import SelectedExtractor, SelectedHouseReader, current_i
 from .native_ice_material_repair import sample_chroma, narrow_dark_paint
 from .physical_ice_width import ground_midpoint_from_source_sides
 from scipy.optimize import least_squares
+from .static_ice_source_exclusions import source_records, exclusion_mask, filter_source_readouts
+from .static_ice_source_exclusions_v2 import filter_source_family_readouts
 
 
 class SourceNormalProfiles(NativeProfiles):
@@ -46,8 +48,21 @@ class SourceNormalProfiles(NativeProfiles):
         if path.get('_current_source_guide'):
             radius = min(radius, 28 if path['material_signal']=='dark' else 45)
         if path['feature_id'] in ('B1','B2','C'):
-            return self.sample_complete_colour_band(local, guide, spacing)
-        return super().sample(local, guide, radius=radius, spacing=32)
+            rows, diagnostic = self.sample_complete_colour_band(local, guide, spacing)
+        else:
+            rows, diagnostic = super().sample(local, guide, radius=radius, spacing=32)
+        rows, rejected = filter_source_readouts(rows, getattr(self, 'static_material_exclusions', []))
+        if rejected:
+            diagnostic['static_material_excluded_readouts'] = rejected
+            diagnostic['measured_count'] = len(rows)
+        if getattr(self, 'source_family_full_footprint_admission', False):
+            rows, failed = filter_source_family_readouts(rows, self.mask,
+                getattr(self, 'static_material_exclusions', []), operator=path.get('operator','material_interface'))
+            diagnostic['full_reader_support_rejections_before_line_fit'] = failed
+            diagnostic['full_reader_support_admitted_readouts'] = len(rows)
+            self.source_family_admission_history.append(dict(kind='line',curve_id=path['curve_id'],
+                admitted=len(rows),rejected=failed))
+        return rows, diagnostic
 
     def sample_complete_colour_band(self, path, guide, spacing):
         local = dict(path, _whole_band_profile_radius=path.get('_whole_band_profile_radius',65))
@@ -173,6 +188,23 @@ class CurrentHouseReader(SelectedHouseReader):
                     eligible_native_material_readouts=stats['eligible_native_material_readouts']-len(role_rejected),
                     material_identity_exclusions_applied_before_shared_family_fit=True,
                     rejected_non_static_material_readouts=role_rejected)
+        rows, static_rejected = filter_source_readouts(rows, getattr(native, 'static_material_exclusions', []))
+        if static_rejected:
+            for role, stats in diagnostic.items():
+                rejected_for_role = [r for r in static_rejected if r['native_readout']['role'] == role]
+                stats['static_material_excluded_readouts'] = rejected_for_role
+                stats['eligible_native_material_readouts'] -= len(rejected_for_role)
+        if getattr(native, 'source_family_full_footprint_admission', False):
+            rows, failed = filter_source_family_readouts(rows, native.mask,
+                getattr(native, 'static_material_exclusions', []),
+                operator='paint_center' if group['outline'] else 'material_interface')
+            native.source_family_admission_history.append(dict(kind='circle',
+                curve_ids=[p['curve_id'] for p in group['paths']],admitted=len(rows),rejected=failed))
+            for role,stats in diagnostic.items():
+                role_failed=[x for x in failed if x['native_readout']['role']==role]
+                stats['full_reader_support_rejections_before_shared_family_fit']=role_failed
+                stats['eligible_native_material_readouts']-=len(role_failed)
+                stats['full_reader_support_admitted_readouts']=sum(r['role']==role for r in rows)
         if group is not self.groups.get('C0'):return rows,diagnostic
         kept=[];rejected=[]
         rgb=native.frame.rgb.astype(np.float32)
@@ -756,8 +788,18 @@ class IceReread(SelectedExtractor):
             if Path(binding['mask_path']).resolve()!=mask_path.resolve():raise ValueError('Exact source binding mask path mismatch')
             source['source_binding']=deepcopy(binding_reference)
         broadcast,bcast=current_broadcast_exclusion(raw);outside,domain=current_ice_domain(self.output_root,index)
-        mask=(person>0)|broadcast|outside
+        static_exclusions = source_records(source, self.source_review.get('static_material_exclusion_rois', []))
+        mask=(person>0)|broadcast|outside|exclusion_mask(static_exclusions)
         native=SourceNormalProfiles(cv2.cvtColor(raw,cv2.COLOR_BGR2RGB),source,mask,self.cameras[index])
+        native.static_material_exclusions = static_exclusions
+        native.source_family_full_footprint_admission = bool(self.source_review.get('source_family_full_footprint_admission'))
+        native.source_family_admission_history = []
+        if native.source_family_full_footprint_admission:
+            # Historical cache keys did not bind the complete source footprint.
+            self.use_circle_cache = False
+        if static_exclusions:
+            source['static_material_exclusion_rois'] = deepcopy(static_exclusions)
+            source['original_person_mask_unchanged'] = True
         nested,counts=self.nested_house_features(index,native);features=[];coverage=[]
         for p in self.paths:
             guide,origin=self.guide(p,index)
@@ -810,6 +852,12 @@ class IceReread(SelectedExtractor):
             old_review_exclusions_reused=False,selected_frames_only=True,
             intermediate_exposures_source_points_extracted=False,
             observation_coordinates_from_projection=False,elapsed_seconds=time.perf_counter()-started)
+        if native.source_family_full_footprint_admission:
+            packet['source_family_support_admission'] = dict(
+                algorithm='original_full_profile_tangent7_cv2_bilinear32_and_current_gaussian_r3_before_family_fit',
+                helper_sha256=sha(Path(__file__).with_name('static_ice_source_exclusions_v2.py')),
+                every_estimation_iteration_guarded=True,failed_readouts_preserved=True,
+                history=native.source_family_admission_history)
         if binding_reference:
             packet['source_binding']=binding_reference
             packet['current_exact_source_binding_and_mask_verified']=True

@@ -1,0 +1,78 @@
+{
+  "schema": "rinkspace.current_native_source_person_and_typed_unknown_effective.v3",
+  "complete": true,
+  "sealed": true,
+  "accepted": true,
+  "accepted_for_final_source_qualification": true,
+  "shot_id": "s05",
+  "frame_count": 1376,
+  "frames": 1376,
+  "source_video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "time_base": "1/12800",
+  "native_frame_step_pts": 256,
+  "first_native_pts": 948992,
+  "last_native_pts": 1300992,
+  "index": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\effective_v1\\s05_index.jsonl.gz",
+    "sha256": "416b49eb18fb69322244bafa4a4d385fabf2a474081f996744bcdd76da75a12d"
+  },
+  "index_file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\effective_v1\\s05_index.jsonl.gz",
+  "index_sha256": "416b49eb18fb69322244bafa4a4d385fabf2a474081f996744bcdd76da75a12d",
+  "counts": {
+    "background_person_instances": 1576,
+    "background_rejected_instances": 170,
+    "native_frames": 1376,
+    "actor_added_pixels": 7446011,
+    "background_added_person_pixels": 6281203,
+    "added_source_unknown_pixels": 381370,
+    "frames_with_any_source_unknown": 108,
+    "old_true_person_pixels_lost": 0,
+    "old_unknown_pixels_lost": 0,
+    "background_typed_unknown_instances": 55
+  },
+  "parent_index": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_footwear_v1\\index.jsonl.gz",
+    "sha256": "0ab10c6b0cac0dfc239198a591eecf7eed2588f1b3c315ecda0cff8f125e3620"
+  },
+  "actor_source_index": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\full_v3\\index.stream.jsonl.gz",
+    "sha256": "04db868412da7e7d26966df3551f58988c782b7942d56506c4bfcc4ea6ac2bd4"
+  },
+  "background_instance_source": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\background_v1\\instances.jsonl.gz",
+    "sha256": "cc9e551bad65235cb0985a7b46d04fb70486e6cd66fddb10d628f88108c4ccb6"
+  },
+  "source_qualification": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\effective_v1\\source_qualification.json",
+    "sha256": "665ea4c6d86588ec43c8193f721103e591b6c47016ddc859108e9743974c0991"
+  },
+  "actor_native_person_motion": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\full_v3\\body_source_motion_s05_receipt.json",
+    "sha256": "57546747f4bce6248dd6c38711c830ef9f7fafbc2406926051cec951967b7237"
+  },
+  "actor_static_counterexamples": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\full_v3\\static_counterexample_audit.json",
+    "sha256": "386cefbfa7356cb9948b2003139117d4360eef16771c729d88d811259efb5b44"
+  },
+  "all_source_BGR_RGB_verified": true,
+  "old_true_person_pixels_preserved": true,
+  "old_unknown_pixels_preserved": true,
+  "both_person_and_unknown_layers_required": true,
+  "person_guard_pixels": 8,
+  "source_unknown_guard_pixels": 8,
+  "guard_is_engineering_visibility_margin_not_noise_sigma": true,
+  "background_stationary_people_are_still_people": true,
+  "all_masks_are_actual_current_SAM_pixels_or_preserved_old_source_pixels": true,
+  "ROI_pose_or_box_not_hard_exclusion": true,
+  "model_or_screen_grid_points_not_issued": true,
+  "source_original_UV_unchanged": true,
+  "source_reader": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\shoe_fix\\seal_effective.py",
+    "sha256": "fd3f9e88b14db10ed3e8f7428773042a24ff146f2f801dd2ffeb53e064601a8f"
+  },
+  "limitations": [
+    "No whole-scene perfect semantic segmentation claim; this qualification restores known actor gaps and source-reviewed foreground silhouettes where scene readers reach the board.",
+    "Navigation association groups can merge or switch human identity; each mask was reread in its current RGB and supplies no body or static-scene physical correspondence.",
+    "Mixed camera/person and raised-arm/wall silhouette domains remain separately typed unknown and cannot establish visible scene observations."
+  ]
+}

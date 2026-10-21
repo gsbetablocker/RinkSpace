@@ -119,6 +119,11 @@ def restore_s01_into_joint_container(current,baseline,*,baseline_sha256,baseline
                 for src,dst in im.items():q['blocks'][j][key][dst]=copy.deepcopy(b[key][src])
         else:
             q['blocks'][j]=copy.deepcopy(b)
+    # An added print block is absent from the older baseline.  Restoring only
+    # its installation would otherwise combine a decoded affine with the old
+    # chart and collapse/move the surviving word (for example Ad8 Ankara).
+    from .print_chart_domain import rebase_surviving_print_affines
+    surviving_print_rebases=rebase_surviving_print_affines(current,q,mapping.values())
     global32=old[0];rig=q['rigs']['main']
     for block,lo,hi in ((q['scene_block'],0,5),(rig['head_block'],5,20),(rig['optics_block'],20,32)):
         target=q['blocks'][block]
@@ -152,7 +157,7 @@ def restore_s01_into_joint_container(current,baseline,*,baseline_sha256,baseline
         restored_materials=restored,restored_shared_material_blocks=len(mapping),raw_UV_changed=False,
         previous_auxiliaries_or_duals_reused=False,requires_native_auxiliary_rebuild=True,
         other_shots_status='unaccepted numerical motion estimate under restored shared scene and main physical rig',
-        exact_s01_time_function_preserved=True)
+        exact_s01_time_function_preserved=True,surviving_print_chart_rebases=surviving_print_rebases)
     q['certificates']=dict(joint_fit_complete=False,formal_engineering_budget_passed=False,whole_shot_visual_accuracy_accepted=False)
     return q
 

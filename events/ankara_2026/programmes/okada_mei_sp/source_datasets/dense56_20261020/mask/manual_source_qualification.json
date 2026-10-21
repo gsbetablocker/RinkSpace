@@ -1,0 +1,44 @@
+{
+  "schema": "rinkspace.current_actual_arm_and_foot_SAM_source_qualification.v1",
+  "accepted": true,
+  "person_pts": [
+    1187584,
+    1187840,
+    1188096,
+    1188352,
+    1188608,
+    1188864,
+    1189120,
+    1189376,
+    1189632,
+    1189888,
+    1190144,
+    1235200
+  ],
+  "unknown_pts": [],
+  "rejected_pts": [
+    1186304,
+    1186560,
+    1186816,
+    1187072,
+    1187328
+  ],
+  "source_index_files": [
+    "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_footwear_v1/manual_arm_foot_source/index.jsonl.gz",
+    "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_footwear_v1/manual_arm_foot_source_v2/index.jsonl.gz",
+    "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_footwear_v1/manual_arm_foot_source_v3/index.jsonl.gz",
+    "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_footwear_v1/manual_arm_foot_source_v4/index.jsonl.gz"
+  ],
+  "source_QA_files": [
+    "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_footwear_v1/manual_arm_foot_source/QA_00.jpg",
+    "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_footwear_v1/manual_arm_foot_source/QA_01.jpg",
+    "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_footwear_v1/manual_arm_foot_source/QA_02.jpg",
+    "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_footwear_v1/manual_arm_foot_source_v2/QA_00.jpg",
+    "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_footwear_v1/manual_arm_foot_source_v3/QA_00.jpg",
+    "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_footwear_v1/manual_arm_foot_source_v4/QA_00.jpg"
+  ],
+  "rejected_generation_notes": "Initial early LK drift into circle logo rejected; second-generation 1187840 circle-logo spill rejected and rerun with actual source logo negative points. Use latest qualified per-frame generation only.",
+  "source_positive_prompt_UV_are_not_rink_measurements": true,
+  "independent_source_review": "root/s56_print independently checked v4 after visible logo negative prompts; root/s56_ice reviewed exact source and masks",
+  "qualified_component_split_file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_footwear_v1/manual_arm_foot_source_v4/qualified_component_split.json"
+}

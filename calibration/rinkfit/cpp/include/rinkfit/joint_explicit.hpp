@@ -8,7 +8,36 @@ namespace rinkfit {
 struct JointPhysicalEqualityTerm {int slot=0,index=0;double coefficient=0;};
 struct JointPhysicalEquality {std::vector<JointPhysicalEqualityTerm>terms;double rhs=0,evaluation_scale=1;template<class T>bool operator()(T const*const*p,T*r)const{T v=-T(rhs);for(const auto&t:terms)v+=T(t.coefficient)*p[t.slot][t.index];r[0]=T(evaluation_scale)*v;return finite_scalar(r[0]);}};
 struct JointZoomControlBound {int offset=0,upper=0;template<class T>bool operator()(T const*const*p,T*r)const{r[0]=upper?p[1][offset+2]-p[0][1]:p[0][0]-p[1][offset+2];return finite_scalar(r[0]);}};
-struct JointZoomCertificate {double f_ref=1,radius=1;int endpoint=0;template<class T>bool operator()(T const*const*p,T*r)const{const T z=p[1][endpoint]-T(std::log(f_ref));Brown<T>b;b.k1=p[0][5]+p[0][6]*z;b.k2=p[0][7]+p[0][8]*z;b.p1=p[0][9];b.p2=p[0][10];b.radius_max=T(radius);r[0]=T(1e-8)-brown_no_fold_lower_bound(b);return finite_scalar(r[0]);}};
+struct JointZoomCertificate {
+ double f_ref=1,radius=1;int endpoint=0;double wide_boundary=0;std::array<double,4>wide_coefficients{};
+ template<class T>std::array<T,2> coefficient_interval(const T&base,const T&slope,double coefficient,const T&lo,const T&hi)const{
+  auto value=[&](const T&x){const T hinge=x<T(wide_boundary)?T(wide_boundary)-x:T(0);return base+slope*(x-T(std::log(f_ref)))+T(coefficient)*hinge*hinge;};
+  T low=value(lo),high=low;auto include=[&](const T&x){const T v=value(x);if(v<low)low=v;if(v>high)high=v;};include(hi);
+  if(lo<T(wide_boundary)&&T(wide_boundary)<hi)include(T(wide_boundary));
+  if(coefficient!=0){const T vertex=T(wide_boundary)-slope/T(2*coefficient);if(lo<vertex&&vertex<hi&&vertex<T(wide_boundary))include(vertex);}
+  return {low,high};
+ }
+ template<class T>bool operator()(T const*const*p,T*r)const{
+  const bool extension=std::any_of(wide_coefficients.begin(),wide_coefficients.end(),[](double x){return x!=0;});
+  const T log_f=p[1][endpoint],z=log_f-T(std::log(f_ref));const T hinge=log_f<T(wide_boundary)?T(wide_boundary)-log_f:T(0),basis=hinge*hinge;
+  Brown<T>b;b.radius_max=T(radius);b.k1=p[0][5]+p[0][6]*z+T(wide_coefficients[0])*basis;b.k2=p[0][7]+p[0][8]*z+T(wide_coefficients[1])*basis;b.p1=p[0][9]+T(wide_coefficients[2])*basis;b.p2=p[0][10]+T(wide_coefficients[3])*basis;
+  // The old affine zoom has a concave no-fold lower bound in log-f, so its
+  // endpoints suffice. A wide quadratic can attain an interior extremum.
+  // Keep two original schema rows: the first encloses the complete interval;
+  // the second retains its exact upper-end disk predicate.
+  if(extension&&endpoint==0){
+   const auto k1=coefficient_interval(p[0][5],p[0][6],wide_coefficients[0],p[1][0],p[1][1]);
+   const auto k2=coefficient_interval(p[0][7],p[0][8],wide_coefficients[1],p[1][0],p[1][1]);
+   const auto p1=coefficient_interval(p[0][9],T(0),wide_coefficients[2],p[1][0],p[1][1]);
+   const auto p2=coefficient_interval(p[0][10],T(0),wide_coefficients[3],p[1][0],p[1][1]);
+   using std::abs;using std::sqrt;b.k1=k1[0];b.k2=k2[0];b.p1=abs(p1[0])>abs(p1[1])?abs(p1[0]):abs(p1[1]);b.p2=abs(p2[0])>abs(p2[1])?abs(p2[0]):abs(p2[1]);
+   const T pnorm2=b.p1*b.p1+b.p2*b.p2,pnorm=pnorm2>T(0)?sqrt(pnorm2):T(0),q=T(radius*radius);
+   const T pad=T(1e-10)*(T(1)+abs(b.k1)*q+abs(b.k2)*q*q+T(6*radius)*pnorm);
+   r[0]=T(1e-8)-brown_no_fold_lower_bound(b)+pad;
+  }else r[0]=T(1e-8)-brown_no_fold_lower_bound(b);
+  return finite_scalar(r[0]);
+ }
+};
 struct JointExplicitRow {
  const JointEventModel* model=nullptr;JointRowLayout layout;const JointObservation* source=nullptr;
  int station_slot=-1,row_slot=-1,alpha_slot=-1;

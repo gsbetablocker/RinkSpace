@@ -8,7 +8,9 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[3]
 MAIN_SITE = ROOT / ".venv" / "Lib" / "site-packages"
-GPU_SITE = ROOT.parent / "MotionTrail_Codex_Starter_v1" / ".venv-gpu" / "Lib" / "site-packages"
+GPU_SITES = (ROOT.parent / "MotionTrail_Codex_Starter_v1" / ".venv-gpu" / "Lib" / "site-packages",
+             Path(r"D:\CodexData\MotionTrail_Archive_20261019\.venv-gpu\Lib\site-packages"))
+GPU_SITE = next((p for p in GPU_SITES if p.is_dir()), GPU_SITES[0])
 
 
 def add_geometry_dependencies() -> tuple[str, ...]:

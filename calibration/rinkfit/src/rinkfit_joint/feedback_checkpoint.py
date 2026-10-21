@@ -103,7 +103,7 @@ def _diagnostics(generation, packet_path):
             raise ValueError('Incomplete or changed committed checkpoint artifact: ' + name)
     model = read_json(generation / 'model.json')
     arrays = {name: _array(packet_path.parent, packet['arrays'][name]) for name in
-              ('native_pts', 'shot_index', 'material_index', 'admission', 'fit_role', 'E', 'uv', 'profile_normal')}
+              ('native_pts', 'shot_index', 'material_index', 'admission', 'fit_role', 'E', 'uv', 'profile_normal', 'kind')}
     n = int(packet['row_count'])
     if len(packet['source_row_ids']) != n or any(len(x) != n for x in arrays.values()):
         raise ValueError('Checkpoint feedback source row identity is incomplete')
@@ -167,6 +167,13 @@ def collect_findings(generation, packet_path, context):
                     native_projection_domain_pass_is_not_source_RGB_identity_proof=True),
                 visual_resolution='unknown_until_current_native_source_review',
                 native_projection_is_not_source_identity_proof=True)
+            # Reuse only the actual source/reader dependency record produced by
+            # a completed native review of this exact observation subject.
+            from .packet_bound_feedback_review import cached_dependencies
+            deps = cached_dependencies(source, packet, arrays, index,
+                review_config=context.get('source_review_configuration'))
+            if deps is not None:
+                finding['review_dependencies'] = deps
             findings.append(finding)
     return findings, dict(active_rows=int(active.sum()), scanned_rows=len(active),
                           over_original_E_rows=int(over.sum()), invalid_raw_RS_rows=int(invalid.sum()),
@@ -193,7 +200,8 @@ def consume_generation(generation, packet_path, *, context=None, database=None, 
     result.update(schema=VERSION, generation_reference=_ref(checkpoint_receipt_path(generation)),
                   summary=summary, automatic_observation_installation=False,
                   visual_quality_improved=False, source_clock=context['source'],
-                  review_reuse_policy='diagnostics lack complete reader/config/fact dependencies; current source review remains required')
+                  source_packet_reference=_ref(packet_path),
+                  review_reuse_policy='reuse completed exact-subject native RGB/mask/observation/reader/fact dependencies; new PTS rereads pixels')
     if output is None:
         from rinkspace.storage import AssetStore
         folder = AssetStore(PROJECT).data / 'events' / context['event_id'] / 'feedback' / 'checkpoints'

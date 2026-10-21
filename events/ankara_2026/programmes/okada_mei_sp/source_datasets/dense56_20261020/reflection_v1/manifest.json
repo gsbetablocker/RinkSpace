@@ -1,0 +1,95 @@
+{
+  "schema": "rinkspace.current_source_competing_material_qualification.v1",
+  "complete": true,
+  "review_status": "qualified_source_uncertain_exclusions_visual_QA_complete",
+  "scope": "S05 blue/gray width measurements only; true red paint never globally excluded",
+  "stats": {
+    "frames": 1376,
+    "rows": 3051096,
+    "bluegray_width_rows": 1554285,
+    "candidate_profiles": 7140,
+    "excluded_rows": 4931
+  },
+  "exclusions_by_feature": {
+    "ice.B1:segment0": 10,
+    "ice.lane4:edge0": 523,
+    "ice.lane1:edge0": 2342,
+    "ice.house_connection_F1_R1:segment0": 1,
+    "ice.lane3:edge2": 3,
+    "ice.lane2:edge0": 3,
+    "ice.lane4:edge1": 1,
+    "ice.house_connection_F4_R4:segment0": 943,
+    "ice.lane4:edge2": 867,
+    "ice.lane3:edge0": 238
+  },
+  "source": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4",
+    "sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+    "native_fps": "50/1",
+    "time_base": "1/12800",
+    "native_frame_step_pts": 256,
+    "image_size_hw": [
+      1080,
+      1920
+    ]
+  },
+  "input_manifest": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_ice_v1\\canonical\\s05\\manifest.json",
+    "sha256": "59473e07b33ce3ddc51e712a3166b1739e074995016be3b4f9a4da05f7de30d7"
+  },
+  "input_rows": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_ice_v1\\canonical\\s05\\rows.jsonl.gz",
+    "sha256": "d25efabf16025e94129b173ced48ca4c6b62d55cccf52d1d3cb8514767cc0feb"
+  },
+  "coverage": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\reflection_v1\\coverage.jsonl.gz",
+    "sha256": "919128e16d0bb880538174b987a19a9556188257141229a77e50049674a9838d"
+  },
+  "exclusions": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\reflection_v1\\exclusions.jsonl.gz",
+    "sha256": "df5b8b1feba8045368f071d76e590c554e12aa0ecf234372fbd6eef2af091819"
+  },
+  "candidate_profiles": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\reflection_v1\\candidate_profiles.jsonl.gz",
+    "sha256": "fde25b9bcdc06d275da87ae1edb14b7de920b22262d79eaaa298321dab698923"
+  },
+  "read_qualify_script": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\reflection_v1\\qualify.py",
+    "sha256": "7f6713996ba8e591decf9444e80e675c8e5a1208776c327e3f622f0a0468ff74"
+  },
+  "all_1376_current_RGB_SHA_match": true,
+  "all_raw_source_rows_preserved": true,
+  "source_UV_moves": 0,
+  "no_refill_to_500": true,
+  "no_source_model_or_residual_used": true,
+  "all_red_pixels_proven_reflection": false,
+  "physical_fit_started": false,
+  "all_visible_material_qualified_claimed": false,
+  "native_bindings": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\reflection_v1\\native_bindings.jsonl.gz",
+    "sha256": "0bd04d607f9d4f0c3785b7b0c821f8230bed26d7573cbc272606a9617481f7b9"
+  },
+  "native_binding_receipt": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\reflection_v1\\native_binding_receipt.json",
+    "sha256": "ddb2ce7ec7932e06cf7c6203da2fdb179d7ac64065cad9cf7431b43cb5d93b80"
+  },
+  "source_immutable_fullfile_SHA_verified": true,
+  "visual_QA": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\reflection_v1\\visual_QA.json",
+    "sha256": "80634c05165de643a000e0abe7777ea354e3e99afdcc2cd3619a2f0aeab59420"
+  },
+  "consumer": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\reflection_v1\\consume.py",
+    "sha256": "f1075ba65cc78d36fbf0955091af239a5d6a2d4ae79c81b8a3bf76b7daa32fd8"
+  },
+  "selected_subset_exclusions": {
+    "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\reflection_v1\\selected_subset_exclusions.jsonl.gz",
+    "sha256": "75a439f68537477f1c8c921fa62f0f5227e6c07a7ba33672dc7e207e7cf1eaba"
+  },
+  "qualification_semantics": "Conservative exact source-row withholding for unresolved current competing bluegray/red material; not a segmentation truth mask or all-red reflection claim.",
+  "candidate_domains_must_not_be_consumed_as_global_masks": true,
+  "selected_subset_excluded_rows": 1218,
+  "selected_subset_retained_rows": 686782,
+  "source_UV_preserved_exactly": true,
+  "all_retained_points_requalified_or_physical_accuracy_claimed": false
+}

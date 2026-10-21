@@ -1,0 +1,115 @@
+{
+  "schema": "rinkspace.programme_source_occlusion_revision_facts.v1",
+  "event_id": "ankara_2026",
+  "programme_id": "okada_mei_sp",
+  "shot_id": "s05",
+  "accepted_consumer": {
+    "manifest": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/raisedshoe_v1/s05_manifest.json",
+      "sha256": "05f03d89202ea210df58cd60ec6dc2520dc03ca89b8e93ba2e390db636a903fd"
+    },
+    "index": {
+      "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\raisedshoe_v1\\s05_index.jsonl.gz",
+      "sha256": "6592082a125b214b8dd900e1b973698a32ec8a0e62cc77d21f46fda4ac021672"
+    }
+  },
+  "native_source_scope": {
+    "time_base": "1/12800",
+    "native_fps": "50/1",
+    "full_s05": [
+      948992,
+      1300992
+    ],
+    "actual_current_RGB_SAM_phase": [
+      1036800,
+      1103104
+    ],
+    "reviewed_frames": 260
+  },
+  "changed_native_frames": 196,
+  "added_independent_unknown_pixels": 256304,
+  "person_layer_unchanged": true,
+  "old_unknown_pixels_preserved": true,
+  "s06_unchanged": true,
+  "original_source_UV_and_physical_fitting_unchanged": true,
+  "source_BGR_RGB_and_crop_hashes_redecoded": 260,
+  "all_six_known_shoe_points_inside_current_unknown": true,
+  "unknown_semantics": "Current native RGB SAM footwear/actor silhouette with motion blur or uncertain exact pixel ownership. Source exclusion only; no true-person pixel, body, world, ice contact, or scene material certificate.",
+  "review": {
+    "all_260_native_current_phase_crops_reviewed": true,
+    "static_ice_wedges_and_independent_printed_logos_rejected": true,
+    "rejected_entire_new_candidate_frames": 26,
+    "refine_v1_current_RGB_frames": 20,
+    "refine_v2_current_RGB_frames": 9,
+    "old_source_masks_and_failed_candidates_preserved": true,
+    "proof_index": {
+      "file": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\dense56_v1\\raisedshoe_v1\\source_proof.jsonl.gz",
+      "sha256": "742977210f59f1a958a2356b89bc69d35571888ffb3ca11af167391e9c760cee"
+    },
+    "source_audit": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/raisedshoe_v1/sealed_source_audit.json",
+      "sha256": "0de1ba7e307a90eec583652a02cd6263e15ec56e24fdd53784a1d07686b58384"
+    },
+    "tail_cross_review": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/raisedshoe_v1/tail_review.json",
+      "sha256": "801c885150ffd611e0acdc59b897ce560143ba72cbedc85f943a8051866e6a3f"
+    }
+  },
+  "source_reader_implementation_mirrors": [
+    {
+      "file": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/source_datasets/shoe_s05/read_native_shoe.py",
+      "sha256": "e57662d2a4c67ae288349dbbf6ea24f5dc5859b0407c126daf85d18ad6804b35",
+      "actual_run_source": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/raisedshoe_v1/build_delta_candidates_v3.py"
+    },
+    {
+      "file": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/source_datasets/shoe_s05/refine_native_shoe_v1.py",
+      "sha256": "e6bf89b9845cc91b2e26c514e00898af9b087a7fe60c085c5677c5d532c5865e",
+      "actual_run_source": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/raisedshoe_v1/refine_source_sam.py"
+    },
+    {
+      "file": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/source_datasets/shoe_s05/refine_native_shoe_v2.py",
+      "sha256": "cfb57351051f8f41d0db118801fd9f388875cbc28fcdc842a0458a394fb7fbb1",
+      "actual_run_source": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/raisedshoe_v1/refine_source_sam_v2.py"
+    },
+    {
+      "file": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/source_datasets/shoe_s05/seal_unknown.py",
+      "sha256": "0e98aad36cf160f4492e87af5ff3dda6dca7778a0ad3a606a8d2407fa6314dcb",
+      "actual_run_source": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/raisedshoe_v1/seal_source_unknown.py"
+    },
+    {
+      "file": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/source_datasets/shoe_s05/audit_source.py",
+      "sha256": "f156ad6de58b2b191d956e913d142d5ff893ecba08240b4d69cf1dcb95298ca1",
+      "actual_run_source": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/raisedshoe_v1/audit_sealed.py"
+    },
+    {
+      "file": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/source_datasets/shoe_s05/track_navigation.py",
+      "sha256": "b7772ae081b9112df8cb8d1a39703e5ae2aff9ef28689e68aa76407991e0219e",
+      "actual_run_source": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/raisedshoe_v1/track_navigation.py"
+    },
+    {
+      "file": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/source_datasets/shoe_s05/navigation_anchors.json",
+      "sha256": "93bf9b4a38e7be206bc8fe3a557eeb9380a676a38f48824d54ee58d27ff1ba1c",
+      "actual_run_source": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/raisedshoe_v1/navigation_anchors.json"
+    },
+    {
+      "file": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/source_datasets/shoe_s05/source_prompts_v1.json",
+      "sha256": "48073c1d901e9d1a70f7d5d836ac7970285568f1bb10a9d091079132771658df",
+      "actual_run_source": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/raisedshoe_v1/refine_source_prompts_crop.json"
+    },
+    {
+      "file": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/source_datasets/shoe_s05/source_prompts_v2.json",
+      "sha256": "dbc29f7afec54f902d6493f1abca82a9182b671da78a20c8553c07460722b7b9",
+      "actual_run_source": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/raisedshoe_v1/refine_v2_source_prompts_crop.json"
+    },
+    {
+      "file": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/source_datasets/shoe_s05/source_decisions.json",
+      "sha256": "a50a8b7b60b3e7e3890882be45572440406e1616e32b52f2284b76feff0939b9",
+      "actual_run_source": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/raisedshoe_v1/source_decisions.json"
+    }
+  ],
+  "notes": [
+    "Archival exact scripts of completed Data runs. Heavy raw native masks, candidate masks, frames, GPU state, logs and QA pages remain under Data.",
+    "Actual pixels come from current native RGB SAM; source pose, LK and neighbour anchor interpolation serve navigation only.",
+    "Result entry is maintained by the main conversation in START_HERE.html."
+  ]
+}

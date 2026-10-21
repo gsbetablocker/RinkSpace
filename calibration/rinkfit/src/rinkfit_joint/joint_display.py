@@ -51,11 +51,12 @@ class SharedModelTopView:
   self.width=width;self.height=height;self.scale=min((height-140)/1.06,(width-100)/(scene.width+.08));self.center=np.array([width/2,height/2+18]);self.base=np.full((height,width,3),(25,34,40),np.uint8)
   cv2.putText(self.base,'SAME PHYSICAL MODEL  L=1',(22,32),cv2.FONT_HERSHEY_SIMPLEX,.6,(235,240,240),1,cv2.LINE_AA)
   for r in records:
+   if r.get('latent_source_track_point',False):continue
    q=world[r['begin']:r['end']];px=self.project(q);color=r['color']
    if r['material_index']<0:
     if np.isfinite(px).all():cv2.putText(self.base,r['label'],tuple(np.rint(px[0]).astype(int)),cv2.FONT_HERSHEY_SIMPLEX,.35,color,1,cv2.LINE_AA)
    elif len(q)>1 and np.isfinite(px).all():cv2.polylines(self.base,[np.rint(px).astype(np.int32).reshape(-1,1,2)],False,color,1,cv2.LINE_AA)
-  cv2.putText(self.base,'current dots: original native UV',(22,height-24),cv2.FONT_HERSHEY_SIMPLEX,.47,(220,230,230),1,cv2.LINE_AA)
+  cv2.putText(self.base,'left dots: current original native UV',(22,height-24),cv2.FONT_HERSHEY_SIMPLEX,.47,(220,230,230),1,cv2.LINE_AA)
  def project(self,xyz):
   q=np.asarray(xyz);return self.center+np.c_[q[...,1],-q[...,0]]*self.scale
  def frame(self,camera,local,sid):

@@ -126,6 +126,21 @@ BuildInventory JointALBuilder::build_advertisement_coordinate_problem(
   // Target is explicitly barred from scene/rig/control/zoom aliases above;
   // all zoom factors are constant in this exact coordinate restriction.
   inequality_index += zoom_bounds_.size() + 2 * zoom_enclosures_.size();
+  assert_source_math_dependencies();
+  // Source-visible-ice ray factors are camera/scene-only. They are constant
+  // in this exact ad-coordinate restriction, but their full schema slots and
+  // current domains must still be accounted for before complete AL acceptance.
+  for (std::size_t i = 0; i < visible_ice_source_inequality_count(); ++i) {
+    auto factor = visible_ice_source_factor(i);
+    if (depends(factor.ids))
+      throw std::logic_error("source-visible-ice factor varies in advertisement coordinate restriction");
+    std::vector<const double*> values;
+    for (auto id : factor.ids) values.push_back(pointer(id));
+    double value;
+    if (!factor.cost->Evaluate(values.data(), &value, nullptr) || !std::isfinite(value))
+      throw std::runtime_error("constant source-visible-ice physical constraint has invalid domain");
+    ++inequality_index;
+  }
   if (inequality_index != schema_.inequality_ids.size())
     throw std::logic_error("coordinate inequality original index inventory mismatch");
   for (std::size_t i = 0; i < equalities_.size(); ++i)

@@ -18,6 +18,7 @@ EventModel EventModel::load(const std::string& path) {
   if(m.blocks.empty()||m.blocks[0].values.size()!=kEventGlobalSize)throw std::runtime_error("global32 block absent");
   const auto& c=j.at("camera");m.R0_seed=c.at("R0_seed").get<Mat3<double>>();m.n_seed=c.at("n_seed").get<Vec3<double>>();m.b_seed=c.at("b_seed").get<Vec3<double>>();
   m.n_tangent1=c.at("n_tangent1").get<Vec3<double>>();m.n_tangent2=c.at("n_tangent2").get<Vec3<double>>();m.f_ref=c.at("f_ref");m.radius_max=c.at("radius_max");
+  if(c.contains("brown_wide_extension")){const auto&w=c.at("brown_wide_extension");if(w.at("schema")!="rinkfit.source_supported_wide_brown_hinge.v1"||w.at("power")!=2)throw std::runtime_error("unsupported wide Brown extension");m.wide_log_f_boundary=w.at("activation_log_f_native");m.wide_coefficients=w.at("coefficients").get<std::array<double,4>>();if(!std::isfinite(m.wide_log_f_boundary)||!finite_array(m.wide_coefficients))throw std::runtime_error("nonfinite wide Brown extension");}
   m.dt=c.at("dt");m.first_control_time=c.at("first_control_time");m.n_controls=c.at("n_controls");m.control_block_begin=c.at("control_block_begin");m.dependent_control=c.at("dependent_control");
   m.reference_indices=c.at("reference_indices").get<std::array<int,4>>();m.reference_weights=c.at("reference_weights").get<std::array<double,4>>();m.tau_bound=c.at("tau_bound");
   if(!valid_rotation(m.R0_seed)||std::abs(dot(m.n_seed,m.n_seed)-1)>1e-9||!(m.f_ref>0)||!(m.radius_max>0)||!(m.dt>0)||m.n_controls<4)throw std::runtime_error("invalid event camera seed");
@@ -139,12 +140,14 @@ EventRootResult EventModel::project_rs(int material,int path,double station,doub
     const double span=dy*half,zmin=Y[2]-span;
     if(zmin>0){const double Xabs=std::abs(Y[0])+span,Yabs=std::abs(Y[1])+span,x=Xabs/zmin,y=Yabs/zmin,r2=x*x+y*y,r=std::sqrt(r2);
       const double xp=dy*(zmin+Xabs)/(zmin*zmin),yp=dy*(zmin+Yabs)/(zmin*zmin);
-      const double k1a=std::abs(g[25])+std::abs(g[26])*zabs,k2a=std::abs(g[27])+std::abs(g[28])*zabs,p1=std::abs(g[29]),p2=std::abs(g[30]);
+      const double hinge_max=std::max(0.,wide_log_f_boundary-(tr[2]-zd*half)),basis_max=hinge_max*hinge_max;
+      const double k1p=std::abs(g[26])+2*std::abs(wide_coefficients[0])*hinge_max,k2p=std::abs(g[28])+2*std::abs(wide_coefficients[1])*hinge_max,p1p=2*std::abs(wide_coefficients[2])*hinge_max,p2p=2*std::abs(wide_coefficients[3])*hinge_max;
+      const double k1a=std::abs(g[25])+std::abs(g[26])*zabs+std::abs(wide_coefficients[0])*basis_max,k2a=std::abs(g[27])+std::abs(g[28])*zabs+std::abs(wide_coefficients[1])*basis_max,p1=std::abs(g[29])+std::abs(wide_coefficients[2])*basis_max,p2=std::abs(g[30])+std::abs(wide_coefficients[3])*basis_max;
       const double L=1+k1a*r2+k2a*r2*r2,Jyx=2*x*y*(k1a+2*k2a*r2)+2*p1*x+2*p2*y,Jyy=L+2*y*y*(k1a+2*k2a*r2)+6*p1*y+2*p2*x;
-      const double ybrown=y*L+p1*(r2+2*y*y)+2*p2*x*y,direct=y*(std::abs(g[26])*r2+std::abs(g[28])*r2*r2)*zd;
+      const double ybrown=y*L+p1*(r2+2*y*y)+2*p2*x*y,direct=(y*(k1p*r2+k2p*r2*r2)+p1p*(r2+2*y*y)+2*p2p*x*y)*zd;
       const double fymax=std::exp(tr[2]+zd*half-g[22]/2),ppprime=std::abs(g[24])*zd;
       const double speed=std::nextafter((fymax*(ybrown*zd+Jyx*xp+Jyy*yp+direct)+ppprime)*(1+1e-10)+1e-8,INFINITY);
-      const double k1lo=oo.brown.k1-std::abs(g[26])*zd*half,k2lo=oo.brown.k2-std::abs(g[28])*zd*half;
+      const double k1lo=oo.brown.k1-k1p*zd*half,k2lo=oo.brown.k2-k2p*zd*half;
       const double fold=std::min(quadratic_minimum(1.,k1lo,k2lo,r2),quadratic_minimum(1.,3*k1lo,5*k2lo,r2))-6*std::hypot(p1,p2)*r;
       certified=r<=radius_max&&fold>1e-10&&std::abs(tau)*speed/1079.<1.-1e-9;
     }

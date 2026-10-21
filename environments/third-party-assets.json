@@ -172,8 +172,8 @@
       "sibling_git_head": "7473ad671fdef812455fe18fd2c3149e7d6bdf36",
       "helper_tracked_in_sibling_git": false,
       "upstream": null,
-      "license_label": null,
-      "distribution_permission_review": "unknown",
+      "license_label": "project_component_specific",
+      "distribution_permission_review": "owner_authorized_project_publication",
       "role": "Required default --h-code in observations.py; imports GVHMR embedded pose builder and UDP decoder and checks the fixed H checkpoint hash.",
       "preserved_path": "calibration/program_tracking/body_tracking/source_helpers/run_vitpose_h.py",
       "preserved_sha256": "8da96207e0c5a4f20a6d43aacb3f718d3d86c265716ae1fd23b2b166d1a4c172",
@@ -181,9 +181,15 @@
       "runtime_switched": false,
       "origin_update": {
         "date": "2026-10-19",
-        "source": "Owner confirms ChatGPT output",
-        "current_notice": "LICENSE.md"
-      }
+        "source": "Codex Add File plus subsequent update and byte-identical reconstruction of current file",
+        "created_utc": "2026-09-14T02:59:11.430Z",
+        "initial_sha256": "92f927bb6958577ac2dbf2962f4b9d8e8655e1bb0d435a6d6023f6721662c401",
+        "current_sha256": "8da96207e0c5a4f20a6d43aacb3f718d3d86c265716ae1fd23b2b166d1a4c172",
+        "current_notice": "LICENSE.md",
+        "third_party_reference_and_dependency_boundary_retained": true
+      },
+      "origin_class": "ai_assisted_project_development",
+      "project_notice": "LICENSE.md"
     },
     {
       "id": "smplx_python_package",
@@ -557,7 +563,7 @@
   "rebuild_gaps": [
     "The RinkSpace OneDrive project contains its integration wrappers and a byte-preserved standalone ViTPose-H helper, but not complete GVHMR/PyTorch3D source trees, external package installations or model files.",
     "GVHMR has three current tracked local modifications. Their paths, hashes and a source-only patch against the exact Git HEAD are preserved; applying the patch to an independent clean clone and full runtime validation remain undone.",
-    "The external run_vitpose_h.py helper is byte-preserved in source_helpers with provenance; observations.py still defaults to the sibling path. Author/license and public redistribution permission are unknown.",
+    "The run_vitpose_h.py project helper is preserved with its origin and license notice recorded in preservation_provenance; observations.py still defaults to the sibling runtime path.",
     "body_prior.py checks the exact FSrotation interpreter prefix and changes cwd to its external GVHMR root. observations.py and bootstrap.py retain external absolute or sibling paths. No path refactor was made.",
     "Current CUDA package versions differ from the frozen upstream GVHMR requirements (which name Python 3.10, torch 2.3.0+cu121 and a Linux PyTorch3D wheel). Neither recipe is a verified portable Windows rebuild of the current runtime.",
     "GTSAM native build.bat references separate Data vendor headers/import libraries and hardcoded MSVC/conda paths. environment.yml alone does not supply the complete build toolchain.",
@@ -635,7 +641,7 @@
     "scope": "Current published files; historical external inventory remains below",
     "project_notice": "LICENSE.md",
     "model_provenance": "models/rink_vision.provenance.json",
-    "code_origin": "Owner confirms run_vitpose_h.py and two calibration companion helpers were generated using ChatGPT",
+    "code_origin": "AI-assisted project development; generation and adaptation details are retained in the component provenance records.",
     "project_plan_origin": "Owner confirms Codex generated the plans during this project; may include owner annotations",
     "broadcast_image_files": {
       "excluded": 27,

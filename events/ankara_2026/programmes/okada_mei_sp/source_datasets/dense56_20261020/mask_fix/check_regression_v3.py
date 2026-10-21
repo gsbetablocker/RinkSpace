@@ -1,0 +1,5 @@
+exec(open(r'D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/shoe_fix/diagnose.py',encoding='utf8').read().split('with av.open')[0])
+a={q['native_pts']:q for q in rz(O/'regression_v3/index.stream.jsonl.gz')};queries={1096192:[[742,409],[734,407],[720,433],[755,434],[743,387.5]],1135104:[[923,398],[937,428],[926,440],[988,484],[970,514]],1153792:[[1040,530],[1178,108],[1190,100]],1161216:[[930,480],[947,500]],1170944:[[941,480],[946,522]],1188352:[[620,398],[556,386],[706,402]],1235200:[[811,582],[815,609]],1044992:[[1350,300],[1600,340]]};rec=[]
+for p,r in a.items():
+ base=cv2.imread(r['parent_mask_ref']['file'],0)>0;new=cv2.imread(r['mask_file'],0)>0;dist=cv2.distanceTransform((~new).astype('u1'),cv2.DIST_L2,5);row=dict(native_pts=p,delta_pixels=r['delta_pixels'],old_person_pixels_lost=int((base&~new).sum()),query=[dict(uv=u,person=bool(new[int(round(u[1])),int(round(u[0]))]),distance=float(dist[int(round(u[1])),int(round(u[0]))]))for u in queries[p]]);rec.append(row)
+print(json.dumps(rec,indent=2));(O/'regression_v3/point_checks.json').write_text(json.dumps(rec,indent=2),encoding='utf8')
