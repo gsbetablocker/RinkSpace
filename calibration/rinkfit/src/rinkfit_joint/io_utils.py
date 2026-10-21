@@ -17,7 +17,11 @@ def read_json(path):
             return value
         finally:
             records.close()
-    return json.loads(Path(path).read_text(encoding="utf-8-sig"))
+    value = json.loads(Path(path).read_text(encoding="utf-8-sig"))
+    if isinstance(value, dict) and value.get("schema") == "rinkfit.joint_packet.v1" and ("dense_source_binding" in value or "dense_parent_packet" in value):
+        from .dense_joint_packet import expand_dense_packet
+        return expand_dense_packet(value, path)
+    return value
 
 
 def write_json(path, value):

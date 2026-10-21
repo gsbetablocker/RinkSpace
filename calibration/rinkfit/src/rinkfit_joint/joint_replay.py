@@ -77,7 +77,7 @@ def inventory(model):
     if not np.isfinite([lo,hi]).all() or not 0.<=lo<=hi<=1. or lo<previous:raise ValueError('Invalid material finite station interval union')
     previous=hi;stations=np.array([lo]) if pa.get('physical_point') else np.unique(np.r_[lo,grid[(grid>=lo)&(grid<=hi)],hi]);q=scene.world(mi,pi,stations)
     if kind==2 and pa.get('closed',False) and lo==0. and hi==1. and len(pa['points'])>1 and not np.array_equal(pa['points'][0],pa['points'][-1]):q=np.concatenate((q,_display_board_closure(scene,pa)))
-    label=m['label'];color=(40,225,240) if label.startswith(('Ad','print_component.')) else (80,230,80) if label.startswith('board') else (255,140,50);start=sum(len(x) for x in xyz);xyz.append(q);records.append(dict(material_index=mi,path=pi,label=label,begin=start,end=start+len(q),closed=bool(pa.get('closed',False) and lo==0. and hi==1.),original_path_closed=pa.get('closed',False),station_domain_interval=[lo,hi],station_samples=stations.tolist() if 'allowed_station_intervals'in pa else None,source_station_domain_applied='allowed_station_intervals'in pa,latent_source_track_point=_source_track_unknown_point(pa),board_material_surface=bool(kind in (2,3,6,7) or label.startswith(('Ad','board.','print_component.'))),color=color))
+    label=m['label'];color=(40,225,240) if label.startswith(('Ad','print_component.')) else (80,230,80) if label.startswith('board') else (255,140,50);start=sum(len(x) for x in xyz);xyz.append(q);records.append(dict(material_index=mi,path=pi,label=label,begin=start,end=start+len(q),closed=bool(pa.get('closed',False) and lo==0. and hi==1.),original_path_closed=pa.get('closed',False),station_domain_interval=[lo,hi],station_samples=stations.tolist() if 'allowed_station_intervals'in pa else None,source_station_domain_applied='allowed_station_intervals'in pa,latent_source_track_point=_source_track_unknown_point(pa),board_material_surface=bool(kind in (2,3,6,7) or label.startswith(('Ad','board.','print_component.'))),board_top_boundary=bool(kind==3 and float(pa.get('fixed_height_fraction',-1.))==1. and (label=='board.top' or label.startswith('board.top.'))),color=color))
  # Actual ad labels follow the solved surfaces, once per physical panel.
  byad={};allxyz=np.concatenate(xyz,axis=0)
  for r in records:
@@ -110,17 +110,41 @@ No off-sensor root is certified; finite clipping only draws legal subsegments.
   ids=np.flatnonzero(unresolved);b=camera.project_rs(world[ids],local);a['uv'][ids]=b['uv'];good[ids]=b['valid'];eq[ids]=b['root_equality_px']
  return a['uv'],good,eq
 
+def material_visibility_records(scene,material_index,path_index):
+ """Preserve top-boundary identity when batching per-source visibility rows."""
+ mi=np.asarray(material_index,int);pi=np.asarray(path_index,int)
+ if mi.shape!=pi.shape or mi.ndim!=1:raise ValueError('Visibility material/path rows differ')
+ if not len(mi):return []
+ pairs,inverse=np.unique(np.c_[mi,pi],axis=0,return_inverse=True);codes=[]
+ for material,branch in pairs:
+  label=scene.materials[int(material)]['label'];path=scene.path(int(material),int(branch));kind=path['kind']
+  board=kind in (2,3,6,7) or label.startswith(('Ad','board.','print_component.'))
+  top=bool(kind==3 and float(path.get('fixed_height_fraction',-1.))==1. and (label=='board.top' or label.startswith('board.top.')))
+  codes.append(int(board)+2*int(top))
+ codes=np.asarray(codes,np.uint8)[inverse];cuts=np.r_[0,np.flatnonzero(codes[1:]!=codes[:-1])+1,len(mi)]
+ return [dict(begin=int(lo),end=int(hi),label='',board_material_surface=bool(codes[lo]&1),board_top_boundary=bool(codes[lo]&2))for lo,hi in zip(cuts[:-1],cuts[1:])]
+
+
 def render_visibility(camera,scene,world,records,local,uv):
  """Cull hidden inner-board faces and rays blocked by the finite near board.
+
+The declared zero-thickness top edge is visible from either side of the wall;
+its visibility does not inherit the inner advertisement face normal. Ray
+occlusion by the finite wall still applies to that edge.
 
 This changes display visibility only, never source identity or fit admission.
 """
  row=np.clip(np.nan_to_num(uv[:,1],nan=539.5,posinf=1079.,neginf=0.),0,1079);tm=local+camera.tau*(row/1079-.5);a=camera.spline(tm);R=rotation(camera.b,a[:,1])@camera.R0@rotation(camera.n,a[:,0]);z=a[:,2]-np.log(float(camera.optics['f_ref']));wb=np.einsum('...ji,j->...i',R,camera.b);h=np.cross(camera.n,wb);h/=np.linalg.norm(h,axis=1)[:,None];D=np.broadcast_to(camera.d,(len(world),3)).copy();D[:,2]+=camera.head.get('pupil_linear',0)*z+camera.head.get('pupil_quadratic',0)*z*z;C=camera.P+np.einsum('...ji,...j->...i',R,D)+camera.a*h
  u=np.maximum((np.abs(world[:,0])-(.5-scene.rx))/scene.rx,0);v=np.maximum((np.abs(world[:,1])-(scene.width/2-scene.ry))/scene.ry,0);normal=-np.c_[np.sign(world[:,0])*u**(scene.p-1)/scene.rx,np.sign(world[:,1])*v**(scene.p-1)/scene.ry]
- board=np.zeros(len(world),bool)
+ board=np.zeros(len(world),bool);top=np.zeros(len(world),bool)
  for r in records:
-  if r.get('board_material_surface',r['label'].startswith(('Ad','board.','print_component.'))):board[r['begin']:r['end']]=True
- facing=np.sum(normal*(C[:,:2]-world[:,:2]),axis=1)>=-1e-12;visible=(~board)|facing
+  label=r.get('label','');lo,hi=int(r['begin']),int(r['end'])
+  if r.get('board_material_surface',label.startswith(('Ad','board.','print_component.'))):board[lo:hi]=True
+  if r.get('board_top_boundary',label=='board.top' or label.startswith('board.top.')):
+   # A semantic top declaration also has to lie on the actual shared upper
+   # boundary. A print corner merely at the same height receives no exemption.
+   q=world[lo:hi];top[lo:hi]=(np.abs(q[:,2]-scene.height)<=1e-10)&(np.abs(scene.containment(q[:,:2]))<=1e-8)
+ facing=np.sum(normal*(C[:,:2]-world[:,:2]),axis=1)>=-1e-12;visible=(~board)|facing|top
  outside=scene.containment(C[:,:2])>1e-10
  if outside.any():
   lo=np.zeros(len(world));hi=np.ones(len(world));direction=world-C

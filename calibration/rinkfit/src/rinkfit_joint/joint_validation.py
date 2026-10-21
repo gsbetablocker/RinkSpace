@@ -50,7 +50,7 @@ def _measure_current(rgb,mask,context):
 def _frozen_board_search_context(scene,camera,local,*,native_pts,shot_id,bgrsha,rgbsha,model_ref,source_sha256,output):
  # The source reader still proves actual blue/body/yellow material in this RGB.
  # These projected points supply no fit UV, identities, or visibility claims.
- grid=np.linspace(0,scene.perimeter,2049);world=np.concatenate([scene.board(grid,h) for h in (scene.height,0.)]);uv,good,_=fast_native_project(camera,world,local);record=[dict(label='board.navigation',begin=0,end=len(world),board_material_surface=True)];good&=render_visibility(camera,scene,world,record,local,uv);good&=np.isfinite(uv).all(1)&(uv[:,0]>=-100)&(uv[:,0]<=2020)&(uv[:,1]>=-100)&(uv[:,1]<=1180)
+ grid=np.linspace(0,scene.perimeter,2049);world=np.concatenate([scene.board(grid,h) for h in (scene.height,0.)]);uv,good,_=fast_native_project(camera,world,local);record=[dict(label='board.top',begin=0,end=2049,board_material_surface=True,board_top_boundary=True),dict(label='board.contact',begin=2049,end=len(world),board_material_surface=True)];good&=render_visibility(camera,scene,world,record,local,uv);good&=np.isfinite(uv).all(1)&(uv[:,0]>=-100)&(uv[:,0]<=2020)&(uv[:,1]>=-100)&(uv[:,1]<=1180)
  a=uv[:2049][good[:2049]];b=uv[2049:][good[2049:]]
  if len(a)<2 or len(b)<2:return None
  a=a[np.argsort(a[:,0])];b=b[np.argsort(b[:,0])];a=a[np.unique(np.linspace(0,len(a)-1,min(64,len(a))).round().astype(int))];b=b[np.unique(np.linspace(0,len(b)-1,min(64,len(b))).round().astype(int))];alluv=np.concatenate([a,b]);top=[max(0,int(np.floor(a[:,1].min()-80))),min(1080,int(np.ceil(a[:,1].max()+80)))];foot=[max(0,int(np.floor(b[:,1].min()-80))),min(1080,int(np.ceil(b[:,1].max()+80)))];box=[max(0,int(np.floor(alluv[:,0].min()-80))),max(0,min(top[0],foot[0])),min(1920,int(np.ceil(alluv[:,0].max()+80))),min(1080,max(top[1],foot[1]))]
@@ -63,7 +63,7 @@ def _frozen_board_search_context(scene,camera,local,*,native_pts,shot_id,bgrsha,
 
 def _project_rows(scene,camera,local,height_fraction,rows):
  def world_at(s):return scene.board(np.asarray(s)*scene.perimeter,scene.height*height_fraction)
- source=np.asarray([r['current_uv'] for r in rows]);n=len(source);grid=np.linspace(0,1,2049);world=world_at(grid);uv,good,_=fast_native_project(camera,world,local);record=[dict(label='board.frozen_source_diagnostic',begin=0,end=len(world))];good&=render_visibility(camera,scene,world,record,local,uv)
+ source=np.asarray([r['current_uv'] for r in rows]);n=len(source);grid=np.linspace(0,1,2049);world=world_at(grid);uv,good,_=fast_native_project(camera,world,local);record=[dict(label='board.top' if height_fraction==1. else 'board.contact',begin=0,end=len(world),board_material_surface=True,board_top_boundary=height_fraction==1.)];good&=render_visibility(camera,scene,world,record,local,uv)
  if not good.any():return [dict(valid=False,reason='no_visible_finite_same_material_projection') for r in rows]
  ids=np.flatnonzero(good);_,nn=cKDTree(uv[good]).query(source);s=grid[ids[nn]];active=np.ones(n,bool)
  # Deterministic finite-curve nearest-point refinement after actual source read.

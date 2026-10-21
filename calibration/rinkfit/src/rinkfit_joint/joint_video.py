@@ -19,36 +19,39 @@ def verified(reference):
 
 
 _FIRST4=(('s01','main',256256,575488),('s02','secondary',575744,720640),('s03','end',720896,745728),('s04','main',745984,948736))
+_FIRST6=_FIRST4+(('s05','end',948992,1300992),('s06','secondary',1301248,1425408))
 
 def _selected_scope(model,scope,cg,scope_mode):
  """Validate the actual selected source interval without certifying other shots."""
  if scope_mode=='programme':
   cg.validate(require_ready=True)
   return 8434,'joint9'
- if scope_mode!='first4':raise ValueError('Unknown native replay scope mode')
+ if scope_mode not in ('first4','first6'):raise ValueError('Unknown native replay scope mode')
+ selected=_FIRST4 if scope_mode=='first4' else _FIRST6
  if not validate_physical_domain(model)['passed']:raise ValueError('Selected physical model is outside its actual scene/material domain')
- if set(model['shots'])!={s[0] for s in _FIRST4}:raise ValueError('First-four replay requires the actual four-shot physical model')
- if len(scope['shots'])!=4:raise ValueError('First-four replay scope contains other shots')
+ if set(model['shots'])!={s[0] for s in selected}:raise ValueError('Selected replay requires the actual scoped physical model')
+ if len(scope['shots'])!=len(selected):raise ValueError('Selected replay scope contains other shots')
  clock=model['source_clock']
- if clock.get('time_base')!=[1,12800] or clock.get('frame_step_pts')!=256 or clock.get('image_size')!=[1920,1080] or clock['source_video_sha256']!=scope['source']['sha256']:raise ValueError('First-four source clock mismatch')
- for s,(sid,rid,first,last) in zip(scope['shots'],_FIRST4):
-  if (s['id'],s['rig_id'],s['first_pts'],s['last_pts'])!=(sid,rid,first,last):raise ValueError('First-four native source interval or rig identity mismatch')
-  if model['shots'][sid]['rig_id']!=rid:raise ValueError('First-four physical rig changed')
+ if clock.get('time_base')!=[1,12800] or clock.get('frame_step_pts')!=256 or clock.get('image_size')!=[1920,1080] or clock['source_video_sha256']!=scope['source']['sha256']:raise ValueError('Selected source clock mismatch')
+ for s,(sid,rid,first,last) in zip(scope['shots'],selected):
+  if (s['id'],s['rig_id'],s['first_pts'],s['last_pts'])!=(sid,rid,first,last):raise ValueError('Selected native source interval or rig identity mismatch')
+  if model['shots'][sid]['rig_id']!=rid:raise ValueError('Selected physical rig changed')
   stamps=np.arange(first,last+1,256,dtype=np.int64);cg.local_seconds(sid,stamps);camera=cg.native_camera(sid)
   allowed=float(cg.graph['rigs'][rid].get('tau_bound',.02));duration=(last-first)/12800.
   if not np.isfinite(allowed) or allowed<=0 or abs(camera.tau)>allowed or camera.domain[0]>-allowed/2+1e-12 or camera.domain[1]<duration+allowed/2-1e-12:raise ValueError('Selected camera lacks full native readout support: '+sid)
   if not camera.optical_domain_certificate()['passed']:raise ValueError('Selected optical domain is invalid: '+sid)
- return 2706,'first4'
+ return sum((last-first)//256+1 for _,_,first,last in selected),scope_mode
 
 def render(model_file,scope_file,output,improvement_receipt,*,compiled_dir=None,gpu_dll=None,gpu_validation=None,ffmpeg='ffmpeg',scope_mode='programme'):
  model_file=Path(model_file).resolve();scope_file=Path(scope_file).resolve();out=Path(output).resolve()
  if out.exists():raise ValueError('Full video requires a new immutable generation')
  entry_refs=[dict(path=str(p),sha256=file_sha256(p))for p in (model_file,scope_file,Path(improvement_receipt).resolve())]
  model=read_json(model_file);scope=read_json(scope_file);sha=entry_refs[0]['sha256'];approval=read_json(improvement_receipt)
- expected_schema='rinkfit.first4.clear_improvement_review.v1' if scope_mode=='first4' else 'rinkfit.joint9.clear_improvement_review.v1'
+ expected_schema='rinkfit.'+('joint9' if scope_mode=='programme' else scope_mode)+'.clear_improvement_review.v1'
  if approval.get('schema')!=expected_schema or not approval.get('clear_improvement'):raise ValueError('Actual source improvement review is required before full video')
- if scope_mode=='first4':
-  if approval.get('all_selected_shots_reviewed') is not True or approval.get('reviewed_shot_ids')!=[s[0] for s in _FIRST4]:raise ValueError('Improvement review must cover all four complete shots')
+ if scope_mode in ('first4','first6'):
+  selected=_FIRST4 if scope_mode=='first4' else _FIRST6
+  if approval.get('all_selected_shots_reviewed') is not True or approval.get('reviewed_shot_ids')!=[s[0] for s in selected]:raise ValueError('Improvement review must cover every selected complete shot')
  elif not approval.get('all_nine_shots_reviewed'):raise ValueError('Actual nine-shot source improvement review is required')
  if approval['model']['sha256']!=sha or file_sha256(approval['model']['path'])!=sha:raise ValueError('Improvement review belongs to a different physical state')
  if approval['native_source_video_sha256']!=scope['source']['sha256']:raise ValueError('Improvement review names another source')
@@ -109,5 +112,9 @@ def render_first4(model_file,scope_file,output,improvement_receipt,**kwargs):
  """Explicit S01–S04 consumer; the default whole-programme API is unchanged."""
  return render(model_file,scope_file,output,improvement_receipt,scope_mode='first4',**kwargs)
 
+def render_first6(model_file,scope_file,output,improvement_receipt,**kwargs):
+ """Explicit S01–S06 replay at the original continuous 50 Hz source clock."""
+ return render(model_file,scope_file,output,improvement_receipt,scope_mode='first6',**kwargs)
+
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--model',required=True);p.add_argument('--scope',required=True);p.add_argument('--out',required=True);p.add_argument('--improvement-receipt',required=True);p.add_argument('--compiled-dir');p.add_argument('--gpu-dll');p.add_argument('--gpu-validation');p.add_argument('--ffmpeg',default='ffmpeg');p.add_argument('--scope-mode',choices=['programme','first4'],default='programme');a=p.parse_args();print(json.dumps(render(a.model,a.scope,a.out,a.improvement_receipt,compiled_dir=a.compiled_dir,gpu_dll=a.gpu_dll,gpu_validation=a.gpu_validation,ffmpeg=a.ffmpeg,scope_mode=a.scope_mode),ensure_ascii=False))
+ p=argparse.ArgumentParser();p.add_argument('--model',required=True);p.add_argument('--scope',required=True);p.add_argument('--out',required=True);p.add_argument('--improvement-receipt',required=True);p.add_argument('--compiled-dir');p.add_argument('--gpu-dll');p.add_argument('--gpu-validation');p.add_argument('--ffmpeg',default='ffmpeg');p.add_argument('--scope-mode',choices=['programme','first4','first6'],default='programme');a=p.parse_args();print(json.dumps(render(a.model,a.scope,a.out,a.improvement_receipt,compiled_dir=a.compiled_dir,gpu_dll=a.gpu_dll,gpu_validation=a.gpu_validation,ffmpeg=a.ffmpeg,scope_mode=a.scope_mode),ensure_ascii=False))

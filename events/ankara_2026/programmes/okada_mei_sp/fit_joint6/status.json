@@ -1,0 +1,254 @@
+{
+  "schema": "rinkspace.joint6_recovery_status.v1",
+  "updated_utc": "2026-10-21T09:29:56.629Z",
+  "user_scope": "Restore joint physical fitting S01–S06 from current dense source store, using existing GPU and source feedback; control disk use.",
+  "phase": "stopped_by_user_pending_system_review",
+  "quality_accepted": false,
+  "shared_scene_count": 1,
+  "rig_count": 3,
+  "shots": [
+    "s01",
+    "s02",
+    "s03",
+    "s04",
+    "s05",
+    "s06"
+  ],
+  "selected_native_scope": {
+    "file": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_joint6/scope.json",
+    "sha256": "e51a32cefd31dc2139f2c018253bb4f7a4dbb0d9db5591d26c6286964bcd1798"
+  },
+  "model": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/model_source_domain_v1/model6.json",
+    "sha256": "a0b8570d62104ff4c80bcd41f8458b28a2be54a938445bbe69254a45ac73c5e4"
+  },
+  "packet": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/fitted_prefix_raw_tail_q7_v1/packet.json",
+    "sha256": "5277028ce137959a03022f5e0e3b6be1f2fd9d0e9b6f6238dc32ae8e3501163f"
+  },
+  "configuration": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/latent_joint_gpu_config_v1.json",
+    "sha256": "c40b898c748145e6c56e99e54de189592122d59e88e7692828e062ad8ae946be"
+  },
+  "native": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/native_v26/joint_fit.exe",
+    "sha256": "6b6cb962ebf4556bfcb5964d00e4ba3f9949b696608ecbcf0042b3204de7796f"
+  },
+  "current_execution_output": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/latent_joint_gpu_v1",
+  "driver_pid": null,
+  "raw_rows": 1210861,
+  "active_rows": 1168579,
+  "active_rows_by_shot": {
+    "s01": 181840,
+    "s02": 122530,
+    "s03": 28955,
+    "s04": 195988,
+    "s05": 488193,
+    "s06": 151073
+  },
+  "current_source_generation": {
+    "source_generation": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/qualification_commit_v7/source_generation.json",
+      "sha256": "0624ec2c6e8efee44ecb069c4ee0ae617482cd0dbc38f0bea4d708758839170d"
+    },
+    "qualification": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/fitted_prefix_raw_tail_q7_v1/source_rebind/source_qualification.json",
+      "sha256": "c43c134a6ad350d56709c92a14c1fc971d01185ac16c00ad2fa07b16e8f18282"
+    },
+    "weights": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/fitted_prefix_raw_tail_q7_v1/source_rebind/engineering_weights.json",
+      "sha256": "bd80d01e67a6bf6b15778edebc7558b18c8805e1dbdfe71430ec76a4eedb2d73"
+    }
+  },
+  "unknown_new_source_rows_retained": 21069,
+  "source_UV_ID_nativePTS_preserved": true,
+  "source_weights_unchanged_for_retained_rows": true,
+  "temporary_stage": {
+    "free_physical_blocks": 2077,
+    "free_tangent_dimensions": 4350,
+    "patch": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/latent_geometry_stage_v1/config_patch.json",
+      "sha256": "aeb5cd6345f0b9b3747779bc067f3f3f6ec3173b5e1fb08ec95d3a75b5754baa"
+    },
+    "s01_full_projection_dependencies_temporarily_fixed": true,
+    "not_a_fully_unlocked_six_shot_physical_optimum": true,
+    "S01_is_not_certified_truth": true
+  },
+  "GPU": {
+    "backend": "CUDA_CGNR",
+    "inexact_linear_step_eta": 0.000001,
+    "existing_PTX_and_batch_reuse": true,
+    "actual_previous_backend_comparison": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/actual_backend_comparison_v1.json",
+      "sha256": "e4db9c4f4623d85bbfda617b9434629ef7a64d1ddb0f3cc1c6f0bda6529b8e9d"
+    }
+  },
+  "accepted_model_source_guard": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/accepted_source_anchor_review_v2.json",
+    "sha256": "d75a9915f339f69daf012eb6b4eb1e42a0b286e3fdefc72a6fd59a37243fb65e"
+  },
+  "source_self_correction": {
+    "q7_new_unknown": 2004,
+    "S04_short_side_new_positive": 10,
+    "S04_new_unknown": 1313,
+    "S04_parent_source_state_preserved": true,
+    "S06_unknown_for_missing_finite_instance_support": 691,
+    "source_positions_not_claimed_all_wrong": true,
+    "source_RGB_profiles_do_not_certify_entity_identity": true,
+    "raw_UV_and_retained_absolute_weights_unchanged": true,
+    "old_packets_immutable": true
+  },
+  "real_static_motion": {
+    "pair_count": 498204,
+    "reused": true,
+    "installed_as_objective": false,
+    "independent_validation": true
+  },
+  "owned_storage_latest": [
+    {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/failed_state_disk_compaction_v1/report.json",
+      "sha256": "8f3e0a8286e3f0e6fd3d3cdc18586b316469b7a7ca5754561f18b793eb4232ba"
+    },
+    {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/failed_state_disk_compaction_v2/report.json",
+      "sha256": "5345d33d546ce157ec69cb689f1afbb2180f658897bc3edfeed1b976c732c626"
+    },
+    {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/failed_state_disk_compaction_v3/report.json",
+      "sha256": "bbc4c0bda9bf032331cde1c4f5897da4bc11eb80095bdcb69cc90698f197424e"
+    },
+    {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/failed_state_disk_compaction_v4/report.json",
+      "sha256": "76de9f56cddb1d003c52d78a0d9eeed063a33c66c53eed42de3cd44dd189766d"
+    }
+  ],
+  "rejected_prior_candidates": {
+    "model": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/observed_gpu_v3/candidate/model.json",
+      "sha256": "2ddd3cd8f9c281db4fc790bfd861db2dd999be43f4dab945e5f4820736bd1af1"
+    },
+    "quality_accepted": false,
+    "installed": false
+  },
+  "rejection_evidence": {
+    "old_2D_anchor_guard": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/evaluation_v1/live_guard_v3_first/anchor_guard/report.json",
+    "actual_source_motion": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/evaluation_v1/live_guard_v3_first/motion_guard/comparison.json",
+    "bad_numeric_tail": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/evaluation_v1/captured_tail_observed_row_cost_diagnosis.json"
+  },
+  "remaining_work": [
+    "先由整体审核区分源实例准入、固定几何与目标冲突；当前不再局部试跑",
+    "区分中间迭代监测与最终严格验收；不能把两步中断候选说成已收敛",
+    "同一observed objective完整CP严格续跑入口尚未实现，禁止把当前CP伪装成trueRS/formal状态",
+    "将已存在的S05/S06静止实体2D原片运动证据真正接入拟合目标，并核未知点/广告chart规范自由度",
+    "有证据地核查及解锁共同scene/main/S01依赖，原审核源不等于S01模型全对",
+    "在完整同源分母上完成真实RS、连续运动、完整镜头验证后才可验收和生成连续网格视频"
+  ],
+  "physical_quality_accepted": false,
+  "latest_actual_execution": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/latent_joint_gpu_v1_execution.json",
+    "sha256": "b467cb96a1a6dc8b1c460de12d3af1e3ada52fec0c16b6d706980e17e169f476"
+  },
+  "latest_candidate": {
+    "model": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/latent_joint_gpu_v1/candidate/model.json",
+      "sha256": "30ca35132309ced9991a0425dc3d9d53fd767a984aa8853ec556188c716db5c3"
+    },
+    "complete_checkpoint": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/latent_joint_gpu_v1/candidate/engineering_checkpoint.json",
+      "sha256": "16003036847d81c1965df7ca9ba3344d47eedb630e594b660a49c27f301e4ba7"
+    },
+    "complete_state_token": "5b7469a5bca4e5e9",
+    "quality_accepted": false,
+    "installed": false,
+    "converged": false
+  },
+  "first_accepted_guard": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/latent_joint_gpu_v1/accepted_source_review/1/decision.json",
+    "sha256": "c39bab7fcedebef9993976479eae40f3a9e0212d09dd134a1e04997b860119b2"
+  },
+  "S01_status": {
+    "physical_model_accepted": false,
+    "source_audit_does_not_certify_model": true,
+    "temporary_projection_freeze": true
+  },
+  "numerical_cap_conflict": {
+    "report": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/evaluation_v1/q6_engineering_cap_budget_v1/report.json",
+      "sha256": "5bd074124b4c65e46dbddc7c019e2aec2460f590b4d77fdd56af9530f6127536"
+    },
+    "active_rows_at_engineering_or_unknown_endpoint": 3949,
+    "engineering_half_cost": 467678598.44030285,
+    "source_UV_or_eligibility_changed": false,
+    "fix_in_progress": "case168已生效；其余flagged集合未证明皆可延拓，不再继续局部修改",
+    "tangent_half_cost": 462293150.47019506,
+    "tangent_fraction": 0.9884847243639796,
+    "classification_caveat": "3949 is a metadata-flagged audit set, not all certified numerical caps: mat423 has a genuine right-side corner and a miscopied left-display-proxy note; no blind extension allowed",
+    "installed_source_supported_case": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/cap168_actual_v2/report.json",
+      "sha256": "007a25de68a26b54f330f502ff32ad8e57e3862c280bc6d2a46fd73777788765"
+    },
+    "source_request": {
+      "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/fitted_prefix_raw_tail_q7_v1/cap168_domain_request.json",
+      "sha256": "03f70ededd4c6c2d442cc745daafaca926c8bb7fb5a72b44b465042c08a35a86"
+    },
+    "new_source_rows_issued": 0,
+    "current_source_qualification_changed": false
+  },
+  "owned_disk_inventory": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/owned_disk_inventory_v2.json",
+    "sha256": "dbf1aedf1982331d08abfb4e606f1d50eb3c6026ce341f02b40fc92f61cc3e8e"
+  },
+  "current_complete_baseline": {
+    "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/evaluation_v1/quality_observed_rawtail_q7_baseline_v1/report.json",
+    "sha256": "226c5d345291b6f44dac7c099759928e4d6dcd3c611a51a4a4975319a1c5b0d2"
+  },
+  "stop_reason": "用户要求停止研究工作，保存接续入口并提交公开源码，制作不超过200MB的私有PRO审核包",
+  "process_status": {
+    "own_last_driver": {
+      "pid": 32284,
+      "exit_code": 0
+    },
+    "all_three_subagents_confirmed_no_active_workers": true,
+    "global_machine_process_inventory": "CIM unavailable; no claim about unrelated sessions",
+    "additional_fitting_compilation_tracking_or_rendering_started": false
+  },
+  "latest_observed_objective": {
+    "objective_id": "rinkfit.sourceUV_observed_row_finite_initialization.v1",
+    "initial_half_cost": 3846650133.765446,
+    "final_half_cost": 1359767866.7400503,
+    "nonzero_accepted_steps": 2,
+    "rejected_steps": 0,
+    "termination": "USER_SUCCESS from STOP_REQUESTED callback, not convergence",
+    "true_RS_verified": false
+  },
+  "system_review": {
+    "early_stop_policy_can_reject_recoverable_intermediate_states": true,
+    "source_UV_replay_does_not_certify_finite_entity_identity": true,
+    "unverified_fixed_ad_geometry_and_camera_latents_require_joint_audit": true,
+    "motion_fit_factors_installed": false,
+    "strict_observed_complete_checkpoint_resume_available": false,
+    "evidence": [
+      {
+        "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/evaluation_v1/latent_joint_v1_iter1_iter2_source_trend/report.json",
+        "sha256": "2b5e3940d444a25132a6ee8ec80eb93a7bee38fed71a10dc0fbe591755c55fe7"
+      },
+      {
+        "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/evaluation_v1/latent_joint_v1_first_counterfactual/report.json",
+        "sha256": "07f92d5a571215d235a37ee17309c6335f5e77427da3a357330892e645e8bd4a"
+      },
+      {
+        "file": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/joint6_v1/evaluation_v1/latent_joint_v1_final_anchors/report.json",
+        "sha256": "93858c2136240dc7a31bc261bd0993e2a6fc048006225aa3c29ca66aac0468c2"
+      }
+    ]
+  },
+  "local_entry": "D:/CodexData/RinkSpace_Data/workbench/START_HERE.html",
+  "public_entry": "docs/GITHUB_REVIEW.md#joint6-20261021",
+  "pro_review": {
+    "bundle_name": "Okada_Joint6_System_Audit_20261021.zip",
+    "public_repository": "https://github.com/gsbetablocker/RinkSpace",
+    "bundle_limit_bytes": 200000000,
+    "status": "private_supplement_identity_recorded_in_Data_delivery_manifest",
+    "delivery_manifest": "D:/CodexData/RinkSpace_Data/pro/okada_joint6_20261021/delivery.json"
+  }
+}

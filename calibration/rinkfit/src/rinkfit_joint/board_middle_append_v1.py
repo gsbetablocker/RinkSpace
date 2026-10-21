@@ -19,7 +19,9 @@ def require(ok,text):
  if not ok:raise ValueError(text)
 def checked(v,seen):
  p=Path(v.get('file',v.get('path'))).resolve();key=(str(p),v['sha256'])
- if key not in seen:require(file_sha256(p)==v['sha256'],'Changed actual board source dependency '+str(p));seen.add(key)
+ if key not in seen:
+  from .exact_dependency_aliases import resolve_dependency
+  p=resolve_dependency(v);key=(str(p),v['sha256']);seen.add(key)
  return p
 def jload(p):
  p=Path(p)

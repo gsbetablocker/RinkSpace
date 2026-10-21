@@ -10,7 +10,7 @@ import numpy as np
 from .io_utils import read_json,read_jsonl,write_json,write_jsonl,file_sha256
 from .joint_model import as_event_view,graph_from_joint
 from .camera_graph import CameraGraph
-from .joint_replay import render_visibility
+from .joint_replay import render_visibility,material_visibility_records
 from rinkfit_start.native_scene import NativeScene
 
 
@@ -95,8 +95,7 @@ def compare_native_tracklets(source_rows,models,output,*,scope_file=None,source_
                     surface_valid[k] &= bool(np.isfinite(uv).all() and np.all(uv>=-1e-10) and np.all(uv<=1+1e-10)
                         and 0<ad[1]<=scene.perimeter+1e-10 and -1e-10<=ad[2]<=ad[3]<=scene.height+1e-10)
 
-            changes=np.r_[0,np.flatnonzero(board[1:]!=board[:-1])+1,len(ii)]
-            records=[dict(begin=int(lo),end=int(hi),label='',board_material_surface=bool(board[lo]))for lo,hi in zip(changes[:-1],changes[1:])]
+            records=material_visibility_records(scene,[int(rows[i]['joint_material_index'])for i in ii],[next(j for j,p in enumerate(model['materials'][int(rows[i]['joint_material_index'])]['paths'])if p.get('physical_point'))for i in ii])
             visible[ii]=render_visibility(camera.native_camera(str(sid)),scene,world[ii],records,camera.local_seconds(str(sid),pts[ii]),predicted[ii])
         valid=rs_valid&visible&surface_valid;error=predicted-observed
         dp=error[pairs[:,1]]-error[pairs[:,0]];vp=valid[pairs].all(axis=1)

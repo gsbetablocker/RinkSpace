@@ -33,7 +33,9 @@ def _assert_first4_source_identity_current(doc,path):
         if not expected or len(expected)!=64:raise ValueError('first4 source requires exact file/SHA reference')
         if p in seen and seen[p]!=expected:raise ValueError('conflicting first4 source dependency '+str(p))
         if p not in seen:
-            if file_sha256(p)!=expected:raise ValueError('changed first4 source dependency '+str(p))
+            from .exact_dependency_aliases import resolve_dependency
+            p=resolve_dependency(ref,base)
+            if p in seen and seen[p]!=expected:raise ValueError('conflicting first4 source dependency '+str(p))
             seen[p]=expected
         return p
     declared=doc.get('engineering_scope',{})
@@ -170,7 +172,11 @@ def assert_source_identity_current(packet,*,return_verified_packet=False):
             try:reason=json.loads(marker.read_text(encoding='utf8'))
             except (ValueError,OSError):reason='source recall marker exists; see the named file'
             raise ValueError('Source physical identity certificate has been recalled: '+str(marker)+'; '+json.dumps(reason,ensure_ascii=False))
-    doc=json.loads(path.read_text(encoding='utf8'));fingerprint=_source_membership_fingerprint(doc);paths=[path]
+    raw=json.loads(path.read_text(encoding='utf8'))
+    if 'dense_source_binding' in raw or 'dense_parent_packet' in raw:
+        from .dense_joint_packet import assert_dense_source_identity_current
+        return assert_dense_source_identity_current(path,return_verified_packet=return_verified_packet)
+    doc=raw;fingerprint=_source_membership_fingerprint(doc);paths=[path]
     for ref in doc.get('source_identity_watchlist',[]):
         if ref.get('source_membership_fingerprint')!=fingerprint:continue
         parent=Path(ref['file']).resolve()
@@ -202,14 +208,25 @@ def assert_source_identity_current(packet,*,return_verified_packet=False):
         assert_board_source_qualification_current(doc,path)
     return doc if return_verified_packet else None
 
+def _read_source_packet(path):
+    from .io_utils import read_json
+    return read_json(path)
+
+def _write_source_packet(path,value,**json_options):
+    if isinstance(value,dict) and "dense_source_binding" in value:
+        from .packet_storage import write_packet
+        write_packet(path,value)
+    else:
+        Path(path).write_text(json.dumps(value,**json_options),encoding="utf8")
+
 def _inherit_source_recall_marker(source_packet,destination_packet):
-    source=Path(source_packet).resolve();destination=Path(destination_packet).resolve();parent=json.loads(source.read_text(encoding='utf8'));doc=json.loads(destination.read_text(encoding='utf8'));fingerprint=_source_membership_fingerprint(doc)
+    source=Path(source_packet).resolve();destination=Path(destination_packet).resolve();parent=_read_source_packet(source);doc=_read_source_packet(destination);fingerprint=_source_membership_fingerprint(doc)
     if fingerprint!=_source_membership_fingerprint(parent):raise ValueError('auxiliary-only rebind changed source qualification fingerprint')
     watches=[dict(file=str(source),sha256=sha(source),source_membership_fingerprint=fingerprint,reason='identical source membership/UV/material/clock/certificates; only numerical auxiliaries rebound')]
     watches += [r for r in parent.get('source_identity_watchlist',[]) if r.get('source_membership_fingerprint')==fingerprint]
     unique={}
     for ref in watches:unique[(ref['file'],ref['sha256'])]=ref
-    doc['source_identity_watchlist']=list(unique.values());destination.write_text(json.dumps(doc,indent=2),encoding='utf8')
+    doc['source_identity_watchlist']=list(unique.values());_write_source_packet(destination,doc,indent=2)
     for ref in doc['source_identity_watchlist']:
         for name in ('SOURCE_IDENTITY_CERTIFICATE_RECALLED.json','SOURCE_IDENTITY_EVIDENCE_RECALL.json'):
             marker=Path(ref['file']).parent/name
@@ -426,7 +443,7 @@ def rebind_current_auxiliaries(packet_path,state_path,output_path,*,state_packet
     import numpy as np
     src=Path(packet_path).resolve();state=Path(state_path).resolve();out=Path(output_path).resolve()
     if out.exists():raise FileExistsError('immutable packet generation exists: '+str(out))
-    packet=json.loads(src.read_text(encoding='utf8'));report=json.loads((state/'value_report.json').read_text(encoding='utf8'));n=int(packet['row_count'])
+    packet=_read_source_packet(src);report=json.loads((state/'value_report.json').read_text(encoding='utf8'));n=int(packet['row_count'])
     checked_dependencies=set()
     def absolute(d):
         q=Path(d['file']);q=q if q.is_absolute() else src.parent/q;q=q.resolve()
@@ -445,7 +462,7 @@ def rebind_current_auxiliaries(packet_path,state_path,output_path,*,state_packet
     prefix_proof=None
     if state_n<n:
         if state_packet_path is None:raise ValueError('appended packet requires the exact previous state packet for prefix verification')
-        old_path=Path(state_packet_path).resolve();old=json.loads(old_path.read_text(encoding='utf8'))
+        old_path=Path(state_packet_path).resolve();old=_read_source_packet(old_path)
         if int(old['row_count'])!=state_n:raise ValueError('state packet raw row count mismatch')
         for name in ('source_dataset_ids','source_row_ids'):
             if packet[name][:state_n]!=old[name]:raise ValueError('changed raw prefix source identity '+name)
@@ -468,7 +485,7 @@ def rebind_current_auxiliaries(packet_path,state_path,output_path,*,state_packet
         files[name]=dict(file=str(q),sha256=expected,dtype=dtype,shape=[n])
         packet['arrays'][name]=files[name]
     packet['current_full_state_auxiliary_binding']=dict(schema='rinkfit.joint_current_full_state_auxiliary_binding.v1',parent_packet=dict(file=str(src),sha256=sha(src)),state_report=dict(file=str(state/'value_report.json'),sha256=sha(state/'value_report.json')),state_model_sha256=report['model_sha256'],arrays=files,source_UV_W_admission_roles_changed=False,appended_prefix_verification=prefix_proof,new_queries_keep_actual_source_window_alpha_initialization=new_query_rows)
-    out.parent.mkdir(parents=True,exist_ok=True);out.write_text(json.dumps(packet,ensure_ascii=False,indent=2),encoding='utf8')
+    out.parent.mkdir(parents=True,exist_ok=True);_write_source_packet(out,packet,ensure_ascii=False,indent=2)
     _inherit_source_recall_marker(src,out)
     return dict(packet=str(out),sha256=sha(out),current_state=str(state),row_count=n)
 
@@ -481,7 +498,7 @@ def rebind_explicit_nuisance(packet_path,accepted_state,output_path,*,current_mo
         from .accepted_aux_prefix import rebind_engineering_nuisance
         return rebind_engineering_nuisance(src,state,out,current_model_path=current_model_path)
     if current_model_path is not None:raise ValueError('qualified physical suffix is currently supported only for an exact engineering candidate CP')
-    packet=json.loads(src.read_text(encoding='utf8'));receipt_path=state/'accepted_state_receipt.json';complete_checkpoint=None
+    packet=_read_source_packet(src);receipt_path=state/'accepted_state_receipt.json';complete_checkpoint=None
     if not receipt_path.exists():
         receipt_path=state/'formal_receipt.json';value_report=json.loads((state/'value_report.json').read_text(encoding='utf8'));formal_checkpoint=state/'formal_checkpoint.json'
         if not formal_checkpoint.exists():raise ValueError('explicit nuisance binding requires an accepted receipt or a complete PHR checkpoint')
@@ -498,7 +515,7 @@ def rebind_explicit_nuisance(packet_path,accepted_state,output_path,*,current_mo
     if sha(src)!=parent_sha:
         parent=Path(receipt['source_packet']).resolve()
         if sha(parent)!=parent_sha:raise ValueError('changed accepted source parent packet')
-        original=json.loads(parent.read_text(encoding='utf8'))
+        original=_read_source_packet(parent)
         if int(original['row_count'])!=old_n:raise ValueError('accepted parent row count mismatch')
         old_queries={int(q['row_index']):q for q in original.get('queries',[])};new_queries={int(q['row_index']):q for q in packet.get('queries',[])}
         for index,q in old_queries.items():
@@ -538,7 +555,7 @@ def rebind_explicit_nuisance(packet_path,accepted_state,output_path,*,current_mo
             combined.astype(dtype,copy=False).tofile(p);d={'sha256':sha(p)}
         packet['arrays'][name]=dict(file=str(p),sha256=d['sha256'],dtype=dtype,shape=[n])
     packet['accepted_explicit_state_binding']=dict(schema='rinkfit.accepted_explicit_state_packet_binding.v1',parent_packet=dict(file=str(src),sha256=sha(src)),accepted_receipt=dict(file=str(receipt_path),sha256=sha(receipt_path)),complete_PHR_checkpoint=complete_checkpoint,model_sha256=receipt['model_sha256'],native_replay_pass_claimed=False,source_UV_W_E_admission_roles_changed=False,appended_prefix_verification=prefix_proof)
-    out.parent.mkdir(parents=True,exist_ok=True);out.write_text(json.dumps(packet,indent=2),encoding='utf8')
+    out.parent.mkdir(parents=True,exist_ok=True);_write_source_packet(out,packet,indent=2)
     _inherit_source_recall_marker(src,out)
     return dict(packet=str(out),sha256=sha(out),model=str(state/'model.json'),model_sha256=receipt['model_sha256'])
 
@@ -548,7 +565,7 @@ def independent_replay(model_path,packet_path,state_path,*,output=None):
     from .joint_model import as_event_view,graph_from_joint,validate_physical_domain
     from .camera_graph import CameraGraph
     from rinkfit_start.native_scene import NativeScene
-    model=json.loads(Path(model_path).read_text(encoding='utf8'));packet=json.loads(Path(packet_path).read_text(encoding='utf8'));state=Path(state_path);base=Path(packet_path).parent
+    model=json.loads(Path(model_path).read_text(encoding='utf8'));packet=_read_source_packet(packet_path);state=Path(state_path);base=Path(packet_path).parent
     def ar(name,dtype):
         d=packet['arrays'][name];q=base/d['file']
         if sha(q)!=d['sha256']:raise ValueError('packet array hash mismatch '+name)
@@ -592,7 +609,7 @@ def bind_captured_nuisance(packet_path,capture_state,source_packet,output_path,*
     import numpy as np
     src=Path(packet_path).resolve();state=Path(capture_state).resolve();parent=Path(source_packet).resolve();out=Path(output_path).resolve()
     if out.exists():raise FileExistsError('immutable captured state binding exists')
-    packet=json.loads(src.read_text(encoding='utf8'));original=json.loads(parent.read_text(encoding='utf8'));manifest=json.loads((state/'manifest.json').read_text(encoding='utf8'))
+    packet=_read_source_packet(src);original=_read_source_packet(parent);manifest=json.loads((state/'manifest.json').read_text(encoding='utf8'))
     if manifest.get('schema')!='rinkfit.joint_initial_nuisance_state.v1' or manifest['input_packet_sha256']!=sha(parent):raise ValueError('capture manifest source mismatch')
     n=int(packet['row_count']);old_n=int(manifest['raw_rows'])
     if n<old_n or int(original['row_count'])!=old_n:raise ValueError('capture raw prefix size mismatch')
@@ -632,7 +649,7 @@ def bind_captured_nuisance(packet_path,capture_state,source_packet,output_path,*
     packet['captured_nuisance_binding']=dict(schema='rinkfit.actual_captured_nuisance_binding.v1',captured_manifest=dict(file=str(state/'manifest.json'),sha256=sha(state/'manifest.json')),captured_source_packet=dict(file=str(parent),sha256=sha(parent)),new_queries_initialized_from_original_actual_source_windows=new_query_rows,source_means_E_material_clock_changed=False,native_RS_or_query_closure_claimed=False)
     if recapture_rows is not None:packet['recapture_rows']=sorted(set(map(int,recapture_rows))|set(new_query_rows))
     if topology_recapture_rows is not None:packet['source_topology_recapture_rows']=list(map(int,topology_recapture_rows));packet['recapture_rows']=sorted(set(packet.get('recapture_rows',[]))|set(map(int,topology_recapture_rows)))
-    out.write_text(json.dumps(packet,indent=2),encoding='utf8');_inherit_source_recall_marker(src,out)
+    _write_source_packet(out,packet,indent=2);_inherit_source_recall_marker(src,out)
     return dict(packet=str(out),sha256=sha(out),new_query_rows=len(new_query_rows),reused_raw_rows=old_n)
 
 
@@ -696,7 +713,7 @@ def rebind_source_capture_auxiliaries(packet_path,state_manifest,output_path):
         original_S01_auxiliary_prefix_bitwise_equal=True,strict_Query_closure_claimed=False,
         alpha_is_bounded_navigation_seed_not_success_certificate=True)
     out.parent.mkdir(parents=True,exist_ok=True)
-    out.write_text(json.dumps(packet,ensure_ascii=False,indent=2),encoding='utf8')
+    _write_source_packet(out,packet,ensure_ascii=False,indent=2)
     _inherit_source_recall_marker(src,out)
     assert_source_identity_current(out)
     return out

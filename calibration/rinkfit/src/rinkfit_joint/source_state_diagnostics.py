@@ -10,7 +10,7 @@ import numpy as np
 from .io_utils import read_json, write_json, file_sha256
 from .joint_model import as_event_view, graph_from_joint
 from .camera_graph import CameraGraph
-from .joint_replay import render_visibility
+from .joint_replay import render_visibility,material_visibility_records
 from rinkfit_start.native_scene import NativeScene
 
 
@@ -154,11 +154,7 @@ def evaluate_source_state(model_file, packet_file, state_manifest, output, *, fi
         prediction[ix] = projected['uv']; row[ix]=projected['row']
         root_equality[ix]=projected['root_equality_px']
         rs_valid[ix] = projected['valid'] & finite[ix]
-        board = np.array([model['materials'][int(m)]['paths'][int(b)]['kind'] in (2,3,6,7)
-                          for m,b in zip(material[ix],branch[ix])])
-        changes = np.r_[0,np.flatnonzero(board[1:]!=board[:-1])+1,len(board)]
-        records = [dict(begin=int(lo),end=int(hi),label='',board_material_surface=bool(board[lo]))
-                   for lo,hi in zip(changes[:-1],changes[1:])]
+        records = material_visibility_records(scene,material[ix],branch[ix])
         visible[ix] = render_visibility(camera,scene,safe,records,local,projected['uv'])
         valid[ix] = rs_valid[ix]&visible[ix]
         print(sid,'active',len(ix),'valid',int(valid[ix].sum()),flush=True)

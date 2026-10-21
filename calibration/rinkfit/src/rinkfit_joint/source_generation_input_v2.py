@@ -49,7 +49,8 @@ class QualifiedSourceGenerationInput:
         p=Path(ref['path']).resolve();expected=ref['sha256']
         if p in self._refs and self._refs[p]!=expected:raise ValueError('Conflicting source dependency hashes')
         if p not in self._refs:
-            if file_sha256(p)!=expected:raise ValueError('Changed source input dependency: '+str(p))
+            from .exact_dependency_aliases import resolve_dependency
+            p=resolve_dependency(ref)
             if 'bytes' in ref and p.stat().st_size!=ref['bytes']:raise ValueError('Changed source input dependency size')
             self._refs[p]=expected
 
