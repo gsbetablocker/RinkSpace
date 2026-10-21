@@ -37,6 +37,8 @@ DEFAULT_TEST_RECORDS = (
     "evidence/tests/long_shot_review.json",
     "evidence/tests/wide_static_protected_review.json",
 )
+LOCAL_DOCUMENTS = {"docs/REPOSITORY_GUIDE.md", "docs/PUBLIC_REPOSITORY_CONTENTS.md",
+                   "docs/PRIVACY_REVIEW.md", "docs/RUNTIME_DEPENDENCIES.md", "docs/rink_model/VALIDATION.md"}
 BLOCKED_PARTS = {".git", ".venv", "__pycache__", ".pytest_cache", "node_modules", "outputs", "models"}
 
 
@@ -99,7 +101,7 @@ def _selected_files(root, test_records):
             raise ValueError("Test records must be explicit text records under evidence/tests/")
         _source_file(root, name)
         names.add(name)
-    return {name: _source_file(root, name) for name in sorted(names)}
+    return {name: _source_file(root, name) for name in sorted(names) if name not in LOCAL_DOCUMENTS}
 
 
 def _git_metadata(root, included):

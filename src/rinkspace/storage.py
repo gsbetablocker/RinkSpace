@@ -149,6 +149,26 @@ class AssetStore:
                 raise
             return path.resolve()
 
+    def project_entry(self) -> Path:
+        """Local status panel; generated state stays outside public source paths."""
+        base = self.data if self.configured else self.project / "outputs"
+        return guard_project_write(self._under(base, "workbench/START_HERE.html"), project_root=self.project)
+
+    def review_page(self, dataset: str | Path, name: str = "review.html") -> Path:
+        """Put source-dataset HTML beside external results, retaining source JSON."""
+        dataset = Path(dataset).resolve()
+        try:
+            relative = dataset.relative_to(self.project)
+        except ValueError:
+            return self._under(dataset, name)
+        parts = list(relative.parts)
+        if "source_datasets" in parts:
+            parts[parts.index("source_datasets")] = "results"
+        else:
+            parts = ["workbench", "reviews", *parts]
+        base = self.data if self.configured else self.project / "outputs"
+        return guard_project_write(self._under(base, Path(*parts) / self._relative(name)), project_root=self.project)
+
     def output(self, relative: str | Path) -> Path:
         """New output location; never silently falls back into the code checkout."""
         return guard_project_write(

@@ -212,3 +212,84 @@ def test_new_outputs_enforce_checkout_limit_and_keep_data_long_path_support(stor
     assert store.resolve(long_relative) == unconfigured / long_relative
     configured = AssetStore(project)
     assert configured.output(long_relative).is_relative_to(data)
+
+
+def test_review_renderer_writes_data_and_preserves_source_packets(stored_project, monkeypatch):
+    from types import SimpleNamespace
+    import cv2
+    import numpy as np
+    from calibration.program_tracking import render_opening_frame_batch as renderer
+
+    project, data = stored_project
+    dataset = project / "events/example/programmes/synthetic/source_datasets/one"
+    media = data / "events/example/programmes/synthetic/results/one"
+    (dataset / "frames").mkdir(parents=True)
+    (media / "frames").mkdir(parents=True)
+    source = np.zeros((1080, 1920, 3), dtype=np.uint8)
+    assert cv2.imwrite(str(media / "frames/000001.png"), source)
+    packet = dict(point_count=1, source=dict(native_pts=256256, time_base="1/12800",
+                  decoded_BGR_sha256=hashlib.sha256(source.tobytes()).hexdigest()),
+                  features=[dict(id="ice.synthetic", segments=[dict(uv=[[100, 100]])])])
+    point = dataset / "frames/000001.json"
+    point.write_text(json.dumps(packet), encoding="utf-8")
+    legacy = dataset / "review.html"
+    legacy.write_bytes(b"retained old local page")
+    before = point.read_bytes()
+    monkeypatch.setattr(renderer, "ROOT", project)
+    monkeypatch.setattr(renderer, "DATA_ROOT", data)
+    result = renderer.run(SimpleNamespace(dataset=dataset, media=media, html=None,
+                                         expected_frames=1, skip_overlays=False))
+    page = Path(result["review_html"])
+    assert page.is_relative_to(data) and page.is_file()
+    assert result["frames"] == 1 and result["total_points"] == 1
+    assert "00:00:20.020" in page.read_text(encoding="utf-8")
+    assert point.read_bytes() == before
+    assert legacy.read_bytes() == b"retained old local page"
+    assert (media / "overlays/000001.png").is_file()
+
+
+def test_workbench_serves_external_panel_and_falls_back_to_generic_ui(stored_project, monkeypatch):
+    import http.client
+    import threading
+    from rinkspace import web
+
+    project, _ = stored_project
+    (project / "START_HERE.html").write_bytes(b"legacy panel must not become the public homepage")
+    panel = AssetStore(project).project_entry()
+    panel.parent.mkdir(parents=True)
+    panel.write_bytes(b"<title>External local panel</title>")
+    original = web.ThreadingHTTPServer
+    ready = threading.Event()
+    servers = []
+
+    def bind(address, handler):
+        instance = original(address, handler)
+        servers.append(instance)
+        ready.set()
+        return instance
+
+    monkeypatch.setattr(web, "ThreadingHTTPServer", bind)
+    worker = threading.Thread(target=web.serve, args=(project, 0, False), daemon=True)
+    worker.start()
+    assert ready.wait(5)
+    instance = servers[0]
+
+    def get(path):
+        connection = http.client.HTTPConnection("127.0.0.1", instance.server_port, timeout=5)
+        try:
+            connection.request("GET", path)
+            response = connection.getresponse()
+            return response.status, response.read()
+        finally:
+            connection.close()
+
+    try:
+        assert get("/") == (200, panel.read_bytes())
+        assert get("/START_HERE.html") == (200, panel.read_bytes())
+        panel.unlink()
+        status, body = get("/")
+        assert status == 200 and b"legacy panel" not in body
+    finally:
+        instance.shutdown()
+        instance.server_close()
+        worker.join(5)

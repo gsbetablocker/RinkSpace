@@ -1,6 +1,6 @@
 # 安卡拉 2026：赛事资产说明
 
-返回 [项目唯一结果入口](../../START_HERE.html)。项目整体结构与公开准备见 [仓库说明](../../docs/REPOSITORY_GUIDE.md)。本目录只保存本赛事的数值、来源与适用范围，不能把这些数值直接当作其他冰场的标定。
+项目整体结构见[架构说明](../../docs/ARCHITECTURE.md)，公开结果见[节目审阅快照](programmes/okada_mei_sp/review/README.md)。本目录只保存本赛事的数值、来源与适用范围，不能把这些数值直接当作其他冰场的标定。
 
 | 目录或文件 | 含义 |
 |---|---|
@@ -23,6 +23,6 @@
 
 原片在 Data 的 `events/ankara_2026/media/`；大规模求解运行、数组及完整检查点在对应 `calibration/runs/`；节目视频和运行历史在 Data 的 `programmes/okada_mei_sp/`。Data 原件保持原位，旧文件名或 `history` 标签不代表可以删除。
 
-增量副本保留原字节及内部地址，不切换活动输入。完整相机种子状态、原 source pack／support index 和运动大数组仍外置；环境、原生库与路径／producer 的剩余条件见 [运行依赖说明](../../docs/RUNTIME_DEPENDENCIES.md)。
+增量副本保留原字节及内部地址，不切换活动输入。完整相机种子状态、原 source pack／support index 和运动大数组仍外置；环境、原生库与路径／producer 的剩余条件见 [环境说明](../../environments/README.md)。
 
 本赛事当前仍是开发证据。模型、真实源时间、人工事实与失败都须追溯到各自文件；后续 programme 状态会继续变化，本页不写死“最新”模型或数值。精度与完整镜头的验收标准见 [验证说明](../../docs/VALIDATION.md)。

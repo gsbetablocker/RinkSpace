@@ -1,7 +1,7 @@
 """Present one saved source frame and its measured points for user review.
 
 Reads the point packet without changing it. Writes a native PNG in Data and
-a local, self-contained HTML control surface beside the OneDrive packet.
+a local HTML control surface in Data.
 There is no fitting, acceptance action, video decode or next-frame operation.
 """
 from __future__ import annotations
@@ -35,6 +35,8 @@ LAYERS = {
     "unbound_static": ("冰面实体：身份待确认", "#ff86df"),
 }
 
+
+from rinkspace.storage import AssetStore
 
 def layer_for(feature_id: str) -> str:
     if feature_id in ("board_top", "board_contact"):
@@ -285,9 +287,12 @@ def run(args) -> dict:
         raise ValueError("Source PNG differs from the point packet's original decoded frame")
     segments = list(source_segments(packet))
     overlay = args.overlay.resolve() if args.overlay else args.source_image.resolve().with_name("points_review.png")
-    page = args.html.resolve() if args.html else points_path.with_name("review.html")
+    page = args.html.resolve() if args.html else AssetStore(ROOT).review_page(points_path.parent)
     if not overlay.is_relative_to(Path("D:/CodexData/RinkSpace_Data").resolve()):
         raise ValueError("Generated review PNG must stay in the existing Data directory")
+    if page.is_relative_to(ROOT) and not page.is_relative_to(ROOT / "outputs"):
+        raise ValueError("Generated review HTML must stay outside public source paths")
+    page.parent.mkdir(parents=True, exist_ok=True)
     if overlay in (args.source_image.resolve(), args.model_image.resolve()) or page == points_path:
         raise ValueError("Review output must not overwrite an input")
     if not cv2.imwrite(str(overlay), native_overlay(source, segments, packet.get('inferred_segments'))):

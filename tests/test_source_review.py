@@ -23,6 +23,7 @@ class SourceReviewTests(unittest.TestCase):
         files = {'README.md': '# Test project', 'pyproject.toml': '[project]\nname="fixture"',
                  'START_LOCAL.cmd': '@echo off', 'INSTALL_LOCAL.cmd': '@echo off',
                  'src/fixture.py': 'value = 1\n', 'tests/test_fixture.py': 'assert True\n',
+                 'docs/ARCHITECTURE.md': '# Public architecture', 'docs/PRIVACY_REVIEW.md': 'LOCAL_WORK_RECORD',
                  'configs/project.example.json': '{"sources":{}}', 'configs/holdout_lock.json': '{}',
                  'configs/local.json': '{"private":"DO_NOT_PACKAGE"}',
                  'data/input/source.mp4': 'DO_NOT_PACKAGE', '.venv/private.py': 'DO_NOT_PACKAGE',
@@ -41,6 +42,8 @@ class SourceReviewTests(unittest.TestCase):
         with zipfile.ZipFile(result['path']) as archive:
             names = set(archive.namelist())
             self.assertIn('src/fixture.py', names)
+            self.assertIn('docs/ARCHITECTURE.md', names)
+            self.assertNotIn('docs/PRIVACY_REVIEW.md', names)
             self.assertIn('configs/holdout_lock.json', names)
             self.assertIn('evidence/tests/current.json', names)
             for forbidden in ['configs/local.json', 'data/input/source.mp4', '.venv/private.py',

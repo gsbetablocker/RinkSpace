@@ -1,6 +1,6 @@
 # 来源与复现
 
-数学方案完整保存在 `spec/SPEC.html`，其中包含 US11176706B2、WACV 2020/2022、Javan 论文/演讲及 Ceres/OpenCV 等一手资料的核对与适用边界。`spec/source_review.json` 保存资料逐项用途。本包重新实现数学接口，没有引入 sportsfield_release 的网络代码、权重或训练资产；也没有移植专利正文作为项目代码。
+初始包的数学方案原保存在 `spec/SPEC.html`，其中包含 US11176706B2、WACV 2020/2022、Javan 论文/演讲及 Ceres/OpenCV 等一手资料的核对与适用边界。`spec/source_review.json` 保存资料逐项用途。这些 spec 文件没有随当前公开源码提供，输入范围见[模块 README](../README.md)。本模块重新实现数学接口，没有引入 sportsfield_release 的网络代码、权重或训练资产；也没有移植专利正文作为项目代码。
 
 新代码以本次用户任务为范围，不新增第三方许可证声明来改变用户已有项目的权属。运行时 NumPy/SciPy、Ceres/Eigen/SuiteSparse 各自依赖仍由其发行版管理。本包不携带这些库的二进制。
 
@@ -8,7 +8,7 @@
 
 `data/input_manifest.json` 是五个原始数组的字节身份。`seeds.json` 的几何和相机都来自已审核的历史运行快照，始终是条件初值。世界 L=1 只是规范；原子来源不能证明历史相机或形状已经正确。
 
-`tools/build_inputs.py` 可从完整审核 bundle 重建输入（bundle 顶层具有 `repo/` 与 `data/`）。所需只读数学解码器 `tools/frozen_camera_math.py` 已一并带入。重建不是启动前提，包内数据已就绪。若重建，随后用 `bootstrap` 模块重新生成 bootstrap_state 并建立新的 manifest/run，不能混用旧校验值。
+`tools/build_inputs.py` 可从完整审核 bundle 重建输入（bundle 顶层具有 `repo/` 与 `data/`）。所需只读数学解码器 `tools/frozen_camera_math.py` 已一并带入。该描述针对原完整启动包；当前公开源码不附完整 data/，使用前须取得并核对相应材料。若重建，随后用 `bootstrap` 模块重新生成 bootstrap_state 并建立新的 manifest/run，不能混用旧校验值。
 
 ```bash
 python tools/build_inputs.py /path/to/review_bundle --out /path/to/new_input

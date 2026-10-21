@@ -28,6 +28,53 @@ CACHE_PARTS = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", ".c
 LOCAL_NAMES = {"local.json", "credentials.json", "token.json", ".npmrc", ".pypirc", ".netrc", "id_rsa", "id_ed25519"}
 
 
+LOCAL_ONLY = {
+    "START_HERE.html", "calibration/rinkfit/START_HERE.md", "calibration/rinkfit/CODEX_START.md",
+    "docs/REPOSITORY_GUIDE.md", "docs/PUBLIC_REPOSITORY_CONTENTS.md", "docs/PRIVACY_REVIEW.md",
+    "docs/RUNTIME_DEPENDENCIES.md", "docs/rink_model/VALIDATION.md",
+    "events/ankara_2026/diagnostics/external_review_20261007.html",
+    "events/ankara_2026/feedback/index.html",
+    "events/ankara_2026/programmes/okada_mei_sp/audit_1017.html",
+    "events/ankara_2026/programmes/okada_mei_sp/fit_joint9/recovery_1019.html",
+    "events/ankara_2026/programmes/okada_mei_sp/fit_joint9/review.html",
+    "events/ankara_2026/programmes/okada_mei_sp/fit_v11/audit_1018.html",
+    "events/ankara_2026/programmes/okada_mei_sp/fit_v11/status.html",
+}
+PUBLIC_GUIDES = ("README.md", "MAINTENANCE.md", "environments/README.md",
+                 "docs/ARCHITECTURE.md", "docs/GITHUB_REVIEW.md", "docs/VALIDATION.md",
+                 "calibration/rinkfit/README.md", "calibration/solver_runtime/README.md")
+QUICKSTART_FILES = ("src/rinkspace/cli.py", "src/rinkspace/demo.py", "tests/test_geometry.py",
+                    "tests/test_motion.py", "tests/test_mosaic.py", "tests/test_demo.py")
+
+
+def local_publication_path(path: str) -> bool:
+    path = path.replace("\\", "/")
+    value = PurePosixPath(path)
+    return (path in LOCAL_ONLY or bool(re.fullmatch(r"START_SHOT[2-9]_REVIEW\.cmd", path))
+            or ("source_datasets" in value.parts and value.name in {"review.html", "whole_first_shot_review.html"}))
+
+
+def public_entry_findings(root: Path, candidates: set[str]) -> list[dict]:
+    findings = []
+    for name in PUBLIC_GUIDES + QUICKSTART_FILES:
+        if name not in candidates or not (root / name).is_file():
+            findings.append({"path": name, "reason": "missing_public_entry_or_quickstart_file"})
+    for name in PUBLIC_GUIDES:
+        path = root / name
+        if not path.is_file():
+            continue
+        text = path.read_text(encoding="utf-8-sig")
+        if re.search(r"file:/+|\]\([A-Za-z]:[/\\]", text, re.I):
+            findings.append({"path": name, "reason": "public_guide_depends_on_machine_file_link"})
+        for target in re.findall(r"\]\(([^)#]+)(?:#[^)]*)?\)", text):
+            if "://" in target:
+                continue
+            linked = (path.parent / target).resolve()
+            if linked.is_relative_to(root) and local_publication_path(linked.relative_to(root).as_posix()):
+                findings.append({"path": name, "reason": "public_guide_links_to_local_only_entry"})
+    return findings
+
+
 def size_class(size: int) -> str:
     if size > inventory.ORDINARY_LIMIT_BYTES:
         return "above_github_ordinary_file_limit"
@@ -42,6 +89,8 @@ def tracked_review_reasons(path: str) -> list[str]:
     parts = {part.lower() for part in value.parts}
     suffix, name = value.suffix.lower(), value.name.lower()
     reasons = []
+    if local_publication_path(path):
+        reasons.append("tracked_local_panel_handoff_or_generated_review")
     if parts & CACHE_PARTS or any(part.endswith(".egg-info") for part in parts):
         reasons.append("tracked_runtime_or_cache")
     if suffix in inventory.COMPILED_SUFFIXES | {".pyc", ".pyo"}:
@@ -237,7 +286,13 @@ def audit(root: Path, *, review_only: bool, max_text_bytes: int) -> dict:
     tracked_review = [{"path": row["path"], "reasons": reasons}
                       for row in index if (reasons := tracked_review_reasons(row["path"]))]
     lfs_raw = [row for row in lfs_rows if row["state"] == "raw_blob_despite_lfs_attribute"]
+    public_findings = public_entry_findings(root, {row["path"] for row in candidates})
+    local_tracked = [row for row in index if local_publication_path(row["path"])]
     blockers = []
+    if public_findings:
+        blockers.append("public_entry_or_quickstart_incomplete")
+    if local_tracked:
+        blockers.append("local_work_material_tracked_for_publication")
     if index_large:
         blockers.append("index_contains_blobs_above_github_ordinary_file_limit")
     if head_large or history:
@@ -263,6 +318,8 @@ def audit(root: Path, *, review_only: bool, max_text_bytes: int) -> dict:
                     "suspected_credential_locations": len(findings), "tracked_artifact_or_local_config_paths": len(tracked_review),
                     "raw_lfs_attribute_blobs_in_index_or_HEAD": len(lfs_raw), "blocking_checks": blockers,
                     "remote_count": len(git_state["remotes"]), "lfs_available": git_state["lfs_available"]},
+        "public_entry_findings": public_findings,
+        "local_work_material_in_index": local_tracked,
         "git": git_state, "candidates": candidates,
         "index_above_ordinary_limit": index_large, "HEAD_above_ordinary_limit": head_large,
         "lfs_index_and_HEAD": lfs_rows, "lfs_attribute_differences": snapshot["lfs_attribute_differences"],

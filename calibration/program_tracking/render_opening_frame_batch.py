@@ -37,6 +37,8 @@ DEFAULT_MEDIA = DATA_ROOT / (
 )
 
 
+from rinkspace.storage import AssetStore
+
 def timestamp(source: dict) -> str:
     value = source.get("source_time")
     if value is not None:
@@ -204,7 +206,9 @@ def run(args) -> dict:
     manifest = dataset / "batch_manifest.json"
     if not manifest.is_file():
         manifest = media / "batch_manifest.json"
-    page = args.html.resolve() if args.html else dataset / "review.html"
+    page = args.html.resolve() if args.html else AssetStore(ROOT).review_page(dataset)
+    if page.is_relative_to(ROOT) and not page.is_relative_to(ROOT / "outputs"):
+        raise ValueError("Generated review HTML must stay outside public source paths")
     if page in point_paths:
         raise ValueError("Review HTML must not overwrite a point packet")
     page.parent.mkdir(parents=True, exist_ok=True)

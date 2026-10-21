@@ -25,6 +25,7 @@ import cv2
 import numpy as np
 
 from rinkspace.path_policy import guard_project_write
+from rinkspace.storage import AssetStore
 from rinkspace.packed_assets import iter_project_assets, materialize_project_asset
 
 from .extract_selected_frame_review import make_binding
@@ -530,7 +531,7 @@ class PointEditorStore:
         manifest_data=json_bytes(manifest)
         review_data,review_cache=self.prepare_review(index,packet)
         writes={path:packet_data,binding_path:binding_data,self.dataset/'batch_manifest.json':manifest_data,
-            self.media/f'overlays/{index:06d}.png':png.tobytes(),self.dataset/'review.html':review_data,
+            self.media/f'overlays/{index:06d}.png':png.tobytes(),AssetStore(ROOT).review_page(self.dataset):review_data,
             self.history_index:json_bytes(histories)}
         if model_data is not None:writes[model_path]=model_data
         release_path=self.media/'release_check.json'
@@ -639,7 +640,7 @@ def main():
     server=create_server(store,args.port)
     runtime=store.media/'point_editor_runtime.json'
     write_atomic(runtime,json_bytes(dict(url=store.editor_url,pid=os.getpid(),dataset=str(store.dataset),media=str(store.media),source_media=str(store.source_media),model=str(store.model))))
-    page=store.dataset/'review.html'
+    page=AssetStore(ROOT).review_page(store.dataset)
     if page.exists():write_atomic(page,store.editor_link(page.read_text(encoding='utf-8')).encode('utf-8'))
     print(store.editor_url,flush=True)
     if args.open:

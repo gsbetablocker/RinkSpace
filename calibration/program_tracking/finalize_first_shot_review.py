@@ -26,6 +26,8 @@ SOURCE_OUT=OUT
 REPAIR_MODE=False
 EDITOR_URL='http://127.0.0.1:48172/'
 
+from rinkspace.storage import AssetStore
+
 def frame_manifest_path():
  return DATA/'frame_manifest.json' if REPAIR_MODE and (DATA/'frame_manifest.json').exists() else SOURCE_DATA/'frame_manifest.json'
 
@@ -285,7 +287,7 @@ def publish(validation):
   model_entry_validation=reference(DATA/'model_entry_validation.json'),model_id=read(MODEL/'model.json')['model_id'],
   source_audits=validation['source_audits'],
   model_path=str(MODEL),optimization_performed=False,model_accuracy_accepted=False,strict_v6_used=False,
-  review_html=str(OUT/'review.html'),editable_review_url=EDITOR_URL,repair_quality_review=quality,frames=frames)
+  review_html=str(AssetStore(ROOT).review_page(OUT)),editable_review_url=EDITOR_URL,repair_quality_review=quality,frames=frames)
  if REPAIR_MODE:
   manifest['accepted_review_batches']=[dict(dataset=str(PARENT/name),media=str(SOURCE_DATA.parent/name))
       for name in ('opening_100_50fps','continuation_101_200_50fps')]
@@ -312,7 +314,7 @@ def publish(validation):
   review_kind='publication_snapshot',subsequent_manual_changes_url=EDITOR_URL,
   current_source_to_historical_correspondence_pixels=reference(SOURCE_DATA/'official_representation_first_shot_1_1248_verification.json')))
  whole_html=page_html(whole,OUT/'whole_first_shot_manifest.json').replace('<header><h1>',f'<header><p>这是本次交付时的取点快照；后续手动修改请查看 <a href="{EDITOR_URL}">可编辑页面中的当前结果</a>。</p><h1>',1)
- (OUT/'whole_first_shot_review.html').write_text(whole_html,encoding='utf8')
+ AssetStore(ROOT).review_page(OUT, 'whole_first_shot_review.html').write_text(whole_html,encoding='utf8')
  model=read(MODEL/'model.json');model.update(candidate_batch_datasets=[dict(**reference(OUT/'batch_manifest.json'),
   frame_count=1048,point_count=sum(counts),programme_frame_range=[201,1248],status='awaiting_user_review')],
   candidate_source_frame_count=1048,candidate_source_point_count=sum(counts),candidate_user_acceptance_pending=True)
@@ -325,11 +327,11 @@ def publish(validation):
   next_step='await_user_review_of_first_shot_remaining_frames_201_to_1248')
  selection['representation_verification']['first_shot_decoded_pixel_verification']=reference(SOURCE_DATA/'official_representation_first_shot_1_1248_verification.json')
  write(selection_path,selection)
- entry=ROOT/'START_HERE.html';text=entry.read_text(encoding='utf8');begin='<!-- CURRENT_SINGLE_FRAME_REVIEW_20261013_BEGIN -->';end='<!-- CURRENT_SINGLE_FRAME_REVIEW_20261013_END -->'
+ entry=AssetStore(ROOT).project_entry();text=entry.read_text(encoding='utf8');begin='<!-- CURRENT_SINGLE_FRAME_REVIEW_20261013_BEGIN -->';end='<!-- CURRENT_SINGLE_FRAME_REVIEW_20261013_END -->'
  relative=OUT.relative_to(ROOT).as_posix()
  block=f'''{begin}<section class="surface"><h3>冈田芽衣：第一个镜头取点完成</h3>
 <p>官方50fps：第1–1248帧，源时间00:20.020–00:44.960。已验收1–200帧保持原样；新增201–1248帧共1048帧，等待审核，每帧{min(counts)}–{max(counts)}点，硬上限500。</p>
-<p><a href="{EDITOR_URL}">打开可加点、删点的逐帧页面</a> · <a href="START_POINT_EDITOR.cmd">启动编辑器</a> · <a href="{relative}/whole_first_shot_review.html">完整第一镜头交付快照（1–1248帧）</a> · <a href="{relative}/batch_manifest.json">新增批次记录</a> · <a href="{SOURCE_OUT.relative_to(ROOT).as_posix()}/historical_manual_annotation_inventory.json">人工标注来源</a></p>
+<p><a href="{EDITOR_URL}">打开可加点、删点的逐帧页面</a> · <a href="START_POINT_EDITOR.cmd">启动编辑器</a> · <a href="{AssetStore(ROOT).review_page(OUT, 'whole_first_shot_review.html').as_uri()}">完整第一镜头交付快照（1–1248帧）</a> · <a href="{relative}/batch_manifest.json">新增批次记录</a> · <a href="{SOURCE_OUT.relative_to(ROOT).as_posix()}/historical_manual_annotation_inventory.json">人工标注来源</a></p>
 <p class="small">B1/B2/C等宽直线取宽度中线；靶圈取指定材料轮廓。广告沿围挡展开面建模。尚未重新求解相机，新增取点尚未由用户验收。</p></section>{end}'''
  require(text.count(begin)==1 and text.count(end)==1,'Review entry markers not unique')
  entry.write_text(re.sub(re.escape(begin)+r'[\s\S]*?'+re.escape(end),lambda _:block,text,count=1),encoding='utf8')

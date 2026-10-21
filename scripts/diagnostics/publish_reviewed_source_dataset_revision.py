@@ -12,6 +12,8 @@ sys.path[:0] = [str(ROOT), str(ROOT / 'src')]
 from calibration.program_tracking.strict_model_scope import authenticate_source_reference, file_sha
 
 
+from rinkspace.storage import AssetStore
+
 def reference(path):
     path = Path(path).resolve()
     return dict(path=str(path), sha256=file_sha(path))
@@ -91,7 +93,7 @@ def publish(dataset_path, audit_path, receipt_path, parent_summary_path, keep_fa
     summary_path = output / 'delivery_summary.json'
     with summary_path.open('x', encoding='utf8') as stream:
         json.dump(summary, stream, ensure_ascii=False, indent=2, allow_nan=False)
-    entry = ROOT / 'START_HERE.html'
+    entry = AssetStore(ROOT).project_entry()
     original = entry.read_bytes()
     begin = b'<!-- CURRENT_FIT_DATASET_20261013_BEGIN -->'
     end = b'<!-- CURRENT_FIT_DATASET_20261013_END -->'

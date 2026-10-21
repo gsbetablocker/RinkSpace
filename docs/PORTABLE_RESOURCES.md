@@ -1,6 +1,6 @@
 # 可选资源解析与配置模板
 
-返回 [START_HERE.html](../START_HERE.html)，目录分工见 [仓库说明](REPOSITORY_GUIDE.md)。本页说明独立的整理工具；现有求解器和 AssetStore 没有接入此工具，活动 profile、源包和原生库仍使用原路径。
+目录分工见[架构说明](ARCHITECTURE.md)，安装和运行条件见[环境说明](../environments/README.md)。本页说明独立的整理工具；现有求解器和 AssetStore 没有接入此工具，活动 profile、源包和原生库仍使用原路径。
 
 ## 工具保存什么
 

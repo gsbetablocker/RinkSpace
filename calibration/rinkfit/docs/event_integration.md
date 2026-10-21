@@ -1,6 +1,6 @@
 # 本片事件适配：把已实现内核接到真实全源问题
 
-本文是初始架构到实际 `rinkfit_event_fit` 的具体实施接口。数学权威为 `../spec/design_contract.json` 和 `../spec/SPEC.html`；已经可编译运行的 Ceres 框架接口见 `solver_backend.md`。以下剩余工作属于接手 Codex 的实施范围。
+本文是初始架构到实际 `rinkfit_event_fit` 的具体实施接口。数学权威为 `../spec/design_contract.json` 和 `../spec/SPEC.html`；已经可编译运行的 Ceres 框架接口见 `solver_backend.md`。本文保留 2026-10-17 初始首镜头包的技术合同；当前公开源码的输入/设计文件缺口及入口见[模块 README](../README.md)，后续实现状态按实际代码和节目快照核实。
 
 ## 1. 数据已经在包中，原始义务固定
 
@@ -51,7 +51,7 @@ PTS 首项 256256，步长 256，即 50 fps。镜头相对时间原点设于 fra
 | `calibration/program_tracking/source_evidence_whitening.py` 中 `SourceWhiteningOperator`、`joint_line_corner_operator` | 原始分组统计算子和线/角点共同噪声关系 |
 | `data/seeds.json` 各 descriptor 的 association/source 路径及哈希 | 保留材料分支的实际证据和候选有限支持 |
 
-`source_sigma.npz` 不包含全镜头 grouped W；审核包中的少量选帧 W 也不等于完整 W。Codex 应用现有读取层导出一个新的不可变 `semantic_packet`：
+`source_sigma.npz` 不包含全镜头 grouped W；审核包中的少量选帧 W 也不等于完整 W。事件适配应用现有读取层导出一个新的不可变 `semantic_packet`：
 
 - 每个原始 row 的 semantic 类型、物理材料 ID、已知实体/未知 station、合法 branch 与有限区段。
 - 只有存在来源的 run 才包含顺序/方向；观察数组顺序不提供连接或单调性。
@@ -126,3 +126,7 @@ PHR 内循环每个目标冻结乘子/rho/统计/材料状态。预算 AL 因子
 S6 至少输出 `final_state`、完整 checkpoint、`final_predictions.npz`、`final_source_residuals.npz`、`verification.json`、按帧/材料汇总。预测 NPZ 字段为 `source_rows/native_pts/source_point_ids/source_target_labels/predicted_native_uv`，逐原始顺序排列。另保存合法 station/branch、root状态、物理域与独立 evaluator 版本。
 
 `launch.py verify-native` 可以独立核对来源身份和普通二维原生像素算术。它故意不能单独接受物理结果；真实 profile、共享几何/固定机构、根和 KKT 等验收还要由独立事件 replay/S6 完成。必须在实际截图/关键帧叠加中检查同一个最终状态；部分平面 0.3 px、合成例 0.1 px 或程序 return code=0 都不代表本片成功。
+
+## 工程预算与统计目标
+
+初始首镜头配置的 E=4I px² 对应 2 px 工程半径，与 sigma/分组 W 的统计含义不同。普通二维 q=eᵀE⁻¹e，b=t²；Phase I 最小化 b 且 q_i≤b，Phase II 固定 b=1 后优化原始统计目标及有依据的项。真实 profile 使用其法向预算和精确 query 等式，有限查询区间不随 b 放宽。该初始配置不是其他赛事的默认精度或长期项目规则。

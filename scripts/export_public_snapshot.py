@@ -451,7 +451,7 @@ class Export:
                   "候选不含 Git 历史、Git 配置、本机会话配置或已安装环境，未提交、未推送。个人用户目录、私人会话标识和明确的私聊引句已脱敏；私人机械参考图和编译产物未包含。\n\n"
                   "脱敏文本、ZIP 成员和相应清单使用公开副本 SHA，并另存 original_sha256。其他来源记录中的历史 SHA 仍指原始实物，不能据此宣称本副本与本机运行身份完全相同。\n\n"
                   "关键代码、模型、统计输入与原始失败说明可离线审阅；原视频、外部模型/专用环境和部分原生后端仍有明确缺口。本候选不保证完整赛事拟合可以运行，也没有恢复已暂停的求解或生成视频。\n\n"
-                  "从 [README.md](README.md)、[START_HERE.html](START_HERE.html) 和 [GitHub审阅说明](docs/GITHUB_REVIEW.md) 阅读。"
+                  "从 [README.md](README.md) 和 [GitHub审阅说明](docs/GITHUB_REVIEW.md) 阅读。"
                   "详细变更、排除项及检查范围见 [PUBLIC_EXPORT_PROVENANCE.json](PUBLIC_EXPORT_PROVENANCE.json)。\n")
         (self.output / "PUBLIC_EXPORT_README.md").write_text(notice, encoding="utf-8")
         main_readme = self.output / "README.md"

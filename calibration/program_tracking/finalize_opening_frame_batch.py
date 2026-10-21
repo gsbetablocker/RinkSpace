@@ -8,6 +8,8 @@ import cv2
 import numpy as np
 from .extract_opening_frame_batch import OUT, DATA, PARENT, MODEL, ROOT, read, write, sha
 
+from rinkspace.storage import AssetStore
+
 def finalize():
     frames=[];counts=[];groups=Counter();violations=[]
     for index in range(1,101):
@@ -61,7 +63,7 @@ def finalize():
         source_selection_snapshot_at_decode=dict(path=str(selection_snapshot),sha256=sha(selection_snapshot)),
         navigation_mapping=dict(path=str(OUT/'navigation_mapping.json'),sha256=sha(OUT/'navigation_mapping.json')),
         model_id=read(MODEL/'model.json')['model_id'],strict_v6_used=False,optimization_performed=False,
-        model_accuracy_accepted=False,review_html=str(OUT/'review.html'),
+        model_accuracy_accepted=False,review_html=str(AssetStore(ROOT).review_page(OUT)),
         foreground_point_exclusion_check=dict(frames=99,first_frame_historical_approval_preserved=True,violations=[]),
         temporal_method='same_shot_static_board_navigation_plus_current_native_colour_readouts',
         first_frame_coordinates_preserved=True,frames=frames)
@@ -73,11 +75,11 @@ def finalize():
     model['candidate_batch_datasets']=[dict(path=str(OUT/'batch_manifest.json'),sha256=sha(OUT/'batch_manifest.json'),
         frame_count=100,status='awaiting_user_review',source_fps='50/1',optimization_performed=False)]
     write(MODEL/'model.json',model)
-    entry=ROOT/'START_HERE.html';text=entry.read_text(encoding='utf8')
+    entry=AssetStore(ROOT).project_entry();text=entry.read_text(encoding='utf8')
     begin='<!-- CURRENT_SINGLE_FRAME_REVIEW_20261013_BEGIN -->';end='<!-- CURRENT_SINGLE_FRAME_REVIEW_20261013_END -->'
     block=f'''{begin}<section class="surface"><h3>冈田芽衣：50fps 开头100帧取点</h3>
 <p>官方单节目原视频 00:20.020–00:22.000，共100帧。每帧 {min(counts)}–{max(counts)} 点，平均 {np.mean(counts):.1f} 点。第一帧历史验收点保持原样，其余等待本批验收。</p>
-<p><a href="events/ankara_2026/programmes/okada_mei_sp/source_datasets/frame_by_frame_review_20261013/opening_100_50fps/review.html">逐帧查看原图、取点与8a28网格导航</a> · <a href="events/ankara_2026/programmes/okada_mei_sp/source_datasets/frame_by_frame_review_20261013/opening_100_50fps/batch_manifest.json">批次记录</a> · <a href="events/ankara_2026/models/framewise_8a28_20261013/model.json">对应模型入口</a></p>
+<p><a href="{AssetStore(ROOT).review_page(OUT).as_uri()}">逐帧查看原图、取点与8a28网格导航</a> · <a href="events/ankara_2026/programmes/okada_mei_sp/source_datasets/frame_by_frame_review_20261013/opening_100_50fps/batch_manifest.json">批次记录</a> · <a href="events/ankara_2026/models/framewise_8a28_20261013/model.json">对应模型入口</a></p>
 <p class="small">旧60fps映射只用于导航；当前坐标来自官方50fps原图。已停在第100帧，未求解、未处理第101帧。</p></section>{end}'''
     if text.count(begin)!=1 or text.count(end)!=1:raise ValueError('Expected existing review entry block')
     text=re.sub(re.escape(begin)+r'[\s\S]*?'+re.escape(end),lambda _:block,text,count=1)

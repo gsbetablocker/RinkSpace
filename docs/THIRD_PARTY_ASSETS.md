@@ -2,7 +2,7 @@
 
 当前分项许可与权利范围见 [LICENSE.md](../LICENSE.md)；原第三方许可证继续适用。2026-10-19 对当前实际仓库内容的 MIT 适用性核查见 [LICENSING_REVIEW.md](LICENSING_REVIEW.md)。下文主要保留2026-10-11的外部运行来源登记，不能把列出的所有外部权重认定为已随仓库打包。
 
-返回唯一入口：[START_HERE.html](../START_HERE.html)。本登记观察于 **2026-10-11**，机器可读详情见 [third-party-assets.json](../environments/third-party-assets.json)，完整已安装包版本见 [环境快照](../environments/observed-python311-windows.json)。登记范围是人体、视觉路径及历史 GTSAM 原生构建实际引用的外部资产；它不是整个 Python 依赖树的许可审计，也不是新的运行配置。
+项目入口见 [README](../README.md)。本登记观察于 **2026-10-11**，机器可读详情见 [third-party-assets.json](../environments/third-party-assets.json)，完整已安装包版本见 [环境快照](../environments/observed-python311-windows.json)。登记范围是人体、视觉路径及历史 GTSAM 原生构建实际引用的外部资产；它不是整个 Python 依赖树的许可审计，也不是新的运行配置。
 
 以下2026-10-11盘点只读取源码、Git 身份、现有元数据和小型许可文件，并保全一个独立 helper 与三处现用源码修改的补丁。未下载模型、安装包、导入模型、训练、编译、改动旁项目或切换现用路径。大模型 SHA-256 继承已有资源记录；本次核对了当前文件存在及字节数，没有重新读取约 5.6 GB 的权重来宣称新的散列验证。
 

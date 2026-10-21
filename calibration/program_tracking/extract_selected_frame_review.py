@@ -10,11 +10,13 @@ from copy import deepcopy
 from pathlib import Path
 import cv2
 import numpy as np
-from .extract_opening_frame_batch import read, write, sha, fit_axis_line, MODEL
+from .extract_opening_frame_batch import read, write, sha, fit_axis_line, MODEL, ROOT
 from .single_frame_source_review import (scan_curve, print_contours, straight_source_boundary,
     space_boundary_samples, remove_temporary_readouts, compact_review_points, transition)
 from .render_single_frame_source_review import native_overlay, source_segments, review_html
 
+
+from rinkspace.storage import AssetStore
 
 def visible_intervals(mask, intercept, slope, lo, hi):
     xx=np.arange(lo,hi+1); yy=np.rint(intercept+slope*xx).astype(int)
@@ -232,7 +234,9 @@ def run(spec_path, *, board_only=False):
         write(dest/f"frame_{spec['programme_frame_index_1based']:06d}_model_binding.json",binding)
         navigation=cv2.imread(str(media/'navigation_raw.png'));navigation[mask]=raw[mask]
         cv2.imwrite(str(media/'navigation.png'),navigation)
-        (dest/'review.html').write_text(review_html(packet,segments,media/'source.png',media/'navigation.png',binding),encoding='utf8')
+        page = AssetStore(ROOT).review_page(dest)
+        page.parent.mkdir(parents=True, exist_ok=True)
+        page.write_text(review_html(packet,segments,media/'source.png',media/'navigation.png',binding),encoding='utf8')
     return dict(point_count=packet['point_count'],feature_counts={f['id']:sum(len(s['uv'])for s in f['segments'])for f in features})
 
 

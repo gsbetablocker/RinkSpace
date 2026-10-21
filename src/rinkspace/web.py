@@ -498,8 +498,8 @@ def serve(root='.', port=8765, open_browser=False):
                     path = app.storage.public_asset(unquote(url.path[len('/assets/'):]))
                 elif url.path.startswith('/data/'):
                     path = app.storage.public_asset('data/' + unquote(url.path[len('/data/'):]))
-                elif url.path in ('/', '/START_HERE.html') and (app.root / 'START_HERE.html').is_file():
-                    path = app.root / 'START_HERE.html'
+                elif url.path in ('/', '/START_HERE.html') and app.storage.project_entry().is_file():
+                    path = app.storage.project_entry()
                 else:
                     relative = unquote(url.path).lstrip('/')
                     if relative == 'workbench.html':

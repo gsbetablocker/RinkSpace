@@ -1,4 +1,4 @@
-"""Refresh the sole project entry from owned models and existing source records.
+"""Refresh the local project panel from owned models and existing source records.
 
 No fitting, training, decoding, dependency installation, or video rendering.
 The active chat owns CURRENT_TASK; retain its latest block when replacing HTML.
@@ -18,6 +18,8 @@ import sys
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+from rinkspace.storage import AssetStore
 TASK = re.compile(r"<!-- CURRENT_TASK_BEGIN -->.*?<!-- CURRENT_TASK_END -->", re.S)
 ENTRY = re.compile(r'<script[^>]*id="entry-data"[^>]*>(.*?)</script>', re.S)
 
@@ -220,7 +222,14 @@ def replace_capturing_previous(target: Path, replacement: Path, backup: Path):
 
 
 def refresh():
-    target = ROOT/"START_HERE.html"
+    target = AssetStore(ROOT).project_entry()
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if not target.exists():
+        legacy = ROOT / "START_HERE.html"
+        if not legacy.is_file():
+            raise FileNotFoundError("Local panel needs an existing entry-data binding; the public CLI works without it")
+        with target.open("xb") as handle:
+            handle.write(legacy.read_bytes())
     store = read(ROOT/"configs/storage.json")
     temp_root = Path(store["data_root"])/"tmp"
     temp_root.mkdir(parents=True, exist_ok=True)
@@ -234,6 +243,10 @@ def refresh():
         if current is None or data is None:
             raise ValueError("Active task and legacy result bindings must remain present")
         head = source.split("</head>", 1)[0]
+        head = re.sub(r'<!-- LOCAL_ENTRY_BASE_BEGIN -->.*?<!-- LOCAL_ENTRY_BASE_END -->', "", head, flags=re.S)
+        head = head.replace('<script>if(location.protocol!=="file:")document.querySelector("base").href="/assets/project/";</script>', "")
+        head = re.sub(r'<base[^>]*>', "", head, flags=re.I)
+        head += f'<!-- LOCAL_ENTRY_BASE_BEGIN --><base href="{ROOT.as_uri()}/"><script>if(location.protocol!=="file:")document.querySelector("base").href="/assets/project/";</script><!-- LOCAL_ENTRY_BASE_END -->'
         head = re.sub(r'<!-- PROJECT_ENTRY_STYLE_BEGIN -->.*?<!-- PROJECT_ENTRY_STYLE_END -->', '', head, flags=re.S)
         head += '<!-- PROJECT_ENTRY_STYLE_BEGIN --><style>.rink-plan{width:100%;display:block;max-height:450px;background:#fff}.model{margin-top:12px}summary{cursor:pointer}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;margin:6px 0}table{width:100%;border-collapse:collapse}td,th{text-align:left;vertical-align:top;padding:8px;border-bottom:1px solid #e1e9ec}.model>summary{font-size:15px}details.surface>summary{list-style-position:inside}.entry-view[hidden]{display:none!important}.entry-view>h1:focus{outline:none}.entry-link{display:flex;justify-content:space-between;align-items:center;gap:16px;text-decoration:none;margin-top:10px}.entry-link strong{font-size:18px}.entry-link span{font-size:14px;color:var(--muted)}.entry-link:hover{border-color:var(--accent)}#entry-breadcrumb{display:block;font-size:14px}header>a{font-size:23px;font-weight:700;text-decoration:none;color:var(--ink)}@media(max-width:650px){.entry-link{align-items:flex-start;flex-direction:column}}</style><!-- PROJECT_ENTRY_STYLE_END --></head>'
         sections = content(json.loads(data.group(1)), current.group())

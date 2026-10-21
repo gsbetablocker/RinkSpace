@@ -9,6 +9,7 @@ import argparse
 from copy import deepcopy
 import json
 from pathlib import Path
+from rinkspace.storage import AssetStore
 import shutil
 
 import cv2
@@ -45,7 +46,9 @@ def apply(spec_path):
     for name in ['ice_extraction_manifest.json', 'release_check.json', 'model_entry_validation.json']:
         shutil.copy2(DATA/name, archive/name)
     for name in ['batch_manifest.json', 'review.html']:
-        shutil.copy2(OUT/name, archive/name)
+        source = (AssetStore(Path(__file__).resolve().parents[2]).review_page(OUT) if name == 'review.html' else OUT/name)
+        if not source.exists() and name == 'review.html': source = OUT/name
+        shutil.copy2(source, archive/name)
     immutable_before = {}
     for path in sorted((OUT/'frames').glob('*.json')):
         immutable_before[int(path.stem)] = {'packet': reference(path), 'binding': reference(OUT/'bindings'/path.name)}

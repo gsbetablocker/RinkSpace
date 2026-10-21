@@ -65,4 +65,4 @@ cmake --build /tmp/rinkfit_build -j 4
 ctest --test-dir /tmp/rinkfit_build --output-on-failure
 ```
 
-Codex 应复用已有验证，针对事件真实参数和导数做必要核验，然后继续实际拟合；无需为了形式完整反复扩大低风险单元测试。
+以上命令来自原完整启动包；当前源码缺失的包内材料见[模块 README](../README.md)。通用验收原则见[主验证说明](../../../docs/VALIDATION.md)，历史测试不代表后续完整节目已通过。

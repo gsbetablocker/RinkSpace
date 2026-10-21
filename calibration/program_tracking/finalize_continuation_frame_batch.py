@@ -32,6 +32,8 @@ DATA = Path('D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei
 REFERENCE = PARENT/'frame_000200_50fps'
 
 
+from rinkspace.storage import AssetStore
+
 def approved_integrity():
     old = PARENT/'opening_100_50fps'
     receipt = read(old/'user_acceptance.json')
@@ -211,7 +213,7 @@ def publish(validation):
         user_authorization=reference(OUT/'user_authorization.json'),model_entry_validation=reference(DATA/'model_entry_validation.json'),
         accepted100_integrity=validation['approved100_integrity'],model_id=read(MODEL/'model.json')['model_id'],
         optimization_performed=False,model_accuracy_accepted=False,strict_v6_used=False,
-        inferred_segments_not_point_observations=True,review_html=str(OUT/'review.html'),frames=frames)
+        inferred_segments_not_point_observations=True,review_html=str(AssetStore(ROOT).review_page(OUT)),frames=frames)
     correction=OUT/'user_review_correction_02.json'
     if correction.exists():
         manifest['latest_user_review_correction']=reference(correction)
@@ -236,12 +238,12 @@ def publish(validation):
         candidate_source_point_count=sum(r['point_count'] for r in batches+model['candidate_frame_datasets']))
     require(model['accepted_source_frame_count']==100 and model['accepted_source_point_count']==11134,'Approved totals changed')
     write(MODEL/'model.json',model)
-    entry=ROOT/'START_HERE.html';text=entry.read_text(encoding='utf8')
+    entry=AssetStore(ROOT).project_entry();text=entry.read_text(encoding='utf8')
     begin='<!-- CURRENT_SINGLE_FRAME_REVIEW_20261013_BEGIN -->';end='<!-- CURRENT_SINGLE_FRAME_REVIEW_20261013_END -->'
     relative=OUT.relative_to(ROOT).as_posix()
     block=f'''{begin}<section class="surface"><h3>冈田芽衣：50fps 第101–200帧取点审阅</h3>
 <p>官方单节目源时间00:22.020–00:24.000，共100帧，每帧{min(counts)}–{max(counts)}点。第200帧已撤去圈内偏点、恢复R3外圈左弧、补全两条长边的可见范围，101–199帧依此样板逐帧提取。冰圈统一采用模型名称R3、R4。</p>
-<p><a href="{relative}/review.html">逐帧查看原图、取点与8a28网格导航</a> · <a href="{relative}/batch_manifest.json">批次记录</a> · <a href="events/ankara_2026/models/framewise_8a28_20261013/model.json">对应模型入口</a></p>
+<p><a href="{AssetStore(ROOT).review_page(OUT).as_uri()}">逐帧查看原图、取点与8a28网格导航</a> · <a href="{relative}/batch_manifest.json">批次记录</a> · <a href="events/ankara_2026/models/framewise_8a28_20261013/model.json">对应模型入口</a></p>
 <p class="small">101–200帧等待一起验收。已通过的1–100帧保持原样。停在第200帧，尚未求解。</p></section>{end}'''
     require(text.count(begin)==1 and text.count(end)==1,'Review entry not unique')
     entry.write_text(re.sub(re.escape(begin)+r'[\s\S]*?'+re.escape(end),lambda _:block,text,count=1),encoding='utf8')

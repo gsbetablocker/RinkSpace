@@ -20,7 +20,7 @@
 | oneTBB 相关保全材料 | 保留 [Apache 原许可](environments/native_support_preserved/round3_legacy/tbb_control/LICENSE.txt)；外部运行依赖按其各自条件处理 |
 | GVHMR 衍生补丁 | [gvhmr-local.patch](environments/third_party_patches/gvhmr-local.patch)适用[原始 GVHMR 许可](environments/third_party_patches/GVHMR_LICENSE.txt)，其中的教育、研究、非营利及衍生修改非商业限制继续有效 |
 | SAM2 上游部分与派生权重 | SAM2 上游部分保留 [Apache-2.0 原文](models/SAM2_LICENSE.txt)。[rink_vision.pt](models/rink_vision.pt)的固定基础来源、字节核验与修改见[来源记录](models/rink_vision.provenance.json)，训练材料与使用边界见[许可核查](docs/LICENSING_REVIEW.md)；本声明不把完整派生权重重新许可为 MIT |
-| 视频、截图、用户提供素材、标注及其他研究数据 | 独立比赛截图和叠加图不随公开仓库分发；原有测量记录保留；项目图、标注及数值观测按各自来源判断。软件许可证不自动覆盖其他第三方材料 |
+| 视频、截图、用户提供素材、标注及其他研究数据 | ISU 比赛视频、截图和叠加画面不随公开仓库分发；可提供官方频道 YouTube 地址及源时间戳供自行核对；原有测量记录保留；项目图、标注及数值观测按各自来源判断。软件许可证不自动覆盖其他第三方材料 |
 
 可选软件、模型和运行依赖也分别适用其原许可；项目自有接口或本声明不改变这些条件。分发组合程序时，还需满足实际适用的第三方条件。
 

@@ -30,6 +30,8 @@ EDITOR_URL = 'http://127.0.0.1:48174/'
 PUBLISH_ENTRY = True
 EXPECTED_SHOT = None
 
+from rinkspace.storage import AssetStore
+
 def read(path):
     return json.loads(Path(path).read_text(encoding='utf-8-sig'))
 
@@ -416,12 +418,13 @@ def run():
         y, x = divmod(i, 4)
         sheet[y*270:(y+1)*270, x*480:(x+1)*480] = tile
     cv2.imwrite(str(DATA / 'points_contact_sheet.png'), sheet)
-    page = OUT / 'review.html'
+    page = AssetStore(ROOT).review_page(OUT)
+    page.parent.mkdir(parents=True, exist_ok=True)
     text = page_html(entries, OUT / 'batch_manifest.json')
     text = text.replace('帧取点审阅', f'帧 · {label} {len(rows)} 张选中帧审阅')
     text = text.replace('<p class="meta" id="meta">', f'<p>仅列出每 0.5–1 秒挑选的尽量清晰帧；快速摇镜段仍有残留拖影，逐帧注明读取限制。全镜头其余帧没有读点数据。<a href="{EDITOR_URL}">进入可加点、删点审阅页</a></p><p class="meta" id="meta">')
     page.write_text(text, encoding='utf-8')
-    entry = ROOT / 'START_HERE.html'
+    entry = AssetStore(ROOT).project_entry()
     current_entry = entry.read_text(encoding='utf-8')
     block = (f'<!-- {marker_name}_BEGIN --><section class="surface" id="shot{shot}-selected-review-20261014">'
         f'<h3>冈田芽衣：{entry_label} {len(rows)} 张选帧取点，等待人工审核</h3>'
@@ -431,7 +434,7 @@ def run():
         f'每帧{min(numbers)}–{max(numbers)}点，总计{sum(numbers)}点；上限500，尚未人工验收、未重新拟合。</p>'
         f'<p><a href="{EDITOR_URL}">打开{label}可加点、删点审阅页</a> · '
         f'<a href="{restart_link}">重启{label}审阅后端</a> · '
-        f'<a href="{(OUT / "review.html").relative_to(ROOT).as_posix()}">静态审阅页</a></p>'
+        f'<a href="{AssetStore(ROOT).review_page(OUT).as_uri()}">静态审阅页</a></p>'
         f'</section><!-- {marker_name}_END -->\n')
     marker = rf'<!-- {marker_name}_BEGIN -->.*?<!-- {marker_name}_END -->\s*'
     if re.search(marker, current_entry, flags=re.S):

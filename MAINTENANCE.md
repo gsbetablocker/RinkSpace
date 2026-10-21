@@ -1,52 +1,30 @@
-# 项目维护导航
+# 维护与开发
 
-本页集中保存开发和项目管理入口。项目介绍见 [README.md](README.md)；结果唯一入口仍是 [START_HERE.html](START_HERE.html)。本页不另建结果页面，也不把历史任务记录当作当前开工授权。
+公开阅读从 [README](README.md) 开始。源码、环境/构建定义、模型参数、人工事实和必要审阅归档保存在项目；原片、帧图、大数组、完整检查点、缓存、日志和诊断视频保存在配置的外部 Data。目录分工见[架构](docs/ARCHITECTURE.md)。
 
-## 状态、结果与协作
+## 本机工具
 
-| 需要处理的事项 | 入口 |
+| 工具 | 用途 |
 |---|---|
-| 项目 → 赛事 → 节目的当前状态、有效模型与结果 | [START_HERE.html](START_HERE.html) |
-| 长期协作要求与文件操作约束 | [AGENTS.md](AGENTS.md) |
-| 文件归属、保全记录与历史结构说明 | [仓库结构](docs/REPOSITORY_GUIDE.md) |
-| 当前赛事事实、模型登记与节目归属 | [安卡拉赛事说明](events/ankara_2026/README.md)、[赛事清单](events/ankara_2026/manifest.json) |
-| 场地与来源验证要求 | [验证说明](docs/VALIDATION.md)、[三维场地建模](docs/rink_model/BUILD_SPEC.md)、[场地验证](docs/rink_model/VALIDATION.md) |
+| [INSTALL_LOCAL.cmd](INSTALL_LOCAL.cmd)、[START_LOCAL.cmd](START_LOCAL.cmd) | Windows 基础安装和本地服务；安装器选择 dev/acquisition，不含 advanced |
+| [START_POINT_EDITOR.cmd](START_POINT_EDITOR.cmd)、[PowerShell 参数](START_POINT_EDITOR.ps1) | 指定 Dataset、Media、SourceMedia、Model 和 Port，编辑有源身份的逐帧观测 |
+| [refresh_project_entry.py](scripts/refresh_project_entry.py) | 刷新 Data 中的本机结果面板，保留 CURRENT_TASK 与冻结结果绑定 |
+| [START_FAST_SOLVER.ps1](START_FAST_SOLVER.ps1) | 现有样本配置的便利入口；输入、完整状态和后端须与所选 profile 相符 |
+| [solver_runtime](calibration/solver_runtime/README.md)、[rinkfit](calibration/rinkfit/README.md) | 求解与后端接口 |
 
-## 本地开发与运行
+`configs/storage.json` 是现有机器的资源桥配置；新机器须调整 Data 根和实际资源。AssetStore.project_entry() 将面板定位到 Data/workbench/START_HERE.html；Web 服务的 / 路由在该页面存在时显示它，否则使用通用工作台。审阅页按 source_datasets → results 定位到 Data，源观测和人工确认仍留原目录。
 
-| 需要处理的事项 | 入口 |
-|---|---|
-| 基础安装与本地工作台 | [INSTALL_LOCAL.cmd](INSTALL_LOCAL.cmd)、[START_LOCAL.cmd](START_LOCAL.cmd) |
-| 原帧点位编辑 | [START_POINT_EDITOR.cmd](START_POINT_EDITOR.cmd)、[启动实现](START_POINT_EDITOR.ps1) |
-| 公共求解器接口 | [solver_runtime](calibration/solver_runtime/README.md) |
-| 现有样本的求解启动配置 | [START_FAST_SOLVER.ps1](START_FAST_SOLVER.ps1) |
-| 环境保存、版本证据与重建限制 | [environments/README.md](environments/README.md)、[运行依赖](docs/RUNTIME_DEPENDENCIES.md) |
-| 更新唯一结果入口 | [refresh_project_entry.py](scripts/refresh_project_entry.py) |
+旧根页面、镜头专用快捷方式及历史交接材料在本机保留并忽略，不作为公开入口。它们可能仍被已有对话使用。刷新器可从旧根页面首次初始化 Data 面板；本机无冻结绑定时无需生成该面板，基础 CLI 和通用工作台可独立使用。
 
-各启动器使用自己的既定配置，不代表完整模型已经验收；尤其样本求解配置不能直接套用到其他赛事。是否继续拟合、训练或生成视频，以当前明确授权和对应源验证为准。
-
-## 单目录与存储
-
-日常只维护当前 OneDrive 项目目录。源码、环境和构建定义、模型参数、人工事实以及必要离线审阅数据在项目内；原片、批量帧图、训练数据、大数组、完整检查点、缓存、日志与诊断视频在现有 Data 中。少量归档通过索引按需读取，不需要把所有逻辑资源展开成文件。
-
-Git 数据库位于本机 Data，项目根仅保留指针。2026-10-19 已将私人原件与旧历史完整保全到本机 Data 的 maintenance/private_20261019/，原目录连接新的公开历史；没有长期维护的脱敏副本或额外同步步骤。日常仍在原目录开发，后续正常提交与推送；提交身份使用GitHub的noreply地址。
-
-路径检查使用 [CHECK_PATHS.cmd](CHECK_PATHS.cmd) 或：
+## 检查
 
 ~~~console
 python -B scripts/check_onedrive_paths.py
+python -B scripts/check_github_readiness.py --data-root <外部Data绝对路径> --output <Data内报告绝对路径> --review-only
 ~~~
 
-检查覆盖被 Git 忽略的安装环境与缓存。旧地址解析见[路径别名](configs/path_aliases.json)及[可选资源解析](docs/PORTABLE_RESOURCES.md)。公开派生身份见[privacy_derivatives.json](configs/privacy_derivatives.json)：历史 SHA 保留原件含义，不能把脱敏后的文件声称为原始运行字节；既有拟合与续算保护不会因此绕过。
+路径检查包含被忽略的环境和缓存。公开检查复用已有大小、LFS、凭证候选及本机生成物检查；检查报告写入 Data。修改功能时选择相关测试，基础范围见 README，高级依赖见[环境说明](environments/README.md)。
 
-## 公开与许可检查
+旧地址的精确文件别名见[路径映射](configs/path_aliases.json)，可选 ResourceRegistry 的限制见[资源接口](docs/PORTABLE_RESOURCES.md)。公开派生文件与原运行字节的区别见[数据身份](docs/GITHUB_REVIEW.md#数据身份与缺失材料)。Git 数据库继续留在本机 Data；本机维护记录不进入公开阅读路径。
 
-| 需要核对的内容 | 入口 |
-|---|---|
-| GitHub 阅读、必要数据和离线读取 | [GITHUB_REVIEW.md](docs/GITHUB_REVIEW.md) |
-| 单目录整理、隐私检查与原件保全 | [PRIVACY_REVIEW.md](docs/PRIVACY_REVIEW.md) |
-| Git 候选、体积与 LFS 检查 | [PUBLIC_REPOSITORY_CONTENTS.md](docs/PUBLIC_REPOSITORY_CONTENTS.md)、[check_github_readiness.py](scripts/check_github_readiness.py) |
-| 当前文本隐私检查 | [audit_worktree_privacy.py](scripts/audit_worktree_privacy.py) |
-| 分项许可声明、第三方许可与未确认授权 | [LICENSE.md](LICENSE.md)、[LICENSING_REVIEW.md](docs/LICENSING_REVIEW.md)、[第三方资产](docs/THIRD_PARTY_ASSETS.md) |
-
-隐私、体积与路径检查通过，不代表第三方代码、权重或赛事素材的公开再分发许可已确认。许可核查目前仍有明确未解决项。公开仓库：[gsbetablocker/RinkSpace](https://github.com/gsbetablocker/RinkSpace)。日常仍在此目录开发，正常提交并推送origin/main；没有第二份项目要同步。
+公开前按 [LICENSE](LICENSE.md) 与[许可核查](docs/LICENSING_REVIEW.md)核对实际内容。公开树和归档不含比赛视频、截图或叠加图；来源链接与 PTS 可公开，原始素材只留本机。

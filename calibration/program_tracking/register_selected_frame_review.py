@@ -2,7 +2,8 @@
 from __future__ import annotations
 import argparse
 from pathlib import Path
-from .extract_opening_frame_batch import read, write, sha, MODEL
+from .extract_opening_frame_batch import read, write, sha, MODEL, ROOT
+from rinkspace.storage import AssetStore
 
 
 def register(spec_path: Path):
@@ -24,7 +25,7 @@ def register(spec_path: Path):
         model_binding=ref(binding_path),camera_seed=ref(directory/'camera_seed.json'),
         navigation_mapping=ref(directory/'navigation_mapping.json'),
         source_image=ref(media/'source.png'),points_image=ref(media/'points_review.png'),
-        navigation_image=ref(media/'navigation.png'),review_html=ref(directory/'review.html'),
+        navigation_image=ref(media/'navigation.png'),review_html=ref(AssetStore(ROOT).review_page(directory)),
         source_specification=ref(spec_path),ice_source_packet=ref(directory/'ice_features.json'),
         model_id=binding['model_id'],optimization_performed=False,
         programme_frames_101_to_199_processed=False,

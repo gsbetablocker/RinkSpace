@@ -1,74 +1,43 @@
-# 通过 GitHub 阅读与离线审阅
+# 公开数据与离线审阅
 
-公开前必读：[本次瘦身与隐私检查](PRIVACY_REVIEW.md)。当前 OneDrive 工作目录已就地脱敏，私人原件与旧 Git 历史在本地 Data 保全；公开仓库为[gsbetablocker/RinkSpace](https://github.com/gsbetablocker/RinkSpace)。日常只维护这个目录，不需要第二份项目或导出同步。
+本页说明可取得的数据、原素材来源和复现边界。项目试用见 [README](../README.md)，方法见[架构](ARCHITECTURE.md)与[算法](ALGORITHMS.md)，准确性要求见[验证说明](VALIDATION.md)。
 
-项目总入口仍是 [START_HERE.html](../START_HERE.html)。本文说明仓库里的实际文件、阅读顺序和离线数据读取方式，不授权启动历史任务。
+## 官方视频与源时间
 
-## 先理解项目
+项目不分发 ISU 比赛视频、截图、叠加图或内嵌画面。可依据以下官方 YouTube 来源和源时钟自行重建视觉线索：
 
-RinkSpace 从花滑转播中恢复共同冰场、连续围挡、广告与相机，再连接选手位置和轨迹。公共方法放在源码，赛事几何与人工事实放在赛事目录，节目保存自己的源时钟、观测与模型绑定。
+| 用途 | 官方来源 | 时间与身份 |
+|---|---|---|
+| 冈田芽衣短节目的现行处理源 | [ISU Skating：Mei OKADA / Ankara 2026](https://www.youtube.com/watch?v=O6j8L8TmfKo)、[从 00:20.020 附近观看](https://www.youtube.com/watch?v=O6j8L8TmfKo&t=20s) | 50/1 fps，time_base=1/12800；首帧 PTS 256256 = 00:20.020 |
+| 首镜头取点范围 | [同一单节目视频](https://www.youtube.com/watch?v=O6j8L8TmfKo&t=20s) | 1248 帧，首/末帧 00:20.020–00:44.960，PTS 256256–575488 |
+| 九镜头离线失败快照范围 | [同一单节目视频](https://www.youtube.com/watch?v=O6j8L8TmfKo&t=20s) | 8434 帧，首/末帧 00:20.020–03:08.680，PTS 256256–2415104 |
+| 历史全场源对齐事实 | [ISU Skating 全场来源](https://www.youtube.com/watch?v=oxXu1avhrvs&t=14916s) | 04:08:36.283333 的旧帧对应单节目 00:20.020；仅保留历史对齐，不作新的节目处理源 |
 
-| 要审阅的内容 | 仓库位置 |
-|---|---|
-| 项目目标、已有能力和范围 | [README](../README.md)、[架构](ARCHITECTURE.md)、[算法](ALGORITHMS.md) |
-| 原片时钟、取点资格、真实验证 | [验证要求](VALIDATION.md)、[源选择](../events/ankara_2026/programmes/okada_mei_sp/primary_source_selection.json) |
-| 公共工具、视觉与持续纠错 | [src/rinkspace](../src/rinkspace/)、[src/rink_feedback](../src/rink_feedback/)、[反馈记录](../events/ankara_2026/feedback/index.html) |
-| 原有场地与节目求解器 | [solver_runtime](../calibration/solver_runtime/README.md)、[program_tracking](../calibration/program_tracking/) |
-| 最近的九镜头物理求解实现 | [rinkfit/src](../calibration/rinkfit/src/)、[C++ 实现](../calibration/rinkfit/cpp/)、[joint_solver.py](../calibration/rinkfit/src/rinkfit_joint/joint_solver.py) |
-| 冰场、广告与机位的事实/约束 | [model_constraints](../events/ankara_2026/model_constraints/)、[模型](../events/ankara_2026/models/) |
-| 当前失败态与关键审阅数据 | [节目 review](../events/ankara_2026/programmes/okada_mei_sp/review/README.md) |
-| 依赖、版本、原生构建与第三方来源 | [环境说明](../environments/README.md)、[运行依赖](RUNTIME_DEPENDENCIES.md)、[第三方资产](THIRD_PARTY_ASSETS.md) |
+官方频道身份及更精确的源哈希、PTS、表征差异和缺口保存在[源选择记录](../events/ankara_2026/programmes/okada_mei_sp/primary_source_selection.json)。YouTube 链接的整数秒仅帮助定位，实际重建以本地文件的原生 PTS/time_base 为准；不能用固定秒差或平均 FPS 取代已核实的帧对应。相同 URL 的不同下载表征不预设解码字节相同。
 
-历史启动包中的 CODEX_START、执行计划和命令是当时的交接材料。它们不代表当前工作已完成，也不覆盖 2026-10-19 的停机状态。
+## 选定的失败快照
 
-## 当前离线审阅快照
+[节目 review](../events/ankara_2026/programmes/okada_mei_sp/review/README.md)冻结于 2026-10-19。它保留真实九镜头失败状态、模型、配置、材料映射、完整状态、源观测、统计 W、资格召回和必要驱动。该候选没有通过完整镜头定位验收，最后工程求解也尚未消费原始 W 的统计似然。
 
-快照为 2026-10-19 用户要求停止后的全九镜头恢复失败状态。官方单节目 O6j8L8TmfKo，50/1 fps，time_base=1/12800，源 PTS 256256–2415104，共 8434 帧。当前模型没有通过全九镜头定位验收；原始 W 的统计似然尚未被最后工程求解实际消费，约束与独立重放仍未闭合。原始数据、W、失败状态和资格召回记录分别保留，不能因归档就变为合格源或成功模型。
+归档清单把逻辑路径及历史地址映射到实际 ZIP 成员。模型和关键 JSON 可直接阅读，其余数据按需读取，完整 ZIP 仍随仓库提供：
 
-review 目录直接提供可读的状态、当前模型、配置、材料映射和关键驱动源码。其余必要观测、完整状态、W、源资格记录和旧基线压成少量 ZIP；清单把每个原路径对应到实际归档成员。不是让审阅者去访问本机 Data，也没有将整个历史目录复制到 OneDrive。
-
-完整源视频、批量解码帧、安装环境、编译中间件、可重建的 4.7 GB 屏幕网格数组和大批诊断视频仍在 Data。仓库保留数值审阅数据，比赛截图与叠加图不公开；完整 8434 帧的独立视觉验收仍需官方源视频。旧 60 帧全场来源只保留历史对齐事实，不用作本节目的新处理源。
-
-## 后续开发进度（2026-10-21）
-
-S02–S06 已交付 3320 个原生帧、1,641,840 个显示源点的提取与资格修订。来源、推定、已知问题和生成代码分别见 [S02–S04](../events/ankara_2026/programmes/okada_mei_sp/source_datasets/dense234_20261020/result.json) 与 [S05–S06](../events/ankara_2026/programmes/okada_mei_sp/source_datasets/dense56_20261020/result_v4.json)。这些是源点交付计数，不能解释为已确认的物理对应点数。
-
-共享源记录与资格差量化的入口见 [存储绑定](../events/ankara_2026/programmes/okada_mei_sp/source_datasets/storage_20261021/bindings.json) 和 [完成记录](../events/ankara_2026/programmes/okada_mei_sp/source_datasets/storage_20261021/result.json)。大规模逐帧点流和数据库留在本机 Data，不包含在上述 10 月 19 日的离线 review 包内；新增代码、资格修订、汇总及恢复参数随仓库保存。
-
-[恢复参数清单](../events/ankara_2026/programmes/okada_mei_sp/fit_joint9/rec1019/artifacts.json)登记了仓库内完整的 physical_seed.json 和 physical_start.json。它们是恢复初值，尚未成为通过独立视觉验证的物理解。本次提交不包含新启动的 1–6 镜头联合拟合工作。
-
-## 离线读取，无需本机 Data
-
-下载完整仓库后，审阅归档本身只需 Python 3.11 标准库，无需安装求解器或访问网络：
-
-~~~powershell
+~~~console
 python -B scripts/read_offline_review.py --check
 python -B scripts/read_offline_review.py --get "Data/runs/okada_rec_1019/demo_grid_recovery_v1/candidate/model.json"
 ~~~
 
-第一条只核对 ZIP 目录、成员存在性与大小，不展开文件。第二条显示该项的实际位置与身份。要取出单项，追加 --output 和一个新的绝对文件名。要批量提取，使用 --extract 和仓库外的新绝对目录；工具拒绝批量展开到项目中，也不会覆盖已有目录或执行归档内的程序。
+仅需 Python 标准库，无需本机 Data、求解环境或网络。--check 核对 ZIP 目录、成员和大小，不批量展开或重新散列全部内容；--get 查询实际位置及身份。要取出单项，追加 --output 和一个新的绝对文件名；批量提取使用 --extract 和仓库外的新绝对目录。工具拒绝批量展开到项目目录或覆盖已有目标，不执行包内代码。
 
-~~~powershell
-python -B scripts/read_offline_review.py --extract D:\RinkSpace_Data\offline_review
-~~~
+Python 也可导入 Review，使用 read(原路径或逻辑路径) 取得字节。提取的 resource_map.json 对应原路径与短文件名；数组 dtype、shape、offset 和行语义须按原 packet/manifest 解释。原生文本 checkpoint 即使以 .json 结尾，也不能直接当 JSON。
 
-提取结果采用短文件名，并提供 resource_map.json，将原路径和逻辑路径映射到实际文件。原 JSON 中的历史绝对地址是清单查询键；私人标识已改为公开别名，变化成员登记原始和公开 SHA，不能据此声称原运行身份不变。也可在 Python 中导入 Review，直接 read(原路径或逻辑路径) 取得原始字节，不必全量解压。数组的 dtype、shape、offset 和行语义来自原 packet/manifest，不能只按后缀猜测。
+后续源数据与该快照分开：[S02–S04](../events/ankara_2026/programmes/okada_mei_sp/source_datasets/dense234_20261020/result.json)、[S05–S06](../events/ankara_2026/programmes/okada_mei_sp/source_datasets/dense56_20261020/result_v4.json)、[共享源记录绑定](../events/ankara_2026/programmes/okada_mei_sp/source_datasets/storage_20261021/bindings.json)。这些修订和[恢复初值](../events/ankara_2026/programmes/okada_mei_sp/fit_joint9/rec1019/artifacts.json)不等于通过验证的新物理解；大规模源点流和数据库未包含在 10 月 19 日的 ZIP 内。
 
-完整拟合、GPU、人体和原生库的跨机器运行仍按环境文档逐项准备；离线审阅不依赖这些安装。models/rink_vision.pt 属 Git LFS，未来克隆权重需安装 Git LFS 并拉取 payload；本次技术审阅 ZIP 使用普通 Git 文件。
+## 数据身份与缺失材料
 
-## 存储与推送准备
+[manifest.json](../events/ankara_2026/programmes/okada_mei_sp/review/manifest.json)的 public_withheld 明确列出未分发的比赛原图和叠加图，保留其源地址、SHA、PTS 与来源事实。原片、批量帧图、可重建页面、安装环境、编译产物和大量运行缓存不随公开仓库提供。
 
-OneDrive 保存源码、依赖/构建定义、模型、人工事实与必要审阅归档。Data 保存大容量运行产物和本机 Git 数据库。压缩保全工具只处理显式清单，在 Data 中构建后再发布到项目，不自动扫描并拷贝历史，不覆盖已有快照。新增路径均检查 Windows UTF-16 长度；全树检查覆盖忽略的环境与缓存。
+测量 JSON/GZ/NPZ、原始 UV、统计 W、资格记录和模型身份保留；文件齐全不代表观测已确认或模型准确。仅凭这些数值不能复核原像素、颜色剖面或完成独立整镜头视觉验收。场地图和二值分类掩膜与原始广播画面分别登记，权利边界见[许可核查](LICENSING_REVIEW.md)。
 
-三个历史入口的默认批量输出已通过现有 AssetStore 放到 Data：build_camera_timelines.py、survey_event_broadcasts.py、track_scene3d_observations.py。最后一项的来源 provenance 继续记录原版身份；默认输出改动是之后的维护修改，没有篡改来源记录。
+[公开派生身份表](../configs/privacy_derivatives.json)记录隐私整理后的文件。历史 SHA 继续描述原件，公开 SHA 描述当前派生字节，两者不能互相冒充；拟合、续算和 producer 的原身份检查仍有效。JSON 中的历史本机绝对地址通常是查询键或 provenance，不要求读者拥有该盘符，也不表示完整运行路径已可移植。
 
-推送前可运行：
-
-~~~powershell
-python -B scripts/check_onedrive_paths.py
-python -B scripts/check_github_readiness.py --help
-~~~
-
-检查包含工作区/索引/HEAD 的大小与 LFS 状态、可达历史的大对象，以及明确限定范围的凭证候选位置；被跳过的文本必须按报告解释。工作区的 LFS 属性不等于已提交指针或远端已有 payload。GitHub 对普通文件超过 50 MiB 警告、超过 100 MiB 阻止，见[官方说明](https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github)。本项目不另设文件数量或仓库容量门槛。
-
-本次旧历史已原封本地保全，同一工作目录接入空的新公开历史；使用GitHub公开的noreply身份，origin指向公开仓库。项目采用[分项许可声明](../LICENSE.md)，第三方原许可保留。本仓库的公开准备不等于完整节目已准确复现。
+完整拟合、GPU、人体和原生后端仍须按[环境说明](../environments/README.md)准备。models/rink_vision.pt 使用 Git LFS；指针存在不等于 payload 已取得，技术审阅 ZIP 则是普通 Git 文件。

@@ -1,12 +1,12 @@
 # 冈田芽衣全九镜头：GitHub 离线技术审阅
 
-冻结日期：2026-10-19。模型与全部恢复工作保持停止，尚未完成全九镜头拟合与视觉验收。此目录保留真实失败状态，不授权运行历史 driver。
+冻结日期：2026-10-19。此快照记录当时停止后的全九镜头失败状态，尚未完成拟合与视觉验收；它不描述后续开发的实时状态。
 
 先读 [CURRENT_STATUS.json](CURRENT_STATUS.json) 与[项目阅读说明](../../../../../docs/GITHUB_REVIEW.md)。当前模型直接见 [model.json](model.json)，执行配置见 [config.json](config.json)，材料/来源定义见 [sources.json](sources.json)、[material_map.json](material_map.json)，资格边界见 [source_qualification.json](source_qualification.json)。这些 JSON 内的原本机地址保留为来源记录；实际数据可通过本目录清单离线读取。
 
 ## 当前事实
 
-- 官方单节目 O6j8L8TmfKo，50fps、time_base=1/12800，PTS 256256–2415104，8434帧。
+- [ISU Skating 官方单节目](https://www.youtube.com/watch?v=O6j8L8TmfKo&t=20s)，50fps、time_base=1/12800，PTS 256256–2415104，8434帧（首/末帧 00:20.020–03:08.680）。
 - 最后完整失败态为 demo_grid_recovery_v1。模型、完整CP、外层状态、lambda/nu、显式station/row/alpha/path及原始重放数组都在归档中。
 - engineering_checkpoint.json 实际以 RINKFIT_AL_CHECKPOINT_V1 开头，是原生文本格式，不能当 JSON 解析或因后缀而删掉。
 - current g9_ice 为907603行。当前候选的249446活跃行不等于249446条已获人工确认、独立同分布的证据。
@@ -40,4 +40,4 @@ baseline保留v98原始输入失败态；state保留最后工程候选、其前�
 
 离线审阅可检查实现、模型/观测/统计定义与失败原因。完整真实镜头准确性验收仍需官方原视频；本次没有恢复求解、训练、统计或视频生成。
 
-公开包已排除25张比赛原图及叠加图，旧路径和SHA登记于manifest的public_withheld；Data保留原归档。测量JSON、NPZ、GZ、18个观测数组、原W与模型未删改。原片视觉核验仍需本地原素材。
+公开包不分发比赛视频、截图或叠加图，已排除25张原图及叠加图；旧路径和SHA登记于manifest的public_withheld；Data保留原归档。测量JSON、NPZ、GZ、18个观测数组、原W与模型未删改。原片视觉核验仍需本地原素材。
