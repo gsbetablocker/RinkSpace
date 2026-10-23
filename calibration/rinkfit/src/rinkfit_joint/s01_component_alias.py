@@ -10,6 +10,7 @@ import cv2,numpy as np
 from scipy.interpolate import RBFInterpolator
 from scipy.spatial import cKDTree
 from .io_utils import read_json,write_json,file_sha256,object_sha256
+from .material_path import new_board_path_points
 
 def dense(q,step=.25):
  q=np.asarray(q,float);out=[]
@@ -24,7 +25,9 @@ def compile_aliases(model,material_map,registry,project):
  result=copy.deepcopy(model);mapping=copy.deepcopy(material_map);project=Path(project);scene_path=project/'events/ankara_2026/models/shot2_8a28_r2_20261014/scene.json';scene=read_json(scene_path);spp=scene['source_conditioned_board_prints'];bylabel={m['label']:i for i,m in enumerate(result['materials'])};pending={m['target'] for m in mapping['pending_geometry']};accepted={m['source_target']:m for m in registry['materials'] if m.get('identity_accepted')};receipts=[];aliases=[];additions=[];diagnostics=[];refs=[dict(path=str(scene_path),sha256=file_sha256(scene_path))]
  def add(target,paths,basis):
   if target not in pending or target not in accepted:return
-  for j,p in enumerate(paths):p['id']='crosswalk/'+target+'/'+str(j);p['variant_id']='crosswalk/'+target;p['provenance']=json.dumps(basis,ensure_ascii=False)
+  for j,p in enumerate(paths):
+   if p['kind']==2:p['points']=new_board_path_points(p['points'],p.get('closed',False))
+   p['id']='crosswalk/'+target+'/'+str(j);p['variant_id']='crosswalk/'+target;p['provenance']=json.dumps(basis,ensure_ascii=False)
   index=len(result['materials']);result['materials'].append(dict(label=target,paths=paths));bylabel[target]=index
   m=accepted[target];mapping['semantic_to_material'][m['id']]={'target':target,'material_index':index,'geometry_ready':True,'source_identity_basis':basis}
   aliases.append(dict(target=target,material_index=index,paths=len(paths),physical_panel=m['physical_entity'],basis=basis))

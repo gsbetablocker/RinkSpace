@@ -16,14 +16,14 @@ struct JointSourceUVCaptureRowV1 {
    // An explicit-row cache is a different function and cannot qualify this factor.
    if(!v.implicit_RS_capture || !v.implicit_RS_valid)return false;
    T station=implicit.station_slot<0?T(source->station):p[implicit.station_slot][0];
-   if(v.sensor_station_active){if(!feasible_sensor_station||source->kind==1||implicit.station_slot<0)return false;station=T(v.implicit_station);if constexpr(!std::is_arithmetic<T>::value){if(!v.jacobians_ready||!v.partials||!v.block_column_starts)return false;const double ds=v.partials[v.station_column].v;if(!std::isfinite(ds)||std::abs(ds)<1e-8||std::abs(ds-v.sensor_station_dv_ds)>1e-8*std::max(1.,std::abs(ds)))return false;T dv=T(0);for(std::size_t k=0;k<implicit.layout.block_ids.size();++k){const int start=v.block_column_starts->at(k);for(std::size_t j=0;j<implicit.model->blocks.at(implicit.layout.block_ids[k]).values.size();++j)dv+=T(v.partials[start+int(j)].v)*(p[k][j]-T(event_scalar(p[k][j])));}station-=dv/T(ds);}if(!source->station_allowed(*implicit.model,implicit.layout.path,event_scalar(station)))return false;*out={station,T(v.implicit_RS_row),T(source->alpha)};return finite_array(*out); }
+   if(v.sensor_station_active){if(!feasible_sensor_station||source->kind==1||implicit.station_slot<0)return false;station=T(v.implicit_station);if constexpr(!std::is_arithmetic<T>::value){if(!v.jacobians_ready||!v.partials||!v.block_column_starts)return false;const double ds=v.partial(v.station_column).v;if(!std::isfinite(ds)||std::abs(ds)<1e-8||std::abs(ds-v.sensor_station_dv_ds)>1e-8*std::max(1.,std::abs(ds)))return false;T dv=T(0);for(std::size_t k=0;k<implicit.layout.block_ids.size();++k){const int start=v.block_column_starts->at(k);for(std::size_t j=0;j<implicit.model->blocks.at(implicit.layout.block_ids[k]).values.size();++j)dv+=T(v.partial(start+int(j)).v)*(p[k][j]-T(event_scalar(p[k][j])));}station-=dv/T(ds);}if(!source->station_allowed(*implicit.model,implicit.layout.path,event_scalar(station)))return false;*out={station,T(v.implicit_RS_row),T(source->alpha)};return finite_array(*out); }
    if(!source->station_allowed(*implicit.model,implicit.layout.path,event_scalar(station)))return false;
    if constexpr(std::is_arithmetic<T>::value){*out={station,T(v.implicit_RS_row),T(source->alpha)};return true;}
    else if(v.jacobians_ready&&v.partials&&v.block_column_starts){
-    const auto&dr=v.partials[v.row_column];const double den=1-dr.v;
+    const auto&dr=v.partial(v.row_column);const double den=1-dr.v;
     if(!std::isfinite(den)||std::abs(den)<1e-6||std::abs(den-v.implicit_RS_denominator)>1e-8*std::max(1.,std::abs(den)))return false;
-    T rhs=T(0);for(std::size_t k=0;k<implicit.layout.block_ids.size();++k){const int start=v.block_column_starts->at(k);const auto&b=implicit.model->blocks.at(implicit.layout.block_ids[k]);for(std::size_t j=0;j<b.values.size();++j)rhs+=T(v.partials[start+int(j)].v)*(p[k][j]-T(event_scalar(p[k][j])));}
-    if(implicit.station_slot>=0)rhs+=T(v.partials[v.station_column].v)*(station-T(event_scalar(station)));
+    T rhs=T(0);for(std::size_t k=0;k<implicit.layout.block_ids.size();++k){const int start=v.block_column_starts->at(k);const auto&b=implicit.model->blocks.at(implicit.layout.block_ids[k]);for(std::size_t j=0;j<b.values.size();++j)rhs+=T(v.partial(start+int(j)).v)*(p[k][j]-T(event_scalar(p[k][j])));}
+    if(implicit.station_slot>=0)rhs+=T(v.partial(v.station_column).v)*(station-T(event_scalar(station)));
     *out={station,T(v.implicit_RS_row)+rhs/T(den),T(source->alpha)};return finite_array(*out);
    }
   }
@@ -38,7 +38,7 @@ struct JointSourceUVCaptureRowV1 {
    if constexpr(std::is_arithmetic<T>::value){*out={T(v.canonical_uv[0]),T(v.canonical_uv[1])};return finite_array(*out);}
    else if(v.jacobians_ready&&v.partials&&v.block_column_starts){
     *out={T(v.canonical_AD_uv[0]),T(v.canonical_AD_uv[1])};
-    auto lift=[&](const T&x,int column){const T d=x-T(event_scalar(x));(*out)[0]+=T(v.partials[column].u)*d;(*out)[1]+=T(v.partials[column].v)*d;};
+    auto lift=[&](const T&x,int column){const T d=x-T(event_scalar(x));(*out)[0]+=T(v.partial(column).u)*d;(*out)[1]+=T(v.partial(column).v)*d;};
     for(std::size_t k=0;k<implicit.layout.block_ids.size();++k){const auto&b=implicit.model->blocks.at(implicit.layout.block_ids[k]);for(std::size_t j=0;j<b.values.size();++j)lift(p[k][j],v.block_column_starts->at(k)+int(j));}
     if(implicit.station_slot>=0)lift(y[0],v.station_column);lift(y[1],v.row_column);cache->note_direct_chain_hit();return finite_array(*out);
    }

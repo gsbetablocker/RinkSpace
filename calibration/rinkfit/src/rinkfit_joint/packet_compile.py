@@ -106,8 +106,12 @@ def append_admitted_sources(s01_packet,solver_rows,statistics_registry,material_
     from .source_statistics import supported_factor_whitening
     out=Path(output)
     if out.exists():raise ValueError('new joint packet generation required')
-    out.mkdir(parents=True)
     parent_path=Path(s01_packet);parent=json.loads(parent_path.read_text(encoding='utf8'))
+    if parent.get('board_material_source_qualification'):
+        raise ValueError('Legacy append cannot rebind qualified source certificates; use a qualified reference append finalizer')
+    if parent.get('dense_parent_packet') or parent.get('dense_source_binding'):
+        raise ValueError('Legacy append does not support dense packets; use the reference source append entry')
+    out.mkdir(parents=True)
     selected=list(read_jsonl(solver_rows));eligible={r['source_row_id']:r for r in selected}
     new=list(read_jsonl(raw_ledger)) if raw_ledger else selected
     if raw_ledger:
@@ -204,7 +208,7 @@ def append_admitted_sources(s01_packet,solver_rows,statistics_registry,material_
     if not np.array_equal(partition,active.astype(np.int16)):raise ValueError('promoted new sources do not have exactly one complete W statistical unit')
     values={'uv':newuv,'native_pts':np.asarray([r['native_pts'] for r in new]),
         'shot_index':np.asarray([int(r['shot_id'][1:])-1 for r in new]),'kind':kind,'material_index':material,
-        'path':np.zeros(len(new)),'admission':active,'fit_role':np.ones(len(new)),
+        'path':np.asarray([(r.get('allowed_path_indices') or [0])[0] for r in new]),'admission':active,'fit_role':np.ones(len(new)),
         'E':np.asarray([r.get('engineering_budget_px',2.) for r in new]),'station':np.full(len(new),.5),
         'row':np.where((newuv[:,1]>=0)&(newuv[:,1]<=1079),newuv[:,1],539.5),
         'alpha':np.zeros(len(new)),'source_sigma':np.ones(len(new)),'profile_normal':np.zeros((len(new),2)),
@@ -213,11 +217,10 @@ def append_admitted_sources(s01_packet,solver_rows,statistics_registry,material_
     for key,ref in parent['arrays'].items():
         base=Path(ref['file']);base=base if base.is_absolute() else parent_path.parent/base
         if file_sha256(base)!=ref['sha256']:raise ValueError('changed s01 parent array')
-        a=np.fromfile(base,ref['dtype']).reshape(ref['shape']);parent_values[key]=a;extra=np.asarray(values[key],dtype=ref['dtype'])
+        a=np.memmap(base,dtype=ref['dtype'],mode='r',offset=int(ref.get('offset_bytes',0)),shape=tuple(ref['shape']));parent_values[key]=a;extra=np.asarray(values[key],dtype=ref['dtype'])
         joined=np.concatenate((a,extra));path=out/(key+'.bin');joined.tofile(path)
         arrays[key]={'file':path.name,'sha256':file_sha256(path),'dtype':joined.dtype.str,'shape':list(joined.shape),'layout':'C','byte_order':'little'}
     original_source_start=parent.get('new_source_start',N0)
-    prior_active=np.flatnonzero((parent_values['admission']==1)&(parent_values['fit_role']==1)&(np.arange(N0)>=original_source_start))
     packet={**parent,'row_count':n,'arrays':arrays,'source_dataset_ids':parent['source_dataset_ids']+['current_native_'+r['shot_id'] for r in new],
         'source_row_ids':parent['source_row_ids']+[r['source_row_id'] for r in new],
         'groups':joint_groups,'active_rows':parent['active_rows']+int(active.sum()),'joint_statistics_rank':rank,
@@ -225,13 +228,15 @@ def append_admitted_sources(s01_packet,solver_rows,statistics_registry,material_
         'current_original_W_rank':parent['current_original_W_rank'],
         'source_manifests':parent['source_manifests']+[{'file':str(parent_path.resolve()),'sha256':file_sha256(parent_path),'role':'immutable parent packet source order and numeric prefix'}]+[{'file':str(Path(q).resolve()),'sha256':file_sha256(q)} for q in [solver_rows,statistics_registry,material_map,model_path]+([raw_ledger] if raw_ledger else [])+([admission_ledger] if admission_ledger else [])],
         'same_s01_raw_rows_prefix_preserved':original_source_start,'new_source_start':original_source_start,'newly_appended_source_start':N0,
-        'recapture_rows':np.r_[prior_active,N0+np.flatnonzero(active)].tolist(),'new_rows_initialized_for_fresh_capture':len(new),
-        'allowed_paths':{str(N0+i):row['allowed_path_indices'] for i,row in enumerate(new) if active[i] and row.get('allowed_path_indices')},
+        'recapture_rows':(N0+np.flatnonzero(active)).tolist(),'new_rows_initialized_for_fresh_capture':len(new),
+        'allowed_paths':{**parent.get('allowed_paths',{}),**{str(N0+i):row['allowed_path_indices'] for i,row in enumerate(new) if active[i] and row.get('allowed_path_indices')}},
         'new_nuisance_state_recomputed':False,'complete_joint_solution_claimed':False,
         'new_source_statistics_status':'initialization_surrogate; nonlinear source-family resampling pending',
         'formal_new_source_statistical_optimum_claimed':False,
         'new_source_numeric_covariance_used':not initialization_geometry,
         'native_geometry_requires_fixed_group_shot_normalization':bool(initialization_geometry)}
+    from .measurement_operator import assert_append_operator_prefix
+    assert_append_operator_prefix(parent, packet, N0)
     qa_path=Path(statistics_registry).parent.parent/'pixel_statistics_QA/report.json'
     if qa_path.is_file():
         packet['new_source_noise_calibration_QA']={'file':str(qa_path),'sha256':file_sha256(qa_path)}

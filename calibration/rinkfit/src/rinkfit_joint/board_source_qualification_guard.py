@@ -44,10 +44,17 @@ def assert_board_material_source_qualification(packet,packet_path,*,verified_dep
     cert_path=_load_ref(ref,base,seen);cert=json.loads(cert_path.read_text(encoding='utf8'))
     for name in ('SOURCE_IDENTITY_CERTIFICATE_RECALLED.json','SOURCE_IDENTITY_EVIDENCE_RECALL.json'):
         if (cert_path.parent/name).exists():raise ValueError('Board material requalification certificate recalled: '+str(cert_path.parent/name))
+    from .measurement_operator import assert_measurement_operator_binding
+    assert_measurement_operator_binding(packet, cert)
+    allowed = packet.get('allowed_paths', {})
+    for i in active:
+        choices = allowed.get(str(int(i)))
+        if not choices or len(set(choices)) != len(choices) or any(type(k) is not int or k < 0 for k in choices):
+            raise ValueError('Qualified source requires explicit finite allowed_paths; missing authority cannot expand to every material path')
     if cert.get('schema') == 'rinkfit.board_material_fit_qualification.v3_reviewed_revision':
         return _assert_reviewed_revision(packet,Path(packet_path),cert,cert_path,seen)
-    incremental = cert.get('schema') == 'rinkfit.board_material_fit_qualification.v2'
-    if cert.get('schema') not in (CERTIFICATE_SCHEMA, 'rinkfit.board_material_fit_qualification.v2'):raise ValueError('Unsupported board physical requalification certificate')
+    incremental = cert.get('schema') in ('rinkfit.board_material_fit_qualification.v2', 'rinkfit.board_material_fit_qualification.v2_operator_bound')
+    if cert.get('schema') not in (CERTIFICATE_SCHEMA, 'rinkfit.board_material_fit_qualification.v2', 'rinkfit.board_material_fit_qualification.v2_operator_bound'):raise ValueError('Unsupported board physical requalification certificate')
     if incremental:
         from .qualified_scope import QUALIFICATION_DIMENSIONS, SOURCE_SHA, DOMAIN
         if (cert.get('qualification_dimensions') != list(QUALIFICATION_DIMENSIONS) or cert.get('source_video_sha256') != SOURCE_SHA or cert.get('time_base') != '1/12800' or cert.get('coordinate_domain') != DOMAIN or cert.get('exact_ID_scope_complete') is not True or cert.get('whole_original_scope_qualified') is not False):raise ValueError('Incremental certificate must declare exact qualified scope and complete native dimensions')
@@ -55,6 +62,7 @@ def assert_board_material_source_qualification(packet,packet_path,*,verified_dep
     if int(cert.get('count',-1))!=len(active)or cert.get('active_board_rows_sha256')!=hashlib.sha256(active.astype('<i8').tobytes()).hexdigest():raise ValueError('Board qualification does not cover the exact active source indices')
     for k in BOUND_ARRAYS:
         if cert.get('membership_array_sha256',{}).get(k)!=packet['arrays'][k]['sha256']:raise ValueError('Board qualification frozen source array differs: '+k)
+        _load_ref(packet['arrays'][k], base, seen)
     recipe_path=_load_ref(cert['recipe_ref'],cert_path.parent,seen);recipe=json.loads(recipe_path.read_text(encoding='utf8'))
     from .board_source_requalification import VERSION
     if recipe.get('version')!=VERSION:raise ValueError('Recalled board source qualification algorithm version')

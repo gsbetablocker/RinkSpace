@@ -1,0 +1,3 @@
+#include "rinkfit/joint_source_guard.hpp"
+#include <iostream>
+int main(int argc,char**argv){try{if(argc!=3)return 2;const auto path=std::filesystem::u8path(argv[2]);if(std::string(argv[1])=="tree"){std::cout<<rinkfit::joint_canonical_tree_sha256(rinkfit::eventio::read_json(path));return 0;}if(std::string(argv[1])=="binding"){std::cout<<rinkfit::joint_measurement_operator_binding(rinkfit::eventio::read_json(path)).dump();return 0;}auto packet=rinkfit::joint_load_qualification_parent(path);rinkfit::assert_joint_board_source_qualification(packet,path);std::cout<<"qualified";return 0;}catch(const std::exception&e){std::cerr<<e.what();return 1;}}

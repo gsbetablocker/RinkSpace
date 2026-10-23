@@ -117,6 +117,9 @@ def rebind_qualified_board_certificate(parent_packet, appended_packet, folder,
         source_row_ids_sha256=hashlib.sha256(json.dumps(result['source_row_ids'],ensure_ascii=False,separators=(',',':')).encode()).hexdigest(),
         source_dataset_ids_sha256=hashlib.sha256(json.dumps(result['source_dataset_ids'],ensure_ascii=False,separators=(',',':')).encode()).hexdigest(),
         inherited_qualification_ref=oldref, nonboard_append_rebind=True)
+    from .measurement_operator import measurement_operator_binding, assert_append_operator_prefix
+    assert_append_operator_prefix(parent, result, n)
+    cert['measurement_operator_binding'] = measurement_operator_binding(result)
     write_json(folder/'qualified_certificate.json',cert)
     result['board_material_source_qualification']=_ref(folder/'qualified_certificate.json')
     result['qualified_scope_generation']=_ref(folder/'qualified_generation.json')

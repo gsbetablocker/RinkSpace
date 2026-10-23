@@ -21,11 +21,11 @@ if(BUILD_TESTING)
 endif()
 
 if(RINKFIT_BUILD_PRODUCTION_BACKEND)
-  find_package(Ceres 2.2 QUIET COMPONENTS SuiteSparse)
+  find_package(Ceres 2.2 QUIET)
   if(NOT Ceres_FOUND)
     message(FATAL_ERROR
-      "Missing production dependency: Ceres >= 2.2 built with SuiteSparse. "
-      "Install Ceres development files, Eigen, SuiteSparse and CMake; "
+      "Missing production dependency: Ceres >= 2.2. "
+      "Install Ceres development files, Eigen and CMake; the requested sparse backend is checked at runtime. "
       "set Ceres_DIR if needed. No SciPy/dense substitute is selected. "
       "For independent standard-C++ mathematical tests only, configure "
       "-DRINKFIT_BUILD_PRODUCTION_BACKEND=OFF (this does not build a fitter).")
@@ -69,6 +69,21 @@ if(RINKFIT_BUILD_PRODUCTION_BACKEND)
     target_compile_options(rinkfit_native_uv PRIVATE /utf-8 /bigobj)
   endif()
   if(BUILD_TESTING)
+    # Explicit local model and motion manifest arguments are required.
+    add_executable(rinkfit_motion_probe tests/native_motion_probe.cpp)
+    target_link_libraries(rinkfit_motion_probe PRIVATE rinkfit_joint)
+    if(MSVC)
+      target_compile_options(rinkfit_motion_probe PRIVATE /utf-8 /bigobj)
+    endif()
+    add_executable(test_engineering_inner_boundary cpp/tests/test_engineering_inner_boundary.cpp)
+    target_link_libraries(test_engineering_inner_boundary PRIVATE rinkfit_ceres nlohmann_json::nlohmann_json)
+    add_test(NAME engineering_inner_budget_boundary COMMAND test_engineering_inner_boundary ${CMAKE_CURRENT_BINARY_DIR}/engineering_inner_boundary)
+    # Requires an explicit reviewed PTX and a new evidence directory at runtime.
+    add_executable(test_gpu_active_columns cpp/tests/test_gpu_active_columns.cpp)
+    target_link_libraries(test_gpu_active_columns PRIVATE rinkfit_joint)
+    add_executable(test_joint_certified_projection cpp/tests/test_joint_certified_projection.cpp)
+    target_link_libraries(test_joint_certified_projection PRIVATE rinkfit_joint)
+    add_test(NAME joint_certified_world_projection COMMAND test_joint_certified_projection)
     add_executable(test_event_model cpp/tests/test_event_model.cpp)
     target_link_libraries(test_event_model PRIVATE rinkfit_event)
     add_test(NAME event_physical_model COMMAND test_event_model)

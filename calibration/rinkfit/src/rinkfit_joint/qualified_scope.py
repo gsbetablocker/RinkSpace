@@ -20,7 +20,7 @@ from .source_scope_repair import marginalize_group
 from .board_source_qualification_guard import FAMILY_PREFIXES, BOUND_ARRAYS
 
 SCHEMA = 'rinkfit.incremental_qualified_source_scope.v1'
-CERTIFICATE_SCHEMA = 'rinkfit.board_material_fit_qualification.v2'
+CERTIFICATE_SCHEMA = 'rinkfit.board_material_fit_qualification.v2_operator_bound'
 SOURCE_SHA = 'e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d'
 DOMAIN = 'native_1920x1080_pixel_centres'
 QUALIFICATION_DIMENSIONS = ('video_identity', 'native_clock_domain', 'physical_material',
@@ -456,6 +456,8 @@ def compile_active_qualified_scope(parent_packet, primary_manifest, mask_provena
         exact_ID_scope_complete=True, whole_original_scope_qualified=False,
         producer_module_is_historical_executed_archive=True,
         consumer_module_ref=_ref(Path(__file__)))
+    from .measurement_operator import measurement_operator_binding
+    cert['measurement_operator_binding'] = measurement_operator_binding({**packet, 'arrays': arrays})
     write_json(out/'certificate.json', cert)
     original_rank = 2*sum(i<int(packet['new_source_start']) for i in independent) + sum(int(g['rank']) for g in groups if all(int(i)<int(packet['new_source_start']) for i in g['rows']))
     result = {**packet, 'arrays':arrays, 'groups':groups, 'independent_rows':independent,

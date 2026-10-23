@@ -58,7 +58,7 @@ BuildInventory JointALBuilder::build_advertisement_coordinate_problem(
         || std::find(shot.control_sources.begin(), shot.control_sources.end(), ad_block) != shot.control_sources.end()
         || std::find(shot.control_blocks.begin(), shot.control_blocks.end(), ad_block) != shot.control_blocks.end())
       throw std::invalid_argument("advertisement block aliases camera control");
-  for (const auto& manifold : core.model.source_json.value("linear_control_manifolds", eventio::Json::array()))
+  for (const auto& manifold : core.model.control_manifolds())
     if (manifold.at("block").get<std::size_t>() == target)
       throw std::invalid_argument("advertisement installation has a control manifold");
 

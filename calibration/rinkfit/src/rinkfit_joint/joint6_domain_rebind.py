@@ -13,7 +13,7 @@ from .source_quality_compare_v1 import _camera
 from .dense_source_motion import _inverse_brown_rows
 
 
-def rebind_source_supported_optical_candidate(candidate_model,packet_file,parent_domain,out,*,allowed_head_rigs=()):
+def rebind_source_supported_optical_candidate(candidate_model,packet_file,parent_domain,out,*,allowed_head_rigs=(),complete_primal=False):
  out=Path(out).resolve()
  if out.exists():raise FileExistsError(out)
  previous=read_json(parent_domain)
@@ -30,14 +30,22 @@ def rebind_source_supported_optical_candidate(candidate_model,packet_file,parent
   allowed.update(model['shots'][sid]['control_blocks'])
   allowed.add(model['shots'][sid]['reference_angles_block'])
  test=copy.deepcopy(model);changed=[]
- if len(model['blocks'])!=len(parent['blocks']):raise ValueError('Changed physical block registry')
+ if len(model['blocks'])!=len(parent['blocks']):
+  extra=model['blocks'][len(parent['blocks']):]
+  if not complete_primal or len(model['blocks'])<len(parent['blocks']) or not extra or any(not b['name'].startswith(('ad/pair/','print/pair/')) for b in extra):raise ValueError('Changed camera-relevant physical block registry')
+  pair_ref=model.get('paired_advertisement_templates')
+  if not pair_ref or file_sha256(pair_ref['file'])!=pair_ref['sha256']:raise ValueError('Appended advertisement coordinates lack their exact pair definition')
+  for key in ('scene_block','rigs','shots'):
+   if model[key]!=parent[key]:raise ValueError('Advertisement append changed camera incidence '+key)
  for i,(a,b) in enumerate(zip(model['blocks'],parent['blocks'])):
   if a['values']!=b['values']:
-   if i not in allowed or a['name']!=b['name'] or (i not in head_blocks and a['name'].split('/')[:1]!=['shot']):raise ValueError('Optical rebind only permits non-S01 motion and explicitly selected end/secondary heads: '+a['name'])
+   if a['name']!=b['name'] or len(a['values'])!=len(b['values']) or (not complete_primal and (i not in allowed or (i not in head_blocks and a['name'].split('/')[:1]!=['shot']))):raise ValueError('Optical rebind only permits non-S01 motion and explicitly selected end/secondary heads: '+a['name'])
    changed.append(dict(block=i,name=a['name'],maximum_absolute_scalar_change=float(np.max(np.abs(np.asarray(a['values'])-b['values'])))))
    test['blocks'][i]['values']=copy.deepcopy(b['values'])
- if test!=parent:raise ValueError('Optical rebind cannot change scene/main/optics/S01 or projection metadata')
+ if not complete_primal and test!=parent:raise ValueError('Optical rebind cannot change scene/main/optics/S01 or projection metadata')
  raw=read_json(packet_file);arrays={}
+ from .dense_joint_run import _run_packet_header
+ shot_ids=_run_packet_header(packet_file)['shot_ids']
  for key in ('uv','native_pts','shot_index','admission','fit_role'):
   spec=raw['arrays'][key]
   if file_sha256(spec['file'])!=spec['sha256']:raise ValueError('Changed source column '+key)
@@ -47,7 +55,7 @@ def rebind_source_supported_optical_candidate(candidate_model,packet_file,parent
  for sid,cam in cams.items():
   rid=model['shots'][sid]['rig_id'];lo,hi=previous['rigs'][rid]['log_f_range']
   if sid!='s01' and (np.min(cam.controls[:,2])<lo or np.max(cam.controls[:,2])>hi):raise ValueError('Candidate control left the unchanged closed optical box: '+sid)
-  take=(arrays['shot_index']==raw['shot_ids'].index(sid))&active
+  take=(arrays['shot_index']==shot_ids.index(sid))&active
   uv=np.array(arrays['uv'][take]);pts=np.array(arrays['native_pts'][take])
   t=(pts-model['shots'][sid]['time_origin_pts'])/12800.+cam.tau*(uv[:,1]/1079.-.5)
   lf=cam.spline(t)[:,2];z=lf-np.log(cam.optics['f_ref'])
@@ -59,7 +67,9 @@ def rebind_source_supported_optical_candidate(candidate_model,packet_file,parent
   per[sid]=dict(rig=rid,active_source_rows=int(take.sum()),native_exposures=int(np.unique(pts).size),source_log_f=_stats(lf),source_focal_native_px=_stats(np.exp(lf)),source_inverse_ray_radius=_stats(radius),inverse_Brown_failed=int((~valid).sum()),outside_frozen_ray_disk=int((valid&(radius>cam.optics['radius_max'])).sum()),outside_unchanged_zoom_box=int(((lf<lo)|(lf>hi)).sum()),source_ray_reconstructed_from_model=True,model_inverse_is_not_hardware_measurement=True)
  for rid,rr in model['rigs'].items():
   cam=_camera(model,rr['reference_shot']);box=previous['rigs'][rid]['log_f_range']
-  cam.controls[0,2]=box[0];cam.controls[1,2]=box[1];cert=cam.optical_domain_certificate()
+  # Certify the requested Brown coefficient interval independently of trajectory control hulls.
+  # The actual source-time focal values were evaluated above without alteration.
+  cam.controls=np.array([[0.,0.,box[0]],[0.,0.,box[1]]]);cert=cam.optical_domain_certificate()
   if not cert['passed'] or cert['full_cubic_log_f_hull']!=box:raise ValueError('Whole unchanged optical box failed: '+rid)
   rigs[rid]=dict(log_f_range=box,ray_radius=previous['rigs'][rid]['ray_radius'],python_optical_certificate=cert,optics_initial_assumption=previous['rigs'][rid]['optics_initial_assumption'])
  out.mkdir(parents=True)
@@ -67,6 +77,6 @@ def rebind_source_supported_optical_candidate(candidate_model,packet_file,parent
  write_json(out/'source_coverage.json',coverage)
  domain=dict(schema=previous['schema'],activity_model=_ref(candidate_model),historical_certified_domain=previous['historical_certified_domain'],source_packet=_ref(packet_file),source_coverage=_ref(out/'source_coverage.json'),direct_logf_shots=previous['direct_logf_shots'],candidate_math_box_not_hardware_calibration=True,whole_six_g0_claimed=False,historical_certificate_unchanged=True,scene_policy=previous['scene_policy'],rigs=rigs)
  write_json(out/'capture_optical_domain.json',domain)
- receipt=dict(schema='rinkfit.dense6_same_optical_box_candidate_rebind.v1',candidate=_ref(candidate_model),parent_domain=_ref(parent_domain),domain=_ref(out/'capture_optical_domain.json'),source_coverage=_ref(out/'source_coverage.json'),changed_motion_blocks=changed,model_or_source_changed=False,complete_S01_scene_main_rig_and_all_optics_preserved=True,permitted_head_rigs=sorted(heads),actual_head_changes=[r for r in changed if r['block']in head_blocks],zoom_ray_box_expanded=False,true_RS_verified=False,quality_accepted=False,reader=_ref(__file__))
+ receipt=dict(schema='rinkfit.dense6_same_optical_box_candidate_rebind.v1',candidate=_ref(candidate_model),parent_domain=_ref(parent_domain),domain=_ref(out/'capture_optical_domain.json'),source_coverage=_ref(out/'source_coverage.json'),changed_motion_blocks=changed,model_or_source_changed=False,complete_S01_scene_main_rig_and_all_optics_preserved=not complete_primal,complete_fitted_primal_coverage_recomputed=complete_primal,permitted_head_rigs=sorted(heads),actual_head_changes=[r for r in changed if r['block']in head_blocks],zoom_ray_box_expanded=False,true_RS_verified=False,quality_accepted=False,reader=_ref(__file__))
  write_json(out/'receipt.json',receipt)
  return receipt

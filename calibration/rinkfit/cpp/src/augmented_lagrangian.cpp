@@ -1,4 +1,7 @@
 #include "rinkfit/augmented_lagrangian.hpp"
+#include "rinkfit/state_text_codec.hpp"
+#include <unordered_set>
+#include <string_view>
 
 #include <algorithm>
 #include <chrono>
@@ -35,21 +38,14 @@ void put_identity(std::ostream& out, const FrozenIdentity& id) {
       << std::quoted(id.scales_id) << ' ' << std::quoted(id.objective_id) << '\n';
 }
 std::string canonical(const StatePayload& data) {
-  std::ostringstream out;
-  out.imbue(std::locale::classic());
-  put_identity(out, data.identity);
-  out << data.parameters.size() << '\n' << std::hexfloat;
-  for (const auto& p : data.parameters) {
-    out << std::quoted(p.name) << ' ' << p.equality_auxiliary << ' ' << p.values.size();
-    for (double v : p.values) out << ' ' << v;
-    out << '\n';
-  }
-  for (const auto* map : {&data.discrete, &data.root_charts}) {
-    out << map->size() << '\n';
-    for (const auto& item : *map) out << std::quoted(item.first) << ' ' << std::quoted(item.second) << '\n';
-  }
-  return out.str();
+ state_text::Writer out;out.text.reserve(data.parameters.size()*64);
+ const auto&id=data.identity;const std::string* ids[]={&id.source_id,&id.model_id,&id.budget_id,&id.statistics_id,&id.scales_id,&id.objective_id};
+ for(int i=0;i<6;++i){out.quoted(*ids[i]);out.ch(i==5?'\n':' ');}out.integer(data.parameters.size());out.ch('\n');
+ for(const auto&p:data.parameters){out.quoted(p.name);out.ch(' ');out.integer(int(p.equality_auxiliary));out.ch(' ');out.integer(p.values.size());for(double v:p.values){out.ch(' ');out.number(v,true);}out.ch('\n');}
+ for(const auto* map:{&data.discrete,&data.root_charts}){out.integer(map->size());out.ch('\n');for(const auto&item:*map){out.quoted(item.first);out.ch(' ');out.quoted(item.second);out.ch('\n');}}
+ return std::move(out.text);
 }
+
 double max_positive(const std::vector<double>& values) {
   double result = 0.;
   for (double v : values) result = std::max(result, v);

@@ -91,6 +91,8 @@ def install_reviewed_source_revision(parent_packet,proposals_path,output):
         source_row_ids_sha256=hashlib.sha256(json.dumps(document['source_row_ids'],ensure_ascii=False,separators=(',',':')).encode()).hexdigest(),
         source_dataset_ids_sha256=hashlib.sha256(json.dumps(document['source_dataset_ids'],ensure_ascii=False,separators=(',',':')).encode()).hexdigest(),
         inherited_source_evidence_is_not_new_review=True,new_exact_native_reading_scope=indices)
+    from .measurement_operator import measurement_operator_binding
+    certificate['measurement_operator_binding'] = measurement_operator_binding(document)
     write_json(out/'qualified_source_revision.json',certificate)
     document['board_material_source_qualification']=dict(file=str(out/'qualified_source_revision.json'),sha256=file_sha256(out/'qualified_source_revision.json'))
     write_packet(out/'packet.json',document)

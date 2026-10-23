@@ -193,7 +193,7 @@ inline InnerResult JointGeometrySeedInner::solve(ProblemBuilder& builder, const 
         if(!r.active||r.kind==1||!problem.HasParameterBlock(s)||problem.IsParameterBlockConstant(s))continue;
         if(problem.GetManifold(s))throw std::runtime_error("unexpected station manifold before numerical units");
         double du=NAN,dv=NAN;JointUVCacheView view;
-        if(cache&&cache->lookup(i,&view)&&view.jacobians_ready&&view.partials&&view.station_column>=0){const auto&d=view.partials[view.station_column];du=d.u;dv=d.v;}
+        if(cache&&cache->lookup(i,&view)&&view.jacobians_ready&&view.partials&&view.station_column>=0){const auto&d=view.partial(view.station_column);du=d.u;dv=d.v;}
         else{++native_unit_CPU_derivatives;using J=ceres::Jet<double,1>;const auto l=r.layout(joint->core.model);std::vector<std::vector<J>>storage;std::vector<const J*>ptrs;
           for(int id:l.block_ids){storage.emplace_back();auto&v=storage.back();for(double x:joint->core.model.blocks[id].values)v.emplace_back(x);ptrs.push_back(v.data());}
           J station(*s);station.v[0]=1;const auto q=joint->core.model.predict_for_al(l,station,J(joint->core.row[i]),ptrs.data());if(q.arithmetic_valid){du=q.uv[0].v[0];dv=q.uv[1].v[0];}
@@ -205,6 +205,7 @@ inline InnerResult JointGeometrySeedInner::solve(ProblemBuilder& builder, const 
     }
     if(normalize_budget_step_&&objective.phase==Phase::kFeasibility){budget_step_scale=std::sqrt(2.*(*b)+1.);problem.SetManifold(b,new joint_seed_detail::JointScalarStepUnits(budget_step_scale));}
     if(builder.capture_state().token()!=state_before_numerical_units)throw std::runtime_error("reversible numerical units changed ambient checkpoint values");
+    if(auto*joint=dynamic_cast<JointALBuilder*>(&builder))if(auto*cache=dynamic_cast<JointUVCache*>(joint->gpu_evaluation_callback()))cache->configure_for_problem(problem);
 
     joint_seed_detail::JointSeedSnapshotCallback callback(builder, objective, outer, hooks);
     ceres::Solver::Options options;

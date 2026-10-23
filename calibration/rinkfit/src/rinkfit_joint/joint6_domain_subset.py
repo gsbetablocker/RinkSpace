@@ -33,7 +33,7 @@ def _view(path):
   for k,v in raw.get('arrays',{}).items():arrays.setdefault(k,v)
   for k in ('row_count','shot_ids','dense_source_binding','dense_joint_source_append'):
    if k in raw:result.setdefault(k,raw[k])
-  if all(k in result for k in ('row_count','shot_ids','dense_source_binding','dense_joint_source_append')) and len(arrays)==18:break
+  if all(k in result for k in ('row_count','shot_ids','dense_source_binding','dense_joint_source_append')) and all(k in arrays for k in ('uv','native_pts','shot_index','admission','fit_role')):break
   parent=raw.get('dense_parent_packet')
   if not parent:raise ValueError('Incomplete columnar dense source packet')
   current=_pin(parent).resolve()
@@ -54,8 +54,12 @@ def rebind_unchanged_model_source_subset(candidate_model,packet_file,parent_doma
   if old[k]!=new[k]:raise ValueError('Changed raw source registry: '+k)
  if old['dense_joint_source_append']['actual_column_identity_sha256']!=new['dense_joint_source_append']['actual_column_identity_sha256']:raise ValueError('Changed exact source column digest')
  if set(old['arrays'])!=set(new['arrays']):raise ValueError('Changed raw source column registry')
+ material_revision=_json(packet_file).get('native_print_identity_rebind')
+ if material_revision:
+  revision=_json(_pin(material_revision))
+  if revision['schema']!='rinkfit.native_print_identity_rebind.v1' or revision['parent_packet']['sha256']!=previous['source_packet']['sha256'] or revision['source_UV_ID_PTS_and_membership_unchanged']is not True:raise ValueError('Material identity optical reuse ancestry')
  for k in old['arrays']:
-  if k not in ('admission','fit_role') and old['arrays'][k]!=new['arrays'][k]:raise ValueError('Changed raw numeric/source column '+k)
+  if k not in ('admission','fit_role') and not(k=='material_index' and material_revision) and old['arrays'][k]!=new['arrays'][k]:raise ValueError('Changed raw numeric/source column '+k)
  def column(view,key):
   spec=view['arrays'][key];p=_pin(spec)
   return np.memmap(p,dtype=np.dtype(spec['dtype']),mode='r',shape=tuple(spec['shape']))

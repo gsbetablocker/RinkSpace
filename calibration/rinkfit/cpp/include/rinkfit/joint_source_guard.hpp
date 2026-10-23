@@ -1,6 +1,7 @@
 #pragma once
 #include <set>
 #include <map>
+#include "rinkfit/joint_measurement_operator.hpp"
 #include "rinkfit/event_io.hpp"
 #include "rinkfit/joint_exact_dependency_alias_v1.hpp"
 namespace rinkfit {
@@ -20,11 +21,13 @@ template<class Packet>inline void assert_joint_board_source_qualification(const 
  const auto certpath=joint_qualification_ref(doc.at("board_material_source_qualification"),packet.parent_path());const auto cert=eventio::read_json(certpath);
  if(cert.value("schema",std::string{})=="rinkfit.board_material_fit_qualification.v5_known_entity_prefix")return assert_joint_known_entity_prefix(p,packet,cert,certpath);
  if(cert.value("schema",std::string{})=="rinkfit.board_material_fit_qualification.v4_static_ice_prefix")return assert_joint_static_ice_prefix(p,packet,cert,certpath);
+ assert_joint_measurement_operator_binding(doc,cert);
+ for(auto i:active){const auto key=std::to_string(i);if(!doc.contains("allowed_paths")||!doc.at("allowed_paths").contains(key)||doc.at("allowed_paths").at(key).empty())throw std::runtime_error("qualified source requires explicit finite allowed_paths; missing authority cannot expand to every material path");std::set<int>seen_paths;for(const auto&x:doc.at("allowed_paths").at(key)){if(!x.is_number_integer())throw std::runtime_error("qualified finite paths require integer indices");const int pi=x.get<int>();if(pi<0||!seen_paths.insert(pi).second)throw std::runtime_error("invalid qualified finite allowed_paths");}}
  if(cert.value("schema",std::string{})=="rinkfit.board_material_fit_qualification.v3_reviewed_revision")return assert_joint_reviewed_source_revision(p,packet,cert,certpath);
- const bool incremental=cert.value("schema",std::string{})=="rinkfit.board_material_fit_qualification.v2";
+ const bool incremental=cert.value("schema",std::string{})=="rinkfit.board_material_fit_qualification.v2"||cert.value("schema",std::string{})=="rinkfit.board_material_fit_qualification.v2_operator_bound";
  if((cert.value("schema",std::string{})!="rinkfit.board_material_fit_qualification.v1"&&!incremental)||cert.value("count",std::size_t(-1))!=active.size()||cert.value("role_and_operator_pass_count",std::size_t(-1))!=active.size()||cert.value("unresolved_or_wrong_rows_consumed",std::size_t(-1))!=0)throw std::runtime_error("incomplete native board role/operator qualification coverage");
  if(incremental){if(!cert.value("exact_ID_scope_complete",false)||cert.value("whole_original_scope_qualified",true)||cert.value("source_video_sha256",std::string{})!="e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"||cert.value("time_base",std::string{})!="1/12800"||cert.value("coordinate_domain",std::string{})!="native_1920x1080_pixel_centres"||!cert.value("producer_module_is_historical_executed_archive",false))throw std::runtime_error("incomplete incremental source native qualification");joint_qualification_ref(cert.at("consumer_module_ref"),certpath.parent_path());}
- for(const char*key:{"uv","native_pts","shot_index","material_index","kind","admission","fit_role","profile_normal"})if(cert.at("membership_array_sha256").at(key)!=doc.at("arrays").at(key).at("sha256"))throw std::runtime_error("changed native board qualification source array: "+std::string(key));
+ for(const char*key:{"uv","native_pts","shot_index","material_index","kind","admission","fit_role","profile_normal"}){if(cert.at("membership_array_sha256").at(key)!=doc.at("arrays").at(key).at("sha256"))throw std::runtime_error("changed native board qualification source array: "+std::string(key));joint_qualification_ref(doc.at("arrays").at(key),packet.parent_path());}
  for(const char*key:{"source_row_ids","source_dataset_ids"})if(cert.at(std::string(key)+"_sha256").get<std::string>()!=joint_guard_string_sha(doc.at(key).dump()))throw std::runtime_error("changed native board qualification ID/dataset registry");
  const auto binding=joint_qualification_ref(cert.at("qualified_active_board_rows_ref"),certpath.parent_path());auto bytes=eventio::bytes(binding);if(bytes.size()!=active.size()*8||eventio::sha256(bytes)!=cert.at("active_board_rows_sha256"))throw std::runtime_error("native board active-row binary coverage shape/hash mismatch");
  for(std::size_t k=0;k<active.size();++k){std::int64_t value;std::memcpy(&value,bytes.data()+8*k,8);if(value<0||std::size_t(value)!=active[k])throw std::runtime_error("native board active-row coverage differs");}

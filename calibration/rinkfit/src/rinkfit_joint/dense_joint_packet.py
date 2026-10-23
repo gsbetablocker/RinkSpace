@@ -69,13 +69,13 @@ def _put(value, dotted, item):
     value[keys[-1]] = item
 
 
-def _read_parent(ref, base, stack):
+def _read_parent(ref, base, stack, registry_cache=None):
     path = _checked(ref, base)
     key = str(path).casefold()
     if key in stack:
         raise ValueError("Cyclic immutable dense packet parent")
     raw = json.loads(path.read_text(encoding="utf-8-sig"))
-    return expand_dense_packet(raw, path, _stack=stack + (key,))
+    return expand_dense_packet(raw, path, _stack=stack + (key,), _registry_cache=registry_cache)
 
 
 def _registry_columns(registry, base):
@@ -107,7 +107,7 @@ def _registry_columns(registry, base):
     return sourceids, [dataset] * n, [family[int(i)] for i in fi]
 
 
-def expand_dense_packet(value, packet_path, *, _stack=None):
+def expand_dense_packet(value, packet_path, *, _stack=None, _registry_cache=None):
     """Hydrate exact parent metadata and columnar IDs for old Python consumers."""
     if not isinstance(value, dict) or value.get("schema") != "rinkfit.joint_packet.v1":
         return value
@@ -115,8 +115,11 @@ def expand_dense_packet(value, packet_path, *, _stack=None):
         return value
     path = Path(packet_path).resolve()
     stack = _stack or (str(path).casefold(),)
+    # Each immutable ID suffix is decoded once within this recursive read.
+    # A new top-level read always rechecks the original pinned source bytes.
+    registry_cache = {} if _registry_cache is None else _registry_cache
     if "dense_parent_packet" in value:
-        parent = _read_parent(value["dense_parent_packet"], path.parent, stack)
+        parent = _read_parent(value["dense_parent_packet"], path.parent, stack, registry_cache)
         if parent.get("schema") != value["schema"]:
             raise ValueError("Dense packet parent ABI differs")
         result = dict(parent)
@@ -144,20 +147,43 @@ def expand_dense_packet(value, packet_path, *, _stack=None):
         raise ValueError("Dense parent reference lacks its source suffix registry")
     registry = result["dense_source_binding"]
     n0, n = int(registry["row_start"]), int(registry["count"])
-    if result["row_count"] != n0 + n:
+    extras = result.get("native_ad_source_bindings", [result["native_ad_source_binding"]] if "native_ad_source_binding" in result else [])
+    if extras and extras[-1] != result.get("native_ad_source_binding"):
+        raise ValueError("Latest native source registry differs from its append chain")
+    if int(extras[0]["row_start"] if extras else result["row_count"]) != n0 + n:
         raise ValueError("Dense suffix range differs from packet denominator")
-    suffix = _registry_columns(registry, path.parent)
+    cache_registry = dict(registry)
+    for key in ("source_id_utf8", "source_id_offsets", "source_family_index", "source_store_ordinal"):
+        ref = dict(registry[key]); dep = Path(ref.get("file", ref.get("path")))
+        ref["file"] = str((dep if dep.is_absolute() else path.parent / dep).resolve())
+        cache_registry[key] = ref
+    cache_key = json.dumps(cache_registry, sort_keys=True, separators=(",", ":"))
+    if cache_key not in registry_cache:
+        registry_cache[cache_key] = _registry_columns(registry, path.parent)
+    suffix = registry_cache[cache_key]
     for key, tail in zip(IDS, suffix):
         current = result.get(key)
         if not isinstance(current, list):
             raise ValueError("Dense source prefix ID list missing")
         if len(current) == n0:
             result[key] = current + tail
-        elif len(current) == n0 + n:
-            if current[n0:] != tail:
+        elif len(current) >= n0 + n:
+            if current[n0:n0+n] != tail:
                 raise ValueError("Expanded dense source IDs differ from immutable registry")
         else:
             raise ValueError("Dense source prefix/full ID count differs")
+    expected = n0 + n
+    for extra in extras:
+        start, count = int(extra["row_start"]), int(extra["count"])
+        if start != expected: raise ValueError("Native source append chain has a gap or overlap")
+        cache_key = json.dumps(extra, sort_keys=True, separators=(",", ":"))
+        if cache_key not in registry_cache: registry_cache[cache_key] = _registry_columns(extra, path.parent)
+        for key, tail in zip(IDS, registry_cache[cache_key]):
+            current = result[key]
+            if len(current) == start: result[key] = current + tail
+            elif len(current) < start + count or current[start:start+count] != tail: raise ValueError("Native source IDs differ")
+        expected += count
+    if expected != int(result["row_count"]): raise ValueError("Native source append chain does not cover every raw row")
     return result
 
 
@@ -331,7 +357,7 @@ def build_dense_joint_packet(parent_packet, input_binding, model_path, output, *
                              engineering_E=2., station_tolerance_px=1e-4, dependency_aliases=None, resume_staging=None, fast_seed=False):
     from .io_utils import read_json, write_json, object_sha256
     from .packet_storage import write_packet
-    from .dense_source_fit import DenseSourceFitInput
+    from .dense_source_factory import open_dense_source_input
     from .joint_model import as_event_view
     from .screen_native_motion_v2 import _camera
     from rinkfit_start.native_scene import NativeScene
@@ -345,7 +371,7 @@ def build_dense_joint_packet(parent_packet, input_binding, model_path, output, *
     if not np.isfinite(engineering_E) or engineering_E <= 0 or not np.isfinite(station_tolerance_px) or station_tolerance_px <= 0:
         raise ValueError("Finite positive engineering and numerical budgets required")
     p, model = read_json(pp), read_json(mp)
-    q = DenseSourceFitInput(ip)
+    q = open_dense_source_input(ip, purpose="new_packet")
     q.verify_model_materials(mp)
     q.assert_dependencies()
     if q.binding.get("parent_packet") != _ref(pp):
@@ -533,7 +559,8 @@ def build_dense_joint_packet(parent_packet, input_binding, model_path, output, *
         original_frame_progress=None if resume is None else resume["completed_frame_progress"],
         retained_completed_auxiliary_prefix_sha256=resume_aux_prefix,
         new_station_initialization="finite_projected_polyline_neighbor_interpolation" if fast_seed else "local_original_row_footpoint",
-        original_source_pixel_decoding_repeated=False)
+        original_source_pixel_decoding_repeated=False,
+        source_reader_qualification=q.reader_qualification_status)
     write_json(out/"receipt.json",report)
     return report
 
@@ -541,7 +568,7 @@ def build_dense_joint_packet(parent_packet, input_binding, model_path, output, *
 def _assert_dense_source_identity_current(packet, *, return_verified_packet=False):
     """Verify the actual parent issuer and every appended actual source column."""
     from .io_utils import read_json
-    from .dense_source_fit import DenseSourceFitInput
+    from .dense_source_factory import open_dense_source_input
     path = Path(packet).resolve()
     doc = read_json(path)
     registry = doc.get("dense_source_binding")
@@ -572,7 +599,7 @@ def _assert_dense_source_identity_current(packet, *, return_verified_packet=Fals
     for k,ref in parent["arrays"].items():
         if k not in AUX and arrays[k][:n0].tobytes() != _array(ref,parent_path.parent).tobytes():
             raise ValueError("Dense source changed inherited raw source array: "+k)
-    q = DenseSourceFitInput(_checked(registry["input_binding"],path.parent))
+    q = open_dense_source_input(_checked(registry["input_binding"],path.parent), purpose="historical_audit")
     q.assert_dependencies()
     if q.row_count != count or q.binding["parent_packet"] != _ref(parent_path):
         raise ValueError("Dense source actual eligibility denominator/parent differs")
@@ -610,7 +637,8 @@ def _assert_dense_source_identity_current(packet, *, return_verified_packet=Fals
         packet=_ref(path),parent_packet=_ref(parent_path),parent_guard=parent_guard,
         actual_input_binding=_ref(q.path),actual_rows=consumed,
         actual_column_identity_sha256=proof.hexdigest(),source_UV_ID_native_clock_exact=True,
-        actual_full_stream_semantics_consumed=True,unknown_source_qualification_granted=False)
+        actual_full_stream_semantics_consumed=True,unknown_source_qualification_granted=False,
+        source_reader_qualification=q.reader_qualification_status)
     return doc if return_verified_packet else report
 
 

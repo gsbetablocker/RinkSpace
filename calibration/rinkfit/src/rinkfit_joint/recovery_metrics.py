@@ -1,4 +1,4 @@
-"""Same-generation full-nine-shot comparison of existing native replay arrays.
+"""Same-generation, explicitly scoped comparison of native replay arrays.
 
 This consumes production CP / independent-RS / finite-material reprofile
 outputs and their SHA ledgers. It does not silently recompute a different
@@ -22,8 +22,10 @@ def _checked_array(root,name,dtype,shape,ledger):
     return value.reshape(shape)
 
 
-def _load_modes(spec,n,packet_sha):
+def _load_modes(spec,n,packet_sha,packet_file,packet,*,legacy_unbound_diagnostic=False,verified_identity=None):
     state=Path(spec['state']);report=read_json(state/'value_report.json');ledger=report['files'];result={}
+    from .report_identity import require_replay_binding
+    report['source_objective_identity']=verified_identity if verified_identity is not None else require_replay_binding(packet_file,packet,report,state,allow_legacy_diagnostic=legacy_unbound_diagnostic)
     for name,prefix in (('fixed_station_independent_RS','raw_station_RS_'),('legal_material_reprofile','')):
         result[name]=dict(predicted=_checked_array(state,prefix+'predicted_uv.f64','<f8',(n,2),ledger),
             error=_checked_array(state,prefix+'error_native_uv.f64','<f8',(n,2),ledger),
@@ -201,11 +203,37 @@ def _temporal(pred,uv,valid,active,kind,sid,mat,model,pts,queries,sourceids):
         free_station_or_Query_tracks_fabricated=False)
 
 
-def compare(packet_file,state_specs,output):
+def _comparison_scope(packet,model,pts,shot_index):
+    """Use the packet's actual shot registry; a partial run is never a full programme."""
+    shot_ids=packet['shot_ids']
+    if not shot_ids or len(set(shot_ids))!=len(shot_ids) or set(model['shots'])!=set(shot_ids):
+        raise ValueError('Comparison model shot set differs from the exact source packet scope')
+    intervals=[];exposures=[];last=None
+    for index,shot_id in enumerate(shot_ids):
+        scope=model['shots'][shot_id]['scope'];first=int(scope['first_pts']);end=int(scope['last_pts'])
+        if first!=scope['first_pts'] or end!=scope['last_pts'] or first>end or first%256 or end%256:
+            raise ValueError('Comparison shot scope is not on the original native PTS lattice')
+        if first<256256 or end>2415104 or (last is not None and first<=last):
+            raise ValueError('Comparison shot scopes overlap or leave the official programme range')
+        source=np.asarray(pts)[np.asarray(shot_index)==index]
+        if np.any((source<first)|(source>end)|((source-first)%256!=0)):
+            raise ValueError('Source exposure lies outside its declared comparison shot scope')
+        interval=dict(shot_id=shot_id,first_pts=first,last_pts=end,native_pts_step=256,
+            native_exposures=(end-first)//256+1)
+        intervals.append(interval);exposures.extend(range(first,end+1,256));last=end
+    full=exposures==list(range(256256,2415105,256))
+    return dict(schema='rinkfit.same_native_source_shot_scope.v1',shot_ids=shot_ids,
+        shots=intervals,native_exposures=len(exposures),full_programme_scope=full,
+        coverage_scope='complete_official_programme' if full else 'declared_shots_only',
+        native_time_base='1/12800',native_pts_step=256,
+        official_programme_first_pts=256256,official_programme_last_pts=2415104)
+
+
+def compare(packet_file,state_specs,output,*,legacy_unbound_diagnostic=False):
     out=Path(output)
     if out.exists():raise ValueError('immutable recovery comparison output exists')
     arrays=PacketArrays(packet_file);packet=arrays.packet;n=int(packet['row_count']);packet_sha=file_sha256(packet_file)
-    uv=arrays.load('uv');pts=arrays.load('native_pts');mat=arrays.load('material_index');kind=arrays.load('kind');si=arrays.load('shot_index');ad=arrays.load('admission').astype(bool);role=arrays.load('fit_role');active=ad&(role==1);E=arrays.load('E').reshape(n);ids=np.flatnonzero(active)
+    uv=arrays.load('uv');pts=arrays.load('native_pts');mat=arrays.load('material_index');kind=arrays.load('kind');si=arrays.load('shot_index');ad=arrays.load('admission')==1;role=arrays.load('fit_role');active=ad&(role==1);E=arrays.load('E').reshape(n);ids=np.flatnonzero(active)
     queries,normals=genuine_query_operators(packet,n);sourceids=packet['source_row_ids'];sid=np.asarray(packet['shot_ids'])[si]
     datasets=packet.get('source_dataset_ids',['joint']*n);keys=list(zip(datasets,sid.tolist(),pts.tolist(),sourceids))
     if len(set(keys))!=len(keys):raise ValueError('compound dataset/shot/native-PTS/source row keys are not unique')
@@ -213,7 +241,7 @@ def compare(packet_file,state_specs,output):
     if isinstance(specs,dict):specs=specs['states']
     if not specs or len({s['label'] for s in specs})!=len(specs):raise ValueError('unique comparison state labels required')
     identity=hashlib.sha256();identity.update(json.dumps(sourceids,separators=(',',':')).encode());identity.update(np.asarray(uv,dtype='<f8').tobytes());identity.update(np.asarray(kind,dtype='u1').tobytes());identity.update(normals.astype('<f8').tobytes());identity.update(np.asarray(mat,dtype='<u4').tobytes());identity.update(np.asarray(pts,dtype='<i8').tobytes());identity.update(np.asarray(si,dtype='<u2').tobytes());identity.update(json.dumps(datasets,separators=(',',':')).encode())
-    report=dict(schema='rinkfit.full9_recovery_same_source_comparison.v1',packet=dict(path=str(Path(packet_file).resolve()),sha256=packet_sha),
+    report=dict(schema='rinkfit.recovery_same_source_comparison.v2',packet=dict(path=str(Path(packet_file).resolve()),sha256=packet_sha),
         exact_source_ID_UV_operator_identity_sha256=identity.hexdigest(),raw_rows=n,active_rows=len(ids),inactive_rows=n-len(ids),
         common_denominator_rows=len(ids),original_UV_changed=False,invalid_rows_removed=False,states={},
         formal_statistics_or_metric_accuracy_claimed=False,source_unknown_and_statistics_unknown_separate=True,
@@ -224,17 +252,28 @@ def compare(packet_file,state_specs,output):
             quantiles='full-N nearest rank including +Infinity',failure_evidence='complete failed-source JSONL ledgers plus invalid-domain finite-pixel tails',
             temporal_statistics='existing temporal difference statistics remain conditional on valid same-entity consecutive samples; failure sources are separately retained'))
     reference_material_labels=None
+    from .report_identity import require_replay_binding,mark_unbound_diagnostic
+    # Reject every mismatched input before writing even the first state's ledger.
+    verified_identities={};shared_scope=None
+    for spec in specs:
+        state=Path(spec['state']);value=read_json(state/'value_report.json')
+        verified_identities[spec['label']]=require_replay_binding(packet_file,packet,value,state,load=arrays.load,allow_legacy_diagnostic=legacy_unbound_diagnostic)
+        model_path=Path(spec.get('model',state/'model.json'))
+        if file_sha256(model_path)!=value['model_sha256']:raise ValueError('model and replay SHA differ: '+spec['label'])
+        scope=_comparison_scope(packet,read_json(model_path),pts,si)
+        if shared_scope is None:shared_scope=scope
+        elif shared_scope!=scope:raise ValueError('Candidate comparison native shot scope differs from the baseline')
+    report['scope']=shared_scope;report['native_exposures']=shared_scope['native_exposures']
+    report['full_programme_scope']=shared_scope['full_programme_scope']
     out.mkdir(parents=True)
     for state_index,spec in enumerate(specs):
-        state=Path(spec['state']);model_path=Path(spec.get('model',state/'model.json'));model=read_json(model_path);modes,value=_load_modes(spec,n,packet_sha)
+        state=Path(spec['state']);model_path=Path(spec.get('model',state/'model.json'));model=read_json(model_path);modes,value=_load_modes(spec,n,packet_sha,packet_file,packet,legacy_unbound_diagnostic=legacy_unbound_diagnostic,verified_identity=verified_identities[spec['label']])
         if file_sha256(model_path)!=value['model_sha256']:raise ValueError('model and replay SHA differ: '+spec['label'])
         labels=np.asarray([m['label'] for m in model['materials']]);targets=labels[mat]
         if reference_material_labels is None:reference_material_labels=targets
         elif not np.array_equal(targets,reference_material_labels):raise ValueError('same numeric material indices changed physical identity')
         categories=np.asarray(['ice' if t.startswith('ice.') else 'board' if t.startswith('board.') else 'advertisement' if t.startswith('Ad') or '.print.' in t or t.startswith('print_component.') else 'other' for t in targets])
-        exposures=np.concatenate([np.arange(s['scope']['first_pts'],s['scope']['last_pts']+1,256,dtype=np.int64) for s in model['shots'].values()]);exposures.sort()
-        if not np.array_equal(exposures,np.arange(256256,2415105,256,dtype=np.int64)):raise ValueError('full nine-shot 8434-exposure programme scope changed')
-        entry=dict(model=dict(path=str(model_path.resolve()),sha256=file_sha256(model_path)),state_directory=str(state.resolve()),native_exposures=8434,modes={})
+        entry=dict(model=dict(path=str(model_path.resolve()),sha256=file_sha256(model_path)),state_directory=str(state.resolve()),native_exposures=shared_scope['native_exposures'],scope=shared_scope,modes={},source_objective_identity=value['source_objective_identity'])
         for mode_name,data in modes.items():
             if 'unavailable' in data:entry['modes'][mode_name]=data;continue
             pred=data['predicted'];error=data['error'];valid=data['valid'];finite=np.isfinite(error).all(1)
@@ -268,12 +307,16 @@ def compare(packet_file,state_specs,output):
                     domain_failure_counts={key:int(np.sum(active&~mask)) for key,mask in data['failure_masks'].items()})
             entry['modes'][mode_name]=result
         report['states'][spec['label']]=entry
+    if any(not x['source_objective_identity']['original_target_verified'] for x in report['states'].values()):
+        report=mark_unbound_diagnostic(report)
+        report['original_target_verified']=False
+    else:report['original_target_verified']=True
     (out/'comparison.json').write_text(json.dumps(report,ensure_ascii=False,indent=2,allow_nan=False)+'\n',encoding='utf8')
-    print(json.dumps(dict(report=str(out/'comparison.json'),states=list(report['states']),same_denominator=len(ids),native_exposures=8434)))
+    print(json.dumps(dict(report=str(out/'comparison.json'),states=list(report['states']),same_denominator=len(ids),native_exposures=shared_scope['native_exposures'])))
     return report
 
 
 def main(argv=None):
-    p=argparse.ArgumentParser();p.add_argument('--packet',required=True);p.add_argument('--states',required=True);p.add_argument('--out',required=True);a=p.parse_args(argv);compare(a.packet,a.states,a.out)
+    p=argparse.ArgumentParser();p.add_argument('--packet',required=True);p.add_argument('--states',required=True);p.add_argument('--out',required=True);p.add_argument('--legacy-unbound-diagnostic',action='store_true');a=p.parse_args(argv);compare(a.packet,a.states,a.out,legacy_unbound_diagnostic=a.legacy_unbound_diagnostic)
 
 if __name__=='__main__':main()

@@ -67,7 +67,7 @@ template<class T>struct Span {const T* data=nullptr;int count=0;HD const T& oper
 '''
 suffix='''
 constexpr int kEventGlobalSize=32;
-struct Path {int kind,radius_index,boundary_segment;double start_angle,end_angle,fixed_height_fraction;Span<Vec2<double>> points;};
+struct Path {int kind,radius_index,boundary_segment,advertisement_offset;double start_angle,end_angle,fixed_height_fraction;Span<Vec2<double>> points;};
 struct Layout {int global_slot=0,geometry_slot=-1,advertisement_slot=-1,flatpath=0;double frame_time=0;Span<int>control_ids,control_slots;};
 struct Model {
 Mat3<double> R0_seed;Vec3<double> n_seed,b_seed,n_tangent1,n_tangent2;

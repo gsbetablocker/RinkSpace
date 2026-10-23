@@ -129,7 +129,11 @@ class NativeScene:
             return np.stack((q[0]+q[int(p.get("radius_index",2))]*np.cos(angle),q[1]+q[int(p.get("radius_index",2))]*np.sin(angle),np.zeros_like(s)),axis=-1)
         if kind==3:
             segment=int(p.get("boundary_segment",-1))
-            if segment>=0:
+            if segment==-2:
+                lengths=np.array([self.long,self.arc,self.short,self.arc,self.long,self.arc,self.short,self.arc])
+                coordinate=s*8; part=np.minimum(7,np.floor(coordinate).astype(int))
+                coordinate=np.r_[0.,np.cumsum(lengths)][part]+(coordinate-part)*lengths[part]
+            elif segment>=0:
                 lengths=np.array([self.long,self.arc,self.short,self.arc,self.long,self.arc,self.short,self.arc])
                 coordinate=float(lengths[:segment].sum())+s*lengths[segment]
             else:coordinate=s*self.perimeter

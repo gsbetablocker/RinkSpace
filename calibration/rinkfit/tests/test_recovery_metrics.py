@@ -39,7 +39,10 @@ def test_same_vertex_ID_across_real_native_times_is_legal(tmp_path):
     for prefix in ('','raw_station_RS_'):
         for name,value in dict(predicted_uv=np.array([[11.,20.],[12.,20.],[13.,20.]],dtype='<f8'),error_native_uv=np.array([[1.,0.]]*3,dtype='<f8'),valid=np.array([1,0,1],dtype='u1')).items():
             file=prefix+name+('.u8' if name=='valid' else '.f64');path=state/file;value.tofile(path);ledger[file]=dict(sha256=sha(path),size_bytes=path.stat().st_size)
-    (state/'value_report.json').write_text(json.dumps(dict(model_sha256=sha(mp),files=ledger)),encoding='utf8')
+    from rinkfit_joint.report_identity import make_replay_binding
+    value=dict(model_sha256=sha(mp),files=ledger)
+    value['source_objective_binding']=make_replay_binding(pp,packet,value,[])
+    (state/'value_report.json').write_text(json.dumps(value),encoding='utf8')
     explicit=tmp_path/'CP_explicit_metrics';explicit.mkdir();cpfiles={}
     for name,value in dict(explicit_predicted_uv=np.array([[11.,20.],[13.,20.],[1012.,20.]],dtype='<f8'),explicit_error_native_uv=np.array([[1.,0.],[2.,0.],[1000.,0.]],dtype='<f8'),explicit_RS_equality=np.zeros(n,dtype='<f8'),explicit_query_equality=np.full((n,2),np.nan,dtype='<f8'),explicit_valid=np.array([1,1,0],dtype='u1'),explicit_arithmetic_valid=np.ones(n,dtype='u1'),explicit_ray_domain_valid=np.array([1,1,0],dtype='u1'),explicit_station_domain_valid=np.ones(n,dtype='u1'),explicit_visibility_valid=np.ones(n,dtype='u1'),explicit_width_domain_valid=np.ones(n,dtype='u1')).items():
         file=name+('.u8' if name.endswith('valid') else '.f64');path=explicit/file;value.tofile(path);cpfiles[file]=dict(sha256=sha(path),size_bytes=path.stat().st_size)

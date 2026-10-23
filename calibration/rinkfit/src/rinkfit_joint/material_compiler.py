@@ -10,6 +10,7 @@ import numpy as np
 from scipy.spatial import cKDTree
 from scipy.optimize import minimize_scalar
 from .io_utils import read_json,write_json,file_sha256,object_sha256
+from .material_path import new_board_path_points
 from rinkfit_start.native_scene import NativeScene
 
 BOARD_SEGMENTS={'lower_long_side':0,'lower_right':1,'right_end':2,'upper_right':3,'upper_long_side':4,'upper_left':5,'left_end':6,'lower_left':7}
@@ -117,7 +118,9 @@ def compile_materials(model,registry,project_root):
     shape=addblock('print/joint/'+object_sha256(target)[:20],[1,0,0,0,1,0],[-10]*6,[10]*6,[1,1,.1,1,1,.1])
     paths=[dict(kind=2,advertisement_block=bi,geometry_block=shape,points=points.tolist(),closed=bool(contour.get('closed')),physical_point=False)]
    else:raise ValueError('Unsupported confirmed primitive')
-   for j,path in enumerate(paths):path.update(id='joint/'+target+'/'+str(j),variant_id='joint/'+target,provenance=provenance)
+   for j,path in enumerate(paths):
+    if path['kind']==2:path['points']=new_board_path_points(path['points'],path.get('closed',False))
+    path.update(id='joint/'+target+'/'+str(j),variant_id='joint/'+target,provenance=provenance)
    bylabel[target]=len(materials);materials.append({'label':target,'paths':paths});audit.append({'target':target,'material_index':bylabel[target],'paths':len(paths),'source_shot':sid,'initializer_only':True})
   except (ValueError,KeyError,StopIteration) as e:pending.append({'target':target,'reason':str(e),'solver_rows_must_remain_ineligible':True})
  mapping={m['id']:{'target':m['source_target'],'material_index':bylabel.get(m['source_target']),'geometry_ready':m['source_target'] in bylabel} for m in accepted}

@@ -15,7 +15,7 @@ from .dense_joint_run import bind_current_generation_rows
 from .dense_fit_feedback import _one_frame
 
 REASONS=dict(legacy.REASONS,**{})
-REASONS.update({10:'current_source_instance_explicitly_unknown',11:'positive_finite_source_instance_support_not_issued'})
+REASONS.update({10:'current_source_instance_explicitly_unknown',11:'positive_finite_source_instance_support_not_issued',12:'protected_or_unresolved_exposure_role'})
 POSITIVE_KINDS={1:'actual_source_connected_instance',2:'verified_static_track_to_confirmed_instance',3:'human_source_identity'}
 
 
@@ -24,9 +24,8 @@ def _ref(path):
 
 
 def _pin(ref):
-    path=Path(ref['file']).resolve()
-    if file_sha256(path)!=ref['sha256']:raise ValueError('Typed instance evidence changed: '+str(path))
-    return path
+    from .exact_dependency_aliases import resolve_dependency
+    return resolve_dependency(ref)
 
 
 def _raw_identity_unchanged(current,prior):
@@ -118,36 +117,55 @@ class SourceInstanceGate:
         code=self.check(row,d['material_index']);return code,d
 
 
-def build_typed_dense_input(storage_bindings,model_path,out,*,instance_registry,project_root,parent_packet=None):
+def build_typed_dense_input(storage_bindings,model_path,out,*,instance_registry,project_root,frame_roles,parent_packet=None):
     """Write the real existing columnar input ABI with positive-only eligibility.
 
     Every source row retains a reason in the full denominator. No UV table,
     fabricated covariance, or source pixel decoder is created here.
     """
+    from .role_guard import FrameRoleGuard,DENY_TRAIN
+    role_guard=FrameRoleGuard(frame_roles);role_ref=_ref(frame_roles)
+    if role_guard.document.get("schema")!="rinkfit.joint_source_frame_protection.v1" or role_guard.document["source_video_sha256"]!=read_json(model_path)["source_clock"]["source_video_sha256"]:raise ValueError("Frame roles are not bound to the current source video")
+    if parent_packet:
+        parent=read_json(parent_packet);pa={k:_array(parent['arrays'][k],Path(parent_packet).parent)for k in ('admission','fit_role','native_pts','shot_index')}
+        for sid,pts in set((parent['shot_ids'][int(sh)],int(pts))for ad,fr,pts,sh in zip(pa['admission'],pa['fit_role'],pa['native_pts'],pa['shot_index'])if ad and fr):
+            role_guard.assert_training_pixels([pts],shot_id=sid)
     gate=SourceInstanceGate(instance_registry)
     if gate.doc.get('current_source_part_semantics_verified')is not True or not gate.source_parts:raise ValueError('Future production input requires current qualified source-part semantics')
     expected={object_sha256(p['reference'])for p in gate.source_parts};actual={object_sha256(g['selected_rows'])for g in read_json(storage_bindings)['generations'].values()}
     if actual!=expected:raise ValueError('Future candidate source bindings are not the current qualified semantic parts')
+    def decision(row,crosswalk,parent_keys=None):
+        code,descriptor=gate.decision(row,crosswalk,parent_keys)
+        if code:return code,descriptor
+        r=role_guard.roles.get(int(row['native_pts']))
+        if r is None or r['shot_id']!=row['shot_id'] or r['role']in DENY_TRAIN:return 12,descriptor
+        return 0,descriptor
     def write(path,value):
         if value.get('schema')=='rinkfit.dense_source_fit_input.v1':
-            value=dict(value,instance_support_gate=gate.ref,positive_finite_instance_required=True,legacy_material_geometry_reader=_ref(legacy.__file__))
+            value=dict(value,instance_support_gate=gate.ref,positive_finite_instance_required=True,legacy_material_geometry_reader=_ref(legacy.__file__),frame_role_authority=role_ref)
         elif value.get('schema')=='rinkfit.dense_finite_material_source_admission.v1':
-            value=dict(value,instance_support_gate=gate.ref,positive_finite_instance_required=True,unreviewed_instance_is_unknown=True,profile_or_repeat_pixel_is_not_instance_authority=True)
+            value=dict(value,instance_support_gate=gate.ref,positive_finite_instance_required=True,unreviewed_instance_is_unknown=True,profile_or_repeat_pixel_is_not_instance_authority=True,frame_role_authority=role_ref)
         return write_json(path,value)
-    namespace=dict(legacy.__dict__,_decision=gate.decision,REASONS=REASONS,write_json=write,__file__=__file__)
+    namespace=dict(legacy.__dict__,_decision=decision,REASONS=REASONS,write_json=write,__file__=__file__)
     function=types.FunctionType(legacy.build_dense_input.__code__,namespace,legacy.build_dense_input.__name__,legacy.build_dense_input.__defaults__,legacy.build_dense_input.__closure__)
     function.__kwdefaults__=legacy.build_dense_input.__kwdefaults__
     return function(storage_bindings,model_path,out,project_root=project_root,parent_packet=parent_packet)
 
 
 class TypedDenseSourceFitInput(legacy.DenseSourceFitInput):
-    def __init__(self,binding_path):
+    def __init__(self,binding_path,*,require_frame_roles=True):
         super().__init__(binding_path)
+        from .role_guard import FrameRoleGuard
+        role=self.binding.get("frame_role_authority")
+        if require_frame_roles and role is None:raise ValueError("Fresh typed input requires a pinned frame-role authority")
+        if role:self._pin(role)
+        self.frame_role_guard=FrameRoleGuard(role['file'])if role else None
         if self.binding.get('positive_finite_instance_required')is not True:raise ValueError('This future reader requires an explicit positive finite instance gate')
         self._pin(self.binding['legacy_material_geometry_reader']);self._pin(self.binding['instance_support_gate']);self.instance_gate=SourceInstanceGate(self.binding['instance_support_gate']['file'])
 
     def rows(self):
         for row in super().rows():
+            if self.frame_role_guard:self.frame_role_guard.assert_training_pixels([int(row["native_pts"])],shot_id=row["shot_id"])
             support=self.instance_gate.rows.get(row['selected_row_id'])
             if support is None or support['instance_state']!=1 or support['instance_support_kind']not in POSITIVE_KINDS:raise ValueError('Future physical consumer lacks positive finite instance authority')
             if (support['shot_id'],support['native_pts'],support['source_uv'],support['material_index'])!=(row['shot_id'],row['native_pts'],row['uv'],row['material_index']):raise ValueError('Future positive instance support changes source identity')
@@ -161,10 +179,16 @@ class TypedDenseSourceFitInput(legacy.DenseSourceFitInput):
 def main():
     p=argparse.ArgumentParser(description=__doc__);sub=p.add_subparsers(dest='operation',required=True)
     r=sub.add_parser('registry');r.add_argument('--packet',required=True);r.add_argument('--qualification',required=True);r.add_argument('--review',action='append',required=True);r.add_argument('--out',required=True)
-    b=sub.add_parser('build');b.add_argument('--bindings',required=True);b.add_argument('--model',required=True);b.add_argument('--out',required=True);b.add_argument('--project',required=True);b.add_argument('--instance-registry',required=True);b.add_argument('--parent-packet')
+    b=sub.add_parser('build');b.add_argument('--bindings',required=True);b.add_argument('--model',required=True);b.add_argument('--out',required=True);b.add_argument('--project',required=True);b.add_argument('--instance-registry',required=True);b.add_argument('--parent-packet');b.add_argument('--frame-roles',required=True)
+    p.add_argument('--code-aliases',help='Explicit append-only exact historical Python source registry')
     a=p.parse_args()
+    from .exact_dependency_aliases import dependency_alias_context
+    with dependency_alias_context(_ref(a.code_aliases)if a.code_aliases else None):
+        return _main_operation(a)
+
+def _main_operation(a):
     if a.operation=='registry':result=build_instance_registry(a.packet,a.qualification,a.review,a.out)
-    else:result=build_typed_dense_input(a.bindings,a.model,a.out,instance_registry=a.instance_registry,project_root=a.project,parent_packet=a.parent_packet)
+    else:result=build_typed_dense_input(a.bindings,a.model,a.out,instance_registry=a.instance_registry,project_root=a.project,frame_roles=a.frame_roles,parent_packet=a.parent_packet)
     print(json.dumps(result,ensure_ascii=False))
 
 if __name__=='__main__':main()

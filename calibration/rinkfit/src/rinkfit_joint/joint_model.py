@@ -6,7 +6,7 @@ import numpy as np
 from .camera_graph import CameraGraph, SHOT_TO_RIG, REFERENCE_SHOTS, GraphError
 SCHEMA='rinkfit.joint_event_model.v1'
 def _slice(b,lo,hi,name):
-    q={k:copy.deepcopy(b[k][lo:hi]) for k in ('values','lower','upper','scales')}
+    q={k:copy.deepcopy(b[k][lo:hi]) for k in ('values','lower','upper','scales') if k in b}
     q.update(name=name,constant=b.get('constant',False),fixed_indices=[x-lo for x in b.get('fixed_indices',[]) if lo<=x<hi]);return q
 def _tangents(n):
     n=np.asarray(n,float);u=np.eye(3)[np.argmin(np.abs(n))];u=np.cross(n,u);u/=np.linalg.norm(u);return u.tolist(),np.cross(n,u).tolist()
@@ -136,6 +136,11 @@ def as_event_view(model,shot_id):
                 q=b[path['geometry_block']]['values'];path.update(kind=1,start_angle=q[3],end_angle=q[3]+np.pi,radius_index=2)
             elif path['kind']==5:
                 q=b[path['geometry_block']]['values'];v=np.asarray(q[:2]);d=q[2]*np.asarray([np.cos(q[3]),np.sin(q[3])]);path.update(kind=0,geometry_block=len(b));b.append(dict(name='readonly/'+path['id'],values=np.r_[v+d,v-d].tolist(),lower=[-2.]*4,upper=[2.]*4,scales=[.5]*4,constant=True))
+            if path.get('advertisement_block',-1)>=0 and (path.get('advertisement_offset',0) or len(b[path['advertisement_block']]['values'])!=4):
+                off=int(path.get('advertisement_offset',0));original=b[path['advertisement_block']]
+                q={k:original[k][off:off+4] for k in ('values','lower','upper','scales') if k in original};q.update(name='readonly/ad/'+path['id'],constant=True)
+                if len(q['values'])!=4:raise GraphError('invalid shared advertisement instance offset')
+                path['advertisement_block']=len(b);path['advertisement_offset']=0;b.append(q)
             off=int(path.get('geometry_offset',0));inds=path.get('geometry_indices',[])
             if path.get('geometry_block',-1)>=0 and (off or inds):
                 original=b[path['geometry_block']];inds=inds or list(range(off,off+4));q={k:[original[k][i] for i in inds] for k in ('values','lower','upper','scales')};q.update(name='readonly/'+path['id'],constant=True);path['geometry_block']=len(b);b.append(q)

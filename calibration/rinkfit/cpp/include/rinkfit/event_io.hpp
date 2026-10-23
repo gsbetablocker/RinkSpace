@@ -10,6 +10,20 @@
 #include <sstream>
 #include <stdexcept>
 #include <vector>
+#include <mutex>
+#include <unordered_map>
+#include <chrono>
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <windows.h>
+#include <bcrypt.h>
+#pragma comment(lib,"bcrypt.lib")
+#endif
 
 namespace rinkfit::eventio {
 using Json = nlohmann::json;
@@ -41,15 +55,68 @@ class SHA256Stream {
  void update(const std::uint8_t*data,std::size_t size){total+=size;while(size){const auto n=std::min(size,pending.size()-used);std::memcpy(pending.data()+used,data,n);used+=n;data+=n;size-=n;if(used==pending.size()){compress(pending.data());used=0;}}}
  std::string finish(){const auto bits=total*8;std::array<std::uint8_t,128>pad{};pad[0]=128;const auto padding=used<56?56-used:120-used;update(pad.data(),padding);std::array<std::uint8_t,8>length{};for(int i=0;i<8;++i)length[7-i]=static_cast<std::uint8_t>(bits>>(8*i));update(length.data(),length.size());std::ostringstream out;out<<std::hex<<std::setfill('0');for(auto h:H)out<<std::setw(8)<<h;return out.str();}
 };
-inline std::string sha256(const std::vector<std::uint8_t>&data){SHA256Stream h;h.update(data.data(),data.size());return h.finish();}
-inline std::string file_sha256(const std::filesystem::path&p){std::ifstream in(p,std::ios::binary);if(!in)throw std::runtime_error("cannot read "+p.string());SHA256Stream h;std::vector<std::uint8_t>buffer(1024*1024);while(in){in.read(reinterpret_cast<char*>(buffer.data()),static_cast<std::streamsize>(buffer.size()));const auto n=in.gcount();if(n>0)h.update(buffer.data(),static_cast<std::size_t>(n));}if(!in.eof())throw std::runtime_error("short hash read "+p.string());return h.finish();}
-inline void verify(const std::filesystem::path& p,const std::string& expected){if(file_sha256(p)!=expected)throw std::runtime_error("SHA256 mismatch: "+p.string());}
+
+#ifdef _WIN32
+// Use the OS SHA-256 implementation; every byte is still hashed on every call.
+// The portable implementation above remains the non-Windows path and test oracle.
+class NativeSHA256Stream {
+ struct Provider {
+  BCRYPT_ALG_HANDLE handle=nullptr;
+  Provider(){if(BCryptOpenAlgorithmProvider(&handle,BCRYPT_SHA256_ALGORITHM,nullptr,0)<0)throw std::runtime_error("cannot open SHA256 provider");}
+  ~Provider(){if(handle)BCryptCloseAlgorithmProvider(handle,0);}
+ };
+ BCRYPT_HASH_HANDLE handle_=nullptr;
+ public:
+ NativeSHA256Stream(){static Provider provider;if(BCryptCreateHash(provider.handle,&handle_,nullptr,0,nullptr,0,0)<0)throw std::runtime_error("cannot create SHA256 hash");}
+ NativeSHA256Stream(const NativeSHA256Stream&)=delete;
+ NativeSHA256Stream& operator=(const NativeSHA256Stream&)=delete;
+ ~NativeSHA256Stream(){if(handle_)BCryptDestroyHash(handle_);}
+ void update(const std::uint8_t*data,std::size_t size){while(size){const auto n=static_cast<ULONG>(std::min<std::size_t>(size,1u<<30));if(BCryptHashData(handle_,const_cast<PUCHAR>(data),n,0)<0)throw std::runtime_error("SHA256 update failed");data+=n;size-=n;}}
+ std::string finish(){std::array<std::uint8_t,32> hash{};if(BCryptFinishHash(handle_,hash.data(),static_cast<ULONG>(hash.size()),0)<0)throw std::runtime_error("SHA256 finish failed");std::ostringstream out;out<<std::hex<<std::setfill('0');for(auto b:hash)out<<std::setw(2)<<unsigned(b);return out.str();}
+};
+using FastSHA256Stream=NativeSHA256Stream;
+#else
+using FastSHA256Stream=SHA256Stream;
+#endif
+
+inline std::string sha256(const std::vector<std::uint8_t>&data){FastSHA256Stream h;h.update(data.data(),data.size());return h.finish();}
+inline std::string file_sha256(const std::filesystem::path&p){std::ifstream in(p,std::ios::binary);if(!in)throw std::runtime_error("cannot read "+p.string());FastSHA256Stream h;std::vector<std::uint8_t>buffer(1024*1024);while(in){in.read(reinterpret_cast<char*>(buffer.data()),static_cast<std::streamsize>(buffer.size()));const auto n=in.gcount();if(n>0)h.update(buffer.data(),static_cast<std::size_t>(n));}if(!in.eof())throw std::runtime_error("short hash read "+p.string());return h.finish();}
+// Input proofs repeatedly reference the same immutable files. Reuse a verified
+// digest only while the normalized path, byte size and write time still match.
+// file_sha256 remains uncached for output/checkpoint identity generation.
+struct VerificationMemo {
+ struct Entry{std::uintmax_t size;std::filesystem::file_time_type modified;std::string digest;};
+ std::mutex mutex;std::unordered_map<std::string,Entry> entries;
+ std::uint64_t calls=0,hits=0,bytes_hashed=0;double hash_seconds=0;
+};
+inline VerificationMemo& verification_memo(){static VerificationMemo memo;return memo;}
+inline void verify(const std::filesystem::path& p,const std::string& expected){
+ const auto size=std::filesystem::file_size(p);const auto modified=std::filesystem::last_write_time(p);
+ const auto key=std::filesystem::absolute(p).lexically_normal().generic_u8string();auto& memo=verification_memo();
+ {std::lock_guard<std::mutex> lock(memo.mutex);++memo.calls;const auto it=memo.entries.find(key);
+  if(it!=memo.entries.end()&&it->second.size==size&&it->second.modified==modified){
+   ++memo.hits;if(it->second.digest!=expected)throw std::runtime_error("SHA256 mismatch: "+p.string());return;
+  }}
+ const auto started=std::chrono::steady_clock::now();const auto digest=file_sha256(p);
+ if(std::filesystem::file_size(p)!=size||std::filesystem::last_write_time(p)!=modified)throw std::runtime_error("file changed during SHA256 verification: "+p.string());
+ if(digest!=expected)throw std::runtime_error("SHA256 mismatch: "+p.string());
+ {std::lock_guard<std::mutex> lock(memo.mutex);memo.entries.insert_or_assign(key,VerificationMemo::Entry{size,modified,digest});memo.bytes_hashed+=size;memo.hash_seconds+=std::chrono::duration<double>(std::chrono::steady_clock::now()-started).count();}
+}
+inline Json verification_statistics(){auto& m=verification_memo();std::lock_guard<std::mutex> lock(m.mutex);return {{"calls",m.calls},{"unchanged_file_reuses",m.hits},{"bytes_hashed",m.bytes_hashed},{"hash_seconds",m.hash_seconds}};}
+
 template<class T> std::vector<T> read_array(const std::filesystem::path& root,const Json& d,const std::string& dtype) {
   if(d.at("dtype")!=dtype || d.value("byte_order",std::string("little"))!="little" || d.value("layout",std::string("C"))!="C")throw std::runtime_error("binary ABI dtype/layout/endian mismatch");
-  auto p=root/d.at("file").get<std::string>(); auto b=bytes(p); if(sha256(b)!=d.at("sha256").get<std::string>())throw std::runtime_error("binary SHA256 mismatch: "+p.string());
-  std::size_t count=1;for(const auto& dim:d.at("shape"))count*=dim.get<std::size_t>();if(b.size()!=count*sizeof(T))throw std::runtime_error("binary byte/shape mismatch: "+p.string());
+  const auto p=root/d.at("file").get<std::string>();const auto size=std::filesystem::file_size(p);const auto modified=std::filesystem::last_write_time(p);const auto expected=d.at("sha256").get<std::string>();
+  std::size_t count=1;for(const auto& dim:d.at("shape"))count*=dim.get<std::size_t>();if(size!=count*sizeof(T))throw std::runtime_error("binary byte/shape mismatch: "+p.string());
   const std::uint16_t endian=1;if(*reinterpret_cast<const std::uint8_t*>(&endian)!=1)throw std::runtime_error("reader requires little-endian host");
-  std::vector<T> out(count);if(!b.empty())std::memcpy(out.data(),b.data(),b.size());return out;
+  const auto key=std::filesystem::absolute(p).lexically_normal().generic_u8string();auto& memo=verification_memo();bool verified=false;
+  {std::lock_guard<std::mutex>lock(memo.mutex);++memo.calls;const auto it=memo.entries.find(key);if(it!=memo.entries.end()&&it->second.size==size&&it->second.modified==modified){++memo.hits;if(it->second.digest!=expected)throw std::runtime_error("binary SHA256 mismatch: "+p.string());verified=true;}}
+  // Read directly into the typed destination, rather than a second full byte array.
+  // Only this process's already verified, unchanged file can reuse its digest.
+  std::vector<T>out(count);std::ifstream in(p,std::ios::binary);if(!in)throw std::runtime_error("cannot read "+p.string());if(size&&!in.read(reinterpret_cast<char*>(out.data()),static_cast<std::streamsize>(size)))throw std::runtime_error("short array read "+p.string());
+  if(std::filesystem::file_size(p)!=size||std::filesystem::last_write_time(p)!=modified)throw std::runtime_error("file changed during array read: "+p.string());
+  if(!verified){const auto started=std::chrono::steady_clock::now();FastSHA256Stream h;h.update(reinterpret_cast<const std::uint8_t*>(out.data()),size);const auto digest=h.finish();if(digest!=expected)throw std::runtime_error("binary SHA256 mismatch: "+p.string());std::lock_guard<std::mutex>lock(memo.mutex);memo.entries.insert_or_assign(key,VerificationMemo::Entry{size,modified,digest});memo.bytes_hashed+=size;memo.hash_seconds+=std::chrono::duration<double>(std::chrono::steady_clock::now()-started).count();}
+  return out;
 }
 inline void atomic_json(const std::filesystem::path& path,const Json& value){const auto tmp=path.string()+".tmp";{std::ofstream out(tmp,std::ios::binary|std::ios::trunc);if(!out)throw std::runtime_error("cannot write "+tmp);out<<value.dump(2)<<'\n';out.flush();if(!out)throw std::runtime_error("cannot flush "+tmp);}std::error_code ec;std::filesystem::rename(tmp,path,ec);if(ec){std::filesystem::remove(path,ec);std::filesystem::rename(tmp,path);}}
 } // namespace rinkfit::eventio

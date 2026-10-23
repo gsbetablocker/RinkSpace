@@ -26,7 +26,7 @@ class JointRawGPU:
         self.dim_array=np.asarray(self.dims,'<i4');self.buffers=dict(offsets=self.module.upload(self.offsets),dims=self.module.upload(self.dim_array),values=self.module.upload(self.values));self.paths=[];self.path_map={};points=[]
         for mi,mat in enumerate(self.model['materials']):
             for pi,pa in enumerate(mat['paths']):
-                self.path_map[(mi,pi)]=len(self.paths);pp=pa.get('points',[]);self.paths.append((int(pa['kind']),pa.get('geometry_block',-1),pa.get('advertisement_block',-1),pa.get('radius_index',2),pa.get('boundary_segment',-1),len(points)//2,len(pp),pa.get('start_angle',0.),pa.get('end_angle',2*np.pi),pa.get('fixed_height_fraction',0.)));points.extend(np.asarray(pp,float).reshape(-1).tolist())
+                self.path_map[(mi,pi)]=len(self.paths);pp=pa.get('points',[]);self.paths.append((int(pa['kind']),pa.get('geometry_block',-1),pa.get('advertisement_block',-1),pa.get('radius_index',2),(pa.get('advertisement_offset',0) if pa['kind']==2 else pa.get('boundary_segment',-1)),len(points)//2,len(pp),pa.get('start_angle',0.),pa.get('end_angle',2*np.pi),pa.get('fixed_height_fraction',0.)));points.extend(np.asarray(pp,float).reshape(-1).tolist())
         self.path_array=np.array(self.paths,dtype=PATH);self.points=np.asarray(points if points else [0.,0.],'<f8');self.buffers['paths']=self.module.upload(self.path_array);self.buffers['points']=self.module.upload(self.points)
         self._layout_maps={};self._seed_maps={}
         for key,l in self.layouts.items():

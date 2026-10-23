@@ -1,0 +1,7 @@
+#include "rinkfit/joint_stacked_scalar_cost.hpp"
+#include <ceres/sized_cost_function.h>
+#include <cmath>
+#include <cstring>
+#include <iostream>
+class Scalar final:public ceres::SizedCostFunction<1,2,1>{int i_;public:explicit Scalar(int i):i_(i){}bool Evaluate(double const*const* p,double*r,double**j)const override{const double a=p[0][0]+(i_+1)*p[0][1]*p[1][0]-i_;if(!std::isfinite(a))return false;r[0]=std::max(0.,a);const double v=a>=0?1.:0.;if(j){if(j[0]){j[0][0]=v;j[0][1]=v*(i_+1)*p[1][0];}if(j[1])j[1][0]=v*(i_+1)*p[0][1];}return true;}};
+int main(){std::vector<std::unique_ptr<ceres::CostFunction>> c;for(int i=0;i<5;++i)c.push_back(std::make_unique<Scalar>(i));rinkfit::JointStackedScalarCost stack(std::move(c));for(double a:{-2.,0.,1.,4.})for(bool partial:{false,true}){double x[2]={a,.5},y[1]={2.};const double*p[2]={x,y};double r[5],Jx[10],Jy[5],r0[5],X0[10],Y0[5];double*j[2]={Jx,partial?nullptr:Jy};if(!stack.Evaluate(p,r,j))throw std::runtime_error("stack evaluation");for(int i=0;i<5;++i){Scalar single(i);double* jj[2]={X0+2*i,partial?nullptr:Y0+i};if(!single.Evaluate(p,r0+i,jj))return 3;}if(std::memcmp(r,r0,sizeof(r))||std::memcmp(Jx,X0,sizeof(Jx))||(!partial&&std::memcmp(Jy,Y0,sizeof(Jy))))throw std::runtime_error("stack changed scalar residual/Jacobian bytes");double value[5];if(!stack.Evaluate(p,value,nullptr)||std::memcmp(value,r,sizeof(r)))throw std::runtime_error("value-only stack differs");}std::cout<<"stacked residual and full/partial Jacobian byte checks passed\n";}

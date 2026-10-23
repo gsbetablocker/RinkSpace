@@ -78,7 +78,18 @@ def evaluate(a):
  report=dict(schema='rinkfit.full_existing_fixed2D_source_anchor_guard.v1',model=mref,implementation=ref(__file__),packet=ref(a.packet),source_visibility_operator=ref(P/'calibration/rinkfit/src/rinkfit_joint/joint_replay.py'),parent_numeric_reference=auxref,rows=len(rows),full_original_parent_fixed2D_cohort=True,cohort_row_ID_sha256=cohort_hash.hexdigest(),source_value_column_descriptors={k:p['arrays'][k]for k in ['uv','native_pts','shot_index','material_index','kind','E']},raw_source_rows=n,station_semantics='physical_point material evaluated at station0; no sliding station approximation',source_entity_fixed_does_not_mean_world_coordinates_calibrated=True,observed_row_semantics='S01 frozen true parent complete prefix row; S02-S06 original actual sourceUVy',candidate_complete_checkpoint_claimed=False,statistical_sigma_or_independence_claimed=False,original_E_is_engineering_review_scale=True,new_curve_rows_projected=0,RGB_decoded=0,sourceUV_modified=False,overall=summary(order),by_shot={s:summary(np.flatnonzero(shot==sn))for sn,s in enumerate(p['shot_ids'])if np.any(shot==sn)},by_entity={s:summary(np.flatnonzero(target==s))for s in sorted(set(target.tolist()))},maximum_true_RS_equality_px=float(np.max(abs(eq[valid]),initial=0.)),quality_accepted=False)
  if a.baseline:
   b=read_json(a.baseline)
-  if b['source_value_column_descriptors']!=report['source_value_column_descriptors']or b['cohort_row_ID_sha256']!=report['cohort_row_ID_sha256']or b['source_visibility_operator']['sha256']!=report['source_visibility_operator']['sha256']:raise ValueError('Guard baseline must bind exact same packet/cohort/operator')
+  if b['cohort_row_ID_sha256']!=report['cohort_row_ID_sha256']or b['source_visibility_operator']['sha256']!=report['source_visibility_operator']['sha256']:raise ValueError('Guard baseline must bind exact same cohort/operator')
+  if b['source_value_column_descriptors']!=report['source_value_column_descriptors']:
+   # Appending independently measured sources changes full-column descriptors.
+   # Compare every actual original cohort value instead of confusing that append
+   # with a modification to the original UV/PTS/material/operator.
+   bp=Path(b['packet']['file'])
+   if file_sha256(bp)!=b['packet']['sha256']:raise ValueError('Changed baseline packet')
+   bl=PacketArrays(bp)
+   for key in ('uv','native_pts','shot_index','material_index','kind','E'):
+    before=np.ascontiguousarray(bl.load(key)[rows]);after=np.ascontiguousarray(arrays[key][rows])
+    if before.dtype!=after.dtype or before.shape!=after.shape or before.tobytes()!=after.tobytes():raise ValueError('Original fixed-source cohort changed '+key)
+   report['source_append_original_cohort_columns_verified_bit_exact']=True
   f=Path(b['distances']['file'])
   if file_sha256(f)!=b['distances']['sha256']:raise ValueError('Changed immutable baseline anchor residual cache')
   with np.load(f)as z:

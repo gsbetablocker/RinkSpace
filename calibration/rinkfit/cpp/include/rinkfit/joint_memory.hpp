@@ -1,6 +1,7 @@
 #pragma once
 #include "rinkfit/event_io.hpp"
 #include <chrono>
+#include <iostream>
 #ifdef _WIN32
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -22,5 +23,6 @@ inline eventio::Json joint_memory_sample(const std::string&stage){
 }
 inline void joint_memory_marker(const std::filesystem::path&out,const std::string&stage,eventio::Json extra=eventio::Json::object()){
  static const auto start=std::chrono::steady_clock::now();auto j=joint_memory_sample(stage);j["elapsed_seconds"]=std::chrono::duration<double>(std::chrono::steady_clock::now()-start).count();j["details"]=std::move(extra);std::filesystem::create_directories(out);std::ofstream f(out/"memory_stages.jsonl",std::ios::app);f<<j.dump()<<std::endl;
+ if(stage!="Ceres_iteration")std::cout<<"[solver] "<<stage<<" "<<j.at("elapsed_seconds").get<double>()<<" s"<<std::endl;
 }
 }

@@ -394,6 +394,25 @@ def execute(executable,model,packet,output,iterations=0,threads=8,fixed_prefixes
     if out.exists():(out/'execution.json').write_text(json.dumps(result,indent=2),encoding='utf8')
     print(json.dumps(result));return r.returncode
 
+def _explicit_execution_status(output,returncode,engineering_recovery):
+    """Preserve native unfinished/stopped status without launching another batch."""
+    path=Path(output)/'engineering_receipt.json'
+    result=dict(native_process_success=returncode==0,fit_acceptance_claimed=False,
+        automatic_continuation_started=False,
+        native_execution_status='process_exited_without_acceptance_claim' if returncode==0 else 'native_process_nonzero_exit')
+    if engineering_recovery and path.is_file():
+        receipt=json.loads(path.read_text(encoding='utf8'));status=receipt.get('run_status')
+        if status:
+            result.update(native_run_status=status,native_receipt=dict(file=str(path.resolve()),sha256=sha(path)))
+            unfinished=status=='inner_accuracy_unfinished'
+            consistent=(returncode==3) if unfinished else returncode!=3
+            result.update(native_execution_status=status if consistent else 'receipt_exit_status_mismatch',
+                native_receipt_exit_consistent=consistent,inner_accuracy_unfinished=unfinished,
+                inner_same_AL_context_preserved=bool(unfinished and consistent and receipt.get('incomplete_inner')
+                    and receipt.get('inner_budget_exhausted_yields_same_context')))
+    return result
+
+
 def execute_explicit(executable,model,packet,output,*,config=None,geometry_initializer=False,audit_only=False,engineering_recovery=False):
     """Run the exact shared explicit RS/query graph; certification comes from receipts."""
     if not audit_only:assert_source_identity_current(packet)
@@ -435,6 +454,7 @@ def execute_explicit(executable,model,packet,output,*,config=None,geometry_initi
             review=cfg['checkpoint_source_review']
             dispatch_checkpoint_reviews(observer.consumed_task_documents,review['run'],out/'source_reviews',device=review.get('device','cuda'),packet_path=packet)
     result=dict(schema='rinkfit.joint_explicit_backend_execution.v1',command=command,backend_sha256=sha(exe),model_sha256=sha(model),packet_sha256=sha(packet),returncode=r.returncode,log=str(log),geometry_initialization_only=bool(geometry_initializer),engineering_recovery=bool(engineering_recovery),objective_id='engineering_recovery_native_pixel_v1' if engineering_recovery else None,certificate_in_native_and_formal_receipts=not engineering_recovery)
+    result.update(_explicit_execution_status(out,r.returncode,engineering_recovery))
     if out.exists():(out/'execution.json').write_text(json.dumps(result,indent=2),encoding='utf8')
     print(json.dumps(result));return r.returncode
 
@@ -444,6 +464,18 @@ def rebind_current_auxiliaries(packet_path,state_path,output_path,*,state_packet
     src=Path(packet_path).resolve();state=Path(state_path).resolve();out=Path(output_path).resolve()
     if out.exists():raise FileExistsError('immutable packet generation exists: '+str(out))
     packet=_read_source_packet(src);report=json.loads((state/'value_report.json').read_text(encoding='utf8'));n=int(packet['row_count'])
+    from .report_identity import require_replay_binding,assert_frozen_source_prefix
+    from .joint_metrics import PacketArrays
+    exact_path=Path(state_packet_path).resolve() if state_packet_path is not None else src
+    exact_arrays=PacketArrays(exact_path)
+    require_replay_binding(exact_path,exact_arrays.packet,report,state,load=exact_arrays.load)
+    state_n=int(report['files']['station.f64']['size_bytes'])//8
+    if int(exact_arrays.packet['row_count'])!=state_n:raise ValueError('Exact replay packet row count differs from stored auxiliaries')
+    if state_n<n:
+        if state_packet_path is None:raise ValueError('appended packet requires the exact previous state packet for prefix verification')
+        current_arrays=PacketArrays(src)
+        assert_frozen_source_prefix(exact_arrays.packet,current_arrays.packet,exact_arrays.load,current_arrays.load)
+    elif sha(exact_path)!=sha(src):raise ValueError('Same-length auxiliary rebind requires the exact frozen replay packet')
     checked_dependencies=set()
     def absolute(d):
         q=Path(d['file']);q=q if q.is_absolute() else src.parent/q;q=q.resolve()

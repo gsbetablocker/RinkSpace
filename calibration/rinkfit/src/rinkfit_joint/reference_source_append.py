@@ -41,6 +41,8 @@ def append_constraint_source_chunks(parent_packet,closed_chunks,model_path,mater
     parent=Path(parent_packet).resolve();out=Path(output).resolve()
     if out.exists():raise ValueError('new immutable source chunk append required')
     p=json.loads(parent.read_text(encoding='utf8'));model=json.loads(Path(model_path).read_text(encoding='utf8'));mapping=json.loads(Path(material_map).read_text(encoding='utf8'))['semantic_to_material']
+    if p.get('board_material_source_qualification') and finalize_packet is None and finalize_packet_with_parent is None:
+        raise ValueError('Qualified source append requires an explicit certificate-preserving finalizer')
     table=p['material_binding']['materials'];actual=[{'index':i,'label':m['label'],'paths':[{'index':j,'id':q['id'],'physical_point':bool(q.get('physical_point',False))}for j,q in enumerate(m['paths'])]}for i,m in enumerate(model['materials'][:len(table)])]
     if actual!=table:raise ValueError('actual model changes inherited physical material topology')
     if any(g.get('statistic_kind')=='initialization_surrogate'for g in p['groups']):raise ValueError('engineering source extension expects no unknown-noise surrogate precision')
@@ -57,7 +59,7 @@ def append_constraint_source_chunks(parent_packet,closed_chunks,model_path,mater
     entity_qualification,entity_source_refs=load_qualification(typed_entity_qualification,verify)
     roles=json.loads(Path(roles_file).read_text(encoding='utf8'))['frame_roles']
     n0=int(p['row_count']);parent_pts_desc=p['arrays']['native_pts'];parent_pts=np.memmap(verify(parent_pts_desc),dtype=parent_pts_desc['dtype'],mode='r',shape=tuple(parent_pts_desc['shape']))
-    seen={(rid,int(parent_pts[i]))for i,rid in enumerate(p['source_row_ids'])};keep=('source_row_id','source_family_id','shot_id','native_pts','source_uv','current_uv','normal','joint_material_id','joint_material_index','point_correspondence','source_geometry_eligible','statistical_objective_eligible','numeric_statistics_ready','solver_eligible','fit_role','frame_role')
+    seen={(rid,int(parent_pts[i]))for i,rid in enumerate(p['source_row_ids'])};keep=('source_row_id','source_family_id','shot_id','native_pts','source_uv','current_uv','normal','joint_material_id','joint_material_index','point_correspondence','source_geometry_eligible','statistical_objective_eligible','numeric_statistics_ready','solver_eligible','fit_role','frame_role','allowed_path_indices')
     old_entity_rows=defaultdict(list)
     for i,rid in enumerate(p['source_row_ids']):
         if rid in entity_qualification:old_entity_rows[(rid,int(parent_pts[i]))].append(i)
@@ -115,7 +117,7 @@ def append_constraint_source_chunks(parent_packet,closed_chunks,model_path,mater
         if used!=set(eligible):raise ValueError('geometry source rows outside complete immutable chunk ledger')
         if count!=m['actual_source_rows']:raise ValueError('closed chunk actual row accounting mismatch')
     out.mkdir(parents=True);n=len(raw);q=np.asarray([r.get('current_uv')if r.get('current_uv')is not None else r['source_uv']for r in raw],float);adnew=np.asarray(newactive,np.uint8)
-    extra=dict(uv=q,native_pts=np.asarray([r['native_pts']for r in raw]),shot_index=np.asarray([int(r['shot_id'][1:])-1 for r in raw]),kind=np.asarray([1 if j is not None else 0 for j in entity_paths]),material_index=np.asarray(materials),path=np.asarray([j if j is not None else 0 for j in entity_paths]),admission=adnew,fit_role=np.ones(n),E=np.full(n,2.),station=np.asarray([0. if j is not None else .5 for j in entity_paths]),row=np.where((q[:,1]>=0)&(q[:,1]<=1079),q[:,1],539.5),alpha=np.zeros(n),source_sigma=np.ones(n),profile_normal=np.asarray([r.get('normal',[0.,0.])for r in raw]),query_uv=q,alpha_bounds=np.zeros((n,2)),stroke_pair_index=np.full(n,-1),stroke_source_side=np.full(n,-1))
+    extra=dict(uv=q,native_pts=np.asarray([r['native_pts']for r in raw]),shot_index=np.asarray([int(r['shot_id'][1:])-1 for r in raw]),kind=np.asarray([1 if j is not None else 0 for j in entity_paths]),material_index=np.asarray(materials),path=np.asarray([j if j is not None else (raw[i].get('allowed_path_indices') or [0])[0] for i,j in enumerate(entity_paths)]),admission=adnew,fit_role=np.ones(n),E=np.full(n,2.),station=np.asarray([0. if j is not None else .5 for j in entity_paths]),row=np.where((q[:,1]>=0)&(q[:,1]<=1079),q[:,1],539.5),alpha=np.zeros(n),source_sigma=np.ones(n),profile_normal=np.asarray([r.get('normal',[0.,0.])for r in raw]),query_uv=q,alpha_bounds=np.zeros((n,2)),stroke_pair_index=np.full(n,-1),stroke_source_side=np.full(n,-1))
     arrays={}
     for k,d in p['arrays'].items():
         if k not in extra:raise ValueError('source adapter lacks new array '+k)
@@ -133,7 +135,14 @@ def append_constraint_source_chunks(parent_packet,closed_chunks,model_path,mater
         groups.append({'id':'constraint_source:'+family,'source_group_id':family,'rows':rows,'rank':0,'W':[],
             'statistic_kind':'constraint_only_unknown_noise','unknown_noise_source_refs':family_refs[(shot,pts,family)],
             'unknown_noise_source_has_statistical_precision':False,'E_RS_Query_and_finite_material_constraints_retained':True})
-        for i in rows:allowed[str(i)]=[entity_paths[i-n0]]if entity_paths[i-n0]is not None else list(range(len(model['materials'][materials[i-n0]]['paths'])))
+        for i in rows:
+            row = raw[i-n0]
+            choices = [entity_paths[i-n0]] if entity_paths[i-n0] is not None else row.get('allowed_path_indices')
+            if choices is None:
+                choices = list(range(len(model['materials'][materials[i-n0]]['paths'])))
+            if not choices or len(set(choices)) != len(choices) or any(type(k) is not int or k < 0 or k >= len(model['materials'][materials[i-n0]]['paths']) for k in choices):
+                raise ValueError('Appended source has invalid finite path authority')
+            allowed[str(i)] = choices
     oldad=p['arrays']['admission'];oldrole=p['arrays']['fit_role'];a=np.memmap(verify(oldad),dtype=oldad['dtype'],mode='r',shape=tuple(oldad['shape']));b=np.memmap(verify(oldrole),dtype=oldrole['dtype'],mode='r',shape=tuple(oldrole['shape']));active=np.r_[(a==1)&(b==1),adnew.astype(bool)]
     partition=np.zeros(n0+n,np.int16);partition[np.asarray(p['independent_rows'],int)]+=1
     for g in groups:partition[g['rows']]+=1
@@ -143,7 +152,7 @@ def append_constraint_source_chunks(parent_packet,closed_chunks,model_path,mater
     write_json(out/'source_chunk_index.json',index)
     result={**p,'row_count':n0+n,'arrays':arrays,'groups':groups,'source_row_ids':p['source_row_ids']+[r['source_row_id']for r in raw],
         'source_dataset_ids':p['source_dataset_ids']+raw_datasets,'source_family_ids':p.get('source_family_ids',[None]*n0)+[r['source_family_id']for r in raw],
-        'allowed_paths':allowed,'active_rows':int(active.sum()),'recapture_rows':np.flatnonzero(active&(np.arange(n0+n)>=p['new_source_start'])).tolist(),
+        'allowed_paths':allowed,'active_rows':int(active.sum()),'recapture_rows':(n0+np.flatnonzero(adnew)).tolist(),
         'source_family_journal_refs':p.get('source_family_journal_refs',[])+journals,
         'source_manifests':p['source_manifests']+[ref(out/'source_chunk_index.json'),ref(material_map),ref(model_path),ref(roles_file)]+entity_source_refs,
         'constraint_only_unknown_noise_rows':sum(len(g['rows'])for g in groups if g.get('statistic_kind')=='constraint_only_unknown_noise'),
@@ -152,6 +161,8 @@ def append_constraint_source_chunks(parent_packet,closed_chunks,model_path,mater
         'source_noise_statistics_supplied_for_appended_rows':False,'unknown_noise_source_rows_keep_engineering_constraints':True,
         'unknown_noise_source_statistical_precision_supplied':False,'all_new_source_nuisance_requires_fresh_physical_capture':True,
         'formal_new_source_statistical_optimum_claimed':False,'physical_total_error_accuracy_claimed':False}
+    from .measurement_operator import assert_append_operator_prefix
+    assert_append_operator_prefix(p, result, n0)
     result=extend_shared_point_material_binding(p,result,model_path,material_map,entity_qualification)
     if finalize_packet is not None and finalize_packet_with_parent is not None:raise ValueError('Choose one source finalizer')
     if finalize_packet_with_parent is not None:
@@ -160,6 +171,7 @@ def append_constraint_source_chunks(parent_packet,closed_chunks,model_path,mater
         result=finalize_packet_with_parent(result,out,p)
     elif finalize_packet is not None:
         result=finalize_packet(result,out)
+    assert_append_operator_prefix(p, result, n0)
     final_ad=np.memmap(result['arrays']['admission']['file'],dtype=result['arrays']['admission']['dtype'],mode='r',shape=(n0+n,));final_role=np.memmap(result['arrays']['fit_role']['file'],dtype=result['arrays']['fit_role']['dtype'],mode='r',shape=(n0+n,));final_partition=np.zeros(n0+n,np.int16)
     final_partition[np.asarray(result['independent_rows'],int)]+=1
     for g in result['groups']:final_partition[g['rows']]+=1

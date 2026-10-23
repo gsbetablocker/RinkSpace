@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 #include "rinkfit/event_model.hpp"
 #include "rinkfit/event_packet.hpp"
 #include <ceres/dynamic_autodiff_cost_function.h>
@@ -155,6 +156,12 @@ struct EventGroupedStatistic {
   }
 };
 
+// Native domain probes can already have the exact zero-tangent AD scalar.
+// Return no value when the ordinary Jet probe is still required.
+template<class Functor>auto event_cached_ad_value(const Functor& f,double const*const* p,double* r,int)
+ ->decltype(f.cached_ad_value(p,r)){return f.cached_ad_value(p,r);}
+template<class Functor>std::optional<bool> event_cached_ad_value(const Functor&,double const*const*,double*,long){return std::nullopt;}
+
 template<class Functor>class EventADCost final : public ceres::CostFunction, public PHRADValueProbe {
  public:
   EventADCost(Functor functor,const std::vector<int>& sizes,int residuals)
@@ -162,8 +169,10 @@ template<class Functor>class EventADCost final : public ceres::CostFunction, pub
     if(residuals<1)throw std::invalid_argument("event cost needs at least one residual");
     for(int size:sizes){if(size<1)throw std::invalid_argument("empty event parameter block");mutable_parameter_block_sizes()->push_back(size);cost_.AddParameterBlock(size);}set_num_residuals(residuals);cost_.SetNumResiduals(residuals);
   }
+  const Functor& functor_view()const{return *functor_;}
   bool Evaluate(double const*const* p,double* residuals,double** jacobians)const override{return cost_.Evaluate(p,residuals,jacobians);}
   bool EvaluateADValue(double const*const* p,double* residuals)const override{
+    if(const auto cached=event_cached_ad_value(*functor_,p,residuals,0);cached.has_value())return *cached;
     using Jet=ceres::Jet<double,4>;std::vector<std::vector<Jet>> storage;std::vector<const Jet*> ptr;
     storage.reserve(parameter_block_sizes().size());ptr.reserve(parameter_block_sizes().size());
     for(std::size_t b=0;b<parameter_block_sizes().size();++b){storage.emplace_back(parameter_block_sizes()[b]);for(int j=0;j<parameter_block_sizes()[b];++j){storage.back()[j].a=p[b][j];storage.back()[j].v.setZero();}ptr.push_back(storage.back().data());}
