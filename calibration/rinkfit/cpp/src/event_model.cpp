@@ -18,17 +18,22 @@ EventModel EventModel::load(const std::string& path) {
   if(m.blocks.empty()||m.blocks[0].values.size()!=kEventGlobalSize)throw std::runtime_error("global32 block absent");
   const auto& c=j.at("camera");m.R0_seed=c.at("R0_seed").get<Mat3<double>>();m.n_seed=c.at("n_seed").get<Vec3<double>>();m.b_seed=c.at("b_seed").get<Vec3<double>>();
   m.n_tangent1=c.at("n_tangent1").get<Vec3<double>>();m.n_tangent2=c.at("n_tangent2").get<Vec3<double>>();m.f_ref=c.at("f_ref");m.radius_max=c.at("radius_max");
-  if(c.contains("brown_wide_extension")){const auto&w=c.at("brown_wide_extension");if(w.at("schema")!="rinkfit.source_supported_wide_brown_hinge.v1"||w.at("power")!=2)throw std::runtime_error("unsupported wide Brown extension");m.wide_log_f_boundary=w.at("activation_log_f_native");m.wide_coefficients=w.at("coefficients").get<std::array<double,4>>();if(!std::isfinite(m.wide_log_f_boundary)||!finite_array(m.wide_coefficients))throw std::runtime_error("nonfinite wide Brown extension");}
   m.dt=c.at("dt");m.first_control_time=c.at("first_control_time");m.n_controls=c.at("n_controls");m.control_block_begin=c.at("control_block_begin");m.dependent_control=c.at("dependent_control");
   m.reference_indices=c.at("reference_indices").get<std::array<int,4>>();m.reference_weights=c.at("reference_weights").get<std::array<double,4>>();m.tau_bound=c.at("tau_bound");
   if(!valid_rotation(m.R0_seed)||std::abs(dot(m.n_seed,m.n_seed)-1)>1e-9||!(m.f_ref>0)||!(m.radius_max>0)||!(m.dt>0)||m.n_controls<4)throw std::runtime_error("invalid event camera seed");
   for(const auto& a:j.at("materials")){EventMaterial mat;mat.label=a.at("label");
-    for(const auto& p:a.at("paths")){EventPath path;path.id=p.at("id");path.variant_id=p.at("variant_id");path.kind=p.at("kind");path.geometry_block=p.value("geometry_block",-1);path.advertisement_block=p.value("advertisement_block",-1);path.advertisement_offset=p.value("advertisement_offset",0);
+    for(const auto& p:a.at("paths")){EventPath path;path.id=p.at("id");path.variant_id=p.at("variant_id");path.kind=p.at("kind");path.geometry_block=p.value("geometry_block",-1);path.advertisement_block=p.value("advertisement_block",-1);
       path.physical_point=p.value("physical_point",false);path.closed=p.value("closed",false);path.provenance=p.value("provenance","");path.points=p.value("points",std::vector<Vec2<double>>{});
       path.start_angle=p.value("start_angle",0.);path.end_angle=p.value("end_angle",6.283185307179586);path.fixed_height_fraction=p.value("fixed_height_fraction",0.);
       path.radius_index=p.value("radius_index",2);
       path.boundary_segment=p.value("boundary_segment",-1);
+      path.shared_station_block=p.value("shared_station_block",-1);
       for(int id:{path.geometry_block,path.advertisement_block})if(id>=int(m.blocks.size()))throw std::runtime_error("path references missing block");
+      if(path.shared_station_block>=0){
+        if(path.shared_station_block>=int(m.blocks.size())||!path.physical_point||path.kind!=0)throw std::runtime_error("shared station requires a physical point on an ice segment");
+        const auto& b=m.blocks[path.shared_station_block];
+        if(b.values.size()!=1||b.lower[0]<0||b.upper[0]>1)throw std::runtime_error("shared station requires a scalar finite [0,1] block");
+      }
       if(path.kind==2&&(path.advertisement_block<0||path.points.empty()))throw std::runtime_error("board path lacks shared installation");mat.paths.push_back(std::move(path));}
     if(mat.paths.empty())throw std::runtime_error("material has no finite path");m.materials.push_back(std::move(mat));}
   return m;
@@ -38,74 +43,22 @@ EventRowLayout EventModel::layout(int material,int path,double time) const {
   const auto& p=materials.at(material).paths.at(path);EventRowLayout l;l.material=material;l.path=path;l.frame_time=time;l.block_ids={0};
   if(p.geometry_block>=0){l.geometry_slot=int(l.block_ids.size());l.block_ids.push_back(p.geometry_block);}
   if(p.advertisement_block>=0){l.advertisement_slot=int(l.block_ids.size());l.block_ids.push_back(p.advertisement_block);}
-  append_trajectory_layout(l);return l;
-}
-void EventModel::append_trajectory_layout(EventRowLayout& l) const {
-  const int lo=int(std::floor((l.frame_time-tau_bound/2-first_control_time)/dt))-1;
-  const int hi=int(std::floor((l.frame_time+tau_bound/2-first_control_time)/dt))+2;
+  if(p.shared_station_block>=0){l.shared_station_slot=int(l.block_ids.size());l.block_ids.push_back(p.shared_station_block);}
+  const int lo=int(std::floor((time-tau_bound/2-first_control_time)/dt))-1;
+  const int hi=int(std::floor((time+tau_bound/2-first_control_time)/dt))+2;
   std::set<int> ids;for(int i=lo;i<=hi;++i)if(i>=0&&i<n_controls)ids.insert(i);
   if(ids.count(dependent_control))for(int k=0;k<4;++k)if(reference_weights[k]!=0&&reference_indices[k]!=dependent_control)ids.insert(reference_indices[k]);
   for(int i:ids){l.control_ids.push_back(i);l.control_slots.push_back(int(l.block_ids.size()));l.block_ids.push_back(control_block_begin+i);}
+  return l;
 }
-
 std::vector<const double*> EventModel::pointers(const EventRowLayout& l) const {
   std::vector<const double*> out;for(int id:l.block_ids)out.push_back(blocks.at(id).values.data());return out;
 }
 double EventModel::corner_length() const {return quarter_arclength(1.5707963267948966,blocks[0].values.data());}
 
-std::array<double,3> EventModel::restricted_trajectory_derivative_bounds(double lo,double hi) const {
-  if(!std::isfinite(lo)||!std::isfinite(hi)||lo>hi||!(dt>0)||n_controls<4
-      ||lo<first_control_time+dt||hi>first_control_time+(n_controls-2)*dt)
-    throw std::domain_error("readout outside complete allocated cubic support");
-  // Expand the reference-angle dependency before constructing each polynomial.
-  // Constant reference offsets then cancel in the adjacent control differences.
-  auto fullcontrol=[&](int i,int channel){
-    if(channel<2&&i==dependent_control){double sum=0,pivot=0;
-      for(int k=0;k<4;++k){if(reference_indices[k]==i)pivot=reference_weights[k];
-        else sum+=reference_weights[k]*blocks.at(control_block_begin+reference_indices[k]).values.at(channel);}
-      if(pivot==0)throw std::domain_error("zero dependent cubic reference pivot");return -sum/pivot;
-    }
-    return blocks.at(control_block_begin+i).values.at(channel);
-  };
-  std::array<double,3> rates{};bool covered=false;
-  // Outward enclosure of the normalized interval avoids late-time knot
-  // reconstruction/cancellation. It encloses arithmetic only, not extra data.
-  const double xlo=(lo-first_control_time)/dt,xhi=(hi-first_control_time)/dt;
-  const double xpad=64*std::numeric_limits<double>::epsilon()*(1+(std::max(std::abs(lo),std::abs(hi))+std::abs(first_control_time))/dt+std::abs(xlo)+std::abs(xhi));
-  const double left=std::nextafter(xlo-xpad,-INFINITY),right=std::nextafter(xhi+xpad,INFINITY);
-  const int begin=std::max(1,int(std::floor(left))-1);
-  const int end=std::min(n_controls-3,int(std::floor(right))+1);
-  for(int cell=begin;cell<=end;++cell){
-    const double u0=std::max(0.,left-cell),u1=std::min(1.,right-cell);
-    if(u0>u1)continue;covered=true;
-    for(int channel=0;channel<3;++channel){
-      const double e0=(fullcontrol(cell,channel)-fullcontrol(cell-1,channel))/dt;
-      const double e1=(fullcontrol(cell+1,channel)-fullcontrol(cell,channel))/dt;
-      const double e2=(fullcontrol(cell+2,channel)-fullcontrol(cell+1,channel))/dt;
-      const double d=.5*(e0+e1),b=e1-e0,a=.5*e0-e1+.5*e2;
-      auto absolute=[&](double u){return std::abs((a*u+b)*u+d);};
-      double value=std::max(absolute(u0),absolute(u1));
-      if(a!=0){const double vertex=-b/(2*a);if(u0<vertex&&vertex<u1)value=std::max(value,absolute(vertex));}
-      const double padding=64*std::numeric_limits<double>::epsilon()*(1+std::abs(e0)+std::abs(e1)+std::abs(e2)+std::abs(d)+std::abs(b)+std::abs(a));
-      if(!std::isfinite(value)||!std::isfinite(padding))throw std::domain_error("nonfinite restricted cubic derivative envelope");
-      rates[channel]=std::max(rates[channel],value+padding);
-    }
-  }
-  if(!covered)throw std::domain_error("no allocated cubic intersects readout");
-  for(auto&rate:rates)rate=std::nextafter(rate*(1+1e-12)+1e-12,INFINITY);
-  return rates;
-}
-
 EventRootResult EventModel::project_rs(int material,int path,double station,double time,double initial) const {
   EventRootResult out;const auto l=layout(material,path,time);const auto ptrs=pointers(l);
   Vec3<double> fixed_world;try{fixed_world=world_point(materials[material].paths[path],station,ptrs.data(),l);}catch(...){out.reason="finite_material_domain_failure";return out;}
-  return project_world_rs(fixed_world,time,initial);
-}
-
-EventRootResult EventModel::project_world_rs(const Vec3<double>& fixed_world,double time,double initial) const {
-  EventRootResult out;
-  if(!finite_array(fixed_world)){out.reason="nonfinite_world_point";return out;}
-  EventRowLayout l;l.frame_time=time;l.block_ids={0};append_trajectory_layout(l);const auto ptrs=pointers(l);
   const auto fixed_head=head(blocks[0].values.data());const auto fixed_optics=optics(blocks[0].values.data());
   auto eval=[&](double v)->Projection<double>{try{const auto tr=trajectory(row_time(time,blocks[0].values[31],v),ptrs.data(),l);const auto oo=zoom_optics(fixed_optics,tr[2]);
       return project(fixed_world,camera_pose(fixed_head,tr[0],tr[1],oo.z),oo.intr,oo.brown);}catch(...){return {};}};
@@ -135,12 +88,15 @@ EventRootResult EventModel::project_world_rs(const Vec3<double>& fixed_world,dou
   if(pp.valid()&&pm.valid())out.implicit_denominator=1-(pp.uv[1]-pm.uv[1])/(std::min(1079.,out.row+h)-std::max(0.,out.row-h));
   out.valid=p.valid()&&out.equality_px<1e-7&&std::abs(out.implicit_denominator)>1e-6;
   // Sufficient whole-readout certificate, independent of root samples:
-  // restricted cubic derivative quadratic extrema -> rigid Y velocity norm -> depth/ray box
+  // derivative B-spline convex hull -> rigid Y velocity norm -> depth/ray box
   // -> polynomial Brown Jacobian -> |tau*pi_y,t/1079| < 1.
   const auto& g=blocks[0].values;const double tau=g[31],half=std::abs(tau)/2;
-  std::array<double,3> rates{};
-  try{rates=restricted_trajectory_derivative_bounds(time-half,time+half);}
-  catch(...){out.unique=false;out.reason="root_requires_full_allocated_cubic_derivative_certificate";return out;}
+  auto fullcontrol=[&](int i,int channel){if(channel<2&&i==dependent_control){double s=0,pivot=0;
+      for(int k=0;k<4;++k){if(reference_indices[k]==i)pivot=reference_weights[k];else s+=reference_weights[k]*blocks[control_block_begin+reference_indices[k]].values[channel];}return -s/pivot;}
+    return blocks[control_block_begin+i].values[channel];};
+  std::array<double,3> rates{};const int begin=int(std::floor((time-half-first_control_time)/dt))-2,end=int(std::floor((time+half-first_control_time)/dt))+2;
+  for(int i=std::max(0,begin);i<=std::min(n_controls-2,end);++i)for(int c=0;c<3;++c)rates[c]=std::max(rates[c],std::abs(fullcontrol(i+1,c)-fullcontrol(i,c))/dt);
+  for(auto& r:rates)r=std::nextafter(r*(1+1e-12)+1e-12,INFINITY);
   bool certified=false;
   try {
     const auto& world=fixed_world;
@@ -150,14 +106,12 @@ EventRootResult EventModel::project_world_rs(const Vec3<double>& fixed_world,dou
     const double span=dy*half,zmin=Y[2]-span;
     if(zmin>0){const double Xabs=std::abs(Y[0])+span,Yabs=std::abs(Y[1])+span,x=Xabs/zmin,y=Yabs/zmin,r2=x*x+y*y,r=std::sqrt(r2);
       const double xp=dy*(zmin+Xabs)/(zmin*zmin),yp=dy*(zmin+Yabs)/(zmin*zmin);
-      const double hinge_max=std::max(0.,wide_log_f_boundary-(tr[2]-zd*half)),basis_max=hinge_max*hinge_max;
-      const double k1p=std::abs(g[26])+2*std::abs(wide_coefficients[0])*hinge_max,k2p=std::abs(g[28])+2*std::abs(wide_coefficients[1])*hinge_max,p1p=2*std::abs(wide_coefficients[2])*hinge_max,p2p=2*std::abs(wide_coefficients[3])*hinge_max;
-      const double k1a=std::abs(g[25])+std::abs(g[26])*zabs+std::abs(wide_coefficients[0])*basis_max,k2a=std::abs(g[27])+std::abs(g[28])*zabs+std::abs(wide_coefficients[1])*basis_max,p1=std::abs(g[29])+std::abs(wide_coefficients[2])*basis_max,p2=std::abs(g[30])+std::abs(wide_coefficients[3])*basis_max;
+      const double k1a=std::abs(g[25])+std::abs(g[26])*zabs,k2a=std::abs(g[27])+std::abs(g[28])*zabs,p1=std::abs(g[29]),p2=std::abs(g[30]);
       const double L=1+k1a*r2+k2a*r2*r2,Jyx=2*x*y*(k1a+2*k2a*r2)+2*p1*x+2*p2*y,Jyy=L+2*y*y*(k1a+2*k2a*r2)+6*p1*y+2*p2*x;
-      const double ybrown=y*L+p1*(r2+2*y*y)+2*p2*x*y,direct=(y*(k1p*r2+k2p*r2*r2)+p1p*(r2+2*y*y)+2*p2p*x*y)*zd;
+      const double ybrown=y*L+p1*(r2+2*y*y)+2*p2*x*y,direct=y*(std::abs(g[26])*r2+std::abs(g[28])*r2*r2)*zd;
       const double fymax=std::exp(tr[2]+zd*half-g[22]/2),ppprime=std::abs(g[24])*zd;
       const double speed=std::nextafter((fymax*(ybrown*zd+Jyx*xp+Jyy*yp+direct)+ppprime)*(1+1e-10)+1e-8,INFINITY);
-      const double k1lo=oo.brown.k1-k1p*zd*half,k2lo=oo.brown.k2-k2p*zd*half;
+      const double k1lo=oo.brown.k1-std::abs(g[26])*zd*half,k2lo=oo.brown.k2-std::abs(g[28])*zd*half;
       const double fold=std::min(quadratic_minimum(1.,k1lo,k2lo,r2),quadratic_minimum(1.,3*k1lo,5*k2lo,r2))-6*std::hypot(p1,p2)*r;
       certified=r<=radius_max&&fold>1e-10&&std::abs(tau)*speed/1079.<1.-1e-9;
     }
@@ -198,7 +152,7 @@ std::vector<EventPhysicalConstraint> EventModel::physical_specs() const {
     EventPhysicalConstraint c;c.id=std::move(id);c.type=type;c.block_ids={0};if(block!=0)c.block_ids.push_back(block);c.index=index;c.axis=axis;c.direction=direction;c.scale=scale;out.push_back(std::move(c));};
   add("rink/nonzero_short_straight",0,0,0,0,1,.5);
   for(std::size_t i=1;i<blocks.size();++i){const auto& b=blocks[i];
-    if(b.name.rfind("ad/",0)==0){std::set<int> offsets;for(const auto& mat:materials)for(const auto& path:mat.paths)if(path.kind==2&&path.advertisement_block==int(i))offsets.insert(path.advertisement_offset);for(int off:offsets){if(off<0||off+4>int(b.values.size()))throw std::runtime_error("advertisement instance offset outside parameter block");const auto name=b.name+(off?"/instance_"+std::to_string(off):"");add(name+"/bottom_on_board",1,int(i),off,0,1,.02);add(name+"/nonzero_height",2,int(i),off,0,1,.02);add(name+"/top_on_board",3,int(i),off,0,1,.02);add(name+"/span_not_larger_than_perimeter",4,int(i),off);}}
+    if(b.name.rfind("ad/",0)==0){add(b.name+"/bottom_on_board",1,int(i),0,0,1,.02);add(b.name+"/nonzero_height",2,int(i),0,0,1,.02);add(b.name+"/top_on_board",3,int(i),0,0,1,.02);add(b.name+"/span_not_larger_than_perimeter",4,int(i));}
     if(b.name.rfind("ice/circle/",0)==0){for(std::size_t j=2;j<b.values.size();++j)add(b.name+"/positive_radius_"+std::to_string(j),5,int(i),int(j),0,1,.05);
       for(std::size_t j=2;j+1<b.values.size();++j)add(b.name+"/nested_radius_"+std::to_string(j),6,int(i),int(j),0,1,.05);
       // Explicit sufficient convex containment: the outer circle is contained
@@ -207,11 +161,11 @@ std::vector<EventPhysicalConstraint> EventModel::physical_specs() const {
       for(int sx:{-1,1})for(int sy:{-1,1})add(b.name+"/conservative_outer_square_"+std::to_string(sx)+"_"+std::to_string(sy),9,int(i),int(b.values.size()-1),sx,sy);
     }
     if(b.name.rfind("ice/line/",0)==0){add(b.name+"/endpoint0_in_rink",7,int(i),0);add(b.name+"/endpoint1_in_rink",7,int(i),2);add(b.name+"/nonzero_length",8,int(i),0,0,1,.25);}
-    if(b.name.rfind("print/",0)==0){std::map<std::pair<int,int>,std::vector<Vec2<double>>> by_ad;for(const auto& m:materials)for(const auto& p:m.paths)if(p.kind==2&&p.geometry_block==int(i)&&p.advertisement_block>=0&&!p.points.empty()){auto& vertices=by_ad[{p.advertisement_block,p.advertisement_offset}];vertices.insert(vertices.end(),p.points.begin(),p.points.end());}
-      // Only consumed ink charts constrain the board. Orphaned historical
-      // blocks have no physical surface. A shared chart can serve several ads.
-      for(const auto& entry:by_ad)for(int direction:{-1,1}){add(b.name+"/ad_"+std::to_string(entry.first.first)+"/instance_"+std::to_string(entry.first.second)+"/board_height_"+std::to_string(direction),12,int(i),entry.first.second,0,direction,.02);out.back().vertices=entry.second;out.back().block_ids.push_back(entry.first.first);}
-      if(!by_ad.empty())add(b.name+"/positive_affine_orientation",11,int(i));}
+    if(b.name.rfind("print/",0)==0){std::vector<Vec2<double>> vertices;int ad=-1;for(const auto& m:materials)for(const auto& p:m.paths)if(p.geometry_block==int(i)){vertices.insert(vertices.end(),p.points.begin(),p.points.end());ad=p.advertisement_block;}
+      // u/v may describe an INTERNAL graphic atlas, not the physical outer ad
+      // canvas. Only sourced board height bounds apply to all finite paths.
+      for(int direction:{-1,1}){add(b.name+"/board_height_"+std::to_string(direction),12,int(i),0,0,direction,.02);out.back().vertices=vertices;out.back().block_ids.push_back(ad);}
+      add(b.name+"/positive_affine_orientation",11,int(i));}
   }
   return out;
 }

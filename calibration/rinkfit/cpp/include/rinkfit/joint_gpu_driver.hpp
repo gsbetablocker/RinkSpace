@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <type_traits>
 
 namespace rinkfit::joint_gpu {
 using DevicePtr = std::uint64_t;
@@ -11,7 +12,10 @@ struct GPUPath { int kind, geom, ad, ri, bs, begin, count; double a0, a1, h; };
 struct UVRow { double t, s, v, alpha, budget; };
 struct UVLayout { int global, geom, ad, ref, path, block_begin, block_count, control_begin, control_count, geometry_begin, geometry_count, geometry_offset; };
 struct UVJob { int row, column; };
-struct UVPartial { double u, v; int arithmetic, status; };
+// Shared host storage/view type; CUDA writes this unchanged binary layout.
+struct UVPartial { double u=0, v=0; int arithmetic=0, status=0; };
+static_assert(std::is_standard_layout_v<UVPartial> && std::is_trivially_copyable_v<UVPartial>, "raw UV partial must remain a plain transfer type");
+static_assert(offsetof(UVPartial,u)==0 && offsetof(UVPartial,v)==8 && offsetof(UVPartial,arithmetic)==16 && offsetof(UVPartial,status)==20, "raw UV partial member ABI differs");
 static_assert(sizeof(GPUMeta)==304 && sizeof(GPUPath)==56 && sizeof(UVRow)==40 && sizeof(UVLayout)==48 && sizeof(UVJob)==8 && sizeof(UVPartial)==24, "Joint raw CUDA ABI differs");
 struct RawArrays {
  DevicePtr offsets=0, values=0, dims=0, paths=0, points=0, rows=0, block_ids=0, controls=0, slots=0, control_offsets=0, geometry_indices=0, layouts=0, jobs=0, output=0;

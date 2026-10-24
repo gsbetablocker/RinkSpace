@@ -3,7 +3,7 @@ from pathlib import Path
 BINDING_FILE=Path(r'D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/final_board_binding.json');BINDING=json.load(open(BINDING_FILE,encoding='utf8'))
 assert BINDING.get('accepted_for_source_overlay')is True,'Await accepted final board generation'
 BOARD_NAME=BINDING['board_generation'];OLD_BOARD_NAME=BINDING.get('previous_board_generation_for_delta','shape_v4')
-exec(open(r'D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/reader56_exact.py',encoding='utf8').read().split('def main():')[0].replace('shape_v3',BOARD_NAME).replace('SAM2_8px','SAM2_footwear_composite_8px').replace('qualified_v3_boardfoot','qualified_'+BOARD_NAME+'_boardfoot').replace("mp=R/'dense56_masks_v1/masks'/f'{pts}.png';","mp=Path(mask_index[pts]['mask_file']);").replace("old=cv2.dilate((raw>0).astype('u1'),np.ones((11,11),'u1'))>0", "old_raw=cv2.imread(str(mask_index[pts].get('parent_mask_file',mp)),0);old=cv2.dilate((old_raw>0).astype('u1'),np.ones((11,11),'u1'))>0"))
+exec(Path(__file__).with_name('reader56_exact.py').read_text(encoding='utf8').split('def main():')[0].replace('shape_v3',BOARD_NAME).replace('SAM2_8px','SAM2_footwear_composite_8px').replace('qualified_v3_boardfoot','qualified_'+BOARD_NAME+'_boardfoot').replace("mp=R/'dense56_masks_v1/masks'/f'{pts}.png';","mp=Path(mask_index[pts]['mask_file']);").replace("old=cv2.dilate((raw>0).astype('u1'),np.ones((11,11),'u1'))>0", "old_raw=cv2.imread(str(mask_index[pts].get('parent_mask_file',mp)),0);old=cv2.dilate((old_raw>0).astype('u1'),np.ones((11,11),'u1'))>0"))
 FINAL_PERSON_INDEX=Path(BINDING['final_person_mask_index_file'])
 assert TH(FINAL_PERSON_INDEX.read_bytes()).hexdigest()==BINDING['final_person_mask_index_sha256'],'Composite person mask index changed'
 mask_index={json.loads(l)['native_pts']:json.loads(l)for l in gzip.open(FINAL_PERSON_INDEX,'rt',encoding='utf8')}
@@ -138,7 +138,7 @@ def affected_curves(rgb,pts,sid,border3,border4):
  return keys
 
 def main_delta():
- out=O/'accepted_board_delta';out.mkdir(exist_ok=True);a=948992;b=1425408;batch=[];total=0;nf=0;newrows=0;audits=[];start=time.monotonic();stats=collections.Counter();features=collections.Counter();boarddir=R/'dense56_board_v1'/BOARD_NAME
+ out=O/'accepted_board_delta_layer_unique_v3';out.mkdir(exist_ok=False);a=948992;b=1425408;batch=[];total=0;nf=0;newrows=0;audits=[];start=time.monotonic();stats=collections.Counter();features=collections.Counter();boarddir=R/'dense56_board_v1'/BOARD_NAME
  with mp.get_context('spawn').Pool(8)as pool,gzip.open(out/'rows.jsonl.gz','wt',encoding='utf8')as wr,gzip.open(out/'coverage.jsonl.gz','wt',encoding='utf8')as wc,gzip.open(out/'source_band_controls.jsonl.gz','wt',encoding='utf8')as wctrl,gzip.open(out/'all1862_domain_audit.jsonl.gz','wt',encoding='utf8')as wa,av.open(str(D/'events/ankara_2026/programmes/okada_mei_sp/Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4'))as con:
   def consume(batch):
    nonlocal nf,total,newrows

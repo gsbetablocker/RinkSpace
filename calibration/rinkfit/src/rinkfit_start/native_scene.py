@@ -46,8 +46,6 @@ def camera_from_event(model,state=None):
        "optics":{"f_ref":model["f_ref"],"radius_max":model["radius_max"],"principal_point":g[20:22].tolist(),"eta":g[22],
             "principal_linear":g[23:25].tolist(),"k1":g[25:27].tolist(),"k2":g[27:29].tolist(),"p1":g[29],"p2":g[30]},
        "rolling_shutter":{"signed_readout_seconds":g[31]}}
-    if model.get('brown_wide_extension') is not None:
-        camera['optics']['brown_wide_extension'] = model['brown_wide_extension']
     return NativeCamera(camera)
 
 
@@ -120,6 +118,12 @@ class NativeScene:
     def world(self,material,path,station):
         p=self.path(material,path);s=np.asarray(station,float)
         if not np.isfinite(s).all() or np.any((s<0)|(s>1)):raise ValueError("illegal finite station")
+        shared=int(p.get("shared_station_block",-1))
+        if shared>=0:
+            if shared>=len(self.values) or self.values[shared].shape!=(1,) or not p.get("physical_point",False) or p["kind"] not in (0,"ice_segment"):
+                raise ValueError("shared finite position needs one physical-point scalar block")
+            s=np.full_like(s,self.values[shared][0])
+            if not np.isfinite(s).all() or np.any((s<0)|(s>1)):raise ValueError("illegal shared finite station")
         kind=p["kind"];kind={"ice_segment":0,"ice_circle":1,"board_path":2,"board_boundary":3}.get(kind,kind)
         block=int(p.get("geometry_block",-1));q=None if block<0 else self.values[block]
         if kind==0:
@@ -129,26 +133,11 @@ class NativeScene:
             return np.stack((q[0]+q[int(p.get("radius_index",2))]*np.cos(angle),q[1]+q[int(p.get("radius_index",2))]*np.sin(angle),np.zeros_like(s)),axis=-1)
         if kind==3:
             segment=int(p.get("boundary_segment",-1))
-            if segment==-2:
-                lengths=np.array([self.long,self.arc,self.short,self.arc,self.long,self.arc,self.short,self.arc])
-                coordinate=s*8; part=np.minimum(7,np.floor(coordinate).astype(int))
-                coordinate=np.r_[0.,np.cumsum(lengths)][part]+(coordinate-part)*lengths[part]
-            elif segment>=0:
+            if segment>=0:
                 lengths=np.array([self.long,self.arc,self.short,self.arc,self.long,self.arc,self.short,self.arc])
                 coordinate=float(lengths[:segment].sum())+s*lengths[segment]
             else:coordinate=s*self.perimeter
             return self.board(coordinate,self.height*p.get("fixed_height_fraction",0))
-        if kind==6:
-            points=q.reshape(-1,2);n=len(points)
-            if n==1:uv=np.broadcast_to(points[0],s.shape+(2,))
-            else:
-                edges=n if p.get('closed',False) else n-1
-                t=s*edges;i=np.minimum(np.floor(t).astype(int),edges-1);u=t-i
-                uv=points[i]*(1-u[...,None])+points[(i+1)%n]*u[...,None]
-            return self.board(uv[...,0],uv[...,1])
-        if kind==7:
-            angle=p.get('start_angle',0.)+s*(p.get('end_angle',2*np.pi)-p.get('start_angle',0.))
-            return self.board(q[0]+q[2]*np.cos(angle)+q[3]*np.sin(angle),q[1]+q[4]*np.sin(angle))
         if kind!=2:raise ValueError("unknown physical material primitive")
         points=np.asarray(p["points"],float)
         if len(points)==1:uv=np.broadcast_to(points[0],s.shape+(2,)).copy()
@@ -161,8 +150,16 @@ class NativeScene:
     def world_rows(self,material,path,station):
         material=np.asarray(material);path=np.asarray(path);station=np.asarray(station)
         out=np.empty((len(station),3));legal=np.ones(len(station),bool);reason=np.full(len(station),"",dtype="U64")
-        for m,branch in np.unique(np.c_[material,path],axis=0):
-            rows=np.flatnonzero((material==m)&(path==branch))
+        # RS/GN repeatedly evaluates the same material/branch ownership at new
+        # stations. Cache only its grouping, never world points or derivatives.
+        # Exact array comparison also catches mutation of reused input buffers.
+        cached=getattr(self,"_world_row_groups",None)
+        if cached is not None and cached[0].dtype==material.dtype and cached[1].dtype==path.dtype and np.array_equal(cached[0],material) and np.array_equal(cached[1],path):
+            groups=cached[2]
+        else:
+            groups=tuple((m,branch,np.flatnonzero((material==m)&(path==branch)))for m,branch in np.unique(np.c_[material,path],axis=0))
+            self._world_row_groups=(material.copy(),path.copy(),groups)
+        for m,branch,rows in groups:
             try:out[rows]=self.world(m,branch,station[rows])
             except (ValueError,IndexError,KeyError):out[rows]=np.nan;legal[rows]=False;reason[rows]="finite_material_or_branch_domain"
         return out,legal,reason
@@ -213,14 +210,6 @@ class NativeScene:
                     result=self.circle_containment(q[:2],r,path.get('start_angle',0.),path.get('end_angle',2*np.pi),tolerance)
                     result['id']=m['label']+'/whole_circle_containment';checks.append(result)
                     if not result['certified']:violations.append(result['id'])
-                elif kind in (6,7) and key not in checked:
-                    checked.add(key);q=self.values[int(path['geometry_block'])]
-                    if kind==6:
-                        points=q.reshape(-1,2);margin=float(max(-np.min(points[:,1]),np.max(points[:,1])-self.height,np.ptp(points[:,0])-self.perimeter))
-                    else:
-                        margin=float(max(1e-12-q[2],1e-12-q[4],q[4]-q[1],q[1]+q[4]-self.height,2*np.hypot(q[2],q[3])-self.perimeter))
-                    checks.append({'id':m['label']+'/direct_shared_board_shape','max_inequality':margin,'certified_by':'complete unfolded finite support and analytic ellipse extrema'})
-                    if margin>tolerance:violations.append(m['label']+'/direct_shared_board_shape_domain')
                 elif kind==2:
                     points=np.asarray(path['points'],float);block=int(path.get('geometry_block',-1))
                     if block>=0:

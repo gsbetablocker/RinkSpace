@@ -1,5 +1,8 @@
 #pragma once
 #include "rinkfit/joint_explicit.hpp"
+#include "rinkfit/joint_global_phr_state_v1.hpp"
+#include "rinkfit/joint_global_phr_epoch_v1.hpp"
+#include <functional>
 #include "rinkfit/joint_motion_v1.hpp"
 #include "rinkfit/joint_source_uv_capture_v1.hpp"
 #include "rinkfit/augmented_lagrangian.hpp"
@@ -20,24 +23,37 @@ class JointFormalHybridHookV1 {
  virtual ceres::EvaluationCallback*evaluation_callback()const=0;
 };
 #define RINKFIT_JOINT_FORMAL_HYBRID_HOOK_V1 1
+class JointPhysicalFeasibilityV1;
+struct JointObservedLocalGraphRebindV1 {const void*owner=nullptr;const void*problem=nullptr;std::vector<std::size_t>raw_rows;std::vector<std::pair<ceres::ResidualBlockId,ceres::ResidualBlockId>>replacements;int residual_blocks=0,residual_scalars=0,parameter_blocks=0;bool detached=false;};
 class JointALBuilder final:public ProblemBuilder {
  public:
  std::vector<JointCaptureStationCellV20>capture_cells_v20;eventio::Json capture_cell_policy_ref_v20;std::string capture_cell_graph_receipt_v20,capture_cell_state_digest_v20="uninstalled";std::map<std::string,std::vector<std::uint8_t>>capture_cell_payload_v20;eventio::Json capture_cell_array_specs_v20;
  std::map<std::string,std::vector<ceres::ResidualBlockId>> engineering_residual_groups;
  std::shared_ptr<JointMotionStoreV1> static_motion;
- JointProblemBuilder core;explicit JointALBuilder(JointEventModel,JointPacket,bool allow_initialization_surrogate=false,bool phase_one_geometry_guidance=false);
+ JointGlobalPHRStateEpochV1 engineering_global_phr_state_v1;
+ using EngineeringGlobalFactorVisitorV1=std::function<void(const std::string&,bool,std::unique_ptr<ceres::CostFunction>,std::vector<double*>)>;
+ void visit_engineering_global_constraints_v1(const EngineeringGlobalFactorVisitorV1&);
+ eventio::Json engineering_global_constraint_registry_v1()const;
+ JointProblemBuilder core;explicit JointALBuilder(JointEventModel,JointPacket,bool allow_initialization_surrogate=false,bool phase_one_geometry_guidance=false,bool defer_formal_catalogue=false);
  const FrozenIdentity&identity()const override{return hybrid_formal_hook_v1_?hybrid_formal_hook_v1_->identity():identity_;}const std::vector<ObservationSpec>&observations()const override{ensure_observed_catalogue();return observations_;}const ConstraintSchema&schema()const override{if(hybrid_formal_hook_v1_)return hybrid_formal_hook_v1_->schema();ensure_observed_catalogue();return schema_;}double*budget_parameter()override{return &budget_;}
  std::vector<ParameterBlockBinding>parameter_blocks()override;StateSnapshot capture_state()const override;void restore_state(const StateSnapshot&)override;NativeReplay replay_native(const StateSnapshot&)const override;ConstraintValues evaluate_constraints(const StateSnapshot&)const override;GradientReport lagrangian_gradient(const StateSnapshot&,Phase,const std::vector<double>&,const std::vector<double>&)const override;BuildInventory build_ceres_problem(ceres::Problem&,const ObjectiveContext&)override;
  BuildInventory build_advertisement_coordinate_problem(ceres::Problem&,const ObjectiveContext&,int,std::vector<std::size_t>*);
  eventio::Json linearized_actual_step_diagnostic(const StateSnapshot&candidate,const ObjectiveContext&context);
  bool initialization_geometry_guidance()const{return bool(hybrid_formal_hook_v1_)||phase_one_geometry_guidance_;}
  BuildInventory build_engineering_problem(ceres::Problem&,const eventio::Json&,eventio::Json*);
- BuildInventory build_engineering_problem(ceres::Problem&,const eventio::Json&,eventio::Json*,const std::vector<double>& physical_lambda,const std::vector<double>& equality_nu,const std::function<void()>&configure={});
+ BuildInventory build_engineering_problem(ceres::Problem&,const eventio::Json&,eventio::Json*,const std::vector<double>& physical_lambda,const std::vector<double>& equality_nu,const std::function<void()>&configure={},std::shared_ptr<JointPhysicalFeasibilityV1>*global_phr_output=nullptr);
+ bool supports_observed_local_cell_rebind_v1(const std::vector<std::size_t>&,std::string*reason=nullptr)const;
+ JointObservedLocalGraphRebindV1 begin_observed_local_cell_rebind_v1(ceres::Problem&,BuildInventory&,const std::vector<std::size_t>&changed,const std::vector<std::size_t>&complete_active_group_rows);
+ void detach_observed_local_rows_v1(ceres::Problem&,BuildInventory&,JointObservedLocalGraphRebindV1&);
+ void bind_observed_local_rows_v1(ceres::Problem&,BuildInventory&,JointObservedLocalGraphRebindV1&);
  // Original physical/native/zoom g and RS/Query h, excluding pixel/budget g.
  ConstraintValues evaluate_current_engineering_constraints(int threads=1)const;
- eventio::Json restore_native_repair_extras_v1(const StateSnapshot&);
+ eventio::Json restore_native_repair_extras_v1(const StateSnapshot&,const eventio::Json&cfg=eventio::Json::object());
+ eventio::Json restore_engineering_global_phr_small_state_v1(const StateSnapshot&s,const eventio::Json&cfg=eventio::Json::object(),bool objective_changed=false){return restore_joint_global_phr_small_state_v1(*this,s,cfg,objective_changed);}
  eventio::Json select_representative_sources_v1(const eventio::Json& cfg);
+ eventio::Json expand_representative_full_source_v1(const eventio::Json& cfg);
  void set_engineering_identity(const std::string& configuration_sha);
+ void bind_shared_print_shape_identity_v1(const eventio::Json&);
  void attach_visible_ice_source_support(std::shared_ptr<const JointVisibleIceSourceSupport>);
  std::shared_ptr<const JointVisibleIceSourceSupport> visible_ice_source_support()const{return visible_ice_source_support_;}
  eventio::Json visible_ice_source_support_report()const;
@@ -51,6 +67,7 @@ class JointALBuilder final:public ProblemBuilder {
  void transition_observed_to_true_RS_v3(){if(!source_uv_observed_row_initialization_||gpu_uv_)throw std::runtime_error("trueRS transition requires restored observed primal before GPU");ensure_observed_catalogue();source_uv_observed_row_initialization_=false;observed_query_sources_.clear();enable_source_uv_capture_v3();}
  void enable_source_uv_capture_v1();void enable_source_uv_capture_v2();void enable_source_uv_capture_v3();void enable_source_uv_capture_v4();bool source_uv_capture_v4()const{return source_uv_capture_cells_v4_;}bool source_uv_capture_v3()const{return source_uv_capture_strict_v3_;}bool source_uv_capture_v1()const{return source_uv_capture_v1_;}bool source_uv_capture_v2()const{return source_uv_capture_sensor_station_v2_;}
  std::string RS_state_policy()const{return source_uv_observed_row_initialization_?"PROVISIONAL sourceUV measured-row initialization: source row fixed, finite station, true RS unverified; fresh v3 revalidation required":source_uv_capture_cells_v4_?"sourceUV_trueRS_capture_v4: strict sensor bracket; certified zoom hard domain; scene follows checked runtime stage; derived RS row; polyline station finite-cell active set with temporary vertex KKT; boundary-only pointwise merit rebind; original Query not imposed":source_uv_capture_strict_v3_?"sourceUV_trueRS_capture_v3: strict sensor bracket; certified zoom hard domain; scene follows checked runtime stage; derived station/row; original Query not imposed":source_uv_capture_sensor_station_v2_?"sourceUV_trueRS_capture_v2: sensor-active station/row derived; alpha retained; original Query not imposed":source_uv_capture_v1_?"sourceUV_trueRS_capture_v1: row is derived RS root; alpha retained, not optimized; original Query not imposed":"explicit bounded station/row/alpha; exact original RS and finite frozen query equalities; independent true RS on export";}
+ void release_gpu_raw_uv_for_path_rebind_v1(bool no_live_problem);
  void enable_gpu_raw_uv(const std::string&ptx,int threads,const std::filesystem::path&log_file);
  void enable_gpu_raw_uv(const std::string&ptx,int threads,const std::filesystem::path&log_file,const std::string&kernel_abi);
  void enable_gpu_raw_uv(const std::string&ptx,int threads,const std::filesystem::path&log_file,const std::string&kernel_abi,bool per_shot_batch_reuse);ceres::EvaluationCallback*gpu_evaluation_callback()const{return hybrid_formal_hook_v1_?hybrid_formal_hook_v1_->evaluation_callback():gpu_uv_.get();}eventio::Json gpu_report()const{return gpu_uv_?gpu_uv_->report():eventio::Json::object();}
@@ -67,6 +84,8 @@ class JointALBuilder final:public ProblemBuilder {
  void visit_hybrid_native_Lagrangian_constraints_v1(const std::vector<double>&,const std::vector<double>&,const HybridNativeFactorVisitorV1&);
  GradientReport project_hybrid_raw_gradient_v1(const std::map<double*,std::vector<double>>&,Phase,const std::string&);
  private:
+ struct RepresentativeFullSourceBackupV1{std::vector<std::size_t>active;std::vector<JointStatisticalGroup>groups;eventio::Json dependency_groups;};
+ std::unique_ptr<RepresentativeFullSourceBackupV1>representative_full_source_backup_;
  struct Factor{std::unique_ptr<ceres::CostFunction>cost;std::vector<std::size_t>ids;};
  std::shared_ptr<const JointVisibleIceSourceSupport>visible_ice_source_support_;std::shared_ptr<const JointSourceQueryBranchRegistry>source_query_branch_registry_;
  std::size_t visible_ice_source_inequality_count()const{return visible_ice_source_support_?visible_ice_source_support_->inequality_count():0;}
@@ -74,7 +93,9 @@ class JointALBuilder final:public ProblemBuilder {
  JointSourceUVCaptureRowV1 capture_row_v1(std::size_t,std::vector<std::size_t>*)const;
  bool source_uv_observed_row_initialization_=false;std::map<std::size_t,std::shared_ptr<JointObservation>>observed_query_sources_;
  bool source_uv_capture_v1_=false,source_uv_capture_sensor_station_v2_=false,source_uv_capture_strict_v3_=false,source_uv_capture_cells_v4_=false;
- std::shared_ptr<JointUVCache>gpu_uv_;FrozenIdentity identity_;mutable std::vector<ObservationSpec>observations_;mutable ConstraintSchema schema_;mutable bool observed_catalogue_compacted_=false;void ensure_observed_catalogue()const;void compact_observed_catalogue();std::vector<std::size_t>active_,station_rows_,profile_rows_;std::vector<EventPhysicalConstraint>physical_;struct Domain{std::size_t row;int kind;};std::vector<Domain>native_domains_,equalities_;struct HardEquality{std::string id;std::vector<std::size_t>ids;JointPhysicalEquality functor;};std::vector<HardEquality>hard_equalities_;struct ZoomBound{std::size_t rig;int control,offset,upper;std::string id;};std::vector<ZoomBound>zoom_bounds_;std::vector<std::array<double,2>>zoom_enclosures_,zoom_box_;EventModel domain_math_;double budget_=1;bool allow_initialization_surrogate_=false,phase_one_geometry_guidance_=false;
+ struct ObservedLocalRowV1 {std::size_t pixel_index=std::size_t(-1),domain_index=std::size_t(-1),family_index=0,domain_begin=0,domain_count=0;double scale=NAN;std::vector<ceres::ResidualBlockId>*family=nullptr;};
+ std::vector<ObservedLocalRowV1>observed_local_rows_v1_;double observed_local_penalty_v1_=NAN;
+ std::shared_ptr<JointUVCache>gpu_uv_;FrozenIdentity identity_;mutable std::vector<ObservationSpec>observations_;mutable ConstraintSchema schema_;mutable bool observed_catalogue_compacted_=false;void ensure_observed_catalogue()const;void compact_observed_catalogue();std::vector<std::size_t>active_,station_rows_,profile_rows_;std::vector<EventPhysicalConstraint>physical_;struct Domain{std::size_t row;int kind;};std::vector<Domain>native_domains_,equalities_;struct HardEquality{std::string id;std::vector<std::size_t>ids;JointPhysicalEquality functor;};std::vector<HardEquality>hard_equalities_,hard_inequalities_;std::size_t physical_count()const{return physical_.size()+hard_inequalities_.size();}const std::string&physical_id(std::size_t i)const{return i<physical_.size()?physical_[i].id:hard_inequalities_.at(i-physical_.size()).id;}struct ZoomBound{std::size_t rig;int control,offset,upper;std::string id;};std::vector<ZoomBound>zoom_bounds_;std::vector<std::array<double,2>>zoom_enclosures_,zoom_box_;EventModel domain_math_;double budget_=1;bool allow_initialization_surrogate_=false,phase_one_geometry_guidance_=false;
  std::size_t station_id(std::size_t i)const{return core.model.blocks.size()+i;}std::size_t row_id(std::size_t i)const{return core.model.blocks.size()+core.packet.rows.size()+i;}std::size_t alpha_id(std::size_t i)const{return core.model.blocks.size()+2*core.packet.rows.size()+i;}std::size_t budget_id()const{return core.model.blocks.size()+3*core.packet.rows.size();}
  std::size_t zoom_id(std::size_t rig)const{return budget_id()+1+rig;}
  double*pointer(std::size_t);std::vector<double*>pointers(const Factor&);std::vector<int>sizes(const std::vector<std::size_t>&)const;std::size_t equality_count()const{return equalities_.size()+hard_equalities_.size();}Factor pixel(std::size_t)const;Factor physical(std::size_t)const;Factor native_domain(std::size_t)const;Factor zoom_bound(std::size_t)const;Factor zoom_certificate(std::size_t)const;Factor equality(std::size_t)const;Factor statistic(const JointStatisticalGroup&)const;JointExplicitRow row(std::size_t,std::vector<std::size_t>*)const;std::unique_ptr<JointALBuilder>frozen(const StateSnapshot&)const;

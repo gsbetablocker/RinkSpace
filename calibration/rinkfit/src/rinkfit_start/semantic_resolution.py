@@ -68,6 +68,22 @@ def load_semantics(manifest_path, n, *, expected_sha256=None, _ancestors=()):
     for spec in m.get('assets', {}).values():
         if sha256_file(_path(path.parent, spec)) != spec['sha256']:
             raise ValueError('Selected semantic provenance changed')
+    scope=m.get('current_input_scope',{})
+    if scope.get('schema')=='rinkfit.current_advertisement_input.v1':
+        active=read_binary(path.parent,m['active_source_mask'])
+        stat=read_binary(path.parent,scope['statistical_active_mask'])
+        resolved=read_binary(path.parent,m['resolved_material_index'])
+        variants=read_binary(path.parent,m['resolved_variant_index'])
+        ids=m['resolved_variant_ids']
+        if any(x.shape!=(n,) for x in (active,stat,resolved,variants)) or np.any((active>1)|(stat>1)|(stat>active)) or np.any(resolved>=m['material_labels']) or np.any(variants>=len(ids)):
+            raise ValueError('Current source masks/material indices do not match declared current graph')
+        stats_ref=m['active_statistics'];stats_path=_path(path.parent,stats_ref)
+        if sha256_file(stats_path)!=stats_ref['sha256']:raise ValueError('Current statistics identity changed')
+        stats=json.loads(stats_path.read_text(encoding='utf8'))
+        if int(active.sum())!=m['active_observations'] or int(stat.sum())!=stats['statistical_observations'] or len(arrays['ordinary_rows'])!=scope['independent_count'] or stats['formal_residual_rows']!=scope['formal_W_rank']:
+            raise ValueError('Current budget/statistical source accounting mismatch')
+        exclusion=dict(enabled=bool(np.any(active==0)),active_mask=active.astype(bool),records=[],replacements={},active_observations=int(active.sum()),statistical_active_mask=stat.astype(bool),current_input_scope=True)
+        return m,arrays,path,dict(enabled=True,current_input_scope=True,query_semantic_sha256=digest,source_identity=m['current_prepared_export']['source_identity'],bindings=[],original_material_index=read_binary(path.parent,m['original_material_index']) if 'original_material_index'in m else resolved.copy(),resolved_material_index=resolved,resolved_variant_index=variants,resolved_variant_ids=ids,source_exclusion=exclusion)
     exclusion = load_exclusion(m,path,arrays,n,
         lambda p,count,**kw:load_semantics(p,count,_ancestors=(*_ancestors,str(path)),**kw))
     parent = m.get('parent_semantic_manifest')

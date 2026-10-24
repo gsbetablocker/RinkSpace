@@ -17,8 +17,9 @@ import shlex
 OBJECTIVE = "rinkfit.sourceUV_observed_row_finite_initialization.v1"
 EXECUTION_KEYS = {
     "observed_primal_restart_v1", "observed_primal_warm_start_v1", "num_threads", "max_inner_iterations",
-    "function_tolerance", "initial_trust_region_radius", "periodic_camera_angle_rebase",
+    "audit_accepted_cost_breakdown_v1", "function_tolerance", "parameter_tolerance", "gradient_tolerance", "initial_trust_region_radius", "periodic_camera_angle_rebase",
     "linear_solver_backend", "write_accepted_complete_checkpoint",
+    "defer_complete_continuation_auxiliary_v1", "defer_auxiliary_minimization_to_joint_phase_v1",
     "write_accepted_physical_preview", "accepted_source_anchor_review",
     "source_uv_capture_construct_problem_only", "archived_dependency_aliases", "audit_group_gradients_v2", "audit_actual_directional_v1", "audit_actual_family_directional_v1", "audit_actual_gradient_locations_v1", "observed_polyline_kkt_working_set_v1", "audit_actual_solver_step_v1",
 }

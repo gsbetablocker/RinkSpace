@@ -1,0 +1,684 @@
+{
+  "schema": "rinksolve.architecture.v1",
+  "revision": 12,
+  "title": "全新求解器：先完成第一镜头",
+  "active_shot": "s01",
+  "legacy_solver_code_used": false,
+  "legacy_failed_checkpoint_used": false,
+  "successful_demo_data_is_initialization_source": true,
+  "modules": [
+    {
+      "id": "sources",
+      "name": "原片与人工证据",
+      "purpose": "保存原生帧、源PTS、人工确认和证据身份；原始像素不可被模型回写。",
+      "status": "精确原生PTS读取器已实现；实际原片时钟/像素检查通过",
+      "inputs": [
+        {
+          "name": "ISU单节目原片",
+          "description": "1920×1080、50fps，原生时间戳",
+          "unit": "PTS / 1⁄12800秒",
+          "source": "programme/input.json"
+        },
+        {
+          "name": "人工标注",
+          "description": "原UV、实体名称、材料边界与人工修订",
+          "unit": "像素",
+          "source": "原始人工记录"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "SourceFrame",
+          "description": "原生曝光与不可变源身份",
+          "unit": "像素 / PTS",
+          "source": "原片"
+        }
+      ],
+      "source_file": "calibration/solve2/rinksolve/sources.py",
+      "contract_types": [
+        "Evidence",
+        "SourceClock",
+        "SourceFrame",
+        "PixelObservation",
+        "DerivedPixelObservation"
+      ]
+    },
+    {
+      "id": "observations",
+      "name": "取点与实体确认",
+      "purpose": "把真正可见的冰面/围挡材料变成观测；分清材料过渡、命名实体与数值导航。 固定交点/角点与沿线范围分型；坐标待估不等于实体位置可滑。",
+      "status": "稳定源ID可对照原片；可恢复撤点、完整W组连带退出及具体基础退出原因已显示",
+      "inputs": [
+        {
+          "name": "SourceFrame",
+          "description": "原片像素",
+          "unit": "像素",
+          "source": "sources"
+        },
+        {
+          "name": "实体确认",
+          "description": "人工确认或独立原片材料证据",
+          "unit": "实体ID",
+          "source": "人工/原片"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ObservationSet",
+          "description": "不可变UV/PTS/EntityId；未知归属只保留待审",
+          "unit": "像素 / PTS",
+          "source": "观测证据"
+        },
+        {
+          "name": "拒绝与缺失记录",
+          "description": "理由与原始位置完整保留",
+          "unit": "记录",
+          "source": "源审查"
+        },
+        {
+          "name": "可恢复的优化选择修订",
+          "description": "按稳定源ID撤点/恢复；记录原因，整原W组联带退出，原始证据不改",
+          "unit": "稳定源ID / selection revision",
+          "source": "当前编辑覆盖层"
+        }
+      ],
+      "source_file": "calibration/solve2/rinksolve/observations.py",
+      "contract_types": [
+        "GeometryEntity",
+        "EntityVerification",
+        "CurveFeature",
+        "LandmarkFeature",
+        "IntersectionPosition",
+        "SharedCurvePointPosition",
+        "CurveLocusFeature",
+        "ObservationAssociation"
+      ],
+      "source_files": [
+        "calibration/solve2/rinksolve/observations.py",
+        "calibration/solve2/rinksolve/observation_edits.py"
+      ]
+    },
+    {
+      "id": "baseline_import",
+      "name": "成功demo初值导入",
+      "purpose": "独立读取成功demo与S01数据，忠实还原实际显示投影；验证后才形成新求解初值。",
+      "status": "demo平面与d78物理前向均已独立导入；原成功数据保留",
+      "inputs": [
+        {
+          "name": "九镜头demo数据",
+          "description": "包含实际画网格的投影方式与覆盖修订；当前只处理S01",
+          "unit": "数据快照",
+          "source": "成功demo"
+        },
+        {
+          "name": "S01 d78",
+          "description": "第一镜头冰线良好版本，广告误差另记",
+          "unit": "数据快照",
+          "source": "S01历史基准"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "InitialState",
+          "description": "新的参数格式，不导入旧求解器代码/失败优化器状态",
+          "unit": "模型单位",
+          "source": "独立格式转换"
+        },
+        {
+          "name": "ProjectionMatch",
+          "description": "逐曝光新旧投影差与不等价原因",
+          "unit": "像素",
+          "source": "原生PTS比较"
+        }
+      ],
+      "source_file": "calibration/solve2/rinksolve/baseline.py",
+      "contract_types": [
+        "InitialState",
+        "ProjectionContract",
+        "ProjectionProof"
+      ]
+    },
+    {
+      "id": "facts",
+      "name": "约束与假设台账",
+      "purpose": "逐条区分用户事实、用户估计、工程选择、数学规范与未批准假设；修改留版本。",
+      "status": "34项约束与工程策略可编辑；逐项实际绑定由当前运行快照核对",
+      "inputs": [
+        {
+          "name": "用户规则",
+          "description": "直接要求与已记录确认；保留原句和来源",
+          "unit": "声明",
+          "source": "用户"
+        },
+        {
+          "name": "待确认假设",
+          "description": "高度先验、畸变、时间等不能冒充测量",
+          "unit": "声明",
+          "source": "工程提案"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ConstraintRevision",
+          "description": "启用状态、审批归属、定义、作用范围和证据",
+          "unit": "修订号",
+          "source": "当前台账"
+        }
+      ],
+      "source_file": "calibration/solve2/rinksolve/store.py",
+      "contract_types": [
+        "Constraint",
+        "RevisionStamp",
+        "RevisionGraph"
+      ]
+    },
+    {
+      "id": "model",
+      "name": "场地 / 机位 / 镜头模型",
+      "purpose": "共同场地、每物理机位安装、每镜头运动分开所有权；源实体与内部计算图册分离。 广告图案模板、围挡安装实例和源观测分层。",
+      "status": "共同场地、完整线与广告、三机位使用同一可编辑状态；初始化与真实验收分开",
+      "inputs": [
+        {
+          "name": "ConstraintRevision",
+          "description": "当前实际启用的模型定义",
+          "unit": "修订号",
+          "source": "facts"
+        },
+        {
+          "name": "InitialState",
+          "description": "已证明投影对应的成功初值",
+          "unit": "模型单位",
+          "source": "baseline_import"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Scene",
+          "description": "跨镜头共同冰面与连续围挡/广告展开面",
+          "unit": "统一世界单位L",
+          "source": "场地参数"
+        },
+        {
+          "name": "Rig",
+          "description": "同一物理机位共享安装及光学定义",
+          "unit": "统一世界单位 / 光学参数",
+          "source": "机位参数"
+        },
+        {
+          "name": "ShotMotion",
+          "description": "当前只S01；每shot源时间运动",
+          "unit": "弧度 / 对数焦距 / 秒",
+          "source": "镜头参数"
+        }
+      ],
+      "source_file": "calibration/solve2/rinksolve/model.py",
+      "contract_types": [
+        "Scene",
+        "GeometryPrimitive",
+        "BoardSurface",
+        "ArtworkTemplate",
+        "BoardInstallation",
+        "InstalledArtworkFeature",
+        "CameraRig",
+        "RigMount",
+        "Shot",
+        "VariableBlock",
+        "ArtworkLayoutGroup",
+        "ArtworkLayout"
+      ]
+    },
+    {
+      "id": "projector",
+      "name": "唯一投影与导数",
+      "purpose": "数值求解、显示与验证调用同一套新数学定义，CPU/GPU从同一定义生成。",
+      "status": "全新唯一CPU投影与解析导数已通过；同state GPU核真实一致性通过",
+      "inputs": [
+        {
+          "name": "模型与当前参数",
+          "description": "typed参数布局，不用地址排序定义身份",
+          "unit": "模型单位",
+          "source": "model"
+        },
+        {
+          "name": "原生PTS与测量行",
+          "description": "显式说明初始化投影与正式滚动快门关系",
+          "unit": "秒 / 像素",
+          "source": "observations"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ProjectionBatch",
+          "description": "预测UV、有效域、参数偏导和失败实体",
+          "unit": "像素 / 导数",
+          "source": "同一投影定义"
+        }
+      ],
+      "source_file": "calibration/solve2/rinksolve/projector.py",
+      "contract_types": [
+        "ProjectionContract",
+        "ExposurePose",
+        "TypedArrayRef"
+      ]
+    },
+    {
+      "id": "factors",
+      "name": "观测与物理因素",
+      "purpose": "源噪声已知与未知分开；实体边界、中线定义和物理关系具备明确含义。",
+      "status": "W始终使用原UV；所有有效源E与单独Query等式明确分开，未知σ保持未知",
+      "inputs": [
+        {
+          "name": "ObservationSet",
+          "description": "只用已确认静止本体材料",
+          "unit": "像素",
+          "source": "observations"
+        },
+        {
+          "name": "ProjectionBatch",
+          "description": "当前真实预测与导数",
+          "unit": "像素",
+          "source": "projector"
+        },
+        {
+          "name": "ConstraintRevision",
+          "description": "物理关系、域、工程选择",
+          "unit": "修订号",
+          "source": "facts"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ResidualBlocks",
+          "description": "像素误差、物理等式、不等式分开",
+          "unit": "各自单位",
+          "source": "因素定义"
+        },
+        {
+          "name": "DependencyGraph",
+          "description": "每因素依赖哪些world/rig/shot/aux变量",
+          "unit": "稳定ID",
+          "source": "显式依赖"
+        }
+      ],
+      "source_file": "calibration/solve2/rinksolve/factors.py",
+      "contract_types": [
+        "FactorBlock",
+        "NoiseFamily",
+        "ObservationAssociation",
+        "Constraint"
+      ]
+    },
+    {
+      "id": "assembly",
+      "name": "同一准备与问题组装",
+      "purpose": "check与fit走同一恢复、域检查、参数化和因素装配；完整准备一次验通。",
+      "status": "当前完整g12绑定模型11；Ad7逐源恢复，Ad8未核小字与Ad5/Ad2/Ad4具体错关联退出；正在求解的冰线围挡阶段独立固定g8",
+      "inputs": [
+        {
+          "name": "模型/观测/因素",
+          "description": "当前自足数据，不追溯旧生产链",
+          "unit": "当前修订",
+          "source": "model / factors"
+        },
+        {
+          "name": "当前新状态",
+          "description": "完整模型值及可变辅助量",
+          "unit": "模型单位",
+          "source": "state"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "PreparedProblem",
+          "description": "同一个完整计算图，先全量前向与导数检查",
+          "unit": "计算图",
+          "source": "当前输入"
+        },
+        {
+          "name": "PreparationReport",
+          "description": "准确报实体/字段/域，不在正式启动试探",
+          "unit": "结构化错误",
+          "source": "统一准备路径"
+        }
+      ],
+      "source_file": "calibration/solve2/rinksolve/optimizer.py",
+      "contract_types": [
+        "PreparedProblem",
+        "ComputeLayout",
+        "ColumnTableRef",
+        "IdIndexRef"
+      ],
+      "source_files": [
+        "calibration/solve2/rinksolve/optimizer.py",
+        "calibration/solve2/rinksolve/preparation.py",
+        "calibration/solve2/rinksolve/factors.py"
+      ]
+    },
+    {
+      "id": "optimizer",
+      "name": "数值优化器",
+      "purpose": "只处理已准备的数值问题；数值工作集与物理事实、坐标规范分开。 形式RS的station/row保留全部自由度；信赖域采用显式数值单位度量，不能用统计先验或冻结切向空方向代替数值稳定性。",
+      "status": "真实min-b续算已接回；完整x/λ/ρ与fullUV数值度量保留，临时高b原W阶段根据真实几何审阅结束，S01未验收",
+      "inputs": [
+        {
+          "name": "PreparedProblem",
+          "description": "真实完整目标、约束、依赖",
+          "unit": "数值块",
+          "source": "assembly"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "AcceptedStep",
+          "description": "真实接受/拒绝、步长、目标分解和域失败",
+          "unit": "数值记录",
+          "source": "优化"
+        },
+        {
+          "name": "NewState",
+          "description": "原子完整状态；当前仅S01",
+          "unit": "模型单位",
+          "source": "接受步"
+        }
+      ],
+      "source_file": "calibration/solve2/rinksolve/optimizer.py",
+      "contract_types": [
+        "PreparedProblem",
+        "OptimizerState",
+        "RunState"
+      ],
+      "source_files": [
+        "calibration/solve2/rinksolve/optimizer.py",
+        "calibration/solve2/rinksolve/constrained.py",
+        "calibration/solve2/run_solver.py"
+      ]
+    },
+    {
+      "id": "compute",
+      "name": "CPU / GPU 执行层",
+      "purpose": "数据常驻、批量计算与稀疏消元明确分工；显示真实用量、时间和瓶颈。",
+      "status": "20CPU稀疏装配与新CUDA投影/围挡实测：286034围挡XYZ+切向含下载47.6ms；完整S01线性化实测3.92s",
+      "inputs": [
+        {
+          "name": "稳定布局的计算批次",
+          "description": "相同数学定义与明确generation",
+          "unit": "字节 / 布局",
+          "source": "assembly / optimizer"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "计算结果",
+          "description": "同一状态的残差/Jacobian/线性代数结果",
+          "unit": "数值数组",
+          "source": "CPU / GPU"
+        },
+        {
+          "name": "资源与耗时",
+          "description": "CPU/GPU利用率、显存、RAM和阶段耗时",
+          "unit": "% / GiB / 毫秒",
+          "source": "实测"
+        }
+      ],
+      "source_file": "calibration/solve2/rinksolve/compute.py",
+      "contract_types": [
+        "ComputeLayout",
+        "TypedArrayRef"
+      ],
+      "source_files": [
+        "calibration/solve2/rinksolve/compute.py",
+        "calibration/solve2/rinksolve/gpu_projector.py",
+        "calibration/solve2/rinksolve/project_at.cu",
+        "calibration/solve2/rinksolve/gpu_board.py",
+        "calibration/solve2/rinksolve/board_at.cu"
+      ]
+    },
+    {
+      "id": "state",
+      "name": "完整状态与运行记录",
+      "purpose": "数据、模型、约束修订与参数值分别存；原子保存，已接受结果可复现。",
+      "status": "完整x/乘子/罚因子和阶段迁移可恢复；Windows监控与checkpoint原子IO冲突已实际修复验证",
+      "inputs": [
+        {
+          "name": "AcceptedStep与修订",
+          "description": "包含实际参数、辅助量与优化器状态",
+          "unit": "结构化状态",
+          "source": "optimizer"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Checkpoint",
+          "description": "新格式的完整可续算状态",
+          "unit": "明确dtype / shape",
+          "source": "原子写入"
+        },
+        {
+          "name": "运行事件",
+          "description": "每次启动主日志、接受步、失败原因",
+          "unit": "记录",
+          "source": "实际运行"
+        }
+      ],
+      "source_file": "calibration/solve2/rinksolve/runtime_state.py",
+      "contract_types": [
+        "RunState",
+        "ArrayArtifact",
+        "ModelRevision"
+      ],
+      "source_files": [
+        "calibration/solve2/rinksolve/runtime_state.py",
+        "calibration/solve2/rinksolve/atomic_io.py",
+        "calibration/solve2/rinksolve/constrained.py"
+      ]
+    },
+    {
+      "id": "renderer",
+      "name": "同模型原片叠图",
+      "purpose": "同一保存的物理模型经唯一正式RS投影器，完整绘制冰线、围挡网格、广告边界和编号。原片/网格可切换及放大，参数修订与SHA随图保留，数值继续推进时明确标出叠图与总览是否同一状态。",
+      "status": "当前完整状态的按需原生PTS全路径叠图已接入界面，冻结身份明确，总览始终常驻；单帧不代替全段验收",
+      "inputs": [
+        {
+          "name": "同一已保存模型",
+          "description": "不另作显示形变或藏线",
+          "unit": "模型单位",
+          "source": "state"
+        },
+        {
+          "name": "SourceFrame",
+          "description": "原生PTS对应原片",
+          "unit": "像素",
+          "source": "sources"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ReviewFrames",
+          "description": "全部实体可见的对应曝光叠图",
+          "unit": "像素",
+          "source": "同一projector"
+        },
+        {
+          "name": "本地审片视频",
+          "description": "明确原始时间，供PotPlayer播放",
+          "unit": "本地路径",
+          "source": "renderer"
+        },
+        {
+          "name": "GET /api/model/projection?native_pts",
+          "description": "只读PNG与X-Projection-Identity；同一冻结模型ID/rev、参数ID/rev/SHA、原生PTS、全开路径数和正式投影状态。无点编辑/求解/模型发布副作用。",
+          "unit": "1920×1080原生像素与状态身份",
+          "source": "renderer / control server"
+        }
+      ],
+      "source_file": "calibration/solve2/rinksolve/renderer.py",
+      "contract_types": [
+        "InspectionSnapshot",
+        "ExposurePose",
+        "ModelRevision"
+      ],
+      "source_files": [
+        "calibration/solve2/rinksolve/renderer.py",
+        "calibration/solve2/rinksolve/server.py",
+        "calibration/solve2/rinksolve/model_view.py"
+      ]
+    },
+    {
+      "id": "validation",
+      "name": "第一镜头完整验收",
+      "purpose": "当前只S01整段冰线/围挡/广告/网格全贴并有真实独立证据后才解锁下一shot。",
+      "status": "F3正式最近圆108/93像素偏差已独立确认，原W切向下降反例已保存；当前回min-b收紧，整镜头与独立证据未通过",
+      "inputs": [
+        {
+          "name": "ReviewFrames",
+          "description": "连续完整镜头，不以精选帧代替",
+          "unit": "原生曝光",
+          "source": "renderer"
+        },
+        {
+          "name": "未调参真实证据",
+          "description": "明确未参与训练或调参的源证据",
+          "unit": "独立观测",
+          "source": "源划分"
+        },
+        {
+          "name": "成功基准对照",
+          "description": "demo与d78冰线效果不丢失",
+          "unit": "像素 / 运动",
+          "source": "baseline_import"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ValidationRecord",
+          "description": "每类材料、连续运动、物理域和独立证据结果",
+          "unit": "证据记录",
+          "source": "真实验证"
+        },
+        {
+          "name": "ShotGate",
+          "description": "当前shot未通过则next保持锁定",
+          "unit": "通过 / 未通过",
+          "source": "正式验收"
+        }
+      ],
+      "source_file": "docs/VALIDATION.md",
+      "contract_types": [
+        "ProjectionProof",
+        "InspectionSnapshot"
+      ],
+      "source_files": [
+        "docs/VALIDATION.md",
+        "calibration/solve2/rinksolve/renderer.py",
+        "calibration/solve2/rinksolve/schema.py"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "sources",
+      "to": "observations",
+      "label": "原片与实体证据"
+    },
+    {
+      "from": "sources",
+      "to": "baseline_import",
+      "label": "原生PTS"
+    },
+    {
+      "from": "facts",
+      "to": "model",
+      "label": "明确事实与假设"
+    },
+    {
+      "from": "baseline_import",
+      "to": "model",
+      "label": "经投影对照的初值"
+    },
+    {
+      "from": "model",
+      "to": "projector",
+      "label": "唯一模型定义"
+    },
+    {
+      "from": "observations",
+      "to": "factors",
+      "label": "已确认源观测"
+    },
+    {
+      "from": "projector",
+      "to": "factors",
+      "label": "UV与导数"
+    },
+    {
+      "from": "factors",
+      "to": "assembly",
+      "label": "因素与依赖"
+    },
+    {
+      "from": "assembly",
+      "to": "optimizer",
+      "label": "完整PreparedProblem"
+    },
+    {
+      "from": "optimizer",
+      "to": "compute",
+      "label": "批量数值任务"
+    },
+    {
+      "from": "compute",
+      "to": "optimizer",
+      "label": "结果与耗时"
+    },
+    {
+      "from": "optimizer",
+      "to": "state",
+      "label": "接受状态"
+    },
+    {
+      "from": "state",
+      "to": "renderer",
+      "label": "同一保存模型"
+    },
+    {
+      "from": "projector",
+      "to": "renderer",
+      "label": "同一投影实现"
+    },
+    {
+      "from": "renderer",
+      "to": "validation",
+      "label": "连续完整原片叠图"
+    },
+    {
+      "from": "validation",
+      "to": "observations",
+      "label": "可定位的取点失败"
+    },
+    {
+      "from": "validation",
+      "to": "model",
+      "label": "可定位的模型失败"
+    }
+  ],
+  "data_model": {
+    "schema_file": "calibration/solve2/rinksolve/schema.py",
+    "catalogue_endpoint": "/api/contracts",
+    "migration_status": "新类型契约正在校验；历史记录与当前展示初值尚未全部迁移，不能宣称已进入数值求解",
+    "storage": "小型实体/特征/约束/变量登记表＋Data列式大数组；原始证据与可变数值状态分离",
+    "identity": "Entity/Feature稳定ID独立于显示label、variant、chart、path、数组偏移",
+    "change_rules": [
+      "原UV/PTS/ID与来源不可由拟合回写；退出拟合另改关联记录",
+      "物理实体位置固定与数值已知分开，定位实体跨帧共享未知量；locus才允许观测局部坐标",
+      "坐标规范、物理关系、统计先验分别登记，默认数值不构成固定事实",
+      "数据/模型/约束/初值各自修订；仅实际依赖变更的下游重准备",
+      "观测与派生交点保存相依源组，禁止重复当独立证据累加",
+      "同一ModelRevision与参数state_id同时驱动求解投影、原片叠图和常驻俯视图"
+    ],
+    "catalogue_file": "calibration/solve2/contracts.json",
+    "types": 70,
+    "fields": 430,
+    "relations": 226,
+    "array_reader": "calibration/solve2/rinksolve/arrays.py"
+  }
+}

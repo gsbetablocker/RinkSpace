@@ -4,6 +4,7 @@
 #include <ceres/ceres.h>
 #include <map>
 #include <set>
+#include <iostream>
 namespace rinkfit {
 // Four numerical directions separate an observed advertisement envelope from
 // the coherent print it contains. A compensated update keeps EVERY printed
@@ -38,7 +39,7 @@ class JointAdEnvelopeBlocksV1 {
  JointAdEnvelopeBlocksV1(JointALBuilder&b,ceres::Problem&p,const eventio::Json&ledger,int threads):b_(b),p_(p),threads_(threads){
   auto&m=b.core.model;std::map<int,Group>candidates;
   for(std::size_t i=0;i<m.materials.size();++i)for(const auto&path:m.materials[i].paths){if(path.kind!=2||path.advertisement_block<0||path.geometry_block<0)continue;auto&ab=m.blocks[path.advertisement_block];auto&gb=m.blocks[path.geometry_block];if(ab.values.size()!=8||gb.values.size()!=6||!p.HasParameterBlock(gb.values.data())||p.ParameterBlockTangentSize(gb.values.data())!=6||p.IsParameterBlockConstant(gb.values.data())||m.materials[i].label.find(".print.")==std::string::npos)continue;candidates[path.advertisement_block].ad=path.advertisement_block;}
-  std::map<int,std::map<int,Geometry>>geometries;std::set<int>invalid;
+  std::map<int,std::map<int,Geometry>>geometries;std::set<int>invalid;for(const auto&material:m.materials)for(const auto&path:material.paths)if(path.kind==6&&!path.vertex_blocks.empty()&&path.advertisement_block>=0)invalid.insert(path.advertisement_block);if(!invalid.empty())std::cout<<"Legacy compensated affine advertisement envelope blocks skipped for "<<invalid.size()<<" static vertex installations; full original camera/ad/vertex residuals and physical domains remain active"<<std::endl;
   for(std::size_t mi=0;mi<m.materials.size();++mi)for(std::size_t pi=0;pi<m.materials[mi].paths.size();++pi){const auto&path=m.materials[mi].paths[pi];const int ad=path.advertisement_block;if(!candidates.count(ad)||path.geometry_block<0)continue;auto&gb=m.blocks[path.geometry_block];if(path.kind!=2||gb.values.size()!=6||m.path_geometry_offsets.at({int(mi),int(pi)})||!m.path_geometry_indices.at({int(mi),int(pi)}).empty()||!p.HasParameterBlock(gb.values.data())||p.IsParameterBlockConstant(gb.values.data())){invalid.insert(ad);continue;}
    const bool full=p.ParameterBlockTangentSize(gb.values.data())==6;if(!full&&path.points.size()!=1){invalid.insert(ad);continue;}Geometry entry{path.geometry_block,full,path.points.front()};auto&seen=geometries[ad];auto it=seen.find(entry.block);if(it!=seen.end()&&(it->second.affine!=full||(!full&&it->second.point!=entry.point)))invalid.insert(ad);seen[entry.block]=entry;
   }

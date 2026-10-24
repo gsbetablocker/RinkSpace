@@ -1,5 +1,7 @@
+// Distinct audited-source reader. Legacy parent body SHA256 802728c887971c6a80d9522bfa0597f1e3f63a2e5e3223b7daa0654edec46499 preserved.
 #pragma once
 #include "rinkfit/event_io.hpp"
+#include "rinkfit/source_covariance.hpp"
 #include "rinkfit/augmented_lagrangian.hpp"
 #include <set>
 #include <map>
@@ -60,6 +62,9 @@ struct EventPacket {
   std::set<std::string> semantic_ancestor_hashes;
   eventio::Json confirmed_bindings;
   eventio::Json source_exclusion,active_statistics;
+  eventio::Json source_audit_revision;
+  std::string source_audit_revision_hash;
+  bool has_source_audit_revision=false;
   std::vector<std::uint8_t> active_mask;
   std::vector<std::uint64_t> active_rows,excluded_rows;
   std::vector<EventStatisticalGroup> excluded_original_groups;
@@ -102,9 +107,12 @@ struct EventPacket {
   bool is_active(std::size_t row)const{return active_mask.at(row)!=0;}
   std::size_t original_group_count=0,formal_residual_rows=0;
   bool statistics_complete=false;
+  bool current_input=false;
+  std::vector<std::uint8_t> statistical_active_mask;
   explicit EventPacket(const std::filesystem::path& path) {
     packet_path=std::filesystem::absolute(path);root=packet_path.parent_path();manifest=eventio::read_json(packet_path);packet_hash=eventio::file_sha256(packet_path);
-    if(manifest.at("schema")!="rinkfit.event_packet.v1" || manifest.at("observations")!=182017 || manifest.at("frame_count")!=1248)throw std::runtime_error("expected exact whole-shot packet, not a fixture or subset");
+    current_input=manifest.contains("current_input_scope") && manifest.at("current_input_scope").value("schema",std::string())=="rinkfit.current_advertisement_input.v1";
+    if(manifest.at("schema")!="rinkfit.event_packet.v1" || (!current_input && (manifest.at("observations")!=182017 || manifest.at("frame_count")!=1248)))throw std::runtime_error("expected exact whole-shot packet, not a fixture or subset");
     shot_id=manifest.at("shot_id");source_hash=manifest.at("immutable_source_hashes").at("observations.npz");
     const auto& a=manifest.at("arrays");
     uv=eventio::read_array<double>(root,a.at("native_uv"),"<f8");rows=eventio::read_array<std::uint64_t>(root,a.at("source_rows"),"<u8");
@@ -112,25 +120,27 @@ struct EventPacket {
     material=eventio::read_array<std::uint32_t>(root,a.at("material_index"),"<u4");point=eventio::read_array<std::uint32_t>(root,a.at("point_id_index"),"<u4");budget=eventio::read_array<double>(root,a.at("engineering_budget_px"),"<f8");
     const auto& st=manifest.at("string_tables");eventio::verify(root/st.at("file").get<std::string>(),st.at("sha256"));const auto strings=eventio::read_json(root/st.at("file").get<std::string>());
     material_labels=strings.at("material_labels").get<std::vector<std::string>>();point_ids=strings.at("source_point_ids").get<std::vector<std::string>>();
-    if(material_labels.size()!=171)throw std::runtime_error("material identity count is not 171");
-    for(const auto& [name,desc]:manifest.at("assets").items())eventio::verify(root/name,desc.at("sha256"));
-    const auto n=rows.size();if(n!=182017 || uv.size()!=2*n || pts.size()!=n || frames.size()!=n || material.size()!=n || point.size()!=n || budget.size()!=n)throw std::runtime_error("whole-source binary dimensions mismatch");
+    if(!current_input && material_labels.size()!=171)throw std::runtime_error("material identity count is not 171");
+    for(const auto& [name,desc]:manifest.at("assets").items())eventio::verify(root/std::filesystem::u8path(desc.value("file",name)),desc.at("sha256"));
+    const auto n=rows.size();if(n!=manifest.at("observations").get<std::size_t>() || uv.size()!=2*n || pts.size()!=n || frames.size()!=n || material.size()!=n || point.size()!=n || budget.size()!=n)throw std::runtime_error("whole-source binary dimensions mismatch");
     kind.assign(n,0);variant.assign(n,0);query_uv.assign(2*n,0.);normal.assign(2*n,0.);alpha_bounds.assign(2*n,0.);
     active_mask.assign(n,1);active_rows=rows;
     std::set<std::string> keys;std::set<int> frame_set;
-    for(std::size_t i=0;i<n;++i){if(rows[i]!=i || frames[i]<1 || frames[i]>1248 || pts[i]!=256256+256*(frames[i]-1) || material[i]>=material_labels.size() || point[i]>=point_ids.size() || !std::isfinite(uv[2*i]) || !std::isfinite(uv[2*i+1]) || budget[i]<=0. || !std::isfinite(budget[i]))throw std::runtime_error("source key/index/time/UV ABI mismatch at row "+std::to_string(i));
+    for(std::size_t i=0;i<n;++i){if(rows[i]!=i || frames[i]<1 || frames[i]>(current_input?manifest.at("current_input_scope").at("source_frame_count").get<int>():1248) || pts[i]!=256256+256*(frames[i]-1) || material[i]>=material_labels.size() || point[i]>=point_ids.size() || !std::isfinite(uv[2*i]) || !std::isfinite(uv[2*i+1]) || budget[i]<=0. || !std::isfinite(budget[i]))throw std::runtime_error("source key/index/time/UV ABI mismatch at row "+std::to_string(i));
       ObservationSpec spec;spec.key=shot_id+":"+std::to_string(pts[i])+":"+point_ids[point[i]];spec.source_uv={uv[2*i],uv[2*i+1]};spec.E={budget[i]*budget[i],0.,0.,budget[i]*budget[i]};if(!keys.insert(spec.key).second)throw std::runtime_error("duplicate composite source key");observations.push_back(std::move(spec));frame_set.insert(frames[i]);}
-    if(frame_set.size()!=1248)throw std::runtime_error("not all 1248 source frames covered");
+    if(frame_set.size()!=manifest.at("frame_count").get<std::size_t>())throw std::runtime_error("not all 1248 source frames covered");
   }
   void load_semantics(const std::filesystem::path& path) {
     semantic_path=std::filesystem::absolute(path);semantics=eventio::read_json(semantic_path);semantic_hash=eventio::file_sha256(semantic_path);const auto dir=semantic_path.parent_path();
+    if(semantics.contains("source_audit_parent_manifest")||semantics.contains("source_audit_revision")){load_source_audit_revision_layer();return;}
     if(semantics.contains("source_component_parent_manifest")||semantics.contains("source_component_recovery")){load_source_component_recovery();return;}
     if(semantics.contains("source_generator_parent_manifest")||semantics.contains("source_generator_recovery")){load_source_generator_recovery();return;}
     if(semantics.contains("source_order_parent_manifest")||semantics.contains("source_order_overlay")){load_source_order_evidence();return;}
     if(!groups.empty()||!runs.empty())throw std::runtime_error("semantic packet must be loaded exactly once");
-    if(semantics.at("schema")!="rinkfit.semantic_packet.v1"||semantics.at("observations")!=182017||semantics.at("shot_id")!=shot_id||semantics.at("frames")!=1248||semantics.at("material_labels")!=171)throw std::runtime_error("semantic/source identity mismatch");
+    if(semantics.at("schema")!="rinkfit.semantic_packet.v1"||semantics.at("observations")!=rows.size()||semantics.at("shot_id")!=shot_id||semantics.at("frames")!=manifest.at("frame_count")||semantics.at("material_labels")!=material_labels.size())throw std::runtime_error("semantic/source identity mismatch");
     if(manifest.contains("semantic_packet")&&manifest.at("semantic_packet").at("sha256")!=semantic_hash)throw std::runtime_error("semantic manifest differs from immutable packet binding");
     semantic_ancestor_hashes.insert(semantic_hash);
+    if(current_input && (!semantics.contains("current_input_scope") || semantics.at("current_input_scope")!=manifest.at("current_input_scope")))throw std::runtime_error("current source/semantic scope mismatch");
     if(semantics.contains("parent_semantic_manifest")){
       const auto& ref=semantics.at("parent_semantic_manifest");const auto parent_path=dir/ref.at("path").get<std::string>();eventio::verify(parent_path,ref.at("sha256"));const auto parent=eventio::read_json(parent_path);
       if(parent.contains("parent_semantic_manifest")||parent.contains("resolved_material_index"))throw std::runtime_error("nested material resolution requires an explicitly composed confirmation packet");
@@ -148,7 +158,8 @@ struct EventPacket {
         }
       }
       semantic_ancestor_hashes.insert(ref.at("sha256").get<std::string>());
-    }else if(semantics.contains("resolved_material_index")||semantics.contains("resolved_variant_index")||semantics.contains("confirmed_bindings"))throw std::runtime_error("resolved material identities require a verified immutable semantic parent");
+    }else if(!current_input && (semantics.contains("resolved_material_index")||semantics.contains("resolved_variant_index")||semantics.contains("confirmed_bindings")))throw std::runtime_error("resolved material identities require a verified immutable semantic parent");
+    if(!current_input){
     const auto& immutable=semantics.at("immutable_source_arrays");
     auto check_source=[&](const std::string& name,const std::string& dtype,const eventio::Json& shape,const std::string& hash){const auto& d=immutable.at(name);if(d.at("dtype_str")!=dtype||d.at("shape")!=shape||d.at("sha256_c_contiguous_array_bytes")!=hash)throw std::runtime_error("immutable source array identity mismatch: "+name);};
     const auto n=rows.size();const eventio::Json scalar_shape=eventio::Json::array({n});
@@ -158,6 +169,7 @@ struct EventPacket {
     check_source("native_pts","<i8",scalar_shape,source_arrays.at("native_pts").at("sha256"));
     check_source("frame_indices","<i4",scalar_shape,source_arrays.at("frame_index").at("sha256"));
     check_source("source_uv","<f8",eventio::Json::array({n,2}),source_arrays.at("native_uv").at("sha256"));
+    }
     if(semantics.contains("arrays")){
       const auto& a=semantics.at("arrays");
       auto read=[&](const std::string& name){return a.contains(name);};
@@ -170,7 +182,7 @@ struct EventPacket {
       if(read("alpha_bounds"))alpha_bounds=eventio::read_array<double>(dir,a.at("alpha_bounds"),"<f8");
       if(kind.size()!=rows.size() || variant.size()!=rows.size() || query_uv.size()!=2*rows.size() || normal.size()!=2*rows.size() || alpha_bounds.size()!=2*rows.size())throw std::runtime_error("semantic source dimensions mismatch");
       std::array<std::size_t,3> counts{};for(auto k:kind){if(k>2)throw std::runtime_error("unknown source observation semantic kind");++counts[k];}
-      if(counts!=std::array<std::size_t,3>{179364,1692,961}||semantics.at("semantic_counts").at("finite_curve")!=counts[0]||semantics.at("semantic_counts").at("entity_corner")!=counts[1]||semantics.at("semantic_counts").at("true_profile")!=counts[2])throw std::runtime_error("original observation semantics inventory changed");
+      if((!current_input && counts!=std::array<std::size_t,3>{179364,1692,961})||semantics.at("semantic_counts").at("finite_curve")!=counts[0]||semantics.at("semantic_counts").at("entity_corner")!=counts[1]||semantics.at("semantic_counts").at("true_profile")!=counts[2])throw std::runtime_error("original observation semantics inventory changed");
       for(const auto* values:{&query_uv,&normal,&alpha_bounds})for(double value:*values)if(!std::isfinite(value))throw std::runtime_error("nonfinite source profile metadata");
       for(std::size_t i=0;i<rows.size();++i)if(kind[i]==2){auto& o=observations[i];o.semantics=ObservationSemantics::kGenuineProfile;o.explicit_profile_query=true;o.profile_query_uv={query_uv[2*i],query_uv[2*i+1]};o.profile_normal={normal[2*i],normal[2*i+1]};o.profile_radius_px=budget[i];o.profile_alpha_lower_px=alpha_bounds[2*i];o.profile_alpha_upper_px=alpha_bounds[2*i+1];if(std::abs(std::hypot(o.profile_normal[0],o.profile_normal[1])-1.)>1e-8 || o.profile_alpha_lower_px>o.profile_alpha_upper_px)throw std::runtime_error("invalid genuine profile provenance/query");}
       if(read("group_rows") && read("weights")){
@@ -191,21 +203,39 @@ struct EventPacket {
        for(auto row:ordinary_rows){if(row>=rows.size()||!(sigma[row]>0)||!std::isfinite(sigma[row]))throw std::runtime_error("invalid original independent row/sigma");
          ++membership_count[row];EventStatisticalGroup one;one.id="independent/"+std::to_string(row);one.provenance="original independent scalar source_sigma; immutable semantic packet "+semantic_hash;one.rows={std::size_t(row)};one.rank=2;one.W={1./sigma[row],0.,0.,1./sigma[row]};groups.push_back(std::move(one));}
        formal_residual_rows=0;for(const auto& group:groups)formal_residual_rows+=group.rank;
-       statistics_complete=std::all_of(membership_count.begin(),membership_count.end(),[](int k){return k==1;});if(!statistics_complete||original_group_count!=9173||ordinary_rows.size()!=87967||formal_residual_rows!=214112)throw std::runtime_error("full original W plus independent rows must account for each source exactly once with unchanged rank");
+       if(current_input){
+         const auto& scope=semantics.at("current_input_scope");
+         statistical_active_mask=eventio::read_array<std::uint8_t>(dir,scope.at("statistical_active_mask"),"|u1");
+         if(statistical_active_mask.size()!=rows.size())throw std::runtime_error("current statistical mask dimensions mismatch");
+         statistics_complete=true;for(std::size_t i=0;i<rows.size();++i)if(statistical_active_mask[i]>1 || membership_count[i]!=int(statistical_active_mask[i]))statistics_complete=false;
+         if(!statistics_complete||original_group_count!=scope.at("group_count")||ordinary_rows.size()!=scope.at("independent_count")||formal_residual_rows!=scope.at("formal_W_rank"))throw std::runtime_error("current W must account exactly once for each declared statistical source; budget-only rows have no invented statistics");
+       }else{statistics_complete=std::all_of(membership_count.begin(),membership_count.end(),[](int k){return k==1;});if(!statistics_complete||original_group_count!=9173||ordinary_rows.size()!=87967||formal_residual_rows!=214112)throw std::runtime_error("full original W plus independent rows must account for each source exactly once with unchanged rank");}
       }
     }
     if(!statistics_complete)throw std::runtime_error("complete original statistical operator is mandatory");
     if(semantics.contains("assets"))for(const auto& item:semantics.at("assets").items())eventio::verify(dir/item.value().at("file").get<std::string>(),item.value().at("sha256"));
     variant_ids=semantics.at("variant_ids").get<std::vector<std::string>>();for(auto v:variant)if(v>=variant_ids.size())throw std::runtime_error("semantic variant index out of range");
-    const auto runs_path=dir/(semantics.contains("assets")?semantics.at("assets").at("source_runs.jsonl").at("file").get<std::string>():std::string("source_runs.jsonl"));std::ifstream input(runs_path);if(!input)throw std::runtime_error("missing verified source runs");std::string line;while(std::getline(input,line)){if(line.empty())continue;const auto j=eventio::Json::parse(line);if(!j.value("source_order_verified",false))throw std::runtime_error("unverified source run");EventSourceRun run;run.rows=j.at("source_rows").get<std::vector<std::size_t>>();run.frame=j.at("frame");run.variant_index=j.at("variant_index");run.closed=j.value("source_closed",false);run.provenance=j.at("provenance");run.id=std::to_string(run.frame)+"/"+j.at("source_feature_id").get<std::string>()+"/"+std::to_string(j.at("source_segment_index").get<int>());if(run.rows.size()<2)throw std::runtime_error("empty ordered source run");for(auto row:run.rows)if(row>=rows.size()||frames[row]!=run.frame||variant[row]!=run.variant_index)throw std::runtime_error("run row/source identity mismatch");runs.push_back(std::move(run));}
-    if(runs.size()!=15419)throw std::runtime_error("verified run inventory mismatch");
+    const auto runs_path=dir/(semantics.contains("assets")?semantics.at("assets").at(current_input?"runs.jsonl":"source_runs.jsonl").at("file").get<std::string>():std::string("source_runs.jsonl"));std::ifstream input(runs_path);if(!input)throw std::runtime_error("missing verified source runs");std::string line;while(std::getline(input,line)){if(line.empty())continue;const auto j=eventio::Json::parse(line);if(!j.value("source_order_verified",false))throw std::runtime_error("unverified source run");EventSourceRun run;run.rows=j.at("source_rows").get<std::vector<std::size_t>>();run.frame=j.at("frame");run.variant_index=j.at("variant_index");run.closed=j.value("source_closed",false);run.provenance=j.at("provenance");run.id=std::to_string(run.frame)+"/"+j.at("source_feature_id").get<std::string>()+"/"+std::to_string(j.at("source_segment_index").get<int>());if(run.rows.size()<2)throw std::runtime_error("empty ordered source run");for(auto row:run.rows)if(row>=rows.size()||frames[row]!=run.frame||variant[row]!=run.variant_index)throw std::runtime_error("run row/source identity mismatch");runs.push_back(std::move(run));}
+    if(runs.size()!=(current_input?semantics.at("current_input_scope").at("run_count").get<std::size_t>():15419))throw std::runtime_error("verified run inventory mismatch");
     for(std::size_t index=0;index<runs.size();++index){std::ostringstream id;id<<"run/"<<std::setw(6)<<std::setfill('0')<<index;runs[index].id=id.str();}
+    if(current_input){
+      resolved_material=eventio::read_array<std::uint32_t>(dir,semantics.at("resolved_material_index"),"<u4");
+      resolved_variant=eventio::read_array<std::uint32_t>(dir,semantics.at("resolved_variant_index"),"<u4");
+      resolved_variant_ids=semantics.at("resolved_variant_ids").get<std::vector<std::string>>();
+      if(resolved_material.size()!=rows.size()||resolved_variant.size()!=rows.size())throw std::runtime_error("current material binding size mismatch");
+      for(std::size_t i=0;i<rows.size();++i)if(resolved_material[i]>=material_labels.size()||resolved_variant[i]>=resolved_variant_ids.size())throw std::runtime_error("current material binding outside current registry");
+      active_mask=eventio::read_array<std::uint8_t>(dir,semantics.at("active_source_mask"),"|u1");if(active_mask.size()!=rows.size())throw std::runtime_error("current engineering source mask dimensions mismatch");
+      active_rows.clear();excluded_rows.clear();for(std::size_t i=0;i<rows.size();++i){if(active_mask[i]>1 || (statistical_active_mask[i] && !active_mask[i]))throw std::runtime_error("invalid current source/statistical masks");(active_mask[i]?active_rows:excluded_rows).push_back(i);}
+      active_mask_hash=semantics.at("active_source_mask").at("sha256");active_statistics=eventio::read_json(dir/semantics.at("active_statistics").at("file").get<std::string>());active_statistics_hash=semantics.at("active_statistics").at("sha256");
+      return;
+    }
     if(semantics.contains("parent_semantic_manifest"))load_confirmed_resolution(dir);
     if(semantics.contains("source_exclusion"))load_source_exclusion(dir);
     else if(semantics.contains("source_exclusion_parent_manifest")||semantics.contains("active_source_mask")||semantics.contains("active_statistics"))throw std::runtime_error("incomplete source-exclusion layer");
   }
   // This narrow policy retires only a proven normal-query navigation registry.
   // The complete original material/exclusion/W/query authority loader runs first.
+#include "rinkfit/source_audit_layer.inc"
   void load_source_component_recovery(){
     const auto selected_path=semantic_path;const auto selected_hash=semantic_hash;const auto selected=semantics;const auto selected_manifest=manifest;const auto dir=selected_path.parent_path();
     if(!groups.empty()||!runs.empty()||!selected.contains("source_component_parent_manifest")||!selected.contains("source_component_recovery"))throw std::runtime_error("incomplete/repeated source-component recovery layer");
@@ -587,6 +617,11 @@ struct EventPacket {
   }
   void load_query(const std::filesystem::path& path,const std::filesystem::path& initialization) {
     const auto j=eventio::read_json(path);const auto dir=path.parent_path();query_hash=eventio::file_sha256(path);
+    if(current_input && j.at("profiles")==0){
+      if(j.at("schema")!="rinkfit.immutable_native_query_curve_packet.v1" || j.at("semantic_manifest").at("sha256")!=semantic_hash || std::any_of(kind.begin(),kind.end(),[](auto k){return k==2;}))throw std::runtime_error("empty current Query must exactly match source semantics");
+      for(const auto& item:j.at("arrays").items()){const auto& d=item.value();const auto p=dir/d.at("file").get<std::string>();eventio::verify(p,d.at("sha256"));if(std::filesystem::file_size(p)!=0 && item.key()!="offsets")throw std::runtime_error("nonempty array in zero current Query");}
+      query_index.assign(rows.size(),-1);queries.clear();return;
+    }
     if(j.at("schema")!="rinkfit.immutable_native_query_curve_packet.v1"||j.at("profiles")!=961||!semantic_ancestor_hashes.count(j.at("semantic_manifest").at("sha256").get<std::string>()))throw std::runtime_error("exact query/source-semantic identity mismatch (no verified immutable parent)");
     const auto& a=j.at("arrays");
     const auto source=eventio::read_array<std::uint64_t>(dir,a.at("source_rows"),"<u8");

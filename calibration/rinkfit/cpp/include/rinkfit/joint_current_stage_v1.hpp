@@ -1,0 +1,19 @@
+#pragma once
+#include "rinkfit/joint_shared_stage_v2.hpp"
+namespace rinkfit {
+// Current issued numerical freedom. Historical review and initialization
+// artifacts are offline provenance; original manifolds/physical factors remain.
+inline eventio::Json install_joint_current_stage_v1(JointALBuilder&b,ceres::Problem&p,const eventio::Json&cfg){
+ using J=eventio::Json;auto need=[](bool ok,const std::string&why){if(!ok)throw std::runtime_error("current parameter stage: "+why);};const auto&stage=cfg.at("runtime_shared_parameter_stage_v2");need(stage.at("schema")=="rinkfit.explicit_shared_parameter_stage.v2"&&stage.at("world_values_measured")==false&&stage.at("source_packet_sha256")==b.core.packet.source_hash,"stage source/schema");std::set<int>seen;J rows=J::array();
+ for(const auto&r:stage.at("blocks")){const int i=r.at("block_index");need(i>=0&&std::size_t(i)<b.core.model.blocks.size()&&seen.insert(i).second,"block index/duplicate");auto&block=b.core.model.blocks.at(i);auto*x=block.values.data();need(r.at("block_name")==block.name&&p.HasParameterBlock(x),"current block identity/graph");auto free=r.at("free_ambient_indices").get<std::vector<int>>();std::sort(free.begin(),free.end());need(!free.empty()&&std::adjacent_find(free.begin(),free.end())==free.end(),"free scalar list");for(int k:free)need(k>=0&&std::size_t(k)<block.values.size(),"free scalar outside ambient");std::vector<int>fixed;for(int k=0;k<int(block.values.size());++k)if(!std::binary_search(free.begin(),free.end(),k))fixed.push_back(k);install_joint_ceres_parameter_bounds(p,block);
+  const bool trajectory=r.value("release_initialization_s01_trajectory",false),paired=block.name.rfind("ad/pair/",0)==0,collinear=r.value("release_collinear_ice_carrier",false);int expected=int(free.size());
+  if(trajectory){expected=r.at("expected_tangent_size");if(block.name.rfind("shot/s01/control/",0)==0){p.SetManifold(x,nullptr);if(!fixed.empty())p.SetManifold(x,new ceres::SubsetManifold(int(block.values.size()),fixed));}need(p.ParameterBlockTangentSize(x)==expected,"current S01 original subspace");}
+  else if(paired){expected=r.at("expected_tangent_size");need(p.GetManifold(x)&&p.ParameterBlockTangentSize(x)==expected&&fixed.empty(),"current paired advertisement common dimensions");}
+  else if(collinear){need(block.values.size()==6&&JointCollinearCarrierV1::collinear(x)&&fixed.empty(),"current straight carrier");expected=5;p.SetManifold(x,new JointCollinearCarrierV1({},&block));for(int k=0;k<6;++k){p.SetParameterLowerBound(x,k,-std::numeric_limits<double>::max());p.SetParameterUpperBound(x,k,std::numeric_limits<double>::max());}const auto rid=p.AddResidualBlock(new JointCollinearCarrierBoxV1(block),nullptr,x);b.engineering_residual_groups["current_straight_carrier_box"].push_back(rid);}
+  else{p.SetManifold(x,nullptr);if(!fixed.empty())p.SetManifold(x,new ceres::SubsetManifold(int(block.values.size()),fixed));}
+  p.SetParameterBlockVariable(x);need(p.ParameterBlockTangentSize(x)==expected,"actual current tangent differs");rows.push_back({{"block",i},{"name",block.name},{"tangent",expected}});
+ }
+ std::size_t vertices=0,envelopes=0;for(auto&block:b.core.model.blocks){const bool vertex=block.name.rfind("print_vertex/",0)==0,envelope=block.name.rfind("print_envelope/",0)==0;if(!vertex&&!envelope)continue;auto*x=block.values.data();need(block.values.size()==2&&!block.constant&&block.fixed_indices.empty()&&p.HasParameterBlock(x)&&!p.GetManifold(x),"current local vertex/envelope numeric structure");install_joint_ceres_parameter_bounds(p,block);p.SetParameterBlockVariable(x);vertex?++vertices:++envelopes;}
+ return {{"schema","rinkfit.actual_current_parameter_stage.v1"},{"released",rows},{"static_two_coordinate_vertex_blocks",vertices},{"numerical_envelope_blocks",envelopes},{"historical_review_or_initialization_artifacts_read",false}};
+}
+}

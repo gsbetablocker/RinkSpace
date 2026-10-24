@@ -1,5 +1,6 @@
 #pragma once
 #include "rinkfit/joint_manifold.hpp"
+#include "rinkfit/joint_solver_metric_v1.hpp"
 #include <ceres/ceres.h>
 #include <algorithm>
 #include <cmath>
@@ -16,7 +17,7 @@ inline std::vector<unsigned char> joint_gpu_ambient_activity(
     return active;
   if (problem.ParameterBlockSize(values) != ambient)
     throw std::runtime_error("GPU active-column physical block shape mismatch");
-  const auto* manifold = problem.GetManifold(values);
+  const auto* manifold = joint_solver_original_manifold_v1(problem.GetManifold(values));
   if (!manifold || (!dynamic_cast<const ceres::SubsetManifold*>(manifold) &&
                     !dynamic_cast<const JointLinearControlManifold*>(manifold))) {
     std::fill(active.begin(), active.end(), 1);

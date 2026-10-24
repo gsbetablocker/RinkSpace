@@ -26,7 +26,7 @@ inline bool joint_full_circle_station(const JointEventModel& m,const JointObserv
  if(r.kind==1)return false;const auto& p=m.materials.at(r.material).paths.at(r.path);
  const bool circle=p.kind==1&&p.closed&&std::abs(std::abs(p.end_angle-p.start_angle)-2*std::acos(-1.))<=16*std::numeric_limits<double>::epsilon();
  const bool printed=p.kind==2&&p.closed&&p.points.size()>2&&p.points.front()==p.points.back();
- const bool shared=p.kind==6&&p.closed;
+ const bool shared=p.kind==6&&p.closed&&p.vertex_blocks.empty();
  const bool board=p.kind==3&&p.boundary_segment==-2;
  if(p.physical_point||!(circle||printed||shared||board))return false;
  const auto intervals=r.station_intervals(m,r.path);return intervals.size()==1&&intervals[0][0]==0.&&intervals[0][1]==1.;

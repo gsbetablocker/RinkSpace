@@ -49,7 +49,7 @@ static J transport_state_identity(const J&req){
  J identity{{"checkpoint_sha256",eventio::file_sha256(cp)},{"model_sha256",doc.at("model").at("sha256")},{"model",doc.at("model")},{"packet",lm.at("packet")},{"semantic",lm.at("semantic")},{"linearization",doc.at("linearization")},{"arrays",J::object()}};
  for(const char*key:{"station","branch","row","alpha"}){
   const auto& d=doc.at("row_state_files").at(key);
-  if(d.at("shape")!=J::array({182017})||d.at("dtype")!=(std::string(key)=="branch"?"<u4":"<f8"))throw std::runtime_error("transport full raw ledger dtype/shape required");
+  if(d.at("shape")!=J::array({immutable->rows.size()})||d.at("dtype")!=(std::string(key)=="branch"?"<u4":"<f8"))throw std::runtime_error("transport full raw ledger dtype/shape required");
   eventio::verify(cp.parent_path()/std::filesystem::u8path(d.at("file").get<std::string>()),d.at("sha256"));identity["arrays"][key]=d.at("sha256");
  }
  if(req.at("expected_state")!=identity)throw std::runtime_error("transport checkpoint/model/four-auxiliary identity mismatch");
@@ -68,7 +68,7 @@ static J state_identity(const J&req){
  const auto qpath=std::filesystem::u8path(immutable->manifest.at("query_packet").at("manifest").get<std::string>());
  if(eventio::file_sha256(qpath)!=authority.at("query_sha256"))throw std::runtime_error("query file authority changed");
  J identity{{"input_sha256",eventio::file_sha256(inpath)},{"model_sha256",input.at("model").at("sha256")},{"arrays",J::object()}};
- for(const char* key:{"station","path","row","alpha","mode"}){const auto&d=input.at("arrays").at(key);if(d.at("shape")!=J::array({182017}))throw std::runtime_error("full raw ledger arrays required");eventio::verify(dir/std::filesystem::u8path(d.at("file").get<std::string>()),d.at("sha256"));identity["arrays"][key]=d.at("sha256");}
+ for(const char* key:{"station","path","row","alpha","mode"}){const auto&d=input.at("arrays").at(key);if(d.at("shape")!=J::array({immutable->rows.size()}))throw std::runtime_error("full raw ledger arrays required");eventio::verify(dir/std::filesystem::u8path(d.at("file").get<std::string>()),d.at("sha256"));identity["arrays"][key]=d.at("sha256");}
  if(input.contains("source_rows")){
   const auto& d=input.at("source_rows");if(d.is_array())identity["selected_rows_sha256"]=hash_json(d);else {eventio::verify(dir/std::filesystem::u8path(d.at("file").get<std::string>()),d.at("sha256"));identity["selected_rows_sha256"]=d.at("sha256");}
  }else identity["selected_rows_sha256"]="all_active";

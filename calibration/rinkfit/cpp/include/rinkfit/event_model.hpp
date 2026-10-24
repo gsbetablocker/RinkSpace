@@ -23,7 +23,9 @@ struct EventParameterBlock {
 struct EventPath {
   // 0=ice segment,1=ice circle,2=board path in normalized ad coordinates,
   // 3=whole board boundary. Each disconnected path remains independent.
-  int kind=0, geometry_block=-1, advertisement_block=-1,advertisement_offset=0,radius_index=2,boundary_segment=-1;
+  int kind=0, geometry_block=-1, advertisement_block=-1,radius_index=2,boundary_segment=-1;
+  // A physical point shared over exposures; -1 keeps observation-local station.
+  int shared_station_block=-1;
   bool physical_point=false, closed=false;
   std::string id, variant_id, provenance;
   std::vector<Vec2<double>> points;
@@ -37,6 +39,7 @@ struct EventMaterial {
 struct EventRowLayout {
   std::vector<int> block_ids;
   int global_slot=0, geometry_slot=-1, advertisement_slot=-1;
+  int shared_station_slot=-1;
   std::vector<int> control_ids, control_slots;
   int station_slot=-1, row_slot=-1;
   double frame_time=0;
@@ -106,8 +109,6 @@ class EventModel {
   Mat3<double> R0_seed=identity3<double>();
   Vec3<double> n_seed{0,0,1},b_seed{1,0,0},n_tangent1{1,0,0},n_tangent2{0,1,0};
   double f_ref=1, radius_max=.5,dt=.02,first_control_time=-.04;
-  double wide_log_f_boundary=0;
-  std::array<double,4> wide_coefficients{};
   int n_controls=0,control_block_begin=1,dependent_control=2;
   std::array<int,4> reference_indices{1,2,3,4};
   std::array<double,4> reference_weights{1./6,4./6,1./6,0};
@@ -115,13 +116,8 @@ class EventModel {
   static EventModel load(const std::string& json_path);
   EventRowLayout layout(int material,int path,double frame_time) const;
   std::vector<const double*> pointers(const EventRowLayout& layout) const;
-  std::array<double,3> restricted_trajectory_derivative_bounds(double lo,double hi) const;
   EventRootResult project_rs(int material,int path,double station,double frame_time,
                             double initial_row=539.5) const;
-  // Independent RS root search/certificate for an already evaluated 3D point.
-  // The world point retains its height; no material primitive is fabricated.
-  EventRootResult project_world_rs(const Vec3<double>& world,double frame_time,
-                                  double initial_row=539.5) const;
   EventRayResult inverse_ray(double native_u,double native_v,double frame_time) const;
   std::vector<double> physical_constraints() const;
   std::vector<EventPhysicalConstraint> physical_specs() const;
@@ -133,10 +129,10 @@ class EventModel {
   template<class T> T evaluate_physical(const EventPhysicalConstraint& c,T const*const* p) const {
     const T* g=p[0];const T* q=c.block_ids.size()>1?p[1]:g;T value=T(0);
     if(c.type==0)value=T(2)*g[2]-g[0]+T(2e-5);
-    else if(c.type==1)value=-q[c.index+2];
-    else if(c.type==2)value=q[c.index+2]-q[c.index+3]+T(1e-6);
-    else if(c.type==3)value=q[c.index+3]-g[4];
-    else if(c.type==4){const T per=T(2)*(T(1)-T(2)*g[1]+g[0]-T(2)*g[2])+T(4)*quarter_arclength(T(1.5707963267948966),g);value=q[c.index+1]-per;}
+    else if(c.type==1)value=-q[2];
+    else if(c.type==2)value=q[2]-q[3]+T(1e-6);
+    else if(c.type==3)value=q[3]-g[4];
+    else if(c.type==4){const T per=T(2)*(T(1)-T(2)*g[1]+g[0]-T(2)*g[2])+T(4)*quarter_arclength(T(1.5707963267948966),g);value=q[1]-per;}
     else if(c.type==5)value=T(1e-6)-q[c.index];
     else if(c.type==6)value=q[c.index]-q[c.index+1]+T(1e-6);
     else if(c.type==7)value=rink_membership(q[c.index],q[c.index+1],g);
@@ -145,7 +141,7 @@ class EventModel {
     else if(c.type==10){bool first=true;for(const auto& xy:c.vertices){const T x=q[c.axis*3]*T(xy[0])+q[c.axis*3+1]*T(xy[1])+q[c.axis*3+2];
         const T v=c.direction>0?x-T(1):-x;if(first||event_scalar(v)>event_scalar(value)){value=v;first=false;}}}
     else if(c.type==11)value=T(1e-6)-(q[0]*q[4]-q[1]*q[3]);
-    else if(c.type==12){const T* a=p[2]+c.index;bool first=true;for(const auto& xy:c.vertices){const T vv=q[3]*T(xy[0])+q[4]*T(xy[1])+q[5];
+    else if(c.type==12){const T* a=p[2];bool first=true;for(const auto& xy:c.vertices){const T vv=q[3]*T(xy[0])+q[4]*T(xy[1])+q[5];
         const T h=a[2]+(a[3]-a[2])*vv,v=c.direction>0?h-g[4]:-h;
         if(first||event_scalar(v)>event_scalar(value)){value=v;first=false;}}}
     else throw std::domain_error("unknown physical constraint");
@@ -183,7 +179,7 @@ class EventModel {
     h.pupil_linear=g[18];h.pupil_quadratic=g[19];return h;
   }
   template<class T> ZoomOptics<T> optics(const T* g) const {
-    ZoomOptics<T> o;o.f_ref=f_ref;o.radius_max=T(radius_max);o.wide_log_f_boundary=wide_log_f_boundary;o.wide_coefficients=wide_coefficients;
+    ZoomOptics<T> o;o.f_ref=f_ref;o.radius_max=T(radius_max);
     o.cx=g[20];o.cy=g[21];o.eta=g[22];o.cx_linear=g[23];o.cy_linear=g[24];
     o.k1=g[25];o.k1_linear=g[26];o.k2=g[27];o.k2_linear=g[28];o.p1=g[29];o.p2=g[30];return o;
   }
@@ -201,28 +197,12 @@ class EventModel {
     const T v=(event_pow_nonnegative(c,g[3]-T(1))*s-event_pow_nonnegative(s,g[3]-T(1))*c)/(cp+sp);
     const T x=g[1]*d*(-s+c*v),y=g[2]*d*(c+s*v);return sqrt(x*x+y*y);
   }
-  template<class T> static T quarter_arclength_uncached(const T& angle,const T* g) {
+  template<class T> static T quarter_arclength(const T& angle,const T* g) {
     // 32-point composite Gauss quadrature, endpoints never evaluated.
     static constexpr double x[8]={.09501250983763744,.2816035507792589,.4580167776572274,.6178762444026438,.755404408355003,.8656312023878318,.9445750230732326,.9894009349916499};
     static constexpr double w[8]={.1894506104550685,.1826034150449236,.1691565193950025,.1495959888165767,.1246289712555339,.0951585116824928,.0622535239386479,.0271524594117541};
     T total=T(0);for(int part=0;part<2;++part){const T mid=angle*T((part+.5)/2),half=angle/T(4);
       for(int i=0;i<8;++i)total+=half*T(w[i])*(quarter_speed(mid-half*T(x[i]),g)+quarter_speed(mid+half*T(x[i]),g));}return total;
-  }
-  template<class T> static T quarter_arclength(const T& angle,const T* g) {
-    // Every board point uses the same full-quarter perimeter integral. Reuse
-    // only an exactly identical scalar AND tangent seed; no geometry is frozen.
-    if(event_scalar(angle)!=1.5707963267948966)return quarter_arclength_uncached(angle,g);
-    struct Cache {bool valid=false;std::array<T,4>key{};T value{};};
-    static thread_local Cache cache;
-    auto same=[](const T&a,const T&b){
-      if constexpr(std::is_arithmetic<T>::value)return a==b;
-      else return a.a==b.a&&(a.v.array()==b.v.array()).all();
-    };
-    const std::array<T,4>key{angle,g[1],g[2],g[3]};bool hit=cache.valid;
-    for(int k=0;k<4&&hit;++k)hit=same(key[k],cache.key[k]);
-    if(hit)return cache.value;
-    const T value=quarter_arclength_uncached(angle,g);
-    cache.key=key;cache.value=value;cache.valid=true;return value;
   }
   template<class T> static Vec3<T> board_point(T s,const T& h,const T* g) {
     constexpr double pi=3.14159265358979323846;
@@ -249,7 +229,8 @@ class EventModel {
     if(k==2)return {-hx+rx-q[0],hy-ry+q[1],h};
     return {-hx+rx-q[0],-hy+ry-q[1],h};
   }
-  template<class T> Vec3<T> world_point(const EventPath& p,const T& station,T const*const* pars,const EventRowLayout& l) const {
+  template<class T> Vec3<T> world_point(const EventPath& p,const T& local_station,T const*const* pars,const EventRowLayout& l) const {
+    const T station=l.shared_station_slot<0?local_station:pars[l.shared_station_slot][0];
     if(event_scalar(station)<0||event_scalar(station)>1)throw std::domain_error("finite material station outside [0,1]");
     const T* g=pars[l.global_slot];const T* q=l.geometry_slot<0?nullptr:pars[l.geometry_slot];
     using std::sin;using std::cos;
@@ -257,7 +238,7 @@ class EventModel {
     if(p.kind==1){const T a=T(p.start_angle)+station*T(p.end_angle-p.start_angle);return {q[0]+q[p.radius_index]*cos(a),q[1]+q[p.radius_index]*sin(a),T(0)};}
     if(p.kind==3){const T arc=quarter_arclength(T(1.5707963267948966),g),ll=T(1)-T(2)*g[1],sl=g[0]-T(2)*g[2];
       const T perimeter=T(2)*(ll+sl)+T(4)*arc;T position=station*perimeter;
-      if(p.boundary_segment>=0||p.boundary_segment==-2){const T lengths[8]={ll,arc,sl,arc,ll,arc,sl,arc};const T coordinate=p.boundary_segment==-2?station*T(8):station;const int segment=p.boundary_segment==-2?std::min(7,int(std::floor(event_scalar(coordinate)))):p.boundary_segment;position=(p.boundary_segment==-2?coordinate-T(segment):coordinate)*lengths[segment];for(int j=0;j<segment;++j)position+=lengths[j];}
+      if(p.boundary_segment>=0){const T lengths[8]={ll,arc,sl,arc,ll,arc,sl,arc};position=station*lengths[p.boundary_segment];for(int j=0;j<p.boundary_segment;++j)position+=lengths[j];}
       return board_point(position,g[4]*T(p.fixed_height_fraction),g);}
     if(p.points.empty())throw std::domain_error("empty board path");
     Vec2<T> uv;
@@ -265,7 +246,7 @@ class EventModel {
     else {const T x=station*T(p.points.size()-1);const int i=std::min(int(p.points.size())-2,int(std::floor(event_scalar(x))));
       const T u=x-T(i);uv={T(p.points[i][0])*(T(1)-u)+T(p.points[i+1][0])*u,T(p.points[i][1])*(T(1)-u)+T(p.points[i+1][1])*u};}
     if(q){const T x=uv[0],y=uv[1];uv={q[0]*x+q[1]*y+q[2],q[3]*x+q[4]*y+q[5]};}
-    const T* ad=pars[l.advertisement_slot]+p.advertisement_offset;
+    const T* ad=pars[l.advertisement_slot];
     return board_point(ad[0]+ad[1]*uv[0],ad[2]+(ad[3]-ad[2])*uv[1],g);
   }
   template<class T> Projection<T> predict_explicit(const EventRowLayout& l,const T& station,const T& row,T const*const* pars) const {
@@ -295,8 +276,6 @@ class EventModel {
       (!(out.brown_lower>T(0))?DomainStatus::kDistortionUncertified:DomainStatus::kValid);
     out.arithmetic_valid=true;return out;
   }
- private:
-  void append_trajectory_layout(EventRowLayout& layout) const;
 };
 } // namespace rinkfit
 #endif

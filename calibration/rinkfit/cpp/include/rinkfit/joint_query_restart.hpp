@@ -1,5 +1,6 @@
 #pragma once
 #include "rinkfit/joint_al.hpp"
+#include "rinkfit/joint_path_generation_v1.hpp"
 #include <algorithm>
 #include <atomic>
 #include <chrono>
@@ -181,11 +182,13 @@ inline JointQueryRestartPlan propose_joint_query_restart(
 
 inline void apply_joint_query_restart_plan(JointALBuilder&b,JointQueryRestartPlan&plan,bool no_live_problem){
   if(!no_live_problem||plan.applied)throw std::runtime_error("Query restart apply requires destroyed graph and unapplied plan");joint_query_restart_detail::check_plan(b,plan,false);
+  if(!plan.rows.empty())advance_joint_path_generation_v1(b.core.packet);
   for(const auto&c:plan.rows){auto&r=b.core.packet.rows[c.row_index];r.path=c.path;b.core.station[c.row_index]=c.station;b.core.row[c.row_index]=r.row=c.row;b.core.alpha[c.row_index]=r.alpha=c.alpha;if(r.kind!=1)r.station=c.station;}
   plan.applied=true;
 }
 inline void rollback_joint_query_restart_plan(JointALBuilder&b,JointQueryRestartPlan&plan,bool no_live_problem){
   if(!no_live_problem||!plan.applied)throw std::runtime_error("Query restart rollback requires destroyed graph and applied plan");joint_query_restart_detail::check_plan(b,plan,true);
+  if(!plan.rows.empty())advance_joint_path_generation_v1(b.core.packet);
   for(const auto&c:plan.rows){auto&r=b.core.packet.rows[c.row_index];r.path=c.old_path;r.station=c.old_source_station;r.row=c.old_source_row;r.alpha=c.old_source_alpha;b.core.station[c.row_index]=c.old_station;b.core.row[c.row_index]=c.old_row;b.core.alpha[c.row_index]=c.old_alpha;}
   plan.applied=false;joint_query_restart_detail::check_plan(b,plan,false);
 }

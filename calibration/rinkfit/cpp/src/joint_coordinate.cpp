@@ -115,8 +115,9 @@ BuildInventory JointALBuilder::build_advertisement_coordinate_problem(
     if (touched.at(i)) add_inequality(pixel(i), inequality_index);
     ++inequality_index;
   }
-  for (std::size_t i = 0; i < physical_.size(); ++i) {
-    if (depends(physical_[i].block_ids)) add_inequality(physical(i), inequality_index);
+  for (std::size_t i = 0; i < physical_count(); ++i) {
+    const bool used = i < physical_.size() ? depends(physical_[i].block_ids) : depends(hard_inequalities_.at(i-physical_.size()).ids);
+    if (used) add_inequality(physical(i), inequality_index);
     ++inequality_index;
   }
   for (std::size_t i = 0; i < native_domains_.size(); ++i) {

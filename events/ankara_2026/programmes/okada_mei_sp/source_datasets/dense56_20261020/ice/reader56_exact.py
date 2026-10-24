@@ -8,6 +8,7 @@ from calibration.program_tracking.runtime.bootstrap import add_geometry_dependen
 add_geometry_dependencies()
 import cv2,numpy as np,av
 from rinkfit_joint.screen_recovery_state import ScreenRecoveryState
+from rinkfit_joint.finite_ring_source import unique_source_interface_candidate
 from rinkspace.vision_programme_ice_review import ice_curve_inventory,_source_queries,_batched_actual_profiles,_actual_profile_candidates
 from rinkspace.vision_source_shapes import _MaterialProfileFrame
 cv2.setNumThreads(1)
@@ -199,11 +200,24 @@ def candidate_options(frame,q,nn,ii,meta,mask):
   else:gates['no_complete_current_material_support']+=1
  return bycurve,gates
 
-def coherent_branch(opts,q,nn,key,pts):
+def coherent_branch(opts,q,nn,key,pts,identity_failures=None):
  # Current source band controls establish one continuous branch before the second RGB read.
  name=key.split(':')[0];byq=collections.defaultdict(list)
  for o in opts:byq[o['query']].append(o)
- initial=[min(v,key=lambda z:abs(z['shift']))for v in byq.values()]
+ initial=[]
+ for qi,options in byq.items():
+  if options[0]['p']['operator']=='material_interface':
+   selected,verdict=unique_source_interface_candidate(options)
+   if selected is None:
+    if identity_failures is not None:
+     identity_failures.append(dict(source_query_id=f'dense56_ice_layer_unique_v3/{pts}/{key}/query{qi}',
+       native_pts=pts,curve_id=key,query_index=qi,**verdict,
+       candidate_uv=[o['uv'].tolist()for o in options],
+       candidate_shift_px=[float(o['shift'])for o in options],
+       raw_native_profiles_and_candidate_UV_preserved=True))
+    continue
+   selected['source_interface_uniqueness']=verdict;initial.append(selected)
+  else:initial.append(min(options,key=lambda z:abs(z['shift'])))
  if len(initial)<6:return [],None
  if name in ['B1','B2','C']:
   base=q[[o['query']for o in initial]];mean=base.mean(0);_,_,V=np.linalg.svd(base-mean,full_matrices=False);tangent=V[0];normal=V[1];alluv=np.array([o['uv']for o in opts]);t=(alluv-mean)@tangent;perp=(alluv-mean)@normal;tc=float(np.mean(t));scale=max(float(np.ptp(t))/2,1);tx=(t-tc)/scale
@@ -264,9 +278,9 @@ def read_frame(rgb,pts,sid):
   qq,nn,ii=_source_queries(p,uv,np.ones(len(uv)),rgb.shape[:2],8.,radius)
   queries.extend(qq);normals.extend(nn);ints.extend(ii);meta.extend([(key,p,g)]*len(qq));navsumm.append(dict(curve_id=key,queries=len(qq),source_navigation=g))
  if not queries:return [],dict(shot_id=sid,native_pts=pts,point_candidates=0,reason='native RGB retained for actual source visibility review; no usable curve navigation',**gateinfo),[]
- q=np.asarray(queries);nn=np.asarray(normals);ii=np.asarray(ints);frame=_MaterialProfileFrame(rgb,dict(source_pts=pts,source_sha256=source_sha,time_base='1/12800',native_hw=[1080,1920],shot_id=sid));bycurve,gates=candidate_options(frame,q,nn,ii,meta,mask);rows=[];controls=[];featurecounts=collections.Counter()
+ q=np.asarray(queries);nn=np.asarray(normals);ii=np.asarray(ints);frame=_MaterialProfileFrame(rgb,dict(source_pts=pts,source_sha256=source_sha,time_base='1/12800',native_hw=[1080,1920],shot_id=sid));bycurve,gates=candidate_options(frame,q,nn,ii,meta,mask);rows=[];controls=[];identity_failures=[];featurecounts=collections.Counter()
  for key,opts in bycurve.items():
-  selected,m=coherent_branch(opts,q,nn,key,pts)
+  selected,m=coherent_branch(opts,q,nn,key,pts,identity_failures)
   if m:
    m.update(shot_id=sid,native_pts=pts,feature_id='ice.'+key,installed_source_navigation=nav[key][2]);controls.append(m);selected=remeasure_band(rgb,frame,pts,sid,key,m,mask)
   name=key.split(':')[0]
@@ -274,18 +288,19 @@ def read_frame(rgb,pts,sid):
    u=o['uv'];p=o['p'];sides=o['edges']if p['operator']=='paint_center'else None
    fid='ice.'+key;binding='source_entity_annotation_identity_retained_not_physical_accuracy_accepted'
    if name in ['A3','A4']:fid='unbound.ice.paired_paint_band.'+key;binding='unbound_not_for_physical_fit'
-   row=dict(shot_id=sid,native_pts=pts,feature_id=fid,curve_id=key,uv=u.tolist(),paired_edge_uv=sides.tolist()if sides is not None else None,source_kind='actual_current_native_RGB_complete_band_on_source_continuous_branch'if m else'actual_current_native_RGB_material_profile',source_row_id=f'dense56_ice/{sid}/{pts}/{key}/{j}',source_UV_is_direct_measurement=True,definition='width_midpoint_between_both_material_edges'if sides is not None else'declared_target_ring_material_boundary',surface='ice',source_uv_from_model=False,source_sha256=source_sha,native_time_base='1/12800',pixel_support=dict(query_index=o['query'],normal=o['normal'].tolist(),native_shift_px=o['shift'],side_interface_quartiles_uv=o['qs'].tolist(),signed_interface_IQR_contrast=o['contrast'],paint_width_px=o['width'],interface_IQR_px=o['iqr'],material_signal=o['signal'],material_transition=p['material_transition'],complete_both_material_sides_visible=sides is not None,entire_source_band_coherence_used_to_disambiguate_crossing=m is not None,source_RGB_center=rgb[int(round(u[1])),int(round(u[0]))].tolist()),navigation=dict(o['g']),occlusion=gateinfo['source_domain'],status='direct_current_pixel_supported',world_entity_binding=binding,visible_span_id=f'{sid}/{pts}/{key}/actual_current_material',canonical_generation='dense56_ice_source_exact_domain_v2')
+   row=dict(shot_id=sid,native_pts=pts,feature_id=fid,curve_id=key,uv=u.tolist(),paired_edge_uv=sides.tolist()if sides is not None else None,source_kind='actual_current_native_RGB_complete_band_on_source_continuous_branch'if m else'actual_current_native_RGB_material_profile',source_row_id=f'dense56_ice_layer_unique_v3/{sid}/{pts}/{key}/query{o["query"]}',source_UV_is_direct_measurement=True,definition='width_midpoint_between_both_material_edges'if sides is not None else'declared_target_ring_material_boundary',surface='ice',source_uv_from_model=False,source_sha256=source_sha,native_time_base='1/12800',pixel_support=dict(query_index=o['query'],normal=o['normal'].tolist(),native_shift_px=o['shift'],side_interface_quartiles_uv=o['qs'].tolist(),signed_interface_IQR_contrast=o['contrast'],paint_width_px=o['width'],interface_IQR_px=o['iqr'],material_signal=o['signal'],material_transition=p['material_transition'],complete_both_material_sides_visible=sides is not None,entire_source_band_coherence_used_to_disambiguate_crossing=m is not None,source_RGB_center=rgb[int(round(u[1])),int(round(u[0]))].tolist()),navigation=dict(o['g']),occlusion=gateinfo['source_domain'],status='direct_current_pixel_supported',world_entity_binding=binding,visible_span_id=f'{sid}/{pts}/{key}/actual_current_material',canonical_generation='dense56_ice_source_layer_unique_v3')
+   if 'source_interface_uniqueness'in o:row['source_interface_uniqueness']=dict(o['source_interface_uniqueness'])
    if sides is not None:assert np.linalg.norm(np.mean(sides,axis=0)-u)<1e-6
    if nav[key][2].get('historical_guidance_registered_on_actual_source_image'):row['navigation']['registered_historical_source_guidance']=dict(nav[key][2])
    support=np.vstack([u[None],o['qs'].reshape(-1,2),o['edges']]);ix=np.rint(support).astype(int);row['pixel_support']['old_conservative_domain_would_exclude_material_support']=bool(LAST_OLD_MASK[ix[:,1],ix[:,0]].any());row['pixel_support']['current_UV_in_newly_opened_source_domain']=bool(LAST_OLD_MASK[int(round(u[1])),int(round(u[0]))]);rows.append(row);featurecounts[fid]+=1
- cov=dict(shot_id=sid,native_pts=pts,time_base='1/12800',point_candidates=len(rows),feature_counts=dict(featurecounts),source_kind_counts=dict(collections.Counter(r['source_kind']for r in rows)),native_RGB_sha256=TH(rgb.tobytes()).hexdigest(),source_navigation_inventory=navsumm,omission_gates=dict(gates),all_visible_material_complete_claimed=False,newly_opened_center_UV_count=sum(r['pixel_support']['current_UV_in_newly_opened_source_domain']for r in rows),newly_opened_material_support_rows=sum(r['pixel_support']['old_conservative_domain_would_exclude_material_support']for r in rows),registered_historical_guidance_features=[k for k,v in nav.items()if v[2].get('historical_guidance_registered_on_actual_source_image')],seconds=time.monotonic()-t0,**gateinfo)
+ cov=dict(shot_id=sid,native_pts=pts,time_base='1/12800',point_candidates=len(rows),feature_counts=dict(featurecounts),source_kind_counts=dict(collections.Counter(r['source_kind']for r in rows)),native_RGB_sha256=TH(rgb.tobytes()).hexdigest(),source_navigation_inventory=navsumm,omission_gates=dict(gates),source_identity_failures=identity_failures,source_interface_selection='unique_legal_native_interface_no_nearest_shift_fallback',all_visible_material_complete_claimed=False,newly_opened_center_UV_count=sum(r['pixel_support']['current_UV_in_newly_opened_source_domain']for r in rows),newly_opened_material_support_rows=sum(r['pixel_support']['old_conservative_domain_would_exclude_material_support']for r in rows),registered_historical_guidance_features=[k for k,v in nav.items()if v[2].get('historical_guidance_registered_on_actual_source_image')],seconds=time.monotonic()-t0,**gateinfo)
  return rows,cov,controls
 
 def main():
  ap=argparse.ArgumentParser();ap.add_argument('--shot');ap.add_argument('--preview',action='store_true');args=ap.parse_args();shots=[args.shot]if args.shot else list(scopes)
  preview={948992,967168,997632,1044992,1119232,1195520,1242368,1273856,1300992,1301248,1330944,1376000,1406720,1425408}
  for sid in shots:
-  a,b=scopes[sid];wanted=set(range(a,b+1,256));wanted= wanted&preview if args.preview else wanted;out=O/('preview'if args.preview else'canonical')/sid;out.mkdir(parents=True,exist_ok=True);tot=0;nf=0;features=collections.Counter();kinds=collections.Counter();framecounts=[];start=time.monotonic()
+  a,b=scopes[sid];wanted=set(range(a,b+1,256));wanted= wanted&preview if args.preview else wanted;out=O/('preview_layer_unique_v3'if args.preview else'layer_unique_v3')/sid;out.mkdir(parents=True,exist_ok=False);tot=0;nf=0;features=collections.Counter();kinds=collections.Counter();framecounts=[];start=time.monotonic()
   with gzip.open(out/'rows.jsonl.gz','wt',encoding='utf8')as wr,gzip.open(out/'coverage.jsonl.gz','wt',encoding='utf8')as wc,gzip.open(out/'source_band_controls.jsonl.gz','wt',encoding='utf8')as wctrl,av.open(str(D/'events/ankara_2026/programmes/okada_mei_sp/Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4'))as con:
    st=con.streams.video[0];assert str(st.time_base)=='1/12800';con.seek(min(wanted),stream=st,backward=True)
    for fr in con.decode(st):
@@ -313,7 +328,7 @@ def worker_read(task):
  rgb,pts,sid=task;return read_frame(rgb,pts,sid)
 def main_pool():
  import multiprocessing as mp
- ap=argparse.ArgumentParser();ap.add_argument('--shot',required=True);ap.add_argument('--workers',type=int,default=4);ap.add_argument('--first',type=int);args=ap.parse_args();sid=args.shot;a,b=scopes[sid];a=args.first if args.first is not None else a;out=O/'canonical'/sid;out.mkdir(parents=True,exist_ok=True);start=time.monotonic();features=collections.Counter();kinds=collections.Counter();fc=[];tot=0;nf=0;expected=list(range(a,b+1,256));seen=[]
+ ap=argparse.ArgumentParser();ap.add_argument('--shot',required=True);ap.add_argument('--workers',type=int,default=4);ap.add_argument('--first',type=int);args=ap.parse_args();sid=args.shot;a,b=scopes[sid];a=args.first if args.first is not None else a;out=O/'layer_unique_v3'/sid;out.mkdir(parents=True,exist_ok=False);start=time.monotonic();features=collections.Counter();kinds=collections.Counter();fc=[];tot=0;nf=0;expected=list(range(a,b+1,256));seen=[]
  with mp.get_context('spawn').Pool(args.workers)as pool,gzip.open(out/'rows.jsonl.gz','wt',encoding='utf8')as wr,gzip.open(out/'coverage.jsonl.gz','wt',encoding='utf8')as wc,gzip.open(out/'source_band_controls.jsonl.gz','wt',encoding='utf8')as wctrl,av.open(str(D/'events/ankara_2026/programmes/okada_mei_sp/Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4'))as con:
   st=con.streams.video[0];con.seek(a,stream=st,backward=True);batch=[]
   def consume(batch):

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>RinkSpace · 求解工作台</title>
+  <link rel="stylesheet" href="/ui/style.css">
+  <script type="module" src="/ui/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">跳到工作区</a>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#architecture" aria-label="RinkSpace 求解工作台首页"><span class="brand-mark" aria-hidden="true">R</span><span>RinkSpace<small>求解工作台 / SOLVE 2</small></span></a>
+      <div class="sidebar-label">工作区</div>
+      <nav aria-label="工作区导航">
+        <button class="nav-item active" data-view="architecture"><span class="nav-icon" aria-hidden="true">↗</span>流程与边界<span class="nav-count" id="nav-modules">—</span></button>
+        <button class="nav-item" data-view="constraints"><span class="nav-icon" aria-hidden="true">≡</span>约束与假设<span class="nav-count" id="nav-constraints">—</span></button>
+        <button class="nav-item" data-view="data"><span class="nav-icon" aria-hidden="true">▤</span>数据入口<span class="nav-count" id="nav-data">—</span></button>
+        <button class="nav-item" data-view="monitor"><span class="nav-icon" aria-hidden="true">⌁</span>运行监控</button>
+        <button class="nav-item" data-view="review"><span class="nav-icon" aria-hidden="true">✓</span>证据审阅</button>
+      </nav>
+      <div class="sidebar-bottom"><span class="dot neutral" id="sidebar-dot"></span><span id="sidebar-state">等待后端连接</span><p>所有状态来自当前 API。<br>缺失数据保留为空。</p></div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar"><div class="breadcrumb">RinkSpace <span>/</span> 独立求解系统</div><div class="topbar-actions"><span class="connection-label" id="connection-label"><span class="dot neutral"></span>正在连接</span><button class="button button-quiet button-small" id="refresh-all" title="立即刷新全部 API">↻ 刷新</button></div></header>
+      <main id="main-content" tabindex="-1">
+        <div class="page-heading"><div><p class="eyebrow" id="page-eyebrow">ARCHITECTURE</p><h1 id="page-title">流程与边界</h1><p class="page-subtitle" id="page-subtitle">跟踪每个模块的输入、输出与责任范围。</p></div><div class="heading-meta"><span id="revision-label">修订 —</span><span id="updated-label">尚未同步</span></div></div>
+        <div id="connection-banner" aria-live="polite"></div>
+        <section id="view-architecture" class="view" aria-label="流程与边界"></section>
+        <section id="view-constraints" class="view" aria-label="约束与假设" hidden></section>
+        <section id="view-data" class="view" aria-label="数据入口" hidden></section>
+        <section id="view-monitor" class="view" aria-label="运行监控" hidden></section>
+        <section id="view-review" class="view" aria-label="证据审阅" hidden></section>
+      </main>
+      <aside id="model-dock" class="model-dock" aria-label="常驻冰场与相机俯视图"><header class="model-dock-header"><div><p class="eyebrow">SPATIAL OVERVIEW</p><h2>冰场 · 三相机总览</h2></div><span id="model-status" class="badge">正在连接</span></header><div id="model-notice" class="model-notice">正在读取真实模型数据…</div><div id="model-frame-controls" class="model-frame-controls"></div><div class="model-maps single-map"><section class="model-map-section overview-map-section"><div class="model-map-label"><h3>完整空间与相机位置</h3><span id="model-unit">单位 —</span></div><div id="model-overview-map" class="model-map" aria-label="包含全部已知相机位置的完整空间俯视图"></div></section><section class="model-map-section rink-map-section"><div class="model-map-label"><h3>冰场全要素局部</h3><span id="model-element-count">标线 / 广告 —</span></div><div id="model-rink-map" class="model-map" aria-label="完整冰场标线围挡广告编号俯视图"></div></section></div><div id="model-rig-legend" class="model-rig-legend"></div><section class="model-ad-index"><div class="model-ad-index-heading"><span>全部广告编号</span><button class="link-button" data-action="model-registry">查全部实体</button></div><div id="model-ad-buttons" class="model-ad-buttons"></div><p id="model-missing-ads" class="model-missing-ads"></p></section><div id="model-selection" class="model-selection" aria-live="polite">点击实体查看定义、参数与来源</div><footer class="model-dock-footer"><span id="model-revision">模型修订 —</span><span id="model-updated">尚未同步</span></footer></aside>
+      <footer class="workspace-footer"><span>本地工作台 · 所有修改写入后端变更记录</span><span id="polling-footer">运行状态每 3 秒同步</span></footer>
+    </div>
+  </div>
+  <div id="drawer-backdrop" class="drawer-backdrop" hidden></div>
+  <aside id="detail-drawer" class="detail-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" hidden><header class="drawer-header"><div><p class="eyebrow" id="drawer-eyebrow">DETAIL</p><h2 id="drawer-title">详情</h2></div><button class="icon-button" id="close-drawer" aria-label="关闭详情">×</button></header><div id="drawer-content" class="drawer-content"></div></aside>
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title"><form method="dialog" class="confirm-form"><div class="dialog-heading"><div><p class="eyebrow">USER CONFIRMATION</p><h2 id="confirm-title">确认约束来源</h2></div><button class="icon-button" value="cancel" aria-label="关闭确认">×</button></div><div id="confirm-content"></div><div class="dialog-actions"><button class="button button-secondary" value="cancel">返回检查</button><button class="button button-primary" id="confirm-submit" type="button" disabled>确认并保存</button></div></form></dialog>
+  <div id="toast-region" class="toast-region" aria-live="polite"></div>
+</body>
+</html>

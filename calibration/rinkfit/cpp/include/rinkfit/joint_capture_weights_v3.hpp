@@ -1,13 +1,14 @@
 #pragma once
 // Explicit engineering source budgets, not source-noise W. Opt-in only.
 #include "rinkfit/joint_builder.hpp"
+#include "rinkfit/joint_exact_dependency_alias_v1.hpp"
 #include <cmath>
 #include <set>
 #include <cstring>
 namespace rinkfit {
 struct JointCaptureWeightsV3 {bool enabled=false;std::vector<double>per_row_weight;eventio::Json receipt=eventio::Json::object();};
 namespace capture_weights_v3_detail {
-inline std::filesystem::path checked(const eventio::Json&r){if(!r.is_object()||!r.contains("file")||!r.contains("sha256"))throw std::runtime_error("source weight reference lacks file/SHA");const auto p=std::filesystem::u8path(r.at("file").get<std::string>());if(!p.is_absolute()||r.at("sha256").get<std::string>().size()!=64)throw std::runtime_error("source weight reference is not exact absolute SHA binding");eventio::verify(p,r.at("sha256"));return p;}
+inline std::filesystem::path checked(const eventio::Json&r){if(!r.is_object()||!r.contains("file")||!r.contains("sha256"))throw std::runtime_error("source weight reference lacks file/SHA");const auto p=std::filesystem::u8path(r.at("file").get<std::string>());if(!p.is_absolute()||r.at("sha256").get<std::string>().size()!=64)throw std::runtime_error("source weight reference is not exact absolute SHA binding");const auto actual=JointExactDependencyAliasesV1::resolve(p,r.at("sha256").get<std::string>());eventio::verify(actual,r.at("sha256"));return actual;}
 template<class T>inline std::vector<T> binary(const eventio::Json&r,std::size_t n,const std::string&dtype){if(r.at("dtype")!=dtype||r.at("shape")!=eventio::Json::array({n}))throw std::runtime_error("source weight binary type/shape differs");const auto bytes=eventio::bytes(checked(r));if(bytes.size()!=n*sizeof(T))throw std::runtime_error("source weight binary size differs");std::vector<T>v(n);if(!bytes.empty())std::memcpy(v.data(),bytes.data(),bytes.size());return v;}
 inline std::string keys(const JointPacket&p,std::size_t n){if(n>p.rows.size())throw std::runtime_error("source weight key prefix overflow");std::string text;for(std::size_t i=0;i<n;++i){const auto&r=p.rows[i];std::vector<std::string>f={std::to_string(i),r.source_dataset_id,r.source_row_id,r.shot_id,std::to_string(r.pts)};for(std::size_t k=0;k<f.size();++k){if(f[k].find_first_of("\x1f\r\n")!=std::string::npos)throw std::runtime_error("source key delimiter ambiguity");if(k)text.push_back('\x1f');text+=f[k];}text.push_back('\n');}return eventio::sha256(std::vector<std::uint8_t>(text.begin(),text.end()));}
 inline bool bits(double a,double b){return std::memcmp(&a,&b,sizeof(double))==0;}

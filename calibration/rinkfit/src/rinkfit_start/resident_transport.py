@@ -31,9 +31,16 @@ class ResidentTransportClient:
     def start(self):
         if self.closed:raise RuntimeError('Cannot restart a closed worker; create a new client')
         if self.worker is not None:return self
-        recipe_path=self.build_dir/'recipe.json';recipe=_read(recipe_path)
+        recipe_path=self.build_dir/'recipe.json'
+        if not recipe_path.exists():recipe_path=self.build_dir/'build_recipe.json'
+        recipe=_read(recipe_path)
+        self.current_input_build=recipe.get('schema')=='rinkfit.source_target_GPU_transport_build.v1'
+        if self.current_input_build:
+            if not recipe.get('CPU_primal_RS_profile_W') or not recipe.get('raw_UV_GPU'):raise ValueError('Current input build lacks original CPU/RS/W and CUDA raw-UV roles')
+            recipe['original_reader_policy_sha256']=recipe['reader_header_sha256']
         gpu=recipe.get('schema')=='rinkfit.resident_verified_GPU_transport.v1'
-        if gpu:
+        if self.current_input_build:pass
+        elif gpu:
             if not recipe.get('CPU_primal_RS_profile_W') or not recipe.get('raw_UV_GPU') or not recipe.get('same_exact_projection_RS_profile_W_math'):raise ValueError('GPU transport changed the original primal/RS/profile/W contract')
             validation=_read(_verified(recipe['backend_validation']))
             if validation.get('build')!=recipe.get('validated_backend_build'):raise ValueError('GPU QA and exact backend build differ')
@@ -49,7 +56,7 @@ class ResidentTransportClient:
             if recipe.get('schema')!='rinkfit.resident_verified_transport_prototype.v3':raise ValueError('An approved transport build is required')
             if not recipe.get('no_kernel_changed') or not recipe.get('same_exact_projection_RS_profile_W_math'):raise ValueError('Unverified transport arithmetic identity')
         if not {'whole_uv','profile_implicit'}.issubset(set(recipe.get('supported_ops',[]))):raise ValueError('Transport worker operations unavailable')
-        for p,digest in recipe['sources'].items():
+        for p,digest in ([] if self.current_input_build else recipe['sources'].items()):
             if _sha(p)!=digest:raise ValueError('Frozen worker source changed: '+p)
         exe=_verified(recipe['executable']);self._recipe=recipe;self._recipe_ref=_ref(recipe_path)
         if self.run_dir.exists() and any(self.run_dir.iterdir()):raise FileExistsError(str(self.run_dir))
@@ -101,7 +108,9 @@ class ResidentTransportClient:
     def _transport_state(self,path):
         doc=_read(path)
         if doc.get('schema')!='rinkfit.complete_continuous_reduced_SLP_checkpoint.v1':raise ValueError('A complete transport CP is required')
-        if doc.get('raw_rows')!=182017 or doc.get('active_rows')!=182016:raise ValueError('Transport CP must retain the whole raw and active ledger')
+        count=int(doc.get('raw_rows',0));active_count=int(doc.get('active_rows',0))
+        if count<=0 or not(0<active_count<=count):raise ValueError('Transport CP current raw/active dimensions invalid')
+        if not self.current_input_build and (count!=182017 or active_count!=182016):raise ValueError('Transport CP must retain the whole raw and active ledger')
         _verified(doc['model']);linearization=_verified(doc['linearization']);lm=_read(linearization)
         for key in ['packet','semantic']:_verified(lm[key])
         data=dict(model=doc['model'],packet=lm['packet'],semantic=lm['semantic'])
@@ -109,8 +118,8 @@ class ResidentTransportClient:
                    model=doc['model'],packet=lm['packet'],semantic=lm['semantic'],linearization=doc['linearization'],arrays={})
         for key,dt in [('station','<f8'),('branch','<u4'),('row','<f8'),('alpha','<f8')]:
             desc=doc['row_state_files'][key];file=_verified(desc,path.parent)
-            if desc['shape']!=[182017] or desc['dtype']!=dt:raise ValueError('Incomplete transport raw array '+key)
-            if file.stat().st_size!=182017*(4 if key=='branch'else 8):raise ValueError('Wrong transport array byte count '+key)
+            if desc['shape']!=[count] or desc['dtype']!=dt:raise ValueError('Incomplete transport raw array '+key)
+            if file.stat().st_size!=count*(4 if key=='branch'else 8):raise ValueError('Wrong transport array byte count '+key)
             ident['arrays'][key]=desc['sha256']
         # CP.linearization may be an older numerical linearization. It is used
         # only for its immutable source authority, never as the new theta/J.
@@ -118,15 +127,15 @@ class ResidentTransportClient:
 
     def _check_profile_rows(self,result,report,data):
         sem_path=_verified(data['semantic']);sem=_read(sem_path)
-        kd=sem['arrays']['kind'];ad=sem['active_source_mask']
+        kd=sem['arrays']['kind'];ad=sem['active_source_mask'];count=int(sem['observations'])
         for d in [kd,ad]:
-            if d['dtype']!='|u1'or d['shape']!=[182017]:raise ValueError('Profile authority mask/kind schema')
+            if d['dtype']!='|u1'or d['shape']!=[count]:raise ValueError('Profile authority mask/kind schema')
         kind=_verified(kd,sem_path.parent).read_bytes();active=_verified(ad,sem_path.parent).read_bytes()
-        if len(kind)!=182017 or len(active)!=182017:raise ValueError('Profile authority byte count')
+        if len(kind)!=count or len(active)!=count:raise ValueError('Profile authority byte count')
         rows=[i for i,(k,a)in enumerate(zip(kind,active))if k==2 and a]
         desc=result['profile_rows'];file=_verified(desc,report.parent)
-        if len(rows)!=961 or desc['dtype']!='<u8'or desc['shape']!=[961]:raise ValueError('Profile source coverage')
-        if file.read_bytes()!=struct.pack('<961Q',*rows):raise ValueError('Profile output source identities differ from immutable source')
+        if (not self.current_input_build and len(rows)!=961) or desc['dtype']!='<u8'or desc['shape']!=[len(rows)]:raise ValueError('Profile source coverage')
+        if file.read_bytes()!=struct.pack('<'+str(len(rows))+'Q',*rows):raise ValueError('Profile output source identities differ from immutable source')
 
     def transport(self,role,checkpoint,out_dir):
         if role not in ['whole_uv','profile_implicit']:raise ValueError('Unknown transport role')
@@ -167,11 +176,16 @@ class ResidentTransportClient:
             self.start();path=Path(input_manifest).resolve();out_dir=Path(out_dir).resolve()
             if out_dir.exists() and any(out_dir.iterdir()):raise FileExistsError(str(out_dir))
             expected,data=self._state(role,path)
+            current_pk=_read(_verified(data['packet']));count=int(current_pk['observations']);sem_path=_verified(data['semantic']);current_sem=_read(sem_path);active_count=int(current_sem.get('active_observations',count));profiles=int(current_sem['semantic_counts']['true_profile']);wrank=int(current_sem['current_input_scope']['formal_W_rank']) if self.current_input_build else 214112
+            if self.current_input_build:
+                kinds=_verified(current_sem['arrays']['kind'],sem_path.parent).read_bytes();mask=_verified(current_sem['active_source_mask'],sem_path.parent).read_bytes()
+                if len(kinds)!=count or len(mask)!=count:raise ValueError('Current Query source view has incomplete kind/active arrays')
+                profiles=sum(k==2 and active!=0 for k,active in zip(kinds,mask))
             if self.authority is None:
                 packet=_read(_verified(data['packet']));qd=packet['query_packet'];query={'path':qd['manifest'],'sha256':qd['sha256']};_verified(query)
                 reply=self._exchange(dict(op='init',packet=data['packet'],semantic=data['semantic'],query=query,reader_policy_sha256=self._recipe['original_reader_policy_sha256'],output=str(self.run_dir/'dataset')))
                 result=reply['result']
-                if result['raw_rows']!=182017 or result['active_rows']!=182016 or not result['complete_source_validation_performed']:raise ValueError('Dataset initialization was incomplete')
+                if result['raw_rows']!=count or result['active_rows']!=active_count or not result['complete_source_validation_performed']:raise ValueError('Dataset initialization was incomplete')
                 self.authority=result['authority'];_atomic(self.run_dir/'initialization.json',reply)
             for key in ['packet','semantic']:
                 if data[key]['sha256']!=self.authority[key+'_sha256']:raise ValueError('New source authority requires a new fully verified worker')
@@ -187,12 +201,12 @@ class ResidentTransportClient:
             if result.get(parentkey)!=_ref(path):raise ValueError('Evaluated report uses a different request parent')
             rawkey,activekey=('raw_source_rows','active_source_rows') if role=='qbar' else ('raw_rows','active_rows')
             if role=='profile_implicit':
-                if result.get('raw_rows')!=182017 or result.get('profiles')!=961:raise ValueError('Profile transport coverage incomplete')
+                if result.get('raw_rows')!=count or result.get('profiles')!=profiles:raise ValueError('Profile transport coverage incomplete')
                 if not result.get('no_Solve')or not result.get('original_finite_S_alpha_domain_preserved'):raise ValueError('Profile transport scope changed')
                 self._check_profile_rows(result,report,data)
-            elif result.get(rawkey)!=182017 or result.get(activekey)!=182016:raise ValueError('Evaluated report is not whole-source')
+            elif result.get(rawkey)!=count or result.get(activekey)!=active_count:raise ValueError('Evaluated report is not whole-source')
             if role=='whole_uv':
-                if result.get('full_W_rank')!=214112 or not result.get('statistical_partition_exactly_once')or result.get('profile_count')!=961:raise ValueError('Whole-W transport source/statistical coverage changed')
+                if result.get('full_W_rank')!=wrank or not result.get('statistical_partition_exactly_once')or result.get('profile_count')!=profiles:raise ValueError('Whole-W transport source/statistical coverage changed')
             if role in ['whole_uv','profile_implicit']:
                 after,_=self._state(role,path)
                 if after!=expected:raise ValueError('CP/model/four auxiliaries changed during transport')

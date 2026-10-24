@@ -1,0 +1,6087 @@
+{
+  "schema": "rinksolve.data.v1",
+  "types": [
+    {
+      "name": "UnitRef",
+      "meaning": "显式单位；scene_unit 不等于已验证米制。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "unit",
+          "type": "Unit",
+          "unit": null,
+          "required": true,
+          "meaning": "显式单位；scene_unit 不等于已验证米制。",
+          "references": []
+        },
+        {
+          "name": "reference_id",
+          "type": "str | NoneType",
+          "unit": null,
+          "required": false,
+          "meaning": "像素/PTS的源、场景坐标系、模板或已验证米制坐标系。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "Quantity",
+      "meaning": "有限数值；不附带默认噪声或物理范围。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "value",
+          "type": "float",
+          "unit": "unit",
+          "required": true,
+          "meaning": "有限数值；不附带默认噪声或物理范围。",
+          "references": []
+        },
+        {
+          "name": "unit",
+          "type": "UnitRef",
+          "unit": null,
+          "required": true,
+          "meaning": "数值单位及其基准。",
+          "references": [
+            "UnitRef"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RecordRevision",
+      "meaning": "稳定对象身份。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "稳定对象身份。",
+          "references": []
+        },
+        {
+          "name": "revision",
+          "type": "int",
+          "unit": "dimensionless",
+          "required": true,
+          "meaning": "该对象当前修订；修订不改变身份。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "Evidence",
+      "meaning": "不可变证据身份；修正产生新记录。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "不可变证据身份；修正产生新记录。",
+          "references": []
+        },
+        {
+          "name": "kind",
+          "type": "EvidenceKind",
+          "unit": null,
+          "required": true,
+          "meaning": "原片、人工记录、图稿、测量、声明或计算。",
+          "references": []
+        },
+        {
+          "name": "uri",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "保留实际本地地址或来源网址，不伪造缺失资产。",
+          "references": []
+        },
+        {
+          "name": "description",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "证据能支持什么，不能支持什么。",
+          "references": []
+        },
+        {
+          "name": "sha256",
+          "type": "str | NoneType",
+          "unit": null,
+          "required": false,
+          "meaning": "已有文件的字节哈希；远程尚未取得可为空。",
+          "references": []
+        },
+        {
+          "name": "parent_evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "派生证据的直接来源。",
+          "references": [
+            "Evidence"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SourceClock",
+      "meaning": "源时钟身份。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "源时钟身份。",
+          "references": []
+        },
+        {
+          "name": "time_base_num",
+          "type": "int",
+          "unit": null,
+          "required": true,
+          "meaning": "原生 time_base 分子。",
+          "references": []
+        },
+        {
+          "name": "time_base_den",
+          "type": "int",
+          "unit": null,
+          "required": true,
+          "meaning": "原生 time_base 分母。",
+          "references": []
+        },
+        {
+          "name": "source_evidence_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "对应单节目原视频证据。",
+          "references": [
+            "Evidence"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SourceFrame",
+      "meaning": "原生曝光身份，不以导出序号替代。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "原生曝光身份，不以导出序号替代。",
+          "references": []
+        },
+        {
+          "name": "clock_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "原视频时钟。",
+          "references": [
+            "SourceClock"
+          ]
+        },
+        {
+          "name": "native_pts",
+          "type": "int",
+          "unit": "native_pts (clock_id)",
+          "required": true,
+          "meaning": "原片 native PTS，保持整数。",
+          "references": []
+        },
+        {
+          "name": "width",
+          "type": "int",
+          "unit": "pixel",
+          "required": true,
+          "meaning": "原生像素宽度。",
+          "references": []
+        },
+        {
+          "name": "height",
+          "type": "int",
+          "unit": "pixel",
+          "required": true,
+          "meaning": "原生像素高度。",
+          "references": []
+        },
+        {
+          "name": "evidence_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "该帧的原片来源。",
+          "references": [
+            "Evidence"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PixelObservation",
+      "meaning": "不可变原始像素观测ID。",
+      "owner": "frame_id",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "不可变原始像素观测ID。",
+          "references": []
+        },
+        {
+          "name": "frame_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "精确原生曝光。",
+          "references": [
+            "SourceFrame"
+          ]
+        },
+        {
+          "name": "uv",
+          "type": "tuple[float, float]",
+          "unit": "pixel",
+          "required": true,
+          "meaning": "原始像素坐标；优化不得回写。",
+          "references": []
+        },
+        {
+          "name": "evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "人工点、材料边缘或原帧证据。",
+          "references": [
+            "Evidence"
+          ]
+        },
+        {
+          "name": "capture_method",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "实际取点方法，不把自动检测冒充人工确认。",
+          "references": []
+        },
+        {
+          "name": "covariance_px2",
+          "type": "tuple[float, float, float] | NoneType",
+          "unit": "pixel^2",
+          "required": false,
+          "meaning": "可证实的二维协方差 xx,xy,yy；未知保持空。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "DerivedPixelObservation",
+      "meaning": "派生图像位置ID；不能改写为独立原始点。",
+      "owner": "frame_id",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "派生图像位置ID；不能改写为独立原始点。",
+          "references": []
+        },
+        {
+          "name": "frame_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "其父观测所属的同一原生曝光。",
+          "references": [
+            "SourceFrame"
+          ]
+        },
+        {
+          "name": "uv",
+          "type": "tuple[float, float]",
+          "unit": "pixel",
+          "required": true,
+          "meaning": "派生图像位置，像素。",
+          "references": []
+        },
+        {
+          "name": "method_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "派生算法与版本的稳定身份。",
+          "references": []
+        },
+        {
+          "name": "parent_observation_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "完整直接依赖；保留原线拟合样本。",
+          "references": [
+            "PixelObservation",
+            "DerivedPixelObservation"
+          ]
+        },
+        {
+          "name": "evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "计算记录与审核证据。",
+          "references": [
+            "Evidence"
+          ]
+        },
+        {
+          "name": "covariance_px2",
+          "type": "tuple[float, float, float] | NoneType",
+          "unit": "pixel^2",
+          "required": false,
+          "meaning": "传播所得协方差；未知保持空。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "CoordinateSystem",
+      "meaning": "场景/图像/展开面/模板的坐标系。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "场景/图像/展开面/模板的坐标系。",
+          "references": []
+        },
+        {
+          "name": "kind",
+          "type": "CoordinateKind",
+          "unit": null,
+          "required": true,
+          "meaning": "坐标意义，不混用透视像素与欧氏/米制。",
+          "references": []
+        },
+        {
+          "name": "dimension",
+          "type": "int",
+          "unit": null,
+          "required": true,
+          "meaning": "坐标维数。",
+          "references": []
+        },
+        {
+          "name": "axis_names",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "每个坐标轴的明确名称及顺序。",
+          "references": []
+        },
+        {
+          "name": "units",
+          "type": "tuple[UnitRef, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "逐轴单位。",
+          "references": [
+            "UnitRef"
+          ]
+        },
+        {
+          "name": "definition",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "原点、方向和尺度定义；不暗中设标准尺寸。",
+          "references": []
+        },
+        {
+          "name": "metric_evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "使用 verified_m 必须有独立米制依据。",
+          "references": [
+            "Evidence"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Scene",
+      "meaning": "赛事共同场景身份。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "赛事共同场景身份。",
+          "references": []
+        },
+        {
+          "name": "coordinate_system_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "共同世界坐标系；尺度状态显式。",
+          "references": [
+            "CoordinateSystem"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CameraRig",
+      "meaning": "物理机位身份；不等于一个shot。",
+      "owner": "scene_id",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "物理机位身份；不等于一个shot。",
+          "references": []
+        },
+        {
+          "name": "scene_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "机位安装所属场景。",
+          "references": [
+            "Scene"
+          ]
+        },
+        {
+          "name": "definition",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "实际采用的安装/光学定义，不写默认硬件假设。",
+          "references": []
+        },
+        {
+          "name": "evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "机位身份依据。",
+          "references": [
+            "Evidence"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Shot",
+      "meaning": "镜头身份。",
+      "owner": "rig_id",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "镜头身份。",
+          "references": []
+        },
+        {
+          "name": "rig_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "所属物理机位。",
+          "references": [
+            "CameraRig"
+          ]
+        },
+        {
+          "name": "clock_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "源时钟。",
+          "references": [
+            "SourceClock"
+          ]
+        },
+        {
+          "name": "frame_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "当前镜头原生曝光；不以重采样时钟替代。",
+          "references": [
+            "SourceFrame"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "GeometryEntity",
+      "meaning": "静止场地材料实体的稳定身份。",
+      "owner": "scene_id",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "静止场地材料实体的稳定身份。",
+          "references": []
+        },
+        {
+          "name": "scene_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "赛事共同场景。",
+          "references": [
+            "Scene"
+          ]
+        },
+        {
+          "name": "label",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "人可读实体名；身份由ID决定。",
+          "references": []
+        },
+        {
+          "name": "claimed_scope",
+          "type": "MaterialScope",
+          "unit": null,
+          "required": true,
+          "meaning": "待证实的物理归属，不等于已确认。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "EntityVerification",
+      "meaning": "实体归属的有据审核记录。",
+      "owner": "entity_id",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "实体归属的有据审核记录。",
+          "references": []
+        },
+        {
+          "name": "entity_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "被审核实体。",
+          "references": [
+            "GeometryEntity"
+          ]
+        },
+        {
+          "name": "status",
+          "type": "VerificationStatus",
+          "unit": null,
+          "required": true,
+          "meaning": "未确认/拒绝保留，但不能进入拟合。",
+          "references": []
+        },
+        {
+          "name": "verified_scope",
+          "type": "MaterialScope",
+          "unit": null,
+          "required": true,
+          "meaning": "核实属于冰面或围挡本体才可入场地拟合。",
+          "references": []
+        },
+        {
+          "name": "static_material_confirmed",
+          "type": "bool",
+          "unit": null,
+          "required": true,
+          "meaning": "确认为静止实体材料；反射/人物/字幕禁止。",
+          "references": []
+        },
+        {
+          "name": "evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "原片与人工确认依据。",
+          "references": [
+            "Evidence"
+          ]
+        },
+        {
+          "name": "notes",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "核对结论与剩余不确定性。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "GeometryPrimitive",
+      "meaning": "几何计算表示ID；采样点不是语义landmark。",
+      "owner": "entity_id",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "几何计算表示ID；采样点不是语义landmark。",
+          "references": []
+        },
+        {
+          "name": "entity_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "所属物理材料实体。",
+          "references": [
+            "GeometryEntity"
+          ]
+        },
+        {
+          "name": "coordinate_system_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "计算表示的坐标。",
+          "references": [
+            "CoordinateSystem"
+          ]
+        },
+        {
+          "name": "representation",
+          "type": "RepresentationKind",
+          "unit": null,
+          "required": true,
+          "meaning": "解析模型、曲线样本或网格；不带定位语义。",
+          "references": []
+        },
+        {
+          "name": "model_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "新实现注册的几何函数身份，不是旧代码路径。",
+          "references": []
+        },
+        {
+          "name": "parameter_block_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "该表示依赖的显式变量。",
+          "references": [
+            "VariableBlock"
+          ]
+        },
+        {
+          "name": "asset_evidence_id",
+          "type": "str | NoneType",
+          "unit": null,
+          "required": false,
+          "meaning": "外部样本/网格的证据资产，可为空。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "Interval",
+      "meaning": "显式允许区间下界；空表示该方向不设界。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "lower",
+          "type": "float | NoneType",
+          "unit": null,
+          "required": true,
+          "meaning": "显式允许区间下界；空表示该方向不设界。",
+          "references": []
+        },
+        {
+          "name": "upper",
+          "type": "float | NoneType",
+          "unit": null,
+          "required": true,
+          "meaning": "显式允许区间上界。",
+          "references": []
+        },
+        {
+          "name": "unit",
+          "type": "UnitRef",
+          "unit": null,
+          "required": true,
+          "meaning": "曲线参数的实际单位；不默认0到1。",
+          "references": [
+            "UnitRef"
+          ]
+        },
+        {
+          "name": "lower_closed",
+          "type": "bool",
+          "unit": null,
+          "required": false,
+          "meaning": "下界是否包含。",
+          "references": []
+        },
+        {
+          "name": "upper_closed",
+          "type": "bool",
+          "unit": null,
+          "required": false,
+          "meaning": "上界是否包含。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "CurveFeature",
+      "meaning": "命名的物理曲线特征身份。",
+      "owner": "entity_id",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "命名的物理曲线特征身份。",
+          "references": []
+        },
+        {
+          "name": "entity_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "曲线属于哪个实体材料。",
+          "references": [
+            "GeometryEntity"
+          ]
+        },
+        {
+          "name": "primitive_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "曲线几何表示。",
+          "references": [
+            "GeometryPrimitive"
+          ]
+        },
+        {
+          "name": "support_surface_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "曲线所在同一材料表面身份。",
+          "references": [
+            "GeometryPrimitive",
+            "BoardSurface"
+          ]
+        },
+        {
+          "name": "meaning",
+          "type": "CurveMeaning",
+          "unit": null,
+          "required": true,
+          "meaning": "宽线中线、实体边界或图案轮廓，不能混用。",
+          "references": []
+        },
+        {
+          "name": "verification_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "曲线归属已核实的记录。",
+          "references": [
+            "EntityVerification"
+          ]
+        },
+        {
+          "name": "parameter_domain",
+          "type": "Interval",
+          "unit": null,
+          "required": true,
+          "meaning": "曲线参数域；与样本索引不同。",
+          "references": [
+            "Interval"
+          ]
+        },
+        {
+          "name": "definition_evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "该曲线测量定义的明确依据。",
+          "references": [
+            "Evidence"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SharedPointPosition",
+      "meaning": "同一实体点的共享未知坐标，绝非每帧station。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "variable_block_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "同一实体点的共享未知坐标，绝非每帧station。",
+          "references": [
+            "VariableBlock"
+          ]
+        },
+        {
+          "name": "coordinate_system_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "共享位置所在坐标系。",
+          "references": [
+            "CoordinateSystem"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SharedCurvePointPosition",
+      "meaning": "该固定实体点所在已确认曲线。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "curve_feature_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "该固定实体点所在已确认曲线。",
+          "references": [
+            "CurveFeature"
+          ]
+        },
+        {
+          "name": "station_variable_block_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "同一实体点全帧共享的未知station；owner是feature，不是观测。",
+          "references": [
+            "VariableBlock"
+          ]
+        },
+        {
+          "name": "allowed_interval",
+          "type": "Interval",
+          "unit": null,
+          "required": true,
+          "meaning": "固定点位置可估计的明确范围，不因逐帧观测而独立滑动。",
+          "references": [
+            "Interval"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "KnownPointPosition",
+      "meaning": "已知位置的数值；初值不能写进此字段。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "coordinates",
+          "type": "tuple[float, ...]",
+          "unit": "coordinate_system_id units",
+          "required": true,
+          "meaning": "已知位置的数值；初值不能写进此字段。",
+          "references": []
+        },
+        {
+          "name": "coordinate_system_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "位置单位与坐标定义。",
+          "references": [
+            "CoordinateSystem"
+          ]
+        },
+        {
+          "name": "definition_constraint_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "该数值为何被固定：测量/用户确认/坐标规范。",
+          "references": [
+            "Constraint"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "IntersectionPosition",
+      "meaning": "两条已确认且测量定义明确的曲线。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "curve_feature_ids",
+          "type": "tuple[str, str]",
+          "unit": null,
+          "required": true,
+          "meaning": "两条已确认且测量定义明确的曲线。",
+          "references": [
+            "CurveFeature"
+          ]
+        },
+        {
+          "name": "branch_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "确定的唯一交点分支身份；不是最近初值选择。",
+          "references": []
+        },
+        {
+          "name": "branch_definition",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "分支的实体/拓扑定义，准备阶段须验证唯一存在。",
+          "references": []
+        },
+        {
+          "name": "branch_evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "分支识别依据；数学唯一性证明亦需留存。",
+          "references": [
+            "Evidence"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "StructuralPointPosition",
+      "meaning": "明确的实体角点/端点等定义，新注册几何函数。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "definition_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "明确的实体角点/端点等定义，新注册几何函数。",
+          "references": []
+        },
+        {
+          "name": "geometry_feature_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "定义所依赖的实体几何。",
+          "references": []
+        },
+        {
+          "name": "definition_evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "真实角点/端点身份依据，不许用采样vertex替代。",
+          "references": [
+            "Evidence"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LandmarkFeature",
+      "meaning": "一个固定实体位置的身份；位置可以尚未求出。",
+      "owner": "entity_id",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "一个固定实体位置的身份；位置可以尚未求出。",
+          "references": []
+        },
+        {
+          "name": "entity_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "固定于哪个材料实体。",
+          "references": [
+            "GeometryEntity"
+          ]
+        },
+        {
+          "name": "verification_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "归属核实。",
+          "references": [
+            "EntityVerification"
+          ]
+        },
+        {
+          "name": "label",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "交点/角点等人可读名称。",
+          "references": []
+        },
+        {
+          "name": "position",
+          "type": "SharedPointPosition | SharedCurvePointPosition | KnownPointPosition | IntersectionPosition | StructuralPointPosition",
+          "unit": null,
+          "required": true,
+          "meaning": "共享未知、已知、交点或实体结构定义；无per-frame滑动位置。",
+          "references": [
+            "SharedPointPosition",
+            "SharedCurvePointPosition",
+            "KnownPointPosition",
+            "IntersectionPosition",
+            "StructuralPointPosition"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CurveLocusFeature",
+      "meaning": "只要求在某条曲线范围内的特征定义。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "只要求在某条曲线范围内的特征定义。",
+          "references": []
+        },
+        {
+          "name": "curve_feature_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "所允许滑动的命名曲线。",
+          "references": [
+            "CurveFeature"
+          ]
+        },
+        {
+          "name": "allowed_intervals",
+          "type": "tuple[Interval, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "允许范围；无隐式0到1或默认整线。",
+          "references": [
+            "Interval"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RegionLocusFeature",
+      "meaning": "只要求在某表面区域内，不指定固定位置。",
+      "owner": "entity_id",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "只要求在某表面区域内，不指定固定位置。",
+          "references": []
+        },
+        {
+          "name": "entity_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "静止材料实体。",
+          "references": [
+            "GeometryEntity"
+          ]
+        },
+        {
+          "name": "verification_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "区域归属核实。",
+          "references": [
+            "EntityVerification"
+          ]
+        },
+        {
+          "name": "support_surface_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "允许区域所在材料面。",
+          "references": [
+            "GeometryPrimitive",
+            "BoardSurface"
+          ]
+        },
+        {
+          "name": "region_model_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "明确的新区域定义注册ID。",
+          "references": []
+        },
+        {
+          "name": "definition_feature_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "区域边界/结构定义依赖。",
+          "references": []
+        },
+        {
+          "name": "coordinate_system_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "观测局部区域坐标的单位。",
+          "references": [
+            "CoordinateSystem"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ArtworkSourceFrame",
+      "meaning": "实际高清图像/SVG来源。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "evidence_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "实际高清图像/SVG来源。",
+          "references": [
+            "Evidence"
+          ]
+        },
+        {
+          "name": "pixel_dimensions",
+          "type": "tuple[int, int] | NoneType",
+          "unit": null,
+          "required": true,
+          "meaning": "原始栅格宽高；矢量源可为空。",
+          "references": []
+        },
+        {
+          "name": "view_box",
+          "type": "tuple[float, float, float, float]",
+          "unit": null,
+          "required": true,
+          "meaning": "源图稿viewBox的x,y,width,height，保留原始比例与裁切范围。",
+          "references": []
+        },
+        {
+          "name": "aspect_definition",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "来源viewBox比例如何解释；logo比例不是现场整幅横幅比例。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "ArtworkStyle",
+      "meaning": "模板材料原色/绘制样式证据，不是求解硬物理约束。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "模板材料原色/绘制样式证据，不是求解硬物理约束。",
+          "references": []
+        },
+        {
+          "name": "color_space",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "原始颜色空间。",
+          "references": []
+        },
+        {
+          "name": "fill_rgba",
+          "type": "tuple[float, float, float, float] | NoneType",
+          "unit": null,
+          "required": true,
+          "meaning": "来源填色，未知或非纯色可为空。",
+          "references": []
+        },
+        {
+          "name": "stroke_rgba",
+          "type": "tuple[float, float, float, float] | NoneType",
+          "unit": null,
+          "required": true,
+          "meaning": "来源描边色，未知可为空。",
+          "references": []
+        },
+        {
+          "name": "evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "样式的来源图稿依据。",
+          "references": [
+            "Evidence"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ArtworkShape",
+      "meaning": "单个字形/图案轮廓的模板内身份。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "单个字形/图案轮廓的模板内身份。",
+          "references": []
+        },
+        {
+          "name": "role",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "glyph、mark、outline等实际语义。",
+          "references": []
+        },
+        {
+          "name": "path_evidence_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "保留高清源及矢量化的可追溯路径资产。",
+          "references": []
+        },
+        {
+          "name": "closed",
+          "type": "bool",
+          "unit": null,
+          "required": true,
+          "meaning": "轮廓实际是否闭合。",
+          "references": []
+        },
+        {
+          "name": "topology_role",
+          "type": "ContourRole",
+          "unit": null,
+          "required": true,
+          "meaning": "外轮廓、内洞或开放笔画的明确拓扑。",
+          "references": []
+        },
+        {
+          "name": "group_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "同一字形/图案组的稳定ID，多个contour不是无关片段。",
+          "references": []
+        },
+        {
+          "name": "parent_shape_id",
+          "type": "str | NoneType",
+          "unit": null,
+          "required": false,
+          "meaning": "内洞/嵌套轮廓所属外轮廓；外层可空。",
+          "references": [
+            "ArtworkShape"
+          ]
+        },
+        {
+          "name": "style_id",
+          "type": "str | NoneType",
+          "unit": null,
+          "required": false,
+          "meaning": "来源填色/描边样式，仅作模板证据。",
+          "references": [
+            "ArtworkStyle"
+          ]
+        },
+        {
+          "name": "text",
+          "type": "str | NoneType",
+          "unit": null,
+          "required": false,
+          "meaning": "确实识别的文字；未知不补造。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "ArtworkLandmark",
+      "meaning": "模板内固定位置，如字形尖角，区别于轮廓采样。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "模板内固定位置，如字形尖角，区别于轮廓采样。",
+          "references": []
+        },
+        {
+          "name": "uv",
+          "type": "tuple[float, float]",
+          "unit": "normalized_2d",
+          "required": true,
+          "meaning": "模板规范坐标，normalized_2d。",
+          "references": []
+        },
+        {
+          "name": "definition",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "实体字形/图案位置定义；不以任意采样顶点冒充。",
+          "references": []
+        },
+        {
+          "name": "evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "模板位置依据。",
+          "references": [
+            "Evidence"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ArtworkTemplate",
+      "meaning": "广告设计对象；不等于围挡上某一次安装。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "广告设计对象；不等于围挡上某一次安装。",
+          "references": []
+        },
+        {
+          "name": "revision",
+          "type": "int",
+          "unit": "dimensionless",
+          "required": true,
+          "meaning": "设计/轮廓修订。",
+          "references": []
+        },
+        {
+          "name": "brand",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "品牌身份；同品牌不同版式不能自动等同。",
+          "references": []
+        },
+        {
+          "name": "variant",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "具体版本、颜色、语言、裁切版式。",
+          "references": []
+        },
+        {
+          "name": "coordinate_system_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "统一模板2D坐标、原点和轴向。",
+          "references": [
+            "CoordinateSystem"
+          ]
+        },
+        {
+          "name": "extent",
+          "type": "TemplateExtent",
+          "unit": null,
+          "required": true,
+          "meaning": "整幅横幅、组成logo或局部设计；不强给彼此相同比例。",
+          "references": []
+        },
+        {
+          "name": "source_frames",
+          "type": "tuple[ArtworkSourceFrame, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "源尺寸/viewBox与比例依据；与现场物理宽高分离。",
+          "references": [
+            "ArtworkSourceFrame"
+          ]
+        },
+        {
+          "name": "source_evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "高清图可来自官网/网络，视频只是安装核对证据。",
+          "references": [
+            "Evidence"
+          ]
+        },
+        {
+          "name": "shapes",
+          "type": "tuple[ArtworkShape, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "文字字形、图案和外轮廓的完整对象层。",
+          "references": [
+            "ArtworkShape"
+          ]
+        },
+        {
+          "name": "landmarks",
+          "type": "tuple[ArtworkLandmark, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "可重复识别的固定模板位置。",
+          "references": [
+            "ArtworkLandmark"
+          ]
+        },
+        {
+          "name": "completeness_notes",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "已拆清/缺失/裁切/尚待确认的部分。",
+          "references": []
+        },
+        {
+          "name": "styles",
+          "type": "tuple[ArtworkStyle, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "材料原色/绘制样式证据，不自动变成物理约束。",
+          "references": [
+            "ArtworkStyle"
+          ]
+        },
+        {
+          "name": "parent_template_id",
+          "type": "str | NoneType",
+          "unit": null,
+          "required": false,
+          "meaning": "组件所属整幅设计若已知则明确引用。",
+          "references": [
+            "ArtworkTemplate"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ArtworkLayoutGroup",
+      "meaning": "A source logo/text group in one shared static installed design layout.",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "整组文字/图案的现场拼版身份；不是单帧自由字形。",
+          "references": []
+        },
+        {
+          "name": "source_template_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "真实源组件图稿，保留官网组合与现场重排的区别。",
+          "references": [
+            "ArtworkTemplate"
+          ]
+        },
+        {
+          "name": "source_feature_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "该组所属源shape/landmark；组内原形状不任意变形。",
+          "references": [
+            "ArtworkShape",
+            "ArtworkLandmark"
+          ]
+        },
+        {
+          "name": "transform_model_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "已注册的跨帧共享静态相似变换，或源坐标恒等。",
+          "references": []
+        },
+        {
+          "name": "parameter_block_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "拼版位置/统一比例/转角的共享变量，归该组而非曝光。",
+          "references": [
+            "VariableBlock"
+          ]
+        },
+        {
+          "name": "match_status",
+          "type": "VerificationStatus",
+          "unit": null,
+          "required": true,
+          "meaning": "该组件版本与现场材料的核对状态。",
+          "references": []
+        },
+        {
+          "name": "match_evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "现场拼版与源组件核对证据。",
+          "references": [
+            "Evidence"
+          ]
+        },
+        {
+          "name": "notes",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "源组合比例是否适用，缺失组件和未知留白。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "ArtworkLayout",
+      "meaning": "Source components are composed before the whole banner is installed.",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "一次真实印刷设计的共享拼版对象；区别源图稿与安装。",
+          "references": []
+        },
+        {
+          "name": "revision",
+          "type": "int",
+          "unit": "dimensionless",
+          "required": true,
+          "meaning": "现场拼版修订。",
+          "references": []
+        },
+        {
+          "name": "coordinate_system_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "拼版的normalized_2d坐标与外矩形定义；不继承源画布白边。",
+          "references": [
+            "CoordinateSystem"
+          ]
+        },
+        {
+          "name": "group_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "完整组件组；组之间位置可共享估计，不逐帧重排。",
+          "references": [
+            "ArtworkLayoutGroup"
+          ]
+        },
+        {
+          "name": "evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "现场原片和真实印刷设计的拼版依据。",
+          "references": [
+            "Evidence"
+          ]
+        },
+        {
+          "name": "banner_extent_definition",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "真实广告外边界如何定义；未见边界明确未知，源画布不自动等于边界。",
+          "references": []
+        },
+        {
+          "name": "notes",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "整体拼版已知/待估/缺失说明，不冒充整幅母版。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "BoardSurface",
+      "meaning": "连续整圈围挡表面，不以直线/圆弧切成互不连续广告面。",
+      "owner": "entity_id",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "连续整圈围挡表面，不以直线/圆弧切成互不连续广告面。",
+          "references": []
+        },
+        {
+          "name": "entity_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "围挡本体实体。",
+          "references": [
+            "GeometryEntity"
+          ]
+        },
+        {
+          "name": "primitive_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "连续三维材料面的新模型表示。",
+          "references": [
+            "GeometryPrimitive"
+          ]
+        },
+        {
+          "name": "unwrapped_coordinate_system_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "整圈剪开摊平后的坐标系，含接缝与方向定义。",
+          "references": [
+            "CoordinateSystem"
+          ]
+        },
+        {
+          "name": "seam_definition",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "展开接缝的位置和跨接缝处理定义。",
+          "references": []
+        },
+        {
+          "name": "governing_constraint_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "围挡物理关系与连续性依据，不附带3D平面矩形假设。",
+          "references": [
+            "Constraint"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BoardInstallation",
+      "meaning": "一个具体实体广告安装对象。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "一个具体实体广告安装对象。",
+          "references": []
+        },
+        {
+          "name": "board_surface_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "位于哪条连续围挡表面。",
+          "references": [
+            "BoardSurface"
+          ]
+        },
+        {
+          "name": "template_id",
+          "type": "str | NoneType",
+          "unit": null,
+          "required": true,
+          "meaning": "已确定匹配的图稿对象；无高清图也可先登记现场安装。",
+          "references": [
+            "ArtworkTemplate"
+          ]
+        },
+        {
+          "name": "template_match_status",
+          "type": "VerificationStatus",
+          "unit": null,
+          "required": true,
+          "meaning": "同品牌不构成版式已匹配。",
+          "references": []
+        },
+        {
+          "name": "template_match_evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "原片中具体文字/颜色/布局与模板的核对证据。",
+          "references": [
+            "Evidence"
+          ]
+        },
+        {
+          "name": "mapping_model_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "模板2D到围挡展开面的显式新映射定义。",
+          "references": []
+        },
+        {
+          "name": "parameter_block_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "安装位置/尺寸/朝向等共享变量，不是每帧广告自由形变。",
+          "references": [
+            "VariableBlock"
+          ]
+        },
+        {
+          "name": "governing_constraint_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "展开矩形等已确认关系；不能暗中增加轴对齐或3D平面。",
+          "references": [
+            "Constraint"
+          ]
+        },
+        {
+          "name": "notes",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "真实安装边界、遮挡、跨弧与接缝情况。",
+          "references": []
+        },
+        {
+          "name": "candidate_template_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "明确的待核对图稿候选，不自动成为实体身份。",
+          "references": [
+            "ArtworkTemplate"
+          ]
+        },
+        {
+          "name": "layout_id",
+          "type": "str | NoneType",
+          "unit": null,
+          "required": false,
+          "meaning": "已确定现场拼版；源组件先拼版再整体映射连续围挡。",
+          "references": [
+            "ArtworkLayout"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "InstalledArtworkFeature",
+      "meaning": "某安装上的图案特征；不会只凭模板直接产生视频观测。",
+      "owner": "installation_id",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "某安装上的图案特征；不会只凭模板直接产生视频观测。",
+          "references": []
+        },
+        {
+          "name": "installation_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "实际物理安装。",
+          "references": [
+            "BoardInstallation"
+          ]
+        },
+        {
+          "name": "template_feature_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "模板landmark或shape的ID。",
+          "references": [
+            "ArtworkShape",
+            "ArtworkLandmark"
+          ]
+        },
+        {
+          "name": "verification_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "该安装对应围挡静止材料的归属确认。",
+          "references": [
+            "EntityVerification"
+          ]
+        },
+        {
+          "name": "allowed_intervals",
+          "type": "tuple[Interval, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "shape轮廓允许的station域；landmark必须为空。",
+          "references": [
+            "Interval"
+          ]
+        },
+        {
+          "name": "layout_group_id",
+          "type": "str | NoneType",
+          "unit": null,
+          "required": false,
+          "meaning": "若来自现场重排拼版，明确使用哪一源组件组。",
+          "references": [
+            "ArtworkLayoutGroup"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "OwnerRef",
+      "meaning": "变量物理共享范围；与数组地址无关。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "kind",
+          "type": "OwnerKind",
+          "unit": null,
+          "required": true,
+          "meaning": "变量物理共享范围；与数组地址无关。",
+          "references": []
+        },
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "所属对象ID。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "ParameterComponent",
+      "meaning": "变量分量的稳定名称。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "name",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "变量分量的稳定名称。",
+          "references": []
+        },
+        {
+          "name": "unit",
+          "type": "UnitRef",
+          "unit": null,
+          "required": true,
+          "meaning": "显式逐分量单位。",
+          "references": [
+            "UnitRef"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "VariableBlock",
+      "meaning": "稳定参数块ID。",
+      "owner": "owner",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "稳定参数块ID。",
+          "references": []
+        },
+        {
+          "name": "owner",
+          "type": "OwnerRef",
+          "unit": null,
+          "required": true,
+          "meaning": "场景/实体/点/机位/shot/安装/观测辅助量所有权。",
+          "references": [
+            "OwnerRef"
+          ]
+        },
+        {
+          "name": "components",
+          "type": "tuple[ParameterComponent, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "分量名称、维数、单位；数值另存。",
+          "references": [
+            "ParameterComponent"
+          ]
+        },
+        {
+          "name": "mode",
+          "type": "VariableMode",
+          "unit": null,
+          "required": true,
+          "meaning": "自由、由明确依据固定、或由模型推导。",
+          "references": []
+        },
+        {
+          "name": "definition_constraint_id",
+          "type": "str | NoneType",
+          "unit": null,
+          "required": false,
+          "meaning": "固定或推导的依据；不能靠初值冻结。",
+          "references": [
+            "Constraint"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ParameterValue",
+      "meaning": "引用变量布局；不重复定义owner。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "variable_block_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "引用变量布局；不重复定义owner。",
+          "references": [
+            "VariableBlock"
+          ]
+        },
+        {
+          "name": "values",
+          "type": "tuple[float, ...]",
+          "unit": "VariableBlock.components units",
+          "required": true,
+          "meaning": "有限实际值，维数必须和块一致。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "ObservationAssociation",
+      "meaning": "像素与语义特征的可修订关联，不修改原像素。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "像素与语义特征的可修订关联，不修改原像素。",
+          "references": []
+        },
+        {
+          "name": "observation_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "原始或派生图像观测。",
+          "references": [
+            "PixelObservation",
+            "DerivedPixelObservation"
+          ]
+        },
+        {
+          "name": "feature_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "固定位置、curve/region locus或安装图案特征。",
+          "references": []
+        },
+        {
+          "name": "use",
+          "type": "AssociationUse",
+          "unit": null,
+          "required": true,
+          "meaning": "拟合/独立验证/停用/拒绝分开保留。",
+          "references": []
+        },
+        {
+          "name": "evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "关联判定依据。",
+          "references": [
+            "Evidence"
+          ]
+        },
+        {
+          "name": "local_variable_block_id",
+          "type": "str | NoneType",
+          "unit": null,
+          "required": false,
+          "meaning": "仅locus有观测局部station/区域坐标；landmark禁止。",
+          "references": [
+            "VariableBlock"
+          ]
+        },
+        {
+          "name": "reason",
+          "type": "str",
+          "unit": null,
+          "required": false,
+          "meaning": "关联或排除理由。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "ExpressionReference",
+      "meaning": "约束显式依赖对象。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "record_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "约束显式依赖对象。",
+          "references": []
+        },
+        {
+          "name": "field_path",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "已注册模型字段；不执行任意代码字符串。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "NamedQuantity",
+      "meaning": "表达式常量名称。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "name",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "表达式常量名称。",
+          "references": []
+        },
+        {
+          "name": "quantity",
+          "type": "Quantity",
+          "unit": null,
+          "required": true,
+          "meaning": "常量数值及单位。",
+          "references": [
+            "Quantity"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Constraint",
+      "meaning": "物理事实/工作选择/坐标规范的稳定身份。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "物理事实/工作选择/坐标规范的稳定身份。",
+          "references": []
+        },
+        {
+          "name": "revision",
+          "type": "int",
+          "unit": "dimensionless",
+          "required": true,
+          "meaning": "该声明当前修订。",
+          "references": []
+        },
+        {
+          "name": "kind",
+          "type": "ConstraintKind",
+          "unit": null,
+          "required": true,
+          "meaning": "物理等式/不等式/统计先验与数学规范分离。",
+          "references": []
+        },
+        {
+          "name": "authority",
+          "type": "Authority",
+          "unit": null,
+          "required": true,
+          "meaning": "用户确认、用户暂用、测量、数学定义、提案或未批准。",
+          "references": []
+        },
+        {
+          "name": "enabled",
+          "type": "bool",
+          "unit": null,
+          "required": true,
+          "meaning": "只有当前已授权的定义能被准备阶段启用。",
+          "references": []
+        },
+        {
+          "name": "operator_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "新计算核注册的表达式，不从描述字符串eval。",
+          "references": []
+        },
+        {
+          "name": "references",
+          "type": "tuple[ExpressionReference, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "显式作用对象与字段。",
+          "references": [
+            "ExpressionReference"
+          ]
+        },
+        {
+          "name": "constants",
+          "type": "tuple[NamedQuantity, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "逐常量单位，不默认米制/噪声/阈值。",
+          "references": [
+            "NamedQuantity"
+          ]
+        },
+        {
+          "name": "evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "来源原句、测量或数学定义依据。",
+          "references": [
+            "Evidence"
+          ]
+        },
+        {
+          "name": "description",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "准确含义、作用范围和限制。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "RevisionStamp",
+      "meaning": "原始证据与观测关联修订。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "data",
+          "type": "int",
+          "unit": null,
+          "required": true,
+          "meaning": "原始证据与观测关联修订。",
+          "references": []
+        },
+        {
+          "name": "model",
+          "type": "int",
+          "unit": null,
+          "required": true,
+          "meaning": "实体/模型/变量布局修订。",
+          "references": []
+        },
+        {
+          "name": "constraints",
+          "type": "int",
+          "unit": null,
+          "required": true,
+          "meaning": "约束台账修订。",
+          "references": []
+        },
+        {
+          "name": "initialization",
+          "type": "int",
+          "unit": null,
+          "required": true,
+          "meaning": "初值修订；不等于物理事实修订。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "DependencyNode",
+      "meaning": "输入、模型、约束、准备缓存或状态节点。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "输入、模型、约束、准备缓存或状态节点。",
+          "references": []
+        },
+        {
+          "name": "revision",
+          "type": "int",
+          "unit": "dimensionless",
+          "required": true,
+          "meaning": "仅本节点修订。",
+          "references": []
+        },
+        {
+          "name": "kind",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "模块/数据类型。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "DependencyEdge",
+      "meaning": "发生变化的上游对象。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "input_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "发生变化的上游对象。",
+          "references": []
+        },
+        {
+          "name": "consumer_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "确实消费该上游的下游对象。",
+          "references": []
+        },
+        {
+          "name": "reason",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "为何依赖；不把历史生产资格链接成普通求解前置。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "RevisionGraph",
+      "meaning": "当前影响图节点。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "nodes",
+          "type": "tuple[DependencyNode, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "当前影响图节点。",
+          "references": [
+            "DependencyNode"
+          ]
+        },
+        {
+          "name": "edges",
+          "type": "tuple[DependencyEdge, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "从输入到消费者的有向依赖。",
+          "references": [
+            "DependencyEdge"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ProjectionContract",
+      "meaning": "投影数学定义的明确身份。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "投影数学定义的明确身份。",
+          "references": []
+        },
+        {
+          "name": "implementation_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "新投影注册实现。",
+          "references": []
+        },
+        {
+          "name": "distortion_definition",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "实际畸变定义，包括明确禁用时的说明。",
+          "references": []
+        },
+        {
+          "name": "exposure_time_definition",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "global/逐行时钟等明确说明，不从相机型号猜。",
+          "references": []
+        },
+        {
+          "name": "coordinate_convention",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "R、C、轴向和内参定义。",
+          "references": []
+        },
+        {
+          "name": "evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "定义依据。",
+          "references": [
+            "Evidence"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ProjectionProof",
+      "meaning": "投影/真实画面验证报告身份。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "投影/真实画面验证报告身份。",
+          "references": []
+        },
+        {
+          "name": "source_contract_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "对照的真实显示或物理投影契约。",
+          "references": [
+            "ProjectionContract"
+          ]
+        },
+        {
+          "name": "target_contract_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "新初始化/求解投影契约。",
+          "references": [
+            "ProjectionContract"
+          ]
+        },
+        {
+          "name": "frame_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "已实际核验的原生曝光覆盖，不虚报完整。",
+          "references": [
+            "SourceFrame"
+          ]
+        },
+        {
+          "name": "stage",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "数学等价、原片叠图或独立整镜头验证，不能互代。",
+          "references": []
+        },
+        {
+          "name": "status",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "pending/passed/failed；报告保存真实判断依据。",
+          "references": []
+        },
+        {
+          "name": "evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "真实输出、误差及审阅证据。",
+          "references": [
+            "Evidence"
+          ]
+        },
+        {
+          "name": "acceptance_constraint_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "若宣布通过，采用什么明确验收定义。",
+          "references": [
+            "Constraint"
+          ]
+        },
+        {
+          "name": "limitations",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "例如平面demo等价不等于Brown/RS等价。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "InitialState",
+      "meaning": "新的参数初值包，没有旧优化器lambda/rho。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "新的参数初值包，没有旧优化器lambda/rho。",
+          "references": []
+        },
+        {
+          "name": "stamp",
+          "type": "RevisionStamp",
+          "unit": null,
+          "required": true,
+          "meaning": "导入所对应的当前数据/模型/约束/初值修订。",
+          "references": [
+            "RevisionStamp"
+          ]
+        },
+        {
+          "name": "parameter_values",
+          "type": "tuple[ParameterValue, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "只给数值，不自动固定实体位置。",
+          "references": [
+            "ParameterValue"
+          ]
+        },
+        {
+          "name": "source_evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "成功demo/测量/人工提供的数据。",
+          "references": [
+            "Evidence"
+          ]
+        },
+        {
+          "name": "frame_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "实际导入覆盖的源PTS。",
+          "references": [
+            "SourceFrame"
+          ]
+        },
+        {
+          "name": "projection_contract_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "实际采用的投影，不偷换物理模型。",
+          "references": [
+            "ProjectionContract"
+          ]
+        },
+        {
+          "name": "proof_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "独立转换等价/不等价报告。",
+          "references": [
+            "ProjectionProof"
+          ]
+        },
+        {
+          "name": "batched_parameter_table_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "批量station等初值的外部完整参数表。",
+          "references": [
+            "ColumnTableRef"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LayoutEntry",
+      "meaning": "稳定参数块ID。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "variable_block_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "稳定参数块ID。",
+          "references": [
+            "VariableBlock"
+          ]
+        },
+        {
+          "name": "offset",
+          "type": "int",
+          "unit": "dimensionless",
+          "required": true,
+          "meaning": "PreparedProblem本次明确数值布局的起点。",
+          "references": []
+        },
+        {
+          "name": "size",
+          "type": "int",
+          "unit": "dimensionless",
+          "required": true,
+          "meaning": "布局维数，必须与定义一致。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "SelectionRef",
+      "meaning": "稳定批选择身份，不将百万个字符串写进JSON。",
+      "owner": "table_id",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "稳定批选择身份，不将百万个字符串写进JSON。",
+          "references": []
+        },
+        {
+          "name": "table_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "被选择的外部列式表。",
+          "references": [
+            "ColumnTableRef"
+          ]
+        },
+        {
+          "name": "generation",
+          "type": "int",
+          "unit": "dimensionless",
+          "required": true,
+          "meaning": "精确表布局generation。",
+          "references": []
+        },
+        {
+          "name": "mode",
+          "type": "SelectionMode",
+          "unit": null,
+          "required": true,
+          "meaning": "小型ID列表、外部row索引或外部mask，三者只能选一。",
+          "references": []
+        },
+        {
+          "name": "ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "仅小集合使用稳定ID，不是当前row号。",
+          "references": []
+        },
+        {
+          "name": "row_index_array_id",
+          "type": "str | NoneType",
+          "unit": null,
+          "required": false,
+          "meaning": "大量选择使用外部整数索引。",
+          "references": [
+            "TypedArrayRef"
+          ]
+        },
+        {
+          "name": "row_mask_array_id",
+          "type": "str | NoneType",
+          "unit": null,
+          "required": false,
+          "meaning": "大量选择使用外部布尔/uint8 mask。",
+          "references": [
+            "TypedArrayRef"
+          ]
+        },
+        {
+          "name": "selected_count",
+          "type": "int | NoneType",
+          "unit": "dimensionless",
+          "required": false,
+          "meaning": "实际读取后已知的有效选择数；未读为None。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "NoiseFamily",
+      "meaning": "共享原始证据支持的噪声/依赖族。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "共享原始证据支持的噪声/依赖族。",
+          "references": []
+        },
+        {
+          "name": "observation_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "原始或派生观测，必须覆盖factor实际使用。",
+          "references": []
+        },
+        {
+          "name": "mode",
+          "type": "DependenceMode",
+          "unit": null,
+          "required": true,
+          "meaning": "联合原始支持、派生替代父样本、或已证实独立。",
+          "references": []
+        },
+        {
+          "name": "observation_selection",
+          "type": "SelectionRef | NoneType",
+          "unit": null,
+          "required": false,
+          "meaning": "生产批观测选择；与小型observation_ids二选一。",
+          "references": [
+            "SelectionRef"
+          ]
+        },
+        {
+          "name": "support_relation_table_id",
+          "type": "str | NoneType",
+          "unit": null,
+          "required": false,
+          "meaning": "派生点到原始支持的外部关系表；不能把交点冒充独立信息。",
+          "references": [
+            "ColumnTableRef"
+          ]
+        },
+        {
+          "name": "joint_model_id",
+          "type": "str | NoneType",
+          "unit": null,
+          "required": false,
+          "meaning": "共享支持联合计数采用的新统计模型；未实现不能假独立。",
+          "references": []
+        },
+        {
+          "name": "evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "统计/替代定义依据；未知噪声不能补成确定值。",
+          "references": [
+            "Evidence"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FactorBlock",
+      "meaning": "已组装的新因素身份。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "已组装的新因素身份。",
+          "references": []
+        },
+        {
+          "name": "kernel_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "实现残差/Jacobian的新注册核。",
+          "references": []
+        },
+        {
+          "name": "association_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "图像因素实际消费的关联。",
+          "references": [
+            "ObservationAssociation"
+          ]
+        },
+        {
+          "name": "constraint_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "物理因素实际消费的声明。",
+          "references": [
+            "Constraint"
+          ]
+        },
+        {
+          "name": "variable_block_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "稀疏依赖，不隐式抓取全局变量。",
+          "references": [
+            "VariableBlock"
+          ]
+        },
+        {
+          "name": "residual_units",
+          "type": "tuple[UnitRef, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "逐残差单位；像素和物理等式不混。",
+          "references": [
+            "UnitRef"
+          ]
+        },
+        {
+          "name": "noise_family_id",
+          "type": "str | NoneType",
+          "unit": null,
+          "required": false,
+          "meaning": "有图像观测必须声明证据依赖族。",
+          "references": [
+            "NoiseFamily"
+          ]
+        },
+        {
+          "name": "association_selection",
+          "type": "SelectionRef | NoneType",
+          "unit": null,
+          "required": false,
+          "meaning": "生产批使用外部关联表选择；与小型association_ids二选一。",
+          "references": [
+            "SelectionRef"
+          ]
+        },
+        {
+          "name": "batched_variable_block_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "批量station/其他同构变量依赖；不展开为百万参数对象。",
+          "references": [
+            "BatchedVariableBlock"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PreparedProblem",
+      "meaning": "当前完整问题实例，不是历史生产资格。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "当前完整问题实例，不是历史生产资格。",
+          "references": []
+        },
+        {
+          "name": "stamp",
+          "type": "RevisionStamp",
+          "unit": null,
+          "required": true,
+          "meaning": "精确当前修订；变化只影响必要依赖。",
+          "references": [
+            "RevisionStamp"
+          ]
+        },
+        {
+          "name": "active_shot_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "当前允许拟合的单镜头。",
+          "references": []
+        },
+        {
+          "name": "frame_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "当前镜头准备覆盖的原生曝光。",
+          "references": [
+            "SourceFrame"
+          ]
+        },
+        {
+          "name": "projection_contract_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "求解与renderer共同投影。",
+          "references": [
+            "ProjectionContract"
+          ]
+        },
+        {
+          "name": "initialization_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "新初值包。",
+          "references": [
+            "InitialState"
+          ]
+        },
+        {
+          "name": "layout",
+          "type": "tuple[LayoutEntry, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "同一check/fit数值布局。",
+          "references": [
+            "LayoutEntry"
+          ]
+        },
+        {
+          "name": "factors",
+          "type": "tuple[FactorBlock, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "实际完整因素集合，不是统计摘要。",
+          "references": [
+            "FactorBlock"
+          ]
+        },
+        {
+          "name": "noise_families",
+          "type": "tuple[NoiseFamily, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "相关原始/派生观测的显式计数模型。",
+          "references": [
+            "NoiseFamily"
+          ]
+        },
+        {
+          "name": "preparation_evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "当前输入一致性、全量前向/导数实际检查。",
+          "references": [
+            "Evidence"
+          ]
+        },
+        {
+          "name": "fingerprint",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "当前问题的内容身份；不能只用旧包/旧回执版本。",
+          "references": []
+        },
+        {
+          "name": "batched_variable_block_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "本次实际采用的列式批变量；全局小变量仍在layout。",
+          "references": [
+            "BatchedVariableBlock"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ArrayArtifact",
+      "meaning": "Data下新generation的新数组资产；不得覆盖仍被memmap/求解器消费的文件。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "path",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "Data下新generation的新数组资产；不得覆盖仍被memmap/求解器消费的文件。",
+          "references": []
+        },
+        {
+          "name": "sha256",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "数组实际字节哈希。",
+          "references": []
+        },
+        {
+          "name": "dtype",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "明确dtype。",
+          "references": []
+        },
+        {
+          "name": "shape",
+          "type": "tuple[int, ...]",
+          "unit": "dimensionless",
+          "required": true,
+          "meaning": "明确shape。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "OptimizerState",
+      "meaning": "新优化器与状态格式身份。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "implementation_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "新优化器与状态格式身份。",
+          "references": []
+        },
+        {
+          "name": "algorithm_revision",
+          "type": "int",
+          "unit": null,
+          "required": true,
+          "meaning": "新实现版本，不导入旧失败状态。",
+          "references": []
+        },
+        {
+          "name": "scalars",
+          "type": "tuple[NamedQuantity, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "实际算法标量，不能冒充物理先验。",
+          "references": [
+            "NamedQuantity"
+          ]
+        },
+        {
+          "name": "arrays",
+          "type": "tuple[ArrayArtifact, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "完整可恢复算法数组。",
+          "references": [
+            "ArrayArtifact"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RunState",
+      "meaning": "实际运行身份；未开始不制造迭代数/目标值。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "实际运行身份；未开始不制造迭代数/目标值。",
+          "references": []
+        },
+        {
+          "name": "prepared_problem_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "实际运行的同一PreparedProblem。",
+          "references": [
+            "PreparedProblem"
+          ]
+        },
+        {
+          "name": "problem_fingerprint",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "防止恢复到不同数据或布局。",
+          "references": []
+        },
+        {
+          "name": "stamp",
+          "type": "RevisionStamp",
+          "unit": null,
+          "required": true,
+          "meaning": "运行所用修订。",
+          "references": [
+            "RevisionStamp"
+          ]
+        },
+        {
+          "name": "active_shot_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "当前只有一个镜头。",
+          "references": []
+        },
+        {
+          "name": "status",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "实际状态，prepared/running/completed/failed。",
+          "references": []
+        },
+        {
+          "name": "iteration",
+          "type": "int",
+          "unit": "dimensionless",
+          "required": true,
+          "meaning": "真实迭代序号。",
+          "references": []
+        },
+        {
+          "name": "accepted_steps",
+          "type": "int",
+          "unit": "dimensionless",
+          "required": true,
+          "meaning": "实际接受步数。",
+          "references": []
+        },
+        {
+          "name": "rejected_steps",
+          "type": "int",
+          "unit": "dimensionless",
+          "required": true,
+          "meaning": "实际拒绝步数。",
+          "references": []
+        },
+        {
+          "name": "parameter_values",
+          "type": "tuple[ParameterValue, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "完整参数及辅助量；先完成新数组文件，再原子替换state manifest，不覆盖运行中映射。",
+          "references": [
+            "ParameterValue"
+          ]
+        },
+        {
+          "name": "optimizer_state",
+          "type": "OptimizerState | NoneType",
+          "unit": null,
+          "required": true,
+          "meaning": "真正续算所需的新完整状态；未运行可空。",
+          "references": [
+            "OptimizerState"
+          ]
+        },
+        {
+          "name": "main_log_path",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "每次运行的主日志绝对地址。",
+          "references": []
+        },
+        {
+          "name": "batched_parameter_table_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "原子checkpoint保存的完整外部批参数/辅助表。",
+          "references": [
+            "ColumnTableRef"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RigMount",
+      "meaning": "物理机位的共享安装定义，区别于逐曝光光心。",
+      "owner": "rig_id",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "物理机位的共享安装定义，区别于逐曝光光心。",
+          "references": []
+        },
+        {
+          "name": "rig_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "真实物理机位。",
+          "references": [
+            "CameraRig"
+          ]
+        },
+        {
+          "name": "pivot_variable_block_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "固定云台轴心的共享位置变量；owner必须是该rig。",
+          "references": [
+            "VariableBlock"
+          ]
+        },
+        {
+          "name": "lever_variable_block_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "相机本地lever的共享变量；不等于逐帧自由光心。",
+          "references": [
+            "VariableBlock"
+          ]
+        },
+        {
+          "name": "coordinate_system_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "pivot与世界位移采用的共同坐标。",
+          "references": [
+            "CoordinateSystem"
+          ]
+        },
+        {
+          "name": "camera_local_axis_definition",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "lever相机本地坐标轴与正方向。",
+          "references": []
+        },
+        {
+          "name": "center_mapping_definition",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "例如 C=P+R^T lever；必须是当前批准定义。",
+          "references": []
+        },
+        {
+          "name": "governing_constraint_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "固定pivot/lever及高度等实际启用依据。",
+          "references": [
+            "Constraint"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ModelRevision",
+      "meaning": "完整场景、安装、相机投影的同一模型身份。",
+      "owner": "scene_id",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "完整场景、安装、相机投影的同一模型身份。",
+          "references": []
+        },
+        {
+          "name": "revision",
+          "type": "int",
+          "unit": "dimensionless",
+          "required": true,
+          "meaning": "完整模型修订。",
+          "references": []
+        },
+        {
+          "name": "stamp",
+          "type": "RevisionStamp",
+          "unit": null,
+          "required": true,
+          "meaning": "该完整模型所对应的分离修订。",
+          "references": [
+            "RevisionStamp"
+          ]
+        },
+        {
+          "name": "scene_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "唯一共同场景。",
+          "references": [
+            "Scene"
+          ]
+        },
+        {
+          "name": "coordinate_system_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "世界单位与尺度身份。",
+          "references": [
+            "CoordinateSystem"
+          ]
+        },
+        {
+          "name": "projection_contract_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "总览、叠图和求解共同投影定义。",
+          "references": [
+            "ProjectionContract"
+          ]
+        },
+        {
+          "name": "primitive_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "完整场地几何对象集合，不只本帧可见部分。",
+          "references": [
+            "GeometryPrimitive"
+          ]
+        },
+        {
+          "name": "rig_mount_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "三机位等所有实际安装；不是只显示当前机位。",
+          "references": [
+            "RigMount"
+          ]
+        },
+        {
+          "name": "installation_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "完整广告安装集合，不只当前可见广告。",
+          "references": [
+            "BoardInstallation"
+          ]
+        },
+        {
+          "name": "parameter_state_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "同一InitialState或RunState数值；禁止混demo几何/d78相机。",
+          "references": [
+            "InitialState",
+            "RunState"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ExposurePose",
+      "meaning": "当前模型某次曝光的派生只读相机状态。",
+      "owner": "shot_id",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "当前模型某次曝光的派生只读相机状态。",
+          "references": []
+        },
+        {
+          "name": "model_revision",
+          "type": "RecordRevision",
+          "unit": null,
+          "required": true,
+          "meaning": "完整模型的精确版本。",
+          "references": [
+            "RecordRevision"
+          ]
+        },
+        {
+          "name": "frame_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "源PTS对应曝光。",
+          "references": [
+            "SourceFrame"
+          ]
+        },
+        {
+          "name": "shot_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "该曝光所属镜头。",
+          "references": [
+            "Shot"
+          ]
+        },
+        {
+          "name": "rig_mount_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "共享pivot/lever安装来源。",
+          "references": [
+            "RigMount"
+          ]
+        },
+        {
+          "name": "coordinate_system_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "与完整场景相同世界单位，不能偷偷换米制。",
+          "references": [
+            "CoordinateSystem"
+          ]
+        },
+        {
+          "name": "rotation_world_to_camera",
+          "type": "tuple[float, float, float, float, float, float, float, float, float]",
+          "unit": "dimensionless",
+          "required": true,
+          "meaning": "R_cw逐行9分量，来自同一参数状态。",
+          "references": []
+        },
+        {
+          "name": "optical_center_world",
+          "type": "tuple[float, float, float]",
+          "unit": "coordinate_system_id units",
+          "required": true,
+          "meaning": "派生光心C，不能当作独立每帧平移自由度。",
+          "references": []
+        },
+        {
+          "name": "intrinsics_px",
+          "type": "tuple[float, float, float, float, float, float, float, float, float]",
+          "unit": "pixel intrinsics; homogeneous row dimensionless",
+          "required": true,
+          "meaning": "像素内参K逐行9分量；畸变另由投影契约指定。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "InspectionSnapshot",
+      "meaning": "可视化总览/叠图使用的同一真实模型快照。",
+      "owner": "scene_id",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "可视化总览/叠图使用的同一真实模型快照。",
+          "references": []
+        },
+        {
+          "name": "model_revision",
+          "type": "RecordRevision",
+          "unit": null,
+          "required": true,
+          "meaning": "禁止跨修订拼图的精确typed link。",
+          "references": [
+            "RecordRevision"
+          ]
+        },
+        {
+          "name": "parameter_state_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "与ModelRevision同一参数状态。",
+          "references": [
+            "InitialState",
+            "RunState"
+          ]
+        },
+        {
+          "name": "coordinate_system_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "共同世界坐标、单位与米制验证状态。",
+          "references": [
+            "CoordinateSystem"
+          ]
+        },
+        {
+          "name": "scene_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "完整场地。",
+          "references": [
+            "Scene"
+          ]
+        },
+        {
+          "name": "all_primitive_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "完整冰场全部几何表示；缺失必须报告。",
+          "references": [
+            "GeometryPrimitive"
+          ]
+        },
+        {
+          "name": "all_installation_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "全部广告对象。",
+          "references": [
+            "BoardInstallation"
+          ]
+        },
+        {
+          "name": "all_rig_mount_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "全部物理机位相对位置。",
+          "references": [
+            "RigMount"
+          ]
+        },
+        {
+          "name": "exposure_pose_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "选择源帧时可叠加的派生光心/R/K。",
+          "references": [
+            "ExposurePose"
+          ]
+        },
+        {
+          "name": "missing_items",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "真正未恢复/未定义对象，绝不补假值。",
+          "references": []
+        },
+        {
+          "name": "evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "该快照来源与派生记录。",
+          "references": [
+            "Evidence"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TypedArrayRef",
+      "meaning": "Data下数组的稳定资产ID；不在JSON中内嵌百万行。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "Data下数组的稳定资产ID；不在JSON中内嵌百万行。",
+          "references": []
+        },
+        {
+          "name": "path",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "实际外部数组绝对地址；新generation用新文件，禁止覆盖仍被映射的输入。",
+          "references": []
+        },
+        {
+          "name": "storage",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "npy/npz/raw等明确读取格式；不得pickle对象数组。",
+          "references": []
+        },
+        {
+          "name": "dtype",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "含字节序的明确dtype，例如<i8/<f8；不能靠指针重解释类型。",
+          "references": []
+        },
+        {
+          "name": "shape",
+          "type": "tuple[int, ...]",
+          "unit": "dimensionless",
+          "required": true,
+          "meaning": "数组的实际维数和shape。",
+          "references": []
+        },
+        {
+          "name": "unit",
+          "type": "UnitRef",
+          "unit": null,
+          "required": true,
+          "meaning": "整列单位；不同单位的字段必须分列。",
+          "references": [
+            "UnitRef"
+          ]
+        },
+        {
+          "name": "role",
+          "type": "ArrayRole",
+          "unit": null,
+          "required": true,
+          "meaning": "不可变证据、关联外键、参数、辅助状态或缓存分离。",
+          "references": []
+        },
+        {
+          "name": "read_only",
+          "type": "bool",
+          "unit": null,
+          "required": true,
+          "meaning": "证据必须只读；工作参数是否可写须显式。",
+          "references": []
+        },
+        {
+          "name": "generation",
+          "type": "int",
+          "unit": "dimensionless",
+          "required": true,
+          "meaning": "当前数组布局generation，与语义版本分离。",
+          "references": []
+        },
+        {
+          "name": "clock_id",
+          "type": "str | NoneType",
+          "unit": null,
+          "required": false,
+          "meaning": "带PTS的列明确源时钟。",
+          "references": [
+            "SourceClock"
+          ]
+        },
+        {
+          "name": "coordinate_system_id",
+          "type": "str | NoneType",
+          "unit": null,
+          "required": false,
+          "meaning": "坐标/长度列明确共同坐标系。",
+          "references": [
+            "CoordinateSystem"
+          ]
+        },
+        {
+          "name": "member",
+          "type": "str | NoneType",
+          "unit": null,
+          "required": false,
+          "meaning": "npz等容器的精确成员名。",
+          "references": []
+        },
+        {
+          "name": "sha256",
+          "type": "str | NoneType",
+          "unit": null,
+          "required": false,
+          "meaning": "资产交付时的当前摘要；普通启动不重算历史链。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "ColumnRef",
+      "meaning": "稳定字段名，不以列号当身份。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "name",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "稳定字段名，不以列号当身份。",
+          "references": []
+        },
+        {
+          "name": "array_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "该列外部typed array。",
+          "references": [
+            "TypedArrayRef"
+          ]
+        },
+        {
+          "name": "meaning",
+          "type": "ColumnMeaning",
+          "unit": null,
+          "required": true,
+          "meaning": "该列数据语义；other必须有明确说明。",
+          "references": []
+        },
+        {
+          "name": "description",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "实际内容与缺失值约定，不补造缺失。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "ColumnForeignKey",
+      "meaning": "当前表的稳定外键列。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "column_name",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "当前表的稳定外键列。",
+          "references": []
+        },
+        {
+          "name": "target_table_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "目标实体/feature/安装/观测表。",
+          "references": [
+            "ColumnTableRef"
+          ]
+        },
+        {
+          "name": "target_column_name",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "目标稳定ID列，不依赖当前行顺序。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "IdIndexRef",
+      "meaning": "稳定ID到当前行的外部索引，不做巨型JSON字典。",
+      "owner": "table_id",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "稳定ID到当前行的外部索引，不做巨型JSON字典。",
+          "references": []
+        },
+        {
+          "name": "table_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "被索引的表。",
+          "references": [
+            "ColumnTableRef"
+          ]
+        },
+        {
+          "name": "key_array_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "稳定ID数组。",
+          "references": [
+            "TypedArrayRef"
+          ]
+        },
+        {
+          "name": "row_array_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "对应行号整数数组。",
+          "references": [
+            "TypedArrayRef"
+          ]
+        },
+        {
+          "name": "generation",
+          "type": "int",
+          "unit": "dimensionless",
+          "required": true,
+          "meaning": "必须匹配当前表布局generation。",
+          "references": []
+        },
+        {
+          "name": "lookup_definition",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "sorted/search/hash等实际索引算法与重复处理定义。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "ColumnTableRef",
+      "meaning": "向量化SoA数据表，独立于少量语义对象。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "向量化SoA数据表，独立于少量语义对象。",
+          "references": []
+        },
+        {
+          "name": "row_count",
+          "type": "int",
+          "unit": "dimensionless",
+          "required": true,
+          "meaning": "实际行数；不能用原始点数虚报有效点。",
+          "references": []
+        },
+        {
+          "name": "generation",
+          "type": "int",
+          "unit": "dimensionless",
+          "required": true,
+          "meaning": "列与ID索引的共同布局版本。",
+          "references": []
+        },
+        {
+          "name": "role",
+          "type": "ArrayRole",
+          "unit": null,
+          "required": true,
+          "meaning": "本表证据/关联/参数角色，不混为通用dict。",
+          "references": []
+        },
+        {
+          "name": "columns",
+          "type": "tuple[ColumnRef, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "每列明确dtype/shape/unit/role的数据引用。",
+          "references": [
+            "ColumnRef"
+          ]
+        },
+        {
+          "name": "primary_key_column",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "稳定ID主键列。",
+          "references": []
+        },
+        {
+          "name": "id_index_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "外部稳定ID到row索引。",
+          "references": [
+            "IdIndexRef"
+          ]
+        },
+        {
+          "name": "foreign_keys",
+          "type": "tuple[ColumnForeignKey, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "稳定实体、feature、安装与帧的外键。",
+          "references": [
+            "ColumnForeignKey"
+          ]
+        },
+        {
+          "name": "evidence_ids",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "本表当前生成/确认依据，不做历史资格启动依赖。",
+          "references": [
+            "Evidence"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BatchedVariableBlock",
+      "meaning": "大规模同构变量块，例如每有效观测station；不是百万个VariableBlock。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "大规模同构变量块，例如每有效观测station；不是百万个VariableBlock。",
+          "references": []
+        },
+        {
+          "name": "owner_kind",
+          "type": "OwnerKind",
+          "unit": null,
+          "required": true,
+          "meaning": "整批一致的物理共享层；固定landmark仍归feature，不归观测。",
+          "references": []
+        },
+        {
+          "name": "owner_selection",
+          "type": "SelectionRef",
+          "unit": null,
+          "required": true,
+          "meaning": "当前有效owner行集合，稳定ID到row索引。",
+          "references": [
+            "SelectionRef"
+          ]
+        },
+        {
+          "name": "owner_id_column",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "owner表中实际稳定身份列，禁止用行序当实体身份。",
+          "references": []
+        },
+        {
+          "name": "components",
+          "type": "tuple[ParameterComponent, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "全批共享一次定义的分量名称/单位。",
+          "references": [
+            "ParameterComponent"
+          ]
+        },
+        {
+          "name": "parameter_table_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "外部SoA参数表。",
+          "references": [
+            "ColumnTableRef"
+          ]
+        },
+        {
+          "name": "component_columns",
+          "type": "tuple[str, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "与components逐一对应的参数列名。",
+          "references": []
+        },
+        {
+          "name": "mode",
+          "type": "VariableMode",
+          "unit": null,
+          "required": true,
+          "meaning": "自由、明确固定或剖面派生。",
+          "references": []
+        },
+        {
+          "name": "definition_constraint_id",
+          "type": "str | NoneType",
+          "unit": null,
+          "required": false,
+          "meaning": "固定/派生的实际定义依据。",
+          "references": [
+            "Constraint"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ComputeBufferBinding",
+      "meaning": "当前输入/参数数组。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "array_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "当前输入/参数数组。",
+          "references": [
+            "TypedArrayRef"
+          ]
+        },
+        {
+          "name": "device",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "cpu或明确GPU设备ID；不把监控当加速完成。",
+          "references": []
+        },
+        {
+          "name": "dtype",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "执行层实际dtype，必须与数组一致。",
+          "references": []
+        },
+        {
+          "name": "shape",
+          "type": "tuple[int, ...]",
+          "unit": "dimensionless",
+          "required": true,
+          "meaning": "执行层实际shape。",
+          "references": []
+        },
+        {
+          "name": "byte_strides",
+          "type": "tuple[int, ...]",
+          "unit": "byte",
+          "required": true,
+          "meaning": "明确字节stride，禁止类型混用。",
+          "references": []
+        },
+        {
+          "name": "generation",
+          "type": "int",
+          "unit": "dimensionless",
+          "required": true,
+          "meaning": "当前CPU/GPU驻留布局generation。",
+          "references": []
+        }
+      ]
+    },
+    {
+      "name": "ComputeLayout",
+      "meaning": "CPU/GPU共同数学问题的明确驻留布局。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "CPU/GPU共同数学问题的明确驻留布局。",
+          "references": []
+        },
+        {
+          "name": "problem_fingerprint",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "当前PreparedProblem内容身份。",
+          "references": []
+        },
+        {
+          "name": "generation",
+          "type": "int",
+          "unit": "dimensionless",
+          "required": true,
+          "meaning": "当前layout generation，改变后必须使旧buffer失效。",
+          "references": []
+        },
+        {
+          "name": "bindings",
+          "type": "tuple[ComputeBufferBinding, ...]",
+          "unit": null,
+          "required": true,
+          "meaning": "SoA批次的CPU/GPU显式数组绑定。",
+          "references": [
+            "ComputeBufferBinding"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "DataBundle",
+      "meaning": "当前自足数据模型；普通准备不追溯旧生产链。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "当前自足数据模型；普通准备不追溯旧生产链。",
+          "references": []
+        },
+        {
+          "name": "stamp",
+          "type": "RevisionStamp",
+          "unit": null,
+          "required": true,
+          "meaning": "分开数据/模型/约束/初值修订。",
+          "references": [
+            "RevisionStamp"
+          ]
+        },
+        {
+          "name": "active_shot_id",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "当前唯一拟合镜头。",
+          "references": []
+        },
+        {
+          "name": "batched_variables",
+          "type": "tuple[BatchedVariableBlock, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "生产规模参数按owner-row表及共享components结构表达。",
+          "references": [
+            "BatchedVariableBlock"
+          ]
+        },
+        {
+          "name": "array_refs",
+          "type": "tuple[TypedArrayRef, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "TypedArrayRef"
+          ]
+        },
+        {
+          "name": "column_tables",
+          "type": "tuple[ColumnTableRef, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "ColumnTableRef"
+          ]
+        },
+        {
+          "name": "id_indices",
+          "type": "tuple[IdIndexRef, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "IdIndexRef"
+          ]
+        },
+        {
+          "name": "compute_layouts",
+          "type": "tuple[ComputeLayout, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "ComputeLayout"
+          ]
+        },
+        {
+          "name": "run_states",
+          "type": "tuple[RunState, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "RunState"
+          ]
+        },
+        {
+          "name": "evidence",
+          "type": "tuple[Evidence, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "Evidence"
+          ]
+        },
+        {
+          "name": "clocks",
+          "type": "tuple[SourceClock, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "SourceClock"
+          ]
+        },
+        {
+          "name": "frames",
+          "type": "tuple[SourceFrame, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "SourceFrame"
+          ]
+        },
+        {
+          "name": "raw_observations",
+          "type": "tuple[PixelObservation, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "PixelObservation"
+          ]
+        },
+        {
+          "name": "derived_observations",
+          "type": "tuple[DerivedPixelObservation, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "DerivedPixelObservation"
+          ]
+        },
+        {
+          "name": "coordinate_systems",
+          "type": "tuple[CoordinateSystem, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "CoordinateSystem"
+          ]
+        },
+        {
+          "name": "scenes",
+          "type": "tuple[Scene, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "Scene"
+          ]
+        },
+        {
+          "name": "rigs",
+          "type": "tuple[CameraRig, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "CameraRig"
+          ]
+        },
+        {
+          "name": "shots",
+          "type": "tuple[Shot, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "Shot"
+          ]
+        },
+        {
+          "name": "entities",
+          "type": "tuple[GeometryEntity, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "GeometryEntity"
+          ]
+        },
+        {
+          "name": "verifications",
+          "type": "tuple[EntityVerification, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "EntityVerification"
+          ]
+        },
+        {
+          "name": "primitives",
+          "type": "tuple[GeometryPrimitive, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "GeometryPrimitive"
+          ]
+        },
+        {
+          "name": "curves",
+          "type": "tuple[CurveFeature, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "CurveFeature"
+          ]
+        },
+        {
+          "name": "landmarks",
+          "type": "tuple[LandmarkFeature, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "LandmarkFeature"
+          ]
+        },
+        {
+          "name": "curve_loci",
+          "type": "tuple[CurveLocusFeature, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "CurveLocusFeature"
+          ]
+        },
+        {
+          "name": "region_loci",
+          "type": "tuple[RegionLocusFeature, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "RegionLocusFeature"
+          ]
+        },
+        {
+          "name": "artworks",
+          "type": "tuple[ArtworkTemplate, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "ArtworkTemplate"
+          ]
+        },
+        {
+          "name": "artwork_layout_groups",
+          "type": "tuple[ArtworkLayoutGroup, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "源组件在现场共享拼版中的语义组。",
+          "references": [
+            "ArtworkLayoutGroup"
+          ]
+        },
+        {
+          "name": "artwork_layouts",
+          "type": "tuple[ArtworkLayout, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "源组件→静态拼版→整体安装的中间设计层。",
+          "references": [
+            "ArtworkLayout"
+          ]
+        },
+        {
+          "name": "board_surfaces",
+          "type": "tuple[BoardSurface, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "BoardSurface"
+          ]
+        },
+        {
+          "name": "installations",
+          "type": "tuple[BoardInstallation, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "BoardInstallation"
+          ]
+        },
+        {
+          "name": "installed_artwork_features",
+          "type": "tuple[InstalledArtworkFeature, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "InstalledArtworkFeature"
+          ]
+        },
+        {
+          "name": "rig_mounts",
+          "type": "tuple[RigMount, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "RigMount"
+          ]
+        },
+        {
+          "name": "model_revisions",
+          "type": "tuple[ModelRevision, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "ModelRevision"
+          ]
+        },
+        {
+          "name": "exposure_poses",
+          "type": "tuple[ExposurePose, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "ExposurePose"
+          ]
+        },
+        {
+          "name": "inspection_snapshots",
+          "type": "tuple[InspectionSnapshot, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "InspectionSnapshot"
+          ]
+        },
+        {
+          "name": "variables",
+          "type": "tuple[VariableBlock, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "VariableBlock"
+          ]
+        },
+        {
+          "name": "associations",
+          "type": "tuple[ObservationAssociation, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "ObservationAssociation"
+          ]
+        },
+        {
+          "name": "constraints",
+          "type": "tuple[Constraint, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "Constraint"
+          ]
+        },
+        {
+          "name": "projection_contracts",
+          "type": "tuple[ProjectionContract, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "ProjectionContract"
+          ]
+        },
+        {
+          "name": "projection_proofs",
+          "type": "tuple[ProjectionProof, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "ProjectionProof"
+          ]
+        },
+        {
+          "name": "initial_states",
+          "type": "tuple[InitialState, ...]",
+          "unit": null,
+          "required": false,
+          "meaning": "当前自足模型中的类型化记录；批量数据使用外部列式数组引用，不代表历史数据已迁移。",
+          "references": [
+            "InitialState"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Issue",
+      "meaning": "准确字段路径/对象身份。",
+      "owner": "record identity",
+      "immutable": true,
+      "fields": [
+        {
+          "name": "path",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "准确字段路径/对象身份。",
+          "references": []
+        },
+        {
+          "name": "code",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "机器可处理的错误原因。",
+          "references": []
+        },
+        {
+          "name": "message",
+          "type": "str",
+          "unit": null,
+          "required": true,
+          "meaning": "人可读修正说明。",
+          "references": []
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "source_type": "Quantity",
+      "field": "unit",
+      "target_type": "UnitRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "Evidence",
+      "field": "parent_evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "SourceClock",
+      "field": "source_evidence_id",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "SourceFrame",
+      "field": "clock_id",
+      "target_type": "SourceClock",
+      "stable_identity": true
+    },
+    {
+      "source_type": "SourceFrame",
+      "field": "evidence_id",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "PixelObservation",
+      "field": "frame_id",
+      "target_type": "SourceFrame",
+      "stable_identity": true
+    },
+    {
+      "source_type": "PixelObservation",
+      "field": "evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DerivedPixelObservation",
+      "field": "frame_id",
+      "target_type": "SourceFrame",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DerivedPixelObservation",
+      "field": "parent_observation_ids",
+      "target_type": "PixelObservation",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DerivedPixelObservation",
+      "field": "parent_observation_ids",
+      "target_type": "DerivedPixelObservation",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DerivedPixelObservation",
+      "field": "evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "CoordinateSystem",
+      "field": "units",
+      "target_type": "UnitRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "CoordinateSystem",
+      "field": "metric_evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "Scene",
+      "field": "coordinate_system_id",
+      "target_type": "CoordinateSystem",
+      "stable_identity": true
+    },
+    {
+      "source_type": "CameraRig",
+      "field": "scene_id",
+      "target_type": "Scene",
+      "stable_identity": true
+    },
+    {
+      "source_type": "CameraRig",
+      "field": "evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "Shot",
+      "field": "rig_id",
+      "target_type": "CameraRig",
+      "stable_identity": true
+    },
+    {
+      "source_type": "Shot",
+      "field": "clock_id",
+      "target_type": "SourceClock",
+      "stable_identity": true
+    },
+    {
+      "source_type": "Shot",
+      "field": "frame_ids",
+      "target_type": "SourceFrame",
+      "stable_identity": true
+    },
+    {
+      "source_type": "GeometryEntity",
+      "field": "scene_id",
+      "target_type": "Scene",
+      "stable_identity": true
+    },
+    {
+      "source_type": "EntityVerification",
+      "field": "entity_id",
+      "target_type": "GeometryEntity",
+      "stable_identity": true
+    },
+    {
+      "source_type": "EntityVerification",
+      "field": "evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "GeometryPrimitive",
+      "field": "entity_id",
+      "target_type": "GeometryEntity",
+      "stable_identity": true
+    },
+    {
+      "source_type": "GeometryPrimitive",
+      "field": "coordinate_system_id",
+      "target_type": "CoordinateSystem",
+      "stable_identity": true
+    },
+    {
+      "source_type": "GeometryPrimitive",
+      "field": "parameter_block_ids",
+      "target_type": "VariableBlock",
+      "stable_identity": true
+    },
+    {
+      "source_type": "Interval",
+      "field": "unit",
+      "target_type": "UnitRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "CurveFeature",
+      "field": "entity_id",
+      "target_type": "GeometryEntity",
+      "stable_identity": true
+    },
+    {
+      "source_type": "CurveFeature",
+      "field": "primitive_id",
+      "target_type": "GeometryPrimitive",
+      "stable_identity": true
+    },
+    {
+      "source_type": "CurveFeature",
+      "field": "support_surface_id",
+      "target_type": "GeometryPrimitive",
+      "stable_identity": true
+    },
+    {
+      "source_type": "CurveFeature",
+      "field": "support_surface_id",
+      "target_type": "BoardSurface",
+      "stable_identity": true
+    },
+    {
+      "source_type": "CurveFeature",
+      "field": "verification_id",
+      "target_type": "EntityVerification",
+      "stable_identity": true
+    },
+    {
+      "source_type": "CurveFeature",
+      "field": "parameter_domain",
+      "target_type": "Interval",
+      "stable_identity": true
+    },
+    {
+      "source_type": "CurveFeature",
+      "field": "definition_evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "SharedPointPosition",
+      "field": "variable_block_id",
+      "target_type": "VariableBlock",
+      "stable_identity": true
+    },
+    {
+      "source_type": "SharedPointPosition",
+      "field": "coordinate_system_id",
+      "target_type": "CoordinateSystem",
+      "stable_identity": true
+    },
+    {
+      "source_type": "SharedCurvePointPosition",
+      "field": "curve_feature_id",
+      "target_type": "CurveFeature",
+      "stable_identity": true
+    },
+    {
+      "source_type": "SharedCurvePointPosition",
+      "field": "station_variable_block_id",
+      "target_type": "VariableBlock",
+      "stable_identity": true
+    },
+    {
+      "source_type": "SharedCurvePointPosition",
+      "field": "allowed_interval",
+      "target_type": "Interval",
+      "stable_identity": true
+    },
+    {
+      "source_type": "KnownPointPosition",
+      "field": "coordinate_system_id",
+      "target_type": "CoordinateSystem",
+      "stable_identity": true
+    },
+    {
+      "source_type": "KnownPointPosition",
+      "field": "definition_constraint_id",
+      "target_type": "Constraint",
+      "stable_identity": true
+    },
+    {
+      "source_type": "IntersectionPosition",
+      "field": "curve_feature_ids",
+      "target_type": "CurveFeature",
+      "stable_identity": true
+    },
+    {
+      "source_type": "IntersectionPosition",
+      "field": "branch_evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "StructuralPointPosition",
+      "field": "definition_evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "LandmarkFeature",
+      "field": "entity_id",
+      "target_type": "GeometryEntity",
+      "stable_identity": true
+    },
+    {
+      "source_type": "LandmarkFeature",
+      "field": "verification_id",
+      "target_type": "EntityVerification",
+      "stable_identity": true
+    },
+    {
+      "source_type": "LandmarkFeature",
+      "field": "position",
+      "target_type": "SharedPointPosition",
+      "stable_identity": true
+    },
+    {
+      "source_type": "LandmarkFeature",
+      "field": "position",
+      "target_type": "SharedCurvePointPosition",
+      "stable_identity": true
+    },
+    {
+      "source_type": "LandmarkFeature",
+      "field": "position",
+      "target_type": "KnownPointPosition",
+      "stable_identity": true
+    },
+    {
+      "source_type": "LandmarkFeature",
+      "field": "position",
+      "target_type": "IntersectionPosition",
+      "stable_identity": true
+    },
+    {
+      "source_type": "LandmarkFeature",
+      "field": "position",
+      "target_type": "StructuralPointPosition",
+      "stable_identity": true
+    },
+    {
+      "source_type": "CurveLocusFeature",
+      "field": "curve_feature_id",
+      "target_type": "CurveFeature",
+      "stable_identity": true
+    },
+    {
+      "source_type": "CurveLocusFeature",
+      "field": "allowed_intervals",
+      "target_type": "Interval",
+      "stable_identity": true
+    },
+    {
+      "source_type": "RegionLocusFeature",
+      "field": "entity_id",
+      "target_type": "GeometryEntity",
+      "stable_identity": true
+    },
+    {
+      "source_type": "RegionLocusFeature",
+      "field": "verification_id",
+      "target_type": "EntityVerification",
+      "stable_identity": true
+    },
+    {
+      "source_type": "RegionLocusFeature",
+      "field": "support_surface_id",
+      "target_type": "GeometryPrimitive",
+      "stable_identity": true
+    },
+    {
+      "source_type": "RegionLocusFeature",
+      "field": "support_surface_id",
+      "target_type": "BoardSurface",
+      "stable_identity": true
+    },
+    {
+      "source_type": "RegionLocusFeature",
+      "field": "coordinate_system_id",
+      "target_type": "CoordinateSystem",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ArtworkSourceFrame",
+      "field": "evidence_id",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ArtworkStyle",
+      "field": "evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ArtworkShape",
+      "field": "parent_shape_id",
+      "target_type": "ArtworkShape",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ArtworkShape",
+      "field": "style_id",
+      "target_type": "ArtworkStyle",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ArtworkLandmark",
+      "field": "evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ArtworkTemplate",
+      "field": "coordinate_system_id",
+      "target_type": "CoordinateSystem",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ArtworkTemplate",
+      "field": "source_frames",
+      "target_type": "ArtworkSourceFrame",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ArtworkTemplate",
+      "field": "source_evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ArtworkTemplate",
+      "field": "shapes",
+      "target_type": "ArtworkShape",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ArtworkTemplate",
+      "field": "landmarks",
+      "target_type": "ArtworkLandmark",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ArtworkTemplate",
+      "field": "styles",
+      "target_type": "ArtworkStyle",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ArtworkTemplate",
+      "field": "parent_template_id",
+      "target_type": "ArtworkTemplate",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ArtworkLayoutGroup",
+      "field": "source_template_id",
+      "target_type": "ArtworkTemplate",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ArtworkLayoutGroup",
+      "field": "source_feature_ids",
+      "target_type": "ArtworkShape",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ArtworkLayoutGroup",
+      "field": "source_feature_ids",
+      "target_type": "ArtworkLandmark",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ArtworkLayoutGroup",
+      "field": "parameter_block_ids",
+      "target_type": "VariableBlock",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ArtworkLayoutGroup",
+      "field": "match_evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ArtworkLayout",
+      "field": "coordinate_system_id",
+      "target_type": "CoordinateSystem",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ArtworkLayout",
+      "field": "group_ids",
+      "target_type": "ArtworkLayoutGroup",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ArtworkLayout",
+      "field": "evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "BoardSurface",
+      "field": "entity_id",
+      "target_type": "GeometryEntity",
+      "stable_identity": true
+    },
+    {
+      "source_type": "BoardSurface",
+      "field": "primitive_id",
+      "target_type": "GeometryPrimitive",
+      "stable_identity": true
+    },
+    {
+      "source_type": "BoardSurface",
+      "field": "unwrapped_coordinate_system_id",
+      "target_type": "CoordinateSystem",
+      "stable_identity": true
+    },
+    {
+      "source_type": "BoardSurface",
+      "field": "governing_constraint_ids",
+      "target_type": "Constraint",
+      "stable_identity": true
+    },
+    {
+      "source_type": "BoardInstallation",
+      "field": "board_surface_id",
+      "target_type": "BoardSurface",
+      "stable_identity": true
+    },
+    {
+      "source_type": "BoardInstallation",
+      "field": "template_id",
+      "target_type": "ArtworkTemplate",
+      "stable_identity": true
+    },
+    {
+      "source_type": "BoardInstallation",
+      "field": "template_match_evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "BoardInstallation",
+      "field": "parameter_block_ids",
+      "target_type": "VariableBlock",
+      "stable_identity": true
+    },
+    {
+      "source_type": "BoardInstallation",
+      "field": "governing_constraint_ids",
+      "target_type": "Constraint",
+      "stable_identity": true
+    },
+    {
+      "source_type": "BoardInstallation",
+      "field": "candidate_template_ids",
+      "target_type": "ArtworkTemplate",
+      "stable_identity": true
+    },
+    {
+      "source_type": "BoardInstallation",
+      "field": "layout_id",
+      "target_type": "ArtworkLayout",
+      "stable_identity": true
+    },
+    {
+      "source_type": "InstalledArtworkFeature",
+      "field": "installation_id",
+      "target_type": "BoardInstallation",
+      "stable_identity": true
+    },
+    {
+      "source_type": "InstalledArtworkFeature",
+      "field": "template_feature_id",
+      "target_type": "ArtworkShape",
+      "stable_identity": true
+    },
+    {
+      "source_type": "InstalledArtworkFeature",
+      "field": "template_feature_id",
+      "target_type": "ArtworkLandmark",
+      "stable_identity": true
+    },
+    {
+      "source_type": "InstalledArtworkFeature",
+      "field": "verification_id",
+      "target_type": "EntityVerification",
+      "stable_identity": true
+    },
+    {
+      "source_type": "InstalledArtworkFeature",
+      "field": "allowed_intervals",
+      "target_type": "Interval",
+      "stable_identity": true
+    },
+    {
+      "source_type": "InstalledArtworkFeature",
+      "field": "layout_group_id",
+      "target_type": "ArtworkLayoutGroup",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ParameterComponent",
+      "field": "unit",
+      "target_type": "UnitRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "VariableBlock",
+      "field": "owner",
+      "target_type": "OwnerRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "VariableBlock",
+      "field": "components",
+      "target_type": "ParameterComponent",
+      "stable_identity": true
+    },
+    {
+      "source_type": "VariableBlock",
+      "field": "definition_constraint_id",
+      "target_type": "Constraint",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ParameterValue",
+      "field": "variable_block_id",
+      "target_type": "VariableBlock",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ObservationAssociation",
+      "field": "observation_id",
+      "target_type": "PixelObservation",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ObservationAssociation",
+      "field": "observation_id",
+      "target_type": "DerivedPixelObservation",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ObservationAssociation",
+      "field": "evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ObservationAssociation",
+      "field": "local_variable_block_id",
+      "target_type": "VariableBlock",
+      "stable_identity": true
+    },
+    {
+      "source_type": "NamedQuantity",
+      "field": "quantity",
+      "target_type": "Quantity",
+      "stable_identity": true
+    },
+    {
+      "source_type": "Constraint",
+      "field": "references",
+      "target_type": "ExpressionReference",
+      "stable_identity": true
+    },
+    {
+      "source_type": "Constraint",
+      "field": "constants",
+      "target_type": "NamedQuantity",
+      "stable_identity": true
+    },
+    {
+      "source_type": "Constraint",
+      "field": "evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "RevisionGraph",
+      "field": "nodes",
+      "target_type": "DependencyNode",
+      "stable_identity": true
+    },
+    {
+      "source_type": "RevisionGraph",
+      "field": "edges",
+      "target_type": "DependencyEdge",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ProjectionContract",
+      "field": "evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ProjectionProof",
+      "field": "source_contract_id",
+      "target_type": "ProjectionContract",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ProjectionProof",
+      "field": "target_contract_id",
+      "target_type": "ProjectionContract",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ProjectionProof",
+      "field": "frame_ids",
+      "target_type": "SourceFrame",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ProjectionProof",
+      "field": "evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ProjectionProof",
+      "field": "acceptance_constraint_ids",
+      "target_type": "Constraint",
+      "stable_identity": true
+    },
+    {
+      "source_type": "InitialState",
+      "field": "stamp",
+      "target_type": "RevisionStamp",
+      "stable_identity": true
+    },
+    {
+      "source_type": "InitialState",
+      "field": "parameter_values",
+      "target_type": "ParameterValue",
+      "stable_identity": true
+    },
+    {
+      "source_type": "InitialState",
+      "field": "source_evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "InitialState",
+      "field": "frame_ids",
+      "target_type": "SourceFrame",
+      "stable_identity": true
+    },
+    {
+      "source_type": "InitialState",
+      "field": "projection_contract_id",
+      "target_type": "ProjectionContract",
+      "stable_identity": true
+    },
+    {
+      "source_type": "InitialState",
+      "field": "proof_ids",
+      "target_type": "ProjectionProof",
+      "stable_identity": true
+    },
+    {
+      "source_type": "InitialState",
+      "field": "batched_parameter_table_ids",
+      "target_type": "ColumnTableRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "LayoutEntry",
+      "field": "variable_block_id",
+      "target_type": "VariableBlock",
+      "stable_identity": true
+    },
+    {
+      "source_type": "SelectionRef",
+      "field": "table_id",
+      "target_type": "ColumnTableRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "SelectionRef",
+      "field": "row_index_array_id",
+      "target_type": "TypedArrayRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "SelectionRef",
+      "field": "row_mask_array_id",
+      "target_type": "TypedArrayRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "NoiseFamily",
+      "field": "observation_selection",
+      "target_type": "SelectionRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "NoiseFamily",
+      "field": "support_relation_table_id",
+      "target_type": "ColumnTableRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "NoiseFamily",
+      "field": "evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "FactorBlock",
+      "field": "association_ids",
+      "target_type": "ObservationAssociation",
+      "stable_identity": true
+    },
+    {
+      "source_type": "FactorBlock",
+      "field": "constraint_ids",
+      "target_type": "Constraint",
+      "stable_identity": true
+    },
+    {
+      "source_type": "FactorBlock",
+      "field": "variable_block_ids",
+      "target_type": "VariableBlock",
+      "stable_identity": true
+    },
+    {
+      "source_type": "FactorBlock",
+      "field": "residual_units",
+      "target_type": "UnitRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "FactorBlock",
+      "field": "noise_family_id",
+      "target_type": "NoiseFamily",
+      "stable_identity": true
+    },
+    {
+      "source_type": "FactorBlock",
+      "field": "association_selection",
+      "target_type": "SelectionRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "FactorBlock",
+      "field": "batched_variable_block_ids",
+      "target_type": "BatchedVariableBlock",
+      "stable_identity": true
+    },
+    {
+      "source_type": "PreparedProblem",
+      "field": "stamp",
+      "target_type": "RevisionStamp",
+      "stable_identity": true
+    },
+    {
+      "source_type": "PreparedProblem",
+      "field": "frame_ids",
+      "target_type": "SourceFrame",
+      "stable_identity": true
+    },
+    {
+      "source_type": "PreparedProblem",
+      "field": "projection_contract_id",
+      "target_type": "ProjectionContract",
+      "stable_identity": true
+    },
+    {
+      "source_type": "PreparedProblem",
+      "field": "initialization_id",
+      "target_type": "InitialState",
+      "stable_identity": true
+    },
+    {
+      "source_type": "PreparedProblem",
+      "field": "layout",
+      "target_type": "LayoutEntry",
+      "stable_identity": true
+    },
+    {
+      "source_type": "PreparedProblem",
+      "field": "factors",
+      "target_type": "FactorBlock",
+      "stable_identity": true
+    },
+    {
+      "source_type": "PreparedProblem",
+      "field": "noise_families",
+      "target_type": "NoiseFamily",
+      "stable_identity": true
+    },
+    {
+      "source_type": "PreparedProblem",
+      "field": "preparation_evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "PreparedProblem",
+      "field": "batched_variable_block_ids",
+      "target_type": "BatchedVariableBlock",
+      "stable_identity": true
+    },
+    {
+      "source_type": "OptimizerState",
+      "field": "scalars",
+      "target_type": "NamedQuantity",
+      "stable_identity": true
+    },
+    {
+      "source_type": "OptimizerState",
+      "field": "arrays",
+      "target_type": "ArrayArtifact",
+      "stable_identity": true
+    },
+    {
+      "source_type": "RunState",
+      "field": "prepared_problem_id",
+      "target_type": "PreparedProblem",
+      "stable_identity": true
+    },
+    {
+      "source_type": "RunState",
+      "field": "stamp",
+      "target_type": "RevisionStamp",
+      "stable_identity": true
+    },
+    {
+      "source_type": "RunState",
+      "field": "parameter_values",
+      "target_type": "ParameterValue",
+      "stable_identity": true
+    },
+    {
+      "source_type": "RunState",
+      "field": "optimizer_state",
+      "target_type": "OptimizerState",
+      "stable_identity": true
+    },
+    {
+      "source_type": "RunState",
+      "field": "batched_parameter_table_ids",
+      "target_type": "ColumnTableRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "RigMount",
+      "field": "rig_id",
+      "target_type": "CameraRig",
+      "stable_identity": true
+    },
+    {
+      "source_type": "RigMount",
+      "field": "pivot_variable_block_id",
+      "target_type": "VariableBlock",
+      "stable_identity": true
+    },
+    {
+      "source_type": "RigMount",
+      "field": "lever_variable_block_id",
+      "target_type": "VariableBlock",
+      "stable_identity": true
+    },
+    {
+      "source_type": "RigMount",
+      "field": "coordinate_system_id",
+      "target_type": "CoordinateSystem",
+      "stable_identity": true
+    },
+    {
+      "source_type": "RigMount",
+      "field": "governing_constraint_ids",
+      "target_type": "Constraint",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ModelRevision",
+      "field": "stamp",
+      "target_type": "RevisionStamp",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ModelRevision",
+      "field": "scene_id",
+      "target_type": "Scene",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ModelRevision",
+      "field": "coordinate_system_id",
+      "target_type": "CoordinateSystem",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ModelRevision",
+      "field": "projection_contract_id",
+      "target_type": "ProjectionContract",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ModelRevision",
+      "field": "primitive_ids",
+      "target_type": "GeometryPrimitive",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ModelRevision",
+      "field": "rig_mount_ids",
+      "target_type": "RigMount",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ModelRevision",
+      "field": "installation_ids",
+      "target_type": "BoardInstallation",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ModelRevision",
+      "field": "parameter_state_id",
+      "target_type": "InitialState",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ModelRevision",
+      "field": "parameter_state_id",
+      "target_type": "RunState",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ExposurePose",
+      "field": "model_revision",
+      "target_type": "RecordRevision",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ExposurePose",
+      "field": "frame_id",
+      "target_type": "SourceFrame",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ExposurePose",
+      "field": "shot_id",
+      "target_type": "Shot",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ExposurePose",
+      "field": "rig_mount_id",
+      "target_type": "RigMount",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ExposurePose",
+      "field": "coordinate_system_id",
+      "target_type": "CoordinateSystem",
+      "stable_identity": true
+    },
+    {
+      "source_type": "InspectionSnapshot",
+      "field": "model_revision",
+      "target_type": "RecordRevision",
+      "stable_identity": true
+    },
+    {
+      "source_type": "InspectionSnapshot",
+      "field": "parameter_state_id",
+      "target_type": "InitialState",
+      "stable_identity": true
+    },
+    {
+      "source_type": "InspectionSnapshot",
+      "field": "parameter_state_id",
+      "target_type": "RunState",
+      "stable_identity": true
+    },
+    {
+      "source_type": "InspectionSnapshot",
+      "field": "coordinate_system_id",
+      "target_type": "CoordinateSystem",
+      "stable_identity": true
+    },
+    {
+      "source_type": "InspectionSnapshot",
+      "field": "scene_id",
+      "target_type": "Scene",
+      "stable_identity": true
+    },
+    {
+      "source_type": "InspectionSnapshot",
+      "field": "all_primitive_ids",
+      "target_type": "GeometryPrimitive",
+      "stable_identity": true
+    },
+    {
+      "source_type": "InspectionSnapshot",
+      "field": "all_installation_ids",
+      "target_type": "BoardInstallation",
+      "stable_identity": true
+    },
+    {
+      "source_type": "InspectionSnapshot",
+      "field": "all_rig_mount_ids",
+      "target_type": "RigMount",
+      "stable_identity": true
+    },
+    {
+      "source_type": "InspectionSnapshot",
+      "field": "exposure_pose_ids",
+      "target_type": "ExposurePose",
+      "stable_identity": true
+    },
+    {
+      "source_type": "InspectionSnapshot",
+      "field": "evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "TypedArrayRef",
+      "field": "unit",
+      "target_type": "UnitRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "TypedArrayRef",
+      "field": "clock_id",
+      "target_type": "SourceClock",
+      "stable_identity": true
+    },
+    {
+      "source_type": "TypedArrayRef",
+      "field": "coordinate_system_id",
+      "target_type": "CoordinateSystem",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ColumnRef",
+      "field": "array_id",
+      "target_type": "TypedArrayRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ColumnForeignKey",
+      "field": "target_table_id",
+      "target_type": "ColumnTableRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "IdIndexRef",
+      "field": "table_id",
+      "target_type": "ColumnTableRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "IdIndexRef",
+      "field": "key_array_id",
+      "target_type": "TypedArrayRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "IdIndexRef",
+      "field": "row_array_id",
+      "target_type": "TypedArrayRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ColumnTableRef",
+      "field": "columns",
+      "target_type": "ColumnRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ColumnTableRef",
+      "field": "id_index_id",
+      "target_type": "IdIndexRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ColumnTableRef",
+      "field": "foreign_keys",
+      "target_type": "ColumnForeignKey",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ColumnTableRef",
+      "field": "evidence_ids",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "BatchedVariableBlock",
+      "field": "owner_selection",
+      "target_type": "SelectionRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "BatchedVariableBlock",
+      "field": "components",
+      "target_type": "ParameterComponent",
+      "stable_identity": true
+    },
+    {
+      "source_type": "BatchedVariableBlock",
+      "field": "parameter_table_id",
+      "target_type": "ColumnTableRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "BatchedVariableBlock",
+      "field": "definition_constraint_id",
+      "target_type": "Constraint",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ComputeBufferBinding",
+      "field": "array_id",
+      "target_type": "TypedArrayRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "ComputeLayout",
+      "field": "bindings",
+      "target_type": "ComputeBufferBinding",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "stamp",
+      "target_type": "RevisionStamp",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "batched_variables",
+      "target_type": "BatchedVariableBlock",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "array_refs",
+      "target_type": "TypedArrayRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "column_tables",
+      "target_type": "ColumnTableRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "id_indices",
+      "target_type": "IdIndexRef",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "compute_layouts",
+      "target_type": "ComputeLayout",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "run_states",
+      "target_type": "RunState",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "evidence",
+      "target_type": "Evidence",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "clocks",
+      "target_type": "SourceClock",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "frames",
+      "target_type": "SourceFrame",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "raw_observations",
+      "target_type": "PixelObservation",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "derived_observations",
+      "target_type": "DerivedPixelObservation",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "coordinate_systems",
+      "target_type": "CoordinateSystem",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "scenes",
+      "target_type": "Scene",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "rigs",
+      "target_type": "CameraRig",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "shots",
+      "target_type": "Shot",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "entities",
+      "target_type": "GeometryEntity",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "verifications",
+      "target_type": "EntityVerification",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "primitives",
+      "target_type": "GeometryPrimitive",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "curves",
+      "target_type": "CurveFeature",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "landmarks",
+      "target_type": "LandmarkFeature",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "curve_loci",
+      "target_type": "CurveLocusFeature",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "region_loci",
+      "target_type": "RegionLocusFeature",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "artworks",
+      "target_type": "ArtworkTemplate",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "artwork_layout_groups",
+      "target_type": "ArtworkLayoutGroup",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "artwork_layouts",
+      "target_type": "ArtworkLayout",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "board_surfaces",
+      "target_type": "BoardSurface",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "installations",
+      "target_type": "BoardInstallation",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "installed_artwork_features",
+      "target_type": "InstalledArtworkFeature",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "rig_mounts",
+      "target_type": "RigMount",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "model_revisions",
+      "target_type": "ModelRevision",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "exposure_poses",
+      "target_type": "ExposurePose",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "inspection_snapshots",
+      "target_type": "InspectionSnapshot",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "variables",
+      "target_type": "VariableBlock",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "associations",
+      "target_type": "ObservationAssociation",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "constraints",
+      "target_type": "Constraint",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "projection_contracts",
+      "target_type": "ProjectionContract",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "projection_proofs",
+      "target_type": "ProjectionProof",
+      "stable_identity": true
+    },
+    {
+      "source_type": "DataBundle",
+      "field": "initial_states",
+      "target_type": "InitialState",
+      "stable_identity": true
+    }
+  ],
+  "policies": {
+    "evidence": "原始UV/native PTS/ID只读；更正关联与撤点另留记录，不回写原证据。",
+    "identity": "Entity/Feature ID独立于label、variant、chart、path和数值布局；当前row不是实体身份。",
+    "position": "固定实体位置可共享未知坐标或共享station；仅locus允许观测局部自由位置。",
+    "artwork": "高清源组件/字形轮廓→跨帧共享现场拼版→连续围挡展开面安装→原片观测分别建模；不隐含三维平面。",
+    "derived_evidence": "图像交点保留原线样本支持；联合噪声或替代，禁止假作独立新增信息。",
+    "arrays": "百万行数据以Data下只读SoA列和外部ID索引引用；语义对象不内嵌巨型观测dict。",
+    "units": "像素、原生PTS、scene_unit和verified_m显式区分；米制必须链接验证依据。",
+    "assumptions": "无默认物理尺寸、噪声、阈值或机位高度；未批准声明不能启用。",
+    "versions": "ModelRevision/InspectionSnapshot精确链接同一参数状态、投影契约与世界坐标；禁止跨版本拼接。",
+    "invalidation": "数据/模型/约束/初值修订分开；RevisionGraph只使受影响消费者失效。",
+    "startup": "只检查当前输入/状态必要一致性；不重放历史生产/资格链，不重哈希全历史。",
+    "atomic_state": "先写新generation新路径的完整数组，再原子替换状态manifest；禁止覆盖在用memmap输入。",
+    "numerics": "本模块不执行拟合；分支唯一性、实际数组头/外键值和投影/Jacobian由当前准备器验证。"
+  },
+  "source_file": "calibration/solve2/rinksolve/schema.py",
+  "implementation_status": "新结构定义和语义测试通过；S01原始观测与初始化已迁移，新数值拟合未运行",
+  "revision": 2,
+  "schema_version": "rinksolve.data.v1",
+  "schema_sha256": "4ee9bd611b9c8fc4c595d80163d5ba6ad8f36ff53f08cac6a39640fe70dd0014"
+}

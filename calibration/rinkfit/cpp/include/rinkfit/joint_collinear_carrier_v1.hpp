@@ -1,5 +1,7 @@
 #pragma once
 #include "rinkfit/joint_al.hpp"
+#include <unordered_map>
+#include "rinkfit/joint_factor_failure_v1.hpp"
 namespace rinkfit {
 // Three points on one carrier. The fifth independent coordinate is C.x;
 // C.y is derived exactly. Numerical box faces are a reversible working set,
@@ -45,7 +47,7 @@ class JointCollinearCarrierV1 final:public ceres::Manifold {
  bool PlusJacobian(const double*x,double*J)const override{double q[5];if(!chart(x,q))return false;using T=ceres::Jet<double,5>;T a[5],b[6];for(int j=0;j<5;++j){a[j].a=q[j];a[j].v.setZero();a[j].v[j]=1;}if(!ambient(a,b))return false;for(int i=0;i<6;++i)for(int j=0;j<TangentSize();++j)J[TangentSize()*i+j]=b[i].v[free_[j]];return true;}
  bool MinusJacobian(const double*,double*J)const override{std::fill(J,J+6*TangentSize(),0.);for(int j=0;j<TangentSize();++j)J[6*j+free_[j]]=1;return true;}
 };
-class JointCollinearCarrierBoxV1 final:public ceres::SizedCostFunction<1,6>{std::vector<double>lo_,hi_;public:explicit JointCollinearCarrierBoxV1(const EventParameterBlock&b):lo_(b.lower),hi_(b.upper){}bool Evaluate(double const*const*x,double*r,double**J)const override{for(int i=0;i<6;++i)if(!std::isfinite(x[0][i])||x[0][i]<lo_.at(i)||x[0][i]>hi_.at(i))return false;r[0]=0;if(J&&J[0])std::fill(J[0],J[0]+6,0.);return true;}};
+class JointCollinearCarrierBoxV1 final:public ceres::SizedCostFunction<1,6>{std::vector<double>lo_,hi_;const EventParameterBlock*origin_;public:explicit JointCollinearCarrierBoxV1(const EventParameterBlock&b):lo_(b.lower),hi_(b.upper),origin_(&b){}bool Evaluate(double const*const*x,double*r,double**J)const override{for(int i=0;i<6;++i)if(!std::isfinite(x[0][i])||x[0][i]<lo_.at(i)||x[0][i]>hi_.at(i))return joint_actual_factor_failure_v1([&](eventio::Json&record){record["factor"]="collinear_carrier_box";record["component"]=i;record["lower"]=lo_.at(i);record["upper"]=hi_.at(i);append_joint_actual_failure_parameter_v1(record,origin_->values.data(),x[0],6,origin_->name);});r[0]=0;if(J&&J[0])std::fill(J[0],J[0]+6,0.);return true;}};
 class JointCollinearBoxWorkingSetV1 {
  struct Item{int block;std::vector<int> held,pending;std::vector<ceres::ResidualBlockId> residuals;std::array<double,5> gradient{};};
  std::vector<Item> items_;
@@ -54,7 +56,25 @@ class JointCollinearBoxWorkingSetV1 {
   JointCollinearCarrierV1 full;double M[30];if(!full.PlusJacobian(x,M))throw std::runtime_error("singular carrier coordinate");std::array<double,5>q{};for(int j=0;j<5;++j)for(int k=0;k<6;++k)q[j]+=g[k]*M[5*k+j];return q;
  }
  public:
- JointCollinearBoxWorkingSetV1(JointALBuilder&b,ceres::Problem&p){for(int i=0;i<int(b.core.model.blocks.size());++i){auto*x=b.core.model.blocks[i].values.data();if(p.HasParameterBlock(x)&&!p.IsParameterBlockConstant(x)&&dynamic_cast<const JointCollinearCarrierV1*>(p.GetManifold(x))){Item a;a.block=i;p.GetResidualBlocksForParameterBlock(x,&a.residuals);items_.push_back(std::move(a));}}}
+ JointCollinearBoxWorkingSetV1(JointALBuilder&b,ceres::Problem&p){
+  std::unordered_map<const double*,std::size_t> wanted;
+  for(int i=0;i<int(b.core.model.blocks.size());++i){auto*x=b.core.model.blocks[i].values.data();if(p.HasParameterBlock(x)&&!p.IsParameterBlockConstant(x)&&dynamic_cast<const JointCollinearCarrierV1*>(p.GetManifold(x))){wanted.emplace(x,items_.size());Item a;a.block=i;items_.push_back(std::move(a));}}
+  if(wanted.empty())return;
+  std::vector<ceres::ResidualBlockId> ids;std::vector<double*>blocks;p.GetResidualBlocks(&ids);
+  for(auto id:ids){p.GetParameterBlocksForResidualBlock(id,&blocks);for(auto*x:blocks){const auto it=wanted.find(x);if(it!=wanted.end())items_[it->second].residuals.push_back(id);}}
+ }
+ // Local factor replacement keeps all parameter addresses and carrier charts.
+ // Preserve incidence ordering while replacing the exact retired factor IDs.
+ struct PreparedResidualRemapV1{std::vector<std::vector<ceres::ResidualBlockId>> residuals;};
+ PreparedResidualRemapV1 prepare_remap_residuals_v1(const std::vector<std::pair<ceres::ResidualBlockId,ceres::ResidualBlockId>>& replacements)const{
+  std::unordered_map<ceres::ResidualBlockId,ceres::ResidualBlockId> ids;
+  for(const auto&r:replacements){if(!r.first||!r.second)throw std::runtime_error("null carrier residual replacement");const auto inserted=ids.emplace(r.first,r.second);if(!inserted.second&&inserted.first->second!=r.second)throw std::runtime_error("conflicting carrier residual replacement");}
+  PreparedResidualRemapV1 result;result.residuals.reserve(items_.size());
+  for(const auto&a:items_){result.residuals.push_back(a.residuals);for(auto&id:result.residuals.back()){const auto it=ids.find(id);if(it!=ids.end())id=it->second;}}
+  return result;
+ }
+ void commit_remap_residuals_v1(PreparedResidualRemapV1&&prepared)noexcept{for(std::size_t i=0;i<items_.size();++i)items_[i].residuals.swap(prepared.residuals[i]);}
+ void remap_residuals_v1(const std::vector<std::pair<ceres::ResidualBlockId,ceres::ResidualBlockId>>& replacements){commit_remap_residuals_v1(prepare_remap_residuals_v1(replacements));}
  bool empty()const{return items_.empty();}
  bool changed(JointALBuilder&b,ceres::Problem&p,bool new_point=false){bool any=false,prepared=false;for(auto&a:items_){const auto&v=b.core.model.blocks[a.block];bool near_boundary=false;for(int j=0;j<5;++j)near_boundary=near_boundary||v.values[j]==v.lower[j]||v.values[j]==v.upper[j];a.pending.clear();if(near_boundary){if(!prepared){if(auto*c=b.gpu_evaluation_callback())c->PrepareForEvaluation(true,new_point);prepared=true;}a.gradient=gradient(p,const_cast<double*>(v.values.data()),a.residuals);for(int j=0;j<5;++j){const double g=a.gradient[j];if(!std::isfinite(g))throw std::runtime_error("nonfinite carrier KKT gradient");if((v.values[j]==v.upper[j]&&g<0)||(v.values[j]==v.lower[j]&&g>0))a.pending.push_back(j);}}any=any||a.pending!=a.held;}return any;}
  eventio::Json install(JointALBuilder&b,ceres::Problem&p){eventio::Json rows=eventio::Json::array();for(auto&a:items_){auto&v=b.core.model.blocks[a.block];const auto previous=a.held;if(a.pending!=a.held){p.SetManifold(v.values.data(),new JointCollinearCarrierV1(a.pending,&v));a.held=a.pending;}rows.push_back({{"block",a.block},{"name",v.name},{"active_box_coordinates",a.held},{"previous_active",previous},{"full_chart_gradient",a.gradient},{"tangent",p.ParameterBlockTangentSize(v.values.data())},{"physical_position_and_direction_free",true},{"source_or_primal_values_changed",false},{"reconsidered_at_each_accepted_step",true}});}return {{"schema","rinkfit.collinear_box_working_set.v1"},{"groups",rows}};}

@@ -19,16 +19,24 @@ def append(*,parent_packet,parent_qualification,parent_weights,model,evidence,ou
  if ev['schema']!='rinkfit.native_surface_source_readout_evidence.v2' or ev['source_model_residual_used'] or not ev['visual_surface_identity_review_completed']:raise ValueError('Missing actual native advertisement evidence')
  for rr in [ev['rows'],ev['frames'],ev['reader'],ev['source_profile_reader'],*ev['review_images']]:
   if file_sha256(rr['file'])!=rr['sha256']:raise ValueError('Changed native ad evidence')
+ from .circle_source_identity import circle_name,require_c0_midline_reading,C0_CURRENT_LABEL
  rows=read_json(ev['rows']['file']);frames=read_json(ev['frames']['file']);n0=int(p['row_count']);count=len(rows);N=n0+count
  if any(r['source_dataset_id']!=ev['source_dataset_id']for r in rows):raise ValueError('Native source dataset identity differs')
  if not count or len({r['source_row_id']for r in rows})!=count or set(r['source_row_id']for r in rows)&set(p['source_row_ids']):raise ValueError('Missing or duplicate source identities')
- for r in rows:
+ for row_index,r in enumerate(rows):
+  name=circle_name(r['material_label'])
+  if name in {'A1','A2','A3','A4'}:r=dict(r,active=False,current_qualification_reason='A1_A4_removed_from_current_fitting_no_replacement')
+  if name=='C0' and r['active']:
+   require_c0_midline_reading(r)
+   if r['material_label']!=C0_CURRENT_LABEL:raise ValueError('New C0 issuance uses ice.C0:middle; historical edge labels need explicit current measurement transport')
+  rows[row_index]=r
   fr=frames[r['frame_index']]
   if m['materials'][r['material_index']]['label']!=r['material_label'] or not ((r['physical_surface']=='board' and r['material_label'].startswith('Ad')) or (r['physical_surface']=='ice' and r['material_label'].startswith('ice.'))) or r['source_model_residual_used'] or r['original_UV_changed']:raise ValueError('Unverified ad source identity')
   if r['native_pts']!=fr['native_pts'] or r['shot_id']!=fr['shot_id'] or fr['frame_role']!='native_material_repair_training':raise ValueError('Native source exposure/role differs')
- scene=NativeScene(as_event_view(m,'s01'));cameras={sid:_camera(m,sid)for sid in m['shots']};paths=np.zeros(count,'<u4');stations=np.zeros(count,'<f8')
+ scene=NativeScene(as_event_view(m,'s01'));cameras={sid:_camera(m,sid)for sid in m['shots']};paths=np.zeros(count,'<u4');stations=np.full(count,.5,'<f8')
  frameids=defaultdict(list)
- for i,r in enumerate(rows):frameids[r['frame_index']].append(i)
+ for i,r in enumerate(rows):
+  if r['active']:frameids[r['frame_index']].append(i)
  for fi,ii in frameids.items():
   block=[dict(rows[i],path_index=0)for i in ii];fr=frames[fi];t=(fr['native_pts']-m['shots'][fr['shot_id']]['time_origin_pts'])/12800
   pa,st,_,_=_fast_seed_frame(scene,cameras[fr['shot_id']],t,block);paths[ii]=pa;stations[ii]=st

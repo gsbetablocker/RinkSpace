@@ -1,0 +1,1132 @@
+{
+  "schema": "rinksolve.constraints.v1",
+  "revision": 14,
+  "event_id": "ankara_2026",
+  "constraints": [
+    {
+      "id": "sequence.single_shot",
+      "title": "只做当前镜头，通过整段验收后才下一个",
+      "kind": "execution_policy",
+      "origin": "latest_user_instruction",
+      "approval": "user_confirmed",
+      "status": "已登记，待连接新模型",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "active_shot": "s01",
+        "require_full_shot_visual_validation": true,
+        "advance_before_validation": false
+      },
+      "owner": "validation",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "当前用户明确要求",
+          "path": "本会话",
+          "quote": "我只允许你一个镜头一个镜头做；一个镜头全贴好了才允许做下一个。"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "baseline.demo",
+      "title": "成功demo网格必须作为新拟合初值来源",
+      "kind": "initialization",
+      "origin": "latest_user_instruction",
+      "approval": "user_confirmed",
+      "status": "已登记，待连接新模型",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "source": "old_demo_s01",
+        "projection_equivalence_required": true,
+        "old_solver_code_import": false,
+        "failed_joint6_optimizer_state_import": false
+      },
+      "owner": "baseline_import",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "当前用户明确要求",
+          "path": "本会话",
+          "quote": "甚至我让你拿demo的网格当新拟合的初值你都做不到。"
+        }
+      ],
+      "notes": "已找回8a28 demo S01原相机表和实际平面显示投影；还须验证新实现的对应关系。"
+    },
+    {
+      "id": "clock.native",
+      "title": "官方50fps单节目原片与原生PTS",
+      "kind": "source_policy",
+      "origin": "latest_user_instruction",
+      "approval": "user_confirmed",
+      "status": "已登记，待连接新模型",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "fps": [
+          50,
+          1
+        ],
+        "time_base": [
+          1,
+          12800
+        ],
+        "pts_step": 256,
+        "source_video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+      },
+      "owner": "sources",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "当前用户明确要求",
+          "path": "D:/OneDrive/codex_projs/RinkSpace/AGENTS.md",
+          "quote": "处理具体节目统一使用 ISU 官方 YouTube 频道的 50 帧单节目原视频，以该视频的原生 PTS 与时间戳为处理时钟。"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "source.material_only",
+      "title": "场地拟合只用静止冰面与围挡本体材料",
+      "kind": "admission",
+      "origin": "latest_user_instruction",
+      "approval": "user_confirmed",
+      "status": "已登记，待连接新模型",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "allowed": [
+          "ice_material",
+          "board_material"
+        ],
+        "unknown_entity": "exclude",
+        "outside_model": "exclude"
+      },
+      "owner": "observations",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "当前用户明确要求",
+          "path": "D:/OneDrive/codex_projs/RinkSpace/AGENTS.md",
+          "quote": "只允许原片核实属于冰面或围挡本体的静止实体与材料。看台、人物、字幕、倒影等模型范围外的点及归属未确认的点严格禁止进入场地拟合。"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "source.line_midline",
+      "title": "B1/B2/C取有宽度材料两边之间的中线",
+      "kind": "measurement_definition",
+      "origin": "latest_user_instruction",
+      "approval": "user_confirmed",
+      "status": "已登记，待连接新模型",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "line_labels": [
+          "B1",
+          "B2",
+          "C"
+        ],
+        "measurement": "material_edge_midline",
+        "circle_and_ad_measurement": "actual_named_boundary"
+      },
+      "owner": "observations",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "当前用户明确要求",
+          "path": "D:/OneDrive/codex_projs/RinkSpace/AGENTS.md",
+          "quote": "B1、B2、C 等有明显宽度的冰面直线在模型中以无宽度线表示，默认取两侧材料边缘之间的宽度中线；靶圈轮廓和广告轮廓仍取各自定义的实体边界。"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "source.layer_identity",
+      "title": "局部峰值或模型最近位置不构成命名圈层身份",
+      "kind": "admission",
+      "origin": "engineering_choice",
+      "approval": "engineering_definition",
+      "status": "已登记，待连接新模型",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "navigation_is_identity_evidence": false,
+        "local_unique_transition_is_layer_identity": false,
+        "unconfirmed_named_layer": "exclude_preserve_raw"
+      },
+      "owner": "observations",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "可追溯来源",
+          "path": "本会话",
+          "quote": "你反复要求删掉错误点，清楚点必须从真实画面确认。"
+        }
+      ],
+      "notes": "这是实体准入的实现定义；不声称每个局部过渡错误，只拒绝未经实体确认的拟合资格。"
+    },
+    {
+      "id": "world.common_scene",
+      "title": "同一场地跨镜头不变",
+      "kind": "physical_relation",
+      "origin": "user_statement_record",
+      "approval": "user_confirmed",
+      "status": "已登记，待连接新模型",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "one_scene_per_event": true
+      },
+      "owner": "model",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "可追溯来源",
+          "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/model_constraints/geometry_relations_current.json",
+          "quote": "共同场景跨帧不变。"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "board.vertical",
+      "title": "冰面水平、围挡竖直，上下边共用XY",
+      "kind": "physical_relation",
+      "origin": "user_statement_record",
+      "approval": "user_confirmed",
+      "status": "已登记，待连接新模型",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "ice_z": 0,
+        "board_vertical": true,
+        "top_bottom_share_xy": true
+      },
+      "owner": "model",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "可追溯来源",
+          "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/model_constraints/geometry_relations_current.json",
+          "quote": "冰面水平、围挡竖直；每对顶部/底部共用世界XY。"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "ad.unfolded_rectangle",
+      "title": "广告长方形定义在连续围挡展开面",
+      "kind": "model_definition",
+      "origin": "latest_user_instruction",
+      "approval": "user_confirmed",
+      "status": "已登记，待连接新模型",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "surface": "continuous_board_unfolded",
+        "can_cross_straight_arc": true,
+        "force_single_plane": false
+      },
+      "owner": "model",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "当前用户明确要求",
+          "path": "D:/OneDrive/codex_projs/RinkSpace/AGENTS.md",
+          "quote": "所有围挡广告所称的“长方形”，均指整圈围挡剪断摊平后的展开面形状；可以跨越直线段与圆弧段。"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "ad.same_brand_sizes",
+      "title": "已确认同品牌两面宽高共同估计",
+      "kind": "physical_relation",
+      "origin": "user_statement_record",
+      "approval": "user_confirmed",
+      "status": "已登记，待连接新模型",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "shared": "width_height_for_confirmed_brand_pair",
+        "separate": "position_height"
+      },
+      "owner": "model",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "可追溯来源",
+          "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/model_constraints/geometry_relations_current.json",
+          "quote": "相同品牌两面的宽高共同估计；位置和离冰高度可各自估计。"
+        }
+      ],
+      "notes": "仅适用于记录中明确配对的品牌实例，不把视觉相似自动当同尺寸。"
+    },
+    {
+      "id": "curling.centres",
+      "title": "F/R两列、配对方向和相邻等间距",
+      "kind": "physical_relation",
+      "origin": "user_statement_record",
+      "approval": "user_confirmed",
+      "status": "已登记，待连接新模型",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "each_column_collinear": true,
+        "columns_parallel_short_side": true,
+        "pairs_parallel_long_side": true,
+        "shared_estimable_pitch": true,
+        "force_centre_mirror": false
+      },
+      "owner": "model",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "可追溯来源",
+          "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/model_constraints/geometry_relations_current.json",
+          "quote": "两端各自四个圆心共列，列平行短边；对应F/R圆心连线平行长边；四行共用可估pitch。"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "curling.radii",
+      "title": "八个营垒共同外圈半径与同心圆半径比",
+      "kind": "physical_relation",
+      "origin": "user_statement_record",
+      "approval": "user_confirmed",
+      "status": "已登记，待连接新模型",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "shared_outer_radius": true,
+        "shared_nested_radius_ratios": true,
+        "estimated_values": true
+      },
+      "owner": "model",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "可追溯来源",
+          "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/model_constraints/geometry_relations_current.json",
+          "quote": "八个营垒共用外圈半径和同心圆半径比；不能只拟合外圈并声称内圈正确。"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "lane.width",
+      "title": "四Lane等宽、右边共线、左侧开口",
+      "kind": "physical_relation",
+      "origin": "user_statement_record",
+      "approval": "user_confirmed",
+      "status": "已登记，待连接新模型",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "shared_estimable_width": true,
+        "right_edges_collinear": true,
+        "left_open": true,
+        "equal_length": false,
+        "synthetic_fourth_edge": false
+      },
+      "owner": "model",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "可追溯来源",
+          "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/model_constraints/geometry_relations_current.json",
+          "quote": "等宽及右边线共线继续有效；用户后来明确撤销等长，保留左侧开口。"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "hockey.centre_blue",
+      "title": "中线蓝线平行、B1/B2关于C对称",
+      "kind": "physical_relation",
+      "origin": "user_statement_record",
+      "approval": "user_confirmed",
+      "status": "已登记，待连接新模型",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "parallel_lines": [
+          "C",
+          "B1",
+          "B2",
+          "goal1",
+          "goal2"
+        ],
+        "C0_on_C": true,
+        "blue_pair_symmetric_about_C": true
+      },
+      "owner": "model",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "可追溯来源",
+          "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/model_constraints/geometry_relations_current.json",
+          "quote": "中线、两条蓝线和两条球门线彼此平行；C0圆心在中线上，两蓝线关于中场对称。"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "rig.installations",
+      "title": "三台独立固定三脚架与已记录机位绑定",
+      "kind": "physical_relation",
+      "origin": "user_statement_record",
+      "approval": "user_confirmed",
+      "status": "已登记，待连接新模型",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "camera_model": "Sony PXW-Z190",
+        "fixed_pivots": true,
+        "independent_installations": true,
+        "binding": {
+          "main": [
+            "s01",
+            "s04"
+          ],
+          "secondary": [
+            "s02",
+            "s06"
+          ],
+          "end": [
+            "s03",
+            "s05"
+          ]
+        }
+      },
+      "owner": "model",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "可追溯来源",
+          "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/model_constraints/camera_hardware/user_camera_mount_and_height_20261006_v4.json",
+          "quote": "三台均为Sony PXW-Z190；fixed_tripods；三个独立安装点。"
+        }
+      ],
+      "notes": "当前只初始化和拟合S01；其余绑定只登记，不解锁。"
+    },
+    {
+      "id": "rig.nonzero_offset",
+      "title": "旋转带动非零相机局部偏移",
+      "kind": "model_definition",
+      "origin": "user_statement_record",
+      "approval": "user_confirmed",
+      "status": "已登记，待连接新模型",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "C": "P + transpose(R) * lever_camera",
+        "fixed_pivot": true,
+        "zero_lever_default": false,
+        "per_frame_arbitrary_C": false
+      },
+      "owner": "model",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "可追溯来源",
+          "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/model_constraints/camera_hardware/user_camera_mount_and_height_20261006_v4.json",
+          "quote": "zero_lever_fixed_optical_centre_default_rejected_by_user；每台分别保留固定云台基座及非零相机局部杆臂。"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "rig.independent_heights",
+      "title": "每台安装独立固定高度，不强迫三台等高",
+      "kind": "physical_relation",
+      "origin": "user_statement_record",
+      "approval": "user_confirmed",
+      "status": "已登记，待连接新模型",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "one_constant_pivot_height_per_installation": true,
+        "equal_height_across_rigs": false,
+        "pivot_above_ice": true
+      },
+      "owner": "model",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "可追溯来源",
+          "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/model_constraints/camera_hardware/user_camera_mount_and_height_20261006_v4.json",
+          "quote": "每个物理安装点在自身镜头序列中采用独立固定高度；三台安装的高度不要求相同；pivot_above_ice确认。"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "rig.lens_height_estimate",
+      "title": "1.5–1.7米是用户目视估计，不是硬边界",
+      "kind": "search_reference",
+      "origin": "user_tentative_estimate",
+      "approval": "user_tentative",
+      "status": "已登记，待连接新模型",
+      "enabled": false,
+      "effective_enabled": false,
+      "expression": {
+        "lens_height_above_operator_floor_m": [
+          1.5,
+          1.7
+        ],
+        "floor_to_ice_offset_measured": false,
+        "hard_bound": false
+      },
+      "owner": "model",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "可追溯来源",
+          "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/model_constraints/camera_hardware/user_camera_mount_and_height_20261006_v4.json",
+          "quote": "range_status=user_tentative_visual_estimate_not_measured_or_hard_bounds。"
+        }
+      ],
+      "notes": "用户确实给过数值，但未测操作地面与冰面高差；不得当作冰面基准硬范围。"
+    },
+    {
+      "id": "rig.mount_search",
+      "title": "杆臂初值/范围是批准过的工作搜索设定",
+      "kind": "search_reference",
+      "origin": "user_statement_record",
+      "approval": "user_working_choice",
+      "status": "已登记，待连接新模型",
+      "enabled": false,
+      "effective_enabled": false,
+      "expression": {
+        "initial_camera_xyz_m": [
+          0,
+          -0.2,
+          0.1
+        ],
+        "lower_m": [
+          -0.05,
+          -0.3,
+          -0.05
+        ],
+        "upper_m": [
+          0.05,
+          -0.1,
+          0.25
+        ],
+        "measurement": false,
+        "metric_scale_verified": false
+      },
+      "owner": "model",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "可追溯来源",
+          "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/model_constraints/camera_hardware/user_camera_mount_and_height_20261006_v4.json",
+          "quote": "user_adopted_photo_based_initialization_and_bounds_from_dot；bounds_are_user_working_search_ranges_not_measurements。"
+        }
+      ],
+      "notes": "保留批准归属；新模型尺度未核实时不直接启用为米制硬约束。"
+    },
+    {
+      "id": "rig.zoom_offset",
+      "title": "第一版每台杆臂不随变焦变化",
+      "kind": "model_choice",
+      "origin": "user_statement_record",
+      "approval": "user_working_choice",
+      "status": "已登记，待连接新模型",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "one_constant_lever_per_installation": true,
+        "zoom_dependent_offset": false
+      },
+      "owner": "model",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "可追溯来源",
+          "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/model_constraints/camera_hardware/user_camera_mount_and_height_20261006_v4.json",
+          "quote": "one_constant_lever_per_installation；no_zoom_dependent_lever_in_first_version。"
+        }
+      ],
+      "notes": "已记录的第一版建模选择，不冒充厂家机械测量。"
+    },
+    {
+      "id": "unapproved.height_gaussian",
+      "title": "旧实现的1.6±0.18米高斯先验未经用户确认为测量",
+      "kind": "statistical_prior",
+      "origin": "assistant_assumption",
+      "approval": "unapproved",
+      "status": "未批准，停用",
+      "enabled": false,
+      "effective_enabled": false,
+      "expression": {
+        "mean_m": 1.6,
+        "sigma_m": 0.18,
+        "applies_to": "reference_lens_height"
+      },
+      "owner": "model",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "可追溯来源",
+          "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/model_constraints/camera_hardware/user_camera_mount_and_height_20261006_v4.json",
+          "quote": "working_height_prior.authority=assistant_working_gaussian_from_user_head_height_estimate_and_unmeasured_ground_offset。"
+        }
+      ],
+      "notes": "默认停用。不能把用户的暂估范围变成自定高斯硬事实。"
+    },
+    {
+      "id": "unapproved.readout",
+      "title": "现场读出时间/防抖/畸变标定不能由型号自动推出",
+      "kind": "physical_assumption",
+      "origin": "assistant_assumption",
+      "approval": "unapproved",
+      "status": "未批准，停用",
+      "enabled": false,
+      "effective_enabled": false,
+      "expression": {
+        "readout_duration_known": false,
+        "stabilization_setting_known": false,
+        "distortion_calibration_known": false
+      },
+      "owner": "projector",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "可追溯来源",
+          "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/model_constraints/camera_hardware/user_camera_mount_and_height_20261006_v4.json",
+          "quote": "Selected modelling settings were not supplied by the production team."
+        }
+      ],
+      "notes": "参数可作为待估未知量；不能擅自固定为已测值。"
+    },
+    {
+      "id": "unapproved.standard_dimensions",
+      "title": "标准尺寸不能直接固定为本赛事精确场地",
+      "kind": "physical_assumption",
+      "origin": "engineering_reference",
+      "approval": "unapproved",
+      "status": "未批准，停用",
+      "enabled": false,
+      "effective_enabled": false,
+      "expression": {
+        "rink_m": [
+          60,
+          30
+        ],
+        "curling_pitch_m": 4.75,
+        "exact_measured": false
+      },
+      "owner": "model",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "可追溯来源",
+          "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/model_constraints/geometry_relations_current.json",
+          "quote": "标准尺寸作工程参考，允许现场施工与尺度估计误差；pitch数值不能固定为4.75米赛道宽。"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "numerical.gauge",
+      "title": "坐标规范与实际米制分开",
+      "kind": "coordinate_gauge",
+      "origin": "mathematical_definition",
+      "approval": "mathematical",
+      "status": "已登记，待连接新模型",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "world_length_L": 1,
+        "metric_verified": false,
+        "independent_axis_stretch": false
+      },
+      "owner": "model",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "可追溯来源",
+          "path": "D:/OneDrive/codex_projs/RinkSpace/AGENTS.md",
+          "quote": "像素、透视、欧氏与已验证米制分开。"
+        }
+      ],
+      "notes": "L=1是消除纯尺度规范；不代表长宽或相机米制已经验证。"
+    },
+    {
+      "id": "render.same_model",
+      "title": "求解、叠图、验证用同一模型并全开标记",
+      "kind": "validation_policy",
+      "origin": "latest_user_instruction",
+      "approval": "user_confirmed",
+      "status": "已登记，待连接新模型",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "same_model": true,
+        "all_lines": true,
+        "board_grid": true,
+        "ad_boundaries_and_ids": true,
+        "full_shot": true,
+        "independent_evidence": true,
+        "cost_is_acceptance": false
+      },
+      "owner": "renderer",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "当前用户明确要求",
+          "path": "D:/OneDrive/codex_projs/RinkSpace/AGENTS.md",
+          "quote": "审阅始终使用求解同一模型，全开标线、广告边界和编号，连续看整镜头。"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "compute.resources",
+      "title": "充分利用本机CPU/GPU并显示真实耗时瓶颈",
+      "kind": "engineering_requirement",
+      "origin": "latest_user_instruction",
+      "approval": "user_confirmed",
+      "status": "已登记，待连接新模型",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "cpu": true,
+        "gpu": true,
+        "real_telemetry": true,
+        "benchmark_required": true,
+        "blank_telemetry_is_not_zero": true
+      },
+      "owner": "compute",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "当前用户明确要求",
+          "path": "本会话",
+          "quote": "求解器必须是快速的、高效的、充分利用本机所有CPU和GPU资源的。"
+        }
+      ],
+      "notes": "20逻辑CPU已实测；新GPU数值内核尚未实现，不能凭监控页面宣称已加速。"
+    },
+    {
+      "id": "observation.fixed_vs_locus",
+      "title": "固定实体位置与在线范围观测必须分开",
+      "kind": "measurement_definition",
+      "origin": "latest_user_instruction",
+      "approval": "user_confirmed",
+      "status": "新结构设计中；尚未进入数值求解",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "locus": "point constrained to specified curve or range",
+        "landmark": "one fixed physical location shared across frames",
+        "known_coordinate_is_separate_from_fixed_identity": true,
+        "polyline_samples_are_landmarks": false
+      },
+      "owner": "data_model",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "当前用户明确要求",
+          "path": "本会话",
+          "quote": "有些点是“在某条线上”是一个范围，而有些点是“必须在某个位置”。"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "observation.intersections",
+      "title": "补查清晰可见的线间交点作为定位特征",
+      "kind": "measurement_definition",
+      "origin": "latest_user_instruction",
+      "approval": "user_confirmed",
+      "status": "5个同C未知世界站标已进入当前数值求解，8个原生曝光按同特征共享位置",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "intersection_defines_shared_location": true,
+        "parent_curves_and_boundary_semantics_explicit": true,
+        "do_not_slide_per_frame": true,
+        "numerical_world_position_may_be_estimated": true
+      },
+      "owner": "observations",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "当前用户明确要求",
+          "path": "本会话",
+          "quote": "冰面上面很多固定的点我们没有取到，比如各种线之间的交点；这些是可以直接定位的。"
+        }
+      ],
+      "notes": "当前是5个SharedCurvePointPosition，每个实体点只有一个model-owned C station，8曝光共用且不允许逐帧滑动。第二条lane/圈线对应尚未作为几何交点强绑定，不能称已知数值世界交点。位置可估计，原source UV/PTS保留。"
+    },
+    {
+      "id": "ad.object_model",
+      "title": "广告以图案模板、现场对象、观测分别表示",
+      "kind": "model_definition",
+      "origin": "latest_user_instruction",
+      "approval": "user_confirmed",
+      "status": "新结构设计中；尚未进入数值求解",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "artwork_template_separate_from_installation": true,
+        "hd_reference_allowed": true,
+        "reference_variant_must_match_scene": true,
+        "split_text_pattern_shape_before_frame_comparison": true
+      },
+      "owner": "model",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "当前用户明确要求",
+          "path": "本会话",
+          "quote": "广告每个都可以当做一个对象处理；先用高清图把文字、图案形状拆清楚，建好模再放回具体画面里对比。"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "inspection.persistent_model",
+      "title": "完整冰场与三机位总览常驻界面",
+      "kind": "inspection_policy",
+      "origin": "latest_user_instruction",
+      "approval": "user_confirmed",
+      "status": "新结构设计中；尚未进入数值求解",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "persist_across_tabs": true,
+        "all_ice_lines": true,
+        "all_advertisements": true,
+        "three_camera_positions_relative_to_scene": true,
+        "same_model_revision_as_solver": true
+      },
+      "owner": "renderer",
+      "scope": "ankara_2026 / okada_mei_sp / 当前仅S01",
+      "evidence": [
+        {
+          "label": "当前用户明确要求",
+          "path": "本会话",
+          "quote": "每时每刻都能看到冰场模型的俯视图，上面所有线、所有广告，以及三个摄像机相对冰场的位置；这是判断模型有没有搞乱的唯一途径。"
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "numerical.intersection_budget",
+      "title": "新固定交点的工程像素目标",
+      "kind": "numerical_acceptance_target",
+      "origin": "explicit_engineering_choice",
+      "approval": "engineering_definition",
+      "status": "待连接新S01约束family",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "radius_px": 2,
+        "residual": "squared_pixel_norm / radius_px^2 - 1 <= 0",
+        "is_statistical_sigma": false,
+        "is_physical_user_fact": false,
+        "parent_support_policy": "replace all existing ice support only at the two measured native exposures; whole original W groups excluded, source pixels retained"
+      },
+      "owner": "factors",
+      "scope": "S01 / 5固定交点 / 8曝光观测",
+      "evidence": [
+        {
+          "label": "新原片材料交点及父样本",
+          "path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/s01_intersections.json"
+        },
+        {
+          "label": "当前既有像素预算仅作工程目标参照",
+          "path": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/observations/current_support.json"
+        }
+      ],
+      "notes": "2px是本次实现公开选择的拟合目标，用户未将其声明为物理事实，也不是测量协方差；可修改或停用。a-c跨曝光共享世界station，灰线全局编号待核不会变成逐帧滑点。"
+    },
+    {
+      "id": "numerical.shared_budget_schedule",
+      "title": "全源像素预算与两阶段可行性求解",
+      "kind": "numerical_policy",
+      "origin": "explicit_engineering_choice",
+      "approval": "engineering_definition",
+      "status": "已核定源定义，正在装配新引擎",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "global_budget_squared": "b",
+        "one_shared_budget_for_all_active_sources": true,
+        "phase_I": {
+          "objective": "min b",
+          "lower_bound": 0,
+          "initial": "max(1,max_i q_i)",
+          "inequality": "q_i - b <= 0"
+        },
+        "phase_II": {
+          "fixed_budget_squared": 1,
+          "objective": "original correlated semidefinite precision criterion from predUV - immutable rawUV",
+          "inequality": "q_i - 1 <= 0"
+        },
+        "ordinary_source_q": "squared_norm(predUV - rawUV) / E_px^2",
+        "profile_source_q": "(source_normal dot (predUV - rawUV))^2 / E_px^2",
+        "profile_query_equality": "predUV - Q(alpha) = [0,0]",
+        "query_does_not_replace_raw_statistical_target": true,
+        "is_statistical_sigma": false,
+        "is_physical_user_fact": false,
+        "visual_acceptance_required": true
+      },
+      "owner": "optimizer",
+      "scope": "S01 / 全部有效原始观测及新交点",
+      "evidence": [
+        {
+          "label": "当前自足观测噪声与预算定义",
+          "path": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/preparation/current_noise_contract.json"
+        }
+      ],
+      "notes": "这是恢复真实数据语义后的公开工程求解策略。E是像素拟合预算，不能冒充测量标准差。单个共享b不得改为每点任意放宽。b>1不通过既有像素目标；b或W下降也不能代替整镜头真实验收。发现不相容实体必须回看原片、对应关系及模型。"
+    },
+    {
+      "id": "numerical.ad7_fixed_corner_budget",
+      "title": "Ad7明确字角的工程像素目标",
+      "kind": "numerical_acceptance_target",
+      "origin": "explicit_engineering_choice",
+      "approval": "engineering_definition",
+      "status": "当前固定实体观测正在装配",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "radius_px": 2,
+        "residual": "squared_norm(predUV - immutable rawUV) / radius_px^2 - shared_budget_squared <= 0",
+        "fixed_entities": 8,
+        "observations": 24,
+        "source_native_pts": [
+          444928,
+          445440,
+          445952
+        ],
+        "per_observation_world_station": false,
+        "is_statistical_sigma": false,
+        "is_physical_user_fact": false,
+        "statistical_objective_weight": null,
+        "shared_global_budget": true,
+        "source_dependencies": "same glyph and nearby exposures; not independent noise samples"
+      },
+      "owner": "factors",
+      "scope": "S01 / Ad7已辨识I/K的8固定模板字角 / 24曝光观测",
+      "evidence": [
+        {
+          "label": "官方50fps原片固定字角、半对比材料边交点及依赖记录",
+          "path": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/hd_binding/ad7_fixed_corner_observations.json"
+        },
+        {
+          "label": "实际原片逐卡审阅",
+          "path": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/hd_binding/ad7_fixed_corners_review.jpg"
+        }
+      ],
+      "notes": "2px为公开工程拟合目标，可修改或停用，不是观测σ或用户物理事实。字角固定在同一真实字形源轮廓，由共享layout与连续围挡映射到世界；不冻结初值XYZ。近邻曝光依赖保留，不当作24份独立统计样本。40秒图像未用于该布局估计或角点调参，仍留作独立检查。"
+    },
+    {
+      "id": "numerical.s01_block_warm_start",
+      "title": "S01先稳住真实冰线与围挡，再细化广告并联合求解",
+      "kind": "numerical_policy",
+      "origin": "explicit_engineering_choice",
+      "approval": "engineering_definition",
+      "status": "同方程分块初始化已通过；连续Ceres内层严格按原declared KKT停止，准备真实续算",
+      "enabled": true,
+      "effective_enabled": false,
+      "expression": {
+        "shot": "S01",
+        "same_model_across_stages": true,
+        "source_admission_modified_by_stage": false,
+        "complete_original_W_groups_only": true,
+        "stages": [
+          {
+            "id": "warm_geometry",
+            "sources": [
+              "verified_ice_material",
+              "verified_board_material",
+              "fixed_ice_intersections"
+            ],
+            "free": [
+              "current_camera_rig",
+              "S01_cubic_motion",
+              "shared_scene_geometry",
+              "shared_ice_feature_positions",
+              "selected_observation_auxiliaries"
+            ],
+            "advertisement_factors": "temporarily outside this numerical stage only",
+            "objective": "min single shared budget_squared",
+            "next_stage_requires_current_image_audit": true
+          },
+          {
+            "id": "warm_artwork",
+            "sources": "all current verified sources",
+            "hold": [
+              "camera_rig",
+              "S01_motion",
+              "shared_scene_geometry",
+              "shared_ice_feature_positions"
+            ],
+            "free": [
+              "shared_static_artwork_layout",
+              "permitted_observation_auxiliaries"
+            ],
+            "objective": "min single shared budget_squared"
+          },
+          {
+            "id": "joint_feasibility",
+            "sources": "all current verified sources",
+            "free": "all currently registered physical and permitted nuisance blocks",
+            "objective": "min single shared budget_squared"
+          },
+          {
+            "id": "joint_precision",
+            "sources": "all current verified sources",
+            "free": "all currently registered physical and permitted nuisance blocks",
+            "fixed_budget_squared": 1,
+            "objective": "original rawUV correlated W criterion"
+          }
+        ],
+        "is_physical_user_fact": false,
+        "is_statistical_prior": false,
+        "holding_blocks_defines_no_final_physical_constraint": true,
+        "stage_completion_is_not_visual_acceptance": true,
+        "auxiliary_initialization": {
+          "source_pixels_and_identity": "immutable",
+          "physical_model_and_station_held_for_row_step": true,
+          "rolling_shutter_rows": "solve the existing exact predicted-row equation inside native sensor-row bounds before joint trust-region steps",
+          "outside_sensor_root": "explicit unresolved model/locus condition; never label a clamped projection as a formal RS solution",
+          "locus_seeding": "reliable multistart/refinement on the same already-confirmed finite branch; retain multiple basins and diagnose projected-distance failures",
+          "branch_or_entity_may_change_by_nearest_projection": false,
+          "mathematical_residual_families_changed": false,
+          "count_as_accepted_ceres_step": false,
+          "continuation": "preserve complete physical state, x, multipliers, penalties, and stage; refresh diagnostics after explicit numerical initialization",
+          "joint_station_row_restoration": "when the existing free locus station has no sensor-row root, seek a same-finite-branch admissible station/row pair with unchanged pixels and physical parameters; all failures explicit",
+          "trust_region_metric": {
+            "chart": "full-rank declared-unit tangent chart scaled by complete unweighted two-dimensional physical pixel-projection sensitivity; existing Q(alpha) tangents included",
+            "support": "per-column nonzero support RMS; no dilution by unrelated zero rows",
+            "effective_scale": "declared_scale / max(1, complete_geometric_support_RMS * declared_scale)",
+            "zero_columns": "retain original declared numerical units; never freeze or reduce dimension",
+            "refresh": "compute at each inner-solve start from current accepted parameter state; hold fixed for that inner solve; save actual array, state SHA and scale SHA",
+            "damping": "identity positive definite metric in this numerical tangent chart",
+            "ceres_column_jacobi_scaling": false,
+            "statistical_W_sigma_or_engineering_E_used_as_metric_weights": false,
+            "physical_residuals_or_statistical_weights_modified": false,
+            "ambient_bounds_preserved": true
+          },
+          "block_coordinate_restoration": {
+            "enabled": true,
+            "applicable_phase": "feasibility",
+            "scope": "current S01 warm_geometry with the same g8 source set and model11",
+            "reason": "Same-model material review plus detached exact-PHR probes show large observation-local station errors and shared-feature coordinate errors causing Ceres to move the global model while much cheaper valid coordinate updates remain. This is an explicit numerical initialization boundary, not convergence, solver failure or visual acceptance.",
+            "sequence": [
+              {
+                "block": "kind0_local_station_and_formal_row",
+                "definition": "same confirmed finite branch, multi-basin in-sensor numerical root of the existing formal row equation with valid physical projection; source q and actual normalized E/row PHR do not increase",
+                "physical_feature_identity_changed": false
+              },
+              {
+                "block": "five_shared_FEATURE_material_positions_and_eight_formal_rows",
+                "definition": "one model-owned station per feature, all its exposures jointly; unknown FEATURE world coordinate may change; camera, rig, scene and curve geometry remain fixed; no per-exposure station",
+                "guard": "each positive E violation and the actual normalized PHR do not increase"
+              },
+              {
+                "block": "one_shared_budget_squared",
+                "definition": "exact b>=0 one-dimensional minimizer of the original min-b objective plus every actual budget-dependent inequality PHR, with original lambda, rho and normalization"
+              }
+            ],
+            "native_finite_station_bounds_equivalence": {
+              "source": "existing typed SharedCurvePointPosition.allowed_interval",
+              "blocks": "the same five model-owned finite C stations",
+              "native_missing_bounds_repaired": true,
+              "physical_projector_domain_or_prior_added": false,
+              "preserve_all_other_native_bounds": true
+            },
+            "source_pixels_clock_entities_W_sigma_E_Query_and_constraint_families_changed": false,
+            "lambda_rho_phase_accepted_count_preserved": true,
+            "old_complete_state_archived": true,
+            "count_as_Ceres_accepted_step": false,
+            "on_candidate_failure": "retain original values and report failure; never publish a false accepted initialization",
+            "evidence": [
+              "D:/CodexData/RinkSpace_Data/runs/solve2_s01/warm_geometry/kind0_auxiliary_candidate_report.json",
+              "D:/CodexData/RinkSpace_Data/runs/solve2_s01/warm_geometry/shared_feature_candidate_report.json"
+            ],
+            "formal_row_root_validity": {
+              "physical_projection_and_sensor_domain_required": true,
+              "actual_row_equality_required": true,
+              "unique_eliminated_RS_certificate_required_by_rowaux_formulation": false,
+              "uncertified_eliminated_status6_preserved_in_diagnostics": true,
+              "uncertified_root_is_not_a_claim_of_unique_projection_or_visual_acceptance": true
+            }
+          },
+          "inner_continuation": {
+            "implementation": "one native ceres::Solve per actual AL inner problem",
+            "checkpointing": "persist every accepted current state inside the same native Solve; no 40-iteration or 300-second scheduling restart",
+            "fixed_during_this_inner": [
+              "actual numerical tangent chart",
+              "multipliers",
+              "penalties"
+            ],
+            "termination": "original declared-unit normalized augmented projected gradient <= the unchanged inner_stationarity_tolerance (currently 1e-3); feasibility/KKT final requirements unchanged",
+            "native_early_function_gradient_parameter_stopping_tolerances": 0,
+            "native_limits": "only int32/double API representational ceilings; not task completion or time/iteration scheduling thresholds",
+            "failure_or_edit": "preserve complete current state and report the actual reason; never count maxiter or USER_SUCCESS alone as inner KKT",
+            "process_recovery": "honest warm restart: primal, lambda, rho, phase and saved metric/context retained; Ceres private LM rejection history is not serialized",
+            "objective_residuals_source_W_sigma_E_Query_or_DOF_modified": false
+          }
+        },
+        "statistical_level_set": {
+          "enabled": false,
+          "objective": "complete original correlated W and independent source sigma statistics; no epsilon mixing into min b",
+          "fixed_budget_squared": 5494.858258192249,
+          "budget_source_checkpoint": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/warm_geometry/checkpoint/feasibility/state.json",
+          "sources": "the same verified ice/board geometry stage and current source constraints; no new source admission",
+          "unchanged_constraints": [
+            "original source engineering E",
+            "formal predicted-row equality",
+            "source Query exact equality",
+            "current physical parameter domains"
+          ],
+          "all_physical_and_permitted_auxiliary_degrees_of_freedom_preserved": true,
+          "phase_migration": "new objective identity and explicitly preserved warm start x, multipliers, penalties; old complete phase state retained",
+          "next": "awaiting_geometry_review; explicit return to feasibility and final fixed b=1 statistics",
+          "is_proven_optimal_budget": false,
+          "is_final_budget_or_visual_acceptance": false,
+          "is_physical_user_fact": false,
+          "review_exit": {
+            "reason": "Ended by same-model original-frame review and independent finite-curve/W-rank audit: the fixed large b permits true F3 material error to be absorbed by W-locus null directions, so statistical objective improvement does not certify geometric fit.",
+            "numerical_convergence": false,
+            "visual_acceptance": false,
+            "successor": "feasibility",
+            "preserve_complete_state": true,
+            "source_model_W_noise_and_physical_constraints_changed": false,
+            "evidence": [
+              "D:/CodexData/RinkSpace_Data/runs/solve2_s01/warm_geometry/geometric_distance_audit.json"
+            ],
+            "ended_at": "2026-10-23T23:14:57.565210+00:00"
+          }
+        }
+      },
+      "owner": "optimizer",
+      "scope": "S01当前场地、相机与广告；不解锁S02–S09",
+      "evidence": [
+        {
+          "label": "当前初值实体冲突，显示广告错误不可由相机补偿",
+          "path": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/optimizer_preflight_g6/entity_conflicts.json"
+        },
+        {
+          "label": "同广告展开坐标初始化纠错的真实前后画面",
+          "path": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/print_chart_candidate/image_checks.json"
+        }
+      ],
+      "notes": "这是当前镜头内的求解顺序。最初广告残差很大时，不让其放松已接近冰线的全局预算并拖动相机。阶段暂时固定变量只用于求初值，最终联合阶段解除；不是宣称相机或广告参数已知。冰线阶段结束先由主代理检查同模型真实原片；无需叫醒用户。最终仍要求全标线、全广告及编号完整S01与独立证据通过。"
+    }
+  ],
+  "updated_at": "2026-10-24T00:15:41.414137+00:00"
+}

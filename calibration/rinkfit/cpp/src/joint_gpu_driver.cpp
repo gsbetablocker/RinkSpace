@@ -92,7 +92,7 @@ DriverContext::DriverContext(const std::string& ptx_file,int ordinal,const char*
  x.check(x.init(0),"initialize");const Impl::SavedContext caller(x);int device=-1;x.check(x.device_get(&device,ordinal),"get device");
  x.check(x.context_create(&x.context,4u,device),"create blocking-sync context");
  x.check(x.event_create(&x.kernel_begin,0),"create begin timing event");x.check(x.event_create(&x.kernel_end,0),"create end timing event");
- const auto ptx=read_ptx(ptx_file);x.check(x.module_load(&x.module,ptx.data(),0,nullptr,nullptr),"load reviewed PTX");if(!kernel_symbol||std::string(kernel_symbol)!="joint_raw_uv"&&std::string(kernel_symbol)!="joint_raw_uv_width_v1")throw std::runtime_error("Joint GPU: unsupported explicit kernel ABI symbol");x.check(x.function_get(&x.kernel,x.module,kernel_symbol),"resolve reviewed raw UV ABI symbol");
+ const auto ptx=read_ptx(ptx_file);x.check(x.module_load(&x.module,ptx.data(),0,nullptr,nullptr),"load reviewed PTX");if(!kernel_symbol||std::string(kernel_symbol)!="joint_raw_uv"&&std::string(kernel_symbol)!="joint_raw_uv_width_v1"&&std::string(kernel_symbol)!="joint_raw_uv_shared_shape_v1"&&std::string(kernel_symbol)!="joint_raw_uv_shared_vertices_v2")throw std::runtime_error("Joint GPU: unsupported explicit kernel ABI symbol");x.check(x.function_get(&x.kernel,x.module,kernel_symbol),"resolve reviewed raw UV ABI symbol");
 }
 DriverContext::~DriverContext()=default;
 void DriverContext::set_current(){impl_->current();}

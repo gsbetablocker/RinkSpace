@@ -40,7 +40,11 @@ int main(int argc,char**argv){try{
   // Retain the original projection's CPU authoritative primal. The root value
   // is from the exact CPU prepass above; no saved numerical result is reused.
   struct {double row;} root{gpu_root_rows[i]};
-  const auto z=gpu_rows.projection(model,i,layout,s[i],root.row);
+  const auto z=[&]()->UVJac{
+    if(gpu_rows.cpu_fallback(i))return projection_ad(model,layout,s[i],root.row);
+    auto g=gpu_rows.projection(model,i,layout,s[i],root.row);
+    return {g.uv,std::move(g.jac),std::move(g.ids),g.nuisance};
+  }();
 #else
   const auto root=model.project_rs(mi,pi,s[i],layout.frame_time,v[i]);if(!root.valid||!root.unique)throw std::runtime_error("strict RS root failure");const auto z=projection_ad(model,layout,s[i],root.row);
 #endif
@@ -60,7 +64,7 @@ int main(int argc,char**argv){try{
  if(!failures.empty())throw std::runtime_error("transport failed "+failures.dump());
  std::vector<int> membership(n,0);std::vector<double> wres,gradient(2*n,0);Json group_desc=Json::array();std::vector<std::uint64_t> group_rows;std::vector<double> group_W;double W=0;
  for(const auto& g:packet.groups){const auto ro=group_rows.size(),wo=group_W.size(),rank=g.rank,width=2*g.rows.size();for(auto i:g.rows){++membership[i];group_rows.push_back(i);}group_W.insert(group_W.end(),g.W.begin(),g.W.end());std::vector<double> r(rank,0);for(std::size_t k=0;k<rank;++k){for(std::size_t j=0;j<g.rows.size();++j)for(int c=0;c<2;++c)r[k]+=g.W[k*width+2*j+c]*error[2*g.rows[j]+c];wres.push_back(r[k]);W+=.5*r[k]*r[k];}for(std::size_t j=0;j<g.rows.size();++j)for(int c=0;c<2;++c)for(std::size_t k=0;k<rank;++k)gradient[2*g.rows[j]+c]+=g.W[k*width+2*j+c]*r[k];group_desc.push_back({{"row_offset",ro},{"members",g.rows.size()},{"weight_offset",wo},{"rank",rank}});}
- for(std::size_t i=0;i<n;++i)if(membership[i]!=(packet.is_active(i)?1:0))throw std::runtime_error("W partition mismatch");if(wres.size()!=214112||profiles!=961)throw std::runtime_error("W/profile rank mismatch");
+ for(std::size_t i=0;i<n;++i)if(membership[i]!=(packet.current_input?int(packet.statistical_active_mask[i]):(packet.is_active(i)?1:0)))throw std::runtime_error("W partition mismatch");if(wres.size()!=214112||profiles!=packet.queries.size())throw std::runtime_error("W/profile rank mismatch");
  auto write=[&](std::string fn,const auto& data,std::string dt){using T=typename std::decay_t<decltype(data)>::value_type;std::ofstream f(out/fn,std::ios::binary);if(!data.empty())f.write(reinterpret_cast<const char*>(data.data()),std::streamsize(data.size()*sizeof(T)));f.close();if(!f)throw std::runtime_error("write failure");return Json{{"file",fn},{"dtype",dt},{"shape",Json::array({data.size()})},{"sha256",eventio::file_sha256(out/fn)}};};
  Json arrays{{"error_uv",write("error_uv.f64",error,"<f8")},{"uv",write("uv.f64",uv,"<f8")},{"true_rs_row",write("true_rs_row.f64",row,"<f8")},{"saved_RS_h",write("saved_RS_h.f64",rs_h,"<f8")},{"query_h",write("query_h.f64",query_h,"<f8")},{"status",write("status.u8",stat,"|u1")},{"station_UV_right",write("station_UV_right.f64",ds_right,"<f8")},{"station_UV_left",write("station_UV_left.f64",ds_left,"<f8")},{"station_delta_lower_right",write("station_lower_right.f64",slo,"<f8")},{"station_delta_upper_right",write("station_upper_right.f64",shi,"<f8")},{"station_delta_lower_left",write("station_lower_left.f64",slo_left,"<f8")},{"station_delta_upper_left",write("station_upper_left.f64",shi_left,"<f8")},{"vertex",write("vertex.u8",vertex,"|u1")},{"profile_implicit_rcond",write("profile_implicit_rcond.f64",rcond,"<f8")},{"W_residual",write("W_residual.f64",wres,"<f8")},{"W_error_gradient",write("W_error_gradient.f64",gradient,"<f8")},{"group_rows",write("group_rows.u64",group_rows,"<u8")},{"group_W",write("group_W.f64",group_W,"<f8")}};
  Json csr{{"row_offsets",write("UV_row_offsets.u64",uvj.offsets,"<u8")},{"block_id",write("UV_block_id.u32",uvj.blocks,"<u4")},{"component",write("UV_component.u32",uvj.components,"<u4")},{"values",write("UV_values.f64",uvj.values,"<f8")}};

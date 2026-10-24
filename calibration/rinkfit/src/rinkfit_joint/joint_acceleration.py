@@ -8,7 +8,6 @@ import sys,time
 import numpy as np
 from .io_utils import file_sha256,write_json
 from rinkfit_start.native_camera import NativeCamera
-
 def install(graph,model_file,output,world,compiled_dir,*,gpu_dll=None,gpu_validation=None,shots=None):
  directory=Path(compiled_dir).resolve();out=Path(output);out.mkdir(exist_ok=False)
  for f in ('bound_camera_sensor.py','compiled_camera_guarded_sensor.py','camera_at.dll'):

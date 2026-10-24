@@ -14,7 +14,7 @@ def sha(path):
  with Path(path).open('rb')as f:
   for b in iter(lambda:f.read(4*1024*1024),b''):h.update(b)
  return h.hexdigest()
-def read(path):return json.loads(Path(path).read_text())
+def read(path):return json.loads(Path(path).read_text(encoding='utf8'))
 def ref(path):return dict(path=str(Path(path).resolve()),sha256=sha(path))
 def verify(d,base=None):
  p=Path(d.get('path',d.get('file')))
@@ -77,12 +77,77 @@ class FixedEntityNorms:
 
 
 
+def _validate_current_semantic_scope(t, sem, pk, semantic_base):
+ """Consume the current prepared input without replaying historical assets.
+
+ Budget membership and statistical membership are distinct. This only reads
+ their current manifests; the original norm and W algebra is unchanged.
+ """
+ N=int(pk['observations']);declared=pk['current_input_scope']
+ if N<0 or sem.get('observations')!=N or t.get('raw_rows')!=N:
+  raise ValueError('Current packet/semantic/transport row counts differ')
+ if sem.get('current_input_scope')!=declared:
+  raise ValueError('Current packet and semantic scope differ')
+ source=pk['immutable_source_hashes']['observations.npz']
+ for document in (pk,sem):
+  export=document.get('current_prepared_export',{})
+  # Early complete-current exports already carry this identity in the packet
+  # source hash and in the explicit semantic export. Accept that same current
+  # declaration without rewriting completed qbar/GPU numerical operations.
+  if document is pk and not export and declared.get('full_physical_solver',False):
+   export=sem.get('current_prepared_export',{})
+  if export.get('source_identity')!=source:
+   raise ValueError('Current prepared source identity differs')
+ if pk.get('semantic_packet',{}).get('sha256')!=t['semantic']['sha256']:
+  raise ValueError('Current packet selects another semantic input')
+ mask=array(sem['active_source_mask'],semantic_base)
+ stat=array(sem['statistical_active_mask'],semantic_base)
+ kind=array(sem['arrays']['kind'],semantic_base)
+ for name,value in [('budget',mask),('statistical',stat)]:
+  if value.shape!=(N,)or value.dtype.kind not in 'bu'or value.dtype.itemsize!=1 or np.any((value!=0)&(value!=1)):
+   raise ValueError('Current '+name+' mask must contain raw-N Boolean bytes')
+ if kind.shape!=(N,)or kind.dtype.kind not in 'iu'or np.any((kind<0)|(kind>2)):
+  raise ValueError('Current source kind layout')
+ active=mask.astype(bool);stat=stat.astype(bool)
+ if np.any(stat&~active):raise ValueError('Statistical source outside current budget membership')
+ counts={i:int(np.count_nonzero(active&(kind==i)))for i in range(3)}
+ na=int(active.sum());ns=int(stat.sum());excluded=np.flatnonzero(~active)
+ if sem.get('active_observations')!=na or t.get('active_rows')!=na or t.get('entity_count')!=counts[1]or t.get('profile_count')!=counts[2]:
+  raise ValueError('Current active source-kind counts differ')
+ if not np.array_equal(np.asarray(t.get('excluded_rows'),dtype=np.int64),excluded):
+  raise ValueError('Current transport exclusions differ')
+ stats=read(verify(sem['active_statistics'],semantic_base))
+ if stats.get('active_source_mask_sha256')!=sem['active_source_mask']['sha256']or stats.get('statistical_active_mask_sha256')!=sem['statistical_active_mask']['sha256']:
+  raise ValueError('Current statistics belong to another membership mask')
+ if stats.get('active_observations')!=na or stats.get('statistical_observations')!=ns or stats.get('budget_only_observations')!=na-ns:
+  raise ValueError('Current budget/statistical source counts differ')
+ rank=int(stats['formal_residual_rows'])
+ if rank<0 or rank!=declared['formal_W_rank']or t.get('full_W_rank')!=rank:
+  raise ValueError('Current statistical rank differs')
+ groups=declared['group_count']+declared['independent_count']
+ if len(t['groups'])!=groups or t.get('original_groups_including_independent')!=groups:
+  raise ValueError('Current complete W assembly group count differs')
+ if not stats.get('statistical_partition_exactly_once')or not t.get('statistical_partition_exactly_once'):
+  raise ValueError('Current statistics require once-only statistical membership')
+ if not t.get('raw_arrays_preserved')or not t.get('source_order_is_raw_array_order'):
+  raise ValueError('Current raw source order or payload changed')
+ gpu=t.get('gpu_rows')
+ if gpu is not None:
+  expected=dict(packet=t['packet']['sha256'],semantic=t['semantic']['sha256'],source=source,active_mask=sem['active_source_mask']['sha256'],statistics=sem['active_statistics']['sha256'])
+  if gpu.get('raw_rows')!=N or gpu.get('active_rows')!=na or not np.array_equal(np.asarray(gpu.get('excluded_rows'),dtype=np.int64),excluded)or any(gpu['packet_identity'].get(k)!=v for k,v in expected.items()):
+   raise ValueError('GPU partials belong to another current input')
+ scope=dict(raw_rows=N,active_rows=na,ordinary_count=counts[0],entity_count=counts[1],profile_count=counts[2],excluded_source_rows=excluded.tolist(),full_W_rank=rank,groups_including_independent=groups,active_mask_sha256=sem['active_source_mask']['sha256'],statistical_active_mask=sem['statistical_active_mask'],statistical_rows=ns,budget_only_rows=na-ns,active_statistics=sem['active_statistics'],source_identity=source,packet_sha256=t['packet']['sha256'],original_packet_sha256=t['packet']['sha256'],original_statistical_assets_unchanged=True,current_prepared_input=True)
+ return scope,active,kind
+
+
 def validate_semantic_scope(t,sem,pk,scope_contract,semantic_base=None):
  """Validate the selected mask against frozen source and original W assets.
 
  Active membership and counts may change only through the selected semantic
  authority. Raw packet, source UV/PTS/frame identity and W asset anchors do not.
  """
+ if pk.get('current_input_scope',{}).get('schema')=='rinkfit.current_advertisement_input.v1':
+  return _validate_current_semantic_scope(t,sem,pk,semantic_base)
  if scope_contract is None:raise ValueError('An explicit frozen event source contract is required')
  N=int(scope_contract['raw_rows'])
  if t.get('raw_rows')!=N or pk.get('observations')!=N or sem.get('observations')!=N:raise ValueError('Frozen raw source count changed')

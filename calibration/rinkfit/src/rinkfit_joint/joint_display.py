@@ -5,6 +5,7 @@ import gzip,hashlib,json
 import cv2,numpy as np
 from .io_utils import read_json,file_sha256
 from .joint_metrics import PacketArrays
+from .joint_model import validate_current_ice_definition
 from rinkfit_start.native_camera import rotation
 
 
@@ -12,16 +13,39 @@ def material_color(label):
  return (40,225,240) if label.startswith(('Ad','print_component.')) else (80,230,80) if label.startswith('board') else (255,140,50)
 
 class CurrentSourcePoints:
- def __init__(self,packet_file,model,scope,*,sealed_evaluation=None):
+ def __init__(self,packet_file,model,scope,*,sealed_evaluation=None,shot_ids=None,native_pts=None,current_membership=None):
+  validate_current_ice_definition(model)
   reader=PacketArrays(packet_file);packet=reader.packet
   self.packet_ref=dict(path=str(Path(packet_file).resolve()),sha256=file_sha256(packet_file));self.by_pts=defaultdict(list);self.ledger={};self.evaluation_ref=None
   uv=reader.load('uv');pts=reader.load('native_pts');shot=reader.load('shot_index');mat=reader.load('material_index');active=(reader.load('admission')==1)&(reader.load('fit_role')==1)
+  retired=(mat==np.iinfo(np.uint32).max)
+  if np.any(retired&active):raise ValueError('Retired source material cannot retain current source-point qualification')
   ranges={s['id']:(s['first_pts'],s['last_pts']) for s in scope['shots']};labels=[m['label'] for m in model['materials']]
-  for i in np.flatnonzero(active):
+  requested=None if shot_ids is None else set(shot_ids)
+  requested_pts=None if native_pts is None else set(map(int,native_pts))
+  if requested_pts is not None:active &= np.isin(pts,list(requested_pts))
+  if requested is not None:
+   if not requested or not requested.issubset(ranges) or not requested.issubset(packet['shot_ids']):raise ValueError('Requested source-point shots differ from the actual scope')
+   active &= np.isin(shot,[packet['shot_ids'].index(sid) for sid in requested])
+  selected=np.flatnonzero(active)
+  membership=current_membership if current_membership is not None else getattr(reader,'current_source_membership_v1',None)
+  roles={int(i):'physical_source_unclassified' for i in selected}
+  self.current_membership_ref=None
+  if membership is not None:
+   if membership.get('schema')!='rinkfit.current_source_point_membership.v1' or membership.get('logical_source_id')!=self.packet_ref['sha256'] or membership.get('raw_rows')!=len(pts):raise ValueError('Current source-point membership is not this raw packet')
+   fit=np.isin(selected,membership['fit_rows']);inspection=np.isin(selected,membership['inspection_rows'])
+   if np.any(fit&inspection):raise ValueError('Current representative and inspection memberships overlap')
+   physical=np.asarray(membership['physical']);training=np.asarray(membership['training'])
+   if physical.shape!=(len(pts),) or training.shape!=(len(pts),):raise ValueError('Current source membership raw denominator changed')
+   if np.any(fit&((physical[selected]!=1)|(training[selected]!=1))) or np.any(inspection&(physical[selected]!=1)):raise ValueError('Current source membership violates its physical/training domain')
+   for i,isfit,isinspection in zip(selected,fit,inspection):
+    roles[int(i)]='fit' if isfit else 'inspection' if isinspection else 'physical_source_unselected' if physical[i]==1 else 'outside_current_physical_domain'
+   self.current_membership_ref=membership['current_input']
+  for i in selected:
    sid=packet['shot_ids'][int(shot[i])];stamp=int(pts[i]);lo,hi=ranges[sid]
    if not lo<=stamp<=hi or (stamp-lo)%256 or int(mat[i])>=len(labels):raise ValueError('Current source point shot/material/native PTS mismatch')
    if not np.isfinite(uv[i]).all() or (uv[i]<0).any() or (uv[i]>[1919,1079]).any():raise ValueError('Active current source point is outside the native sensor')
-   self.by_pts[stamp].append((uv[i].copy(),material_color(labels[int(mat[i])]),int(i),'fit'))
+   self.by_pts[stamp].append((uv[i].copy(),material_color(labels[int(mat[i])]),int(i),roles[int(i)]))
   if sealed_evaluation is not None:
    evalfile=Path(sealed_evaluation);evaluation=read_json(evalfile)
    if evaluation.get('schema')!='rinkfit.joint9.frozen_native_board_validation.v1':raise ValueError('Only sealed current-exposure evaluation points are displayable')
@@ -33,18 +57,21 @@ class CurrentSourcePoints:
     for line in f:
      row=json.loads(line)
      if row.get('role')!='sealed_validation' or row.get('training_eligible') is not False or not row.get('current_RGB_measured') or row.get('current_uv')!=row.get('source_uv'):raise ValueError('Evaluation display must preserve its first actual current measurement')
-     stamp=int(row['native_pts']);sid=row['shot_id'];lo,hi=ranges[sid]
+     stamp=int(row['native_pts']);sid=row['shot_id']
+     if requested_pts is not None and stamp not in requested_pts:continue
+     if requested is not None and sid not in requested:continue
+     lo,hi=ranges[sid]
      if not lo<=stamp<=hi or (stamp-lo)%256:raise ValueError('Sealed source point native clock mismatch')
      xy=np.asarray(row['current_uv'],float)
      if not np.isfinite(xy).all() or (xy<0).any() or (xy>[1919,1079]).any():raise ValueError('Sealed source point outside native sensor')
      self.by_pts[stamp].append((xy,material_color(row['material_label']),row['source_row_id'],'sealed_evaluation'))
    self.evaluation_ref=dict(path=str(evalfile.resolve()),sha256=file_sha256(evalfile))
   for stamp,values in self.by_pts.items():
-   raw=np.asarray([v[0] for v in values],dtype='<f8');self.ledger[stamp]=dict(current_actual_source_points=len(values),fit_points=sum(v[3]=='fit' for v in values),sealed_evaluation_points=sum(v[3]=='sealed_evaluation' for v in values),current_native_UV_sha256=hashlib.sha256(raw.tobytes()).hexdigest(),source_points_from_model=False,prior_exposure_points_drawn=False)
+   raw=np.asarray([v[0] for v in values],dtype='<f8');self.ledger[stamp]=dict(current_actual_source_points=len(values),physical_source_points=sum(v[3]!='sealed_evaluation' for v in values),fit_points=sum(v[3]=='fit' for v in values),representative_fit_points=sum(v[3]=='fit' for v in values),inspection_points=sum(v[3]=='inspection' for v in values),unclassified_physical_source_points=sum(v[3]=='physical_source_unclassified' for v in values),other_physical_source_points=sum(v[3] in ('physical_source_unselected','outside_current_physical_domain') for v in values),current_membership_ref=self.current_membership_ref,inspection_is_independent_validation=False,sealed_evaluation_points=sum(v[3]=='sealed_evaluation' for v in values),current_native_UV_sha256=hashlib.sha256(raw.tobytes()).hexdigest(),source_points_from_model=False,prior_exposure_points_drawn=False)
  def draw(self,image,native_pts):
   for xy,color,_,_ in self.by_pts.get(int(native_pts),[]):
    cv2.circle(image,tuple(np.rint(xy).astype(int)),2,color,1,cv2.LINE_AA)
-  return self.ledger.get(int(native_pts),dict(current_actual_source_points=0,fit_points=0,sealed_evaluation_points=0,current_native_UV_sha256=hashlib.sha256(b'').hexdigest(),source_points_from_model=False,prior_exposure_points_drawn=False))
+  return self.ledger.get(int(native_pts),dict(current_actual_source_points=0,physical_source_points=0,fit_points=0,representative_fit_points=0,inspection_points=0,unclassified_physical_source_points=0,other_physical_source_points=0,current_membership_ref=self.current_membership_ref,inspection_is_independent_validation=False,sealed_evaluation_points=0,current_native_UV_sha256=hashlib.sha256(b'').hexdigest(),source_points_from_model=False,prior_exposure_points_drawn=False))
 
 class SharedModelTopView:
  def __init__(self,world,records,scene,*,width=640,height=1080):

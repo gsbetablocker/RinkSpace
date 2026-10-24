@@ -16,6 +16,7 @@ class RowUVCache {
   RowUVCache(const RowUVCache&)=delete;RowUVCache&operator=(const RowUVCache&)=delete;
   void evaluate(const EventModel&,const EventPacket&,const std::vector<std::uint32_t>& branch,const std::vector<double>& S,const std::vector<double>& V,const std::vector<double>& alpha,double b,const std::string& state_identity);
   Projection projection(const EventModel&,std::size_t raw_row,const EventRowLayout&,double s,double v)const;
+  bool cpu_fallback(std::size_t raw_row)const;
   const UVPartial& partial(std::size_t raw_row,std::size_t local_column)const;
   std::size_t local_columns(std::size_t raw_row)const;
   std::size_t total_columns()const;

@@ -7,7 +7,7 @@ INNER numerical chart; they are not asserted to be the whole old box image.
 Every nonlinear proposal is decoded through the exact original-domain LP API.
 """
 from pathlib import Path
-import argparse, hashlib, json, sys, time
+import argparse, hashlib, json, os, sys, time
 import numpy as np
 from scipy import sparse
 import clarabel
@@ -44,11 +44,13 @@ def run(input_path, output, solve=False, release=None, secondary_from=None, time
     old = assemble(Q, T, selection=SEL, station_seed=verify(spec['station_seed']) if spec.get('station_seed') else None,
                    station_trust=spec.get('station_trust'))
     old, trust_info = apply_station_curvature_TR(old, paths['station_TR_manifest'], spec.get('station_TR_array_key', 'radius'))
-    chart = PrintOnlyAdChart(old.model); physical0 = chart.pack(); full_n = len(chart.free); no = len(old.free); k = len(old.selected)
+    chart = PrintOnlyAdChart(old.model, ad_ids=tuple(old.model.get('current_input_scope',{}).get('print_only_ad_ids',(8,9,10,11,12)))); physical0 = chart.pack(); full_n = len(chart.free); no = len(old.free); k = len(old.selected)
     if full_n != no - chart.removed_free or chart.removed_free not in (0, 20): raise ValueError('The print-only chart must remove every independent ad coordinate or inherit their already-dependent storage')
     if any(any(int(chart.offset[ai]+j) in set(chart.free)for j in range(4))for ai in chart.ads): raise ValueError('A dependent advertisement chart leaked into solver coordinates')
     from rinkfit_start.camera_spline_chart import time_chart_from_model
-    time_chart=time_chart_from_model(old.model,time_multiple,time_window);time_info=None
+    camera_begin=int(old.model['camera'].get('control_block_begin',1));camera_end=camera_begin+int(old.model['camera']['n_controls'])
+    camera_controls_free=any(not block.get('constant',False) and any(j not in block.get('fixed_indices',())for j in range(len(block['values'])))for block in old.model['blocks'][camera_begin:camera_end])
+    time_chart=None if old.model.get('current_input_scope',{}).get('schema')=='rinkfit.current_advertisement_input.v1' and not camera_controls_free else time_chart_from_model(old.model,time_multiple,time_window);time_info=None
     if time_chart is not None:
         C,coordinate_scales,coordinate_names,time_info=time_chart.compose_physical(chart,old.model)
     else:
@@ -192,7 +194,8 @@ def run(input_path, output, solve=False, release=None, secondary_from=None, time
                 W_change_from_primary=final['predicted_W_half_cost']-summary['primary_proposal_W_half_cost'])
         (O/'report.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2),encoding='utf8')
         print('W_DONE',json.dumps(summary,ensure_ascii=False),flush=True);return summary
-    settings = clarabel.DefaultSettings(); settings.verbose = True; settings.max_threads = 1; settings.max_iter = 100
+    settings = clarabel.DefaultSettings(); settings.verbose = True; settings.max_threads = (os.cpu_count()or 1) if old.model.get('current_input_scope',{}).get('full_physical_solver',False) else 1; settings.max_iter = 100
+    if old.model.get('current_input_scope',{}).get('full_physical_solver',False):settings.direct_solve_method='faer'
     settings.tol_gap_abs = 1e-10; settings.tol_gap_rel = 1e-10; settings.tol_feas = 1e-10
     tsolve = time.perf_counter(); solver = clarabel.DefaultSolver(P, objective, AA, bb, cones, settings); sol = solver.solve()
     report = dict(assembly=ref(O / 'assembly.json'), raw_solver_status=str(sol.status), iterations=int(sol.iterations),
@@ -224,13 +227,13 @@ def run(input_path, output, solve=False, release=None, secondary_from=None, time
                 witnesses.append(dict(fraction=f, passed=True, model=ref(file), domain=domain)); break
             except ValueError as exc:
                 witnesses.append(dict(fraction=f, passed=False, reason=str(exc))); f *= .5
-        print_cols = np.asarray([chart.column[int(chart.offset[qi] + j)] for qi in chart.print_ad for j in range(6)])
-        print_translate = np.asarray([chart.column[int(chart.offset[qi] + j)] for qi in chart.print_ad for j in [2,5]])
+        print_cols = np.asarray([chart.column[int(chart.offset[qi] + j)] for qi in chart.print_ad for j in range(6)],dtype=int)
+        print_translate = np.asarray([chart.column[int(chart.offset[qi] + j)] for qi in chart.print_ad for j in [2,5]],dtype=int)
         report.update(physical_columns=n, original_physical_columns=no,
                       all_source_affine_qmax=float(q.max()), baseline_b=float(cp['b']),
                       predicted_W_half_cost=float(.5 * wr @ wr), baseline_W_half_cost=float(.5 * old.rW @ old.rW),
-                      maximum_print_affine_physical_step_L=float(np.max(abs(full_delta[print_cols]))),
-                      maximum_print_placement_step_L=float(np.max(abs(full_delta[print_translate]))),
+                      maximum_print_affine_physical_step_L=float(np.max(abs(full_delta[print_cols]),initial=0.)),
+                      maximum_print_placement_step_L=float(np.max(abs(full_delta[print_translate]),initial=0.)),
                       nonzero_print_physical_coordinates=int(np.count_nonzero(full_delta[print_cols])),
                       exact_domain_decoder_trial_witnesses=witnesses,
                       current_linear_box_violations=int(np.count_nonzero((step < lo) | (step > hi))),

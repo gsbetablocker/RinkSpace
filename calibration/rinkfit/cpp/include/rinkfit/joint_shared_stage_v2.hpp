@@ -2,6 +2,7 @@
 #include "rinkfit/joint_collinear_carrier_v1.hpp"
 #include "rinkfit/joint_ceres_bounds.hpp"
 #include "rinkfit/joint_al.hpp"
+#include "rinkfit/joint_shared_print_shape_transition_v1.hpp"
 namespace rinkfit {
 inline bool shared_scene_requested_v2(const JointALBuilder& b,const eventio::Json& cfg){
  if(!cfg.contains("runtime_shared_parameter_stage_v2"))return false;
@@ -58,6 +59,7 @@ inline eventio::Json install_joint_shared_stage_v2(JointALBuilder& b,
  for(const auto& row:b.core.packet.rows){
    if(!row.active)continue;
    const auto& path=b.core.model.materials.at(row.material).paths.at(row.path);
+   if(path.kind==6&&!path.vertex_blocks.empty()&&path.advertisement_block>=0){auto&s=advertisement_support[path.advertisement_block];++s.rows;s.shots.insert(row.shot_id);s.exposures.insert({row.shot_id,row.pts});}
    if(path.kind==2&&path.advertisement_block>=0){bool known=path.geometry_block<0;if(path.geometry_block>=0){const auto&shape=b.core.model.blocks.at(path.geometry_block);known=shape.name.rfind("print/",0)==0&&(shape.constant||coherent_groups.count(path.geometry_block));}if(known){auto&s=advertisement_support[path.advertisement_block];++s.rows;s.shots.insert(row.shot_id);s.exposures.insert({row.shot_id,row.pts});}}
    if(b.core.model.materials.at(row.material).label.rfind("ice.",0)==0&&!path.physical_point&&ice_support.count(path.geometry_block)){auto& s=ice_support[path.geometry_block];++s.rows;s.shots.insert(row.shot_id);s.exposures.insert({row.shot_id,row.pts});}
    if((path.kind==2||path.kind==6)&&path.geometry_block>=0){
@@ -136,7 +138,7 @@ inline eventio::Json install_joint_shared_stage_v2(JointALBuilder& b,
      require(rows>0,"no reviewed active ice support");
      for(int i:free)require(i<2||radii.count(i),"released circle radius has no reviewed source boundary");
    }else if(ad && (rec.value("known_local_board_material_support",false)||rec.value("coherent_print_material_support",false))){
-     if(rec.value("coherent_print_material_support",false))require(request.contains("confirmed_print_template_restore"),"coherent print placement requires restored source template");
+     if(rec.value("coherent_print_material_support",false))require(request.contains("confirmed_print_template_restore")||request.contains("static_shared_print_vertex_stage_v1"),"coherent print placement requires source-bound static template support");
      const auto&support=advertisement_support[index];rows=support.rows;shots=support.shots;exposures=support.exposures;
      require(rows>0,"no active known-local board material support: "+block.name);
    }else{
@@ -172,8 +174,9 @@ inline eventio::Json install_joint_shared_stage_v2(JointALBuilder& b,
      {"actual_corner_shots",shots},{"native_exposures",exposures.size()},
      {"serialized_constant_preserved",block.constant},{"released_initialization_camera_indices",release_camera?block.fixed_indices:std::vector<int>{}}});
  }
+ const auto vertex_stage=install_joint_shared_print_vertex_stage_v1(b,problem,cfg);
  require(!requested.empty()&&b.capture_state().token()==before,"empty stage or mutated primal");
- return {{"schema","rinkfit.actual_shared_parameter_stage.v2"},{"enabled",true},{"released",released},
+ return {{"schema","rinkfit.actual_shared_parameter_stage.v2"},{"enabled",true},{"released",released},{"static_print_vertices",vertex_stage},
    {"source_membership_and_UV_unchanged",true},{"historical_model_flags_unchanged",true},
    {"world_values_measured",false},{"support_is_not_rank_certificate",true},
    {"S01_in_objective",true},{"full_scalar_whitelist_check_follows",true}};

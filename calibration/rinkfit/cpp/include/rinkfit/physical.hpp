@@ -157,10 +157,6 @@ template <class T> struct ZoomOptics {
   T cx_linear=T(0), cy_linear=T(0);
   T k1=T(0), k1_linear=T(0), k2=T(0), k2_linear=T(0);
   T p1=T(0), p2=T(0), radius_max=T(2);
-  // Source-estimated local wide candidate; exactly zero on the preserved
-  // narrow interval. Coefficients are immutable calibration metadata here.
-  double wide_log_f_boundary=0;
-  std::array<double,4> wide_coefficients{};
 };
 template <class T> struct OpticalState {
   Intrinsics<T> intr;
@@ -175,12 +171,8 @@ template <class T> inline OpticalState<T> zoom_optics(const ZoomOptics<T>& optic
   out.z=log_f-T(std::log(optics.f_ref));
   out.intr={exp(log_f+optics.eta/T(2)),exp(log_f-optics.eta/T(2)),
             optics.cx+optics.cx_linear*out.z,optics.cy+optics.cy_linear*out.z};
-  const T hinge=log_f<T(optics.wide_log_f_boundary)?T(optics.wide_log_f_boundary)-log_f:T(0);
-  const T basis=hinge*hinge;
-  out.brown={optics.k1+optics.k1_linear*out.z+T(optics.wide_coefficients[0])*basis,
-             optics.k2+optics.k2_linear*out.z+T(optics.wide_coefficients[1])*basis,
-             optics.p1+T(optics.wide_coefficients[2])*basis,
-             optics.p2+T(optics.wide_coefficients[3])*basis,optics.radius_max};
+  out.brown={optics.k1+optics.k1_linear*out.z,optics.k2+optics.k2_linear*out.z,
+             optics.p1,optics.p2,optics.radius_max};
   return out;
 }
 template <class T> inline T quadratic_minimum(const T& c0,const T& c1,const T& c2,const T& xmax) {

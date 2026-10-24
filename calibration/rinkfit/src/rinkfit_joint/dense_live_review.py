@@ -10,6 +10,82 @@ from .io_utils import read_json,write_json,file_sha256
 def reference(path):
  p=Path(path).resolve();return {'file':str(p),'sha256':file_sha256(p)}
 
+def validate_anchor_review_binding(configuration, packet):
+ """Reject stale cohort/operator baselines before launching native work.
+
+ A changed packet needs an explicit baseline projection on that packet.  The
+ evaluator still compares every original cohort value and invalid row; this
+ preflight does not replace the mathematical same-source checks.
+ """
+ configuration_path=Path(configuration['file']).resolve()
+ if file_sha256(configuration_path)!=configuration['sha256']:
+  raise ValueError('Changed accepted review configuration')
+ cfg=read_json(configuration_path)
+ if cfg.get('schema')!='rinkfit.dense6.accepted_source_anchor_review.v1':
+  raise ValueError('Unknown accepted review schema')
+ baseline=Path(cfg['baseline']['file']).resolve()
+ if file_sha256(baseline)!=cfg['baseline']['sha256']:
+  raise ValueError('Changed complete anchor baseline')
+ report=read_json(baseline)
+ if report.get('schema')!='rinkfit.full_existing_fixed2D_source_anchor_guard.v1':
+  raise ValueError('Unknown complete anchor baseline schema')
+ if report.get('packet')!=reference(packet):
+  raise ValueError('Anchor baseline must be reprojected on the current packet before launch')
+ for key,filename in (('implementation','dense_fixed_anchor_guard.py'),
+                      ('source_visibility_operator','joint_replay.py')):
+  if report.get(key)!=reference(Path(__file__).with_name(filename)):
+   raise ValueError('Anchor baseline must be reprojected with the current '+key+' before launch')
+ if not report.get('cohort_row_ID_sha256') or int(report.get('rows',0))<=0:
+  raise ValueError('Anchor baseline lacks its entire fixed-source cohort binding')
+ distances=report['distances']
+ if file_sha256(distances['file'])!=distances['sha256']:
+  raise ValueError('Changed immutable baseline anchor residual cache')
+ return cfg
+
+
+def prepare_anchor_review(configuration, baseline_model, packet, output):
+ """Project a pinned prior physical state on the new complete source cohort.
+
+ This is deliberately explicit: source/operator updates cannot silently reset
+ a review baseline to an already changed candidate or reuse stale residuals.
+ """
+ output=Path(output).resolve()
+ if output.exists():raise FileExistsError('Use a new immutable anchor-review preparation directory')
+ cfg_path=Path(configuration['file']).resolve()
+ if file_sha256(cfg_path)!=configuration['sha256']:
+  raise ValueError('Changed previous accepted review configuration')
+ cfg=read_json(cfg_path)
+ if cfg.get('schema')!='rinkfit.dense6.accepted_source_anchor_review.v1':
+  raise ValueError('Unknown accepted review schema')
+ if cfg.get('intermediate_policy','strict') not in ('strict','diagnostic'):
+  raise ValueError('Unknown intermediate review policy')
+ model_path=Path(baseline_model['file']).resolve()
+ if file_sha256(model_path)!=baseline_model['sha256']:
+  raise ValueError('Changed explicitly selected prior physical baseline model')
+ from .dense_fixed_anchor_guard import evaluate_fixed_anchors
+ report=evaluate_fixed_anchors(model_path,packet,output/'baseline')
+ cfg.update(baseline=reference(output/'baseline/report.json'),
+            guard=reference(Path(__file__).with_name('dense_fixed_anchor_guard.py')),
+            policy=reference(__file__),
+            strata=reference(Path(__file__).with_name('fixed_local_anchor_audit.py')),
+            baseline_rebind=dict(schema='rinkfit.anchor_baseline_current_cohort_rebind.v1',
+               previous_review=configuration,prior_physical_model=baseline_model,
+               current_packet=reference(packet),cohort_row_ID_sha256=report['cohort_row_ID_sha256'],
+               rows=report['rows'],source_UV_or_E_or_membership_modified=False,
+               thresholds_or_intermediate_policy_changed=False,quality_accepted=False))
+ write_json(output/'review.json',cfg)
+ result=reference(output/'review.json')
+ validate_anchor_review_binding(result,packet)
+ return result
+
+
+def _extended_metric(value):
+ # Guard statistics retain undefined rows as extended-real +Infinity in JSON.
+ if value=='+Infinity':return math.inf
+ if value=='-Infinity':return -math.inf
+ return float(value)
+
+
 def decide_anchor_review(report, intermediate_policy="strict"):
  if intermediate_policy not in ("strict", "diagnostic"):
   raise ValueError("Unknown intermediate review policy")
@@ -20,7 +96,7 @@ def decide_anchor_review(report, intermediate_policy="strict"):
   b=c['baseline_true_RS'];v=c['candidate_true_RS']
   if not all(b.get(k)is not None and v.get(k)is not None for k in ('rms_px','p95_px')):continue
   witnesses=[r for r in report['worst_worsened_subject_by_entity']if r['shot_id']==sid and r['candidate_error_px']is not None and r['baseline_error_px']is not None and r['candidate_error_px']-r['baseline_error_px']>r['original_E']]
-  if v['rms_px']>b['rms_px']and v['p95_px']>b['p95_px']and c['sum_squared_error_delta_on_common_valid']>0 and witnesses:
+  if _extended_metric(v['rms_px'])>_extended_metric(b['rms_px'])and _extended_metric(v['p95_px'])>_extended_metric(b['p95_px'])and c['sum_squared_error_delta_on_common_valid']>0 and witnesses:
    reasons.append({'shot_id':sid,'reason':'fixed_cohort_RMS_and_p95_worsened_with_original_E_exceeding_source_witness','baseline_RMS_px':b['rms_px'],'candidate_RMS_px':v['rms_px'],'baseline_p95_px':b['p95_px'],'candidate_p95_px':v['p95_px'],'source_witnesses':witnesses})
  for entry in report['same_source_comparison'].get('by_shot_entity',[]):
   sid=entry['shot_id'];entity=entry['feature_id'];c=entry['comparison']
@@ -30,18 +106,15 @@ def decide_anchor_review(report, intermediate_policy="strict"):
   b=c['baseline_true_RS'];v=c['candidate_true_RS']
   if not all(b.get(k)is not None and v.get(k)is not None for k in ('rms_px','p95_px')):continue
   witnesses=[r for r in report['worst_worsened_subject_by_entity']if r['shot_id']==sid and r['feature_id']==entity and r['candidate_error_px']is not None and r['baseline_error_px']is not None and r['candidate_error_px']-r['baseline_error_px']>r['original_E']]
-  if v['rms_px']>b['rms_px']and v['p95_px']>b['p95_px']and c['sum_squared_error_delta_on_common_valid']>0 and witnesses:
+  if _extended_metric(v['rms_px'])>_extended_metric(b['rms_px'])and _extended_metric(v['p95_px'])>_extended_metric(b['p95_px'])and c['sum_squared_error_delta_on_common_valid']>0 and witnesses:
    reasons.append(dict(scope='shot_entity',shot_id=sid,feature_id=entity,reason='entity_source_RMS_and_p95_worsened_with_original_E_exceeding_witness',baseline_RMS_px=b['rms_px'],candidate_RMS_px=v['rms_px'],baseline_p95_px=b['p95_px'],candidate_p95_px=v['p95_px'],source_witnesses=witnesses))
  return {'schema':'rinkfit.accepted_fixed_anchor_review_decision.v1','requires_source_or_geometry_review':bool(reasons),'request_stop':bool(reasons) and intermediate_policy=='strict','intermediate_policy':intermediate_policy,'final_quality_gate_unchanged':True,'reasons':reasons,'source_UV_or_qualification_modified':False,'quality_accepted':False,'original_E_is_engineering_scale_not_sigma':True,'additional_arbitrary_error_threshold_issued':False}
 
 class AcceptedSourceReview:
  def __init__(self,output,packet,configuration):
   self.output=Path(output).resolve();self.packet=Path(packet).resolve();self.last_sha=None;self.records=[];self.stopped=False;self.failed=False
-  cfg=read_json(configuration['file'])
-  if file_sha256(configuration['file'])!=configuration['sha256']:raise ValueError('Changed accepted review configuration')
-  if cfg.get('schema')!='rinkfit.dense6.accepted_source_anchor_review.v1':raise ValueError('Unknown accepted review schema')
+  cfg=validate_anchor_review_binding(configuration,self.packet)
   self.baseline=Path(cfg['baseline']['file']).resolve()
-  if file_sha256(self.baseline)!=cfg['baseline']['sha256']:raise ValueError('Changed complete anchor baseline')
   self.config=configuration
   self.intermediate_policy=cfg.get("intermediate_policy", "strict")
   if self.intermediate_policy not in ("strict", "diagnostic"):raise ValueError("Unknown intermediate review policy")
@@ -84,3 +157,14 @@ class AcceptedSourceReview:
   try:
    with (self.output/'STOP_REQUESTED').open('x',encoding='utf8')as f:f.write('Accepted source review failed; preserve candidate, inspect accepted_source_review/error.json\n')
   except FileExistsError:pass
+
+
+if __name__=='__main__':
+ import argparse
+ q=argparse.ArgumentParser(description='Prepare a real current-cohort anchor baseline from a pinned prior physical model')
+ q.add_argument('--prepare-configuration',required=True)
+ q.add_argument('--baseline-model',required=True)
+ q.add_argument('--packet',required=True)
+ q.add_argument('--out',required=True)
+ a=q.parse_args()
+ print(json.dumps(prepare_anchor_review(reference(a.prepare_configuration),reference(a.baseline_model),a.packet,a.out)))

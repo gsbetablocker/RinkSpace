@@ -7,8 +7,7 @@ import numpy as np
 P=Path(__file__).resolve().parents[4]
 from rinkfit_joint.io_utils import read_json,write_json,file_sha256
 from rinkfit_joint.joint_metrics import PacketArrays
-from rinkfit_joint.joint_model import graph_from_joint,as_event_view
-from rinkfit_joint.camera_graph import CameraGraph
+from rinkfit_joint.joint_model import native_camera_from_joint,as_event_view
 from rinkfit_joint.joint_replay import render_visibility,material_visibility_records
 from rinkfit_joint.recovery_metrics import _same_denominator_statistics
 from rinkfit_start.native_scene import NativeScene
@@ -40,9 +39,23 @@ def source_col(d,root):
  f=Path(d['file']);f=f if f.is_absolute()else root/f
  if file_sha256(f)!=d['sha256']:raise ValueError('Changed source numeric column')
  return np.memmap(f,dtype=d['dtype'],mode='r',offset=int(d.get('offset_bytes',0)),shape=tuple(d['shape']))
+def source_local_seconds(model, shot_id, native_pts):
+ clock=model['source_clock'];time_base=clock['time_base'];step=clock['frame_step_pts'];shot=model['shots'][shot_id];scope=shot['scope'];points=np.asarray(native_pts)
+ if len(time_base)!=2 or any(not isinstance(x,int)or isinstance(x,bool)or x<=0 for x in time_base):raise ValueError('Exact current source time base required')
+ if not isinstance(step,int)or step<=0 or points.dtype.kind not in 'iu':raise ValueError('Exact current native exposure lattice required')
+ first,last,origin=scope['first_pts'],scope['last_pts'],shot['time_origin_pts']
+ if any(not isinstance(x,int)or isinstance(x,bool)for x in (first,last,origin))or origin!=first or last<first or(last-first)%step:raise ValueError('Current shot source scope/time origin differs')
+ if np.any(points<first)or np.any(points>last)or np.any((points-first)%step):raise ValueError('Native PTS outside current shot or exposure lattice')
+ return (points.astype(np.int64)-origin)*time_base[0]/time_base[1]
+
 def evaluate(a):
  t=time.monotonic();out=Path(a.out)
+ observed_row_clock=getattr(a,'observed_row_clock','source_uv')
+ if observed_row_clock not in ('source_uv','historical_s01'):raise ValueError('Unknown observed-row clock')
+ observed_row_semantics=('all shots original actual sourceUVy'if observed_row_clock=='source_uv'else 'S01 frozen true parent complete prefix row; S02-S06 original actual sourceUVy')
  if out.exists():raise FileExistsError('Use a new immutable live-guard output directory')
+ baseline=read_json(a.baseline)if a.baseline else None
+ if baseline is not None and (baseline.get('observed_row_clock')!=observed_row_clock or baseline.get('observed_row_semantics')!=observed_row_semantics):raise ValueError('Observed-row baseline uses a different or unbound clock; regenerate it with the same explicit observed_row_clock')
  ml=Path(a.model);m=read_json(ml);mref=ref(ml)
  loader=PacketArrays(a.packet);p=loader.packet;n=p['row_count']
  arrays={k:loader.load(k)for k in ['kind','material_index','admission','fit_role','uv','native_pts','shot_index','E']}
@@ -50,22 +63,22 @@ def evaluate(a):
  prefix,auxref=find_overlay(a.packet,p);end=int(prefix['count'])
  rows=np.flatnonzero((np.arange(n)<end)&(arrays['kind']==1)&(arrays['admission']==1)&(arrays['fit_role']==1)&isboard[material])
  if not len(rows):raise ValueError('The original complete fixed2D cohort is empty')
- if a.baseline and len(rows)!=int(read_json(a.baseline)['rows']):raise ValueError('Complete fixed2D cohort count changed; rebind instead of silently comparing a subset')
+ if a.baseline and len(rows)!=int(baseline['rows']):raise ValueError('Complete fixed2D cohort count changed; rebind instead of silently comparing a subset')
  branch=source_col(prefix['arrays']['path'],Path(auxref['overlay']['file']).parent)[rows+int(prefix['source_offset'])]
- frozenrow=source_col(prefix['arrays']['row'],Path(auxref['overlay']['file']).parent)[rows+int(prefix['source_offset'])]
+ frozenrow=source_col(prefix['arrays']['row'],Path(auxref['overlay']['file']).parent)[rows+int(prefix['source_offset'])]if observed_row_clock=='historical_s01'else None
  station=np.zeros(len(rows))
  scene=NativeScene(as_event_view(m,'s01'));world,finite,reason=scene.world_rows(material[rows],branch,station)
  for mi,pi in np.unique(np.c_[material[rows],branch],axis=0):
   path=scene.path(int(mi),int(pi))
   if path.get('physical_point')is not True:raise ValueError('Fixed2D cohort contains sliding material')
   if not any(lo<=0<=hi for lo,hi in path.get('allowed_station_intervals',[[0.,1.]])):raise ValueError('Fixed2D station0 outside actual material domain')
- cg=CameraGraph(graph_from_joint(m));uv=arrays['uv'][rows];pts=arrays['native_pts'][rows];shot=arrays['shot_index'][rows];E=arrays['E'][rows].reshape(-1);mi=material[rows]
+ uv=arrays['uv'][rows];pts=arrays['native_pts'][rows];shot=arrays['shot_index'][rows];E=arrays['E'][rows].reshape(-1);mi=material[rows]
  pred=np.full_like(uv,np.nan);observed=np.full_like(uv,np.nan);rs=np.zeros(len(rows),bool);vis=rs.copy();obsvalid=rs.copy();bracket=rs.copy();cert=rs.copy();eq=np.full(len(rows),np.nan);target=labels[mi]
  for sn,s in enumerate(p['shot_ids']):
   ix=np.flatnonzero(shot==sn)
   if not len(ix):continue
-  cam=cg.native_camera(s);local=cg.local_seconds(s,pts[ix]);w=world[ix].copy();w[~finite[ix]]=0.
-  rr=frozenrow[ix]if s=='s01'else uv[ix,1]
+  cam=native_camera_from_joint(m,s);local=source_local_seconds(m,s,pts[ix]);w=world[ix].copy();w[~finite[ix]]=0.
+  rr=frozenrow[ix]if observed_row_clock=='historical_s01'and s=='s01'else uv[ix,1]
   q=cam.at(w,local+cam.tau*(rr/1079.-.5));observed[ix]=q['uv'];obsvalid[ix]=finite[ix]&q['valid']&np.isfinite(rr)&(rr>=0)&(rr<=1079)
   q=cam.project_rs(w,local);pred[ix]=q['uv'];rs[ix]=finite[ix]&q['valid'];bracket[ix]=q['bracketed'];cert[ix]=q['certificate']['certified'];eq[ix]=q['root_equality_px']
   records=material_visibility_records(scene,mi[ix],branch[ix]);vis[ix]=render_visibility(cam,scene,w,records,local,q['uv'])
@@ -75,9 +88,9 @@ def evaluate(a):
  def summary(ix):
   ix=np.asarray(ix,int)
   return dict(true_RS_rawUV=_same_denominator_statistics(distance,ix,valid,E,'true_RS_fixed2D_full_source_cohort'),observed_row_rawUV=_same_denominator_statistics(od,ix,obsvalid,E,'source_observed_row_fixed2D_full_source_cohort'),finite_invalid=int((~finite[ix]).sum()),true_RS_invalid=int((~rs[ix]).sum()),visibility_invalid=int((rs[ix]&~vis[ix]).sum()),RS_endpoint_not_bracketed=int((~bracket[ix]).sum()),RS_certificate_unknown=int((~cert[ix]).sum()))
- report=dict(schema='rinkfit.full_existing_fixed2D_source_anchor_guard.v1',model=mref,implementation=ref(__file__),packet=ref(a.packet),source_visibility_operator=ref(P/'calibration/rinkfit/src/rinkfit_joint/joint_replay.py'),parent_numeric_reference=auxref,rows=len(rows),full_original_parent_fixed2D_cohort=True,cohort_row_ID_sha256=cohort_hash.hexdigest(),source_value_column_descriptors={k:p['arrays'][k]for k in ['uv','native_pts','shot_index','material_index','kind','E']},raw_source_rows=n,station_semantics='physical_point material evaluated at station0; no sliding station approximation',source_entity_fixed_does_not_mean_world_coordinates_calibrated=True,observed_row_semantics='S01 frozen true parent complete prefix row; S02-S06 original actual sourceUVy',candidate_complete_checkpoint_claimed=False,statistical_sigma_or_independence_claimed=False,original_E_is_engineering_review_scale=True,new_curve_rows_projected=0,RGB_decoded=0,sourceUV_modified=False,overall=summary(order),by_shot={s:summary(np.flatnonzero(shot==sn))for sn,s in enumerate(p['shot_ids'])if np.any(shot==sn)},by_entity={s:summary(np.flatnonzero(target==s))for s in sorted(set(target.tolist()))},maximum_true_RS_equality_px=float(np.max(abs(eq[valid]),initial=0.)),quality_accepted=False)
+ report=dict(schema='rinkfit.full_existing_fixed2D_source_anchor_guard.v1',model=mref,implementation=ref(__file__),packet=ref(a.packet),source_visibility_operator=ref(P/'calibration/rinkfit/src/rinkfit_joint/joint_replay.py'),parent_numeric_reference=auxref,rows=len(rows),full_original_parent_fixed2D_cohort=True,cohort_row_ID_sha256=cohort_hash.hexdigest(),source_value_column_descriptors={k:p['arrays'][k]for k in ['uv','native_pts','shot_index','material_index','kind','E']},raw_source_rows=n,station_semantics='physical_point material evaluated at station0; no sliding station approximation',source_entity_fixed_does_not_mean_world_coordinates_calibrated=True,observed_row_semantics=observed_row_semantics,observed_row_clock=observed_row_clock,candidate_complete_checkpoint_claimed=False,statistical_sigma_or_independence_claimed=False,original_E_is_engineering_review_scale=True,new_curve_rows_projected=0,RGB_decoded=0,sourceUV_modified=False,camera_consumer='exact_current_joint_model_with_current_reference_angles',legacy_graph_initializer_required=False,legacy_graph_initializer_path=m.get('source_graph_ref'),legacy_graph_initializer_available=bool(m.get('source_graph_ref')and Path(m['source_graph_ref']).is_file()),overall=summary(order),by_shot={s:summary(np.flatnonzero(shot==sn))for sn,s in enumerate(p['shot_ids'])if np.any(shot==sn)},by_entity={s:summary(np.flatnonzero(target==s))for s in sorted(set(target.tolist()))},maximum_true_RS_equality_px=float(np.max(abs(eq[valid]),initial=0.)),quality_accepted=False)
  if a.baseline:
-  b=read_json(a.baseline)
+  b=baseline
   if b['cohort_row_ID_sha256']!=report['cohort_row_ID_sha256']or b['source_visibility_operator']['sha256']!=report['source_visibility_operator']['sha256']:raise ValueError('Guard baseline must bind exact same cohort/operator')
   if b['source_value_column_descriptors']!=report['source_value_column_descriptors']:
    # Appending independently measured sources changes full-column descriptors.
@@ -113,9 +126,9 @@ def evaluate(a):
  write_json(out/'report.json',report);print(json.dumps(dict(report=ref(out/'report.json'),overall=report['overall'],comparison=report.get('same_source_comparison',{}).get('overall'),seconds=report['elapsed_seconds'])))
  return report
 
-def evaluate_fixed_anchors(model,packet,output,baseline=None):
+def evaluate_fixed_anchors(model,packet,output,baseline=None,observed_row_clock='source_uv'):
  """Evaluate every original fixed board point, retaining all invalid rows."""
- return evaluate(argparse.Namespace(model=model,packet=packet,out=output,baseline=baseline))
+ return evaluate(argparse.Namespace(model=model,packet=packet,out=output,baseline=baseline,observed_row_clock=observed_row_clock))
 
 if __name__=='__main__':
- q=argparse.ArgumentParser();q.add_argument('--model',required=True);q.add_argument('--packet',required=True);q.add_argument('--out',required=True);q.add_argument('--baseline');a=q.parse_args();evaluate(a)
+ q=argparse.ArgumentParser();q.add_argument('--model',required=True);q.add_argument('--packet',required=True);q.add_argument('--out',required=True);q.add_argument('--baseline');q.add_argument('--observed-row-clock',choices=['source_uv','historical_s01'],default='source_uv');a=q.parse_args();evaluate(a)

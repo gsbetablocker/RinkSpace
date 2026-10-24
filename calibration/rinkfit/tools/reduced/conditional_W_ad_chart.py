@@ -5,7 +5,7 @@ operators. Fixes only its budget coordinate, and optimizes the same physical
 and station chart. No raw ambient-column assumption and no new motion prior.
 """
 from pathlib import Path
-import argparse,hashlib,json,time
+import argparse,hashlib,json,os,time
 import numpy as np
 from scipy import sparse
 import clarabel
@@ -13,6 +13,7 @@ from rinkfit_start.ad_chart import PrintOnlyAdChart
 from rinkfit_start.camera_spline_chart import time_chart_from_model
 from rinkfit_start.native_scene import NativeScene
 from types import SimpleNamespace
+from current_input_identity import same_numerical_input
 
 
 def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
@@ -91,7 +92,12 @@ def run(primary,output,budget_from_full_report=None,resume_primal=None,baseline_
     if baseline_engineering_budget and budget_from_full_report is not None:raise ValueError('Select one explicitly identified W budget authority')
     if budget_from_full_report is not None:
         budget_path=Path(budget_from_full_report).resolve();budget_report=read(budget_path)
-        if not budget_report.get('source_W_E_unchanged')or budget_report.get('active_rows')!=m or budget_report.get('semantic',{}).get('sha256')!=authority['semantic']['sha256']or not budget_report['best']['valid']:raise ValueError('Different-budget reference is not a complete unchanged-source actual evaluation')
+        same_semantic=budget_report.get('semantic',{}).get('sha256')==authority['semantic']['sha256']
+        if not same_semantic and model.get('current_input_scope',{}).get('full_physical_solver',False):
+            previous_packet=verify(budget_report['packet']);current_packet=verify(authority['packet'])
+            same_semantic=same_numerical_input(previous_packet,current_packet)
+            if same_semantic:print('BUDGET_METADATA_COMPATIBLE',json.dumps(dict(previous_packet=ref(previous_packet),current_packet=ref(current_packet),same_source_UV_E_W_Query_model_and_selection=True)),flush=True)
+        if not budget_report.get('source_W_E_unchanged')or budget_report.get('active_rows')!=m or not same_semantic or not budget_report['best']['valid']:raise ValueError('Different-budget reference is not a complete unchanged-source actual evaluation')
         budget=float(budget_report['best']['max_q'])
         if not np.isfinite(budget)or budget<primary_budget:raise ValueError('Chosen existing full-state budget cannot contain this primary anchor')
         budget_reference=ref(budget_path)
@@ -109,7 +115,7 @@ def run(primary,output,budget_from_full_report=None,resume_primal=None,baseline_
     # It changes neither the original cones, original W nor fixed budget.
     centered_rhs=fixed_rhs-A@anchor
     cones=[clarabel.NonnegativeConeT(int(dims[0]))]+[clarabel.SecondOrderConeT(int(d))for d in dims[1:]]
-    settings=clarabel.DefaultSettings();settings.verbose=True;settings.max_threads=1;settings.tol_gap_abs=1e-10;settings.tol_gap_rel=1e-10;settings.tol_feas=1e-10
+    settings=clarabel.DefaultSettings();settings.verbose=True;settings.max_threads=(os.cpu_count()or 1)if model.get('current_input_scope',{}).get('full_physical_solver',False)else 1;settings.tol_gap_abs=1e-10;settings.tol_gap_rel=1e-10;settings.tol_feas=1e-10
     print('W_ASSEMBLY',json.dumps(dict(physical_columns=n,station_columns=k,all_source_norms=m,W_rank=len(rW),rows=A.shape[0],columns=A.shape[1],H_nnz=H.nnz,budget=budget)),flush=True)
     resume_reference=None
     if resume_primal is None:
@@ -140,7 +146,7 @@ def run(primary,output,budget_from_full_report=None,resume_primal=None,baseline_
         fraction=low
     restored=anchor+fraction*(raw-anchor);final=audit(restored)
     if not good(final):raise ValueError('Strict conditional-W primal restoration failed')
-    physical_map=sparse.load_npz(D/'full_physical_from_solver_scaled.npz');chart=PrintOnlyAdChart(model);physical0=chart.pack()
+    physical_map=sparse.load_npz(D/'full_physical_from_solver_scaled.npz');chart=PrintOnlyAdChart(model, ad_ids=tuple(model.get('current_input_scope',{}).get('print_only_ad_ids',(8,9,10,11,12))));physical0=chart.pack()
     time_info=assembly.get('time_subspace');time_chart=time_chart_from_model(model)if time_info is not None else None
     np.savez_compressed(O/'solver_before_domain.npz',solver_raw=solver_raw,affine_restored_solver=restored,primary_anchor=anchor,units=units,budget=budget,affine_restoration_fraction=fraction,primary_assembly_sha256=np.asarray(sha(D/'assembly.json')))
     def decode(z):

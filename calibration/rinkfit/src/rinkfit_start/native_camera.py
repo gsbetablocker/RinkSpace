@@ -53,16 +53,6 @@ class NativeCamera:
         self.R0=np.asarray(self.head["R0"],float);self.n=np.asarray(self.head["n"],float);self.b=np.asarray(self.head["b"],float)
         self.P=np.asarray(self.head["P"],float);self.d=np.asarray(self.head["d"],float);self.a=float(self.head["a"])
         self.tau=float(camera["rolling_shutter"]["signed_readout_seconds"])
-        self.wide=self.optics.get('brown_wide_extension')
-        self.wide_boundary=0.
-        self.wide_coefficients=np.zeros(4)
-        if self.wide is not None:
-            if self.wide.get('schema')!='rinkfit.source_supported_wide_brown_hinge.v1' or self.wide.get('power')!=2:
-                raise ValueError('Unsupported wide Brown extension')
-            self.wide_boundary=float(self.wide['activation_log_f_native'])
-            self.wide_coefficients=np.asarray(self.wide['coefficients'],float)
-            if not np.isfinite(self.wide_boundary) or self.wide_coefficients.shape!=(4,) or not np.isfinite(self.wide_coefficients).all():
-                raise ValueError('Nonfinite wide Brown extension')
         self.gauge_error=max(abs(np.linalg.norm(self.n)-1),abs(np.linalg.norm(self.b)-1),
           abs(self.b@self.R0@self.n),float(np.max(np.abs(self.R0@self.R0.T-np.eye(3)))),abs(np.linalg.det(self.R0)-1))
         if self.dt<=0 or self.gauge_error>1e-8: raise ValueError("fixed-head SO3/orthogonal-axis domain")
@@ -101,11 +91,7 @@ class NativeCamera:
             xy=Y[...,:2]/depth[...,None];xx,yy=np.moveaxis(xy,-1,0);r2=xx*xx+yy*yy
             k1=np.polynomial.polynomial.polyval(z,self.optics["k1"])
             k2=np.polynomial.polynomial.polyval(z,self.optics["k2"])
-            basis=np.maximum(self.wide_boundary-logf,0.)**2
-            k1=k1+self.wide_coefficients[0]*basis
-            k2=k2+self.wide_coefficients[1]*basis
-            p1=float(self.optics["p1"])+self.wide_coefficients[2]*basis
-            p2=float(self.optics["p2"])+self.wide_coefficients[3]*basis
+            p1=float(self.optics["p1"]);p2=float(self.optics["p2"])
             radial=1+k1*r2+k2*r2*r2
             xd=xx*radial+2*p1*xx*yy+p2*(r2+2*xx*xx)
             yd=yy*radial+p1*(r2+2*yy*yy)+2*p2*xx*yy
@@ -132,33 +118,11 @@ class NativeCamera:
         radius=float(self.optics['radius_max']);q=radius*radius
         if not (np.isfinite(radius) and radius>0):return {'passed':False,'reason':'unbounded_or_invalid_Brown_disk'}
         a=np.polynomial.polynomial.polyval(z,k1);b=np.polynomial.polynomial.polyval(z,k2)
-        tangential_p1=abs(float(self.optics['p1']));tangential_p2=abs(float(self.optics['p2']))
-        if self.wide is not None:
-            # Enclose each continuous piecewise quadratic coefficient over the
-            # full cubic log-f hull, including its active-branch vertex.
-            def interval(base, slope, coefficient):
-                candidates=[low,high]
-                if low<self.wide_boundary<high:candidates.append(self.wide_boundary)
-                if coefficient:
-                    vertex=self.wide_boundary-slope/(2*coefficient)
-                    if low<vertex<min(high,self.wide_boundary):candidates.append(vertex)
-                t=np.asarray(candidates)
-                values=base+slope*(t-np.log(float(self.optics['f_ref'])))+coefficient*np.maximum(self.wide_boundary-t,0.)**2
-                return float(values.min()),float(values.max())
-            k1lo,k1hi=interval(k1[0],k1[1] if len(k1)>1 else 0.,self.wide_coefficients[0])
-            k2lo,k2hi=interval(k2[0],k2[1] if len(k2)>1 else 0.,self.wide_coefficients[1])
-            a=np.array([k1lo,k1hi]);b=np.array([k2lo,k2hi])
-            p1lo,p1hi=interval(float(self.optics['p1']),0.,self.wide_coefficients[2])
-            p2lo,p2hi=interval(float(self.optics['p2']),0.,self.wide_coefficients[3])
-            tangential_p1=max(abs(p1lo),abs(p1hi));tangential_p2=max(abs(p2lo),abs(p2hi))
-            # For r²>=0 the coefficient-wise lower endpoint is conservative.
-            # Independent coefficient extrema need not occur at one zoom.
-            a=np.array([k1lo]);b=np.array([k2lo])
         def lower(c1,c2):
             out=np.minimum(1.,1+c1*q+c2*q*q)
             vertex=np.divide(-c1,2*c2,out=np.zeros_like(c1),where=c2!=0)
             return np.minimum(out,np.where((c2>0)&(vertex>0)&(vertex<q),1+c1*vertex+c2*vertex*vertex,np.inf))
-        tangential=6*np.hypot(tangential_p1,tangential_p2)*radius
+        tangential=6*np.hypot(float(self.optics['p1']),float(self.optics['p2']))*radius
         scale=1+np.max(abs(a)*q+abs(b)*q*q)+tangential
         bound=float(min(lower(a,b).min(),lower(3*a,5*b).min())-tangential-1e-10*scale)
         with np.errstate(over='ignore'):focal=np.exp(np.array([low,high]))
@@ -170,46 +134,18 @@ class NativeCamera:
             'scope':'sufficient analytic convex-hull/quadratic bound; not a camera hardware specification'}
 
     def derivative_bounds(self,frame_time):
-        """Enclose exact cubic derivatives on each complete sensor row-time interval.
-
-        Each derivative is a quadratic in the adjacent expanded-control differences.
-        Endpoints and every interior stationary point suffice; distant control slopes
-        need not enlarge this local interval. Explicit roundoff padding encloses the
-        normalized time interval and the coefficient/value arithmetic.
-        """
-        t=np.asarray(frame_time,float)
-        if not np.isfinite(t).all(): raise ValueError("nonfinite native frame time")
-        if not t.size: return np.empty(t.shape+(3,),float)
-        times,inverse=np.unique(t.reshape(-1),return_inverse=True)
-        half=abs(self.tau)/2;lo=times-half;hi=times+half
-        if np.any(lo<self.domain[0]) or np.any(hi>self.domain[1]):
-            raise ValueError("readout extends beyond cubic domain")
-        xlo=(lo-self.first)/self.dt;xhi=(hi-self.first)/self.dt
-        eps=np.finfo(float).eps
-        time_roundoff=64*eps*(1+(np.abs(times)+half+abs(self.first))/self.dt+np.abs(xlo)+np.abs(xhi))
-        # Intersection only removes roundoff beyond an already-checked allocated edge.
-        xlo=np.maximum(1.,np.nextafter(xlo-time_roundoff,-np.inf))
-        xhi=np.minimum(len(self.controls)-2.,np.nextafter(xhi+time_roundoff,np.inf))
-        begin=np.minimum(np.floor(xlo).astype(int),len(self.controls)-3)
-        end=np.minimum(np.floor(xhi).astype(int),len(self.controls)-3)
-        result=np.zeros((len(times),3))
+        """Cubic derivative convex-hull bound on each entire row-time interval."""
+        t=np.asarray(frame_time,float);half=abs(self.tau)/2
+        lo=t-half;hi=t+half
+        if np.any(lo<self.domain[0]) or np.any(hi>self.domain[1]): raise ValueError("readout extends beyond cubic domain")
+        begin=np.floor((lo-self.first)/self.dt).astype(int)-2
+        end=np.floor((hi-self.first)/self.dt).astype(int)+2
+        d=np.abs(np.diff(self.controls,axis=0)/self.dt)
+        result=np.zeros(t.shape+(3,))
         for offset in range(int(np.max(end-begin))+1):
-            j=begin+offset;legal=j<=end;safe=np.minimum(j,len(self.controls)-3)
-            u0=np.maximum(0.,xlo-j);u1=np.minimum(1.,xhi-j);legal&=u0<=u1
-            u0=np.where(legal,u0,0.);u1=np.where(legal,u1,0.)
-            e=np.diff(self.controls[safe[:,None]+np.arange(-1,3)],axis=1)/self.dt
-            d0=.5*(e[:,0]+e[:,1]);d1=e[:,1]-e[:,0];d2=.5*e[:,0]-e[:,1]+.5*e[:,2]
-            left=(d2*u0[:,None]+d1)*u0[:,None]+d0
-            right=(d2*u1[:,None]+d1)*u1[:,None]+d0
-            vertex=np.divide(-d1,2*d2,out=np.zeros_like(d1),where=d2!=0)
-            interior=(d2!=0)&(vertex>u0[:,None])&(vertex<u1[:,None])
-            at_vertex=(d2*vertex+d1)*vertex+d0
-            value=np.maximum(np.abs(left),np.abs(right))
-            value=np.maximum(value,np.where(interior,np.abs(at_vertex),0.))
-            rounding=64*eps*(1+np.abs(e).sum(axis=1)+np.abs(d0)+np.abs(d1)+np.abs(d2))
-            result=np.maximum(result,np.where(legal[:,None],value+rounding,0.))
-        result=np.nextafter(result*(1+1e-12)+1e-12,np.inf)
-        return result[inverse].reshape(t.shape+(3,))
+            j=begin+offset;legal=(j<=end)&(j>=0)&(j<len(d))
+            result=np.maximum(result,np.where(legal[...,None],d[np.clip(j,0,len(d)-1)],0.))
+        return np.nextafter(result*(1+1e-12)+1e-12,np.inf)
 
     def rs_certificate(self,world,frame_time):
         """Analytic conservative speed/no-fold bound over the full readout.
@@ -234,21 +170,11 @@ class NativeCamera:
         k1p=sum(j*abs(v)*zabs**(j-1) for j,v in enumerate(self.optics["k1"][1:],1))
         k2p=sum(j*abs(v)*zabs**(j-1) for j,v in enumerate(self.optics["k2"][1:],1))
         p1=abs(float(self.optics["p1"]));p2=abs(float(self.optics["p2"]))
-        hinge_max=np.maximum(self.wide_boundary-(mid['logf']-zd*half),0.)
-        basis_max=hinge_max**2
-        k1a=k1a+abs(self.wide_coefficients[0])*basis_max
-        k2a=k2a+abs(self.wide_coefficients[1])*basis_max
-        k1p=k1p+2*abs(self.wide_coefficients[0])*hinge_max
-        k2p=k2p+2*abs(self.wide_coefficients[1])*hinge_max
-        p1=p1+abs(self.wide_coefficients[2])*basis_max
-        p2=p2+abs(self.wide_coefficients[3])*basis_max
-        p1p=2*abs(self.wide_coefficients[2])*hinge_max
-        p2p=2*abs(self.wide_coefficients[3])*hinge_max
         L=1+k1a*r2+k2a*r2*r2
         Jyx=2*x*y*(k1a+2*k2a*r2)+2*p1*x+2*p2*y
         Jyy=L+2*y*y*(k1a+2*k2a*r2)+6*p1*y+2*p2*x
         ybrown=y*L+p1*(r2+2*y*y)+2*p2*x*y
-        direct=(y*(k1p*r2+k2p*r2*r2)+p1p*(r2+2*y*y)+2*p2p*x*y)*zd
+        direct=y*(k1p*r2+k2p*r2*r2)*zd
         fymax=np.exp(mid["logf"]+zd*half-float(self.optics.get("eta",0.))/2)
         ppprime=abs(self.optics.get("principal_linear",[0.,0.])[1])*zd
         speed=fymax*(ybrown*zd+Jyx*xyprime[...,0]+Jyy*xyprime[...,1]+direct)+ppprime
@@ -257,9 +183,6 @@ class NativeCamera:
         # Conservative symmetric coefficient uncertainty around mid zoom.
         k1mid=np.polynomial.polynomial.polyval(mid["z"],self.optics["k1"])
         k2mid=np.polynomial.polynomial.polyval(mid["z"],self.optics["k2"])
-        midbasis=np.maximum(self.wide_boundary-mid['logf'],0.)**2
-        k1mid=k1mid+self.wide_coefficients[0]*midbasis
-        k2mid=k2mid+self.wide_coefficients[1]*midbasis
         k1lo=k1mid-k1p*zd*half;k2lo=k2mid-k2p*zd*half
         # If negative quadratic: its minimum is at an interval endpoint;
         # positive quadratic also checks its interior vertex.

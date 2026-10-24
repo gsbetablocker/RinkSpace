@@ -1,4 +1,6 @@
 #pragma once
+#include "rinkfit/joint_engineering_identity_v1.hpp"
+#include "rinkfit/joint_legacy_line_rechart_v1.hpp"
 #include "rinkfit/joint_paired_advertisements_v1.hpp"
 #include "rinkfit/joint_continuous_board_station_v1.hpp"
 #include "rinkfit/joint_full_s01_subspace_v1.hpp"
@@ -88,8 +90,9 @@ inline eventio::Json restore_joint_observed_primal_restart_v1(
     // These control execution/diagnostics only. All other fields, including
     // stage freezes, weights, source/domain refs, and PTX qualification match.
     for (const auto* name : {"observed_primal_restart_v1", "observed_primal_warm_start_v1", "num_threads",
-            "max_inner_iterations", "function_tolerance", "initial_trust_region_radius", "periodic_camera_angle_rebase",
+            "max_inner_iterations", "audit_accepted_cost_breakdown_v1", "function_tolerance", "parameter_tolerance", "gradient_tolerance", "initial_trust_region_radius", "periodic_camera_angle_rebase",
             "linear_solver_backend", "write_accepted_complete_checkpoint",
+            "defer_complete_continuation_auxiliary_v1", "defer_auxiliary_minimization_to_joint_phase_v1",
             "write_accepted_physical_preview", "accepted_source_anchor_review",
             "source_uv_capture_construct_problem_only", "archived_dependency_aliases", "audit_group_gradients_v2", "audit_actual_directional_v1", "audit_actual_family_directional_v1", "audit_actual_gradient_locations_v1", "observed_polyline_kkt_working_set_v1", "audit_actual_solver_step_v1"}) j.erase(name);
     if (warm) for (const auto* name : {"runtime_atlas_gauge_v1", "audit_expected_free_physical_blocks", "joint6_atlas_gauge_transition"}) j.erase(name);
@@ -207,14 +210,7 @@ inline eventio::Json restore_joint_observed_primal_restart_v1(
   const auto cp_file = pin(manifest.at("checkpoint"));
   std::ifstream stream(cp_file);
   auto cp = read_checkpoint(stream);  // Existing parser validates full state token.
-  Json producer_objective={{"objective_id",previous_cfg.at("source_uv_capture_objective")},
-      {"physical_constraint_penalty",previous_cfg.value("physical_constraint_penalty",10.)},
-      {"pixel_total_weight",previous_cfg.at("pixel_total_weight")}};
-  for (const auto* name : {"engineering_active_shot_ids", "engineering_pixel_dependency_policy",
-          "dense_source_qualification", "capture_certified_numeric_domain", "engineering_dense_source_weights_v1", "runtime_atlas_gauge_v1", "engineering_support_budget_v2", "static_surface_motion_v1", "runtime_shared_parameter_stage_v2"})
-    if (previous_cfg.contains(name)) producer_objective[name]=previous_cfg.at(name);
-  const auto text=producer_objective.dump();
-  const auto producer_fingerprint=eventio::sha256(std::vector<std::uint8_t>(text.begin(),text.end()));
+  const auto producer_fingerprint=verified_joint_engineering_producer_fingerprint_v1(previous_cfg,manifest,cp.runtime_fingerprint,cp.state.token(),producer_source_hash,pin);
   require(cp.runtime_fingerprint == producer_fingerprint && (warm || cp.runtime_fingerprint == fingerprint) && cp.outer.lambda.empty() &&
           cp.outer.nu.empty() && cp.outer.rho == 0 &&
           cp.state.data().identity.objective_id == manifest.at("objective_id") &&
@@ -267,7 +263,12 @@ inline eventio::Json restore_joint_observed_primal_restart_v1(
   restore_joint_sparse_s01_storage_v1(b.core.model,previous_cfg,false);
   restore_joint_continuous_board_stations_v1(b,previous_cfg,false);
   if(previous_cfg.value("runtime_shared_parameter_stage_v2",Json::object()).contains("confirmed_tripod_outside_rink_v1"))b.attach_confirmed_tripod_outside_rink(previous_cfg.at("runtime_shared_parameter_stage_v2").at("confirmed_tripod_outside_rink_v1"));
-  const auto actual_model=b.core.model.exact_json(),saved_model=eventio::read_json(material_append?input_model:pin(manifest.at("model")));if(actual_model!=saved_model)eventio::atomic_json(out/"observed_restart_model_difference.json",Json::diff(saved_model,actual_model));
+  const auto saved_model=eventio::read_json(material_append?input_model:pin(manifest.at("model")));
+  // These are SHA-bound completed numeric transitions. Reconstruct their
+  // metadata/domain views without projecting a physical scalar a second time.
+  for(const auto*key:{"capture_zoom_feasibility_recovery_v1","legacy_line_coordinate_recharts_v1"})if(saved_model.contains(key)){const auto current=b.core.model.runtime_model_metadata.value(key,b.core.model.source_json.value(key,Json()));require(current.is_null()||current==saved_model.at(key),"saved numeric transition metadata differs");b.core.model.runtime_model_metadata[key]=saved_model.at(key);}
+  restore_joint_legacy_line_domains_v1(b.core);
+  const auto actual_model=b.core.model.exact_json();if(actual_model!=saved_model)eventio::atomic_json(out/"observed_restart_model_difference.json",Json::diff(saved_model,actual_model));
   require(actual_model==saved_model,"checkpoint physical values differ from its candidate model; see observed_restart_model_difference.json");
 
   const auto n = b.core.packet.rows.size();

@@ -6,6 +6,7 @@
 #include <ceres/dynamic_autodiff_cost_function.h>
 #include <mutex>
 #include <cstring>
+#include "rinkfit/joint_factor_failure_v1.hpp"
 namespace rinkfit {
 struct JointMotionObservationV1 {int shot=0;std::int64_t pts0=0,pts1=0;Vec2<double> uv0{},uv1{};std::array<double,2> latent{};std::size_t pair=0,index=0;double scale0=1,scale1=1;};
 struct JointMotionStoreV1 {
@@ -15,6 +16,18 @@ struct JointMotionStoreV1 {
  void assert_dependencies()const{for(const auto& item:dependencies){const auto& d=item.second;if(!std::filesystem::exists(d.path)||d.size!=std::filesystem::file_size(d.path)||d.time!=std::filesystem::last_write_time(d.path))throw std::runtime_error("motion source dependency changed: "+d.path.u8string());}}
  using Exposure=std::pair<std::string,std::int64_t>;
  std::map<Exposure,std::size_t> incidence(const JointEventModel&m)const{std::map<Exposure,std::size_t> a;for(const auto&r:rows){++a[{m.shots.at(r.shot).id,r.pts0}];++a[{m.shots.at(r.shot).id,r.pts1}];}return a;}
+ static std::shared_ptr<JointMotionStoreV1> load_current_v1(const eventio::Json&j,const std::filesystem::path&base,const JointEventModel&m){
+  auto require=[](bool ok,const char*why){if(!ok)throw std::runtime_error(std::string("current motion: ")+why);};
+  require(j.at("schema")=="rinkfit.current_surface_motion.v1"&&j.at("surface")=="board_inner"&&j.at("latent_coordinates")=="board_arclength_and_height_fraction","unsupported table contract");
+  require(j.at("source_clock")==m.source_json.at("source_clock"),"current source clock differs from model");
+  auto pin=[&](const eventio::Json&r){auto p=std::filesystem::u8path(r.at("file").get<std::string>());if(p.is_relative())p=base/p;eventio::verify(p,r.at("sha256"));return p;};
+  const auto&table=j.at("table");const auto n=j.at("selected_matches").get<std::size_t>();require(table.at("dtype")=="<f8"&&table.at("shape")==eventio::Json::array({n,12}),"table dtype/shape");
+  const auto bytes=eventio::bytes(pin(table));require(bytes.size()==n*12*sizeof(double),"table byte count");
+  const auto roles=eventio::read_json(pin(j.at("frame_roles")));require(roles.at("schema")=="rinkfit.joint_source_frame_protection.v1"&&roles.at("source_video_sha256")==j.at("source_clock").at("source_video_sha256"),"current frame-role authority");
+  auto s=std::make_shared<JointMotionStoreV1>();s->manifest=j;s->hash=j.at("logical_motion_id").get<std::string>();require(!s->hash.empty(),"motion semantic ID missing");s->rows.resize(n);std::set<std::pair<std::size_t,std::size_t>>seen;
+  for(std::size_t i=0;i<n;++i){double v[12];std::memcpy(v,bytes.data()+i*12*sizeof(double),sizeof(v));for(double x:v)require(std::isfinite(x),"nonfinite row");for(int k:{0,1,2,9,10})require(v[k]>=0&&std::floor(v[k])==v[k],"nonintegral shot/PTS/source index");require(v[0]<m.shots.size()&&v[11]==1&&v[8]>=0&&v[8]<=1,"shot, retained flag or height invalid");auto&r=s->rows[i];r.shot=int(v[0]);r.pts0=std::int64_t(v[1]);r.pts1=std::int64_t(v[2]);r.uv0={v[3],v[4]};r.uv1={v[5],v[6]};r.latent={v[7],v[8]};r.pair=std::size_t(v[9]);r.index=std::size_t(v[10]);require(seen.emplace(r.pair,r.index).second,"duplicate pair/source index");const auto&shot=m.shots.at(r.shot);require(r.pts1-r.pts0==256&&r.pts0>=shot.first_pts&&r.pts1<=shot.last_pts,"native clock or cut mismatch");for(auto pts:{r.pts0,r.pts1}){const auto&role=roles.at("frame_roles").at(std::to_string(pts));const auto name=role.at("role").get<std::string>();require(role.at("shot_id")==shot.id&&name!="reserved_pending_lineage"&&name!="validation_guard"&&name!="sealed_validation","protected/unresolved or cross-shot motion exposure");}}
+  return s;
+ }
  static std::shared_ptr<JointMotionStoreV1> load(const eventio::Json&ref,const JointEventModel&m){
   auto require=[](bool c,const std::string&msg){if(!c)throw std::runtime_error("static motion: "+msg);};
   auto s=std::make_shared<JointMotionStoreV1>();
@@ -38,14 +51,16 @@ struct JointMotionStoreV1 {
  }
 };
 struct JointMotionFactorV1 {
- const JointEventModel*model;JointRowLayout a,b;std::vector<int>ma,mb,sizes;Vec2<double> u,v;int latent_slot=0;double scale0=1,scale1=1;bool true_rs=false;
+ const JointEventModel*model;const JointMotionObservationV1*source=nullptr;JointRowLayout a,b;std::vector<int>ma,mb,sizes;Vec2<double> u,v;int latent_slot=0;double scale0=1,scale1=1;bool true_rs=false;
  struct Cache {std::mutex mutex;std::vector<double>key;std::array<double,2>row{},den{};bool valid=false,has=false;};std::shared_ptr<Cache>cache=std::make_shared<Cache>();
+
+ template<class T>bool failure(T const*const*pars,const char*reason,int side=-1)const noexcept{return joint_actual_factor_failure_v1([&](eventio::Json&record){record["factor"]="static_surface_motion";record["failure_kind"]=reason;record["side"]=side;record["true_RS"]=true_rs;record["shot"]=model->shots.at(a.shot_index).id;if(source){record["native_pts0"]=source->pts0;record["native_pts1"]=source->pts1;record["pair_index"]=source->pair;record["source_index"]=source->index;}std::vector<const double*>origins(sizes.size(),nullptr);std::vector<std::string>names(sizes.size());const JointRowLayout*ls[2]={&a,&b};const std::vector<int>*maps[2]={&ma,&mb};for(int s=0;s<2;++s)for(std::size_t k=0;k<maps[s]->size();++k)if((*maps[s])[k]>=0){const auto&v=model->blocks.at(ls[s]->block_ids.at(k));origins[(*maps[s])[k]]=v.values.data();names[(*maps[s])[k]]=v.name;}origins[latent_slot]=source?source->latent.data():nullptr;names[latent_slot]="static_motion_latent";for(std::size_t k=0;k<sizes.size();++k){std::vector<double>actual(sizes[k]);for(int j=0;j<sizes[k];++j)actual[j]=event_scalar(pars[k][j]);append_joint_actual_failure_parameter_v1(record,origins[k],actual.data(),sizes[k],names[k]);}record["trial_latent"]=eventio::Json::array({joint_factor_failure_number_v1(event_scalar(pars[latent_slot][0])),joint_factor_failure_number_v1(event_scalar(pars[latent_slot][1]))});});}
  template<class T>bool raw(const JointRowLayout&l,const std::vector<int>&map,T const*const*pars,T row,Vec2<T>*uv)const{
   std::vector<const T*>p(map.size(),nullptr);for(std::size_t k=0;k<map.size();++k)if(map[k]>=0)p[k]=pars[map[k]];
-  const auto g=model->global(l,p.data());const auto*z=pars[latent_slot];if(event_scalar(z[1])<0||event_scalar(z[1])>1.)return false;
+  const auto g=model->global(l,p.data());const auto*z=pars[latent_slot];if(event_scalar(z[1])<0||event_scalar(z[1])>1.)return failure(pars,"height_fraction_outside_unit_domain",&l==&a?0:1);
   const auto X=EventModel::board_point(z[0],z[1]*g[4],g.data());std::vector<const T*>ep;std::vector<T>geometry;const auto e=model->legacy_layout(l,ep,g,p.data(),geometry);const auto&math=model->shots.at(l.shot_index).math;
   auto q=math.trajectory(row_time(T(l.frame_time),g[31],row),ep.data(),e);q[0]+=p[l.reference_angles_slot][0];q[1]+=p[l.reference_angles_slot][1];const auto o=zoom_optics(math.optics(g.data()),q[2]);const auto pose=camera_pose(math.head(g.data()),q[0],q[1],o.z);
-  if(!pose.valid()||!valid_rotation(pose.R))return false;const auto zproj=project(X,pose,o.intr,o.brown);if(!zproj.valid()||!joint_visibility(g.data(),pose.C,X,true).visible())return false;*uv=zproj.uv;return finite_array(*uv);
+  if(!pose.valid())return failure(pars,"camera_pose_invalid",&l==&a?0:1);if(!valid_rotation(pose.R))return failure(pars,"camera_rotation_invalid",&l==&a?0:1);const auto zproj=project(X,pose,o.intr,o.brown);if(!zproj.valid())return failure(pars,"projection_invalid",&l==&a?0:1);if(!joint_visibility(g.data(),pose.C,X,true).visible())return failure(pars,"opaque_board_visibility",&l==&a?0:1);*uv=zproj.uv;return finite_array(*uv)?true:failure(pars,"nonfinite_UV",&l==&a?0:1);
  }
  bool roots(const double*const*pars,std::array<double,2>&roots,std::array<double,2>&den)const{
   const JointRowLayout*ls[2]={&a,&b};const std::vector<int>*maps[2]={&ma,&mb};const Vec2<double>obs[2]={u,v};
@@ -53,23 +68,23 @@ struct JointMotionFactorV1 {
    const auto h=e.head(g.data());e.R0_seed=matmul(matmul(rodrigues(h.b,p[l.reference_angles_slot][1]),h.R0),rodrigues(h.n,p[l.reference_angles_slot][0]));e.n_seed=h.n;e.b_seed=h.b;const Vec3<double>axis=std::abs(h.n[0])<.8?Vec3<double>{1,0,0}:Vec3<double>{0,1,0};e.n_tangent1=event_normalized(cross(h.n,axis));e.n_tangent2=cross(h.n,e.n_tangent1);for(int k=5;k<=10;++k)g[k]=0;
    e.blocks.clear();e.blocks.resize(e.n_controls+1);e.control_block_begin=1;e.blocks[0].values.assign(g.begin(),g.end());for(int k=0;k<e.n_controls;++k)e.blocks[k+1].values={NAN,NAN,NAN};
    for(std::size_t k=0;k<l.control_ids.size();++k){const auto*x=p[l.control_slots[k]]+l.control_offsets[k];e.blocks[1+l.control_ids[k]].values={x[0],x[1],x[2]};}
-   const auto*lat=pars[latent_slot];const auto X=EventModel::board_point(lat[0],lat[1]*g[4],g.data());const auto root=e.project_world_rs(X,l.frame_time,obs[side][1]);if(!root.valid||!root.unique)return false;roots[side]=root.row;
-   using K=ceres::Jet<double,1>;std::vector<std::vector<K>>store(sizes.size());std::vector<const K*>kp;for(std::size_t i=0;i<sizes.size();++i){for(int j=0;j<sizes[i];++j)store[i].emplace_back(pars[i][j]);kp.push_back(store[i].data());}K rw(root.row);rw.v[0]=1;Vec2<K>q;if(!raw(l,map,kp.data(),rw,&q))return false;den[side]=1-q[1].v[0];if(!std::isfinite(den[side])||std::abs(den[side])<1e-6||std::abs(q[1].a-root.row)>1e-7)return false;
+   const auto*lat=pars[latent_slot];const auto X=EventModel::board_point(lat[0],lat[1]*g[4],g.data());const auto root=e.project_world_rs(X,l.frame_time,obs[side][1]);if(!root.valid||!root.unique)return failure(pars,"true_RS_root_invalid_or_nonunique",side);roots[side]=root.row;
+   using K=ceres::Jet<double,1>;std::vector<std::vector<K>>store(sizes.size());std::vector<const K*>kp;for(std::size_t i=0;i<sizes.size();++i){for(int j=0;j<sizes[i];++j)store[i].emplace_back(pars[i][j]);kp.push_back(store[i].data());}K rw(root.row);rw.v[0]=1;Vec2<K>q;if(!raw(l,map,kp.data(),rw,&q))return false;den[side]=1-q[1].v[0];if(!std::isfinite(den[side])||std::abs(den[side])<1e-6||std::abs(q[1].a-root.row)>1e-7)return failure(pars,"true_RS_denominator_or_root_residual",side);
   }return true;
  }
  template<class T>bool operator()(T const*const*p,T*r)const{
   try{Vec2<T>x,y;if(!true_rs){if(!raw(a,ma,p,T(u[1]),&x)||!raw(b,mb,p,T(v[1]),&y))return false;}else{
    std::vector<double>key;std::vector<std::vector<double>>store(sizes.size());std::vector<const double*>ptr;for(std::size_t i=0;i<sizes.size();++i){for(int j=0;j<sizes[i];++j){const double q=event_scalar(p[i][j]);key.push_back(q);store[i].push_back(q);}ptr.push_back(store[i].data());}
-   std::array<double,2>rw,den;{std::lock_guard<std::mutex>lock(cache->mutex);if(!cache->has||cache->key!=key){cache->valid=roots(ptr.data(),cache->row,cache->den);cache->key=key;cache->has=true;}if(!cache->valid)return false;rw=cache->row;den=cache->den;}
+   std::array<double,2>rw,den;{std::lock_guard<std::mutex>lock(cache->mutex);if(!cache->has||cache->key!=key){cache->valid=roots(ptr.data(),cache->row,cache->den);cache->key=key;cache->has=true;}if(!cache->valid)return failure(p,"true_RS_root_invalid_cached");rw=cache->row;den=cache->den;}
    Vec2<T>xa,ya;if(!raw(a,ma,p,T(rw[0]),&xa)||!raw(b,mb,p,T(rw[1]),&ya))return false;
    const T ra=T(rw[0])+(xa[1]-T(event_scalar(xa[1])))/T(den[0]),rb=T(rw[1])+(ya[1]-T(event_scalar(ya[1])))/T(den[1]);
    if(!raw(a,ma,p,ra,&x)||!raw(b,mb,p,rb,&y))return false;
-  }for(int k=0;k<2;++k){r[k]=T(scale0)*(x[k]-T(u[k]));r[k+2]=T(scale1)*(y[k]-T(v[k]));}return true;}catch(...){return false;}
+  }for(int k=0;k<2;++k){r[k]=T(scale0)*(x[k]-T(u[k]));r[k+2]=T(scale1)*(y[k]-T(v[k]));}return true;}catch(const std::exception&e){return failure(p,e.what());}catch(...){return failure(p,"non_std_exception");}
  }
 };
 inline std::pair<ceres::CostFunction*,std::vector<double*>> make_joint_motion_factor_v1(JointEventModel&m,JointMotionObservationV1&r,bool true_rs){
- auto a=m.layout(r.shot,0,0,r.pts0),b=m.layout(r.shot,0,0,r.pts1);a.geometry_slot=a.advertisement_slot=a.width_slot=-1;b.geometry_slot=b.advertisement_slot=b.width_slot=-1;
- auto*f=new JointMotionFactorV1;f->model=&m;f->a=a;f->b=b;f->u=r.uv0;f->v=r.uv1;f->scale0=r.scale0;f->scale1=r.scale1;f->true_rs=true_rs;std::map<int,int>slots;std::vector<double*>p;
+ auto a=m.layout(r.shot,0,0,r.pts0,-1,0,0.),b=m.layout(r.shot,0,0,r.pts1,-1,0,0.);a.geometry_slot=a.advertisement_slot=a.width_slot=-1;b.geometry_slot=b.advertisement_slot=b.width_slot=-1;a.shape_segment=b.shape_segment=-1;a.shape_vertex_slots=b.shape_vertex_slots={{-1,-1}};
+ auto*f=new JointMotionFactorV1;f->model=&m;f->source=&r;f->a=a;f->b=b;f->u=r.uv0;f->v=r.uv1;f->scale0=r.scale0;f->scale1=r.scale1;f->true_rs=true_rs;std::map<int,int>slots;std::vector<double*>p;
  auto bind=[&](const JointRowLayout&l,std::vector<int>&map){map.assign(l.block_ids.size(),-1);std::vector<int>required={l.scene_slot,l.rig_slot,l.optics_slot,l.reference_angles_slot};required.insert(required.end(),l.control_slots.begin(),l.control_slots.end());for(int k:required){int id=l.block_ids.at(k);if(!slots.count(id)){slots[id]=int(p.size());p.push_back(m.blocks[id].values.data());f->sizes.push_back(int(m.blocks[id].values.size()));}map[k]=slots.at(id);}};bind(a,f->ma);bind(b,f->mb);f->latent_slot=int(p.size());p.push_back(r.latent.data());f->sizes.push_back(2);
  auto*cost=new ceres::DynamicAutoDiffCostFunction<JointMotionFactorV1,64>(f);for(int size:f->sizes)cost->AddParameterBlock(size);cost->SetNumResiduals(4);return {cost,std::move(p)};
 }

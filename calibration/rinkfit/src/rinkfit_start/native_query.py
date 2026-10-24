@@ -23,6 +23,35 @@ def load_query_packet(path, read_array, semantic_hash, source_rows):
     return m,arrays
 
 
+
+def select_query_rows(curves, source_rows):
+    """Select a numerical active view while keeping the raw Query packet intact."""
+    source=np.asarray(curves['source_rows'],dtype=np.int64)
+    requested=np.asarray(source_rows,dtype=np.int64)
+    if source.ndim!=1 or requested.ndim!=1 or len(np.unique(source))!=len(source) or len(np.unique(requested))!=len(requested):
+        raise ValueError('Query source identities must be unique vectors')
+    position={int(row):i for i,row in enumerate(source)}
+    if any(int(row)not in position for row in requested):
+        raise ValueError('An active genuine-profile source has no raw Query')
+    take=np.asarray([position[int(row)]for row in requested],dtype=np.int64)
+    offsets=np.asarray(curves['offsets'])
+    if offsets.shape!=(len(source)+1,) or offsets[0]!=0 or offsets[-1]!=len(curves['alpha']) or np.any(np.diff(offsets)<2):
+        raise ValueError('Raw Query sample offsets do not match its finite curves')
+    parts=[np.arange(int(offsets[i]),int(offsets[i+1]),dtype=np.int64)for i in take]
+    sample=np.concatenate(parts)if parts else np.empty(0,dtype=np.int64)
+    result={}
+    for key,value in curves.items():
+        value=np.asarray(value)
+        if key=='source_rows':result[key]=value[take].copy()
+        elif key=='offsets':result[key]=np.r_[0,np.cumsum([len(part)for part in parts])].astype(value.dtype)
+        elif key in ('alpha','uv'):result[key]=value[sample].copy()
+        elif key in ('bounds','numerator_u','numerator_v','denominator'):
+            if value.shape[:1]!=(len(source),):raise ValueError('Raw Query coefficient count differs from its source keys')
+            result[key]=value[take].copy()
+        else:raise ValueError('Unknown raw Query array '+key)
+    return result
+
+
 def rational_query(curves, alpha):
     a=np.asarray(alpha,float);coeff=np.stack((curves['numerator_u'],curves['numerator_v'],curves['denominator']),axis=1)
     value=((coeff[:,:,3]*a[:,None]+coeff[:,:,2])*a[:,None]+coeff[:,:,1])*a[:,None]+coeff[:,:,0]

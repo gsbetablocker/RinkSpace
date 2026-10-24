@@ -1,0 +1,418 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -182,7 +182,7 @@
+ 
+ # Eigen.
+ # Eigen delivers Eigen3Config.cmake since v3.3.3
+-find_package(Eigen3 3.3 REQUIRED)
++find_package(Eigen3 5.0 REQUIRED)
+ if (Eigen3_FOUND)
+   message("-- Found Eigen version ${Eigen3_VERSION}: ${Eigen3_DIR}")
+   if (CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64.*|AARCH64.*)" AND
+@@ -249,7 +249,13 @@
+       enable_language(CUDA)
+       if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.18")
+         # Support Maxwell, Pascal, Volta, Turing, and Ampere GPUs.
+-        set(CMAKE_CUDA_ARCHITECTURES "50;60;70;80")
++        if (NOT CMAKE_CUDA_ARCHITECTURES)
++          if (NOT CMAKE_CUDA_ARCHITECTURES)
++          if (NOT CMAKE_CUDA_ARCHITECTURES)
++          set(CMAKE_CUDA_ARCHITECTURES "50;60;70;80")
++        endif()
++        endif()
++        endif()
+         message("-- Setting CUDA Architecture to ${CMAKE_CUDA_ARCHITECTURES}")
+       endif()
+       list(APPEND CERES_CUDA_LIBRARIES
+--- a/internal/ceres/evaluator.h
++++ b/internal/ceres/evaluator.h
+@@ -147,6 +147,17 @@
+                     const double* delta,
+                     double* state_plus_delta) const = 0;
+ 
++  // Actual tangent displacement between two ambient states.  Implemented by
++  // ProgramEvaluator for the projected trust-region model.  Other evaluators
++  // may opt out by returning false.
++  virtual bool Minus(const double* y, const double* x, double* y_minus_x) const {
++    return false;
++  }
++
++  // Optional first-order domain check for an explicitly registered local
++  // manifold's gradient norm probe. Other evaluators preserve fatal failure.
++  virtual bool LocalGradientProbeDomain(const double*,const double*,double*) const { return false; }
++
+   // The number of parameters in the optimization problem.
+   virtual int NumParameters() const = 0;
+ 
+--- a/internal/ceres/program_evaluator.h
++++ b/internal/ceres/program_evaluator.h
+@@ -93,6 +93,7 @@
+ #include <vector>
+ 
+ #include "ceres/evaluation_callback.h"
++#include "ceres/local_gradient_norm_probe.h"
+ #include "ceres/execution_summary.h"
+ #include "ceres/internal/eigen.h"
+ #include "ceres/parallel_for.h"
+@@ -307,6 +308,44 @@
+         state, delta, state_plus_delta, options_.context, options_.num_threads);
+   }
+ 
++  bool LocalGradientProbeDomain(const double* state,const double* delta,double* mapped) const final {
++    bool has_local=false;
++    for(auto* block:program_->parameter_blocks()) {
++      const int n=block->Size(),k=block->TangentSize();
++      const double* x=state+block->state_offset();
++      const double* d=delta+block->delta_offset();
++      double* out=mapped+block->state_offset();
++      const bool local=RinkfitCeresLocalNormProbeAllowedV1(block->manifold());
++      has_local=has_local||local;
++      // A failed nonlocal chart retains the original fatal semantics.
++      if(!local&&!block->Plus(x,d,out))return false;
++      const double* A=block->PlusJacobian();
++      for(int a=0;a<n;++a){double v=0;if(A){for(int c=0;c<k;++c)v+=A[a*k+c]*d[c];}else if(a<k)v=d[a];if(!std::isfinite(v))return false;out[a]=v;}
++    }
++    return has_local;
++  }
++
++  bool Minus(const double* y, const double* x, double* y_minus_x) const final {
++    std::atomic<bool> abort(false);
++    const auto& blocks = program_->parameter_blocks();
++    ParallelFor(options_.context, 0, blocks.size(), options_.num_threads,
++                [&](int block_id) {
++      if (abort) return;
++      const auto* block = blocks[block_id];
++      if (block->TangentSize() == 0) return;
++      const double* bx = x + block->state_offset();
++      const double* by = y + block->state_offset();
++      double* bd = y_minus_x + block->delta_offset();
++      if (const auto* manifold = block->manifold()) {
++        if (!manifold->Minus(by, bx, bd)) abort = true;
++      } else {
++        VectorRef(bd, block->Size()) =
++            ConstVectorRef(by, block->Size()) - ConstVectorRef(bx, block->Size());
++      }
++    });
++    return !abort;
++  }
++
+   int NumParameters() const final { return program_->NumParameters(); }
+   int NumEffectiveParameters() const final {
+     return program_->NumEffectiveParameters();
+--- a/internal/ceres/trust_region_minimizer.cc
++++ b/internal/ceres/trust_region_minimizer.cc
+@@ -38,6 +38,9 @@
+ #include <memory>
+ #include <string>
+ #include <vector>
++#include <filesystem>
++#include <fstream>
++#include <iomanip>
+ 
+ #include "Eigen/Core"
+ #include "ceres/array_utils.h"
+@@ -46,6 +49,7 @@
+ #include "ceres/evaluator.h"
+ #include "ceres/file.h"
+ #include "ceres/line_search.h"
++#include "ceres/local_gradient_norm_probe.h"
+ #include "ceres/parallel_for.h"
+ #include "ceres/stringprintf.h"
+ #include "ceres/types.h"
+@@ -62,6 +66,10 @@
+   } while (0)
+ 
+ namespace ceres::internal {
++namespace { thread_local LocalGradientNormProbeClassifierV1 local_norm_probe_classifier=nullptr; }
++extern "C" CERES_EXPORT LocalGradientNormProbeClassifierV1 RinkfitCeresSetLocalNormProbeClassifierV1(LocalGradientNormProbeClassifierV1 classifier){const auto previous=local_norm_probe_classifier;local_norm_probe_classifier=classifier;return previous;}
++extern "C" CERES_EXPORT bool RinkfitCeresLocalNormProbeAllowedV1(const void* manifold){return local_norm_probe_classifier&&manifold&&local_norm_probe_classifier(manifold);}
++
+ 
+ void TrustRegionMinimizer::Minimize(const Minimizer::Options& options,
+                                     double* parameters,
+@@ -106,7 +114,16 @@
+     }
+ 
+     ComputeCandidatePointAndEvaluateCost();
++    if (!iteration_summary_.step_is_valid) {
++      RETURN_IF_ERROR_AND_LOG(HandleInvalidStep());
++      continue;
++    }
+     DoInnerIterationsIfNeeded();
++
++    // Report the actual ambient displacement even for the first accepted
++    // step. ParameterToleranceReached is deliberately skipped until a prior
++    // success, but the iteration report must not inherit its default zero.
++    iteration_summary_.step_norm = (x_ - candidate_x_).norm();
+ 
+     if (atleast_one_successful_step && ParameterToleranceReached()) {
+       return;
+@@ -285,19 +302,29 @@
+   // Where the Plus operator lifts the negative gradient to the
+   // ambient space, adds it to x and projects it on the hypercube
+   // defined by the bounds.
++  const auto norm_probe = LocalGradientNormProbe(
++      x_.data(), num_parameters_, gradient_.data(), num_effective_parameters_,
++      negative_gradient_.data(), projected_gradient_step_.data(),
++      [&](const double* x, const double* d, double* y) {
++        return evaluator_->Plus(x, d, y);
++      }, [&](const double* d, double* mapped) {
++        return evaluator_->LocalGradientProbeDomain(x_.data(),d,mapped);
++      });
+   negative_gradient_ = -gradient_;
+-  if (!evaluator_->Plus(x_.data(),
+-                        negative_gradient_.data(),
+-                        projected_gradient_step_.data())) {
+-    solver_summary_->message =
+-        "projected_gradient_step = Plus(x, -gradient) failed.";
++  if (!norm_probe.valid) {
++    solver_summary_->message = "Nonfinite local gradient-norm probe.";
+     solver_summary_->termination_type = FAILURE;
+     return false;
+   }
+-
+-  iteration_summary_.gradient_max_norm =
+-      (x_ - projected_gradient_step_).lpNorm<Eigen::Infinity>();
+-  iteration_summary_.gradient_norm = (x_ - projected_gradient_step_).norm();
++  if (norm_probe.rejected_probes) {
++    LOG(WARNING) << "Local manifold gradient-norm probe: rejected="
++                 << norm_probe.rejected_probes << ", scale=" << norm_probe.scale
++                 << ", gradient_termination_disabled=" << norm_probe.conservative
++                 << ", local_mapping_estimate=" << norm_probe.local_max_norm
++                 << "; trust-region trial and line-search direction unchanged.";
++  }
++  iteration_summary_.gradient_max_norm = norm_probe.max_norm;
++  iteration_summary_.gradient_norm = norm_probe.norm;
+   return true;
+ }
+ 
+@@ -413,6 +440,12 @@
+ 
+   if (strategy_summary.termination_type ==
+       LinearSolverTerminationType::FAILURE) {
++    if (is_not_silent_) LOG(WARNING)
++        << "Trust-region trial rejected: reason=linear_solver_failure"
++        << " iteration=" << iteration_summary_.iteration
++        << " radius=" << strategy_->Radius()
++        << " linear_iterations=" << strategy_summary.num_iterations
++        << " linear_residual_norm=" << strategy_summary.residual_norm;
+     return true;
+   }
+ 
+@@ -450,7 +483,11 @@
+   }
+ 
+   if (is_not_silent_ && !iteration_summary_.step_is_valid) {
+-    VLOG(1) << "Invalid step: current_cost: " << x_cost_
++    LOG(WARNING) << "Trust-region trial rejected: reason=unprojected_model_not_descent"
++            << " iteration=" << iteration_summary_.iteration
++            << " radius=" << strategy_->Radius()
++            << " step_norm=" << trust_region_step_.norm()
++            << " current_cost: " << x_cost_
+             << " absolute model cost change: " << model_cost_change_
+             << " relative model cost change: "
+             << (model_cost_change_ / x_cost_);
+@@ -614,7 +651,15 @@
+       LineSearch::Create(ceres::ARMIJO, line_search_options, &message));
+   LineSearch::Summary line_search_summary;
+   line_search_function.Init(x, *delta);
+-  line_search->Search(1.0, cost, gradient.dot(*delta), &line_search_summary);
++  line_search_function.SetProjectedModelGradient(&gradient);
++  const double directional_slope = gradient.dot(*delta);
++  const char* trace_directory=std::getenv("RINKFIT_CERES_FIRST_PROPOSAL_DIR");
++  const bool save_first=trace_directory&&iteration_summary_.iteration==1&&!std::filesystem::exists(std::filesystem::path(trace_directory)/"first_gn.json");
++  if(save_first){const std::filesystem::path dir(trace_directory);std::filesystem::create_directories(dir);auto raw=[&](const char*name,const Vector&v){std::ofstream out(dir/name,std::ios::binary);out.write(reinterpret_cast<const char*>(v.data()),v.size()*sizeof(double));};raw("first_gn_base.f64",x);raw("first_gn_tangent.f64",*delta);raw("first_gn_gradient.f64",gradient);std::ofstream meta(dir/"first_gn.json");meta<<std::setprecision(17)<<R"({"ambient_values":)"<<x.size()<<R"(,"tangent_values":)"<<delta->size()<<R"(,"cost":)"<<cost<<R"(,"radius":)"<<strategy_->Radius()<<R"(,"direction_norm":)"<<delta->norm()<<R"(,"directional_slope":)"<<directional_slope<<R"(,"unprojected_model_decrease":)"<<model_cost_change_<<R"(,"before_any_diagnostic_Minus":true})";}
++  LOG(INFO)<<"Actual GN proposal: iteration="<<iteration_summary_.iteration<<" radius="<<strategy_->Radius()<<" direction_norm="<<delta->norm()<<" directional_slope="<<directional_slope<<" unprojected_model_decrease="<<model_cost_change_;
++  line_search->Search(1.0, cost, directional_slope, &line_search_summary);
++  if(save_first){std::ofstream trace(std::filesystem::path(trace_directory)/"first_line_search.csv");trace<<std::setprecision(17)<<"step,Plus,Evaluate,Minus,actual_cost_change,actual_projected_linear_change,original_linear_change\n";for(const auto&v:line_search_function.projected_trace())trace<<v.step<<','<<v.plus<<','<<v.value<<','<<v.minus<<','<<(v.value?v.cost-cost:0.)<<','<<v.linear_change<<','<<directional_slope*v.step<<'\n';}
++
+ 
+   solver_summary_->num_line_search_steps += line_search_summary.num_iterations;
+   solver_summary_->line_search_cost_evaluation_time_in_seconds +=
+@@ -628,6 +673,25 @@
+ 
+   if (line_search_summary.success) {
+     *delta *= line_search_summary.optimal_point.x;
++  } else if (is_not_silent_) {
++    LOG(WARNING) << "Trust-region projected line search failed: iteration="
++                 << iteration_summary_.iteration
++                 << " radius=" << strategy_->Radius()
++                 << " direction_norm=" << delta->norm()
++                 << " directional_slope=" << directional_slope
++                 << " iterations=" << line_search_summary.num_iterations
++                 << " cost_evaluations=" << line_search_summary.num_function_evaluations
++                 << " gradient_evaluations=" << line_search_summary.num_gradient_evaluations
++                 << " optimal_value_valid=" << line_search_summary.optimal_point.value_is_valid
++                 << " optimal_step=" << line_search_summary.optimal_point.x
++                 << " error=" << line_search_summary.error;
++    for(const auto& trial:line_search_function.projected_trace())LOG(WARNING)
++      << "Projected trial sample: iteration=" << iteration_summary_.iteration
++      << " step=" << trial.step << " Plus=" << trial.plus
++      << " Evaluate=" << trial.value << " Minus=" << trial.minus
++      << " actual_cost_change=" << (trial.value?trial.cost-cost:0.)
++      << " actual_projected_linear_change=" << trial.linear_change
++      << " original_linear_change=" << directional_slope*trial.step;
+   }
+ }
+ 
+@@ -775,8 +839,53 @@
+       LOG(WARNING) << "x_plus_delta = Plus(x, delta) failed. "
+                    << "Treating it as a step with infinite cost";
+     }
++    iteration_summary_.step_is_valid = false;
+     candidate_cost_ = std::numeric_limits<double>::max();
+     return;
++  }
++
++  // Bounds (and optional line search) change the proposed step.  Evaluate
++  // the same existing Gauss-Newton model at the step actually taken, rather
++  // than attributing its clipped-away part to poor model agreement.
++  if (options_.is_constrained) {
++    const double unprojected_model_cost_change = model_cost_change_;
++    const bool minus_valid = evaluator_->Minus(candidate_x_.data(), x_.data(), delta_.data());
++    if (!minus_valid || !delta_.allFinite()) {
++      if (is_not_silent_) LOG(WARNING)
++          << "Trust-region trial rejected: reason=projected_minus_failed"
++          << " iteration=" << iteration_summary_.iteration
++          << " radius=" << strategy_->Radius()
++          << " minus_valid=" << minus_valid
++          << " tangent_finite=" << delta_.allFinite()
++          << " unprojected_model_decrease=" << unprojected_model_cost_change;
++      iteration_summary_.step_is_valid = false;
++      candidate_cost_ = std::numeric_limits<double>::max();
++      return;
++    }
++    ParallelAssign(options_.context, options_.num_threads, trust_region_step_,
++                   (delta_.array() / jacobian_scaling_.array()));
++    ParallelSetZero(options_.context, options_.num_threads, model_residuals_);
++    jacobian_->RightMultiplyAndAccumulate(trust_region_step_.data(),
++                                         model_residuals_.data(),
++                                         options_.context,
++                                         options_.num_threads);
++    model_cost_change_ = -Dot(model_residuals_,
++                             residuals_ + model_residuals_ / 2.0,
++                             options_.context, options_.num_threads);
++    iteration_summary_.step_is_valid =
++        std::isfinite(model_cost_change_) && model_cost_change_ > 0.0;
++    if (!iteration_summary_.step_is_valid) {
++      if (is_not_silent_) LOG(WARNING)
++          << "Trust-region trial rejected: reason=projected_model_not_descent"
++          << " iteration=" << iteration_summary_.iteration
++          << " radius=" << strategy_->Radius()
++          << " tangent_step_norm=" << delta_.norm()
++          << " scaled_step_norm=" << trust_region_step_.norm()
++          << " unprojected_model_decrease=" << unprojected_model_cost_change
++          << " projected_model_decrease=" << model_cost_change_;
++      candidate_cost_ = std::numeric_limits<double>::max();
++      return;
++    }
+   }
+ 
+   if (!evaluator_->Evaluate(
+@@ -785,6 +894,7 @@
+       LOG(WARNING) << "Step failed to evaluate. "
+                    << "Treating it as a step with infinite cost";
+     }
++    iteration_summary_.step_is_valid = false;
+     candidate_cost_ = std::numeric_limits<double>::max();
+   }
+ }
+--- /dev/null
++++ b/internal/ceres/local_gradient_norm_probe.h
+@@ -0,0 +1,38 @@
++#ifndef CERES_INTERNAL_LOCAL_GRADIENT_NORM_PROBE_H_
++#define CERES_INTERNAL_LOCAL_GRADIENT_NORM_PROBE_H_
++#include "ceres/internal/export.h"
++#include <algorithm>
++#include <cmath>
++#include <limits>
++namespace ceres::internal {
++using LocalGradientNormProbeClassifierV1=bool(*)(const void*);
++extern "C" CERES_EXPORT LocalGradientNormProbeClassifierV1 RinkfitCeresSetLocalNormProbeClassifierV1(LocalGradientNormProbeClassifierV1);
++extern "C" CERES_EXPORT bool RinkfitCeresLocalNormProbeAllowedV1(const void*);
++struct LocalGradientNormProbeResult {
++ bool valid=false,conservative=false;double max_norm=0,norm=0,local_max_norm=0,local_norm=0,scale=1;int rejected_probes=0;
++};
++// Preserve the original unit gradient mapping whenever it is defined. Only
++// an explicitly registered local chart may backtrack a norm probe. A smaller
++// mapping is diagnostic, not an upper bound on the unit mapping: any unit
++// failure disables this evaluation's gradient-tolerance termination.
++template<class Plus,class Domain>
++LocalGradientNormProbeResult LocalGradientNormProbe(const double*x,int ambient,const double*gradient,int tangent,double*delta,double*projected,const Plus&plus,const Domain&domain){
++ LocalGradientNormProbeResult out;double raw_max=0;for(int j=0;j<tangent;++j){if(!std::isfinite(gradient[j]))return out;raw_max=std::max(raw_max,std::abs(gradient[j]));}for(int i=0;i<ambient;++i)if(!std::isfinite(x[i]))return out;
++ double minimum_scale=0;
++ for(;;){for(int j=0;j<tangent;++j)delta[j]=-out.scale*gradient[j];bool valid=plus(x,delta,projected);double largest=0,norm=0;
++  if(valid)for(int i=0;i<ambient;++i){if(!std::isfinite(projected[i])){valid=false;break;}const double d=x[i]-projected[i];largest=std::max(largest,std::abs(d));norm=std::hypot(norm,d);}
++  if(valid){out.valid=true;out.local_max_norm=largest/out.scale;out.local_norm=norm/out.scale;if(out.rejected_probes){out.conservative=true;out.max_norm=out.norm=std::numeric_limits<double>::max();}else{out.max_norm=largest;out.norm=norm;}return out;}
++  ++out.rejected_probes;
++  if(out.rejected_probes==1){
++   // Domain verifies that no unrelated manifold failed and maps this exact
++   // tangent direction through the original PlusJacobian, without residuals.
++   if(!domain(delta,projected))return out;minimum_scale=std::numeric_limits<double>::infinity();
++   for(int i=0;i<ambient;++i){if(!std::isfinite(projected[i]))return out;const double a=std::abs(projected[i]);if(a>0)minimum_scale=std::min(minimum_scale,64*std::numeric_limits<double>::epsilon()*std::max(1.,std::abs(x[i]))/a);}
++   if(!std::isfinite(minimum_scale)||!(raw_max>0))return out;
++  }
++  const double next=out.rejected_probes==1?std::min(.5,1./std::max(1.,raw_max)):out.scale*.5;
++  if(!(next>minimum_scale)||next==out.scale)return out;out.scale=next;
++ }
++}
++}
++#endif
+--- a/internal/ceres/line_search.h
++++ b/internal/ceres/line_search.h
+@@ -36,6 +36,7 @@
+ #include <memory>
+ #include <string>
+ #include <vector>
++#include <cstdlib>
+ 
+ #include "ceres/function_sample.h"
+ #include "ceres/internal/eigen.h"
+@@ -228,6 +229,9 @@
+   // corresponding fields have numerically valid values or not.
+   void Evaluate(double x, bool evaluate_gradient, FunctionSample* output);
+ 
++  struct ProjectedTrialTrace { double step=0, cost=0, linear_change=0; bool plus=false, value=false, minus=false; };
++  void SetProjectedModelGradient(const Vector* gradient) { model_gradient_=gradient; diagnostic_minus_=std::getenv("RINKFIT_DISABLE_PROJECTED_TRACE_MINUS_V1")==nullptr; projected_trace_.clear(); }
++  const std::vector<ProjectedTrialTrace>& projected_trace() const { return projected_trace_; }
+   double DirectionInfinityNorm() const;
+ 
+   // Resets to now, the start point for the results from TimeStatistics().
+@@ -239,6 +243,10 @@
+ 
+  private:
+   Evaluator* evaluator_;
++  const Vector* model_gradient_=nullptr;
++  bool diagnostic_minus_=true;
++  std::vector<ProjectedTrialTrace> projected_trace_;
++  Vector projected_delta_;
+   Vector position_;
+   Vector direction_;
+ 
+--- a/internal/ceres/line_search.cc
++++ b/internal/ceres/line_search.cc
+@@ -107,6 +107,8 @@
+   output->gradient_is_valid = false;
+   output->vector_gradient_is_valid = false;
+ 
++  ProjectedTrialTrace* trace=nullptr;
++  if(model_gradient_){projected_trace_.push_back({});trace=&projected_trace_.back();trace->step=x;}
+   scaled_direction_ = output->x * direction_;
+   output->vector_x.resize(position_.rows(), 1);
+   if (!evaluator_->Plus(position_.data(),
+@@ -115,6 +117,7 @@
+     return;
+   }
+   output->vector_x_is_valid = true;
++  if(trace){trace->plus=true;if(diagnostic_minus_){projected_delta_.resize(direction_.size());trace->minus=evaluator_->Minus(output->vector_x.data(),position_.data(),projected_delta_.data())&&projected_delta_.allFinite();if(trace->minus)trace->linear_change=model_gradient_->dot(projected_delta_);}}
+ 
+   double* gradient = nullptr;
+   if (evaluate_gradient) {
+@@ -129,6 +132,7 @@
+   }
+ 
+   output->value_is_valid = true;
++  if(trace){trace->value=true;trace->cost=output->value;}
+   if (!evaluate_gradient) {
+     return;
+   }

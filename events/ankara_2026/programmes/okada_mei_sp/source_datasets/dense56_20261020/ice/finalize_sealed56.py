@@ -4,7 +4,7 @@ BINDING_FILE=Path(r'D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/d
 BINDING=json.load(open(BINDING_FILE,encoding='utf8'))
 assert BINDING.get('accepted_for_source_overlay')is True,'Final board source generation has not passed review'
 BOARD_NAME=BINDING['board_generation'];FINAL_BOARD_MANIFEST=Path(BINDING['board_manifest_file'])
-exec(open(r'D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_ice_v1/reader56_exact.py',encoding='utf8').read().split('def main():')[0].replace('shape_v3',BOARD_NAME).replace('SAM2_8px','SAM2_footwear_composite_8px').replace('qualified_v3_boardfoot','qualified_'+BOARD_NAME+'_boardfoot').replace("mp=R/'dense56_masks_v1/masks'/f'{pts}.png';","mp=Path(mask_index[pts]['mask_file']);").replace("old=cv2.dilate((raw>0).astype('u1'),np.ones((11,11),'u1'))>0", "old_raw=cv2.imread(str(mask_index[pts].get('parent_mask_file',mp)),0);old=cv2.dilate((old_raw>0).astype('u1'),np.ones((11,11),'u1'))>0"))
+exec(Path(__file__).with_name('reader56_exact.py').read_text(encoding='utf8').split('def main():')[0].replace('shape_v3',BOARD_NAME).replace('SAM2_8px','SAM2_footwear_composite_8px').replace('qualified_v3_boardfoot','qualified_'+BOARD_NAME+'_boardfoot').replace("mp=R/'dense56_masks_v1/masks'/f'{pts}.png';","mp=Path(mask_index[pts]['mask_file']);").replace("old=cv2.dilate((raw>0).astype('u1'),np.ones((11,11),'u1'))>0", "old_raw=cv2.imread(str(mask_index[pts].get('parent_mask_file',mp)),0);old=cv2.dilate((old_raw>0).astype('u1'),np.ones((11,11),'u1'))>0"))
 FINAL_PERSON_INDEX=Path(BINDING['final_person_mask_index_file'])
 assert TH(FINAL_PERSON_INDEX.read_bytes()).hexdigest()==BINDING['final_person_mask_index_sha256'],'Composite person mask index changed'
 mask_index={json.loads(l)['native_pts']:json.loads(l)for l in gzip.open(FINAL_PERSON_INDEX,'rt',encoding='utf8')}
@@ -26,6 +26,7 @@ def mask_frame(rgb,pts,sid):
 
 
 import heapq,itertools
+from rinkfit_joint.finite_ring_source import qualify_existing_target_interfaces
 
 def sha(path):
  h=TH()
@@ -67,7 +68,7 @@ def main():
   for r in read_lines(p['path']/'rows.jsonl.gz',p['lo'],p['hi']):
    if r['shot_id']!=sid:continue
    r['_input_part']=p['id'];r['_input_kind']=p['kind'];r['_control_file']=str(p['path']/'source_band_controls.jsonl.gz');yield r
- stream=heapq.merge(*[tagged(p)for p in parts],key=lambda r:r['native_pts']);groups=itertools.groupby(stream,key=lambda r:r['native_pts']);current=next(groups,None);out=O/'canonical'/sid;out.mkdir(parents=True,exist_ok=True);counts=collections.Counter();features=collections.Counter();omissions=collections.Counter();n=0;total=0;recovered_center=0;recovered_support=0;v4_new=0;histfeatures=collections.Counter();sourceeffects=collections.Counter();clean_recovered=0;start=time.monotonic();seen=[];minpts=10**9;maxpts=0
+ stream=heapq.merge(*[tagged(p)for p in parts],key=lambda r:r['native_pts']);groups=itertools.groupby(stream,key=lambda r:r['native_pts']);current=next(groups,None);out=O/'sealed_layer_unique_v3'/sid;out.mkdir(parents=True,exist_ok=False);counts=collections.Counter();features=collections.Counter();omissions=collections.Counter();n=0;total=0;recovered_center=0;recovered_support=0;v4_new=0;histfeatures=collections.Counter();sourceeffects=collections.Counter();clean_recovered=0;start=time.monotonic();seen=[];minpts=10**9;maxpts=0
  with gzip.open(out/'rows.jsonl.gz','wt',encoding='utf8',compresslevel=3)as wr,gzip.open(out/'coverage.jsonl.gz','wt',encoding='utf8',compresslevel=3)as wc,gzip.open(out/'exclusions.jsonl.gz','wt',encoding='utf8',compresslevel=3)as we,av.open(str(D/'events/ankara_2026/programmes/okada_mei_sp/Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4'))as con:
   st=con.streams.video[0];con.seek(a,stream=st,backward=True)
   for fr in con.decode(st):
@@ -77,9 +78,13 @@ def main():
    rgb=fr.to_ndarray(format='rgb24');digest=TH(rgb.tobytes()).hexdigest();assert digest==basecov[pts]['native_RGB_sha256'];mask,ginfo=mask_frame(rgb,pts,sid);raw=[]
    if current and current[0]==pts:raw=list(current[1]);current=next(groups,None)
    dc=deltacov.get(pts);replace={fe for(pp,fe)in replacement_owner if pp==pts};sc=suppcov.get(pts);red_count=sum(r['feature_id']=='unbound.ice.flat_red_static_spot'and(r['_input_part']==replacement_owner.get((pts,r['feature_id']),r['_input_part']))for r in raw);accepted=[];fc=collections.Counter();kc=collections.Counter();rc=collections.Counter();opened_uv=0;opened_support=0;newfoot=0;hfc=collections.Counter();input_counts=collections.Counter();frame_clean_recovered=0
-   for r in raw:
+   interface_reviews=qualify_existing_target_interfaces(rgb,mask,raw,binding=dict(source_pts=pts,source_sha256=source_sha,time_base='1/12800',native_hw=[1080,1920],shot_id=sid))
+   for r,interface_review in zip(raw,interface_reviews):
     part=r.pop('_input_part');kind=r.pop('_input_kind');ctrl=r.pop('_control_file');reason=None
     if (pts,r['feature_id'])in replacement_owner and part!=replacement_owner[(pts,r['feature_id'])]:reason='same_current_frame_feature_replaced_by_complete_final_board_domain_RGB_reread'
+    if interface_review is not None:
+     r['source_interface_uniqueness']=interface_review
+     if interface_review.get('source_identity_decision')=='unknown' and reason is None:reason='unknown_current_ring_layer_interface_not_uniquely_identified'
     ps=r.get('pixel_support',{})
     if'side_interface_quartiles_uv'not in ps and'signed_interface_quartiles_uv'in ps:ps['side_interface_quartiles_uv']=[ps['signed_interface_quartiles_uv']]
     if'normal'not in ps and'profile_normal'in ps:ps['normal']=ps['profile_normal']
@@ -91,8 +96,8 @@ def main():
     if reason is None and r['feature_id']=='unbound.ice.flat_red_static_spot'and red_count<4:reason='unknown_current_red_entry_exit_fragment_signed_interface_material_identity_not_resolved'
     if edges.size:assert len(edges)==2 and np.linalg.norm(u-edges.mean(0))<1e-6
     if reason:
-     we.write(json.dumps(dict(shot_id=sid,native_pts=pts,source_row_id=r['source_row_id'],input_part=part,qualification='unknown'if reason.startswith('unknown')else'exclude',reason=reason),separators=(',',':'))+'\n');rc[reason]+=1;continue
-    support=np.vstack([u[None],edges,qs]);xy=np.rint(support).astype(int);newcenter=bool(LAST_OLD_MASK[int(round(u[1])),int(round(u[0]))]);newsupport=bool(LAST_OLD_MASK[xy[:,1],xy[:,0]].any());ps['current_UV_in_newly_opened_source_domain']=newcenter;ps['old_conservative_domain_would_exclude_material_support']=newsupport;r['source_UV_is_direct_measurement']=True;r['source_input_part']=part;r['source_parent_generation']=r.get('canonical_generation');r['canonical_generation']='dense56_ice_source_sealed_'+BOARD_NAME;r['source_surface_qualification']='current_static_ice_material_with_final_actual_surface_gate';r['occlusion']=ginfo['source_domain'];r['source_uv_from_model']=False
+     we.write(json.dumps(dict(shot_id=sid,native_pts=pts,source_row_id=r['source_row_id'],input_part=part,qualification='unknown'if reason.startswith('unknown')else'exclude',reason=reason,uv=r['uv'],feature_id=r['feature_id'],source_interface_uniqueness=interface_review),separators=(',',':'))+'\n');rc[reason]+=1;continue
+    support=np.vstack([u[None],edges,qs]);xy=np.rint(support).astype(int);newcenter=bool(LAST_OLD_MASK[int(round(u[1])),int(round(u[0]))]);newsupport=bool(LAST_OLD_MASK[xy[:,1],xy[:,0]].any());ps['current_UV_in_newly_opened_source_domain']=newcenter;ps['old_conservative_domain_would_exclude_material_support']=newsupport;r['source_UV_is_direct_measurement']=True;r['source_input_part']=part;r['source_parent_generation']=r.get('canonical_generation');r['canonical_generation']='dense56_ice_source_sealed_layer_unique_v3_'+BOARD_NAME;r['source_surface_qualification']='current_static_ice_material_with_final_actual_surface_gate';r['occlusion']=ginfo['source_domain'];r['source_uv_from_model']=False
     if r.get('navigation',{}).get('whole_current_source_band'):r['navigation']['source_file']=ctrl
     if r['feature_id']=='unbound.ice.flat_red_static_spot':r['source_material_qualification']=dict(status='supported',basis='prior confirmed native red spot ROIs plus current signed material interface and dense complete-sequence visual review',exact_world_identity='unbound_not_for_physical_fit')
     if r.get('navigation',{}).get('registered_historical_source_guidance'):hfc[r['feature_id']]+=1

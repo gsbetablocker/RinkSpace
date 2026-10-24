@@ -12,6 +12,12 @@ def read(p):return json.loads(Path(p).read_text(encoding='utf8'))
 def frozen_headers(directory):
  return sorted(f for f in (Path(directory)/'frozen_include').rglob('*') if f.is_file())
 
+def adapt_current_values_source(text):
+ old='memberships[i]!=(packet.is_active(i)?1:0)'
+ new='memberships[i]!=(packet.current_input?int(packet.statistical_active_mask[i]):(packet.is_active(i)?1:0))'
+ if old not in text and new not in text:raise ValueError('Current values statistical partition signature changed')
+ return text.replace(old,new).replace('{"raw_material_labels",171}','{"raw_material_labels",packet.material_labels.size()}').replace('{"frames",1248}','{"frames",packet.manifest.at("frame_count")}')
+
 def build(run,header,output):
  R,H,O=Path(run).resolve(),Path(header).resolve(),Path(output).resolve();M=R/'model_checks';P=Path(__file__).resolve().parents[4]
  rows_origin=read(R/'gpu_accel/rows/build_recipe.json')
@@ -20,7 +26,7 @@ def build(run,header,output):
   if rows_origin['inputs'].get(str(path))!=sha(path):raise ValueError('Pure CUDA input changed: '+name)
  if O.exists():raise FileExistsError(str(O))
  O.mkdir(parents=True);setup={};save=sys.argv;sys.argv=[sys.argv[0],str(O)];driver=M/'build_event_backend.py';exec(compile(driver.read_text().split('sources=[')[0],str(driver),'exec'),setup);sys.argv=save
- old=M/'qbar_finite_refine_v7_build';oldr=read(old/'recipe.json');V=R/'gpu_accel/resident';source_header=H
+ old=M/'qbar_finite_refine_v7_build';oldr=dict(runtime_bin_paths=[str(p)for p in setup['bins']],source_component_evidence_policies={});V=R/'gpu_accel/resident';source_header=H
  for name in ['qbar','values','whole_cpu','profile_cpu','resident']:
   D=O/name;D.mkdir();shutil.copytree(V/'frozen_include',D/'frozen_include');shutil.copyfile(H,D/'frozen_include/rinkfit/event_packet.hpp')
   extras=[*H.parent.glob('*.hpp'),P/'calibration/rinkfit/cpp/include/rinkfit/source_audit_layer.inc',P/'calibration/rinkfit/cpp/include/rinkfit/source_covariance.hpp']
@@ -36,20 +42,23 @@ def build(run,header,output):
   if result.returncode:raise RuntimeError(name+' compile failed: '+str(D/'build.log'))
   return cmd
  recipes={};caps=dict(source_component_recovery=True,source_audit_revision=True)
+ active_profile_count='std::count_if(packet.active_rows.begin(),packet.active_rows.end(),[&](auto i){return packet.kind[i]==2;})'
  for name,origin,frozen_name,exe in [('qbar',M/'qbar_finite_refine_v7.cpp','qbar_finite_refine_v7.cpp','qbar_sparse.exe'),('values',M/'values_rf29_partial_build/reduced_values_frozen.cpp','reduced_values_frozen.cpp','reduced_state_values.exe')]:
-  D=O/name;src=D/frozen_name;shutil.copyfile(origin,src);cmd=compile_one(name,[src],exe)
+  D=O/name;src=D/frozen_name;text=origin.read_text(encoding='utf8')
+  src.write_text(adapt_current_values_source(text) if name=='values' else text,encoding='utf8');cmd=compile_one(name,[src],exe)
   frozen={str(f):dict(file=str(f.relative_to(D)),sha256=sha(f))for f in frozen_headers(D)}
   r=dict(schema='rinkfit.reduced_reader_snapshot_build.v1',tool=name,no_Solve=True,source_sha256=sha(src),math_source=ref(origin),command=cmd,
     frozen_sources=frozen,event_model_source=ref(D/'event_model.cpp'),reader_header_sha256=sha(H),source_component_recovery=True,source_audit_revision=True,source_component_evidence_policies=oldr['source_component_evidence_policies'],capabilities=caps,
     event_model_object=ref(D/'event_model.obj'),runtime_bin_paths=oldr['runtime_bin_paths'],executable_sha256=sha(D/exe),arithmetic_math_unchanged=True,
-    supports_partial_linearization_values=name=='values',parent_helper_recipe=ref(old/'recipe.json'))
+    supports_partial_linearization_values=name=='values',current_reader_build=True)
   (D/'recipe.json').write_text(json.dumps(r,indent=2),encoding='utf8');recipes[name]=dict(executable=ref(D/exe),recipe=ref(D/'recipe.json'))
  print('SOURCE_QBAR_VALUES_BUILT',json.dumps(recipes),flush=True)
  whole=P/'calibration/rinkfit/tools/reduced/whole_W_transport.cpp';transport=P/'calibration/rinkfit/tools/reduced/transport_qbar_base.cpp';profile=M/'profile_implicit_transport_build/profile_implicit_transport.cpp'
  for name,origin,filename,exe in [('whole_cpu',whole,'whole.cpp','whole_W_transport.exe'),('profile_cpu',profile,'profile.cpp','profile_implicit_transport.exe')]:
   D=O/name;shutil.copyfile(transport,D/'transport_qbar_base.cpp');text=origin.read_text()
   if name=='whole_cpu':
-   text=text.replace('n!=182017','n!=packet.manifest.at("observations").get<std::size_t>()').replace('packet.active_rows.size()!=182016','packet.active_rows.size()!=doc.at("active_rows").get<std::size_t>()').replace('wres.size()!=214112','wres.size()!=packet.formal_residual_rows')
+   text=text.replace('n!=182017','n!=packet.manifest.at("observations").get<std::size_t>()').replace('packet.active_rows.size()!=182016','packet.active_rows.size()!=doc.at("active_rows").get<std::size_t>()').replace('wres.size()!=214112','wres.size()!=packet.formal_residual_rows').replace('membership[i]!=(packet.is_active(i)?1:0)','membership[i]!=(packet.current_input?int(packet.statistical_active_mask[i]):(packet.is_active(i)?1:0))').replace('profiles!=961','profiles!='+active_profile_count).replace('profiles!=packet.queries.size()','profiles!='+active_profile_count)
+  text=text.replace('rows.size()!=961','rows.size()!='+active_profile_count)
   src=D/filename;src.write_text(text,encoding='utf8');cmd=compile_one(name,[src],exe)
   r=dict(schema='rinkfit.source_target_operator_build.v1',command=cmd,executable_sha256=sha(D/exe),source_sha256=sha(src),runtime_bin_paths=oldr['runtime_bin_paths'],reader_header_sha256=sha(H),source_inputs={str(f):sha(f)for f in [origin,transport,src,D/'event_model.cpp',*frozen_headers(D)]},selected_rank_from_validated_packet=True)
   (D/'recipe.json').write_text(json.dumps(r,indent=2),encoding='utf8');recipes[name]=dict(executable=ref(D/exe),recipe=ref(D/'recipe.json'),source_files=[ref(src),ref(D/'transport_qbar_base.cpp')])
@@ -62,7 +71,7 @@ def build(run,header,output):
  body=body.replace(old_loader,'const EventPacket& packet=resident::dataset(pp,sp);').replace('int main(int argc,char**argv)','int run(int argc,char**argv)',1)
  pre='#include "resident_dataset.hpp"\n#include "rinkfit/event_model.hpp"\n#include "rinkfit/event_packet.hpp"\n#include <ceres/dynamic_autodiff_cost_function.h>\n#include <ceres/jet.h>\n#include <Eigen/LU>\n#include <chrono>\n#include <iostream>\n#include <iomanip>\n#include "row_uv_cache.hpp"\n'
  (D/'whole_adapter.cpp').write_text(pre+'namespace source_whole_GPU {\n#include "transport_math_only.inc"\n'+body+'\n}\nint resident_whole_uv_main(int argc,char**argv){return source_whole_GPU::run(argc,argv); }\n',encoding='utf8')
- shutil.copyfile(M/'resident_transport_proto_v3/profile_implicit_adapter.cpp',D/'profile_adapter.cpp')
+ (D/'profile_adapter.cpp').write_text((M/'resident_transport_proto_v3/profile_implicit_adapter.cpp').read_text().replace('rows.size()!=961','rows.size()!='+active_profile_count),encoding='utf8')
  (D/'unsupported.cpp').write_text('#include <stdexcept>\nint resident_qbar_main(int,char**){throw std::runtime_error("source-target worker exposes only whole_uv and profile_implicit");}\nint resident_values_main(int,char**){throw std::runtime_error("source-target worker exposes only whole_uv and profile_implicit");}\n')
  rowlib=R/'gpu_accel/rows/row_uv.obj';cuda=Path('D:/Program Files/CUDA');shutil.copyfile(S/'row_uv_cache.cpp',D/'row_uv_cache.cpp');sources=[D/f for f in ['resident_worker.cpp','whole_adapter.cpp','profile_adapter.cpp','unsupported.cpp','row_uv_cache.cpp']]
  cmd=compile_one('resident',sources,'resident_worker.exe',[rowlib,cuda/'lib/x64/cudart.lib'],gpu=True)

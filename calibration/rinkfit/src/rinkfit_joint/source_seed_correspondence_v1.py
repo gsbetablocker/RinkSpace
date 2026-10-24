@@ -52,6 +52,23 @@ def correlation(reference, gray, H, center):
     return float(np.corrcoef(a, b)[0, 1])
 
 
+def _select_boundary_identity(boundary_distances, best, second, known=None, conflicted=False):
+    """Current proximity can support a seed identity, never replace that identity."""
+    direct = (boundary_distances[best] <= 3 and
+              boundary_distances[second] - boundary_distances[best] >= 3)
+    if conflicted:
+        return None, None, 'source_seed_identity_conflict'
+    if known is not None:
+        identity, proof = known
+        if ((direct and best != identity) or
+                not boundary_distances[identity] <= 3):
+            return None, proof, 'source_seed_tracking_conflict'
+        return identity, proof, None
+    if direct:
+        return best, None, None
+    return None, None, 'unresolved_current_pixel_identity'
+
+
 def repair(packet_path, model, source_config, groups, workers=8):
     cv2.setNumThreads(1)
     start = time.perf_counter()
@@ -96,6 +113,7 @@ def repair(packet_path, model, source_config, groups, workers=8):
                 si = int(sid.rsplit('/seed', 1)[1]); j = g['name_lookup'][key]
                 witnessed[si][j].append((e['raw_row'], str(file)))
         g['known'] = {}
+        g['seed_identity_conflicts'] = {}
         gseeds = {row_seed[int(i)] for i in g['rows'] if int(i) in row_seed}
         for si in gseeds:
             s = cfg['seeds'][si]; candidates = set(witnessed[si]); proof = {}
@@ -111,6 +129,13 @@ def repair(packet_path, model, source_config, groups, workers=8):
                     witness_rows=[q[0] for q in witnessed[si].get(j, [])],
                     witness_files=sorted({q[1] for q in witnessed[si].get(j, [])}))
                 g['known'][si] = (j, proof)
+            elif len(candidates) > 1:
+                g['seed_identity_conflicts'][si] = dict(group=g['name'], seed_index=si,
+                    native_pts=int(s['native_pts']), source_uv=s['uv'],
+                    reason='conflicting_original_seed_identity_evidence',
+                    candidate_boundaries=[dict(g['paths'][j]) for j in sorted(candidates)],
+                    witness_rows={str(j):[q[0] for q in witnessed[si].get(j, [])]
+                                  for j in sorted(candidates)}, source_row_retained=True)
         g['by_pts'] = {}
         for pt in np.unique(pts[g['rows']]):
             g['by_pts'][int(pt)] = g['rows'][pts[g['rows']] == pt]
@@ -143,18 +168,37 @@ def repair(packet_path, model, source_config, groups, workers=8):
             at = cv2.perspectiveTransform(measured[None], np.linalg.inv(H))[0]
             pairs = [distances(measured, p) for p in polys]
             dd = np.array([q[0] for q in pairs]).T; ss = np.array([q[1] for q in pairs]).T
-            order = np.argsort(dd, axis=1); stats = Counter(); changes = []; confirmations = []
+            order = np.argsort(dd, axis=1); stats = Counter(); changes = []; confirmations = []; conflicts = []
             for k, ii in enumerate(ids):
                 i = int(ii); best, second = map(int, order[k, :2]); old = None
                 if not inside(hull, at[k]): stats['outside_registered_source_support'] += 1; continue
-                direct = dd[k, best] <= 3 and dd[k, second] - dd[k, best] >= 3
-                proof = None; chosen = best if direct else None
+                seed = i if seed_pass else row_seed.get(i)
+                known = g['known'].get(seed)
+                chosen, proof, reason = _select_boundary_identity(dd[k], best, second,
+                    known, seed in g['seed_identity_conflicts'])
                 if not seed_pass:
                     old = g['lookup'].get((int(mat[i]), int(path[i])))
-                    seed = row_seed.get(i); known = g['known'].get(seed)
-                    if chosen is None and known is not None and dd[k, known[0]] <= 3:
-                        chosen, proof = known
-                if chosen is None: stats['unresolved_current_pixel_identity'] += 1; continue
+                if chosen is None:
+                    stats[reason] += 1
+                    if reason != 'unresolved_current_pixel_identity':
+                        nearest = g['paths'][best]
+                        conflict = dict(group=g['name'], native_pts=pt, seed_index=seed,
+                            uv=measured[k].tolist(), reason=reason,
+                            phase='original_source_seed' if seed_pass else 'current_source_row',
+                            nearest_boundary=dict(label=nearest['label'], path=nearest['path'],
+                                                  distance_px=float(dd[k, best])),
+                            registration_kind=reg['kind'],
+                            registration_correlation=reg['correlation'],
+                            source_row_retained=True, source_pixels_changed=False)
+                        if known is not None:
+                            expected = g['paths'][known[0]]
+                            conflict.update(expected_boundary=dict(label=expected['label'],
+                                path=expected['path'], distance_px=float(dd[k, known[0]])),
+                                original_source_seed=known[1])
+                        if not seed_pass:
+                            conflict.update(raw_row=i, source_row_id=source_ids[i])
+                        conflicts.append(conflict)
+                    continue
                 f = foot(g['polys'][chosen], ss[k, chosen])
                 if not inside(hull, f): stats['boundary_outside_registered_support'] += 1; continue
                 corr = correlation(g['reference'], gray, H, f)
@@ -176,28 +220,35 @@ def repair(packet_path, model, source_config, groups, workers=8):
                     nearest_px=float(dd[k, chosen]), next_boundary_px=float(min(dd[k,j] for j in range(len(polys)) if j!=chosen)),
                     old_boundary_px=float(dd[k, old]), registration_kind=reg['kind'],
                     registration_correlation=reg['correlation'], local_source_pixel_correlation=corr,
-                    identity_basis='current_original_image_unique_boundary' if direct else 'original_seed_and_current_visible_boundary')
+                    identity_basis='original_seed_and_current_visible_boundary' if proof is not None else 'current_original_image_unique_boundary')
                 if proof is not None: e['original_source_seed'] = proof
                 changes.append(e); stats['repaired_identity'] += 1
-            result.append((gi, pt, confirmations, changes, dict(stats), len(ids)))
+            result.append((gi, pt, confirmations, changes, dict(stats), len(ids), conflicts))
         return result
     # First resolve all source anchors, then apply their consistent identities.
     with ThreadPoolExecutor(max_workers=workers) as pool:
         futures = [pool.submit(work, pt, True) for pt in tasks if any(groups[i]['seed_by_pts'].get(pt) for i in tasks[pt])]
         for future in as_completed(futures):
-            for gi, pt, confirmations, _, _, _ in future.result():
+            for gi, pt, confirmations, _, _, _, conflicts in future.result():
                 g = groups[gi]
+                for conflict in conflicts:
+                    g['seed_identity_conflicts'].setdefault(conflict['seed_index'], conflict)
                 for si, j, proof in confirmations:
                     old = g['known'].get(si)
                     if old is not None and old[0] != j:
-                        g['known'].pop(si); continue
+                        g['seed_identity_conflicts'][si] = dict(group=g['name'], seed_index=si,
+                            native_pts=pt, reason='conflicting_original_seed_identity_evidence',
+                            original_source_seed=old[1], conflicting_source_seed=proof,
+                            source_row_retained=True)
+                        continue
                     g['known'][si] = (j, proof)
     print(json.dumps(dict(phase='source_identities_resolved', groups={g['name']:len(g['known']) for g in groups}, seconds=time.perf_counter()-start)), flush=True)
-    changes = []; coverage = []; complete = 0
+    changes = []; coverage = []; tracking_conflicts = []; complete = 0
     with ThreadPoolExecutor(max_workers=workers) as pool:
         futures = [pool.submit(work, pt, False) for pt in tasks if any(groups[i]['by_pts'].get(pt) is not None for i in tasks[pt])]
         for future in as_completed(futures):
-            for gi, pt, _, rows, stats, n in future.result():
+            for gi, pt, _, rows, stats, n, conflicts in future.result():
+                tracking_conflicts.extend(conflicts)
                 changes.extend(rows); coverage.append(dict(group=groups[gi]['name'], native_pts=pt, rows=n, **stats))
             complete += 1
             if complete % 100 == 0:
@@ -210,5 +261,8 @@ def repair(packet_path, model, source_config, groups, workers=8):
     missing = {g['name']:dict(frames=sum(pt not in g['registrations'] for pt in g['by_pts']),
         rows=sum(len(ids) for pt, ids in g['by_pts'].items() if pt not in g['registrations'])) for g in groups}
     return dict(rows=sorted(unique.values(), key=lambda e:e['raw_row']), coverage=coverage,
+                tracking_conflicts=sorted(tracking_conflicts, key=lambda e:(e['raw_row'], e['group'])),
+                source_seed_identity_conflicts=[e for g in groups
+                    for _, e in sorted(g['seed_identity_conflicts'].items())],
                 missing_current_image_registration=missing, seconds=time.perf_counter()-start,
                 raw_source_pixels_changed=False, fitted_camera_used=False)

@@ -11,8 +11,8 @@ inline eventio::Json install_joint_line_coordinate_gauge_v1(JointALBuilder& b,
  if(!stage.contains("finite_line_coordinate_gauges"))return {{"enabled",false}};
  eventio::Json report=eventio::Json::array();
  for(const auto& item:stage.at("finite_line_coordinate_gauges")){
-  if(item.at("schema")!="rinkfit.source_supported_line_coordinate_gauge.v1"||item.at("endpoints_are_physical_measurements")!=false)throw std::runtime_error("untyped numerical line coordinate policy");
-  const auto ref=item.at("source_review");eventio::verify(ref.at("file").get<std::string>(),ref.at("sha256"));
+  const bool current=cfg.contains("current_input_v1");if(item.at("schema")!=(current?"rinkfit.current_line_coordinate_gauge.v1":"rinkfit.source_supported_line_coordinate_gauge.v1")||item.at("endpoints_are_physical_measurements")!=false)throw std::runtime_error("untyped numerical line coordinate policy");
+  if(!current){const auto ref=item.at("source_review");eventio::verify(ref.at("file").get<std::string>(),ref.at("sha256"));}
   const int bi=item.at("geometry_block"),axis=item.at("coordinate_axis");auto& block=b.core.model.blocks.at(bi);
   if(block.name!=item.at("block_name")||block.values.size()!=4||axis<0||axis>1||problem.IsParameterBlockConstant(block.values.data())||problem.ParameterBlockTangentSize(block.values.data())!=4)throw std::runtime_error("numerical line gauge requires existing four-free-coordinate carrier");
   const double span=block.values[axis+2]-block.values[axis];if(std::abs(span)<1e-8)throw std::runtime_error("numerical line coordinate chart is singular");

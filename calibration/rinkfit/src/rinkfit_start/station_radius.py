@@ -1,4 +1,4 @@
-"""Adaptive numerical calibration of a current-state sampled station radius.
+"""Adaptive DATA-only calibration of a current-state sampled station radius.
 Calibrates only actually legal pure-S Taylor errors. Pure-S RS loss is recorded
 as conditional visibility evidence; it never alone shrinks/fixes the station.
 Not a continuous remainder enclosure or changed-theta/source feasibility proof.
@@ -32,12 +32,13 @@ def run(input_path,output):
  _,semantic_arrays,_,verified_semantics=load_semantics(SP,N,expected_sha256=sha(SP));mi=np.asarray(verified_semantics['resolved_material_index'],int);kind=semantic_arrays['kind'];active=np.asarray(verified_semantics['source_exclusion']['active_mask'],bool);pts=arr(pk['arrays']['native_pts'],PK.parent);E=arr(pk['arrays']['engineering_budget_px'],PK.parent);times=(pts-int(pk['pts_origin']))*int(pk['native_time_base'][0])/int(pk['native_time_base'][1])
  L=arr(tr["arrays"]["station_delta_lower_right"],T.parent);U=arr(tr["arrays"]["station_delta_upper_right"],T.parent);tan=arr(tr["arrays"]["station_UV_right"],T.parent).reshape(N,2);speed=np.linalg.norm(tan,axis=1)
  if cp["raw_rows"]!=N or cp["active_rows"]!=int(active.sum())or not np.all(active[ids]&(kind[ids]==0)):raise ValueError("Radius differs from verified active ordinary source scope")
- base=_certified_candidates(scene,camera,mi[ids],B[ids],S[ids],times[ids])
+ base=_certified_candidates(scene,camera,mi[ids],B[ids],S[ids],times[ids]) if len(ids) else dict(valid=np.empty(0,bool),uv=np.empty((0,2)))
  if not base["valid"].all():raise ValueError("Current same-state base source is not valid")
  uv0=np.full((N,2),np.nan);uv0[ids]=base["uv"];target=.05*E
  probes=[(sg,f)for sg in [-1,1]for f in [.25,.5,1.]]
  valid=np.zeros((6,N),bool);error=np.full((6,N),np.nan);row=np.full((6,N),np.nan)
  def sample(jj):
+  if not len(jj):return
   for p,(sg,f)in enumerate(probes):
    ds=np.maximum(L[jj],np.minimum(U[jj],sg*f*radius[jj]));z=_certified_candidates(scene,camera,mi[jj],B[jj],S[jj]+ds,times[jj])
    valid[p,jj]=z["valid"];row[p,jj]=z["row"];error[p,jj]=np.linalg.norm(z["uv"]-uv0[jj]-tan[jj]*ds[:,None],axis=1)
@@ -59,7 +60,7 @@ def run(input_path,output):
  final=[]
  for p,(sg,f)in enumerate(probes):
   g=valid[p,ids];ee=error[p,ids][g]
-  final.append(dict(sign=sg,fraction=f,tested_rows=len(ids),strict_RS_valid=int(g.sum()),pureS_RS_conditional_failed_rows=ids[~g].tolist(),legal_remainder_over_0p05E=int(np.count_nonzero(ee>target[ids[g]])),maximum_legal_remainder_px=float(np.max(ee)),normalized_legal_remainder_quantiles=np.quantile(ee/E[ids[g]],[.5,.95,.99,1]).tolist()))
+  final.append(dict(sign=sg,fraction=f,tested_rows=len(ids),strict_RS_valid=int(g.sum()),pureS_RS_conditional_failed_rows=ids[~g].tolist(),legal_remainder_over_0p05E=int(np.count_nonzero(ee>target[ids[g]])),maximum_legal_remainder_px=float(np.max(ee,initial=0.)),normalized_legal_remainder_quantiles=np.quantile(ee/E[ids[g]],[.5,.95,.99,1]).tolist() if len(ee) else []))
  if any(x["legal_remainder_over_0p05E"]for x in final):raise ValueError("Adaptive sampled accuracy not reached")
  camera.at.close();arrays={}
  for name,value,dtype in [("radius",radius,"<f8"),("sample_status",status,"|u1"),("sample_valid",valid,"|u1"),("sample_remainder_px",error,"<f8"),("sample_true_row",row,"<f8"),("initial_sample_valid",initial_valid,"|u1"),("initial_sample_remainder_px",initial_error,"<f8"),("initial_sample_true_row",initial_row,"<f8")]:

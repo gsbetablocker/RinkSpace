@@ -4,8 +4,9 @@ from collections import Counter
 import argparse,gzip,hashlib,json,time,re
 from fractions import Fraction
 import av,cv2,numpy as np
-from .joint_model import as_event_view,graph_from_joint,validate_physical_domain
+from .joint_model import as_event_view,graph_from_joint,validate_physical_domain,validate_current_ice_definition
 from .camera_graph import CameraGraph
+from .joint_review_camera import CurrentJointCameras
 from .io_utils import read_json,write_json,file_sha256
 from rinkfit_start.native_scene import NativeScene
 from rinkfit_start.native_camera import rotation
@@ -13,10 +14,10 @@ from rinkfit_start.native_camera import rotation
 def camera_ledger(model_file,scope_file,output):
  out=Path(output)
  if out.exists():raise ValueError('A new immutable replay generation is required')
- model=read_json(model_file);scope=read_json(scope_file);graph=graph_from_joint(model);cg=CameraGraph(graph);validation=cg.validate(require_ready=True);physical=validate_physical_domain(model);out.mkdir(parents=True)
+ model=read_json(model_file);scope=read_json(scope_file);cg=CurrentJointCameras(model);graph=cg.graph;validation=cg.validate(require_ready=True);physical=validate_physical_domain(model);out.mkdir(parents=True)
  values=[];pts=[];sids=[];rows=[];certs=[];model_sha=file_sha256(model_file)
  with gzip.open(out/'camera_rows.jsonl.gz','wt',encoding='utf8') as f:
-  for si,s in enumerate(scope['shots']):
+  for si,s in enumerate(x for x in scope['shots'] if x['id'] in model['shots']):
    sid=s['id'];camera=cg.native_camera(sid);stamp=np.arange(s['first_pts'],s['last_pts']+1,256,dtype=np.int64);local=cg.local_seconds(sid,stamp);abf=camera.spline(local);alpha,beta,logf=abf.T;R=rotation(camera.b,beta)@camera.R0@rotation(camera.n,alpha);z=logf-np.log(float(camera.optics['f_ref']));w=np.einsum('...ji,j->...i',R,camera.b);h=np.cross(camera.n,w);h/=np.linalg.norm(h,axis=1)[:,None];D=np.broadcast_to(camera.d,(len(stamp),3)).copy();D[:,2]+=camera.head.get('pupil_linear',0)*z+camera.head.get('pupil_quadratic',0)*z*z;C=camera.P+np.einsum('...ji,...j->...i',R,D)+camera.a*h;db=camera.derivative_bounds(local)
    full_tau=float(graph['rigs'][s['rig_id']].get('tau_bound',.02));duration=(s['last_pts']-s['first_pts'])/12800.;halo=bool(camera.domain[0]<=-full_tau/2+1e-12 and camera.domain[1]>=duration+full_tau/2-1e-12);opt=camera.optical_domain_certificate();certs.append(dict(shot_id=sid,optical=opt,full_allowed_tau_halo=halo,current_tau=camera.tau,allowed_tau_bound=full_tau,cubic_domain=camera.domain))
    for j,p in enumerate(stamp):
@@ -25,8 +26,9 @@ def camera_ledger(model_file,scope_file,output):
    values.append(np.c_[local,abf,C,R.reshape(-1,9),db]);pts.append(stamp);sids.append(np.full(len(stamp),si,np.uint8))
  np.savez_compressed(out/'cameras.npz',native_pts=np.concatenate(pts),shot_index=np.concatenate(sids),camera_values=np.concatenate(values),columns=np.asarray(['local_seconds','alpha','beta','logf','Cx','Cy','Cz',*[f'R{i}{j}' for i in range(3) for j in range(3)],'yaw_derivative_bound','pitch_derivative_bound','logf_derivative_bound']))
  total=sum(len(x) for x in pts)
- if total!=8434 or len(set(np.concatenate(pts).tolist()))!=8434:raise ValueError('Nine-shot camera ledger is incomplete or duplicated')
- receipt=dict(schema='rinkfit.joint9.full_camera_replay.v1',model=dict(path=str(Path(model_file).resolve()),sha256=file_sha256(model_file)),scope=dict(path=str(Path(scope_file).resolve()),sha256=file_sha256(scope_file)),graph_schema=validation,physical_domain=physical,frames=total,all8434_camera_states_present=True,per_shot=certs,all_optical_domains_passed=all(c['optical']['passed'] for c in certs),all_full_tau_halos_covered=all(c['full_allowed_tau_halo'] for c in certs),source_pixel_accuracy_verified=False,independent_metre_scale=False,coordinate_gauge='L=1 full rink length',arrays_sha256=file_sha256(out/'cameras.npz'),ledger_sha256=file_sha256(out/'camera_rows.jsonl.gz'))
+ expected=sum((s['last_pts']-s['first_pts'])//model['source_clock']['frame_step_pts']+1 for s in scope['shots'] if s['id'] in model['shots'])
+ if total!=expected or len(set(np.concatenate(pts).tolist()))!=expected:raise ValueError('Current scoped camera ledger is incomplete or duplicated')
+ receipt=dict(schema='rinkfit.current_joint.full_camera_replay.v2',model=dict(path=str(Path(model_file).resolve()),sha256=file_sha256(model_file)),scope=dict(path=str(Path(scope_file).resolve()),sha256=file_sha256(scope_file)),graph_schema=validation,physical_domain=physical,frames=total,all_scoped_camera_states_present=True,per_shot=certs,all_optical_domains_passed=all(c['optical']['passed'] for c in certs),all_full_tau_halos_covered=all(c['full_allowed_tau_halo'] for c in certs),source_pixel_accuracy_verified=False,independent_metre_scale=False,coordinate_gauge='L=1 full rink length',arrays_sha256=file_sha256(out/'cameras.npz'),ledger_sha256=file_sha256(out/'camera_rows.jsonl.gz'))
  write_json(out/'manifest.json',receipt);return receipt
 
 def _display_board_closure(scene,path):
@@ -53,12 +55,13 @@ def _source_track_unknown_point(path):
  return bool(isinstance(provenance,dict) and provenance.get('track_id') and provenance.get('geometry_role') in ('shared_unknown_ice_XY_z0','unknown_shared_material_uv_on_existing_continuous_board_ad'))
 
 def inventory(model):
+ validate_current_ice_definition(model)
  scene=NativeScene(as_event_view(model,'s01'));xyz=[];records=[]
  for mi,m in enumerate(scene.materials):
   for pi,pa in enumerate(m['paths']):
    kind=pa['kind'];n=1 if pa.get('physical_point') else (257 if kind in (1,7) else max(33,min(1025,4*len(pa.get('points',[])))) if kind==2 else 129)
    if kind==6 and not pa.get('physical_point'):
-    block=scene.values[pa['geometry_block']];indices=pa.get('geometry_indices');coordinates=len(indices) if indices else len(block)-pa.get('geometry_offset',0);vertices=coordinates//2;edges=vertices if pa.get('closed',False) else vertices-1
+    vertex_blocks=pa.get('vertex_blocks',[]);block=scene.values[pa['geometry_block']] if not vertex_blocks else None;indices=pa.get('geometry_indices');coordinates=2*len(vertex_blocks) if vertex_blocks else len(indices) if indices else len(block)-pa.get('geometry_offset',0);vertices=coordinates//2;edges=vertices if pa.get('closed',False) else vertices-1
     if coordinates%2 or edges<1:raise ValueError('Shared board print path lacks complete finite vertices')
     n=max(4,int(np.ceil(128/edges)))*edges+1
    grid=np.linspace(0,1,n)
@@ -76,7 +79,7 @@ def inventory(model):
     lo,hi=map(float,interval)
     if not np.isfinite([lo,hi]).all() or not 0.<=lo<=hi<=1. or lo<previous:raise ValueError('Invalid material finite station interval union')
     previous=hi;stations=np.array([lo]) if pa.get('physical_point') else np.unique(np.r_[lo,grid[(grid>=lo)&(grid<=hi)],hi]);q=scene.world(mi,pi,stations)
-    if kind==2 and pa.get('closed',False) and lo==0. and hi==1. and len(pa['points'])>1 and not np.array_equal(pa['points'][0],pa['points'][-1]):q=np.concatenate((q,_display_board_closure(scene,pa)))
+    # Render the consumed finite primitive; a closed flag cannot invent an edge.
     label=m['label'];color=(40,225,240) if label.startswith(('Ad','print_component.')) else (80,230,80) if label.startswith('board') else (255,140,50);start=sum(len(x) for x in xyz);xyz.append(q);records.append(dict(material_index=mi,path=pi,label=label,begin=start,end=start+len(q),closed=bool(pa.get('closed',False) and lo==0. and hi==1.),original_path_closed=pa.get('closed',False),station_domain_interval=[lo,hi],station_samples=stations.tolist() if 'allowed_station_intervals'in pa else None,source_station_domain_applied='allowed_station_intervals'in pa,latent_source_track_point=_source_track_unknown_point(pa),board_material_surface=bool(kind in (2,3,6,7) or label.startswith(('Ad','board.','print_component.'))),board_top_boundary=bool(kind==3 and float(pa.get('fixed_height_fraction',-1.))==1. and (label=='board.top' or label.startswith('board.top.'))),color=color))
  # Actual ad labels follow the solved surfaces, once per physical panel.
  byad={};allxyz=np.concatenate(xyz,axis=0)
@@ -100,10 +103,16 @@ def fast_native_project(camera,world,local):
 No off-sensor root is certified; finite clipping only draws legal subsegments.
 """
  mid=camera.at(world,local);v=np.clip(mid['uv'][:,1],0,1079);cert=camera.rs_certificate(world,local)
+ pending=np.arange(len(world))
  for _ in range(12):
-  a=camera.at(world,local+camera.tau*(v/1079-.5));nv=np.clip(a['uv'][:,1],0,1079)
-  if np.max(np.abs(nv-v),initial=0)<1e-9:v=nv;break
-  v=nv
+  if not len(pending):break
+  a=camera.at(world[pending],local+camera.tau*(v[pending]/1079-.5));nv=np.clip(a['uv'][:,1],0,1079)
+  previous=v[pending];unchanged=nv==previous;v[pending]=nv
+  if np.max(np.abs(nv-previous),initial=0)<1e-9:break
+  # Independent points that reached an exactly unchanged row have identical
+  # future inputs. Keep their value; continue every still-changing point.
+  pending=pending[~unchanged]
+ # Keep the original unified final physical projection and root equation.
  a=camera.at(world,local+camera.tau*(v/1079-.5));eq=v-a['uv'][:,1];good=a['valid']&cert['certified']&(np.abs(eq)<2e-8)
  unresolved=a['valid']&cert['certified']&(~good)&(mid['uv'][:,1]>=0)&(mid['uv'][:,1]<=1079)
  if unresolved.any():
@@ -169,7 +178,7 @@ def draw(bgr,uv,valid,records,title):
    if yes and np.max(np.abs([a,b]))<1e7:
     ok,x,y=cv2.clipLine((0,0,1920,1080),tuple(np.rint(a).astype(int)),tuple(np.rint(b).astype(int)))
     if ok:cv2.line(image,x,y,r['color'],1,cv2.LINE_AA);paths+=1
- cv2.rectangle(image,(0,1038),(1920,1080),(12,23,28),-1);cv2.putText(image,title,(18,1067),cv2.FONT_HERSHEY_SIMPLEX,.55,(240,245,245),1,cv2.LINE_AA)
+ # Review metadata belongs beside the source frame, never over its pixels.
  return image,dict(visible_subsegments=paths,visible_ad_labels=labels)
 
 
@@ -192,14 +201,15 @@ def draw_fast(bgr,uv,valid,records,title):
   pieces=[np.rint(q[a:b]).astype(np.int32).reshape(-1,1,2) for a,b in zip(beg,end) if b-a>=2]
   if pieces:cv2.polylines(image,pieces,False,r['color'],1,cv2.LINE_AA)
   both=g[:-1]&g[1:];lo=np.minimum(q[:-1],q[1:]);hi=np.maximum(q[:-1],q[1:]);paths+=int(np.count_nonzero(both&(hi[:,0]>=0)&(lo[:,0]<=1919)&(hi[:,1]>=0)&(lo[:,1]<=1079)))
- cv2.rectangle(image,(0,1038),(1920,1080),(12,23,28),-1);cv2.putText(image,title,(18,1067),cv2.FONT_HERSHEY_SIMPLEX,.55,(240,245,245),1,cv2.LINE_AA)
+ # Review metadata belongs beside the source frame, never over its pixels.
  return image,dict(visible_subsegments_bbox_intersecting=paths,visible_ad_labels=labels,physical_runs_drawn_with_clipped_OpenCV_polylines=True)
 
 def render_snapshots(model_file,scope_file,output,pick_pts=None,*,shots=None,compiled_dir=None,gpu_dll=None,gpu_validation=None,packet_file=None,top_view=False,only_pick_pts=False):
  out=Path(output)
  if out.exists():raise ValueError('New immutable review generation required')
- model=read_json(model_file);scope=read_json(scope_file);cg=CameraGraph(graph_from_joint(model));world,records=inventory(model);scene=NativeScene(as_event_view(model,'s01'));sha=file_sha256(model_file);wanted={}
+ model=read_json(model_file);scope=read_json(scope_file);cg=CurrentJointCameras(model);world,records=inventory(model);scene=NativeScene(as_event_view(model,'s01'));sha=file_sha256(model_file);wanted={}
  for s in scope['shots']:
+  if s['id'] not in model['shots']:continue
   if shots is not None and s['id'] not in shots:continue
   pp=np.arange(s['first_pts'],s['last_pts']+1,256,dtype=np.int64)
   if not only_pick_pts:
@@ -213,7 +223,7 @@ def render_snapshots(model_file,scope_file,output,pick_pts=None,*,shots=None,com
  if file_sha256(scope['source']['path'])!=scope['source']['sha256']:raise ValueError('Source SHA changed')
  out.mkdir(parents=True);frames=[];tiles=[]
  from .joint_display import CurrentSourcePoints,SharedModelTopView
- points=CurrentSourcePoints(packet_file,model,scope) if packet_file else None;top=SharedModelTopView(world,records,scene) if top_view else None
+ points=CurrentSourcePoints(packet_file,model,scope,native_pts=wanted) if packet_file else None;top=SharedModelTopView(world,records,scene) if top_view else None
  if compiled_dir:
   from .joint_acceleration import install
   install(cg,model_file,out/'acceleration',world,compiled_dir,gpu_dll=gpu_dll,gpu_validation=gpu_validation,shots=list(dict.fromkeys(wanted.values())))

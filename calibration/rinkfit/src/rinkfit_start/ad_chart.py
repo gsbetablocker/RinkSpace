@@ -57,11 +57,13 @@ class PrintOnlyAdChart:
         self.offset = np.r_[0, np.cumsum([len(b['values']) for b in model['blocks']])]
         names = {b['name']: i for i, b in enumerate(model['blocks'])}
         self.ads = {}; self.print_ad = {}; self.paths = {}
+        current_scope=model.get('current_input_scope',{}).get('schema')=='rinkfit.current_advertisement_input.v1'
+        chart_materials=[m for m in model['materials'] if not(current_scope and m.get('unused_legacy_witness',False))]
         for ad_id in ad_ids:
             name = 'ad/' + str(ad_id)
             if name not in names: raise ValueError('Missing print-only chart ' + name)
             ai = names[name]; paths = []
-            for material in model['materials']:
+            for material in chart_materials:
                 for path in material['paths']:
                     if path.get('advertisement_block') == ai:
                         if path.get('kind') not in (2, 'board_path') or path.get('geometry_block', -1) < 0:
@@ -74,7 +76,7 @@ class PrintOnlyAdChart:
             if not paths: raise ValueError('No finite print paths for ' + name)
             self.ads[ai] = sorted({int(p['geometry_block']) for p in paths})
         # An affine shared with a non-target ad would invalidate the quotient.
-        for material in model['materials']:
+        for material in chart_materials:
             for path in material['paths']:
                 qi = int(path.get('geometry_block', -1))
                 if qi in self.print_ad and path.get('advertisement_block') != self.print_ad[qi]:

@@ -12,6 +12,14 @@ class _GroupedExactRS:
   v=(left+right)/2;out=camera.at(X,t+camera.tau*(v/1079-.5));eq=v-out["uv"][...,1];valid=out["valid"]&bracket&cert["certified"]&(np.abs(eq)<=tolerance_px*2);out.update(valid=valid,row=v,root_equality_px=eq,bracketed=bracket,certificate=cert);return out
 
 def _grid_batches(scene,camera,tasks,station,times,grid_count):
+ # The original CPU pack cap is also the measured GPU routing minimum.
+ # Three ~1025-node tasks fit under that cap but never reach the GPU.  Pack
+ # twice the routing minimum so complete, unchanged tasks use the existing
+ # GPU adapter; the actual tasks, knots and per-task RS stopping stay intact.
+ target=int(BATCH_STATS['batch_points_target'])
+ if getattr(camera,'gpu_acceleration',{}).get('enabled'):
+  target=max(target,2*int(camera.at.min_batch))
+ BATCH_STATS['batch_points_target']=target
  def project(pack):
   lengths=[len(z[-1])for z in pack];mm=np.concatenate([np.full(len(z[-1]),z[2],int)for z in pack]);bb=np.concatenate([np.full(len(z[-1]),z[3],int)for z in pack]);ss=np.concatenate([z[-1]for z in pack]);tt=np.concatenate([np.full(len(z[-1]),times[z[4][0]])for z in pack]);view=_GroupedExactRS(camera,lengths);rr=_certified_candidates(scene,view,mm,bb,ss,tt);BATCH_STATS["grid_batches"]+=1;BATCH_STATS["grid_points"]+=len(ss);offset=0
   for task_id,frame,m,b,ii,grid in pack:
@@ -19,7 +27,7 @@ def _grid_batches(scene,camera,tasks,station,times,grid_count):
  pack=[];size=0
  for task_id,((frame,m,b),rows)in enumerate(tasks.items()):
   ii=np.asarray(rows,int);path=scene.path(m,b);knots=np.arange(len(path.get("points",[])))/max(1,len(path.get("points",[]))-1);grid=np.unique(np.r_[np.linspace(0.,1.,grid_count),knots,station[ii]]);BATCH_STATS["grid_task_count"]+=1
-  if pack and size+len(grid)>BATCH_STATS["batch_points_target"]:
+  if pack and size+len(grid)>target:
    yield from project(pack);pack=[];size=0
   pack.append((task_id,frame,m,b,ii,grid));size+=len(grid)
  if pack:yield from project(pack)

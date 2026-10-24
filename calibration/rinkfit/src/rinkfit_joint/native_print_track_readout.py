@@ -43,7 +43,7 @@ def read_interval(images,masks,anchors,left,right,writer,already_written,endpoin
         if not seeds:continue
         uv=np.array([x['uv']for x in seeds]);n=np.array([x['normal']for x in seeds]);r=batch_interfaces(uv,n,endpoint_channels[apt]);good=r['valid']&clear_profile(r['uv'],r['normal'],masks[apt]);ids=np.flatnonzero(good)
         if not len(ids):continue
-        seeds=[seeds[i]for i in ids];uv=r['uv'][ids];n=r['normal'][ids];t=np.c_[n[:,1],-n[:,0]];points=np.stack((uv,uv-t*2,uv+t*2),axis=1).astype(np.float32);alive=np.ones(len(ids),bool);reference=r['profile'][ids];prev=apt;fb=np.zeros(len(ids));
+        seeds=[seeds[i]for i in ids];uv=r['uv'][ids];n=r['normal'][ids];t=np.c_[n[:,1],-n[:,0]];span=np.asarray([s.get('tangent_halfspan_px',2.)for s in seeds])[:,None];points=np.stack((uv,uv-t*span,uv+t*span),axis=1).astype(np.float32);alive=np.ones(len(ids),bool);reference=r['profile'][ids];prev=apt;fb=np.zeros(len(ids));
         for pt in order:
             if pt!=apt:points,alive,fb=track_step(gray[prev],gray[pt],points,alive,masks[pt])
             nav[pt].append((apt,seeds,points.copy(),alive.copy(),reference,fb.copy()));prev=pt

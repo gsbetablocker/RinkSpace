@@ -1,0 +1,90 @@
+{
+  "schema": "rinkfit.independent_ceres_local_face_probe.v1",
+  "source_zip_sha256": "1fc28e22ce190ce4c1db04d0c2ddfdf8dc836609866d09372ea8533c8b6d490b",
+  "version": "2.2.0",
+  "base_projected_gain_patch": "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\cg22p\\projected_gain.patch",
+  "base_projected_gain_patch_sha256": "d194f23aee9def19227d746678de132645ade6afe8401f7cea287dc3de4a8da2",
+  "source_files": {
+    "internal/ceres/evaluator.h": "4623d916128e41665fc76b0612ee7b4ab9edf3e68de0d702c2fa52cbf184888b",
+    "internal/ceres/program_evaluator.h": "080b9cea326a4a2e4ec859c6aaef31f68b04c4380d89977a640e1fc4e1f700a4",
+    "internal/ceres/trust_region_minimizer.cc": "29742f309bf909def50b07e30d271c66c111ef3f00dca8792b8df373bf5f8940",
+    "internal/ceres/local_gradient_norm_probe.h": "f184553d380a737f645becf077112744c31f7439f47ff7d81616827520feb1ce",
+    "internal/ceres/line_search.h": "f2f96bdafc0852e855793ac870f55477a07c38d6a16c503b7565561f7a497932",
+    "internal/ceres/line_search.cc": "e8faa770e4f64dd944e2d4e3cdcd3a7559dba4f89ea543b79a5a2ed04ce7bd40"
+  },
+  "commands": [
+    [
+      "D:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe",
+      "--build",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint6_1021b\\ceres_local_face_v1\\build",
+      "--config",
+      "Release",
+      "--parallel",
+      "2",
+      "--target",
+      "ceres"
+    ],
+    [
+      "D:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe",
+      "--install",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint6_1021b\\ceres_local_face_v1\\build",
+      "--config",
+      "Release"
+    ]
+  ],
+  "seconds": 38.546818900009384,
+  "artifacts": {
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\cg22f\\bin\\ceres.dll": "9c788405d460b905cf2528c71d1c4ab600cb54cbf81b694531dac4d9cd5f2eab",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\cg22f\\lib\\ceres.lib": "d2ed565b614a521ec8147709ec1471c0080f8853a9c294e646f49d5a40600361",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\cg22f\\lib\\ceres_cuda_kernels.lib": "148c1dd1bd8deb7ee32f181824f87640aef4fd9964e1e5e6e81994c9b09b1149"
+  },
+  "old_public_library_unchanged": true,
+  "norm_backtracking_only_for_explicit_local_face": true,
+  "unit_probe_failure_disables_only_gradient_tolerance": true,
+  "invalid_real_trial_cannot_enter_convergence_checks": true,
+  "real_TR_and_line_search_direction_unchanged": true,
+  "complete_patch": {
+    "file": "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\cg22f\\local_gradient_probe.patch",
+    "sha256": "67df10930dd8a8cf638dd90b3d63a49d04ce10aec66171e4771963c76fd4aaf0",
+    "applies_to": "upstream_ceres_2.2.0_exact_source_zip",
+    "includes_existing_projected_gain_patch": true,
+    "apply_separately_after_base_patch": false
+  },
+  "current_repair_v1": {
+    "schema": "rinkfit.continuous_face_and_step_report_repair.v1",
+    "direct_link_script": "D:/CodexData/RinkSpace_Data/runs/okada_joint6_1021b/ceres_local_face_v1/link_repaired.py",
+    "direct_link_log": "D:/CodexData/RinkSpace_Data/runs/okada_joint6_1021b/ceres_local_face_v1/repaired/link.log",
+    "cmake_wrapper_link_rejected_access": true,
+    "direct_link_succeeded": true,
+    "first_valid_trial_step_norm_reported_before_first_accepted_step": true,
+    "actual_projected_trial_failure_reasons_enabled": true,
+    "regression": {
+      "fixed_policy_accepted_steps": 8,
+      "accepted_inward_checks_before_face_convergence": 7,
+      "released_endpoint_faces": 3,
+      "full_original_box_final_cost": 4.722e-27,
+      "old_policy_expected_failure": true,
+      "optical_face_cases_passed": [
+        "main",
+        "secondary"
+      ]
+    }
+  },
+  "current_failure_trace_v1": {
+    "per_trial_fields": [
+      "Plus",
+      "Evaluate",
+      "Minus",
+      "actual_cost_change",
+      "actual_projected_linear_change",
+      "original_linear_change"
+    ],
+    "same_original_Armijo_and_iteration_limit": true,
+    "export_at_failure_only": true,
+    "first_failed_factor_captures_current_accepted_base": true,
+    "direct_link_log": "D:/CodexData/RinkSpace_Data/runs/okada_joint6_1021b/ceres_local_face_v1/repaired/link.log",
+    "first_GN_vectors_before_optional_Minus": true,
+    "optional_Minus_switch": "RINKFIT_DISABLE_PROJECTED_TRACE_MINUS_V1",
+    "first_GN_directory": "RINKFIT_CERES_FIRST_PROPOSAL_DIR"
+  }
+}

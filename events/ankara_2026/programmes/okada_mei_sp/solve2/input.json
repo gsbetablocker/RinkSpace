@@ -1,0 +1,601 @@
+{
+  "schema": "rinksolve.programme_input.v1",
+  "event_id": "ankara_2026",
+  "programme_id": "okada_mei_sp",
+  "source": {
+    "id": "O6j8L8TmfKo",
+    "url": "https://www.youtube.com/watch?v=O6j8L8TmfKo",
+    "channel": "Skating ISU",
+    "channel_id": "UCVZpqbnDjHyScSYGFPMUtYA",
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4",
+    "sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+    "native_fps": "50/1",
+    "time_base": "1/12800",
+    "native_pts_step": 256,
+    "width": 1920,
+    "height": 1080,
+    "native_frame_count": 16013,
+    "duration_pts": 4099328,
+    "duration_seconds": 320.26,
+    "contains_audio": true
+  },
+  "active_shot": "s01",
+  "shot_order": [
+    "s01",
+    "s02",
+    "s03",
+    "s04",
+    "s05",
+    "s06",
+    "s07",
+    "s08",
+    "s09"
+  ],
+  "current_scope": {
+    "id": "s01",
+    "first_pts": 256256,
+    "last_pts": 575488,
+    "pts_step": 256,
+    "native_frames": 1248
+  },
+  "baseline_manifest": "D:/CodexData/RinkSpace_Data/runs/solve2_review/shot1_runs/s01_baselines.json",
+  "legacy_solver_code_allowed": true,
+  "datasets": [
+    {
+      "id": "baseline_d78",
+      "name": "本来的第一镜头：当时的冰场与相机",
+      "status": "原参数原样找回；当前画面正显示这一版",
+      "source": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/ceres_regression/restore_index.json",
+      "rows": 1248,
+      "columns": [
+        "真实固定云台状态",
+        "三次轨迹",
+        "Brown",
+        "逐行时间",
+        "独立原几何"
+      ],
+      "notes": "当时的完整数据未转成共同场地；全部258路径、相机、1252组控制保留。新前向与当时预测最大差6.91e−9像素。"
+    },
+    {
+      "id": "native_video",
+      "name": "官方50fps原片",
+      "status": "原片保留；当前只S01",
+      "source": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4",
+      "rows": 1248,
+      "columns": [
+        {
+          "name": "native_pts",
+          "unit": "1/12800秒"
+        },
+        {
+          "name": "RGB",
+          "unit": "1920×1080像素"
+        }
+      ],
+      "notes": "S01源时间20.02–44.96秒，不用60fps全场作为处理源。"
+    },
+    {
+      "id": "baseline_demo",
+      "name": "成功demo S01原相机与平面投影表",
+      "status": "独立新导入已完成；仅平面投影数值等价",
+      "source": "D:/CodexData/RinkSpace_Data/runs/solve2_review/shot1_runs/s01_baselines.json",
+      "rows": 1248,
+      "columns": [
+        "PTS",
+        "camera25",
+        "H",
+        "bridge_mode"
+      ],
+      "notes": "1194帧direct、54帧同shot插值。不是正式Brown/RS模型已等价。"
+    },
+    {
+      "id": "source_annotations",
+      "name": "S01原始取点、人工修订与同源支持",
+      "status": "355554原始行 / 1248曝光已自足交付",
+      "source": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/observations/manifest.json",
+      "rows": 355554,
+      "columns": [
+        "原UV/PTS/source ID",
+        "355554只读SoA行",
+        "11096统计组W",
+        "961 Query",
+        "相依与撤点记录"
+      ],
+      "notes": "继承当前已交付来源与人工确认，原始记录不改；实体crosswalk与新的联合残差正在接入。"
+    },
+    {
+      "id": "source_constraints",
+      "name": "用户事实与假设台账",
+      "status": "可查看、编辑并保留修订",
+      "source": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/solve2/constraints.json",
+      "rows": 31,
+      "columns": [
+        "来源",
+        "审批归属",
+        "定义",
+        "启用",
+        "作用模块"
+      ],
+      "notes": "未批准物理假设默认停用。"
+    },
+    {
+      "id": "shot1_history",
+      "name": "当时第一镜头的代码、配置、日志与完整状态",
+      "status": "原文件正在完整整理；不拿demo替代",
+      "source": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/recovered",
+      "rows": null,
+      "columns": [
+        "代码版本",
+        "输入",
+        "实际日志",
+        "检查点",
+        "真实叠图"
+      ],
+      "notes": "旧代码只用于审计，不调用为新求解器。"
+    },
+    {
+      "id": "ad_objects",
+      "name": "S01广告对象与高清资产登记",
+      "status": "11个现场身份已核；高清模板拆解中",
+      "source": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_inventory.json",
+      "rows": 11,
+      "columns": [
+        "ArtworkTemplate",
+        "Installation",
+        "SemanticFeature",
+        "Observation",
+        "版式匹配证据"
+      ],
+      "notes": "原片核实与高清组件图不同来源；普通logo不代替整幅横幅。"
+    },
+    {
+      "id": "data_contract",
+      "name": "完整新数据结构契约",
+      "source": "D:/OneDrive/codex_projs/RinkSpace/calibration/solve2/contracts.json",
+      "status": "72类型 / 449字段；含源组件→静态拼版→安装",
+      "rows": 72,
+      "columns": [
+        "字段含义",
+        "类型",
+        "单位",
+        "所有权",
+        "不可变性",
+        "外键关系"
+      ],
+      "notes": "由新schema.py反射生成，定义通过不代表当前数据已迁移或拟合通过。"
+    },
+    {
+      "id": "artwork_templates",
+      "name": "已取得的高清广告组件模板",
+      "status": "8模板 / 55命名部件；整幅banner尚未完成",
+      "source": "D:/CodexData/RinkSpace_Data/runs/solve2_review/artwork_templates.json",
+      "rows": 8,
+      "columns": [
+        "原始高清/矢量来源",
+        "具体版本",
+        "字形/图案/孔拓扑",
+        "现场匹配状态",
+        "安装映射待估"
+      ],
+      "notes": "覆盖Ad3/6–12，模板与现场安装分开；孔拓扑可能有原始噪声，未生成语义landmark。",
+      "data": {
+        "templates": [
+          {
+            "id": "isu_user_symbol",
+            "ads": [
+              "Ad7"
+            ],
+            "kind": "component_logo",
+            "match": {
+              "status": "component_identity_visually_matched",
+              "reason": "ISU 主切线字标与原片一致；图片画布和渐变并不是现场整幅打印边，缺右侧两行全称。",
+              "scene_evidence": [
+                {
+                  "pts": 448000,
+                  "time_base": "1/12800",
+                  "source_seconds": 35,
+                  "image_path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_source_448000.png"
+                },
+                {
+                  "pts": 512000,
+                  "time_base": "1/12800",
+                  "source_seconds": 40,
+                  "image_path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_source_512000.png"
+                }
+              ],
+              "entire_banner_geometry_verified": false
+            },
+            "components": 3,
+            "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\assets\\solve2\\templates\\isu_user_symbol.json"
+          },
+          {
+            "id": "wyndham_wordmark",
+            "ads": [
+              "Ad8"
+            ],
+            "kind": "component_logo",
+            "match": {
+              "status": "candidate_partial_identity_match",
+              "reason": "WYNDHAM 品牌主体相符；现场 Ankara 附加字、图标组合及打印布局尚未完成配准。",
+              "scene_evidence": [
+                {
+                  "pts": 448000,
+                  "time_base": "1/12800",
+                  "source_seconds": 35,
+                  "image_path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_source_448000.png"
+                },
+                {
+                  "pts": 499200,
+                  "time_base": "1/12800",
+                  "source_seconds": 39,
+                  "image_path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_source_499200.png"
+                }
+              ],
+              "entire_banner_geometry_verified": false
+            },
+            "components": 10,
+            "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\assets\\solve2\\templates\\wyndham_wordmark.json"
+          },
+          {
+            "id": "daikichi_japanese",
+            "ads": [
+              "Ad3"
+            ],
+            "kind": "component_logo",
+            "match": {
+              "status": "candidate_typography_edition_unverified",
+              "reason": "官网标志为多色组合；现场是反白广告。只抽中文字形，未锁字体、字距或全幅打印比例。",
+              "scene_evidence": [
+                {
+                  "pts": 320000,
+                  "time_base": "1/12800",
+                  "source_seconds": 25,
+                  "image_path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_source_320000.png"
+                },
+                {
+                  "pts": 575488,
+                  "time_base": "1/12800",
+                  "source_seconds": 44.96,
+                  "image_path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_source_575488.png"
+                }
+              ],
+              "entire_banner_geometry_verified": false
+            },
+            "components": 4,
+            "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\assets\\solve2\\templates\\daikichi_japanese.json"
+          },
+          {
+            "id": "oriental_japanese_old",
+            "ads": [
+              "Ad6"
+            ],
+            "kind": "component_logo",
+            "match": {
+              "status": "candidate_typography_edition_unverified",
+              "reason": "官方比较图左侧旧日文字标与现场品牌文字相同；现场没有圆形企业图标，官网右侧新英文图标不可直接代替。字体/反白版本仍待场景配准。",
+              "scene_evidence": [
+                {
+                  "pts": 416000,
+                  "time_base": "1/12800",
+                  "source_seconds": 32.5,
+                  "image_path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_source_416000.png"
+                },
+                {
+                  "pts": 428800,
+                  "time_base": "1/12800",
+                  "source_seconds": 33.5,
+                  "image_path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_source_428800.png"
+                },
+                {
+                  "pts": 524800,
+                  "time_base": "1/12800",
+                  "source_seconds": 41,
+                  "image_path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_source_524800.png"
+                }
+              ],
+              "entire_banner_geometry_verified": false
+            },
+            "components": 9,
+            "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\assets\\solve2\\templates\\oriental_japanese_old.json"
+          },
+          {
+            "id": "spor_toto_white",
+            "ads": [
+              "Ad10"
+            ],
+            "kind": "component_logo",
+            "match": {
+              "status": "partial_shape_match_subtitle_excluded",
+              "reason": "字标与上下弧形可分别对照；官网含 TEŞKİLAT BAŞKANLIĞI 副标题，现场未见此行，此处明确不把副标题进入现场模板。颜色不替代几何版本核验。",
+              "scene_evidence": [
+                {
+                  "pts": 460800,
+                  "time_base": "1/12800",
+                  "source_seconds": 36,
+                  "image_path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_source_460800.png"
+                },
+                {
+                  "pts": 467200,
+                  "time_base": "1/12800",
+                  "source_seconds": 36.5,
+                  "image_path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_source_467200.png"
+                },
+                {
+                  "pts": 473600,
+                  "time_base": "1/12800",
+                  "source_seconds": 37,
+                  "image_path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_source_473600.png"
+                },
+                {
+                  "pts": 480000,
+                  "time_base": "1/12800",
+                  "source_seconds": 37.5,
+                  "image_path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_source_480000.png"
+                },
+                {
+                  "pts": 486400,
+                  "time_base": "1/12800",
+                  "source_seconds": 38,
+                  "image_path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_source_486400.png"
+                }
+              ],
+              "entire_banner_geometry_verified": false
+            },
+            "components": 10,
+            "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\assets\\solve2\\templates\\spor_toto_white.json"
+          },
+          {
+            "id": "ozcan_red_badge",
+            "ads": [
+              "Ad9"
+            ],
+            "kind": "component_logo",
+            "match": {
+              "status": "partial_edition_match_missing_cursive_line",
+              "reason": "红色花边徽章、Öz 花形小徽和 can、1957 可对应。现场另有 cursive pişmaniye，本图没有，不能按整幅同版放回现场。",
+              "scene_evidence": [
+                {
+                  "pts": 460800,
+                  "time_base": "1/12800",
+                  "source_seconds": 36,
+                  "image_path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_source_460800.png"
+                },
+                {
+                  "pts": 480000,
+                  "time_base": "1/12800",
+                  "source_seconds": 37.5,
+                  "image_path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_source_480000.png"
+                },
+                {
+                  "pts": 486400,
+                  "time_base": "1/12800",
+                  "source_seconds": 38,
+                  "image_path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_source_486400.png"
+                }
+              ],
+              "entire_banner_geometry_verified": false
+            },
+            "components": 5,
+            "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\assets\\solve2\\templates\\ozcan_red_badge.json"
+          },
+          {
+            "id": "tbpf_roundel",
+            "ads": [
+              "Ad11"
+            ],
+            "kind": "component_logo",
+            "match": {
+              "status": "component_identity_visually_matched_detail_pending",
+              "reason": "原片可见圆徽组织名称与盾形旗/冰鞋相符；原片37秒有人体遮挡，细字和线宽版尚待无遮挡帧配准。官网动画首帧是另一政府徽章，已排除首帧。",
+              "scene_evidence": [
+                {
+                  "pts": 460800,
+                  "time_base": "1/12800",
+                  "source_seconds": 36,
+                  "image_path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_source_460800.png"
+                },
+                {
+                  "pts": 467200,
+                  "time_base": "1/12800",
+                  "source_seconds": 36.5,
+                  "image_path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_source_467200.png"
+                },
+                {
+                  "pts": 473600,
+                  "time_base": "1/12800",
+                  "source_seconds": 37,
+                  "image_path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_source_473600.png"
+                },
+                {
+                  "pts": 480000,
+                  "time_base": "1/12800",
+                  "source_seconds": 37.5,
+                  "image_path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_source_480000.png"
+                },
+                {
+                  "pts": 486400,
+                  "time_base": "1/12800",
+                  "source_seconds": 38,
+                  "image_path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_source_486400.png"
+                }
+              ],
+              "entire_banner_geometry_verified": false
+            },
+            "components": 8,
+            "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\assets\\solve2\\templates\\tbpf_roundel.json"
+          },
+          {
+            "id": "ankara_municipal",
+            "ads": [
+              "Ad12"
+            ],
+            "kind": "component_logo",
+            "match": {
+              "status": "component_layout_visually_matched",
+              "reason": "官方第1页盾徽居左、右侧 T.C./ANKARA/BÜYÜKŞEHİR/BELEDİYESİ 与原片37秒一致。模板包含 logo 组合，不把 PDF 白纸边或裁图矩形当实体广告边。",
+              "scene_evidence": [
+                {
+                  "pts": 473600,
+                  "time_base": "1/12800",
+                  "source_seconds": 37,
+                  "image_path": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_source_473600.png"
+                }
+              ],
+              "entire_banner_geometry_verified": false
+            },
+            "components": 6,
+            "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\assets\\solve2\\templates\\ankara_municipal.json"
+          }
+        ],
+        "summary": {
+          "actual_templates": 8,
+          "named_components": 55,
+          "raw_outer_contours": 215,
+          "raw_topological_holes": 191,
+          "semantic_landmarks": 0,
+          "full_banner_templates": 0
+        }
+      }
+    },
+    {
+      "id": "fixed_intersections",
+      "name": "新核查的第一镜头固定交点",
+      "status": "5固定实体候选 / 8曝光 / 10父证据组",
+      "source": "D:/CodexData/RinkSpace_Data/runs/solve2_review/s01_intersections.json",
+      "rows": 8,
+      "columns": [
+        "两条父材料曲线",
+        "固定特征ID",
+        "源UV/PTS",
+        "派生依赖",
+        "全局角色候选"
+      ],
+      "notes": "已核实真实材料交会；世界数值待估，全局lane/house绑定未确认，禁止每帧沿线滑动。"
+    },
+    {
+      "id": "ad_layouts",
+      "name": "现场广告静态拼版与新增源组件",
+      "status": "6新模板 / 105命名部件 / 6拼版提案",
+      "source": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_layouts.json",
+      "rows": 6,
+      "columns": [
+        "高清源组件",
+        "静态组件组布局",
+        "整幅安装",
+        "真实原片比对",
+        "未匹配反例"
+      ],
+      "notes": "Ad7全称横标、Ad5周年组件、Ad4赛事图标、Ad9手写版已补；Ad2字体候选不匹配，未锁定；源画布不当横幅边界。"
+    },
+    {
+      "id": "compute_check",
+      "name": "当前CPU/GPU物理投影核与稀疏数值桥",
+      "status": "真实182017行CPU/GPU一致性通过；尚未S01拟合",
+      "source": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/model_core/gpu_proof.json",
+      "rows": 182017,
+      "columns": [
+        "同参数project_at",
+        "解析world/motion/time导数",
+        "GPU真实计时",
+        "稀疏Ceres接口"
+      ],
+      "notes": "RTX5070Ti同状态投影+共享相机导数核约1ms；UV-only连下载约1.5ms。完整S01新装配正在接入，不能等同完整求解耗时。"
+    },
+    {
+      "id": "prepared_s01",
+      "name": "已停用的重做候选资料",
+      "status": "保留追查；未用于当前原版画面",
+      "source": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/preparation/g12/manifest.json",
+      "rows": 355554,
+      "columns": [
+        "8886完整原W组",
+        "87921独立源观测",
+        "340021全源E预算行",
+        "897真实profile / 1794独立Query等式",
+        "5共享冰交点 / 8工程预算",
+        "8固定Ad7字角 / 24工程预算",
+        "305逐源Ad7恢复 / 10727未核退出",
+        "1320模糊Ad8有限关联退出 / 10452原确认保留",
+        "82具体Ad5关联退出 / 18独立统计移除",
+        "8具体Ad2关联退出 / 0统计影响",
+        "50具体Ad4关联退出 / 19独立统计移除 / 0整W连带"
+      ],
+      "notes": "g12/model11是此前重做候选；当前显示的是原来的d78，二者不混用，不启动旧暖链。",
+      "noise_contract_revision": 2,
+      "model_revision": 11
+    }
+  ],
+  "inspection_model": {
+    "kind": "runtime_model",
+    "id": "original_ceres_s01_restored",
+    "label": "本来的第一镜头 · 当时的冰场与相机参数",
+    "package": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/ceres_regression/d78_exact",
+    "revision": 1,
+    "read_only": true,
+    "restored_original": true,
+    "original_parameter_sha256": "4cdff29eeea87a3e2624e976876aee5d39b9b99dfb92a0e3e02fb7328a24b945"
+  },
+  "advertisement_ids": [
+    "Ad1",
+    "Ad2",
+    "Ad3",
+    "Ad4",
+    "Ad5",
+    "Ad6",
+    "Ad7",
+    "Ad8",
+    "Ad9",
+    "Ad10",
+    "Ad11",
+    "Ad12",
+    "Ad13",
+    "Ad14",
+    "Ad15",
+    "Ad16",
+    "Ad17",
+    "Ad18",
+    "Ad19",
+    "Ad20",
+    "Ad21",
+    "Ad22",
+    "Ad23",
+    "Ad24",
+    "Ad25",
+    "Ad26"
+  ],
+  "ad_inventory": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_inventory.json",
+  "artwork_collection": "D:/CodexData/RinkSpace_Data/runs/solve2_review/artwork_templates.json",
+  "artwork_layouts": "D:/CodexData/RinkSpace_Data/runs/solve2_review/ad_layouts.json",
+  "run_status": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/current_run.json",
+  "preparation_delivery": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/preparation/delivery.json",
+  "observation_selection": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/selection.json",
+  "suspended_inspection_model": {
+    "kind": "runtime_model",
+    "id": "s01_current_physical_model",
+    "label": "S01当前共同模型与同广告展开坐标初始化",
+    "package": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/print_chart_candidate",
+    "revision": 11
+  },
+  "original_s01_recovery": {
+    "active": true,
+    "status": "按用户要求接回实际生成d78效果的原求解代码和加速；原画面作为最低效果基准",
+    "reference": "Ceres时期第一镜头d78；冰线已经较贴，广告未完全贴",
+    "source_model": "D:/CodexData/RinkSpace_Data/runs/solve2_review/shot1_runs/text_d78b7012c80664.json",
+    "source_model_sha256": "d78b7012c80664131f88134be0f9f868c1d6742ad7516155fc131b72ca3110e9",
+    "original_video": "D:/CodexData/RinkSpace_Data/runs/solve2_review/shot1_runs/d78_review.mp4",
+    "source_seconds": [
+      20.02,
+      44.96
+    ],
+    "restore_index": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/ceres_regression/restore_index.json",
+    "frozen_original_parameters": true,
+    "new_result_may_not_be_worse": true,
+    "automatic_replacement_allowed": false,
+    "numerical_solver_running": false
+  },
+  "control_surface": {
+    "enabled": false,
+    "auto_open": false,
+    "reason": "用户明确要求撤掉此控制台，不再打开或展示"
+  }
+}
