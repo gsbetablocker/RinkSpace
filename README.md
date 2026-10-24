@@ -4,7 +4,9 @@ RinkSpace 研究如何从花样滑冰转播中恢复冰场、连续围挡、广�
 
 项目处于研究验证阶段。安卡拉赛事与冈田芽衣节目是开发样本；现有九镜头恢复快照保留为失败状态，完整节目定位、人体空间位置及跨赛事能力仍未完成验收。数值收敛、平滑结果和测试通过均不能代替真实镜头验证。
 
-第1–6镜头的最新恢复已按用户要求停止并转入[系统审核](docs/GITHUB_REVIEW.md#joint6-20261021)。GPU求解已实际执行，源资格与完整候选已保存；早期停止策略、源实例准入和固定几何仍有问题，尚无通过验收的六镜头共同模型。
+2026-10-24 的重构已接入共同 native 几何、完整时变相机前向、观测合同和原生 PTS 回放。当前场地包含已确认的 M1–M5 几何关系，Ad1/Ad14、Ad2/Ad15、Ad3/Ad16 共享各自模板与尺寸，实例位置独立；Ad15、Ad16 仍未定位。具体尺寸和广告安装仍为待拟合初值。新 GPU LM、`solve` 和 `resume` 尚未实现，不能把结构图或 D3 回放称为新拟合。见[当前实现状态](docs/REBUILD.md)。
+
+此前第1–6镜头的恢复已停止并转入[系统审核](docs/GITHUB_REVIEW.md#joint6-20261021)。历史 GPU 求解确实执行过，其源资格与候选照常保留；它与当前尚未完成的统一求解引擎分别登记。
 
 ## 快速试用：合成数据
 
@@ -35,6 +37,7 @@ python -m pytest tests/test_geometry.py tests/test_motion.py tests/test_mosaic.p
 | 公开数据和失败快照怎样读取 | [离线审阅](docs/GITHUB_REVIEW.md)、[节目快照](events/ankara_2026/programmes/okada_mei_sp/review/README.md) |
 | 准确性、源时间和尺度怎样判定 | [验证说明](docs/VALIDATION.md) |
 | 模块 API 与后端 | [rinkfit](calibration/rinkfit/README.md)、[solver_runtime](calibration/solver_runtime/README.md) |
+| 重构后的原生接口、场地与广告模型 | [实现状态](docs/REBUILD.md)、[接口合同](docs/INTERFACES.md)、[当前场景](events/ankara_2026/scene/field/model.json) |
 
 下载完整仓库后，使用 Python 标准库检查审阅归档：
 

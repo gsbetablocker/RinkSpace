@@ -338,6 +338,11 @@ class StructuredIceFamily:
     hockey_midline_block_id: str | None = None
     constraint_ids: tuple[str,...] = ("curling.centres", "curling.radii", "lane.width", "hockey.centre_blue")
     authority: str = "user_confirmed_relations_with_engineering_parameterization"
+    # v1 is retained only to read saved states without silently changing them.
+    # New candidates eliminate the independent Lane centres and C0 translation.
+    layout_version: int = 1
+    board_block_id: str | None = None
+    hockey_end_block_id: str | None = None
 
     def curves(self, state):
         # curling=[xF,xR,yFirst,pitch,rOuter, ratios...]
@@ -348,10 +353,19 @@ class StructuredIceFamily:
             raise ValueError("invalid shared F/R geometry")
         if np.any(ratios <= 0) or np.any(ratios >= 1) or np.any(np.diff(ratios) <= 0):
             raise ValueError("nested shared house radii invalid")
-        # lane=[right_x,width,yMid1..4,left_draw1..4, centre_right1..4]
         lane = state.get(self.lane_block_id)
         right, width = lane[:2]
-        centers, lefts, carrier_ends = lane[2:6], lane[6:10], lane[10:14]
+        if self.layout_version == 2:
+            if len(lane) != 10:
+                raise ValueError("v2 Lane has no independent row-centre parameters")
+            centers = y0 + np.arange(4)*pitch
+            lefts, carrier_ends = lane[2:6], lane[6:10]
+        elif self.layout_version == 1:
+            if len(lane) != 14:
+                raise ValueError("historical v1 Lane layout mismatch")
+            centers, lefts, carrier_ends = lane[2:6], lane[6:10], lane[10:14]
+        else:
+            raise ValueError("unknown shared-ice layout version")
         if width <= 0 or np.any(lefts >= right) or np.any(carrier_ends <= xR):
             raise ValueError("invalid Lane width or finite coverage")
         result = {}
@@ -370,8 +384,14 @@ class StructuredIceFamily:
             for edge, ends in ((0,[lefts[row],high,right,high]),(1,[right,high,right,low]),(2,[right,low,lefts[row],low])):
                 result[f"ice.lane{row+1}:edge{edge}"]={"kind":"ice_segment","endpoints_xy":ends,
                     "left_values_are_drawing_coverage_not_physical_endpoints":True}
-        # hockey=[origin_x,origin_y,axis_angle,blue_offset, C0radius, y_draw_low,y_draw_high]
-        hx,hy,angle,blue,r0,low,high=state.get(self.hockey_block_id)
+        hockey=state.get(self.hockey_block_id)
+        if self.layout_version == 2:
+            if len(hockey) != 5:
+                raise ValueError("v2 hockey has no independent origin parameters")
+            hx=hy=0.
+            angle,blue,r0,low,high=hockey
+        else:
+            hx,hy,angle,blue,r0,low,high=hockey
         if blue <= 0 or r0 <= 0 or low >= high:
             raise ValueError("invalid shared hockey geometry")
         ca,sa=np.cos(angle),np.sin(angle)
@@ -397,6 +417,36 @@ class StructuredIceFamily:
                               ("A3",gx_left+inward_left,yhalf_left),("A4",gx_left+inward_left,-yhalf_left)):
                 center=np.array([x,y])@transform+[hx,hy]
                 result[f"ice.{label}:outer"]={"kind":"ice_circle","center_xy":center,"radius":float(r0),"angle_interval":[0.,2*np.pi]}
+            if self.hockey_end_block_id is not None:
+                if self.layout_version != 2 or self.board_block_id is None:
+                    raise ValueError("shared end markings require the v2 rink frame")
+                rleft,rright,goal_half,board_half=state.get(self.hockey_end_block_id)
+                if min(rleft,rright,goal_half,board_half)<=0:
+                    raise ValueError("invalid finite end-marking sizes")
+                W,rx,ry,p,_=state.get(self.board_block_id)
+                def board_end(sign, y):
+                    # Exact intersection with this same continuous superellipse
+                    # boundary, not a nominal end-plane or a new observation.
+                    def membership(x):
+                        q=np.abs(np.array([x,y])@transform)
+                        return max(0.,(q[0]-(.5-rx))/rx)**p+max(0.,(q[1]-(W/2-ry))/ry)**p-1.
+                    if membership(0.)>=0:
+                        raise ValueError("trapezoid span does not cross the rink interior")
+                    lo,hi=0.,2.
+                    for _ in range(55):
+                        mid=(lo+hi)/2
+                        if membership(sign*mid)>0: hi=mid
+                        else: lo=mid
+                    return np.array([sign*(lo+hi)/2,y])@transform
+                for side,gx,radius,sign in (("left",gx_left,rleft,-1),("right",gx_right,rright,1)):
+                    start=-np.pi/2 if sign<0 else np.pi/2
+                    result[f"ice.goal_crease_{side}"]={"kind":"ice_circle","center_xy":np.array([gx,0.])@transform,
+                        "radius":float(radius),"angle_interval":[float(start+angle),float(start+angle+np.pi)]}
+                    for edge,ysign in (("lower",-1),("upper",1)):
+                        a=np.array([gx,ysign*goal_half])@transform
+                        b=board_end(sign,ysign*board_half)
+                        result[f"ice.goal_trapezoid_{side}_{edge}_outer:segment0"]={"kind":"ice_segment",
+                            "endpoints_xy":np.r_[a,b],"boundary_endpoint":"derived_from_same_continuous_board"}
         return result
 
 
@@ -429,6 +479,11 @@ class SceneModel:
             if curve is None:
                 raise KeyError(f"unknown alias target: {target}")
         d = plain(curve.definition)
+        if d.get('kind')=='installed_artwork_polyline' and d.get('template_curve_id'):
+            template=next((c for c in self.curves if c.id==d['template_curve_id']),None)
+            if template is None or template.definition.get('kind')!='installed_artwork_polyline' or template.definition.get('template_curve_id'):
+                raise ValueError('installed artwork requires one canonical static template curve')
+            d['normalized_points']=plain(template.definition['normalized_points'])
         if self.structural_family is not None:
             generated=self.structural_family.curves(state)
             if curve.label in generated:
@@ -940,14 +995,7 @@ def structured_candidate(model):
         lefts.append(min(float(e[:,0].min()) for e in edges.values()))
     if not widths:
         raise ValueError("no observed initial Lane width support")
-    width=float(np.mean(widths));centers=[]
-    for edges in rows:
-        if 0 in edges and 2 in edges:
-            centers.append(float((edges[0][:,1].mean()+edges[2][:,1].mean())/2))
-        elif 0 in edges:
-            centers.append(float(edges[0][:,1].mean()-width/2))
-        else:
-            centers.append(float(edges[2][:,1].mean()+width/2))
+    width=float(np.mean(widths))
     carrier_ends=[]
     available=[]
     for row in range(1,5):
@@ -959,20 +1007,18 @@ def structured_candidate(model):
     if not available:
         raise ValueError("house-connection finite drawing support unavailable")
     carrier_ends=[float(np.median(available)) if x is None else x for x in carrier_ends]
-    lane=[float(np.mean(rights)),width,*centers,*lefts,*carrier_ends]
+    lane=[float(np.mean(rights)),width,*lefts,*carrier_ends]
     c0=defs["ice.C0:outer"];c=defs["ice.C:segment0"]
     ends=np.asarray(c["endpoints_xy"]).reshape(2,2)
     high,low=ends[np.argmax(ends[:,1])],ends[np.argmin(ends[:,1])]
     vec=high-low;angle=float(np.arctan2(-vec[0],vec[1]));axis=np.array([np.cos(angle),np.sin(angle)])
-    # Preserve the actually observed S01 C carrier as the orientation/position
-    # initializer. An unobserved demo C0 center must not drag that clear line.
-    origin_hint=np.asarray(defs.get("ice.C0:middle",c0)["center_xy"])
-    carrier_unit=vec/np.linalg.norm(vec)
-    origin=low+carrier_unit*float((origin_hint-low)@carrier_unit)
+    # The centre is the rink origin by the confirmed relation. The old carrier
+    # supplies orientation only; its old translation is deliberately removed.
+    origin=np.zeros(2)
     offset=np.mean([abs(float((np.asarray(defs[f"ice.{label}:segment0"]["endpoints_xy"]).reshape(2,2).mean(axis=0)-origin)@axis)) for label in ("B1","B2")])
     transverse=np.array([-np.sin(angle),np.cos(angle)])
     low_y=float((low-origin)@transverse);high_y=float((high-origin)@transverse)
-    hockey=[*origin,angle,float(offset),float(c0["radius"]),low_y,high_y]
+    hockey=[angle,float(offset),float(c0["radius"]),low_y,high_y]
     extra=None
     if all(k in defs for k in ("ice.goal_line_left:segment0","ice.goal_line_right:segment0",*[f"ice.A{i}:outer" for i in range(1,5)])):
         basis=np.stack((axis,transverse),axis=1)
@@ -981,32 +1027,64 @@ def structured_candidate(model):
         extra=[goals[0][0],goals[1][0],np.mean([faceoffs[2][0],faceoffs[3][0]])-goals[0][0],
                goals[1][0]-np.mean([faceoffs[0][0],faceoffs[1][0]]),np.mean([abs(faceoffs[2][1]),abs(faceoffs[3][1])]),
                np.mean([abs(faceoffs[0][1]),abs(faceoffs[1][1])])]
-    family=StructuredIceFamily("ankara_user_relations.v1","scene/curling_shared","scene/lane_shared","scene/hockey_shared",len(ratios),
+    end_sizes=None
+    end_labels=[f"ice.goal_crease_{side}" for side in ("left","right")]
+    trap_labels=[f"ice.goal_trapezoid_{side}_{edge}_outer:segment0" for side in ("left","right") for edge in ("lower","upper")]
+    if extra is not None and all(k in defs for k in end_labels+trap_labels):
+        radii=[]
+        for name in end_labels:
+            definition=defs[name]
+            if definition['kind']=='ice_circle':
+                radii.append(float(definition['radius']))
+            else:
+                q=np.asarray(definition['points_xyz'])[:,:2]
+                # The already-saved semicircle's two end points give its
+                # diameter. This is initialization from geometry, not fitting.
+                radii.append(float(np.linalg.norm(q[-1]-q[0])/2))
+        spans=[]
+        for label in trap_labels:
+            q=np.asarray(defs[label]['endpoints_xy']).reshape(2,2)@basis
+            q=q[np.argsort(np.abs(q[:,0]))]
+            spans.append(np.abs(q[:,1]))
+        end_sizes=[*radii,*np.mean(spans,axis=0)]
+    family=StructuredIceFamily("ankara_user_relations.v2","scene/curling_shared","scene/lane_shared","scene/hockey_shared",len(ratios),
         "scene/hockey_faceoff_shared" if extra is not None else None,
-        "scene/C0_material_midline_radius" if "ice.C0:middle" in defs else None)
+        "scene/C0_material_midline_radius" if "ice.C0:middle" in defs else None,
+        layout_version=2,board_block_id=model.scene.board_block_id,
+        hockey_end_block_id="scene/hockey_ends_shared" if end_sizes is not None else None)
     specs=list(state.blocks);vals=list(state.values)
     def add(key,names,units,q):
         specs.append(block(key,S.OwnerKind.SCENE,model.scene.id,names,units,model.scene.coordinate_system_id))
         vals.append(S.ParameterValue(key,tuple(float(x) for x in q)))
     add(family.curling_block_id,["xF","xR","first_row_y","pitch","outer_radius",*[f"{name}_outer_ratio" for name in ratios]],
         [S.Unit.SCENE_UNIT]*5+[S.Unit.DIMENSIONLESS]*len(ratios),curling)
-    add(family.lane_block_id,["right_x","width",*[f"center_y{i}" for i in range(1,5)],*[f"left_drawing_x{i}" for i in range(1,5)],*[f"centreline_right_drawing_x{i}" for i in range(1,5)]],S.Unit.SCENE_UNIT,lane)
-    add(family.hockey_block_id,["origin_x","origin_y","angle","blue_offset","C0radius","drawing_y_low","drawing_y_high"],
-        [S.Unit.SCENE_UNIT]*2+[S.Unit.RADIAN]+[S.Unit.SCENE_UNIT]*4,hockey)
+    add(family.lane_block_id,["right_x","width",*[f"left_drawing_x{i}" for i in range(1,5)],*[f"centreline_right_drawing_x{i}" for i in range(1,5)]],S.Unit.SCENE_UNIT,lane)
+    add(family.hockey_block_id,["angle","blue_offset","C0radius","drawing_y_low","drawing_y_high"],
+        [S.Unit.RADIAN]+[S.Unit.SCENE_UNIT]*4,hockey)
     if family.hockey_midline_block_id is not None:
         add(family.hockey_midline_block_id,["material_width_midline_radius"],S.Unit.SCENE_UNIT,[defs["ice.C0:middle"]["radius"]])
     if extra is not None:
         add(family.hockey_extra_block_id,["goal_x_left","goal_x_right","faceoff_inward_left","faceoff_inward_right","faceoff_yhalf_left","faceoff_yhalf_right"],S.Unit.SCENE_UNIT,extra)
+    if end_sizes is not None:
+        add(family.hockey_end_block_id,["crease_radius_left","crease_radius_right","trapezoid_goal_half_span","trapezoid_board_half_span"],S.Unit.SCENE_UNIT,end_sizes)
     preliminary=ParameterState("shared_geometry_initial@1",state.revision+1,state.coordinate_system_id,tuple(specs),tuple(vals))
     generated=family.curves(preliminary)
+    aliases={'ice.curling_centerline_row3:segment0':'ice.house_connection_F3_R3:segment0'}
     removed={c.parameter_block_id for c in model.scene.curves if c.label in generated and c.parameter_block_id}
+    removed.update(c.parameter_block_id for c in model.scene.curves if c.label in aliases and c.parameter_block_id)
     specs=tuple(b for b in specs if b.id not in removed);vals=tuple(v for v in vals if v.variable_block_id not in removed)
     newstate=ParameterState("shared_geometry_initial@1",state.revision+1,state.coordinate_system_id,specs,vals)
     curves=[];seen=set();displacements=[]
     for curve in model.scene.curves:
         if curve.label in generated:
-            curves.append(replace(curve,parameter_block_id=None,definition={**plain(curve.definition),**generated[curve.label],"structural_family_id":family.id},semantic_status="shared_user_relation_initial_geometry"))
+            curves.append(replace(curve,kind=generated[curve.label]["kind"],parameter_block_id=None,definition={**plain(curve.definition),**generated[curve.label],"structural_family_id":family.id},semantic_status="shared_user_relation_initial_geometry"))
             seen.add(curve.label)
+        elif curve.label in aliases:
+            target=next(c.id for c in model.scene.curves if c.label==aliases[curve.label])
+            curves.append(replace(curve,kind='curve_alias',parameter_block_id=None,
+                definition={**plain(curve.definition),'kind':'curve_alias','target_curve_id':target,
+                    'identity_basis':'named curling row-3 centreline and F3/R3 carrier are the same user-defined line'},
+                semantic_status='shared_row_centreline_alias'))
         else:
             curves.append(curve)
     for label,d in generated.items():
@@ -1014,7 +1092,7 @@ def structured_candidate(model):
             identifier=f"shared_geometry/{label}"
             curves.append(CurveModel(identifier,label,f"entity/{label.split(':')[0]}",d["kind"],None,d,
                 semantic_status="derived_shared_structure_not_new_observation"))
-    scene=replace(model.scene,curves=tuple(curves),geometry_family="user_shared_ice_relation_candidate.v1",structural_family=family)
+    scene=replace(model.scene,curves=tuple(curves),geometry_family="user_shared_ice_relation_candidate.v2",structural_family=family)
     candidate=replace(model,id=model.id+"_shared_geometry_candidate",revision=model.revision+1,scene=scene,state=newstate)
     stations=np.linspace(0,1,33)
     for curve in model.scene.curves:
@@ -1027,7 +1105,128 @@ def structured_candidate(model):
         "governing_constraint_ids":list(family.constraint_ids),"metre_dimensions_used":False,
         "Lane_left_values":"finite drawing/source-support coverage, not physical endpoints or fourth edges",
         "new_derived_curves_are_evidence":False,"source_visual_acceptance":False}
+    report.update(shared_layout_version=2,independent_Lane_centres_removed=4,independent_hockey_translation_removed=2,
+        C0_is_rink_origin=True,Lane_centres_are_same_row_coordinates=True,
+        end_markings_follow_shared_hockey_frame=end_sizes is not None)
+    report['shared_row_centreline_aliases']=aliases
     return candidate,report
+
+
+def shared_advertisement_candidate(model, pair_facts):
+    """One static template and size per explicitly confirmed x/x+13 pair.
+
+    This changes the new scene only. Historic d78 material samples supply the
+    template where available; demo geometry supplies missing placement/inventory.
+    A material bounding box is a numerical template chart, never a banner edge.
+    """
+    facts=pair_facts['constraint']
+    if facts.get('paired_advertisement_numbers')!='x and x+13' or not facts.get('same_printed_template') or not facts.get('shared_printed_dimensions'):
+        raise ValueError('explicit confirmed paired template/size relation required')
+    state=model.state;board=model.scene.board(state);P=board.perimeter
+    grouped={};untouched=[]
+    for c in model.scene.curves:
+        match=re.match(r'Ad(\d+)',c.label)
+        if not match:untouched.append(c);continue
+        n=int(match[1]);d=model.scene.resolved_definition(c,state)
+        if d['kind']!='board_material_polyline':raise ValueError('unexpected advertisement input kind')
+        q=np.asarray(d['unwrapped_station_height'],dtype=float).copy()
+        q[:,0]=np.unwrap(q[:,0]/P*2*np.pi)/(2*np.pi)*P
+        grouped.setdefault(n,[]).append((c,q))
+    def normalize(parts):
+        anchor=float(parts[0][1][0,0]);out=[]
+        for c,q in parts:
+            q=q.copy();q[:,0]+=np.round((anchor-q[:,0].mean())/P)*P;out.append((c,q))
+        return out
+    grouped={n:normalize(v) for n,v in grouped.items()}
+    removed={c.parameter_block_id for parts in grouped.values() for c,_ in parts if c.parameter_block_id}
+    removed.update(b.id for b in state.blocks if b.owner.kind in (S.OwnerKind.INSTALLATION,S.OwnerKind.ARTWORK))
+    specs=[b for b in state.blocks if b.id not in removed];values=[v for v in state.values if v.variable_block_id not in removed]
+    def add(key,kind,owner,names,units,q):
+        specs.append(block(key,kind,owner,names,units,state.coordinate_system_id))
+        values.append(S.ParameterValue(key,tuple(float(x) for x in q)))
+    def extent(parts):
+        q=np.concatenate([q for _,q in parts]);return q.min(axis=0),q.max(axis=0)
+    def suffix(c,n):
+        s=re.sub(r'^Ad\d+','',c.label)
+        s=re.sub(r'Ad\d+:','',s)
+        if 'circle' in s and 'print.' in s:return '.print.circle'
+        return s
+    new_curves=list(untouched);installations=[];artworks=[];reports=[];missing=[]
+    previous_installations={a.id:a for a in model.installations}
+    for first in range(1,14):
+        members=(first,first+13)
+        source=next((n for n in members if any(c.id.startswith('d78_') for c,_ in grouped.get(n,()))),None)
+        if source is None:source=next((n for n in members if n in grouped),None)
+        if source is None:
+            missing.extend(members);continue
+        parts=grouped[source]
+        # A second historic version can have different component names and a
+        # different placement. Do not superimpose it on the d78 material object.
+        saved=[item for item in parts if item[0].id.startswith('d78_')]
+        if saved:parts=saved
+        low,high=extent(parts);size=high-low
+        if np.any(size<=0):raise ValueError('degenerate static advertisement template')
+        pair=f'artwork_pair/Ad{first}-Ad{first+13}'
+        size_key=pair+'/size'
+        add(size_key,S.OwnerKind.ARTWORK,pair,['material_width','material_height'],S.Unit.SCENE_UNIT,size)
+        template_ids=[];missing_members=[];replaced=[]
+        for n in members:
+            iid=f'installation/Ad{n}'
+            current=grouped.get(n)
+            old_installation=previous_installations.get(iid)
+            role=old_installation.extent_role if old_installation else 'unknown_do_not_infer_banner_from_print_canvas'
+            if current is None:
+                installations.append(InstallationModel(iid,'board/continuous',pair,None,size_key,pair,
+                    source_status='confirmed_template_available_placement_missing',extent_role=role))
+                missing.append(n);missing_members.append(n);continue
+            if n==source:origin=low
+            else:
+                target_low,target_high=extent(current)
+                # Preserve the current material centre as initialization. Equal
+                # dimensions come from the shared template, not another fit.
+                origin=(target_low+target_high)/2-size/2
+            placement=iid+'/shared_placement'
+            add(placement,S.OwnerKind.INSTALLATION,iid,['station','height','angle'],
+                [S.Unit.SCENE_UNIT,S.Unit.SCENE_UNIT,S.Unit.RADIAN],[*origin,0.])
+            installations.append(InstallationModel(iid,'board/continuous',pair,placement,size_key,pair,
+                template_match_status='user_confirmed_paired_print_initial_shape_not_HD_verified',
+                source_status='shared_static_pair_candidate',extent_role=role))
+            targets={suffix(c,n):c for c,_ in current}
+            used=set()
+            for c,q in parts:
+                tail=suffix(c,source);target=c if n==source else targets.get(tail)
+                identifier=target.id if target else f'shared_pair/Ad{n}/{c.id}'
+                definition={'kind':'installed_artwork_polyline','installation_id':iid,
+                    'template_pair_id':pair,'source_template_curve_id':c.id,
+                    'initialization_source':'shared_pair_from_d78_static_template' if saved else 'shared_pair_from_demo8a28_static_template',
+                    'initialization_only':True,'vertices_are_landmarks':False,
+                    'normalized_extent_is_banner_boundary':False,'shape_is_HD_verified':False}
+                if n==source:
+                    definition['normalized_points']=(q-low)/size
+                    template_ids.append(identifier)
+                else:definition['template_curve_id']=c.id
+                # Keep the true source identity only where an existing path has
+                # that identity; copied template parts are derived geometry.
+                if target:
+                    definition['historic_definition']=plain(target.definition)
+                    used.add(target.id)
+                new_curves.append(CurveModel(identifier,f'Ad{n}'+tail,f'entity/Ad{n}',
+                    'installed_artwork_polyline',None,definition,
+                    semantic_status='shared_pair_static_template_not_new_source_observation'))
+            replaced.extend(c.id for c,_ in current if c.id not in used)
+        artworks.append(ArtworkModel(pair,None,(ArtworkGroup(pair,tuple(template_ids),None),),
+            'user_confirmed_pair_static_initial_shape_not_HD_verified',
+            'One canonical curve set and one size block for both installations; origins remain independent.'))
+        reports.append({'numbers':members,'template_source_ad':source,'shared_size_block_id':size_key,
+            'canonical_template_curves':template_ids,'superseded_initial_curves':replaced,
+            'missing_placement':missing_members,'template_bbox_is_not_new_external_border':True})
+    newstate=ParameterState('shared_scene_and_artwork@1',state.revision+1,state.coordinate_system_id,tuple(specs),tuple(values))
+    scene=replace(model.scene,curves=tuple(new_curves),missing_inventory=tuple(model.scene.missing_inventory)+tuple(f'Ad{n}_placement_unknown' for n in missing))
+    candidate=replace(model,id=model.id+'_shared_ads',revision=model.revision+1,scene=scene,state=newstate,
+        installations=tuple(installations),artworks=tuple(artworks))
+    return candidate,{'schema':'rinksolve.shared_ad_pairs.v1','pairs':reports,
+        'missing_placement':missing,'new_source_observations':0,'per_vertex_shape_variables':False,
+        'pair_authority':pair_facts.get('authority'),'fitting_performed':False}
 
 
 @dataclass(frozen=True)

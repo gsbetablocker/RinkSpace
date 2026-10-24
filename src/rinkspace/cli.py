@@ -13,6 +13,36 @@ from .io import dump_json, load_json
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="rinkspace", description="RinkSpace tested starter utilities; see README for implemented scope.")
     sub = parser.add_subparsers(dest="command", required=True)
+    p = sub.add_parser("model", help="Native-core structure tools; this slice does not run fitting")
+    model_sub = p.add_subparsers(dest="model_command", required=True)
+    m = model_sub.add_parser("import-d78", help="One-time unfitted structural seed import; original files unchanged")
+    m.add_argument("--model", required=True); m.add_argument("--relations", required=True); m.add_argument("--out", required=True)
+    m = model_sub.add_parser("preview", help="Render explicitly incomplete structure through the built native core")
+    m.add_argument("--scene", required=True); m.add_argument("--library", required=True); m.add_argument("--out", required=True)
+    m = model_sub.add_parser("import-state", help="Import complete frozen d78 state; no fit")
+    m.add_argument("--model", required=True); m.add_argument("--complete-state"); m.add_argument("--scope", required=True)
+    m.add_argument("--library", required=True); m.add_argument("--out", required=True)
+    p = sub.add_parser("prepare", help="Compile current immutable observations and scope")
+    p.add_argument("--input", required=True); p.add_argument("--scope", required=True)
+    p.add_argument("--shots", required=True); p.add_argument("--out", required=True)
+    p = sub.add_parser("review", help="Complete native-PTS replay using the same compiled forward; no fit")
+    p.add_argument("--prepared", required=True); p.add_argument("--state", required=True); p.add_argument("--assets", required=True)
+    p.add_argument("--shots", required=True); p.add_argument("--library", required=True); p.add_argument("--out", required=True)
+    p.add_argument("--compare")
+    m = model_sub.add_parser("preview-curling", help="Native curling/Lane structure with explicit drawing-support semantics; no fit")
+    m.add_argument("--scene", required=True); m.add_argument("--library", required=True); m.add_argument("--out", required=True)
+    m = model_sub.add_parser("preview-field", help="Native M1-M5 field geometry review; no fit")
+    m.add_argument("--scene", required=True); m.add_argument("--library", required=True); m.add_argument("--out", required=True)
+    m = model_sub.add_parser("import-ad-assets", help="Import explicitly selected existing advertisement source records; no fit")
+    m.add_argument("--input", required=True); m.add_argument("--out", required=True)
+    m = model_sub.add_parser("preview-ad-assets", help="Review original advertisement pixels and native-sampled templates; no fit")
+    m.add_argument("--assets", required=True); m.add_argument("--library", required=True); m.add_argument("--out", required=True)
+    m = model_sub.add_parser("rebuild-glyphs", help="Rebuild user-confirmed printed text from native source pixels; no scene fit")
+    m.add_argument("--input", required=True); m.add_argument("--library", required=True); m.add_argument("--out", required=True)
+    m = model_sub.add_parser("preview-print-installation", help="Same native print, continuous board and motion camera; no fit")
+    m.add_argument("--scene", required=True); m.add_argument("--assets", required=True); m.add_argument("--instance", required=True)
+    m.add_argument("--camera", required=True); m.add_argument("--frame", required=True); m.add_argument("--pts", required=True, type=int)
+    m.add_argument("--library", required=True); m.add_argument("--out", required=True)
     sub.add_parser("doctor", help="Report environment and FFmpeg availability")
     p = sub.add_parser("serve", help="Start the local source-frame and rink-plane workbench")
     p.add_argument("--root", default="."); p.add_argument("--port", type=int, default=8765)
@@ -36,6 +66,49 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--out", default="outputs/synthetic_demo")
     args = parser.parse_args(argv)
     try:
+        if args.command == "model":
+            if args.model_command == "import-d78":
+                from .compat.d78_geometry import import_d78
+                result = import_d78(args.model, args.relations, args.out)
+            elif args.model_command == "import-ad-assets":
+                from .session.ad_assets import import_assets
+                result = import_assets(args.input, args.out)
+            elif args.model_command == "preview-ad-assets":
+                from .session.ad_review import render
+                result = render(args.assets, args.library, args.out)
+            elif args.model_command == "rebuild-glyphs":
+                from .session.glyph_rebuild import rebuild
+                result = rebuild(args.input, args.library, args.out)
+            elif args.model_command == "preview-print-installation":
+                from .session.print_installation import render
+                result = render(args.scene,args.assets,args.instance,args.camera,args.frame,args.pts,args.library,args.out)
+            elif args.model_command == "preview-field":
+                from .session.field_preview import render
+                result = render(args.scene, args.library, args.out)
+            elif args.model_command == "preview-curling":
+                from .session.curling_preview import render
+                result = render(args.scene, args.library, args.out)
+            elif args.model_command == "import-state":
+                from .compat.d78_state import import_d78_state
+                path = import_d78_state(args.model, args.out, args.scope, args.library, args.complete_state)
+                result = {"state_path": str(path), "fit_executed": False, "purpose": "frozen_d78_replay"}
+            else:
+                from .session.core_preview import preview
+                result = preview(args.scene, args.library, args.out)
+            print(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False))
+            return 0
+        if args.command == "prepare":
+            from dataclasses import asdict
+            from .session.prepare import prepare
+            result = asdict(prepare(args.input, args.scope, args.shots, args.out))
+            print(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False))
+            return 0
+        if args.command == "review":
+            from .review.render import render
+            receipt = render(args.prepared, args.state, args.assets, args.shots, args.library, args.out, args.compare)
+            print(json.dumps({"review_path": receipt.review_path, "scope_status": receipt.review["scope_status"],
+                              "fit_executed": False, "artifacts": receipt.review["artifacts"]}, ensure_ascii=False, indent=2))
+            return 0
         if args.command == "serve":
             from .web import serve
             serve(args.root, args.port, args.open)

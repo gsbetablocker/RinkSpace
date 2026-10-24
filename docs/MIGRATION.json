@@ -1,0 +1,339 @@
+{
+  "schema": "rinkspace.refactor.migration/1",
+  "base_commit": "3e866a835dac26c461bb4ae436ae289814a1ae57",
+  "status": "design_not_automatic_delete_plan",
+  "normal_runtime_legacy_imports_allowed": false,
+  "preserve_confirmed_observation_values": true,
+  "manual_review_required_for_every_observation": false,
+  "entries": [
+    {
+      "id": "storage_media",
+      "sources": [
+        "src/rinkspace/media.py",
+        "src/rinkspace/storage.py",
+        "src/rinkspace/path_policy.py",
+        "src/rinkspace/resource_registry.py"
+      ],
+      "action": "retain_and_adapt",
+      "destinations": [
+        "src/rinkspace/media.py",
+        "src/rinkspace/storage.py",
+        "src/rinkspace/domain/source.py"
+      ],
+      "preserve": [
+        "native integer PTS",
+        "source hash",
+        "existing registered Data paths",
+        "OneDrive path policy"
+      ],
+      "exit_condition": "Application services call one source and asset interface; remove only demonstrated duplicate helpers."
+    },
+    {
+      "id": "source_shots_rigs",
+      "sources": [
+        "src/rinkspace/workspace.py",
+        "src/rinkspace/camera_timeline.py",
+        "src/rinkspace/camera_classification.py",
+        "src/rinkspace/camera_scope.py"
+      ],
+      "action": "extract_services_preserve_labels",
+      "destinations": [
+        "src/rinkspace/session/prepare.py",
+        "src/rinkspace/domain/source.py",
+        "src/rinkspace/domain/camera.py"
+      ],
+      "preserve": [
+        "user-confirmed physical rig identity",
+        "source shot ranges",
+        "installation epochs"
+      ],
+      "exit_condition": "Existing source, shot and rig registrations are read without reclassification or repeated full-video indexing."
+    },
+    {
+      "id": "domain_contracts",
+      "sources": [
+        "calibration/solve2/rinksolve/schema.py",
+        "calibration/solve2/rinksolve/arrays.py",
+        "src/rinkspace/delivery_contracts.py"
+      ],
+      "action": "replace_with_small_typed_contract",
+      "destinations": [
+        "src/rinkspace/domain/contracts.py",
+        "src/rinkspace/domain/observations.py",
+        "src/rinkspace/domain/state.py"
+      ],
+      "preserve": [
+        "measurement meaning",
+        "finite entities",
+        "full uncertainty groups",
+        "source identities",
+        "confirmed legacy observations"
+      ],
+      "exit_condition": "All new active inputs validate through domain; unsupported entities fail explicitly; legacy origin alone never deactivates a confirmed measurement."
+    },
+    {
+      "id": "geometry_projection",
+      "sources": [
+        "calibration/solve2/rinksolve/model.py",
+        "calibration/solve2/rinksolve/projector.py",
+        "calibration/solve2/rinksolve/project_at.cu",
+        "calibration/solve2/rinksolve/board_at.cu",
+        "src/rinkspace/calibration_companion/scene_camera.py",
+        "src/rinkspace/calibration_companion/pivot_camera.py",
+        "src/rinkspace/calibration_companion/wide_angle_camera.py"
+      ],
+      "action": "port_verified_math_to_single_core",
+      "destinations": [
+        "native/include/rinkspace/geometry.hpp",
+        "native/include/rinkspace/projection.hpp",
+        "native/src/core_api.cpp",
+        "src/rinkspace/core/native.py"
+      ],
+      "preserve": [
+        "known nonzero camera lever",
+        "continuous board surface",
+        "unwrapped advertisement definition",
+        "legacy frozen geometry for exact replay"
+      ],
+      "exit_condition": "Exact frozen-baseline replay and separately reviewed physically structured candidate use the same forward implementation."
+    },
+    {
+      "id": "solver",
+      "sources": [
+        "calibration/solve2/rinksolve/parameterization.py",
+        "calibration/solve2/rinksolve/optimizer.py",
+        "calibration/solve2/rinksolve/constrained.py",
+        "calibration/solve2/rinksolve/gpu_projector.py",
+        "calibration/solve2/rinksolve/gpu_linear_backend.py",
+        "calibration/solve2/rinksolve/original_ads_solver.py",
+        "calibration/solve2/native/gpu_batch_ceres.cpp"
+      ],
+      "action": "replace_production_engine",
+      "destinations": [
+        "native/include/rinkspace/problem.hpp",
+        "native/include/rinkspace/solver.hpp",
+        "native/src/problem.cpp",
+        "native/src/solver.cpp",
+        "native/gpu/evaluate.cu",
+        "native/gpu/reduce.cu",
+        "native/src/cudss_system.cpp",
+        "native/gpu/local_eliminate.cu",
+        "native/src/checkpoint.cpp"
+      ],
+      "preserve": [
+        "reliable existing CUDA formulas and source provenance",
+        "baseline states",
+        "measured observations"
+      ],
+      "exit_condition": "Full real S01 is visually accepted and has measured end-to-end GPU timing; ads and ice run through one engine."
+    },
+    {
+      "id": "prepared_inputs",
+      "sources": [
+        "calibration/solve2/rinksolve/preparation.py",
+        "calibration/solve2/rinksolve/observations.py",
+        "calibration/solve2/rinksolve/sources.py",
+        "calibration/rinkfit/src/rinkfit_joint/current_input_v1.py"
+      ],
+      "action": "generalize_self_contained_preparation",
+      "destinations": [
+        "src/rinkspace/observations/compile.py",
+        "src/rinkspace/session/prepare.py"
+      ],
+      "preserve": [
+        "current-input self-containment",
+        "raw UV and PTS",
+        "correlated source groups",
+        "entity relation edits"
+      ],
+      "exit_condition": "Normal solve and resume consume current prepared arrays directly without importing data-generation history."
+    },
+    {
+      "id": "measurement_association",
+      "sources": [
+        "src/rinkspace/scene_observations.py",
+        "src/rinkspace/landmark_association.py",
+        "src/rinkspace/landmark_observations.py",
+        "src/rinkspace/vision_data.py",
+        "src/rinkspace/vision_source_roles.py",
+        "src/rinkspace/vision_source_topology.py"
+      ],
+      "action": "consolidate_measuring_associating_tracking",
+      "destinations": [
+        "src/rinkspace/observations/extract.py",
+        "src/rinkspace/observations/associate.py",
+        "src/rinkspace/observations/track.py",
+        "src/rinkspace/observations/quality.py"
+      ],
+      "preserve": [
+        "real source pixels",
+        "reviewed entity identities",
+        "raw detections and rejected evidence",
+        "manual uncertainty and decisions"
+      ],
+      "exit_condition": "Automatic observations on confirmed entities can be active after source and quality checks; only ambiguous identity clusters require human intervention."
+    },
+    {
+      "id": "legacy_runtime",
+      "sources": [
+        "calibration/solver_runtime/runtime.py",
+        "calibration/solver_runtime/event_factories.py",
+        "calibration/solver_runtime/legacy",
+        "calibration/rinkfit/src/rinkfit_joint"
+      ],
+      "action": "freeze_history_retire_runtime_dependencies",
+      "destinations": [
+        "src/rinkspace/compat",
+        "events/ankara_2026/programmes/okada_mei_sp/s01_original"
+      ],
+      "preserve": [
+        "irreproducible source facts",
+        "complete historical states",
+        "historical failure records",
+        "required legacy static readers"
+      ],
+      "exit_condition": "Required history has data-only importers; new solve/resume never installs meta-path finders or replays historical qualification chains. No bulk deletion is authorized by this row."
+    },
+    {
+      "id": "d78_import",
+      "sources": [
+        "calibration/solve2/rinksolve/d78_import.py",
+        "calibration/solve2/rinksolve/baseline.py",
+        "events/ankara_2026/programmes/okada_mei_sp/s01_original/original_model.json",
+        "events/ankara_2026/programmes/okada_mei_sp/s01_original/original_complete_state.json"
+      ],
+      "action": "data_only_import_preserve_originals",
+      "destinations": [
+        "src/rinkspace/compat/d78_geometry.py",
+        "src/rinkspace/compat/d78_state.py"
+      ],
+      "preserve": [
+        "original bytes and hashes",
+        "original cameras",
+        "frozen original geometry",
+        "source-time mapping"
+      ],
+      "exit_condition": "New replay consumes an explicit current-format snapshot without calling old solver modules.",
+      "current_slice": "d78_geometry.py extracts an unfitted structured seed only; d78_state.py remains the future complete frozen-state replay importer."
+    },
+    {
+      "id": "render_review",
+      "sources": [
+        "src/rinkspace/review.py",
+        "src/rinkspace/landmark_render.py",
+        "src/rinkspace/structure_render.py",
+        "calibration/solve2/rinksolve/renderer.py",
+        "calibration/solve2/rinksolve/server.py",
+        "src/rinkspace/static/frame_point_editor.js"
+      ],
+      "action": "retain_image_ui_rebind_projection",
+      "destinations": [
+        "src/rinkspace/review/render.py",
+        "src/rinkspace/review/compare.py",
+        "src/rinkspace/review/export.py"
+      ],
+      "preserve": [
+        "native PTS",
+        "all model line and advertisement visibility",
+        "user point editing capability",
+        "PotPlayer local video paths"
+      ],
+      "exit_condition": "All overlays request paths from the same native model snapshot as the solver; no simultaneous review.py and review package."
+    },
+    {
+      "id": "tracking_analysis",
+      "sources": [
+        "src/rinkspace/athlete_continuity.py",
+        "src/rinkspace/motion.py",
+        "src/rinkspace/metric_scale.py",
+        "src/rinkspace/vision_person_cpu.py"
+      ],
+      "action": "reuse_parts_with_explicit_spatial_semantics",
+      "destinations": [
+        "src/rinkspace/tracking/reference.py",
+        "src/rinkspace/tracking/observe.py",
+        "src/rinkspace/tracking/reconstruct.py",
+        "src/rinkspace/analysis/segments.py",
+        "src/rinkspace/analysis/kinematics.py",
+        "src/rinkspace/analysis/coverage.py"
+      ],
+      "preserve": [
+        "source-time continuity",
+        "missing and airborne segments",
+        "conditional scale provenance"
+      ],
+      "exit_condition": "A body reference, its world vertical projection, ray-plane intersection and blade contact have distinct types and claims."
+    },
+    {
+      "id": "cli_and_build",
+      "sources": [
+        "src/rinkspace/cli.py",
+        "pyproject.toml",
+        "calibration/solve2/run_solver.py",
+        "calibration/solve2/run_original_ads.py",
+        "calibration/solve2/native/build_gpu.py",
+        "calibration/rinkfit/CMakeLists.txt"
+      ],
+      "action": "one_public_cli_one_native_build",
+      "destinations": [
+        "src/rinkspace/cli.py",
+        "pyproject.toml",
+        "native/CMakeLists.txt",
+        "environments"
+      ],
+      "preserve": [
+        "public package entry point",
+        "known usable local dependencies",
+        "source and output path rules"
+      ],
+      "exit_condition": "Production commands dispatch to session services and one native engine; optional imports remain lazy; the existing environment is reused where compatible."
+    },
+    {
+      "id": "event_facts_and_artifacts",
+      "sources": [
+        "events",
+        "configs/camera_classification",
+        "configs/camera_hardware",
+        "configs/rink_model",
+        "configs/continuous_inputs"
+      ],
+      "action": "preserve_originals_add_current_references",
+      "destinations": [
+        "events/<event>/scene.json",
+        "events/<event>/rigs.json",
+        "events/<event>/programmes/<programme>/session.json",
+        "Data/prepared/<dataset_id>",
+        "Data/runs/<run_id>"
+      ],
+      "preserve": [
+        "confirmed facts",
+        "manual observations",
+        "advertisement topology",
+        "camera installations",
+        "historical failure records",
+        "original asset locations"
+      ],
+      "exit_condition": "Current event/programme references are self-contained and all old source identities remain traceable. Large data is not copied into OneDrive."
+    }
+  ],
+  "public_cli": "rinkspace; current slice adds model import-d78 and model preview; no competing import entrypoint",
+  "programme_scope": {
+    "manifest": "events/ankara_2026/programmes/okada_mei_sp/rebuild_scope.json",
+    "required_shot_ids": [
+      "s01",
+      "s02",
+      "s03",
+      "s04",
+      "s05",
+      "s06",
+      "s07",
+      "s08",
+      "s09"
+    ],
+    "old_joint6_is_selected_subset": true,
+    "subset_run_cannot_claim_programme_complete": true,
+    "physical_shot_boundary_and_selected_processing_stop_are_distinct": true
+  },
+  "interface_contract": "docs/INTERFACES.md",
+  "handoff_entry": "Delivery root START_CODEX.md; apply_to_repo.py is a one-time delivery helper, never a runtime dependency."
+}

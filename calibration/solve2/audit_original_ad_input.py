@@ -174,7 +174,7 @@ def audit(input_dir, deltas=(), immutable_reference=None):
         return int(item.get('original_row', item.get('row', item.get('full_row'))))
     for delta_path in deltas:
         delta = read(delta_path)
-        records = delta.get('records', delta.get('rebindings', []))
+        records = delta.get('records', delta.get('rebind', delta.get('rebindings', [])))
         for item in records:
             row = delta_row(item)
             target = item.get('new_curve_id', item.get('current_native_path_id'))
@@ -187,7 +187,7 @@ def audit(input_dir, deltas=(), immutable_reference=None):
             if target:
                 expected[row] = target
                 pending.discard(row)
-        detached = delta.get('pending_records', delta.get('pending_sources', []))
+        detached = delta.get('pending_records', delta.get('pending', delta.get('pending_sources', [])))
         for item in detached:
             pending.add(delta_row(item))
         delta_checks.append(dict(path=str(Path(delta_path).resolve()), sha256=digest(delta_path),

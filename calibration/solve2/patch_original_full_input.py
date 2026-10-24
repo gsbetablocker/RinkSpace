@@ -21,12 +21,44 @@ def ref(path):return dict(path=str(Path(path).resolve()),sha256=sha(path))
 def array(d):return np.fromfile(d.get('file',d.get('path')),d['dtype']).reshape(d['shape'])
 
 
-def patch(input_dir,state_dir,output,delta_paths,compiled_dir):
+def patch(input_dir,state_dir,output,delta_paths,compiled_dir,current_model=None):
     I=Path(input_dir).resolve();F=Path(state_dir).resolve();O=checked(output)
     O.relative_to(Path('D:/CodexData/RinkSpace_Data').resolve())
     if O.exists():raise FileExistsError('Refuse to overwrite a current input: '+str(O))
     pk=read(I/'packet/manifest.json');sem=read(I/'semantic/manifest.json');query=read(I/'query/manifest.json')
     parent=read(F/'report.json');model=read(F/'model.json');N=int(pk['observations'])
+    source_model_change=None
+    if current_model is not None:
+        replacement=read(current_model)
+        if replacement['blocks']!=model['blocks'] or replacement['camera']!=model['camera']:
+            raise ValueError('Current static source update changed physical parameters or camera')
+        previous_materials=model['materials'];new_materials=replacement['materials']
+        if len(new_materials)<len(previous_materials):
+            raise ValueError('Current static source update removed historical materials')
+        metadata={'unused_legacy_witness','retired_alias','canonical_alias','canonical_curve_alias','alias_retirement','source_identity_status','provenance'}
+        for old,new in zip(previous_materials,new_materials):
+            if {k:v for k,v in old.items()if k not in metadata}!={k:v for k,v in new.items()if k not in metadata}:
+                raise ValueError('Current static source update changed an existing mathematical path: '+old['label'])
+        for material in new_materials[len(previous_materials):]:
+            if not material.get('current_source_curve')or not material['label'].startswith('Ad'):
+                raise ValueError('Only an explicit current advertisement source path may be appended')
+            for path in material['paths']:
+                if path['kind']not in (2,3)or not path.get('current_curve_id'):
+                    raise ValueError('Appended source is not a declared finite print/board path')
+                points=np.asarray(path.get('points',()),float)
+                if points.ndim!=2 or not len(points)or not np.isfinite(points).all():
+                    raise ValueError('Appended source curve has invalid finite vertices')
+                for key in ('advertisement_block','geometry_block','whole_print_block'):
+                    if key in path and not 0<=int(path[key])<len(model['blocks']):
+                        raise ValueError('Appended source path uses an absent physical block')
+        source_model_change=dict(current_model=ref(current_model),existing_mathematical_paths_and_physical_values_unchanged=True,
+            appended_materials=len(new_materials)-len(previous_materials),existing_source_aliases_preserved=True,no_new_parameter_blocks=True)
+        model=replacement
+        for material in model['materials']:
+            for path in material['paths']:
+                variant_id=path['variant_id']
+                if variant_id not in sem['resolved_variant_ids']:sem['resolved_variant_ids'].append(variant_id)
+        sem['material_labels']=len(model['materials'])
     if parent['semantic']['sha256']!=sha(I/'semantic/manifest.json')or parent['packet']['sha256']!=sha(I/'packet/manifest.json'):
         raise ValueError('Delta state must belong to this current numerical input')
     raw={k:array(d)for k,d in pk['arrays'].items()};tables=read(pk['string_tables']['file']);ids=tables['stable_observation_ids']
@@ -135,7 +167,7 @@ def patch(input_dir,state_dir,output,delta_paths,compiled_dir):
     stats=deepcopy(sem['statistics']);stats.update(active_observations=int(active.sum()),statistical_observations=int(partition.sum()),formal_residual_rows=rank,original_group_count=len(groups),independent_rows=len(ordinary),active_source_mask_sha256=am['sha256'],statistical_active_mask_sha256=sm['sha256'],budget_only_observations=int(active.sum()-partition.sum()))
     save_json(sd/'active_statistics.json',stats);scope=deepcopy(sem['current_input_scope']);scope.update(group_count=len(groups),independent_count=len(ordinary),formal_W_rank=rank,statistical_active_mask=sm,print_only_ad_ids=model['print_only_ad_ids'],unobserved_geometry_blocks=unsupported_geometry)
     model['current_input_scope']=scope;sem.update(active_source_mask=am,statistical_active_mask=sm,active_observations=int(active.sum()),active_statistics=dict(file=str(sd/'active_statistics.json'),sha256=sha(sd/'active_statistics.json')),statistics=stats,current_input_scope=scope)
-    receipt=dict(schema='rinkfit.current_full_S01_specific_delta.v1',parent_packet=ref(I/'packet/manifest.json'),parent_complete_state=ref(F/'report.json'),reviewed_deltas=receipts,rebindings=changed,pending_sources=pending,withdrawn_complete_group_ids=sorted(found),withdrawn_group_rank=removed_rank,withdrawn_independent_rows=removed_independent.tolist(),withdrawn_independent_rank=2*len(removed_independent),raw_observations_and_E_sigma_unchanged=True,remaining_W_matrices_and_support_unchanged=True,unobserved_objects_fixed=unsupported_values,source_qualification_replayed=False,optimizer_started=False,finite_foot_recovery=report)
+    receipt=dict(schema='rinkfit.current_full_S01_specific_delta.v1',current_static_source_model_update=source_model_change,parent_packet=ref(I/'packet/manifest.json'),parent_complete_state=ref(F/'report.json'),reviewed_deltas=receipts,rebindings=changed,pending_sources=pending,withdrawn_complete_group_ids=sorted(found),withdrawn_group_rank=removed_rank,withdrawn_independent_rows=removed_independent.tolist(),withdrawn_independent_rank=2*len(removed_independent),raw_observations_and_E_sigma_unchanged=True,remaining_W_matrices_and_support_unchanged=True,unobserved_objects_fixed=unsupported_values,source_qualification_replayed=False,optimizer_started=False,finite_foot_recovery=report)
     sem['current_specific_delta']=receipt
     save_json(O/'model.json',model);save_json(sd/'manifest.json',sem)
     query['semantic_manifest']=ref(sd/'manifest.json');save_json(qd/'manifest.json',query)
@@ -236,7 +268,7 @@ def rebase_current(input_dir,reference_input,reference_state,output,compiled_dir
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)
     for k in ('input','state','output','compiled-dir'):p.add_argument('--'+k,required=True)
-    p.add_argument('--delta',action='append',required=True);p.add_argument('--baseline-output');a=p.parse_args()
-    result=patch(a.input,a.state,a.output,a.delta,a.compiled_dir)
+    p.add_argument('--delta',action='append',required=True);p.add_argument('--baseline-output');p.add_argument('--current-model',help='Current append-only static advertisement source model; no physical parameter update');a=p.parse_args()
+    result=patch(a.input,a.state,a.output,a.delta,a.compiled_dir,a.current_model)
     if a.baseline_output:result['baseline']=scope_baseline(a.output,a.baseline_output)
     print(json.dumps(result))

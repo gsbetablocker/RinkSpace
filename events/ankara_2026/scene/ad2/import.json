@@ -1,0 +1,102 @@
+{
+  "schema": "rinkspace.ad_source_selection.v1",
+  "advertisement_number": 2,
+  "scope": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\rebuild_scope.json",
+  "scene": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\field\\model_r4.json",
+  "mixed_template": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\models\\shot2_8a28_r2_20261014\\ad2_material_template.json",
+  "source_atlases": [
+    {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\solve2_s01\\full_original\\data_current\\ad23_repair\\ad2_atlas_320000.json",
+      "frame_sha256": "3db52a1ca8f72a1bcf79500f47341a01947856b65c7afcb1972dde0a79647f6c"
+    }
+  ],
+  "source_selection_notes": [
+    "来源搜索覆盖整个项目工作区、Data及F盘归档，不限公开GitHub目录。",
+    "历史17条字形及231原UV保留原视频SHA、PTS56218880、1/15360；它们只作模板依据。",
+    "S02的15条新增蓝纹/符号材料边界及1363原UV属于官方源PTS702976、1/12800；17条嵌套继承项为别名，不能再计权。",
+    "官方S01 PTS320000、25.000s 的17条完整字行及2808原UV更清楚，实际绑定到同名模板路径作优先像素依据；提取仍是机器阈值，未提升为用户批准。",
+    "当前39条模型库存包括17字形、8边角与14旧片段，数量较大不代表更准确；保留库存与安装初值引用。"
+  ],
+  "review_references": [
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\ad2_review_v2.json",
+      "role": "prior_specific_native_identity_corrections",
+      "changed_source_rows": 108,
+      "reviewed_fragment_rows": 240,
+      "reviewed_frames": 32,
+      "review_authority": "agent_not_user_confirmation"
+    },
+    {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\solve2_s01\\full_original\\data_current\\ad23_repair\\ad2_unique_shape_verified.json",
+      "role": "latest_existing_current_source_identity_candidate",
+      "confirmed_source_rows": 41402,
+      "pending_source_rows": 1992,
+      "changed_identity_rows": 2535,
+      "source_pixels_changed": false,
+      "review_authority": "automatic_and_agent_not_whole_shot_acceptance",
+      "source_packet": "D:\\CodexData\\RinkSpace_Data\\runs\\solve2_s01\\full_original\\data_current\\ad23_repair\\source_packet.json",
+      "fit_admission_extended": false
+    },
+    {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_d1_20261024\\source_frame_checks.json",
+      "role": "affected_source_frames_exact_native_RGB_check"
+    }
+  ],
+  "discovery_references": [
+    "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_d1_20261024\\discovery_worktree.json",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_d1_20261024\\discovery_runs.json",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_d1_20261024\\discovery_archive.json",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_d1_20261024\\recovered\\archive_recovery.json"
+  ],
+  "historical_runtime_inventory": {
+    "model": "D:\\CodexData\\RinkSpace_Data\\runs\\solve2_s01\\ads_original\\source_original\\ready_model\\model.json",
+    "native_model": "D:\\CodexData\\RinkSpace_Data\\runs\\solve2_s01\\ads_original\\source_original\\native_ready\\model.json",
+    "manifest": "D:\\CodexData\\RinkSpace_Data\\runs\\solve2_s01\\ads_original\\source_original\\native_ready\\manifest.json",
+    "Ad2_curves": 39,
+    "composition": {
+      "glyphs": 17,
+      "border_and_corners": 8,
+      "historical_fragments": 14
+    },
+    "role": "preserved_inventory_and_installation_initializer_not_better_pixel_measurement"
+  },
+  "shared_size_relation_source": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\reset_1024\\changes.json",
+  "limitations": [
+    "17条当前高清字形没有完整面板material chart；同曝光只有上/下/右三边，没有左边和完整四角。不制造四角、不用相机反投影造变换、不把源像素直接当三维字形。",
+    "模板32条仍保留既有归一化chart初值；高清字形已关联为像素证据，后续由统一模型拟合校正形状与安装。",
+    "S02的13条开放弧不闭口；A/O内孔各自保留，不把遮挡或裁切边补成材料边。",
+    "D1只完成Ad2来源、模板、实例与观测候选绑定；沿连续围挡的安装更新属于D3。未启动任何求解或改变几何工作单关系。"
+  ],
+  "target_scene": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\field\\model.json",
+  "shared_size_instance_ids": [
+    "print_instance/Ad2",
+    "print_instance/Ad15"
+  ],
+  "template_shape_review": {
+    "status": "source_rebuilt_pending_user_visual_review",
+    "text": "ISU-SKATING.COM",
+    "text_content_authority": "direct_user_confirmation",
+    "background_texture_paths": 0
+  },
+  "glyph_rebuild": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\ad2\\glyphs_v3.json",
+  "paired_instances": [
+    {
+      "primary_instance_id": "print_instance/Ad2",
+      "paired_instance_id": "print_instance/Ad15",
+      "size_block_id": "artwork_pair/Ad2-Ad15/size",
+      "authority": {
+        "kind": "direct_user_confirmation",
+        "relation": "x_and_x_plus_13_same_template_and_size_independent_location",
+        "source": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\model_constraints\\user_advertisement_pairs_20261005.json",
+        "sha256": "e43b6a250508de4ed48c70d7cdb9cd82539202be5008c5ad0733d073a894c103",
+        "current_scope": "Ad2_and_Ad15_identity_only_for_unobserved_instance"
+      }
+    }
+  ],
+  "installation_initializations": [
+    {
+      "instance_id": "print_instance/Ad2",
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\ad2\\install_r1.json"
+    }
+  ]
+}

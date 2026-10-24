@@ -1,0 +1,87 @@
+{
+  "schema": "rinkspace.m4.source_references.v1",
+  "role": "geometry_review_references_not_a_new_observation_packet",
+  "latest_shape_authority": "用户2026-10-24明确修正为半椭圆；两端各自两个半轴独立估计。",
+  "official50_references": [
+    {
+      "schema": "rinkspace.m4.source_reference.v1",
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_a_20261024\\m4_source_refs\\official_blue_left_1800192.jpg",
+      "source_id": "O6j8L8TmfKo",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "pts": 1800192,
+      "time_base_num": 1,
+      "time_base_den": 12800,
+      "seconds": 140.64,
+      "role": "official_native_source_shape_reference_not_new_UV",
+      "navigation": "min image RMSE against existing historical blue-crease source image within registered S08; not an exposure-identity proof",
+      "navigation_thumbnail_RMSE": 2.0884603579351624,
+      "old_source_reference": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\aligned_complete_20261007_478afaf77615\\nine_shot_motion_regression_v2\\native_board_motion_source_frames\\native_230967552.png",
+      "new_source_observations": 0,
+      "endpoint_identity_confirmed": false
+    }
+  ],
+  "historical_existing_measurements": [
+    {
+      "feature": "goal_crease_left",
+      "packet": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\observations\\vision_training\\continuous_review\\cut6_clear_source_constraints\\complete_source_clear_anchor_append_20261007\\ice_clear_anchors_lane23_trace_and_goal_crease_v2_20261007.json",
+      "source_video_sha256": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891",
+      "time_base_num": 1,
+      "time_base_den": 15360,
+      "pts": [
+        230955776,
+        230967552,
+        230979840
+      ],
+      "origin": "existing agent source review; not human-confirmed exact endpoint UV",
+      "recovered_same_hash_frame": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\aligned_complete_20261007_478afaf77615\\nine_shot_motion_regression_v2\\native_board_motion_source_frames\\native_230967552.png",
+      "same_hash": "5762fd4be9a4745fb93d36043274371ef563e2d50b639f2146b3e94fc5648cc7",
+      "not_relabelled_as_official50_observations": true
+    },
+    {
+      "feature": "goal_crease_right",
+      "record": "events/ankara_2026/observations/static_wide_next44.json",
+      "existing_curve_UV_count": 36,
+      "source_pts": 56218880,
+      "time_base_num": 1,
+      "time_base_den": 15360,
+      "programme_native_pts_membership": false,
+      "source_or_clock_alias_to_programme": false,
+      "current_source_image_missing": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\shot1_physical_fit_20261014\\ad2_corner_far_audit\\shortwide\\material_audit\\goal_crease_right_visible.png"
+    }
+  ],
+  "endpoint_semantics": {
+    "blue_arc_endpoints": {
+      "parents": [
+        "corresponding_goal_line",
+        "corresponding_half_ellipse"
+      ],
+      "source_endpoint_UV_confirmed": false,
+      "role": "derived_structure_endpoints_no_new_observation"
+    },
+    "trapezoid_goal_endpoints": {
+      "parents": [
+        "corresponding_goal_line",
+        "shared_goal_end_outer_span"
+      ],
+      "source_endpoint_UV_confirmed": false,
+      "role": "model_support_not_measured_endpoint"
+    },
+    "trapezoid_board_endpoints": {
+      "parents": [
+        "continuous_board_contact_curve",
+        "shared_board_end_outer_span"
+      ],
+      "source_endpoint_UV_confirmed": false,
+      "role": "model_support_not_measured_endpoint"
+    }
+  },
+  "trapezoid_existing_source_status": "现有framewise_8a28_20261013/scene.json 四条梯形边source.UV_count=0，保留模型关系，未制造源角点。",
+  "half_axis_initializer": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\user_corrected_programme_candidate\\latest9a8c_world66_initialization_ONLY.json",
+    "field": "geometry_initializer_auxiliary.crease_unit",
+    "role": "旧模型61点轮廓的两轴包络初值，非原片新测量，不固定轴比"
+  },
+  "new_source_observations": 0,
+  "fit_executed": false,
+  "accuracy_accepted": false
+}

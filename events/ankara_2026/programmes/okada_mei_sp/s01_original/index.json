@@ -1,7 +1,7 @@
 {
   "schema": "rinkspace.restored_original_first_shot.v1",
   "name": "本来的第一镜头",
-  "status": "第一镜头完整原求解已实际启动，正在完整RS与有限路径落脚点初始回算；还没有完整接受步",
+  "status": "用户要求立即全部停止；广告修复尚未完成，本次未启动拟合",
   "original_model": {
     "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/s01_original/original_model.json",
     "sha256": "d78b7012c80664131f88134be0f9f868c1d6742ad7516155fc131b72ca3110e9",
@@ -38,7 +38,7 @@
   },
   "current_advertisement_work": {
     "source_catalogue": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/ads_original/source_original/ready_model",
-    "run_status": "original_baseline_camera_and_ice_restored; C0_outer_observations_reconnected; current_ad_source_repair_before_next_complete_step",
+    "run_status": "stopped_by_user_incomplete",
     "main_log": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/full_original/solve02/main.log",
     "optimization_running": false,
     "original_runtime": "original d78 primary / whole original W / full finite RS recompute; original GPU interfaces reused",
@@ -109,7 +109,7 @@
       "candidate_model": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/full_original/solve01/i00001_retry01/solve_retry01/full2/model.json",
       "candidate_complete_state": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/full_original/solve01/i00001_retry01/solve_retry01/full2/report.json",
       "all_active_sources_strict_RS_legal": 277564,
-      "active_Query_max_root_equality_px": 9.6e-09,
+      "active_Query_max_root_equality_px": 9.6e-9,
       "next_current_scope": {
         "input": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/full_original/solve02/input_delta01",
         "baseline_cost": 409846.5649820296,
@@ -154,7 +154,7 @@
       ]
     },
     "readable_progress": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/full_original/solve01/step_cost.log",
-    "work_running": true,
+    "work_running": false,
     "continuous_candidate_review": {
       "directory": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/full_original/review_full01",
       "all_actual_material_paths": 672,
@@ -213,14 +213,9 @@
     "clarity_review_ad7_11": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/ads_original/clarity_ad7_11/clarity_facts.json"
   },
   "continuation_requested": {
-    "order": [
-      "finish_every_advertisement_in_S01",
-      "run_complete_original_S01_solver_and_full_native_shot_review",
-      "continue_S02",
-      "continuous_S01_S02_solving"
-    ],
-    "continue_without_waiting_for_user": true,
-    "new_user_instruction_date": "2026-10-24",
-    "later_shot_starts_only_after_S01_visual_acceptance": true
+    "order": [],
+    "continue_without_waiting_for_user": false,
+    "fitting_authorized_now": false,
+    "user_instruction": "全部停掉，不要再浪费我的token了，马上全部停掉"
   }
 }

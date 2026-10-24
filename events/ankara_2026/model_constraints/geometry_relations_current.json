@@ -66,13 +66,15 @@
         "scope": "后续再次明确保留等宽及右边线共线；不是恢复等长。"
       }
     ],
-    "curling_layout_original_messages_verified_via_read_thread": true
+    "curling_layout_original_messages_verified_via_read_thread": true,
+    "lane_centreline_latest_user_correction": "S2–S4 中线终止于 Lane 右边线（N线）左侧，不穿过该线；本次调整绘制支持，未增加源观测。",
+    "blue_crease_latest_user_correction": "M4中的半圆蓝区改为半椭圆蓝区；本次一次完成M2–M5，交完整图后停。"
   },
   "hockey_structure": {
     "circles": "C0、A1、A2及对应另一端两个争球圈共用半径；圈与线同属共同冰球坐标架。",
-    "carriers": "中线、两条蓝线和两条球门线彼此平行；C0圆心在中线上，两蓝线关于中场对称。",
-    "faceoff_pairs": "同端两个争球圈有共同的球门线向内距离及横向对称间隔，不各自漂移。",
-    "crease": "保留真实场馆蓝区的已建模轮廓，不能用现行直边模板替换所见半圆。",
+    "carriers": "C、B1/B2及两条球门线全部平行冰场短边方向；共同方向固定到冰场坐标轴，不保留独立paint旋转。五条线的两端均与同一冰场实际连续轮廓求交。",
+    "faceoff_pairs": "A1/A4圆心共下行、A2/A3圆心共上行，每对左右圆心关于场地横向中轴（中场C线）镜像；同端两圆仍关于纵向中轴对称并共用向内距离。两条门线位置不强制镜像。",
+    "crease": "按用户2026-10-24修正，蓝区为半椭圆；每端内向/横向两个半轴独立估计。现有轮廓包络仅作未拟合初值，不固定轴比，不用现行直边模板替换。",
     "trapezoids": "四条边使用同一对球门端/围挡端外缘跨度；每条连接实际球门端与实际围挡。"
   },
   "hockey_engineering_references_m": {
@@ -94,7 +96,7 @@
       "F3–R3",
       "F4–R4"
     ],
-    "centreline_extent": "纵向穿过F/R圆心，保留已说明的右侧延伸和端点；右端不得自动等同于Lane矩形右端或仅停在R圆心。具体几何长度用可见源证据估计。",
+    "centreline_extent": "沿纵向穿过F/R圆心并向右延伸，但不穿过Lane矩形右边线（N线）。中线右端与Lane右边线独立；终端位置未由原片证实，目前仅有绘制支持。",
     "right_extent_initialization": {
       "fraction_of_FR_separation": 0.11428571428571428,
       "role": "用户图相对形状的近似初值；不是节目源像素观测、拟合先验或标准尺寸。",
@@ -108,9 +110,17 @@
       "equal_row_spacing": "四行共用可估pitch；confirmed_layout_v2及原人类消息明确确认等间距，不能只读更早not_asserted而解除。",
       "equal_Lane_width": "用户硬结构关系：四Lane共用一个可估宽度；没有确认固定米制宽度。",
       "collinear_Lane_painted_right_edges": "用户硬结构关系：四条已观测矩形右边线在平行短边的一条直线上；共用可估纵向station，不固定历史6米。它们与靶圈连接中线的右端各自独立。",
-      "left_open_and_no_equal_length": "用户后来明确撤销等长，保留左侧开口。左端顶点只能作为有限绘制或源支持覆盖，不是已测实际端点、第四条物理边或等长约束。"
+      "left_open_and_no_equal_length": "用户后来明确撤销等长，保留左侧开口。左端顶点只能作为有限绘制或源支持覆盖，不是已测实际端点、第四条物理边或等长约束。",
+      "equal_top_bottom_clearance": "F1/R1到下长边等于F4/R4到上长边；在现有关于y=0对称的场地中，四行y0=-3*pitch/2，所有圈、Lane三边、连接中线共同引用。",
+      "lane_left_support_bound": "每条Lane左侧绘制支持不得越过左侧底线；各行左值独立，保留左开口，无等长约束。"
     },
-    "unseen_marks": "未观测的hog/back/hack及标准端线不进入现场冰面标记库存。"
+    "unseen_marks": "未观测的hog/back/hack及标准端线不进入现场冰面标记库存。",
+    "centreline_terminal_relation": {
+      "stops_before_Lane_right_edge": true,
+      "endpoint_equals_Lane_right_edge": false,
+      "terminal_source_UV_identified": false,
+      "equal_length_asserted": false
+    }
   },
   "curling_engineering_references_m": {
     "tee_centre_separation": 34.75,
@@ -125,7 +135,8 @@
   "board_and_advertisements": {
     "board": "冰面水平、围挡竖直；每对顶部/底部共用世界XY。审阅必须画完整围挡横竖网格。",
     "advertisements": "相同品牌两面的宽高共同估计；位置和离冰高度可各自估计，实际已建模边界与编号持续显示。",
-    "renderer": "每帧和俯视图画同一实际求解模型；不按置信度或误差隐藏线。"
+    "renderer": "每帧和俯视图画同一实际求解模型；不按置信度或误差隐藏线。",
+    "board_station": "上下沿拟合点使用整圈未缠绕弧长s，直段/弯角接缝及闭合接缝不是参数硬边界；原分段仅保留来源alias，不限制新共同模型中的点跨接缝。"
   },
   "programme_and_scale": {
     "last_complete_baseline": "9a8c1ac9d049",
@@ -136,5 +147,19 @@
     "metric": "几何求解后使用一个统一系数使长宽整体最接近60×30米，不按轴拉伸。",
     "body_scope": "只看骨盆中心P的世界垂直投影G，不冒充冰刀接触。"
   },
-  "status": "USER_REQUIREMENT_RECORD_NOT_FIT_OR_ACCURACY_ACCEPTANCE"
+  "status": "USER_REQUIREMENT_RECORD_NOT_FIT_OR_ACCURACY_ACCEPTANCE",
+  "measurement_policy": {
+    "id": "ankara_2026.curve_measurement.user_20261024.v3",
+    "contours": [
+      "F1-F4",
+      "R1-R4",
+      "goal_crease_left",
+      "goal_crease_right"
+    ],
+    "all_other_lines": "材料宽度中线；直曲线一致，模型零线宽",
+    "C0_and_A1_A4": "中线而非外轮廓",
+    "old_UV_relabelled": false,
+    "obsolete_definitions_allowed": false,
+    "inactive_legacy_definitions_allowed": false
+  }
 }

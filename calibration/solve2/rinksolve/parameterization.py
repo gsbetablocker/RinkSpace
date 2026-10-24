@@ -65,7 +65,7 @@ class S01Parameterization:
         family=model.scene.structural_family
         self.scene_keys=[]
         if family:
-            self.scene_keys=[v for v in (family.curling_block_id,family.lane_block_id,family.hockey_block_id,family.hockey_extra_block_id,family.hockey_midline_block_id) if v]
+            self.scene_keys=[v for v in (family.curling_block_id,family.lane_block_id,family.hockey_block_id,family.hockey_extra_block_id,family.hockey_midline_block_id,family.hockey_end_block_id) if v]
         self.board_key=model.scene.board_block_id
         self.curve_group_keys={c.id:model.scene.resolved_definition(c,model.state).get('shared_layout_block_id') for c in model.scene.curves}
         used_group_keys={self.curve_group_keys[k] for k in self.curve_ids if self.curve_group_keys[k]}

@@ -1,0 +1,11 @@
+# Ad3 / Ad16 当前模型
+
+唯一当前入口为 [assets_r3.json](assets_r3.json)，来源索引为 [source_r3.json](source_r3.json)，安装初值见 [install.json](install.json)，共同场景绑定见 [installation_d3.json](installation_d3.json)。
+
+模板只保留六边形、“買取”及其结构孔、广告四边，共 19 条路径。“大吉”两字及细碎装饰已退出当前几何和关联，原图稿、旧模型与撤回读数仅在本机保留。当前模型不需要载入旧版本或原始 SVG 才能求值。
+
+Ad3 与 Ad16 引用同一个模板及尺寸块，安装位置独立。Ad3 有原 S01 时变相机下的安装初值；Ad16 身份已确认，保留 549 个历史局部 UV 与原 `1/15360` 时钟，安装位置为空。没有补齐裁切部分，也没有强制相差半圈。
+
+Ad3 当前数值源库位于节目目录的 [rows.npz](../../programmes/okada_mei_sp/ad3_sources/rows.npz) 和 [correspondence.json](../../programmes/okada_mei_sp/ad3_sources/correspondence.json)。共 7009 行、145 曝光，稳定身份、原 UV/PTS 及当前曲线注册表保留；角点别名不重复计权。源库仍为未激活的证据与候选，未被宣称为完整统计求解输入。
+
+原始广告图稿的官方提取来源、SHA 及历史地址保存在资产和来源索引中，完整 SVG 原件不随公开包分发。比赛原帧与叠加图保留在本机 Data；公开边界见[公开审阅说明](../../../../docs/GITHUB_REVIEW.md)。当前模板、尺寸、安装和 D3 投影不等于新拟合完成。

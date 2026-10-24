@@ -96,9 +96,89 @@ def inventory(model):
     return np.concatenate(arrays), records, physical_path_count
 
 
+
+PANEL_WIDTH = 640
+OUTPUT_WIDTH = 1920 + PANEL_WIDTH
+
+
+def current_observations(args, incoming, model=None):
+    packet_path = getattr(args, 'packet', None)
+    state_report = incoming.parent / 'report.json'
+    if packet_path is None and state_report.is_file():
+        report = json.loads(state_report.read_text(encoding='utf8'))
+        packet_path = report.get('packet', {}).get('path')
+    if packet_path is None:
+        return {}, None
+    packet_path = Path(packet_path).resolve()
+    packet = json.loads(packet_path.read_text(encoding='utf8'))
+    semantic_path = Path(packet['semantic_packet']['manifest'])
+    if sha(semantic_path) != packet['semantic_packet']['sha256']:
+        raise ValueError('Current observation packet/semantic binding differs')
+    semantic = json.loads(semantic_path.read_text(encoding='utf8'))
+    if state_report.is_file():
+        expected = json.loads(state_report.read_text(encoding='utf8')).get('packet')
+        if expected is not None and expected != ref(packet_path):
+            raise ValueError('Review observations differ from this complete solver state')
+    if model is not None:
+        declared = model.get('current_input_scope', {}).get('statistical_active_mask', {})
+        if declared.get('sha256') != semantic['statistical_active_mask']['sha256']:
+            raise ValueError('Review model/source selection differs')
+    count = int(packet['observations'])
+    if semantic['observations'] != count or packet['native_time_base'] != [1, 12800] or packet['native_image_wh'] != [1920, 1080]:
+        raise ValueError('Current observation native source clock/layout differs')
+    def array(desc):
+        path = Path(desc['file'])
+        if not path.is_absolute():
+            path = packet_path.parent / path
+        if sha(path) != desc['sha256']:
+            raise ValueError('Current observation array differs: ' + str(path))
+        return np.fromfile(path, desc['dtype']).reshape(desc['shape'])
+    uv = array(packet['arrays']['native_uv'])
+    pts = array(packet['arrays']['native_pts'])
+    active = array(semantic['active_source_mask']).astype(bool)
+    if uv.shape != (count, 2) or pts.shape != (count,) or active.shape != (count,):
+        raise ValueError('Current observation row layout differs')
+    if not np.isfinite(uv[active]).all() or np.any((pts[active] < FIRST) | (pts[active] > LAST) | ((pts[active]-FIRST) % STEP != 0)):
+        raise ValueError('Current observations are outside the exact native exposure clock')
+    rows = {int(pt): np.flatnonzero(active & (pts == pt)) for pt in np.unique(pts[active])}
+    values = {pt: (rr, uv[rr]) for pt, rr in rows.items()}
+    identity = dict(packet=ref(packet_path), semantic=ref(semantic_path),
+                    active_source_mask=semantic['active_source_mask'], native_uv=packet['arrays']['native_uv'],
+                    native_pts=packet['arrays']['native_pts'], raw_rows=count, active_rows=int(active.sum()),
+                    only_current_exposure_active_sources=True, inactive_or_historical_points_drawn=False,
+                    source_point_numbers_drawn=False)
+    return values, identity
+
+
+def top_down(world, records):
+    panel = np.full((1080, PANEL_WIDTH, 3), 24, np.uint8)
+    xy = np.asarray(world)[:, :2]
+    lo, hi = xy.min(axis=0), xy.max(axis=0)
+    span = np.maximum(hi-lo, 1.e-6)
+    scale = min((PANEL_WIDTH-72)/span[0], 850/span[1])
+    center = (hi+lo)/2
+    def pixel(points):
+        result = (points-center)*scale
+        return np.rint(np.column_stack([PANEL_WIDTH/2+result[:, 0], 535-result[:, 1]])).astype(np.int32)
+    for item in records:
+        points = pixel(xy[item['begin']:item['end']])
+        if item['material_id'] <= -2:
+            if len(points):
+                cv2.putText(panel, item['label'], tuple(points[0]+[5,-5]), cv2.FONT_HERSHEY_SIMPLEX,
+                            .45, (255,255,255), 1, cv2.LINE_AA)
+            continue
+        if len(points)>1:
+            cv2.polylines(panel, [points], False, item['color'], 1, cv2.LINE_AA)
+        elif len(points):
+            cv2.circle(panel, tuple(points[0]), 2, item['color'], 1, cv2.LINE_AA)
+    cv2.putText(panel, 'Same complete model - top view', (20, 32), cv2.FONT_HERSHEY_SIMPLEX, .57, (230,230,230), 1, cv2.LINE_AA)
+    cv2.putText(panel, 'All ice / board / advertisement paths', (20, 60), cv2.FONT_HERSHEY_SIMPLEX, .47, (230,230,230), 1, cv2.LINE_AA)
+    cv2.putText(panel, 'Red dots at left: current active source UV', (20, 1020), cv2.FONT_HERSHEY_SIMPLEX, .44, (100,140,255), 1, cv2.LINE_AA)
+    return panel
+
 def encoder(ffmpeg, path):
     return [ffmpeg, "-hide_banner", "-loglevel", "error", "-f", "rawvideo", "-pixel_format", "bgr24",
-            "-video_size", "1920x1080", "-framerate", "50", "-i", "pipe:0", "-an", "-c:v", "libx264",
+            "-video_size", str(OUTPUT_WIDTH)+"x1080", "-framerate", "50", "-i", "pipe:0", "-an", "-c:v", "libx264",
             "-preset", "fast", "-crf", "19", "-pix_fmt", "yuv420p", "-video_track_timescale", "12800",
             "-movflags", "+faststart", str(path)]
 
@@ -159,10 +239,21 @@ def setup(args):
         original_text(banner, "Current complete scene/camera - working review", (16, 25), .59, (50, 210, 255))
         original_text(banner, "All ice lines, artwork boundaries and advertisement numbers; not accepted", (16, 51), .43)
 
+    source_points, source_identity = current_observations(args, incoming, model)
+    overview = top_down(world, records)
+
     def draw(raw, prediction, pts):
         canvas, record = native.draw(raw, prediction, records, pts, dict(maximum_error_px=0., quantiles_px=[0.]))
+        rr, measured = source_points.get(int(pts), (np.empty(0, np.int64), np.empty((0,2), float)))
+        for point in measured:
+            cv2.circle(canvas, tuple(np.rint(point).astype(int)), 2, (0,0,255), -1, cv2.LINE_AA)
         canvas[:67] = banner
-        return canvas, record
+        right = overview.copy()
+        cv2.putText(right, 'PTS '+str(pts)+' | source points '+str(len(rr)), (20,1054), cv2.FONT_HERSHEY_SIMPLEX, .48, (230,230,230), 1, cv2.LINE_AA)
+        record.update(current_active_source_points=len(rr),
+                      current_source_rows_sha256=hashlib.sha256(rr.astype('<u8').tobytes()).hexdigest(),
+                      current_source_UV_sha256=hashlib.sha256(measured.astype('<f8').tobytes()).hexdigest())
+        return np.concatenate([canvas, right], axis=1), record
 
     context = dict(schema="rinkfit.current_complete_artwork_review_context.v1", model=ref(frozen),
                    source=str(Path(args.source).resolve()), original_native_review=ref(args.native_review),
@@ -171,6 +262,8 @@ def setup(args):
                    GPU_camera=camera.gpu_acceleration, GPU_dll=ref(args.gpu_dll),
                    all_actual_material_paths=count, continuous_board_added_paths=2, advertisement_numbers=list(range(2, 13)),
                    total_world_samples=len(world), source_vertices_preserved=True, projection_approximation=False,
+                   current_observations=source_identity, source_native_image_wh=[1920,1080], review_output_wh=[OUTPUT_WIDTH,1080],
+                   same_complete_model_top_down=True,
                    strict_original_RS_certificate_bracket_and_1e8_root_equation=True,
                    source_PTS=dict(first=FIRST, last=LAST, step=STEP, frames=FRAMES, time_base="1/12800"),
                    model_time="(source_PTS-256256)/12800", no_Solve=True, whole_shot_acceptance=False)
@@ -181,6 +274,8 @@ def setup(args):
 
 def preflight(args, runtime):
     out, frozen, model, native, camera, world, records, draw, context = runtime
+    if context["current_observations"] is None:
+        raise ValueError("Complete review needs the current packet (--packet); source points must not be omitted")
     report_path = out / "preflight.json"
     if report_path.exists():
         report = json.loads(report_path.read_text(encoding="utf8"))
@@ -321,7 +416,12 @@ def complete(args, runtime, initial):
     result = subprocess.run(mux, capture_output=True, text=True, encoding="utf8")
     if result.returncode:
         raise RuntimeError(result.stderr)
-    verification = native.verify_video(final, ffprobe)
+    source_wh = native.WH
+    try:
+        native.WH = (OUTPUT_WIDTH,1080)
+        verification = native.verify_video(final, ffprobe)
+    finally:
+        native.WH = source_wh
     actual_pts = [json.loads(line)["native_pts"] for line in ledger.read_text(encoding="utf8").splitlines()]
     if actual_pts != list(range(FIRST, LAST+STEP, STEP)):
         raise ValueError("Full source native PTS ledger changed")
@@ -339,7 +439,8 @@ def complete(args, runtime, initial):
                   GPU_stats=dict(camera.at.stats), preflight=ref(out / "preflight.json"),
                   projection_seconds=projection_total, draw_seconds=draw_total,
                   elapsed_seconds=time.perf_counter()-started, encoding_command=command, audio_mux_command=mux,
-                  no_Solve=True, no_new_observations=True, whole_shot_acceptance=False)
+                  current_observations=context["current_observations"], same_complete_model_top_down=True,
+                  review_output_wh=[OUTPUT_WIDTH,1080], no_Solve=True, no_new_observations=True, whole_shot_acceptance=False)
     write(out / "manifest.json", report)
     print(json.dumps(dict(stage="complete", video=str(final), manifest=str(out / "manifest.json"), frames=count,
                           elapsed_seconds=report["elapsed_seconds"])), flush=True)
@@ -350,6 +451,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", required=True)
     parser.add_argument("--source", required=True)
+    parser.add_argument("--packet", help="Current solver packet; inferred only from this complete state report when present")
     parser.add_argument("--output", required=True)
     parser.add_argument("--compiled-dir", required=True)
     parser.add_argument("--gpu-dll", required=True)
