@@ -14,11 +14,11 @@ def text(image, message, xy, scale=.42, color=(240, 240, 240)):
     cv2.putText(image, str(message), at, cv2.FONT_HERSHEY_SIMPLEX, scale, color, 1, cv2.LINE_AA)
 
 
-def top_down(world, cuts, height=1080):
+def top_down(world, cuts, height=1080, *, missing_count=0):
     panel = np.full((height, PANEL_WIDTH, 3), 22, np.uint8)
     xy = np.asarray(world)[:, :2]
     lo, hi = xy.min(axis=0), xy.max(axis=0)
-    scale = min((PANEL_WIDTH-70)/max(hi[0]-lo[0], 1e-6), (height-220)/max(hi[1]-lo[1], 1e-6))
+    scale = min((PANEL_WIDTH-70)/max(hi[0]-lo[0], 1e-6), max(1, height-220)/max(hi[1]-lo[1], 1e-6))
     center = (hi+lo)/2
     points = np.rint((xy-center)*[scale, -scale]+[PANEL_WIDTH/2, height/2]).astype(np.int32)
     ad_labels = {}
@@ -34,9 +34,9 @@ def top_down(world, cuts, height=1080):
             ad_labels.setdefault(ad.group(), []).append(pp[len(pp)//2])
     for label, positions in ad_labels.items():
         text(panel, label, np.median(positions, axis=0), .45, (255, 255, 255))
-    text(panel, 'SAME COMPLETE MODEL / TOP VIEW', (18, 30), .59)
-    text(panel, f'{len(cuts)} paths | all layers enabled', (18, 57), .45)
-    text(panel, 'Frozen d78 replay; no optimization', (18, 84), .45, (60, 210, 255))
+    text(panel, 'SAME MODEL / TOP VIEW', (18, 30), .59)
+    text(panel, f'{len(cuts)} paths | missing / unlocalized: {missing_count}', (18, 57), .45)
+    text(panel, 'Current state replay; no optimization', (18, 84), .45, (60, 210, 255))
     text(panel, 'Red: active UV at this exact source PTS', (18, height-42), .42, (100, 130, 255))
     text(panel, 'Geometry coordinates: rink-length units', (18, height-18), .40)
     return panel
@@ -66,7 +66,7 @@ def overlay(raw, projected, cuts, overview, pts, time_base, measured_uv, shot_id
         visible = np.flatnonzero(in_image[begin:end])
         if len(visible):
             ad = re.search(r'Ad\d+', item['label'], re.IGNORECASE)
-            label = ad.group() if ad else item['label'].split('.')[0]
+            label = ad.group() if ad else item['label'].removeprefix('ice.').split(':')[0]
             if len(label) <= 16:
                 labels.setdefault(label, []).append(pp[visible[len(visible)//2]])
     for label, positions in labels.items():
@@ -78,7 +78,7 @@ def overlay(raw, projected, cuts, overview, pts, time_base, measured_uv, shot_id
             cv2.circle(canvas, tuple(np.rint(point).astype(int)), 2, (0, 0, 255), -1, cv2.LINE_AA)
     canvas[:65] = 18
     seconds = float(pts*time_base)
-    text(canvas, f'{shot_id.upper()} | NATIVE d78 REPLAY / MODEL MIGRATION REVIEW | NOT FITTED', (15, 25), .62, (55, 215, 255))
+    text(canvas, f'{shot_id.upper()} | NATIVE SOURCE / CURRENT STATE REVIEW | NO NEW FIT', (15, 25), .62, (55, 215, 255))
     text(canvas, f'Source {seconds:.3f}s | PTS {pts} | frame {frame_index+1}/{total} | all ice / board / ads + IDs | UV {len(measured_uv)}', (15, 52), .48)
     side = overview.copy()
     text(side, f'Source PTS {pts}', (18, h-68), .46)

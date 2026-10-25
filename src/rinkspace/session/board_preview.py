@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+from ..review.fonts import review_font
 from ..core.native import NativeCore
 
 BG = '#fafcfb'
@@ -81,7 +82,7 @@ class Canvas:
     def __init__(self,size):
         self.image=Image.new('RGB',size,BG);self.draw=ImageDraw.Draw(self.image);self.fonts={}
     def text(self,xy,text,size=26,color=INK,anchor='lm',box=False):
-        font=self.fonts.setdefault(size,ImageFont.truetype('C:/Windows/Fonts/msyh.ttc',size))
+        font=review_font(size)
         if box:
             b=self.draw.textbbox(tuple(xy),text,font=font,anchor=anchor)
             self.draw.rectangle((b[0]-4,b[1]-3,b[2]+4,b[3]+3),fill=BG)

@@ -15,8 +15,6 @@ from ..core.native import NativeCore
 
 def decode_joint_camera(model,shot_id,core):
     shot=model['shots'][shot_id];rig=model['rigs'][shot['rig_id']];blocks=model['blocks']
-    if shot.get('control_coordinates'):
-        raise ValueError('joint camera import requires explicit complete local control blocks')
     scene=blocks[model['scene_block']]['values']
     head=blocks[rig['head_block']]['values'];optics=blocks[rig['optics_block']]['values']
     if (len(scene),len(head),len(optics))!=(5,15,12):
@@ -24,10 +22,60 @@ def decode_joint_camera(model,shot_id,core):
     ids=shot['control_blocks']
     if len(ids)!=shot['camera']['n_controls'] or len(set(ids))!=len(ids):
         raise ValueError('joint camera control identity/count mismatch')
+    coordinates=shot.get('control_coordinates')
+    if coordinates:
+        # Packed ambient block values are the saved accepted controls; a
+        # block's optimizer manifold is not needed to read that saved state.
+        # Follow the explicit address of every triplet instead of stale alias
+        # control_blocks, and never reconstruct controls from a motion fit.
+        if len(coordinates)!=len(ids):
+            raise ValueError('joint packed control coordinate/count mismatch')
+        local_blocks=[];seen=set()
+        for address in coordinates:
+            block=address.get('block');offset=address.get('offset')
+            if (type(block) is not int or type(offset) is not int or block<0
+                    or block>=len(blocks) or offset<0 or offset+3>len(blocks[block]['values'])
+                    or (block,offset) in seen):
+                raise ValueError('invalid joint packed control coordinate')
+            seen.add((block,offset))
+            local_blocks.append({'values':deepcopy(blocks[block]['values'][offset:offset+3])})
+    else:
+        local_blocks=[deepcopy(blocks[i]) for i in ids]
     definition={**deepcopy(rig['camera']),**deepcopy(shot['camera']),'control_block_begin':1}
-    local={'blocks':[{'values':[*scene,*head,*optics]}]+[deepcopy(blocks[i]) for i in ids],
+    # The recorded wide-angle hinge is identically zero on these shots when
+    # every allocated cubic log-f control is at/above its activation boundary.
+    # Prove this on the entire convex hull (including existing RS support),
+    # never just the requested exposure. Active or unknown extensions still
+    # fail instead of silently losing their coefficients.
+    original_definition=deepcopy(definition)
+    extension=definition.get('brown_wide_extension')
+    inactive=None
+    if extension is not None:
+        if (extension.get('schema')!='rinkfit.source_supported_wide_brown_hinge.v1'
+                or extension.get('power')!=2):
+            raise ValueError('unsupported joint wide Brown extension')
+        coefficients=np.asarray(extension.get('coefficients'),dtype=float)
+        boundary=float(extension['activation_log_f_native'])
+        local_controls=np.asarray([b['values'] for b in local_blocks],dtype=float)
+        if (coefficients.shape!=(4,) or not np.isfinite(coefficients).all()
+                or not np.isfinite(boundary) or local_controls.shape!=(len(ids),3)
+                or not np.isfinite(local_controls).all()):
+            raise ValueError('invalid joint wide Brown extension/control values')
+        lower=float(local_controls[:,2].min())
+        if lower<boundary:
+            raise ValueError('active joint wide Brown extension is not supported by this native camera')
+        inactive={'kind':'wide_brown_hinge','original_definition':deepcopy(extension),
+            'reason':'identically_zero_on_entire_allocated_cubic_control_hull',
+            'allocated_log_f_lower_bound':lower,'activation_log_f_native':boundary,
+            'scope':'all valid native spline times, including allocated row-exposure support',
+            'effective_coefficients_discarded':False}
+        definition.pop('brown_wide_extension')
+    local={'blocks':[{'values':[*scene,*head,*optics]}]+local_blocks,
            'camera':definition}
     camera,controls=decode_camera(local,core)
+    if inactive is not None:
+        camera['original_camera_definition']=original_definition
+        camera['inactive_extension_proofs']=[inactive]
     angles=np.asarray(blocks[shot['reference_angles_block']]['values'],dtype=float)
     if angles.shape!=(2,) or not np.isfinite(angles).all():
         raise ValueError('joint camera shot reference angles must contain two finite values')
@@ -40,6 +88,10 @@ def decode_joint_camera(model,shot_id,core):
         shot_reference_angles=angles.tolist(),
         reference_angles_representation='constant angle offsets expanded into all native cubic controls',
         state_status='preserved_complete_joint_camera_initial_not_refitted')
+    if coordinates:
+        camera['control_storage_import']={'kind':'explicit_packed_ambient_triplets',
+            'control_count':len(coordinates),'coordinates':deepcopy(coordinates),
+            'legacy_alias_blocks_used':False,'trajectory_refitted':False}
     camera['reference_dependency']['absolute_controls_include_shot_reference_angles']=True
     camera['reference_dependency']['expanded_absolute_angles']=controls[definition['dependent_control'],:2].tolist()
     return camera,controls

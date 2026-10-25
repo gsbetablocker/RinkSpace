@@ -1,6 +1,6 @@
 # 实现接口：现有入口与目标合同
 
-版本：2026-10-24。native ABI 2 的完整几何/时变相机前向（含隐式 RS）、prepare/review 及下述 D1/D3 入口已实现；GPU LM、solve/resume 仍是目标合同，尚无对应命令或可调用生命周期。CPU 回放不表示 GPU 拟合。算法与参数设计见 [SOLVER.md](SOLVER.md)，当前实现状态见 [REBUILD.md](REBUILD.md)。
+版本：2026-10-25。native ABI 2 的完整几何/时变相机前向（含隐式 RS）、prepare/review 及下述 D1/D3 入口已实现；GPU LM、solve/resume 仍是目标合同，尚无对应命令或可调用生命周期。CPU 回放不表示 GPU 拟合。算法与参数设计见 [SOLVER.md](SOLVER.md)，当前实现状态见 [REBUILD.md](REBUILD.md)。
 
 ## 1. 现在确实能调用什么
 
@@ -45,6 +45,16 @@ C ABI 的完整、唯一签名在 `native/include/rinkspace/core_api.h`，绑定
 
 D3 已实现 `model preview-print-installation --scene FILE --assets FILE --instance ID --camera FILE --frame FILE --pts INT --library FILE --out DIR`。消费当前自包含模板/参数与已迁入相机，输出同一实例的 `unfolded.png/three_d.png/source.png/source_full.png/geometry.json/result.json`，不重新导入历史来源、不拟合。`domain.print_assets.initialize_instance` 只显式初始化共用 log 尺寸块及所选实例独立安装块，拒绝覆盖不同现值；未定位实例求三维坐标会明确失败。`sample_instance` 对原 material_uv 沿边加密，调用同一 native kind5 和 `rs_sample_print_chart`，其展开变换共用一份 C++ 实现。kind5 参数为 `[s_origin,z_origin,rotation,width,height]`，不按直/弧分段限制安装。字形、内孔、开放支持和原观测保持不变；采样不生成观测。缺少新 chart 能力的旧 DLL 明确报错。Ad2 的 source-UV 方向通过安装旋转 π 表达，没有再翻转原顶点。
 
+**D3 来源核实：** `--frame` 仅用于任意图片的未核实预览，输出明确 `native_source_verified=false`，不宣称其对应相机源曝光。需要核实原曝光时使用下面的互斥入口；它核对 scope 中既有原视频 SHA、源尺寸/时基/镜头区间，并精确解码请求 PTS，保存 `decoded_source.png`。相邻曝光不能代替缺失的 PTS，来源核实也不代表视觉拟合通过。
+
+```text
+python -m rinkspace model preview-print-installation --scene FILE --assets FILE --instance ID --camera FILE --source-video FILE --scope FILE --pts INT --library FILE --out DIR
+```
+
+`--assets` 实际内容必须与 scene 当前登记的资产 SHA 相同；多个引用的实例 ID 不得重叠。孔洞父引用采用完整当前 path ID，不能在显示时静默退回自身。`domain.print_assets.sample_instance(..., stations_by_path={path_id: stations})` 支持指定共同物质采样位置以比较不同尺寸候选，仍在 native 求值，不插值像素。
+
+`compat.joint_camera.import_joint_camera` 可只读取所需镜头的完整保存相机。显式 `control_coordinates` 按块与 offset 读取已保存的三元组，不用失效的别名块，也不重新拟合时间轨迹。已知 wide Brown hinge 仅在全部已分配 log-f 控制值均不低于激活边界时等价导入基础前向，并保存原定义与整个 cubic control hull 上不激活的依据；仍有作用或未知的扩展明确拒绝。该支持不表示已实现活动宽域扩展或新优化器。
+
 ## 2. 完整节目范围与源时钟〔prepare/review 已接入〕
 
 范围文件为 `events/ankara_2026/programmes/okada_mei_sp/rebuild_scope.json`。完整节目必须覆盖 **s01–s09 九镜头**，显示为 S01–S09；旧六镜头只是子集。公共代码读取清单，不硬编码 9。
@@ -58,6 +68,8 @@ prepared/run 的覆盖指源 PTS 登记及相机状态定义域覆盖，不要�
 ## 3. 统一 CLI 与编排接口
 
 D1 已实现的来源适配接口：`compat.ad_assets.import_mixed_ad_template(path,current_source)` 返回来源、模板、实例、逐轮廓观测候选、别名及原始provenance；`append_source_atlas(assets,path,source,frame_sha256=...)` 把已有原生字形关联同名模板，不生成缺失的material坐标。复制别名不再登记测量；所有新迁入候选不因导入获得拟合或人审资格。`model import-ad-assets --input FILE --out FILE` 与 `model preview-ad-assets --assets FILE --library FILE --out DIR` 已接唯一CLI。它们只导入/查看，不调用优化器；输出已存在时明确拒绝覆盖。
+
+D1 预览消费统一模板和原有逐曝光记录，审计包已验证 Ad1、Ad2、Ad3 的预览，保留外轮廓、内孔及已声明解析图形。缺图、缺原像素、缺直接观测关联会列入输出，不借模板投影补齐。不同曝光必须使用逐 observation 的 PTS 及匹配的 source.exposures 记录，不能把 registry 顶层首曝光套给所有行。
 
 使用现有 `src/rinkspace/cli.py`。`FILE/DIR` 为路径参数，`--shots` 接受 `all` 或逗号分隔的清单 ID；未知/重复 ID 报错。当前已实现：
 
@@ -94,7 +106,31 @@ review.render.render(prepared_dir, state_path, assets_path, shot_ids,
 
 `PreparedReceipt` 返回 `manifest_path,dataset_id,revision,selected_shot_ids,scope_status`；`ReviewReceipt` 返回 review 对象及 `review_path`，路径为绝对路径。目标 `RunReceipt` 返回下面定义的 result 对象及 `result_path/log_path`。当前 CLI 捕获失败并返回非零；后文的结构化求解错误和完整退出码映射仍是目标，不能视为已实现。
 
+`domain.scene_assets.snapshot_scene` 保存当前 scene 及其显式广告数值资产；`domain.runtime_rigs.snapshot_runtime` 保存 rigs/shots 及其显式 camera/controls 依赖，重写包内相对路径，保留数值与原 NPY 字节。prepared revision 绑定这些实际当前内容、features、观测元数据、查询和配置；不只依赖调用方手写 revision 标签。不读这些文档中的历史 origin 或重新生成来源。
+
+`review` 支持 `rinkspace.field_model.v1`，沿统一 scene 资产引用显示已定位广告，未定位实例进入 missing 清单。已有连续围挡上下边不会再次补画。源视频每次 review 按唯一 source 校验一次已登记 SHA；同源多镜头不重复扫描该视频。预览字体优先使用已有系统字体，可用 `RINKSPACE_CJK_FONT` 指定现有 CJK 字体文件，不在渲染时下载。
+
 `model rebuild-glyphs --input FILE --library FILE --out DIR` 已实现，其 SciPy 依赖属于 `advanced` extra；`domain.entity_graph.render_graph` 的 Matplotlib 同属 `advanced`。一般 native 几何/回放不需要这两个辅助依赖。
+
+### 冰面线与围挡底边的固定交点
+
+现有 `Feature(kind="fixed_junction", surface="ice", measurement="material_point")` 可显式声明 `junction_relation="ice_board_bottom"`。两个父 Feature 必须分别属于 `ice` 和 `board`，后者明确标识 `board.bottom`；父实体通过 `path_id`（省略时为 Feature ID）绑定当前 scene 路径。普通交点未声明此关联时继续要求同表面。关联字段只用于固定交点，不能放在普通曲线或材料点上。
+
+`branch="0"/"1"` 按有向冰面直线的两次围挡交点排序，排序在有限支持检查之前确定；缺少该分支不能自动换到另一交点。`domain.junctions.evaluate_ice_board_junction` 使用当前 scene 与同一 native 几何选项解析父实体。native `rs_ice_board_junction` 检查实际连续围挡、有限冰面线支持、分支及双方的 `z=0`，拒绝顶边、非零或未知深度、延长线交点、相切和重合。固定交点无逐帧 station，观测 `kind=0, local_index=-1, support=[0,0]`。
+
+包含此关联的通用准备入口使用 `prepare ... --library 当前库`；Python 为 `prepare(..., core=NativeCore(...))`，当前拟合输入重载为 `load_prepared(..., core=...)`。准备与重载共用上述校验，缺 native 能力时明确失败，不以保存过的通过记录替代当前几何检查。原 UV、PTS、父实体身份与人工确认保留，不由数学交点新增观测。
+
+### 广告内部几何的共同可调状态
+
+当前13份模板的299条路径已登记内部参数，26个实例引用13份共同模板；原材料UV数组是不可变参考几何，原片UV/PTS、观测相关组和人工确认不变。每个字形/明确图形的组内位置、独立宽高和非整体仿射的双轴单调轮廓形变进入 `print_shape`（10个存储坐标）；内孔与父轮廓、同字断开笔画使用同一组。单调映射保留组内拓扑和正体横竖直边，绘图加密点不是独立自由度，也不为每帧复制形状。
+
+`print_square` 的3个坐标为展开面方框中心UV与log边长/面板高，仍由native生成真正方形。`print_rectangle` 的4个坐标为中心UV与log宽高，四边共角且保持直角；Ad5原四边种子不共角，转为已确认矩形的参数初值时存在小位置差，旧参考数组和原片读数保留，未作拟合。面板单位矩形固定为模板坐标规约，其物理宽高/安装仍可调；没有面板的模板选一个显式参考组，用整体尺寸/安装承担该组的平移和尺度，避免重复活动自由度。这是坐标规约，不是固定现场位置或尺寸的观测。
+
+`domain.parameters.compile_scene_parameters(scene,scene_path)` 返回不可变 `ParameterState`：同一个float64向量、全局稳定block ID/offset、活动局部坐标、冻结/规约坐标与明确的null未定位块。场地几何在本批保持冻结；尺寸、独立安装和内部形状共用此布局。`with_blocks`产生独立数值候选，拒绝修改冻结坐标或替未定位实例发明值。活动坐标表示可优化能力，不自动赋予观测信息、质量或统计模型。
+
+`SceneParameterModel.dependencies(instance_id+'::'+template_path_id)` 编译真实共享依赖；`evaluate_print(...,state=...,jacobian=True)` 调用同一native并返回SZ/XYZ、按block排列的几何Jacobian、全局活动列和station导数。尺寸导数已经从物理宽高链到log尺寸。`sample_instance(...,parameter_state=state)`与完整审核共用它；审核比较重新建立共同采样时也继续消费同一状态，不退回静态模板。
+
+新增native ABI2能力为形变路径和typed方形/矩形求值，返回材料UV、展开SZ、XYZ及解析导数；旧DLL不支持时明确失败。这里实现的是几何导数，不能当作完整时变相机因子Jacobian、GPU累计或LM求解。生产求解生命周期仍按下文待实现能力处理；本批没有运行拟合。
 
 ## 4. 持久输入与输出〔当前合同与求解目标〕
 
@@ -104,7 +140,7 @@ review.render.render(prepared_dir, state_path, assets_path, shot_ids,
 
 `rinkspace.input.v1` 必填：`dataset_id/revision, scene_ref, rigs_ref, shots_ref, sources_ref, observations_ref, features_ref, noise_groups_ref, provenance_ref`。引用绑定当前静态文件/数组及其版本；适配器一次性产生它，不把旧 Python 源码路径注册为运行依赖。未知实体/相机族显式失败。
 
-当前 `rinkspace.prepared.v1` 的 `manifest.json` 保存上述身份、`scope_ref/required_shot_ids/selected_shot_ids`、源/实体/机位/镜头/噪声组索引表、`arrays`、`model_configuration`、`dependency_revision`。`arrays` 每项含 `path,dtype,shape,sha256`；当前 prepare 核对所读数组。源记录含 SHA、宽高、time_base、整数 PTS 索引引用和外部资产 ID；镜头含源、rig、处理/物理区间和样条参考时间。未来正常 solve/resume 只检查当前输入的必要一致性，不重扫未变的历史资产或重放来源生产链。
+当前 `rinkspace.prepared.v1` 的 `manifest.json` 另保存 `parameter_layout_ref/initial_state_ref/parameter_dependencies_ref`；初值状态是独立可读的共同数值快照，不是假优化结果。它保存上述身份、`scope_ref/required_shot_ids/selected_shot_ids`、源/实体/机位/镜头/噪声组索引表、`arrays`、`model_configuration`、`dependency_revision`。`arrays` 每项含 `path,dtype,shape,sha256`；当前 prepare 核对所读数组。源记录含 SHA、宽高、time_base、整数 PTS 索引引用和外部资产 ID；镜头含源、rig、处理/物理区间和样条参考时间。未来正常 solve/resume 只检查当前输入的必要一致性，不重扫未变的历史资产或重放来源生产链。
 
 观测数 N，行序固定；以下数组最小合同：
 
@@ -120,7 +156,13 @@ review.render.render(prepared_dir, state_path, assets_path, shot_ids,
 | `support_kind` | uint8 `[N]`（连续围挡必需） | 0=真实有限域；1=整圈未缠绕弧长，不受分段或闭合接缝限制 |
 | `local_index` | int64 `[N]` | 固定点 -1；曲线对应局部状态索引，共享材料点跨帧共用 |
 
-当前测量定义只有：八组靶圈四层圆及半椭圆蓝区取轮廓，其他直曲线取材料宽度中线（模型零线宽）。靶圈实体名字保持 center/inner/middle/outer；取点方式不能替代实体名字。当前 feature 不接受任何旧外/内边缘定义或兼容别名，未激活条目也拒绝；prepare 与拟合读取入口执行同一规则。
+冰面测量定义：八组靶圈四层圆及半椭圆蓝区取轮廓，其余冰面直曲线取材料宽度中线（模型零线宽）。靶圈实体名字保持 center/inner/middle/outer；取点方式不能替代实体名字。当前冰面 feature 不接受任何旧外/内边缘定义或兼容别名，未激活条目也拒绝。这条中线规则不适用于广告材料边界；prepare 与拟合读取入口执行同一分类型规则。
+
+广告曲线的 `measurement` 为 `contour`，保留模板原有字形外缘、内孔（含完整父轮廓 ID）、面板边与明确图形的角色；开放材料边界弧同样按原路径支持范围取轮廓。`domain.print_assets.resolve_print_curve(assets, instance_id, template_path_id)` 返回不可变 `PrintCurveBinding`。`Feature` 用 `surface="board"`、`kind="finite_curve"` 和该 `print_binding`；`label` 为绑定的模板路径 ID 或完整实例路径 ID，不能用广告绑定覆盖冰面标签。
+
+JSON feature 的 `path_id` 为 `binding.path_id`（`instance_id::template_path_id`；若 `id` 就是此值，可省略 `path_id`），`print_binding` 为 `binding.as_record()`，保存 `instance_id/template_id/template_path_id/role/parent_contour_key`。prepare 与 prepared 载入均从 scene 实际登记、SHA 匹配的资产及所选实例重新解析该绑定；逐行元数据复用同一解析结果，不凭广告编号、任意 board 曲线或自称的 role 放行。不改源 UV、PTS、观测身份或相关组，不把轮廓改名为中线。共享尺寸仍引用资产参数块；未定位的配对实例可保留模型身份，但不能因此激活拟合观测。材料身份准入不代替源可见性、审核和统计模型，也不表示已经完成 D4 或启动拟合。
+
+**尚未接通的类型边界：** 当前生成图虽包含冰面标线与围挡底边的固定交点，Feature 的“父实体同一 surface”检查还需有类型地表达 z=0 的跨表面相交；不能整体取消表面校验。这仍是后续观测适配缺口。
 
 围挡上下沿使用 native kind7，以未缠绕全局弧长 s 求值；接缝不是 bounds。旧分段到全局坐标只由 native 做一次坐标转换，原分段作为来源记录，不限制新的 station。
 
@@ -130,7 +172,7 @@ review.render.render(prepared_dir, state_path, assets_path, shot_ids,
 
 ### 当前状态导入与审核
 
-完整状态导入已输出 `rinkspace.state.v1`，包含 `state_id,scene_revision,prepared_revision,layout_revision,parameter_blocks,values_ref,local_values_ref,shots,origin,user_approval`。参数/局部值为 float64 `[P]`/`[L]`；block 保存参数布局信息。当前冻结 d78 回放布局不等于已经实现新优化器的活动布局。初值和候选为 `user_approval=not_reviewed`。
+完整状态导入已输出 `rinkspace.state.v1`，包含 `state_id,scene_revision,prepared_revision,layout_revision,parameter_blocks,values_ref,local_values_ref,shots,origin,user_approval`。参数/局部值为 float64 `[P]`/`[L]`；block 保存参数布局信息。当前冻结 d78 回放布局继续按只读历史语义保留。新的 `layout_family=shared_scene_parameters.v1` 状态实际读取 `parameter_layout_ref` 和有dtype/shape/SHA的 `values_ref`，完整审核不得忽略这些值；prepare 输出 `initial_state.json`。数值候选保存到新的JSON/NPY，不覆盖初值。局部观测状态仍归prepared输入，本批不虚构station或LM RunState。初值和候选为 `user_approval=not_reviewed`，不更改源观测既有人工确认。
 
 已实现的 `review.json` 保存 `state_id,prepared_revision,source_ids,required_shot_ids,selected_shot_ids,scope_status,covered_pts,missing_pts,entity_inventory,missing_entities,artifacts,comparison,user_approval`。artifacts 含绝对路径与源 PTS/时间范围；回放使用已有标线、围挡、广告边界/编号。输出明确 `fit_executed=false,cuda_executed=false`；数值或覆盖 complete 不改用户验收。
 

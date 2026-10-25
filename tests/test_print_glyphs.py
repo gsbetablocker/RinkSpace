@@ -1,5 +1,8 @@
 import cv2
+import hashlib
+import json
 import numpy as np
+import pytest
 from rinkspace.vision_print_glyphs import extract_glyphs,validate_holes,clean_outline
 
 
@@ -24,3 +27,20 @@ def test_straight_bar_and_smooth_round_outline_keep_geometry():
     q=clean_outline(ellipse)
     assert np.max(abs((q[:,0]/22)**2+(q[:,1]/30)**2-1))<.035
     assert np.array_equal(q[0],q[-1])
+
+
+def test_changed_panel_reference_is_rejected_before_template_extraction(tmp_path):
+    from rinkspace.session.glyph_rebuild import rebuild
+    primary = tmp_path/'primary.png'
+    reference = tmp_path/'reference.png'
+    cv2.imwrite(str(primary), np.full((12, 16, 3), 100, dtype=np.uint8))
+    cv2.imwrite(str(reference), np.full((12, 16, 3), 200, dtype=np.uint8))
+    old_hash = hashlib.sha256(reference.read_bytes()).hexdigest()
+    selection = tmp_path/'panel.json'
+    selection.write_text(json.dumps({'source_image': {'path': str(reference), 'sha256': old_hash}}))
+    config = tmp_path/'input.json'
+    config.write_text(json.dumps({'primary': {'frame_path': str(primary),
+        'frame_sha256': hashlib.sha256(primary.read_bytes()).hexdigest()}, 'panel_reference': str(selection)}))
+    cv2.imwrite(str(reference), np.full((12, 16, 3), 30, dtype=np.uint8))
+    with pytest.raises(ValueError, match='selected panel reference frame changed'):
+        rebuild(config, 'unused-no-native-build-needed', tmp_path/'output')

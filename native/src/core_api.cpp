@@ -36,6 +36,52 @@ int rs_sample_print_chart(const double* p,size_t np,const double* vertices,size_
     try{return code(sample_print_chart(p,np,vertices,nv,stations,n,sz,status));}
     catch(...){return code(Status::invalid_argument);}
 }
+int rs_deform_print_points(const double* vertices,size_t nv,const double* bounds,size_t nb,
+    const double* shape,size_t nsh,double* uv,size_t nuv,double* jac,size_t njac,int* status,size_t ns){
+    if(nv%2||nuv!=nv||ns!=nv/2||(nv&&(!vertices||!uv||!status))||
+       !((!jac&&njac==0)||(jac&&counts(ns,20,njac))))return code(Status::invalid_argument);
+    nan_out(uv,nuv);nan_out(jac,njac);
+    for(size_t i=0;i<ns;++i)status[i]=code(Status::invalid_argument);
+    try{return code(deform_print_points(vertices,nv,bounds,nb,shape,nsh,uv,jac,status));}
+    catch(...){nan_out(uv,nuv);nan_out(jac,njac);return code(Status::invalid_argument);}
+}
+int rs_sample_print_deformed_path(const double* bp,size_t nb,const double* p,size_t np,
+    const double* vertices,size_t nv,const double* stations,size_t n,const double* bounds,size_t nbound,
+    const double* shape,size_t nsh,double* uv,size_t nuv,double* sz,size_t nsz,double* xyz,size_t nxyz,
+    double* juv,size_t njuv,double* jsz,size_t njsz,double* jxyz,size_t njxyz,
+    double* ji,size_t nji,double* jt,size_t njt,int* status,size_t ns){
+    const auto optional=[n](double* ptr,size_t size,size_t stride){
+        return (!ptr&&size==0)||(ptr&&counts(n,stride,size));};
+    if(!counts(n,2,nuv)||!counts(n,2,nsz)||!counts(n,3,nxyz)||ns!=n||
+       (n&&(!uv||!sz||!xyz||!status))||!optional(juv,njuv,20)||!optional(jsz,njsz,20)||
+       !optional(jxyz,njxyz,30)||!optional(ji,nji,15)||!optional(jt,njt,3))return code(Status::invalid_argument);
+    nan_out(uv,nuv);nan_out(sz,nsz);nan_out(xyz,nxyz);nan_out(juv,njuv);nan_out(jsz,njsz);
+    nan_out(jxyz,njxyz);nan_out(ji,nji);nan_out(jt,njt);
+    for(size_t i=0;i<ns;++i)status[i]=code(Status::invalid_argument);
+    try{return code(sample_print_deformed_path(bp,nb,p,np,vertices,nv,stations,n,bounds,nbound,
+        shape,nsh,uv,sz,xyz,juv,jsz,jxyz,ji,jt,status));}
+    catch(...){nan_out(uv,nuv);nan_out(sz,nsz);nan_out(xyz,nxyz);nan_out(juv,njuv);nan_out(jsz,njsz);
+        nan_out(jxyz,njxyz);nan_out(ji,nji);nan_out(jt,njt);return code(Status::invalid_argument);}
+}
+int rs_sample_print_analytic_path(const double* bp,size_t nb,const double* p,size_t np,
+    int family,int side,int reverse,const double* values,size_t nvalues,const double* stations,size_t n,
+    double* uv,size_t nuv,double* sz,size_t nsz,double* xyz,size_t nxyz,
+    double* juv,size_t njuv,double* jsz,size_t njsz,double* jxyz,size_t njxyz,
+    double* ji,size_t nji,double* jt,size_t njt,int* status,size_t ns){
+    if((family!=0&&family!=1)||nvalues!=(family==0?3u:4u)||(reverse!=0&&reverse!=1))return code(Status::invalid_argument);
+    const auto optional=[n](double* ptr,size_t size,size_t stride){
+        return (!ptr&&size==0)||(ptr&&counts(n,stride,size));};
+    if(!counts(n,2,nuv)||!counts(n,2,nsz)||!counts(n,3,nxyz)||ns!=n||
+       (n&&(!uv||!sz||!xyz||!status))||!optional(juv,njuv,2*nvalues)||!optional(jsz,njsz,2*nvalues)||
+       !optional(jxyz,njxyz,3*nvalues)||!optional(ji,nji,15)||!optional(jt,njt,3))return code(Status::invalid_argument);
+    nan_out(uv,nuv);nan_out(sz,nsz);nan_out(xyz,nxyz);nan_out(juv,njuv);nan_out(jsz,njsz);
+    nan_out(jxyz,njxyz);nan_out(ji,nji);nan_out(jt,njt);
+    for(size_t i=0;i<ns;++i)status[i]=code(Status::invalid_argument);
+    try{return code(sample_print_analytic_path(bp,nb,p,np,family,side,reverse!=0,values,nvalues,
+        stations,n,uv,sz,xyz,juv,jsz,jxyz,ji,jt,status));}
+    catch(...){nan_out(uv,nuv);nan_out(sz,nsz);nan_out(xyz,nxyz);nan_out(juv,njuv);nan_out(jsz,njsz);
+        nan_out(jxyz,njxyz);nan_out(ji,nji);nan_out(jt,njt);return code(Status::invalid_argument);}
+}
 int rs_sample_entity_path(const double* bp,size_t nb,int kind,
     const double* p,size_t np,const double* vertices,size_t nv,
     const double* stations,size_t n,double* xyz,size_t nxyz,int* status,size_t ns){
@@ -59,6 +105,18 @@ int rs_board_course_chart(const double* bp,size_t nb,double* breaks,size_t no){
     nan_out(breaks,no);
     try{const BoardCourse course(board(bp));for(size_t i=0;i<9;++i)breaks[i]=course.breaks()[i];return 0;}
     catch(...){return code(Status::invalid_argument);}
+}
+int rs_ice_board_junction(const double* bp,size_t nb,const double* line,size_t nl,
+    double height_fraction,int branch,double* xyz,size_t no){
+    if(!xyz||no!=3)return code(Status::invalid_argument);
+    nan_out(xyz,no);
+    if(!valid_board(bp,nb)||!line||nl!=6)return code(Status::invalid_argument);
+    try{
+        Vec3 point{};
+        const auto status=ice_board_junction(board(bp),{load3(line),load3(line+3)},height_fraction,branch,point);
+        if(status==Status::ok)store3(xyz,point);
+        return code(status);
+    }catch(...){return code(Status::invalid_argument);}
 }
 int rs_board_stations_from_legacy(const double* bp,size_t nb,int segment,const double* local,size_t n,double* station,size_t no){
     if(!valid_board(bp,nb)||no!=n||segment< -2||segment>7||(n&&(!local||!station)))return code(Status::invalid_argument);

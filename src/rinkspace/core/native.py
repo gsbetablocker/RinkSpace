@@ -68,6 +68,10 @@ class NativeCore:
 
         # Additive capabilities preserve loading of historical ABI2 libraries.
         optional = {
+            "rs_ice_board_junction": [D,N,D,N,c.c_double,c.c_int,D,N],
+            "rs_sample_print_analytic_path": [D,N,D,N,c.c_int,c.c_int,c.c_int,D,N,D,N,D,N,D,N,D,N,D,N,D,N,D,N,D,N,D,N,I,N],
+            "rs_deform_print_points": [D,N,D,N,D,N,D,N,D,N,I,N],
+            "rs_sample_print_deformed_path": [D,N,D,N,D,N,D,N,D,N,D,N,D,N,D,N,D,N,D,N,D,N,D,N,D,N,D,N,I,N],
             "rs_print_square_vertices": [D,N,D,N,c.c_double,D,N],
             "rs_sample_print_chart": [D,N,D,N,D,N,D,N,I,N],
             "rs_shared_entity_definition_with_options": [D,N,D,N,c.c_int,c.c_uint,I,D,N],
@@ -119,6 +123,16 @@ class NativeCore:
     def line_circle(self, line, circle, branch: int) -> tuple[float, float, float]:
         out = (c.c_double * 3)()
         self._call("rs_line_circle", _d(line), len(line), _d(circle), len(circle), branch, out, 3)
+        return tuple(out)
+
+    def ice_board_junction(self, board, line, height_fraction, branch: int):
+        if type(branch) is not int:
+            raise ValueError("junction branch must be an explicit integer")
+        if not hasattr(self._lib, 'rs_ice_board_junction'):
+            raise ValueError("native library lacks ice/board fixed-junction capability")
+        out = (c.c_double * 3)()
+        self._call('rs_ice_board_junction', _d(board), len(board), _d(line), len(line),
+                   height_fraction, branch, out, 3)
         return tuple(out)
 
     def project(self, camera, xyz) -> tuple[list[tuple[float, float]], list[int]]:
@@ -204,6 +218,109 @@ class NativeCore:
             i, value = failures[0]
             raise NativeError(f"rs_sample_entity_path row {i}", value, self.status_message(value))
         return _points(out)
+
+    def deform_print_points(self, vertices, bounds, shape_values, *, jacobian=True):
+        """Native shared-group material deformation; failures retain NaN rows."""
+        import numpy as np
+        if not hasattr(self._lib, "rs_deform_print_points"):
+            raise ValueError("native library lacks adjustable print-shape capability")
+        points = np.ascontiguousarray(vertices, dtype=np.float64)
+        box = np.ascontiguousarray(bounds, dtype=np.float64)
+        shape = np.ascontiguousarray(shape_values, dtype=np.float64)
+        if points.ndim != 2 or points.shape[1] != 2 or box.shape != (4,) or shape.shape != (10,):
+            raise ValueError("print deformation requires material UV[N,2], bounds[4] and shape[10]")
+        uv = np.full(points.shape, np.nan, dtype=np.float64)
+        deriv = np.full((len(points), 2, 10), np.nan, dtype=np.float64) if jacobian else None
+        status = np.empty(len(points), dtype=np.int32)
+        self._call("rs_deform_print_points", points.ctypes.data_as(D), points.size,
+                   box.ctypes.data_as(D), box.size, shape.ctypes.data_as(D), shape.size,
+                   uv.ctypes.data_as(D), uv.size,
+                   None if deriv is None else deriv.ctypes.data_as(D), 0 if deriv is None else deriv.size,
+                   status.ctypes.data_as(I), status.size)
+        return {"material_uv": uv, "d_uv_d_shape": deriv, "status": status}
+
+    def sample_deformed_print_path(self, board, parameters, vertices, stations, bounds,
+                                   shape_values, *, jacobian=True):
+        """Same native kind5 chart/course, with an active material shape group.
+
+        Shape columns are [tx,ty,log_sx,log_sy,xlogw0..2,ylogw0..2].
+        Installation columns use physical [s,z,rotation,width,height]. No source
+        pixels, fit status or camera parameters are changed by this evaluation.
+        """
+        import numpy as np
+        if not hasattr(self._lib, "rs_sample_print_deformed_path"):
+            raise ValueError("native library lacks adjustable print-path capability")
+        points = np.ascontiguousarray(vertices, dtype=np.float64)
+        course = np.ascontiguousarray(board, dtype=np.float64)
+        installation = np.ascontiguousarray(parameters, dtype=np.float64)
+        coordinates = np.ascontiguousarray(stations, dtype=np.float64)
+        box = np.ascontiguousarray(bounds, dtype=np.float64)
+        shape = np.ascontiguousarray(shape_values, dtype=np.float64)
+        if (points.ndim != 2 or points.shape[1] != 2 or course.shape != (6,)
+                or installation.shape != (5,) or coordinates.ndim != 1
+                or box.shape != (4,) or shape.shape != (10,)):
+            raise ValueError("print path requires board[6], installation[5], UV[N,2], stations[M], bounds[4], shape[10]")
+        n = len(coordinates)
+        result = {"material_uv": np.full((n, 2), np.nan), "sz": np.full((n, 2), np.nan),
+                  "xyz": np.full((n, 3), np.nan), "status": np.empty(n, dtype=np.int32)}
+        derivative_shapes = {"d_uv_d_shape": (n, 2, 10), "d_sz_d_shape": (n, 2, 10),
+                             "d_xyz_d_shape": (n, 3, 10), "d_xyz_d_installation": (n, 3, 5),
+                             "d_xyz_d_station": (n, 3)}
+        result.update({key: np.full(size, np.nan) if jacobian else None
+                       for key, size in derivative_shapes.items()})
+        args = [course.ctypes.data_as(D), course.size, installation.ctypes.data_as(D), installation.size,
+                points.ctypes.data_as(D), points.size, coordinates.ctypes.data_as(D), coordinates.size,
+                box.ctypes.data_as(D), box.size, shape.ctypes.data_as(D), shape.size]
+        for key in ("material_uv", "sz", "xyz", *derivative_shapes):
+            value = result[key]
+            args.extend((None if value is None else value.ctypes.data_as(D), 0 if value is None else value.size))
+        args.extend((result["status"].ctypes.data_as(I), n))
+        self._call("rs_sample_print_deformed_path", *args)
+        return result
+
+    def _sample_analytic_print_path(self, board, parameters, values, stations, *,
+                                    family, side=0, reverse=False, jacobian=True):
+        import numpy as np
+        if not hasattr(self._lib, "rs_sample_print_analytic_path"):
+            raise ValueError("native library lacks adjustable analytic print capability")
+        course = np.ascontiguousarray(board, dtype=np.float64)
+        installation = np.ascontiguousarray(parameters, dtype=np.float64)
+        shape = np.ascontiguousarray(values, dtype=np.float64)
+        coordinates = np.ascontiguousarray(stations, dtype=np.float64)
+        width = 3 if family == 0 else 4
+        if course.shape != (6,) or installation.shape != (5,) or shape.shape != (width,) or coordinates.ndim != 1:
+            raise ValueError("invalid analytic print array shapes")
+        if type(side) is not int or type(reverse) is not bool:
+            raise ValueError("analytic print side/reverse must be integer/boolean")
+        n = len(coordinates)
+        name = "square" if family == 0 else "rectangle"
+        result = {"material_uv": np.full((n, 2), np.nan), "sz": np.full((n, 2), np.nan),
+                  "xyz": np.full((n, 3), np.nan), "status": np.empty(n, dtype=np.int32)}
+        derivative_shapes = {"d_uv_d_"+name: (n, 2, width), "d_sz_d_"+name: (n, 2, width),
+                             "d_xyz_d_"+name: (n, 3, width), "d_xyz_d_installation": (n, 3, 5),
+                             "d_xyz_d_station": (n, 3)}
+        result.update({key: np.full(size, np.nan) if jacobian else None
+                       for key, size in derivative_shapes.items()})
+        args = [course.ctypes.data_as(D), course.size, installation.ctypes.data_as(D), installation.size,
+                family, side, int(reverse), shape.ctypes.data_as(D), shape.size,
+                coordinates.ctypes.data_as(D), coordinates.size]
+        for key in ("material_uv", "sz", "xyz", *derivative_shapes):
+            value = result[key]
+            args.extend((None if value is None else value.ctypes.data_as(D), 0 if value is None else value.size))
+        args.extend((result["status"].ctypes.data_as(I), n))
+        self._call("rs_sample_print_analytic_path", *args)
+        return result
+
+    def sample_print_square_path(self, board, parameters, square_values, stations, *, jacobian=True):
+        """Native metric square: values=[centre_u,centre_v,log_side_over_height]."""
+        return self._sample_analytic_print_path(board, parameters, square_values, stations,
+                                               family=0, jacobian=jacobian)
+
+    def sample_print_rectangle_path(self, board, parameters, rectangle_values, side, stations, *,
+                                    reverse=False, jacobian=True):
+        """Native shared rectangle edge: values=[centre_u,centre_v,log_w_uv,log_h_uv]."""
+        return self._sample_analytic_print_path(board, parameters, rectangle_values, stations,
+                                               family=1, side=side, reverse=reverse, jacobian=jacobian)
 
     def print_square_vertices(self, parameters, center_uv, side_over_panel_height) -> list[tuple[float, float]]:
         """Four regular unfolded-metric square corners plus closure; native math."""

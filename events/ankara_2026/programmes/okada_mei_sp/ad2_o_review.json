@@ -1,0 +1,61 @@
+{
+  "schema": "rinkspace.observation_visual_review.v1",
+  "status": "accepted",
+  "authority": "direct_user_confirmation",
+  "user_statement": "这帧可以",
+  "review_date": "2026-10-25",
+  "review_timezone": "Asia/Shanghai",
+  "scope": {
+    "feature_ids": [
+      "Ad2.print.COM_O",
+      "Ad2.print.COM_O_inner"
+    ],
+    "observation_ids": [
+      "ad_source/f65a12055a975703fd20326b0e59b955",
+      "ad_source/aa2fb4a7b5af07b0d7a6da23553b793f"
+    ],
+    "source_id": "O6j8L8TmfKo",
+    "shot_id": "s01",
+    "pts": 320000,
+    "time_base_num": 1,
+    "time_base_den": 12800,
+    "source_seconds": 25.0,
+    "scope_status": "two_boundaries_one_exposure_only"
+  },
+  "accepted_aspects": [
+    "identity_of_the_same_COM_O_outer_and_inner_boundaries",
+    "displayed_existing_source_UV_boundary_readouts_at_this_exposure"
+  ],
+  "observations": [
+    {
+      "observation_id": "ad_source/f65a12055a975703fd20326b0e59b955",
+      "feature_id": "Ad2.print.COM_O",
+      "point_count": 150,
+      "uv_sha256_float64_le": "6f7ecdcd275e1fa3da4a2e5c003e66fe2e5c31a41bbe32e1cf9b7fa13123152a",
+      "record_sha256_canonical_json": "83806ff73083f0b2cefa7a3b4651b720074b00e3eadd25fad828b0157b6e69b1"
+    },
+    {
+      "observation_id": "ad_source/aa2fb4a7b5af07b0d7a6da23553b793f",
+      "feature_id": "Ad2.print.COM_O_inner",
+      "point_count": 101,
+      "uv_sha256_float64_le": "2948a72e01d0401f32f8eb62613a3e68a203c914ac1fa7e3159b4b89bb9559a4",
+      "record_sha256_canonical_json": "bdea254b317df54a1d5cc2747c30ee6312dade280dd327f51d26aba0b0fe714d"
+    }
+  ],
+  "source_video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "decoded_rgb_sha256": "8dd244e7e21795024043439886cf1da1f151f3e60500afec2b0d4608c35167c5",
+  "card": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\ad2_o_320000\\card.png",
+    "sha256": "5b7196b20c9b875b9ebbc78c29d0f7c68fabe555ab70118c27b7e5199687398b",
+    "status_at_creation": "not_reviewed"
+  },
+  "measurement_uncertainty": "not_estimated_by_this_visual_acceptance",
+  "approval_scope": "only_the_two_named_records_at_PTS_320000",
+  "approval_extends_to_other_pts": false,
+  "approval_extends_to_other_features": false,
+  "template_geometry_or_camera_fit_approved": false,
+  "source_uv_changed": false,
+  "active_for_fit": false,
+  "fit_executed": false,
+  "cuda_executed": false
+}

@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 import numpy as np
 from ..path_policy import guard_project_write
-from .entity_graph import _code
+from .entity_graph import _code, carrier_boundary_junctions
 from .measurement import POLICY_ID, required_measurement, validate_scene_measurements
 from ..compat.d78_entities import native_definition
 
@@ -180,6 +180,11 @@ def sample_model(scene,core,samples=361):
                 else:parents=p['endpoint_parent_ids'][i];name=f'T{side}{"下" if code%2==0 else "上"}{"G" if i==0 else "B"}'
                 node(name,xyz,parents,p['endpoint_roles'][i],'unmeasured_attachment',
                      evidence_role='geometric_attachment_with_no_source_endpoint_measurement')
+    # These are the same unmeasured physical intersections returned by model
+    # graph. The preview's hollow endpoint markers still create no source UV.
+    for junction in carrier_boundary_junctions(shapes):
+        nodes.append({**junction, "parent_ids": junction["parents"],
+                      "display_kind": "derived_boundary_intersection"})
     # M2/M3 checks use native output, not a separately drawn reference model.
     def endpoints(code):return np.asarray(by_code[code]['parameters'],dtype=float).reshape(2,3)
     c=endpoints(400);b1=endpoints(401);b2=endpoints(402)

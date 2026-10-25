@@ -110,12 +110,18 @@ def import_d78_state(model_path, out_dir, scope_path, library_path, complete_sta
                 if migrated.get("sha256") != record.get("sha256"):
                     raise ValueError(f"current local-state mapping changes identity: {name}")
                 source = Path(migrated["file"])
-                if not source.is_file() or _hash(source) != record["sha256"]:
-                    raise ValueError(f"current local-state file differs from its mapped original: {source}")
             if not source.is_file():
                 raise FileNotFoundError(f"complete d78 local-state file is missing: {source}")
             dtype = "<u4" if name.endswith(".u32") else "<f8"
-            array = np.fromfile(source, dtype=dtype)
+            # Existing original paths need the same identity check as relocated
+            # paths. Hash exactly the bytes decoded, and reject truncated scalar
+            # tails that np.fromfile would otherwise silently ignore.
+            raw = source.read_bytes()
+            if hashlib.sha256(raw).hexdigest() != record.get("sha256"):
+                raise ValueError(f"complete d78 local-state content differs from its declared identity: {source}")
+            if len(raw) % np.dtype(dtype).itemsize:
+                raise ValueError(f"complete d78 local-state byte count is not aligned to {dtype}: {source}")
+            array = np.frombuffer(raw, dtype=dtype).copy()
             if dtype == "<f8" and not np.isfinite(array).all():
                 raise ValueError(f"nonfinite complete d78 local state: {source}")
             local_arrays[name.replace(".", "_")+".npy"] = array

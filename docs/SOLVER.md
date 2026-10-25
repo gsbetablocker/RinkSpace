@@ -35,7 +35,7 @@ Ceres 留作开发期的小问题数值对照，不是第二个生产求解入�
 | `State` | 一份共享连续参数向量、稳定 ID 到偏移的映射 | 不保存多个互不对应的“最新模型” |
 | `RunState` | LM 阻尼、有效活动集、优化候选、耗时和终止原因 | 不写入用户已接受状态 |
 
-具体 CLI 参数、数组 dtype/shape、状态、错误与输出格式统一由 [INTERFACES.md](INTERFACES.md) 定义。当前已有 API 只有该文档第 1 节的基础几何/静态投影能力；下面是待实现的唯一聚合生命周期，不是已经能运行的命令：
+具体 CLI 参数、数组 dtype/shape、状态、错误与输出格式统一由 [INTERFACES.md](INTERFACES.md) 定义。当前已有 API 包括该文档列出的共同几何、静态及完整时变相机前向、prepare/review 和 D1/D3；下面是待实现的唯一聚合求解生命周期，不是已经能运行的命令：
 
 ```cpp
 CompiledProblem compile_problem(const PreparedProblemView&, const ActiveSet&,

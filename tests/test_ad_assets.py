@@ -70,8 +70,8 @@ def test_mixed_source_clock_and_original_pixels_are_preserved(packet):
 def test_holes_and_open_source_arcs_keep_topology(packet):
     path, _ = packet
     paths = {p["original_id"]: p for p in import_mixed_ad_template(path, CURRENT)["templates"][0]["paths"]}
-    assert paths["A_inner"]["parent_contour_key"] == "glyph0"
-    assert paths["O_inner"]["parent_contour_key"] == "glyph1"
+    assert paths["A_inner"]["parent_contour_key"] == "Ad2.print.glyph0"
+    assert paths["O_inner"]["parent_contour_key"] == "Ad2.print.glyph1"
     assert all(not paths[f"ribbon{i}"]["closed"] for i in range(15))
     assert all(paths[f"ribbon{i}"]["material_uv"] == [[.1, .2], [.3, .4]] for i in range(15))
 

@@ -7,6 +7,7 @@ from pathlib import Path
 from rinkspace.session.prepare import validate_current_feature_contracts
 from rinkspace.session.dataset import DatasetError, load_prepared, write_array, write_json, iter_current_observations
 from rinkspace.domain.measurement import POLICY_ID, MeasurementPolicyError
+from rinkspace.domain.print_assets import PrintBindingError
 
 
 def fixture():
@@ -60,7 +61,8 @@ def test_all_current_ring_layers_and_ellipse_exceptions_remain_admissible():
     root=Path(__file__).resolve().parents[1]
     scene=json.loads((root/'events/ankara_2026/scene/field/model.json').read_text(encoding='utf-8'))
     f,a,rows=fixture()
-    result=validate_current_feature_contracts({},scene,f,a,rows)
+    result=validate_current_feature_contracts({},scene,f,a,rows,
+        scene_path=root/'events/ankara_2026/scene/field/model.json')
     assert result['scene_measurement']['features']==66
     assert sum(100<=p.get('generated_code',-1)<132 for p in scene['paths'])==32
     assert [p['measurement'] for p in scene['paths'] if p.get('generated_code') in (410,411)]==['contour']*2
@@ -84,7 +86,10 @@ def test_boundary_identity_from_scene_cannot_be_hidden_by_feature_metadata():
 def test_finite_board_artwork_and_fixed_points_are_not_reclassified_as_boundaries():
     f,a,rows=fixture()
     f[0].update(label='Ad2.print',surface='board',native_kind=5,finite_support=[0.,1.])
-    assert validate_current_feature_contracts({}, {}, f,a,rows)['periodic_station_rows']==0
+    # A bare kind5 declaration cannot supply a material identity. Actual bound
+    # print curves are covered by test_print_measurement, without kind7 stations.
+    with pytest.raises(PrintBindingError):validate_current_feature_contracts({}, {}, f,a,rows)
+    f[0].pop('native_kind')
     f[0].update(label='board.top',kind='material_point',measurement='material_point')
     a['kind'][:]=0;a['local_index'][:]=-1;a['support'][:]=0
     assert validate_current_feature_contracts({}, {}, f,a,rows)['periodic_station_rows']==0

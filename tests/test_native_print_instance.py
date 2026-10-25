@@ -6,6 +6,8 @@ import unittest
 import numpy as np
 
 from rinkspace.core.native import NativeCore, NativeError
+from rinkspace.domain.print_assets import (attach_paired_instance, initialize_instance,
+    sample_instance, PrintBindingError)
 
 
 @unittest.skipUnless(os.environ.get("RINKSPACE_CORE_LIBRARY"), "explicit native library required")
@@ -88,6 +90,36 @@ class NativePrintInstance(unittest.TestCase):
             self.core.board_points(self.board, [chart[0][0]], [chart[0][1]])
         with self.assertRaises(NativeError):
             self.core.sample_path(self.board, 5, p, [[0., 1.]], [0.])
+
+    def test_explicit_comparison_stations_use_the_same_native_path(self):
+        assets = {'templates': [{'id': 'template', 'paths': [
+            {'id': 'edge', 'role': 'panel_outer_boundary', 'closed': False,
+             'material_uv': [[0., 0.], [1., 0.]]},
+            {'id': 'other', 'role': 'panel_outer_boundary', 'closed': False,
+             'material_uv': [[0., 1.], [1., 1.]]}]}],
+            'instances': [{'id': 'print_instance/a', 'template_id': 'template',
+                           'scene_surface_id': 'entity/board.continuous'}], 'counts': {}}
+        assets = attach_paired_instance(assets, 'print_instance/a', 'print_instance/b',
+                                        'size', authority={'kind': 'synthetic_test'})
+        parameters = [.1, .003, .1, .02, .009]
+        assets = initialize_instance(assets, 'print_instance/a', parameters, provenance={})
+        stations = [0., .17, .5, .82, 1.]
+        result = sample_instance(assets, 'print_instance/a', self.board, self.core,
+                                 stations_by_path={'edge': stations})
+        edge, other = result['paths']
+        self.assertEqual(edge['stations'], stations)
+        self.assertGreater(len(other['stations']), len(stations))
+        expected = self.core.sample_path(self.board, 5, parameters, [[0., 0.], [1., 0.]], stations)
+        np.testing.assert_allclose(edge['xyz'], expected, rtol=0., atol=2e-16)
+        self.assertEqual(result['new_source_observations'], 0)
+        for invalid in ([0., float('nan')], [-.01, 1.], [0., 1.01], [[0., 1.]], [], [1., 0.]):
+            with self.subTest(stations=invalid):
+                with self.assertRaisesRegex(PrintBindingError, 'invalid_print_sampling_stations'):
+                    sample_instance(assets, 'print_instance/a', self.board, self.core,
+                                    stations_by_path={'edge': invalid})
+        with self.assertRaisesRegex(PrintBindingError, 'unknown_print_sampling_path'):
+            sample_instance(assets, 'print_instance/a', self.board, self.core,
+                            stations_by_path={'absent': [0., 1.]})
 
 
 class NativePrintCapability(unittest.TestCase):

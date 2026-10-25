@@ -131,11 +131,51 @@ def resolve_path(scene, path, core):
     return path
 
 
+def carrier_boundary_junctions(resolved_paths):
+    """Name existing native carrier ends on the current continuous ice edge.
+
+    This consumes evaluated geometry, never estimates XYZ from display samples
+    or creates image observations. Only explicitly declared physical boundary
+    intersections qualify; drawing supports and unmeasured M4 attachments do not.
+    """
+    carriers = [p for p in resolved_paths
+                if p.get("native_kind", p.get("kind")) in (0, "ice_segment")
+                and p.get("endpoint_roles") == ["derived_ice_boundary_intersection"]*2]
+    if not carriers:
+        return []
+    boundaries = [p for p in resolved_paths
+                  if p.get("native_kind", p.get("kind")) in (7, "board_course")
+                  and p.get("layer") == "board" and p.get("parameters") == [0.]]
+    if len(boundaries) != 1:
+        raise ValueError("Declared carrier intersections need one continuous ice boundary")
+    boundary = boundaries[0]
+    nodes = []
+    for carrier in carriers:
+        parameters = np.asarray(carrier["parameters"], dtype=float)
+        if parameters.shape != (6,) or not np.isfinite(parameters).all():
+            raise ValueError("Carrier endpoints must come from a finite native segment")
+        parents = [carrier, boundary]
+        for branch, xyz in enumerate(parameters.reshape(2, 3)):
+            nodes.append({
+                "id": "junction/"+"|".join(sorted(p["id"] for p in parents))+f"/{branch}",
+                "kind": "FixedJunction", "parents": [p["id"] for p in parents],
+                "surface": "ice", "junction_relation": "ice_board_bottom",
+                "parent_labels": [p["label"] for p in parents], "branch": branch,
+                "xyz": xyz.tolist(), "meaning": "material_centreline_meets_continuous_ice_boundary",
+                "source_observation_ids": [], "source_uv": None,
+                "semantic_status": "derived_model_node_unobserved",
+                "per_frame_station_parameter": False, "coordinate_unit": "rink_length",
+                "role": "derived_ice_boundary_intersection", "new_source_observation": False,
+            })
+    return nodes
+
+
 def fixed_node_graph(scene, core) -> dict:
     if scene.get('measurement_policy_id') or scene.get('schema') == 'rinkspace.field_model.v1':
         from .measurement import validate_scene_measurements
         validate_scene_measurements(scene)
-    paths = [resolve_path(scene, p, core) for p in scene["paths"] if p["layer"] == "ice" and not p.get("physical_alias_of")]
+    resolved = [resolve_path(scene, p, core) for p in scene["paths"] if not p.get("physical_alias_of")]
+    paths = [p for p in resolved if p["layer"] == "ice"]
     lines = [p for p in paths if p["kind"] == "ice_segment"]
     circles = [p for p in paths if p["kind"] == "ice_circle" and abs(p["parameters"][5]-p["parameters"][4]-2*math.pi) < 1e-10]
     nodes = []
@@ -162,7 +202,11 @@ def fixed_node_graph(scene, core) -> dict:
                     if exc.status not in (2, 3, 4):
                         raise
                 else:
-                    add([a, circle], branch, xyz, "line_midwidth_axis_crosses_named_ring_material_boundary")
+                    meaning = ("intersection_of_finite_material_centrelines"
+                               if circle.get("measurement") == "centreline"
+                               else "line_midwidth_axis_crosses_named_ring_material_boundary")
+                    add([a, circle], branch, xyz, meaning)
+    nodes.extend(carrier_boundary_junctions(resolved))
     # Material corners belong to an installation chart. They are not generated
     # from arbitrary print polyline vertices and are not pixel constraints.
     installation_paths = {}

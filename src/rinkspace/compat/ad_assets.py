@@ -90,6 +90,29 @@ def _pointer(value):
     return str(value).replace("~", "~0").replace("/", "~1")
 
 
+def _bind_template_path_references(paths):
+    """Convert explicit legacy path keys once, keeping raw records unchanged."""
+    ids = {path['id'] for path in paths}
+    originals = {}
+    for path in paths:
+        if path.get('original_id') is not None:
+            originals.setdefault(path['original_id'], []).append(path['id'])
+    def resolve(key):
+        if key in ids:
+            return key
+        matches = originals.get(key, [])
+        if len(matches) != 1:
+            raise ValueError('missing or ambiguous print contour reference: '+str(key))
+        return matches[0]
+    for path in paths:
+        if path.get('parent_contour_key') is not None:
+            path['parent_contour_key'] = resolve(path['parent_contour_key'])
+        if 'separate_inner_contour_keys' in path:
+            path['separate_inner_contour_keys'] = [resolve(key) for key in path['separate_inner_contour_keys']]
+    from ..domain.print_assets import validate_template_topology
+    validate_template_topology({'paths': paths})
+
+
 def _source(record, supplement=None):
     """Supplement an explicitly selected source, never an enclosing template."""
     raw = deepcopy(record)
@@ -239,6 +262,7 @@ def import_mixed_ad_template(path: str | Path, current_source: dict) -> dict:
             raise ValueError("internal-hole parent contour is missing")
         if any(key not in keys for key in item["separate_inner_contour_keys"]):
             raise ValueError("declared internal-hole contour is missing")
+    _bind_template_path_references(paths)
     return {"schema": "rinkspace.ad_asset_import.v1", "advertisement_number": number,
             "sources": {s["id"]: s for s in (historical, current)},
             "templates": [{"id": template_id, "advertisement_number": number, "paths": paths,
@@ -384,6 +408,7 @@ def apply_glyph_rebuild(assets: dict, rebuild_path: str | Path) -> dict:
             'preferred_pixel_evidence_id':oid,'material_uv':deepcopy(record['material_uv']),
             'closed':record['closed'],'role':record['role'],'parent_contour_key':record['parent_contour_key'],
             'template_shape_refinement_pending':False})
+    _bind_template_path_references(new_paths)
     template=result['templates'][0];template['paths']=new_paths;template['text']=rebuilt['text']
     template['text_content_authority']='direct_user_confirmation';template['display_reference_size']=[1536,256]
     template['shape_status']='source_rebuilt_pending_user_visual_review'

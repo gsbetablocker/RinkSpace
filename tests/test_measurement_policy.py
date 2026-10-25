@@ -8,7 +8,7 @@ from rinkspace.domain.measurement import (
 )
 
 
-def test_only_named_houses_and_half_ellipse_are_contours():
+def test_only_named_ice_houses_and_half_ellipse_are_ice_contours():
     for side in ('F','R'):
         for row in range(1,5):
             for suffix in ('center','inner','middle','outer'):
@@ -19,10 +19,10 @@ def test_only_named_houses_and_half_ellipse_are_contours():
         assert required_measurement(label)=='contour'
 
 
-def test_every_other_curve_is_zero_width_midline():
+def test_other_ice_curves_and_existing_board_course_keep_zero_width_midline():
     labels=['ice.C0:outer',*[f'ice.A{i}:outer' for i in range(1,5)],
             'ice.C','ice.B1','ice.lane3:edge2','ice.house_connection_F4_R4:segment0',
-            'ice.goal_trapezoid_left_lower_outer:segment0','board.top','Ad7.print.contour:arc0']
+            'ice.goal_trapezoid_left_lower_outer:segment0','board.top']
     for label in labels:
         rule=measurement_rule(label)
         assert rule.mode=='centreline' and rule.model_width==0.

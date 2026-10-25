@@ -3,14 +3,17 @@
 No optimization, source extraction or historical preparation is performed.
 """
 from __future__ import annotations
+from fractions import Fraction
 import hashlib
 import json
 from pathlib import Path
+import re
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 from ..core.native import NativeCore
 from ..domain.print_assets import sample_instance, resolve_instance
 from ..domain.field_model import sample_model
+from ..review.fonts import review_font
 from .board_preview import Canvas, _mapping, _project_display, BG, INK
 
 TEAL='#00ba9d'
@@ -38,6 +41,76 @@ def ref(path):
     return {'path':str(path),'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
 
 
+def verified_source_frame(camera, video_path, scope_path, pts):
+    """Decode one registered native exposure, without trusting a PNG caption.
+
+    A frozen source scope supplies the expected video identity. The video bytes,
+    decoded time base, dimensions and actual frame PTS must all agree. This is
+    a review operation, not a new observation or solver-start qualification chain.
+    """
+    if type(pts) is not int:
+        raise ValueError('D3 requires native integer PTS')
+    scope = read(scope_path)
+    source, clock = scope['source'], scope['source_clock']
+    matches = [shot for shot in scope['shots'] if shot['id'] == camera['shot_id']]
+    if len(matches) != 1 or camera['shot_id'] not in scope['required_shot_ids']:
+        raise ValueError('D3 camera shot is absent or ambiguous in source scope')
+    expected_tb = Fraction(clock['time_base_num'], clock['time_base_den'])
+    camera_tb = Fraction(camera['time_base_num'], camera['time_base_den'])
+    if (source['id'] != camera['source_id'] or expected_tb != camera_tb or
+            (source['width'], source['height']) != (camera['image_width'], camera['image_height'])):
+        raise ValueError('D3 camera and registered source identity/clock/dimensions differ')
+    window = matches[0]['processing']
+    if not (window['first_pts'] <= pts < window['stop_pts_exclusive'] and
+            camera['first_pts'] <= pts < camera['stop_pts_exclusive']):
+        raise ValueError('D3 PTS outside registered shot or camera')
+    expected = source.get('sha256', '')
+    if not re.fullmatch(r'[0-9a-f]{64}', expected):
+        raise ValueError('D3 requires the registered original video SHA256')
+    path = Path(video_path).resolve(strict=True)
+    digest = hashlib.sha256()
+    with path.open('rb') as stream:
+        for block in iter(lambda: stream.read(1024*1024), b''):
+            digest.update(block)
+    if digest.hexdigest() != expected:
+        raise ValueError('D3 original video SHA256 differs from registered source')
+    # Reuse the complete-review decoder's exact-PTS checks. No frame/fps seek,
+    # nearest-frame fallback, rescaling or interpolation is used here.
+    from ..review.render import source_frames
+    decoded = list(source_frames(path, {**source, 'time_base_num': expected_tb.numerator,
+        'time_base_den': expected_tb.denominator}, [pts]))
+    if len(decoded) != 1 or decoded[0][0] != pts:
+        raise ValueError('D3 did not decode the requested native exposure')
+    rgb = np.ascontiguousarray(decoded[0][1][:, :, ::-1])
+    return Image.fromarray(rgb), {
+        'status': 'native_pts_decoded', 'native_source_verified': True,
+        'video': {'path': str(path), 'sha256': expected}, 'scope': ref(scope_path),
+        'source_id': source['id'], 'pts': pts,
+        'time_base_num': expected_tb.numerator, 'time_base_den': expected_tb.denominator,
+        'decoded_RGB_sha256': hashlib.sha256(rgb.tobytes()).hexdigest(),
+        'verification_meaning': 'registered video bytes and native exposure; no visual-fit approval',
+    }
+
+
+def bound_scene_assets(scene, scene_path, assets_path, instance_id):
+    """The selected print and context must come from this scene's exact assets."""
+    from ..domain.scene_assets import read_scene_assets
+    registered = read_scene_assets(scene, scene_path)
+    by_instance = {}
+    for reference, assets in registered:
+        for instance in assets['instances']:
+            identity = instance['id']
+            if identity in by_instance:
+                raise ValueError('duplicate print instance in current scene: '+identity)
+            by_instance[identity] = reference
+    if instance_id not in by_instance:
+        raise ValueError('selected print instance is not bound to current scene: '+instance_id)
+    selected = ref(assets_path)
+    if selected['sha256'] != by_instance[instance_id]['sha256']:
+        raise ValueError('selected print asset differs from current scene binding: '+instance_id)
+    return registered
+
+
 def _paint_shapes(canvas,paths,xy,*,fill=False):
     for path in sorted(paths,key=_is_hole):
         points=xy(path)
@@ -48,10 +121,14 @@ def _paint_shapes(canvas,paths,xy,*,fill=False):
 
 
 def unfolded(data,out):
-    c=Canvas((2400,810))
+    # Dense, multi-row words need a separate identifier legend. Putting every
+    # hole ID into the inter-row gap erased neighbouring letter strokes.
+    legend=len(data['paths'])>24
+    legend_rows=(len(data['paths'])+3)//4
+    c=Canvas((2400,810+(75+29*legend_rows if legend else 0)))
     label=data['instance_id'].rsplit('/',1)[-1]
     c.text((65,55),f'D3 · {label} 展开面（从冰内观看）',43)
-    c.text((65,114),'原 D1 字形与内孔 → 同一 native 安装 chart；没有重新打字、替换字体或读取背景纹理。',27)
+    c.text((65,114),'当前所选轮廓与内孔 → 同一 native 安装 chart；没有重新打字、替换字体或读取背景纹理。',27)
     # Display station right-to-left, as on this upper board from the ice.
     points=np.vstack([p['sz'] for p in data['paths']])
     mapping=_mapping(points*[-1.,1.],(100,210,2200,345))
@@ -59,6 +136,11 @@ def unfolded(data,out):
     _paint_shapes(c,data['paths'],xy,fill=True)
     by_id={p['id']:p for p in data['paths']}
     for i,path in enumerate(data['paths'],1):
+        if legend:
+            name=path['id'].removeprefix(label+'.print.').removeprefix(label+'.')
+            c.text((65+(i-1)%4*575,870+(i-1)//4*29),
+                f'{i:02}  {name}',19,HOLE if _is_hole(path) else INK)
+            continue
         q=xy(path);at=(q.min(axis=0)+q.max(axis=0))/2
         if path['role']=='panel_outer_boundary':
             offset=_edge_offset(path)
@@ -76,6 +158,8 @@ def unfolded(data,out):
     c.text((65,708),f'横轴 s 向左增加，纵轴 z 向上；{sum(_is_hole(p) for p in data["paths"])} 条内孔独立保留；开放轮廓不补闭合边。',25)
     missing=' / '.join(data['unlocalized_related_instances']) or '无'
     c.text((65,758),f'未定位的同模板实例：{missing}。' + ('其位置仍为空，没有生成三维位置或源像素。' if data['unlocalized_related_instances'] else '两实例共用模板和尺寸，安装位置各自独立。'),25)
+    if legend:
+        c.text((65,823),'实体编号索引（对应源图、三维图与 geometry.json；文字区不覆盖编号）',24)
     c.image.save(out/'unfolded.png')
 
 
@@ -138,7 +222,7 @@ def board_view(data,board,core,out):
     c.text((65,1304),'本实例包含真实弯角段，字形逐点随围挡弯曲。' if curved else '本实例初值位于直段；旁边为同一连续围挡。',26)
     c.text((65,1358),'全部 8 个分段接缝及闭合缝已用同一 native 安装路径检查连续性；采样点不被固定在某一段。',25)
     c.text((65,1412),f'编号 01–{len(data["paths"]):02} 与展开图、源投影及数据一一对应；未建模的细节不补成材料边。',25)
-    c.text((65,1466),'原模板 UV、实体身份与观测相关组不变；此图是安装前向审核，不是 GPU / LM 拟合结果。',25,'#ad7225')
+    c.text((65,1466),'原源像素、实体身份与观测相关组保留；此图是安装前向审核，尚未重新拟合。',25,'#ad7225')
     c.text((65,1520),'主图为正交展示视角；源图由各自镜头的完整时变相机另行投影，未用展示视角代替标定。',24)
     c.image.save(out/'three_d.png')
 
@@ -166,7 +250,10 @@ def course_continuity(core,board,parameters):
         'eps':eps,'joins':records,'actual_instance_parameters_changed':False}
 
 
-def source_view(data,scene,core,camera,frame,pts,out,context_prints=()):
+def source_view(data,scene,core,camera,frame,pts,out,context_prints=(),source_verification=None):
+    source_verification = source_verification or {
+        'status': 'unverified_image_preview', 'native_source_verified': False}
+    verified = source_verification.get('native_source_verified') is True
     image=Image.open(frame).convert('RGB')
     if image.size!=(camera['image_width'],camera['image_height']):raise ValueError('source/camera image-size mismatch')
     sizes=[len(p['xyz']) for p in data['paths']]
@@ -177,7 +264,7 @@ def source_view(data,scene,core,camera,frame,pts,out,context_prints=()):
     if not np.any(visible):raise ValueError('no visible valid projection for this print/source exposure')
     parts=np.split(uv,np.cumsum(sizes)[:-1]);valid_parts=np.split(valid,np.cumsum(sizes)[:-1])
     overlay=image.copy();pen=ImageDraw.Draw(overlay)
-    font=ImageFont.truetype('C:/Windows/Fonts/msyh.ttc',15)
+    font=review_font(15)
     for i,(path,q,ok) in enumerate(zip(data['paths'],parts,valid_parts),1):
         color=HOLE if _is_hole(path) else TEAL
         start=None
@@ -197,16 +284,24 @@ def source_view(data,scene,core,camera,frame,pts,out,context_prints=()):
     bounds=np.r_[uv[visible].min(axis=0)-[70,75],uv[visible].max(axis=0)+[65,65]]
     bounds=np.rint(bounds).astype(int);bounds[:2]=np.maximum(bounds[:2],[0,0]);bounds[2:]=np.minimum(bounds[2:],image.size)
     box=tuple(map(int,bounds));rawcrop=image.crop(box);overcrop=overlay.crop(box)
-    target_w=2240;target_h=round(rawcrop.height*target_w/rawcrop.width)
+    # A nearly out-of-frame projection can leave a very narrow crop. Preserve
+    # its aspect ratio without creating a many-metres-tall comparison card.
+    display_scale=min(2240/rawcrop.width,1100/rawcrop.height)
+    target_w=max(1,round(rawcrop.width*display_scale))
+    target_h=max(1,round(rawcrop.height*display_scale))
+    image_left=(2400-target_w)//2
     c=Canvas((2400,435+2*target_h))
     label=data['instance_id'].rsplit('/',1)[-1]
     seconds=pts*camera['time_base_num']/camera['time_base_den']
-    c.text((65,55),f'D3 · {label} 同源投影对照 · {camera["shot_id"]} / {seconds:.3f}s',43)
-    c.text((65,113),f'官方 50fps 原片，PTS {pts}，time_base = {camera["time_base_num"]}/{camera["time_base_den"]}；原时变相机冻结。',26)
-    c.text((65,178),f'上：原片像素（{label} 当前可见部分；裁切、遮挡不补成取点）',28)
-    c.image.paste(rawcrop.resize((target_w,target_h),Image.Resampling.LANCZOS),(80,215))
-    c.text((65,245+target_h),'下：同一原片 + 原 D1 字形 / 内孔 / 四边 native 投影',28)
-    c.image.paste(overcrop.resize((target_w,target_h),Image.Resampling.LANCZOS),(80,285+target_h))
+    mode='同源投影对照' if verified else '图像预览（源曝光未核实）'
+    c.text((65,55),f'D3 · {label} {mode} · {camera["shot_id"]} / {seconds:.3f}s',43)
+    clock_text=f'PTS {pts}，time_base = {camera["time_base_num"]}/{camera["time_base_den"]}'
+    c.text((65,113),f'已核对原视频 SHA 与原生曝光，{clock_text}；原时变相机冻结。' if verified else
+        f'图片未绑定原视频曝光；{clock_text} 仅用于相机计算，不能作同源验收。',26)
+    c.text((65,178),f'上：'+('原片像素' if verified else '待核验图片')+f'（{label} 当前可见部分；裁切、遮挡不补成取点）',28)
+    c.image.paste(rawcrop.resize((target_w,target_h),Image.Resampling.LANCZOS),(image_left,215))
+    c.text((65,245+target_h),'下：'+('同一原片' if verified else '同一待核验图片')+' + 当前所选字形、内孔和明确边界的 native 投影',28)
+    c.image.paste(overcrop.resize((target_w,target_h),Image.Resampling.LANCZOS),(image_left,285+target_h))
     footer=315+2*target_h
     c.text((65,footer),'青：所选明确轮廓及外边；橙：内孔。遮挡处仅显示模型投影，没有补造源观测。',25)
     c.text((65,footer+45),'原安装尺寸与新模板布局仍为初值，投影存在可见残差；没有在 D3 中拟合相机或广告。',26,'#ad7225')
@@ -253,10 +348,15 @@ def source_view(data,scene,core,camera,frame,pts,out,context_prints=()):
                 at=q[index[len(index)//2]]
                 label=other['instance_id'].rsplit('/',1)[-1]+'.'+path['id'].split('.',1)[-1]
                 d.text(tuple(at),label,font=font,fill='#e7a8e3',stroke_width=1,stroke_fill='#153447',anchor='mm')
-    d.text((30,30),f'D3 / {camera["shot_id"]} {seconds:.3f}s / PTS {pts} / initial, NOT REFITTED',font=font,fill='#ffffff',stroke_width=2,stroke_fill='#153447')
+    d.text((30,30),f'D3 / {camera["shot_id"]} {seconds:.3f}s / PTS {pts} / '+
+        ('native source verified' if verified else 'UNVERIFIED IMAGE')+' / initial, NOT REFITTED',
+        font=font,fill='#ffffff',stroke_width=2,stroke_fill='#153447')
     full.save(out/'source_full.png')
-    return {'source_pts':pts,'source_seconds':seconds,'crop_xyxy':box,
-        'source_id':camera['source_id'],'shot_id':camera['shot_id'],
+    return {'source_pts':pts if verified else None,'source_seconds':seconds if verified else None,
+        'projection_pts':pts,'projection_seconds':seconds,'crop_xyxy':box,
+        'source_id':camera['source_id'] if verified else None,
+        'camera_source_id':camera['source_id'],'shot_id':camera['shot_id'],
+        'source_verification':source_verification,
         'time_base_num':camera['time_base_num'],'time_base_den':camera['time_base_den'],
         'projected_path_count':len(parts),'projection_failures':int(np.count_nonzero(projection['status'])),
         'visible_projected_samples':int(np.count_nonzero(print_visible)),
@@ -265,13 +365,25 @@ def source_view(data,scene,core,camera,frame,pts,out,context_prints=()):
         'context_localized_print_instances':context_instances}
 
 
-def render(scene_path,assets_path,instance_id,camera_path,frame_path,pts,library_path,out_dir):
+def render(scene_path,assets_path,instance_id,camera_path,frame_path,pts,library_path,out_dir,*,
+           source_video_path=None,scope_path=None):
     out=Path(out_dir).resolve();project=Path(__file__).resolve().parents[3]
     if out.is_relative_to(project):raise ValueError('diagnostic output must be in Data')
     if out.exists():raise FileExistsError(out)
     scene=read(scene_path);assets=read(assets_path);camera_path=Path(camera_path).resolve();camera=read(camera_path)
+    registered_assets=bound_scene_assets(scene,scene_path,assets_path,instance_id)
     controls=camera_path.parent/camera['controls_ref'];camera['controls']=np.load(controls)
     if not camera['first_pts']<=pts<camera['stop_pts_exclusive']:raise ValueError('PTS outside this shot camera')
+    if (frame_path is None) == (source_video_path is None):
+        raise ValueError('choose exactly one registered source video or unverified frame preview')
+    if source_video_path is not None:
+        if scope_path is None:raise ValueError('registered source scope is required with source video')
+        source_image,verification=verified_source_frame(camera,source_video_path,scope_path,pts)
+    else:
+        if scope_path is not None:raise ValueError('scope verifies a source video, not an arbitrary frame image')
+        source_image=None
+        verification={'status':'unverified_image_preview','native_source_verified':False,
+            'verification_meaning':'supplied image has no verified binding to the requested source PTS'}
     core=NativeCore(library_path);data=sample_instance(assets,instance_id,scene['board'],core)
     template=resolve_instance(assets,instance_id)[1]
     data['unlocalized_related_instances']=[i['id'].rsplit('/',1)[-1] for i in assets['instances']
@@ -279,23 +391,26 @@ def render(scene_path,assets_path,instance_id,camera_path,frame_path,pts,library
     data['path_index']=[{'display_id':f'{i:02}','id':p['id'],'role':p['role'],
         'closed':p.get('closed',False),'parent_contour_key':p.get('parent_contour_key')} for i,p in enumerate(data['paths'],1)]
     out.mkdir(parents=True)
+    if source_image is not None:
+        frame_path=out/'decoded_source.png'
+        source_image.save(frame_path)
     data['course_continuity']=course_continuity(core,scene['board'],data['parameters'])
     unfolded(data,out);board_view(data,scene['board'],core,out)
-    context_prints=[];unlocalized=[];seen={instance_id}
-    for reference in scene.get('advertisement_assets',[]):
-        other_assets=read(Path(scene_path).resolve().parent/reference['path'])
+    context_prints=[];unlocalized=[]
+    for reference,other_assets in registered_assets:
         for instance in other_assets['instances']:
             identity=instance['id']
-            if identity in seen:continue
-            seen.add(identity)
+            if identity==instance_id:continue
             if resolve_instance(other_assets,identity)[3]['values'] is None:
                 unlocalized.append(identity);continue
             context_prints.append(sample_instance(other_assets,identity,scene['board'],core))
-    source=source_view(data,scene,core,camera,frame_path,int(pts),out,context_prints)
+    source=source_view(data,scene,core,camera,frame_path,int(pts),out,context_prints,verification)
     source['unlocalized_context_print_instances']=unlocalized
     report={'schema':'rinkspace.print_installation_review.v1','instance_id':instance_id,
         'scene':ref(scene_path),'assets':ref(assets_path),'camera':ref(camera_path),'controls':ref(controls),
         'source_frame':ref(frame_path),'library':str(Path(library_path).resolve()),
+        'source_binding_verified':verification['native_source_verified'],
+        'purpose':'source_bound_installation_review' if verification['native_source_verified'] else 'unverified_image_preview',
         'template_id':template['id'],'native_kind':5,'coordinate_pipeline':['material_uv','native_unwrapped_sz','native_BoardCourse_XYZ','native_motion_camera'],
         'source':source,'checks':{'chart_board_max_abs':data['chart_board_max_abs'],
             'template_paths':len(data['paths']),'hole_paths':sum(_is_hole(p) for p in data['paths']),

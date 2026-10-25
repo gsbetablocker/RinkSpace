@@ -2,15 +2,17 @@
 
 本页说明可取得的数据、原素材来源和复现边界。项目试用见 [README](../README.md)，方法见[架构](ARCHITECTURE.md)与[算法](ALGORITHMS.md)，准确性要求见[验证说明](VALIDATION.md)。
 
-## 2026-10-24 重构的公开范围
+## 2026-10-25 重构的公开范围
 
-本次保留 native 源码、Python 薄绑定、准备与回放入口、合同和反例测试，以及[当前场地](../events/ankara_2026/scene/field/model.json)和三对广告的当前数值模板。重复中间版本与撤回模型仅留本机，不作为当前公开入口。各组入口为 [Ad1/Ad14](../events/ankara_2026/scene/ad1/assets_r4.json)、[Ad2/Ad15](../events/ankara_2026/scene/ad2/assets_r5.json)、[Ad3/Ad16](../events/ankara_2026/scene/ad3/assets_r3.json)。
+本次保留 native 源码、Python 薄绑定、共同场景参数状态、准备与回放入口、合同和反例测试。唯一当前数值入口为[场地模型](../events/ankara_2026/scene/field/model.json)，其引用及 SHA 登记 13 对广告、26 个实例；逐对当前版本见[场景索引](../events/ankara_2026/scene/README.md)。每对共用模板、内部几何组和尺寸，安装独立；Ad15、Ad16 仍未定位。为保留内部参数化前的数值参照，当前场景明确引用的参考模板一并保留；其他重复中间版本只留本机。
 
-Ad1/Ad14 的两份相机定义及小型控制数组随仓库提供，使用相对引用。Ad3 当前 7009 行、145 曝光的[数值源库](../events/ankara_2026/programmes/okada_mei_sp/ad3_sources/rows.npz)与[对应表](../events/ankara_2026/programmes/okada_mei_sp/ad3_sources/correspondence.json)按原字节保留；它们只对应当前 19 条材料路径和 4 个角点，不包含已撤回的“大吉”几何。它们是已有证据与候选，未因公开而激活拟合，也不是完整统计求解输入。Ad1/Ad2 的已选轮廓读数嵌在各自当前资产中；历史源、原 W 及大规模运行状态的可用范围仍按各自清单区分。
+Ad1/Ad14 的两份相机定义，以及新增广告使用的 [S01/S02/S04/S05 相机定义和小型控制数组](../events/ankara_2026/programmes/okada_mei_sp/ad_cameras/)，均随仓库提供并使用相对控制数组引用。Ad3 的 [7009 行数值源库](../events/ankara_2026/programmes/okada_mei_sp/ad3_sources/rows.npz)及[对应表](../events/ankara_2026/programmes/okada_mei_sp/ad3_sources/correspondence.json)、Ad7 的 [2192 行数值源库](../events/ankara_2026/programmes/okada_mei_sp/ad7_sources/rows.npz)及[对应表](../events/ankara_2026/programmes/okada_mei_sp/ad7_sources/correspondence.json)保留原 UV、PTS 和来源身份，不含广播图像缓冲区。其余已选轮廓读数保留在各自资产或来源索引中。它们是已有证据与候选，不是完整统计求解输入，不因公开或工程测试通过而自动激活拟合。
 
-比赛原片、截图、叠加图、诊断视频、完整检查点和日志不进入本次提交。Ad3 完整第三方原始 SVG 图稿也不随本次分发，保留官方提取来源 URL、SHA 与本机历史地址；当前简化模型使用已选的数值轮廓，不依赖重新载入原图稿。历史绝对路径是追查键，当前可直接消费的模型及小型参数引用不要求相同盘符。
+比赛原片、截图、叠加图、诊断视频、完整检查点和日志不进入本次提交。完整第三方广告图稿也不随本次分发，保留来源 URL、SHA 与本机历史地址；当前数值模型不依赖重新载入原图稿。历史绝对路径用于追查，当前模型、参考模板和小型参数的分发范围以本页及场景引用为准；不会据历史地址自动重放生产链。
 
-公开包可以检查数值定义、几何关系和 native 前向；原像素复核与视频回放仍需要本地原素材。当前具体尺寸、广告安装及其源图偏差尚未由新引擎重新拟合；新 GPU LM、solve/resume 未实现。完整节目范围始终为 [S01–S09 九镜头](../events/ankara_2026/programmes/okada_mei_sp/rebuild_scope.json)，阶段子集不改变完整范围。
+[Ad2 的 O 外缘与内孔审核](../events/ankara_2026/programmes/okada_mei_sp/ad2_o_review.json)只接受 PTS 320000（00:25.000）这一曝光的两个既有记录；源 UV 未变，仍为 active_for_fit=false，不扩展到其他曝光、模板几何或相机拟合。新增十对广告的 D3 与内部参数状态仍待完整画面审核。
+
+公开包可以检查数值定义、几何关系、内部参数及 native 前向；原像素复核与视频回放仍需要本地原素材。具体尺寸、广告版式和安装尚未由新引擎重新拟合或验证米制；新 GPU LM、solve/resume 未实现。完整节目范围始终为 [S01–S09 九镜头](../events/ankara_2026/programmes/okada_mei_sp/rebuild_scope.json)，阶段子集不改变完整范围。
 
 ## 官方视频与源时间
 

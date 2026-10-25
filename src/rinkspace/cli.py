@@ -25,6 +25,7 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("prepare", help="Compile current immutable observations and scope")
     p.add_argument("--input", required=True); p.add_argument("--scope", required=True)
     p.add_argument("--shots", required=True); p.add_argument("--out", required=True)
+    p.add_argument("--library", help="Current native core; required for ice/board fixed junctions")
     p = sub.add_parser("review", help="Complete native-PTS replay using the same compiled forward; no fit")
     p.add_argument("--prepared", required=True); p.add_argument("--state", required=True); p.add_argument("--assets", required=True)
     p.add_argument("--shots", required=True); p.add_argument("--library", required=True); p.add_argument("--out", required=True)
@@ -41,7 +42,12 @@ def main(argv: list[str] | None = None) -> int:
     m.add_argument("--input", required=True); m.add_argument("--library", required=True); m.add_argument("--out", required=True)
     m = model_sub.add_parser("preview-print-installation", help="Same native print, continuous board and motion camera; no fit")
     m.add_argument("--scene", required=True); m.add_argument("--assets", required=True); m.add_argument("--instance", required=True)
-    m.add_argument("--camera", required=True); m.add_argument("--frame", required=True); m.add_argument("--pts", required=True, type=int)
+    m.add_argument("--camera", required=True)
+    frame_input = m.add_mutually_exclusive_group(required=True)
+    frame_input.add_argument("--frame", help="Unverified image preview; not a source-PTS validation")
+    frame_input.add_argument("--source-video", help="Decode the registered video at its native PTS")
+    m.add_argument("--scope", help="Current source/shot scope, required with --source-video")
+    m.add_argument("--pts", required=True, type=int)
     m.add_argument("--library", required=True); m.add_argument("--out", required=True)
     sub.add_parser("doctor", help="Report environment and FFmpeg availability")
     p = sub.add_parser("serve", help="Start the local source-frame and rink-plane workbench")
@@ -81,7 +87,8 @@ def main(argv: list[str] | None = None) -> int:
                 result = rebuild(args.input, args.library, args.out)
             elif args.model_command == "preview-print-installation":
                 from .session.print_installation import render
-                result = render(args.scene,args.assets,args.instance,args.camera,args.frame,args.pts,args.library,args.out)
+                result = render(args.scene,args.assets,args.instance,args.camera,args.frame,args.pts,args.library,args.out,
+                                source_video_path=args.source_video,scope_path=args.scope)
             elif args.model_command == "preview-field":
                 from .session.field_preview import render
                 result = render(args.scene, args.library, args.out)
@@ -100,7 +107,9 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "prepare":
             from dataclasses import asdict
             from .session.prepare import prepare
-            result = asdict(prepare(args.input, args.scope, args.shots, args.out))
+            from .core.native import NativeCore
+            core = NativeCore(args.library) if args.library else None
+            result = asdict(prepare(args.input, args.scope, args.shots, args.out, core=core))
             print(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False))
             return 0
         if args.command == "review":

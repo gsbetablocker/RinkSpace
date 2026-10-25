@@ -10,7 +10,10 @@ from dataclasses import dataclass
 from fractions import Fraction
 import math
 import re
-from typing import Mapping
+from typing import TYPE_CHECKING, Mapping
+
+if TYPE_CHECKING:
+    from .print_assets import PrintCurveBinding
 
 
 class ContractError(ValueError):
@@ -56,11 +59,13 @@ class Feature:
     kind: str  # fixed_junction, material_point, finite_curve
     surface: str  # ice, board
     identity: str  # confirmed, unresolved, rejected
-    measurement: str  # canonical: centreline, contour (specified targets only), material_point
+    measurement: str  # ice centreline/target contour, bound print contour, or material_point
     parents: tuple[str, ...] = ()
     branch: str | None = None
     has_station_parameter: bool = False
     label: str | None = None
+    print_binding: PrintCurveBinding | None = None
+    junction_relation: str | None = None  # None=same surface; ice_board_bottom=z=0 boundary
 
     def __post_init__(self) -> None:
         _require(bool(self.feature_id), "feature_id is required")
@@ -70,13 +75,19 @@ class Feature:
         _require(self.identity in {"confirmed", "unresolved", "rejected"}, "unknown identity status")
         _require(self.measurement in {"centreline", "contour", "material_point"}, "measurement semantics are required")
         from .measurement import required_measurement
-        _require(self.measurement == required_measurement(self.label or self.feature_id, self.kind),
+        _require(self.measurement == required_measurement(self.label or self.feature_id, self.kind,
+                     surface=self.surface, print_binding=self.print_binding),
                  "only the canonical measurement definition is allowed for this entity")
         if self.kind == "fixed_junction":
             _require(len(self.parents) == 2 and self.parents[0] != self.parents[1], "junction needs two distinct parent entities")
             _require(bool(self.branch), "junction branch must be stable and explicit")
+            _require(self.junction_relation in (None, 'ice_board_bottom'), "unknown junction surface relation")
+            if self.junction_relation == 'ice_board_bottom':
+                _require(self.surface == 'ice', "ice/board junction belongs to the z=0 ice boundary")
+                _require(self.branch in ('0', '1'), "ice/board branch must be explicit 0 or 1 along the directed ice line")
         else:
             _require(not self.parents and self.branch is None, "parents/branch only apply to junctions")
+            _require(self.junction_relation is None, "surface relations only apply to fixed junctions")
         if self.kind != "finite_curve":
             _require(not self.has_station_parameter, "fixed points cannot acquire per-row stations")
 
@@ -133,6 +144,27 @@ class Observation:
             _require(xx > 0 and yy > 0 and xx * yy > xy * xy, "pixel covariance must be positive definite")
 
 
+def validate_feature_registry(features: Mapping[str, Feature]) -> None:
+    """Check named surface relations; numerical existence remains native-owned."""
+    for fid, feature in features.items():
+        _require(fid == feature.feature_id, "feature registry key mismatch")
+        parents = []
+        for parent_id in feature.parents:
+            _require(parent_id in features, f"missing junction parent: {parent_id}")
+            parent = features[parent_id]
+            _require(parent.kind == "finite_curve", "junction parents must be named finite entities")
+            parents.append(parent)
+        if feature.junction_relation == 'ice_board_bottom':
+            _require(sorted(p.surface for p in parents) == ['board', 'ice'],
+                     "ice_board_bottom requires one ice and one board parent")
+            boundary = next(p for p in parents if p.surface == 'board')
+            _require((boundary.label or boundary.feature_id) == 'board.bottom',
+                     "ice_board_bottom requires the identified board.bottom parent")
+        else:
+            _require(all(p.surface == feature.surface for p in parents),
+                     "junction and parents must share a surface unless an explicit boundary relation is declared")
+
+
 def validate_dataset(
     sources: Mapping[str, Source],
     features: Mapping[str, Feature],
@@ -148,13 +180,7 @@ def validate_dataset(
     groups = noise_groups or {}
     for sid, source in sources.items():
         _require(sid == source.source_id, "source registry key mismatch")
-    for fid, feature in features.items():
-        _require(fid == feature.feature_id, "feature registry key mismatch")
-        for parent_id in feature.parents:
-            _require(parent_id in features, f"missing junction parent: {parent_id}")
-            parent = features[parent_id]
-            _require(parent.kind == "finite_curve", "junction parents must be named finite entities")
-            _require(parent.surface == feature.surface, "junction and parents must share a surface")
+    validate_feature_registry(features)
     ids = {row.observation_id for row in observations}
     _require(len(ids) == len(observations), "duplicate observation IDs")
     by_id = {row.observation_id: row for row in observations}

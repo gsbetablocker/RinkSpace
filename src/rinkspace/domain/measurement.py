@@ -1,13 +1,14 @@
-"""The single current measurement definition, with explicit contour exceptions.
+"""Ice marking measurements and explicitly bound print material boundaries.
 
-Current curve definitions are exactly centreline or contour. Source pixels and
-historical evidence are separate data; old names are never accepted as aliases.
+Ice width-centrelines do not redefine printed lettering, holes or panel edges.
+Source pixels and historical evidence are separate; old ice names remain invalid.
 """
 from __future__ import annotations
 from dataclasses import dataclass
 import re
 from typing import Mapping
 from .contracts import ContractError
+from .print_assets import PrintCurveBinding
 
 POLICY_ID = 'ankara_2026.curve_measurement.user_20261024.v3'
 CANONICAL_MEASUREMENTS = frozenset({'centreline', 'contour', 'material_point'})
@@ -39,20 +40,30 @@ def _name(label: str) -> str:
     return label.removeprefix('entity/').removeprefix('ice.').split(':', 1)[0]
 
 
-def measurement_rule(label: str, feature_kind: str = 'finite_curve') -> MeasurementRule:
-    """Select the one allowed current meaning for this identified feature."""
+def measurement_rule(label: str, feature_kind: str = 'finite_curve', *,
+                     surface: str | None = None, print_binding: PrintCurveBinding | None = None) -> MeasurementRule:
+    """Use an identified print boundary's own meaning, never its label spelling."""
+    if print_binding is not None:
+        if not isinstance(print_binding, PrintCurveBinding):
+            raise ContractError('Print measurement requires a resolved current template/path binding')
+        if surface != 'board' or feature_kind != 'finite_curve':
+            raise ContractError('Print material boundaries require a finite curve on the board')
+        if label not in (print_binding.path_id, print_binding.template_path_id):
+            raise ContractError('Print feature label must identify its bound material path')
+        return MeasurementRule('contour', ('contour',), None)
     if feature_kind in ('material_point', 'fixed_junction'):
         return MeasurementRule('material_point', ('material_point',), None)
     if feature_kind != 'finite_curve':
         raise ContractError('Unsupported feature kind for measurement policy: '+feature_kind)
     name = _name(label)
-    if re.fullmatch(r'[FR][1-4]', name) or name in ('goal_crease_left', 'goal_crease_right'):
+    if surface in (None, 'ice') and (re.fullmatch(r'[FR][1-4]', name) or name in ('goal_crease_left', 'goal_crease_right')):
         return MeasurementRule('contour', ('contour',), None)
     return MeasurementRule('centreline', ('centreline',), 0.)
 
 
-def required_measurement(label: str, feature_kind: str = 'finite_curve') -> str:
-    return measurement_rule(label, feature_kind).mode
+def required_measurement(label: str, feature_kind: str = 'finite_curve', *,
+                         surface: str | None = None, print_binding: PrintCurveBinding | None = None) -> str:
+    return measurement_rule(label, feature_kind, surface=surface, print_binding=print_binding).mode
 
 
 def _source_evidence_error(evidence, required):
@@ -72,13 +83,14 @@ def _source_evidence_error(evidence, required):
 
 
 def assess_measurement_binding(label: str, measurement: str, source_measurement_evidence=None,
-                               *, feature_kind: str = 'finite_curve') -> dict:
+                               *, feature_kind: str = 'finite_curve', surface: str | None = None,
+                               print_binding: PrintCurveBinding | None = None) -> dict:
     """Reject incompatible current meaning or incompatible source evidence.
 
     This function does not change pixels, source time, IDs, row activity or W.
     Evidence is diagnostic input only, never a second valid feature definition.
     """
-    rule = measurement_rule(label, feature_kind)
+    rule = measurement_rule(label, feature_kind, surface=surface, print_binding=print_binding)
     current_valid = measurement == rule.mode
     evidence_error = _source_evidence_error(source_measurement_evidence, rule.mode)
     compatible = current_valid and evidence_error is None
@@ -93,7 +105,7 @@ def assess_measurement_binding(label: str, measurement: str, source_measurement_
     }
 
 
-def validate_feature_bindings(features, active_feature_ids, policy_id=POLICY_ID) -> dict:
+def validate_feature_bindings(features, active_feature_ids, policy_id=POLICY_ID, *, print_bindings=None) -> dict:
     """Validate every current feature, including inactive features, or fail.
 
     There is no inactive-conflict acceptance path. Frozen historical data must
@@ -111,6 +123,7 @@ def validate_feature_bindings(features, active_feature_ids, policy_id=POLICY_ID)
     active=set(active_feature_ids)
     if active-set(registry):
         raise MeasurementPolicyError('Active measurement references absent feature', {'feature_ids':sorted(active-set(registry))})
+    resolved = print_bindings or {}
     conflicts=[]
     for identity,feature in registry.items():
         forbidden=sorted(FORBIDDEN_DEFINITION_CHANNELS.intersection(feature))
@@ -122,8 +135,14 @@ def validate_feature_bindings(features, active_feature_ids, policy_id=POLICY_ID)
         if not isinstance(label,str) or not label:
             conflicts.append({'feature_id':identity,'reason':'Explicit physical entity label is missing'})
             continue
+        binding = resolved.get(identity)
+        declaration = feature.get('print_binding')
+        if declaration is not None and (binding is None or declaration != binding.as_record()):
+            conflicts.append({'feature_id':identity,'reason':'Print boundary is not resolved against current scene assets'})
+            continue
         assessment=assess_measurement_binding(label,feature.get('measurement',''),
-            feature.get('source_measurement_evidence'),feature_kind=feature.get('kind','finite_curve'))
+            feature.get('source_measurement_evidence'),feature_kind=feature.get('kind','finite_curve'),
+            surface=feature.get('surface'), print_binding=binding)
         if not assessment['measurement_compatible']:
             conflicts.append({'feature_id':identity,'label':label,**assessment})
     if conflicts:
@@ -156,7 +175,7 @@ def validate_scene_measurements(scene, policy_id=POLICY_ID) -> dict:
     return report
 
 
-def validate_observation_binding(record, feature, row_index):
+def validate_observation_binding(record, feature, row_index, *, print_binding=None):
     """Check current row declarations only; never reopen source/provenance assets."""
     if not isinstance(record, Mapping):
         raise MeasurementPolicyError('Observation metadata must be a record', {'source_row':row_index})
@@ -167,8 +186,14 @@ def validate_observation_binding(record, feature, row_index):
                                      {**context,'forbidden_definition_channels':forbidden})
     if record.get('feature_id') != feature['id']:
         raise MeasurementPolicyError('Row metadata and numeric feature binding differ', context)
+    if 'print_binding' in record and (print_binding is None or record['print_binding'] != print_binding.as_record()):
+        raise MeasurementPolicyError('Observation and feature print bindings differ', context)
+    if feature.get('print_binding') is not None:
+        if print_binding is None or feature['print_binding'] != print_binding.as_record():
+            raise MeasurementPolicyError('Observation print boundary lacks a current resolved binding', context)
     assessment = assess_measurement_binding(feature['label'], record.get('measurement', ''),
-        record.get('source_measurement_evidence'), feature_kind=feature.get('kind', 'finite_curve'))
+        record.get('source_measurement_evidence'), feature_kind=feature.get('kind', 'finite_curve'),
+        surface=feature.get('surface'), print_binding=print_binding)
     if not assessment['measurement_compatible']:
         raise MeasurementPolicyError('Current row contains an invalid measurement definition',
                                      {**context, **assessment})

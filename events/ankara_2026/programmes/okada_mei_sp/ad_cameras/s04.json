@@ -1,0 +1,261 @@
+{
+  "schema": "rinkspace.camera.motion.v1",
+  "rig": [
+    0.8706994102871407,
+    -0.4917896399703458,
+    -0.00504845951381226,
+    -0.025344310080560987,
+    -0.03461533767489901,
+    -0.9990792983263106,
+    0.49116209429491325,
+    0.8700257056061563,
+    -0.0426036232302407,
+    0.004368297631177356,
+    -0.0049713794538166585,
+    0.9999781014412924,
+    0.9993414031743301,
+    -0.0004261343833868081,
+    0.03628468424898039,
+    0.017610686563783038,
+    -0.2566078818721614,
+    0.023011545043330143,
+    -0.0014135285013894643,
+    -0.003680986747690285,
+    0.005728926527291632,
+    0.0006546610605659705,
+    -0.0057965512808113425,
+    -0.001128589042183489,
+    9145.10852652288,
+    0.7716858396350659,
+    1041.8424143236373,
+    865.589723581268,
+    -0.002823400710124131,
+    -0.013492161107644795,
+    7.01913195407894,
+    0.0663919568828182,
+    -0.045405092212360484,
+    1.0514366617428443,
+    0.7790987170425974,
+    0.006390422884538531,
+    0.007951404221289527,
+    0.02
+  ],
+  "controls_ref": "s04_controls.npy",
+  "mount_family": "orthogonal_pan_tilt_pivot",
+  "lens_family": "brown_zoom_linear",
+  "pupil_model": "zoom_quadratic_camera_z",
+  "readout_mode": "predicted_row_implicit_unique",
+  "first_control_time": -0.8,
+  "control_dt": 0.4,
+  "reference_dependency": {
+    "index": 2,
+    "reference_indices": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "reference_weights": [
+      0.16666666666666666,
+      0.6666666666666666,
+      0.16666666666666666,
+      0.0
+    ],
+    "stored_inactive_angles": [
+      0.0016781651985801616,
+      0.0003434213409650236
+    ],
+    "expanded_angles": [
+      0.005659168150621266,
+      0.00085902353891974
+    ],
+    "absolute_controls_include_shot_reference_angles": true,
+    "expanded_absolute_angles": [
+      -0.15664356313444455,
+      0.05313731859283852
+    ]
+  },
+  "original_camera_definition": {
+    "R0_seed": [
+      0.8696653951670424,
+      -0.49362121317762114,
+      -0.004494257447580338,
+      -0.025318072247064543,
+      -0.035509555329371424,
+      -0.9990485807497065,
+      0.49299198336955136,
+      0.8689517647035212,
+      -0.043378969005638424
+    ],
+    "b_seed": [
+      0.99892478473946,
+      2.2010020511431435e-05,
+      0.04636026260476077
+    ],
+    "brown_wide_extension": {
+      "activation_focal_native_px": 3110.3489698730414,
+      "activation_log_f_native": 8.042490207840718,
+      "calibration_status": "candidate_frozen_offline_radial_fit",
+      "coefficients": [
+        0.6082371701103915,
+        1.6702454379063951,
+        0,
+        0
+      ],
+      "hardware_calibration_claimed": false,
+      "outside_observed_wide_neighborhood": "unverified extrapolation; domain audit required",
+      "power": 2,
+      "preserved_interval": "entire S01 allocated cubic log-f hull and RS halo",
+      "schema": "rinkfit.source_supported_wide_brown_hinge.v1",
+      "source_support": [
+        {
+          "native_pts": 1464832,
+          "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\s07_lines_v1\\confirmed_1464832.json",
+          "sha256": "97b71e8c7dacce0ea9e13e0002e4bfd9b23de920b83000e2d2ad2f36c41effc9",
+          "source_RGB_sha256": "399ed66ed4cddb84cb224a93c4e142d64ff110cbff5efba5087176ca68d620a6",
+          "source_entity_ids": [
+            "ice.B2:segment0",
+            "ice.C:segment0",
+            "s07_visible_long_ice_line_A"
+          ]
+        }
+      ],
+      "tangential_extension_identified": false
+    },
+    "f_ref": 9145.10852652288,
+    "n_seed": [
+      0.0048350496620340536,
+      -0.004883903553163167,
+      0.9999763846115813
+    ],
+    "n_tangent1": [
+      0,
+      0.9999880733931047,
+      0.004883960641392942
+    ],
+    "n_tangent2": [
+      -0.9999883110790675,
+      -2.3614192248554564e-05,
+      0.0048349919962974155
+    ],
+    "radius_max": 0.7716858396350659,
+    "tau_bound": 0.02,
+    "dependent_control": 2,
+    "dt": 0.4,
+    "first_control_time": -0.8,
+    "n_controls": 44,
+    "reference_indices": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "reference_weights": [
+      0.16666666666666666,
+      0.6666666666666666,
+      0.16666666666666666,
+      0
+    ],
+    "control_block_begin": 1
+  },
+  "original_global32": [
+    0.4922142556252473,
+    0.11272697019367729,
+    0.12387485115055916,
+    1.8121347338912348,
+    0.016811144093661412,
+    -0.0007659224091746087,
+    0.0021251751183624904,
+    -0.000463271437905458,
+    -8.74664822964639e-05,
+    0.00046675699418951454,
+    -0.010054036522884146,
+    0.017610686563783038,
+    -0.2566078818721614,
+    0.023011545043330143,
+    -0.0014135285013894643,
+    -0.003680986747690285,
+    0.005728926527291632,
+    0.0006546610605659705,
+    -0.0057965512808113425,
+    -0.001128589042183489,
+    1041.8424143236373,
+    865.589723581268,
+    -0.002823400710124131,
+    -0.013492161107644795,
+    7.01913195407894,
+    0.0663919568828182,
+    -0.045405092212360484,
+    1.0514366617428443,
+    0.7790987170425974,
+    0.006390422884538531,
+    0.007951404221289527,
+    0.02
+  ],
+  "inactive_extension_proofs": [
+    {
+      "kind": "wide_brown_hinge",
+      "original_definition": {
+        "activation_focal_native_px": 3110.3489698730414,
+        "activation_log_f_native": 8.042490207840718,
+        "calibration_status": "candidate_frozen_offline_radial_fit",
+        "coefficients": [
+          0.6082371701103915,
+          1.6702454379063951,
+          0,
+          0
+        ],
+        "hardware_calibration_claimed": false,
+        "outside_observed_wide_neighborhood": "unverified extrapolation; domain audit required",
+        "power": 2,
+        "preserved_interval": "entire S01 allocated cubic log-f hull and RS halo",
+        "schema": "rinkfit.source_supported_wide_brown_hinge.v1",
+        "source_support": [
+          {
+            "native_pts": 1464832,
+            "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_rec_1019\\recover_v2\\s07_lines_v1\\confirmed_1464832.json",
+            "sha256": "97b71e8c7dacce0ea9e13e0002e4bfd9b23de920b83000e2d2ad2f36c41effc9",
+            "source_RGB_sha256": "399ed66ed4cddb84cb224a93c4e142d64ff110cbff5efba5087176ca68d620a6",
+            "source_entity_ids": [
+              "ice.B2:segment0",
+              "ice.C:segment0",
+              "s07_visible_long_ice_line_A"
+            ]
+          }
+        ],
+        "tangential_extension_identified": false
+      },
+      "reason": "identically_zero_on_entire_allocated_cubic_control_hull",
+      "allocated_log_f_lower_bound": 8.042490207840718,
+      "activation_log_f_native": 8.042490207840718,
+      "scope": "all valid native spline times, including allocated row-exposure support",
+      "effective_coefficients_discarded": false
+    }
+  ],
+  "shot_id": "s04",
+  "rig_id": "main",
+  "reference_pts": 745984,
+  "first_pts": 745984,
+  "stop_pts_exclusive": 948992,
+  "shot_reference_angles": [
+    -0.1623027312850658,
+    0.052278295053918775
+  ],
+  "reference_angles_representation": "constant angle offsets expanded into all native cubic controls",
+  "state_status": "preserved_complete_joint_camera_initial_not_refitted",
+  "source_id": "O6j8L8TmfKo",
+  "time_base_num": 1,
+  "time_base_den": 12800,
+  "time_base": "1/12800",
+  "image_width": 1920,
+  "image_height": 1080,
+  "origin": {
+    "kind": "one_time_complete_joint_camera_import",
+    "model_path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint6_1021b\\ad_shape_repair\\native_print_model.json",
+    "model_sha256": "4d9e8c96149713114f32d10870db8b42ffe7df2eb9dbf1201e726ec4ca91e936",
+    "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+    "scope_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\rebuild_scope.json",
+    "geometry_or_source_rows_imported": false,
+    "fit_executed": false
+  }
+}

@@ -98,6 +98,53 @@ def test_fixed_node_graph_uses_same_current_definitions_without_new_observations
     assert all(n['source_uv'] is None and not n['per_frame_station_parameter'] for n in actual['nodes'])
 
 
+def test_graph_includes_all_ten_physical_carrier_boundary_intersections(model,core):
+    graph=fixed_node_graph(model,core)
+    boundary=next(p for p in model['paths'] if p['label']=='board.bottom')
+    nodes=[n for n in graph['nodes'] if n.get('role')=='derived_ice_boundary_intersection']
+    assert len(nodes)==10
+    a,b,rx,ry,exponent,_=model['board']
+    for code in range(400,405):
+        path=path_for(model,code)
+        _,parameters=native_definition(model,path,core)
+        for branch,expected in enumerate(np.asarray(parameters).reshape(2,3)):
+            node=next(n for n in nodes if n['parents']==[path['id'],boundary['id']] and n['branch']==branch)
+            np.testing.assert_array_equal(node['xyz'],expected)
+            x,y,z=node['xyz']
+            membership=max(0.,(abs(x)-(a-rx))/rx)**exponent+max(0.,(abs(y)-(b-ry))/ry)**exponent
+            assert membership==pytest.approx(1.,abs=1e-13)
+            assert z==0. and node['source_uv'] is None and node['source_observation_ids']==[]
+            assert node['semantic_status']=='derived_model_node_unobserved'
+            assert node['new_source_observation'] is False and node['per_frame_station_parameter'] is False
+
+
+def test_boundary_node_identity_survives_shape_updates_and_preview_agrees(model,core):
+    before={n['id']:n for n in fixed_node_graph(model,core)['nodes']
+            if n.get('role')=='derived_ice_boundary_intersection'}
+    model['board'][2]*=1.1
+    after={n['id']:n for n in fixed_node_graph(model,core)['nodes']
+           if n.get('role')=='derived_ice_boundary_intersection'}
+    preview={n['id']:n for n in sample_model(model,core)['nodes']
+             if n.get('role')=='derived_ice_boundary_intersection'}
+    assert set(before)==set(after)==set(preview)
+    assert any(before[key]['xyz']!=after[key]['xyz'] for key in before)
+    for key,node in after.items():
+        assert preview[key]['xyz']==node['xyz']
+        assert preview[key]['parents']==node['parents']
+        assert preview[key]['source_uv'] is None
+
+
+def test_circle_junction_meaning_matches_actual_measurement(model,core):
+    graph=fixed_node_graph(model,core)
+    centred=[n for n in graph['nodes'] if any(label.startswith(('ice.C0:','ice.A1:','ice.A2:','ice.A3:','ice.A4:'))
+                                             for label in n['parent_labels'])]
+    assert centred
+    assert all(n['meaning']=='intersection_of_finite_material_centrelines' for n in centred)
+    ring=[n for n in graph['nodes'] if any(label.startswith(('ice.F','ice.R')) for label in n['parent_labels'])]
+    assert ring
+    assert all(n['meaning']=='line_midwidth_axis_crosses_named_ring_material_boundary' for n in ring)
+
+
 @pytest.mark.parametrize('endpoint_kind',['before_R','at_R','at_N','past_N'])
 def test_bad_connections_fail_all_current_entry_points(model,core,endpoint_kind):
     q=model['shared_layout']

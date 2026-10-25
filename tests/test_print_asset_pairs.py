@@ -6,7 +6,8 @@ from rinkspace.domain.print_assets import attach_paired_instance,resolve_instanc
 
 def source_assets():
     return {'templates':[{'id':'print_template/Ad2','text':'ISU-SKATING.COM',
-        'paths':[{'id':'Ad2.print.COM_O_inner','material_uv':[[.1,.2],[.2,.3]],'parent_contour_key':'COM_O'}]}],
+        'paths':[{'id':'Ad2.print.COM_O','material_uv':[[0.,0.],[1.,0.],[1.,1.],[0.,0.]],'closed':True},
+                 {'id':'Ad2.print.COM_O_inner','material_uv':[[.1,.2],[.2,.3]],'parent_contour_key':'Ad2.print.COM_O'}]}],
         'instances':[{'id':'print_instance/Ad2','template_id':'print_template/Ad2','scene_surface_id':'entity/board.continuous'}],
         'observations':[{'id':'measured/Ad2','feature_id':'Ad2.print.COM_O_inner','pts':320000,'uv':[100.,200.],'noise_group_id':'original/group'}],
         'aliases':[{'canonical_observation_id':'measured/Ad2'}],

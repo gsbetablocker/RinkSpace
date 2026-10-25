@@ -12,10 +12,11 @@ import av
 import cv2
 import numpy as np
 from ..core.native import NativeCore
-from ..compat.d78_entities import sample_entities
-from ..session.dataset import load_prepared, load_array, relative
+from ..domain.scene_assets import scene_content_identity, read_scene_assets
+from ..session.dataset import load_prepared, load_array, relative, digest
 from ..storage import AssetStore
 from .draw import top_down, overlay
+from .scene import sample_review_scene, common_print_stations
 
 
 @dataclass(frozen=True)
@@ -51,21 +52,18 @@ def load_state(state_path, core, shot_ids):
     state = read(path)
     if state.get('schema') != 'rinkspace.state.v1':
         raise ValueError('review requires rinkspace.state.v1')
-    scene = read(reference(path.parent, state.get('scene_ref', state.get('replay_scene_ref'))))
-    if scene.get('schema') not in {'rinkspace.scene.replay.v1', 'rinkspace.scene.shared.v1'}:
+    scene_path = reference(path.parent, state.get('scene_ref', state.get('replay_scene_ref')))
+    scene = read(scene_path)
+    if scene.get('schema') not in {'rinkspace.scene.replay.v1', 'rinkspace.scene.shared.v1', 'rinkspace.field_model.v1'}:
         raise ValueError('unsupported scene family: '+str(scene.get('schema')))
-    samples = sample_entities(scene, core)
-    # The board's complete course is part of the same compiled geometry. Its
-    # two display edges supplement finite observed paths without inventing
-    # observations or changing the physical path inventory.
-    for height, name in ((0., 'continuous_board_bottom'), (1., 'continuous_board_top')):
-        xyz = np.asarray(core.sample_path(scene['board'], 3, [-1., height], [], np.linspace(0., 1., 4097)))
-        begin = len(samples['xyz'])
-        samples['xyz'] = np.vstack((samples['xyz'], xyz))
-        samples['cuts'].append({'id': name, 'entity_id': 'continuous_board', 'label': name,
-            'layer': 'board', 'closed': True, 'begin': begin, 'end': begin+len(xyz),
-            'kind': 'derived_continuous_board_edge', 'support': [0., 1.]})
-    samples['inventory']['derived_display_paths'] = ['continuous_board_bottom', 'continuous_board_top']
+    from ..domain.parameters import STATE_LAYOUT, load_parameter_state
+    parameters = None
+    if state.get('layout_family') == STATE_LAYOUT:
+        parameters = load_parameter_state(path, expected_scene=scene, expected_scene_path=scene_path)
+    elif any(t.get('internal_geometry') is not None for _,a in read_scene_assets(scene, scene_path)
+             for t in a['templates']):
+        raise ValueError('Parameterized current scene requires an explicit shared parameter State')
+    samples = sample_review_scene(scene, core, scene_path, parameter_state=parameters)
     cameras = {}
     by_id = {s.get('id', s.get('shot_id')): s for s in state['shots']}
     for shot_id in shot_ids:
@@ -74,7 +72,16 @@ def load_state(state_path, core, shot_ids):
             raise ValueError('state has no camera definition for '+shot_id)
         camera_path = reference(path.parent, camera_ref)
         camera = read(camera_path)
+        expected = {'schema': 'rinkspace.camera.motion.v1',
+                    'mount_family': 'orthogonal_pan_tilt_pivot', 'lens_family': 'brown_zoom_linear',
+                    'pupil_model': 'zoom_quadratic_camera_z', 'readout_mode': 'predicted_row_implicit_unique'}
+        if any(camera.get(key) != value for key, value in expected.items()):
+            raise ValueError('unsupported complete camera definition for '+shot_id)
         camera['controls'] = np.load(reference(camera_path.parent, camera['controls_ref']), allow_pickle=False)
+        if (np.asarray(camera['rig']).shape != (38,) or not np.isfinite(camera['rig']).all()
+                or camera['controls'].ndim != 2 or camera['controls'].shape[1] != 3
+                or len(camera['controls']) < 4 or not np.isfinite(camera['controls']).all()):
+            raise ValueError('invalid complete camera arrays for '+shot_id)
         cameras[shot_id] = camera
     return state, scene, samples, cameras
 
@@ -127,6 +134,29 @@ def validate_video(path, expected_pts, time_base):
     return {'decoded_frames': len(found), 'native_PTS_equal': True, 'display_speed': 1}
 
 
+def verified_source_paths(manifest, requested, assets, store):
+    """Bind the actual currently consumed video once per source before rendering."""
+    source_lookup = {s['id']: s for s in manifest['sources']}
+    shot_lookup = {s['id']: s for s in manifest['shots']}
+    paths = {}
+    for shot_id in requested:
+        source = source_lookup[shot_lookup[shot_id]['source_id']]
+        if source['id'] in paths:
+            continue
+        supplied = assets.get('sources', {}).get(source['id'], source.get('asset_path'))
+        if isinstance(supplied, dict):
+            supplied = supplied['path']
+        if not supplied:
+            raise ValueError('no current video asset registered for '+source['id'])
+        path = store.source(supplied)
+        if not path.is_file():
+            raise FileNotFoundError(path)
+        if digest(path) != source.get('sha256'):
+            raise ValueError('source video SHA256 differs from registered source: '+source['id'])
+        paths[source['id']] = path
+    return paths
+
+
 def render(prepared_dir, state_path, assets_path, shot_ids, library_path, out_dir, compare_path=None):
     prepared_dir = Path(prepared_dir).resolve(strict=True)
     manifest, arrays = load_prepared(prepared_dir, purpose="review")
@@ -141,14 +171,22 @@ def render(prepared_dir, state_path, assets_path, shot_ids, library_path, out_di
     state, scene, samples, cameras = load_state(state_path, core, requested)
     if state.get('prepared_revision') != manifest['revision']:
         raise ValueError('state/prepared revision mismatch')
-    current_scene = read(reference(prepared_dir, manifest['scene_ref']))
-    if current_scene != scene:
+    current_scene_path = reference(prepared_dir, manifest['scene_ref'])
+    current_scene = read(current_scene_path)
+    if scene_content_identity(current_scene, current_scene_path) != scene_content_identity(scene, samples['scene_path']):
         raise ValueError('state scene differs from the current prepared scene')
     comparison = None
     if compare_path is not None:
         other_state, other_scene, other_samples, other_cameras = load_state(compare_path, core, requested)
-        if other_samples['inventory'] != samples['inventory']:
-            raise ValueError('comparison requires the same entity inventory, not its intersection')
+        grids = common_print_stations(samples, other_samples)
+        samples = sample_review_scene(scene, core, samples['scene_path'], print_stations=grids,
+                                      parameter_state=samples.get('_parameter_state'))
+        other_samples = sample_review_scene(other_scene, core, other_samples['scene_path'], print_stations=grids,
+                                            parameter_state=other_samples.get('_parameter_state'))
+        # Equal inventories alone do not guarantee equal material sampling.
+        layout = lambda data: [(c['id'], c['begin'], c['end']) for c in data['cuts']]
+        if layout(samples) != layout(other_samples):
+            raise ValueError('comparison path sampling differs; explicit common stations are required')
         comparison = {'state_id': other_state['state_id'], 'path': str(Path(compare_path).resolve()),
                       'meaning': 'same source PTS and full entity inventory', 'maximum_uv_difference_px': 0., 'status_mismatches': 0}
     assets = read(assets_path)
@@ -157,18 +195,11 @@ def render(prepared_dir, state_path, assets_path, shot_ids, library_path, out_di
     shot_lookup = {s['id']: s for s in manifest['shots']}
     all_shot_index = {s['id']: i for i,s in enumerate(manifest['shots'])}
     # Resolve and check source assets before creating any candidate output.
-    source_paths = {}
-    for shot_id in requested:
-        source = source_lookup[shot_lookup[shot_id]['source_id']]
-        supplied = assets.get('sources', {}).get(source['id'], source['asset_path'])
-        if isinstance(supplied, dict):
-            supplied = supplied['path']
-        path = store.source(supplied)
-        if not path.is_file():
-            raise FileNotFoundError(path)
-        source_paths[source['id']] = path
+    source_paths = verified_source_paths(manifest, requested, assets, store)
     out.mkdir(parents=True)
-    overview = top_down(samples['xyz'], samples['cuts'])
+    first_height = source_lookup[shot_lookup[requested[0]]['source_id']]['height']
+    overview = top_down(samples['xyz'], samples['cuts'], height=first_height,
+                        missing_count=len(samples['missing_entities']))
     cv2.imwrite(str(out/'model_top.png'), overview)
     write(out/'entity_inventory.json', {**samples['inventory'], 'cuts': samples['cuts'], 'missing_entities': samples['missing_entities']})
     artifacts, covered, timing = [], {}, {}
@@ -179,8 +210,18 @@ def render(prepared_dir, state_path, assets_path, shot_ids, library_path, out_di
             log.write('Native source replay; fit_executed=false; cuda_executed=false\n')
             for shot_id in requested:
                 shot = shot_lookup[shot_id]; camera = cameras[shot_id]; source = source_lookup[shot['source_id']]
+                if overview.shape[0] != source['height']:
+                    overview = top_down(samples['xyz'], samples['cuts'], height=source['height'],
+                                        missing_count=len(samples['missing_entities']))
                 if camera['source_id'] != source['id'] or (camera['time_base_num'],camera['time_base_den']) != (source['time_base_num'],source['time_base_den']):
                     raise ValueError('camera/source identity or native time base differs for '+shot_id)
+                if (camera['image_width'], camera['image_height']) != (source['width'], source['height']):
+                    raise ValueError('camera/source image dimensions differ for '+shot_id)
+                if compare_path is not None:
+                    other = other_cameras[shot_id]
+                    for key in ('source_id', 'time_base_num', 'time_base_den', 'image_width', 'image_height'):
+                        if other[key] != camera[key]:
+                            raise ValueError('comparison camera/source binding differs for '+shot_id)
                 pts_index = load_array(prepared_dir, source['pts_ref'])
                 window = shot['processing']
                 expected = pts_index[(pts_index >= window['first_pts']) & (pts_index < window['stop_pts_exclusive'])]
@@ -188,6 +229,8 @@ def render(prepared_dir, state_path, assets_path, shot_ids, library_path, out_di
                     raise ValueError('prepared actual PTS index does not cover '+shot_id)
                 if camera['first_pts'] > int(expected[0]) or camera['stop_pts_exclusive'] < window['stop_pts_exclusive']:
                     raise ValueError('camera domain does not cover '+shot_id)
+                if compare_path is not None and (other['first_pts'] > int(expected[0]) or other['stop_pts_exclusive'] < window['stop_pts_exclusive']):
+                    raise ValueError('comparison camera domain does not cover '+shot_id)
                 tb = Fraction(source['time_base_num'], source['time_base_den'])
                 path = out/(shot_id+'_native_overlay.mp4')
                 records, compare_records = [], []

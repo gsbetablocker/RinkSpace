@@ -101,6 +101,71 @@ struct BoardShape {
     RS_HD double speed(double theta)const{const Vec2 v=derivative(theta);return std::sqrt(v.x*v.x+v.y*v.y);}
 };
 
+/* Fixed ice/board-bottom intersection. Branch 0/1 orders the two roots along
+ * the directed line BEFORE testing its finite support; a missing branch never
+ * switches to the other root. Uses the same rounded-superellipse boundary as
+ * BoardShape::polar. Tangencies and coincident boundary straights are not an
+ * isolated, stable junction. There is no observation/station input. */
+inline Status ice_board_junction(BoardShape board,Segment line,double height_fraction,
+                                 int branch,Vec3& out){
+    if(!board.valid()||!finite(line.a)||!finite(line.b)||
+       !std::isfinite(height_fraction)||branch<0||branch>1)return Status::invalid_argument;
+    if(height_fraction!=0||line.a.z!=0||line.b.z!=0)return Status::not_coplanar;
+    const Vec3 d=sub(line.b,line.a);
+    if(!finite(d))return Status::nonfinite;
+    if(d.x==0&&d.y==0)return Status::degenerate;
+    double lo=-std::numeric_limits<double>::infinity(),hi=-lo;
+    const double origin[]={line.a.x,line.a.y},direction[]={d.x,d.y};
+    const double extent[]={board.half_length,board.half_width};
+    for(int axis=0;axis<2;++axis){
+        if(direction[axis]==0){
+            if(std::abs(origin[axis])>extent[axis])return Status::no_intersection;
+        }else{
+            const double a=(-extent[axis]-origin[axis])/direction[axis];
+            const double b=(extent[axis]-origin[axis])/direction[axis];
+            lo=std::max(lo,std::min(a,b));hi=std::min(hi,std::max(a,b));
+        }
+    }
+    if(!std::isfinite(lo)||!std::isfinite(hi))return Status::nonfinite;
+    if(lo>hi)return Status::no_intersection;
+    if(lo==hi)return Status::degenerate;
+    const auto level=[&](double t){
+        const Vec3 p=add(line.a,mul(t,d));
+        const double u=std::max(0.,(std::abs(p.x)-(board.half_length-board.rx))/board.rx);
+        const double v=std::max(0.,(std::abs(p.y)-(board.half_width-board.ry))/board.ry);
+        return std::pow(u,board.exponent)+std::pow(v,board.exponent)-1.;
+    };
+    // This level function is convex because exponent>1. An interior minimum
+    // brackets both crossings even when neither finite endpoint is inside.
+    double ml=lo,mh=hi;
+    for(int k=0;k<80;++k){
+        const double a=ml+(mh-ml)/3,b=mh-(mh-ml)/3;
+        if(level(a)<level(b))mh=b;else ml=a;
+    }
+    const double middle=(ml+mh)/2,minimum=level(middle);
+    const double tolerance=64*std::numeric_limits<double>::epsilon();
+    if(!std::isfinite(minimum))return Status::nonfinite;
+    if(minimum>tolerance)return Status::no_intersection;
+    if(minimum>=-tolerance)return Status::degenerate;
+    double a=branch?middle:lo,b=branch?hi:middle;
+    double t=branch?hi:lo;
+    if(std::abs(level(t))>tolerance){
+        for(int k=0;k<80;++k){
+            const double m=a+(b-a)/2;
+            if((level(m)>0)==(branch==0))a=m;else b=m;
+        }
+        t=a+(b-a)/2;
+    }
+    // Only reconcile root-solver roundoff at an endpoint that itself lies on
+    // this boundary. A real extension-only intersection remains unsupported.
+    const double slack=tolerance*(1+std::abs(t));
+    if(t<0&&t>=-slack&&std::abs(level(0))<=tolerance)t=0;
+    if(t>1&&t<=1+slack&&std::abs(level(1))<=tolerance)t=1;
+    if(t<0||t>1)return Status::outside_support;
+    out=add(line.a,mul(t,d));
+    return finite(out)?Status::ok:Status::nonfinite;
+}
+
 /* Host-side immutable station cache. Geometry/polar math is shared; this
  * bounded cache is NOT a claim that a CUDA implementation already exists.
  * Integration occurs once per scene shape per batch. Each inverse only

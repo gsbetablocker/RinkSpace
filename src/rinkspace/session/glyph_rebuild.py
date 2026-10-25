@@ -70,6 +70,8 @@ def rebuild(input_path,library_path,out_dir):
     out.mkdir(parents=True)
     source=config['primary'];reference=_read(config['panel_reference'])
     if _sha(source['frame_path'])!=source['frame_sha256']:raise ValueError('selected glyph frame changed')
+    if _sha(reference['source_image']['path'])!=reference['source_image']['sha256']:
+        raise ValueError('selected panel reference frame changed')
     primary=cv2.imread(source['frame_path']);reference_image=cv2.imread(reference['source_image']['path'])
     measured=extract_glyphs(primary,config['primary_roi'],config['component_order'],threshold=config['threshold'])
     ref=extract_glyphs(reference_image,config['reference_roi'],config['component_order'],threshold=config['reference_threshold'])

@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+from ..review.fonts import review_font
 from ..core.native import NativeCore, NativeError
 from ..domain.entity_graph import _code
 from ..path_policy import guard_project_write
@@ -145,7 +146,7 @@ class Canvas:
     def __init__(self,size):
         self.image=Image.new('RGB',size,BG);self.draw=ImageDraw.Draw(self.image);self.fonts={}
     def text(self,xy,message,size=24,color=INK,anchor='lm',box=False):
-        font=self.fonts.setdefault(size,ImageFont.truetype('C:/Windows/Fonts/msyh.ttc',size))
+        font=review_font(size)
         if box:
             bounds=self.draw.textbbox(tuple(xy),message,font=font,anchor=anchor)
             self.draw.rectangle((bounds[0]-4,bounds[1]-2,bounds[2]+4,bounds[3]+2),fill=BG)

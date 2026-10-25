@@ -95,7 +95,7 @@ class PreparedReceipt:
     scope_status: str
 
 
-def iter_current_observations(path, features, feature_indices, *, mask=None):
+def iter_current_observations(path, features, feature_indices, *, mask=None, print_bindings=None):
     """Stream current row semantics and preserve the exact selected JSON lines.
 
     This checks declarations against current numeric bindings. It does not
@@ -111,12 +111,13 @@ def iter_current_observations(path, features, feature_indices, *, mask=None):
                 continue
             index = int(feature_indices[row])
             require(0 <= index < len(features), 'Row feature index is outside current registry', source_row=row)
-            validate_observation_binding(json.loads(line), features[index], row)
+            binding = (print_bindings or {}).get(features[index]['id'])
+            validate_observation_binding(json.loads(line), features[index], row, print_binding=binding)
             yield line
     require(count == len(feature_indices), 'Observation metadata row count differs from arrays')
 
 
-def load_prepared(prepared_dir, *, purpose="fit"):
+def load_prepared(prepared_dir, *, purpose="fit", core=None):
     """Current-format structural load; does not rehash historical assets."""
     root = Path(prepared_dir).resolve()
     manifest = read_json(root / "manifest.json")
@@ -126,9 +127,23 @@ def load_prepared(prepared_dir, *, purpose="fit"):
     if purpose == "fit":
         from .prepare import validate_current_feature_contracts
         scene = read_json(relative(root, manifest["scene_ref"]))
-        validate_current_feature_contracts(manifest, scene, manifest["features"], arrays, np.arange(len(arrays["pts"])))
+        from ..domain.print_assets import resolve_feature_print_bindings
+        from ..domain.scene_assets import read_scene_assets
+        active_indices = np.unique(arrays['feature_index'][arrays['active'] != 0])
+        active_ids = {manifest['features'][int(i)]['id'] for i in active_indices}
+        print_bindings = resolve_feature_print_bindings(manifest['features'],
+            read_scene_assets(scene, relative(root, manifest['scene_ref'])), active_feature_ids=active_ids)
+        validate_current_feature_contracts(manifest, scene, manifest["features"], arrays, np.arange(len(arrays["pts"])),
+                                          print_bindings=print_bindings, core=core)
+        if manifest.get('initial_state_ref'):
+            from ..domain.parameters import load_parameter_state
+            load_parameter_state(relative(root, manifest['initial_state_ref']),
+                                 expected_scene=scene, expected_scene_path=relative(root, manifest['scene_ref']))
+        elif any(t.get('internal_geometry') is not None for _,a in read_scene_assets(
+                 scene, relative(root, manifest['scene_ref'])) for t in a['templates']):
+            raise DatasetError('invalid_input', 'Current parameterized scene requires its prepared initial State')
         if manifest.get('observations_ref'):
             for _ in iter_current_observations(relative(root, manifest['observations_ref']),
-                                               manifest['features'], arrays['feature_index']):
+                                               manifest['features'], arrays['feature_index'], print_bindings=print_bindings):
                 pass
     return manifest, arrays

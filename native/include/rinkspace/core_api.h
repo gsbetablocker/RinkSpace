@@ -46,6 +46,45 @@ RS_API int rs_sample_entity_path(const double* board,size_t nboard,int kind,
 RS_API int rs_sample_print_chart(const double* parameters,size_t nparameters,
     const double* vertices,size_t nvertices,const double* stations,size_t n,
     double* sz,size_t nsz,int* status,size_t nstatus);
+/* Shared monotone material deformation, shape[10] = tx,ty,log_sx,log_sy,
+ * three x interval logits, three y interval logits. Four positive normalized
+ * intervals per axis; the final logit is fixed zero. bounds[4]=min_u,min_v,
+ * max_u,max_v is the group's seed box, including its holes. Values zero replay
+ * seed coordinates exactly. Outputs/Jacobians are row-major; Jacobian columns
+ * are shape10 or installation5 [s,z,rotation,width,height]. Optional derivative
+ * pointers must be null with count zero, or have the exact documented size.
+ * This is geometry/linearization only, not a nonlinear or GPU solver.
+ * rs_sample_print_deformed_path first samples the ORIGINAL vertex-index station,
+ * then deforms material UV, then uses the same installed chart and BoardCourse.
+ * Derivative counts: uv/shape and sz/shape=20*n, XYZ/shape=30*n,
+ * XYZ/installation=15*n, XYZ/station=3*n. Invalid point outputs remain NaN.
+ */
+RS_API int rs_deform_print_points(const double* vertices,size_t nvertices,
+    const double* bounds,size_t nbounds,const double* shape,size_t nshape,
+    double* uv,size_t nuv,double* d_uv_d_shape,size_t njac,int* status,size_t nstatus);
+RS_API int rs_sample_print_deformed_path(const double* board,size_t nboard,
+    const double* parameters,size_t nparameters,const double* vertices,size_t nvertices,
+    const double* stations,size_t n,const double* bounds,size_t nbounds,
+    const double* shape,size_t nshape,double* uv,size_t nuv,double* sz,size_t nsz,
+    double* xyz,size_t nxyz,double* d_uv_d_shape,size_t n_uv_shape,
+    double* d_sz_d_shape,size_t n_sz_shape,double* d_xyz_d_shape,size_t n_xyz_shape,
+    double* d_xyz_d_installation,size_t n_xyz_installation,
+    double* d_xyz_d_station,size_t n_xyz_station,int* status,size_t nstatus);
+/* Typed analytic print structure: family=0 square (values3 centre_u,
+ * centre_v,log_side_over_panel_height), family=1 rectangle (values4 centre_u,
+ * centre_v,log_width_uv,log_height_uv). Rectangle side=0 top/1 right/2 bottom/
+ * 3 left; traversal is clockwise, reverse=1 reverses the source station. Square
+ * station traverses all four edges. Derivative layouts match the deformed-path
+ * entry above with nshape replaced by 3 or 4. Geometry still uses the same
+ * installed chart/BoardCourse, including size dependence of a metric square. */
+RS_API int rs_sample_print_analytic_path(const double* board,size_t nboard,
+    const double* parameters,size_t nparameters,int family,int side,int reverse,
+    const double* values,size_t nvalues,const double* stations,size_t n,
+    double* uv,size_t nuv,double* sz,size_t nsz,double* xyz,size_t nxyz,
+    double* d_uv_d_values,size_t n_uv_values,double* d_sz_d_values,size_t n_sz_values,
+    double* d_xyz_d_values,size_t n_xyz_values,
+    double* d_xyz_d_installation,size_t n_xyz_installation,
+    double* d_xyz_d_station,size_t n_xyz_station,int* status,size_t nstatus);
 /* Standard square in the unfolded board metric, expressed in material UV.
  * centre_uv[2] and positive side_over_panel_height are template parameters.
  * Parameters use the same [s,z,rotation,width,height] chart as kind5.
@@ -77,6 +116,13 @@ RS_API int rs_shared_entity_definition_with_options(const double* board,size_t n
 /* Continuous board-course chart. Output the nine arc-length segment joins;
  * these joins are topology/display metadata, never bounds on fit stations. */
 RS_API int rs_board_course_chart(const double* board,size_t nboard,double* breaks,size_t nbreaks);
+/* Fixed relation ice_board_bottom: line[6] is a directed finite segment in
+ * z=0; board_height_fraction must be zero. Branch 0/1 orders the full carrier's
+ * roots before finite-support admission. Top/unknown depth, missing support,
+ * tangent/coincident roots and invalid branches fail. No per-row station. */
+RS_API int rs_ice_board_junction(const double* board,size_t nboard,
+    const double* line,size_t nline,double board_height_fraction,int branch,
+    double* xyz,size_t nxyz);
 /* One-time import of valid legacy local 0..1 coordinates into global station.
  * segment=-1: full arc-length course; -2: historical equal-eighth chart;
  * 0..7: legacy finite segment. Optimisation then uses the returned unwrapped

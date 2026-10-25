@@ -1,0 +1,169 @@
+{
+  "schema": "rinkspace.ad_pair_selected_sources.v1",
+  "pair": [
+    13,
+    26
+  ],
+  "current_assets": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\ad13\\assets_r2.json",
+    "sha256": "b4c4ae9019675e3c868ab283dae589c14ac3d679e5399e99c85b1409f3500ca2"
+  },
+  "selected": {
+    "model": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint6_1021b\\ad_shape_repair\\native_print_model.json",
+      "sha256": "4d9e8c96149713114f32d10870db8b42ffe7df2eb9dbf1201e726ec4ca91e936"
+    },
+    "raw_shape": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint6_1021b\\ad_shape_repair\\ad13_native_template.json",
+      "sha256": "01bb8eee0fc4095f9b3a71b4740076201cf3e6f0843f0024b30b9401cf28deb5"
+    },
+    "ring_source": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint6_1021b\\ad_shape_repair\\ministry_outer_ring_source.json",
+      "sha256": "75aaf4871182a101a010423c675ba0bed5397119fce1cc2686a15d7527e589e9"
+    },
+    "old_board": [
+      0.5,
+      0.24610712781262364,
+      0.11272697019367729,
+      0.12387485115055916,
+      1.8121347338912348,
+      0.016811144093661412
+    ],
+    "current_board": [
+      0.5,
+      0.24430451947682078,
+      0.10850634879564748,
+      0.12303208010764176,
+      1.8439189216646732,
+      0.016674859856109624
+    ],
+    "placement_conversion": "compose_kind2_geometry_and_adblock_to_actual_sz_then_primary_material_bbox_and_independent_course_fraction_centers",
+    "dimensions_status": "historical_shape_initial_not_refitted"
+  },
+  "search_inventory": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\ad13_inventory.json",
+    "sha256": "66ef286a40f853324d93886472ccf41d8ea0bd5b612cdc1c8c1b9154dfc5a0bf"
+  },
+  "selection_reason": "Native4250 has clear two-line ministry letters and defined existing holes; mature model retains actual paired installation. Native3730 confirms counterpart full sign but has motion blur; no synthetic counterpart text UV produced. Existing exact original ring fragments from s02/s05/s06 preserved.",
+  "content": [
+    "T.C. GENÇLİK VE",
+    "SPOR BAKANLIĞI",
+    "existing_defined_letter_holes",
+    "large_outer_ring"
+  ],
+  "excluded": [
+    "small_stars",
+    "stylized_athletes",
+    "fine_emblem_interior",
+    "fragmented_ring_parts",
+    "texture"
+  ],
+  "missing": [
+    "native4250 full-frame PNG not retained in selected contour file; crop and exact native PTS retained",
+    "Ad26 clear per-letter source UV absent; ring readouts retained"
+  ],
+  "review_status": "pending_user_visual_review",
+  "fit_executed": false,
+  "searched_roots": [
+    "D:\\OneDrive\\codex_projs\\RinkSpace",
+    "D:\\CodexData\\RinkSpace_Data\\events",
+    "D:\\CodexData\\RinkSpace_Data\\runs",
+    "D:\\CodexData\\RinkSpace_Data\\history"
+  ],
+  "candidates": [
+    {
+      "source": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\history\\work_sessions\\20261002_01a0fd26-33ba-7873-9aa9-bbd9d2ca1328\\ice_alignment_review\\read_external_ad13_ad12_pattern_source_v2.py",
+        "sha256": "32a49be08cb914fa05e8f6399e22a11652e4bc138feeb8c3cf74bbebd406284d"
+      },
+      "decision": "rejected_for_current_Ad13_26",
+      "reason": "Old external reader calls the TCF federation emblem Ad13; this is not the current ministry two-line print. Old source PTS1/15360 retained without conversion or reassignment."
+    },
+    {
+      "source": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint6_1021b\\ad_shape_repair\\ad13_sources\\candidate_source_frames.json",
+        "sha256": "1b8ef4e1cbd6caaa79fd78068362a777a2864c33d22f793c2e53845f141a5e93"
+      },
+      "decision": "native4250_selected_for_clear_full_text",
+      "reason": "Native50 original crop and UV retained at PTS1344000."
+    },
+    {
+      "source": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint6_1021b\\ad_shape_repair\\ad26_sources\\candidate_source_frames.json",
+        "sha256": "2f8526909d2f824987de9d5908477f9017c1d5fc0b25ec65cd6f09c76dfa99a6"
+      },
+      "decision": "native3730_identity_reference_only",
+      "reason": "Full sign unobscured with motion blur; native3714 rejected for skater occlusion. No synthetic counterpart text UV."
+    }
+  ],
+  "source_correlations_preserved": true,
+  "observations_inactive": true,
+  "previous_assets": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\ad13\\assets.json",
+    "sha256": "05d5f0bfb9570c3b4edd015438fb08464f8904d9220faa2777b499972d068e4c"
+  },
+  "revision2": {
+    "reason": "closed ring interface must display as linework, not filled disc",
+    "display_only": true,
+    "coordinate_audit": [
+      {
+        "instance_id": "print_instance/Ad13",
+        "old_material_bbox_center": [
+          2.6000876967842963,
+          0.007942693903173056
+        ],
+        "new_material_bbox_center": [
+          2.6032461993118368,
+          0.007878304235422283
+        ],
+        "old_ring_bbox_center": [
+          2.609209080719477,
+          0.007942693903173056
+        ],
+        "new_ring_bbox_center": [
+          2.6123675832470177,
+          0.007878304235422283
+        ],
+        "old_to_new_geometry_max_abs": 5.204170427930421e-18,
+        "ring_max_abs": 2.6020852139652106e-18,
+        "all_template_parts_composed_exactly": true,
+        "placement_changed": false
+      },
+      {
+        "instance_id": "print_instance/Ad26",
+        "old_material_bbox_center": [
+          1.2135300290267628,
+          0.008808583808541574
+        ],
+        "new_material_bbox_center": [
+          1.2166307327794699,
+          0.00873717456229576
+        ],
+        "old_ring_bbox_center": [
+          1.2226514129619432,
+          0.008808583808541574
+        ],
+        "new_ring_bbox_center": [
+          1.2257521167146503,
+          0.00873717456229576
+        ],
+        "old_to_new_geometry_max_abs": 5.204170427930421e-18,
+        "ring_max_abs": 3.469446951953614e-18,
+        "all_template_parts_composed_exactly": true,
+        "placement_changed": false
+      }
+    ],
+    "placement_correction_applied": false,
+    "finding": "Mature Ad26 path uses the same complete ministry template and paired full-print adblock. Reconstructed historical primary and counterpart SZ paths equal current migrated paths to floating precision. No ring-only bbox has been substituted for the full template bbox. The current visual displacement is a preserved historical initializer residual; it must not be visually tuned.",
+    "historical_second_installation_initializer_source": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint6_1021b\\ad_shape_repair\\missing_ministry_source_repair.json",
+      "sha256": "c4111413399d3747a60ab56f0e649bb0209549edea234d52a80a6a3d243505cf"
+    },
+    "historical_initializer_script": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\okada_joint6_1021b\\ad_shape_repair\\restore_ministry_v5.py",
+      "sha256": "4d9dac155c5824ab33acb66c516770540c0fee1e82a46ef3f0027cf1eafa55b0"
+    },
+    "source_pixels_or_shared_size_changed": false,
+    "fit_executed": false
+  }
+}
