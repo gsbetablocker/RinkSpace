@@ -250,6 +250,21 @@ class SourceFeedbackRead:
                     self._use(match, "regression_check_current_board_material_order", current_native_positions_required=True)
         return result
 
+    def check_top_face_exclusion(self, near_board):
+        """Record use only after the current source material/exclusion actually ran."""
+        if not near_board.get('readings'):
+            return
+        if (near_board.get('world_geometry_modified') is not False
+                or near_board.get('exterior_top_deck_cameras_judges_people_are_advertisements') is not False):
+            raise ValueError('Near-board source check conflicts with the zero-thickness contract')
+        for match in getattr(self, 'applicable', []):
+            rule=match['case'].get('assertions', {}).get('top_face_rule', {})
+            if rule.get('model_board_thickness') == 0 and rule.get('outside_surface_and_objects_are_ads') is False:
+                self._use(match,'current_top_face_iceward_boundary_and_outside_ad_exclusion',
+                    current_native_positions_required=True, old_UV_transferred=False,
+                    excluded_pixel_count=near_board['exclusion_pixel_count'],
+                    native_geometry_modified=False)
+
     def finish(self, rgb, summary, *, tool, current_evidence=(), observation_ids=()):
         import numpy as np
         image = np.asarray(rgb)

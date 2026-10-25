@@ -7,7 +7,7 @@
 namespace rinkspace {
 struct CurlingLayout {
     double xF,xR,y0,pitch,radius,middle_ratio,inner_ratio,button_ratio,lane_width,right_x;
-    inline bool valid()const{
+    RS_HD inline bool valid()const{
         const double p[]={xF,xR,y0,pitch,radius,middle_ratio,inner_ratio,button_ratio,lane_width,right_x};
         return finite_array(p,10)&&xF<xR&&pitch>0&&radius>0&&lane_width>0&&
             0<=button_ratio&&button_ratio<inner_ratio&&inner_ratio<middle_ratio&&middle_ratio<1;
@@ -42,7 +42,7 @@ RS_HD inline Status line_line(Segment a,Segment b,Vec3& out){
 }
 RS_HD inline Status line_circle(Segment line,Circle circle,int branch,Vec3& out){
     if(branch<0||branch>1||!finite(line.a)||!finite(line.b)||!finite(circle.centre)||
-       !std::isfinite(circle.radius)||circle.radius<=0)return Status::invalid_argument;
+       !finite_scalar(circle.radius)||circle.radius<=0)return Status::invalid_argument;
     if(!same_plane(line.a,line.b)||!same_plane(line.a,circle.centre))return Status::not_coplanar;
     const Vec3 d=sub(line.b,line.a),f=sub(line.a,circle.centre);
     const double a=d.x*d.x+d.y*d.y;
@@ -60,7 +60,7 @@ RS_HD inline Status line_circle(Segment line,Circle circle,int branch,Vec3& out)
 
 struct BoardShape {
     double half_length,half_width,rx,ry,exponent,height;
-    inline bool valid()const{
+    RS_HD inline bool valid()const{
         const double p[]={half_length,half_width,rx,ry,exponent,height};
         return finite_array(p,6)&&half_length>0&&half_width>0&&rx>0&&ry>0&&
             rx<half_length&&ry<half_width&&exponent>1&&height>0;
@@ -74,8 +74,8 @@ struct BoardShape {
      * intersection is solved on polar(), not on a rectangular clipping box.
      * A carrier coincident with an end straight is degenerate, not invented.
      */
-    inline Status vertical_section(double x,Segment& out)const{
-        if(!valid()||!std::isfinite(x))return Status::invalid_argument;
+    RS_HD inline Status vertical_section(double x,Segment& out)const{
+        if(!valid()||!finite_scalar(x))return Status::invalid_argument;
         const double ax=std::abs(x);
         if(ax>half_length)return Status::outside_support;
         if(ax==half_length)return Status::degenerate;
@@ -109,7 +109,7 @@ struct BoardShape {
 inline Status ice_board_junction(BoardShape board,Segment line,double height_fraction,
                                  int branch,Vec3& out){
     if(!board.valid()||!finite(line.a)||!finite(line.b)||
-       !std::isfinite(height_fraction)||branch<0||branch>1)return Status::invalid_argument;
+       !finite_scalar(height_fraction)||branch<0||branch>1)return Status::invalid_argument;
     if(height_fraction!=0||line.a.z!=0||line.b.z!=0)return Status::not_coplanar;
     const Vec3 d=sub(line.b,line.a);
     if(!finite(d))return Status::nonfinite;
@@ -126,7 +126,7 @@ inline Status ice_board_junction(BoardShape board,Segment line,double height_fra
             lo=std::max(lo,std::min(a,b));hi=std::min(hi,std::max(a,b));
         }
     }
-    if(!std::isfinite(lo)||!std::isfinite(hi))return Status::nonfinite;
+    if(!finite_scalar(lo)||!finite_scalar(hi))return Status::nonfinite;
     if(lo>hi)return Status::no_intersection;
     if(lo==hi)return Status::degenerate;
     const auto level=[&](double t){
@@ -144,7 +144,7 @@ inline Status ice_board_junction(BoardShape board,Segment line,double height_fra
     }
     const double middle=(ml+mh)/2,minimum=level(middle);
     const double tolerance=64*std::numeric_limits<double>::epsilon();
-    if(!std::isfinite(minimum))return Status::nonfinite;
+    if(!finite_scalar(minimum))return Status::nonfinite;
     if(minimum>tolerance)return Status::no_intersection;
     if(minimum>=-tolerance)return Status::degenerate;
     double a=branch?middle:lo,b=branch?hi:middle;
@@ -166,8 +166,8 @@ inline Status ice_board_junction(BoardShape board,Segment line,double height_fra
     return finite(out)?Status::ok:Status::nonfinite;
 }
 
-/* Host-side immutable station cache. Geometry/polar math is shared; this
- * bounded cache is NOT a claim that a CUDA implementation already exists.
+/* Immutable station cache, constructed once on host and copied unchanged
+ * to CUDA. CPU and GPU use the same point/inverse-arclength implementation.
  * Integration occurs once per scene shape per batch. Each inverse only
  * integrates within one small cached interval, never from zero per point.
  */
@@ -181,11 +181,11 @@ public:
         const double lengths[]={x,c,y,c,x,c,y,c};breaks_[0]=0;
         for(int i=0;i<8;++i)breaks_[i+1]=breaks_[i]+lengths[i];
     }
-    double perimeter()const{return breaks_[8];}
-    double corner_length()const{return arc_[cells];}
-    const std::array<double,9>& breaks()const{return breaks_;}
-    Status point(double station,double z,Vec3& xyz,Vec3& tangent)const{
-        if(!std::isfinite(station)||!std::isfinite(z))return Status::invalid_argument;
+    RS_HD double perimeter()const{return breaks_[8];}
+    RS_HD double corner_length()const{return arc_[cells];}
+    RS_HD const std::array<double,9>& breaks()const{return breaks_;}
+    RS_HD Status point(double station,double z,Vec3& xyz,Vec3& tangent)const{
+        if(!finite_scalar(station)||!finite_scalar(z))return Status::invalid_argument;
         if(z<0||z>shape_.height)return Status::outside_support;
         double s=std::fmod(station,perimeter());if(s<0)s+=perimeter();
         int part=0;while(part<7&&s>breaks_[part+1])++part;
@@ -206,8 +206,8 @@ public:
         return finite(xyz)&&finite(tangent)?Status::ok:Status::nonfinite;
     }
 private:
-    static constexpr double step(){return (pi/2)/cells;}
-    double integrate(double lo,double hi)const{
+    RS_HD static constexpr double step(){return (pi/2)/cells;}
+    RS_HD double integrate(double lo,double hi)const{
         // Positive half of the standard 16-point Gauss-Legendre rule.
         static constexpr double nodes[]={.095012509837637440185,.28160355077925891323,.45801677765722738634,.61787624440264374845,.75540440835500303390,.86563120238783174388,.94457502307323257608,.98940093499164993260};
         static constexpr double weights[]={.18945061045506849629,.18260341504492358887,.16915651939500253819,.14959598881657673208,.12462897125553387205,.09515851168249278481,.062253523938647892863,.027152459411754094852};
@@ -215,11 +215,13 @@ private:
         for(int i=0;i<8;++i)sum+=weights[i]*(shape_.speed(mid-half*nodes[i])+shape_.speed(mid+half*nodes[i]));
         return half*sum;
     }
-    double angle(double target)const{
+    RS_HD double angle(double target)const{
         if(target<=0)return 0;
         if(target>=corner_length())return pi/2;
-        const auto it=std::upper_bound(arc_.begin(),arc_.end(),target);
-        const int cell=static_cast<int>(it-arc_.begin())-1;
+        int begin=0,end=cells+1;
+        while(begin<end){const int mid=begin+(end-begin)/2;
+            if(target<arc_[mid])end=mid;else begin=mid+1;}
+        const int cell=begin-1;
         const double origin=cell*step();double lo=origin,hi=origin+step();
         double theta=lo+(hi-lo)*(target-arc_[cell])/(arc_[cell+1]-arc_[cell]);
         for(int i=0;i<20;++i){

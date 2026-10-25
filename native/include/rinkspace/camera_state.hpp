@@ -4,11 +4,12 @@
 #include <limits>
 
 namespace rinkspace {
-RS_HD inline Vec3 cross3(Vec3 a,Vec3 b){return {a.y*b.z-a.z*b.y,a.z*b.x-a.x*b.z,a.x*b.y-a.y*b.x};}
-RS_HD inline Mat3 multiply3(const Mat3& a,const Mat3& b){Mat3 c{};for(int i=0;i<3;++i)for(int j=0;j<3;++j)for(int k=0;k<3;++k)c.a[3*i+j]+=a.a[3*i+k]*b.a[3*k+j];return c;}
-RS_HD inline Vec3 unit3(Vec3 a){return mul(1/std::sqrt(dot(a,a)),a);}
-RS_HD inline Mat3 axis_rotation(Vec3 a,double t){
-    const double x=a.x,y=a.y,z=a.z,s=std::sin(t),c=std::cos(t),d=1-c;
+template<class T> RS_HD inline Vec3Value<T> cross3(Vec3Value<T> a,Vec3Value<T> b){return {a.y*b.z-a.z*b.y,a.z*b.x-a.x*b.z,a.x*b.y-a.y*b.x};}
+template<class T> RS_HD inline Mat3Value<T> multiply3(const Mat3Value<T>& a,const Mat3Value<T>& b){Mat3Value<T> c{};for(int i=0;i<3;++i)for(int j=0;j<3;++j)for(int k=0;k<3;++k)c.a[3*i+j]+=a.a[3*i+k]*b.a[3*k+j];return c;}
+template<class T> RS_HD inline Vec3Value<T> unit3(Vec3Value<T> a){using std::sqrt;return mul(1/sqrt(dot(a,a)),a);}
+template<class T> RS_HD inline Mat3Value<T> axis_rotation(Vec3Value<T> a,T t){
+    using std::sin;using std::cos;
+    const T x=a.x,y=a.y,z=a.z,s=sin(t),c=cos(t),d=1-c;
     return {{c+d*x*x,d*x*y-s*z,d*x*z+s*y,d*x*y+s*z,c+d*y*y,d*y*z-s*x,d*x*z-s*y,d*y*z+s*x,c+d*z*z}};
 }
 RS_HD inline Mat3 exp_rotation(Vec3 v){const double q=dot(v,v);if(q==0)return {{1,0,0,0,1,0,0,0,1}};return axis_rotation(mul(1/std::sqrt(q),v),std::sqrt(q));}
@@ -25,7 +26,7 @@ struct MotionRig {
             std::abs(dot(pan,pan)-1)<1e-8&&std::abs(dot(tilt,tilt)-1)<1e-8&&std::abs(dot(tilt,apply(R0,pan)))<1e-8&&fref>0&&radius>0;
     }
 };
-inline MotionRig motion_rig(const double* p){MotionRig r{};for(int i=0;i<9;++i)r.R0.a[i]=p[i];r.pan=load3(p+9);r.tilt=load3(p+12);r.pivot=load3(p+15);r.lever=load3(p+18);r.spacing=p[21];r.pupil1=p[22];r.pupil2=p[23];r.fref=p[24];r.radius=p[25];r.cx=p[26];r.cy=p[27];r.eta=p[28];r.cxz=p[29];r.cyz=p[30];r.k10=p[31];r.k11=p[32];r.k20=p[33];r.k21=p[34];r.p1=p[35];r.p2=p[36];r.tau=p[37];return r;}
+RS_HD inline MotionRig motion_rig(const double* p){MotionRig r{};for(int i=0;i<9;++i)r.R0.a[i]=p[i];r.pan=load3(p+9);r.tilt=load3(p+12);r.pivot=load3(p+15);r.lever=load3(p+18);r.spacing=p[21];r.pupil1=p[22];r.pupil2=p[23];r.fref=p[24];r.radius=p[25];r.cx=p[26];r.cy=p[27];r.eta=p[28];r.cxz=p[29];r.cyz=p[30];r.k10=p[31];r.k11=p[32];r.k20=p[33];r.k21=p[34];r.p1=p[35];r.p2=p[36];r.tau=p[37];return r;}
 inline Status decode_d78_camera(const double* p,double* out){
     // p = global32, R0_seed9, n_seed3, b_seed3, n_tangent1/2 (3 each), f_ref, radius.
     Mat3 seed{};for(int i=0;i<9;++i)seed.a[i]=p[32+i];if(!valid_rotation(seed))return Status::invalid_argument;
@@ -40,18 +41,24 @@ inline Status decode_d78_camera(const double* p,double* out){
 }
 struct MotionSpline {
     const double* controls;size_t count;double first,dt;
-    bool valid()const{return controls&&count>=4&&count<=size_t(std::numeric_limits<int>::max())&&std::isfinite(first)&&std::isfinite(dt)&&dt>0&&finite_array(controls,3*count);}
-    RS_HD Status evaluate(double time,double* value)const{
-        if(!std::isfinite(time))return Status::invalid_argument;
+    bool valid()const{return controls&&count>=4&&count<=size_t(std::numeric_limits<int>::max())&&finite_scalar(first)&&finite_scalar(dt)&&dt>0&&finite_array(controls,3*count);}
+    RS_HD Status basis(double time,int& cell,double* weights,double* derivatives=nullptr)const{
+        if(!finite_scalar(time))return Status::invalid_argument;
         if(time<first+dt-1e-12||time>first+(count-2)*dt+1e-12)return Status::outside_support;
-        const double x=(time-first)/dt;int cell=int(std::floor(x));
+        const double x=(time-first)/dt;cell=int(std::floor(x));
         if(cell==int(count)-2&&std::abs(x-cell)<1e-10)--cell;
         if(cell<1||cell+2>=int(count))return Status::outside_support;
         const double u=x-cell,v=1-u,u2=u*u,u3=u2*u,w[]={v*v*v/6,(3*u3-6*u2+4)/6,(-3*u3+3*u2+3*u+1)/6,u3/6};
+        for(int j=0;j<4;++j)weights[j]=w[j];
+        if(derivatives){const double dw[]={-v*v/2,(9*u2-12*u)/6,(-9*u2+6*u+3)/6,u2/2};for(int j=0;j<4;++j)derivatives[j]=dw[j]/dt;}
+        return Status::ok;
+    }
+    RS_HD Status evaluate(double time,double* value)const{
+        int cell;double w[4];const auto status=basis(time,cell,w);if(status!=Status::ok)return status;
         for(int c=0;c<3;++c){value[c]=0;for(int j=0;j<4;++j)value[c]+=w[j]*controls[3*(cell-1+j)+c];}
         return finite_array(value,3)?Status::ok:Status::nonfinite;
     }
-    Status rates(double lo,double hi,double* rates)const{
+    RS_HD Status rates(double lo,double hi,double* rates)const{
         double q[3];if(evaluate(lo,q)!=Status::ok||evaluate(hi,q)!=Status::ok)return Status::outside_support;
         const int begin=std::max(1,int(std::floor((lo-first)/dt))),end=std::min(int(count)-3,int(std::floor((hi-first)/dt)));
         for(int c=0;c<3;++c){rates[c]=0;
@@ -65,16 +72,32 @@ struct MotionSpline {
             }rates[c]=std::nextafter(rates[c]+2e-11*(1+rates[c]),std::numeric_limits<double>::infinity());}return Status::ok;
     }
 };
-struct MotionInstant {Camera camera;Vec3 ray;double logf,z,depth;};
+template<class T> struct MotionCameraStateValue {CameraValue<T> camera;T pan,tilt,logf,z;};
+using MotionCameraState=MotionCameraStateValue<double>;
+struct MotionInstant : MotionCameraState {Vec3 ray;double depth;};
 RS_HD inline double quadratic_min(double c1,double c2,double r2){double v=std::fmin(1.,1+c1*r2+c2*r2*r2);if(c2>0){const double t=-c1/(2*c2);if(t>0&&t<r2)v=std::fmin(v,1+c1*t+c2*t*t);}return v;}
-RS_HD inline Status motion_instant(const MotionRig& r,const MotionSpline& s,Vec3 X,double time,MotionInstant& out,Vec2& uv){
-    double tr[3];auto status=s.evaluate(time,tr);if(status!=Status::ok)return status;
-    out.logf=tr[2];out.z=tr[2]-std::log(r.fref);const auto R=multiply3(multiply3(axis_rotation(r.tilt,tr[1]),r.R0),axis_rotation(r.pan,tr[0]));
-    Vec3 h=cross3(r.pan,transpose_apply(R,r.tilt));if(dot(h,h)<1e-20)return Status::degenerate;h=unit3(h);
-    Vec3 lever=r.lever;lever.z+=r.pupil1*out.z+r.pupil2*out.z*out.z;
-    Camera c{};c.rotation=R;c.centre=pivot_centre(R,r.pivot,lever,h,r.spacing);c.fx=std::exp(tr[2]+r.eta/2);c.fy=std::exp(tr[2]-r.eta/2);
+template<class T> RS_HD inline Status motion_camera_from_values(const MotionRig& r,const T* tr,MotionCameraStateValue<T>& out){
+    using std::exp;
+    const auto pan=scalar_cast<T>(r.pan),tilt=scalar_cast<T>(r.tilt),pivot=scalar_cast<T>(r.pivot);
+    const auto R0=scalar_cast<T>(r.R0);
+    out.pan=tr[0];out.tilt=tr[1];
+    out.logf=tr[2];out.z=tr[2]-std::log(r.fref);const auto R=multiply3(multiply3(axis_rotation(tilt,tr[1]),R0),axis_rotation(pan,tr[0]));
+    Vec3Value<T> h=cross3(pan,transpose_apply(R,tilt));if(dot(h,h)<1e-20)return Status::degenerate;h=unit3(h);
+    Vec3Value<T> lever=scalar_cast<T>(r.lever);lever.z+=r.pupil1*out.z+r.pupil2*out.z*out.z;
+    CameraValue<T> c{};c.rotation=R;c.centre=pivot_centre(R,pivot,lever,h,T(r.spacing));c.fx=exp(tr[2]+r.eta/2);c.fy=exp(tr[2]-r.eta/2);
     c.cx=r.cx+r.cxz*out.z;c.cy=r.cy+r.cyz*out.z;c.k1=r.k10+r.k11*out.z;c.k2=r.k20+r.k21*out.z;c.p1=r.p1;c.p2=r.p2;
-    out.camera=c;out.ray=apply(R,sub(X,c.centre));out.depth=out.ray.z;
+    out.camera=c;
+    const T optics[]={c.fx,c.fy,c.cx,c.cy,c.k1,c.k2,c.p1,c.p2};
+    for(int i=0;i<8;++i)if(!finite_scalar(optics[i]))return Status::nonfinite;
+    return finite(c.centre)&&c.fx>0&&c.fy>0?Status::ok:Status::nonfinite;
+}
+RS_HD inline Status evaluate_motion_camera(const MotionRig& r,const MotionSpline& s,double time,MotionCameraState& out){
+    double tr[3];const auto status=s.evaluate(time,tr);if(status!=Status::ok)return status;
+    return motion_camera_from_values(r,tr,out);
+}
+RS_HD inline Status motion_instant(const MotionRig& r,const MotionSpline& s,Vec3 X,double time,MotionInstant& out,Vec2& uv){
+    auto status=evaluate_motion_camera(r,s,time,out);if(status!=Status::ok)return status;
+    const auto& c=out.camera;out.ray=apply(c.rotation,sub(X,c.centre));out.depth=out.ray.z;
     if(!finite(out.ray))return Status::nonfinite;if(out.depth<=0)return Status::behind_camera;
     const double x=out.ray.x/out.depth,y=out.ray.y/out.depth,r2=x*x+y*y;
     if(r2>r.radius*r.radius)return static_cast<Status>(8);
@@ -86,7 +109,7 @@ RS_HD inline Status motion_instant(const MotionRig& r,const MotionSpline& s,Vec3
  * derivative extrema and rigid-body/Brown norm bounds exclude multiple row
  * roots. This is a floating-point padded bound, not interval arithmetic.
  */
-inline Status contraction_bound(const MotionRig& r,const MotionSpline& s,Vec3 X,double t,int height,double& bound){
+RS_HD inline Status contraction_bound(const MotionRig& r,const MotionSpline& s,Vec3 X,double t,int height,double& bound){
     const double half=std::abs(r.tau)/2;double rates[3];auto status=s.rates(t-half,t+half,rates);if(status!=Status::ok)return status;
     MotionInstant m{};Vec2 uv{};status=motion_instant(r,s,X,t,m,uv);if(status!=Status::ok)return status;
     const double omega=rates[0]+rates[1],zd=rates[2],zabs=std::abs(m.z)+zd*half;
@@ -101,11 +124,11 @@ inline Status contraction_bound(const MotionRig& r,const MotionSpline& s,Vec3 X,
     bound=std::abs(r.tau)*speed/(height-1);
     const double k1lo=m.camera.k1-std::abs(r.k11)*zd*half,k2lo=m.camera.k2-std::abs(r.k21)*zd*half;
     const double fold=std::fmin(quadratic_min(k1lo,k2lo,r2),quadratic_min(3*k1lo,5*k2lo,r2))-6*std::hypot(p1,p2)*radius;
-    return radius<=r.radius&&fold>1e-10&&std::isfinite(bound)&&bound<1-1e-9?Status::ok:static_cast<Status>(9);
+    return radius<=r.radius&&fold>1e-10&&finite_scalar(bound)&&bound<1-1e-9?Status::ok:static_cast<Status>(9);
 }
 struct MotionProjection {Vec2 uv;double depth,row,equality,contraction;};
-inline Status project_motion(const MotionRig& r,const MotionSpline& s,int height,Vec3 X,double time,MotionProjection& out){
-    if(!finite(X)||!std::isfinite(time))return Status::invalid_argument;
+RS_HD inline Status project_motion(const MotionRig& r,const MotionSpline& s,int height,Vec3 X,double time,MotionProjection& out){
+    if(!finite(X)||!finite_scalar(time))return Status::invalid_argument;
     auto status=contraction_bound(r,s,X,time,height,out.contraction);if(status!=Status::ok)return status;
     MotionInstant a{},b{};Vec2 ua{},ub{};const double last=height-1;
     status=motion_instant(r,s,X,time-r.tau/2,a,ua);if(status!=Status::ok)return status;

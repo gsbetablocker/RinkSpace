@@ -1,4 +1,4 @@
-"""Reuse existing local CV/SciPy installations without changing their environments."""
+"""Reuse the project-owned CV/SciPy and CUDA environments."""
 
 from __future__ import annotations
 
@@ -8,9 +8,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[3]
 MAIN_SITE = ROOT / ".venv" / "Lib" / "site-packages"
-GPU_SITES = (ROOT.parent / "MotionTrail_Codex_Starter_v1" / ".venv-gpu" / "Lib" / "site-packages",
-             Path(r"D:\CodexData\MotionTrail_Archive_20261019\.venv-gpu\Lib\site-packages"))
-GPU_SITE = next((p for p in GPU_SITES if p.is_dir()), GPU_SITES[0])
+GPU_SITE = ROOT / ".venv-gpu" / "Lib" / "site-packages"
 
 
 def add_geometry_dependencies() -> tuple[str, ...]:

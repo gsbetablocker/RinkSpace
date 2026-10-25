@@ -176,15 +176,18 @@ def attach_grid_context_evidence(row,seed,*,source_binding,source_motion=None):
     original=seed.get('source_identity_navigation_evidence')
     if original is None:return row
     evidence=dict(original)
+    flags={key:original.get(key,value) for key,value in GRID_CONTEXT_FLAGS.items()}
+    if original.get('verified_source_guides_used_as_navigation'):
+        flags['verified_source_guides_used_as_navigation']=True
     evidence.update(source_binding=dict(source_binding),
         current_actual_candidate_indices=list(row['original_candidate_indices']),
         current_actual_query_indices=list(row.get('source_query_indices',())),
         current_actual_two_sides_uv=row['source_sides_uv'],
         current_actual_measured_UV_sha256=hashlib.sha256(np.ascontiguousarray(row['uv'],np.float64).tobytes()).hexdigest(),
-        current_feature_semantics_remeasured=True,source_identity_confirmed=True,**GRID_CONTEXT_FLAGS)
+        current_feature_semantics_remeasured=True,source_identity_confirmed=True,**flags)
     temporal=row['temporal_evidence']
     if temporal['kind']=='confirmed_original_source_identity_anchor':
-        temporal['kind']=GRID_CONTEXT_KIND
+        temporal['kind']=original.get('kind',GRID_CONTEXT_KIND)
         prior=original['previous_source_binding']
         temporal.update(previous_actual_pts=prior['actual_pts'],previous_shot_id=prior['shot_id'],
             previous_decoded_BGR_sha256=prior['decoded_native_BGR_sha256'],previous_frame_RGB_measured=True,
@@ -196,8 +199,8 @@ def attach_grid_context_evidence(row,seed,*,source_binding,source_motion=None):
     if source_motion is not None:evidence['current_actual_material_continuity_evidence']=source_motion
     row.pop('model_projection_or_fit_residual_used_for_identity',None)
     temporal.pop('model_projection_or_fit_residual_used_for_identity',None)
-    row.update(GRID_CONTEXT_FLAGS,source_identity_navigation_evidence=evidence)
-    temporal.update(GRID_CONTEXT_FLAGS,source_identity_navigation_evidence=evidence)
+    row.update(flags,source_identity_navigation_evidence=evidence)
+    temporal.update(flags,source_identity_navigation_evidence=evidence)
     return row
 
 
@@ -467,7 +470,8 @@ class SameStateIceModelContextIdentity:
             indices=chosen[matched]
             if len(indices)<2:
                 decisions.append(dict(curve_id=name,actual_pts=pts,status='actual_material_current_interface_or_entity_switch'));continue
-            evidence=dict(kind=GRID_CONTEXT_KIND,source_binding=current_binding,
+            context_flags=getattr(self,'navigation_flags',GRID_CONTEXT_FLAGS)
+            evidence=dict(kind=getattr(self,'navigation_kind',GRID_CONTEXT_KIND),source_binding=current_binding,
                 previous_source_binding=dict(self.previous_binding),
                 actual_material_correspondence_confirmed=True,actual_field_order_confirmed=True,
                 physical_model_scope_confirmed=True,same_shot_source_continuity_confirmed=True,
@@ -484,16 +488,16 @@ class SameStateIceModelContextIdentity:
                     for key,value in raster_material.items()},
                 known_actual_source_negative_material_references=negative_references,
                 competing_actual_material_interpretations_rejected=True,
-                field_order_test='named_same_state_curve_neighborhood_and_distinct_actual_material_support',
+                field_order_test=getattr(self,'navigation_field_order_test','named_same_state_curve_neighborhood_and_distinct_actual_material_support'),
                 model_neighborhood_px=24.,model_neighborhood_is_center_accuracy_tolerance=False,
                 **self._source_field_order_identity_evidence(measurement,ci,indices),
-                **GRID_CONTEXT_FLAGS)
+                **context_flags)
             seed=dict(curve_id=name,physical_id=definition['feature_id'],actual_pts=pts,native_pts=native,
                 source_sha256=self.source_sha256,time_base=self.time_base,shot_id=binding['shot_id'],
                 decoded_native_RGB_sha256=digest,decoded_native_BGR_sha256=bgr,navigation_uv=uv[indices].tolist(),
                 source_material_class='static_painted_ice',surface_and_physical_identity_confirmed=True,
                 authority=self.authority,is_exact_centerline_pixel_ground_truth=False,
-                source_identity_navigation_evidence=evidence,**GRID_CONTEXT_FLAGS)
+                source_identity_navigation_evidence=evidence,**context_flags)
             track['source_context_identity_pending']=False
             seeds.append(seed);decisions.append(dict(curve_id=name,actual_pts=pts,status='actual_RGB_model_context_material_correspondence',
                 actual_source_readouts=len(indices)))

@@ -153,3 +153,32 @@ def test_scene_without_advertisements_is_valid(tmp_path):
     assert snapshot==scene and summary==[]
     assert read_scene_assets(snapshot,tmp_path/'output'/'scene.json')==[]
     assert scene_content_identity(snapshot,tmp_path/'output'/'scene.json')==scene_content_identity(scene,source)
+
+
+def test_scene_archive_maps_only_retired_files_and_preserves_identity_catalog():
+    from pathlib import PurePosixPath
+    catalog = json.loads((ROOT/'events/ankara_2026/scene/archive.json').read_text(encoding='utf-8'))
+    shared = json.loads((ROOT/'configs/storage.defaults.json').read_text(encoding='utf-8'))
+    assert catalog['schema'] == 'rinkspace.scene-archive.v1'
+    scene = json.loads(FIELD.read_text(encoding='utf-8'))
+    current = {FIELD.resolve()}
+    for ref in scene['advertisement_assets']:
+        current.add((FIELD.parent/ref['path']).resolve())
+        if 'source_index_ref' in ref:
+            current.add((FIELD.parent/ref['source_index_ref']).resolve())
+    seen, content_ids = set(), {}
+    for entry in catalog['entries']:
+        old, target = PurePosixPath(entry['old_path']), PurePosixPath(entry['data_path'])
+        assert not old.is_absolute() and not target.is_absolute()
+        assert '..' not in old.parts and '..' not in target.parts
+        assert entry['old_path'] not in seen
+        seen.add(entry['old_path'])
+        assert (ROOT/entry['old_path']).resolve() not in current
+        assert not (ROOT/entry['old_path']).exists()
+        assert shared['legacy_paths'][entry['old_path']] == entry['data_path']
+        assert len(entry['sha256']) == 64 and all(c in '0123456789abcdef' for c in entry['sha256'])
+        assert entry['bytes'] > 0
+        identity = (entry['sha256'], entry['bytes'])
+        assert content_ids.setdefault(entry['data_path'], identity) == identity
+    assert seen
+    assert all(path.is_file() for path in current)

@@ -26,6 +26,8 @@ def load_storage_config(project: str | Path, *, data_root: str | Path | None = N
             schema = values.get("schema_version", "rinkspace.storage.v1" if name == "storage.json" else None)
             if schema != "rinkspace.storage.v1":
                 raise ValueError("Unsupported storage configuration")
+            if "legacy_paths" in values and "legacy_paths" in config:
+                values["legacy_paths"] = {**config["legacy_paths"], **values["legacy_paths"]}
             config.update(values)
     selected = data_root if data_root is not None else os.environ.get("RINKSPACE_DATA_ROOT")
     if selected is not None:

@@ -14,7 +14,8 @@ def reader_and_spies(monkeypatch):
     reader.active_guides = []
     reader.active_binding = None
     reader.active_global_exclusion = None
-    module = SimpleNamespace(device='cpu', classes=('background', 'ice_contact'))
+    module = SimpleNamespace(device='cpu', classes=('background', 'ice_contact'),
+                             model_usage=lambda:dict(sha256='b'*64,path='cpu_test_stub'))
 
     def predict(rgb, binding, reset=False):
         module.current_image = torch.from_numpy(rgb.copy()).permute(2, 0, 1)[None].float() / 255

@@ -1,0 +1,17 @@
+{
+  "schema": "rinkspace.continuous_source_reader_request.v1",
+  "vision_config": "D:/OneDrive/codex_projs/RinkSpace/configs/rink_vision.json",
+  "programme_scope": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/rebuild_scope.json",
+  "validation_scope": "按用户最新要求限定 S01，复用已有10帧检查窗口；验证完整读取入口和同镜头持续取点，切镜身份恢复不属于本轮。",
+  "sequences": [
+    {
+      "shot_id": "s01",
+      "first_pts": 308480,
+      "stop_pts_exclusive": 311040,
+      "acceptance": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/source_datasets/frame_by_frame_review_20261013/first_shot_remaining_50fps/repair_20261014/user_acceptance.json",
+      "packet_directory": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/source_datasets/frame_by_frame_review_20261013/first_shot_remaining_50fps/repair_20261014/frames",
+      "binding_directory": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/source_datasets/frame_by_frame_review_20261013/first_shot_remaining_50fps/repair_20261014/bindings"
+    }
+  ],
+  "source_reidentification": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/source_reidentification.json"
+}

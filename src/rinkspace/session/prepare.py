@@ -10,7 +10,8 @@ import numpy as np
 from ..domain.scene_assets import snapshot_scene, scene_content_identity
 from ..domain.runtime_rigs import snapshot_runtime
 from .dataset import (DatasetError, PreparedReceipt, digest, load_array, read_json,
-                      relative, require, write_array, write_json, iter_current_observations)
+                      relative, require, write_array, write_json, iter_current_observations,
+                      validate_current_noise_groups)
 
 REQUIRED_ARRAYS = {
     "uv": ("<f8", (2,)), "pts": ("<i8", ()),
@@ -50,6 +51,12 @@ def validate_current_feature_contracts(inp, scene, features, arrays, rows, *, sc
     if policy:
         active_ids = {features[int(i)]["id"] for i in np.unique(arrays["feature_index"][active_rows])}
         report = validate_feature_bindings(features, active_ids, policy, print_bindings=print_bindings)
+    if len(rows):
+        kinds = {'finite_curve': 1, 'material_point': 0, 'fixed_junction': 0}
+        expected_kind = np.asarray([kinds.get(f.get('kind'), -1) for f in features], dtype='i1')
+        expected_kind = expected_kind[arrays['feature_index'][rows]]
+        require(np.all(expected_kind >= 0) and np.array_equal(arrays['kind'][rows], expected_kind),
+                'Observation numerical kind differs from its current feature kind')
     scene_report = validate_scene_measurements(scene, policy)
     paths = {p['id']: p for p in scene.get('paths', [])}
     for record in paths.values():
@@ -91,7 +98,7 @@ def validate_current_feature_contracts(inp, scene, features, arrays, rows, *, sc
             "periodic_station_rows": int(len(periodic)), "periodic_zero_support_is_not_bounds": True}
 
 
-def prepare(input_path, scope_path, shot_ids, out_dir, *, core=None):
+def prepare(input_path, scope_path, shot_ids, out_dir, *, core=None, local_charts=None):
     source_path = Path(input_path).resolve(strict=True)
     root = source_path.parent
     inp = read_json(source_path)
@@ -186,28 +193,17 @@ def prepare(input_path, scope_path, shot_ids, out_dir, *, core=None):
         require(np.all((uv[:, 0] >= 0) & (uv[:, 0] < source["width"]) & (uv[:, 1] >= 0) & (uv[:, 1] < source["height"])), "UV outside native source image", source_id=source["id"])
     members = load_array(root, groups_doc["members_ref"], verify=True)
     weights = load_array(root, groups_doc["weights_ref"], verify=True)
+    group_supports = validate_current_noise_groups(groups_doc['groups'], members, weights, arrays)
     group_rows, group_weights, groups, group_map = [], [], [], {}
-    claimed = np.zeros(n, np.uint8)
-    for ordinal, group in enumerate(groups_doc["groups"]):
-        start, count, rank = group["member_start"], group["member_count"], group["rank"]
-        rr = np.asarray(members[start:start + count], np.int64)
-        require(len(rr) == count and len(np.unique(rr)) == count and np.all((rr >= 0) & (rr < n)), "Malformed correlation support", group_id=group["id"])
-        require(not np.any(claimed[rr]), "Correlation groups overlap", group_id=group["id"])
-        claimed[rr] = 1
-        require(np.all(arrays["noise_group_index"][rr] == ordinal), "Correlation membership is not reciprocal", group_id=group["id"])
-        require(len(np.unique(arrays["split"][rr])) == 1, "Correlated evidence closure crosses data split", group_id=group["id"])
+    for ordinal, (group, (rr, w)) in enumerate(zip(groups_doc['groups'], group_supports)):
         take = mask[rr]
         require(not np.any(take) or np.all(take), "Selected shots truncate a correlation group", group_id=group["id"])
-        begin = group["weight_start"]
-        w = np.asarray(weights[begin:begin + rank * count * 2])
-        require(w.size == rank * count * 2 and np.isfinite(w).all(), "Malformed group whitening matrix", group_id=group["id"])
         if not np.any(take):
             continue
         group_map[ordinal] = len(groups)
         groups.append(dict(group, member_start=len(group_rows), weight_start=len(group_weights)))
         group_rows.extend(new_rows[rr].tolist())
         group_weights.extend(w.tolist())
-    require(np.all(claimed[arrays["noise_group_index"] >= 0] == 1), "Observation references absent correlation support")
     active = arrays["active"] != 0
     correlated = arrays["noise_group_index"] >= 0
     covariance = arrays["covariance"]
@@ -254,13 +250,16 @@ def prepare(input_path, scope_path, shot_ids, out_dir, *, core=None):
     if metadata:
         with (out / "observations.jsonl").open("w", encoding="utf-8", newline="\n") as dst:
             count = 0
-            for line in iter_current_observations(relative(root, metadata), features, arrays['feature_index'], mask=mask, print_bindings=print_bindings):
+            for line in iter_current_observations(
+                    relative(root, metadata), features, arrays['feature_index'],
+                    mask=mask, print_bindings=print_bindings, arrays=arrays,
+                    sources=sources, shots=shots, noise_groups=groups_doc['groups']):
                 dst.write(line)
                 count += 1
         require(count == len(rows), "Observation metadata row count differs from arrays")
     from ..domain.parameters import compile_scene_parameters, write_parameter_state, SceneParameterModel
-    parameter_state = compile_scene_parameters(scene_snapshot, out/'scene.json')
-    compiled_scene = SceneParameterModel(scene_snapshot, out/'scene.json')
+    parameter_state = compile_scene_parameters(scene_snapshot, out/'scene.json', local_charts=local_charts)
+    compiled_scene = SceneParameterModel(scene_snapshot, out/'scene.json', local_charts=local_charts)
     feature_dependencies = {}
     for feature in features:
         if feature.get('print_binding') is not None:
@@ -269,6 +268,9 @@ def prepare(input_path, scope_path, shot_ids, out_dir, *, core=None):
     write_json(out/'parameter_dependencies.json', {'schema':'rinkspace.parameter_dependencies.v1',
         'layout_revision':parameter_state.layout['layout_revision'], 'features':feature_dependencies,
         'source_rows_or_groups_changed':False})
+    from ..domain.parameters import FactorPlan
+    write_json(out/'factor_plan.json', FactorPlan(parameter_state, feature_dependencies,
+        scope='prepared_print_geometry_dependencies_not_complete_camera_factors').to_dict())
     initial_state = write_parameter_state(out, parameter_state, shots=shots,
         required_shot_ids=scope['required_shot_ids'], selected_shot_ids=selected, name='initial_state.json')
     scope_status = "complete" if set(selected) == set(scope["required_shot_ids"]) else "subset"
@@ -283,6 +285,7 @@ def prepare(input_path, scope_path, shot_ids, out_dir, *, core=None):
         "observations": digest(out/'observations.jsonl') if metadata else None,
         "queries": digest(out/'queries.json') if queries_ref else None,
         "parameter_layout": digest(out/'parameter_layout.json'),
+        "factor_plan": digest(out/'factor_plan.json'),
         "initial_parameters": initial_state['values_ref']['sha256'],
         "parameter_dependencies": digest(out/'parameter_dependencies.json'),
     }
@@ -304,6 +307,7 @@ def prepare(input_path, scope_path, shot_ids, out_dir, *, core=None):
                 "dependency_revision": dependency_revision,
                 "snapshot_dependencies": {"scene": scene_dependencies, "rigs": rig_dependencies},
                 "parameter_layout_ref":"parameter_layout.json", "initial_state_ref":"initial_state.json",
+                "factor_plan_ref":"factor_plan.json",
                 "parameter_dependencies_ref":"parameter_dependencies.json",
                 "current_contracts": current_contracts, "observations": len(rows), "active_observations": int(arrays["active"][rows].sum()),
                 "user_approval": "not_reviewed", "fit_executed": False}

@@ -64,9 +64,10 @@ def _temporal_identity(row):
             return False
         authenticate_source_reference(seed)
         return evidence.get('source_identity_confirmed') is True
+    source_anchor=evidence.get('kind')=='actual_RGB_material_field_order_and_continuity_with_native_source_guides'
     grid_anchor=evidence.get('kind')=='actual_RGB_material_field_order_and_continuity_with_model_navigation'
-    if grid_anchor:
-        if (evidence.get('model_projection_used_as_navigation_and_identity_context') is not True
+    if grid_anchor or source_anchor:
+        if (evidence.get('model_projection_used_as_navigation_and_identity_context') is not (not source_anchor)
                 or evidence.get('source_identity_confirmed') is not True
                 or evidence.get('source_identity_authority')!=
                     evidence['source_identity_navigation_evidence']['source_identity_authority']):
@@ -682,7 +683,8 @@ class StrictAbsolutePackWriter:
         for row in self.rows:
             temporal=row['temporal_evidence']
             if temporal['kind'] in ('same_shot_actual_RGB_temporal_identity',
-                    'actual_RGB_material_field_order_and_continuity_with_model_navigation'):
+                    'actual_RGB_material_field_order_and_continuity_with_model_navigation',
+                    'actual_RGB_material_field_order_and_continuity_with_native_source_guides'):
                 previous=self.frame_bindings.get(temporal['previous_actual_pts'])
                 if (previous is not None and previous['decoded_BGR_sha256']!=temporal['previous_decoded_BGR_sha256']):
                     raise ValueError('Temporal previous BGR hash differs from actual processed source frame')
@@ -778,7 +780,8 @@ class StrictAbsoluteSourcePack:
                 raise ValueError('Missing source uncertainty cannot become an explicit source weight')
             temporal=row['temporal_evidence']
             if temporal['kind'] in ('same_shot_actual_RGB_temporal_identity',
-                    'actual_RGB_material_field_order_and_continuity_with_model_navigation'):
+                    'actual_RGB_material_field_order_and_continuity_with_model_navigation',
+                    'actual_RGB_material_field_order_and_continuity_with_native_source_guides'):
                 previous=self.frame_bindings.get(temporal['previous_actual_pts'])
                 if previous is not None and previous['decoded_BGR_sha256']!=temporal['previous_decoded_BGR_sha256']:
                     raise ValueError('Temporal source BGR binding differs from actual processed frame')

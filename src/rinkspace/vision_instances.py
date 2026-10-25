@@ -36,8 +36,10 @@ def source_correspondence_identity_verified(authority, binding, physical_id):
     if any(reference[key] != binding[key] for key in ("source_sha256", "time_base")):
         raise ValueError("Source identity transfer belongs to a different original source/clock")
     human = authority.get("confirmed_reference_identity_authority", {})
-    if not (isinstance(human, Mapping) and human.get("kind") in HUMAN_IDENTITIES
-            and human.get("reference") and authority.get("reference_physical_id") == physical_id):
+    from .vision_native_references import registered_source_identity_verified
+    reference_valid = (isinstance(human, Mapping) and human.get("kind") in HUMAN_IDENTITIES and human.get("reference"))
+    reference_valid = reference_valid or registered_source_identity_verified(human, reference, physical_id)
+    if not (reference_valid and authority.get("reference_physical_id") == physical_id):
         return False
     for key in ("source_packet_sha256", "query_RGB_sha256"):
         digest = str(authority.get(key, ""))
@@ -2625,7 +2627,9 @@ def transfer_source_context_identities(rows, prompts, contexts, binding, *, even
             if row.get("reference_source_binding") != context["reference_source_binding"]:
                 continue
             human = row.get("event_identity_authority", {})
-            if human.get("kind") not in HUMAN_IDENTITIES or not human.get("reference"):
+            from .vision_native_references import registered_source_identity_verified
+            if not ((human.get("kind") in HUMAN_IDENTITIES and human.get("reference")) or
+                    registered_source_identity_verified(human, reference, row["reference_physical_id"])):
                 continue
             authority = dict(kind=SOURCE_CORRESPONDENCE_IDENTITY, event_id=str(event_id),
                 reference=human["reference"], confirmed_reference_identity_authority=dict(human),
@@ -2754,9 +2758,12 @@ class SourceAdvertisementMatcher:
                                       descriptors=context_descriptors, image=image, mask=context_mask,
                                       reference_order=packet["image_left_to_right_physical_order"]))
             for advertisement in packet["advertisements"]:
-                if not advertisement.get("physical_identity_human_confirmed"):
-                    continue
                 number = int(advertisement["advertisement_number"])
+                from .vision_native_references import registered_source_identity_verified
+                registered = advertisement.get("registered_source_identity_authority")
+                registered_valid = registered_source_identity_verified(registered, ref_binding, f"Ad{number}")
+                if not advertisement.get("physical_identity_human_confirmed") and not registered_valid:
+                    continue
                 aliases = alias_by_number[number]
                 for component in advertisement["components"]:
                     roi = component.get("actual_source_navigation_roi")
@@ -2789,6 +2796,9 @@ class SourceAdvertisementMatcher:
                         feature_scale_is_navigation_only=True,
                         boundary_definition="printed_pattern_external_contour",
                         whole_pattern_extent_is_edge=False, internal_holes_have_separate_role=True)
+                    if registered_valid:
+                        record["event_identity_authority"] = registered
+                        record["reference_identity_human_confirmed"] = False
                     record.update(source_component_scope=component.get('source_component_scope'),
                         whole_advertisement_outer_boundary_eligible=component.get(
                             'whole_advertisement_outer_boundary_eligible',True),

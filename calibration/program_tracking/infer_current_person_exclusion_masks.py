@@ -23,7 +23,7 @@ from rinkspace.programme_source_stream import file_sha
 
 DEFAULT_SEQUENCE = Path("D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/"
     "frame_by_frame_review_20261013/opening_100_50fps")
-DEFAULT_MODEL = ROOT.parent / "MotionTrail_Codex_Starter_v1/models/sam2.1-hiera-tiny"
+DEFAULT_MODEL = ROOT / "models/cache/sam2.1-hiera-tiny"
 
 
 def current_skin_seeds(rgb):

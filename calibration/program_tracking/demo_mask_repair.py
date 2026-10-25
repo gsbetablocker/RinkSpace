@@ -11,8 +11,8 @@ ROOT=Path(__file__).resolve().parents[2]
 DATA=Path("D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp")
 OUT=DATA/"results/demo_full_20261016/v2"
 PACKET=DATA/"results/demo_last_shot_20261016/source_packet.npz"
-MODEL=ROOT.parent/"MotionTrail_Codex_Starter_v1/models/sam2.1-hiera-tiny"
-YOLO_MODEL=ROOT.parent/"FSpathing/models/yolo11n-pose.pt"
+MODEL=ROOT / "models/cache/sam2.1-hiera-tiny"
+YOLO_MODEL=ROOT / "models/cache/yolo11n-pose.pt"
 WINDOWS=((1300224,1306880),(1456384,1469952))
 FPS=50
 WH=(1920,1080)
@@ -131,7 +131,7 @@ def qa(source,targets,packed,rows,out):
 def build(samples=False):
     import cv2,numpy as np,torch
     cv2.setNumThreads(1);torch.set_num_threads(2)
-    sys.path.append(str(ROOT.parent/"FSpathing/.venv/Lib/site-packages"))
+    sys.path.append(str(ROOT / ".venv-gpu/Lib/site-packages"))
     from ultralytics import YOLO
     from transformers import Sam2VideoModel,Sam2VideoProcessor
     OUT.mkdir(parents=True,exist_ok=True)

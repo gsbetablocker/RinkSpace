@@ -35,7 +35,7 @@ def reacquire(run,project,first_pass,source,decisions,material_map,out,shot_ids=
  add_geometry_dependencies()
  import torch
  from rinkspace.vision_instances import Sam2SourceInstances
- torch.set_num_threads(2);cv2.setNumThreads(1);provider=Sam2SourceInstances(project.parent/'MotionTrail_Codex_Starter_v1/models/sam2.1-hiera-tiny',device='cuda',reread_rgb=False,contour_stride=16)
+ torch.set_num_threads(2);cv2.setNumThreads(1);provider=Sam2SourceInstances(project/'models/cache/sam2.1-hiera-tiny',device='cuda',reread_rgb=False,contour_stride=16)
  result_rows=[];receipts=list(unavailable);profiles=[];profile_index=[];puv=[];pn=[];pch=[];normal_off=np.arange(-3,3.0001,.25);tangent_off=np.arange(-2,3,dtype=float);counts=Counter()
  def mask_for(pts,rgb,binding):
   cache=out/'mask_cache'/f'{pts}.png'

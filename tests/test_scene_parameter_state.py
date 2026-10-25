@@ -289,6 +289,40 @@ def test_domain_placement_logsize_and_shape_jacobians_match_independent_state_fd
                 rtol=4e-5, atol=3e-7, err_msg=block_id+'/'+str(column))
 
 
+@pytest.mark.parametrize('path,expected_shape_columns', [
+    ('print_instance/Ad2::'+INNER, 10),
+    ('print_instance/Ad1::Ad1.print.SKATING_I', 4),
+    ('print_instance/Ad5::Ad5.bottom_edge/path0', 0),
+])
+def test_active_geometry_jacobians_assemble_by_global_columns(
+        model, core, path, expected_shape_columns):
+    state = model.initial_state
+    stations = [.043, .217, .481, .739, .927]
+    result = model.evaluate_print(path, stations, core, state=state)
+    assert set(result['active_jacobians_by_block']) == set(result['parameter_columns'])
+    direction = np.sin(np.arange(len(state.values)) + .37)
+    predicted = np.zeros((len(stations), 3))
+    plus, minus = {}, {}
+    epsilon = 2e-7
+    for identity, active_jacobian in result['active_jacobians_by_block'].items():
+        block = state.blocks[identity]
+        columns = result['parameter_columns'][identity]
+        assert active_jacobian.shape == (len(stations), 3, len(columns))
+        assert result['jacobians_by_block'][identity].shape[-1] == block['size']
+        if block['kind'] in {'print_shape', 'print_rectangle'}:
+            assert len(columns) == expected_shape_columns
+        predicted += active_jacobian @ direction[columns]
+        local_direction = np.zeros(block['size'])
+        local_direction[list(block['independent_local_indices'])] = direction[columns]
+        plus[identity] = state[identity] + epsilon*local_direction
+        minus[identity] = state[identity] - epsilon*local_direction
+    high = model.evaluate_print(path, stations, core,
+        state=state.with_blocks(plus), jacobian=False)['xyz']
+    low = model.evaluate_print(path, stations, core,
+        state=state.with_blocks(minus), jacobian=False)['xyz']
+    np.testing.assert_allclose(predicted, (high-low)/(2*epsilon), rtol=4e-5, atol=3e-7)
+
+
 def test_review_load_and_common_grid_resampling_keep_numeric_candidate(model, core):
     state = model.initial_state
     identity = shape_block(model, 'print_instance/Ad2::'+OUTER)

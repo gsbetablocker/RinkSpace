@@ -10,10 +10,13 @@ from scipy.ndimage._filters import _gaussian_kernel1d
 
 class NVRTCSourceFilterCUDA:
     def __init__(self,height,width,*,batch=1,kernel_source=None,build_output=None,ptx_file=None,
-                 runtime_bin="D:/OneDrive/codex_projs/MotionTrail_Codex_Starter_v1/.venv-gpu/Lib/site-packages/torch/lib"):
+                 runtime_bin=None):
         self.h,self.w,self.batch=int(height),int(width),int(batch)
         if min(self.h,self.w)<2 or self.batch<1:raise ValueError("invalid CUDA dimensions")
-        self._dll_dir=os.add_dll_directory(runtime_bin)
+        if runtime_bin is None:
+            from .feedback_dispatch import source_reader_python
+            runtime_bin=source_reader_python().parents[1]/"Lib/site-packages/torch/lib"
+        self._dll_dir=os.add_dll_directory(str(runtime_bin))
         self.driver=C.WinDLL("nvcuda.dll")
         self._builtins=C.WinDLL(str(Path(runtime_bin)/"nvrtc-builtins64_128.dll"))
         self.nvrtc=C.WinDLL(str(Path(runtime_bin)/"nvrtc64_120_0.dll"))

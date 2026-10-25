@@ -11,6 +11,8 @@ from PIL import Image, ImageFont
 import pytest
 
 from rinkspace.session import ad_review, curling_preview
+from rinkspace.core.native import NativeCore
+from rinkspace.domain.print_assets import evaluate_print_path, sample_instance
 
 
 @pytest.fixture
@@ -30,15 +32,19 @@ def library():
     return path
 
 
-@pytest.mark.parametrize('relative,count,holes', [
-    ('ad1/assets_r4.json', 26, 6),
-    ('ad2/assets_r5.json', 21, 2),
-    ('ad3/assets_r3.json', 19, 11),
+@pytest.mark.parametrize('advertisement_number,count,holes', [
+    (1, 26, 6),
+    (2, 21, 2),
+    (3, 19, 11),
 ])
 def test_all_current_templates_use_same_native_chart_without_requiring_media(
-        relative, count, holes, tmp_path, library, preview_font):
+        advertisement_number, count, holes, tmp_path, library, preview_font):
     root = Path(__file__).resolve().parents[1]
-    path = root/'events/ankara_2026/scene'/relative
+    field = root/'events/ankara_2026/scene/field/model.json'
+    scene = json.loads(field.read_text(encoding='utf-8'))
+    ref, = (item for item in scene['advertisement_assets']
+            if item['advertisement_number'] == advertisement_number)
+    path = (field.parent/ref['path']).resolve()
     original = path.read_bytes()
     assets = json.loads(original)
     receipt = ad_review.render(path, library, tmp_path/'preview')
@@ -47,7 +53,7 @@ def test_all_current_templates_use_same_native_chart_without_requiring_media(
     assert template['path_count'] == count
     assert template['hole_count'] == holes
     assert [p['id'] for p in geometry['shapes']] == [p['id'] for p in assets['templates'][0]['paths']]
-    assert geometry['native_api'] == 'sample_print_chart'
+    assert geometry['geometry_evaluator'] == 'evaluate_print_path'
     assert template['display_basis']['kind'] == 'shared_model_size'
     assert geometry['shape_status'] == assets['templates'][0]['shape_status']
     assert len(receipt['source_rows']) == len(assets['observations'])
@@ -68,7 +74,7 @@ def test_all_current_templates_use_same_native_chart_without_requiring_media(
     assert Path(receipt['card']).is_file()
     page = Path(receipt['page']).read_text(encoding='utf-8')
     assert '来源缺失与限制' in page
-    assert 'D1 · Ad2' not in page or relative.startswith('ad2/')
+    assert 'D1 · Ad2' not in page or advertisement_number == 2
 
 
 def synthetic_assets(tmp_path):
@@ -143,3 +149,74 @@ def test_source_registry_can_only_supply_the_matching_exposure(tmp_path):
     matched = next(value for record, value in available if record['observation_id'] == 'no_frame')
     assert matched['pts'] == 101
     assert matched['source_native_uv'] == row['source_native_uv']
+
+
+@pytest.mark.parametrize('primary', ['print_instance/Ad1', 'print_instance/Ad5'])
+def test_d1_consumes_the_same_current_internal_geometry_as_d3(
+        primary, tmp_path, library, preview_font):
+    scene_path = Path(__file__).resolve().parents[1]/'events/ankara_2026/scene/field/model.json'
+    scene = json.loads(scene_path.read_text(encoding='utf-8-sig'))
+    reference = next(r for r in scene['advertisement_assets'] if r['instance_id'] == primary)
+    assets = json.loads((scene_path.parent/reference['path']).read_text(encoding='utf-8-sig'))
+    before = deepcopy(assets)
+    state = {block['id']: deepcopy(block['values']) for block in assets['parameter_blocks']}
+    if primary == 'print_instance/Ad1':
+        # Include an internal warp kink, analytic square and shared width in
+        # the same candidate. Frozen seed vertices cannot represent this state.
+        warp = next(b for b in assets['parameter_blocks'] if b['kind'] == 'print_shape')
+        state[warp['id']][0] += .075
+        state[warp['id']][4] += .35
+        state[warp['id']][5] -= .17
+        square = next(b for b in assets['parameter_blocks'] if b['kind'] == 'print_square')
+        state[square['id']][0] += .045
+        state[square['id']][2] += .1
+        size = next(b for b in assets['parameter_blocks'] if b['kind'] == 'print_size')
+        state[size['id']][0] += math.log(1.15)
+    core = NativeCore(library)
+    template = assets['templates'][0]
+    receipt = ad_review._template_panel(assets, template, core, tmp_path, 0,
+                                       parameter_state=state)
+    geometry = json.loads(Path(receipt['geometry']).read_text(encoding='utf-8'))
+    dimensions = geometry['display_dimensions']
+    for shape in geometry['shapes']:
+        installed = evaluate_print_path(assets, primary, shape['id'], scene['board'], core,
+                                       shape['stations'], parameter_state=state, jacobian=False)
+        np.testing.assert_allclose(shape['material_uv'], installed['material_uv'], rtol=0, atol=1e-14)
+        # Native chart at a display origin, with the same current shared size.
+        expected = core.sample_print_chart([0., 0., 0., *dimensions], installed['material_uv'],
+                                           np.linspace(0., 1., len(shape['stations'])))
+        np.testing.assert_allclose(shape['native_template_xy'], expected, rtol=0, atol=1e-14)
+        assert 'xyz' not in shape and 'instance_id' not in shape
+        assert not any(identity.startswith('installation/') for identity in shape['parameter_block_ids'])
+    assert geometry['parameter_state_consumed'] is True
+    assert geometry['display_origin_is_not_installation'] is True
+    assert geometry['physical_placement_estimated'] is False
+    assert geometry['new_source_observations'] == 0
+    assert assets == before
+
+
+def test_d1_can_draw_an_unlocalized_template_without_inventing_placement(
+        tmp_path, library, preview_font):
+    root = Path(__file__).resolve().parents[1]
+    assets = json.loads((root/'events/ankara_2026/scene/ad1/assets_r5.json').read_text(encoding='utf-8-sig'))
+    for block in assets['parameter_blocks']:
+        if block['kind'] == 'print_placement':
+            block['values'] = None
+    before = deepcopy(assets)
+    receipt = ad_review._template_panel(assets, assets['templates'][0], NativeCore(library), tmp_path, 0)
+    assert receipt['path_count'] == len(assets['templates'][0]['paths'])
+    assert assets == before
+
+
+def test_rectangle_drawing_budget_uses_the_current_native_rectangle(library):
+    scene_path = Path(__file__).resolve().parents[1]/'events/ankara_2026/scene/field/model.json'
+    scene = json.loads(scene_path.read_text(encoding='utf-8-sig'))
+    reference = next(r for r in scene['advertisement_assets'] if r['instance_id'] == 'print_instance/Ad5')
+    assets = json.loads((scene_path.parent/reference['path']).read_text(encoding='utf-8-sig'))
+    data = sample_instance(assets, reference['instance_id'], scene['board'], NativeCore(library), max_step=.0004)
+    bindings = assets['templates'][0]['internal_geometry']['path_bindings']
+    rectangle = [path for path in data['paths'] if bindings[path['id']]['kind'] == 'rectangle_side']
+    assert len(rectangle) == 4
+    for path in rectangle:
+        lengths = np.linalg.norm(np.diff(np.asarray(path['sz']), axis=0), axis=1)
+        assert float(lengths.max()) <= .0004 + 1e-14, path['id']

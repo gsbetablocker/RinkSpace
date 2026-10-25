@@ -50,6 +50,8 @@ int rs_sample_print_deformed_path(const double* bp,size_t nb,const double* p,siz
     const double* shape,size_t nsh,double* uv,size_t nuv,double* sz,size_t nsz,double* xyz,size_t nxyz,
     double* juv,size_t njuv,double* jsz,size_t njsz,double* jxyz,size_t njxyz,
     double* ji,size_t nji,double* jt,size_t njt,int* status,size_t ns){
+    // This entry always denotes an installed physical curve. Material-only
+    // evaluation is an explicit additive capability with no XYZ output.
     const auto optional=[n](double* ptr,size_t size,size_t stride){
         return (!ptr&&size==0)||(ptr&&counts(n,stride,size));};
     if(!counts(n,2,nuv)||!counts(n,2,nsz)||!counts(n,3,nxyz)||ns!=n||
@@ -58,6 +60,7 @@ int rs_sample_print_deformed_path(const double* bp,size_t nb,const double* p,siz
     nan_out(uv,nuv);nan_out(sz,nsz);nan_out(xyz,nxyz);nan_out(juv,njuv);nan_out(jsz,njsz);
     nan_out(jxyz,njxyz);nan_out(ji,nji);nan_out(jt,njt);
     for(size_t i=0;i<ns;++i)status[i]=code(Status::invalid_argument);
+    if(!bp||nb!=6)return code(Status::invalid_argument);
     try{return code(sample_print_deformed_path(bp,nb,p,np,vertices,nv,stations,n,bounds,nbound,
         shape,nsh,uv,sz,xyz,juv,jsz,jxyz,ji,jt,status));}
     catch(...){nan_out(uv,nuv);nan_out(sz,nsz);nan_out(xyz,nxyz);nan_out(juv,njuv);nan_out(jsz,njsz);
@@ -77,10 +80,36 @@ int rs_sample_print_analytic_path(const double* bp,size_t nb,const double* p,siz
     nan_out(uv,nuv);nan_out(sz,nsz);nan_out(xyz,nxyz);nan_out(juv,njuv);nan_out(jsz,njsz);
     nan_out(jxyz,njxyz);nan_out(ji,nji);nan_out(jt,njt);
     for(size_t i=0;i<ns;++i)status[i]=code(Status::invalid_argument);
+    if(!bp||nb!=6)return code(Status::invalid_argument);
     try{return code(sample_print_analytic_path(bp,nb,p,np,family,side,reverse!=0,values,nvalues,
         stations,n,uv,sz,xyz,juv,jsz,jxyz,ji,jt,status));}
     catch(...){nan_out(uv,nuv);nan_out(sz,nsz);nan_out(xyz,nxyz);nan_out(juv,njuv);nan_out(jsz,njsz);
         nan_out(jxyz,njxyz);nan_out(ji,nji);nan_out(jt,njt);return code(Status::invalid_argument);}
+}
+int rs_sample_print_deformed_material_path(const double* p,size_t np,
+    const double* vertices,size_t nv,const double* stations,size_t n,
+    const double* bounds,size_t nbound,const double* shape,size_t nsh,
+    double* uv,size_t nuv,double* sz,size_t nsz,int* status,size_t ns){
+    if(!counts(n,2,nuv)||!counts(n,2,nsz)||ns!=n||
+       (n&&(!uv||!sz||!status)))return code(Status::invalid_argument);
+    nan_out(uv,nuv);nan_out(sz,nsz);
+    for(size_t i=0;i<ns;++i)status[i]=code(Status::invalid_argument);
+    try{return code(sample_print_deformed_path(nullptr,0,p,np,vertices,nv,stations,n,
+        bounds,nbound,shape,nsh,uv,sz,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,status));}
+    catch(...){nan_out(uv,nuv);nan_out(sz,nsz);return code(Status::invalid_argument);}
+}
+int rs_sample_print_analytic_material_path(const double* p,size_t np,
+    int family,int side,int reverse,const double* values,size_t nvalues,
+    const double* stations,size_t n,double* uv,size_t nuv,double* sz,size_t nsz,
+    int* status,size_t ns){
+    if((family!=0&&family!=1)||nvalues!=(family==0?3u:4u)||(reverse!=0&&reverse!=1)||
+       !counts(n,2,nuv)||!counts(n,2,nsz)||ns!=n||
+       (n&&(!uv||!sz||!status)))return code(Status::invalid_argument);
+    nan_out(uv,nuv);nan_out(sz,nsz);
+    for(size_t i=0;i<ns;++i)status[i]=code(Status::invalid_argument);
+    try{return code(sample_print_analytic_path(nullptr,0,p,np,family,side,reverse!=0,
+        values,nvalues,stations,n,uv,sz,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,status));}
+    catch(...){nan_out(uv,nuv);nan_out(sz,nsz);return code(Status::invalid_argument);}
 }
 int rs_sample_entity_path(const double* bp,size_t nb,int kind,
     const double* p,size_t np,const double* vertices,size_t nv,
@@ -144,6 +173,22 @@ int rs_decode_d78_camera(const double* chart,size_t nc,double* rig,size_t nr){
     if(nr==38)nan_out(rig,nr);
     if(nc!=55||nr!=38||!rig||!finite_array(chart,nc))return code(Status::invalid_argument);
     try{return code(decode_d78_camera(chart,rig));}catch(...){nan_out(rig,nr);return code(Status::invalid_argument);}
+}
+int rs_evaluate_motion_camera(const double* rig,size_t nr,const double* controls,size_t n_controls,
+    double first,double dt,const double* times,size_t nt,double* output,size_t no,int* status,size_t ns){
+    if(!counts(nt,24,no)||ns!=nt||(nt&&(!times||!output||!status)))return code(Status::invalid_argument);
+    nan_out(output,no);for(size_t i=0;i<nt;++i)status[i]=code(Status::invalid_argument);
+    if(nr!=38||!rig||!motion_rig(rig).valid())return code(Status::invalid_argument);
+    const MotionSpline spline{controls,n_controls,first,dt};if(!spline.valid())return code(Status::invalid_argument);
+    const auto physical=motion_rig(rig);
+    try{for(size_t i=0;i<nt;++i){MotionCameraState state{};
+        status[i]=code(evaluate_motion_camera(physical,spline,times[i],state));
+        if(!status[i]){double* p=output+24*i;const auto& c=state.camera;
+            p[0]=state.pan;p[1]=state.tilt;p[2]=state.logf;p[3]=state.z;
+            for(int j=0;j<9;++j)p[4+j]=c.rotation.a[j];store3(p+13,c.centre);
+            p[16]=c.fx;p[17]=c.fy;p[18]=c.cx;p[19]=c.cy;
+            p[20]=c.k1;p[21]=c.k2;p[22]=c.p1;p[23]=c.p2;}}
+    }catch(...){nan_out(output,no);return code(Status::invalid_argument);}return 0;
 }
 int rs_project_motion(const double* rig,size_t nr,const double* controls,size_t n_controls,
     double first,double dt,int height,const double* times,size_t nt,const double* xyz,size_t count,

@@ -23,8 +23,8 @@ from calibration.program_tracking.infer_current_person_exclusion_masks import DE
 from calibration.program_tracking.infer_continuation_person_exclusion import source_materials,current_point
 from calibration.program_tracking.prepare_first_shot_review import DATA,OUT,read,write,navigation,PRIORITIES
 
-YOLO_WEIGHTS=ROOT.parent/"FSpathing/models/yolo11n-pose.pt"
-YOLO_SITE=ROOT.parent/"FSpathing/.venv/Lib/site-packages"
+YOLO_WEIGHTS=ROOT / "models/cache/yolo11n-pose.pt"
+YOLO_SITE=ROOT / ".venv-gpu/Lib/site-packages"
 ANCHORS={201:[1100,620],250:[870,620],300:[960,590],400:[1020,490],500:[1010,570],600:[800,580],800:[720,650],1000:[890,540],1200:[1140,540],1248:[790,510]}
 # Verified in the current native exposure, not coordinates imported from a
 # neighbouring mask: these two raised white boots were locally omitted by SAM.

@@ -1,0 +1,177 @@
+{
+  "schema": "rinkspace.camera.r2_review.v1",
+  "scope": "S01 short native window; camera forward only; no R3",
+  "first_pts": 307200,
+  "last_pts": 332800,
+  "source_time_seconds": [
+    24.0,
+    26.0
+  ],
+  "native_frame_count": 101,
+  "encoded_duration_seconds": 2.02,
+  "video_validation": {
+    "decoded_frames": 101,
+    "native_PTS_equal": true,
+    "display_speed": 1
+  },
+  "source": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4",
+    "registered_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+    "registered_identity_reused": true,
+    "pts_index_path": "D:/CodexData/RinkSpace_Data/runs/solve2_s01/observations/s01_frames_native_pts.npy",
+    "time_base": [
+      1,
+      12800
+    ],
+    "dimensions": [
+      1920,
+      1080
+    ]
+  },
+  "snapshot": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\r2\\camera.json",
+  "snapshot_files": {
+    "camera.json": "229fa48a303847ac5e88261bfd68dfb8d2efb40d69dec0bcd3af8b9f5d052b84",
+    "controls.npy": "28f7b6ea2ef2c9c43023bf27b5d9452b935cbc4dec0fd7a9104f17431e80d673",
+    "window.json": "d4ce746901b95a6af7a5ac90887c24e1a45eb6d81abe032ac6b90077911be98a"
+  },
+  "controls_retained": 105,
+  "controls_unchanged": true,
+  "r1_camera_and_overlap_controls_equal": true,
+  "library": "D:\\CodexData\\RinkSpace_Data\\build\\r1\\Release\\rinkspace_core.dll",
+  "library_sha256": "96265661d6310319a3bceefe5484085ff308680bcb263f46ff687e40e8fdaf0a",
+  "scene": "D:\\CodexData\\RinkSpace_Data\\runs\\r2_20261025\\scene\\scene.json",
+  "scene_identity": "24242167436b4e5ce89345072b91b1c229678b13104d9e9dcdb97d26f972ec67",
+  "scene_policy": "same current scene for both camera implementations; no old ice edge geometry/observations imported",
+  "reference": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\solve2\\rinksolve\\d78_import.py",
+  "reference_sha256": "45ab5dea290a2ac2eb2c8cb38b0e624f4a19feb2d1e48fa85e5b7d1255c3b730",
+  "reference_role": "comparison only, never a solver startup dependency",
+  "reference_prefilter_checked_against_full_domain": true,
+  "path_count": 624,
+  "sample_count_per_frame": 126550,
+  "total_material_exposure_evaluations": 12781550,
+  "common_valid_total": 2460199,
+  "validity_mismatches": 0,
+  "projection_max_l2_delta_px": 3.8610341501662365e-10,
+  "trim_max_l2_delta_px": 3.867195274712669e-10,
+  "row_equality_max_px": 9.999894245993346e-09,
+  "row_state_max_abs_delta_by_group": {
+    "pan_tilt_logf": 3.552713678800501e-15,
+    "rotation": 3.3306690738754696e-16,
+    "centre_scene_units": 5.551115123125783e-17,
+    "intrinsics_px": 3.456079866737127e-11,
+    "brown": 5.329070518200751e-15
+  },
+  "actual_material_row_checks": 303,
+  "actual_row_projection_max_delta_px": 4.543208252172937e-12,
+  "signed_readout_seconds": 0.01966580615683459,
+  "zero_tau_max_l2_change_px": 22.581157657165026,
+  "centre_row_start_end": {
+    "pan_radians": [
+      0.017979981615196133,
+      -0.1318927539020834
+    ],
+    "tilt_radians": [
+      0.04114017903888415,
+      0.06512362543653896
+    ],
+    "fx_px": [
+      9660.319224627308,
+      6407.131646050355
+    ]
+  },
+  "maximum_top_bottom_fx_difference_px": 79.14187846595632,
+  "missing_entities": [
+    {
+      "id": "print_instance/Ad15",
+      "template_id": "print_template/Ad2",
+      "reason": "unlocalized_print_instance",
+      "geometry_fabricated": false
+    },
+    {
+      "id": "print_instance/Ad16",
+      "template_id": "print_template/Ad3",
+      "reason": "unlocalized_print_instance",
+      "geometry_fabricated": false
+    }
+  ],
+  "observations_changed": false,
+  "fit_executed": false,
+  "solver_started": false,
+  "full_S01_accuracy_accepted": false,
+  "user_approval": "not_reviewed",
+  "tests": {
+    "passed": 23,
+    "log": "D:\\CodexData\\RinkSpace_Data\\runs\\r2_20261025\\tests.log"
+  },
+  "visual_review": {
+    "contact_sheets_complete": true,
+    "contact_sheets": [
+      "D:\\CodexData\\RinkSpace_Data\\runs\\r2_20261025\\coverage_1.jpg",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\r2_20261025\\coverage_2.jpg",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\r2_20261025\\coverage_3.jpg",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\r2_20261025\\coverage_4.jpg",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\r2_20261025\\coverage_5.jpg"
+    ],
+    "native_exposures_inspected": 101,
+    "selected_source_comparisons": [
+      307200,
+      320000,
+      332800
+    ],
+    "row_table_inspected": true,
+    "continuous_player_review": false,
+    "full_S01_review": false,
+    "finding": "Both camera forwards agree. Shared current geometry has clear unfitted offsets. No fit, observations or geometry were changed."
+  },
+  "artifacts": {
+    "comparison": "D:\\CodexData\\RinkSpace_Data\\runs\\r2_20261025\\comparison.png",
+    "row_states": "D:\\CodexData\\RinkSpace_Data\\runs\\r2_20261025\\row_states.png",
+    "video": "D:\\CodexData\\RinkSpace_Data\\runs\\r2_20261025\\S01_24-26_native_comparison.mp4",
+    "per_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\r2_20261025\\frames.json",
+    "actual_material_rows": "D:\\CodexData\\RinkSpace_Data\\runs\\r2_20261025\\material_rows.json",
+    "log": "D:\\CodexData\\RinkSpace_Data\\runs\\r2_20261025\\main.log"
+  },
+  "render_elapsed_seconds": 59.8,
+  "recovered_failure": "Optional matplotlib chart unavailable; existing row data rendered as a Pillow table, no forward replay.",
+  "source_camera_binding_checked": true,
+  "path_checks": [
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\src\\rinkspace\\session\\camera_window.py",
+      "utf16_units": 72,
+      "violations": 0
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\tests\\test_camera_window.py",
+      "utf16_units": 61,
+      "violations": 0
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\r2\\camera.json",
+      "utf16_units": 91,
+      "violations": 0
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\r2\\controls.npy",
+      "utf16_units": 92,
+      "violations": 0
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\r2\\result.json",
+      "utf16_units": 91,
+      "violations": 0
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\r2\\window.json",
+      "utf16_units": 91,
+      "violations": 0
+    }
+  ],
+  "scene_current_content_equal_at_delivery": true,
+  "artifact_sha256": {
+    "comparison": "829a799859c872c0d2e8a86e77b259a3ca54e5a89f6fe7d58fa0f3ef0a4b4a1a",
+    "row_states": "f4b272c4fcb359b23bc90d23703c5d992ac19d9bc1824113ab1736b1736de008",
+    "video": "edd83a0053426b395b711b8cce858ccca6d1e5bf9a679370bce27c959ad4fa4e",
+    "per_frame": "71fbea7e87f09c6aea821d93e52db0c9e323991812b4504f870e88cde5905d5b",
+    "actual_material_rows": "870ea9495b8c1a4e5a23548f83edab0682775005722c83b4831699e112707c4d"
+  }
+}

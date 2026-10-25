@@ -1,0 +1,71 @@
+{
+  "schema": "rinkspace.observation_audit_record.v1",
+  "case_ref": {
+    "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/o01/case.json",
+    "sha256": "9919cdda002990447cd216a09126ec772f82c91538194f5b0f69092ba3336399"
+  },
+  "result_ref": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/o01_s01_308480/result.json",
+    "sha256": "be5cc9172ed4c86d78fc93038a70a631681e5d091f0edc64ab66b265b5858006"
+  },
+  "receipt_ref": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/o01_s01_308480/receipt.json",
+    "sha256": "d1c7631ebc6952a9d31e55dfd1fc845720e38ba08149ada03f55dab88af5eaf0"
+  },
+  "artifact_paths": {
+    "index.html": "D:\\CodexData\\RinkSpace_Data\\runs\\o01_s01_308480\\index.html",
+    "card.png": "D:\\CodexData\\RinkSpace_Data\\runs\\o01_s01_308480\\card.png",
+    "locator.png": "D:\\CodexData\\RinkSpace_Data\\runs\\o01_s01_308480\\locator.png",
+    "crop_original.png": "D:\\CodexData\\RinkSpace_Data\\runs\\o01_s01_308480\\crop_original.png",
+    "crop_reference.png": "D:\\CodexData\\RinkSpace_Data\\runs\\o01_s01_308480\\crop_reference.png",
+    "crop_reread.png": "D:\\CodexData\\RinkSpace_Data\\runs\\o01_s01_308480\\crop_reread.png",
+    "evidence": "D:\\CodexData\\RinkSpace_Data\\runs\\o01_s01_308480\\evidence.json",
+    "reference": "D:\\CodexData\\RinkSpace_Data\\runs\\o01_s01_308480\\reference.json"
+  },
+  "covered_source_pts": [
+    308480
+  ],
+  "source_seconds": 24.1,
+  "reference_used_for_measurement": false,
+  "original_packet_sha256": "083bcca06143ba46bc1c7929b2b30f774d9e985a67b2e758b0499f027bdecd8b",
+  "original_packet_sha256_after": "083bcca06143ba46bc1c7929b2b30f774d9e985a67b2e758b0499f027bdecd8b",
+  "original_UV_groups_and_approval_unchanged": true,
+  "query_counts": {
+    "ambiguous_material": 27,
+    "candidate_not_reviewed": 19,
+    "no_pixel_support": 13
+  },
+  "diagnostic_comparison": {
+    "compared_single_candidates": 19,
+    "distance_px_median": 0.24613510006093126,
+    "distance_px_max": 1.5631605238231472,
+    "meaning": "Diagnostic distance to frozen approved segments; not independent accuracy evidence"
+  },
+  "validation": {
+    "tests_passed": 7,
+    "log": "D:/CodexData/RinkSpace_Data/runs/o01_checks.json",
+    "card_visually_inspected": true,
+    "git_diff_check": "passed"
+  },
+  "status": "withdrawn_by_user_O_worksheet_cancelled",
+  "finding": "左侧可对应双边中点，右侧存在漏读；保留歧义、截断和未读出，未声称整条线取点能力通过。",
+  "fit_executed": false,
+  "formal_observations_written": false,
+  "user_approval": "not_reviewed",
+  "required_shot_ids": [
+    "s01",
+    "s02",
+    "s03",
+    "s04",
+    "s05",
+    "s06",
+    "s07",
+    "s08",
+    "s09"
+  ],
+  "user_review_requested": false,
+  "withdrawal": {
+    "date": "2026-10-25",
+    "reason": "用户明确撤销整个 O 工作单，要求全面审计并恢复既有完整取点流程。原卡与原始执行结果保留为历史失败。"
+  }
+}

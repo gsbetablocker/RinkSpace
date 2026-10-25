@@ -295,8 +295,12 @@ def evaluate_print_path(assets,instance_id,path_id,board,core,stations,*,
     Shape, instance installation and log-size columns come from the same native
     call. Source UV/PTS and station identity are not modified. Jacobians here
     are geometry XYZ derivatives, not a complete camera/factor/GPU Jacobian.
+    board=None with jacobian=False evaluates material UV/SZ only, without
+    claiming XYZ or successful physical placement on any board.
     """
     import numpy as np
+    if board is None and jacobian:
+        raise PrintBindingError('material_only_print_evaluation_has_no_world_jacobian')
     context=_print_context(assets,instance_id,parameter_state) if _context is None else _context
     paths={p['id']:p for p in context['template']['paths']}
     if path_id not in paths:
@@ -332,9 +336,10 @@ def evaluate_print_path(assets,instance_id,path_id,board,core,stations,*,
             _positive_bounds(vertices),[0.]*10,jacobian=True)
     else:
         sz=np.asarray(core.sample_print_chart(parameters,vertices,stations),dtype=float)
-        xyz=np.asarray(core.sample_path(board,5,parameters,vertices,stations),dtype=float)
         seed=np.asarray(core.sample_print_chart([0.,0.,0.,1.,1.],vertices,stations),dtype=float)
-        data={'material_uv':seed,'sz':sz,'xyz':xyz,'status':np.zeros(len(stations),dtype=np.int32)}
+        data={'material_uv':seed,'sz':sz,'status':np.zeros(len(stations),dtype=np.int32)}
+        if board is not None:
+            data['xyz']=np.asarray(core.sample_path(board,5,parameters,vertices,stations),dtype=float)
     data=dict(data)
     failures=np.flatnonzero(np.asarray(data.get('status',[])))
     if len(failures):
@@ -346,6 +351,7 @@ def evaluate_print_path(assets,instance_id,path_id,board,core,stations,*,
     data['dependency_block_ids']=ids
     data['path_id']=path_id;data['instance_id']=instance_id
     data['geometry_parameterization']=None if binding is None else binding['kind']
+    data['geometry_space']='material_only' if board is None else 'installed_world'
     if jacobian:
         ji=np.asarray(data['d_xyz_d_installation'],dtype=float)
         by_block={context['placement']['id']:ji[:,:,:3],
@@ -377,13 +383,9 @@ def _drawing_stations(path,vertices,context,core,max_step):
     breaks=np.unique(breaks)
     # Exact native material points are sufficient for drawing density: rotation
     # preserves lengths in the unfolded plane and BoardCourse handles bending.
-    if binding is not None and binding['kind']=='shape_group':
-        group=context['groups'][binding['group_id']]
-        seeds=np.asarray(core.sample_print_chart([0.,0.,0.,1.,1.],vertices,breaks),dtype=float)
-        q=core.deform_print_points(seeds,group['reference_bounds'],context['values'][group['parameter_block_id']])
-        changed=np.asarray(q['material_uv'],dtype=float)
-    else:
-        changed=np.asarray(core.sample_print_chart([0.,0.,0.,1.,1.],vertices,breaks),dtype=float)
+    current=evaluate_print_path(None,None,path['id'],None,core,breaks,
+                                jacobian=False,_context=context)
+    changed=np.asarray(current['material_uv'],dtype=float)
     lengths=np.linalg.norm(np.diff(changed,axis=0)*context['parameters'][3:],axis=1)
     stations=[]
     for j,length in enumerate(lengths):
@@ -391,6 +393,72 @@ def _drawing_stations(path,vertices,context,core,max_step):
         stations.extend(float(breaks[j]+(breaks[j+1]-breaks[j])*k/count) for k in range(count))
     stations.append(1.)
     return stations
+
+
+def frozen_print_curves(assets, instance_id, core, *, parameter_state=None):
+    """Exact native piecewise SZ curves for a frozen parameter state.
+
+    Original station coordinates and all seed/warp breaks are retained.
+    No dense drawing grid, source rows or fitted geometry is introduced.
+    """
+    context=_print_context(assets,instance_id,parameter_state)
+    result=[]
+    for path in context['template']['paths']:
+        vertices=_print_seed(path,context,core)
+        stations=_drawing_stations(path,vertices,context,core,math.inf)
+        data=evaluate_print_path(assets,instance_id,path['id'],None,core,stations,
+                                 jacobian=False,_context=context)
+        result.append({'id':instance_id+'::'+path['id'],'kind':8,
+            'parameters':[],'vertices':data['sz'].tolist() if hasattr(data['sz'],'tolist') else data['sz'],
+            'knots':stations,'template_path_id':path['id'],'instance_id':instance_id})
+    return result
+
+
+def sample_template_paths(assets,template_id,core,display_dimensions,*,parameter_state=None):
+    """Draw the current material template without assigning any installation.
+
+    Reuse exactly the installed-path evaluator and its native shape dispatch,
+    using its explicit material-only capability. No board or XYZ is computed.
+    Display SZ is the template XY chart, not a real-world placement, source
+    observation, or initializer for an unlocalized instance.
+    """
+    import numpy as np
+    from .print_parameters import parameter_values, validate_print_parameters
+    templates=_registry(assets['templates'])
+    if template_id not in templates:
+        raise PrintBindingError('unknown_print_template',template_id=template_id)
+    template=templates[template_id]
+    validate_template_topology(template)
+    validate_print_parameters(assets)
+    values=parameter_values(assets,parameter_state)
+    dimensions=np.asarray(display_dimensions,dtype=float)
+    if dimensions.shape!=(2,) or not np.isfinite(dimensions).all() or np.any(dimensions<=0):
+        raise PrintBindingError('invalid_print_template_display_dimensions',template_id=template_id)
+    size_id=template.get('size_class_id')
+    if size_id in values and values[size_id] is not None:
+        expected=[math.exp(float(v)) for v in values[size_id]]
+        if not np.array_equal(dimensions,expected):
+            raise PrintBindingError('print_template_display_size_differs_from_state',template_id=template_id)
+    internal=template.get('internal_geometry')
+    context={'template':template,'values':values,'parameters':[0.,0.,0.,*dimensions.tolist()],
+             'size':{'id':size_id},'placement':{'id':'__display_origin_only__'},'internal':internal,
+             'groups':{} if internal is None else _registry(internal['groups'])}
+    shapes=[]
+    for path in template['paths']:
+        vertices=_print_seed(path,context,core)
+        # Each path is piecewise linear in the material chart. Preserve all
+        # seed vertices and native warp knots, without unnecessary dense XYZ
+        # drawing samples or a second implementation of shape deformation.
+        stations=_drawing_stations(path,vertices,context,core,math.inf)
+        data=evaluate_print_path(assets,None,path['id'],None,core,stations,
+                                 jacobian=False,_context=context)
+        shapes.append({'id':path['id'],'stations':stations,
+                       'material_uv':np.asarray(data['material_uv']).tolist(),
+                       'native_template_xy':np.asarray(data['sz']).tolist(),
+                       'parameter_block_ids':[identity for identity in data['dependency_block_ids']
+                                              if identity in values],
+                       'geometry_parameterization':data['geometry_parameterization']})
+    return shapes
 
 
 def sample_instance(assets,instance_id,board,core,*,max_step=.0004,stations_by_path=None,parameter_state=None):

@@ -94,7 +94,7 @@ def evaluate(run,project,freeze_file,output,*,compiled_dir=None,gpu_dll=None,gpu
  import torch
  from rinkspace.vision_instances import SourcePersonBoxes,Sam2SourceInstances
  torch.set_num_threads(2);cv2.setNumThreads(1)
- detector=SourcePersonBoxes(project.parent/'FSpathing/models/yolo11n-pose.pt',dependency_paths=[project.parent/'FSpathing/.venv/Lib/site-packages'],runtime_directory=out/'detector_runtime',device='cuda');provider=Sam2SourceInstances(project.parent/'MotionTrail_Codex_Starter_v1/models/sam2.1-hiera-tiny',device='cuda',reread_rgb=False,contour_stride=16)
+ detector=SourcePersonBoxes(project/'models/cache/yolo11n-pose.pt',dependency_paths=[project/'.venv-gpu/Lib/site-packages'],runtime_directory=out/'detector_runtime',device='cuda');provider=Sam2SourceInstances(project/'models/cache/sam2.1-hiera-tiny',device='cuda',reread_rgb=False,contour_stride=16)
  if compiled_dir:
   from .joint_acceleration import install
   worlds=np.concatenate([scene.board(np.linspace(0,scene.perimeter,2049),scene.height*h) for h in (1.,0.)]);install(cg,frozen['model']['path'],out/'acceleration',worlds,compiled_dir,gpu_dll=gpu_dll,gpu_validation=gpu_validation)

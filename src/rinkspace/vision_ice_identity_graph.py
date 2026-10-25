@@ -444,7 +444,8 @@ class IceSourceMaterialIdentityGraph:
                     or seed.get('authority',{}).get('path')!=authority.get('path') or seed.get('authority',{}).get('sha256')!=authority.get('sha256')):
                 raise ValueError('Preserved selector proof requires the authenticated original named paint seed')
             ev=row['temporal_evidence']
-            if ev['kind'] in ('same_shot_actual_RGB_temporal_identity','actual_RGB_material_field_order_and_continuity_with_model_navigation'):
+            if ev['kind'] in ('same_shot_actual_RGB_temporal_identity','actual_RGB_material_field_order_and_continuity_with_model_navigation',
+                    'actual_RGB_material_field_order_and_continuity_with_native_source_guides'):
                 old=next((f for f in self.frames if f['pts']==int(ev['previous_actual_pts'])),None)
                 if (old is None or old['binding']['shot_id']!=ev['previous_shot_id']
                         or old['binding']['decoded_BGR_sha256']!=ev['previous_decoded_BGR_sha256']):
@@ -729,7 +730,8 @@ class IceSourceMaterialIdentityGraph:
                     or seed.get('authority',{}).get('sha256')!=authority.get('sha256')):
                 raise ValueError('Offline anchor requires the authenticated original physical identity seed')
             temporal=row['temporal_evidence']
-            if temporal['kind'] in ('same_shot_actual_RGB_temporal_identity','actual_RGB_material_field_order_and_continuity_with_model_navigation'):
+            if temporal['kind'] in ('same_shot_actual_RGB_temporal_identity','actual_RGB_material_field_order_and_continuity_with_model_navigation',
+                    'actual_RGB_material_field_order_and_continuity_with_native_source_guides'):
                 previous=lookup.get(int(temporal['previous_actual_pts']))
                 if (previous is None or self.frames[previous]['binding']['shot_id']!=binding['shot_id']
                         or self.frames[previous]['binding']['decoded_BGR_sha256']!=temporal['previous_decoded_BGR_sha256']):

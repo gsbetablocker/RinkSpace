@@ -1,8 +1,8 @@
 # RinkSpace 求解器重构设计：唯一数值核心与 GPU 执行路径
 
-版本：2026-10-24，针对公开仓库 `3e866a835dac26c461bb4ae436ae289814a1ae57`。本文规定待实现的完整数值架构；本轮首切片只实现统一类型、部分场景几何和投影前向计算，不能把这些接口说明当成已完成 GPU 求解器。
+算法设计始于 2026-10-24；2026-10-25 文档审计后，本文只维护数值方案和运行要求。当前能力见 [REBUILD](REBUILD.md)，精确接口见 [INTERFACES](INTERFACES.md)。原生 GPU 已贯通连续 LM、数值停止及同一 handle 的停止／继续；磁盘完整 checkpoint/resume 尚未交付。设计不是运行回执或本次任务安排。
 
-## 1. 决策与上一版必须纠正的地方
+## 1. 数值架构选择
 
 生产求解器只保留一条路径：**C++ 控制的阻尼 Gauss–Newton / LM；CUDA 计算同一几何、相机、残差、导数和块累计；cuDSS 解共享稀疏线性系统**。Python 只准备数据、启动任务、保存结果、组织审核。
 
@@ -10,62 +10,23 @@ Ceres 留作开发期的小问题数值对照，不是第二个生产求解入�
 
 官方 Ceres 已支持 CUDA + cuDSS 的稀疏线性求解。因此“Ceres 做不了 GPU”是不成立的。当前仓库的 GPU bridge 仍把 sparse_normal / sparse_schur 配成 EIGEN_SPARSE，是当前集成选择。上面的决策是项目架构选择，不是 Ceres 能力结论。
 
-必须撤回或修正上一轮这些做法：
-
-- 不再以 G0 审计作为重构启动前置。已知缺陷归入相应模块的实际替换工作。
-- 撤回 S01 每轮 2 秒、旧六镜头子集每轮 5 秒的无实测预期。完整冈田芽衣短节目是 S01–S09 九镜头，六镜头不是完成范围。当前只定义计时方法与资源上限，最终数值由 5070 Ti 上的真实数据给出。
-- “静态背景跟踪”限定为已确认属于冰面或围挡材料的点。看台、人物、字幕、倒影和未知深度点不得进入当前场地求解。
-- 不把全部 legacy_import 设为不可用；已确认旧观测允许语义、时钟、坐标等价迁移。不要求每行新机器观测都有人类复核签名。
-- 不把固定光心当作默认物理事实。保留非零杆臂及姿态导致光心变化的能力；旧模型已有的轴间距、入口瞳项先准确读取，不能在导入时静默归零。
-- 不无条件把每个像素的预测行和 Query 参数升级为全局未知量；滚动快门按来源明确的模式进入同一前向核。
-- 用户目视接受是唯一画面质量验收。数值下降、内核一致、源数据完整只是工程正确性条件。
+场地材料、旧记录及机器观测的准入统一见 [BUILD_SPEC](rink_model/BUILD_SPEC.md#observation-eligibility)，完整原片与用户目视验收见 [VALIDATION](VALIDATION.md)。旧迭代耗时预期、阶段顺序和运行预算不作为当前要求；性能以相同输入和目标的实测为准。
 
 ## 2. 对外接口与所有权
 
-数值核心只消费一份已经独立可读的 `PreparedProblem`，不读取旧审计包、旧日志或历史生产链。赛事名字、镜头号、广告品牌不出现在优化器分支中。
+核心消费可独立读取的当前 PreparedProblem，不读历史生产链。Scene、Rig、Shot、Observation 与状态所有权见 [ARCHITECTURE](ARCHITECTURE.md#数据所有权)；CLI、数组和唯一聚合生命周期见 [INTERFACES](INTERFACES.md)。prepare 与驻留 native 连续求解已实现；PreparedProblem 的完整 solve/resume 生命周期仍为目标。
 
-| 对象 | 所有权与内容 | 不允许的职责 |
-|---|---|---|
-| `SceneDefinition` | 实体拓扑、材料测量定义、几何关系、支持区间 | 不保存逐帧相机或像素 |
-| `SceneParameters` | 本安装时期共同的场地、标线、围挡、广告参数 | 不出现每镜头一份冰场 |
-| `CameraRig` | 真实物理安装、轴、杆臂、镜头模型、读出模式 | 不用一个“相机型号”强迫不同机器共享数值 |
-| `ShotTrajectory` | 一镜头的时间范围、云台角度/焦距曲线与活动参数 | 不重定义场景实体 |
-| `ObservationTable` | 不可变源 UV、整数 PTS、实体身份、支持、噪声和准入状态 | 不把模型投影写回观测 |
-| `FactorPlan` | 参数依赖、局部变量连通组、白化布局、稀疏结构 | 不制造新的人工事实 |
-| `State` | 一份共享连续参数向量、稳定 ID 到偏移的映射 | 不保存多个互不对应的“最新模型” |
-| `RunState` | LM 阻尼、有效活动集、优化候选、耗时和终止原因 | 不写入用户已接受状态 |
+数值状态、优化器接受步与用户验收分别保存。镜头全集、处理与物理区间从所属节目清单读取，不在公共核心硬编码镜头数量。
 
-具体 CLI 参数、数组 dtype/shape、状态、错误与输出格式统一由 [INTERFACES.md](INTERFACES.md) 定义。当前已有 API 包括该文档列出的共同几何、静态及完整时变相机前向、prepare/review 和 D1/D3；下面是待实现的唯一聚合求解生命周期，不是已经能运行的命令：
-
-```cpp
-CompiledProblem compile_problem(const PreparedProblemView&, const ActiveSet&,
-                                const BackendOptions&);
-RunResult solve(CompiledProblem&, State&, RunState&,
-                const RunOptions&, RunControl&);
-ProjectionBatch project(const CompiledModel&, const State&,
-                        ArrayView<ProjectionRequest>, ProjectionWorkspace&);
-Checkpoint snapshot(const CompiledProblem&, const State&, const RunState&);
-void request_stop(RunControl&);
-```
-
-准备由 Python `session.prepare.prepare(...)` 一次性产生自包含 PreparedDataset；`session.solve.solve(...)` 与 `session.resume.resume(...)` 组织同一个 native `solve`，后者恢复完整 State/RunState，不另有续算算法。`step` 只在 LM 内部使用，不公开另一套 prepare/step/snapshot/cancel 引擎。`snapshot/request_stop` 是同一生命周期的安全点辅助操作；数值接受步不改变用户通过状态。
-
-完整范围从 `events/ankara_2026/programmes/okada_mei_sp/rebuild_scope.json` 读取，必须覆盖 s01–s09；公共核心不硬编码镜头数。单镜头/多镜头阶段显式保存 selected 与 required，子集不能报告完整节目。原片物理镜头区间和用户要求处理区间分别保留，处理终点不能改名为切镜点。
-
-`project()` 与 residual evaluator 必须调用同一套 `geometry.hpp` / `projection.hpp` 中的数学；渲染器不能维护另一份相机公式。对已导入旧模型的回放采用标记为只读的旧几何常量，但调用同一前向核；这些独立旧几何数值不会自动注册为新求解自由度。
+project 与 residual evaluator 调用同一 geometry/projection 数学，渲染器不维护另一套相机公式。旧模型回放可使用有来源的只读旧几何，但不自动将这些值注册为新求解自由度。
 
 ## 3. 共享场景参数：关系在构造时成立
 
 世界坐标：冰面 Z=0，场地几何中心为原点，场地长边为 X。先以单一 L=1 定规；只有有来源的米制标定才增加一个统一比例，不能独立拉伸 XY。场景原点/轴/尺度的规约与现场测量分开保存。
 
-本安卡拉场景的确认关系写成生成器，公共引擎不硬编码 F/R 的数量或标签：
+已确认几何关系由有类型生成器构造，不再用重复罚项“近似成立”。赛事关系及适用版本由[安卡拉场景](../events/ankara_2026/scene/README.md)和[关系记录](../events/ankara_2026/model_constraints/geometry_relations_current.json)维护，公共引擎不硬编码 F/R 数量或赛事标签。
 
-- 四行 `y_i = y0 + i*pitch`；`F_i=(xF,y_i,0)`、`R_i=(xR,y_i,0)`。两列不强制关于中场镜像。
-- Lane 中线引用同一 `y_i`，上下边引用同一个共同宽度。已确认的右边线共用一条纵向 station；各左侧源支持范围不同，不恢复已撤销的等长关系，不生成左封口。
-- 八组同规格大本营引用共同外半径与同心半径比。未观测实体可以在模型库存中标为推断/待观测，不伪造源约束。
-- C0 由场地中心生成；蓝线关于中心对称；共用冰球坐标架。保留共同 paint angle 的能力须以场地关系记录允许为准，不能让每条线独立旋转。
-- 围挡表面 `B(s,z)` 使用一个连续封闭边界和共同高度方向。当前真实超椭圆弯角必须支持，不能为了实现方便换成四个圆弧再称等价。
-- 广告在展开面 `(s,z)` 中有实例位姿及模板尺寸，三维位置由 `B` 生成。可跨直边与弯角。相同模板/品牌中已确认等尺寸的实例共享尺寸，位置和离冰高度独立。
+围挡 B(s,z) 是连续封闭表面；真实超椭圆不能被圆弧近似冒称等价。广告在展开面上有共享模板/尺寸和独立安装，可跨直段与弯段，三维位置由同一 B 生成。
 
 正尺寸用 log 参数化；半径排序用正增量构造。有限轮廓、超椭圆参数域和板面几何必须在构造时检查。未知图元在编译阶段报出 ID 和类型，不能跳过后宣称“全部已检查”。
 
@@ -81,7 +42,7 @@ void request_stop(RunControl&);
 | `PrintTemplate` | `template_id, normalized_paths[], size_class_id, aspect_policy, measurement_definition` | 共同图案轮廓、已确认同尺寸或同宽高比关系 |
 | `PrintInstance` | `instance_id, template_id, station_s, height_z, rotation_sz, size_class_ref` | 展开面安装与跨直/弯边映射；不自由优化每个采样顶点 |
 
-这些是目标聚合数据字段，不代表本轮首层已实现全部图元。不存在的实际场地实体不因类型支持就自动加入。
+这些是目标聚合数据字段，是否可调用以 REBUILD 和实际 schema 为准。不存在的实际场地实体不因类型支持就自动加入。
 
 ### 固定点不是最近线上的一个自由位置
 
@@ -96,7 +57,7 @@ void request_stop(RunControl&);
 | 参数块 | 共享范围 | 活动策略 |
 |---|---|---|
 | 安装支点 P、轴方向、参考姿态、杆臂 l | 同一物理安装时期 | 保留旧值与来源；有跨姿态证据时估计，不把初值认作测量 |
-| 云台角与 log(f) 样条 | 单镜头 | 首先活动的主参数；切镜处分开 |
+| 云台角与 log(f) 样条 | 单镜头 | 按 ActiveSet 选择；切镜处分开 |
 | 主点、像素比例、skew、畸变基系数 | 真实相机/镜头状态 | 按证据逐族开放，不全部逐帧自由 |
 | 变焦相关畸变/主点/入口瞳项 | 同一机组及覆盖的焦距范围 | 共享低维曲线；保留已存在族的准确回放，不宣称某个 log(f) 规律是厂家定律 |
 | 广播 crop/resize/像素域变换 | 特定源视频/已知处理阶段 | 从媒体登记读取；未知时标为条件性，不混进焦距解释 |
@@ -104,24 +65,18 @@ void request_stop(RunControl&);
 
 初期生产曲线使用有物理含义的 pan/tilt 与 log(f) 低维样条，不默认每一曝光都有三个独立自由控制点。主线的安装参考姿态是完整 SO(3)，包含固定安装 roll；不能只保存两个欧拉角。旧模型完整三维姿态、已有 roll、轴间距/入口瞳项全部按旧 family 准确回放。若旧模型含时间变化 roll，导入状态保留它，不能以“新模型只有 pan/tilt”为由丢失；是否将其解释为固定安装或保留滚转曲线，是有独立对照的模型变更。一个旧字段尚未支持时，导入明确失败，不静默简化。
 
-新生产拟合初始使用每 0.25 秒一个结点、含两端所需支撑的三次样条；这是可配置的数值初值，不是相机运动硬事实。d78 密集曲线的准确回放仍保存原结点；投影误差受控的压缩转换另外记录误差，不能伪称完全等价。
+样条结点和控制密度由所选输入与运行配置记录；既有曲线的准确回放保留原结点。压缩转换另外记录投影差，不伪称等价。
 
-样条增结只在外层 refinement 中执行，不在一次 LM trial 中改变图：
+增结属于外层 refinement，不在 LM trial 内改变图。候选区间需要跨源时刻、跨几何方向的真实材料证据与可观测的新导数列；单个错误身份、遮挡簇或广告失败不触发盲目加参。精确 knot insertion 先保持当前曲线，再开放新增自由度、更新 FactorPlan、RS 支撑及稀疏符号结构。
 
-1. 当前活动参数的优化达到数值停止或稳定后，检查是否仍有同方向、随时间变化的运动型残差。一个候选区间至少要覆盖三个不同原生 PTS、两个几何方向不同且身份已确认的材料实体；优先同时使用冰面与围挡。仅一个边缘/广告失败、未知身份或遮挡簇，不触发增结。
-2. 用新增结点对应的相机运动导数列评估其可观测性。只有新列在已有列之外提供有效方向，才提出该区间中点；近零/线性相关的新列不得注册。
-3. 采用精确 knot insertion 保持当前曲线不变，再开放新增自由度。这个操作在数值误差内不得改变一帧投影。随后更新 FactorPlan、RS 支撑并集和 cuDSS 符号结构。
-4. 对候选进行相同目标的优化，用预先划分的调参选择组选择增结。首版默认要求该组白化误差平方和至少下降 1%，且各已接受镜头在该组上的误差均不增加，才保留这次增结；该 1% 是 RunOptions 中明确的数值选择规则，不是视觉通过标准。调参选择组已经参与模型选择，不能再称为最终未参与调参证据。选择证据不足时不自动增结，报告不足而非自动加满每帧控制点。
-5. 按预期收益最高的有效区间逐次执行；已拒绝且证据未变化的区间不重复尝试。不设置“每帧自动加三个控制点”的退路。控制密度始终不改变源 50fps、原生 PTS 或观测准入。
-
-上述计数和阈值是首版可调数值配置，不升级为项目长期规则或新的用户审核关卡。完整镜头最终仍由用户目视验收。
+增结与先验强度由预先划分的调参选择证据比较，采用的判据显式保存；最终检查组不参与选择。证据不足报告不足，拒绝且证据未变的候选不重复尝试。控制密度不改变原生 PTS、观测准入或完整镜头验收范围。旧稿的固定间隔、样本计数和下降百分比不作为已实现默认值。
 
 参考角为零等规约仅消除参数化冗余，不能偷偷固定实际轴朝向。对于单平面、狭小视野、仅共线点等欠约束情况，不开放无法辨识的畸变/主点/几何组合。报告相关的参数列与证据覆盖；不足的自由度维持显式的条件假设，而不是让算法通过极端参数假装确定。
 
 必要的 `Rig` 与 `Shot` 字段必须精确登记：
 
 - `Rig`：`rig_id, installation_id, coordinate_frame_id, mount_family, reference_rotation, pivot_world, pan_axis, tilt_axis, lever_camera, axis_spacing, pupil_model, sensor_geometry, lens_family, lens_coefficients, zoom_reference, readout_mode`。`sensor_geometry` 包含源像素尺寸和像素轴约定；`readout_mode` 内含 tau、方向和参考时刻定义。family不认识时显式失败，不能忽略旧wide扩展或入口瞳项。
-- `Shot`：`shot_id, rig_id, source_id, first_pts, last_pts, reference_pts, native_time_base, spline_knots, pan_controls, tilt_controls, log_f_controls, optional_roll_controls, readout_padding, active_block_ids`。原片帧身份始终是 source+整数PTS；`time_base` 必须与源一致，不能用显示帧号或 `frame/fps` 代替。源像素域的 crop/resize 由 source_id 引用同一媒体记录。
+- `Shot`：`shot_id, rig_id, source_id, first_pts, stop_pts_exclusive, reference_pts, native_time_base, spline_knots, pan_controls, tilt_controls, log_f_controls, optional_roll_controls, readout_padding, active_block_ids`。原片帧身份始终是 source+整数PTS；`time_base` 必须与源一致，不能用显示帧号或 `frame/fps` 代替。源像素域的 crop/resize 由 source_id 引用同一媒体记录。
 
 ### 滚动快门的实施边界
 
@@ -133,7 +88,7 @@ void request_stop(RunControl&);
 
 ## 5. 观测准入与目标函数
 
-准入由源与实体身份、测量定义、独立源质量决定，不能由当前拟合残差大小决定。人工已确认观测可等价导入；属于已确认实体、通过来源/跟踪/模糊/遮挡检查的机器观测自动加入。未知实体、被用户否决、合成观测不能进入真实拟合。低置信疑义按实体与时间簇提交审核，避免再次要求用户逐帧标注。
+观测准入按 [BUILD_SPEC](rink_model/BUILD_SPEC.md#observation-eligibility)执行；数值残差与导入成功均不改变资格。源 UV、相关 W 和原状态保留。
 
 固定观测的像素误差：`r_i(theta)=project(X_i(theta_scene),theta_camera,t_i)-uv_i`。曲线观测为 `r_i(theta,u_i)`；真实边界/中心线的意义由实体测量定义决定。首版生产目标是明确几何观测的似然：原始光度 profile 用于准备阶段估计中心/边界的UV、噪声和相关关系，原始像素样本仍保留可追溯。已经明确的旧UV与W等价迁移；只能按旧Query模型解释、尚不能等价转换的源组单独标为需要适配，不能借Query参数改变像素身份或仅改标签冒充等价。源图搜索alpha不进入全局求解未知量；不为此另建第二套光度求解器。
 
@@ -143,10 +98,10 @@ void request_stop(RunControl&);
               + 1/2 ||r_motion(theta)||^2
               + 1/2 ||r_measured_prior(theta)||^2`。
 
-`A_g` 是源相关组的白化算子，保持其行顺序、坐标单位与有效秩。不把人工像素容许误差当作噪声标准差。首版材料观测统一使用按有效秩归一的 Huber：`rho_d(s)=d*huber(s/d,delta)`，`delta=2.5`（白化后的无量纲 RMS）；`huber(a,delta)=a` 当 `a<=delta^2`，否则为 `2*delta*sqrt(a)-delta^2`。阈值归 RunOptions，不由某次拟合难易偷偷修改；已测先验和运动项为二次项。不能任意逐分量 robustify 一个可任意旋转的白化基并声称统计意义不变。
+`A_g` 是源相关组的白化算子，保持其行顺序、坐标单位与有效秩。不把人工像素容许误差当作噪声标准差。首版材料观测统一使用按有效秩归一的 Huber：`rho_d(s)=d*huber(s/d,delta)`，delta 为 RunOptions 中显式记录的白化后无量纲 RMS 阈值；`huber(a,delta)=a` 当 `a<=delta^2`，否则为 `2*delta*sqrt(a)-delta^2`。阈值归 RunOptions，不由某次拟合难易偷偷修改；已测先验和运动项为二次项。不能任意逐分量 robustify 一个可任意旋转的白化基并声称统计意义不变。
 
 - 已确认恒等几何关系已由构造实现，不再加入重复罚项。
-- 工程像素预算成为始终显示的验收指标；删除“先仅最小化全局 b，再设 b=1”的双重目标状态机。
+- 工程像素误差持续显示为验收指标，不以全局 b 的两阶段优化替代同一统计目标。
 - 已知安装/尺寸测量按其真实不确定度形成先验；标准尺寸只作工程参考，不伪装成现场测量。
 - 运动项采用 pan/tilt 和 log(f) 二阶时间导数的连续积分（按样条区间积分或一致求积），不直接把控制点二阶差分不加时间尺度地相加；增结不能无意改变先验强度。它是明确记录的运动先验，强度用调参选择组比较确定；冻结的最终检查组只在候选定稿后报告表现，不反复反馈选择先验强度。不能在渲染阶段再平滑网格。
 - 同一原始线条证据生成曲线与交点时，保留相关关系或选择明确的非重复表示。新交点只替换同源证据，不删除同曝光的其他独立观测。
@@ -154,9 +109,7 @@ void request_stop(RunControl&);
 
 ### 三类证据分开使用，不能把调参数据伪装成最终检查
 
-准备时建立三份固定用途集合：训练组进入拟合目标；调参选择组选择样条增结、运动先验强度和已声明的模型选项；冻结最终检查组只在候选定稿后用于报告未参与调参的表现。最终检查组不进入自动增结、参数解锁或先验选择循环。调参选择组虽然不进入该次连续参数拟合，其结果已影响模型选择，因此绝不能称为最终独立证据。
-
-划分以原始相关组、同一材料track以及连续时间块为单位；同一源线条衍生的点/交点、同一相关白化组、相邻帧高度相关的跟踪不得分散到训练和检查两侧。必要时合并其关联闭包再分配，并记录时段边界及用途。若真实数据不足以形成独立最终检查组，明确报告这一限制，不按行随机切分制造独立性。最终检查结果一旦被用来修正模型，该组对后续版本就成为已参与开发的证据，后续报告如实改变其身份；不能仍标为未参与调参，也不把重新人工标注大量帧作为默认补救。用户仍连续审核完整镜头，数据分组不限制其视觉验收范围。
+拟合组进入目标，调参选择组用于增结/先验/模型选项，最终检查组只报告定稿后的独立表现。相关组、同一材料轨迹及同源衍生证据按关联闭包划分；字段见 INTERFACES，冻结、保护邻域、数据不足及旧留出再利用的判定统一见 [VALIDATION](VALIDATION.md#观测与独立性)。
 
 ### 唯一因子目录与参数依赖
 
@@ -175,28 +128,11 @@ void request_stop(RunControl&);
 
 ## 6. 初始化与活动变量：通过配置逐步扩大同一个问题
 
-初始化属于同一模型的状态构造，不另建 S01 专用优化器。
+初始化消费所选完整状态，保留相机、几何、源时钟和观测身份；未知字段明确失败。旧几何转为新的共享结构时显式展示差异，不声称旧相机移植后仍保持原投影。没有旧状态时可由平面对应或已知板面点产生初值，但这不证明完整三维与内参正确。
 
-1. 导入已经存在的完整 d78 / 多镜头状态，保留精确相机、源时间、旧几何和观测身份。不可读取的字段明确报错；不默认归零。
-2. 构造符合确认关系的新共享场景。旧几何与新几何的差异单独可见，不能在第一次求解前被“兼容转换”隐藏。
-3. 首先利用空间分散的固定交点、真实广告/围挡角点及普通曲线来调整主要相机曲线。已有 d78 相机是初值，不能宣称移植到新场景后还保持原投影。
-4. 再开放可观测的共享场景参数和安装参数。广告模板/位置与相机使用相同目标，有活动块阶段，无另起一套广告 solver。
-5. 在多镜头证据覆盖足够后开放共享镜头与变焦相关项。每次只开放有明确残差解释和数据覆盖的一族，记录为何需要；不是用更多参数吞掉错误标注。
+ActiveSet 依据当前任务、数据覆盖和可辨识性指定，不固定 S01 开工顺序。运动、场景、安装和镜头参数始终属于同一目标与同一核；冻结/规约项与未可辨识的条件性初值分别记录。半径/变焦相关残差需检查相机族，不让场景无限变形吸收错误。
 
-新的赛事如果没有旧相机，可用平面对应/已知板面点得到姿态和焦距初值；这只是初始化。平面单应性不能单独证明完整三维和镜头内参。求解前的可观测性报告应指出共线点、纯平面、单一变焦、实体覆盖不足等具体缺口。
-
-首个 S01 运行使用以下明确的 ActiveSet，内部阶段无需另开用户审批：
-
-| 数值阶段 | 活动参数 | 保留初值而不改动的参数 |
-|---|---|---|
-| 相机初始调整 | 该镜头 pan/tilt、log(f) 曲线；已存在且不能等价去除的动态 roll | 当前结构化场景、完整安装、镜头/RS 参数、广告模板 |
-| 共享场景调整 | 上述运动 + 有来源支持的共同场地/标线参数 + 广告安装参数；已确认等式始终成立 | 镜头高阶/变焦项、尚不可辨识的安装轴/杆臂、RS |
-| 安装调整 | 上述参数 + 本安装时期支点、杆臂、轴图中具独立证据的列 | 主点/畸变/读出项默认仍不自动解锁 |
-| 有证据的镜头调整 | 已声明的一族镜头参数；数据覆盖需区分视场半径/变焦与实体身份错误 | 其他未经证据支持的镜头族和自由度 |
-
-这是同一求解器的活动块配置，不是四套目标。如果残差明确呈现随图像半径/变焦变化的结构，应检查镜头族，不能让场景无限变形去吸收。安装或镜头列缺乏独立证据时保留条件性初值并指出可辨识性不足，不宣称这些值已经被现场测量证实。
-
-新增镜头默认只开放该镜头的运动曲线；不自动解锁旧镜头镜头模型、既有场地或全部杆臂。之后按本轮已授权的共享调整阶段开放相应块，并同时显示旧镜头对照。活动参数集合是一份 `ActiveSet`，不同阶段仍编译相同实体、目标与核；严禁 `if shot_id == "S01"` 的数学分支。新增镜头是新增 ShotTrajectory 和观测引用，不复制优化器。
+增加镜头是增加 ShotTrajectory 和观测引用，不复制优化器，也不自动解锁全部共享参数。修改共享块时同时检查已有镜头；具体选择由实际运行配置保存，不由历史阶段表授权。
 
 ## 7. 一次迭代的精确定义
 
@@ -244,9 +180,9 @@ while (!stop_requested && !converged) {
 }
 ```
 
-首版数值规则固定为 Nielsen 式 LM 更新，所有常量集中在 RunOptions：`lambda0 = 1e-3 * max(diag(H0))`；若最大对角为零，返回无可观测下降方向。`eta=1e-4`，只有实际目标下降且 `rho>eta` 才接受；接受时 `lambda *= max(1/3,1-(2*rho-1)^3)` 并令 `nu=2`；拒绝时 `lambda*=nu`、`nu*=2`。检查有限值与线性解残差，不能溢出后继续执行。
+采用 Nielsen 式阻尼更新：实际下降且增益比 rho 大于显式接受阈值 eta 时接受，lambda 乘 max(1/3,1-(2*rho-1)^3)，nu 复位为 2；拒绝时 lambda 乘 nu、nu 加倍。初始阻尼结合缩放后的 H 对角设定；无可观测下降方向、非有限数或线性解失败需明确返回。
 
-数值停止条件：缩放切空间 `||g||_infinity <= 1e-6`；或者一次接受步同时满足 `||delta||_infinity <= 1e-7` 且相对目标下降 `<=1e-8`。RunOptions 明确允许调整这些实现默认值；默认最大 100 次新线性化作为单次运行数值预算，用户授权的任务可根据报告继续同一阶段。暂停、用户停止、预算用尽、无可行步、不可辨识、数值失败、达到数值停止分别返回不同原因；不得把预算用尽写成收敛。以上均不是画面质量阈值，不构成新的项目审批。
+梯度小，或接受步同时满足步长小与相对下降小，属于数值停止条件；其容差和实际采用的运行预算保存在 RunOptions。当前连续控制器已接入梯度停止、接受步与代价同时变小、浮点停滞及调用者停止，并分别返回原因。本文不把历史稿中的次数、容差或内存数值冒充实现默认值。暂停、用户停止、预算耗尽、无可行步、不可辨识、数值失败和数值停止分别报告；预算耗尽不是收敛，也不是画面质量判据。
 
 上述 `accepted_state` 仅表示优化器接受的一步，不表示用户验收。非有限数、深度错误、实体分支消失、RS 不可解、非正定或线性残差过大，都记录具体首批实体/参数 ID。错误 trial 不覆盖最后可用状态。
 
@@ -277,7 +213,7 @@ while (!stop_requested && !converged) {
 
 首先用 FP64 参考小数据建立数值正确性。生产候选可采用 FP32 几何/局部导数、FP64 块累计与线性求解，但必须测量真实条件数下的投影、导数方向与步长一致性；不默认 FP16/TF32。消费级卡上的 FP64 速度和稀疏填充必须实测，不能凭 TFLOPS 广告推断迭代耗时。
 
-对 16GB VRAM / 32GB RAM 的机器，启动时报告可用容量与用户可见预算；可以以约 12GiB 设备、24GiB 主机作为明确的初始工程配置，不把它描述为已经测到的占用。真正容量由图结构决定：观测常驻数组通常线性于行数，块矩阵与因子分解可能产生填充。cuDSS 符号分析后的内存估计要参与判断。
+启动时读取设备与主机可用容量，记录实际运行配置中的资源预算；本文不指定固定显存/内存配额。容量依据观测数组、块矩阵及分解填充估计，cuDSS 符号分析的内存估计参与判断，不能把配置预算说成实测占用。
 
 仅用 N×参数数估计 Jacobian 内存是不够的。必须输出观测数、活动参数数、局部组最大维度、矩阵非零数和预计分解内存。观测 tile 可以减少工作缓冲，不能解决全局分解填充超过显存的问题。
 
@@ -292,73 +228,36 @@ while (!stop_requested && !converged) {
 
 ## 10. 文件责任与接口落点
 
-本轮首层实现文件（实际能力以根交付的运行记录为准）：
+模块职责只在 [ARCHITECTURE](ARCHITECTURE.md)维护，已实现文件与能力见 [REBUILD](REBUILD.md)，C ABI 与聚合接口见 [INTERFACES](INTERFACES.md)。prepare、review 包及 compare 已有实现；其增量缓存或求解扩展不能与已存在模块一起写成“待建文件”。
 
-| 路径 | 当前责任 |
-|---|---|
-| `native/include/rinkspace/core_types.hpp` | 公共 POD 数值类型、状态码与坐标约定 |
-| `native/include/rinkspace/geometry.hpp` | 统一场景几何、固定节点、围挡展开映射 |
-| `native/include/rinkspace/projection.hpp` | 同源前向相机投影 |
-| `native/include/rinkspace/core_api.h` | 薄 C ABI |
-| `native/src/core_api.cpp` | CPU 编译及 C ABI 实现 |
-| `src/rinkspace/domain/contracts.py` | 类型、来源身份、时间与实体引用 |
-| `src/rinkspace/core/native.py` | 薄绑定；不重写几何公式 |
-| `src/rinkspace/session/core_preview.py` | 首层模型预览，用同一核心生成可见几何 |
-
-待实现的生产求解部分：
-
-| 路径 | 唯一责任 |
-|---|---|
-| `native/include/rinkspace/problem.hpp` | Prepared/CompiledProblem、参数块、观测与 FactorPlan |
-| `native/include/rinkspace/solver.hpp` | RunOptions、RunResult、暂停与回调 API |
-| `native/src/problem.cpp` | 实体引用解析、活动参数、相关组与稀疏依赖 |
-| `native/gpu/evaluate.cu` | 几何→相机→残差及局部导数；调用公共数学头 |
-| `native/gpu/reduce.cu` | 白化、稳健权重、块累计 |
-| `native/gpu/local_eliminate.cu` | 相关局部变量分组消元/回代 |
-| `native/src/cudss_system.cpp` | 稀疏分析、分解、求解、状态及内存估计 |
-| `native/src/solver.cpp` | 唯一 LM 状态机；无赛事、广告、S01 特判 |
-| `native/src/checkpoint.cpp` | 原子候选保存和数值续算状态 |
-| `src/rinkspace/session/prepare.py` | 当前输入的一次性编译，变更仅重建受影响部分 |
-| `src/rinkspace/session/solve.py` | 当前输入加载、工作目录、进程生命周期 |
-| `src/rinkspace/session/resume.py` | 同输入/布局的数值续算，不重跑准备 |
-| `src/rinkspace/review/render.py` | 调用同一核心的完整镜头审核导出 |
-| `src/rinkspace/review/compare.py` | 同 PTS、同可见库存的基线与候选比较 |
-
-新 review 包在对应批次一次性替换旧 `review.py`，不允许同名模块与包并存。C ABI 只有 `core_api.h/core_api.cpp`，不另建空 bindings 框架。
-
-文件存在不等于功能完成。未实现能力必须明确报 unavailable；不能让空的 `solve()` 返回成功或把核函数占位注册为有效 backend。
-
-### 最早的 GPU 实跑切片
-
-第二个实际代码批次就必须贯通常驻 GPU 的完整一次 LM 迭代：使用等价迁移的当前真实固定点/有限曲线输入，执行残差和J、H/g累计、阻尼、局部消元、cuDSS、trial目标、接受/拒绝和checkpoint。它先支持已声明的因子子集，再逐类接入完整目标。不能把只有 CUDA project() 或单位矩阵线性求解的演示称为求解器已启动。
-
-这个工程切片应在检测器全面重写之前完成，直接使用已有可靠观测。每次增加因子沿同一内核与接口扩展，没有第二个临时求解器；尚未接入的因子明确列出，并且该子集结果不能被标成完整S01通过。随后完成全库存审核与整镜头拟合。
+GPU 求解能力需要实际贯通所声明因子子集的残差/导数、H/g 累计、阻尼与局部消元、线性求解、trial 目标、接受/拒绝及完整状态保存。CUDA 投影演示、单位矩阵求解或空 solve 返回成功都不构成该能力；未接入因子与缺口明确报告。此判定不规定开发批次数、镜头先后或新的审批步骤。
 
 ## 11. Windows / 5070 Ti 构建与运行
 
-使用单一 CMake 项目与少量明确 preset：CPU reference、Windows CUDA production。复用已有可用工具链；不因为“重构”就重装 Python、CUDA 或 Ceres。先记录现有 NVCC、MSVC、driver 与 cuDSS 版本，选与该 CUDA 主版本匹配的 cuDSS。
+现有 CPU 核心的构建命令见 [native/README](../native/README.md)。完整 CUDA 生产生命周期仍为目标；G1–G3 的有界实现见 REBUILD。复用已有 Python、CMake、MSVC、CUDA 和依赖，记录版本并选择匹配 CUDA 主版本的 cuDSS，不因重构重复安装。
 
-5070 Ti 的计算能力是 12.0。编译必须包含适配该卡的 cubin/PTX，并在本机实际加载核；不要误用数据中心 Blackwell 的 sm_100 作为等价目标。CMake 的 CUDA 架构字段必须由支持它的实际工具链验证，不能硬写一个版本字符串就算支持。
+RTX 5070 Ti 的计算能力为 12.0，目标代码须由支持该卡的工具链编译并实际加载，不能用数据中心 Blackwell 的 sm_100 冒充。Windows cuDSS 的运行 DLL 在 bin，lib 保存链接库；依赖解析随所用版本验证，不能靠改 PATH 掩盖版本不匹配。
 
-cuDSS 在 Windows 运行时 DLL 位于其 `bin`，`lib` 是链接库。新版依赖项随 cuDSS 版本变化，应在一次性构建 recipe 中固定并验证 DLL 解析。运行求解不重新下载或重新编译依赖；只有相应源码/构建配置变化才触发增量构建。安装/构建一次，prepare一次，可以反复solve与resume。仅改参数值不重编结构；改某个观测组只重建其相关组及必要稀疏依赖；改拓扑/活动集才更新对应结构和符号分析。
+源码/构建配置变化触发相应增量构建。目标求解缓存按输入和依赖变化失效：参数数值变更不重建拓扑，相关组或活动集改变时更新相应结构/符号分析。当前 prepare 的实际校验与未实现的缓存边界见 REBUILD，不将设计写成既有性能保证。文件位置统一见 [MAINTENANCE](../MAINTENANCE.md)。
 
-公开源码、配置、最终参数留项目；编译缓存、原片、观测大数组、运行日志、完整检查点和视频在 `D:\CodexData\RinkSpace_Data`。不改变用户的 Git 数据库位置。
-
+<a id="run-contract"></a>
 ## 12. 运行、暂停、恢复与审核产物
 
-启动必须立即给出本次主日志绝对路径。日志逐次记录目标分项、块数、设备时序、域失败、阻尼、是否接受数值步及当前可见产物的位置，不能长时间只有一个“running”。
+本节的主日志和当前输入要求适用于实际启动、重启与续算；前文的重构设计不表示新求解器已经实现，可调用能力以[实现状态](REBUILD.md)为准。
 
-数据准备与求解分离。恢复读取当前数据包、模型与 checkpoint 的必要一致性，直接恢复；不因重编译或无关源码修改重新执行历史资格链。输入改变仅检查受影响对象及其引用闭包。
+每次启动或重启求解，立即向用户提供本次主日志的绝对路径。日志逐次记录目标分项、块数、设备时序、域失败、阻尼、是否接受数值步及当前可见产物的位置，不能长时间只有一个“running”。
+
+正常求解与续算不得重放历史数据生产或资格链，不得把旧包、历史源码或历史审计回执作为启动前置条件。数据准备负责交付可独立消费的当前数据；未改变的数据不重复校验来源，变更只检查受影响部分及其必要关联。求解器只检查当前输入、模型与状态的必要一致性，不因重编译或无关源码修改重新追溯来源；不得把每次重放换名为准备或缓存回退。原片、人工确认和历史失败照常保留供追查。
 
 暂停在当前 GPU 操作的安全边界响应，保存最后可用状态。崩溃不覆盖已有 checkpoint；同目录临时文件完成后原子替换。优化候选与用户接受版本分别存储，用户接受只通过明确的审核动作改变。
 
-每个实际代码批次产生与改动相关的可见结果：模型层产生正确关联的场地与节点图；投影层产生对应真实源帧的全模型叠加；求解层产生完整 S01 和残差定位；新增镜头产生新增镜头及旧镜头回归对照。不能拿“编译成功”或一套合成测试代替画面交付。
+可见结果及其验证范围按 [VALIDATION](VALIDATION.md#工程验证与交付)登记：模型关联、真实源投影、拟合残差和受影响镜头对照与实际改动对应。具体目标镜头由当前任务及节目清单决定，不固定为历史 S01；编译或合成测试不代替画面验收。
 
-性能测量必须固定源输入、活动参数、目标、精度和结果质量，并分开报告冷启动、暖启动、线性化、累计消元、分解、trial 评估、输出时间与峰值内存。少量实测迭代足以定位瓶颈后应继续实际拟合，不做无穷 benchmark。没有视觉改善时不反复编码完整节目。
+性能测量必须固定源输入、活动参数、目标、精度和结果质量，并分开报告冷启动、暖启动、线性化、累计消元、分解、trial 评估、输出时间与峰值内存。性能检查服务于当前授权任务，不自行扩成持续 benchmark；视频生成条件见 VALIDATION。
 
 ## 13. 官方能力依据与仓库证据
 
-以下官方链接仅证明相应接口/支持情况，不证明本项目实现或速度：
+以下官方链接用于核对外部接口/支持情况，不证明本项目实现或速度；本机能力仍须由实际构建与运行记录支持：
 
 1. Ceres CUDA / cuDSS 支持与构建： https://ceres-solver.readthedocs.io/latest/installation.html
 2. Ceres CostFunction / EvaluationCallback： https://ceres-solver.readthedocs.io/latest/nnls_modeling.html
@@ -368,4 +267,4 @@ cuDSS 在 Windows 运行时 DLL 位于其 `bin`，`lib` 是链接库。新版依
 6. Blackwell cubin/PTX 兼容： https://docs.nvidia.com/cuda/blackwell-compatibility-guide/
 7. 标准LM与Nielsen阻尼更新（第2.4、3.2节）： https://www2.imm.dtu.dk/pubdb/edoc/imm3215.pdf 。本文有界步、robust IRLS及默认阈值是项目实现选择，不能当作原文全部算法已适用于本项目的证明。
 
-仓库固定证据：`calibration/solve2/rinksolve/{model.py,parameterization.py,optimizer.py,projector.py,whitening.py}`、`calibration/solve2/native/gpu_batch_ceres.cpp`、`events/ankara_2026/model_constraints/geometry_relations_current.json`、`AGENTS.md`。所有当前行为判断绑定上述提交；未来代码变更需要更新对应事实，不自动沿用旧缺陷结论。
+仓库固定证据：`calibration/solve2/rinksolve/{model.py,parameterization.py,optimizer.py,projector.py,whitening.py}`、`calibration/solve2/native/gpu_batch_ceres.cpp`、`events/ankara_2026/model_constraints/geometry_relations_current.json`、`AGENTS.md`。旧设计针对提交 3e866a835dac26c461bb4ae436ae289814a1ae57 的判断只保留其历史范围；当前状态按 REBUILD 和所选源码/运行记录核对，不自动沿用旧缺陷结论。审计前完整原稿保存在 Data/maintenance/agents_audit_20261025/supporting_before.json 的本文件键。

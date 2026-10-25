@@ -58,6 +58,6 @@ int main(){try{
     double ad[12*11];require(rs_board_ad_polyline(board,6,course.perimeter()-.04,.08,.002,.015,11,ad,132)==0,"ad crosses closed seam");
     close(ad[0],ad[3*(4*11-1)],1e-14,"ad closes x");close(ad[1],ad[3*(4*11-1)+1],1e-14,"ad closes y");
     require(rs_board_point(board,6,.1,.03,a,6)==3,"board height outside support");
-    std::cout<<"{\"abi\":1,\"geometry_invariants\":\"ok\",\"fixed_branch_identity\":\"ok\",\"point_jacobian_max_abs_error\":"<<maxerr
+    std::cout<<"{\"abi\":"<<rs_core_abi_version()<<",\"geometry_invariants\":\"ok\",\"fixed_branch_identity\":\"ok\",\"point_jacobian_max_abs_error\":"<<maxerr
         <<",\"board_seam_distance\":"<<seam_error<<",\"gpu_or_real_video_fit\":false}"<<std::endl;return 0;
 }catch(const std::exception& e){std::cerr<<e.what()<<std::endl;return 1;}}

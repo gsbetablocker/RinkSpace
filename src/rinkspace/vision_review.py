@@ -713,11 +713,44 @@ def compact_instances(packet):
     return result
 
 
-def reread_source_advertisements(rgb, instance_packet, provider):
+def current_source_pixel_exclusion(instance_packet, binding, *, native_hw, device):
+    """Reuse this exposure's SAM person/graphic pixels, never detector rectangles."""
+    import torch
+    from .vision_geometry import _same_frame
+    _same_frame(binding,instance_packet['source_binding'])
+    mask=torch.zeros(tuple(native_hw),device=device,dtype=torch.bool)
+    evidence=[]
+    for instance in instance_packet.get('instances',()):
+        if instance.get('kind') not in ('occluder','broadcast_overlay'):continue
+        region=instance.get('region_mask')
+        if region is None:continue
+        _same_frame(binding,instance['source_binding'])
+        region=torch.as_tensor(region,device=device)
+        if tuple(region.shape)!=tuple(native_hw) or region.dtype!=torch.bool:
+            raise ValueError('Source occlusion requires a boolean mask on the current native frame')
+        mask|=region
+        evidence.append(dict(object_id=instance.get('object_id'),kind=instance['kind'],pixel_count=int(region.sum())))
+    reviewed=instance_packet.get('reviewed_source_exclusion_mask')
+    if reviewed is not None:
+        reviewed=torch.as_tensor(reviewed,device=device)
+        if tuple(reviewed.shape)!=tuple(native_hw) or reviewed.dtype!=torch.bool:
+            raise ValueError('Reviewed source exclusion differs from the current native frame')
+        mask|=reviewed
+    return mask,dict(source_binding=dict(binding),SAM_model_sha256=instance_packet.get('model_sha256'),
+        regions=evidence,pixel_count=int(mask.sum()),person_detector_rectangles_used_as_exclusion=False,
+        mask_is_pixel_ground_truth=False,human_acceptance_modified=False)
+
+
+def reread_source_advertisements(rgb, instance_packet, provider, *, near_board=None):
     """Read printed contours from RGB without enabling unrelated SAM outlines."""
+    from .vision_near_board import read_near_board, exclude_top_face_prints
+    near = near_board if near_board is not None else read_near_board(rgb, instance_packet["source_binding"])
+    from .vision_instances import same_frame
+    if near_board is not None:same_frame(instance_packet["source_binding"], near["source_binding"])
     from .vision_instances import reread_region_edges
     cache_function=getattr(provider,'source_RGB_profile_cache',None)
     source_rgb_cache=cache_function(rgb,instance_packet['source_binding']) if cache_function else None
+    exclusion=instance_packet.get('current_source_exclusion_mask',instance_packet.get('reviewed_source_exclusion_mask'))
     for instance in instance_packet.get("instances", ()):
         if instance["kind"] != "advertisement_panel" or provider.reread_rgb:
             continue
@@ -725,7 +758,7 @@ def reread_source_advertisements(rgb, instance_packet, provider):
         readings = reread_region_edges(rgb, contours, instance_packet["source_binding"],
             device=provider.device, search_radius_px=provider.search_radius_px,
             printed_contour_search_radius_px=provider.printed_contour_search_radius_px,
-            source_exclusion_mask=instance_packet.get("reviewed_source_exclusion_mask"),source_rgb_cache=source_rgb_cache)
+            source_exclusion_mask=exclusion,source_rgb_cache=source_rgb_cache)
         count = sum(len(reading["actual_source_uv"]) for reading in readings)
         instance.update(boundary_readings=readings,
             boundary_reading_mode="printed_source_RGB_profile_read_no_type_probability_veto",
@@ -736,16 +769,16 @@ def reread_source_advertisements(rgb, instance_packet, provider):
             rgb, conflicts, instance_packet["source_binding"], device=provider.device,
             search_radius_px=provider.search_radius_px,
             printed_contour_search_radius_px=provider.printed_contour_search_radius_px,
-            source_exclusion_mask=instance_packet.get("reviewed_source_exclusion_mask"),source_rgb_cache=source_rgb_cache) if conflicts else []
+            source_exclusion_mask=exclusion,source_rgb_cache=source_rgb_cache) if conflicts else []
         raw_contours=instance.get('source_print_unfiltered_contours',())
         instance['source_print_raw_boundary_readings']=reread_region_edges(
             rgb,raw_contours,instance_packet['source_binding'],device=provider.device,
             search_radius_px=provider.search_radius_px,
             printed_contour_search_radius_px=provider.printed_contour_search_radius_px,
-            source_exclusion_mask=instance_packet.get('reviewed_source_exclusion_mask'),source_rgb_cache=source_rgb_cache) if raw_contours else []
+            source_exclusion_mask=exclusion,source_rgb_cache=source_rgb_cache) if raw_contours else []
         instance['source_print_raw_reading_mode']='unfiltered_source_contour_search_remeasured_on_current_RGB'
         instance['source_print_unfiltered_contours_are_measured_UV']=False
-    return instance_packet
+    return exclude_top_face_prints(instance_packet, near)
 
 
 def retain_same_source_refinement_evidence(previous, refined):
@@ -988,7 +1021,8 @@ def source_region_constraints(instance_packet, *, native_hw, device, radius_px=1
         if kind in ("occluder", "broadcast_overlay"):
             unverified_exclusions.append(dict(object_id=instance.get("object_id"), kind=kind,
                 source_candidate_pixel_count=int(mask.sum()),
-                reason="candidate_exclusion_not_used_without_provider_source_review_authority"))
+                reason="current_SAM_pixel_exclusion_applied_by_reader" if instance_packet.get("current_source_pixel_exclusion_evidence") else
+                       "candidate_exclusion_not_used_without_provider_source_review_authority"))
             continue
         masks[kind] = masks.get(kind, torch.zeros_like(mask)) | mask
 
@@ -1001,7 +1035,7 @@ def source_region_constraints(instance_packet, *, native_hw, device, radius_px=1
 
     ice, board = masks.get("ice_region"), masks.get("board_region")
     exclusion = torch.zeros((h, w), device=device, dtype=torch.bool)
-    reviewed_exclusion = instance_packet.get("reviewed_source_exclusion_mask")
+    reviewed_exclusion = instance_packet.get("current_source_exclusion_mask",instance_packet.get("reviewed_source_exclusion_mask"))
     if reviewed_exclusion is not None:
         exclusion = torch.as_tensor(reviewed_exclusion, device=device).bool()
         if tuple(exclusion.shape) != (h, w):
@@ -1059,7 +1093,10 @@ def source_region_constraints(instance_packet, *, native_hw, device, radius_px=1
     for name in soft_roles:
         metadata["source_role_status"][name] = "RGB_type_evidence_preserved_region_scope_unresolved"
     metadata["board_top_search_rule"] = "upper_source_region_envelope_search_band_internal_mask_holes_not_top"
-    metadata["reviewed_exclusion_source_pixel_count"] = int(exclusion.sum())
+    original_reviewed=instance_packet.get("reviewed_source_exclusion_mask")
+    metadata["reviewed_exclusion_source_pixel_count"] = 0 if original_reviewed is None else int(torch.as_tensor(original_reviewed).sum())
+    metadata["current_source_exclusion_pixel_count"] = int(exclusion.sum())
+    metadata["current_source_pixel_exclusion_evidence"] = instance_packet.get("current_source_pixel_exclusion_evidence")
     return dict(source_binding=instance_packet.get("source_binding"),
                 masks={name: mask[None, None] for name, mask in roles.items()},
                 soft_search_masks={name: mask[None, None] for name, mask in soft_roles.items()},
@@ -1721,6 +1758,10 @@ def review(config_path, shots_path, output_directory, *, video=None, shot_ids=()
                             diagnostics['issues'].append(dict(feature_id='unnamed_source_print_materials',
                                 reasons=['current_RGB_material_layers_have_unverified_print_identity_and_physical_roles'],
                                 source_material_object_ids=unknown))
+                    from .vision_near_board import exclude_top_face_prints
+                    if result.get("near_board"):
+                        instances.setdefault("source_binding",binding)
+                        instances=exclude_top_face_prints(instances,result["near_board"])
                     if constraints and constraints["soft_search_masks"]:
                         conflicts = {}
                         for kind, mask in constraints["soft_search_masks"].items():

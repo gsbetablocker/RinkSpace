@@ -1843,6 +1843,13 @@ def guided_source_reading(
                                           padding_mode="zeros", align_corners=False)[0, 0, :, 0] > .5
             flags["known_source_occlusion"] = excluded
             quality_mask &= ~excluded
+        temporal_valid = guide.get("temporal_flow_supported")
+        if temporal_valid is not None:
+            temporal_valid = cuda_array(temporal_valid, torch.bool, "temporal_flow_supported", 1)
+            if temporal_valid.shape != (n,):
+                raise ValueError("Temporal validity must bind every guide position")
+            flags["temporal_identity_unresolved"] = ~temporal_valid
+            quality_mask &= temporal_valid
         quality_mask &= torch.isfinite(candidate_uv).all(1) & (quality_weights > 0)
         indices = torch.nonzero(quality_mask, as_tuple=False).flatten()
         actual = candidate_uv[indices]
@@ -1923,10 +1930,14 @@ def guided_source_reading(
                 typed_probability=(profiles["typed_probability_profile"][row, column]
                                    + profiles["typed_probability_profile"][row, column+1])*.5,
                 rgb_transition_polarity=polarity,
+                material_outward_transition=guide.get("material_outward_transition", "dark_to_light"),
                 metadata=dict(all_source_peaks_above_minimum_gradient_retained=True,
                               minimum_gradient=float(minimum_gradient),
                               source_measurement_is_exact=False, camera_or_world_used=False,
                               is_calibrated_uncertainty=False))
+        if temporal_valid is not None and peak_candidates is not None:
+            peak_candidates["source_valid"] &= temporal_valid[peak_candidates["source_indices"]]
+            peak_candidates["temporal_identity_unresolved"] = ~temporal_valid[peak_candidates["source_indices"]]
         readings.append(dict(
             expected_id=expected_id, physical_id=expected_id if identity_confirmed else None,
             identity_authority=authority if identity_confirmed else None, origin=origin,
@@ -2641,8 +2652,13 @@ def coherent_named_source_reading(
             member_ids.append(torch.full_like(indices, member_index))
             pool_indices.append(indices)
             polarity = pool.get("rgb_transition_polarity")
-            signs.append(torch.full((len(indices),), -1. if polarity == "darkening_along_normal" else
-                                    1. if polarity == "lightening_along_normal" else 0., device=device))
+            sign = (-1. if polarity == "darkening_along_normal" else
+                    1. if polarity == "lightening_along_normal" else 0.)
+            # Nested light discs have the inverse material order. Conic normals
+            # point outward regardless of which side is darker; keep source polarity.
+            if pool.get("material_outward_transition") == "light_to_dark":
+                sign *= -1
+            signs.append(torch.full((len(indices),), sign, device=device))
             active_profiles_by_member.append(torch.unique(original_profile)+profile_base)
             profile_base += len(reading["guide"]["uv"])
         uv = torch.cat(points); normals = torch.cat(normal)

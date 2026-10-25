@@ -164,7 +164,7 @@ class SourceHouseLayerIdentityExpander:
         measurement.clear();measurement.update(overlay)
         return query_for_source
 
-    def consume(self,rgb,measurement,exclusion_mask,*,source_ice_scope_mask,selected_rows=()):
+    def consume(self,rgb,measurement,exclusion_mask,*,source_ice_scope_mask,selected_rows=(),current_measured_curve_ids=()):
         binding=measurement['source_binding'];pts=int(binding.get('actual_pts',binding['source_pts']))
         digest=hashlib.sha256(np.asarray(rgb).tobytes()).hexdigest()
         if (measurement['decoded_native_RGB_sha256']!=digest or binding['source_sha256']!=self.source_sha256
@@ -178,7 +178,9 @@ class SourceHouseLayerIdentityExpander:
         normals=np.asarray(measurement['query_normal'],float)[queries]
         flags=np.asarray(measurement['candidate_flags'])
         selected=selected_rows.get('rows',()) if isinstance(selected_rows,dict) else selected_rows
-        already={r['curve_id'] for r in selected}
+        # A current RGB readout already represented in the active source guides
+        # must not become a new nested navigation group on each exposure.
+        already={r['curve_id'] for r in selected}|set(current_measured_curve_ids)
         rows=[];decisions=[]
         native_rgb_field=native_luminance_field=None
         for known in selected:

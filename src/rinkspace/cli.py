@@ -22,6 +22,12 @@ def main(argv: list[str] | None = None) -> int:
     m = model_sub.add_parser("import-state", help="Import complete frozen d78 state; no fit")
     m.add_argument("--model", required=True); m.add_argument("--complete-state"); m.add_argument("--scope", required=True)
     m.add_argument("--library", required=True); m.add_argument("--out", required=True)
+    p = sub.add_parser("observe", help="Continuous trained source reader with current native geometry")
+    observe_sub = p.add_subparsers(dest="observe_command", required=True)
+    o = observe_sub.add_parser("read", help="Read consecutive original frames with trained vision, tracking and feedback")
+    o.add_argument("--request", required=True); o.add_argument("--out", required=True)
+    o = observe_sub.add_parser("audit", help="Audit one exact exposure against a frozen reviewed reference")
+    o.add_argument("--case", required=True); o.add_argument("--assets", required=True); o.add_argument("--out", required=True)
     p = sub.add_parser("prepare", help="Compile current immutable observations and scope")
     p.add_argument("--input", required=True); p.add_argument("--scope", required=True)
     p.add_argument("--shots", required=True); p.add_argument("--out", required=True)
@@ -102,6 +108,14 @@ def main(argv: list[str] | None = None) -> int:
             else:
                 from .session.core_preview import preview
                 result = preview(args.scene, args.library, args.out)
+            print(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False))
+            return 0
+        if args.command == "observe":
+            if args.observe_command == "read":
+                from .session.source_read import run_source_read
+                result = run_source_read(args.request, args.out)
+            else:
+                raise ValueError("The O worksheet audit entry was withdrawn; use observe read with the complete source reader")
             print(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False))
             return 0
         if args.command == "prepare":

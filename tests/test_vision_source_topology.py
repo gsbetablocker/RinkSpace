@@ -224,7 +224,7 @@ class BoardFootMaterialEvidenceTests(unittest.TestCase):
         coordinates=torch.stack((torch.full_like(axis,4),axis),-1)[None]
         profiles=dict(rgb_profile=rgb,valid_mask=torch.ones((1,len(axis)),dtype=torch.bool),
             rgb_gradient_valid_mask=torch.ones((1,len(axis)-1),dtype=torch.bool),
-            sampled_native_uv=coordinates,metadata=dict(sample_step_native_px=.5))
+            sampled_native_uv=coordinates,offsets_native_px=axis,rgb_gradient_offsets_native_px=(axis[:-1]+axis[1:])*.5,metadata=dict(sample_step_native_px=.5))
         background=(axis<40).float()[None]
         contact=((axis>=40)&(axis<55)).float()[None]
         semantic=dict(background=background,ice_contact=contact,ice_paint=(axis>=55).float()[None])
@@ -234,8 +234,9 @@ class BoardFootMaterialEvidenceTests(unittest.TestCase):
         self.assertLessEqual(abs(float(result['exit_index'][0])*.5-40),2)
         self.assertTrue((result['all_ordered_pair_indices_profile_entry_exit'][:,2]*.5>60).any(),
             'The wrong diffuse tail must remain in the full optical candidate ledger')
-        self.assertTrue(result['source_model_probabilities_used_only_to_rank_actual_RGB_optical_candidates'])
-        repeated={key:value.expand((5,)+value.shape[1:]).clone() if isinstance(value,torch.Tensor) else value
+        self.assertFalse(result['source_model_probabilities_used_only_to_rank_actual_RGB_optical_candidates'])
+        self.assertTrue(result['source_model_probabilities_used_only_as_context_disagreement'])
+        repeated={key:value.expand((5,)+value.shape[1:]).clone() if isinstance(value,torch.Tensor) and value.ndim>=2 else value
                   for key,value in profiles.items()}
         semantics={key:value.expand(5,-1).clone() for key,value in semantic.items()}
         full=_ordered_foot_material_pairs(repeated,ice,[300]*5,semantics)
@@ -252,7 +253,7 @@ class BoardFootMaterialEvidenceTests(unittest.TestCase):
         profiles=dict(rgb_profile=rgb,valid_mask=torch.ones((1,193),dtype=torch.bool),
             rgb_gradient_valid_mask=torch.ones((1,192),dtype=torch.bool),
             sampled_native_uv=torch.stack((torch.full_like(axis,4),axis),-1)[None],
-            metadata=dict(sample_step_native_px=.5))
+            offsets_native_px=axis,rgb_gradient_offsets_native_px=(axis[:-1]+axis[1:])*.5,metadata=dict(sample_step_native_px=.5))
         result=_ordered_foot_material_pairs(profiles,torch.ones((100,10),dtype=torch.bool),[100])
         self.assertTrue(result['missing_same_band'][0])
         self.assertEqual(len(result['all_ordered_pair_indices_profile_entry_exit']),0)
@@ -264,7 +265,7 @@ class BoardFootMaterialEvidenceTests(unittest.TestCase):
         profiles=dict(rgb_profile=rgb,valid_mask=torch.ones((1,193),dtype=torch.bool),
             rgb_gradient_valid_mask=torch.ones((1,192),dtype=torch.bool),
             sampled_native_uv=torch.stack((torch.full_like(axis,4),axis),-1)[None],
-            metadata=dict(sample_step_native_px=.5))
+            offsets_native_px=axis,rgb_gradient_offsets_native_px=(axis[:-1]+axis[1:])*.5,metadata=dict(sample_step_native_px=.5))
         semantic=dict(background=(axis<10).float()[None],
             ice_contact=(axis>=10).float()[None],ice_paint=torch.zeros((1,193)))
         result=_ordered_foot_material_pairs(profiles,torch.ones((100,10),dtype=torch.bool),[300],semantic)
@@ -282,7 +283,7 @@ class BoardFootMaterialEvidenceTests(unittest.TestCase):
         profiles=dict(rgb_profile=rgb,valid_mask=torch.ones((1,193),dtype=torch.bool),
             rgb_gradient_valid_mask=torch.ones((1,192),dtype=torch.bool),
             sampled_native_uv=torch.stack((torch.full_like(axis,4),axis),-1)[None],
-            metadata=dict(sample_step_native_px=.5))
+            offsets_native_px=axis,rgb_gradient_offsets_native_px=(axis[:-1]+axis[1:])*.5,metadata=dict(sample_step_native_px=.5))
         result=_ordered_foot_material_pairs(profiles,torch.ones((100,10),dtype=torch.bool),[300])
         self.assertTrue(result['usable'][0])
         self.assertLessEqual(abs(float(result['exit_index'][0])*.5-40),1)
@@ -351,7 +352,7 @@ class BoardFootMaterialEvidenceTests(unittest.TestCase):
         profiles=dict(rgb_profile=rgb,valid_mask=torch.ones((1,80),dtype=torch.bool),
             rgb_gradient_valid_mask=torch.ones((1,79),dtype=torch.bool),
             sampled_native_uv=torch.stack((torch.full_like(y,50),y),1)[None],
-            metadata=dict(sample_step_native_px=.5))
+            offsets_native_px=y,rgb_gradient_offsets_native_px=(y[:-1]+y[1:])*.5,metadata=dict(sample_step_native_px=.5))
         result=_ordered_foot_material_pairs(profiles,torch.zeros((80,100),dtype=torch.bool),np.array([80.]))
         self.assertFalse(bool(result['missing_same_band'][0]))
         self.assertGreater(len(result['all_ordered_pair_indices_profile_entry_exit']),0)

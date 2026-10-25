@@ -1,0 +1,70 @@
+{
+  "schema": "rinkspace.ice-contact-material-role-confirmation.v1",
+  "event_id": "ankara_2026",
+  "revision_id": "official_programme_board_roles_20261025",
+  "authority": {
+    "kind": "direct_user_confirmation",
+    "human_authority": true,
+    "date": "2026-10-25",
+    "user_text": "在能看到整个围挡一面的角度，上沿是蓝色带的上沿，下沿是黄色带的下沿（但要严格防止误把倒影当做黄色带）",
+    "top_face_user_text": "可能出现拍摄角度是画面中看不到围挡的竖立面，而是看到围挡的上端的整个横面，还有围挡外的摄像机、裁判席等等，这个时候要明确我们模型几何中围挡是没有厚度的，所以你只取它横面靠近冰场的外边缘当做围挡上沿，在这个边缘之外的围挡横面还有外面的摄像机裁判人物之类一律不能当做广告"
+  },
+  "authority_scope": {
+    "semantic_role_authoritative": true,
+    "view_condition": "visible front face: blue upper edge and yellow lower edge; top-face-only view: ice-side top-face edge, outside face excluded",
+    "automatically_confirms_new_UV": false
+  },
+  "reference_source": {
+    "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+    "source_pts": 308480,
+    "time_base": "1/12800",
+    "decoded_native_RGB_sha256": "ad04743b9ffbe4e7e0f29936713dc8cf8599cc16611407501890bdf4724c0cbb"
+  },
+  "definition": {
+    "primary_boundary": "visible_lower_edge_of_board_bottom_strip_at_ice",
+    "bottom_strip_material_in_reference": "very_narrow_pale_yellow_board_bottom_strip",
+    "bottom_strip_region_belongs_to": "board",
+    "bottom_strip_is_ice": false,
+    "upper_strip_edge": "board_internal_material_interface_not_ice_contact",
+    "lower_strip_edge": "ice_contact_board_bottom_strip_to_ice",
+    "boundary_determined_by": "actual board structure and source RGB material order; never just highest gradient or ice mask contour",
+    "unseen_events": "reuse material-role distinction; identify actual local board materials instead of assuming every rink has yellow strip",
+    "missing_or_occluded_boundary": "retain user geometry authority; no invented visible source measurement",
+    "top_boundary": "upper_edge_of_blue_rail",
+    "blue_to_white_exit_is_internal": true,
+    "yellow_reflection_is_not_board_material": true,
+    "top_face_only": {
+      "model": "current native zero-thickness board",
+      "upper_edge": "ice-side edge of the horizontal top surface",
+      "excluded_as_advertisements": [
+        "horizontal top surface beyond the ice-side edge",
+        "outside cameras",
+        "judges desks",
+        "outside people"
+      ],
+      "front_face_blue_entry_rule_applicable": false
+    }
+  },
+  "existing_event_semantics": {
+    "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/model_constraints/user_board_edge_semantics_20261010.json",
+    "sha256": "2f4a091f49ff8ae457f624101c68f0d477acb08bc857ca95ade0af36489d918b"
+  },
+  "pixel_coordinates_added": false,
+  "geometry_modified": false,
+  "existing_near_board_source_confirmations": [
+    {
+      "path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/main_nearboard_source_candidates_20260928/user_confirmed_main_lower_board_top.json",
+      "source_pts": 230545920,
+      "sha256": "935836b7300f93f50f512e0e7c55344c272ca4d0cabfe640438db619080e5d3f"
+    },
+    {
+      "path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/secondary_visibility_domain_20260927/user_confirmed_lower_board_top.json",
+      "source_pts": 230416128,
+      "sha256": "8925a96443ca3751e0ffc81c6c8f249b4e1727a64b7a3be5cb3e7c2ff3d23d86"
+    }
+  ],
+  "existing_unified_board_top_confirmation": {
+    "path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/secondary_visibility_domain_20260927/user_unified_board_top_definition_20261003.json",
+    "sha256": "c7a1234d96ac888ca803e6c6f680ad173e98ecd1003e56b5bf848a2c8cf25e40"
+  }
+}

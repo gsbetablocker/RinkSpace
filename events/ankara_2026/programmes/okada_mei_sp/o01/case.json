@@ -1,0 +1,99 @@
+{
+  "schema": "rinkspace.observation_audit_case.v1",
+  "case_id": "ankara_2026.okada_mei_sp.s01.308480.lane3_center",
+  "revision": 2,
+  "source_id": "O6j8L8TmfKo",
+  "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "shot_id": "s01",
+  "pts": 308480,
+  "purpose": "O0.1：S01 已审曝光的暗色冰线中线回归检查；本次像素重读未审，不是未见样本",
+  "source": {
+    "width": 1920,
+    "height": 1080,
+    "time_base_num": 1,
+    "time_base_den": 12800,
+    "frame_rate": "50/1",
+    "expected_decoded_RGB_sha256": "ad04743b9ffbe4e7e0f29936713dc8cf8599cc16611407501890bdf4724c0cbb"
+  },
+  "scope_ref": {
+    "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/rebuild_scope.json",
+    "sha256": "205fe8b794adc5fdeee35cb33ccfb6cea2537fa41db735f3f982a58d50392491"
+  },
+  "requests": [
+    {
+      "id": "lane3_center",
+      "roi_xyxy": [
+        0,
+        780,
+        1920,
+        970
+      ],
+      "measurement": "paint_center",
+      "material_signal": "dark",
+      "entity_candidates": [
+        "ice.lane3:edge2"
+      ],
+      "navigation_origin": {
+        "method": "agent_full_source_frame_visual_inspection",
+        "meaning": "宽矩形搜索区来自原全帧目视定位；人物、阴影、右侧弱线与字幕边缘保留；未从旧 UV 或相机投影生成逐点搜索位置。",
+        "identity_origin": "同一曝光已审记录的 Lane3 第2边身份，仅沿用目标名称，不测试自主实体识别。"
+      }
+    }
+  ],
+  "reader_config": {
+    "scan_axis": "y",
+    "sample_step_px": 32,
+    "sampling_inset_px": 20,
+    "profile_reader": "signed_interfaces"
+  },
+  "reference_ref": {
+    "packet": {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/source_datasets/frame_by_frame_review_20261013/first_shot_remaining_50fps/repair_20261014/frames/000205.json",
+      "sha256": "083bcca06143ba46bc1c7929b2b30f774d9e985a67b2e758b0499f027bdecd8b"
+    },
+    "binding": {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/source_datasets/frame_by_frame_review_20261013/first_shot_remaining_50fps/repair_20261014/bindings/000205.json",
+      "sha256": "ec5bce628b8cc74b9dd6dbc8be47ca0283269f49bf921b51b23f781d9e60eace"
+    },
+    "acceptance": {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/source_datasets/frame_by_frame_review_20261013/first_shot_remaining_50fps/repair_20261014/user_acceptance.json",
+      "sha256": "1d86fb049805ef057cd6ca100c29aa2a9c5aa1eab430a499bd68bdc728976f2e"
+    },
+    "programme_frame_index_1based": 205,
+    "feature_ids": [
+      "ice.lane3:edge2"
+    ],
+    "note": "整包哈希与人工接受清单匹配；旧 UV 和相关组冻结，仅在 measure 完成后加载用于对照。"
+  },
+  "development_history": "此 S01 来源曾用于旧读取程序开发和人工修正；本项仅为回归检查。",
+  "uncovered_conditions": [
+    "不检验自主实体识别",
+    "不检验跨帧传播、S02 新机位或全节目准确性"
+  ],
+  "required_shot_ids": [
+    "s01",
+    "s02",
+    "s03",
+    "s04",
+    "s05",
+    "s06",
+    "s07",
+    "s08",
+    "s09"
+  ],
+  "display": {
+    "target_label": "Lane3 第2边的暗色材料中线",
+    "agent_finding": "复用已有双界面读取与像素线分支组织，右侧读数恢复；人物遮挡和未解析位置保持断点。按冻结的人工接受标线自动核查，不请求重复标注。"
+  },
+  "visibility_ref": {
+    "path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/frame_by_frame_review_20261013/first_shot_remaining_50fps/masks_current/000205.png",
+    "sha256": "f58de180c0019eafabdb0a86f0cd2b5466001114bce723a41bd9e47414bd61d6",
+    "source_pts": 308480,
+    "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+    "scope": "existing_same_exposure_foreground_and_broadcast_exclusion_used_after_RGB_measurement"
+  },
+  "previous_case_ref": {
+    "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/o01/case_v1.json",
+    "sha256": "9919cdda002990447cd216a09126ec772f82c91538194f5b0f69092ba3336399"
+  }
+}

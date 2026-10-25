@@ -23,8 +23,17 @@ extern "C" {
  */
 /* ABI 2 adds physical time-varying projection; existing ABI 1 functions keep
  * their signatures. Added statuses: 8 optical domain, 9 uncertified row root,
- * 10 row root numerical failure. No nonlinear solver is exposed here. */
+ * 10 row root numerical failure. CUDA/LM entry points are additive below. */
 RS_API int rs_decode_d78_camera(const double* chart,size_t nc,double* rig,size_t nr);
+/* Additive ABI2 camera evaluation at explicit times (seconds in the spline
+ * clock). output has 24 values per time: pan,tilt,log_f,zoom_log_ratio,
+ * world-to-camera R(9 row-major), world camera centre C(3),
+ * fx,fy,cx,cy,k1,k2,p1,p2. This is an instantaneous camera, not an RS frame;
+ * callers must retain readout semantics and evaluate each actual row time.
+ * Inspect time_status: failed rows remain NaN. No source pixels or fitting. */
+RS_API int rs_evaluate_motion_camera(const double* rig,size_t nr,
+    const double* controls,size_t n_controls,double first_control_time,double control_dt,
+    const double* times,size_t nt,double* output,size_t no,int* time_status,size_t ns);
 /* rig[38]: R0(9),pan(3),tilt(3),pivot(3),lever(3),spacing,pupil1,pupil2,
  * fref,radius,cx,cy,eta,cxz,cyz,k10,k11,k20,k21,p1,p2,signed_readout.
  * controls is n_controls*3, fully expanded cardinal cubic (pan,tilt,log_f).
@@ -85,6 +94,23 @@ RS_API int rs_sample_print_analytic_path(const double* board,size_t nboard,
     double* d_xyz_d_values,size_t n_xyz_values,
     double* d_xyz_d_installation,size_t n_xyz_installation,
     double* d_xyz_d_station,size_t n_xyz_station,int* status,size_t nstatus);
+/* Material/display evaluation of the SAME deformed/analytic curves, without
+ * a scene board or a claim of installed XYZ. Additive ABI2 capabilities: callers
+ * must require these symbols explicitly, rather than inventing a display board.
+ * Chart parameters remain [s,z,rotation,width,height]; output uv and sz each
+ * contain 2*n doubles. Material UV may legitimately lie outside the unit panel.
+ * Stations, finite parameters, positive dimensions and shape domains retain the
+ * same validation. No XYZ or geometry Jacobian is produced by these entries.
+ * Existing installed-path entries continue to require a valid physical board. */
+RS_API int rs_sample_print_deformed_material_path(
+    const double* parameters,size_t nparameters,const double* vertices,size_t nvertices,
+    const double* stations,size_t n,const double* bounds,size_t nbounds,
+    const double* shape,size_t nshape,double* uv,size_t nuv,double* sz,size_t nsz,
+    int* status,size_t nstatus);
+RS_API int rs_sample_print_analytic_material_path(
+    const double* parameters,size_t nparameters,int family,int side,int reverse,
+    const double* values,size_t nvalues,const double* stations,size_t n,
+    double* uv,size_t nuv,double* sz,size_t nsz,int* status,size_t nstatus);
 /* Standard square in the unfolded board metric, expressed in material UV.
  * centre_uv[2] and positive side_over_panel_height are template parameters.
  * Parameters use the same [s,z,rotation,width,height] chart as kind5.
@@ -183,6 +209,85 @@ RS_API int rs_board_points(const double* b,size_t nb,const double* stations,size
  * Edges remain curved in 3D when crossing a corner or the perimeter seam.
  */
 RS_API int rs_board_ad_polyline(const double* b,size_t nb,double s0,double width,double z0,double height,size_t samples_per_edge,double* xyz,size_t nxyz);
+
+/* Optional G1 CUDA capability (built with RINKSPACE_ENABLE_CUDA).
+ * Inputs are immutable until the optional G3 solver is explicitly attached.
+ * Per row: native generated feature code, finite station, relative frame time,
+ * observed source UV. Same shared native geometry + implicit RS on CPU/GPU.
+ * output[N,11]=XYZ,UV,depth,row,root_equality,contraction,residualUV.
+ * All rows are retained; unsupported code is row status 11, invalid results NaN.
+ * create metrics[10]=wall_ms,context_ms,h2d_event_ms,owned_device_bytes,
+ * free_before_alloc,free_after_alloc,total_device_bytes,device,cc_major,cc_minor.
+ * evaluate metrics[3]=wall_ms,kernel_event_ms,d2h_event_ms; backend 0 CPU,1 CUDA.
+ */
+RS_API int rs_g1_create(const double* board,size_t nb,const double* layout,size_t nl,unsigned options,
+    const double* rig,size_t nr,const double* controls,size_t nc,double first,double dt,int height,
+    const int* codes,const double* stations,const double* times,const double* observed,size_t count,
+    void** handle,double* metrics,size_t nm);
+/* Frozen current-native geometry plan, before attaching linearization:
+ * paths[P,7]=kind,parameter offset/count,vertex offset/count,knot offset/count.
+ * Values packed doubles; codes become row path indices. Kinds 0..7 are native
+ * primitives; kind8 is an exact frozen native print chart with original knots.
+ * No geometry is inferred from source pixels or independent drawing vertices. */
+RS_API int rs_gpu_attach_paths(void* handle,const int* paths,size_t npaths,
+    const double* values,size_t nvalues,double* owned_device_bytes);
+RS_API int rs_g1_evaluate(void* handle,int backend,double* output,size_t no,int* statuses,size_t ns,
+    double* metrics,size_t nm);
+RS_API void rs_g1_destroy(void* handle);
+RS_API const char* rs_g1_last_error(void);
+
+/* G2 attaches a frozen activity/noise plan to the same G1 resident problem.
+ * dirs[ncontrols,3,q] maps scaled retained coordinates to existing controls.
+ * row_local[N] is -1 for fixed/frozen points, otherwise a shared station ID.
+ * Complete groups partition N rows; each original W is rank x (2*members).
+ * Native compiles connected local components (never per-row Schur).
+ * info[12]=q,nlocal,ng,ncomponent,white_values,H_values,g_values,device_bytes,
+ * setup_wall_ms,h2d_event_ms,max_local_component,total_whitened_rank.
+ */
+RS_API int rs_g2_attach(void* handle,int q,const double* dirs,size_t ndirs,const int* row_local,size_t nrows,
+    const double* local_scales,size_t nlocal,const int* offsets,int ng,const int* members,size_t nmembers,
+    const int* ranks,const int* weight_offsets,const double* weights,size_t nweights,double huber_delta,
+    double* info,size_t ninfo);
+/* Metadata only: groups[G,6], components[C,7], packed local IDs[L].
+ * Group: member begin/count,rank,W begin,component,white begin.
+ * Component: local begin/count,group begin/count,dimension,H begin,g begin. */
+RS_API int rs_g2_layout(void* handle,int* groups,size_t ng,int* components,size_t nc,int* locals,size_t nl);
+/* Normal production call copies ONLY summary[4] and timings[8].
+ * summary=failed rows,quadratic whitened cost,Huber cost,downweighted groups.
+ * timings=wall,raw-J,white,loss,block+reduce,summary-D2H,device bytes,D2H bytes.
+ * No parameter update, damping, elimination or solve. */
+RS_API int rs_g2_linearize(void* handle,int backend,double* summary,size_t ns,double* timings,size_t nt);
+/* Explicit, separately requested engineering diagnostics. Never automatic. */
+RS_API int rs_g2_export_blocks(void* handle,int backend,double* h,size_t nh,double* g,size_t ng,double* shared,size_t nq);
+RS_API int rs_g2_probe_rows(void* handle,int backend,const int* rows,size_t n,double* jac,size_t nj);
+RS_API int rs_g2_probe_group(void* handle,int backend,int group,double* white,size_t nw,double* loss,size_t ns);
+
+/* Optional G3: same resident problem and G2 factor plan.
+ * options[6]=initial_lambda_relative,initial_lambda(0 auto),acceptance_eta,
+ * reduced_relative_tolerance,available_device_budget,available_host_budget.
+ * finite lower/upper are the intersection of original supports per station.
+ * step executes exactly ONE LM candidate, not an iteration loop.
+ * State stays native; rejected trials cannot replace accepted state.
+ * summary[32] and timings[12] fields documented by the Python thin binding.
+ */
+RS_API int rs_g3_attach(void* handle,const double* lower,const double* upper,size_t nlocal,const double* options,size_t noptions,double* info,size_t ninfo);
+RS_API int rs_g3_step(void* handle,double* summary,size_t nsummary,double* timings,size_t ntimings);
+/* G4 owns the continuous loop in native code; callback is telemetry only.
+ * tolerances[3]=projected_gradient_inf,accepted_step_inf,relative_cost.
+ * stop codes: 0 gradient,1 accepted step AND cost,2 floating-point stagnation
+ * (2 is NOT convergence), 3=explicit stop at an accepted-state boundary.
+ * No implicit iteration/time budget.
+ * summary[17] fields are named in the thin Python binding.
+ */
+typedef void (*rs_lm_progress)(const double* summary,const double* timings,double gradient,double numerical_rejections,void* context);
+RS_API int rs_g4_solve(void* handle,const double* tolerances,size_t ntolerances,
+    rs_lm_progress callback,void* context,double* summary,size_t nsummary);
+/* Thread-safe stop request. Only this function may run concurrently with solve.
+ * Keeps accepted state and damping; calling solve again continues the same handle. */
+RS_API int rs_g4_request_stop(void* handle);
+/* Explicit state/system snapshots only; never part of normal step D2H. */
+RS_API int rs_g3_export_state(void* handle,int trial,double* controls,size_t ncontrols,double* stations,size_t nstations);
+RS_API int rs_g3_export_system(void* handle,double* values,size_t nvalues,int* blocked,size_t nblocked);
 
 #ifdef __cplusplus
 }

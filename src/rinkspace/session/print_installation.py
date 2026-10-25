@@ -98,7 +98,7 @@ def bound_scene_assets(scene, scene_path, assets_path, instance_id):
     registered = read_scene_assets(scene, scene_path)
     by_instance = {}
     for reference, assets in registered:
-        for instance in assets['instances']:
+        for instance in _selected_instances(reference, assets):
             identity = instance['id']
             if identity in by_instance:
                 raise ValueError('duplicate print instance in current scene: '+identity)
@@ -109,6 +109,18 @@ def bound_scene_assets(scene, scene_path, assets_path, instance_id):
     if selected['sha256'] != by_instance[instance_id]['sha256']:
         raise ValueError('selected print asset differs from current scene binding: '+instance_id)
     return registered
+
+
+def _selected_instances(reference, assets):
+    """Iterate only the identities admitted by a verified scene reference.
+
+    One asset can retain an omitted paired instance, and disjoint references can
+    select different instances from the same asset. Neither expands the scene.
+    """
+    by_id = {instance['id']: instance for instance in assets['instances']}
+    selected = reference.get('instance_ids',
+                             [reference['instance_id']] if 'instance_id' in reference else [])
+    return [by_id[identity] for identity in selected]
 
 
 def _paint_shapes(canvas,paths,xy,*,fill=False):
@@ -366,12 +378,20 @@ def source_view(data,scene,core,camera,frame,pts,out,context_prints=(),source_ve
 
 
 def render(scene_path,assets_path,instance_id,camera_path,frame_path,pts,library_path,out_dir,*,
-           source_video_path=None,scope_path=None):
+           source_video_path=None,scope_path=None,parameter_state=None):
     out=Path(out_dir).resolve();project=Path(__file__).resolve().parents[3]
     if out.is_relative_to(project):raise ValueError('diagnostic output must be in Data')
     if out.exists():raise FileExistsError(out)
     scene=read(scene_path);assets=read(assets_path);camera_path=Path(camera_path).resolve();camera=read(camera_path)
     registered_assets=bound_scene_assets(scene,scene_path,assets_path,instance_id)
+    if parameter_state is not None:
+        from ..domain.parameters import compile_scene_parameters, LOCAL_LAYOUT_SCHEMA
+        layout=parameter_state.layout
+        charts=({b['id']:b['local_chart'] for b in layout['blocks'] if b.get('local_chart') is not None}
+                if layout['schema']==LOCAL_LAYOUT_SCHEMA else None)
+        if compile_scene_parameters(scene,scene_path,local_charts=charts).layout != layout:
+            raise ValueError('D3 state does not match current scene layout')
+        scene=parameter_state.apply_scene(scene)
     controls=camera_path.parent/camera['controls_ref'];camera['controls']=np.load(controls)
     if not camera['first_pts']<=pts<camera['stop_pts_exclusive']:raise ValueError('PTS outside this shot camera')
     if (frame_path is None) == (source_video_path is None):
@@ -384,10 +404,11 @@ def render(scene_path,assets_path,instance_id,camera_path,frame_path,pts,library
         source_image=None
         verification={'status':'unverified_image_preview','native_source_verified':False,
             'verification_meaning':'supplied image has no verified binding to the requested source PTS'}
-    core=NativeCore(library_path);data=sample_instance(assets,instance_id,scene['board'],core)
+    core=NativeCore(library_path);data=sample_instance(assets,instance_id,scene['board'],core,parameter_state=parameter_state)
     template=resolve_instance(assets,instance_id)[1]
-    data['unlocalized_related_instances']=[i['id'].rsplit('/',1)[-1] for i in assets['instances']
-        if i['template_id']==template['id'] and resolve_instance(assets,i['id'])[3]['values'] is None]
+    data['unlocalized_related_instances']=[i['id'].rsplit('/',1)[-1]
+        for reference,other_assets in registered_assets for i in _selected_instances(reference,other_assets)
+        if i['template_id']==template['id'] and resolve_instance(other_assets,i['id'])[3]['values'] is None]
     data['path_index']=[{'display_id':f'{i:02}','id':p['id'],'role':p['role'],
         'closed':p.get('closed',False),'parent_contour_key':p.get('parent_contour_key')} for i,p in enumerate(data['paths'],1)]
     out.mkdir(parents=True)
@@ -398,12 +419,12 @@ def render(scene_path,assets_path,instance_id,camera_path,frame_path,pts,library
     unfolded(data,out);board_view(data,scene['board'],core,out)
     context_prints=[];unlocalized=[]
     for reference,other_assets in registered_assets:
-        for instance in other_assets['instances']:
+        for instance in _selected_instances(reference,other_assets):
             identity=instance['id']
             if identity==instance_id:continue
             if resolve_instance(other_assets,identity)[3]['values'] is None:
                 unlocalized.append(identity);continue
-            context_prints.append(sample_instance(other_assets,identity,scene['board'],core))
+            context_prints.append(sample_instance(other_assets,identity,scene['board'],core,parameter_state=parameter_state))
     source=source_view(data,scene,core,camera,frame_path,int(pts),out,context_prints,verification)
     source['unlocalized_context_print_instances']=unlocalized
     report={'schema':'rinkspace.print_installation_review.v1','instance_id':instance_id,
@@ -418,6 +439,8 @@ def render(scene_path,assets_path,instance_id,camera_path,frame_path,pts,library
             'open_paths':sum(not p.get('closed',False) for p in data['paths'])},
         'dimensions_status':'尚未重新拟合；使用保留的历史安装与模板初值，米制未验证',
         'fit_executed':False,'new_source_observations':0,
+        'parameter_state_consumed':parameter_state is not None,
+        'layout_revision':None if parameter_state is None else parameter_state.layout['layout_revision'],
         'artifacts':{key:str(out/name) for key,name in [('unfolded','unfolded.png'),('three_d','three_d.png'),('source','source.png'),('source_full','source_full.png'),('geometry','geometry.json')]}}
     for name,value in [('geometry.json',data),('result.json',report)]:
         (out/name).write_text(json.dumps(value,ensure_ascii=False,indent=2,allow_nan=False)+'\n',encoding='utf8')

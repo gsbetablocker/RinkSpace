@@ -947,6 +947,18 @@ def _first_iceward_yellow_material_fall(profiles,gamma,entry,optical_exit,has_va
     gray_count=gray.sum(1)
     gray_gamma=torch.where(gray,gamma,torch.nan).nanmedian(1).values
     gray_gamma=torch.nan_to_num(gray_gamma)
+    # A weak yellow reflection can remain above half the rail's chroma. Using
+    # only a distant grey baseline would cross that reflection much later.
+    # Reuse the selected ACTUAL optical fall's immediate weak-grey plateau
+    # when it is already supported by three native samples. This changes the
+    # material baseline, never substitutes a guide or semantic-mask boundary.
+    immediate=(sample>optical_exit[:,None])&(sample<=optical_exit[:,None]+3)&valid
+    weak_gray=immediate&((rgb.amax(-1)-rgb.amin(-1))<=.12)&(gamma<=12/255)
+    immediate_count=weak_gray.sum(1)
+    immediate_gamma=torch.where(weak_gray,gamma,torch.nan).nanmedian(1).values
+    use_immediate=has_values&(immediate_count>=3)&torch.isfinite(immediate_gamma)
+    distant_gray_gamma=gray_gamma.clone()
+    gray_gamma=torch.where(use_immediate,immediate_gamma,gray_gamma)
     level=(peak_values+gray_gamma)*.5
     def first_crossing(threshold):
         below=(sample>peak_index[:,None])&valid&(gamma<=threshold[:,None])
@@ -969,6 +981,7 @@ def _first_iceward_yellow_material_fall(profiles,gamma,entry,optical_exit,has_va
     return dict(gradient_index=torch.where(found&has_values,first,optical_exit),offset_native_px=offset,
         supported=supported,dominant_warm_peak_index=peak_index,dominant_warm_peak_gamma=peak_values,
         actual_gray_side_sample_count=gray_count,actual_gray_side_gamma=gray_gamma,
+        immediate_weak_gray_plateau_used=use_immediate,distant_gray_gamma_diagnostic=distant_gray_gamma,
         actual_warm_gray_half_height=level,first_fall_found=found,
         actual_warm_gray_80_to_20_fall_support_native_px=torch.stack((high,low),1),
         actual_warm_gray_80_to_20_fall_support_complete=high_found&low_found,

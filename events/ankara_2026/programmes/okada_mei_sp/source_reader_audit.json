@@ -1,0 +1,251 @@
+{
+  "schema": "rinkspace.programme_source_reader_recovery.v1",
+  "date": "2026-10-25",
+  "request": {
+    "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/source_reader.json",
+    "sha256": "9487e4d1447888c0d2af65df98310dbdd2181e0ffc7507c4445e08fc2a8792e1"
+  },
+  "source_definition": {
+    "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/board_source_roles.json",
+    "sha256": "593dc3faecb1e8ecf7017c5a7d67cc099a21e8d60f47a4b7308d57016b5d5631"
+  },
+  "audit": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/point_pipeline_audit_20261025/audit_state.json",
+    "sha256": "4cfb1e0491b965eaaa40e223552cff087ed42f21e3da1505a749263df49ae8bf"
+  },
+  "native_geometry_unchanged": true,
+  "required_shots": [
+    "s01",
+    "s02",
+    "s03",
+    "s04",
+    "s05",
+    "s06",
+    "s07",
+    "s08",
+    "s09"
+  ],
+  "whole_programme_accuracy_accepted": false,
+  "old_O_work_order": "withdrawn_by_user",
+  "actual_result": "D:/CodexData/RinkSpace_Data/runs/point_pipeline_audit_20261025/restored_continuous/near_final/result.json",
+  "historical_same_source_near_generation": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/near_board_v1/final_v3/manifest.json",
+    "sha256": "796495b6e66790b90a8553dee77a45ce053ce3994ad4f9e93e6e0a132c0a2917"
+  },
+  "qualified_source_UV_replaced_by_new_runtime": false,
+  "public_entry": "rinkspace observe read",
+  "known_limits": [
+    "完整自动取点能力尚未恢复，存在已实证支持的实现连接缺口，并非只欠最后准确性验收。此前以同一十帧的引导复读、模块执行、测试数量或名称保留证明完整接回，结论过早，现明确撤回。",
+    "本次仍只覆盖 S01 的 10/1248 个原生曝光；两项缺陷修复与接口回归不构成完整恢复或整镜头准确性验收。",
+    "PTS 309760 固定原查询对照恢复 261/261；连续生产入口输出 260/261，剩余 1 点仍缺少通过现有竖立面准入条件的读数。",
+    "已有命名与材料读数仅有局部引导窗口证据；学习形状候选未接入新增实体的正式读数和下一帧有效引导，中、末段独立启动四帧冰面读数与精读查询均为 0，完整能力未接通。",
+    "后帧回补接线及原帧/遮挡/人工 UV 保护测试已通过；本次真实十帧回放存在后向身份对应，但未满足同组可发布读数条件，新增回补读数为 0。",
+    "当前训练模型沿用 step 9200；其整节目精度验收仍为 false，未提升历史保留测试失败的后续模型。",
+    "广告/冰面仍有弱材料和遮挡缺口；保留缺测，不补造旧帧坐标。",
+    "13 个云端历史对话未取得正文，审计覆盖仍明确不完整。",
+    "切镜后的身份恢复按用户要求后置；此前 S02 失败证据保留。"
+  ],
+  "independent_findings_followup": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/point_pipeline_audit_20261025/independent_findings_followup.json",
+    "sha256": "fbc3e9620c8544777ccade73355e06f51aac5f0c1d7ce8355b03e89c05fc8367"
+  },
+  "latest_entry_validation": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/point_pipeline_audit_20261025/complete_reader/s01_review_fixes/entry/result.json",
+    "sha256": "ce1b244ee1f753ef90ab7d95fd5055e4d47fffdda7b17803a00574b54b245de8"
+  },
+  "previous_entry_validations": [
+    {
+      "path": "D:/CodexData/RinkSpace_Data/runs/point_pipeline_audit_20261025/entry_gap_recheck/result.json",
+      "sha256": "05fe7b7fb0048e93e8b156bb536f5c68567708cf6fa1e0cfd9a8591d6ba25992"
+    },
+    {
+      "path": "D:/CodexData/RinkSpace_Data/runs/point_pipeline_audit_20261025/complete_reader/s01_continuity/result.json",
+      "sha256": "a338d6df97bef36d9158b3b10c7d2f07b6844cfc78d401c56e26ab14deae1423"
+    }
+  ],
+  "execution_scope": "S01；按用户最新指示后置切镜身份恢复。完整节目目标仍为 S01–S09。",
+  "complete_reader_verification": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/point_pipeline_audit_20261025/complete_reader/current_verification.json",
+    "sha256": "2f52211fb2e10c2bf8bb6ad7f9024ea8350cd2e9892f29b3e6f654cfd00f197d"
+  },
+  "latest_capability_evidence": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/point_pipeline_audit_20261025/complete_reader/s01_review_fixes/production_verification.json",
+    "sha256": "2e750da81471a037d66b82465a49abaa81a9a6432c9705c10f6eab1e1ecaa242"
+  },
+  "current_native_only": true,
+  "restored_ice_reference_groups_preserved": 10,
+  "current_execution_complete": false,
+  "current_execution_complete_meaning": "完整自动取点能力尚未恢复，存在已实证支持的实现连接缺口，并非只欠最后准确性验收。此前以同一十帧的引导复读、模块执行、测试数量或名称保留证明完整接回，结论过早，现明确撤回。 按用户要求停止，等待下一步指令。",
+  "latest_independent_review_fix": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/point_pipeline_audit_20261025/complete_reader/s01_review_fixes/result.json",
+    "sha256": "2288c3dd30df7a67dab8128dafdb7dff5952dd9e54b3849886b0cde2a548da9c"
+  },
+  "complete_restoration_verified": false,
+  "execution_status": {
+    "status": "paused_by_user",
+    "recorded_at": "2026-10-25T11:41:38.504Z",
+    "requested_by": "user",
+    "user_instruction": "把这个缺口明确记清楚，然后停下来等我下一步指令。",
+    "authorized_action_this_turn": "record_confirmed_gaps_and_stop",
+    "implementation_complete": false,
+    "new_implementation_or_validation_run_started": false,
+    "resume_only_after_new_user_instruction": true,
+    "current_scope": "S01；切镜后身份恢复仍后置。完整节目目标保持 S01–S09。",
+    "preservation": "当前 native 为唯一几何依据；保留原 UV、整数 PTS、相关组、既有人工确认和历史失败。"
+  },
+  "latest_independent_capability_review": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/point_pipeline_audit_20261025/independent_capability/review.json",
+    "sha256": "d35606bc2bb386d841ba155556f3827185ffb1ffdc25b3995df2422146b55d7e"
+  },
+  "unresolved_automatic_point_reading_gap": {
+    "recorded_at": "2026-10-25T11:41:38.504Z",
+    "status": "confirmed_unresolved_paused_by_user",
+    "conclusion": "完整自动取点能力尚未恢复，存在已实证支持的实现连接缺口，并非只欠最后准确性验收。此前以同一十帧的引导复读、模块执行、测试数量或名称保留证明完整接回，结论过早，现明确撤回。",
+    "source": "用户提供的独立审阅及其已保存实测；本次只记录，没有重跑或声称重新独立复现。",
+    "review": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/point_pipeline_audit_20261025/independent_capability/review.json",
+      "sha256": "d35606bc2bb386d841ba155556f3827185ffb1ffdc25b3995df2422146b55d7e"
+    },
+    "probe": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/point_pipeline_audit_20261025/independent_capability/result.json",
+      "sha256": "f7f6fb8e0c56180f55b59433cff4a109cf31a0c774c50e692a2dedef3173b71b"
+    },
+    "prior_run_inventory": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/point_pipeline_audit_20261025/independent_capability/prior_run_inventory.json",
+      "sha256": "6012ea128fd5b17b669782d69380003189af6447791f81bf8fb543557b70d912"
+    },
+    "findings": [
+      {
+        "id": "sample_locked_validation_and_entry",
+        "status": "unresolved",
+        "completed_run_receipts": 21,
+        "frame_executions": 89,
+        "unique_source_pts": [
+          308480,
+          308736,
+          308992,
+          309248,
+          309504,
+          309760,
+          310016,
+          310272,
+          310528,
+          310784
+        ],
+        "distinct_frames": 10,
+        "full_S01_native_frames": 1248,
+        "source_seconds": [
+          24.1,
+          24.28
+        ],
+        "public_entry_still_fixed_to_this_window": true,
+        "first_frame_accepted_guides_supplied": true,
+        "saved_occlusion_masks_supplied_each_frame": true,
+        "interpretation": "局部有引导 RGB 复读回归有效，但不能证明其它时段的自动取点能力；清单只针对本次恢复目录，不否定历史其它运行。",
+        "code_refs": [
+          {
+            "path": "events/ankara_2026/programmes/okada_mei_sp/source_reader.json",
+            "line": 9
+          },
+          {
+            "path": "src/rinkspace/session/source_read.py",
+            "line": 180
+          },
+          {
+            "path": "src/rinkspace/session/source_read.py",
+            "line": 194
+          }
+        ]
+      },
+      {
+        "id": "named_material_discovery_not_connected_to_output",
+        "status": "unresolved_implementation_gap",
+        "mechanism": "带引导启动会关闭该镜头重新识别；学习形状结果停留在 unassigned_material_search，未接入正式读数及下一帧有效引导，新出现材料的实体识别到精读之间存在断层。",
+        "probe_conditions": "保留现有模型、当前 native 几何与参考库；不提供当前帧人工点或人工掩膜。",
+        "actual_frames": [
+          {
+            "source_pts": 416000,
+            "time_base": "1/12800",
+            "source_seconds": 32.5,
+            "shape_candidates": 75,
+            "named_shape_candidates": 0,
+            "formal_ice_points": 0,
+            "ice_precision_queries": 0,
+            "reset": true
+          },
+          {
+            "source_pts": 416256,
+            "time_base": "1/12800",
+            "source_seconds": 32.52,
+            "shape_candidates": 75,
+            "named_shape_candidates": 0,
+            "formal_ice_points": 0,
+            "ice_precision_queries": 0,
+            "reset": false
+          },
+          {
+            "source_pts": 573440,
+            "time_base": "1/12800",
+            "source_seconds": 44.8,
+            "shape_candidates": 51,
+            "named_shape_candidates": 0,
+            "formal_ice_points": 0,
+            "ice_precision_queries": 0,
+            "reset": true
+          },
+          {
+            "source_pts": 573696,
+            "time_base": "1/12800",
+            "source_seconds": 44.82,
+            "shape_candidates": 51,
+            "named_shape_candidates": 0,
+            "formal_ice_points": 0,
+            "ice_precision_queries": 0,
+            "reset": false
+          }
+        ],
+        "limitation": "32.50–32.52 秒与 44.80–44.82 秒分别为同镜头独立启动后接一帧连续读取；有可见冰面标记，四帧正式冰面读数和精读查询均为 0。它不是已初始化后的整段连续评测。20.02 秒近景缺少可用冰面标记，不计作漏读。",
+        "code_refs": [
+          {
+            "path": "src/rinkspace/vision.py",
+            "line": 1134
+          },
+          {
+            "path": "src/rinkspace/vision.py",
+            "line": 1379
+          },
+          {
+            "path": "src/rinkspace/vision.py",
+            "line": 1395
+          },
+          {
+            "path": "src/rinkspace/vision_material_reader.py",
+            "line": 385
+          }
+        ]
+      },
+      {
+        "id": "capability_verification_counts_without_location_error",
+        "status": "unresolved_validation_gap",
+        "summary": "尚未按整段 S01 实际输出建立可见材料漏读分母、漏读率、实体身份错误率和像素定位误差。200/204 项测试通过、候选数量或保留 10 个名称均不能替代这些证据。",
+        "code_refs": [
+          {
+            "path": "D:/CodexData/RinkSpace_Data/runs/point_pipeline_audit_20261025/complete_reader/summarize_s01.py",
+            "line": 10
+          }
+        ]
+      }
+    ],
+    "valid_but_limited_existing_work": "真实 RGB 局部精读能力、此前两项 bug 修复、原有冰面组保留及已有几何保护核对仍有各自的局部证据；不扩展为完整自动能力恢复。",
+    "incomplete_work_for_future_user_direction": [
+      "接通新材料候选到当前 native 实体身份、正式 RGB 取点及下一帧有效引导的路径，并保留同镜头时间连续性。",
+      "在整段 S01 实际输出上区分有引导局部回归、同镜头独立启动与已初始化连续读取，建立可见材料分母、漏读和定位/身份错误证据。"
+    ],
+    "future_work_started": false
+  },
+  "superseded_capability_statement": {
+    "statement": "训练形状模块已读取并命名部分真实材料，尚未通过材料定位核验的形状仍是候选，不提升为已接受点。",
+    "corrected_at": "2026-10-25T11:41:38.504Z",
+    "reason": "该措辞弱化了未接通新增实体入口的实现缺口。"
+  }
+}

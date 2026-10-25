@@ -14,7 +14,7 @@ class NVRTCModule:
         if (source is None)==(ptx is None):raise ValueError("supply exactly one of source or PTX")
         if runtime_bin is None:
             # Reuse the production source-reader runtime resolver: the GPU
-            # environment was moved out of OneDrive and must not be rebuilt.
+            # environment and its exact NVRTC libraries are owned by this project.
             from .feedback_dispatch import source_reader_python
             runtime_bin=source_reader_python().parents[1]/'Lib/site-packages/torch/lib'
         runtime_bin=Path(runtime_bin)

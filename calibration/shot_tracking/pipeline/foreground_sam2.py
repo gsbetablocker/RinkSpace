@@ -1,13 +1,13 @@
 """Local SAM2 person silhouettes for the 121 native-frame shot trial.
 
-Uses this run's source.mp4 and coarse athlete_bbox only. The external directory
+Uses this run's source.mp4 and coarse athlete_bbox only. The project model directory
 supplies pretrained model weights/configuration, never images or labels. Each
 frame is segmented independently from its own box and torso point prompt.
 Outputs stay inside runs/low_end_pm1/sam2_people/.
 
 Run with the verified CUDA 12.8 environment (RTX 5070 Ti):
-  D:/OneDrive/codex_projs/MotionTrail_Codex_Starter_v1/.venv-gpu/Scripts/python.exe -B foreground_sam2.py --mode samples
-  D:/OneDrive/codex_projs/MotionTrail_Codex_Starter_v1/.venv-gpu/Scripts/python.exe -B foreground_sam2.py --mode all
+  D:/OneDrive/codex_projs/RinkSpace/.venv-gpu/Scripts/python.exe -B foreground_sam2.py --mode samples
+  D:/OneDrive/codex_projs/RinkSpace/.venv-gpu/Scripts/python.exe -B foreground_sam2.py --mode all
 """
 
 from __future__ import annotations
@@ -27,7 +27,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[3]
 RUN = ROOT / "calibration" / "shot_tracking" / "runs" / "low_end_pm1"
 OUT = RUN / "sam2_people"
-MODEL = Path("D:/OneDrive/codex_projs/MotionTrail_Codex_Starter_v1/models/sam2.1-hiera-tiny")
+MODEL = ROOT / "models/cache/sam2.1-hiera-tiny"
 SAMPLE_INDICES = (0, 60, 120)
 FIRST_PTS = 104678400
 FRAME_COUNT = 121

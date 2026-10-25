@@ -34,6 +34,22 @@ class NativeCore:
 
     def __init__(self, library_path: str | Path):
         self.library_path = Path(library_path).resolve(strict=True)
+        self._dll_dirs = []
+        if __import__("os").name == "nt":
+            import os, json
+            project = Path(__file__).resolve().parents[3]
+            directories = []
+            cuda = os.environ.get("CUDA_PATH")
+            if cuda: directories.extend([Path(cuda)/"bin"/"x64",Path(cuda)/"bin"])
+            local = project/"environments/cudss-local.json"
+            if local.is_file():
+                root = (project/json.loads(local.read_text(encoding="utf-8"))["root"]).resolve()
+                if not root.is_relative_to(project):
+                    raise ValueError("cuDSS runtime must remain inside this project")
+                directories.append(root/"bin")
+            for directory in directories:
+                if directory.is_dir():
+                    self._dll_dirs.append(os.add_dll_directory(str(directory)))
         self._lib = c.CDLL(str(self.library_path))
         self._lib.rs_core_abi_version.argtypes = []
         self._lib.rs_core_abi_version.restype = c.c_int
@@ -68,6 +84,9 @@ class NativeCore:
 
         # Additive capabilities preserve loading of historical ABI2 libraries.
         optional = {
+            "rs_evaluate_motion_camera": [D,N,D,N,c.c_double,c.c_double,D,N,D,N,I,N],
+            "rs_sample_print_deformed_material_path": [D,N,D,N,D,N,D,N,D,N,D,N,D,N,I,N],
+            "rs_sample_print_analytic_material_path": [D,N,c.c_int,c.c_int,c.c_int,D,N,D,N,D,N,D,N,I,N],
             "rs_ice_board_junction": [D,N,D,N,c.c_double,c.c_int,D,N],
             "rs_sample_print_analytic_path": [D,N,D,N,c.c_int,c.c_int,c.c_int,D,N,D,N,D,N,D,N,D,N,D,N,D,N,D,N,D,N,D,N,I,N],
             "rs_deform_print_points": [D,N,D,N,D,N,D,N,D,N,I,N],
@@ -189,6 +208,34 @@ class NativeCore:
         self._call("rs_decode_d78_camera", _d(chart), len(chart), out, 38)
         return list(out)
 
+    def evaluate_motion_camera(self, rig, controls, first_control_time, control_dt, times):
+        """Evaluate the same native camera at explicit spline times.
+
+        An instant is not a rolling-shutter frame. The original signed readout
+        and predicted-row equation remain necessary for frame projection.
+        Failed time rows retain NaNs and their native status.
+        """
+        import numpy as np
+        if not hasattr(self._lib, "rs_evaluate_motion_camera"):
+            raise ValueError("native library lacks instantaneous motion-camera snapshot capability")
+        physical = np.ascontiguousarray(rig, dtype=np.float64)
+        coefficients = np.ascontiguousarray(controls, dtype=np.float64)
+        requested = np.atleast_1d(np.asarray(times, dtype=np.float64))
+        if physical.shape != (38,) or coefficients.ndim != 2 or coefficients.shape[1] != 3 or requested.ndim != 1:
+            raise ValueError("camera evaluation requires rig[38], controls[M,3] and scalar or times[N]")
+        requested = np.ascontiguousarray(requested)
+        out = np.full((len(requested), 24), np.nan, dtype=np.float64)
+        status = np.empty(len(requested), dtype=np.int32)
+        self._call("rs_evaluate_motion_camera", physical.ctypes.data_as(D), physical.size,
+                   coefficients.ctypes.data_as(D), len(coefficients), float(first_control_time), float(control_dt),
+                   requested.ctypes.data_as(D), len(requested), out.ctypes.data_as(D), out.size,
+                   status.ctypes.data_as(I), len(status))
+        return {"values": out, "pan": out[:, 0], "tilt": out[:, 1], "log_f": out[:, 2], "zoom_log_ratio": out[:, 3],
+                "rotation": out[:, 4:13].reshape(-1, 3, 3), "centre": out[:, 13:16],
+                "fx": out[:, 16], "fy": out[:, 17], "cx": out[:, 18], "cy": out[:, 19],
+                "k1": out[:, 20], "k2": out[:, 21], "p1": out[:, 22], "p2": out[:, 23],
+                "status": status}
+
     def project_motion(self, rig, controls, first_control_time, control_dt, image_height, frame_times, xyz):
         import numpy as np
         points = np.ascontiguousarray(xyz, dtype=np.float64)
@@ -246,69 +293,89 @@ class NativeCore:
         Shape columns are [tx,ty,log_sx,log_sy,xlogw0..2,ylogw0..2].
         Installation columns use physical [s,z,rotation,width,height]. No source
         pixels, fit status or camera parameters are changed by this evaluation.
+        board=None, jacobian=False explicitly requests only material UV/SZ;
+        that result has no XYZ or world derivatives and needs the additive
+        material-only native capability.
         """
         import numpy as np
-        if not hasattr(self._lib, "rs_sample_print_deformed_path"):
-            raise ValueError("native library lacks adjustable print-path capability")
+        material_only = board is None
+        if material_only and jacobian:
+            raise ValueError("material-only print evaluation has no world Jacobian")
+        operation = "rs_sample_print_deformed_material_path" if material_only else "rs_sample_print_deformed_path"
+        if not hasattr(self._lib, operation):
+            raise ValueError("native library lacks "+("material-only " if material_only else "")+"adjustable print-path capability")
         points = np.ascontiguousarray(vertices, dtype=np.float64)
-        course = np.ascontiguousarray(board, dtype=np.float64)
+        course = None if material_only else np.ascontiguousarray(board, dtype=np.float64)
         installation = np.ascontiguousarray(parameters, dtype=np.float64)
         coordinates = np.ascontiguousarray(stations, dtype=np.float64)
         box = np.ascontiguousarray(bounds, dtype=np.float64)
         shape = np.ascontiguousarray(shape_values, dtype=np.float64)
-        if (points.ndim != 2 or points.shape[1] != 2 or course.shape != (6,)
+        if (points.ndim != 2 or points.shape[1] != 2 or (course is not None and course.shape != (6,))
                 or installation.shape != (5,) or coordinates.ndim != 1
                 or box.shape != (4,) or shape.shape != (10,)):
             raise ValueError("print path requires board[6], installation[5], UV[N,2], stations[M], bounds[4], shape[10]")
         n = len(coordinates)
         result = {"material_uv": np.full((n, 2), np.nan), "sz": np.full((n, 2), np.nan),
-                  "xyz": np.full((n, 3), np.nan), "status": np.empty(n, dtype=np.int32)}
-        derivative_shapes = {"d_uv_d_shape": (n, 2, 10), "d_sz_d_shape": (n, 2, 10),
+                  "status": np.empty(n, dtype=np.int32)}
+        if not material_only:
+            result["xyz"] = np.full((n, 3), np.nan)
+        derivative_shapes = {} if material_only else {"d_uv_d_shape": (n, 2, 10), "d_sz_d_shape": (n, 2, 10),
                              "d_xyz_d_shape": (n, 3, 10), "d_xyz_d_installation": (n, 3, 5),
                              "d_xyz_d_station": (n, 3)}
         result.update({key: np.full(size, np.nan) if jacobian else None
                        for key, size in derivative_shapes.items()})
-        args = [course.ctypes.data_as(D), course.size, installation.ctypes.data_as(D), installation.size,
+        args = [] if material_only else [course.ctypes.data_as(D), course.size]
+        args.extend([installation.ctypes.data_as(D), installation.size,
                 points.ctypes.data_as(D), points.size, coordinates.ctypes.data_as(D), coordinates.size,
-                box.ctypes.data_as(D), box.size, shape.ctypes.data_as(D), shape.size]
-        for key in ("material_uv", "sz", "xyz", *derivative_shapes):
+                box.ctypes.data_as(D), box.size, shape.ctypes.data_as(D), shape.size])
+        outputs = ("material_uv", "sz") if material_only else ("material_uv", "sz", "xyz", *derivative_shapes)
+        for key in outputs:
             value = result[key]
             args.extend((None if value is None else value.ctypes.data_as(D), 0 if value is None else value.size))
         args.extend((result["status"].ctypes.data_as(I), n))
-        self._call("rs_sample_print_deformed_path", *args)
+        self._call(operation, *args)
         return result
 
     def _sample_analytic_print_path(self, board, parameters, values, stations, *,
                                     family, side=0, reverse=False, jacobian=True):
         import numpy as np
-        if not hasattr(self._lib, "rs_sample_print_analytic_path"):
-            raise ValueError("native library lacks adjustable analytic print capability")
-        course = np.ascontiguousarray(board, dtype=np.float64)
+        material_only = board is None
+        if material_only and jacobian:
+            raise ValueError("material-only print evaluation has no world Jacobian")
+        operation = "rs_sample_print_analytic_material_path" if material_only else "rs_sample_print_analytic_path"
+        if not hasattr(self._lib, operation):
+            raise ValueError("native library lacks "+("material-only " if material_only else "")+"adjustable analytic print capability")
+        course = None if material_only else np.ascontiguousarray(board, dtype=np.float64)
         installation = np.ascontiguousarray(parameters, dtype=np.float64)
         shape = np.ascontiguousarray(values, dtype=np.float64)
         coordinates = np.ascontiguousarray(stations, dtype=np.float64)
         width = 3 if family == 0 else 4
-        if course.shape != (6,) or installation.shape != (5,) or shape.shape != (width,) or coordinates.ndim != 1:
+        if ((course is not None and course.shape != (6,)) or installation.shape != (5,)
+                or shape.shape != (width,) or coordinates.ndim != 1):
             raise ValueError("invalid analytic print array shapes")
         if type(side) is not int or type(reverse) is not bool:
             raise ValueError("analytic print side/reverse must be integer/boolean")
         n = len(coordinates)
         name = "square" if family == 0 else "rectangle"
         result = {"material_uv": np.full((n, 2), np.nan), "sz": np.full((n, 2), np.nan),
-                  "xyz": np.full((n, 3), np.nan), "status": np.empty(n, dtype=np.int32)}
-        derivative_shapes = {"d_uv_d_"+name: (n, 2, width), "d_sz_d_"+name: (n, 2, width),
+                  "status": np.empty(n, dtype=np.int32)}
+        if not material_only:
+            result["xyz"] = np.full((n, 3), np.nan)
+        derivative_shapes = {} if material_only else {"d_uv_d_"+name: (n, 2, width), "d_sz_d_"+name: (n, 2, width),
                              "d_xyz_d_"+name: (n, 3, width), "d_xyz_d_installation": (n, 3, 5),
                              "d_xyz_d_station": (n, 3)}
         result.update({key: np.full(size, np.nan) if jacobian else None
                        for key, size in derivative_shapes.items()})
-        args = [course.ctypes.data_as(D), course.size, installation.ctypes.data_as(D), installation.size,
+        args = [] if material_only else [course.ctypes.data_as(D), course.size]
+        args.extend([installation.ctypes.data_as(D), installation.size,
                 family, side, int(reverse), shape.ctypes.data_as(D), shape.size,
-                coordinates.ctypes.data_as(D), coordinates.size]
-        for key in ("material_uv", "sz", "xyz", *derivative_shapes):
+                coordinates.ctypes.data_as(D), coordinates.size])
+        outputs = ("material_uv", "sz") if material_only else ("material_uv", "sz", "xyz", *derivative_shapes)
+        for key in outputs:
             value = result[key]
             args.extend((None if value is None else value.ctypes.data_as(D), 0 if value is None else value.size))
         args.extend((result["status"].ctypes.data_as(I), n))
-        self._call("rs_sample_print_analytic_path", *args)
+        self._call(operation, *args)
         return result
 
     def sample_print_square_path(self, board, parameters, square_values, stations, *, jacobian=True):

@@ -17,7 +17,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 from ..core.native import NativeCore
-from ..domain.print_assets import validate_template_topology
+from ..domain.print_assets import sample_template_paths, validate_template_topology
 from ..review.fonts import review_font
 from .curling_preview import Canvas, INK, GRAY, BG, write
 
@@ -176,15 +176,19 @@ def _source_rows(assets, assets_path):
     return result, records
 
 
-def _template_size(assets, template):
+def _template_size(assets, template, parameter_state=None):
+    from ..domain.print_parameters import parameter_values
+    values = None if parameter_state is None else parameter_values(assets, parameter_state)
     matches = [b for b in assets.get('parameter_blocks', []) if b['id'] == template.get('size_class_id')]
     if len(matches) > 1:
         raise ValueError('duplicate template size block')
-    if matches and matches[0].get('values') is not None:
+    current = None if not matches else (matches[0].get('values') if values is None
+                                       else values[matches[0]['id']])
+    if current is not None:
         block = matches[0]
-        if block.get('kind') != 'print_size' or block.get('size') != 2 or len(block['values']) != 2:
+        if block.get('kind') != 'print_size' or block.get('size') != 2 or len(current) != 2:
             raise ValueError('invalid template size block')
-        width, height = map(math.exp, block['values'])
+        width, height = map(math.exp, current)
         basis = {'kind': 'shared_model_size', 'block_id': block['id'], 'status': block.get('status'),
                  'coordinate_unit': 'rink_length', 'physical_dimensions_verified': False}
     else:
@@ -200,32 +204,20 @@ def _template_size(assets, template):
     return [float(width), float(height)], basis
 
 
-def _template_panel(assets, template, core, out, index):
+def _template_panel(assets, template, core, out, index, *, parameter_state=None):
     validate_template_topology(template)
-    dimensions, basis = _template_size(assets, template)
-    parameters = [0., 0., 0., *dimensions]  # Display origin only, never an installation seed.
+    dimensions, basis = _template_size(assets, template, parameter_state)
+    current_paths = sample_template_paths(assets, template['id'], core, dimensions,
+                                         parameter_state=parameter_state)
     shapes = []
-    for number, path in enumerate(template['paths'], 1):
+    for number, (path, current) in enumerate(zip(template['paths'], current_paths), 1):
         geometry = path.get('geometry')
-        if geometry is None:
-            vertices = _points(path.get('material_uv'))
-        else:
-            if geometry.get('kind') != 'unfolded_square' or 'material_uv' in path:
-                raise ValueError('unsupported or ambiguous analytic print geometry')
-            vertices = np.asarray(core.print_square_vertices(parameters, geometry['center_uv'],
-                                   geometry['side_over_panel_height']))
-        if len(vertices) < 2:
-            raise ValueError('template path needs at least two vertices')
-        if path.get('closed') and not np.array_equal(vertices[0], vertices[-1]):
-            vertices = np.vstack((vertices, vertices[0]))
-        stations = np.linspace(0., 1., len(vertices))
-        xy = np.asarray(core.sample_print_chart(parameters, vertices, stations))
         shapes.append({'id': path['id'], 'display_id': f'{number:02}', 'closed': path.get('closed'),
             'role': path.get('role'), 'parent_contour_key': path.get('parent_contour_key'),
             'display_fill': path.get('display_fill'), 'geometry': geometry,
             'source_observation_id': path.get('source_observation_id'),
             'source_observation_ids': path.get('source_observation_ids', []),
-            'native_template_xy': xy.tolist(), 'vertices_are_source_observations': False})
+            **current, 'vertices_are_source_observations': False})
     if not shapes:
         raise ValueError('template has no current paths')
     points = np.vstack([p['native_template_xy'] for p in shapes])
@@ -277,9 +269,12 @@ def _template_panel(assets, template, core, out, index):
     geometry_file = out/f'template_geometry{suffix}.json'
     plain.image.save(image)
     canvas.image.save(numbered)
-    data = {'native_generated': True, 'native_api': 'sample_print_chart', 'template_id': template['id'],
+    data = {'native_generated': True, 'native_api': 'shared_native_print_geometry',
+            'geometry_evaluator': 'evaluate_print_path', 'template_id': template['id'],
             'display_origin_is_not_installation': True, 'display_dimensions': dimensions,
             'display_basis': basis, 'shape_status': template.get('shape_status'),
+            'parameter_state_consumed': parameter_state is not None,
+            'internal_geometry_schema': (template.get('internal_geometry') or {}).get('schema'),
             'physical_placement_estimated': False, 'fit_executed': False,
             'new_source_observations': 0, 'shapes': shapes}
     write(geometry_file, data)
@@ -298,7 +293,7 @@ def _escape(value):
     return html.escape(str(value)) if value is not None else '未登记'
 
 
-def render(assets_path, library_path, out_dir):
+def render(assets_path, library_path, out_dir, *, parameter_state=None):
     assets_path = Path(assets_path).resolve()
     assets = json.loads(assets_path.read_text(encoding='utf-8-sig'))
     out = Path(out_dir).resolve()
@@ -306,7 +301,7 @@ def render(assets_path, library_path, out_dir):
         raise FileExistsError('Advertisement review output already exists: '+str(out))
     out.mkdir(parents=True)
     core = NativeCore(library_path)
-    templates = [_template_panel(assets, template, core, out, index)
+    templates = [_template_panel(assets, template, core, out, index, parameter_state=parameter_state)
                  for index, template in enumerate(assets['templates'])]
     available, source_records = _source_rows(assets, assets_path)
     grouped = {}
@@ -373,6 +368,7 @@ def render(assets_path, library_path, out_dir):
         'counts': assets.get('counts', {}), 'displayed_source_rows': sum(r['status'] == 'displayed' for r in source_records),
         'unavailable_source_rows': sum(r['status'] != 'displayed' for r in source_records),
         'external_observation_store_expanded': False, 'fit_executed': False,
+        'parameter_state_consumed': parameter_state is not None,
         'new_source_observations': 0, 'whole_advertisement_user_approval_inferred': False}
     write(out/'review.json', receipt)
     return receipt

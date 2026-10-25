@@ -16,9 +16,10 @@ def source_reader_python(explicit=None):
         if not p.is_file():raise FileNotFoundError('Explicit source reader interpreter missing')
         return p
     project=Path(__file__).resolve().parents[4]
-    candidates=(project.parent/'MotionTrail_Codex_Starter_v1/.venv-gpu/Scripts/python.exe',
-                Path(r'D:\CodexData\MotionTrail_Archive_20261019\.venv-gpu\Scripts\python.exe'))
-    return next((p for p in candidates if p.is_file()),Path(sys.executable))
+    interpreter=project/'.venv-gpu/Scripts/python.exe'
+    if not interpreter.is_file():
+        raise FileNotFoundError('Project GPU interpreter missing: '+str(interpreter))
+    return interpreter
 
 
 def dispatch_checkpoint_reviews(task_documents, review_run, output, *, device='cuda', packet_path=None,

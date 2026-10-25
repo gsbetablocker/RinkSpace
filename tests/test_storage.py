@@ -329,3 +329,33 @@ def test_explicit_and_environment_data_roots_work_without_local_config(tmp_path,
     assert Workbench(project).path.is_relative_to(data)
     assert AssetStore(project, data_root=override).data == override
     assert shared.read_bytes() == original and not (project / "configs/storage.json").exists()
+
+
+def test_shared_history_alias_survives_local_roots_and_legacy_settings(stored_project):
+    project, data = stored_project
+    old = "events/example/scene/old.json"
+    shared = {"schema_version": "rinkspace.storage.v1",
+              "legacy_paths": {old: "history/preserved.json", "outputs": "shared/outputs"}}
+    (project / "configs/storage.defaults.json").write_text(json.dumps(shared), encoding="utf-8")
+    target = data / "history/preserved.json"
+    target.parent.mkdir(parents=True)
+    original = b'{"uv":[11.25,7.5],"pts":320000,"quality":"pending"}\n'
+    target.write_bytes(original)
+    store = AssetStore(project)
+    assert store.resolve(old, must_exist=True) == target
+    assert store.resolve(project / old, must_exist=True) == target
+    assert store.resolve("old.json", base=project / "events/example/scene", must_exist=True) == target
+    assert store.resolve("outputs/file.json") == data / "events/ankara_2026/history/legacy_outputs/file.json"
+    assert target.read_bytes() == original
+
+
+def test_local_exact_history_override_still_takes_precedence(stored_project):
+    project, data = stored_project
+    old = "events/example/scene/old.json"
+    shared = {"schema_version": "rinkspace.storage.v1", "legacy_paths": {old: "shared/original.json"}}
+    (project / "configs/storage.defaults.json").write_text(json.dumps(shared), encoding="utf-8")
+    config_path = project / "configs/storage.json"
+    local = json.loads(config_path.read_text(encoding="utf-8"))
+    local["legacy_paths"][old] = "local/original.json"
+    config_path.write_text(json.dumps(local), encoding="utf-8")
+    assert AssetStore(project).resolve(old) == data / "local/original.json"

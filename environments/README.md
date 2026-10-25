@@ -9,12 +9,20 @@
 | 高级 CPU 数值 | `python -m pip install -e ".[dev,advanced]"` | 增加 SciPy、quadprog、Clarabel；实际 profile 可能还需原生库 |
 | 采集接口 | `python -m pip install -e ".[acquisition]"` | 增加 yt-dlp；材料获取和使用遵循来源条件 |
 | 媒体探测与转码 | 自行配置 PATH 上的 ffmpeg 和 ffprobe | Python 包可导入不等于这两个可执行程序齐备；doctor 报告实际路径 |
-| 视觉 GPU | [CUDA/PyTorch 候选层](requirements-vision-torch-cu128.txt)、硬件/驱动及对应权重 | 未完成独立 GPU 重建验收；不属于基础 extra |
-| 人体 | [上游与补丁身份](body-upstream-provenance.json)、专用环境、GVHMR/HMR2/SMPL-X 等资源 | 仍有外部源码、特殊编译及模型获取条件，不能仅安装本项目重建 |
+| 视觉 GPU | 本项目 `.venv-gpu`，模型位于 `models/cache`；[迁移与隔离验证](gpu-local-validation.json) | 已验证实际 CUDA/NVRTC 和本地模型加载；不是空白机器重建或取点准确性验收 |
+| 人体 | 本项目 `.venv-body`、`environments/body`；[上游与补丁身份](body-upstream-provenance.json) | 专用环境与源码/权重已迁入；既有 CUDA 变换通过隔离验证，原有未编译扩展及完整推理边界保留 |
 | 历史 GTSAM | [独立候选配置](gtsam-reconstruction-candidate.yml) | NumPy 1.26/GTSAM 4.2.2 栈，与主 NumPy 2.x 环境分开；候选未验收 |
 | Ceres 与原生求解 | [rinkfit 构建/API](../calibration/rinkfit/README.md)、[原生 recipe](native-build-recipes-observed.json) | Ceres/Eigen/SuiteSparse 或匹配的 Windows 后端；源码 checkout、ABI 和身份条件须齐备 |
 
 INSTALL_LOCAL.cmd 安装 dev/acquisition，不含 advanced。当前 setuptools 只发现 src 下的包，calibration 求解模块仍需要完整源码 checkout；普通 Python wheel 不包含整个赛事运行闭包。
+
+## 当前本机 GPU 环境
+
+2026-10-25 已将当前运行依赖从其它项目迁入 RinkSpace。主环境为 `.venv-gpu/Scripts/python.exe`，人体专用环境为 `.venv-body/Scripts/python.exe`；两套包版本保持分开。SAM2 与 YOLO 在 `models/cache`，GVHMR/PyTorch3D 源码、人体权重与 ViTPose helper 在 `environments/body`。这些本机环境和第三方资产已加入 Git 忽略，原项目文件未删除。
+
+迁入文件逐一校验哈希，启动器及 editable 路径已重新绑定；隔离检查禁止访问 MotionTrail、FSpathing、FSrotation 和 SkatePoseSingles，并核对实际 Python 模块与 DLL 路径。详情、完整包版本及验证范围见 [gpu-local-validation.json](gpu-local-validation.json)。安装仍使用项目之外的系统 Python（`D:/Python/Python311`）、NVIDIA 驱动与系统 CUDA 工具链；它们不位于其它项目目录。历史观察文件中的旧路径仅作来源记录，当前运行使用本节入口。
+
+本次只迁移和验证环境，未执行 G1–G5，也未恢复已暂停的取点工作。
 
 ## 基础测试与完整回归
 
@@ -44,7 +52,7 @@ solver_runtime 先核对源码 SHA，再查找 RINKSPACE_SOLVER_NATIVE_CACHE_ROO
 
 历史 reference_callback 需要匹配 Python/C++ ABI、GTSAM、Eigen、Boost、pybind11 和 oneTBB include/lib。build_manifest 保存 vendor archive 的历史 SHA，不代表今天重新核验了 archive 或拥有完整下载/许可闭包。相应实验文件在[来源清单](native_support_preserved/round3_legacy/source_preservation_manifest.json)登记。
 
-人体路径当前连接外部 GVHMR、PyTorch3D、YOLO/helper 和专用解释器；补丁及来源不等于完整上游树、模型或 Windows 编译链已经可移植。模型获取条件见[第三方资产](../docs/THIRD_PARTY_ASSETS.md)。
+人体路径当前使用本项目的 GVHMR、PyTorch3D、YOLO/helper 和专用解释器，详见[本机迁移记录](gpu-local-validation.json)。本地依赖已保全，不能据此声称空白机器 Windows 编译或完整人体推理已经验证；模型获取条件仍见[第三方资产](../docs/THIRD_PARTY_ASSETS.md)。
 
 源身份、PTS、资格、完整 q/profile、统计 W、物理 guard、producer 与原生身份均须对应所选运行。旧 import/pickle 名称由 source_manifest 加载；复制文件或更换根目录不会自动改写这些契约。[可选 ResourceRegistry](../docs/PORTABLE_RESOURCES.md)仍是独立准备接口，尚未替代活动 AssetStore 和完整运行路径。
 
@@ -53,3 +61,5 @@ solver_runtime 先核对源码 SHA，再查找 RINKSPACE_SOLVER_NATIVE_CACHE_ROO
 历史 solver_runtime 的 source_manifest 固定原始源码身份，部分公开脱敏字节会被原校验拒绝。依赖该运行时的测试需准备匹配原件；纯代价保护测试按需加载 legacy，不为测试绕过生产身份检查。
 
 共享映射在 [storage.defaults.json](../configs/storage.defaults.json)，本机根目录由忽略的 configs/storage.json 或 RINKSPACE_DATA_ROOT 提供；示例见 [storage.example.json](../configs/storage.example.json)。普通 clone 不读取作者盘符。AssetStore 和 pytest 缓存使用同一解析器；需要外部资源的工具在缺少 Data 根时给出设置方法。
+
+G3 复用的 cuDSS 0.8.0.10 / CUDA 13 已离线归入本项目 `environments/cudss/0.8-cu13`；库身份与来源见 [cudss-local.json](cudss-local.json)。native CMake 通过显式 `--cudss` 根路径连接，不引用历史归档目录或其它项目。CUDA 工具链和 cuSOLVER 使用系统 `CUDA_PATH`，运行 DLL 位于其 `bin/x64`。

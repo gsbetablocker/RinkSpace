@@ -15,11 +15,13 @@ GRID_CONTEXT_FIELDS = (
     'source_identity_not_confirmed_from_projection_alone',
     'fit_residual_used_for_identity',
     'source_identity_navigation_evidence',
+    'verified_source_guides_used_as_navigation',
 )
 
 
 def source_identity_context_fields(value):
-    if value.get('model_projection_used_as_navigation_and_identity_context') is not True:
+    if (value.get('model_projection_used_as_navigation_and_identity_context') is not True
+            and value.get('verified_source_guides_used_as_navigation') is not True):
         return {}
     fields={key:deepcopy(value[key]) for key in GRID_CONTEXT_FIELDS if key in value}
     if 'model_projection_or_fit_residual_used_for_identity' in value:
@@ -29,21 +31,27 @@ def source_identity_context_fields(value):
 
 def admissible_source_identity_context(value, *, expected=None, source=None):
     """Validate old independent evidence or the explicit measured-grid branch."""
-    if value.get('model_projection_used_as_navigation_and_identity_context') is not True:
+    source_guides=value.get('verified_source_guides_used_as_navigation') is True
+    if value.get('model_projection_used_as_navigation_and_identity_context') is not True and not source_guides:
         return value.get('model_projection_or_fit_residual_used_for_identity') is False
     if (value.get('projected_UV_used_as_source_pixel_truth') is not False
             or value.get('source_identity_not_confirmed_from_projection_alone') is not True
-            or value.get('fit_residual_used_for_identity') is not False
-            or value.get('model_projection_or_fit_residual_used_for_identity') not in (None,True)
-            or value.get('model_projection_or_fit_residual_used_for_identity') is False):
-        return False
+            or value.get('fit_residual_used_for_identity') is not False):return False
+    if source_guides:
+        if (value.get('model_projection_used_as_navigation_and_identity_context') is not False
+                or value.get('model_projection_or_fit_residual_used_for_identity') not in (None,False)):return False
+        kind='actual_RGB_material_field_order_and_continuity_with_native_source_guides'
+    else:
+        if value.get('model_projection_or_fit_residual_used_for_identity') not in (None,True):return False
+        kind='actual_RGB_material_field_order_and_continuity_with_model_navigation'
     evidence=value.get('source_identity_navigation_evidence')
-    if (not isinstance(evidence,dict)
-            or evidence.get('kind')!='actual_RGB_material_field_order_and_continuity_with_model_navigation'
+    if (not isinstance(evidence,dict) or evidence.get('kind')!=kind
             or any(evidence.get(key) is not True for key in (
                 'actual_material_correspondence_confirmed','actual_field_order_confirmed',
-                'physical_model_scope_confirmed','same_shot_source_continuity_confirmed'))):
-        return False
+                'physical_model_scope_confirmed','same_shot_source_continuity_confirmed'))):return False
+    if source_guides and (evidence.get('same_native_camera_reference') is not None
+            or evidence.get('same_scene_reference')!=evidence.get('source_model_navigation_reference')
+            or not evidence.get('source_identity_authority',{}).get('original_feature_identity_authorities')):return False
     binding=evidence.get('source_binding',{})
     if (not isinstance(binding,dict)
             or any(type(binding.get(key)) is not int for key in ('actual_pts','native_pts'))

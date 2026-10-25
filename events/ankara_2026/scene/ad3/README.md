@@ -1,6 +1,6 @@
 # Ad3 / Ad16 当前模型
 
-唯一当前入口为 [assets_r3.json](assets_r3.json)，来源索引为 [source_r3.json](source_r3.json)，安装初值见 [install.json](install.json)，共同场景绑定见 [installation_d3.json](installation_d3.json)。
+唯一当前入口为 [assets_r4.json](assets_r4.json)，来源索引为 [source_r3.json](source_r3.json)。安装初值、D3 回执和旧模板已归入 Data，原路径及 SHA 见[归档映射](../archive.json)；当前绑定由[共同场景](../field/model.json)登记，不需要历史文件才能求值。
 
 模板只保留六边形、“買取”及其结构孔、广告四边，共 19 条路径。“大吉”两字及细碎装饰已退出当前几何和关联，原图稿、旧模型与撤回读数仅在本机保留。当前模型不需要载入旧版本或原始 SVG 才能求值。
 

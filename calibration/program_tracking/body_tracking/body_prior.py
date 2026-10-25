@@ -1,6 +1,6 @@
 """Source-time GVHMR/SMPL-X prior for the frozen Ankara programme.
 
-Run stages in order: plan (CPU), prepare (CPU), infer (existing FSrotation
+Run stages in order: plan (CPU), prepare (CPU), infer (project-owned body
 CUDA environment, one shot at a time), materialize (same environment).  No
 stage downloads weights, installs packages, writes the upstream repository,
 or treats network global translation as a measured rink trajectory.
@@ -43,8 +43,8 @@ except ImportError:
     from three_frame_refit.program_tracking.body_tracking.observations import iter_exact_frames
 
 
-FS_ROOT = Path("D:/OneDrive/codex_projs/FSrotation")
-GVHMR_ROOT = FS_ROOT / "cache/g0_gvhmr_runtime/GVHMR"
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+GVHMR_ROOT = PROJECT_ROOT / "environments/body/GVHMR"
 GVHMR_CHECKPOINT = GVHMR_ROOT / "inputs/checkpoints/gvhmr/gvhmr_siga24_release.ckpt"
 HMR2_CHECKPOINT = GVHMR_ROOT / "inputs/checkpoints/hmr2/epoch=10-step=25000.ckpt"
 SMPLX_MODEL = GVHMR_ROOT / "inputs/checkpoints/body_models/smplx/SMPLX_NEUTRAL.npz"
@@ -506,8 +506,8 @@ def _windows(shot_slot: np.ndarray, *, max_length: int = 256,
 def _upstream_runtime():
     import sys
     if not GVHMR_CHECKPOINT.is_file() or not HMR2_CHECKPOINT.is_file() or not SMPLX_MODEL.is_file():
-        raise FileNotFoundError("Existing verified FSrotation/GVHMR weights are missing")
-    expected_env = FS_ROOT / "cache/g0_gvhmr_runtime/venv"
+        raise FileNotFoundError("Existing verified project GVHMR weights are missing")
+    expected_env = PROJECT_ROOT / ".venv-body"
     if not Path(sys.prefix).resolve().samefile(expected_env.resolve()):
         raise RuntimeError(f"Use existing GVHMR interpreter: {expected_env / 'Scripts/python.exe'}")
     if str(GVHMR_ROOT) not in sys.path:

@@ -1,7 +1,7 @@
 {
   "schema": "rinkspace.vision-training.v1",
-  "python": "D:/OneDrive/codex_projs/MotionTrail_Codex_Starter_v1/.venv-gpu/Scripts/python.exe",
-  "backbone": "D:/OneDrive/codex_projs/MotionTrail_Codex_Starter_v1/models/sam2.1-hiera-tiny",
+  "python": "D:/OneDrive/codex_projs/RinkSpace/.venv-gpu/Scripts/python.exe",
+  "backbone": "D:/OneDrive/codex_projs/RinkSpace/models/cache/sam2.1-hiera-tiny",
   "flow_weights": "models/cache/raft_large_C_T_SKHT_V2-ff5fadd5.pth",
   "data_directory": "D:/CodexData/RinkSpace_Data/events/ankara_2026/observations/vision_training",
   "source_video": "D:/CodexData/RinkSpace_Data/events/ankara_2026/media/originals/oxXu1avhrvs.mp4",
@@ -37,5 +37,27 @@
     "dense_segmentation": "https://github.com/qubvel-org/segmentation_models.pytorch",
     "temporal_points": "https://github.com/facebookresearch/co-tracker"
   },
-  "native_boundary_overlay_sha256": "b28aaa78003fbf2e2d1fda59cf2f4c13572694daa6edfb9bd42646dc73642531"
+  "native_boundary_overlay_sha256": "b28aaa78003fbf2e2d1fda59cf2f4c13572694daa6edfb9bd42646dc73642531",
+  "native_geometry": {
+    "event_id": "ankara_2026",
+    "scene": "events/ankara_2026/scene/field/model.json",
+    "library": "D:/CodexData/RinkSpace_Data/build/f58_audit/Release/rinkspace_core.dll"
+  },
+  "board_foot_material_contract": "events/ankara_2026/programmes/okada_mei_sp/board_source_roles.json",
+  "near_board_source_evidence": {
+    "gray_history": {
+      "path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/secondary_visibility_domain_20260927/nearboard_top_source_review/source_observations.json",
+      "sha256": "fa6446daeccb8c6d18dc4807ce3f270976490a5dc022ccea4ef45ffe098886ad"
+    },
+    "restored_blue_reader_source": {
+      "path": "D:/CodexData/RinkSpace_Data\\events\\ankara_2026\\history\\legacy_project\\three_frame_refit\\program_tracking\\main_nearboard_blue_ice_source.py",
+      "sha256": "da65ffb466a784a6419e17334f2c8398bc9d8efb0ff2a298301d1df24a613871"
+    },
+    "official_gray_generation": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/okada_rec_1019/recover_v2/dense56_v1/near_board_v1/final_v3/manifest.json",
+      "sha256": "796495b6e66790b90a8553dee77a45ce053ce3994ad4f9e93e6e0a132c0a2917"
+    }
+  },
+  "source_instances": true,
+  "source_reidentification": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/source_reidentification.json"
 }

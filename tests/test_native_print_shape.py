@@ -299,3 +299,68 @@ def test_constant_coordinate_convex_sampling_cannot_drift_outside_group_by_one_u
     invalid = core.deform_print_points([[np.nextafter(right, np.inf), .4]], bounds, np.zeros(10))
     np.testing.assert_array_equal(invalid["status"], [3])
     assert np.isnan(invalid["material_uv"]).all()
+
+
+@pytest.mark.parametrize("family", ["shape", "square", "rectangle"])
+def test_material_capability_uses_same_curve_without_claiming_installed_xyz(core, family):
+    p = installation(core)
+    if family == "shape":
+        call = lambda board, stations, **kw: core.sample_deformed_print_path(
+            board, p, VERTICES, stations, BOUNDS, SHAPE, **kw)
+    elif family == "square":
+        call = lambda board, stations, **kw: core.sample_print_square_path(
+            board, p, [.4, .5, np.log(.35)], stations, **kw)
+    else:
+        call = lambda board, stations, **kw: core.sample_print_rectangle_path(
+            board, p, [.4, .5, np.log(.35), np.log(.5)], 2,
+            stations, reverse=True, **kw)
+    physical = call(BOARD, STATIONS, jacobian=False)
+    material = call(None, STATIONS, jacobian=False)
+    assert set(material) == {"material_uv", "sz", "status"}
+    for key in material:
+        np.testing.assert_array_equal(material[key], physical[key])
+    outside = call(None, [-.1, .4, 1.1], jacobian=False)
+    np.testing.assert_array_equal(outside["status"], [3, 0, 3])
+    assert np.isnan(outside["material_uv"][[0, 2]]).all()
+    assert np.isnan(outside["sz"][[0, 2]]).all()
+    empty = call(None, [], jacobian=False)
+    assert empty["material_uv"].shape == (0, 2)
+    with pytest.raises(ValueError, match="no world Jacobian"):
+        call(None, STATIONS, jacobian=True)
+
+
+@pytest.mark.parametrize("family", ["shape", "square", "rectangle"])
+def test_material_outside_panel_does_not_relax_physical_board_domain(core, family):
+    # D1 is allowed to show ink beyond the arbitrary unit-panel origin. The
+    # same candidate has no valid installation below an actual board's z=0.
+    p = [.2, 0., 0., .025, .008]
+    if family == "shape":
+        shape = np.zeros(10); shape[1] = -2.
+        call = lambda board: core.sample_deformed_print_path(
+            board, p, VERTICES, STATIONS, BOUNDS, shape, jacobian=False)
+    elif family == "square":
+        call = lambda board: core.sample_print_square_path(
+            board, p, [.4, -.5, np.log(.35)], STATIONS, jacobian=False)
+    else:
+        call = lambda board: core.sample_print_rectangle_path(
+            board, p, [.4, -.5, np.log(.35), np.log(.5)], 2,
+            STATIONS, jacobian=False)
+    material = call(None)
+    np.testing.assert_array_equal(material["status"], 0)
+    assert np.isfinite(material["material_uv"]).all()
+    assert np.all(material["sz"][:, 1] < 0.)
+    physical = call(BOARD)
+    np.testing.assert_array_equal(physical["status"], 3)
+    assert np.isnan(physical["xyz"]).all()
+
+
+def test_material_requires_additive_native_capability_without_fallback():
+    from types import SimpleNamespace
+    old = object.__new__(NativeCore)
+    old._lib = SimpleNamespace()
+    with pytest.raises(ValueError, match="material-only.*capability"):
+        old.sample_deformed_print_path(None, [.2, 0., 0., .025, .008], VERTICES,
+            STATIONS, BOUNDS, SHAPE, jacobian=False)
+    with pytest.raises(ValueError, match="material-only.*capability"):
+        old.sample_print_square_path(None, [.2, 0., 0., .025, .008],
+            [.4, .5, np.log(.35)], STATIONS, jacobian=False)

@@ -1,0 +1,76 @@
+{
+  "case_id": "ankara_board_view_roles_user_20261025",
+  "version": 1,
+  "status": "active",
+  "kind": "fact",
+  "title": "用户确认：正面材料上下沿与零厚度围挡顶面朝冰边缘",
+  "scope": {
+    "event_id": "ankara_2026",
+    "entity_ids": [
+      "board.top",
+      "board.contact"
+    ]
+  },
+  "tags": [
+    "material_boundary",
+    "source_reader",
+    "board"
+  ],
+  "assertions": {
+    "material_roles": {
+      "primary_boundary": "visible_lower_edge_of_board_bottom_strip_at_ice",
+      "bottom_strip_material_in_reference": "very_narrow_pale_yellow_board_bottom_strip",
+      "bottom_strip_region_belongs_to": "board",
+      "bottom_strip_is_ice": false,
+      "upper_strip_edge": "board_internal_material_interface_not_ice_contact",
+      "lower_strip_edge": "ice_contact_board_bottom_strip_to_ice",
+      "boundary_determined_by": "actual board structure and source RGB material order; never just highest gradient or ice mask contour",
+      "unseen_events": "reuse material-role distinction; identify actual local board materials instead of assuming every rink has yellow strip",
+      "missing_or_occluded_boundary": "retain user geometry authority; no invented visible source measurement",
+      "top_boundary": "upper_edge_of_blue_rail",
+      "blue_to_white_exit_is_internal": true,
+      "yellow_reflection_is_not_board_material": true,
+      "top_face_only": {
+        "model": "current native zero-thickness board",
+        "upper_edge": "ice-side edge of the horizontal top surface",
+        "excluded_as_advertisements": [
+          "horizontal top surface beyond the ice-side edge",
+          "outside cameras",
+          "judges desks",
+          "outside people"
+        ],
+        "front_face_blue_entry_rule_applicable": false
+      }
+    },
+    "top_face_rule": {
+      "model_board_thickness": 0,
+      "upper_boundary": "ice_facing_boundary_of_board_top_surface",
+      "outside_surface_and_objects_are_ads": false
+    },
+    "transfer_pixel_coordinates_to_new_frame": false,
+    "current_native_geometry_authoritative": true
+  },
+  "provenance": {
+    "authority": "direct_current_user_correction",
+    "date": "2026-10-25",
+    "confirmation_scope": "Ankara physical material roles; does not accept new UV or extend saved acceptance"
+  },
+  "evidence_refs": [
+    {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/board_source_roles.json",
+      "sha256": "593dc3faecb1e8ecf7017c5a7d67cc099a21e8d60f47a4b7308d57016b5d5631"
+    },
+    {
+      "path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/secondary_visibility_domain_20260927/user_unified_board_top_definition_20261003.json",
+      "sha256": "c7a1234d96ac888ca803e6c6f680ad173e98ecd1003e56b5bf848a2c8cf25e40"
+    },
+    {
+      "path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/main_nearboard_source_candidates_20260928/user_confirmed_main_lower_board_top.json",
+      "sha256": "935836b7300f93f50f512e0e7c55344c272ca4d0cabfe640438db619080e5d3f"
+    },
+    {
+      "path": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/secondary_visibility_domain_20260927/user_confirmed_lower_board_top.json",
+      "sha256": "8925a96443ca3751e0ffc81c6c8f249b4e1727a64b7a3be5cb3e7c2ff3d23d86"
+    }
+  ]
+}

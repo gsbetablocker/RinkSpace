@@ -97,12 +97,16 @@ def test_finite_board_artwork_and_fixed_points_are_not_reclassified_as_boundarie
 
 def prepared_fixture(tmp_path, records, *, active=1):
     f,a,_=fixture();a['active'][:]=active
-    a.update(uv=np.array([[501.,603.]],dtype='<f8'),noise_group_weights=np.array([1.,0.],dtype='<f8'))
+    a.update(uv=np.array([[501.,603.]],dtype='<f8'),noise_group_weights=np.array([1.,0.],dtype='<f8'),
+             noise_group_index=np.array([0],dtype='<i4'), noise_group_members=np.array([0],dtype='<i8'),
+             split=np.zeros(1,dtype='u1'))
     refs={k:write_array(tmp_path,k,v) for k,v in a.items()}
     write_json(tmp_path/'scene.json',{'paths':[dict(id='c0',label='ice.C0:centreline',kind='ice_circle',measurement='centreline')]})
     text=''.join(json.dumps(record,ensure_ascii=False)+'\n' for record in records)
     (tmp_path/'observations.jsonl').write_text(text,encoding='utf-8')
-    write_json(tmp_path/'manifest.json',dict(schema='rinkspace.prepared.v1',scene_ref='scene.json',arrays=refs,features=f,observations_ref='observations.jsonl'))
+    write_json(tmp_path/'manifest.json',dict(schema='rinkspace.prepared.v1',scene_ref='scene.json',arrays=refs,
+        features=f,noise_groups=[dict(id='W17',member_start=0,member_count=1,rank=1,weight_start=0)],
+        observations_ref='observations.jsonl'))
     return a
 
 
@@ -140,4 +144,4 @@ def test_prepare_metadata_selection_preserves_exact_rows_without_rechecking_unse
     path=tmp_path/'rows.jsonl'
     lines=[json.dumps(r)+'\n' for r in records];path.write_text(''.join(lines),encoding='utf-8')
     f,_,_=fixture()
-    assert list(iter_current_observations(path,f,np.array([0,0]),mask=np.array([False,True])))==lines[1:]
+    assert list(iter_current_observations(path,f,np.array([0,0]),mask=np.array([False,True]))) == path.read_bytes().decode('utf-8').splitlines(keepends=True)[1:]

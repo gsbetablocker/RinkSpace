@@ -82,7 +82,7 @@ def recover(run,project,first_pass,reverse,source,decisions,material_map,out,pre
      add_geometry_dependencies()
      import torch
      from rinkspace.vision_instances import Sam2SourceInstances
-     torch.set_num_threads(2);person_provider=Sam2SourceInstances(project.parent/'MotionTrail_Codex_Starter_v1/models/sam2.1-hiera-tiny',device='cuda',reread_rgb=False,contour_stride=16)
+     torch.set_num_threads(2);person_provider=Sam2SourceInstances(project/'models/cache/sam2.1-hiera-tiny',device='cuda',reread_rgb=False,contour_stride=16)
     current=person_provider.read(rgb,binding,prompts=prompts,reset=True);sam=current['occluder_region_candidate_mask'].detach().cpu().numpy().astype(np.uint8);mask|=cv2.dilate(sam,cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(25,25)))
   mask[:170,:620]=1;mask[900:,1600:]=1;cv2.imwrite(str(out/'mask_cache'/f'{pts}.png'),mask.astype(np.uint8)*255);return mask>0
  def anchor_for(sid,pts):

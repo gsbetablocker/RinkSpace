@@ -9,7 +9,7 @@ namespace rinkspace {
  * that interval; repair only its provable floating rounding residue. This
  * never widens the shape box or clamps a caller-supplied material point.
  */
-inline double print_convex_interpolate(double a,double b,double t){
+RS_HD inline double print_convex_interpolate(double a,double b,double t){
     if(a==b||t==0)return a;
     if(t==1)return b;
     const double value=(1-t)*a+t*b;
@@ -18,7 +18,7 @@ inline double print_convex_interpolate(double a,double b,double t){
 /* Shared installed material chart, before wrapping onto the board course.
  * p=[unwrapped_s,z,rotation,width,height]; dimensions stay positive.
  * Template chart orientation is explicit in the supplied material vertices. */
-inline Vec2 installed_print_chart(const double* p,double x,double y){
+RS_HD inline Vec2 installed_print_chart(const double* p,double x,double y){
     const double ca=std::cos(p[2]),sa=std::sin(p[2]);
     return {p[0]+ca*x*p[3]-sa*y*p[4],p[1]+sa*x*p[3]+ca*y*p[4]};
 }
@@ -29,7 +29,7 @@ inline Vec2 installed_print_chart(const double* p,double x,double y){
 inline Status print_square_vertices(const double* p,size_t np,const double* centre,size_t nc,
                                     double side_over_height,double* vertices){
     if(np!=5||nc!=2||!vertices||!finite_array(p,np)||!finite_array(centre,nc)||
-       p[3]<=0||p[4]<=0||!std::isfinite(side_over_height)||side_over_height<=0)
+       p[3]<=0||p[4]<=0||!finite_scalar(side_over_height)||side_over_height<=0)
         return Status::invalid_argument;
     const double hv=side_over_height/2,hu=hv*p[4]/p[3];
     const double left=centre[0]-hu,right=centre[0]+hu;
@@ -47,7 +47,7 @@ inline Status sample_print_chart(const double* p,size_t np,const double* vertice
     const size_t count=nv/2;
     for(size_t i=0;i<n;++i){
         const double s=stations[i];Vec2 q{};Status status=Status::ok;
-        if(!std::isfinite(s))status=Status::invalid_argument;
+        if(!finite_scalar(s))status=Status::invalid_argument;
         else if(s<0||s>1)status=Status::outside_support;
         else {
             const double u=s*(count-1);
@@ -55,7 +55,7 @@ inline Status sample_print_chart(const double* p,size_t np,const double* vertice
             const size_t k=count==1?0:j+1;const double t=count==1?0:u-j;
             q=installed_print_chart(p,print_convex_interpolate(vertices[2*j],vertices[2*k],t),
                                       print_convex_interpolate(vertices[2*j+1],vertices[2*k+1],t));
-            if(!std::isfinite(q.x)||!std::isfinite(q.y))status=Status::nonfinite;
+            if(!finite_scalar(q.x)||!finite_scalar(q.y))status=Status::nonfinite;
         }
         statuses[i]=static_cast<int>(status);
         if(status==Status::ok){sz[2*i]=q.x;sz[2*i+1]=q.y;}
@@ -76,21 +76,21 @@ struct PrintShape10 {
             return Status::invalid_argument;
         for(int axis=0;axis<2;++axis){
             lo[axis]=bounds[axis];span[axis]=bounds[axis+2]-bounds[axis];
-            if(!(span[axis]>0)||!std::isfinite(span[axis]))return Status::invalid_argument;
+            if(!(span[axis]>0)||!finite_scalar(span[axis]))return Status::invalid_argument;
             centre[axis]=lo[axis]+span[axis]/2;translation[axis]=values[axis];
             scale[axis]=std::exp(values[axis+2]);scale_delta[axis]=std::expm1(values[axis+2]);
-            if(!std::isfinite(scale[axis])||!std::isfinite(scale_delta[axis]))return Status::nonfinite;
+            if(!finite_scalar(scale[axis])||!finite_scalar(scale_delta[axis]))return Status::nonfinite;
             if(!(scale[axis]>0))return Status::degenerate;
             const double* logits=values+4+3*axis;
             const double maximum=std::max(0.,std::max(logits[0],std::max(logits[1],logits[2])));
             double sum=0;
             for(int k=0;k<4;++k){
                 weights[axis][k]=std::exp((k<3?logits[k]:0.)-maximum);
-                if(!(weights[axis][k]>0)||!std::isfinite(weights[axis][k]))return Status::degenerate;
+                if(!(weights[axis][k]>0)||!finite_scalar(weights[axis][k]))return Status::degenerate;
                 sum+=weights[axis][k];
             }
             const double extent=scale[axis]*span[axis];
-            if(!std::isfinite(extent))return Status::nonfinite;
+            if(!finite_scalar(extent))return Status::nonfinite;
             if(!(extent>0))return Status::degenerate;
             for(int k=0;k<4;++k){
                 weights[axis][k]/=sum;
@@ -98,7 +98,7 @@ struct PrintShape10 {
                 // Domain validity covers the whole group and cannot depend
                 // on whether a caller requests a Jacobian or samples this cell.
                 if(!(weights[axis][k]>0&&derivative>0))return Status::degenerate;
-                if(!std::isfinite(derivative))return Status::nonfinite;
+                if(!finite_scalar(derivative))return Status::nonfinite;
             }
         }
         return Status::ok;
@@ -110,7 +110,7 @@ struct PrintShape10 {
         if(jacobian)for(int k=0;k<20;++k)jacobian[k]=0;
         for(int axis=0;axis<2;++axis){
             const double q=(seed[axis]-lo[axis])/span[axis];
-            if(!std::isfinite(q)||q<0||q>1)return Status::outside_support;
+            if(!finite_scalar(q)||q<0||q>1)return Status::outside_support;
             double coverage[4]{},delta=0;
             for(int k=0;k<4;++k){
                 coverage[k]=std::min(1.,std::max(0.,4*q-k));
@@ -125,7 +125,7 @@ struct PrintShape10 {
             if(endpoint)delta=0;
             result[axis]=seed[axis]+translation[axis]+
                 scale_delta[axis]*(seed[axis]-centre[axis])+scale[axis]*span[axis]*delta;
-            if(!std::isfinite(result[axis]))return Status::nonfinite;
+            if(!finite_scalar(result[axis]))return Status::nonfinite;
             if(jacobian){
                 double* row=jacobian+10*axis;
                 row[axis]=1;
@@ -137,7 +137,7 @@ struct PrintShape10 {
             if(seed_derivative){
                 const int cell=std::min(static_cast<int>(std::floor(4*q)),3);
                 seed_derivative[axis]=scale[axis]*4*weights[axis][cell];
-                if(!(seed_derivative[axis]>0)||!std::isfinite(seed_derivative[axis]))return Status::degenerate;
+                if(!(seed_derivative[axis]>0)||!finite_scalar(seed_derivative[axis]))return Status::degenerate;
             }
         }
         output={result[0],result[1]};return Status::ok;
@@ -167,20 +167,26 @@ inline Status sample_print_deformed_path(const double* bp,size_t nb,const double
     const double* bounds,size_t nbound,const double* values,size_t nvalues,
     double* uv,double* sz,double* xyz,double* juv,double* jsz,double* jxyz,
     double* jinstallation,double* jstation,int* statuses){
-    if(nb!=6||!bp||np!=5||!finite_array(p,np)||!(p[3]>0&&p[4]>0)||
-       nv<2||nv%2||!finite_array(vertices,nv)||(n&&(!stations||!uv||!sz||!xyz||!statuses)))
+    const bool material_only=!bp&&nb==0;
+    const bool derivatives=juv||jsz||jxyz||jinstallation||jstation;
+    if((!material_only&&(nb!=6||!bp))||(material_only&&(xyz||derivatives))||
+       np!=5||!finite_array(p,np)||!(p[3]>0&&p[4]>0)||
+       nv<2||nv%2||!finite_array(vertices,nv)||(n&&(!stations||!uv||!sz||(!material_only&&!xyz)||!statuses)))
         return Status::invalid_argument;
-    const BoardShape board{bp[0],bp[1],bp[2],bp[3],bp[4],bp[5]};
-    if(!board.valid())return Status::invalid_argument;
+    std::unique_ptr<BoardCourse> course;
+    if(!material_only){
+        const BoardShape board{bp[0],bp[1],bp[2],bp[3],bp[4],bp[5]};
+        if(!board.valid())return Status::invalid_argument;
+        course.reset(new BoardCourse(board));
+        if(!finite_scalar(course->perimeter()))return Status::nonfinite;
+    }
     PrintShape10 shape;const Status valid=shape.initialize(bounds,nbound,values,nvalues);
     if(valid!=Status::ok)return valid;
-    const BoardCourse course(board);if(!std::isfinite(course.perimeter()))return Status::nonfinite;
     const size_t count=nv/2;const double ca=std::cos(p[2]),sa=std::sin(p[2]);
-    const bool derivatives=juv||jsz||jxyz||jinstallation||jstation;
     for(size_t i=0;i<n;++i){
         Status status=Status::ok;Vec2 material{},chart{};Vec3 point{},tangent{};
         double local[20]{},seed_derivative[2]{},chart_jac[20]{},world_jac[30]{},installation[15]{},station_jac[3]{};
-        if(!std::isfinite(stations[i]))status=Status::invalid_argument;
+        if(!finite_scalar(stations[i]))status=Status::invalid_argument;
         else if(stations[i]<0||stations[i]>1)status=Status::outside_support;
         else {
             const double u=stations[i]*(count-1);
@@ -191,7 +197,8 @@ inline Status sample_print_deformed_path(const double* bp,size_t nb,const double
             status=shape.point(x,y,material,derivatives?local:nullptr,jstation?seed_derivative:nullptr);
             if(status==Status::ok){
                 chart=installed_print_chart(p,material.x,material.y);
-                status=course.point(chart.x,chart.y,point,tangent);
+                status=material_only?((finite_scalar(chart.x)&&finite_scalar(chart.y))?Status::ok:Status::nonfinite):
+                    course->point(chart.x,chart.y,point,tangent);
             }
             if(status==Status::ok&&derivatives){
                 for(int col=0;col<10;++col){
@@ -218,7 +225,8 @@ inline Status sample_print_deformed_path(const double* bp,size_t nb,const double
         }
         statuses[i]=static_cast<int>(status);
         if(status==Status::ok){
-            uv[2*i]=material.x;uv[2*i+1]=material.y;sz[2*i]=chart.x;sz[2*i+1]=chart.y;store3(xyz+3*i,point);
+            uv[2*i]=material.x;uv[2*i+1]=material.y;sz[2*i]=chart.x;sz[2*i+1]=chart.y;
+            if(xyz)store3(xyz+3*i,point);
             if(juv)for(int col=0;col<20;++col)juv[20*i+col]=local[col];
             if(jsz)for(int col=0;col<20;++col)jsz[20*i+col]=chart_jac[col];
             if(jxyz)for(int col=0;col<30;++col)jxyz[30*i+col]=world_jac[col];
@@ -239,21 +247,29 @@ inline Status sample_print_analytic_path(const double* bp,size_t nb,const double
     int family,int side,bool reverse,const double* values,size_t nvalues,
     const double* stations,size_t n,double* uv,double* sz,double* xyz,
     double* juv,double* jsz,double* jxyz,double* jinstallation,double* jstation,int* statuses){
-    if(nb!=6||!bp||np!=5||!finite_array(p,np)||!(p[3]>0&&p[4]>0)||
+    const bool material_only=!bp&&nb==0;
+    const bool derivatives=juv||jsz||jxyz||jinstallation||jstation;
+    if((!material_only&&(nb!=6||!bp))||(material_only&&(xyz||derivatives))||
+       np!=5||!finite_array(p,np)||!(p[3]>0&&p[4]>0)||
        (family!=0&&family!=1)||nvalues!=(family==0?3u:4u)||!finite_array(values,nvalues)||
-       side<0||side>3||(n&&(!stations||!uv||!sz||!xyz||!statuses)))return Status::invalid_argument;
-    const BoardShape board{bp[0],bp[1],bp[2],bp[3],bp[4],bp[5]};
-    if(!board.valid())return Status::invalid_argument;
+       side<0||side>3||(n&&(!stations||!uv||!sz||(!material_only&&!xyz)||!statuses)))return Status::invalid_argument;
+    std::unique_ptr<BoardCourse> course;
+    if(!material_only){
+        const BoardShape board{bp[0],bp[1],bp[2],bp[3],bp[4],bp[5]};
+        if(!board.valid())return Status::invalid_argument;
+        course.reset(new BoardCourse(board));
+        if(!finite_scalar(course->perimeter()))return Status::nonfinite;
+    }
     double vertices[10]{},width=0,height=0;
     if(family==0){
         const double side_over_height=std::exp(values[2]);
-        if(!std::isfinite(side_over_height))return Status::nonfinite;
+        if(!finite_scalar(side_over_height))return Status::nonfinite;
         if(!(side_over_height>0))return Status::degenerate;
         const auto valid=print_square_vertices(p,np,values,2,side_over_height,vertices);
         if(valid!=Status::ok)return valid;
     }else{
         width=std::exp(values[2]);height=std::exp(values[3]);
-        if(!std::isfinite(width)||!std::isfinite(height))return Status::nonfinite;
+        if(!finite_scalar(width)||!finite_scalar(height))return Status::nonfinite;
         if(!(width>0&&height>0))return Status::degenerate;
         const double left=values[0]-width/2,right=values[0]+width/2;
         const double top=values[1]-height/2,bottom=values[1]+height/2;
@@ -261,13 +277,11 @@ inline Status sample_print_analytic_path(const double* bp,size_t nb,const double
         const double rectangle[]={left,top,right,top,right,bottom,left,bottom,left,top};
         for(int k=0;k<10;++k)vertices[k]=rectangle[k];
     }
-    const BoardCourse course(board);if(!std::isfinite(course.perimeter()))return Status::nonfinite;
     const double ca=std::cos(p[2]),sa=std::sin(p[2]);
-    const bool derivatives=juv||jsz||jxyz||jinstallation||jstation;
     for(size_t i=0;i<n;++i){
         Status status=Status::ok;Vec2 material{},chart{};Vec3 point{},tangent{};
         double local[8]{},chart_jac[8]{},world_jac[12]{},installation[15]{},station_jac[3]{};
-        if(!std::isfinite(stations[i]))status=Status::invalid_argument;
+        if(!finite_scalar(stations[i]))status=Status::invalid_argument;
         else if(stations[i]<0||stations[i]>1)status=Status::outside_support;
         else {
             const double coordinate=reverse?1-stations[i]:stations[i];
@@ -277,7 +291,8 @@ inline Status sample_print_analytic_path(const double* bp,size_t nb,const double
             material={print_convex_interpolate(vertices[2*j],vertices[2*j+2],t),
                       print_convex_interpolate(vertices[2*j+1],vertices[2*j+3],t)};
             chart=installed_print_chart(p,material.x,material.y);
-            status=course.point(chart.x,chart.y,point,tangent);
+            status=material_only?((finite_scalar(chart.x)&&finite_scalar(chart.y))?Status::ok:Status::nonfinite):
+                course->point(chart.x,chart.y,point,tangent);
             if(status==Status::ok&&derivatives){
                 const int nlocal=static_cast<int>(nvalues);
                 local[0]=1;local[nlocal+1]=1;
@@ -317,7 +332,8 @@ inline Status sample_print_analytic_path(const double* bp,size_t nb,const double
         }
         statuses[i]=static_cast<int>(status);
         if(status==Status::ok){
-            uv[2*i]=material.x;uv[2*i+1]=material.y;sz[2*i]=chart.x;sz[2*i+1]=chart.y;store3(xyz+3*i,point);
+            uv[2*i]=material.x;uv[2*i+1]=material.y;sz[2*i]=chart.x;sz[2*i+1]=chart.y;
+            if(xyz)store3(xyz+3*i,point);
             if(juv)for(size_t col=0;col<2*nvalues;++col)juv[2*nvalues*i+col]=local[col];
             if(jsz)for(size_t col=0;col<2*nvalues;++col)jsz[2*nvalues*i+col]=chart_jac[col];
             if(jxyz)for(size_t col=0;col<3*nvalues;++col)jxyz[3*nvalues*i+col]=world_jac[col];
@@ -326,6 +342,81 @@ inline Status sample_print_analytic_path(const double* bp,size_t nb,const double
         }
     }
     return Status::ok;
+}
+
+/* Shared scalar primitive sampler. Parameters and finite support are validated
+ * by the caller. CPU review and CUDA factors use identical arithmetic. */
+template<class T> RS_HD inline Vec3Value<T> sample_planar_primitive(int kind,const double* p,T s){
+    using std::sin;using std::cos;
+    Vec3Value<T> q{};
+    if(kind==0)q=add(mul(1-s,scalar_cast<T>(load3(p))),mul(s,scalar_cast<T>(load3(p+3))));
+    else if(kind==1){const T a=p[4]+s*(p[5]-p[4]);q={p[0]+p[3]*cos(a),p[1]+p[3]*sin(a),p[2]};}
+    else if(kind==6){const T a=p[6]+s*(p[7]-p[6]),x=p[3]*cos(a),y=p[4]*sin(a),ca=cos(p[5]),sa=sin(p[5]);q={p[0]+ca*x-sa*y,p[1]+sa*x+ca*y,p[2]};}
+    return q;
+}
+
+/* Shared one-point primitive forward, with its station tangent. Geometry and
+ * placement are frozen inputs; arbitrary display samples are never landmarks. */
+RS_HD inline Status sample_entity_point(const BoardCourse* course,double height,int kind,
+    const double* p,const double* vertices,size_t nv,double s,Vec3& q,Vec3& ds){
+    ds={0,0,0};
+    if(!finite_scalar(s))return Status::invalid_argument;
+    if(kind!=7&&(s<0||s>1))return Status::outside_support;
+    if(kind==7){return course->point(s,p[0]*height,q,ds);}
+    if(kind==0||kind==1||kind==6){
+        q=sample_planar_primitive(kind,p,s);
+        if(kind==0)ds=sub(load3(p+3),load3(p));
+        else if(kind==1){double a=p[4]+s*(p[5]-p[4]),rate=p[5]-p[4];
+            ds={-p[3]*std::sin(a)*rate,p[3]*std::cos(a)*rate,0};}
+        else{double a=p[6]+s*(p[7]-p[6]),rate=p[7]-p[6],ca=std::cos(p[5]),sa=std::sin(p[5]);
+            double x=-p[3]*std::sin(a)*rate,y=p[4]*std::cos(a)*rate;
+            ds={ca*x-sa*y,sa*x+ca*y,0};}
+    }else if(kind==2||kind==4||kind==5){
+        const size_t dim=kind==4?3:2,count=nv/dim;const double u=s*(count-1);
+        const size_t j=count==1?0:std::min(static_cast<size_t>(std::floor(u)),count-2);
+        const size_t k=count==1?0:j+1;const double t=count==1?0:u-j;
+        const double x=kind==5?print_convex_interpolate(vertices[j*dim],vertices[k*dim],t):
+            (1-t)*vertices[j*dim]+t*vertices[k*dim];
+        const double y=kind==5?print_convex_interpolate(vertices[j*dim+1],vertices[k*dim+1],t):
+            (1-t)*vertices[j*dim+1]+t*vertices[k*dim+1];
+        double dx=(vertices[k*dim]-vertices[j*dim])*(count-1),dy=(vertices[k*dim+1]-vertices[j*dim+1])*(count-1);
+        if(kind==4){q={x,y,(1-t)*vertices[j*dim+2]+t*vertices[k*dim+2]};
+            ds={dx,dy,(vertices[k*dim+2]-vertices[j*dim+2])*(count-1)};}
+        else{
+            Vec2 chart{x,y};
+            if(kind==5){chart=installed_print_chart(p,x,y);
+                const double ca=std::cos(p[2]),sa=std::sin(p[2]);
+                double tx=ca*dx*p[3]-sa*dy*p[4],ty=sa*dx*p[3]+ca*dy*p[4];dx=tx;dy=ty;}
+            Vec3 tangent{};auto status=course->point(chart.x,chart.y,q,tangent);
+            if(status!=Status::ok)return status;ds={tangent.x*dx,tangent.y*dx,dy};
+        }
+    }else if(kind==3){
+        const int segment=static_cast<int>(p[0]);const auto& breaks=course->breaks();double position,rate;
+        if(segment==-2){double u=s*8;int j=std::min(static_cast<int>(std::floor(u)),7);
+            rate=8*(breaks[j+1]-breaks[j]);position=breaks[j]+(u-j)*(breaks[j+1]-breaks[j]);}
+        else if(segment>=0){rate=breaks[segment+1]-breaks[segment];position=breaks[segment]+s*rate;}
+        else{rate=course->perimeter();position=s*rate;}
+        Vec3 tangent{};auto status=course->point(position,p[1]*height,q,tangent);
+        if(status!=Status::ok)return status;ds=mul(rate,tangent);
+    }else return Status::invalid_argument;
+    return finite(q)&&finite(ds)?Status::ok:Status::nonfinite;
+}
+
+/* Exact piecewise-linear unfolded chart of a frozen native print. Knots are
+ * original seed/warp break stations, never adaptive drawing samples. */
+RS_HD inline Status sample_knot_board(const BoardCourse& course,const double* knots,const double* sz,
+    size_t count,double station,Vec3& xyz,Vec3& derivative){
+    if(!finite_scalar(station)||count<2)return Status::invalid_argument;
+    if(station<knots[0]||station>knots[count-1])return Status::outside_support;
+    size_t lo=0,hi=count;
+    while(lo<hi){size_t mid=lo+(hi-lo)/2;if(station<knots[mid])hi=mid;else lo=mid+1;}
+    size_t j=std::min(lo?lo-1:0,count-2);double width=knots[j+1]-knots[j];
+    double t=(station-knots[j])/width;
+    double x=print_convex_interpolate(sz[2*j],sz[2*j+2],t),y=print_convex_interpolate(sz[2*j+1],sz[2*j+3],t);
+    Vec3 tangent{};auto status=course.point(x,y,xyz,tangent);
+    double dx=(sz[2*j+2]-sz[2*j])/width,dy=(sz[2*j+3]-sz[2*j+1])/width;
+    derivative={tangent.x*dx,tangent.y*dx,dy};
+    return status;
 }
 
 /* One finite-path evaluator used by replay, reviews and future factors.
@@ -349,7 +440,7 @@ inline Status sample_entity_path(const double* bp,size_t nb,int kind,
         BoardShape b{bp[0],bp[1],bp[2],bp[3],bp[4],bp[5]};
         if(!b.valid())return Status::invalid_argument;
         course.reset(new BoardCourse(b));height=b.height;
-        if(!std::isfinite(course->perimeter()))return Status::nonfinite;
+        if(!finite_scalar(course->perimeter()))return Status::nonfinite;
     }
     if(kind==0&&(np!=6||!finite_array(p,np)))return Status::invalid_argument;
     if(kind==1&&(np!=6||!finite_array(p,np)||p[3]<=0||p[5]<=p[4]))return Status::invalid_argument;
@@ -361,30 +452,7 @@ inline Status sample_entity_path(const double* bp,size_t nb,int kind,
     if((kind==2||kind==4||kind==5)&&(nv<dim||nv%dim||!finite_array(vertices,nv)))return Status::invalid_argument;
     for(size_t i=0;i<n;++i){
         const double s=stations[i];Vec3 q{};Status status=Status::ok;
-        if(!std::isfinite(s))status=Status::invalid_argument;
-        else if(kind!=7&&(s<0||s>1))status=Status::outside_support;
-        else if(kind==7){Vec3 tangent{};status=course->point(s,p[0]*height,q,tangent);}
-        else if(kind==0)q=add(mul(1-s,load3(p)),mul(s,load3(p+3)));
-        else if(kind==1){const double a=p[4]+s*(p[5]-p[4]);q={p[0]+p[3]*std::cos(a),p[1]+p[3]*std::sin(a),p[2]};}
-        else if(kind==6){const double a=p[6]+s*(p[7]-p[6]),x=p[3]*std::cos(a),y=p[4]*std::sin(a),ca=std::cos(p[5]),sa=std::sin(p[5]);q={p[0]+ca*x-sa*y,p[1]+sa*x+ca*y,p[2]};}
-        else if(kind==2||kind==4||kind==5){
-            const size_t count=nv/dim;const double u=s*(count-1);
-            const size_t j=count==1?0:std::min(static_cast<size_t>(std::floor(u)),count-2);
-            const size_t k=count==1?0:j+1;const double t=count==1?0:u-j;
-            const double x=kind==5?print_convex_interpolate(vertices[j*dim],vertices[k*dim],t):
-                                   (1-t)*vertices[j*dim]+t*vertices[k*dim];
-            const double y=kind==5?print_convex_interpolate(vertices[j*dim+1],vertices[k*dim+1],t):
-                                   (1-t)*vertices[j*dim+1]+t*vertices[k*dim+1];
-            if(kind==2){Vec3 tangent{};status=course->point(x,y,q,tangent);}
-            else if(kind==5){const Vec2 chart=installed_print_chart(p,x,y);Vec3 tangent{};status=course->point(chart.x,chart.y,q,tangent);}
-            else q={x,y,(1-t)*vertices[j*dim+2]+t*vertices[k*dim+2]};
-        } else {
-            const int segment=static_cast<int>(p[0]);const auto& breaks=course->breaks();double position;
-            if(segment==-2){const double u=s*8;const int j=std::min(static_cast<int>(std::floor(u)),7);position=breaks[j]+(u-j)*(breaks[j+1]-breaks[j]);}
-            else if(segment>=0)position=breaks[segment]+s*(breaks[segment+1]-breaks[segment]);
-            else position=s*course->perimeter();
-            Vec3 tangent{};status=course->point(position,p[1]*height,q,tangent);
-        }
+        Vec3 derivative{};status=sample_entity_point(course.get(),height,kind,p,vertices,nv,s,q,derivative);
         if(status==Status::ok&&!finite(q))status=Status::nonfinite;
         statuses[i]=static_cast<int>(status);
         if(status==Status::ok)store3(xyz+3*i,q);
@@ -400,7 +468,7 @@ inline Status sample_entity_path(const double* bp,size_t nb,int kind,
  * its original circular replay interpretation; no old state is rewritten.
  * These are estimable geometry parameters, never observations or metre facts.
  */
-inline Status shared_entity_definition(const double* bp,size_t nb,const double* q,size_t nq,
+RS_HD inline Status shared_entity_definition(const double* bp,size_t nb,const double* q,size_t nq,
                                       int code,int& kind,double* out,size_t no,unsigned options=0){
     if(!bp||nb!=6||!q||(nq!=33&&nq!=35)||!out||!finite_array(q,nq)||(options&~15u))return Status::invalid_argument;
     if(((options&4u)||(options&8u))&&!(options&2u))return Status::invalid_argument;

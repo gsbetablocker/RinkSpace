@@ -336,3 +336,35 @@ def _append_guided_readouts(rgb,measurement,mask,inventory,points,normals,interv
     result.update(source_guided_actual_RGB_remeasured=True,source_guided_navigation_UV_admitted=False,
         source_readout_quantization_step_px=1.,source_interpolation_grid_px=1./32.)
     return result
+
+
+def read_actual_source_query_profiles(rgb, binding, inventory, points, normals, intervals, curves,
+        exclusion_mask, *, query_guide_indices=None, profile_backend='cpu'):
+    """Public adapter for native-bound image queries; reuse the existing q50 reader.
+
+    The inventory supplies measurement semantics only. Queries are current image
+    navigation, never observations. No old scene or camera is loaded here.
+    """
+    points=np.asarray(points,np.float64).reshape(-1,2)
+    normals=np.asarray(normals,np.float64).reshape(-1,2)
+    intervals=np.asarray(intervals,np.float64).reshape(-1,2)
+    curves=np.asarray(curves,np.int16)
+    if (normals.shape!=points.shape or intervals.shape!=points.shape or curves.shape!=(len(points),)
+            or not np.isfinite(np.r_[points.ravel(),normals.ravel(),intervals.ravel()]).all()
+            or np.any(curves<0) or np.any(curves>=len(inventory))):
+        raise ValueError('Every native source query needs a finite normal, interval and retained path')
+    if len(points) and (not np.allclose(np.linalg.norm(normals,axis=1),1.,atol=1e-5)
+            or np.any(intervals[:,1]<=intervals[:,0])):
+        raise ValueError('Unit source normals and ordered material search intervals required')
+    empty=dict(source_binding=dict(binding),decoded_native_RGB_sha256=hashlib.sha256(np.asarray(rgb).tobytes()).hexdigest(),
+        query_uv=np.empty((0,2),np.float64),query_normal=np.empty((0,2),np.float64),query_interval=np.empty((0,2),np.float64),
+        query_curve=np.empty(0,np.int16),query_status=np.empty(0,np.uint8),curve_status=np.zeros(len(inventory),np.uint8),
+        candidate_uv=np.empty((0,2),np.float32),candidate_sides=np.empty((0,2,2),np.float32),
+        candidate_query=np.empty(0,np.int32),candidate_flags=np.empty(0,np.uint8),
+        candidate_side_quantiles_uv=np.empty((0,2,3,2),np.float64),
+        source_measurement_method='existing_native_RGB_material_profiles_q25_q50_q75',
+        source_RGB_measured=True,projected_UV_used_as_measurements=False)
+    query_guide_indices=np.full(len(points),-1,np.int32) if query_guide_indices is None else np.asarray(query_guide_indices,np.int32)
+    if query_guide_indices.shape!=(len(points),):raise ValueError('Source query provenance has a different length')
+    return _append_guided_readouts(rgb,empty,np.asarray(exclusion_mask,bool),inventory,points,normals,intervals,curves,
+        query_guide_indices,[],guides=(),profile_backend=profile_backend)

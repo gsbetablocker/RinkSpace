@@ -40,8 +40,8 @@ def run(indices=None, data=None):
     manifest = read(DATA / 'frame_manifest.json')
     shot_index = int(manifest['shot_scope']['shot_index'])
     provider = Sam2SourceInstances(DEFAULT_MODEL, device='cuda', reread_rgb=False, contour_stride=16)
-    detector = SourcePersonBoxes(ROOT.parent / 'FSpathing/models/yolo11n-pose.pt',
-        dependency_paths=[ROOT.parent / 'FSpathing/.venv/Lib/site-packages'],
+    detector = SourcePersonBoxes(ROOT / "models/cache/yolo11n-pose.pt",
+        dependency_paths=[ROOT / ".venv-gpu/Lib/site-packages"],
         runtime_directory=DATA / 'person_detector_runtime', device='cuda')
     tiles = []
     for row in manifest['frames']:
