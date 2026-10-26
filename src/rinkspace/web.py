@@ -426,6 +426,20 @@ def serve(root='.', port=8765, open_browser=False):
         def log_message(self, fmt, *args):
             pass
 
+        def check_host(self):
+            # Binding the listener to loopback does not prevent DNS rebinding.
+            # A browser-controlled Host must not authorize reading local assets
+            # or modifying the project, even when Origin uses the same host.
+            hosts = self.headers.get_all('Host', [])
+            if len(hosts) != 1:
+                raise ValueError('Expected one local Host header')
+            host = urlsplit('//' + hosts[0])
+            if (host.hostname not in ('127.0.0.1', 'localhost')
+                    or host.username is not None or host.password is not None
+                    or host.path or host.query or host.fragment
+                    or (host.port or 80) != self.server.server_port):
+                raise ValueError('Only the local workbench host is accepted')
+
         def json(self, value, status=200):
             payload = json.dumps(value, ensure_ascii=False, allow_nan=False).encode('utf-8')
             self.send_response(status)
@@ -469,6 +483,7 @@ def serve(root='.', port=8765, open_browser=False):
 
         def do_GET(self):
             try:
+                self.check_host()
                 url = urlsplit(self.path)
                 query = {k: v[-1] for k, v in parse_qs(url.query).items()}
                 if url.path == '/api/state':
@@ -522,14 +537,16 @@ def serve(root='.', port=8765, open_browser=False):
 
         def do_POST(self):
             try:
+                self.check_host()
                 origin = self.headers.get('Origin')
-                if origin and urlsplit(origin).netloc != self.headers.get('Host'):
+                if origin and (urlsplit(origin).scheme != 'http'
+                               or urlsplit(origin).netloc != self.headers.get('Host')):
                     raise ValueError('Only same-origin local requests are accepted')
-                if 'application/json' not in self.headers.get('Content-Type', ''):
+                if self.headers.get('Content-Type', '').split(';', 1)[0].strip().lower() != 'application/json':
                     raise ValueError('Expected application/json')
                 length = int(self.headers.get('Content-Length', 0))
-                if length > 2_000_000:
-                    raise ValueError('JSON payload too large')
+                if not 0 <= length <= 2_000_000:
+                    raise ValueError('Invalid JSON payload length')
                 data = json.loads(self.rfile.read(length) or b'{}')
                 route = urlsplit(self.path).path
                 if route == '/api/project':

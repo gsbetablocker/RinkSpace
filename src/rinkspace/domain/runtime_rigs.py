@@ -53,6 +53,8 @@ def _camera_data(path):
     camera = _decode(raw, path)
     if camera.get("schema") != "rinkspace.camera.motion.v1":
         raise ValueError(f"Unsupported current camera schema: {path}")
+    if camera.get("source_binding_verified") is False:
+        raise ValueError(f"Unverified historical replay cannot become a prepared fit camera: {path}")
     rig = camera.get("rig")
     if not isinstance(rig, list) or len(rig) != 38 or not all(_finite_number(v) for v in rig):
         raise ValueError(f"Camera rig must contain 38 finite numbers: {path}")

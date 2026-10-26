@@ -862,7 +862,7 @@ class RinkVisionModule:
             self.reset()
         old = self.previous_binding
         if old and (any(old.get(k) != binding.get(k) for k in
-                        ("source_sha256", "time_base", "shot_id", "installation_id", "native_hw")) or
+                        ("source_sha256", "time_base", "shot_id", "event_id", "rig_id", "installation_id", "native_hw")) or
                     int(binding["source_pts"]) < int(old["source_pts"])):
             self.reset()
             old = None
@@ -1028,8 +1028,10 @@ def source_guide_visibility_override_crop(guide, binding, native_hw):
 class SourceRinkReader:
     """Read actual source pixels. A search hint never becomes the measurement."""
     def __init__(self, config_path, *, model_path=None, original_fit_request_path=None, native_geometry=None,
-                 source_reidentification=None):
+                 source_reidentification=None, programme_scope=None):
         self.config, self.data = configure(config_path)
+        # F30 remains explicit opt-in until its real-source loop is validated.
+        self.candidate_admission_enabled = self.config.get("enable_candidate_admission") is True
         self.vision = RinkVisionModule(Path(model_path) if model_path else ROOT / self.config["final_model"],
                                        ROOT / self.config["flow_weights"], device=self.config["device"],
                                        exposure_registry=self.config.get("source_clock_registry"))
@@ -1051,7 +1053,7 @@ class SourceRinkReader:
         source_reidentification = source_reidentification or self.config.get('source_reidentification')
         if source_reidentification:
             from .vision_reidentify import AcceptedSourceReidentifier
-            self.reidentifier = AcceptedSourceReidentifier(source_reidentification, self.native_geometry, device=self.vision.device)
+            self.reidentifier = AcceptedSourceReidentifier(source_reidentification, self.native_geometry, device=self.vision.device, programme_scope=programme_scope)
         self.instance_provider = None
         self.active_guides = []
         self.active_global_exclusion = None
@@ -1061,15 +1063,168 @@ class SourceRinkReader:
             from .vision_source_fit import OriginalFITSourceReader
             self.original_fit_reader = OriginalFITSourceReader(original_fit_request_path)
 
-    def read(self, rgb, source_binding, *, guides_2d=None, ignored_regions=(), reset=False,
+    def begin_frame(self, rgb, source_binding, *, reset=False, **options):
+        """Open one native exposure. Neural/flow state is provisional until commit.
+
+        No second exposure can enter while this frame is open. Query refinements
+        share its prediction, masks and source image; they never predict again.
+        """
+        import hashlib
+        if getattr(self, "_pending_frame", None) is not None:
+            raise ValueError("Commit or abort the open source exposure first")
+        prediction = options.pop("precomputed_prediction", None)
+        if prediction is None:
+            prediction = self.vision.predict(rgb, source_binding, reset=reset)
+        binding = prediction["source_binding"]
+        from .vision_geometry import _same_frame
+        _same_frame(dict(source_binding, native_hw=list(rgb.shape[:2])), binding)
+        context = dict(rgb=rgb, binding=binding, prediction=prediction, reset=reset,
+            options=options, queries=None, result=None, frontend=None,
+            rgb_sha256=hashlib.sha256(np.ascontiguousarray(rgb).tobytes()).hexdigest(),
+            frontend_calls=1, commits=0,
+            before=(self.active_guides, self.active_binding, self.active_global_exclusion,
+                    getattr(self, "active_front_face", None)))
+        self._pending_frame = context
+        return context
+
+    def continuation_queries(self, context):
+        """Move existing search support once; this never emits measured UV."""
+        import torch
+        from torch.nn import functional as F
+        from .vision_geometry import warp
+        if context is not getattr(self, '_pending_frame', None):
+            raise ValueError('Temporal query context is stale')
+        if context['prediction']['memory_update']=='shot_reset':return []
+        if 'continued_queries' in context:return context['continued_queries']
+        binding=context['binding'];h,w=context['rgb'].shape[:2]
+        guides_2d = [{**g} for g in self.active_guides]
+        pair = self.vision.last_motion
+        for guide in guides_2d:
+            # A native projection describes its own exposure. Fresh navigation
+            # is attached by the dispatcher; optical flow cannot update it.
+            guide.pop('native_identity_navigation',None)
+            guide.pop('model_search_projection',None)
+            points = torch.as_tensor(guide["points_uv"], device=self.vision.device, dtype=torch.float32)
+            if pair is not None:
+                grid = points * points.new_tensor([2/(w-1),2/(h-1)])-1
+                movement = F.grid_sample(pair.forward, grid[None,:,None], align_corners=True)[0,:,:,0].T
+                flow_valid = F.grid_sample(pair.valid_forward.float(), grid[None,:,None],
+                                           mode="nearest", align_corners=True)[0,0,:,0] > .5
+                if guide.get("normals") is not None:
+                    normal = torch.as_tensor(guide["normals"], device=self.vision.device, dtype=torch.float32)
+                    tangent = torch.stack((normal[:, 1], -normal[:, 0]), 1)
+                    tangent = tangent / tangent.norm(dim=1, keepdim=True).clamp_min(1e-8)
+                    tip_grid = (points+tangent) * points.new_tensor([2/(w-1),2/(h-1)])-1
+                    tip_move = F.grid_sample(pair.forward, tip_grid[None,:,None], align_corners=True)[0,:,:,0].T
+                    moved_tangent = tangent + tip_move - movement
+                    guide["normals"] = torch.stack((-moved_tangent[:, 1], moved_tangent[:, 0]), 1)
+                points = points + movement
+                guide["temporal_flow_supported"] = flow_valid
+                if guide.get("source_exclusion_mask") is not None:
+                    mask, inside = warp(guide["source_exclusion_mask"].float(), pair.backward)
+                    guide["source_exclusion_mask"] = (mask > .5) & inside
+                if guide.get("source_guide_exclusion_mask") is not None:
+                    mask, inside = warp(guide["source_guide_exclusion_mask"].float(), pair.backward)
+                    guide["source_guide_exclusion_mask"] = (mask > .5) & inside
+            if guide.get("rgb_transition_polarity") and guide.get("identity_authority"):
+                if not guide.get("transition_authority"):
+                    guide["transition_authority"] = guide["identity_authority"]
+            guide.update(points_uv=points, source_binding=binding,
+                         origin="temporal_source_search_hint",
+                         identity_confirmed=(guide.get("identity_confirmed") is True
+                                             and bool(guide.get("identity_authority"))),
+                         hint_previous_source_binding=self.active_binding,
+                         hint_is_source_measurement=False)
+            if guide.get("source_exclusion_mask") is not None:
+                guide["source_exclusion_binding"] = binding
+        context["continued_queries"]=guides_2d
+        return guides_2d
+
+    def read_queries(self, context, queries=None):
+        """Refine the union of queries using this exposure's existing frontend."""
+        import hashlib
+        if context is not getattr(self, "_pending_frame", None):
+            raise ValueError("Query context is stale or already committed")
+        if context['rgb_sha256'] != hashlib.sha256(np.ascontiguousarray(context['rgb']).tobytes()).hexdigest():
+            raise ValueError("Original RGB changed during an open exposure")
+        if queries is not None:
+            # A physical path can have several disjoint visible query runs.
+            # Deduplicating by path ID silently erased all but the last run.
+            def keyed(rows):
+                occurrences = {}
+                for original in rows:
+                    g = dict(original)
+                    ordinal = occurrences.get(g['id'], 0)
+                    occurrences[g['id']] = ordinal + 1
+                    g.setdefault('query_id', f"{g['id']}::source_run:{ordinal}")
+                    yield g['query_id'], g
+            merged = dict(keyed(context['queries'] or []))
+            merged.update(keyed(queries))
+            context['queries'] = list(merged.values())
+        if context['result'] is not None and queries is None:
+            return context['result']
+        try:
+            result = self._read_frame_queries(context['rgb'], context['binding'],
+                guides_2d=context['queries'], reset=context['reset'],
+                precomputed_prediction=context['prediction'], **context['options'])
+            context['after'] = (self.active_guides, self.active_binding,
+                self.active_global_exclusion, getattr(self, 'active_front_face', None))
+            context['queries'] = [dict(g) for g in self.active_guides]
+            context['result'] = result
+            result['frame_context'] = dict(frontend_calls=1, temporal_commits=0,
+                same_exposure_query_rounds=context.get('rounds', 0)+1,
+                decoded_RGB_sha256=context['rgb_sha256'])
+            context['rounds'] = context.get('rounds', 0)+1
+        finally:
+            self.active_guides, self.active_binding, self.active_global_exclusion, self.active_front_face = context['before']
+        return result
+
+    def commit_frame(self, context):
+        """Expose exactly one final temporal observation for the native exposure."""
+        if context is not getattr(self, '_pending_frame', None) or context['commits']:
+            raise ValueError('Source exposure has already been committed')
+        if context['result'] is None:
+            self.read_queries(context)
+        self.active_guides, self.active_binding, self.active_global_exclusion, self.active_front_face = context['after']
+        context['commits'] = 1
+        context['result']['frame_context']['temporal_commits'] = 1
+        self._pending_frame = None
+        return context['result']
+
+    def abort_frame(self, context):
+        if context is not getattr(self, '_pending_frame', None):
+            raise ValueError('Source exposure is not open')
+        # A failed exposure cannot leave a usable partially advanced memory.
+        self.vision.reset()
+        self.active_guides, self.active_binding, self.active_global_exclusion = [], None, None
+        self.active_front_face = None
+        self._pending_frame = None
+
+    def read(self, rgb, source_binding, *, guides_2d=None, reset=False, **options):
+        context = self.begin_frame(rgb, source_binding, reset=reset, **options)
+        try:
+            self.read_queries(context, guides_2d)
+            return self.commit_frame(context)
+        except BaseException:
+            self.abort_frame(context)
+            raise
+
+    def _read_frame_queries(self, rgb, source_binding, *, guides_2d=None, ignored_regions=(), reset=False,
              source_region_constraints=None, precomputed_prediction=None,
-             extract_source_components=True, current_source_masks_by_kind=None):
+             extract_source_components=True, current_source_masks_by_kind=None,
+             additional_search_guides=None, additional_source_guides=None):
         import torch
         from torch.nn import functional as F
         from .vision_geometry import extract_source_primitives, guided_source_reading, coherent_named_source_reading
         from .vision_geometry import warp, _same_frame
         from .vision_feedback import begin_read, check_guide_operators, finish_read
-        feedback = begin_read(source_binding, guides_2d if guides_2d is not None else self.active_guides)
+        additional_search_guides = None if additional_search_guides is None else list(additional_search_guides)
+        feedback_guides = list(guides_2d if guides_2d is not None else self.active_guides)
+        feedback_guides.extend(additional_search_guides or ())
+        feedback_guides.extend(additional_source_guides or ())
+        feedback_guides.extend(dict(g, id=g['display_label']) for g in (additional_search_guides or ())
+            if g.get('display_label') and g['display_label'] != g['id'])
+        feedback = begin_read(source_binding, feedback_guides)
         if precomputed_prediction is None:
             prediction = self.vision.predict(rgb, source_binding, reset=reset)
         else:
@@ -1093,162 +1248,160 @@ class SourceRinkReader:
             if explicit_guides:
                 guides_2d = [{**g} for g in guides_2d]
             else:
-                guides_2d = [{**g} for g in self.active_guides]
-                pair = self.vision.last_motion
-                for guide in guides_2d:
-                    points = torch.as_tensor(guide["points_uv"], device=self.vision.device, dtype=torch.float32)
-                    if pair is not None:
-                        grid = points * points.new_tensor([2/(w-1),2/(h-1)])-1
-                        movement = F.grid_sample(pair.forward, grid[None,:,None], align_corners=True)[0,:,:,0].T
-                        flow_valid = F.grid_sample(pair.valid_forward.float(), grid[None,:,None],
-                                                   mode="nearest", align_corners=True)[0,0,:,0] > .5
-                        if guide.get("normals") is not None:
-                            normal = torch.as_tensor(guide["normals"], device=self.vision.device, dtype=torch.float32)
-                            tangent = torch.stack((normal[:, 1], -normal[:, 0]), 1)
-                            tangent = tangent / tangent.norm(dim=1, keepdim=True).clamp_min(1e-8)
-                            tip_grid = (points+tangent) * points.new_tensor([2/(w-1),2/(h-1)])-1
-                            tip_move = F.grid_sample(pair.forward, tip_grid[None,:,None], align_corners=True)[0,:,:,0].T
-                            moved_tangent = tangent + tip_move - movement
-                            guide["normals"] = torch.stack((-moved_tangent[:, 1], moved_tangent[:, 0]), 1)
-                        points = points + movement
-                        guide["temporal_flow_supported"] = flow_valid
-                        if guide.get("source_exclusion_mask") is not None:
-                            mask, inside = warp(guide["source_exclusion_mask"].float(), pair.backward)
-                            guide["source_exclusion_mask"] = (mask > .5) & inside
-                    if guide.get("rgb_transition_polarity") and guide.get("identity_authority"):
-                        if not guide.get("transition_authority"):
-                            guide["transition_authority"] = guide["identity_authority"]
-                    guide.update(points_uv=points, source_binding=binding,
-                                 origin="temporal_source_search_hint",
-                                 identity_confirmed=bool(guide.get("identity_authority")),
-                                 hint_previous_source_binding=self.active_binding,
-                                 hint_is_source_measurement=False)
-                    if guide.get("source_exclusion_mask") is not None:
-                        guide["source_exclusion_binding"] = binding
-            reidentification = None
-            material_matches = None
-            instances = None
-            people, graphics = [], dict(candidates=[])
-            if getattr(self, 'reidentifier', None) is not None:
-                if prediction['memory_update'] == 'shot_reset':
-                    self.reidentification_active = not bool(guides_2d)
-                exclusion, people, graphics = self.reidentifier.exclusions(rgb, binding)
-                current_source_masks_by_kind = dict(current_source_masks_by_kind or {})
-                for kind in ('board_top','ice_contact','ad_boundary','ice_paint'):
-                    supplied = current_source_masks_by_kind.get(kind)
-                    fresh = torch.as_tensor(exclusion, device=self.vision.device)
-                    current_source_masks_by_kind[kind] = fresh if supplied is None else fresh | torch.as_tensor(supplied, device=self.vision.device)
-                if self.reidentification_active:
-                    recovered, reidentification = self.reidentifier.search(rgb, binding,
-                        reset=prediction['memory_update']=='shot_reset', person_boxes=people,
-                        prediction=prediction, classes=self.vision.classes, exclusion=exclusion, flow_engine=getattr(self.vision,'flow',None))
-                    recovered_ids = {g['id'] for g in recovered}
-                    guides_2d = [g for g in guides_2d if g['id'] not in recovered_ids] + recovered
-                    material_matches=reidentification
-                    reidentification['current_occlusion'] = dict(person_boxes=people,
-                        graphic_boxes=[g['box_xyxy'] for g in graphics.get('candidates',[])],
-                        excluded_pixels=int(exclusion.sum()), person_model_sha256=self.reidentifier.person.weights_sha256)
-                elif prediction['memory_update']=='shot_reset' and getattr(self,'config',{}).get('source_instances'):
-                    material_matches=self.reidentifier.matcher.read(rgb,binding,person_boxes=people,
-                        overlay_boxes=graphics.get('candidates',[]),
-                        source_identity_anchors=self.reidentifier.accepted_ad_anchors(guides_2d,binding))
-                    native_ads,native_identities=self.reidentifier.advertisement_guides(rgb,binding,material_matches,native_only=True)
-                    if native_ads:
-                        preserved=[]
-                        for guide in guides_2d:
-                            definition=self.native_geometry.lookup(guide['id'])
-                            physical=(definition or {}).get('instance_id','').rsplit('/',1)[-1]
-                            if physical in native_identities and guide.get('kind')=='ad_boundary':
-                                preserved.append(dict(id=guide['id'],points_uv=guide['points_uv'],
-                                    identity_authority=guide.get('identity_authority'),source_binding=guide.get('source_binding')))
-                        replaced_paths={g['id'] for g in native_ads}
-                        replaced={row['id'] for row in preserved if self.native_geometry.lookup(row['id'])['id'] in replaced_paths}
-                        guides_2d=[g for g in guides_2d if g['id'] not in replaced]+native_ads
-                        material_matches['preserved_accepted_source_navigation']=preserved
-                        material_matches['current_native_registered_correspondence_used']=True
-            if getattr(self, 'config', {}).get('source_instances'):
-                from .vision_instances import Sam2SourceInstances
-                from .vision_review import source_region_constraints as instance_constraints
-                if self.instance_provider is None:
-                    self.instance_provider = Sam2SourceInstances(ROOT / self.config['backbone'],
-                        device=self.vision.device, reread_rgb=False)
-                instances = self.instance_provider.read_auto(rgb, binding,
-                    class_probabilities=prediction['class_probabilities'],classes=self.vision.classes,
-                    probabilities_conditioned_on_geometry=False,person_boxes=people,
-                    overlay_boxes=graphics.get('candidates',[]),reset=prediction['memory_update']=='shot_reset')
-                if material_matches and material_matches.get('prompts'):
-                    from .vision_review import retain_same_source_refinement_evidence
-                    from .vision_instances import source_correspondence_identity_verified
-                    # One authenticated native physical instance per SAM object;
-                    # dozens of reference views cannot create duplicate objects.
-                    chosen={}
-                    for prompt in material_matches['prompts']:
-                        physical=prompt.get('physical_id')
-                        from .vision_instances import HUMAN_IDENTITIES
-                        authority=prompt.get('identity_authority',{}) or {}
-                        human=authority.get('kind') in HUMAN_IDENTITIES and authority.get('reference')
-                        if physical and (human or source_correspondence_identity_verified(authority,binding,physical)):
-                            if physical not in chosen or len(prompt.get('actual_pattern_keypoints_uv',[]))>len(chosen[physical].get('actual_pattern_keypoints_uv',[])):
-                                chosen[physical]=dict(prompt,object_id=2000+int(physical.removeprefix('Ad')))
-                    if chosen:
-                        before=self.instance_provider.frame_index
-                        instances=retain_same_source_refinement_evidence(instances,
-                            self.instance_provider.read(rgb,binding,prompts=list(chosen.values()),reset=False))
-                        if self.instance_provider.frame_index!=before:raise ValueError('Same-RGB print refinement advanced exposure')
-                    instances['current_native_ad_reference_search']=dict(
-                        verified_physical_ids=sorted(chosen),reference_matching_is_boundary_measurement=False)
-                from .vision_review import current_source_pixel_exclusion
-                pixel_exclusion,pixel_evidence=current_source_pixel_exclusion(
-                    instances,binding,native_hw=rgb.shape[:2],device=self.vision.device)
-                instances['current_source_exclusion_mask']=pixel_exclusion
-                instances['current_source_pixel_exclusion_evidence']=pixel_evidence
-                instances['unreviewed_occluder_predictions_used_as_RGB_veto']=bool(pixel_evidence['regions'])
-                current_source_masks_by_kind=dict(current_source_masks_by_kind or {})
-                for kind in ('board_top','ice_contact','ad_boundary','ice_paint'):
-                    prior=current_source_masks_by_kind.get(kind)
-                    current_source_masks_by_kind[kind]=pixel_exclusion if prior is None else pixel_exclusion|torch.as_tensor(prior,device=self.vision.device)
-                constraints = instance_constraints(instances,native_hw=rgb.shape[:2],device=self.vision.device)
-                if source_region_constraints is None:
-                    source_region_constraints = constraints
-                else:
-                    old_masks=dict(source_region_constraints.get('masks',{}))
-                    for kind, mask in constraints.get('masks',{}).items():
-                        old_masks[kind]=old_masks.get(kind,torch.ones_like(mask))&mask
-                    source_region_constraints=dict(source_region_constraints,masks=old_masks)
-            # Re-read the top-deck/ice interface on this exact RGB before any ad read.
-            from .vision_near_board import read_near_board
-            near_board = read_near_board(rgb, binding, guides=guides_2d,
-                gray_history=getattr(self, "config", {}).get("near_board_source_evidence", {}).get("gray_history"))
-            near_exclusion = torch.as_tensor(near_board["ad_exclusion_mask"], device=self.vision.device)[None, None]
-            if instances is not None:
-                from .vision_review import reread_source_advertisements
-                mask=np.asarray(near_board['ad_exclusion_mask'],bool).copy()
-                mask|=instances['current_source_exclusion_mask'].detach().cpu().numpy()
-                for kind in ('ad_boundary',):
-                    current=(current_source_masks_by_kind or {}).get(kind)
-                    if current is not None:mask|=torch.as_tensor(current).reshape(h,w).cpu().numpy()
-                instances['current_source_exclusion_mask']=mask
-                instances=reread_source_advertisements(rgb,instances,self.instance_provider,near_board=near_board)
-                instances['named_output_requires_current_native_retained_path']=True
-            if bool(near_exclusion.any()):
-                source_region_constraints = dict(source_region_constraints or {}, source_binding=binding)
-                regions = dict(source_region_constraints.get("masks", {}))
-                regions["ad_boundary"] = regions.get("ad_boundary", torch.ones_like(near_exclusion)) & ~near_exclusion
-                source_region_constraints["masks"] = regions
-                source_region_constraints["metadata"] = dict(source_region_constraints.get("metadata", {}),
-                    actual_top_face_exterior_excluded=True, model_board_thickness=0)
-            if near_board.get("qualified_ice_visible_mask") is not None:
-                source_region_constraints = dict(source_region_constraints or {}, source_binding=binding)
-                regions = dict(source_region_constraints.get("masks", {}))
-                ice_visible = torch.as_tensor(near_board["qualified_ice_visible_mask"],device=self.vision.device)[None,None]
-                regions["ice_paint"] = regions.get("ice_paint",torch.ones_like(ice_visible)) & ice_visible
-                source_region_constraints["masks"] = regions
+                guides_2d = self.continuation_queries(self._pending_frame)
+            context = getattr(self, "_pending_frame", None)
+            cached = context.get("frontend") if context else None
+            if cached is not None:
+                reidentification, material_matches, instances, people, graphics, near_board, near_exclusion, current_source_masks_by_kind, source_region_constraints = cached
+            else:
+                reidentification = None
+                material_matches = None
+                instances = None
+                people, graphics = [], dict(candidates=[])
+                if getattr(self, 'reidentifier', None) is not None:
+                    if prediction['memory_update'] == 'shot_reset':
+                        self.reidentification_active = True
+                    exclusion, people, graphics = self.reidentifier.exclusions(rgb, binding)
+                    current_source_masks_by_kind = dict(current_source_masks_by_kind or {})
+                    for kind in ('board_top','ice_contact','ad_boundary','ice_paint'):
+                        supplied = current_source_masks_by_kind.get(kind)
+                        fresh = torch.as_tensor(exclusion, device=self.vision.device)
+                        current_source_masks_by_kind[kind] = fresh if supplied is None else fresh | torch.as_tensor(supplied, device=self.vision.device)
+                    if self.reidentification_active:
+                        recovered, reidentification = self.reidentifier.search(rgb, binding,
+                            reset=prediction['memory_update']=='shot_reset', person_boxes=people,
+                            prediction=prediction, classes=self.vision.classes, exclusion=exclusion, flow_engine=getattr(self.vision,'flow',None))
+                        # Appearance recovery fills missing image support. It must
+                        # not replace already established current source runs.
+                        from .vision_navigation import _uncovered_query
+                        recovery_added=[]
+                        for candidate in recovered:
+                            gap=_uncovered_query(candidate,guides_2d,geometry=self.native_geometry)
+                            if gap is not None:
+                                guides_2d.append(gap);recovery_added.append(gap['id'])
+                        reidentification['gap_query_path_ids']=recovery_added
+                        reidentification['existing_source_runs_preserved']=True
+                        material_matches=reidentification
+                        reidentification['current_occlusion'] = dict(person_boxes=people,
+                            graphic_boxes=[g['box_xyxy'] for g in graphics.get('candidates',[])],
+                            excluded_pixels=int(exclusion.sum()), person_model_sha256=self.reidentifier.person.weights_sha256)
+                    elif prediction['memory_update']=='shot_reset' and getattr(self,'config',{}).get('source_instances'):
+                        material_matches=self.reidentifier.matcher.read(rgb,binding,person_boxes=people,
+                            overlay_boxes=graphics.get('candidates',[]),
+                            source_identity_anchors=self.reidentifier.accepted_ad_anchors(guides_2d,binding))
+                        native_ads,native_identities=self.reidentifier.advertisement_guides(rgb,binding,material_matches,native_only=True)
+                        if native_ads:
+                            preserved=[]
+                            for guide in guides_2d:
+                                definition=self.native_geometry.lookup(guide['id'])
+                                physical=(definition or {}).get('instance_id','').rsplit('/',1)[-1]
+                                if physical in native_identities and guide.get('kind')=='ad_boundary':
+                                    preserved.append(dict(id=guide['id'],points_uv=guide['points_uv'],
+                                        identity_authority=guide.get('identity_authority'),source_binding=guide.get('source_binding')))
+                            replaced_paths={g['id'] for g in native_ads}
+                            replaced={row['id'] for row in preserved if self.native_geometry.lookup(row['id'])['id'] in replaced_paths}
+                            guides_2d=[g for g in guides_2d if g['id'] not in replaced]+native_ads
+                            material_matches['preserved_accepted_source_navigation']=preserved
+                            material_matches['current_native_registered_correspondence_used']=True
+                if getattr(self, 'config', {}).get('source_instances'):
+                    from .vision_instances import Sam2SourceInstances
+                    from .vision_review import source_region_constraints as instance_constraints
+                    if self.instance_provider is None:
+                        self.instance_provider = Sam2SourceInstances(ROOT / self.config['backbone'],
+                            device=self.vision.device, reread_rgb=False)
+                    instances = self.instance_provider.read_auto(rgb, binding,
+                        class_probabilities=prediction['class_probabilities'],classes=self.vision.classes,
+                        probabilities_conditioned_on_geometry=False,person_boxes=people,
+                        overlay_boxes=graphics.get('candidates',[]),reset=prediction['memory_update']=='shot_reset')
+                    if material_matches and material_matches.get('prompts'):
+                        from .vision_review import retain_same_source_refinement_evidence
+                        from .vision_instances import source_correspondence_identity_verified
+                        # One authenticated native physical instance per SAM object;
+                        # dozens of reference views cannot create duplicate objects.
+                        chosen={}
+                        for prompt in material_matches['prompts']:
+                            physical=prompt.get('physical_id')
+                            from .vision_instances import HUMAN_IDENTITIES
+                            authority=prompt.get('identity_authority',{}) or {}
+                            human=authority.get('kind') in HUMAN_IDENTITIES and authority.get('reference')
+                            if physical and (human or source_correspondence_identity_verified(authority,binding,physical)):
+                                if physical not in chosen or len(prompt.get('actual_pattern_keypoints_uv',[]))>len(chosen[physical].get('actual_pattern_keypoints_uv',[])):
+                                    chosen[physical]=dict(prompt,object_id=2000+int(physical.removeprefix('Ad')))
+                        if chosen:
+                            before=self.instance_provider.frame_index
+                            instances=retain_same_source_refinement_evidence(instances,
+                                self.instance_provider.read(rgb,binding,prompts=list(chosen.values()),reset=False))
+                            if self.instance_provider.frame_index!=before:raise ValueError('Same-RGB print refinement advanced exposure')
+                        instances['current_native_ad_reference_search']=dict(
+                            verified_physical_ids=sorted(chosen),reference_matching_is_boundary_measurement=False)
+                    from .vision_review import current_source_pixel_exclusion
+                    pixel_exclusion,pixel_evidence=current_source_pixel_exclusion(
+                        instances,binding,native_hw=rgb.shape[:2],device=self.vision.device)
+                    instances['current_source_exclusion_mask']=pixel_exclusion
+                    instances['current_source_pixel_exclusion_evidence']=pixel_evidence
+                    instances['unreviewed_occluder_predictions_used_as_RGB_veto']=bool(pixel_evidence['regions'])
+                    current_source_masks_by_kind=dict(current_source_masks_by_kind or {})
+                    for kind in ('board_top','ice_contact','ad_boundary','ice_paint'):
+                        prior=current_source_masks_by_kind.get(kind)
+                        current_source_masks_by_kind[kind]=pixel_exclusion if prior is None else pixel_exclusion|torch.as_tensor(prior,device=self.vision.device)
+                    constraints = instance_constraints(instances,native_hw=rgb.shape[:2],device=self.vision.device)
+                    if source_region_constraints is None:
+                        source_region_constraints = constraints
+                    else:
+                        old_masks=dict(source_region_constraints.get('masks',{}))
+                        for kind, mask in constraints.get('masks',{}).items():
+                            old_masks[kind]=old_masks.get(kind,torch.ones_like(mask))&mask
+                        source_region_constraints=dict(source_region_constraints,masks=old_masks)
+                # Re-read the top-deck/ice interface on this exact RGB before any ad read.
+                from .vision_near_board import read_near_board
+                near_evidence = getattr(self, "config", {}).get("near_board_source_evidence", {})
+                near_board = read_near_board(rgb, binding, guides=guides_2d,
+                    gray_history=near_evidence.get("gray_history"),
+                    qualified_generation=near_evidence.get("official_gray_generation"))
+                near_exclusion = torch.as_tensor(near_board["ad_exclusion_mask"], device=self.vision.device)[None, None]
+                if instances is not None:
+                    from .vision_review import reread_source_advertisements
+                    mask=np.asarray(near_board['ad_exclusion_mask'],bool).copy()
+                    mask|=instances['current_source_exclusion_mask'].detach().cpu().numpy()
+                    for kind in ('ad_boundary',):
+                        current=(current_source_masks_by_kind or {}).get(kind)
+                        if current is not None:mask|=torch.as_tensor(current).reshape(h,w).cpu().numpy()
+                    instances['current_source_exclusion_mask']=mask
+                    instances=reread_source_advertisements(rgb,instances,self.instance_provider,near_board=near_board)
+                    instances['named_output_requires_current_native_retained_path']=True
+                if bool(near_exclusion.any()):
+                    source_region_constraints = dict(source_region_constraints or {}, source_binding=binding)
+                    regions = dict(source_region_constraints.get("masks", {}))
+                    regions["ad_boundary"] = regions.get("ad_boundary", torch.ones_like(near_exclusion)) & ~near_exclusion
+                    source_region_constraints["masks"] = regions
+                    source_region_constraints["metadata"] = dict(source_region_constraints.get("metadata", {}),
+                        actual_top_face_exterior_excluded=True, model_board_thickness=0)
+                if near_board.get("qualified_ice_visible_mask") is not None:
+                    source_region_constraints = dict(source_region_constraints or {}, source_binding=binding)
+                    regions = dict(source_region_constraints.get("masks", {}))
+                    ice_visible = torch.as_tensor(near_board["qualified_ice_visible_mask"],device=self.vision.device)[None,None]
+                    regions["ice_paint"] = regions.get("ice_paint",torch.ones_like(ice_visible)) & ice_visible
+                    source_region_constraints["masks"] = regions
+                if context is not None:
+                    context["frontend"] = (reidentification, material_matches, instances, people, graphics,
+                        near_board, near_exclusion, current_source_masks_by_kind, source_region_constraints)
+            source_query_dispatch = None
+            if additional_source_guides:
+                from .vision_navigation import merge_verified_source_guides
+                guides_2d, source_query_dispatch = merge_verified_source_guides(guides_2d,
+                    additional_source_guides, binding=binding, geometry=getattr(self,'native_geometry',None))
+            navigation_dispatch = None
+            if additional_search_guides is not None:
+                from .vision_navigation import merge_navigation_guides
+                guides_2d, navigation_dispatch = merge_navigation_guides(guides_2d,
+                    additional_search_guides, binding=binding, geometry=getattr(self, 'native_geometry', None))
             geometry_report = None
             if getattr(self, "native_geometry", None) is not None:
                 configured_event = getattr(self, "config", {}).get("native_geometry", {}).get("event_id")
                 if feedback.event_id and configured_event and feedback.event_id != configured_event:
                     raise ValueError("Source event differs from the configured current native geometry")
                 guides_2d, geometry_report = self.native_geometry.bind(guides_2d)
+            feedback = begin_read(binding, guides_2d)
             operator_conflicts = check_guide_operators(feedback, guides_2d)
             global_mask = torch.zeros((1, 1, h, w), device=self.vision.device, dtype=torch.bool)
             if not explicit_guides and self.active_global_exclusion is not None:
@@ -1269,6 +1422,17 @@ class SourceRinkReader:
                 else:
                     global_mask[:, :, y0:y1, x0:x1] = True
             for guide in guides_2d:
+                # Preserve guide-specific provenance before unioning masks:
+                # subtraction after the union loses explicit restrictions that
+                # overlap a detector box eligible for local source clearance.
+                specific = guide.get("source_guide_exclusion_mask")
+                if specific is None:
+                    specific = guide.get("source_exclusion_mask")
+                specific = (torch.zeros_like(global_mask) if specific is None else
+                            torch.as_tensor(specific,device=self.vision.device).clone())
+                if specific.shape == (h,w):specific=specific[None,None]
+                if specific.shape != (1,1,h,w) or specific.dtype != torch.bool:
+                    raise ValueError("Guide-specific exclusions must be native boolean masks")
                 current_mask = (current_source_masks_by_kind or {}).get(guide.get("kind"))
                 if current_mask is not None:
                     current_mask = torch.as_tensor(current_mask, device=self.vision.device)
@@ -1289,17 +1453,25 @@ class SourceRinkReader:
                 if guide.get("source_exclusion_mask") is not None:
                     _same_frame(binding, guide["source_exclusion_binding"])
                     mask |= guide["source_exclusion_mask"]
+                mask |= specific
                 if guide["id"] in feature_masks:
                     mask |= feature_masks[guide["id"]]
+                    specific |= feature_masks[guide["id"]]
                 crop = source_guide_visibility_override_crop(guide, binding, (h, w))
                 if crop is not None:
                     x0, y0, x1, y1 = crop
                     mask[:, :, y0:y1, x0:x1] = False
+                    specific[:, :, y0:y1, x0:x1] = False
+                protected = specific.clone()
                 if guide.get("kind") in ("ad_boundary", "ice_paint"):
                     mask |= near_exclusion
+                    protected |= near_exclusion
                 if guide.get("kind") == "ice_paint" and near_board.get("qualified_ice_visible_mask") is not None:
-                    mask |= ~torch.as_tensor(near_board["qualified_ice_visible_mask"],device=self.vision.device)[None,None]
-                guide.update(source_exclusion_mask=mask, source_exclusion_binding=binding)
+                    outside=~torch.as_tensor(near_board["qualified_ice_visible_mask"],device=self.vision.device)[None,None]
+                    mask |= outside
+                    protected |= outside
+                guide.update(source_exclusion_mask=mask, source_exclusion_binding=binding,
+                    source_guide_exclusion_mask=specific,source_exclusion_protected_mask=protected)
             guided = (guided_source_reading(
                 self.vision.current_image, prediction["class_probabilities"], guides_2d,
                 classes=self.vision.classes, rgb_source_binding=binding,
@@ -1330,6 +1502,13 @@ class SourceRinkReader:
                 admitted_face |= dense_face
                 face_receipt['dense_current_RGB'] = dense_receipt
                 near_board['current_source_board_measurement'] = dense_packet
+                from .vision_board_reader import read_connected_board_gaps
+                gap_receipt=read_connected_board_gaps(rgb,binding,guides_2d,guided,
+                    source_packet=dense_packet,face_receipt=dense_receipt,
+                    geometry=getattr(self,'native_geometry',None),authority=self.board_material_authority,
+                    feedback=feedback,prediction=prediction,classes=self.vision.classes,
+                    device=self.vision.device,exclusion=board_exclusion)
+                if board_material is not None:board_material['connected_source_gap_queries']=gap_receipt
                 if near_board.get("qualified_vertical_face_mask") is not None:
                     admitted_face = torch.as_tensor(near_board["qualified_vertical_face_mask"],device=self.vision.device)[None,None]
                     face_receipt.update(current_RGB_material_face_reference=near_board["source_reference"],
@@ -1353,13 +1532,20 @@ class SourceRinkReader:
                 if board_material is not None:board_material["advertisement_face_admission"] = face_receipt
             material_result = None
             if getattr(self, 'material_reader', None) is not None:
+                material_global=global_mask|near_exclusion
+                material_current=(current_source_masks_by_kind or {}).get('ice_paint')
+                if material_current is not None:
+                    material_global|=torch.as_tensor(material_current,device=self.vision.device).reshape(1,1,h,w)
                 material_result = self.material_reader.refine_ice(rgb, binding, guides_2d, guided,
-                    near_board=near_board, global_exclusion=global_mask,
+                    near_board=near_board, global_exclusion=material_global,
                     source_instances=instances, person_boxes=people,
                     reset=prediction['memory_update']=='shot_reset')
                 material_result['advertisements'] = self.material_reader.refine_print(
                     rgb, binding, guides_2d, guided, near_board=near_board)
-            if extract_source_components:
+            cached_source = context.get('source_components') if context else None
+            if cached_source is not None:
+                source = cached_source
+            elif extract_source_components:
                 source = extract_source_primitives(
                     self.vision.current_image, prediction["class_probabilities"], classes=self.vision.classes,
                     rgb_source_binding=binding, probability_source_binding=prediction["prediction_source_binding"],
@@ -1375,12 +1561,57 @@ class SourceRinkReader:
                     component_search_status="not_performed_on_intermediate_tracking_frame",
                     source_region_rejection_masks={}, probabilities_conditioned_on_geometry=False,
                     fitted_or_flow_pixels_used_as_measurements=False)
+            if context is not None:
+                context['source_components'] = source
             if material_result is not None:
                 material_result['unassigned_material_search'] = self.material_reader.read_unassigned_material(
                     rgb, binding, prediction, source, flow_pair=self.vision.last_motion,
-                    reset=prediction['memory_update']=='shot_reset',guides=guides_2d)
+                    reset=prediction['memory_update']=='shot_reset',guides=guides_2d,guided=guided)
+                admission_enabled = getattr(self, 'candidate_admission_enabled', False) is True
+                if admission_enabled:
+                    from .vision_candidate_admission import admit_material_candidates
+                    admission = admit_material_candidates(rgb, binding, material_result['unassigned_material_search'],
+                        self.native_geometry, existing_guides=guides_2d,
+                        exclusion=material_global[0,0].detach().cpu().numpy())
+                    from .vision_association import associate, extend_feedback_scope
+                    dispatched = associate(dict(binding=binding), admission['accepted_current_query_guides'], self.native_geometry)
+                    additions = dispatched['queries']
+                    admission['common_association'] = {k:v for k,v in dispatched.items() if k != 'queries'}
+                    if additions:
+                        extend_feedback_scope(context if context is not None else dict(binding=binding), [g['id'] for g in additions])
+                        for guide in additions:
+                            mask = torch.as_tensor(guide['source_exclusion_mask'], device=self.vision.device)[None,None]
+                            if guide['id'] in feature_masks:
+                                mask |= feature_masks[guide['id']]
+                            if near_board.get('qualified_ice_visible_mask') is not None:
+                                mask |= ~torch.as_tensor(near_board['qualified_ice_visible_mask'], device=self.vision.device)[None,None]
+                            guide.update(source_exclusion_mask=mask,
+                                source_exclusion_protected_mask=mask.clone(), source_guide_exclusion_mask=mask.clone())
+                        # Re-read the same original RGB. Candidate UV only locates queries.
+                        fresh = guided_source_reading(self.vision.current_image, prediction['class_probabilities'], additions,
+                            classes=self.vision.classes, rgb_source_binding=binding,
+                            probability_source_binding=prediction['prediction_source_binding'], guide_source_binding=binding,
+                            probabilities_conditioned_on_geometry=False, source_exclusion_mask=None, exclusion_source_binding=binding)
+                        fresh = coherent_named_source_reading(fresh)
+                        guides_2d.extend(additions);guided['readings'].extend(fresh['readings'])
+                        feedback = begin_read(binding, guides_2d)
+                        operator_conflicts = check_guide_operators(feedback, guides_2d)
+                        # The material reader replaces this exposure from its saved pre-frame
+                        # state, so adding queries cannot count the old graph contribution twice.
+                        updated = self.material_reader.refine_ice(rgb, binding, guides_2d, guided,
+                            near_board=near_board, global_exclusion=material_global,
+                            source_instances=instances, person_boxes=people, reset=False)
+                        updated['advertisements'] = material_result['advertisements']
+                        updated['unassigned_material_search'] = material_result['unassigned_material_search']
+                        material_result = updated
+                    material_result['candidate_admission'] = admission
+                material_result['candidate_admission_enabled'] = admission_enabled
                 material_result['output_scope'] = self.native_geometry.check_output(guides_2d, guided)
-            for reading, guide in zip(guided["readings"], guides_2d):
+            used_query_ids=set()
+            for query_ordinal,(reading, guide) in enumerate(zip(guided["readings"], guides_2d)):
+                query_id=guide.get('query_id',f"{guide['id']}::source_reading:{query_ordinal}")
+                if query_id in used_query_ids:query_id=f"{query_id}::split_run:{query_ordinal}"
+                used_query_ids.add(query_id);guide['query_id']=query_id;reading['query_id']=query_id
                 reading["display_label"] = guide.get("display_label", reading.get("physical_id"))
                 reading["original_source_group_id"] = guide.get("source_group_id")
                 reading["original_dependence_groups_per_point"] = guide.get("original_dependence_groups_per_point")
@@ -1390,8 +1621,10 @@ class SourceRinkReader:
                     str(binding.get("shot_id"))+":"+str(guide["id"]))
                 reading["temporal_hint_previous_source_binding"] = guide.get("hint_previous_source_binding")
                 reading["temporal_flow_supported"] = guide.get("temporal_flow_supported")
-            if prediction["new_observation"]:
+            if prediction["new_observation"] or prediction["memory_update"] == "reused_same_source_frame":
                 self.active_guides = []
+                from .vision_material_reader import retain_material_identity
+                source_rgb_sha=(context or {}).get('rgb_sha256') or hashlib.sha256(np.ascontiguousarray(rgb).tobytes()).hexdigest()
                 for guide, reading in zip(guides_2d, guided["readings"]):
                     points = torch.as_tensor(guide["points_uv"], device=self.vision.device,
                                              dtype=torch.float32).clone()
@@ -1399,6 +1632,9 @@ class SourceRinkReader:
                     actual = reading.get("coherent_source_uv", reading["actual_source_uv"])
                     points[indices] = actual.to(dtype=points.dtype)
                     self.active_guides.append({**guide, "points_uv": points,
+                                               "material_identity_continuation": retain_material_identity(
+                                                   guide,reading,binding,source_rgb_sha),
+                                               "last_measured_query_indices": indices.detach().cpu().tolist(),
                                                "origin": "temporal_source_search_hint",
                                                "source_binding": binding,
                                                "identity_confirmed": bool(reading.get("identity_authority"))})
@@ -1414,6 +1650,7 @@ class SourceRinkReader:
                     native_material=material_result, source_instances=instances,
                     near_board=near_board, source_reidentification=reidentification,
                     source_print_reference_search=material_matches,
+                    navigation_dispatch=navigation_dispatch, source_query_dispatch=source_query_dispatch,
                     model_usage=self.vision.model_usage(),
                     original_FIT_source_revision=fit_revision,
                     memory_update=prediction["memory_update"], source=source, guided=guided,
@@ -1508,10 +1745,11 @@ def read_frame(config_path, source_pts, guide_path=None, *, model_path=None, ori
                 raise ValueError("Exact requested native PTS was not decoded")
         else:
             raise ValueError("Requested native source frame is absent")
-    if sample and not np.array_equal(rgb, _image(sample["frame_path"])):
+    if sample and not np.array_equal(rgb, _image(sample["frame_path"], sample.get("frame_key"))):
         raise ValueError("User-confirmed annotations differ from the original video RGB")
     binding = dict(source_sha256=digest, source_pts=source_pts, time_base=clock,
-                   shot_id=f"single_source_frame_{source_pts}", native_hw=list(rgb.shape[:2]))
+                   shot_id=(sample.get("shot_id") if sample else None) or f"single_source_frame_{source_pts}",
+                   native_hw=list(rgb.shape[:2]))
     result = reader.read(rgb, binding, guides_2d=guides,
                          ignored_regions=sample.get("ignored_regions", ()) if sample else (), reset=True)
     fit_revision = result.get('original_FIT_source_revision')

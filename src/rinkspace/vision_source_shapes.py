@@ -7,6 +7,7 @@ paint labels, physical marker identities or a verified world circle.
 from __future__ import annotations
 
 import hashlib
+import json
 import cv2
 import numpy as np
 
@@ -1226,7 +1227,8 @@ def _direct_source_shape_readings(guides):
                      original_source_profile_indices=rows[row_run[rows] == number],
                      contains_interpolated_or_fitted_pixels=False)
                 for number in np.unique(run_ids)]
-        initialized = guide.get("human_confirmed_instance_identity_initialized") is True
+        human = guide.get("human_confirmed_instance_identity_initialized") is True
+        initialized = human or guide.get("source_instance_identity_initialized") is True
         readings.append(dict(id=guide["id"], source_local_id=guide["id"],
             physical_id=guide.get("physical_id") if initialized else None,
             source_binding=guide["source_binding"], physical_role=guide["physical_role"],
@@ -1234,8 +1236,10 @@ def _direct_source_shape_readings(guides):
             physical_identity_verified=initialized, actual_source_uv=points,
             physical_curve_id=guide.get("physical_curve_id") if initialized else None,
             identity_authority=guide.get("identity_authority") if initialized else None,
-            identity_scope="human_confirmed_source_physical_instance; RGB boundary quality is separate" if initialized else
-                           "unassigned_source_local_observation",
+            identity_scope=("human_confirmed_source_physical_instance; RGB boundary quality is separate" if human else
+                "machine_source_material_identity; no human pixel acceptance" if initialized else "unassigned_source_local_observation"),
+            source_instance_identity_initialized=initialized,
+            source_identity_source_binding=guide.get('source_identity_source_binding'),
             human_confirmed_identity_source_binding=guide.get("human_confirmed_identity_source_binding") if initialized else None,
             original_source_profile_indices=rows, measured_runs=runs,
             full_curve_missing_or_conflicting_profiles=~available,
@@ -1264,10 +1268,10 @@ def _direct_source_shape_readings(guides):
 def bind_confirmed_source_instances(result, confirmed_source_guide_packet, *, role_definitions=None):
     """Initialize known instance identities without replacing any measured UV.
 
-    This consumes the existing source_annotations_to_guides adapter only at its
-    exact reference frame. Human points associate already read RGB paths with
-    known objects; they never become automatic measurements. RGB topology can
-    connect child layers to that object. Nearby unlinked material stays local.
+    Human references or point-scoped current material graph proofs associate
+    already read RGB paths with objects at this exact exposure. Their pixels
+    never replace the shape reader's measurements. Machine proof is retained
+    as machine proof, including when it seeds new observed child layers.
     """
     binding = result["source_binding"]
     same_frame(binding, confirmed_source_guide_packet["source_binding"])
@@ -1277,9 +1281,22 @@ def bind_confirmed_source_instances(result, confirmed_source_guide_packet, *, ro
     families, reference_rows = {}, {}
     for reference in references:
         same_frame(binding, reference["source_binding"])
-        if (reference.get("origin") != "user_confirmed_visual_supervision"
-                or reference.get("identity_confirmed") is not True or not reference.get("identity_authority")):
-            raise ValueError("Instance initialization requires recorded human source identity authority")
+        human=reference.get('origin')=='user_confirmed_visual_supervision'
+        authority=reference.get('identity_authority') or {}
+        machine=False
+        if reference.get('origin')=='current_RGB_verified_material_identity':
+            from .vision_material_reader import material_readout_identity
+            same_frame(binding,authority.get('source_binding',{}))
+            points=np.asarray(reference.get('points_uv',[]))
+            digest=result.get('source_RGB_sha256')
+            reading=dict(native_path_id=authority.get('native_path_id'),
+                support=dict(actual_readout_evidence=authority.get('source_readout_evidence',{})))
+            machine=bool(authority.get('kind')=='current_RGB_verified_material_identity_for_shape' and
+                authority.get('decoded_native_RGB_sha256')==digest and authority.get('current_native_scene') and
+                authority.get('human_pixel_acceptance') is False and len(points)>=2 and
+                all(material_readout_identity(reading,binding,digest,i,p) is not None for i,p in enumerate(points)))
+        if not ((human or machine) and reference.get('identity_confirmed') is True and authority):
+            raise ValueError("Instance initialization requires recorded human source identity authority or verified current RGB material proof")
         if reference.get("kind") != "ice_paint":
             continue
         curve_id = str(reference["id"])
@@ -1287,15 +1304,22 @@ def bind_confirmed_source_instances(result, confirmed_source_guide_packet, *, ro
         entry = families.setdefault(parent, dict(physical_id=parent, identity_confirmed=True,
             identity_source_binding=reference["source_binding"], identity_authority=[], confirmed_curve_ids=[],
             confirmed_source_group_ids=[], human_identity_has_priority_over_model_probability=True,
-            source_pixel_boundary_accuracy_is_separate=True))
+            source_pixel_boundary_accuracy_is_separate=True,human_identity_verified=False))
+        entry['human_identity_verified'] |= human
         if curve_id not in entry["confirmed_curve_ids"]:
             entry["confirmed_curve_ids"].append(curve_id)
         entry["confirmed_source_group_ids"].append(reference["source_group_id"])
         entry["identity_authority"].append(reference["identity_authority"])
-        if reference.get("physical_role") != "painted_stroke_center_axis":
+        if reference.get("physical_role") != "painted_stroke_center_axis" or machine:
             reference_rows.setdefault(parent, []).append(reference)
     readings_by_id = {item["id"]: item for item in result.get("source_shape_readings", [])}
-    associations, layer_parents = {}, {}
+    associations, layer_parents, layer_human_identity = {}, {}, {}
+
+    def current_identity(guide):
+        association=guide.get('source_identity_association',{})
+        return (guide.get('identity_confirmed') and guide.get('identity_authority') and
+            (not association.get('requires_two_sided_center_reread') or
+             association.get('paired_profile_source_binding')==binding))
 
     def distance_to_reference(points, reference):
         trace = np.asarray(reference["points_uv"], float)
@@ -1308,10 +1332,73 @@ def bind_confirmed_source_instances(result, confirmed_source_guide_packet, *, ro
         near = start[None]+fraction.clip(0, 1)[..., None]*vector[None]
         return np.linalg.norm(points[:, None]-near, axis=2).min(1)
 
+    def machine_transition_correspondence(points, reference, guide, reading, *, navigation=False):
+        trace=np.asarray(reference['points_uv'],float)
+        evidence=reference['identity_authority']['source_readout_evidence']['identity_by_source_index']
+        if any(not evidence[str(i)].get('actual_transition_quantiles_uv') or
+               not evidence[str(i)].get('actual_profile_normal') for i in range(len(trace))):
+            return np.full(len(points),np.inf)
+        segments=np.asarray(reference.get('segment_ids',np.zeros(len(trace),int)))
+        actual_normal=np.asarray(guide['normals'])[np.asarray(reading['original_source_profile_indices'],int)]
+        actual_normal=actual_normal*np.sign(reading['actual_source_signed_luminance_gradient'])[:,None]
+        center=reference.get('physical_role')=='painted_stroke_center_axis'
+        ratios=[];queries=[]
+        for side in range(2 if center else 1):
+            locations=[];widths=[];normals=[];centers=[];profile_normals=[];windows=[]
+            for i,p in enumerate(trace):
+                member=evidence[str(i)];q=np.asarray(member['actual_transition_quantiles_uv'],float)
+                if (q.shape not in ((2,3,2),(3,2)) or not np.isfinite(q).all()):return np.full(len(points),np.inf)
+                if center:
+                    from .vision_material_reader import paired_material_support
+                    support=paired_material_support(member)
+                    if support is None:return np.full(len(points),np.inf)
+                    pair,_,signs=support
+                    location=pair[side];quantiles=q[side];sign=signs[side]
+                    n=np.asarray(member['actual_profile_normal'],float);n=n/np.linalg.norm(n)
+                    origin=np.asarray(member['actual_profile_origin_uv'],float)
+                    centers.append(pair.mean(0));profile_normals.append(n)
+                    windows.append(np.asarray(member['actual_profile_interval_px'],float)+(origin-pair.mean(0))@n)
+                else:
+                    location=p;quantiles=q.reshape(-1,2)
+                    sign=1 if member.get('material_transition')=='dark_to_light' else -1
+                locations.append(location)
+                widths.append(max(1.,float(np.max(np.linalg.norm(quantiles-location,axis=1)))))
+                normals.append(sign*np.asarray(member['actual_profile_normal'],float))
+            path=np.asarray(locations);widths=np.asarray(widths);normals=np.asarray(normals)
+            starts=np.r_[np.arange(len(path)-1)[segments[:-1]==segments[1:]],np.arange(len(path))]
+            ends=np.r_[starts[:len(starts)-len(path)]+1,np.arange(len(path))]
+            a,b=path[starts],path[ends];v=b-a
+            t=np.clip(((points[:,None]-a)*v).sum(2)/np.maximum((v*v).sum(1),1e-12),0,1)
+            distance=np.linalg.norm(points[:,None]-(a+t[:,:,None]*v),axis=2)
+            nearest=distance.argmin(1);ix=np.arange(len(points));f=t[ix,nearest]
+            normal=(1-f[:,None])*normals[starts[nearest]]+f[:,None]*normals[ends[nearest]]
+            source_width=np.maximum(widths[starts[nearest]],widths[ends[nearest]])
+            radius=source_width+np.maximum(1.,np.asarray(reading['actual_source_peak_fwhm_px'])*.5)
+            ratio=distance[ix,nearest]/radius
+            ratio[np.sum(normal*actual_normal,axis=1)<=0]=np.inf
+            ratios.append(ratio)
+            if center:
+                left,right=starts[nearest],ends[nearest]
+                mix=lambda values:(1-f[:,None])*np.asarray(values)[left]+f[:,None]*np.asarray(values)[right]
+                direction=mix(profile_normals)
+                direction/=np.maximum(np.linalg.norm(direction,axis=1,keepdims=True),1e-12)
+                queries.append(dict(points_uv=mix(centers),
+                    normals=direction,intervals=mix(windows)))
+        ratios=np.asarray(ratios);distance=ratios.min(0)
+        if not navigation:return distance
+        chosen=ratios.argmin(0)
+        return [dict(profile_index=int(reading['original_source_profile_indices'][i]),
+            actual_source_interface_uv=np.asarray(points[i]).tolist(),
+            query_uv=queries[chosen[i]]['points_uv'][i].tolist(),
+            normal=queries[chosen[i]]['normals'][i].tolist(),
+            interval_px=queries[chosen[i]]['intervals'][i].tolist())
+            for i in np.flatnonzero(distance<=1.)] if center else []
+
     # Anchor an observed outer path, rather than naming every gray path inside
     # a broad circle-search ROI. The recorded search radius is an engineering
     # association neighborhood, never a pixel-accuracy bound.
     for guide in result.get("guides", []):
+        if current_identity(guide):continue
         reading = readings_by_id.get(guide["id"])
         if reading is None or not len(reading["actual_source_uv"]):
             continue
@@ -1320,13 +1407,19 @@ def bind_confirmed_source_instances(result, confirmed_source_guide_packet, *, ro
         points = np.asarray(reading["actual_source_uv"])
         options = []
         for parent, members in reference_rows.items():
-            distances = [distance_to_reference(points, member) for member in members]
+            # A named centerline can have a human identity reference while
+            # only its current measured two sides support this edge match.
+            human_members=[member for member in members if member.get('origin')=='user_confirmed_visual_supervision']
+            members=human_members or members
+            machine=not bool(human_members)
+            distances = [(machine_transition_correspondence(points,member,guide,reading) if machine else
+                          distance_to_reference(points, member)) for member in members]
             distance = np.min(distances, axis=0)
-            radius = max(float(member.get("search_radius_px", 18.)) for member in members)
+            radius = 1. if machine else max(float(member.get("search_radius_px", 18.)) for member in members)
             coverage = float((distance <= radius).mean())
             if coverage >= .5:
                 best = members[int(np.argmin([np.median(row) for row in distances]))]
-                options.append((coverage, float(np.median(distance)), parent, best, distance, radius))
+                options.append((coverage, float(np.median(distance)), parent, best, distance, radius, machine))
         options.sort(key=lambda option: (-option[0], option[1]))
         if not options:
             continue
@@ -1334,18 +1427,38 @@ def bind_confirmed_source_instances(result, confirmed_source_guide_packet, *, ro
             associations[guide["id"]] = dict(status="multiple_confirmed_parent_correspondence_candidates",
                 candidate_physical_ids=[option[2] for option in options], boundary_points_unchanged=True)
             continue
-        coverage, median, parent, reference, distance, radius = options[0]
-        associations[guide["id"]] = dict(status="human_reference_initialized_source_instance_correspondence",
+        coverage, median, parent, reference, distance, radius, machine = options[0]
+        center_navigation=reference.get('physical_role')=='painted_stroke_center_axis'
+        associations[guide["id"]] = dict(status=("human_reference_initialized_source_instance_correspondence"
+            if not machine else 'verified_RGB_material_initialized_source_instance_correspondence'),
             physical_id=parent, physical_curve_id=reference["id"], source_reference_group_id=reference["source_group_id"],
-            expected_physical_role=reference["physical_role"], actual_RGB_source_association_fraction=coverage,
-            source_reference_median_distance_px=median, engineering_search_radius_px=radius,
+            expected_physical_role=(guide['physical_role'] if center_navigation else reference["physical_role"]),
+            expected_query_physical_role=reference['physical_role'],
+            requires_two_sided_center_reread=center_navigation,source_peak_is_center_measurement=False,
+            actual_RGB_source_association_fraction=coverage,
+            source_reference_median_distance_px=(median if not machine else None),
+            engineering_search_radius_px=(radius if not machine else None),
+            measured_transition_support_distance_ratio=(None if not machine else median),
+            correspondence_basis=('human_reference_neighborhood' if not machine
+                else 'actual_paired_material_support' if center_navigation else 'actual_signed_transition_support'),
+            source_reference_distance_unit=('native_source_px' if not machine else
+                'combined_observed_transition_support'),
             source_reference_search_radius_is_accuracy_bound=False, boundary_points_unchanged=True)
+        if center_navigation:
+            # A partly matching edge island does not confer line identity on
+            # its unobserved remainder or on a crossing circle. These are only
+            # profile-specific search coordinates, never measured centers.
+            associations[guide['id']]['matched_material_profiles']=machine_transition_correspondence(
+                points,reference,guide,reading,navigation=True)
+            associations[guide['id']]['paired_profile_source_binding']=dict(binding)
         topology = guide.get("source_material_topology_id")
-        if topology and guide.get("material_contour_depth") == 0:
+        if topology and guide.get("material_contour_depth") == 0 and not center_navigation:
             layer_parents[topology] = parent
+            layer_human_identity[topology] = not machine
     role_map = dict(role_definitions or {})
     layer_names = {0: "outer", 1: "middle", 2: "inner", 3: "center"}
     for guide in result.get("guides", []):
+        if current_identity(guide):continue
         association = associations.get(guide["id"], {})
         parent = association.get("physical_id")
         topology = guide.get("source_material_topology_id")
@@ -1361,7 +1474,8 @@ def bind_confirmed_source_instances(result, confirmed_source_guide_packet, *, ro
                     expected_role = "filled_disc_boundary"
             elif isinstance(definition, str):
                 expected_role = definition
-            association = dict(status="observed_RGB_material_layer_under_human_named_parent",
+            association = dict(status=("observed_RGB_material_layer_under_human_named_parent"
+                if layer_human_identity.get(topology,False) else 'observed_RGB_material_layer_under_machine_named_parent'),
                 physical_id=parent, physical_curve_id=curve_id,
                 expected_physical_role=expected_role,
                 child_role_authority="observed_source_material_hierarchy_and_recorded_event_role_definition",
@@ -1369,10 +1483,15 @@ def bind_confirmed_source_instances(result, confirmed_source_guide_packet, *, ro
             associations[guide["id"]] = association
         if parent is None:
             continue
+        human_identity=association.get('status') in ('human_reference_initialized_source_instance_correspondence',
+            'observed_RGB_material_layer_under_human_named_parent')
         guide.update(physical_id=parent, physical_curve_id=association.get("physical_curve_id"),
             physical_role=association.get("expected_physical_role", guide["physical_role"]), identity_confirmed=True,
-            human_confirmed_instance_identity_initialized=True,
-            human_confirmed_identity_source_binding=confirmed_source_guide_packet["source_binding"],
+            source_instance_identity_initialized=True,
+            source_identity_source_binding=confirmed_source_guide_packet['source_binding'],
+            human_confirmed_instance_identity_initialized=human_identity,
+            human_confirmed_identity_source_binding=(confirmed_source_guide_packet["source_binding"]
+                if human_identity else None),
             identity_authority=families[parent]["identity_authority"], source_identity_association=association,
             source_boundary_accuracy_verified=False, human_reference_UV_used_as_measured_UV=False)
     original_uv = {key: np.asarray(item["actual_source_uv"]).copy() for key, item in readings_by_id.items()}
@@ -1380,13 +1499,15 @@ def bind_confirmed_source_instances(result, confirmed_source_guide_packet, *, ro
     for reading in result["source_shape_readings"]:
         if not np.array_equal(original_uv[reading["id"]], reading["actual_source_uv"]):
             raise RuntimeError("Identity initialization changed source RGB measurements")
-    result["confirmed_source_instances"] = list(families.values())
+    known={row['physical_id']:row for row in result.get('confirmed_source_instances',[])}
+    known.update(families)
+    result["confirmed_source_instances"] = list(known.values())
     for entry in result["confirmed_source_instances"]:
         measured = [reading for reading in result["source_shape_readings"] if reading["physical_id"] == entry["physical_id"]]
         entry.update(current_source_binding=binding, actual_RGB_point_count=sum(len(reading["actual_source_uv"]) for reading in measured),
             source_reading_ids=[reading["id"] for reading in measured],
             visibility_status="actual_source_readings_present_with_quality_pending" if measured else "source_missing_identity_retained")
-    result["source_instance_identity_associations"] = associations
+    result["source_instance_identity_associations"] = {**result.get('source_instance_identity_associations',{}),**associations}
     result["human_reference_UV_used_as_actual_boundary_output"] = False
     result["identity_initialization_is_independent_measurement_validation"] = False
     return result
@@ -1398,7 +1519,7 @@ def continue_confirmed_source_instances(result, previous):
     if not known:
         return result
     binding, old = result["source_binding"], previous["source_binding"]
-    if any(binding.get(key) != old.get(key) for key in ("source_sha256", "time_base", "shot_id", "installation_id", "native_hw")):
+    if any(binding.get(key) != old.get(key) for key in ("source_sha256", "time_base", "shot_id", "event_id", "rig_id", "installation_id", "native_hw")):
         raise ValueError("Named source correspondence cannot cross a source or shot reset")
     if result.get("previous_source_binding") is not None:
         same_frame(old, result["previous_source_binding"])
@@ -1407,11 +1528,13 @@ def continue_confirmed_source_instances(result, previous):
               for reading in result.get("source_shape_readings", [])}
     fields = ("physical_id", "physical_curve_id", "physical_role", "identity_confirmed",
               "human_confirmed_instance_identity_initialized", "human_confirmed_identity_source_binding",
+              "source_instance_identity_initialized", "source_identity_source_binding",
               "identity_authority", "source_identity_association", "source_boundary_accuracy_verified",
               "human_reference_UV_used_as_measured_UV")
     for guide in result.get("guides", []):
         reference = old_guides.get(guide["id"], {})
-        if reference.get("human_confirmed_instance_identity_initialized") is not True:
+        if not (reference.get("human_confirmed_instance_identity_initialized") is True or
+                reference.get('source_instance_identity_initialized') is True):
             continue
         # The runtime's existing native flow/search identity supplies the
         # correspondence. No reference-frame human UV is read at this point.
@@ -1447,6 +1570,51 @@ def continue_confirmed_source_instances(result, previous):
     result["human_reference_UV_used_as_actual_boundary_output"] = False
     result["human_reference_UV_reused_as_current_frame_guide"] = False
     result["identity_initialization_is_independent_measurement_validation"] = False
+    return result
+
+
+def _merge_current_material_discovery(result, fresh):
+    """Append newly observed RGB support while retaining each old current read.
+
+    Only same-role material peaks within their measured transition width are
+    duplicate support. A new local ID is exposure-bound, never an object name.
+    Disjoint newly visible arcs remain eligible for physical association.
+    """
+    same_frame(result['source_binding'],fresh['source_binding'])
+    from scipy.spatial import cKDTree
+    old={row['id']:row for row in result.get('source_shape_readings',[])}
+    trees={}
+    for guide in result.get('guides',[]):
+        row=old.get(guide['id'],{});uv=np.asarray(row.get('actual_source_uv',[])).reshape(-1,2)
+        if not len(uv):continue
+        role=(guide.get('material_contour_depth'),guide.get('material_transition'))
+        trees.setdefault(role,[]).append(uv)
+    trees={key:cKDTree(np.vstack(points)) for key,points in trees.items()}
+    additions=[];duplicate_points=0
+    for original in fresh.get('guides',[]):
+        guide=dict(original);profiles=dict(guide['full_curve_source_RGB_profiles'])
+        membership=np.asarray(profiles.get('temporal_material_signature_group_membership',
+            profiles['source_material_conic_group_membership']),bool).copy()
+        points=np.asarray(profiles['all_actual_source_peak_uv'])
+        role=(guide.get('material_contour_depth'),guide.get('material_transition'))
+        if role in trees and len(points):
+            distance,_=trees[role].query(points)
+            widths=np.asarray(profiles['all_actual_source_peak_fwhm_px'])
+            duplicate=membership&(distance<=np.maximum(1.,widths*.5))
+            duplicate_points+=int(duplicate.sum());membership&=~duplicate
+        if not membership.any():continue
+        profiles['temporal_material_signature_group_membership']=membership
+        guide['full_curve_source_RGB_profiles']=profiles
+        guide['id']=f"{guide['id']}@{result['source_binding']['source_pts']}"
+        if guide.get('source_material_topology_id'):
+            guide['source_material_topology_id']=f"{guide['source_material_topology_id']}@{result['source_binding']['source_pts']}"
+        additions.append(guide)
+    result['guides']=[*result.get('guides',[]),*additions]
+    result['source_shape_readings']=[*result.get('source_shape_readings',[]),*_direct_source_shape_readings(additions)]
+    result['current_source_discovery']=dict(candidate_count=len(fresh.get('guides',[])),
+        added_source_local_paths=len(additions),duplicate_actual_support_points=duplicate_points,
+        existing_current_readouts_rewritten=False,physical_identity_from_search_alone=False,
+        source_binding=result['source_binding'],source_RGB_sha256=fresh['source_RGB_sha256'])
     return result
 
 
@@ -2046,9 +2214,11 @@ class SourceMaterialShapeReader:
     def __init__(self, **search_parameters):
         self.search_parameters = search_parameters
         self.previous = None
+        self._query_frame = None
 
     def reset(self):
         self.previous = None
+        self._query_frame = None
 
     def read_material_transition_profiles(self, rgb, packet, **search):
         """Read explicitly declared source-material normals without conic gating.
@@ -2087,14 +2257,132 @@ class SourceMaterialShapeReader:
              primitive_probabilities=None, primitive_source_binding=None,
              source_ice_search_mask=None, source_ice_search_binding=None,
              confirmed_source_guide_packet=None, role_definitions=None):
+        """Reevaluate changed same-frame searches from the pre-frame memory.
+
+        PTS alone cannot cache a material search: its masks, source candidates,
+        measurement definitions and query support can change in a second round.
+        Only the final result is the predecessor for the next exposure.
+        """
+        binding = source_binding(packet['source_binding'], np.asarray(rgb).shape[:2])
+        digest = hashlib.sha256(np.ascontiguousarray(rgb).tobytes()).hexdigest()
+        if packet.get('RGB_sha256', digest) != digest:
+            raise ValueError('Current source shape RGB differs from its reader ledger')
+        options = dict(flow_pair=flow_pair, reset=reset,
+            primitive_probabilities=primitive_probabilities, primitive_source_binding=primitive_source_binding,
+            source_ice_search_mask=source_ice_search_mask, source_ice_search_binding=source_ice_search_binding,
+            confirmed_source_guide_packet=confirmed_source_guide_packet, role_definitions=role_definitions)
+        fingerprint = hashlib.sha256()
+        def visit(value):
+            if hasattr(value, 'detach'):
+                value = value.detach().cpu().numpy()
+            if isinstance(value, np.ndarray):
+                if value.dtype.hasobject:
+                    raise ValueError('Source query arrays cannot contain opaque objects')
+                array = np.ascontiguousarray(value)
+                fingerprint.update(json.dumps([array.dtype.str, list(array.shape)]).encode())
+                fingerprint.update(array.tobytes())
+            elif isinstance(value, dict):
+                fingerprint.update(b'{')
+                for key in sorted(value):
+                    visit(key);visit(value[key])
+                fingerprint.update(b'}')
+            elif isinstance(value, (tuple, list)):
+                fingerprint.update(b'[')
+                for item in value:visit(item)
+                fingerprint.update(b']')
+            else:
+                if isinstance(value, np.generic):value = value.item()
+                fingerprint.update(json.dumps(value, sort_keys=True, allow_nan=False).encode())
+                fingerprint.update(b'\0')
+        flow = None if flow_pair is None else dict(metadata=flow_pair.metadata,
+            forward=flow_pair.forward, valid_forward=flow_pair.valid_forward)
+        visit(dict(packet=packet, RGB_sha256=digest, search_parameters=self.search_parameters,
+                   **{k:v for k,v in options.items() if k != 'flow_pair'}, flow=flow))
+        token = fingerprint.hexdigest()
+        frame = self._query_frame
+        same = bool(frame and all(frame['binding'].get(k) == binding.get(k) for k in
+            ('source_sha256','time_base','shot_id','source_pts','event_id','rig_id','installation_id','native_hw')))
+        if same and frame['RGB_sha256'] != digest:
+            raise ValueError('Same original PTS has changed RGB in source shape memory')
+        if same and frame['key'] == token:
+            return dict(self.previous, memory_update='same_original_source_frame_reread',
+                query_transaction=dict(frame['result']['query_transaction'], cache_hit=True))
+        predecessor = frame['predecessor'] if same else self.previous
+        committed = self.previous
+        self.previous = predecessor
+        try:
+            result = self._read_queries_from_predecessor(rgb, packet, **options)
+            if predecessor is not None and not reset and primitive_probabilities is not None:
+                fresh=source_primitive_material_readings(rgb,packet,
+                    primitive_probabilities=primitive_probabilities,primitive_source_binding=primitive_source_binding,
+                    source_ice_search_mask=source_ice_search_mask,source_ice_search_binding=source_ice_search_binding)
+                result=_merge_current_material_discovery(result,fresh)
+            if source_ice_search_mask is not None:
+                result = self._apply_current_scope(result, source_ice_search_mask, source_ice_search_binding)
+            if confirmed_source_guide_packet is not None:
+                result=bind_confirmed_source_instances(result,confirmed_source_guide_packet,role_definitions=role_definitions)
+        except Exception:
+            self.previous = committed
+            raise
+        rounds = frame['rounds']+1 if same else 1
+        result['query_transaction'] = dict(query_sha256=token, query_rounds=rounds,
+            cache_hit=False, temporal_exposure_contributions=1,
+            same_frame_previous_contribution_replaced=same)
+        self.previous = result
+        self._query_frame = dict(binding=dict(binding), RGB_sha256=digest, key=token,
+            predecessor=predecessor, result=result, rounds=rounds)
+        return result
+
+    @staticmethod
+    def _apply_current_scope(result, scope, scope_binding):
+        """A same-frame mask revision also governs transported RGB profiles."""
+        from .vision_board_reader import _unexcluded_pixels
+        binding=result['source_binding'];same_frame(binding,scope_binding)
+        scope=_numpy(scope)
+        if scope.dtype!=np.bool_ or scope.shape!=tuple(binding['native_hw']):
+            raise ValueError('Source shape scope must be a native boolean mask')
+        excluded=~scope;guides=[]
+        for original in result.get('guides',[]):
+            guide=dict(original);profiles=dict(guide['full_curve_source_RGB_profiles'])
+            uv=np.asarray(profiles['all_actual_source_peak_uv'])
+            rows=np.asarray(profiles['all_actual_source_peak_profile_indices'],int)
+            normals=np.asarray(guide['normals'])[rows]
+            # The actual material signature uses RGB flanks up to six native
+            # pixels on either side of its measured transition. Check every
+            # bilinear contributor; an optical-flow position alone is no proof.
+            samples=uv[:,None]+normals[:,None]*np.arange(-6.,6.25,.5)[None,:,None]
+            visible=_unexcluded_pixels(excluded,samples.reshape(-1,2)).reshape(len(uv),25).all(1)
+            visible &= _unexcluded_pixels(excluded,np.asarray(guide['points_uv']))[rows]
+            for field in ('source_material_conic_group_membership','temporal_material_signature_group_membership'):
+                if field in profiles:profiles[field]=np.asarray(profiles[field],bool)&visible
+            supported=np.zeros(len(guide['points_uv']),bool)
+            membership=profiles.get('temporal_material_signature_group_membership',profiles['source_material_conic_group_membership'])
+            supported[rows[np.asarray(membership,bool)]]=True
+            profiles['source_image_conic_supported_profiles']=supported
+            profiles['current_source_scope_candidate_support']=visible
+            guide['full_curve_source_RGB_profiles']=profiles
+            guide['source_RGB_measured_run_ids']=_visible_search_runs(supported)
+            guides.append(guide)
+        result=dict(result,guides=guides,source_shape_readings=_direct_source_shape_readings(guides),
+            current_source_scope_reapplied=True)
+        if 'confirmed_source_instances' in result:
+            result['confirmed_source_instances']=[dict(row,actual_RGB_point_count=sum(
+                len(r['actual_source_uv']) for r in result['source_shape_readings'] if r.get('physical_id')==row.get('physical_id')))
+                for row in result['confirmed_source_instances']]
+        return result
+
+    def _read_queries_from_predecessor(self, rgb, packet, *, flow_pair=None, reset=False,
+             primitive_probabilities=None, primitive_source_binding=None,
+             source_ice_search_mask=None, source_ice_search_binding=None,
+             confirmed_source_guide_packet=None, role_definitions=None):
         binding = source_binding(packet["source_binding"], np.asarray(rgb).shape[:2])
         digest = hashlib.sha256(np.asarray(rgb).tobytes()).hexdigest()
         if packet.get("RGB_sha256", digest) != digest:
             raise ValueError("Current source shape RGB differs from its reader ledger")
         previous = self.previous
         cut = bool(previous and any(previous["source_binding"].get(key) != binding.get(key)
-                   for key in ("source_sha256", "time_base", "shot_id", "installation_id", "native_hw")))
-        if previous and not cut and binding["source_pts"] < previous["source_binding"]["source_pts"]:
+                   for key in ("source_sha256", "time_base", "shot_id", "event_id", "rig_id", "installation_id", "native_hw")))
+        if previous and not reset and not cut and binding["source_pts"] < previous["source_binding"]["source_pts"]:
             raise ValueError("Source shape memory cannot run backwards without reset")
         if reset or cut or previous is None:
             if primitive_probabilities is not None:
@@ -2103,16 +2391,11 @@ class SourceMaterialShapeReader:
                     source_ice_search_mask=source_ice_search_mask, source_ice_search_binding=source_ice_search_binding)
             else:
                 result = source_circle_search_guides(rgb, packet, **self.search_parameters)
-            if confirmed_source_guide_packet is not None:
-                result = bind_confirmed_source_instances(result, confirmed_source_guide_packet,
-                                                         role_definitions=role_definitions)
             result["memory_update"] = "source_shot_material_bootstrap"
             result["source_local_identity_is_physical_marker_identity"] = False
             self.previous = result
             return result
         same_pts = binding["source_pts"] == previous["source_binding"]["source_pts"]
-        if confirmed_source_guide_packet is not None:
-            raise ValueError("Confirmed reference guide points initialize a source instance once, not every frame")
         if same_pts:
             if digest != previous["source_RGB_sha256"]:
                 raise ValueError("Same original PTS has changed RGB in source shape memory")

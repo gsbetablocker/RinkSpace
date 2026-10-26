@@ -86,7 +86,7 @@ def source_binding(value: Mapping[str, Any], native_hw=None) -> dict:
 
 def same_frame(first, second):
     a, b = source_binding(first), source_binding(second)
-    for key in ("source_sha256", "source_pts", "time_base", "shot_id", "native_hw"):
+    for key in ("source_sha256", "source_pts", "time_base", "shot_id", "event_id", "rig_id", "installation_id", "native_hw"):
         if a.get(key) != b.get(key):
             raise ValueError(f"Prompt and RGB source binding differ: {key}")
     return a
@@ -841,7 +841,7 @@ def source_print_component_continuity(rgb, binding, pattern, *, previous_evidenc
         return {**base, "status": "reference_pattern_initialization_without_previous_source"}
     old = source_binding(previous_evidence["source_binding"], np.asarray(previous_rgb).shape[:2])
     if any(old.get(key) != binding.get(key) for key in
-           ("source_sha256", "time_base", "shot_id", "installation_id", "native_hw")):
+           ("source_sha256", "time_base", "shot_id", "event_id", "rig_id", "installation_id", "native_hw")):
         raise ValueError("Print material tracks cannot cross a source or shot binding")
     if hashlib.sha256(np.asarray(previous_rgb).tobytes()).hexdigest() != previous_evidence.get("source_RGB_sha256"):
         raise ValueError("Print material track memory RGB changed")
@@ -1076,7 +1076,7 @@ def source_print_layout_evidence(rgb, binding, reference, *, query_features=None
     if H is None and previous_evidence is not None and previous_rgb is not None:
         old = source_binding(previous_evidence["source_binding"], np.asarray(previous_rgb).shape[:2])
         if any(old.get(key) != binding.get(key) for key in
-               ("source_sha256", "time_base", "shot_id", "installation_id", "native_hw")):
+               ("source_sha256", "time_base", "shot_id", "event_id", "rig_id", "installation_id", "native_hw")):
             raise ValueError("Print source memory cannot cross a source or shot binding")
         if hashlib.sha256(np.asarray(previous_rgb).tobytes()).hexdigest() != previous_evidence.get("source_RGB_sha256"):
             raise ValueError("Print source memory RGB changed")
@@ -1445,7 +1445,7 @@ def _validate_material_search_alias(prompt, parent, binding):
         raise ValueError('SAM material search aliases require an integer object ID')
     if not parent:
         raise ValueError('A material search alias requires an existing same-source parent')
-    for key in ('source_sha256', 'time_base', 'shot_id', 'native_hw'):
+    for key in ('source_sha256', 'time_base', 'shot_id', 'event_id', 'rig_id', 'installation_id', 'native_hw'):
         if parent['source_binding'].get(key) != binding.get(key):
             raise ValueError('Shared material search cannot cross original source or shot')
     if prompt.get('shared_SAM_board_search_only'):
@@ -1570,7 +1570,7 @@ class Sam2SourceInstances:
         normalized = source_binding(binding, np.asarray(rgb).shape[:2])
         old = self.previous_binding
         cut = old and any(old.get(key) != normalized.get(key) for key in
-                          ("source_sha256", "time_base", "shot_id", "native_hw"))
+                          ("source_sha256", "time_base", "shot_id", "event_id", "rig_id", "installation_id", "native_hw"))
         if reset or cut or not self.objects:
             return self.bootstrap_regions(
                 rgb, normalized, class_probabilities=class_probabilities, classes=classes,
@@ -1643,7 +1643,7 @@ class Sam2SourceInstances:
                 raise ValueError('Material refinement navigation differs from the current source RGB')
         old = self.previous_binding
         cut = old and any(old.get(key) != binding.get(key) for key in
-                          ("source_sha256", "time_base", "shot_id", "native_hw"))
+                          ("source_sha256", "time_base", "shot_id", "event_id", "rig_id", "installation_id", "native_hw"))
         if reset or cut:
             self.reset()
             old = None

@@ -91,6 +91,29 @@ class NativePrintInstance(unittest.TestCase):
         with self.assertRaises(NativeError):
             self.core.sample_path(self.board, 5, p, [[0., 1.]], [0.])
 
+    def test_explicit_unobserved_display_does_not_clamp_or_relax_physical_domain(self):
+        assets={'templates':[{'id':'template','paths':[
+            {'id':'inside','material_uv':[[0.,0.],[1.,0.]],'closed':False},
+            {'id':'outside','material_uv':[[0.,1.],[1.,1.]],'closed':False}]}],
+            'instances':[{'id':'print_instance/a','template_id':'template',
+                          'scene_surface_id':'entity/board.continuous'}],'counts':{}}
+        assets=attach_paired_instance(assets,'print_instance/a','print_instance/b','size',authority={'kind':'synthetic_test'})
+        assets=initialize_instance(assets,'print_instance/a',[.1,.014,0.,.02,.009],provenance={})
+        with self.assertRaises((NativeError,PrintBindingError)):
+            sample_instance(assets,'print_instance/a',self.board,self.core)
+        with self.assertRaises((NativeError,PrintBindingError)):
+            sample_instance(assets,'print_instance/a',self.board,self.core,unobserved_surface_extensions=['inside'])
+        result=sample_instance(assets,'print_instance/a',self.board,self.core,unobserved_surface_extensions=['outside'])
+        inside,outside=result['paths']
+        np.testing.assert_array_equal(inside['xyz'],self.core.board_points(self.board,
+            np.asarray(inside['sz'])[:,0],np.asarray(inside['sz'])[:,1]))
+        self.assertIsNone(inside['unobserved_surface_extension'])
+        np.testing.assert_array_equal(np.asarray(outside['xyz'])[:,2],np.asarray(outside['sz'])[:,1])
+        self.assertTrue(np.all(np.asarray(outside['xyz'])[:,2]>self.board[5]))
+        self.assertFalse(outside['unobserved_surface_extension']['physical_placement_valid'])
+        with self.assertRaises(NativeError):
+            self.core.board_points(self.board,np.asarray(outside['sz'])[:,0],np.asarray(outside['sz'])[:,1])
+
     def test_explicit_comparison_stations_use_the_same_native_path(self):
         assets = {'templates': [{'id': 'template', 'paths': [
             {'id': 'edge', 'role': 'panel_outer_boundary', 'closed': False,

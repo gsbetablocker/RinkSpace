@@ -2,10 +2,22 @@
 #include "rinkspace/geometry.hpp"
 #include "rinkspace/projection.hpp"
 #include "rinkspace/camera_state.hpp"
+#include "rinkspace/camera_chart.hpp"
+#include "rinkspace/camera_envelope.hpp"
+#include "rinkspace/scene_derivatives.hpp"
 #include "rinkspace/entities.hpp"
 #include <limits>
 
 using namespace rinkspace;
+RS_API int rs_camera_envelope_evaluate(const double* rig,size_t nr,const double* controls,size_t nc,double dt,
+    const double* limits,size_t n,double* out,size_t no){
+    CameraEnvelope e{};MotionSpline s{controls,nc,0.,dt};
+    if(!rig||(nr!=38&&nr!=43)||!out||(no!=4&&no!=8)||!s.valid()||!motion_rig(rig).valid()||!camera_envelope(limits,n,e))return 1;
+    auto a=camera_envelope_check(motion_rig(rig),s,e);out[0]=a.margin;out[1]=a.kind;out[2]=a.cell;out[3]=a.u;
+    if(no==8){out[4]=a.channel;out[5]=a.kind>=7?a.kind-6:0;out[6]=a.limit;
+        out[7]=a.kind>=7?camera_spline_derivative(controls+3*size_t(a.cell-1),a.channel,a.u,dt,a.kind-6):0.;}
+    return 0;
+}
 namespace {
 int code(Status s){return static_cast<int>(s);}
 void nan_out(double* p,size_t n){if(p)for(size_t i=0;i<n;++i)p[i]=std::numeric_limits<double>::quiet_NaN();}
@@ -22,6 +34,19 @@ bool valid_curling(const double* p,size_t n){return p&&n==10&&curling(p).valid()
 bool valid_rows(size_t rows){return rows>0&&rows<=static_cast<size_t>(std::numeric_limits<int>::max()/2);}
 }
 extern "C" {
+RS_API int rs_scene_retract(const double* values,size_t n,const int* chart,const double* delta,double* out){
+    if(!chart||!out||!rinkspace::finite_array(values,n)||!rinkspace::finite_array(delta,n))return 1;
+    for(size_t i=0;i<n;++i)if(chart[i]<0||chart[i]>5||(chart[i]>=3&&(i<size_t(chart[i]-3)||i-(chart[i]-3)+2>=n)))return 1;
+    double step=1.;for(size_t i=0;i<n;++i)out[i]=rinkspace::scene_chart_retract(values,chart,i,delta,1,&step,1.);
+    return rinkspace::finite_array(out,n)?0:6;
+}
+RS_API int rs_camera_retract(const double* rig,size_t nr,const double* delta,size_t nd,double* out,size_t no){
+    if((nr!=38&&nr!=43)||nd!=(nr==43?31:27)||no!=nr||!out||!rinkspace::finite_array(rig,nr)||!rinkspace::finite_array(delta,nd)||!rinkspace::motion_rig(rig,nr==43?rig+38:nullptr).valid())return 1;
+    auto status=rinkspace::retract_motion_rig(rig,delta,out);if(status!=rinkspace::Status::ok)return static_cast<int>(status);
+    if(nr==43){out[38]=rig[38];for(int i=0;i<4;++i)out[39+i]=rig[39+i]+delta[27+i];}
+    return rinkspace::finite_array(out,no)?0:1;
+}
+
 int rs_print_square_vertices(const double* p,size_t np,const double* centre,size_t nc,
     double side_over_height,double* vertices,size_t nv){
     if(!vertices||nv!=10)return code(Status::invalid_argument);
@@ -174,13 +199,28 @@ int rs_decode_d78_camera(const double* chart,size_t nc,double* rig,size_t nr){
     if(nc!=55||nr!=38||!rig||!finite_array(chart,nc))return code(Status::invalid_argument);
     try{return code(decode_d78_camera(chart,rig));}catch(...){nan_out(rig,nr);return code(Status::invalid_argument);}
 }
+int rs_motion_derivative_extrema(const double* controls,size_t n_controls,
+    double first,double dt,double lo,double hi,double* output,size_t no){
+    if(!output||no!=27)return code(Status::invalid_argument);nan_out(output,no);
+    const MotionSpline s{controls,n_controls,first,dt};if(!s.valid())return code(Status::invalid_argument);
+    const auto status=s.derivative_extrema(lo,hi,output);if(status!=Status::ok)nan_out(output,no);return code(status);
+}
+int rs_evaluate_motion_kinematics(const double* controls,size_t n_controls,
+    double first,double dt,const double* times,size_t nt,double* output,size_t no,int* status,size_t ns){
+    if(!counts(nt,12,no)||ns!=nt||(nt&&(!times||!output||!status)))return code(Status::invalid_argument);
+    nan_out(output,no);for(size_t i=0;i<nt;++i)status[i]=code(Status::invalid_argument);
+    const MotionSpline spline{controls,n_controls,first,dt};if(!spline.valid())return code(Status::invalid_argument);
+    try{for(size_t i=0;i<nt;++i){double values[12];status[i]=code(spline.kinematics(times[i],values));
+        if(!status[i])std::copy(values,values+12,output+12*i);}
+    }catch(...){nan_out(output,no);return code(Status::invalid_argument);}return 0;
+}
 int rs_evaluate_motion_camera(const double* rig,size_t nr,const double* controls,size_t n_controls,
     double first,double dt,const double* times,size_t nt,double* output,size_t no,int* status,size_t ns){
     if(!counts(nt,24,no)||ns!=nt||(nt&&(!times||!output||!status)))return code(Status::invalid_argument);
     nan_out(output,no);for(size_t i=0;i<nt;++i)status[i]=code(Status::invalid_argument);
-    if(nr!=38||!rig||!motion_rig(rig).valid())return code(Status::invalid_argument);
+    if((nr!=38&&nr!=43)||!rig||!finite_array(rig,nr)||!motion_rig(rig,nr==43?rig+38:nullptr).valid())return code(Status::invalid_argument);
     const MotionSpline spline{controls,n_controls,first,dt};if(!spline.valid())return code(Status::invalid_argument);
-    const auto physical=motion_rig(rig);
+    const auto physical=motion_rig(rig,nr==43?rig+38:nullptr);
     try{for(size_t i=0;i<nt;++i){MotionCameraState state{};
         status[i]=code(evaluate_motion_camera(physical,spline,times[i],state));
         if(!status[i]){double* p=output+24*i;const auto& c=state.camera;
@@ -193,10 +233,10 @@ int rs_evaluate_motion_camera(const double* rig,size_t nr,const double* controls
 int rs_project_motion(const double* rig,size_t nr,const double* controls,size_t n_controls,
     double first,double dt,int height,const double* times,size_t nt,const double* xyz,size_t count,
     double* output,size_t no,int* status,size_t ns){
-    if(nr!=38||!rig||!motion_rig(rig).valid()||height<2||!counts(count,6,no)||nt!=count||ns!=count||
+    if((nr!=38&&nr!=43)||!rig||!finite_array(rig,nr)||!motion_rig(rig,nr==43?rig+38:nullptr).valid()||height<2||!counts(count,6,no)||nt!=count||ns!=count||
         count>std::numeric_limits<size_t>::max()/3||(count&&(!times||!xyz||!output||!status)))return code(Status::invalid_argument);
     const MotionSpline spline{controls,n_controls,first,dt};if(!spline.valid())return code(Status::invalid_argument);
-    nan_out(output,no);const auto physical=motion_rig(rig);
+    nan_out(output,no);const auto physical=motion_rig(rig,nr==43?rig+38:nullptr);
     try{for(size_t i=0;i<count;++i){MotionProjection p{};status[i]=code(project_motion(physical,spline,height,load3(xyz+3*i),times[i],p));
         if(!status[i]){output[6*i]=p.uv.x;output[6*i+1]=p.uv.y;output[6*i+2]=p.depth;output[6*i+3]=p.row;output[6*i+4]=p.equality;output[6*i+5]=p.contraction;}}
     }catch(...){nan_out(output,no);return code(Status::invalid_argument);}return 0;

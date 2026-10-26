@@ -6552,14 +6552,28 @@
             "parameterization": "monotone_axis_warp.v1",
             "affine_only_material_set": false,
             "preserved_structure": [
-              "path_identity",
-              "path_order",
-              "closed_or_open_support",
+              "shared_positive_axis_affine_map",
+              "relative_contour_geometry_and_spacing",
               "parent_hole_ownership",
-              "axis_aligned_straight_edges"
+              "closed_or_open_support",
+              "source_vertex_order"
             ],
             "source_observations_created": 0,
-            "whole_print_coordinate_reference": true
+            "whole_print_coordinate_reference": true,
+            "component_identity": "Ad9/complete badge",
+            "component_evidence": {
+              "kind": "source_and_native_template_visual_component_review",
+              "source_image": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_20261026\\print_shape_audit\\Ad09_source_485376.png",
+              "source_image_sha256": "5d5ca5bd51b06b74568194f868c027b4d33d4472faca6fb208a03c427f4f9835",
+              "native_initial_template_review": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_20261026\\print_shape_audit\\Ad09_native_shapes.png",
+              "source_pts": 485376,
+              "decision": "Keep all contours and holes of this visibly coherent word/line/logo in one shared positive affine map; whole installation dimensions remain unknown",
+              "physical_size_measured": false,
+              "source_paths_and_UV_preserved": true,
+              "component": "complete badge"
+            },
+            "nonlinear_warp_enabled": false,
+            "fixed_in_template_chart": false
           }
         ],
         "path_bindings": {
@@ -6596,6 +6610,35 @@
           ],
           "source_measurement": false,
           "reason": "Remove template-wide translation/scale gauge; shared size and independent instance placement retain those freedoms"
+        },
+        "layout_policy": {
+          "schema": "rinkspace.print_component_layout.v1",
+          "nonlinear_glyph_warp": false,
+          "groups": [
+            {
+              "id": "Ad9/complete badge",
+              "path_ids": [
+                "Ad9.print.red_field.boundary.0000",
+                "Ad9.print.can_c.boundary.0000",
+                "Ad9.print.can_a.boundary.0001",
+                "Ad9.print.can_n.boundary.0002"
+              ],
+              "evidence": {
+                "kind": "source_and_native_template_visual_component_review",
+                "source_image": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_20261026\\print_shape_audit\\Ad09_source_485376.png",
+                "source_image_sha256": "5d5ca5bd51b06b74568194f868c027b4d33d4472faca6fb208a03c427f4f9835",
+                "native_initial_template_review": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_20261026\\print_shape_audit\\Ad09_native_shapes.png",
+                "source_pts": 485376,
+                "decision": "Keep all contours and holes of this visibly coherent word/line/logo in one shared positive affine map; whole installation dimensions remain unknown",
+                "physical_size_measured": false,
+                "source_paths_and_UV_preserved": true,
+                "component": "complete badge"
+              },
+              "fixed_in_template_chart": false
+            }
+          ],
+          "whole_installation_and_size_remain_separate": true,
+          "reference_artwork_is_not_a_measured_physical_size": true
         }
       }
     }
@@ -46842,23 +46885,17 @@
         0.0,
         0.0
       ],
-      "active": true,
-      "tangent_size": 6,
-      "independent_local_indices": [
-        4,
-        5,
-        6,
-        7,
-        8,
-        9
-      ],
+      "active": false,
+      "tangent_size": 0,
+      "independent_local_indices": [],
       "owner_template_id": "print_template/Ad9",
       "gauge_fixed_local_indices": [
         0,
         1,
         2,
         3
-      ]
+      ],
+      "activity_reason": "explicit_shared_artwork_component_layout"
     }
   ],
   "observation_store": {

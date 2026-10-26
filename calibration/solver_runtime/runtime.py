@@ -13,10 +13,11 @@ import sys
 from .config import PACKAGE_ROOT, PROJECT_ROOT, PROGRAM_SOURCE_ROOT, SOURCE_ROOT, data_root
 
 _finder = None
+MANIFEST_PATH = PACKAGE_ROOT / "source_manifest_public_20261026.json"
 
 
 def _manifest():
-    return json.loads((PACKAGE_ROOT / "source_manifest.json").read_text(encoding="utf8"))
+    return json.loads(MANIFEST_PATH.read_text(encoding="utf8"))
 
 
 def source_path(module_name: str) -> Path:
@@ -102,14 +103,15 @@ def status(*, verify_sources: bool = True) -> dict:
     return dict(schema="rinkspace.reusable-solver-runtime.v1", package_root=str(PACKAGE_ROOT),
                 data_root=str(data_root()), program_source_root=str(PROGRAM_SOURCE_ROOT),
                 owned_module_count=len(manifest["modules"]), native_source_count=len(manifest["native_sources"]),
-                source_manifest_sha256=hashlib.sha256((PACKAGE_ROOT / "source_manifest.json").read_bytes()).hexdigest(),
+                source_manifest_sha256=hashlib.sha256(MANIFEST_PATH.read_bytes()).hexdigest(),
                 solver_core="z190_joint_source_solver.solve_joint_source",
                 event_adapter="run_current_named66_full_programme.main",
                 source_identity_verified=verify_sources, runtime_modules_owned=True,
+                runtime_version=manifest["runtime_version"], previous_manifest=manifest["previous_manifest"],
                 legacy_event_source_manifest=str(PACKAGE_ROOT / "legacy_dependencies.json"),
                 event_adapter_uses_explicit_external_private_factories=False,
                 owned_event_factory_count=4,
-                event_factory_manifest=str(PACKAGE_ROOT / "event_factories_manifest.json"),
+                event_factory_manifest=str(PACKAGE_ROOT / "event_factories_public_20261026.json"),
                 builds_during_install=False, optimization_or_accuracy_claim=False)
 
 

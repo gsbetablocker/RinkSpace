@@ -66,12 +66,19 @@ def load_state(state_path, core, shot_ids):
     samples = sample_review_scene(scene, core, scene_path, parameter_state=parameters)
     cameras = {}
     by_id = {s.get('id', s.get('shot_id')): s for s in state['shots']}
+    if None in by_id or len(by_id) != len(state['shots']):
+        raise ValueError('state contains missing or duplicate shot identities')
     for shot_id in shot_ids:
         camera_ref = by_id.get(shot_id, {}).get('camera_ref')
         if not camera_ref:
             raise ValueError('state has no camera definition for '+shot_id)
         camera_path = reference(path.parent, camera_ref)
         camera = read(camera_path)
+        if camera.get('shot_id') is not None and camera['shot_id'] != shot_id:
+            raise ValueError('camera shot identity differs from state binding for '+shot_id)
+        shot_rig = by_id[shot_id].get('rig_id')
+        if shot_rig is not None and camera.get('rig_id') is not None and shot_rig != camera['rig_id']:
+            raise ValueError('camera rig identity differs from state binding for '+shot_id)
         expected = {'schema': 'rinkspace.camera.motion.v1',
                     'mount_family': 'orthogonal_pan_tilt_pivot', 'lens_family': 'brown_zoom_linear',
                     'pupil_model': 'zoom_quadratic_camera_z', 'readout_mode': 'predicted_row_implicit_unique'}

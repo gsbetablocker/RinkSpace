@@ -8,7 +8,7 @@ def evaluate_ice_board_junction(feature, features, scene, core, *, path_ids=None
     Parent path IDs bind real scene geometry; labels alone cannot promote a top
     edge or a screen crossing. Candidate scene values are evaluated afresh.
     """
-    from ..compat.d78_entities import native_definition
+    from ..compat.d78_entities import native_definition, finite_path_support
     from .board_station import validate_boundary_definition
     if feature.kind != 'fixed_junction' or feature.junction_relation != 'ice_board_bottom':
         raise ContractError('Expected an explicit ice_board_bottom fixed junction')
@@ -32,7 +32,7 @@ def evaluate_ice_board_junction(feature, features, scene, core, *, path_ids=None
         if parent.surface == 'ice':
             if kind != 0:
                 raise ContractError('ice_board_bottom requires a finite native ice line')
-            support = path.get('finite_support', path.get('support', [0., 1.]))
+            support = finite_path_support(path)
             if len(support) != 2 or not 0 <= support[0] < support[1] <= 1:
                 raise ContractError('Invalid finite ice line support')
             # Native path sampling applies the actual finite model support.

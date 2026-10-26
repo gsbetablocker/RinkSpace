@@ -1,0 +1,189 @@
+{
+  "schema": "rinkspace.source_identity_review.v1",
+  "review_id": "s01_ice_identity_followup_20261027",
+  "before_point_input_sha256": "78cccf5a0c72c83b1473bc00c02959e51bc1d8f8c2fc44302f13b75b3eb083b5",
+  "finding": "Four Lane4 representative line points track filled F4 material; four late C0 points follow the F2-R2 straight line.",
+  "visual_review": {
+    "reviewer": "assistant",
+    "user_acceptance_claimed": false,
+    "source_inspection_images": [
+      {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_20261026\\ice_residual_audit\\ice_identity_context_433664.png",
+        "sha256": "39bcbaabfedcbf066f5d2cbccc0d59bdf9bc43b4f0c127985fff40d85ecb59bd"
+      },
+      {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_20261026\\ice_residual_audit\\ice_identity_context_437760.png",
+        "sha256": "bcc802b9443be37fee04f9144d7c524ab2de4fec623bc44889e58b54ce92ae63"
+      },
+      {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_20261026\\ice_residual_audit\\ice_identity_context_562944.png",
+        "sha256": "af76f6dc6792ba6e8e9e830fa945dfc9b154ba89927a919c2704d779369eaf09"
+      },
+      {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_20261026\\ice_residual_audit\\C0_late_line_identity.png",
+        "sha256": "642eaee9a1ece139e1891c3ab62ea5930508238c4b93007ae0fc945eadb759b9"
+      }
+    ],
+    "selected_by_residual_only_for_inspection": true,
+    "automatic_error_threshold_deletion": false
+  },
+  "scope": "Exactly eight explicitly inspected IDs. Preserve all other original point fields and native global parameters. Keep user-confirmed F3 and C0 arc errors.",
+  "decisions": [
+    {
+      "observation_id": "raw:12:s01_original:433664:ice.lane4:edge2/segment/0/vertex/0",
+      "source_row": 105656,
+      "pts": 433664,
+      "uv": [
+        1269.1248780080698,
+        856.8607175369026
+      ],
+      "kind": 1,
+      "old_path_id": "d78_material_170/path0",
+      "source_image": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\frames\\000694.png",
+      "source_BGR_sha256": "a0e9c79d6ffea3a831cdf2691c5c870cabc66b29dccfcf362fbee3e217d17ee9",
+      "action": "exclude",
+      "reason": "Source coordinates belong to a straight-line estimate across the F4 filled circle band, not the Lane4 paint centreline. The source pixels do not establish a unique material circle interface for these representative line-fit coordinates; no guessed circle reassignment.",
+      "source_packet": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\repair_20261014\\frames\\000694.json",
+        "sha256": "433e52a9cd8d0a08a7d7af3dd81fa3aa35201a0b9f9ea5b37db21cdb8458d0e7"
+      }
+    },
+    {
+      "observation_id": "raw:12:s01_original:433664:ice.lane4:edge2/segment/0/vertex/1",
+      "source_row": 105657,
+      "pts": 433664,
+      "uv": [
+        1333.156413859783,
+        855.398937879532
+      ],
+      "kind": 1,
+      "old_path_id": "d78_material_170/path0",
+      "source_image": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\frames\\000694.png",
+      "source_BGR_sha256": "a0e9c79d6ffea3a831cdf2691c5c870cabc66b29dccfcf362fbee3e217d17ee9",
+      "action": "exclude",
+      "reason": "Source coordinates belong to a straight-line estimate across the F4 filled circle band, not the Lane4 paint centreline. The source pixels do not establish a unique material circle interface for these representative line-fit coordinates; no guessed circle reassignment.",
+      "source_packet": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\repair_20261014\\frames\\000694.json",
+        "sha256": "433e52a9cd8d0a08a7d7af3dd81fa3aa35201a0b9f9ea5b37db21cdb8458d0e7"
+      }
+    },
+    {
+      "observation_id": "raw:12:s01_original:437760:ice.lane4:edge2/segment/0/vertex/0",
+      "source_row": 107486,
+      "pts": 437760,
+      "uv": [
+        1646.9513,
+        810.1659
+      ],
+      "kind": 1,
+      "old_path_id": "d78_material_170/path0",
+      "source_image": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\frames\\000710.png",
+      "source_BGR_sha256": "a0ffc7d9f556c877b8541301601e496028c070e536e78f4ae30d1a5f8f8944be",
+      "action": "exclude",
+      "reason": "Source coordinates belong to a straight-line estimate across the F4 filled circle band, not the Lane4 paint centreline. The source pixels do not establish a unique material circle interface for these representative line-fit coordinates; no guessed circle reassignment.",
+      "source_packet": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\repair_20261014\\frames\\000710.json",
+        "sha256": "10979ea384bbb4578e47b5a2af9170226da8854066536e3ef44f4bacadc5a731"
+      }
+    },
+    {
+      "observation_id": "raw:12:s01_original:437760:ice.lane4:edge2/segment/0/vertex/1",
+      "source_row": 107487,
+      "pts": 437760,
+      "uv": [
+        1838.8474,
+        816.6886
+      ],
+      "kind": 1,
+      "old_path_id": "d78_material_170/path0",
+      "source_image": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\frames\\000710.png",
+      "source_BGR_sha256": "a0ffc7d9f556c877b8541301601e496028c070e536e78f4ae30d1a5f8f8944be",
+      "action": "exclude",
+      "reason": "Source coordinates belong to a straight-line estimate across the F4 filled circle band, not the Lane4 paint centreline. The source pixels do not establish a unique material circle interface for these representative line-fit coordinates; no guessed circle reassignment.",
+      "source_packet": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\repair_20261014\\frames\\000710.json",
+        "sha256": "10979ea384bbb4578e47b5a2af9170226da8854066536e3ef44f4bacadc5a731"
+      }
+    },
+    {
+      "observation_id": "raw:12:s01_original:562688:ice.C0:outer/segment/5/vertex/0",
+      "source_row": 174619,
+      "pts": 562688,
+      "uv": [
+        1366.6631,
+        1054.436
+      ],
+      "kind": 1,
+      "old_path_id": "d78_material_144/path0",
+      "source_image": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\frames\\001198.png",
+      "source_BGR_sha256": "100d9fab1f7f25f8558c3222291a107d9cdb0860a849bf2f32caeef8281182d1",
+      "action": "rebind",
+      "new_path_id": "d78_material_162/path0",
+      "reason": "Exact source crop shows this UV on the thin straight F2-R2 connection crossing C0, while the C0 arc is below it. Preserve the original pixel and bind to the already modelled straight paint centreline.",
+      "source_packet": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\repair_20261014\\frames\\001198.json",
+        "sha256": "7a069930153ef30976d6fcacdd63df7d289fe40dc7210ba2a4fedc57bd43a820"
+      }
+    },
+    {
+      "observation_id": "raw:12:s01_original:562944:ice.C0:outer/segment/7/vertex/0",
+      "source_row": 174840,
+      "pts": 562944,
+      "uv": [
+        1373.9392,
+        1047.5665
+      ],
+      "kind": 1,
+      "old_path_id": "d78_material_144/path0",
+      "source_image": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\frames\\001199.png",
+      "source_BGR_sha256": "93a30770738b636397cb8b834ff12b878d11b02c090274747ed879a6b2b2330e",
+      "action": "rebind",
+      "new_path_id": "d78_material_162/path0",
+      "reason": "Exact source crop shows this UV on the thin straight F2-R2 connection crossing C0, while the C0 arc is below it. Preserve the original pixel and bind to the already modelled straight paint centreline.",
+      "source_packet": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\repair_20261014\\frames\\001199.json",
+        "sha256": "613e3f4a8b2872567586f27e5de18e71112a4dd0dfa2f358b5927d6662942cf3"
+      }
+    },
+    {
+      "observation_id": "raw:12:s01_original:562944:ice.C0:outer/segment/7/vertex/1",
+      "source_row": 174841,
+      "pts": 562944,
+      "uv": [
+        1411.8933,
+        1051.0256
+      ],
+      "kind": 1,
+      "old_path_id": "d78_material_144/path0",
+      "source_image": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\frames\\001199.png",
+      "source_BGR_sha256": "93a30770738b636397cb8b834ff12b878d11b02c090274747ed879a6b2b2330e",
+      "action": "rebind",
+      "new_path_id": "d78_material_162/path0",
+      "reason": "Exact source crop shows this UV on the thin straight F2-R2 connection crossing C0, while the C0 arc is below it. Preserve the original pixel and bind to the already modelled straight paint centreline.",
+      "source_packet": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\repair_20261014\\frames\\001199.json",
+        "sha256": "613e3f4a8b2872567586f27e5de18e71112a4dd0dfa2f358b5927d6662942cf3"
+      }
+    },
+    {
+      "observation_id": "raw:12:s01_original:563456:ice.C0:outer/segment/8/vertex/0",
+      "source_row": 175224,
+      "pts": 563456,
+      "uv": [
+        1343.2955,
+        1031.7559
+      ],
+      "kind": 1,
+      "old_path_id": "d78_material_144/path0",
+      "source_image": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\frames\\001201.png",
+      "source_BGR_sha256": "3510d163c6ea2de6dca920b72cf0911ccde5b4120deabe4659a9db93532cabc8",
+      "action": "rebind",
+      "new_path_id": "d78_material_162/path0",
+      "reason": "Exact source crop shows this UV on the thin straight F2-R2 connection crossing C0, while the C0 arc is below it. Preserve the original pixel and bind to the already modelled straight paint centreline.",
+      "source_packet": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\source_datasets\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\repair_20261014\\frames\\001201.json",
+        "sha256": "2f60ba08c66eb4f36c9a60752a624291a526e70d19e9a07bfcefb45fec02f518"
+      }
+    }
+  ]
+}

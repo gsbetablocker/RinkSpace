@@ -1,5 +1,6 @@
 import copy,hashlib,importlib.util,json
-from pathlib import Path
+import os
+from pathlib import Path, PureWindowsPath
 import numpy as np
 import pytest
 from rinkspace.vision_ice_model_context_identity import SameStateIceModelContextIdentity
@@ -7,6 +8,10 @@ from rinkspace.vision_ice_single_gray_support_identity import ConfirmedSingleGra
 from test_vision_ice_model_context_identity import source
 
 PREDECESSOR=Path(r'D:\CodexData\RinkSpace_Data\events\ankara_2026\diagnostics\current56_shared_active_set_filter_20261009\systematic_continuation_20261010\full_programme_strict_source_review_20261012\model_context_pre_single_gray_support_20261013\vision_ice_model_context_identity_predecessor.py')
+# A Windows absolute path is one oversized POSIX filename, so stat() itself
+# can fail before pytest evaluates the historical-fixture skip condition.
+PREDECESSOR_AVAILABLE = ((os.name == 'nt' or not PureWindowsPath(str(PREDECESSOR)).is_absolute())
+                         and PREDECESSOR.is_file())
 
 def context(cls,tmp_path,*,gray=False):
     authority=tmp_path/'authority.json'
@@ -40,7 +45,7 @@ def literal(v):
     if isinstance(v,(list,tuple)):return [literal(x) for x in v]
     return v
 
-@pytest.mark.skipif(not PREDECESSOR.is_file(), reason="Requires the recorded predecessor source; not distributed in the public fixture")
+@pytest.mark.skipif(not PREDECESSOR_AVAILABLE, reason="Requires the recorded predecessor source; not distributed in the public fixture")
 def test_default_context_two_exposures_is_bitexact_to_saved_predecessor(tmp_path):
     spec=importlib.util.spec_from_file_location('rinkspace._single_gray_saved_predecessor',PREDECESSOR)
     old=importlib.util.module_from_spec(spec);spec.loader.exec_module(old)

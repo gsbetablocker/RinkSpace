@@ -1,4 +1,4 @@
-"""Load the four unchanged event operators from owned project source.
+"""Load the four authenticated current event operators from owned project source.
 
 This is a separate, closed source registry so an existing runtime manifest can
 be inspected while a solve is running. It never searches Data for Python code.
@@ -18,7 +18,7 @@ import sys
 
 from .config import PACKAGE_ROOT
 
-MANIFEST_PATH = PACKAGE_ROOT / "event_factories_manifest.json"
+MANIFEST_PATH = PACKAGE_ROOT / "event_factories_public_20261026.json"
 _original_spec_from_file_location = importlib.util.spec_from_file_location
 _spec_hook_installed = False
 _locations_unspecified = object()

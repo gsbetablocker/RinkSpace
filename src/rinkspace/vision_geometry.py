@@ -45,6 +45,9 @@ def _source_binding(binding: Mapping[str, Any]) -> dict:
         raise ValueError("A positive source time_base and a shot identity are required")
     result.update(source_sha256=digest.lower(), source_pts=int(stamp),
                   time_base=str(Fraction(str(time_base))))
+    if result.get("identity_schema") == "rinkspace.source_installation.v2":
+        if any(not result.get(k) for k in ("event_id", "rig_id", "installation_id")) or result["event_id"] == result["installation_id"]:
+            raise ValueError("Distinct event/rig/physical installation identity required")
     return result
 
 
@@ -53,7 +56,7 @@ def _same_frame(first, second):
     keys = ("source_sha256", "source_pts", "time_base", "shot_id")
     if any(a[key] != b[key] for key in keys):
         raise ValueError("Camera/target and prediction belong to different source frames")
-    for key in ("camera_group_id", "installation_id", "native_hw", "image_domain", "crop_xyxy"):
+    for key in ("camera_group_id", "event_id", "rig_id", "installation_id", "native_hw", "image_domain", "crop_xyxy"):
         if key in a or key in b:
             if a.get(key) != b.get(key):
                 raise ValueError(f"Source coordinate binding differs: {key}")
@@ -76,7 +79,7 @@ def source_visibility_matches_frame(binding, evidence):
     except (KeyError, ValueError, TypeError, ZeroDivisionError):
         return False
     return all(key not in evidence or evidence[key] == current.get(key)
-               for key in ("shot_id", "native_hw", "image_domain"))
+               for key in ("shot_id", "event_id", "rig_id", "installation_id", "native_hw", "image_domain"))
 
 
 def warp(source, target_to_source_flow):
@@ -178,7 +181,7 @@ class GPUFlow:
             if source0 is None or source1 is None:
                 raise ValueError("Provide both source frame bindings")
             a, b = _source_binding(source0), _source_binding(source1)
-            if any(a[k] != b[k] for k in ("source_sha256", "time_base", "shot_id")) or a["source_pts"] >= b["source_pts"]:
+            if any(a.get(k) != b.get(k) for k in ("source_sha256", "time_base", "shot_id", "event_id", "rig_id", "installation_id")) or a["source_pts"] >= b["source_pts"]:
                 raise ValueError("Temporal flow cannot cross cuts, sources or reversed PTS")
             bindings = [a, b]
         batch, _, h, w = image0.shape

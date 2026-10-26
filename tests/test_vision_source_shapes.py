@@ -223,6 +223,161 @@ def test_two_layer_material_search_rereads_lower_line_like_pixels_without_world_
             source_ice_search_mask=np.ones(rgb.shape[:2],bool),source_ice_search_binding=binding)
 
 
+def test_new_visible_material_is_discovered_after_an_empty_first_frame():
+    rgb=source_annulus()
+    blank=np.full_like(rgb,220)
+    reader=SourceMaterialShapeReader()
+    def options(image,pts):
+        packet=native_paint_search_packet(image);packet['source_binding']['source_pts']=pts
+        primitive=np.zeros((3,*image.shape[:2]),np.float32);primitive[2]=1
+        paint=image[:,:,0]<219;primitive[2,paint]=0;primitive[1,paint]=1
+        b=packet['source_binding']
+        return packet,dict(primitive_probabilities=primitive,primitive_source_binding=b,
+            source_ice_search_mask=np.ones(image.shape[:2],bool),source_ice_search_binding=b)
+    packet,opts=options(blank,100)
+    assert not reader.read(blank,packet,**opts)['guides']
+    packet,opts=options(rgb,101)
+    result=reader.read(rgb,packet,**opts)
+    assert result['current_source_discovery']['added_source_local_paths']>0
+    assert any(len(r['actual_source_uv']) for r in result['source_shape_readings'])
+    assert all(r['physical_id'] is None for r in result['source_shape_readings'])
+    assert all(g['id'].endswith('@101') for g in result['guides'])
+    again=reader.read(rgb,packet,**opts)
+    assert again['query_transaction']['cache_hit']
+    assert len(again['guides'])==len(result['guides'])
+
+
+def test_verified_machine_material_can_name_new_shape_without_human_acceptance():
+    from copy import deepcopy
+    from types import SimpleNamespace
+    from rinkspace.vision_candidate_admission import admit_material_candidates
+    from rinkspace.vision_source_shapes import _merge_current_material_discovery
+    rgb=source_annulus();packet=source_packet(rgb);binding=packet['source_binding']
+    result=source_circle_search_guides(rgb,packet,hypothesis_count=40)
+    outer=next(r for r in result['source_shape_readings'] if
+        next(g for g in result['guides'] if g['id']==r['id']).get('material_contour_depth')==0)
+    points=outer['actual_source_uv'].copy();scene=dict(path='current-native.json',sha256='b'*64)
+    outer_guide=next(g for g in result['guides'] if g['id']==outer['id'])
+    normals=np.asarray(outer_guide['normals'])[outer['original_source_profile_indices']]
+    normals*=np.sign(outer['actual_source_signed_luminance_gradient'])[:,None]
+    proof=dict(kind='current_RGB_material_graph_identity',source_binding=binding,native_path_id='native/R1:outer',
+        source_seed_authority=scene,current_RGB_measured=True,identity_from_projection_alone=False,
+        decoded_native_RGB_sha256=packet['RGB_sha256'])
+    authority=dict(kind='current_RGB_verified_material_identity_for_shape',source_binding=binding,
+        current_native_scene=scene,native_path_id='native/R1:outer',decoded_native_RGB_sha256=packet['RGB_sha256'],
+        human_pixel_acceptance=False,source_readout_evidence=dict(identity_authorities={'a':proof},
+            identity_by_source_index={str(i):dict(authority_key='a',actual_source_uv=p.tolist(),
+                actual_transition_quantiles_uv=[(p-normals[i]).tolist(),p.tolist(),(p+normals[i]).tolist()],
+                actual_profile_normal=normals[i].tolist(),material_transition='dark_to_light') for i,p in enumerate(points)}))
+    reference=dict(source_binding=binding,guides=[dict(id='ice.R1:outer',kind='ice_paint',
+        origin='current_RGB_verified_material_identity',identity_confirmed=True,identity_authority=authority,
+        source_binding=binding,points_uv=points,physical_role='filled_disc_boundary',source_group_id='actual-group')])
+    old={r['id']:r['actual_source_uv'].copy() for r in result['source_shape_readings']}
+    bound=bind_confirmed_source_instances(deepcopy(result),reference,
+        role_definitions={f'ice.R1:{role}':dict(physical_role='filled_disc_boundary') for role in ('outer','middle','inner')})
+    assert all(g['source_instance_identity_initialized'] and not g['human_confirmed_instance_identity_initialized'] for g in bound['guides'])
+    assert all(g['human_confirmed_identity_source_binding'] is None for g in bound['guides'])
+    for r in bound['source_shape_readings']:
+        np.testing.assert_array_equal(old[r['id']],r['actual_source_uv'])
+        assert r['physical_identity_verified'] and 'machine' in r['identity_scope']
+        r['native_material_role_matches']=True
+    def lookup(name):
+        if name and name.startswith(('ice.R1:','native/R1:')):
+            return dict(id=name.replace('ice.','native/'),label=name.replace('native/','ice.'),layer='ice',measurement='contour')
+    geometry=SimpleNamespace(refs=[scene],assert_unchanged=lambda:None,lookup=lookup,
+        bind=lambda guides:(guides,dict(unresolved=[])))
+    admitted=admit_material_candidates(rgb,binding,bound,geometry)
+    assert admitted['accepted_current_query_guides'], admitted['pending_identity']+admitted['rejected']
+    assert all(not g['identity_authority']['human_pixel_acceptance'] for g in admitted['accepted_current_query_guides'])
+    bad=deepcopy(reference);bad['guides'][0]['points_uv'][0,0]+=1
+    with pytest.raises(ValueError,match='verified current RGB'):
+        bind_confirmed_source_instances(deepcopy(result),bad)
+    duplicate=_merge_current_material_discovery(deepcopy(bound),result)
+    assert duplicate['current_source_discovery']['added_source_local_paths']==0
+    for r in duplicate['source_shape_readings']:np.testing.assert_array_equal(old[r['id']],r['actual_source_uv'])
+
+
+@pytest.mark.parametrize('reference_stop,crossing',[(300.,False),(490.,False),(490.,True)])
+def test_actual_two_sided_paint_identity_opens_center_queries_without_relabeling_edges(reference_stop,crossing):
+    from copy import deepcopy
+    from types import SimpleNamespace
+    import torch
+    from rinkspace.vision_ice_source_guides import read_actual_source_query_profiles
+    from rinkspace.vision_candidate_admission import admit_material_candidates
+    from rinkspace.vision_material_reader import CurrentNativeMaterialReader
+    rgb=np.full((200,520,3),220,np.uint8);rgb[70:94]=140;rgb[140:160]=140
+    if crossing:rgb[40:74,130:231]=140
+    rgb=cv2.GaussianBlur(rgb,(0,0),2.)
+    packet=source_packet(rgb);binding=packet['source_binding'];scene=dict(path='fixture-native.json',sha256='b'*64)
+    definition=dict(id='native/line',label='ice.line:segment0',layer='ice',measurement='centreline',
+        curve_id='line:segment0',feature_id='line',world_curve_role='segment0',operator='paint_center',
+        material_signal='dark',material_transition=None,native_path_id='native/line',native_kind='ice_segment')
+    xs=np.arange(30.,reference_stop+1.,10.)
+    if crossing:xs=xs[(xs<120.)|(xs>240.)]
+    query=np.c_[xs,np.full(len(xs),81.5)]
+    normal=np.tile([0.,1.],(len(query),1))
+    measured=read_actual_source_query_profiles(rgb,binding,[definition],query,normal,
+        np.tile([-40.,40.],(len(query),1)),np.zeros(len(query),int),np.zeros(rgb.shape[:2],bool))
+    ids=np.flatnonzero((measured['candidate_flags']&3)==0)
+    sides=measured['candidate_side_quantiles_uv'][ids,:,1];points=sides.mean(1)
+    assert len(points)>20
+    proof=dict(kind='current_RGB_material_graph_identity',source_binding=binding,native_path_id='native/line',
+        source_seed_authority=dict(kind='synthetic_known_paint_identity'),current_RGB_measured=True,
+        identity_from_projection_alone=False,decoded_native_RGB_sha256=packet['RGB_sha256'])
+    members={str(i):dict(authority_key='a',actual_source_uv=p.tolist(),measurement_operator='paint_center',material_signal='dark',
+        actual_source_sides_uv=sides[i].tolist(),actual_transition_quantiles_uv=measured['candidate_side_quantiles_uv'][ids[i]].tolist(),
+        actual_profile_origin_uv=measured['query_uv'][measured['candidate_query'][ids[i]]].tolist(),
+        actual_profile_interval_px=measured['query_interval'][measured['candidate_query'][ids[i]]].tolist(),
+        actual_transition_luminance_signs=[-1,1],actual_profile_normal=[0.,1.]) for i,p in enumerate(points)}
+    authority=dict(kind='current_RGB_verified_material_identity_for_shape',source_binding=binding,
+        current_native_scene=scene,native_path_id='native/line',decoded_native_RGB_sha256=packet['RGB_sha256'],
+        human_pixel_acceptance=False,source_readout_evidence=dict(identity_authorities={'a':proof},identity_by_source_index=members))
+    reference=dict(source_binding=binding,guides=[dict(id='ice.line:segment0',kind='ice_paint',
+        origin='current_RGB_verified_material_identity',identity_confirmed=True,identity_authority=authority,
+        source_binding=binding,points_uv=points,physical_role='painted_stroke_center_axis',source_group_id='actual-paint')])
+    reference['guides'].insert(0,dict(reference['guides'][0],origin='user_confirmed_visual_supervision',
+        identity_authority=dict(kind='synthetic_human_named_line_identity')))
+    result=partial_source_material_readings(rgb,binding=binding,source_ice_search_mask=np.ones(rgb.shape[:2],bool),
+        source_ice_search_binding=binding,source_paint_probabilities=np.ones(rgb.shape[:2],np.float32),probability_source_binding=binding)
+    original={r['id']:r['actual_source_uv'].copy() for r in result['source_shape_readings']}
+    bound=bind_confirmed_source_instances(deepcopy(result),reference)
+    named=[r for r in bound['source_shape_readings'] if r['physical_identity_verified']]
+    assert named
+    assert all(not g.get('human_confirmed_instance_identity_initialized') for g in bound['guides'])
+    for row in bound['source_shape_readings']:
+        np.testing.assert_array_equal(row['actual_source_uv'],original[row['id']])
+        row['native_material_role_matches']=False
+    assert all(r['physical_role']=='source_paint_role_unresolved' and np.max(r['actual_source_uv'][:,1])<110 for r in named)
+    def bind(guides):return [dict(g,native_geometry=dict(path_id='native/line',scene=scene)) for g in guides],dict(unresolved=[])
+    geometry=SimpleNamespace(refs=[scene],assert_unchanged=lambda:None,ice_inventory=lambda:[definition],bind=bind,
+        lookup=lambda name:definition if name in ('native/line','ice.line:segment0') else None)
+    admitted=admit_material_candidates(rgb,binding,bound,geometry)
+    guides=admitted['accepted_current_query_guides'];assert guides,admitted['pending_identity']
+    assert all(g['source_boundary_requires_native_center_reread'] for g in guides)
+    assert all(np.max(g['source_material_interface_query_uv'][:,0])<reference_stop+10. for g in guides)
+    assert all(np.allclose(g['normals'],[0.,1.]) for g in guides)
+    if reference_stop==300.:
+        assert any(np.max(r['actual_source_uv'][:,0])>350. for r in named)
+        assert any(r['reason']=='edge_profiles_outside_actual_paired_material_identity'
+            for r in admitted['pending_identity'])
+    rows=[dict(guide=dict(uv=torch.as_tensor(g['points_uv']),normals=torch.as_tensor(g['normals'])),
+        actual_source_uv=torch.empty((0,2)),source_indices=torch.empty(0,dtype=torch.long),metadata={}) for g in guides]
+    reader=CurrentNativeMaterialReader(geometry,device='cpu')
+    reread=reader.refine_ice(rgb,binding,guides,dict(readings=rows),near_board=dict(qualified_ice_visible_mask=np.ones(rgb.shape[:2],bool)))
+    centers=np.vstack([r['actual_source_uv'].numpy() for r in rows])
+    assert len(centers)>10,(reread['selected']['decisions'],np.unique(reread['measurement']['candidate_flags'],return_counts=True))
+    assert np.max(np.abs(centers[:,1]-81.5))<1.
+    if crossing:
+        assert not np.any((centers[:,0]>140.)&(centers[:,0]<220.))
+        assert any(r['reason']=='current_RGB_two_material_sides_unresolved_or_excluded'
+            for r in admitted['pending_identity'])
+    bad=deepcopy(reference)
+    for member in bad['guides'][1]['identity_authority']['source_readout_evidence']['identity_by_source_index'].values():
+        member['actual_source_sides_uv'][1]=member['actual_source_sides_uv'][0]
+    rejected=bind_confirmed_source_instances(deepcopy(result),bad)
+    assert not any(r['physical_identity_verified'] for r in rejected['source_shape_readings'])
+
+
 def test_open_material_memory_rereads_source_rgb_without_fitting_or_closing_ellipse():
     from types import SimpleNamespace
     rgb=np.full((160,480,3),220,np.uint8)
@@ -249,6 +404,61 @@ def test_open_material_memory_rereads_source_rgb_without_fitting_or_closing_elli
         assert not ((uv[:,0]>214)&(uv[:,0]<258)).any()
         assert row['physical_id'] is None and not row['fitted_or_flow_pixels_used_as_measurements']
         assert row['full_curve_missing_or_conflicting_profiles'].any()
+
+
+def test_same_exposure_new_material_scope_rereads_pixels_without_double_memory():
+    rgb=np.full((160,480,3),220,np.uint8)
+    cv2.ellipse(rgb,(240,166),(220,62),0,0,360,(160,160,160),-1)
+    cv2.ellipse(rgb,(240,166),(145,35),0,0,360,(220,220,220),-1)
+    rgb=cv2.GaussianBlur(rgb,(0,0),2.)
+    packet=native_paint_search_packet(rgb);binding=packet['source_binding']
+    primitive=np.zeros((3,*rgb.shape[:2]),np.float32);primitive[2]=1
+    gray=rgb[:,:,0]<219;primitive[2,gray]=0;primitive[1,gray]=1
+    scope=np.zeros(rgb.shape[:2],bool)
+    reader=SourceMaterialShapeReader()
+    args=dict(primitive_probabilities=primitive,primitive_source_binding=binding,
+        source_ice_search_mask=scope,source_ice_search_binding=binding)
+    first=reader.read(rgb,packet,**args)
+    assert not first['source_shape_readings']
+    # Mutating the same mask object must change the search fingerprint too.
+    scope[:]=True
+    second=reader.read(rgb,packet,**args)
+    assert second['source_shape_readings']
+    assert sum(len(r['actual_source_uv']) for r in second['source_shape_readings'])>0
+    assert second['query_transaction']['query_rounds']==2
+    assert second['query_transaction']['temporal_exposure_contributions']==1
+    assert reader._query_frame['predecessor'] is None
+    again=reader.read(rgb,packet,**args)
+    assert again['query_transaction']['cache_hit']
+    assert again['query_transaction']['query_rounds']==2
+    assert reader.previous is second
+    bad=dict(args,source_ice_search_binding=dict(binding,source_pts=999))
+    with pytest.raises(ValueError,match='source_pts'):
+        reader.read(rgb,packet,**bad)
+    assert reader.previous is second
+    assert reader._query_frame['rounds']==2
+
+
+def test_same_exposure_changed_mask_rechecks_tracked_material_and_keeps_predecessor():
+    from types import SimpleNamespace
+    rgb=source_annulus();packet=source_packet(rgb);binding=packet['source_binding']
+    reader=SourceMaterialShapeReader(hypothesis_count=40)
+    first=reader.read(rgb,packet)
+    next_packet=source_packet(rgb);next_packet['source_binding']['source_pts']=101
+    second_binding=next_packet['source_binding'];h,w=rgb.shape[:2]
+    flow=SimpleNamespace(forward=np.zeros((1,2,h,w),np.float32),valid_forward=np.ones((1,1,h,w),bool),
+        metadata=dict(source_alignment_verified=True,source_bindings=[binding,second_binding]))
+    scope=np.ones((h,w),bool)
+    args=dict(flow_pair=flow,source_ice_search_mask=scope,source_ice_search_binding=second_binding)
+    visible=reader.read(rgb,next_packet,**args)
+    assert sum(len(r['actual_source_uv']) for r in visible['source_shape_readings'])>0
+    scope[:]=False
+    masked=reader.read(rgb,next_packet,**args)
+    assert not any(len(r['actual_source_uv']) for r in masked['source_shape_readings'])
+    assert reader._query_frame['predecessor'] is first
+    assert masked['query_transaction']['temporal_exposure_contributions']==1
+    assert masked['query_transaction']['query_rounds']==2
+    assert sum(len(r['actual_source_uv']) for r in visible['source_shape_readings'])>0
 
 
 def confirmed_reference_packet(binding):

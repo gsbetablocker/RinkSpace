@@ -1,0 +1,287 @@
+{
+  "schema": "rinkspace.source_identity_review.v1",
+  "before_point_input_sha256": "874affb2b785205863a865b3ffb1bd3720a031528db7cf4d1cb6bf6017205e6c",
+  "finding": "Two actual source frames contain neighboring-letter and non-boundary misreads under the TA identity. Complete-pattern registration did not prove every left-side glyph identity.",
+  "source_identity_evidence": {
+    "atlas_file": "D:\\CodexData\\RinkSpace_Data\\runs\\native_ad_replacement_s01_20261026\\atlases.json",
+    "atlas_id": 75,
+    "source_path_index": 0,
+    "contour_sha256": "e56e8298fc4aa432be6cc94a4bd6605302447792fe35c88db14bbd1e2c511e34",
+    "chart_file": "D:\\CodexData\\RinkSpace_Data\\runs\\native_ad_replacement_s01_20261026\\increments\\002\\evidence\\source_identity_charts.json",
+    "chart_file_sha256": "c5af5e6e19e8fbd3eba0a3df969333bcfa6e512213ca240c93d91b576d337a40",
+    "old_whole_pattern_scores": [
+      0.7700398736114236,
+      0.7548231642957661
+    ],
+    "scores_used_as_acceptance_rule": false
+  },
+  "visual_review": {
+    "reviewer": "assistant",
+    "user_acceptance_claimed": false,
+    "source_pts": [
+      423424,
+      423680
+    ],
+    "source_times_seconds": [
+      33.08,
+      33.1
+    ],
+    "points_reviewed": 16,
+    "neighbor_pts": [
+      422400,
+      422912,
+      423168,
+      424448
+    ],
+    "neighbor_points_reviewed": 7,
+    "neighbor_result": "No same neighboring-letter swap in these seven inspected points; no blanket claim about pixel precision.",
+    "images": [
+      {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_20261026\\print_component_layout\\ad6_remaining\\ta_identity_423424.png",
+        "sha256": "8b57999fb372bb1a67bb7b6a746609d418e754e9803069724c48c22f75d372d4"
+      },
+      {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_20261026\\print_component_layout\\ad6_remaining\\ta_identity_423680.png",
+        "sha256": "1abf4f3beb4af23928e4c23b2d1b82df345159d496c26e5770003ecc20942151"
+      },
+      {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_20261026\\print_component_layout\\ad6_remaining\\ta_point_tiles_423424.png",
+        "sha256": "77bc7c7b05ac87f57f8d4be219586d1ebbe4f810b6f2d6743b5f41b5bd8fcdf9"
+      },
+      {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_20261026\\print_component_layout\\ad6_remaining\\ta_point_tiles_423680.png",
+        "sha256": "dd58503ce1951a432b3af7273494e93c53b3aac21ab582a98fa9dadd6bd09c42"
+      },
+      {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_20261026\\print_component_layout\\ad6_remaining\\ta_neighbor_point_tiles.png",
+        "sha256": "d8f0c2e66cecd511c0e35d31a0aa5452dc5e52cf15fe772d4ad4d89dd3869475"
+      }
+    ]
+  },
+  "scope": "Only ten explicitly reviewed IDs change; six same-frame TA observations and all other rows remain unchanged. No residual threshold, new weights, UV correction, or regenerated points.",
+  "decisions": [
+    {
+      "observation_id": "s01_native_source_v2_423424_109_0000",
+      "source_row": 731670,
+      "pts": 423424,
+      "uv": [
+        707.1567898698786,
+        594.6438952029371
+      ],
+      "kind": 1,
+      "old_path_id": "print_instance/Ad6::Ad6.print.component003/path0",
+      "action": "rebind",
+      "new_path_id": "print_instance/Ad6::Ad6.print.component002/path0",
+      "reason": "Actual N long-stroke right boundary, not TA.",
+      "source_image": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\frames\\000654.png",
+      "source_BGR_sha256": "5acf14ee079f2f4de1ef60fe8decebb239fdbae684458ad2c267b8284c67a495"
+    },
+    {
+      "observation_id": "s01_native_source_v2_423424_109_0005",
+      "source_row": 731761,
+      "pts": 423424,
+      "uv": [
+        732.0771487082977,
+        627.8873302777512
+      ],
+      "kind": 1,
+      "old_path_id": "print_instance/Ad6::Ad6.print.component003/path0",
+      "action": "exclude",
+      "reason": "Plain red gap below the TA left part; no material edge at this original UV.",
+      "source_image": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\frames\\000654.png",
+      "source_BGR_sha256": "5acf14ee079f2f4de1ef60fe8decebb239fdbae684458ad2c267b8284c67a495"
+    },
+    {
+      "observation_id": "s01_native_source_v2_423424_109_0010",
+      "source_row": 731791,
+      "pts": 423424,
+      "uv": [
+        712.5399021659683,
+        584.26915692077
+      ],
+      "kind": 1,
+      "old_path_id": "print_instance/Ad6::Ad6.print.component003/path0",
+      "action": "rebind",
+      "new_path_id": "print_instance/Ad6::Ad6.print.component002/path0",
+      "reason": "Actual N long-stroke right boundary, not TA.",
+      "source_image": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\frames\\000654.png",
+      "source_BGR_sha256": "5acf14ee079f2f4de1ef60fe8decebb239fdbae684458ad2c267b8284c67a495"
+    },
+    {
+      "observation_id": "s01_native_source_v2_423424_109_0017",
+      "source_row": 731812,
+      "pts": 423424,
+      "uv": [
+        754.0863305051415,
+        534.4409118151975
+      ],
+      "kind": 1,
+      "old_path_id": "print_instance/Ad6::Ad6.print.component003/path0",
+      "action": "exclude",
+      "reason": "Inside the white TA upright, near its horizontal stroke junction; not its boundary.",
+      "source_image": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\frames\\000654.png",
+      "source_BGR_sha256": "5acf14ee079f2f4de1ef60fe8decebb239fdbae684458ad2c267b8284c67a495"
+    },
+    {
+      "observation_id": "s01_native_source_v2_423424_109_0020",
+      "source_row": 731815,
+      "pts": 423424,
+      "uv": [
+        715.8149220655836,
+        544.6039204257245
+      ],
+      "kind": 1,
+      "old_path_id": "print_instance/Ad6::Ad6.print.component003/path0",
+      "action": "rebind",
+      "new_path_id": "print_instance/Ad6::Ad6.print.component002/path0",
+      "reason": "Actual N long-stroke top boundary, not TA.",
+      "source_image": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\frames\\000654.png",
+      "source_BGR_sha256": "5acf14ee079f2f4de1ef60fe8decebb239fdbae684458ad2c267b8284c67a495"
+    },
+    {
+      "observation_id": "s01_native_source_v2_423680_109_0001",
+      "source_row": 732499,
+      "pts": 423680,
+      "uv": [
+        742.238041438337,
+        592.8601504245312
+      ],
+      "kind": 1,
+      "old_path_id": "print_instance/Ad6::Ad6.print.component003/path0",
+      "action": "rebind",
+      "new_path_id": "print_instance/Ad6::Ad6.print.component002/path0",
+      "reason": "Actual N long-stroke right boundary, not TA.",
+      "source_image": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\frames\\000655.png",
+      "source_BGR_sha256": "aa34e56a55620c02b368ab9c7a663510783ebe26f0bc7dd900f52b6767f0128c"
+    },
+    {
+      "observation_id": "s01_native_source_v2_423680_109_0004",
+      "source_row": 732619,
+      "pts": 423680,
+      "uv": [
+        752.8459075064792,
+        640.2142969217807
+      ],
+      "kind": 1,
+      "old_path_id": "print_instance/Ad6::Ad6.print.component003/path0",
+      "action": "exclude",
+      "reason": "Plain red gap between TA strokes, next to the black foreground; no printed material edge at this original UV.",
+      "source_image": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\frames\\000655.png",
+      "source_BGR_sha256": "aa34e56a55620c02b368ab9c7a663510783ebe26f0bc7dd900f52b6767f0128c"
+    },
+    {
+      "observation_id": "s01_native_source_v2_423680_109_0005",
+      "source_row": 732629,
+      "pts": 423680,
+      "uv": [
+        722.6833691783111,
+        593.8544237467873
+      ],
+      "kind": 1,
+      "old_path_id": "print_instance/Ad6::Ad6.print.component003/path0",
+      "action": "exclude",
+      "reason": "Inside the white neighboring N long stroke, not a material boundary.",
+      "source_image": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\frames\\000655.png",
+      "source_BGR_sha256": "aa34e56a55620c02b368ab9c7a663510783ebe26f0bc7dd900f52b6767f0128c"
+    },
+    {
+      "observation_id": "s01_native_source_v2_423680_109_0006",
+      "source_row": 732637,
+      "pts": 423680,
+      "uv": [
+        726.8564035120163,
+        589.5874051708472
+      ],
+      "kind": 1,
+      "old_path_id": "print_instance/Ad6::Ad6.print.component003/path0",
+      "action": "exclude",
+      "reason": "Inside the white neighboring N long stroke, not a material boundary.",
+      "source_image": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\frames\\000655.png",
+      "source_BGR_sha256": "aa34e56a55620c02b368ab9c7a663510783ebe26f0bc7dd900f52b6767f0128c"
+    },
+    {
+      "observation_id": "s01_native_source_v2_423680_109_0008",
+      "source_row": 732650,
+      "pts": 423680,
+      "uv": [
+        751.3884810921958,
+        546.5207900823381
+      ],
+      "kind": 1,
+      "old_path_id": "print_instance/Ad6::Ad6.print.component003/path0",
+      "action": "rebind",
+      "new_path_id": "print_instance/Ad6::Ad6.print.component002/path0",
+      "reason": "Actual N long-stroke top boundary, not TA.",
+      "source_image": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\results\\frame_by_frame_review_20261013\\first_shot_remaining_50fps\\frames\\000655.png",
+      "source_BGR_sha256": "aa34e56a55620c02b368ab9c7a663510783ebe26f0bc7dd900f52b6767f0128c"
+    }
+  ],
+  "reviewed_retained_without_changes": [
+    {
+      "observation_id": "s01_native_source_v2_423424_109_0006",
+      "source_row": 731780,
+      "pts": 423424,
+      "uv": [
+        778.0553681371906,
+        536.5031372399015
+      ],
+      "kind": 1,
+      "old_path_id": "print_instance/Ad6::Ad6.print.component003/path0"
+    },
+    {
+      "observation_id": "s01_native_source_v2_423424_109_0007",
+      "source_row": 731782,
+      "pts": 423424,
+      "uv": [
+        782.6887128769229,
+        536.4127981957643
+      ],
+      "kind": 1,
+      "old_path_id": "print_instance/Ad6::Ad6.print.component003/path0"
+    },
+    {
+      "observation_id": "s01_native_source_v2_423424_109_0013",
+      "source_row": 731805,
+      "pts": 423424,
+      "uv": [
+        790.4020646731129,
+        536.6732432255316
+      ],
+      "kind": 1,
+      "old_path_id": "print_instance/Ad6::Ad6.print.component003/path0"
+    },
+    {
+      "observation_id": "s01_native_source_v2_423424_109_0015",
+      "source_row": 731810,
+      "pts": 423424,
+      "uv": [
+        740.6601077638005,
+        608.1271953794685
+      ],
+      "kind": 1,
+      "old_path_id": "print_instance/Ad6::Ad6.print.component003/path0"
+    },
+    {
+      "observation_id": "s01_native_source_v2_423424_109_0018",
+      "source_row": 731813,
+      "pts": 423424,
+      "uv": [
+        722.7508823197647,
+        585.563840557984
+      ],
+      "kind": 1,
+      "old_path_id": "print_instance/Ad6::Ad6.print.component003/path0"
+    },
+    {
+      "observation_id": "s01_native_source_v2_423680_109_0007",
+      "source_row": 732647,
+      "pts": 423680,
+      "uv": [
+        769.088433496477,
+        514.805490135529
+      ],
+      "kind": 1,
+      "old_path_id": "print_instance/Ad6::Ad6.print.component003/path0"
+    }
+  ]
+}

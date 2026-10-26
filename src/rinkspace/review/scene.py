@@ -13,7 +13,7 @@ from ..domain.print_assets import resolve_instance, sample_instance
 from ..domain.scene_assets import read_scene_assets
 
 
-def sample_scene(scene, core, scene_path, *, print_stations=None, parameter_state=None):
+def sample_scene(scene, core, scene_path, *, print_stations=None, parameter_state=None, observed_path_ids=None):
     if parameter_state is not None and hasattr(parameter_state, 'apply_scene'):
         scene = parameter_state.apply_scene(scene)
     sampled = sample_entities(scene, core)
@@ -23,6 +23,8 @@ def sample_scene(scene, core, scene_path, *, print_stations=None, parameter_stat
     material_ids = list(inventory['material_ids'])
     path_ids = set(inventory['path_ids'])
     registered, localized, unlocalized = [], [], []
+    observed=None if observed_path_ids is None else set(observed_path_ids)
+    surface_extensions=[]
     print_grids = {}
     missing = list(sampled['missing_entities'])
     for reference, assets in read_scene_assets(scene, scene_path):
@@ -39,6 +41,9 @@ def sample_scene(scene, core, scene_path, *, print_stations=None, parameter_stat
                 continue
             grids = None if print_stations is None else print_stations.get(identity)
             kwargs = {'parameter_state':parameter_state}
+            if observed is not None:
+                kwargs['unobserved_surface_extensions']=[p['id'] for p in template['paths']
+                                                         if identity+'::'+p['id'] not in observed]
             if grids is not None:
                 kwargs['stations_by_path'] = grids
             evaluated = sample_instance(assets, identity, scene['board'], core, **kwargs)
@@ -56,6 +61,8 @@ def sample_scene(scene, core, scene_path, *, print_stations=None, parameter_stat
                 if xyz.ndim != 2 or xyz.shape[1] != 3 or not len(xyz) or not np.isfinite(xyz).all():
                     raise ValueError('Invalid native print samples: '+path_id)
                 print_grids[identity][path['id']] = list(path['stations'])
+                extension=path.get('unobserved_surface_extension')
+                if extension is not None:surface_extensions.append({'path_id':path_id,**extension})
                 sampled['cuts'].append({
                     'id': path_id, 'entity_id': entity_id,
                     'label': identity.rsplit('/', 1)[-1]+'.'+path['id'].rsplit('/', 1)[-1],
@@ -64,6 +71,7 @@ def sample_scene(scene, core, scene_path, *, print_stations=None, parameter_stat
                     'kind': 'installed_artwork_polyline', 'support': [0., 1.],
                     'instance_id': identity, 'template_id': template['id'],
                     'template_path_id': path['id'], 'role': path.get('role'),
+                    'unobserved_surface_extension':extension,
                 })
                 chunks.append(xyz)
                 offset += len(xyz)
@@ -78,6 +86,9 @@ def sample_scene(scene, core, scene_path, *, print_stations=None, parameter_stat
     }
     sampled['print_sampling_stations'] = print_grids
     sampled['scene_path'] = str(Path(scene_path).resolve())
+    sampled['unobserved_print_surface_extensions']=surface_extensions
+    if observed is not None and not observed<=path_ids:
+        raise ValueError('Observed paths missing from review geometry: '+str(sorted(observed-path_ids)))
     sampled['_parameter_state'] = parameter_state
     return sampled
 
@@ -100,11 +111,12 @@ def common_print_stations(first, second):
     return grids
 
 
-def sample_review_scene(scene, core, scene_path, *, print_stations=None, parameter_state=None):
+def sample_review_scene(scene, core, scene_path, *, print_stations=None, parameter_state=None, observed_path_ids=None):
     """Add full board display edges only when the model does not contain them."""
     if parameter_state is not None and hasattr(parameter_state, 'apply_scene'):
         scene = parameter_state.apply_scene(scene)
-    samples = sample_scene(scene, core, scene_path, print_stations=print_stations, parameter_state=parameter_state)
+    samples = sample_scene(scene, core, scene_path, print_stations=print_stations, parameter_state=parameter_state,
+                           observed_path_ids=observed_path_ids)
     existing_heights = set()
     for path in scene['paths']:
         kind, parameters = native_definition(scene, path, core)

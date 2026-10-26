@@ -67,3 +67,38 @@ def test_straight_red_segment_cannot_establish_circle_identity():
     points=np.c_[np.arange(0.,240.,20.),np.full(12,60.)]
     okay,evidence=_actual_curved_paint_structure(points,np.arange(len(points)))
     assert not okay and evidence['actual_source_tangent_span_rad']==0
+
+
+def test_added_current_rgb_fragment_preserves_full_two_image_track(tmp_path):
+    authority=tmp_path/'authority.json';authority.write_text('{}')
+    reference=dict(path=str(authority),sha256=hashlib.sha256(authority.read_bytes()).hexdigest())
+    inventory=[dict(curve_id='B1:segment0',feature_id='B1',world_curve_role='segment0',
+        operator='paint_center',material_signal='blue')]
+    def prepared():
+        context=SameStateIceModelContextIdentity.__new__(SameStateIceModelContextIdentity)
+        context.inventory=inventory;context.source_sha256='a'*64;context.time_base='1/1000';context.authority=reference
+        context.state_reference=context.scene_reference=context.camera_reference=reference
+        context.source_negative_materials=[];context.feature_kind={'B1':'polyline'}
+        context.previous_gray=context.previous_mask=context.previous_binding=None;context.previous_tracks={}
+        context.navigation=lambda m:[[np.array([[0.,m['candidate_uv'][0,1]],[239.,m['candidate_uv'][0,1]]])]]
+        selector=TemporalIceIdentitySelector(inventory,source_sha256='a'*64,time_base='1/1000',model_context_identity=context)
+        rgb,measurement=source(10);mask=np.zeros(rgb.shape[:2],bool)
+        assert not selector.consume(rgb,measurement,mask,source_ice_scope_mask=~mask)['rows']
+        return selector
+    for kind in ('current_RGB_candidate_admission','current_RGB_existing_readout_identity'):
+        baseline,expanded=prepared(),prepared()
+        rgb,measurement=source(20,2);mask=np.zeros(rgb.shape[:2],bool)
+        seed=dict(curve_id='B1:segment0',actual_pts=20,source_sha256='a'*64,time_base='1/1000',
+            shot_id='one',decoded_native_RGB_sha256=measurement['decoded_native_RGB_sha256'],
+            source_material_class='static_painted_ice',surface_and_physical_identity_confirmed=True,
+            navigation_uv=measurement['candidate_uv'][-2:].tolist(),authority=dict(kind=kind))
+        expected=baseline.consume(rgb,measurement,mask,source_ice_scope_mask=~mask)
+        actual=expanded.consume(rgb,measurement,mask,seeds=[seed],source_ice_scope_mask=~mask)
+        assert len(actual['rows'])==len(expected['rows'])==1
+        assert np.array_equal(actual['rows'][0]['uv'],expected['rows'][0]['uv'])
+        assert len(actual['rows'][0]['uv'])==6
+        assert 'additional_current_source_navigation_runs' not in expanded.tracks['B1:segment0']
+        rgb,measurement=source(30,4)
+        expected=baseline.consume(rgb,measurement,mask,source_ice_scope_mask=~mask)
+        actual=expanded.consume(rgb,measurement,mask,source_ice_scope_mask=~mask)
+        assert np.array_equal(actual['rows'][0]['uv'],expected['rows'][0]['uv'])

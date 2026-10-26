@@ -18,8 +18,8 @@ RS_HD inline double print_convex_interpolate(double a,double b,double t){
 /* Shared installed material chart, before wrapping onto the board course.
  * p=[unwrapped_s,z,rotation,width,height]; dimensions stay positive.
  * Template chart orientation is explicit in the supplied material vertices. */
-RS_HD inline Vec2 installed_print_chart(const double* p,double x,double y){
-    const double ca=std::cos(p[2]),sa=std::sin(p[2]);
+template<class T> RS_HD inline Vec2Value<T> installed_print_chart(const T* p,T x,T y){
+    using std::cos;using std::sin;const T ca=cos(p[2]),sa=sin(p[2]);
     return {p[0]+ca*x*p[3]-sa*y*p[4],p[1]+sa*x*p[3]+ca*y*p[4]};
 }
 /* A regular square in the Euclidean unfolded (s,z) plane. Material UV axes
@@ -71,7 +71,7 @@ inline Status sample_print_chart(const double* p,size_t np,const double* vertice
 struct PrintShape10 {
     double lo[2]{},span[2]{},centre[2]{},translation[2]{},scale[2]{},scale_delta[2]{};
     double weights[2][4]{};
-    Status initialize(const double* bounds,size_t nb,const double* values,size_t nv){
+    RS_HD Status initialize(const double* bounds,size_t nb,const double* values,size_t nv){
         if(nb!=4||nv!=10||!finite_array(bounds,nb)||!finite_array(values,nv))
             return Status::invalid_argument;
         for(int axis=0;axis<2;++axis){
@@ -103,7 +103,7 @@ struct PrintShape10 {
         }
         return Status::ok;
     }
-    Status point(double x,double y,Vec2& output,double* jacobian=nullptr,
+    RS_HD Status point(double x,double y,Vec2& output,double* jacobian=nullptr,
                  double* seed_derivative=nullptr)const{
         const double seed[]={x,y};double result[2]{};
         if(!finite_array(seed,2))return Status::invalid_argument;
@@ -243,6 +243,16 @@ inline Status sample_print_deformed_path(const double* bp,size_t nb,const double
  * [centre_u,centre_v,log_width_uv,log_height_uv], side=top/right/bottom/left,
  * and station traverses that edge in clockwise order (or its explicit reverse).
  * No independent corners can break square/rectangle relationships. */
+template<class T> RS_HD inline Status print_analytic_vertices(const T* p,const T* values,int family,T* vertices){
+    using std::exp;T width,height;
+    if(family==0){height=exp(values[2]);width=height*p[4]/p[3];}
+    else{width=exp(values[2]);height=exp(values[3]);}
+    if(!finite_scalar(width)||!finite_scalar(height)||!(width>0&&height>0))return Status::degenerate;
+    T left=values[0]-width/2,right=values[0]+width/2,top=values[1]-height/2,bottom=values[1]+height/2;
+    if(!(left<right&&top<bottom))return Status::degenerate;
+    const T v[]={left,top,right,top,right,bottom,left,bottom,left,top};
+    for(int k=0;k<10;++k)vertices[k]=v[k];return Status::ok;
+}
 inline Status sample_print_analytic_path(const double* bp,size_t nb,const double* p,size_t np,
     int family,int side,bool reverse,const double* values,size_t nvalues,
     const double* stations,size_t n,double* uv,double* sz,double* xyz,
@@ -260,23 +270,9 @@ inline Status sample_print_analytic_path(const double* bp,size_t nb,const double
         course.reset(new BoardCourse(board));
         if(!finite_scalar(course->perimeter()))return Status::nonfinite;
     }
-    double vertices[10]{},width=0,height=0;
-    if(family==0){
-        const double side_over_height=std::exp(values[2]);
-        if(!finite_scalar(side_over_height))return Status::nonfinite;
-        if(!(side_over_height>0))return Status::degenerate;
-        const auto valid=print_square_vertices(p,np,values,2,side_over_height,vertices);
-        if(valid!=Status::ok)return valid;
-    }else{
-        width=std::exp(values[2]);height=std::exp(values[3]);
-        if(!finite_scalar(width)||!finite_scalar(height))return Status::nonfinite;
-        if(!(width>0&&height>0))return Status::degenerate;
-        const double left=values[0]-width/2,right=values[0]+width/2;
-        const double top=values[1]-height/2,bottom=values[1]+height/2;
-        if(!(left<right&&top<bottom))return Status::degenerate;
-        const double rectangle[]={left,top,right,top,right,bottom,left,bottom,left,top};
-        for(int k=0;k<10;++k)vertices[k]=rectangle[k];
-    }
+    double vertices[10]{};
+    auto vertex_status=print_analytic_vertices(p,values,family,vertices);
+    if(vertex_status!=Status::ok)return vertex_status;
     const double ca=std::cos(p[2]),sa=std::sin(p[2]);
     for(size_t i=0;i<n;++i){
         Status status=Status::ok;Vec2 material{},chart{};Vec3 point{},tangent{};
@@ -346,7 +342,7 @@ inline Status sample_print_analytic_path(const double* bp,size_t nb,const double
 
 /* Shared scalar primitive sampler. Parameters and finite support are validated
  * by the caller. CPU review and CUDA factors use identical arithmetic. */
-template<class T> RS_HD inline Vec3Value<T> sample_planar_primitive(int kind,const double* p,T s){
+template<class T,class U> RS_HD inline Vec3Value<T> sample_planar_primitive(int kind,const U* p,T s){
     using std::sin;using std::cos;
     Vec3Value<T> q{};
     if(kind==0)q=add(mul(1-s,scalar_cast<T>(load3(p))),mul(s,scalar_cast<T>(load3(p+3))));
@@ -468,18 +464,19 @@ inline Status sample_entity_path(const double* bp,size_t nb,int kind,
  * its original circular replay interpretation; no old state is rewritten.
  * These are estimable geometry parameters, never observations or metre facts.
  */
-RS_HD inline Status shared_entity_definition(const double* bp,size_t nb,const double* q,size_t nq,
-                                      int code,int& kind,double* out,size_t no,unsigned options=0){
+template<class T> RS_HD inline Status shared_entity_definition(const T* bp,size_t nb,const T* q,size_t nq,
+                                      int code,int& kind,T* out,size_t no,unsigned options=0){
+    using std::sin;using std::cos;using std::abs;using std::pow;
     if(!bp||nb!=6||!q||(nq!=33&&nq!=35)||!out||!finite_array(q,nq)||(options&~15u))return Status::invalid_argument;
     if(((options&4u)||(options&8u))&&!(options&2u))return Status::invalid_argument;
     const bool ellipse=(nq==35&&(code==410||code==411));
     if(no!=(ellipse?8u:6u))return Status::invalid_argument;
-    const BoardShape board{bp[0],bp[1],bp[2],bp[3],bp[4],bp[5]};
+    const BoardShapeValue<T> board{bp[0],bp[1],bp[2],bp[3],bp[4],bp[5]};
     if(!board.valid())return Status::invalid_argument;
-    const double* c=q;const double* lane=q+8;const double* h=q+18;const double* f=q+23;const double* e=q+29;
+    const T* c=q;const T* lane=q+8;const T* h=q+18;const T* f=q+23;const T* e=q+29;
     // Four equally spaced rows centred between y=+-board.half_width.
     // c[2] remains a legacy slot, not an independent DOF in this option.
-    const double y0=(options&1u)?-1.5*c[3]:c[2];
+    const T y0=(options&1u)?-1.5*c[3]:c[2];
     if(!(c[0]<c[1]&&c[3]>0&&c[4]>0&&0<c[5]&&c[5]<c[6]&&c[6]<c[7]&&c[7]<1&&lane[1]>0&&h[1]>0&&h[2]>0&&((options&2u)||h[3]<h[4])&&f[0]<0&&f[1]>0))return Status::invalid_argument;
     // A1/A4 and A2/A3 share rows and mirror about the transverse x=0 axis.
     // In this declared chart f[2]=common half longitudinal separation and
@@ -492,7 +489,7 @@ RS_HD inline Status shared_entity_definition(const double* bp,size_t nb,const do
     // Bounds are checked, never clamped, and each row retains its own support.
     if(options&4u){
         if(code>=200&&code<204){
-            const double end=lane[6+code-200];
+            const T end=lane[6+code-200];
             // Each connection passes R and ends strictly before N. Its
             // support stays independent of both R and the Lane right edge.
             if(c[0]<f[0]||!(c[1]<end&&end<lane[0]))return Status::outside_support;
@@ -502,47 +499,53 @@ RS_HD inline Status shared_entity_definition(const double* bp,size_t nb,const do
                 if(lane[2+row]<f[0]||lane[2+row]>lane[0])return Status::outside_support;
         }
     }
-    const double yaw=(options&2u)?0.:h[0];
-    const double ca=std::cos(yaw),sa=std::sin(yaw);
-    auto point=[&](double x,double y){return Vec3{ca*x-sa*y,sa*x+ca*y,0};};
-    auto line=[&](Vec3 a,Vec3 b){kind=0;store3(out,a);store3(out+3,b);return Status::ok;};
-    auto circle=[&](Vec3 center,double radius,double a0,double a1){kind=1;store3(out,center);out[3]=radius;out[4]=a0;out[5]=a1;return radius>0?Status::ok:Status::invalid_argument;};
-    if(code>=100&&code<132){const int i=(code-100)/4,ring=(code-100)%4;const double ratios[]={c[5],c[6],c[7],1.};return circle({i<4?c[0]:c[1],y0+(i%4)*c[3],0},c[4]*ratios[ring],0,2*pi);}
+    const T yaw=(options&2u)?0.:h[0];
+    const T ca=cos(yaw),sa=sin(yaw);
+    auto point=[&](T x,T y){return Vec3Value<T>{ca*x-sa*y,sa*x+ca*y,0};};
+    auto line=[&](Vec3Value<T> a,Vec3Value<T> b){kind=0;store3(out,a);store3(out+3,b);return Status::ok;};
+    auto circle=[&](Vec3Value<T> center,T radius,T a0,T a1){kind=1;store3(out,center);out[3]=radius;out[4]=a0;out[5]=a1;return radius>0?Status::ok:Status::invalid_argument;};
+    if(code>=100&&code<132){const int i=(code-100)/4,ring=(code-100)%4;const T ratios[]={c[5],c[6],c[7],1.};return circle({i<4?c[0]:c[1],y0+(i%4)*c[3],0},c[4]*ratios[ring],0,2*pi);}
     if(code>=200&&code<204){const int row=code-200;return line({c[0],y0+row*c[3],0},{lane[6+row],y0+row*c[3],0});}
-    if(code>=300&&code<312){const int row=(code-300)/3,edge=(code-300)%3;const double y=y0+row*c[3],lo=y-lane[1]/2,hi=y+lane[1]/2;
+    if(code>=300&&code<312){const int row=(code-300)/3,edge=(code-300)%3;const T y=y0+row*c[3],lo=y-lane[1]/2,hi=y+lane[1]/2;
         if(edge==0)return line({lane[2+row],hi,0},{lane[0],hi,0});
         if(edge==1)return line({lane[0],hi,0},{lane[0],lo,0});
         return line({lane[0],lo,0},{lane[2+row],lo,0});}
     if(code>=400&&code<=404){
-        const double xs[]={0,-h[1],h[1],f[0],f[1]};const double x=xs[code-400];
-        if(options&2u){Segment carrier{};const auto status=board.vertical_section(x,carrier);
+        const T xs[]={0,-h[1],h[1],f[0],f[1]};const T x=xs[code-400];
+        if(options&2u){SegmentValue<T> carrier{};const auto status=board.vertical_section(x,carrier);
             if(status!=Status::ok)return status;return line(carrier.a,carrier.b);}
         return line(point(x,h[4]),point(x,h[3]));
     }
     if(code==405)return circle({0,0,0},h[2],0,2*pi);
     if(code>=406&&code<=409){
-        if(options&8u){const double x[]={f[2],f[2],-f[2],-f[2]},y[]={-f[4],f[4],f[4],-f[4]};
+        if(options&8u){const T x[]={f[2],f[2],-f[2],-f[2]},y[]={-f[4],f[4],f[4],-f[4]};
             return circle(point(x[code-406],y[code-406]),h[2],0,2*pi);}
-        const double x[]={f[1]-f[3],f[1]-f[3],f[0]+f[2],f[0]+f[2]},y[]={-f[5],f[5],f[4],-f[4]};
+        const T x[]={f[1]-f[3],f[1]-f[3],f[0]+f[2],f[0]+f[2]},y[]={-f[5],f[5],f[4],-f[4]};
         return circle(point(x[code-406],y[code-406]),h[2],0,2*pi);}
 
     if(code==410||code==411){const int side=code-410;
-        if(nq==35){const double ax=e[side*2],ay=e[side*2+1],a0=side?pi/2:-pi/2;
+        if(nq==35){const T ax=e[side*2],ay=e[side*2+1],a0=side?pi/2:-pi/2;
             if(!(ax>0&&ay>0))return Status::invalid_argument;
             kind=6;store3(out,point(f[side],0));out[3]=ax;out[4]=ay;out[5]=yaw;out[6]=a0;out[7]=a0+pi;return Status::ok;}
-        const double a0=(side?pi/2:-pi/2)+yaw;return circle(point(f[side],0),e[side],a0,a0+pi);}
+        const T a0=(side?pi/2:-pi/2)+yaw;return circle(point(f[side],0),e[side],a0,a0+pi);}
 
     if(code>=420&&code<=423){
-        const int side=(code-420)/2;const double sign=side?1.:-1.,ysign=(code%2)?1.:-1.;
-        const double goal_half=e[nq==35?4:2],board_half=e[nq==35?5:3];
+        const int side=(code-420)/2;const T sign=side?1.:-1.,ysign=(code%2)?1.:-1.;
+        const T goal_half=e[nq==35?4:2],board_half=e[nq==35?5:3];
         if(!(goal_half>0&&board_half>0))return Status::invalid_argument;
-        const double y=ysign*board_half;
-        auto membership=[&](double x){const Vec3 p=point(x,y);const double u=std::fmax(0.,(std::abs(p.x)-(board.half_length-board.rx))/board.rx),v=std::fmax(0.,(std::abs(p.y)-(board.half_width-board.ry))/board.ry);return std::pow(u,board.exponent)+std::pow(v,board.exponent)-1.;};
+        const T y=ysign*board_half;
+        auto membership=[&](T x){const Vec3Value<T> p=point(x,y);const T u=std::max(T(0.),(abs(p.x)-(board.half_length-board.rx))/board.rx),v=std::max(T(0.),(abs(p.y)-(board.half_width-board.ry))/board.ry);return pow(u,board.exponent)+pow(v,board.exponent)-1.;};
         if(membership(0)>=0)return Status::outside_support;
-        double lo=0,hi=4*std::max(board.half_length,board.half_width);
+        T lo=0,hi=4*std::max(board.half_length,board.half_width);
         if(membership(sign*hi)<=0)return Status::no_intersection;
-        for(int i=0;i<60;++i){const double mid=(lo+hi)/2;if(membership(sign*mid)>0)hi=mid;else lo=mid;}
-        return line(point(f[side],ysign*goal_half),point(sign*(lo+hi)/2,y));
+        for(int i=0;i<60;++i){const T mid=(lo+hi)/2;if(membership(sign*mid)>0)hi=mid;else lo=mid;}
+        T x=sign*(lo+hi)/2;const auto hit=point(x,y);
+        const T u=std::max(T(0.),(abs(hit.x)-(board.half_length-board.rx))/board.rx);
+        const T v=std::max(T(0.),(abs(hit.y)-(board.half_width-board.ry))/board.ry);
+        const T dx=board.exponent*(pow(u,board.exponent-1)*(hit.x<0?-1.:1.)*ca/board.rx+pow(v,board.exponent-1)*(hit.y<0?-1.:1.)*sa/board.ry);
+        if(abs(dx)<1e-12)return Status::degenerate;
+        x-=membership(x)/dx;
+        return line(point(f[side],ysign*goal_half),point(x,y));
     }
     return Status::invalid_argument;
 }

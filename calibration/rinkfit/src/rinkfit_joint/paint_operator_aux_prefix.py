@@ -110,7 +110,7 @@ def rebind_operator_transition_nuisance(packet_path, candidate, output_path, *, 
         if original[key] != packet[key][:old_n]: raise ValueError('changed engineering source ID prefix '+key)
     physical_suffix=None
     if current_model_path is not None:
-        physical_suffix=(physical_suffix_qualifier or _qualified_physical_suffix)(packet,src,model,current_model_path,old_n)
+        physical_suffix=(physical_suffix_qualifier or qualify_operator_width_suffix)(packet,src,model,current_model_path,old_n)
     old_queries = [q for q in original.get('queries',[]) if int(q['row_index']) < old_n]
     new_queries = [q for q in packet.get('queries',[]) if int(q['row_index']) < old_n]
     if old_queries != new_queries: raise ValueError('changed engineering genuine Query prefix')

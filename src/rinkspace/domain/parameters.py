@@ -26,11 +26,11 @@ def _identity(value):
         separators=(',', ':'), allow_nan=False).encode('utf-8')).hexdigest()
 
 
-def compile_scene_parameters(scene, scene_path, *, local_charts=None):
+def compile_scene_parameters(scene, scene_path, *, local_charts=None, optimize_scene=False):
     """Compile present numeric blocks only; never activate observations.
 
-    Board/layout values stay frozen in this task. Print internal geometry and
-    existing size/placement coordinates share one vector and active-column map.
+    Board/layout activity is explicit. The rink-length gauge and declared
+    dependent coordinates remain fixed; prints share their existing blocks.
     Unlocalized blocks retain None and allocate no invented numeric values.
     """
     from .print_parameters import validate_print_parameters
@@ -67,8 +67,9 @@ def compile_scene_parameters(scene, scene_path, *, local_charts=None):
 
     scene_id = scene.get('scene_id', 'scene')
     if 'board' in scene:
-        add(dict(id='scene/'+scene_id+'/board', kind='board_shape', size=len(scene['board'])),
-            scene['board'], {'kind':'board'})
+        add(dict(id='scene/'+scene_id+'/board', kind='board_shape', size=len(scene['board']),
+                 **({'independent_local_indices':list(range(1,len(scene['board'])))} if optimize_scene else {})),
+            scene['board'], {'kind':'board'}, active=optimize_scene)
     layout = scene.get('shared_layout')
     if layout is not None:
         claimed = set()
@@ -79,12 +80,20 @@ def compile_scene_parameters(scene, scene_path, *, local_charts=None):
                 raise ValueError('Overlapping/out-of-range shared scene parameter block')
             claimed.update(support)
             descriptor = {**record, 'id':'scene/'+scene_id+'/'+record['id'], 'kind':'shared_geometry'}
-            add(descriptor, layout[start:start+size], {'kind':'shared_layout', 'offset':start})
+            add(descriptor, layout[start:start+size], {'kind':'shared_layout', 'offset':start}, active=optimize_scene)
         if claimed != set(range(len(layout))):
             raise ValueError('Shared scene layout must register every stored coordinate')
+    shared_assets = {}
     for reference, assets in read_scene_assets(scene, scene_path):
+        # Disjoint scene references may select instances from the same stored
+        # template. Its shared size/shape blocks must be allocated once, with
+        # the union of selected installations determining placement activity.
+        identity = reference['sha256']
+        if identity not in shared_assets:
+            shared_assets[identity] = (assets, set())
+        shared_assets[identity][1].update(reference.get('instance_ids', [reference.get('instance_id')]))
+    for assets, selected in shared_assets.values():
         validate_print_parameters(assets)
-        selected = set(reference.get('instance_ids', [reference.get('instance_id')]))
         allowed_placements = {i['placement_block_id'] for i in assets['instances'] if i['id'] in selected}
         for record in assets.get('parameter_blocks', []):
             descriptor = record
@@ -98,6 +107,7 @@ def compile_scene_parameters(scene, scene_path, *, local_charts=None):
     definition = {'schema':LAYOUT_SCHEMA, 'scene_content_revision':scene_content_identity(scene, scene_path),
         'blocks':blocks, 'size':len(values), 'scope':'shared_scene_geometry',
         'source_observations_changed':False}
+    if optimize_scene:definition['optimize_scene']=True
     definition['layout_revision'] = _identity(definition)
     state = ParameterState(definition, np.asarray(values, dtype='<f8'))
     if local_charts is not None:
@@ -307,7 +317,7 @@ def load_parameter_state(state_path, *, expected_scene=None, expected_scene_path
     if expected_scene is not None:
         charts = ({b['id']:b['local_chart'] for b in result.layout['blocks'] if b.get('local_chart') is not None}
                   if result.layout['schema'] == LOCAL_LAYOUT_SCHEMA else None)
-        actual = compile_scene_parameters(expected_scene, expected_scene_path, local_charts=charts)
+        actual = compile_scene_parameters(expected_scene, expected_scene_path, local_charts=charts, optimize_scene=result.layout.get("optimize_scene",False))
         if actual.layout != result.layout:
             raise ValueError('State parameter layout differs from the current scene definition')
     if state.get('station_bindings_ref') is not None:
@@ -371,15 +381,16 @@ def write_parameter_state(root, parameter_state, *, scene_ref='scene.json', prep
 
 class SceneParameterModel:
     """Present scene topology plus one common parameter layout for all prints."""
-    def __init__(self, scene, scene_path, *, local_charts=None):
+    def __init__(self, scene, scene_path, *, local_charts=None, optimize_scene=False):
         self.scene, self.scene_path = deepcopy(scene), Path(scene_path).resolve()
-        self.initial_state = compile_scene_parameters(scene, scene_path, local_charts=local_charts)
+        self.initial_state = compile_scene_parameters(scene, scene_path, local_charts=local_charts, optimize_scene=optimize_scene)
         self.assets = read_scene_assets(scene, scene_path)
         self.paths = {}
         for reference, assets in self.assets:
             templates = {t['id']:t for t in assets['templates']}
+            selected = reference.get('instance_ids', [reference.get('instance_id')])
             for instance in assets['instances']:
-                if instance['id'] not in reference['instance_ids']:
+                if instance['id'] not in selected:
                     continue
                 for path in templates[instance['template_id']]['paths']:
                     identity = instance['id']+'::'+path['id']
@@ -437,7 +448,7 @@ def _check_scene_charts(scene, scene_path, charts):
                     fixed_material_points=chart['definition'].get('fixed_material_points', []))
                 if compile_shape_local_chart(definition, internal['coordinate_gauge']) != chart:
                     raise ValueError('Local chart does not describe the current complete group: '+identity)
-                remaining.remove(identity)
+                remaining.discard(identity)
     if remaining:
         raise ValueError('Unknown scene chart blocks: '+str(sorted(remaining)))
 

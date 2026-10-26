@@ -14,7 +14,7 @@ RS_HD inline Status motion_point_partials(const MotionRig& rig,const MotionSplin
     double tr[3],dw[4],rate[3]{};
     auto status=spline.evaluate(t,tr);if(status!=Status::ok)return status;
     status=spline.basis(t,cell,weights,dw);if(status!=Status::ok)return status;
-    for(int c=0;c<3;++c)for(int j=0;j<4;++j)rate[c]+=dw[j]*spline.controls[3*(cell-1+j)+c];
+    for(int c=0;c<3;++c)for(int j=0;j<4;++j)rate[c]+=dw[j]*spline.controls[3*size_t(cell-1+j)+c];
     double instant[8];
     for(int direction=0;direction<4;++direction){
         LocalJet angles[3];for(int c=0;c<3;++c)angles[c]=LocalJet(tr[c],direction==c?1.:0.);

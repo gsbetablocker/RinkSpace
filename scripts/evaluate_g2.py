@@ -31,9 +31,14 @@ def inputs(p, *, controls=None, stations=None, codes=None, times=None, observed=
         codes=a["codes"] if codes is None else codes,stations=a["stations"] if stations is None else stations,
         times=a["times"] if times is None else times,observed=a["uv"] if observed is None else observed)
 
+def component_columns(layout,index,q):
+    if "component_columns" not in layout:return np.arange(q)
+    begin,count=map(int,layout["component_columns"][index])
+    return layout["columns"][begin:begin+count]
+
 def close(a,b,rtol=1e-9,atol=1e-8):
     np.testing.assert_allclose(a,b,rtol=rtol,atol=atol)
-    return {"max_abs":float(np.max(np.abs(a-b))),"relative_l2":float(np.linalg.norm(a-b)/max(np.linalg.norm(b),1e-30))}
+    return {"max_abs":float(np.max(np.abs(a-b),initial=0.)),"relative_l2":float(np.linalg.norm(a-b)/max(np.linalg.norm(b),1e-30))}
 
 def cpu_projection(core,p,rows,controls=None,stations=None):
     a=p["arrays"];s=p["scene"];rows=np.asarray(rows,np.int64)
@@ -93,10 +98,11 @@ def whitening_checks(problem,p,out):
         record=problem.layout["groups"][gi];component=problem.layout["components"][record[4]]
         lb,nl,_,_,dim,_,_=map(int,component);local_order=problem.layout["locals"][lb:lb+nl]
         local_col={int(v):j for j,v in enumerate(local_order)}
-        J=np.zeros((2*len(rows),dim));J[:,:problem._q]=raw[:,:,:problem._q].reshape(-1,problem._q)
+        cols=component_columns(problem.layout,int(record[4]),problem._q);nq=len(cols)
+        J=np.zeros((2*len(rows),dim));J[:,:nq]=raw[:,:,cols].reshape(2*len(rows),nq)
         for j,row in enumerate(rows):
             lid=int(p["local_ids"][row])
-            if lid>=0:J[2*j:2*j+2,problem._q+local_col[lid]]=raw[j,:,-1]
+            if lid>=0:J[2*j:2*j+2,nq+local_col[lid]]=raw[j,:,-1]
         expected_r=w@residual[rows].ravel();expected_J=w@J
         got=problem.probe_group(gi);got_cpu=problem.probe_group(gi,"cpu")
         rc=close(got["white_r"],expected_r);jc=close(got["white_J"],expected_J)
@@ -116,7 +122,9 @@ def blocks_and_rank(blocks,problem,p,out):
     ranks=[];profile=blocks["shared_H"].copy();max_asym=0.;minimum_eigen=0.;cross_nonzero=0
     for ci,component in enumerate(components):
         lb,nl,_,_,dim,h0,g0=map(int,component)
-        H=blocks["H"][h0:h0+dim*dim].reshape(dim,dim);C=H[q:,q:];B=H[:q,q:]
+        cols=component_columns(problem.layout,ci,q);nq=len(cols)
+        if dim==0:continue
+        H=blocks["H"][h0:h0+dim*dim].reshape(dim,dim);C=H[nq:,nq:];B=H[:nq,nq:]
         max_asym=max(max_asym,float(np.max(np.abs(H-H.T))))
         eig=np.linalg.eigvalsh((H+H.T)/2)
         minimum_eigen=min(minimum_eigen,float(eig[0]))
@@ -124,10 +132,11 @@ def blocks_and_rank(blocks,problem,p,out):
         if nl:
             ev=np.linalg.eigvalsh((C+C.T)/2);tol=max(float(ev[-1]),1e-300)*nl*np.finfo(float).eps*64
             rank=int(np.count_nonzero(ev>tol));ranks.append({"component":ci,"locals":nl,"rank":rank,"tolerance":tol})
-            profile-=B@np.linalg.pinv(C,rcond=nl*np.finfo(float).eps*64,hermitian=True)@B.T
+            profile[np.ix_(cols,cols)]-=B@np.linalg.pinv(C,rcond=nl*np.finfo(float).eps*64,hermitian=True)@B.T
             if nl>1:cross_nonzero+=int(np.count_nonzero(np.triu(np.abs(C)>1e-14,1)))
     eig=np.linalg.eigvalsh((profile+profile.T)/2)
-    nonzero=q*q+2*q*int(problem.linearization_info["local_count"])+sum(int(c[1])**2 for c in components)
+    nonzero=2*len(problem.layout["csr_columns"])-q if "csr_columns" in problem.layout else q*q
+    nonzero+=sum(2*len(component_columns(problem.layout,ci,q))*int(c[1])+int(c[1])**2 for ci,c in enumerate(components))
     result={"shared_variables":q,"station_variables":int(problem.linearization_info["local_count"]),
         "connected_components":len(components),"max_station_component":int(problem.linearization_info["max_local_component"]),
         "formal_whitened_residual_dimension":int(problem.linearization_info["whitened_rank"]),
@@ -172,9 +181,9 @@ def directional_check(reference,p,blocks,problem):
         weight=min(1.,p["activity"]["loss"]["delta"]/rms) if rms else (1. if rank else 0.)
         expected_curvature+=weight*(d@d)
     gradient=0.;curvature=0.
-    for component in problem.layout["components"]:
+    for ci,component in enumerate(problem.layout["components"]):
         lb,nl,_,_,dim,h0,g0=map(int,component);ids=problem.layout["locals"][lb:lb+nl]
-        direction=np.r_[dq,dl[ids]]
+        direction=np.r_[dq[component_columns(problem.layout,ci,q)],dl[ids]]
         H=blocks["H"][h0:h0+dim*dim].reshape(dim,dim)
         gradient+=direction@blocks["g"][g0:g0+dim]
         curvature+=direction@H@direction

@@ -1,6 +1,6 @@
 # 实现接口：现有入口与目标合同
 
-版本：2026-10-25。native ABI 2 的完整几何/时变相机前向（含隐式 RS）、prepare/review 及下述 D1/D3 入口已实现；同一 resident handle 已接通连续 GPU LM、安全停止及继续；数据集命令和磁盘完整 solve/resume 生命周期仍是目标合同。CPU 回放不表示 GPU 拟合。算法与参数设计见 [SOLVER.md](SOLVER.md)，当前实现状态见 [REBUILD.md](REBUILD.md)。
+版本：2026-10-26。native ABI 2 的完整几何/时变相机前向（含隐式 RS）、prepare/review 及下述 D1/D3 入口已实现；同一 resident handle 已接通连续 GPU LM、安全停止及继续；数据集命令和磁盘完整 solve/resume 生命周期仍是目标合同。CPU 回放不表示 GPU 拟合。算法与参数设计见 [SOLVER.md](SOLVER.md)，当前实现状态见 [REBUILD.md](REBUILD.md)。
 
 ## 1. 现在确实能调用什么
 
@@ -10,16 +10,22 @@
 python scripts/build_core.py --out DIR [--cmake EXISTING_CMAKE]
 python -m rinkspace model import-d78 --model FILE --relations FILE --out FILE
 python -m rinkspace model preview --scene FILE --library DLL_OR_SO --out DIR
-python -m rinkspace model import-state --model FILE [--complete-state FILE] --scope FILE --library FILE --out DIR
+python -m rinkspace model import-state --model FILE [--complete-state FILE] --scope FILE --source-binding FILE [--shot ID] --library FILE --out DIR
 python -m rinkspace model preview-curling --scene FILE --library FILE --out DIR
 python -m rinkspace model preview-field --scene FILE --library FILE --out DIR
 ```
 
-构建目录在源码树外。构建输出 `build.log/build.json`，后者的 `library` 是实际库路径；默认 CPU 构建为 `cuda_built=false`、`nonlinear_solver_implemented=false`；显式 CUDA + cuDSS 构建两者为 true，磁盘完整续算仍未实现。`import-d78` 输出 `rinkspace.scene.seed.v1`、状态为 `unfitted_structure_candidate`，不是保持原投影的完整 d78 状态；`import-state` 才导入冻结镜头的完整状态与实体供回放，同时保留九镜头登记，不补造其他镜头的相机。各模型预览输出图、几何和回执，不拟合。已有 `doctor/probe/index` 等命令维持原语义。
+构建目录在源码树外。CUDA 默认指定 `--cuda-architectures native`，可显式选择目标架构；`--cuda-fast-compile 0|min|mid|max` 仅选择编译器优化开销档位，默认 0，实际选择写入 build.json，不启用 fast-math。构建输出 `build.log/build.json`，后者的 `library` 是实际库路径；默认 CPU 构建为 `cuda_built=false`、`nonlinear_solver_implemented=false`；显式 CUDA + cuDSS 构建两者为 true，磁盘完整续算仍未实现。`import-d78` 输出 `rinkspace.scene.seed.v1`、状态为 `unfitted_structure_candidate`，不是保持原投影的完整 d78 状态；`import-state` 才导入冻结镜头的完整状态与实体供回放，同时保留九镜头登记，不补造其他镜头的相机。各模型预览输出图、几何和回执，不拟合。已有 `doctor/probe/index` 等命令维持原语义。
+
+`import-state` 默认要求显式 `--source-binding`，认证原 observations、media/input_manifest、视频和原时间原点；同源子窗口不重置 controls 时间原点。显式 `--unverified-replay` 只生成未验证回放状态，不能作为 prepared fit 相机。
+
+F10 的完整生产求解／磁盘续算未实现；F30 已保留候选资格适配及读取接线，但未完成真实节目闭环验收。两项实际改动和测试边界见 [REBUILD](REBUILD.md) 的 F10／F30 记录。
 
 Python 入口为 `rinkspace.core.native.NativeCore(library_path)`；方法签名见 [core/native.py](../src/rinkspace/core/native.py)，C ABI 唯一定义见 [core_api.h](../native/include/rinkspace/core_api.h)。ABI 2 使用 float64、行优先、显式长度和调用者分配输出。同一 ABI 号不保证旧库有所有新增符号，绑定需检查实际能力。
 
 `camera[22]=R[9],C[3],fx,fy,cx,cy,skew,k1,k2,p1,p2,k3` 只代表静态曝光；`board[6]=half_length,half_width,rx,ry,exponent,height`。运动相机经 project_motion 使用完整状态及隐式预测行 RS，不使用静态 camera 数组替代。
+
+RS 先认证整个源读出区间的深度、光学域及行映射收缩界；整段充分上界过于保守时，用中点的解析相机坐标速度及区间加速度范数上界分别包住三个方向的速度和位移，并以覆盖该区间的二分子区间重新认证，最多细分 8 层。每一叶区间都须通过原条件，导数比例始终使用完整 `tau/(height-1)`；任何未认证区间仍返回状态 9，真实光学域失败仍拒绝。CPU 与 GPU 共用这一路径，不改变行根方程、观测、物理参数或条件阈值。
 
 单点包装失败抛 NativeError；批投影返回逐点状态，失败 UV 为 NaN，调用方逐项处理，不能钳回有效像素或删除失败请求。状态由头文件和 rs_status_message 维护。前向接口不更新参数；连续 LM 使用 `rs_g4_solve`，薄绑定与当前模型入口见 [native 调用说明](../native/README.md#当前模型的-gpu-求解入口)。
 
@@ -33,7 +39,7 @@ python -m rinkspace model preview-print-installation --scene FILE --assets FILE 
 
 `--assets` 实际内容必须与 scene 当前登记的资产 SHA 相同；多个引用的实例 ID 不得重叠。孔洞父引用采用完整当前 path ID，不能在显示时静默退回自身。`domain.print_assets.sample_instance(..., stations_by_path={path_id: stations})` 支持指定共同物质采样位置以比较不同尺寸候选，仍在 native 求值，不插值像素。
 
-`compat.joint_camera.import_joint_camera` 可只读取所需镜头的完整保存相机。显式 `control_coordinates` 按块与 offset 读取已保存的三元组，不用失效的别名块，也不重新拟合时间轨迹。已知 wide Brown hinge 仅在全部已分配 log-f 控制值均不低于激活边界时等价导入基础前向，并保存原定义与整个 cubic control hull 上不激活的依据；仍有作用或未知的扩展明确拒绝。该支持不表示已实现活动宽域扩展或新优化器。
+`compat.joint_camera.import_joint_camera` 可只读取所需镜头的完整保存相机。显式 `control_coordinates` 按块与 offset 读取已保存的三元组，不用失效的别名块，也不重新拟合时间轨迹。已知 wide Brown hinge 仅在全部已分配 log-f 控制值均不低于激活边界时等价导入基础前向，并保存原定义与整个 cubic control hull 上不激活的依据；仍有作用或未知的扩展明确拒绝。该旧导入接口的限制仍保留。当前 `session.gpu_geometry.complete_camera_rig` 会将已经保存的原始扩展显式打包为 rig43：选定 log-f 结点加四个平方 hinge 系数；native GPU、隐式预测行导数、联合更新和审核前向均使用完整模型，不能把旧的不激活证明当作继续省略扩展的许可。
 
 ### 原片连续取点入口
 
@@ -110,11 +116,15 @@ review.render.render(prepared_dir, state_path, assets_path, shot_ids,
 
 ### 广告内部几何的共同可调状态
 
+当前安卡拉场景使用 `scene/print_layout_components.json` 的完整印刷图案分组，同一图案的文字行、标志、轮廓、内孔和间距共用一个正轴仿射变换。S01 仅 Ad2／3／4／6／7 的完整图案相对独立底板保留各 4 个坐标，共 20 个；Ad5 的解析矩形属于 MEIWA 图案本体，与其余印刷内容保持同一参考版式。整体尺寸和安装继续拟合。`print_shape` 仍有 10 个存储坐标，但六个非线性形变坐标为零且不活动，不能重开逐字、逐行或标志之间的独立形变。下述十维族是引擎的存储能力，不表示当前全部开放；参考图稿也未冒充实测印刷母版。
+
+实拍确认的彩色底板可显式声明 `PrintTemplate.material_domain={kind:physical_unit_panel,boundary_path_ids:[四边],evidence:{...}}`。它要求已有四边和单位面板坐标规约，不由文字名称或包围盒推断。原生十二整数 `ScenePath` 的 print 类型以 `code=1` 表示此关系，`code=0` 不声明包含；其它值拒绝。GPU 用同一图案求值和导数检查有限路径的四边包含条件，与围挡高度和相机边界共同修正步长，真实 trial 再验证。这里没有像素容许误差、观测权重或新自由度；底板尺寸与安装、印刷组件整体变换仍参与联合拟合，无观测路径不加入当前求解约束。
+
 模板、实例及版本库存见[场景索引](../events/ankara_2026/scene/README.md#当前资产与审核状态)；原材料UV数组是不可变参考几何，原片UV/PTS、观测相关组和人工确认不变。每个字形/明确图形的组内位置、独立宽高和非整体仿射的双轴单调轮廓形变进入 `print_shape`（10个存储坐标）；内孔与父轮廓、同字断开笔画使用同一组。单调映射保留组内拓扑和正体横竖直边，绘图加密点不是独立自由度，也不为每帧复制形状。
 
 `print_square` 的3个坐标为展开面方框中心UV与log边长/面板高，仍由native生成真正方形。`print_rectangle` 的4个坐标为中心UV与log宽高，四边共角且保持直角；Ad5原四边种子不共角，转为已确认矩形的参数初值时存在小位置差，旧参考数组和原片读数保留，未作拟合。面板单位矩形固定为模板坐标规约，其物理宽高/安装仍可调；没有面板的模板选一个显式参考组，用整体尺寸/安装承担该组的平移和尺度，避免重复活动自由度。这是坐标规约，不是固定现场位置或尺寸的观测。
 
-`domain.parameters.compile_scene_parameters(scene,scene_path, *, local_charts=None)` 返回不可变 `ParameterState`：同一个float64向量、全局稳定block ID/offset、活动局部坐标、冻结/规约坐标与明确的null未定位块。当前编译器保持场地几何冻结；尺寸、独立安装和内部形状共用此布局。`with_blocks`产生独立数值候选，拒绝修改冻结坐标或替未定位实例发明值。活动坐标表示可优化能力，不自动赋予观测信息、质量或统计模型。
+`domain.parameters.compile_scene_parameters(scene,scene_path, *, local_charts=None, optimize_scene=False)` 返回不可变 `ParameterState`：同一个float64向量、全局稳定block ID/offset、活动局部坐标、冻结/规约坐标与明确的null未定位块。默认保持场地几何冻结；显式 `optimize_scene=True` 激活共享冰场／围挡几何并保留长度规约及已声明的依赖坐标。尺寸、独立安装和内部形状共用此布局。`with_blocks`产生独立数值候选，拒绝修改冻结坐标或替未定位实例发明值。活动坐标表示可优化能力，不自动赋予观测信息、质量或统计模型。
 
 `SceneParameterModel.dependencies(instance_id+'::'+template_path_id)` 编译真实共享依赖；`evaluate_print(...,state=...,jacobian=True)` 调用同一native并返回SZ/XYZ、按block排列的几何Jacobian、全局活动列和station导数。`jacobians_by_block[id]` 的末轴对应该block全部存储坐标；用于累计的 `active_jacobians_by_block[id]` 经统一展开矩阵映射到局部活动坐标（v1 为 `independent_local_indices` 选列，v2 可为混合基底），末轴与 `parameter_columns[id]` 的全局列号严格一一对应。冻结block的活动导数末轴与活动列号长度均为0，不能把完整存储导数直接与活动列zip。尺寸导数已经从物理宽高链到log尺寸。`sample_instance(...,parameter_state=state)`与完整审核共用它；审核比较重新建立共同采样时也继续消费同一状态，不退回静态模板。
 
@@ -190,21 +200,53 @@ G1 实际实体范围是 shared curling contour（native code 100–131）；输
 
 `linearize("cpu"/"cuda")` 复用同一几何、完整物理相机、Brown 投影与隐式 RS。局部方向导数在已认证预测行根上使用隐函数关系，不采用观测行，不在生产内做全局有限差分。GPU 先算原残差及局部 J，再用完整 W 白化；按组的白化范数与有效秩计算 Huber 权重，并在连通分量内累计所有交叉项。任意行非法会使本次线性化报错，不删行后返回成功。
 
-默认返回四个 double 摘要（32 字节 D2H）及分阶段时间，不返回 J。`export_blocks`、`probe_rows`、`probe_group` 是显式诊断接口，分别导出 H/g、选定行导数、单组白化结果，独立累计下载字节。CPU 同公式对照、旧 DLL 有限差分和 NumPy 原 W 校验仅在 `scripts/evaluate_g2.py` 工程验证中运行。
+布局按 `directions` 的非零列与完整声明 RS 读出域的样条支撑并集打包。每条观测只保存实际依赖列，每个局部连通分量保存这些列的并集；固定点组不人为合并。保留系统按实际结构生成上三角 CSR 和可复用 scatter 地址。值偏移用 64 位，行／station／列身份及 CSR 索引用 int32。`layout["component_columns"]` 是每个分量在 `layout["columns"]` 中的起点／数量，分量 H/g 的前部采用这份列顺序，后部采用其局部 station 顺序。
+
+默认返回四个 double 摘要（32 字节 D2H）及分阶段时间，不返回 J。`export_blocks`、`probe_rows`、`probe_group` 是显式诊断接口，分别导出 H/g、选定行导数、单组白化结果，独立累计下载字节。`export_sparse_blocks()` 返回打包分量 H/g 和保留上三角 CSR 值；`export_blocks()` 仅为显式小规模诊断把保留矩阵展开为 q×q，分量仍按各自列映射解释。CPU 同公式对照、旧 DLL 有限差分和 NumPy 原 W 校验仅供工程验证。
 
 该入口尚未实现阻尼、生产消元、cuDSS 或参数更新。实际 G2 窗口采用 pan／tilt／log(f) 三个常量修正与已有 station；时间斜率因条件性差而冻结，场地、广告、安装、畸变和读出固定。原 197 个相关组与 73 个独立观测完整保留；局部秩亏、参考规约、损失配置和无先验的限制见节目 `g2.json`。原片扰动图只临时改变复制的控制值，不写回初值或宣称改善。
 
+### 完整安装、共享场景与源剖面因子
+
+`session.gpu_geometry.NativeSceneGPU` 只消费显式选定的当前 scene 和共同 ParameterState；观测参数没有替换场景的入口。`resident(..., scene_directions=...)` 附加该状态中实际的共享几何、尺寸、安装、轮廓形变与解析图形。`configure_camera_parameters` 的基础 27 维／含原有广角扩展 31 维物理局部图与运动、场景和 station 使用同一个保留系统；完整参考姿态、转轴、固定安装支点、杆臂、轴间距、入口瞳、未知光学与读出均可由方向矩阵激活。长度和参考坐标规约必须显式保留，不等于固定光心。
+
+`NativeSceneGPU.resident` 的数值路径表仅包含 `path_ids` 实际引用的路径，联合场景与冻结场景采用相同范围。共同参数按这些路径的依赖连接；没有读点的其他显示路径不能以旧安装初值使当前候选失败。完整场景库存和参数关系仍保留，数值路径表不是删改全场模型，也不是未观测实例的验收。
+
+固定双轴机构中的 `P=rig[15:18]` 是两轴最短连线在摇摄轴上的端点；`Q=P+a*h` 是该连线在俯仰轴上的端点，`h=unit(n×Rᵀb)`，`a=rig[21]` 为有符号的两轴最近距离。`Q` 随摇摄移动，但同一次纯俯仰时不动；`C=Q+Rᵀ(d+e_z·pupil(z))`。`h` 同时垂直于两轴，摇摄轴竖直时 P、Q 等高，故 `a` 不是云台底部到俯仰轴的高度。P 未绑定到某个安装螺孔；禁止再把一个独立轴向高度作为与 P 同时自由的变量，因为两者完全抵消。可视化外壳及底座相对 P 的未测绘位置，不得成为另一组透视拟合参数。给定 P 高度只计一次，不需要固定光心或固定杆臂来消除此冗余。
+
+`configure_camera_envelope(..., frame_time_bounds=(begin, end))` 可显式选择相机时钟下的曝光中点区间，必须包含 resident 中的全部源曝光；不传时仍检查整个已分配样条。native 按每个候选实际的 `abs(readout)/2` 扩展至完整传感器行时间，认证所有与该区间相交的完整样条单元，首尾各最多保守扩展一个存储单元。该选项排除未使用的外推存储，不裁掉镜头或滚动快门范围，不改变安装／姿态／入口瞳等数值限制。C ABI 的 21 个 limits 值是在原 19 个值之后附加 `(time-first_control_time)/control_dt` 表示的两个曝光中点界限；Python 使用秒并负责转换，native 再检查源曝光覆盖。
+
+预测像素不被图像矩形截断。`project_motion` 在画外继续求同一 `v=pi_y(X,t(v))`，并对延伸区间认证深度、光学域和唯一根；全局快门直接返回该时刻的有限投影。`configure_camera_parameters(max_readout=...)` 同时为每行保留曝光中点前后 `max_readout/2` 的数值时间支持，投影与稀疏列编译使用同一区间。固定 rig 的稀疏调用可在编译前使用 `configure_projection_time_support(half_seconds=...)`（C ABI `rs_gpu_set_projection_time_support`）显式声明更窄的计算区间；必须包含完整允许读出。没有声明时使用完整样条支持，列计划也包含整个支持，可能更密集。时间支持不是读点误差范围或新的物理测量；越界明确失败，不能把跨结点后漏掉的导数当作零。渲染裁剪与拟合残差分开，已删除把画面边缘加入 station／相机活动约束、强行拉回及停滞梯度判断的旧处理。
+
+相机包络的候选修正使用当前已分解的联合 Schur 矩阵 S：对约束梯度 a 解 S w=a，再沿 w 恢复该边界，随后按真实几何重新检查其他边界、原始目标和预测下降。不会以逐参数裁剪或单独的对角阻尼度量替代该耦合方向；这不改变物理限制或观测权重。重复非线性包络修正仍须实际候选检查，不声称是一般约束问题的精确全局解。
+
+共同场景的有观测印刷路径，在 native 内按其全部有限节点、形变分段节点或解析端点检查 `0 <= z <= board_height`，并以候选处解析导数和当前联合 Schur 矩阵修正违反边界的方向。相机与印刷边界在同一次候选恢复中交替重检，随后仍按原像素目标与实际施加步接受／拒绝；没有改变边界、删观测或增加误差罚项。检查节点只缓存不可变路径结构，当前共同几何每次重新计算。无观测路径不在本 resident 的数值路径表内。
+
+安装域也参与上述联合修正：支点正高度、非零杆臂、超椭圆围挡外侧和已声明一侧使用同一当前几何及解析导数，支点与围挡参数共同调整。负／正 Y 侧的外侧半空间已蕴含围挡外部，不重复施加同义曲面条件；最终 `valid_installation` 检查保留。没有把数值提议越界直接当作必须拒绝整步的理由，也不放宽实际安装域。
+
+GPU 分量正规矩阵内部仅存对称上三角；公共线性化诊断的 `H_value_count` 与显式导出块仍表示原来的密集逻辑布局，不能直接把该计数乘 8 当作实际设备分配。实际分配见 `device_bytes`；显式请求密集诊断块仍需要对应的主机内存。
+
+`configure_profiles` 附加原始有理三次源查询曲线、alpha 区间及几何 station 区间。`exact` 在 native 内求投影曲线与源查询的交点，使用相同 UV/W 并对交点作隐式微分；alpha 不进入全局未知量，station 不得同时注册为自由量。`resolve_profile_roots` 总是检查严格交点。显式 `feasibility_restoration` 仅允许初值阶段暂用同名曲线 station 和原 UV/W 恢复定义域，不能将它的目标冒充最终严格查询似然。
+
+候选可行性恢复保留同一原始目标：各 station 独立投影到真实有限支持；画面边缘用同一预测行方程恢复。共享 Lane／球门关系、已声明杆臂范围及有限查询边界通过联合候选修正处理，不用单个局部边界缩小所有参数的步长。查询外延只用于定位越过的原始 alpha 边界，不进入接受目标；最终候选必须通过原始有限区间、预测行唯一性及物理有效性检查，预测下降量使用实际施加的修正。
+
 ### G3 一次原生 LM 候选〔已实现的有界能力〕
 
-`configure_solver`／`rs_g3_attach` 给同一 resident handle 附加原 station 支撑交集、明确的 LM 配置和启动时可用容量。`lm_step`／`rs_g3_step` 只生成一个候选：必要时调用同一 G2 线性化，在缩放坐标中采用 D=I，先加入阻尼，再按完整连通分量通过 cuSOLVER 批量 Cholesky 求解局部块。保留变量的 CSR 上三角按 SPD 交给 cuDSS；禁用 hybrid execute/memory，不使用 CPU 数值求解后备。
+局部有限端点和传感器边界按同一次联合步计算乘子，批量释放乘子符号错误的边界，再统一消元／求解。对重复工作集使用设备端逐项精确比较与常量数量的快照检测循环。共享参数的物理投影并不是完整约束二次问题的精确解，投影后重新释放局部端点可能再次触发同一端点。出现这种循环且局部块均为独立标量时，在已经投影的共享增量条件下，直接最小化每个局部阻尼二次项，并同时满足原有限支持及线性化传感器行区间，再由原生非线性域、原目标下降及增益比决定是否接受；共享参数与局部变量均未在后续拟合中冻结。成功候选返回 `reason_code=5`（`accepted_decrease_after_conditional_local_completion`），不声称求得完整约束二次问题的最优解。若局部块耦合、条件区间不可行或共享增量越界，仍返回 `reason_code=4`（`repeated_active_set_retry_with_damping`），保持已接受状态并增加阻尼重试。循环不计为分解失败或数值收敛，也不改变点的目标、边界或活动参数。`RINKSPACE_TRACE_LM_ACTIVESET` 可显式开启内部阶段诊断，默认不输出。
+
+`configure_solver`／`rs_g3_attach` 给同一 resident handle 附加原 station 支撑交集、明确的 LM 配置和启动时可用容量。`lm_step`／`rs_g3_step` 只生成一个候选：必要时调用同一 G2 线性化，在显式缩放坐标中默认采用 D=I；可选 `jacobi` 使用完整联合 Hessian 对角及浮点数值下限，`jacobi_image_station` 补入 station 的原像素 Jacobian 范数，`jacobi_image` 使用 `D=max(1,diag(H),diag(J_image^T J_image))`。最后一种保留配置的坐标单位，抑制源 W 的切线零空间与近饱和轮廓坐标造成过大数值步长。它们只改变阻尼，不增加先验、不修改源 W、目标或参数活动性。先加入阻尼，再按完整连通分量求解局部块：标量块直接除法，较大块按实际维度分桶调用 cuSOLVER 批量 Cholesky；工作区不按全局最大局部维度填充，右端列数取本分量的实际相机依赖。保留变量的 CSR 上三角按 SPD 交给 cuDSS；禁用 hybrid execute/memory，不使用 CPU 数值求解后备。
 
 初始 lambda 为显式 `initial_lambda_relative × max(diag(H))`（可显式指定 lambda）；默认配置为 1e-3、eta=1e-4、相对线性残差容限 1e-8，均保存进本次结果。边界下降分量的活动集由 native 处理；耦合后的步若在已有边界朝外，固定相应局部维度并重新消元／求解，保持同一 lambda 和线性化。内部边界求解不是另一个 LM 候选。可行步长后按实际增量计算未加阻尼的二次预测下降，候选重新计算原完整 W 和原 Huber 总目标，不能使用旧 IRLS 权重替代实际候选目标。
 
-cuSOLVER、cuDSS 主机返回码与设备数值状态分别核对；检查 `Sδ-rhs`，拒绝非有限或不正定结果。源行失效使整个候选拒绝，不删行。只有实际下降且增益比超过 eta 才接受；Nielsen 规则更新 lambda/nu。拒绝保持 accepted state 和原线性化，之后若显式再调用则按新阻尼重做局部消元，复用符号分析。接受后使旧线性化失效。当前实际只验证一次真实候选，未将 G4 连续迭代或 G5 完整停止／续算声明为完成。
+cuSOLVER、cuDSS 主机返回码与设备数值状态分别核对；检查 `Sδ-rhs`，拒绝非有限或不正定结果。源行失效使整个候选拒绝，不删行。只有实际下降且增益比超过 eta 才接受；Nielsen 规则更新 lambda/nu。拒绝保持 accepted state 和原线性化，之后若显式再调用则按新阻尼重做局部消元，复用符号分析。接受后使旧线性化失效。真实数据的一次候选及后来连续尝试的失败／停止均按原记录保留；连续原生循环与百万观测工程验证见 REBUILD，磁盘完整续算仍未交付。
 
-正常返回摘要、时序及状态，完整 J 不回传；`export_state(trial=False/True)` 与 `export_step_system()` 是显式交付／工程诊断。CPU 前向在显式请求时同步已接受 native 状态，正常候选无需下载整个状态。`scripts/evaluate_g3.py` 读取 G1 数值输入和 G2 已保存的 plan，不重跑历史权重生产；结果目录已有 decision 时拒绝重复执行，`--review-existing` 仅完成已保存候选的报告和原片对照，不是求解恢复。
+正常返回摘要、时序及状态，完整 J 不回传；`export_state(trial=False/True)` 与 `export_step_system(sparse=True)` 是显式交付／工程诊断；后者返回保留 CSR，默认 `sparse=False` 为小规模检查显式展开 q×q。CPU 前向在显式请求时同步已接受 native 状态，正常候选无需下载整个状态。`scripts/evaluate_g3.py` 读取 G1 数值输入和 G2 已保存的 plan，不重跑历史权重生产；结果目录已有 decision 时拒绝重复执行，`--review-existing` 仅完成已保存候选的报告和原片对照，不是求解恢复。
 
 本机 cuDSS 复用项目已有 0.8.0.10 / CUDA 13 包，现归 `environments/cudss/0.8-cu13`，逐文件身份见 `environments/cudss-local.json`。CUDA 13 系统运行库从 `CUDA_PATH/bin/x64` 读取，cuDSS DLL 从本项目 bin 读取，不依赖其它项目目录。数值库调用依据其随包头文件与示例；另参见 [cuDSS 状态与内存接口](https://docs.nvidia.com/cuda/cudss/latest/types.html)及 [cuSOLVER 批量分解](https://docs.nvidia.com/cuda/cusolver/index.html)。
+
+### 连续原生 LM〔已实现〕
+
+`solve(gradient_tolerance=1e-7, step_tolerance=1e-6, relative_cost_tolerance=1e-10)` 调用同一 native 连续控制器，没有隐含次数／时间上限。每个接受状态重新线性化，只有原目标的投影梯度通过容差才报告数值收敛；边界截断或大阻尼导致步长／下降小不单独触发成功。浮点停滞和调用者停止分别返回非收敛状态。`request_stop()` 或回调返回 `False` 在安全点停止，同一 handle 再次 `solve()` 保留状态和阻尼继续。结果的 `linearization_wall_ms` 与 `candidate_wall_ms` 分别累计线性化和候选阶段，互不重叠；进度事件 `wall_ms` 包含该次必要的线性化。
 
 ### 求解运行与检查点〔目标，未实现〕
 
@@ -244,3 +286,5 @@ void request_stop(RunControl&);
 结果 status 为 `numerical_stop`、`paused`、`budget_exhausted`、`failed`。reason_code 区分 `gradient_small/step_and_cost_small/user_stop/iteration_budget/invalid_input/unsupported_capability/domain_failure/unobservable/numerical_failure/resource_exhausted`。预算耗尽不是收敛；错误含具体实体/参数 ID、字段与输入位置；不能把无法识别的实体跳过后返回成功。
 
 目标 CLI 退出码：0=请求正常完成（solve 的数值停止仍不代表视觉通过）；2=参数/合同错误；3=能力/依赖不可用；4=数值/资源失败；5=预算耗尽；130=收到停止并安全保存。当前已实现 CLI 尚未完整映射上述求解退出码。native 逐点状态与进程退出码不混用。目标求解失败写结构化 result/error；没有结果时 stderr 写明原因和已有日志路径，文件系统错误不打印成功回执。
+
+F30 候选资格适配保留在 SourceRinkReader 的 material_reader 路径，默认关闭。只有所选读取配置显式设置布尔值 `enable_candidate_admission: true` 才启用；输出 `native_material.candidate_admission_enabled` 记录实际状态。默认读取仍保留已有命名导引精读、F15 同帧事务和 F16 遮罩修复。该开关不代表真实节目闭环已经验收。

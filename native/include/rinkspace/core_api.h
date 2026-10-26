@@ -1,5 +1,6 @@
 #pragma once
 #include <stddef.h>
+#include <stdint.h>
 
 #if defined(_WIN32)
 # if defined(RINKSPACE_CORE_BUILD)
@@ -31,6 +32,17 @@ RS_API int rs_decode_d78_camera(const double* chart,size_t nc,double* rig,size_t
  * fx,fy,cx,cy,k1,k2,p1,p2. This is an instantaneous camera, not an RS frame;
  * callers must retain readout semantics and evaluate each actual row time.
  * Inspect time_status: failed rows remain NaN. No source pixels or fitting. */
+/* Native cubic values and first/second/third time derivatives, N x 4 x 3.
+ * Channels are pan, tilt, log(f). At knots jerk follows the selected cell.
+ * Diagnostic only: neither parameter values nor solver activity are changed. */
+RS_API int rs_evaluate_motion_kinematics(const double* controls,size_t n_controls,
+    double first_control_time,double control_dt,const double* times,size_t nt,
+    double* output,size_t no,int* status,size_t ns);
+/* Exact continuous derivative extrema, output[3 orders,3 channels,3 fields].
+ * Fields: signed absolute-extreme value, time, cubic cell (jerk side identity).
+ * Supplied lo/hi must lie within the allocated native spline support. */
+RS_API int rs_motion_derivative_extrema(const double* controls,size_t n_controls,
+    double first_control_time,double control_dt,double lo,double hi,double* output,size_t no);
 RS_API int rs_evaluate_motion_camera(const double* rig,size_t nr,
     const double* controls,size_t n_controls,double first_control_time,double control_dt,
     const double* times,size_t nt,double* output,size_t no,int* time_status,size_t ns);
@@ -248,10 +260,25 @@ RS_API int rs_g2_attach(void* handle,int q,const double* dirs,size_t ndirs,const
     const double* local_scales,size_t nlocal,const int* offsets,int ng,const int* members,size_t nmembers,
     const int* ranks,const int* weight_offsets,const double* weights,size_t nweights,double huber_delta,
     double* info,size_t ninfo);
+// Raw per-point squared pixel distances. This entry point accepts no W,
+// sigma, covariance, robust threshold, source query, or pixel error allowance.
+RS_API int rs_g2_attach_pixels(void* handle,int q,const double* dirs,size_t ndirs,const int* row_local,size_t nrows,
+    const double* local_scales,size_t nlocal,double* info,size_t ninfo);
+// Native coordinate minimization of independent ordinary curve points.
+// Fixed corners and genuinely shared material stations are not changed.
+RS_API int rs_g3_refine_stations(void* handle,double* info,size_t ninfo);
 /* Metadata only: groups[G,6], components[C,7], packed local IDs[L].
  * Group: member begin/count,rank,W begin,component,white begin.
  * Component: local begin/count,group begin/count,dimension,H begin,g begin. */
 RS_API int rs_g2_layout(void* handle,int* groups,size_t ng,int* components,size_t nc,int* locals,size_t nl);
+/* Sparse components use their own retained-column list. Packed value offsets
+ * are 64-bit; row/station/global parameter identities remain int32.
+ * info[6]=CSR nnz,column-map entries,scatter entries,packed J values,
+ * maximum row retained columns,maximum component retained columns. */
+RS_API int rs_g2_layout64(void* handle,int64_t* groups,size_t ng,int64_t* components,size_t nc,int* locals,size_t nl);
+RS_API int rs_g2_sparse_info(void* handle,int64_t* info,size_t ninfo);
+RS_API int rs_g2_sparse_layout(void* handle,int64_t* component_columns,size_t nc,int* columns,size_t ncol,int* csr_offsets,size_t no,int* csr_columns,size_t ni);
+RS_API int rs_g2_export_sparse_blocks(void* handle,int backend,double* h,size_t nh,double* g,size_t ng,double* shared,size_t nq);
 /* Normal production call copies ONLY summary[4] and timings[8].
  * summary=failed rows,quadratic whitened cost,Huber cost,downweighted groups.
  * timings=wall,raw-J,white,loss,block+reduce,summary-D2H,device bytes,D2H bytes.
@@ -265,16 +292,23 @@ RS_API int rs_g2_probe_group(void* handle,int backend,int group,double* white,si
 /* Optional G3: same resident problem and G2 factor plan.
  * options[6]=initial_lambda_relative,initial_lambda(0 auto),acceptance_eta,
  * reduced_relative_tolerance,available_device_budget,available_host_budget.
+ * Optional seventh value: 0 identity damping (legacy), 1 diag(H),
+ * 2 diag(H) with raw image station metric, 3 max(1,diag(H),diag(J_image^T J_image)).
+ * These metrics change only damping; the original W/loss remain unchanged.
+ * The latter uses a 64*epsilon*max(diag(H)) numerical floor and a dimensionless
+ * initial_lambda_relative; all actual trial factors remain unchanged.
  * finite lower/upper are the intersection of original supports per station.
  * step executes exactly ONE LM candidate, not an iteration loop.
  * State stays native; rejected trials cannot replace accepted state.
+ * A pending stop at a stream boundary returns 25 without committing a trial;
+ * rs_g4_solve translates that interruption into stop code 3.
  * summary[32] and timings[12] fields documented by the Python thin binding.
  */
 RS_API int rs_g3_attach(void* handle,const double* lower,const double* upper,size_t nlocal,const double* options,size_t noptions,double* info,size_t ninfo);
 RS_API int rs_g3_step(void* handle,double* summary,size_t nsummary,double* timings,size_t ntimings);
 /* G4 owns the continuous loop in native code; callback is telemetry only.
  * tolerances[3]=projected_gradient_inf,accepted_step_inf,relative_cost.
- * stop codes: 0 gradient,1 accepted step AND cost,2 floating-point stagnation
+ * stop codes: 0 gradient,1 gradient AND accepted small step/cost,2 floating-point stagnation
  * (2 is NOT convergence), 3=explicit stop at an accepted-state boundary.
  * No implicit iteration/time budget.
  * summary[17] fields are named in the thin Python binding.
@@ -285,10 +319,62 @@ RS_API int rs_g4_solve(void* handle,const double* tolerances,size_t ntolerances,
 /* Thread-safe stop request. Only this function may run concurrently with solve.
  * Keeps accepted state and damping; calling solve again continues the same handle. */
 RS_API int rs_g4_request_stop(void* handle);
+/* Safe-boundary numerical-retry telemetry; callback may request stop only. */
+typedef void (*rs_lm_numeric_progress)(int rejection_count,double lambda,double nu,void* context);
+RS_API int rs_g4_set_numeric_progress(void* handle,rs_lm_numeric_progress callback,void* context);
 /* Explicit state/system snapshots only; never part of normal step D2H. */
+/* Optional native physical chart: 27 rows (base rig38), or 31 rows
+ * (wide rig43), by the SAME retained columns as
+ * trajectory directions. Bounds are explicit physical component bounds. */
+RS_API int rs_gpu_attach_profiles(void* handle,const int* ids,size_t ni,const double* data,size_t nd);
+RS_API int rs_gpu_set_profile_mode(void* handle,int enabled);
+RS_API int rs_gpu_profile_roots(void* handle,int backend,double* roots,size_t nr,int* status,size_t ns);
+RS_API int rs_gpu_attach_scene(void* handle,const double* values,size_t nv,const int* paths,size_t np,const double* data,size_t nd,int q,const double* directions,size_t nj,const double* lower,const double* upper);
+RS_API int rs_gpu_set_scene_chart(void* handle,const int* chart,size_t n);
+RS_API int rs_scene_retract(const double* values,size_t n,const int* chart,const double* delta,double* out);
+RS_API int rs_gpu_export_scene(void* handle,int trial,double* values,size_t n);
+RS_API int rs_gpu_set_mount_constraints(void* handle,int side);
+/* Full continuous camera envelope: forward lo/hi, pupil lo/hi, maximum pan
+ * tilt from vertical and tilt-axis deviation from camera right, optical
+ * elevation lo/hi, body roll lo/hi. Distances in scene units, angles radians.
+ * The complete allocated spline interval includes the rolling-row halo.
+ * n=10 preserves the static envelope. n=19 additionally supplies three maxima
+ * each for absolute speed, acceleration and jerk, in pan/tilt/log(f) order.
+ * Angular units are radians; time units are seconds. Positive infinity means
+ * explicitly unset; zero/negative/NaN limits fail instead of freezing motion.
+ * n=21 additionally selects exposure-midpoint bounds in spline-grid coordinates
+ * (time-first)/dt. They must contain all resident exposures. Every candidate's
+ * signed readout expands these bounds to the full sensor-row interval; complete
+ * intersecting cells are checked, not unused allocated extrapolation cells. */
+RS_API int rs_gpu_set_camera_envelope(void* handle,const double* limits,size_t n);
+/* Independent diagnostic using the same native envelope. out[4] = minimum
+ * signed margin, constraint kind, cubic cell, local u. Optional out[8] appends
+ * channel, derivative order, declared limit and signed derivative value.
+ * Kinds 7/8/9 check speed/acceleration/jerk exactly over each cubic cell;
+ * their margin is 1-abs(derivative)/limit. No numerical fitting. */
+RS_API int rs_camera_envelope_evaluate(const double* rig,size_t nr,const double* controls,size_t nc,double dt,
+    const double* limits,size_t n,double* out,size_t no);
+RS_API int rs_gpu_configure_camera(void* handle,int q,const double* directions,size_t n,const double* lower,const double* upper,size_t nb,double max_readout);
+/* Optional computational row-time support for a fixed-rig sparse plan. The
+ * pixel plane remains unbounded; roots outside this time interval fail rather
+ * than losing motion columns. Must contain the full admissible readout. */
+RS_API int rs_gpu_set_projection_time_support(void* handle,double half_seconds);
+RS_API int rs_gpu_export_model(void* handle,int trial,double* board,size_t nb,double* layout,size_t nl,double* rig,size_t nr);
+RS_API int rs_camera_retract(const double* rig,size_t nr,const double* delta,size_t nd,double* out,size_t no);
 RS_API int rs_g3_export_state(void* handle,int trial,double* controls,size_t ncontrols,double* stations,size_t nstations);
+/* Immediate last-step diagnostic N x 6: before UV, trial UV, J*actual_step.
+ * Call before any subsequent evaluate/linearize/step on the same handle. */
+RS_API int rs_g3_probe_changes(void* handle,double* values,size_t n);
 RS_API int rs_g3_export_system(void* handle,double* values,size_t nvalues,int* blocked,size_t nblocked);
+/* Same snapshot with CSR values instead of dense q x q S. */
+RS_API int rs_g3_export_sparse_system(void* handle,double* values,size_t nvalues,int* blocked,size_t nblocked);
 
 #ifdef __cplusplus
 }
 #endif
+
+/* Moving-camera rig lengths: 38 is the base physical model; 43 appends
+ * [selected wide log-f knot, k1/k2/p1/p2 squared-hinge coefficients].
+ * The wide knot is the selected model basis, coefficients are four additional
+ * free chart coordinates (31 total). CPU projection, CUDA and review share
+ * the same formula, implicit derivatives and complete row-time certificate. */

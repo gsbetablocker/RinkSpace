@@ -18,18 +18,25 @@ def _load(path):
 
 
 class AcceptedSourceReidentifier:
-    def __init__(self, specification, native_geometry, *, device):
-        from .vision_instances import SourceAdvertisementMatcher, SourcePersonBoxes, _add_existing_geometry_dependencies
+    def __init__(self, specification, native_geometry, *, device, programme_scope=None):
+        from .vision_instances import SourceAdvertisementMatcher, _add_existing_geometry_dependencies
         _add_existing_geometry_dependencies()
         from .camera_reuse_localization import ReuseConfig
         if native_geometry is None:
             raise ValueError('Reidentification requires the current native scene')
         self.spec = _load(specification)
+        self.programme_scope = programme_scope or self.spec.get("programme_scope")
+        if self.programme_scope is None:
+            raise ValueError("Reidentification requires a registered programme scope for physical installation identity")
         self.spec_reference = file_ref(specification)
         self.geometry = native_geometry
         self.last_search = None
         self.interval = Fraction(str(ReuseConfig().keyframe_every_s))
-        self.person = SourcePersonBoxes(**self.spec['person'], device=device)
+        # Appearance correspondence does not need a person model. Load the
+        # detector only at its actual exclusion entry; source replay with an
+        # authenticated current mask must not allocate an unused CUDA model.
+        self.person = None
+        self.person_device = device
         self.references = {}
         self.ice_descriptors = {}
         cache = Path(self.spec['cache_directory'])
@@ -47,8 +54,10 @@ class AcceptedSourceReidentifier:
             binding = dict(source_sha256=source['source_video_sha256'], source_pts=packet['source_pts'],
                 time_base=source['time_base'], shot_id=self.spec['reference_shot_id'], native_hw=source['native_hw'],
                 installation_id=self.spec['event_id'])
+            from .source_binding import canonical_source_binding
+            binding = canonical_source_binding(binding, self.programme_scope, allow_legacy_event_installation=True)
             guides, reference = accepted_packet_guides(packet, _load(binding_path), acceptance,
-                packet_path=path, binding_path=binding_path, acceptance_path=self.spec['acceptance'], source_binding=binding)
+                packet_path=path, binding_path=binding_path, acceptance_path=self.spec['acceptance'], source_binding=binding, programme_scope=self.programme_scope)
             source_guides = guides
             guides, _ = native_geometry.bind(source_guides)
             ads = {}
@@ -83,7 +92,7 @@ class AcceptedSourceReidentifier:
         from .vision_native_references import current_native_source_banks
         native_paths, native_refs, self.native_bank_receipt = current_native_source_banks(
             native_geometry, cache_directory=cache/'current_native', identity_catalog=self.spec['identity_catalog'],
-            event_id=self.spec['event_id'], source_sha256=self.spec['source_sha256'])
+            event_id=self.spec['event_id'], source_sha256=self.spec['source_sha256'], programme_scope=self.programme_scope)
         paths.extend(native_paths);self.references.update(native_refs)
         if not paths:
             raise ValueError('No authenticated appearance references in the source bank')
@@ -91,6 +100,9 @@ class AcceptedSourceReidentifier:
 
     def exclusions(self, rgb, binding):
         from .vision_source_topology import source_graphic_rectangle_candidates
+        if self.person is None:
+            from .vision_instances import SourcePersonBoxes
+            self.person = SourcePersonBoxes(**self.spec['person'], device=self.person_device)
         mask = np.zeros(rgb.shape[:2], bool)
         people = self.person.read(rgb, binding)
         graphics = source_graphic_rectangle_candidates(rgb, binding)
@@ -110,7 +122,6 @@ class AcceptedSourceReidentifier:
         from .vision_instances import _add_existing_geometry_dependencies
         _add_existing_geometry_dependencies()
         from .camera_reuse_localization import ReuseConfig
-        if flow_engine is None:return [],dict(status='existing_flow_engine_unavailable')
         choices=[]
         for key,physical in eligible.items():
             source=self.references[key]['source_binding']
@@ -119,6 +130,7 @@ class AcceptedSourceReidentifier:
                 and source['time_base']==binding['time_base'] and 0<delta<=Fraction(str(ReuseConfig().max_lk_gap_s))):
                 choices.append((delta,key,physical))
         if not choices:return [],dict(status='no_close_reference_in_this_actual_shot',cross_cut_flow_used=False)
+        if flow_engine is None:return [],dict(status='existing_flow_engine_unavailable')
         _,key,physical=min(choices,key=lambda r:r[0]);reference=self.references[key];context=contexts[key]
         pair=flow_engine.compute(_tensor(np.ascontiguousarray(context['image'][:,:,::-1])[None],flow_engine.device)[:,0],
             _tensor(rgb[None],flow_engine.device)[:,0],analysis_hw=(384,640),source0=reference['source_binding'],source1=binding)
@@ -147,7 +159,8 @@ class AcceptedSourceReidentifier:
                 tip=(points+tangent)*points.new_tensor([2/(w-1),2/(h-1)])-1
                 tip_move=F.grid_sample(pair.forward,tip[None,:,None],align_corners=True)[0,:,:,0].T
                 moved=tangent+tip_move-move;guide['normals']=torch.stack((-moved[:,1],moved[:,0]),1)
-            for field in ('source_exclusion_mask','source_exclusion_binding','accepted_source_packet','confirmed_source_uv'):
+            for field in ('source_exclusion_mask','source_exclusion_binding','source_guide_exclusion_mask',
+                          'source_exclusion_protected_mask','accepted_source_packet','confirmed_source_uv'):
                 guide.pop(field,None)
             guides.append(guide)
         return guides,dict(status='ice_identity_recovered_from_actual_shot_RGB' if guides else 'ice_same_shot_flow_support_missing',
@@ -158,10 +171,6 @@ class AcceptedSourceReidentifier:
         import cv2
         from .camera_reuse_localization import descriptors, match_features, ReuseConfig
         from .vision_instances import source_correspondence_identity_verified
-        probabilities=prediction['class_probabilities']
-        if hasattr(probabilities,'detach'):probabilities=probabilities.detach().cpu().numpy()
-        probabilities=np.asarray(probabilities)
-        if probabilities.ndim==4:probabilities=probabilities[0]
         from calibration.program_tracking.source_board_measurements import measure_board_source_frame
         from .vision_programme_board_review import conservative_ice_exclusion
         excluded=np.zeros(rgb.shape[:2],bool) if exclusion is None else np.asarray(exclusion,bool)
@@ -229,11 +238,18 @@ class AcceptedSourceReidentifier:
                 reidentification_reference=reference['reference'],reference_UV_used_as_measurement=False,
                 historical_world_geometry_imported=False)
             if original.get('normals') is not None:
-                normal=np.asarray(original['normals'],np.float32)
-                transformed=cv2.perspectiveTransform((uv+normal)[None],H)[0]-query
+                normal=np.asarray(original['normals'],np.float64)
+                # A normal is a line covector, not a displaced image point.
+                # H(p+n)-H(p) is generally not perpendicular to the mapped
+                # material edge when the view has shear or perspective.
+                lines=np.c_[normal,-np.einsum('ij,ij->i',normal,uv)]
+                transformed=np.linalg.solve(H.T,lines.T).T[:,:2]
+                homogeneous_scale=np.c_[uv,np.ones(len(uv))]@H[2]
+                transformed*=np.sign(homogeneous_scale)[:,None]
                 transformed/=np.maximum(np.linalg.norm(transformed,axis=1,keepdims=True),1e-9)
                 guide['normals']=transformed[ids]
-            for field in ('accepted_source_packet','source_exclusion_mask','source_exclusion_binding','confirmed_source_uv'):
+            for field in ('accepted_source_packet','source_exclusion_mask','source_exclusion_binding',
+                          'source_guide_exclusion_mask','source_exclusion_protected_mask','confirmed_source_uv'):
                 guide.pop(field,None)
             for field in ('original_source_point_indices','original_dependence_groups_per_point'):
                 if field in guide:guide[field]=[guide[field][i] for i in ids]
@@ -301,7 +317,8 @@ class AcceptedSourceReidentifier:
                 reidentification_reference=reference['reference'],reidentification_previous_source_binding=reference['source_binding'],
                 reference_UV_used_as_measurement=False,historical_world_geometry_imported=False,
                 closed=bool(original.get('closed') and inside.all()))
-            for field in ('accepted_source_packet','normals','source_exclusion_mask','source_exclusion_binding'):
+            for field in ('accepted_source_packet','normals','source_exclusion_mask','source_exclusion_binding',
+                          'source_guide_exclusion_mask','source_exclusion_protected_mask'):
                 guide.pop(field,None)
             for field in ('original_source_point_indices','original_dependence_groups_per_point'):
                 if field in guide:guide[field]=[guide[field][i] for i in ids]
@@ -313,6 +330,9 @@ class AcceptedSourceReidentifier:
         from .vision_instances import source_correspondence_identity_verified
         if binding['source_sha256'] != self.spec['source_sha256']:
             raise ValueError('Reidentification reference bank belongs to a different source')
+        if getattr(self, 'programme_scope', None) is not None:
+            from .source_binding import canonical_source_binding
+            binding = canonical_source_binding(binding, self.programme_scope)
         now = int(binding['source_pts'])*Fraction(binding['time_base'])
         if reset:
             self.last_search = None
@@ -342,16 +362,22 @@ class AcceptedSourceReidentifier:
             guide = dict(id='board.top' if kind=='board_top' else 'board.bottom', kind=kind,
                 primitive='free_curve', physical_role='board_top_edge' if kind=='board_top' else 'ice_board_contact',
                 points_uv=points, segment_ids=np.cumsum(np.r_[0,np.diff(columns)>4]), source_binding=binding,
-                source_board_view='front_face', origin='source_annotation_search_hint',
-                identity_confirmed=True, identity_authority=dict(kind='current_source_paired_board_materials',
-                    source_binding=binding, reference=self.spec_reference, typed_pixel_is_measured_boundary=False),
+                source_board_view='unresolved', origin='source_annotation_search_hint',
+                identity_confirmed=False, identity_authority=None,
+                source_board_view_candidate='front_face',
+                source_board_view_candidate_evidence=dict(source_binding=binding,
+                    reference=self.spec_reference, same_board_structure_verified=False,
+                    kind='unassigned_typed_topology_pair',
+                    typed_pixel_is_measured_boundary=False,
+                    current_material_pair_and_surface_correspondence_required=True),
                 search_radius_px=18., source_group_id='current_source_paired_board_materials:'+kind,
                 reference_UV_used_as_measurement=False)
             bound, _ = self.geometry.bind([guide])
             guides.extend(bound)
         matches['board_search'] = dict(hypothesis_count=len(topology['boundary_topology_hypotheses']),
             paired_candidate_count=len(topology['board_contact_pair_hypotheses']),
-            mask_or_typed_edge_used_as_measurement=False)
+            mask_or_typed_edge_used_as_measurement=False,
+            topology_pair_alone_certifies_front_face=False)
         matches['current_native_reference_bank']=self.native_bank_receipt
         matches.update(status='source_identity_reacquired' if guides else 'source_identity_unresolved',
             guide_count=len(guides), native_path_ids=[g['native_geometry']['path_id'] for g in guides],

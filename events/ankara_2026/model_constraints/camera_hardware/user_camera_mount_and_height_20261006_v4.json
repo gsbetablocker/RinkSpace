@@ -69,7 +69,7 @@
     "correction": "The referenced research thread contains the user's tentative 150-170cm estimate. The previous record incorrectly stated that no numerical range had been supplied. Historical records and existing v5 camera/body bindings are preserved unchanged; this correction changes attribution only."
   },
   "rigid_mount_offset": {
-    "authority": "user_adopted_photo_based_initialization_and_bounds_from_dot",
+    "authority": "assistant_photo_based_working_estimates_not_user_approved_numerical_bounds",
     "coordinate_frame": "camera-local OpenCV x right, y down, z forward",
     "initial_camera_xyz_m": [
       0,
@@ -91,7 +91,8 @@
       0.2,
       0.1
     ],
-    "bounds_are_user_working_search_ranges_not_measurements": true,
+    "bounds_are_user_working_search_ranges_not_measurements": false,
+    "bounds_are_assistant_working_estimates_not_measurements": true,
     "shared_across_same_installation_exposures": true,
     "separate_offset_for_each_installation": true,
     "first_version_zoom_dependent_offset_enabled": false,
@@ -165,8 +166,8 @@
         -0.1,
         0.25
       ],
-      "original_authority": "user_adopted_photo_based_initialization_and_bounds_from_dot",
-      "user_adopted_working_search_ranges_retained": true,
+      "original_authority": "historical_record_incorrectly_claimed_user_adoption_of_dot_estimates",
+      "user_adopted_working_search_ranges_retained": false,
       "precise_hardware_measurement": false,
       "metre_scale_verified": false,
       "no_new_numerical_bounds_invented": true,
@@ -263,6 +264,19 @@
     "original_v3_fields_and_quoted_encoding_not_repaired": true,
     "no_AGENTS_or_config_or_solver_or_camera_modified": true,
     "source_technical_summary": "人工确认的技术事实为：转播机位由站立操作员使用固定三脚架，支点应高于冰面；近零支点与约 1.74 m 杆臂的分解已被人工否定。提供的参考图片仅说明相机、三脚架及云台的机械形态，不能用于当前赛事场地定位或透视校正尺寸测量。本次确认没有增加新的精确高度或硬数值边界。"
+  },
+  "attribution_correction_20261026": {
+    "authority": "current_user_explicit_clarification_and_reread_of_original_conversation",
+    "user_approved_the_historical_numeric_ranges": false,
+    "continuation_authorization_was_not_numeric_parameter_approval": true,
+    "source_definition": "The original suggested offset starts at the head's tilt axis and ends at the equivalent projection centre. It uses camera-local right/down/forward directions. It does not start at an independently separated pan-axis point.",
+    "historical_formula_limit": "The original C=P+R.T@lever formula used one unsplit pivot and a zoom-independent offset. Its P must not be equated without explanation to the current separated pan-axis reference P.",
+    "current_native_difference": "Current native separates a pan-axis reference P, tilt-axis reference Q=P+a*h, reference-pupil offset d, and zoom pupil shift. Bounding d alone does not bound the complete Q-to-C offset.",
+    "preserved_historical_numeric_values_are_not_current_approved_bounds": true,
+    "current_assistant_estimate": "z190_mount_working_ranges_20261026.json",
+    "private_source_trace": "D:/CodexData/RinkSpace_Data/runs/native_joint_s01_20261026/mount_definition_trace.json",
+    "previous_record_preserved": "D:/CodexData/RinkSpace_Data/runs/native_joint_s01_20261026/mount_record_before_attribution_correction.json",
+    "previous_record_sha256": "4c003aced91f7fbcc25d6087e1ee0e09ff379dde5c1a2af7af2940bd65e35ae5"
   },
   "publication_derivative": {
     "privacy_redacted": true,

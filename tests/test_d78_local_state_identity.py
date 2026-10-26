@@ -35,7 +35,7 @@ class D78LocalStateIdentity(unittest.TestCase):
                 "assets": {name: {"file": str(local), "sha256": expected}}}]})
         return dict(model_path=model, out_dir=root / "out", scope_path=scope,
                     library_path="not-used-by-identity-test", complete_state_path=complete,
-                    asset_map_path=asset_map)
+                    asset_map_path=asset_map, allow_unverified_replay=True)
 
     def import_state(self, arguments):
         # Optical and scene math have their own real-native tests. Isolate this

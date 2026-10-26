@@ -132,7 +132,9 @@ class SourceRecordStorageTests(unittest.TestCase):
         refined=dict(source_binding=binding,memory_update='source_frame_prompt_refinement',instances=[known,prompt])
         provider=SimpleNamespace(frame_index=0,read=lambda *args,**kwargs:refined)
         actual_uv=np.array([[2.25,3.5]],np.float32)
-        def reread(source,packet,instance_provider):
+        selected_evidence=dict(gray_history=dict(path="selected",sha256="b"*64))
+        def reread(source,packet,instance_provider,*,near_board_evidence):
+            self.assertIs(near_board_evidence,selected_evidence)
             self.assertIs(source,rgb)
             packet['instances'][-1]=dict(packet['instances'][-1],actual_source_uv=actual_uv)
             return packet
@@ -140,7 +142,7 @@ class SourceRecordStorageTests(unittest.TestCase):
             source_binding=binding,prompts=[prompt],material_candidates=[]))as proposal,patch(
             'rinkspace.vision_review.reread_source_advertisements',side_effect=reread):
             result,evidence=bootstrap_source_print_materials(rgb,original,
-                dict(source_board_material_search_navigation=navigation),provider)
+                dict(source_board_material_search_navigation=navigation),provider,near_board_evidence=selected_evidence)
         self.assertIs(proposal.call_args.kwargs['board_search'],navigation)
         self.assertEqual(result['initial_source_read_memory_update'],'shot_reset')
         self.assertEqual(result['source_person_reidentification'],original['source_person_reidentification'])

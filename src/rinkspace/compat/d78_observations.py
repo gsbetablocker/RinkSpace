@@ -9,11 +9,33 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
-import shutil
+import tempfile
+from ..domain.scene_assets import snapshot_scene
+from ..domain.runtime_rigs import snapshot_runtime
+from .d78_source import resolve_d78_source_binding
 import numpy as np
 
 from ..session.dataset import digest, read_json, require, write_array, write_json
 from ..domain.measurement import POLICY_ID, required_measurement
+
+
+def _bind_legacy_references(value, owner):
+    """Resolve executable legacy descriptors relative to the declaring document."""
+    if isinstance(value, list):
+        return [_bind_legacy_references(item, owner) for item in value]
+    if not isinstance(value, dict):
+        return value
+    result = {key: _bind_legacy_references(item, owner) for key, item in value.items()}
+    if 'sha256' in value:
+        key = 'file' if 'file' in value else 'path' if 'path' in value else None
+        if key is not None:
+            reference = Path(value[key])
+            result[key] = str(reference if reference.is_absolute() else Path(owner).resolve().parent / reference)
+    return result
+
+
+def _read_legacy_document(path):
+    return _bind_legacy_references(read_json(path), path)
 
 
 def _legacy_array(desc):
@@ -63,7 +85,27 @@ def _path_feature(mi, pi, mat, path, *, trusted):
 
 def import_d78_observations(input_path, model_path, scope_path, pts_index_path, out_dir, *,
                             path_indices_path=None, observation_ids_path=None,
-                            scene_path=None, rigs_path=None, shots_path=None):
+                            scene_path=None, rigs_path=None, shots_path=None,
+                            source_binding_path=None, row_shot_ids_path=None):
+    """Publish only a complete authenticated, relocatable migration."""
+    from ..path_policy import guard_project_write
+    out = guard_project_write(Path(out_dir).resolve())
+    require(not out.exists(), "Adapter output exists; preserve it and choose a new revision", path=str(out))
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="d78-import-", dir=out.parent) as temporary:
+        stage = Path(temporary) / "input"
+        _import_d78_observations(input_path, model_path, scope_path, pts_index_path, stage,
+            path_indices_path=path_indices_path, observation_ids_path=observation_ids_path,
+            scene_path=scene_path, rigs_path=rigs_path, shots_path=shots_path,
+            source_binding_path=source_binding_path, row_shot_ids_path=row_shot_ids_path)
+        require(not out.exists(), "Adapter destination appeared during import", path=str(out))
+        stage.rename(out)
+    return out / "input.json"
+
+
+def _import_d78_observations(input_path, model_path, scope_path, pts_index_path, out_dir, *,
+                            path_indices_path=None, observation_ids_path=None,
+                            scene_path=None, rigs_path=None, shots_path=None, source_binding_path=None, row_shot_ids_path=None):
     """Return current input.json; all source UV/PTS/W remain bitwise unchanged.
 
     ``path_indices_path`` is the delivered finite branch state, not a nearest-
@@ -73,9 +115,9 @@ def import_d78_observations(input_path, model_path, scope_path, pts_index_path, 
     current_mode = Path(input_path).is_dir()
     input_document = Path(input_path) / "packet/manifest.json" if current_mode else Path(input_path)
     if current_mode:
-        packet = read_json(input_document)
-        sem = read_json(Path(input_path) / "semantic/manifest.json")
-        current_query = read_json(Path(input_path) / "query/manifest.json")
+        packet = _read_legacy_document(input_document)
+        sem = _read_legacy_document(Path(input_path) / "semantic/manifest.json")
+        current_query = _read_legacy_document(Path(input_path) / "query/manifest.json")
         inp = {"raw_rows": packet["observations"], "source_arrays": packet["arrays"],
                "semantic_arrays": sem["arrays"], "resolved_material_index": sem["resolved_material_index"],
                "resolved_variant_index": sem["resolved_variant_index"], "resolved_variant_ids": sem["resolved_variant_ids"],
@@ -84,12 +126,14 @@ def import_d78_observations(input_path, model_path, scope_path, pts_index_path, 
                    "group_rows": sem["arrays"]["group_rows"], "independent_rows": sem["arrays"]["ordinary_rows"],
                    "source_sigma": sem["arrays"]["source_sigma"], "formal_rank": sem["statistics"]["formal_residual_rows"]}}
     else:
-        inp = read_json(input_document)
+        inp = _read_legacy_document(input_document)
         require(inp.get("schema") == "rinkspace.relocated_d78_native_input.v1", "Expected delivered frozen d78 input")
     model = read_json(model_path)
     scope = read_json(scope_path)
     out = Path(out_dir).resolve()
     require(not out.exists(), "Adapter output exists; preserve it and choose a new revision", path=str(out))
+    require(source_binding_path is not None, "Authenticated source_binding_path is required for old observation migration")
+    binding = resolve_d78_source_binding(model_path, source_binding_path, scope_path=scope_path, shot_id="s01")
     n = inp["raw_rows"]
     source = {k: _legacy_array(v) for k, v in inp["source_arrays"].items()}
     semantic = {k: _legacy_array(v) for k, v in inp["semantic_arrays"].items()}
@@ -110,6 +154,28 @@ def import_d78_observations(input_path, model_path, scope_path, pts_index_path, 
     pts_index = np.load(pts_index_path, allow_pickle=False)
     require(pts_index.dtype.str == "<i8" and pts_index.ndim == 1 and np.all(np.diff(pts_index) > 0), "Expected actual decoded native PTS index")
     require(np.isin(source["native_pts"], pts_index).all(), "Frozen source PTS absent from registered decoded index")
+    # This historical model owns s01 only. PTS overlap never supplies shot identity.
+    if row_shot_ids_path is not None:
+        row_shots = np.load(row_shot_ids_path, allow_pickle=False)
+        require(row_shots.shape == (n,) and row_shots.dtype.kind in "US" and np.all(row_shots.astype("U") == "s01"),
+                "This d78 observation adapter supports authenticated s01 rows only")
+    selected = next(shot for shot in scope["shots"] if shot["id"] == "s01")
+    interval = selected["processing"]
+    require(np.all((source["native_pts"] >= interval["first_pts"]) & (source["native_pts"] < interval["stop_pts_exclusive"])),
+            "d78 row PTS outside authenticated s01 domain")
+    shots_document = read_json(shots_path) if shots_path else {"schema": "rinkspace.shots.v1", "shots": [
+        dict(shot, source_id=scope["source"]["id"], spline_reference_pts=binding["original_reference_pts"],
+             camera_domain={"status": "missing_state_not_fabricated"}) for shot in scope["shots"]],
+        "required_shot_ids": scope["required_shot_ids"]}
+    shots = shots_document["shots"]
+    shot_ids = [shot["id"] for shot in shots]
+    require(len(shot_ids) == len(set(shot_ids)) and "s01" in shot_ids, "Imported shots must uniquely include s01")
+    supplied = shots[shot_ids.index("s01")]
+    require(supplied.get("rig_id") == selected["rig_id"] and supplied.get("source_id") == scope["source"]["id"],
+            "Imported s01 source/rig differs")
+    require(supplied.get("processing") == selected["processing"], "Imported s01 processing domain differs")
+    if "spline_reference_pts" in supplied:
+        require(supplied["spline_reference_pts"] == binding["original_reference_pts"], "Imported camera time origin differs")
     ids = np.asarray(tables["stable_observation_ids"], dtype="U") if current_mode else None
     if observation_ids_path and not current_mode:
         registered = Path(observation_ids_path).parent
@@ -194,9 +260,19 @@ def import_d78_observations(input_path, model_path, scope_path, pts_index_path, 
     support[kind == 0] = 0
     local_index = np.full(n, -1, "<i8")
     local_index[kind == 1] = np.arange(np.sum(kind == 1), dtype=np.int64)
-    out.mkdir(parents=True)
+    scene, scene_dependencies = snapshot_scene(scene_path or model_path, out)
+    rigs = read_json(rigs_path) if rigs_path else {"schema": "rinkspace.rigs.v1", "rigs": [{"id": "main", "status": "missing_camera_not_fabricated"}]}
+    # Generated registries contain metadata only. Explicit registries keep their
+    # own owner path when cameras/controls are resolved.
+    with tempfile.TemporaryDirectory(prefix="d78-registry-", dir=out.parent) as tmp:
+        registry_root = Path(tmp)
+        write_json(registry_root / "rigs.json", rigs)
+        write_json(registry_root / "shots.json", shots_document)
+        rigs, shots_document, runtime_dependencies = snapshot_runtime(
+            rigs_path or registry_root / "rigs.json", shots_path or registry_root / "shots.json", out)
+    shots = shots_document["shots"]
     arrays = {"uv": source["native_uv"], "pts": source["native_pts"].astype("<i8"),
-              "source_index": np.zeros(n, "<i4"), "shot_index": np.zeros(n, "<i4"), "feature_index": feature_index,
+              "source_index": np.zeros(n, "<i4"), "shot_index": np.full(n, shot_ids.index("s01"), "<i4"), "feature_index": feature_index,
               "kind": kind, "active": active, "split": np.zeros(n, "u1"), "noise_group_index": group_index,
               "covariance": covariance, "support": support, "local_index": local_index, "observation_ids": ids,
               "legacy_kind": original_kind, "legacy_source_rows": source["source_rows"],
@@ -218,19 +294,6 @@ def import_d78_observations(input_path, model_path, scope_path, pts_index_path, 
                      "time_base_num": scope["source_clock"]["time_base_num"], "time_base_den": scope["source_clock"]["time_base_den"],
                      "pts_ref": write_array(out, "source_pts", pts_index, "<i8"),
                      "pts_registry_origin": str(Path(pts_index_path).resolve()), "external_asset_id": scope["source"]["id"]}
-    shots = []
-    for shot in scope["shots"]:
-        item = dict(shot, source_id=source_record["id"], spline_reference_pts=scope["shots"][0]["processing"]["first_pts"])
-        item["camera_domain"] = ({"status": "defined", "first_pts": shot["processing"]["first_pts"],
-                                 "stop_pts_exclusive": shot["processing"]["stop_pts_exclusive"]}
-                                 if shot["id"] == "s01" else {"status": "missing_state_not_fabricated"})
-        shots.append(item)
-    rigs = read_json(rigs_path) if rigs_path else {"rigs": [{"id": "main", "status": "frozen_d78_replay"}]}
-    scene = read_json(scene_path) if scene_path else model
-    write_json(out / "scene.json", scene)
-    write_json(out / "rigs.json", rigs)
-    write_json(out / "shots.json", {"schema": "rinkspace.shots.v1", "required_shot_ids": scope["required_shot_ids"], "shots": shots,
-                                   "imported_shots_origin": str(shots_path) if shots_path else None})
     write_json(out / "sources.json", {"schema": "rinkspace.sources.v1", "sources": [source_record]})
     write_json(out / "features.json", {"schema": "rinkspace.features.v1", "features": features})
     write_json(out / "noise_groups.json", groups_doc)
@@ -265,6 +328,7 @@ def import_d78_observations(input_path, model_path, scope_path, pts_index_path, 
                   "existing_marginal_replacements_preserved": len(replacements), "queries": inp["query"]["arrays"]["source_rows"]["shape"][0],
                   "finite_branch_source": str(Path(path_indices_path).resolve()), "measurement_semantics": "original descriptor copied verbatim; no centreline or boundary reinterpretation",
                   "current_corrected_observations": "delivered current corrected binding retained" if current_mode else "kept at original registered current input; not overwritten by frozen replay import",
+                  "source_binding": binding, "scene_dependencies": scene_dependencies, "runtime_dependencies": runtime_dependencies,
                   "constraint_only_rows": len(constraint_rows), "statistical_rows": int(statistical_activity.sum())}
     write_json(out / "provenance.json", provenance)
     revision = hashlib.sha256(json.dumps({"original": provenance["original_input_sha256"], "scope": digest(scope_path),
@@ -276,12 +340,12 @@ def import_d78_observations(input_path, model_path, scope_path, pts_index_path, 
                "noise_groups_ref": "noise_groups.json", "provenance_ref": "provenance.json",
                "model_configuration": {"measurement_policy_id": POLICY_ID, "state_kind": "current_corrected_static_import" if current_mode else "frozen_d78_replay", "fit_executed": False,
                                        "native_current_extended_entity_support": False if current_mode else True, "query_constraints_ref": "queries.json",
-                                       "required_shot_ids": scope["required_shot_ids"], "available_camera_shot_ids": ["s01"]}}
+                                       "required_shot_ids": scope["required_shot_ids"], "available_camera_shot_ids": [shot["id"] for shot in shots if shot.get("camera_ref")]}}
     write_json(out / "input.json", current)
     return (out / "input.json").resolve()
 
 
-def import_current_observations(current_dir, scope_path, pts_index_path, out_dir):
+def import_current_observations(current_dir, scope_path, pts_index_path, out_dir, *, source_binding_path):
     """Migrate delivered current corrected observations through the same adapter.
 
     Native fitting of the extended current material inventory is a separate
@@ -289,4 +353,4 @@ def import_current_observations(current_dir, scope_path, pts_index_path, out_dir
     """
     directory = Path(current_dir).resolve(strict=True)
     return import_d78_observations(directory, directory / "model.json", scope_path,
-                                   pts_index_path, out_dir, path_indices_path=directory / "path.u32")
+                                   pts_index_path, out_dir, path_indices_path=directory / "path.u32", source_binding_path=source_binding_path)

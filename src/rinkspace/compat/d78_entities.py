@@ -101,6 +101,18 @@ def sample_path(scene, path, core, stations):
                      path.get("vertices", []), stations), dtype=np.float64)
 
 
+def finite_path_support(path):
+    """Read one finite material domain; periodic board paths use no such bound."""
+    support = np.asarray(path.get('support', path.get('finite_support', [0., 1.])), dtype=float)
+    if (support.shape != (2,) or not np.isfinite(support).all()
+            or not 0. <= support[0] <= support[1] <= 1.):
+        raise ValueError(f"invalid finite material support for {path['id']}")
+    if ('support' in path and 'finite_support' in path
+            and not np.array_equal(support, np.asarray(path['finite_support'], dtype=float))):
+        raise ValueError(f"conflicting finite material supports for {path['id']}")
+    return tuple(map(float, support))
+
+
 def sample_entities(scene, core, samples=129):
     if samples < 2:
         raise ValueError("at least two representation samples")
@@ -112,15 +124,24 @@ def sample_entities(scene, core, samples=129):
         kind, parameters = native_definition(scene, path, core)
         vertices = path.get("vertices", [])
         count = max(samples, 4*len(vertices)) if kind in (2, 5) else samples
-        stop = core.board_perimeter(scene['board']) if kind == 7 else 1.
-        stations = np.unique(np.r_[np.linspace(0., stop, count), np.linspace(0., stop, len(vertices))]) if vertices else np.linspace(0., stop, count)
+        if kind == 7:
+            start, stop = 0., core.board_perimeter(scene['board'])
+        else:
+            start, stop = finite_path_support(path)
+        stations = np.linspace(start, stop, count)
+        if vertices:
+            # Vertex knots retain their original material coordinate. A
+            # truncated path must neither draw outside its support nor move
+            # the original polyline corners to a newly normalized interval.
+            knots = np.linspace(0., 1., len(vertices))
+            stations = np.unique(np.r_[stations, knots[(knots >= start) & (knots <= stop)]])
         xyz = np.asarray(core.sample_path(scene['board'], kind, parameters, vertices, stations.tolist()), dtype=np.float64)
         if xyz.shape != (len(stations), 3) or not np.isfinite(xyz).all():
             raise ValueError(f"native entity sampling failed at {path['id']}")
         points.append(xyz)
-        closed = kind == 7 or (kind in (1, 6) and abs(parameters[-1]-parameters[-2]-2*math.pi) < 1e-10)
+        closed = kind == 7 or (kind in (1, 6) and abs((parameters[-1]-parameters[-2])*(stop-start)-2*math.pi) < 1e-10)
         cuts.append({**{k: path[k] for k in ("id", "entity_id", "label", "layer")},
-                     "closed": path.get('closed', closed), "begin": offset, "end": offset+len(xyz),
+                     "closed": bool(path.get('closed', closed) and (kind == 7 or (start == 0. and stop == 1.))), "begin": offset, "end": offset+len(xyz),
                      "kind": KIND_NAMES[kind], "support": None if kind == 7 else path.get("support", path.get('finite_support', [0., 1.])),
                      **({'station_domain':path['station_domain'], 'sampling_interval':[0., stop]} if kind == 7 else {})})
         offset += len(xyz)

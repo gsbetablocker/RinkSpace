@@ -42,7 +42,7 @@ def main():
     candidates, skipped_candidates = [], []
     for row in dependencies:
         original = row["source_path"].split("#", 1)[0]
-        if not reference_key(original).startswith(reference_key(storage["data_root"]).rstrip("/") + "/"):
+        if not reference_key(original).startswith(reference_key(data).rstrip("/") + "/"):
             continue
         try:
             path = Path(original).resolve()

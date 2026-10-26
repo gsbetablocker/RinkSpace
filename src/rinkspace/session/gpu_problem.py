@@ -124,3 +124,132 @@ def load_linearization_problem(g1_dir, g2_dir):
         raise ValueError("inconsistent original finite station supports")
     p["lower"]=lo;p["upper"]=hi
     return p
+
+
+def compile_navigation_problem(prepared_dir, navigation_local_state, *, shot_id, core,
+                               camera_state=None, activity='supported_controls'):
+    """Compile one complete shot using the common frozen native GPU implementation."""
+    from .dataset import load_prepared, relative
+    from .gpu_geometry import NativeSceneGPU, bind_fixed_junctions
+    root=Path(prepared_dir)
+    manifest,arrays=load_prepared(root,purpose='camera_navigation',core=core)
+    shots=manifest['shots'];shot_index=next(i for i,s in enumerate(shots) if s['id']==shot_id)
+    shot=shots[shot_index]
+    if camera_state is None:
+        path=relative(root,shot['camera_ref']);camera=read(path)
+        controls=np.load(relative(path.parent,camera['controls_ref']),allow_pickle=False)
+    else:camera,controls=camera_state['camera'],np.asarray(camera_state['controls'],float)
+    selected=np.flatnonzero((arrays['shot_index']==shot_index)&(arrays['active']!=0)&(arrays['split']==0))
+    if not len(selected):raise ValueError('No qualified source measurements for '+shot_id)
+    rowmap={int(old):i for i,old in enumerate(selected)}
+    offsets=[0];weight_offsets=[0];members=[];ranks=[];weights=[];groups=[]
+    all_members=arrays['noise_group_members'];all_weights=arrays['noise_group_weights']
+    for g in manifest['noise_groups']:
+        rr=all_members[g['member_start']:g['member_start']+g['member_count']]
+        take=[int(r) in rowmap for r in rr]
+        if not any(take):continue
+        if not all(take):raise ValueError('Navigation selection truncates correlation group '+g['id'])
+        if 'allowed_use' in g and 'camera_navigation' not in g['allowed_use']:raise ValueError('W not authorized for camera navigation')
+        w=all_weights[g['weight_start']:g['weight_start']+g['rank']*2*len(rr)]
+        if hashlib.sha256(np.asarray(w,dtype='<f8').tobytes()).hexdigest()!=g['matrix_sha256']:raise ValueError('Original W changed')
+        members.extend(rowmap[int(r)] for r in rr);weights.extend(w);ranks.append(g['rank'])
+        offsets.append(len(members));weight_offsets.append(len(weights));groups.append(g)
+    for raw in selected[arrays['noise_group_index'][selected]<0]:
+        xx,xy,yy=arrays['covariance'][raw];w=np.linalg.solve(np.linalg.cholesky([[xx,xy],[xy,yy]]),np.eye(2))
+        members.append(rowmap[int(raw)]);weights.extend(w.ravel());ranks.append(2)
+        offsets.append(len(members));weight_offsets.append(len(weights))
+    if sorted(members)!=list(range(len(selected))):raise ValueError('Incomplete noise partition')
+    features=manifest['features'];scene=NativeSceneGPU(relative(root,manifest['scene_ref']),core)
+    bind_fixed_junctions(scene,features)
+    states=navigation_local_state if isinstance(navigation_local_state,dict) else read(navigation_local_state)
+    lookup={r['observation_id']:r for r in states['rows']}
+    if len(lookup)!=len(states['rows']):raise ValueError('Duplicate navigation local state identity')
+    paths=[];stations=[];locals_=[];localmap={};lower=[];upper=[];local_origin=[]
+    # An isolated normal residual has only one observed direction. Giving its
+    # station another free direction would annihilate that same camera factor.
+    # Preserve its real initialized station as a fixed search coordinate; only
+    # groups with extra observed rank may jointly refine stations.
+    fixed_normal_rows=set()
+    for g in groups:
+        rr=all_members[g['member_start']:g['member_start']+g['member_count']]
+        if g['rank']<=len(rr):fixed_normal_rows.update(map(int,rr))
+    for raw in selected:
+        f=features[int(arrays['feature_index'][raw])];path_id=f.get('path_id',f['id'])
+        if f['kind']=='fixed_junction':path_id=f['id']
+        paths.append(path_id)
+        oid=arrays['observation_ids'][raw].decode()
+        if f['kind']!='finite_curve':
+            if int(arrays['local_index'][raw])!=-1:raise ValueError('Fixed point acquired station')
+            stations.append(0.);locals_.append(-1);continue
+        state=lookup.get(oid)
+        if state is None or state['path_id']!=path_id or not np.isfinite(state['value']):
+            raise ValueError('Missing or incompatible real navigation station for '+oid)
+        value=float(state['value']);key=state['local_id']
+        if int(raw) in fixed_normal_rows:
+            stations.append(value);locals_.append(-1);continue
+        lo,hi=(-np.inf,np.inf) if arrays['support_kind'][raw]==1 else arrays['support'][raw]
+        if not lo<=value<=hi:raise ValueError('Initial station is outside real path support')
+        if key not in localmap:
+            localmap[key]=len(localmap);lower.append(lo);upper.append(hi);local_origin.append(state)
+        local=localmap[key]
+        if local_origin[local]['path_id']!=path_id or local_origin[local]['value']!=value:raise ValueError('Shared station identity disagrees')
+        lower[local]=max(lower[local],lo);upper[local]=min(upper[local],hi)
+        stations.append(value);locals_.append(local)
+    native_pts=arrays['pts'][selected]
+    times=(native_pts-int(camera['reference_pts']))*camera['time_base_num']/camera['time_base_den']
+    if activity=='level':
+        directions=np.zeros((len(controls),3,3));
+        for j in range(3):directions[:,j,j]=.001
+        active_controls=list(range(len(controls)))
+    elif activity=='supported_controls':
+        # Native cubic support is cell-1 through cell+2. Include signed readout
+        # margins; controls with insufficient real source factors remain frozen.
+        dt=camera['control_dt'];first=camera['first_control_time'];readout=abs(camera['rig'][37])
+        cells=np.floor((times-first)/dt).astype(int)
+        active_controls=[k for k in range(len(controls)) if np.count_nonzero((cells>=k-2)&(cells<=k+1))>=3]
+        if not active_controls:raise ValueError('No supported camera control directions')
+        directions=np.zeros((len(controls),3,len(active_controls)*3))
+        for j,k in enumerate(active_controls):directions[k,:,3*j:3*j+3]=np.eye(3)*.001
+    else:raise ValueError('Unknown camera activity')
+    resident=scene.resident(camera=camera,controls=controls,path_ids=paths,stations=np.asarray(stations),pts=native_pts,observed=arrays['uv'][selected])
+    try:
+        plan=resident.configure_linearization(directions=directions,local_ids=np.asarray(locals_,np.int32),
+            local_scales=np.full(len(localmap),.001),group_offsets=np.asarray(offsets,np.int32),members=np.asarray(members,np.int32),
+            ranks=np.asarray(ranks,np.int32),weight_offsets=np.asarray(weight_offsets,np.int32),weights=np.asarray(weights),huber_delta=3.)
+        # For the common engineering normal-only input, no nuisance station
+        # is active. Exact weighted native Jacobians expose any unobservable
+        # camera combinations before the LM solver is attached.
+        observability=dict(method='native_weighted_camera_J',directions_before=directions.shape[2])
+        if not localmap:
+            resident.linearize('cuda')
+            if hasattr(resident,'sparsity'):
+                blocks=resident.export_sparse_blocks('cuda')
+                h=np.zeros((directions.shape[2],directions.shape[2]))
+                for row,(begin,end) in enumerate(zip(blocks['csr_offsets'][:-1],blocks['csr_offsets'][1:])):
+                    columns=blocks['csr_columns'][begin:end];values=blocks['shared_values'][begin:end]
+                    h[row,columns]=values;h[columns,row]=values
+            else:h=resident.export_blocks('cuda')['shared_H']
+            eigen,vectors=np.linalg.eigh(h)
+            tolerance=np.finfo(float).eps*max(h.shape)*max(float(eigen[-1]),1.)*64
+            keep=eigen>tolerance
+            observability.update(retained_rank=int(keep.sum()),squared_singular_values=eigen.tolist(),
+                numerical_rank_tolerance=tolerance,station_activity='normal_only_stations_frozen_no_false_nuisance_fit')
+            if not keep.any():raise ValueError('No observable camera direction in actual source normals')
+            if not keep.all():
+                directions=np.einsum('ncq,qr->ncr',directions,vectors[:,keep])
+                resident.close()
+                resident=scene.resident(camera=camera,controls=controls,path_ids=paths,stations=np.asarray(stations),
+                    pts=native_pts,observed=arrays['uv'][selected])
+                plan=resident.configure_linearization(directions=directions,local_ids=np.asarray(locals_,np.int32),
+                    local_scales=[],group_offsets=np.asarray(offsets,np.int32),members=np.asarray(members,np.int32),
+                    ranks=np.asarray(ranks,np.int32),weight_offsets=np.asarray(weight_offsets,np.int32),weights=np.asarray(weights),huber_delta=3.)
+        else:
+            observability.update(station_activity='joint_native_station_groups',rank_requires_native_local_elimination=True)
+        setup=resident.configure_solver(lower=lower,upper=upper,device_budget_bytes=8*1024**3,host_budget_bytes=8*1024**3)
+    except BaseException:resident.close();raise
+    return dict(resident=resident,scene=scene,camera=camera,controls=controls,source_rows=selected,
+        observation_ids=[arrays['observation_ids'][r].decode() for r in selected],local_origins=local_origin,
+        local_ids=np.asarray(locals_),path_ids=paths,groups=groups,plan=plan,setup=setup,
+        active_control_indices=active_controls,activity=activity,observability=observability,source_UV_unchanged=True,
+        frozen_normal_station_rows=len(fixed_normal_rows),
+        frozen=['native_scene','print_placement','print_internal_shape','rig_installation','Brown_optics','readout'])

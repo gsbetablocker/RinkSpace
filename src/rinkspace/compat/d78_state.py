@@ -11,6 +11,7 @@ from pathlib import Path
 import numpy as np
 from rinkspace.core.native import NativeCore
 from .d78_entities import decode_entities
+from .d78_source import resolve_d78_source_binding
 
 
 def _read(path):
@@ -63,7 +64,7 @@ def decode_camera(model, core):
             "original_camera_definition": deepcopy(camera), "original_global32": g.tolist()}, controls
 
 
-def import_d78_state(model_path, out_dir, scope_path, library_path, complete_state_path=None, prepared_revision="unbound", asset_map_path=None, shot_id=None):
+def import_d78_state(model_path, out_dir, scope_path, library_path, complete_state_path=None, prepared_revision="unbound", asset_map_path=None, shot_id=None, *, source_binding_path=None, allow_unverified_replay=False):
     model_path, out_dir, scope_path = Path(model_path).resolve(strict=True), Path(out_dir).resolve(), Path(scope_path).resolve(strict=True)
     if out_dir.exists():
         raise FileExistsError(f"state migration does not overwrite an existing candidate: {out_dir}")
@@ -77,9 +78,16 @@ def import_d78_state(model_path, out_dir, scope_path, library_path, complete_sta
     if len(matches) != 1 or selected_id not in scope["required_shot_ids"]:
         raise ValueError(f"unknown or ambiguous scope shot ID: {selected_id}")
     selected = matches[0]
+    if source_binding_path is None:
+        if not allow_unverified_replay:
+            raise ValueError("Authenticated d78 source_binding_path required; unverified replay must be explicit")
+        source_binding = {"verified": False, "reason": "explicit unverified replay; forbidden as fit input"}
+    else:
+        source_binding = resolve_d78_source_binding(model_path, source_binding_path, scope_path=scope_path, shot_id=selected_id)
     clock = scope["source_clock"]
     camera.update(source_id=scope["source"]["id"], shot_id=selected["id"], rig_id=selected["rig_id"],
-                  reference_pts=selected["processing"]["first_pts"], time_base_num=clock["time_base_num"],
+                  reference_pts=source_binding.get("original_reference_pts", selected["processing"]["first_pts"]),
+                  source_binding_verified=source_binding["verified"], source_binding=source_binding, time_base_num=clock["time_base_num"],
                   time_base_den=clock["time_base_den"], image_height=scope["source"]["height"], image_width=scope["source"]["width"],
                   time_base={"num": clock["time_base_num"], "den": clock["time_base_den"]},
                   first_pts=selected["processing"]["first_pts"], stop_pts_exclusive=selected["processing"]["stop_pts_exclusive"])
@@ -93,6 +101,13 @@ def import_d78_state(model_path, out_dir, scope_path, library_path, complete_sta
                        "owner": "frozen_replay", "active": False, "original_block": deepcopy(block)})
         values.extend(raw.tolist());offset+=len(raw)
     complete = _read(complete_state_path) if complete_state_path is not None else None
+    if complete is not None:
+        declared_model = complete.get('model')
+        if declared_model is not None and (
+                not isinstance(declared_model, dict) or declared_model.get('sha256') != _hash(model_path)):
+            raise ValueError('complete d78 state belongs to a different model content identity')
+        if 'source_identity' in complete and complete['source_identity'] != model.get('source_identity'):
+            raise ValueError('complete d78 state belongs to a different source observation identity')
     local = np.empty(0, dtype="<f8")
     local_layout, local_arrays = {}, {}
     resolved_assets = {}
@@ -155,7 +170,8 @@ def import_d78_state(model_path, out_dir, scope_path, library_path, complete_sta
                         "complete_state_path": str(Path(complete_state_path).resolve()) if complete_state_path else None,
                         "complete_state_preserved_ref": "original_complete_state.json", "original_source_identity": model.get("source_identity"),
                         "imported_shot_id": selected_id, "shot_selection": "explicit" if shot_id is not None else "first_required_scope_shot",
-                        "complete_local_state_imported": complete is not None},
+                        "complete_local_state_imported": complete is not None, "source_binding": source_binding},
+             "eligible_for_fit": source_binding["verified"],
              "status": "frozen_projection_replay", "fit_executed": False, "cuda_executed": False, "user_approval": "not_reviewed",
              "limitations": ["Frozen original geometry is a faithful replay, not fitted new common structure.", "Original d78 chart and full local state are preserved; historical LM process/duals are not a new optimizer checkpoint.", "Other shot camera values are not invented; all nine required shot IDs remain registered."]}
     _write(out_dir/"state.json", state)

@@ -277,6 +277,7 @@ def normalize_dataset(input_root: str | Path, output_dir: str | Path, *,
                 declarations = packet.get("source_correlated_groups", [])
                 packet_named = packet_unbound = 0
                 for collection in ("features", "unbound_static_materials"):
+                    named = collection == "features"
                     for fi, feature in enumerate(packet.get(collection, [])):
                         feature_id = feature.get("id", f"unnamed_feature_{fi}")
                         feature_ptr = f"/{collection}/{fi}"
@@ -432,7 +433,6 @@ def normalize_dataset(input_root: str | Path, output_dir: str | Path, *,
                                           earlier_row_id=frame_coordinates[coord_key], target_id=target)
                                 else:
                                     frame_coordinates[coord_key] = row_id
-                                named = collection == "features"
                                 state = ("merged_named_pending_auto_qa" if legacy_binding else
                                          "candidate_named_pending_assembly") if named else "unbound_pending_identity"
                                 correspondence = legacy_binding.get("point_correspondence", point_binding.get("kind") == "corner")

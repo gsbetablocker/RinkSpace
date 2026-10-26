@@ -8,9 +8,8 @@ from unittest.mock import patch
 
 import numpy as np
 
-from tests.test_compaction_binding_reindex_runtime import fixture
+from test_compaction_binding_reindex_runtime import fixture
 from calibration.solver_runtime.role_block_binding_runtime import _make_view
-from calibration.solver_runtime.role_view_binding_seed_runtime import seed_owned_role_view_cache
 
 
 def two_block_fixture(packet):
@@ -37,7 +36,7 @@ class RoleViewBindingSeedTest(unittest.TestCase):
             old_records = deepcopy(full_cache[1]['records'])
             view, reason = _make_view(role, 'main1')
             self.assertIsNone(reason)
-            receipt = seed_owned_role_view_cache(role, view, [0])
+            receipt = view._rinkspace_role_binding_seed_receipt
             self.assertTrue(receipt['seeded'], receipt)
             self.assertFalse(receipt['full_worker_numeric_cache_released'])
             self.assertIs(role._current_binding_cache, full_cache)
@@ -67,9 +66,9 @@ class RoleViewBindingSeedTest(unittest.TestCase):
                 self.assertEqual(changed[name].tobytes(), expected[name].tobytes())
             self.assertEqual(changed['records'], expected['records'])
 
-            worker_view, _ = _make_view(role, 'main2')
             with patch('multiprocessing.current_process', return_value=SimpleNamespace(name='rink-source-fixture')):
-                receipt = seed_owned_role_view_cache(role, worker_view, [1])
+                worker_view, _ = _make_view(role, 'main2')
+            receipt = worker_view._rinkspace_role_binding_seed_receipt
             self.assertTrue(receipt['seeded'], receipt)
             self.assertTrue(receipt['full_worker_numeric_cache_released'])
             self.assertIsNone(role._current_binding_cache)
@@ -80,9 +79,9 @@ class RoleViewBindingSeedTest(unittest.TestCase):
             # Existing same-facet shortcut can leave a historical source record
             # in a numeric cache. Seeding must reject even index-only staleness.
             stale_role.records[0]['active_global_bundle_index'] = 99
-            stale_view, _ = _make_view(stale_role, 'main1')
             old = stale_role._current_binding_cache
-            receipt = seed_owned_role_view_cache(stale_role, stale_view, [0])
+            stale_view, _ = _make_view(stale_role, 'main1')
+            receipt = stale_view._rinkspace_role_binding_seed_receipt
             self.assertFalse(receipt['seeded'])
             self.assertIsNone(stale_view._current_binding_cache)
             self.assertIs(stale_role._current_binding_cache, old)

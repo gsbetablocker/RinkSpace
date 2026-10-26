@@ -196,8 +196,11 @@ class ResourceRegistry:
     @classmethod
     def from_project(cls, project_root: str | Path, data_root: str | Path) -> "ResourceRegistry":
         registry = cls(project_root, data_root)
-        from .storage import load_storage_config
-        config = load_storage_config(registry.project)
+        # These are historical aliases, not the runtime roots on this host.
+        # The explicit constructor roots own all resolved paths. In particular,
+        # a recorded Windows Data path must remain an alias on a POSIX host.
+        from .storage import read_storage_mapping
+        config = read_storage_mapping(registry.project)
         old_project = config.get("legacy_root", str(registry.project))
         registry._load_privacy_derivatives()
         registry.path_aliases = load_project_path_aliases(registry.project)

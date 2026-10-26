@@ -461,12 +461,16 @@ def sample_template_paths(assets,template_id,core,display_dimensions,*,parameter
     return shapes
 
 
-def sample_instance(assets,instance_id,board,core,*,max_step=.0004,stations_by_path=None,parameter_state=None):
+def sample_instance(assets,instance_id,board,core,*,max_step=.0004,stations_by_path=None,parameter_state=None,
+                    unobserved_surface_extensions=()):
     """Sample the current state through one native chart and BoardCourse.
 
     The frozen seed chart supplies stable finite station coordinates. New shape
     blocks deform that chart in native, before installation; they never become
     independent coordinates for each dense drawing sample or each video frame.
+    Explicitly unobserved paths may be drawn on the vertical extension of the
+    native board surface. Such samples are flagged as unsupported placement;
+    this display option never makes them physical or eligible for fitting.
     """
     import numpy as np
     if not math.isfinite(max_step) or max_step<=0:
@@ -477,6 +481,9 @@ def sample_instance(assets,instance_id,board,core,*,max_step=.0004,stations_by_p
     if not isinstance(requested,dict):raise ValueError('print sampling stations must be keyed by path identity')
     unknown=set(requested)-{p['id'] for p in template['paths']}
     if unknown:raise PrintBindingError('unknown_print_sampling_path',path_ids=sorted(unknown))
+    extensions=set(unobserved_surface_extensions)
+    unknown=extensions-{p['id'] for p in template['paths']}
+    if unknown:raise PrintBindingError('unknown_print_extension_path',path_ids=sorted(unknown))
     shapes=[];maximum=0.
     for path in template['paths']:
         vertices=_print_seed(path,context,core)
@@ -487,15 +494,36 @@ def sample_instance(assets,instance_id,board,core,*,max_step=.0004,stations_by_p
                 raise PrintBindingError('invalid_print_sampling_stations',path_id=path['id'])
             stations=explicit.tolist()
         else:stations=_drawing_stations(path,vertices,context,core,max_step)
-        data=evaluate_print_path(assets,instance_id,path['id'],board,core,stations,
-                                 jacobian=False,_context=context)
+        data=None;outside=None
+        if path['id'] in extensions:
+            material=evaluate_print_path(assets,instance_id,path['id'],None,core,stations,
+                                         jacobian=False,_context=context)
+            sz=np.asarray(material['sz']);outside=(sz[:,1]<0.)|(sz[:,1]>board[5])
+            if np.any(outside):
+                # B(s,z) is a vertical ruled surface. Keep the exact native SZ
+                # and native B(s,0) XY, including the unsupported height. Do not
+                # clamp, alter placement, omit the path, or use this in a fit.
+                xyz=np.asarray(core.board_points(board,sz[:,0],np.zeros(len(sz))))
+                xyz[:,2]=sz[:,1]
+                data={**material,'xyz':xyz}
+        if data is None:
+            data=evaluate_print_path(assets,instance_id,path['id'],board,core,stations,
+                                     jacobian=False,_context=context)
         sz=np.asarray(data['sz']);xyz=np.asarray(data['xyz'])
-        check=np.asarray(core.board_points(board,sz[:,0],sz[:,1]))
-        if len(xyz):maximum=max(maximum,float(np.max(abs(xyz-check))))
+        valid=np.ones(len(sz),bool) if outside is None else ~outside
+        if np.any(valid):
+            check=np.asarray(core.board_points(board,sz[valid,0],sz[valid,1]))
+            maximum=max(maximum,float(np.max(abs(xyz[valid]-check))))
+        extension=None if outside is None or not np.any(outside) else dict(
+            reason='unobserved_print_outside_physical_board',outside_samples=int(np.count_nonzero(outside)),
+            z_range=[float(sz[:,1].min()),float(sz[:,1].max())],board_z_range=[0.,float(board[5])],
+            representation='native_material_SZ_on_vertical_extension_of_native_B(s,0)',
+            physical_placement_valid=False,geometry_clamped=False,fit_constraint_created=False)
         shapes.append({key:deepcopy(path[key]) for key in
             ('id','closed','role','parent_contour_key','boundary_side','logical_labels','display_fill','geometry') if key in path}|
             {'stations':stations,'sz':sz.tolist(),'xyz':xyz.tolist(),
              'parameter_block_ids':data['dependency_block_ids'],
+             'unobserved_surface_extension':extension,
              'sample_role':'model_drawing_support_not_source_observation'})
     if maximum>1e-12:raise PrintBindingError('native_print_chart_board_disagreement',maximum=maximum)
     return {'instance_id':instance_id,'template_id':template['id'],'surface_id':instance['scene_surface_id'],

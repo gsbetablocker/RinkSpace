@@ -21,6 +21,8 @@ def main() -> int:
     parser.add_argument("--cuda", action="store_true", help="Build the optional G1/G2 CUDA evaluator and linearization")
     parser.add_argument("--cudss", type=Path, help="Existing project-owned cuDSS root; enables one native LM candidate")
     parser.add_argument("--generator", help="Existing CMake generator, e.g. Ninja")
+    parser.add_argument("--cuda-architectures", default="native", help="CMake CUDA architectures; default builds for the installed GPU")
+    parser.add_argument("--cuda-fast-compile", choices=["0","min","mid","max"], default="0", help="Explicit CUDA compile-time optimizer tradeoff; requires compiler support")
     args = parser.parse_args()
     if args.cudss and not args.cuda: parser.error("--cudss requires --cuda")
     project = Path(__file__).resolve().parents[1]
@@ -37,9 +39,12 @@ def main() -> int:
                     [cmake, "--build", str(output), "--config", "Release"]]
         commands[0].append("-DRINKSPACE_ENABLE_CUDA="+("ON" if args.cuda else "OFF"))
         commands[0].append("-DRINKSPACE_CUDSS_ROOT="+(str(args.cudss.resolve(strict=True)) if args.cudss else ""))
+        if args.cuda:commands[0].extend(["-DCMAKE_CUDA_ARCHITECTURES="+args.cuda_architectures,"-DRINKSPACE_CUDA_FAST_COMPILE="+args.cuda_fast_compile])
         if args.generator:
             commands[0].extend(["-G", args.generator])
-        expected = "rinkspace_core.dll" if os.name == "nt" else "librinkspace_core.so"
+        expected = ("rinkspace_core.dll" if os.name == "nt" else
+                    "librinkspace_core.dylib" if sys.platform == "darwin" else
+                    "librinkspace_core.so")
     elif not args.cuda and os.name != "nt" and sys.platform != "darwin" and shutil.which("g++"):
         expected = "librinkspace_core.so"
         commands = [[shutil.which("g++"), "-std=c++17", "-O2", "-Wall", "-Wextra", "-Wpedantic", "-fPIC", "-shared",
@@ -63,7 +68,7 @@ def main() -> int:
         print(f"Expected exactly one {expected}; found {len(candidates)}. Check {log}", file=sys.stderr)
         return 2
     result = {"library": str(candidates[0].resolve()), "log": str(log), "cpu_core_built": True,
-              "cuda_built": args.cuda, "lm_candidate_implemented": bool(args.cudss), "nonlinear_solver_implemented": bool(args.cudss),
+              "cuda_built": args.cuda, "cuda_architectures": args.cuda_architectures if args.cuda else None, "cuda_fast_compile": args.cuda_fast_compile if args.cuda else None, "lm_candidate_implemented": bool(args.cudss), "nonlinear_solver_implemented": bool(args.cudss),
               "native_geometry_plan_implemented": bool(args.cuda), "persistent_resume_implemented": False}
     (output/"build.json").write_text(json.dumps(result, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
     print(json.dumps(result, ensure_ascii=False, indent=2))

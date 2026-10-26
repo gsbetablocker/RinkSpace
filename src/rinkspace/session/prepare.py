@@ -11,7 +11,7 @@ from ..domain.scene_assets import snapshot_scene, scene_content_identity
 from ..domain.runtime_rigs import snapshot_runtime
 from .dataset import (DatasetError, PreparedReceipt, digest, load_array, read_json,
                       relative, require, write_array, write_json, iter_current_observations,
-                      validate_current_noise_groups)
+                      validate_current_noise_groups, validate_current_stations)
 
 REQUIRED_ARRAYS = {
     "uv": ("<f8", (2,)), "pts": ("<i8", ()),
@@ -57,6 +57,7 @@ def validate_current_feature_contracts(inp, scene, features, arrays, rows, *, sc
         expected_kind = expected_kind[arrays['feature_index'][rows]]
         require(np.all(expected_kind >= 0) and np.array_equal(arrays['kind'][rows], expected_kind),
                 'Observation numerical kind differs from its current feature kind')
+    validate_current_stations(features, arrays, rows)
     scene_report = validate_scene_measurements(scene, policy)
     paths = {p['id']: p for p in scene.get('paths', [])}
     for record in paths.values():

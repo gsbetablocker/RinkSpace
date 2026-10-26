@@ -741,10 +741,13 @@ def current_source_pixel_exclusion(instance_packet, binding, *, native_hw, devic
         mask_is_pixel_ground_truth=False,human_acceptance_modified=False)
 
 
-def reread_source_advertisements(rgb, instance_packet, provider, *, near_board=None):
+def reread_source_advertisements(rgb, instance_packet, provider, *, near_board=None, near_board_evidence=None):
     """Read printed contours from RGB without enabling unrelated SAM outlines."""
     from .vision_near_board import read_near_board, exclude_top_face_prints
-    near = near_board if near_board is not None else read_near_board(rgb, instance_packet["source_binding"])
+    evidence = near_board_evidence or {}
+    near = near_board if near_board is not None else read_near_board(
+        rgb, instance_packet["source_binding"], gray_history=evidence.get("gray_history"),
+        qualified_generation=evidence.get("official_gray_generation"))
     from .vision_instances import same_frame
     if near_board is not None:same_frame(instance_packet["source_binding"], near["source_binding"])
     from .vision_instances import reread_region_edges
@@ -796,7 +799,7 @@ def retain_same_source_refinement_evidence(previous, refined):
 
 
 def bootstrap_source_print_materials(rgb, instance_packet, top_role_packet, provider, *,
-                                    person_boxes=(), overlay_boxes=()):
+                                    person_boxes=(), overlay_boxes=(), near_board_evidence=None):
     """Navigate unnamed material searches from current measured rail/foot support.
 
     This refines the current SAM exposure, then remeasures original RGB. The
@@ -833,7 +836,8 @@ def bootstrap_source_print_materials(rgb, instance_packet, top_role_packet, prov
                           material_search_navigation=effective_navigation))
         if provider.frame_index!=before:
             raise ValueError('Same-PTS material refinement advanced the native source exposure index')
-        instance_packet=reread_source_advertisements(rgb,refined,provider)
+        instance_packet=reread_source_advertisements(rgb,refined,provider,
+            near_board_evidence=near_board_evidence)
     proposals['SAM_source_frame_index_before']=before
     proposals['SAM_source_frame_index_after']=provider.frame_index
     proposals['actual_source_RGB_remeasurement_after_prompt_refinement']=bool(proposals['prompts'])
@@ -1684,7 +1688,8 @@ def review(config_path, shots_path, output_directory, *, video=None, shot_ids=()
                             previously_missing_ads = missing_ads
                         if advertisement_matcher:
                             instances = timed("advertisement_RGB_reread", lambda:
-                                reread_source_advertisements(rgb, instances, provider))
+                                reread_source_advertisements(rgb, instances, provider,
+                                    near_board_evidence=reader.config.get("near_board_source_evidence")))
                         constraints = source_region_constraints(instances, native_hw=rgb.shape[:2],
                                                                 device=reader.vision.device)
                     result = timed("source_and_guided_reader", lambda: reader.read(rgb, binding, guides_2d=guides,
@@ -1732,7 +1737,8 @@ def review(config_path, shots_path, output_directory, *, video=None, shot_ids=()
                     if source_material_proposals and keyframe:
                         if reset or application_keyframe_interval_seconds is not None:
                             instances,material_proposals=timed('unnamed_source_material_bootstrap_and_RGB_reread',lambda:
-                                bootstrap_source_print_materials(rgb,instances,top_roles,provider,person_boxes=person_rows))
+                                bootstrap_source_print_materials(rgb,instances,top_roles,provider,person_boxes=person_rows,
+                                    near_board_evidence=reader.config.get("near_board_source_evidence")))
                             diagnostics['source_print_material_search_proposals']=material_proposals
                         else:
                             frame_index=provider.frame_index
@@ -1743,7 +1749,8 @@ def review(config_path, shots_path, output_directory, *, video=None, shot_ids=()
                             if provider.frame_index!=frame_index:
                                 raise ValueError('Current material navigation advanced the native source frame index')
                             instances=timed('shared_material_original_RGB_edges',lambda:
-                                reread_source_advertisements(rgb,instances,provider))
+                                reread_source_advertisements(rgb,instances,provider,
+                                    near_board_evidence=reader.config.get("near_board_source_evidence")))
                             diagnostics['source_print_material_search_proposals']=dict(source_binding=binding,
                                 status='shared_board_unnamed_layers_current_native_navigation_and_RGB_remeasured',
                                 current_source_material_object_ids=[item['object_id']for item in instances.get('instances',())

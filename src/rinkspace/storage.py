@@ -14,8 +14,12 @@ from urllib.parse import quote
 from .path_policy import guard_project_write
 
 
-def load_storage_config(project: str | Path, *, data_root: str | Path | None = None) -> dict:
-    """Shared mappings plus optional, untracked machine roots; explicit root wins."""
+def read_storage_mapping(project: str | Path) -> dict:
+    """Read declared mappings, including old roots from a different platform.
+
+    This metadata alone is not a usable runtime configuration. Runtime callers
+    use load_storage_config, which selects and validates the current Data root.
+    """
     project = Path(project).resolve()
     config = {}
     for name in ("storage.defaults.json", "storage.json"):
@@ -29,6 +33,12 @@ def load_storage_config(project: str | Path, *, data_root: str | Path | None = N
             if "legacy_paths" in values and "legacy_paths" in config:
                 values["legacy_paths"] = {**config["legacy_paths"], **values["legacy_paths"]}
             config.update(values)
+    return config
+
+
+def load_storage_config(project: str | Path, *, data_root: str | Path | None = None) -> dict:
+    """Shared mappings plus optional, untracked machine roots; explicit root wins."""
+    config = read_storage_mapping(project)
     selected = data_root if data_root is not None else os.environ.get("RINKSPACE_DATA_ROOT")
     if selected is not None:
         config["data_root"] = str(selected)

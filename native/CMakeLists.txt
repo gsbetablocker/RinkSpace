@@ -3,6 +3,13 @@ project(rinkspace_core LANGUAGES CXX)
 option(RINKSPACE_ENABLE_CUDA "Build the resident CUDA evaluator/linearization" OFF)
 set(RINKSPACE_CUDSS_ROOT "" CACHE PATH "Existing cuDSS root for the optional native LM candidate")
 add_library(rinkspace_core SHARED src/core_api.cpp)
+# Some localized MSVC/Ninja combinations misdecode /showIncludes and record
+# zero header dependencies. Keep project-header changes explicit so CPU and
+# CUDA cannot silently use different revisions of the shared mathematics.
+file(GLOB_RECURSE RINKSPACE_PUBLIC_HEADERS CONFIGURE_DEPENDS
+  "${CMAKE_CURRENT_SOURCE_DIR}/include/rinkspace/*.h"
+  "${CMAKE_CURRENT_SOURCE_DIR}/include/rinkspace/*.hpp")
+set_property(SOURCE src/core_api.cpp APPEND PROPERTY OBJECT_DEPENDS "${RINKSPACE_PUBLIC_HEADERS}")
 target_include_directories(rinkspace_core PUBLIC include)
 target_compile_features(rinkspace_core PUBLIC cxx_std_17)
 target_compile_definitions(rinkspace_core PRIVATE RINKSPACE_CORE_BUILD)
@@ -29,6 +36,10 @@ if(RINKSPACE_ENABLE_CUDA)
   endif()
 
   set_target_properties(rinkspace_core PROPERTIES CUDA_STANDARD 17 CUDA_STANDARD_REQUIRED YES)
+  set(RINKSPACE_CUDA_FAST_COMPILE "0" CACHE STRING "CUDA device optimizer compile-time tradeoff: 0/min/mid/max")
+  if(NOT RINKSPACE_CUDA_FAST_COMPILE STREQUAL "0")
+    target_compile_options(rinkspace_core PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:--Ofast-compile=${RINKSPACE_CUDA_FAST_COMPILE}>)
+  endif()
   target_compile_options(rinkspace_core PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:--expt-relaxed-constexpr;--fmad=false;--diag-error=20011;--diag-error=20014>)
 endif()
 include(CTest)

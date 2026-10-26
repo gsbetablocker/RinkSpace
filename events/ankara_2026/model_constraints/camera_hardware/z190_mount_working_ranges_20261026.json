@@ -1,0 +1,113 @@
+{
+  "schema": "rinkspace.assistant_camera_working_envelope.v1",
+  "event_id": "ankara_2026",
+  "camera_model": "Sony PXW-Z190",
+  "scope": "Three independently fitted rinkside standing-operator tripod installations; pitch interval below is a first-shot working interval.",
+  "authority": "assistant_engineering_estimate_requested_by_user_20261026",
+  "user_approved_numeric_ranges": false,
+  "manufacturer_calibrated_mount_or_pupil": false,
+  "status": "connected_to_native_gpu_s01_joint_fit_as_assistant_working_estimates",
+  "source_evidence": {
+    "sony_dimensions_url": "https://www.sony.jp/products/catalog/SPC_PXW-Z190.pdf",
+    "sony_dimensions_pdf_sha256": "13543d58632b40699aa6a41fbb83b5f58ef2da28917c37679f2fca5daea09d52",
+    "manufacturer_width_height_depth_mm": [190.0, 202.0, 419.7],
+    "drawing_readout": "The front elevation gives approximately 6 cm from the camera base to lens-axis height by drawing proportion, not an explicitly dimensioned Sony optical-centre measurement. Add the actual mounting plate/head arrangement with a deliberately broad margin.",
+    "actual_event_camera_record": "D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/camera_hardware_20261001/user_same_camera_20261015.json",
+    "actual_event_camera_image_sha256": "8ac55b68ff386c93b54034a6bffd32bef2f44dfff06085e06749a442055a6786",
+    "actual_image_findings": "Compact body, monitor/support and head assembly on an upright tripod beside the board; standing operator. The lower legs and operator floor are occluded; no exact height, axis separation or entrance-pupil position is measured.",
+    "mechanical_reference_image_sha256": "45b1e5b0a2d9b025a809e3bcfa85c731127ad938d175892258329c14aac81414",
+    "mechanical_reference_limit": "The Ostrava photo shows an accessory platform and fluid head; it supports allowing mounting-stack height, but is not an Ankara placement measurement or proof of identical head hardware."
+  },
+  "definitions": {
+    "tilt_axis_reference": "Q: closest point on the head's tilt axis to its pan axis. This is the centre about which the camera nods up/down, not the tripod feet or front lens glass.",
+    "pan_axis_reference": "P: corresponding closest point on the pan axis. P and Q are geometric axis references, not two independently identified screws or bearings. Height is represented once by P; there is no additional free axial height from a physical base to Q.",
+    "offset_frame": "Camera local x=right, y=down, z=forward. Read dimensions with the camera level; these axes rotate with the body.",
+    "reference_projection_centre": "C0 at selected reference focal length. Its precise position is unknown and fitted.",
+    "complete_offset": "R*(C-Q)=d+[0,0,pupil(z)]. The forward interval applies to this sum throughout the shot including row exposures; a bound on d alone is insufficient.",
+    "axis_spacing": "Signed shortest distance between the two axis lines; it is not the vertical height of the head. Axes can intersect with a=0 while the camera lever remains nonzero.",
+    "height_gauge": "For a vertical pan axis, P and Q are at the same height. With a <= 5 cm in magnitude and pan-axis tilt <= 3 degrees, their derived world-height difference is <= 2.62 mm. This is a geometric consequence, not a new fit parameter.",
+    "retracted_proposal": "The assistant's proposal to fit a separate physical-base height and a free base-to-tilt axial height was incorrect: P_base + H*n is exactly redundant. No such parameter was added. Keep the existing 27/31-dimensional native chart."
+  },
+  "working_ranges": {
+    "tilt_axis_height_above_operator_floor_m": {
+      "initial": 1.45,
+      "lower": 1.2,
+      "upper": 1.8,
+      "basis": "Standing-operator event image and earlier rough head-height estimate, widened by the assistant. Each installation independent."
+    },
+    "floor_to_ice_offset": {
+      "status": "not_measured",
+      "assistant_uncertainty_allowance_m": [-0.2, 0.2],
+      "allowance_is_measurement": false,
+      "application": "Include this provisional uncertainty allowance in the single ice-relative Pz interval below. Do not add an independently fitted floor height or head-base height that can cancel Pz. Review the allowance if new floor evidence conflicts with it."
+    },
+    "single_pan_reference_height_above_ice_m": {
+      "initial": 1.45,
+      "lower": 1.0,
+      "upper": 2.0,
+      "basis": "Assistant engineering working envelope: 1.2 to 1.8 m head height above operator floor, widened by a provisional +/-0.2 m floor-to-ice uncertainty allowance. This directly bounds the one existing Pz coordinate; neither component creates another fitted height. Not a surveyed interval."
+    },
+    "complete_tilt_axis_to_projection_centre_camera_m": {
+      "initial_reference": [0.0, -0.15, 0.10],
+      "lower": [-0.05, -0.25, -0.10],
+      "upper": [0.05, -0.08, 0.30],
+      "plain_language_cm": "Left/right +/-5; upward 8 to 25; forward -10 to +30 including zoom. All components remain fitted.",
+      "basis": "Sony body drawing, compact event assembly and allowance for the accessory platform, sliding plate and unknown equivalent pupil. This is a broad working range, not a measured hardware boundary."
+    },
+    "axis_spacing_m": {
+      "initial": 0.0,
+      "lower": -0.05,
+      "upper": 0.05,
+      "basis": "Compact fluid-head geometry; allow either sign and intersecting axes. Exact head model and spacing are not identified."
+    },
+    "zoom_pupil_shift_from_reference_m": {
+      "initial": [0.0, 0.0],
+      "lower": -0.10,
+      "upper": 0.10,
+      "basis": "Assistant provisional compact-optics allowance only. Sony publishes no entrance-pupil curve here. Fit both coefficients and constrain the resulting displacement over the actual continuous zoom range, together with the complete forward offset."
+    },
+    "pan_axis_angle_from_vertical_degrees": {
+      "initial": 0.0,
+      "upper": 3.0,
+      "basis": "Upright levelled tripod seen in the event image; small levelling error remains fitted. This is not a measured three-degree tolerance."
+    },
+    "tilt_axis_angle_from_camera_right_degrees": {
+      "initial": 0.0,
+      "upper": 5.0,
+      "basis": "Camera seated normally on a tilt head with alignment and mounting uncertainty. Axis direction sign is a convention."
+    },
+    "first_shot_optical_axis_elevation_degrees": {
+      "lower": -20.0,
+      "upper": 5.0,
+      "basis": "Rinkside following of skater/ice; negative means down. Apply to the actual optical direction, not a raw Euler-angle chart."
+    },
+    "first_shot_body_roll_degrees": {
+      "lower": -3.0,
+      "upper": 3.0,
+      "basis": "Upright body and near-level broadcast framing; not a command to freeze roll at zero."
+    }
+  },
+  "use_policy": {
+    "fixed_installation_across_shot": true,
+    "three_installations_forced_equal": false,
+    "unknown_installation_axes_lever_spacing_pupil_optics_remain_fitted": true,
+    "working_ranges_may_be_revised_with_recorded_evidence": true,
+    "boundary_hit_requires_model_data_and_identifiability_review": true,
+    "fitted_cost_decrease_is_not_physical_validation": true,
+    "native_parameters_overwritten_by_source_dataset": false,
+    "current_meter_conversion_is_conditional_not_surveyed": true
+  },
+  "geometry_verification": {
+    "tests": "tests/test_camera_mount_geometry.py",
+    "result": "5 passed against the current native library on 20261026",
+    "checked": ["rigid pan around fixed axis through P", "rigid tilt around unchanged line through Q", "P-Q perpendicular to both axes with length abs(a)", "zoom pupil displacement along the actual optical axis", "15 independent mechanical chart columns in a fully excited synthetic trajectory; adding an axial height creates a duplicate column"],
+    "actual_shot_identifiability_or_fit_acceptance_claimed": false
+  },
+  "native_constraint_verification": {
+    "tests": "tests/test_camera_envelope.py",
+    "result": "4 passed against the current native library on 20261026",
+    "checked": ["continuous zoom pupil extrema, including interior quadratic extrema", "complete forward offset includes the pupil shift", "actual optical elevation and body roll", "GPU trial respects the envelope while unrelated optics remain fitted"],
+    "s01_activity_record": "D:/CodexData/RinkSpace_Data/runs/native_joint_s01_20261026/activity_pixels.json",
+    "numeric_ranges_are_user_approved_or_measured": false
+  }
+}

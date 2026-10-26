@@ -48,18 +48,19 @@ def compare(actual,expected,rtol=2e-8,atol=2e-9):
 def system_check(p,layout,blocks,system,step):
     q=p["directions"].shape[2];nl=len(p["local_scales"]);lam=step["summary"]["lambda_used"]
     S=blocks["shared_H"].copy()+lam*np.eye(q);rhs=-blocks["shared_g"].copy();parts=[]
-    for comp in layout["components"]:
+    for ci,comp in enumerate(layout["components"]):
         lb,n,_,_,d,h0,g0=map(int,comp);ids=layout["locals"][lb:lb+n];free=np.flatnonzero(system["blocked"][ids]==0)
         H=blocks["H"][h0:h0+d*d].reshape(d,d);g=blocks["g"][g0:g0+d]
-        B=H[:q,q+free];C=H[np.ix_(q+free,q+free)]+lam*np.eye(len(free))
-        solved=np.linalg.solve(C,np.c_[B.T,g[q+free]]) if len(free) else np.empty((0,q+1))
-        S-=B@solved[:,:q];rhs+=B@solved[:,q]
-        parts.append((ids,free,solved,H,g))
+        cols=g2["component_columns"](layout,ci,q);nq=len(cols)
+        B=H[:nq,nq+free];C=H[np.ix_(nq+free,nq+free)]+lam*np.eye(len(free))
+        solved=np.linalg.solve(C,np.c_[B.T,g[nq+free]]) if len(free) else np.empty((0,nq+1))
+        S[np.ix_(cols,cols)]-=B@solved[:,:nq];rhs[cols]+=B@solved[:,nq]
+        parts.append((ids,free,cols,solved,H,g))
     dq=np.linalg.solve(S,rhs);full=np.r_[dq,np.zeros(nl)]
-    for ids,free,solved,H,g in parts:full[q+ids[free]]=-(solved[:,q]+solved[:,:q]@dq)
+    for ids,free,cols,solved,H,g in parts:full[q+ids[free]]=-(solved[:,len(cols)]+solved[:,:len(cols)]@dq[cols])
     pred=0.
-    for ids,free,solved,H,g in parts:
-        d=np.r_[system["applied"][:q],system["applied"][q+ids]]
+    for ids,free,cols,solved,H,g in parts:
+        d=np.r_[system["applied"][cols],system["applied"][q+ids]]
         pred-=g@d+.5*d@H@d
     return {"reduced_S":compare(system["S"],S),"reduced_rhs":compare(system["rhs"],rhs),
         "full_step":compare(system["step"],full),"prediction":compare(np.array([step["summary"]["predicted_decrease"]]),np.array([pred])),

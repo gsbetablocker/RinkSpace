@@ -131,6 +131,38 @@ def publish_delayed_source_readouts(result, reports, output, video):
             else:raise ValueError('Original revision source ended early')
 
 
+def _validated_sequences(request, scope):
+    """Validate native intervals before loading models or writing frame results."""
+    step = scope['source_clock']['native_pts_step']
+    if type(step) is not int or step <= 0:
+        raise ValueError('Native PTS step must be a positive integer')
+    shots = {shot['id']: shot for shot in scope['shots']}
+    if len(shots) != len(scope['shots']):
+        raise ValueError('Programme scope repeats a shot identity')
+    batches = request['sequences']
+    if not isinstance(batches, list) or not batches:
+        raise ValueError('At least one explicit source sequence is required')
+    selected, intervals = [], {}
+    for batch in batches:
+        shot = shots.get(batch['shot_id'])
+        if shot is None:
+            raise ValueError('Requested shot is absent from the programme scope')
+        start, stop = batch['first_pts'], batch['stop_pts_exclusive']
+        first, limit = shot['processing']['first_pts'], shot['processing']['stop_pts_exclusive']
+        if (type(start) is not int or type(stop) is not int or stop <= start
+                or start < first or stop > limit):
+            raise ValueError('Requested sequence is outside the original shot scope')
+        if (start-first) % step or (stop-first) % step:
+            raise ValueError('Requested sequence must be aligned to original native PTS')
+        intervals.setdefault(shot['id'], []).append((start, stop))
+        selected.append((batch, shot))
+    for ranges in intervals.values():
+        ordered = sorted(ranges)
+        if any(right[0] < left[1] for left, right in zip(ordered, ordered[1:])):
+            raise ValueError('Source sequences overlap and would overwrite the same frame result')
+    return selected
+
+
 def run_source_read(request_path, output):
     import av
     from ..vision import SourceRinkReader, _source_json
@@ -138,24 +170,31 @@ def run_source_read(request_path, output):
     output = guard_project_write(Path(output).resolve())
     output.mkdir(parents=True, exist_ok=True)
     scope = load(request['programme_scope'])
+    sequences = _validated_sequences(request, scope)
     video = Path(scope['source']['registered_path'])
     expected_sha = scope['source']['sha256']
     if file_ref(video)['sha256'] != expected_sha:
         raise ValueError('Original source video hash differs from programme scope')
     clock = str(Fraction(scope['source_clock']['time_base_num'],scope['source_clock']['time_base_den']))
     step = scope['source_clock']['native_pts_step']
-    reader = SourceRinkReader(request['vision_config'], source_reidentification=request.get('source_reidentification'))
+    reader = SourceRinkReader(request['vision_config'], source_reidentification=request.get('source_reidentification'), programme_scope=scope)
     if reader.native_geometry is None:
         raise ValueError('Current native geometry is required by this execution entry')
     geometry_before = reader.native_geometry.refs
+    navigation = None
+    if request.get('navigation') is not None:
+        from ..vision_navigation import NativeNavigation
+        spec = request['navigation']
+        seed_set = Path(spec['seed_set'])
+        if not seed_set.is_absolute():
+            seed_set = Path(request_path).resolve().parent/seed_set
+        navigation = NativeNavigation(reader.native_geometry, seed_set, scope=scope,
+            search_radius_px=spec.get('search_radius_px',24.),
+            sample_spacing_px=spec.get('sample_spacing_px',8.))
     reports = []
     started = time.monotonic()
-    for batch in request['sequences']:
-        shot, = [s for s in scope['shots'] if s['id'] == batch['shot_id']]
+    for batch, shot in sequences:
         start, stop = batch['first_pts'], batch['stop_pts_exclusive']
-        if (type(start) is not int or type(stop) is not int or stop <= start
-                or start < shot['processing']['first_pts'] or stop > shot['processing']['stop_pts_exclusive']):
-            raise ValueError('Requested sequence is outside the original shot scope')
         acceptance = load(batch['acceptance']) if batch.get('acceptance') else None
         decoded = []
         with av.open(str(video)) as container:
@@ -174,17 +213,23 @@ def run_source_read(request_path, output):
                 rgb = frame.to_ndarray(format='rgb24')
                 digest = hashlib.sha256(rgb.tobytes()).hexdigest()
                 binding = dict(source_sha256=expected_sha, source_pts=pts, time_base=clock,
-                    shot_id=shot['id'], installation_id=scope['event_id'], native_hw=list(rgb.shape[:2]),
+                    shot_id=shot['id'], native_hw=list(rgb.shape[:2]),
                     evaluation_role='development', decoded_native_rgb_sha256=digest)
+                from ..source_binding import canonical_source_binding
+                binding = canonical_source_binding(binding, scope)
                 guides, reference, masks = None, None, {}
+                accepted_guides = []
                 if acceptance:
-                    index = (pts-shot['processing']['first_pts'])//step + 1
+                    receipts = [r for r in acceptance['frames'] if r.get('native_pts') == pts]
+                    if len(receipts) != 1:
+                        raise ValueError('Accepted reference requires one exact native PTS receipt')
+                    index = receipts[0]['index']
                     packet_path = Path(batch['packet_directory'])/(str(index).zfill(6)+'.json')
                     binding_path = Path(batch['binding_directory'])/packet_path.name
                     packet, original_binding = load(packet_path), load(binding_path)
                     accepted_guides, reference = accepted_packet_guides(packet, original_binding, acceptance,
                         packet_path=packet_path, binding_path=binding_path, acceptance_path=batch['acceptance'],
-                        source_binding=binding)
+                        source_binding=binding, programme_scope=scope)
                     source = packet['source']
                     if source['decoded_RGB_sha256'] != digest:
                         raise ValueError('Accepted packet differs from the actual decoded native RGB')
@@ -198,9 +243,16 @@ def run_source_read(request_path, output):
                         guides = accepted_guides
                 elif not decoded:
                     guides = []
+                extra_guides, navigation_report = None, None
+                if navigation is not None:
+                    extra_guides, navigation_report = navigation.project(binding)
                 result = reader.read(rgb, binding, guides_2d=guides, reset=not decoded,
                     current_source_masks_by_kind=masks,
-                    extract_source_components=not decoded)
+                    extract_source_components=not decoded,
+                    additional_search_guides=extra_guides,
+                    additional_source_guides=accepted_guides if decoded else None)
+                if navigation_report is not None:
+                    result['native_navigation'] = navigation_report
                 from ..vision_storage import pack_source_record_arrays
                 name = f"{shot['id']}_{pts}"
                 # Reuse the existing lossless array store before JSON conversion.
@@ -208,29 +260,33 @@ def run_source_read(request_path, output):
                     minimum_array_bytes=16384, storage_layout='byte_pool')
                 clean = _source_json(compact)
                 rows = []
-                for reading in clean['guided']['readings']:
+                # The packed record contains sidecar references for large arrays.
+                # Statistics and overlays must consume the original measurements.
+                for reading in result['guided']['readings']:
                     actual = reading.get('coherent_source_uv', reading['actual_source_uv'])
                     valid = reading.get('temporal_flow_supported')
                     rows.append(dict(id=reading.get('expected_id'), primitive=reading.get('primitive'),
                         role=reading.get('physical_role'), read_count=len(actual),
-                        tracked_count=None if valid is None else sum(valid),
+                        tracked_count=None if valid is None else int(sum(_source_json(valid))),
                         queried_count=reading.get('metadata',{}).get('source_point_count'),
                         continuity_status=reading.get('coherent_flags',{}).get('status')))
                 clean['preserved_accepted_reference'] = reference
                 clean['accepted_reference_used_for_guides'] = guides is not None and bool(guides)
+                clean['accepted_reference_used_for_gap_queries'] = bool(decoded and accepted_guides)
+                clean['evaluation_role'] = 'regression' if acceptance else 'development'
                 name = f"{shot['id']}_{pts}"
                 write(output/(name+'.json'), clean)
                 image = Image.fromarray(rgb)
                 draw = ImageDraw.Draw(image)
-                for reading in clean['guided']['readings']:
+                for reading in result['guided']['readings']:
                     # These are measured material samples. The fitted diagnostic
                     # and immutable native scene remain separately identifiable.
-                    for u,v in reading.get('coherent_source_uv', reading['actual_source_uv']):
+                    for u,v in _source_json(reading.get('coherent_source_uv', reading['actual_source_uv'])):
                         draw.ellipse((u-2,v-2,u+2,v+2),fill=(255,180,0))
-                near=clean.get('near_board',{})
+                near=result.get('near_board',{})
                 near_count=sum(r.get('source_point_count',0) for r in near.get('readings',[]))
                 for reading in near.get('readings',[]):
-                    for u,v in reading.get('actual_source_uv',[]):
+                    for u,v in _source_json(reading.get('actual_source_uv',[])):
                         draw.ellipse((u-2,v-2,u+2,v+2),fill=(0,220,80))
                 image.save(output/(name+'.png'))
                 report = dict(shot_id=shot['id'], source_pts=pts, source_time_seconds=float(pts*Fraction(clock)),
@@ -241,6 +297,9 @@ def run_source_read(request_path, output):
                     near_board_source_reader=near.get('source_reader'),
                     near_board_excluded_pixels=near.get('exclusion_pixel_count',0),
                     source_feedback=clean['source_feedback'],
+                    navigation_dispatch=clean.get('navigation_dispatch'),
+                    navigation_query_points=(navigation_report['query_point_count']
+                                             if navigation_report is not None else 0),
                     source_reidentification={key:clean['source_reidentification'].get(key) for key in
                         ('status','verified_physical_ids','guide_count','native_path_ids','board_search')} if clean.get('source_reidentification') else None,
                     native_geometry=clean['native_geometry'], result=name+'.json', image=name+'.png')
@@ -252,10 +311,13 @@ def run_source_read(request_path, output):
         if len(decoded)*step != stop-start:
             raise ValueError('Source sequence ended before requested native PTS')
     reader.native_geometry.assert_unchanged()
+    if navigation is not None:
+        navigation.assert_unchanged()
     receipt = dict(schema='rinkspace.continuous_source_reader_run.v1',request=file_ref(request_path),
         programme_scope=file_ref(request['programme_scope']), required_shots=scope['required_shot_ids'],
         validated_frames=len(reports), frames=reports, model_usage=reader.vision.model_usage(),
         native_geometry_refs=geometry_before, native_geometry_unchanged=True,
+        navigation_refs=navigation.refs if navigation is not None else [],
         original_source_UV_and_acceptance_files_modified=False,
         full_programme_accuracy_accepted=False, fit_executed=False,
         elapsed_seconds=time.monotonic()-started)

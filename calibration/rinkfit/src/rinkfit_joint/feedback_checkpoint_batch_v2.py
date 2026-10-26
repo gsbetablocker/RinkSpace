@@ -1,7 +1,7 @@
 """Versioned exact-source collector writing lossless interned task documents."""
 from pathlib import Path
 import hashlib
-from .feedback_checkpoint_batch_v1 import collect_findings,batch_class,infer_context,_store,_ref,checkpoint_receipt_path
+from .feedback_checkpoint_batch_v1 import PROJECT,collect_findings,batch_class,infer_context,_store,_ref,checkpoint_receipt_path
 from .feedback_checkpoint_batch_v1 import CheckpointObserver as _FrozenObserver
 from .io_utils import write_json
 from . import feedback_task_codec_v1 as task_codec

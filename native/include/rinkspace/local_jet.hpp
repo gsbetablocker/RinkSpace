@@ -14,8 +14,14 @@ RS_HD inline LocalJet operator-(LocalJet a){return LocalJet(-a.a,-a.v);}
 RS_HD inline bool operator<(LocalJet a,LocalJet b){return a.a<b.a;}RS_HD inline bool operator>(LocalJet a,LocalJet b){return a.a>b.a;}
 RS_HD inline bool operator<=(LocalJet a,LocalJet b){return a.a<=b.a;}RS_HD inline bool operator>=(LocalJet a,LocalJet b){return a.a>=b.a;}
 RS_HD inline LocalJet sin(LocalJet x){return LocalJet(::sin(x.a),::cos(x.a)*x.v);}RS_HD inline LocalJet cos(LocalJet x){return LocalJet(::cos(x.a),-::sin(x.a)*x.v);}
-RS_HD inline LocalJet sqrt(LocalJet x){double y=::sqrt(x.a),scale=.5/y;return LocalJet(y,x.v*scale);}RS_HD inline LocalJet exp(LocalJet x){double y=::exp(x.a);return LocalJet(y,y*x.v);}
-RS_HD inline LocalJet pow(LocalJet x,LocalJet p){double y=::pow(x.a,p.a),dx=p.a*::pow(x.a,p.a-1.),dp=y*::log(x.a);return LocalJet(y,dx*x.v+dp*p.v);}
+RS_HD inline LocalJet sqrt(LocalJet x){double y=::sqrt(x.a);return LocalJet(y,x.v==0?0.:x.v*.5/y);}RS_HD inline LocalJet exp(LocalJet x){double y=::exp(x.a);return LocalJet(y,y*x.v);}
+RS_HD inline LocalJet pow(LocalJet x,LocalJet p){double y=::pow(x.a,p.a),dx=p.a*::pow(x.a,p.a-1.),dp=(x.a==0&&p.a>0)?0.:y*::log(x.a);return LocalJet(y,(x.v==0?0.:dx*x.v)+(p.v==0?0.:dp*p.v));}
+RS_HD inline bool operator==(LocalJet a,LocalJet b){return a.a==b.a;}
+RS_HD inline bool operator!=(LocalJet a,LocalJet b){return a.a!=b.a;}
+RS_HD inline double primal(LocalJet x){return x.a;}
+RS_HD inline LocalJet fmod(LocalJet x,LocalJet y){return {::fmod(x.a,y.a),x.v-::trunc(x.a/y.a)*y.v};}
+RS_HD inline LocalJet expm1(LocalJet x){return {::expm1(x.a),::exp(x.a)*x.v};}
+RS_HD inline LocalJet log(LocalJet x){return LocalJet(::log(x.a),x.v/x.a);}
 RS_HD inline LocalJet abs(LocalJet x){return x.a<0?-x:x;}RS_HD inline bool isfinite(LocalJet x){return finite_scalar(x.a)&&finite_scalar(x.v);}
 RS_HD inline bool finite_scalar(LocalJet x){return finite_scalar(x.a)&&finite_scalar(x.v);}
 }

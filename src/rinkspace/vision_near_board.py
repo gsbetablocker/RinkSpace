@@ -64,13 +64,16 @@ def configured_near_evidence():
 
 
 def read_near_board(rgb, binding, *, gray_history=None, guides=(), person_mask=None, qualified_generation=None):
-    """Use the retained material readers, not a second geometry or neural class edge."""
-    evidence = configured_near_evidence()
-    gray_history = gray_history or evidence.get('gray_history')
+    """Read current pixels using only explicitly selected historical evidence.
+
+    The generic reader must not open another configuration's event or Data
+    paths. SourceRinkReader passes its selected evidence; missing explicit
+    references continue to fail their existing identity/hash checks.
+    """
     image = np.ascontiguousarray(rgb[...,::-1])
     from .vision_near_board_qualified import reread_qualified_near_board
     qualified = reread_qualified_near_board(image, binding,
-        qualified_generation or evidence.get('official_gray_generation'), person_mask=person_mask)
+        qualified_generation, person_mask=person_mask)
     if qualified is not None:
         return dict(qualified, source_binding=dict(binding),
             decoded_native_RGB_sha256=hashlib.sha256(rgb.tobytes()).hexdigest(),

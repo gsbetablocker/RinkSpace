@@ -141,6 +141,58 @@ def validate_current_noise_groups(groups, members, weights, arrays):
     return result
 
 
+def validate_current_stations(features, arrays, rows):
+    """Validate auxiliary material identities and their evidence closure.
+
+    A shared local index denotes the same material coordinate across exposures.
+    It cannot silently join different curves, disjoint finite supports or a
+    fitting row with a held-out row. No local state or source row is rewritten.
+    """
+    rows = np.asarray(rows, dtype=np.int64)
+    n = len(arrays['pts'])
+    local = arrays['local_index']
+    support = arrays['support']
+    require(local.dtype.str == '<i8' and local.shape == (n,),
+            'Station identities must be a native int64 vector')
+    require(support.dtype.str == '<f8' and support.shape == (n, 2),
+            'Station support must be a float64 [N,2] array')
+    require(np.isfinite(support[rows]).all(), 'Nonfinite station support')
+    fixed = rows[arrays['kind'][rows] == 0]
+    curves = rows[arrays['kind'][rows] == 1]
+    require(np.all(local[fixed] == -1) and np.all(support[fixed] == 0),
+            'Fixed material points cannot acquire per-observation stations')
+    require(np.all(local[curves] >= 0), 'Finite curves require nonnegative station identities')
+    require(np.all(support[curves, 0] <= support[curves, 1]), 'Reversed finite curve support')
+    support_kind = arrays.get('support_kind', np.zeros(n, dtype='u1'))
+    # Include the complete identity closure if a selected row owns the station.
+    # Selecting one shot cannot conceal a conflicting split in another shot.
+    order = np.argsort(local, kind='stable')
+    sorted_local = local[order]
+    boundaries = np.r_[0, np.flatnonzero(np.diff(sorted_local)) + 1, n]
+    starts, stops = boundaries[:-1], boundaries[1:]
+    shared = (stops-starts) > 1
+    starts, stops = starts[shared], stops[shared]
+    selected = np.isin(sorted_local[starts], local[curves])
+    for start, stop in zip(starts[selected], stops[selected]):
+        identity = sorted_local[start]
+        members = order[start:stop]
+        feature_keys = {features[int(i)].get('canonical_geometry_id',
+                        features[int(i)].get('path_id', features[int(i)]['id']))
+                        for i in arrays['feature_index'][members]}
+        require(len(feature_keys) == 1, 'Shared station refers to different feature paths',
+                local_index=int(identity))
+        kinds = np.unique(support_kind[members])
+        require(len(kinds) == 1, 'Shared station mixes finite and periodic coordinates',
+                local_index=int(identity))
+        if kinds[0] == 0:
+            require(np.isfinite(support[members]).all() and
+                    np.max(support[members, 0]) <= np.min(support[members, 1]),
+                    'Shared station has incompatible finite supports', local_index=int(identity))
+        if 'split' in arrays:
+            require(len(np.unique(arrays['split'][members])) == 1,
+                    'Shared material evidence closure crosses data split', local_index=int(identity))
+
+
 def validate_current_observation_row(record, row, arrays, *, sources=None, shots=None, noise_groups=None):
     """Bind explicit current metadata to its numerical row without remeasurement.
 
@@ -259,9 +311,18 @@ def load_prepared(prepared_dir, *, purpose="fit", core=None):
     root = Path(prepared_dir).resolve()
     manifest = read_json(root / "manifest.json")
     require(manifest.get("schema") == "rinkspace.prepared.v1", "Unknown prepared format")
-    arrays = {key: load_array(root, desc) for key, desc in manifest["arrays"].items()}
-    require(purpose in {"fit", "review"}, "Unknown prepared consumer purpose")
-    if purpose == "fit":
+    # These are the current prepared inputs, not historical producers. Reading
+    # altered bytes under an unchanged revision would invalidate every later
+    # state/prepared identity check, including read-only source overlays.
+    arrays = {key: load_array(root, desc, verify=True) for key, desc in manifest["arrays"].items()}
+    for source in manifest.get('sources', []):
+        load_array(root, source['pts_ref'], verify=True)
+    require(purpose in {"fit", "review", "camera_navigation"}, "Unknown prepared consumer purpose")
+    allowed = manifest.get('model_configuration', {}).get('allowed_use')
+    if allowed is not None and purpose != 'review':
+        require(purpose in allowed or (purpose == 'fit' and 'geometry_fit' in allowed),
+                'Prepared engineering weights do not authorize this consumer purpose')
+    if purpose in ("fit", "camera_navigation"):
         from .prepare import validate_current_feature_contracts
         if 'noise_groups' in manifest:
             require('noise_group_members' in arrays and 'noise_group_weights' in arrays,

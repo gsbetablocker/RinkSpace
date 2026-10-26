@@ -95,6 +95,49 @@ def test_mask_remains_specific_to_its_guide_and_flow_support_is_preserved():
     assert visible['source_indices'].tolist() == list(range(8))
 
 
+@pytest.mark.parametrize('verified', [True,False])
+def test_current_paired_face_extends_only_verified_runs_and_rereads_rgb(verified):
+    import hashlib
+    from rinkspace.vision_board_reader import read_connected_board_gaps
+    rgb,binding,_,_,authority=material_case()
+    points=np.c_[np.arange(15.,185.,5),np.full(34,32.)]
+    bottom=points.copy();bottom[:,1]=105.
+    scene=dict(path='current_native',sha256='b'*64)
+    def lookup(name):
+        if 'top' in name:return dict(id='board/continuous/top',layer='board',label='board.top')
+        if 'bottom' in name or 'foot' in name:return dict(id='board/continuous/bottom',layer='board',label='board.bottom')
+    def bind(items):
+        return [dict(g,primitive='free_curve',physical_role='board_top_edge' if g['kind']=='board_top' else 'ice_board_contact',
+            native_geometry=dict(path_id=g['id'],scene=scene)) for g in items],dict(unresolved=[])
+    geometry=SimpleNamespace(lookup=lookup,bind=bind)
+    guides=[];rows=[]
+    for name,kind,uv in (('top','board_top',points),('foot','ice_contact',bottom)):
+        guides.append(dict(id=name,kind=kind,points_uv=uv[:2].copy(),source_binding=binding,
+            source_board_view='front_face',identity_confirmed=verified,
+            identity_authority={'kind':'actual_source_identity'} if verified else None))
+        rows.append(dict(expected_id=name,physical_id=name if verified else None,
+            actual_source_uv=torch.tensor(uv[:2]),source_indices=torch.arange(2)))
+    originals=[r['actual_source_uv'].clone() for r in rows]
+    excluded=np.zeros(rgb.shape[:2],bool);excluded[:,80:105]=True
+    packet=dict(source=dict(binding,decoded_BGR_sha256=hashlib.sha256(rgb[:,:,::-1].copy().tobytes()).hexdigest()),
+        boundary_candidates=[dict(candidate_id='paired_run',blue_upper_uv=points,yellow_lower_uv=bottom)])
+    face=dict(regions=[dict(candidate_id='paired_run',named_source_boundaries=dict(board_top=['top'],ice_contact=['foot']))])
+    result=read_connected_board_gaps(rgb,binding,guides,dict(readings=rows),source_packet=packet,
+        face_receipt=face,geometry=geometry,authority=authority,
+        feedback=SimpleNamespace(material_authority=lambda a:a),prediction=None,classes=(),device='cpu',exclusion=excluded)
+    for old,row in zip(originals,rows):torch.testing.assert_close(old,row['actual_source_uv'])
+    if not verified:
+        assert result['added_query_count']==0 and len(rows)==2
+        return
+    assert result['added_query_count']==2 and result['added_actual_point_count']>0
+    for row in rows[2:]:
+        uv=row['actual_source_uv']
+        assert not ((uv[:,0]>=80)&(uv[:,0]<105)).any()
+        # Search positions y=32/105 are not copied as measured interfaces.
+        assert not torch.allclose(uv[:,1],torch.full_like(uv[:,1],32. if row['kind']=='board_top' else 105.))
+        assert row['identity_authority']['human_pixel_acceptance'] is False
+
+
 @pytest.mark.parametrize('invalid', ['missing_binding', 'different_pts', 'wrong_shape', 'not_boolean'])
 def test_material_exclusion_requires_current_native_frame(invalid):
     case = material_case(mask=torch.ones((1, 1, 140, 200), dtype=torch.bool))
@@ -135,7 +178,8 @@ def test_real_grey_deck_is_excluded_through_advertisement_reread_entry():
     uv = np.array([[149., 900.]], np.float32)
     packet = dict(source_binding=binding, instances=[dict(kind='advertisement_panel',
         region_mask=np.ones(rgb.shape[:2], bool), boundary_readings=[dict(actual_source_uv=uv, source_indices=np.array([0]))])])
-    result = reread_source_advertisements(rgb, packet, SimpleNamespace(reread_rgb=True))
+    result = reread_source_advertisements(rgb, packet, SimpleNamespace(reread_rgb=True),
+        near_board_evidence=cfg["near_board_source_evidence"])
     assert result['near_board_ad_exclusion']['exclusion_pixel_count'] == 112313
     assert len(result['instances'][0]['boundary_readings'][0]['actual_source_uv']) == 0
     assert not result['instances'][0]['region_mask'][900, 149]

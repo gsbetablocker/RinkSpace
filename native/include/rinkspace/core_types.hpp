@@ -17,8 +17,8 @@ template<class T> struct Vec3Value { T x,y,z; };
 template<class T> struct Vec2Value { T x,y; };
 template<class T> struct Mat3Value { T a[9]; };
 using Vec3=Vec3Value<double>;using Vec2=Vec2Value<double>;using Mat3=Mat3Value<double>;
-template<class T> RS_HD inline Vec3Value<T> scalar_cast(Vec3 p){return {T(p.x),T(p.y),T(p.z)};}
-template<class T> RS_HD inline Mat3Value<T> scalar_cast(const Mat3& p){Mat3Value<T> r{};for(int i=0;i<9;++i)r.a[i]=T(p.a[i]);return r;}
+template<class T,class U> RS_HD inline Vec3Value<T> scalar_cast(Vec3Value<U> p){return {T(p.x),T(p.y),T(p.z)};}
+template<class T,class U> RS_HD inline Mat3Value<T> scalar_cast(const Mat3Value<U>& p){Mat3Value<T> r{};for(int i=0;i<9;++i)r.a[i]=T(p.a[i]);return r;}
 template<class T> RS_HD inline Vec3Value<T> add(Vec3Value<T> a,Vec3Value<T> b){return {a.x+b.x,a.y+b.y,a.z+b.z};}
 template<class T> RS_HD inline Vec3Value<T> sub(Vec3Value<T> a,Vec3Value<T> b){return {a.x-b.x,a.y-b.y,a.z-b.z};}
 template<class S,class T> RS_HD inline Vec3Value<T> mul(S s,Vec3Value<T> a){return {s*a.x,s*a.y,s*a.z};}
@@ -41,13 +41,14 @@ RS_HD inline bool finite_scalar(double value){
 #endif
 }
 template<class T> RS_HD inline bool finite(Vec3Value<T> p){return finite_scalar(p.x)&&finite_scalar(p.y)&&finite_scalar(p.z);}
-RS_HD inline bool finite_array(const double* p,std::size_t n){
+template<class T> RS_HD inline bool finite_array(const T* p,std::size_t n){
     if(!p)return false;
     for(std::size_t i=0;i<n;++i)if(!finite_scalar(p[i]))return false;
     return true;
 }
-RS_HD inline Vec3 load3(const double* p){return {p[0],p[1],p[2]};}
-RS_HD inline void store3(double* p,Vec3 v){p[0]=v.x;p[1]=v.y;p[2]=v.z;}
+template<class T> RS_HD inline Vec3Value<T> load3(const T* p){return {p[0],p[1],p[2]};}
+template<class T> RS_HD inline void store3(T* p,Vec3Value<T> v){p[0]=v.x;p[1]=v.y;p[2]=v.z;}
+RS_HD inline double primal(double x){return x;}
 inline bool valid_rotation(const Mat3& r){
     if(!finite_array(r.a,9))return false;
     for(int i=0;i<3;++i)for(int j=i;j<3;++j){

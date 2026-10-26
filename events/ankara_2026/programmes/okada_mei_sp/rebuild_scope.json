@@ -2,9 +2,21 @@
   "schema": "rinkspace.rebuild.programme_scope.v1",
   "event_id": "ankara_2026",
   "programme_id": "okada_mei_sp",
-  "recorded_local_date": "2026-10-24",
+  "recorded_local_date": "2026-10-26",
   "status": "required_scope_not_fit_acceptance",
-  "authority": "latest_user_instruction_requires_all_nine_shots; existing_source_inventory_preserves_explicit_tail_exclusion",
+  "authority": "user_20261026_requires_demo_timer_start_for_current_and_future_nine_shot_fitting_and_analysis; existing_tail_exclusion_preserved",
+  "analysis_start": {
+    "first_pts": 283136,
+    "source_seconds": 22.12,
+    "time_base_num": 1,
+    "time_base_den": 12800,
+    "applies_to": "all nine shots: fitting, grid deliverables and programme analysis",
+    "selection_basis": "explicit user choice of the existing demo programme timer zero",
+    "demo_reference": "outro_stats.json#/statistics/clock",
+    "demo_code_reference": "calibration/program_tracking/demo_outro_stats.py#PROGRAMME_START_SOURCE_SECONDS",
+    "before_start_policy": "retain original media, observations and historical results; exclude observations before first_pts from fitting",
+    "physical_shot_boundaries_unchanged": true
+  },
   "source": {
     "id": "O6j8L8TmfKo",
     "url": "https://www.youtube.com/watch?v=O6j8L8TmfKo",
@@ -34,11 +46,11 @@
   ],
   "required_shot_count": 9,
   "processing_scope": {
-    "first_pts": 256256,
+    "first_pts": 283136,
     "last_pts": 2415104,
     "stop_pts_exclusive": 2415360,
-    "native_frame_count": 8434,
-    "first_source_time": "00:00:20.020",
+    "native_frame_count": 8329,
+    "first_source_time": "00:00:22.120",
     "last_source_time": "00:03:08.680",
     "stop_source_time_exclusive": "00:03:08.700"
   },
@@ -58,11 +70,11 @@
       "rig_id": "main",
       "rig_binding_status": "existing_registered_assignment_not_new_visual_confirmation",
       "processing": {
-        "first_pts": 256256,
+        "first_pts": 283136,
         "last_pts": 575488,
         "stop_pts_exclusive": 575744,
-        "native_frame_count": 1248,
-        "first_source_time": "00:00:20.020",
+        "native_frame_count": 1143,
+        "first_source_time": "00:00:22.120",
         "last_source_time": "00:00:44.960"
       },
       "physical": {

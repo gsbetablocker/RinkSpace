@@ -269,11 +269,96 @@ class ActualIceSourceGuideTracker:
         self.supports=supports;self.previous={k:v for k,v in self.current.items() if k not in ('measurement','readout_prefix')};self.current=None
 
 
-def _append_guided_readouts(rgb,measurement,mask,inventory,points,normals,intervals,curves,q_guide,references,*,guides,profile_backend):
+def _candidate_excluded(mask, uv, sides, normal, quantiles=None):
+    """Check both the raw readout and the exact q50 used by later graph nodes."""
+    if any(_candidate_context_excluded(mask,p,normal) for p in (uv,*sides)):
+        return True
+    if quantiles is not None:
+        fine=np.asarray(quantiles,float)[:,1]
+        if np.isfinite(fine).all():
+            delta=fine[1]-fine[0];width=np.linalg.norm(delta)
+            final_normal=delta/width if width>1e-6 else normal
+            return any(_candidate_context_excluded(mask,p,final_normal) for p in (fine.mean(0),*fine))
+    return False
+
+
+def _scoped_clearance_mask(mask, protected, cleared_global, proof):
+    """A source proof clears only its own global context, never guide vetoes."""
+    from .vision_ice_local_clearance import _context_pixels
+    context=proof['current_complete_material_context']
+    interval=np.asarray(context['normal_interval_px'],float)
+    if (interval.shape!=(2,) or not np.isfinite(interval).all() or interval[1]<=0
+            or interval[0]!=-interval[1] or context['tangent_interval_px']!=[-3,3]):
+        raise ValueError('Local clearance has an unsupported source context')
+    pixels=_context_pixels(np.asarray(context['source_center_uv'],float),
+        np.asarray(context['source_normal'],float),float(interval[1]))
+    if (len(pixels)!=context['actual_native_context_pixel_count'] or
+            hashlib.sha256(pixels.tobytes()).hexdigest()!=context['actual_native_context_pixel_indices_sha256']
+            or not ((pixels>=0).all(1)&(pixels<[mask.shape[1],mask.shape[0]]).all(1)).all()):
+        raise ValueError('Local clearance source context identity differs')
+    x,y=pixels.T
+    allowed=cleared_global[y,x]&~protected[y,x]
+    result=mask.copy()
+    result[y[allowed],x[allowed]]=False
+    return result
+
+
+def apply_query_exclusions(measurement, exclusion_mask, *, query_guide_indices, guide_exclusion_masks,
+        guide_protected_masks=None, cleared_global_mask=None):
+    """Keep each query's own mask in force before identity/temporal propagation.
+
+    Guide masks are the final current-frame masks assembled by the source
+    reader, including its explicitly reviewed visibility exceptions. The
+    default mask applies only to queries without such an owner. This function
+    adds exclusion flags; it never clears an existing flag or changes UV. A
+    same-candidate source clearance can retire global pixels only within its
+    verified context; separately retained guide/surface masks always survive,
+    including where their pixels overlap the original global exclusion.
+    """
+    mask=np.asarray(exclusion_mask,bool)
+    owners=np.asarray(query_guide_indices,np.int64)
+    if owners.shape!=(len(measurement['query_curve']),):
+        raise ValueError('Source query mask ownership has a different length')
+    masks={int(k):np.asarray(v) for k,v in guide_exclusion_masks.items()}
+    if any(v.dtype!=np.bool_ or v.shape!=mask.shape for v in masks.values()):
+        raise ValueError('Guide exclusions must be boolean masks at native resolution')
+    protected={} if guide_protected_masks is None else {int(k):np.asarray(v) for k,v in guide_protected_masks.items()}
+    if any(v.dtype!=np.bool_ or v.shape!=mask.shape for v in protected.values()):
+        raise ValueError('Protected guide exclusions must be boolean masks at native resolution')
+    cleared=None if cleared_global_mask is None else np.asarray(cleared_global_mask)
+    if cleared is not None and (cleared.dtype!=np.bool_ or cleared.shape!=mask.shape):
+        raise ValueError('Global source clearance must be a boolean mask at native resolution')
+    flags=np.asarray(measurement['candidate_flags']).copy()
+    queries=np.asarray(measurement['candidate_query'])
+    quantiles=measurement.get('candidate_side_quantiles_uv')
+    for candidate,qi in enumerate(queries):
+        owner=int(owners[qi]);current=masks.get(owner,mask)
+        proof=measurement.get('candidate_local_source_clearance',{}).get(candidate)
+        if cleared is not None and proof is not None:
+            binding=measurement['source_binding']
+            if (proof.get('original_candidate_index')!=candidate or
+                    proof.get('kind')!='known_static_ice_material_visible_inside_primary_detector_box' or
+                    proof.get('only_primary_box_context_exclusion_removed') is not True or
+                    any(str(proof.get(k))!=str(binding.get(k)) for k in ('source_sha256','time_base','shot_id')) or
+                    proof.get('actual_pts')!=int(binding.get('actual_pts',binding['source_pts']))):
+                raise ValueError('Local clearance does not belong to this source candidate')
+            current=_scoped_clearance_mask(current,protected.get(owner,current),cleared,proof)
+        fine=None if quantiles is None else quantiles[candidate]
+        if _candidate_excluded(current,measurement['candidate_uv'][candidate],
+                measurement['candidate_sides'][candidate],measurement['query_normal'][qi],fine):
+            flags[candidate]|=np.uint8(2)
+    measurement['candidate_flags']=flags
+    return measurement
+
+
+def _append_guided_readouts(rgb,measurement,mask,inventory,points,normals,intervals,curves,q_guide,references,*,guides,profile_backend,guide_exclusion_masks=None):
     result=dict(measurement);oldq=len(measurement['query_curve']);oldc=len(measurement['candidate_uv'])
     binding=measurement['source_binding'];digest=hashlib.sha256(np.asarray(rgb).tobytes()).hexdigest()
     if measurement['decoded_native_RGB_sha256']!=digest:raise ValueError('Guide overlay must read this native presentation RGB')
     if mask.shape!=np.asarray(rgb).shape[:2]:raise ValueError('Native guide profile mask dimensions differ')
+    guide_masks={} if guide_exclusion_masks is None else {int(k):np.asarray(v) for k,v in guide_exclusion_masks.items()}
+    if any(v.dtype!=np.bool_ or v.shape!=mask.shape for v in guide_masks.values()):
+        raise ValueError('Guide exclusions must be boolean masks at native resolution')
     statuses=np.full(len(points),STATUS['physical_role_unresolved'],np.uint8)
     added={key:[] for key in ('candidate_uv','candidate_sides','candidate_query','candidate_flags','candidate_side_quantiles_uv')}
     if len(points):
@@ -286,12 +371,13 @@ def _append_guided_readouts(rgb,measurement,mask,inventory,points,normals,interv
         else:raise ValueError('Source guide profile backend must be cpu or cuda')
         for qi in range(len(points)):
             role=inventory[int(curves[qi])];take=valid[qi]
+            current_mask=guide_masks.get(int(q_guide[qi]),mask)
             operator='paint_center' if role['operator']=='unresolved' else role['operator']
             values=_actual_profile_candidates(points[qi],normals[qi],offsets[qi,take],profiles[qi,take],smoothed[qi,take],
                 operator=operator,signal=role['material_signal'],transition=role.get('material_transition'),with_quantiles=True)
             clean=0
             for uv,sides,bad,quantiles in values:
-                excluded=any(_candidate_context_excluded(mask,p,normals[qi]) for p in (uv,*sides))
+                excluded=_candidate_excluded(current_mask,uv,sides,normals[qi],quantiles)
                 added['candidate_uv'].append(uv);added['candidate_sides'].append(sides)
                 added['candidate_query'].append(oldq+qi);added['candidate_flags'].append(int(bad)|(int(excluded)<<1)|(int(len(values)>1)<<2)|8)
                 added['candidate_side_quantiles_uv'].append(quantiles);clean+=not bad and not excluded
@@ -339,11 +425,13 @@ def _append_guided_readouts(rgb,measurement,mask,inventory,points,normals,interv
 
 
 def read_actual_source_query_profiles(rgb, binding, inventory, points, normals, intervals, curves,
-        exclusion_mask, *, query_guide_indices=None, profile_backend='cpu'):
+        exclusion_mask, *, query_guide_indices=None, guide_exclusion_masks=None, profile_backend='cpu'):
     """Public adapter for native-bound image queries; reuse the existing q50 reader.
 
     The inventory supplies measurement semantics only. Queries are current image
     navigation, never observations. No old scene or camera is loaded here.
+    Optional guide masks are the final per-guide native visibility masks; one
+    guide's exclusions must never become another guide's veto.
     """
     points=np.asarray(points,np.float64).reshape(-1,2)
     normals=np.asarray(normals,np.float64).reshape(-1,2)
@@ -367,4 +455,4 @@ def read_actual_source_query_profiles(rgb, binding, inventory, points, normals, 
     query_guide_indices=np.full(len(points),-1,np.int32) if query_guide_indices is None else np.asarray(query_guide_indices,np.int32)
     if query_guide_indices.shape!=(len(points),):raise ValueError('Source query provenance has a different length')
     return _append_guided_readouts(rgb,empty,np.asarray(exclusion_mask,bool),inventory,points,normals,intervals,curves,
-        query_guide_indices,[],guides=(),profile_backend=profile_backend)
+        query_guide_indices,[],guides=(),profile_backend=profile_backend,guide_exclusion_masks=guide_exclusion_masks)

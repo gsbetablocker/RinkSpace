@@ -85,6 +85,9 @@ class NativeCore:
         # Additive capabilities preserve loading of historical ABI2 libraries.
         optional = {
             "rs_evaluate_motion_camera": [D,N,D,N,c.c_double,c.c_double,D,N,D,N,I,N],
+            "rs_evaluate_motion_kinematics": [D,N,c.c_double,c.c_double,D,N,D,N,I,N],
+            "rs_motion_derivative_extrema": [D,N,c.c_double,c.c_double,c.c_double,c.c_double,D,N],
+            "rs_camera_envelope_evaluate": [D,N,D,N,c.c_double,D,N,D,N],
             "rs_sample_print_deformed_material_path": [D,N,D,N,D,N,D,N,D,N,D,N,D,N,I,N],
             "rs_sample_print_analytic_material_path": [D,N,c.c_int,c.c_int,c.c_int,D,N,D,N,D,N,D,N,I,N],
             "rs_ice_board_junction": [D,N,D,N,c.c_double,c.c_int,D,N],
@@ -208,6 +211,47 @@ class NativeCore:
         self._call("rs_decode_d78_camera", _d(chart), len(chart), out, 38)
         return list(out)
 
+    def evaluate_camera_envelope(self, rig, controls, first_control_time, control_dt, limits):
+        """Exact native continuous envelope diagnostic; this never changes state."""
+        import numpy as np
+        physical=np.ascontiguousarray(rig,np.float64);coefficients=np.ascontiguousarray(controls,np.float64)
+        bounds=np.ascontiguousarray(limits,np.float64)
+        if physical.shape not in ((38,),(43,)) or coefficients.ndim!=2 or coefficients.shape[1]!=3 or bounds.shape not in ((10,),(19,),(21,)):
+            raise ValueError("envelope requires rig[38/43], controls[M,3], limits[10/19/21]")
+        out=np.empty(8,np.float64)
+        self._call("rs_camera_envelope_evaluate",physical.ctypes.data_as(D),physical.size,
+            coefficients.ctypes.data_as(D),len(coefficients),float(control_dt),bounds.ctypes.data_as(D),bounds.size,out.ctypes.data_as(D),out.size)
+        return dict(margin=float(out[0]),kind=int(out[1]),cell=int(out[2]),u=float(out[3]),
+            time=float(first_control_time+(out[2]+out[3])*control_dt),channel=int(out[4]),
+            derivative_order=int(out[5]),limit=float(out[6]),derivative=float(out[7]))
+
+    def motion_derivative_extrema(self, controls, first_control_time, control_dt, interval):
+        """Exact continuous speed/acceleration/jerk maxima, with native times and cells."""
+        import numpy as np
+        coefficients=np.ascontiguousarray(controls,np.float64);span=np.asarray(interval,np.float64)
+        if coefficients.ndim!=2 or coefficients.shape[1]!=3 or span.shape!=(2,):
+            raise ValueError("derivative extrema require controls[M,3] and interval[2]")
+        out=np.full((3,3,3),np.nan)
+        self._call("rs_motion_derivative_extrema",coefficients.ctypes.data_as(D),len(coefficients),
+            float(first_control_time),float(control_dt),float(span[0]),float(span[1]),out.ctypes.data_as(D),out.size)
+        return dict(value=out[:,:,0],time=out[:,:,1],cell=out[:,:,2].astype(np.int32))
+
+    def evaluate_motion_kinematics(self, controls, first_control_time, control_dt, times):
+        """Read the native trajectory and its analytic time derivatives, without smoothing."""
+        import numpy as np
+        if not hasattr(self._lib, "rs_evaluate_motion_kinematics"):
+            raise ValueError("native library lacks trajectory derivative diagnostics")
+        coefficients=np.ascontiguousarray(controls,dtype=np.float64)
+        requested=np.atleast_1d(np.asarray(times,dtype=np.float64))
+        if coefficients.ndim!=2 or coefficients.shape[1]!=3 or requested.ndim!=1:
+            raise ValueError("kinematics requires controls[M,3] and scalar or times[N]")
+        requested=np.ascontiguousarray(requested);out=np.full((len(requested),4,3),np.nan,np.float64)
+        status=np.empty(len(requested),np.int32)
+        self._call("rs_evaluate_motion_kinematics",coefficients.ctypes.data_as(D),len(coefficients),
+            float(first_control_time),float(control_dt),requested.ctypes.data_as(D),len(requested),
+            out.ctypes.data_as(D),out.size,status.ctypes.data_as(I),len(status))
+        return dict(values=out,position=out[:,0],velocity=out[:,1],acceleration=out[:,2],jerk=out[:,3],status=status)
+
     def evaluate_motion_camera(self, rig, controls, first_control_time, control_dt, times):
         """Evaluate the same native camera at explicit spline times.
 
@@ -221,7 +265,7 @@ class NativeCore:
         physical = np.ascontiguousarray(rig, dtype=np.float64)
         coefficients = np.ascontiguousarray(controls, dtype=np.float64)
         requested = np.atleast_1d(np.asarray(times, dtype=np.float64))
-        if physical.shape != (38,) or coefficients.ndim != 2 or coefficients.shape[1] != 3 or requested.ndim != 1:
+        if physical.shape not in ((38,), (43,)) or coefficients.ndim != 2 or coefficients.shape[1] != 3 or requested.ndim != 1:
             raise ValueError("camera evaluation requires rig[38], controls[M,3] and scalar or times[N]")
         requested = np.ascontiguousarray(requested)
         out = np.full((len(requested), 24), np.nan, dtype=np.float64)

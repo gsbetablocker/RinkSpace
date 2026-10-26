@@ -344,6 +344,88 @@ def parameterize_print_assets(assets, *, group_overrides=()):
     return result
 
 
+def parameterize_print_layout(assets, layouts):
+    """Compile explicit artwork-component layout, preserving all source paths.
+
+    ``layouts`` maps template IDs to a complete list of named material groups.
+    Every ordinary path must be named exactly once, including holes and parts.
+    The existing native shape evaluator carries only a shared positive affine
+    map for each group. Its six nonlinear warp coordinates remain zero. This
+    is an explicit model change, never inferred from labels or observation UV.
+    Analytic panels/rectangles/squares retain their existing construction.
+    """
+    source = deepcopy(assets)
+    templates = _registry(source['templates'])
+    if set(layouts) != set(templates):
+        raise PrintBindingError('incomplete_print_component_layout')
+    overrides = []
+    definitions = {}
+    for identity, template in templates.items():
+        paths = validate_template_topology(template)
+        rectangles = {p for sides in _rectangle_families(paths).values() for p in sides.values()}
+        ordinary = {p for p, record in paths.items()
+                    if p not in rectangles and record.get('role') != 'panel_outer_boundary'
+                    and record.get('geometry') is None}
+        assigned = set(); names = set()
+        for definition in layouts[identity]:
+            name = definition.get('id'); members = definition.get('path_ids')
+            if (not isinstance(name, str) or not name or name in names
+                    or not isinstance(members, list) or not members
+                    or len(set(members)) != len(members)
+                    or not set(members) <= ordinary or assigned.intersection(members)
+                    or not isinstance(definition.get('evidence'), dict)
+                    or not definition['evidence']):
+                raise PrintBindingError('invalid_print_component_layout', template_id=identity)
+            if type(definition.get('fixed_in_template_chart', False)) is not bool:
+                raise PrintBindingError('invalid_print_component_activity', group_id=name)
+            names.add(name); assigned.update(members)
+            for path in members:
+                parent = paths[path].get('parent_contour_key')
+                if parent is not None and parent not in members:
+                    raise PrintBindingError('print_component_splits_parent_hole', path_id=path)
+            if len(members)>1: overrides.append(members)
+            definitions[frozenset(members)] = deepcopy(definition)
+        if assigned != ordinary:
+            raise PrintBindingError('incomplete_print_component_paths',
+                                    template_id=identity, path_ids=sorted(ordinary-assigned))
+        template.pop('internal_geometry', None)
+    source['parameter_blocks'] = [b for b in source['parameter_blocks']
+                                 if b['kind'] in ('print_size', 'print_placement')]
+    result = parameterize_print_assets(source, group_overrides=overrides)
+    blocks = _registry(result['parameter_blocks'])
+    found = set()
+    for template in result['templates']:
+        for group in template['internal_geometry']['groups']:
+            if group['parameterization'] != SHAPE_KIND: continue
+            key = frozenset(group['path_ids'])
+            if key not in definitions:
+                raise PrintBindingError('implicit_print_component_merge', path_ids=sorted(key))
+            definition = definitions[key]; found.add(key)
+            block = blocks[group['parameter_block_id']]
+            independent = ([] if definition.get('fixed_in_template_chart', False)
+                           else [i for i in block['independent_local_indices'] if i < 4])
+            block.update(independent_local_indices=independent,
+                         tangent_size=len(independent), active=bool(independent),
+                         activity_reason='explicit_shared_artwork_component_layout')
+            group.update(component_identity=definition['id'],
+                         component_evidence=definition['evidence'],
+                         nonlinear_warp_enabled=False,
+                         fixed_in_template_chart=definition.get('fixed_in_template_chart', False),
+                         preserved_structure=['shared_positive_axis_affine_map',
+                             'relative_contour_geometry_and_spacing', 'parent_hole_ownership',
+                             'closed_or_open_support', 'source_vertex_order'])
+        template['internal_geometry']['layout_policy'] = {
+            'schema':'rinkspace.print_component_layout.v1',
+            'nonlinear_glyph_warp':False,
+            'groups':deepcopy(layouts[template['id']]),
+            'whole_installation_and_size_remain_separate':True,
+            'reference_artwork_is_not_a_measured_physical_size':True}
+    if found != set(definitions):
+        raise PrintBindingError('missing_print_layout_component')
+    validate_print_parameters(result)
+    return result
+
+
 def validate_print_parameters(assets):
     """Validate structural state ownership without re-reading source evidence."""
     blocks = _registry(assets.get('parameter_blocks', []))
@@ -356,6 +438,20 @@ def validate_print_parameters(assets):
             raise PrintBindingError('unsupported_print_internal_geometry_schema', template_id=template['id'])
         paths = validate_template_topology(template)
         groups = _registry(internal.get('groups', []))
+        domain=template.get('material_domain')
+        if domain is not None:
+            boundary=domain.get('boundary_path_ids',[])
+            if (domain.get('kind')!='physical_unit_panel'
+                    or not isinstance(domain.get('evidence'),dict) or not domain['evidence']
+                    or internal.get('coordinate_gauge',{}).get('kind')!='unit_panel_chart'
+                    or len(boundary)!=4 or len(set(boundary))!=4
+                    or any(p not in paths or paths[p].get('role')!='panel_outer_boundary' for p in boundary)):
+                raise PrintBindingError('invalid_physical_print_panel_domain',template_id=template['id'])
+        layout_policy = internal.get('layout_policy')
+        if layout_policy is not None:
+            if (layout_policy.get('schema') != 'rinkspace.print_component_layout.v1'
+                    or layout_policy.get('nonlinear_glyph_warp') is not False):
+                raise PrintBindingError('invalid_print_layout_policy', template_id=template['id'])
         bindings = internal.get('path_bindings')
         if not isinstance(bindings, Mapping) or set(bindings) != set(paths):
             raise PrintBindingError('incomplete_print_internal_path_bindings', template_id=template['id'])
@@ -384,6 +480,18 @@ def validate_print_parameters(assets):
                     or block.get('owner_template_id') != template['id']
                     or group.get('parameterization') != SHAPE_KIND):
                 raise PrintBindingError('invalid_print_internal_shape_block', group_id=group['id'])
+            if layout_policy is not None:
+                declarations = [g for g in layout_policy.get('groups', [])
+                                if g.get('id') == group.get('component_identity')]
+                if (len(declarations) != 1
+                        or set(declarations[0]['path_ids']) != set(group['path_ids'])
+                        or declarations[0]['evidence'] != group.get('component_evidence')
+                        or group.get('nonlinear_warp_enabled') is not False
+                        or any(i >= 4 for i in block['independent_local_indices'])
+                        or any(v != 0. for v in block['values'][4:])
+                        or (declarations[0].get('fixed_in_template_chart', False)
+                            and block['independent_local_indices'])):
+                    raise PrintBindingError('print_layout_freedom_contract_changed', group_id=group['id'])
             bounds = _finite_vector(group.get('reference_bounds'), 4, group['id'])
             if not (bounds[0] < bounds[2] and bounds[1] < bounds[3]):
                 raise PrintBindingError('degenerate_print_shape_bounds', group_id=group['id'])

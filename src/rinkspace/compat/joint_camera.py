@@ -5,12 +5,58 @@ geometry, observations and optimizer state are not imported or rebuilt.
 """
 from __future__ import annotations
 from copy import deepcopy
+from fractions import Fraction
 import hashlib
 import json
 from pathlib import Path
+import re
 import numpy as np
 from .d78_state import decode_camera
 from ..core.native import NativeCore
+
+
+def validate_joint_camera_source(model, scope):
+    """Match saved source metadata before assigning a current source identity.
+
+    This checks declarations in the two files, not the video bytes. Missing
+    metadata is a blocker; a matching shot interval alone is not evidence that
+    the saved camera belongs to this video, pixel grid or native clock.
+    """
+    model_clock = model.get('source_clock')
+    source, clock = scope.get('source'), scope.get('source_clock')
+    if not all(isinstance(value, dict) for value in (model_clock, source, clock)):
+        raise ValueError('joint camera import requires model and scope source identity/clock metadata')
+    model_sha, scope_sha = model_clock.get('source_video_sha256'), source.get('sha256')
+    if any(not isinstance(value, str) or not re.fullmatch(r'[0-9a-f]{64}', value)
+           for value in (model_sha, scope_sha)):
+        raise ValueError('joint camera import requires an explicit valid source SHA256 in model and scope')
+    if model_sha != scope_sha:
+        raise ValueError('joint camera source SHA256 differs from current programme source')
+    if not isinstance(source.get('id'), str) or not source['id']:
+        raise ValueError('joint camera import requires the current source ID')
+    model_time = model_clock.get('time_base')
+    scope_time = [clock.get('time_base_num'), clock.get('time_base_den')]
+    if (not isinstance(model_time, list) or len(model_time) != 2
+            or any(type(value) is not int or value <= 0 for value in [*model_time, *scope_time])):
+        raise ValueError('joint camera import requires explicit positive integer source time bases')
+    if Fraction(*model_time) != Fraction(*scope_time):
+        raise ValueError('joint camera source time_base differs from current programme clock')
+    model_size = model_clock.get('image_size')
+    scope_size = [source.get('width'), source.get('height')]
+    if (not isinstance(model_size, list) or len(model_size) != 2
+            or any(type(value) is not int or value <= 0 for value in [*model_size, *scope_size])):
+        raise ValueError('joint camera import requires explicit positive integer source image sizes')
+    if model_size != scope_size:
+        raise ValueError('joint camera source image_size differs from current source pixel grid')
+    model_step, scope_step = model_clock.get('frame_step_pts'), clock.get('native_pts_step')
+    if any(type(value) is not int or value <= 0 for value in (model_step, scope_step)):
+        raise ValueError('joint camera import requires explicit positive integer native PTS steps')
+    if model_step != scope_step:
+        raise ValueError('joint camera source PTS step differs from current programme clock')
+    return {'source_id': source['id'], 'source_sha256': scope_sha,
+            'model_time_base': list(model_time), 'scope_time_base': scope_time,
+            'image_size': scope_size, 'native_pts_step': scope_step,
+            'saved_metadata_match': True, 'source_video_redecoded': False}
 
 
 def decode_joint_camera(model,shot_id,core):
@@ -101,11 +147,26 @@ def import_joint_camera(model_path,shot_id,scope_path,library_path,out_dir):
     model_path=Path(model_path).resolve(strict=True);scope_path=Path(scope_path).resolve(strict=True)
     out=Path(out_dir).resolve()
     if out.exists():raise FileExistsError(out)
-    model=json.loads(model_path.read_text(encoding='utf-8-sig'))
-    scope=json.loads(scope_path.read_text(encoding='utf-8-sig'))
-    selected=next(s for s in scope['shots'] if s['id']==shot_id)
-    camera,controls=decode_joint_camera(model,shot_id,NativeCore(library_path))
+    model_raw=model_path.read_bytes();scope_raw=scope_path.read_bytes()
+    model=json.loads(model_raw.decode('utf-8-sig'))
+    scope=json.loads(scope_raw.decode('utf-8-sig'))
+    source_binding=validate_joint_camera_source(model,scope)
+    selected_shots=[s for s in scope['shots'] if s['id']==shot_id]
+    if len(selected_shots)!=1 or shot_id not in scope['required_shot_ids']:
+        raise ValueError('unknown or ambiguous current programme shot: '+shot_id)
+    selected=selected_shots[0]
+    saved=model.get('shots',{}).get(shot_id)
+    if not isinstance(saved,dict):
+        raise ValueError('joint camera model has no requested shot: '+shot_id)
     interval=selected['processing']
+    saved_interval=saved.get('scope',{})
+    for name in ('first_pts','stop_pts_exclusive'):
+        if (type(saved_interval.get(name)) is not int or type(interval.get(name)) is not int
+                or saved_interval[name]!=interval[name]):
+            raise ValueError('joint camera scope differs from current programme shot')
+    if saved.get('rig_id')!=selected.get('rig_id'):
+        raise ValueError('joint camera rig identity differs from current programme shot')
+    camera,controls=decode_joint_camera(model,shot_id,NativeCore(library_path))
     if camera['first_pts']!=interval['first_pts'] or camera['stop_pts_exclusive']!=interval['stop_pts_exclusive']:
         raise ValueError('joint camera scope differs from current programme shot')
     clock=scope['source_clock'];source=scope['source']
@@ -113,8 +174,9 @@ def import_joint_camera(model_path,shot_id,scope_path,library_path,out_dir):
         time_base=f"{clock['time_base_num']}/{clock['time_base_den']}",
         image_width=source['width'],image_height=source['height'],
         origin={'kind':'one_time_complete_joint_camera_import','model_path':str(model_path),
-            'model_sha256':hashlib.sha256(model_path.read_bytes()).hexdigest(),'source_sha256':source['sha256'],
-            'scope_path':str(scope_path),'geometry_or_source_rows_imported':False,'fit_executed':False})
+            'model_sha256':hashlib.sha256(model_raw).hexdigest(),'source_sha256':source['sha256'],
+            'scope_path':str(scope_path),'scope_sha256':hashlib.sha256(scope_raw).hexdigest(),
+            'source_binding':source_binding,'geometry_or_source_rows_imported':False,'fit_executed':False})
     out.mkdir(parents=True)
     (out/'camera.json').write_text(json.dumps(camera,ensure_ascii=False,indent=2,allow_nan=False)+'\n',encoding='utf8')
     np.save(out/'controls.npy',controls,allow_pickle=False)

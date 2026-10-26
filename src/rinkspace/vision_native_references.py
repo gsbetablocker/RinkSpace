@@ -208,7 +208,7 @@ def _recover_registered_frames(assets, records, cache, source_sha256):
     return ready,remaining,recovered
 
 
-def current_native_source_banks(geometry, *, cache_directory, identity_catalog, event_id, source_sha256):
+def current_native_source_banks(geometry, *, cache_directory, identity_catalog, event_id, source_sha256, programme_scope):
     from PIL import Image
     from .session.ad_review import _source_rows
     cache=Path(cache_directory);cache.mkdir(parents=True,exist_ok=True)
@@ -256,8 +256,9 @@ def current_native_source_banks(geometry, *, cache_directory, identity_catalog, 
         image_ref=file_ref(image_path)
         if frame['sha'] and frame['sha']!=image_ref['sha256']:raise ValueError('Native source reference image changed')
         rgb=np.asarray(Image.open(image_path).convert('RGB'));h,w=rgb.shape[:2]
-        binding=dict(source_sha256=sha,time_base=clock,source_pts=pts,shot_id='registered_native_reference:'+str(pts),
-            native_hw=[h,w],installation_id=event_id)
+        from .source_binding import registered_reference_binding
+        binding = registered_reference_binding(dict(source_sha256=sha, time_base=clock, source_pts=pts,
+            native_hw=[h,w], event_id=event_id), programme_scope)
         advertisements=[];guides=[]
         for instance,ad in frame['ads'].items():
             items=ad['items'];points=np.concatenate([i['uv'] for i in items])

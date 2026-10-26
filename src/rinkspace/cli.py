@@ -22,10 +22,18 @@ def main(argv: list[str] | None = None) -> int:
     m = model_sub.add_parser("import-state", help="Import complete frozen d78 state; no fit")
     m.add_argument("--model", required=True); m.add_argument("--complete-state"); m.add_argument("--scope", required=True)
     m.add_argument("--library", required=True); m.add_argument("--out", required=True)
+    m.add_argument("--source-binding"); m.add_argument("--shot")
+    m.add_argument("--unverified-replay", action="store_true", help="Explicit replay only; never a fit input")
     p = sub.add_parser("observe", help="Continuous trained source reader with current native geometry")
     observe_sub = p.add_subparsers(dest="observe_command", required=True)
     o = observe_sub.add_parser("read", help="Read consecutive original frames with trained vision, tracking and feedback")
     o.add_argument("--request", required=True); o.add_argument("--out", required=True)
+    o = observe_sub.add_parser("check-source", help="Compare actual source readings and generate machine repair work")
+    o.add_argument("--request", required=True); o.add_argument("--out", required=True)
+    o = observe_sub.add_parser("programme", help="Read all native exposures in an explicit programme job and update camera navigation")
+    o.add_argument("--job", required=True); o.add_argument("--out", required=True)
+    o.add_argument("--resume", action="store_true")
+    o.add_argument("--previous-job", help="Authenticate existing source records when execution instructions changed")
     o = observe_sub.add_parser("audit", help="Audit one exact exposure against a frozen reviewed reference")
     o.add_argument("--case", required=True); o.add_argument("--assets", required=True); o.add_argument("--out", required=True)
     p = sub.add_parser("prepare", help="Compile current immutable observations and scope")
@@ -103,7 +111,8 @@ def main(argv: list[str] | None = None) -> int:
                 result = render(args.scene, args.library, args.out)
             elif args.model_command == "import-state":
                 from .compat.d78_state import import_d78_state
-                path = import_d78_state(args.model, args.out, args.scope, args.library, args.complete_state)
+                path = import_d78_state(args.model, args.out, args.scope, args.library, args.complete_state, shot_id=args.shot,
+                                        source_binding_path=args.source_binding, allow_unverified_replay=args.unverified_replay)
                 result = {"state_path": str(path), "fit_executed": False, "purpose": "frozen_d78_replay"}
             else:
                 from .session.core_preview import preview
@@ -114,10 +123,16 @@ def main(argv: list[str] | None = None) -> int:
             if args.observe_command == "read":
                 from .session.source_read import run_source_read
                 result = run_source_read(args.request, args.out)
+            elif args.observe_command == "check-source":
+                from .session.source_check import run_source_check
+                result = run_source_check(args.request, args.out)
+            elif args.observe_command == "programme":
+                from .session.source_programme import run_programme
+                result = run_programme(args.job, args.out, resume=args.resume, previous_job=args.previous_job)
             else:
                 raise ValueError("The O worksheet audit entry was withdrawn; use observe read with the complete source reader")
             print(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False))
-            return 0
+            return result.get("exit_code", 0)
         if args.command == "prepare":
             from dataclasses import asdict
             from .session.prepare import prepare

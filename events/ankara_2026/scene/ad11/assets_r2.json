@@ -12717,11 +12717,16 @@
         "schema": "rinkspace.print_internal_geometry.v1",
         "groups": [
           {
-            "id": "print_group/print_template/Ad11_Ad24/94b3ed66d7f80d63d364",
-            "parameter_block_id": "print_shape/print_template/Ad11_Ad24/94b3ed66d7f80d63d364",
+            "id": "print_group/print_template/Ad11_Ad24/2f0af8421e46624d5b11",
+            "parameter_block_id": "print_shape/print_template/Ad11_Ad24/2f0af8421e46624d5b11",
             "path_ids": [
               "Ad11.outer_ring.outer",
-              "Ad11.outer_ring.inner"
+              "Ad11.outer_ring.inner",
+              "Ad11.shield.outer",
+              "Ad11.shield.inner",
+              "Ad11.red_shield",
+              "Ad11.star",
+              "Ad11.crescent"
             ],
             "reference_bounds": [
               0.0,
@@ -12732,93 +12737,58 @@
             "parameterization": "monotone_axis_warp.v1",
             "affine_only_material_set": false,
             "preserved_structure": [
-              "path_identity",
-              "path_order",
-              "closed_or_open_support",
+              "shared_positive_axis_affine_map",
+              "relative_contour_geometry_and_spacing",
               "parent_hole_ownership",
-              "axis_aligned_straight_edges"
+              "closed_or_open_support",
+              "source_vertex_order"
             ],
             "source_observations_created": 0,
-            "whole_print_coordinate_reference": true
-          },
-          {
-            "id": "print_group/print_template/Ad11_Ad24/67622bd5d7cd1c901b07",
-            "parameter_block_id": "print_shape/print_template/Ad11_Ad24/67622bd5d7cd1c901b07",
-            "path_ids": [
-              "Ad11.shield.outer",
-              "Ad11.shield.inner"
-            ],
-            "reference_bounds": [
-              0.13697165258048427,
-              0.13503952606881944,
-              0.8686086866615745,
-              0.8650206897758945
-            ],
-            "parameterization": "monotone_axis_warp.v1",
-            "affine_only_material_set": false,
-            "preserved_structure": [
-              "path_identity",
-              "path_order",
-              "closed_or_open_support",
-              "parent_hole_ownership",
-              "axis_aligned_straight_edges"
-            ],
-            "source_observations_created": 0
-          },
-          {
-            "id": "print_group/print_template/Ad11_Ad24/042330015cfe44ff061b",
-            "parameter_block_id": "print_shape/print_template/Ad11_Ad24/042330015cfe44ff061b",
-            "path_ids": [
-              "Ad11.red_shield",
-              "Ad11.star",
-              "Ad11.crescent"
-            ],
-            "reference_bounds": [
-              0.21359341152768763,
-              0.1956220397571492,
-              0.782333843468785,
-              0.8296205675769828
-            ],
-            "parameterization": "monotone_axis_warp.v1",
-            "affine_only_material_set": false,
-            "preserved_structure": [
-              "path_identity",
-              "path_order",
-              "closed_or_open_support",
-              "parent_hole_ownership",
-              "axis_aligned_straight_edges"
-            ],
-            "source_observations_created": 0
+            "whole_print_coordinate_reference": true,
+            "component_identity": "Ad11/federation badge",
+            "component_evidence": {
+              "kind": "source_and_native_template_visual_component_review",
+              "source_image": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_20261026\\print_shape_audit\\Ad11_source_484864.png",
+              "source_image_sha256": "e2260e1e4df7bd87b1fe1f84f8140ea18cc0ada0d7a888c51fcd0bb8fa1f7c7b",
+              "native_initial_template_review": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_20261026\\print_shape_audit\\Ad11_native_shapes.png",
+              "source_pts": 484864,
+              "decision": "Keep all contours and holes of this visibly coherent word/line/logo in one shared positive affine map; whole installation dimensions remain unknown",
+              "physical_size_measured": false,
+              "source_paths_and_UV_preserved": true,
+              "component": "federation badge"
+            },
+            "nonlinear_warp_enabled": false,
+            "fixed_in_template_chart": false
           }
         ],
         "path_bindings": {
           "Ad11.outer_ring.outer": {
             "kind": "shape_group",
-            "group_id": "print_group/print_template/Ad11_Ad24/94b3ed66d7f80d63d364"
+            "group_id": "print_group/print_template/Ad11_Ad24/2f0af8421e46624d5b11"
           },
           "Ad11.outer_ring.inner": {
             "kind": "shape_group",
-            "group_id": "print_group/print_template/Ad11_Ad24/94b3ed66d7f80d63d364"
+            "group_id": "print_group/print_template/Ad11_Ad24/2f0af8421e46624d5b11"
           },
           "Ad11.shield.outer": {
             "kind": "shape_group",
-            "group_id": "print_group/print_template/Ad11_Ad24/67622bd5d7cd1c901b07"
+            "group_id": "print_group/print_template/Ad11_Ad24/2f0af8421e46624d5b11"
           },
           "Ad11.shield.inner": {
             "kind": "shape_group",
-            "group_id": "print_group/print_template/Ad11_Ad24/67622bd5d7cd1c901b07"
+            "group_id": "print_group/print_template/Ad11_Ad24/2f0af8421e46624d5b11"
           },
           "Ad11.red_shield": {
             "kind": "shape_group",
-            "group_id": "print_group/print_template/Ad11_Ad24/042330015cfe44ff061b"
+            "group_id": "print_group/print_template/Ad11_Ad24/2f0af8421e46624d5b11"
           },
           "Ad11.star": {
             "kind": "shape_group",
-            "group_id": "print_group/print_template/Ad11_Ad24/042330015cfe44ff061b"
+            "group_id": "print_group/print_template/Ad11_Ad24/2f0af8421e46624d5b11"
           },
           "Ad11.crescent": {
             "kind": "shape_group",
-            "group_id": "print_group/print_template/Ad11_Ad24/042330015cfe44ff061b"
+            "group_id": "print_group/print_template/Ad11_Ad24/2f0af8421e46624d5b11"
           }
         },
         "panel_chart_gauge": "unit_material_rectangle_with_instance_size_and_placement",
@@ -12827,8 +12797,8 @@
         "source_values_rewritten": false,
         "coordinate_gauge": {
           "kind": "reference_group_layout",
-          "group_id": "print_group/print_template/Ad11_Ad24/94b3ed66d7f80d63d364",
-          "parameter_block_id": "print_shape/print_template/Ad11_Ad24/94b3ed66d7f80d63d364",
+          "group_id": "print_group/print_template/Ad11_Ad24/2f0af8421e46624d5b11",
+          "parameter_block_id": "print_shape/print_template/Ad11_Ad24/2f0af8421e46624d5b11",
           "fixed_local_indices": [
             0,
             1,
@@ -12837,6 +12807,38 @@
           ],
           "source_measurement": false,
           "reason": "Remove template-wide translation/scale gauge; shared size and independent instance placement retain those freedoms"
+        },
+        "layout_policy": {
+          "schema": "rinkspace.print_component_layout.v1",
+          "nonlinear_glyph_warp": false,
+          "groups": [
+            {
+              "id": "Ad11/federation badge",
+              "path_ids": [
+                "Ad11.outer_ring.outer",
+                "Ad11.outer_ring.inner",
+                "Ad11.shield.outer",
+                "Ad11.shield.inner",
+                "Ad11.red_shield",
+                "Ad11.star",
+                "Ad11.crescent"
+              ],
+              "evidence": {
+                "kind": "source_and_native_template_visual_component_review",
+                "source_image": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_20261026\\print_shape_audit\\Ad11_source_484864.png",
+                "source_image_sha256": "e2260e1e4df7bd87b1fe1f84f8140ea18cc0ada0d7a888c51fcd0bb8fa1f7c7b",
+                "native_initial_template_review": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_20261026\\print_shape_audit\\Ad11_native_shapes.png",
+                "source_pts": 484864,
+                "decision": "Keep all contours and holes of this visibly coherent word/line/logo in one shared positive affine map; whole installation dimensions remain unknown",
+                "physical_size_measured": false,
+                "source_paths_and_UV_preserved": true,
+                "component": "federation badge"
+              },
+              "fixed_in_template_chart": false
+            }
+          ],
+          "whole_installation_and_size_remain_separate": true,
+          "reference_artwork_is_not_a_measured_physical_size": true
         }
       }
     }
@@ -25703,8 +25705,8 @@
     "texture_template_paths": 0,
     "print_instances": 2,
     "shared_size_parameter_blocks": 1,
-    "internal_shape_groups": 3,
-    "internal_parameter_blocks": 3
+    "internal_shape_groups": 1,
+    "internal_parameter_blocks": 1
   },
   "parameter_blocks": [
     {
@@ -25892,7 +25894,7 @@
       ]
     },
     {
-      "id": "print_shape/print_template/Ad11_Ad24/94b3ed66d7f80d63d364",
+      "id": "print_shape/print_template/Ad11_Ad24/2f0af8421e46624d5b11",
       "kind": "print_shape",
       "size": 10,
       "coordinates": [
@@ -25920,113 +25922,17 @@
         0.0,
         0.0
       ],
-      "active": true,
-      "tangent_size": 6,
-      "independent_local_indices": [
-        4,
-        5,
-        6,
-        7,
-        8,
-        9
-      ],
+      "active": false,
+      "tangent_size": 0,
+      "independent_local_indices": [],
       "owner_template_id": "print_template/Ad11_Ad24",
       "gauge_fixed_local_indices": [
         0,
         1,
         2,
         3
-      ]
-    },
-    {
-      "id": "print_shape/print_template/Ad11_Ad24/67622bd5d7cd1c901b07",
-      "kind": "print_shape",
-      "size": 10,
-      "coordinates": [
-        "translate_u",
-        "translate_v",
-        "log_scale_u",
-        "log_scale_v",
-        "u_log_interval_0",
-        "u_log_interval_1",
-        "u_log_interval_2",
-        "v_log_interval_0",
-        "v_log_interval_1",
-        "v_log_interval_2"
       ],
-      "parameterization": "monotone_axis_warp.v1",
-      "values": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
-      ],
-      "active": true,
-      "tangent_size": 10,
-      "independent_local_indices": [
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9
-      ],
-      "owner_template_id": "print_template/Ad11_Ad24"
-    },
-    {
-      "id": "print_shape/print_template/Ad11_Ad24/042330015cfe44ff061b",
-      "kind": "print_shape",
-      "size": 10,
-      "coordinates": [
-        "translate_u",
-        "translate_v",
-        "log_scale_u",
-        "log_scale_v",
-        "u_log_interval_0",
-        "u_log_interval_1",
-        "u_log_interval_2",
-        "v_log_interval_0",
-        "v_log_interval_1",
-        "v_log_interval_2"
-      ],
-      "parameterization": "monotone_axis_warp.v1",
-      "values": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
-      ],
-      "active": true,
-      "tangent_size": 10,
-      "independent_local_indices": [
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9
-      ],
-      "owner_template_id": "print_template/Ad11_Ad24"
+      "activity_reason": "explicit_shared_artwork_component_layout"
     }
   ]
 }

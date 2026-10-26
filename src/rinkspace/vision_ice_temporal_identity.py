@@ -68,7 +68,15 @@ def final_current_source_track_support(rgb,measurement,ids,*,operator,uv=None,si
     tangent=np.gradient(uv,axis=0);arc=np.c_[-tangent[:,1],tangent[:,0]]
     length=np.linalg.norm(arc,axis=1);arc_support=length>1e-6
     normals[~paired&arc_support]=arc[~paired&arc_support]/length[~paired&arc_support,None]
-    valid=(paired if operator=='paint_center' else paired|arc_support)
+    directional_support=np.zeros(len(ids),bool)
+    if operator=='material_interface' and measurement.get('query_normal') is not None:
+        directions=np.asarray(measurement['query_normal'],float)[queries]
+        lengths=np.linalg.norm(directions,axis=1)
+        directional_support=np.isfinite(directions).all(1)&(lengths>1e-6)
+        # Query ordering may contain disjoint arcs. Retain each actually read
+        # signed profile direction instead of differentiating across its gaps.
+        normals[~paired&directional_support]=directions[~paired&directional_support]/lengths[~paired&directional_support,None]
+    valid=(paired if operator=='paint_center' else paired|arc_support|directional_support)
     descriptor,strength=_measured_material_descriptors(rgb,uv,sides,normals)
     valid &= strength>0
     if valid.sum()<2:return None
@@ -212,8 +220,14 @@ def _curve_local_navigation(previous, current, previous_mask, current_mask, trac
     normals = delta_sides/np.maximum(lengths[:, None], 1e-9)
     if np.any(lengths <= 1e-6):
         tangent = np.gradient(actual, axis=0)
-        normals = np.c_[-tangent[:, 1], tangent[:, 0]]
-        normals /= np.maximum(np.linalg.norm(normals, axis=1, keepdims=True), 1e-9)
+        fallback = np.c_[-tangent[:, 1], tangent[:, 0]]
+        fallback /= np.maximum(np.linalg.norm(fallback, axis=1, keepdims=True), 1e-9)
+        recorded=np.asarray(track.get('source_normals',[]),float)
+        if recorded.shape==normals.shape:
+            length=np.linalg.norm(recorded,axis=1)
+            supported=np.isfinite(recorded).all(1)&(length>1e-6)
+            fallback[supported]=recorded[supported]/length[supported,None]
+        normals[lengths<=1e-6]=fallback[lengths<=1e-6]
     paired = b[good]-a[good]
     normal_motion = np.einsum('ij,ij->i', paired, normals[owners[good]])
     # Paint support identifies normal motion. Tangential aperture cannot
@@ -512,6 +526,15 @@ class TemporalIceIdentitySelector:
                     or seed.get('surface_and_physical_identity_confirmed') is not True
                     or not seed.get('authority')):
                 raise ValueError('Physical source seed requires same-frame RGB, identity and painted ice material authority')
+            if (name in navigation and seed.get('authority',{}).get('kind') in
+                    ('current_RGB_candidate_admission','current_RGB_existing_readout_identity')):
+                # A newly read fragment adds source support to this same entity;
+                # it must not replace the rest of the current two-image track.
+                # Keep runs separate: joining endpoints would invent a bridge.
+                predicted,track=navigation[name]
+                navigation[name]=(predicted,dict(track,additional_current_source_navigation_runs=[
+                    *track.get('additional_current_source_navigation_runs',[]),seed['navigation_uv']]))
+                continue
             navigation[name] = (np.asarray(seed['navigation_uv'], float).reshape(-1, 2),
                 dict(seed=seed, actual_uv=seed['navigation_uv'], actual_pts=pts, source_RGB_sha256=digest, is_seed=True))
         qcurve = np.asarray(measurement['query_curve'])
@@ -525,11 +548,15 @@ class TemporalIceIdentitySelector:
                 decisions.append(dict(curve_id=name, actual_pts=pts, status='physical_source_identity_seed_or_continuity_missing'))
                 continue
             predicted, track = navigation[name]
+            additional_runs=track.get('additional_current_source_navigation_runs',[])
+            track={k:v for k,v in track.items() if k!='additional_current_source_navigation_runs'}
             # Preserve a source-flow search through occlusion; this is only
             # navigation and does not create a measurement in the missing frame.
             next_tracks[name] = {**track, 'navigation_uv': predicted, 'is_seed': False}
             subset = np.flatnonzero(qcurve[queries] == ci)
             distances = _point_polyline_distance(uv[subset], predicted)
+            for run in additional_runs:
+                distances=np.minimum(distances,_point_polyline_distance(uv[subset],np.asarray(run,float).reshape(-1,2)))
             # The actual same-source two sides supply all emitted centers.
             # Source flow locates the already confirmed entity, not a world
             # projection, and a second matching RGB candidate remains unknown.

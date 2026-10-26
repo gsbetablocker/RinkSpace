@@ -147,6 +147,36 @@ class IceSourceMaterialIdentityGraph:
         self.shot_id = None
         self.catalog = []
 
+    def source_frame_state(self):
+        """Snapshot stream structure without copying immutable pixel/node arrays."""
+        return {key: list(value) if isinstance(value, list) else value
+                for key, value in self.__dict__.items() if key != '_source_frame_checkpoint'}
+
+    def restore_source_frame_state(self, state, checkpoint=None):
+        self.__dict__.clear()
+        self.__dict__.update({key: list(value) if isinstance(value, list) else value
+                              for key, value in state.items()})
+        self._source_frame_checkpoint = checkpoint
+
+    def checkpoint_source_frame(self):
+        """Keep the state before this exposure for a same-RGB query revision."""
+        self._source_frame_checkpoint = self.source_frame_state()
+
+    def _editable_frame(self, ordinal):
+        frame = self.frames[ordinal]
+        checkpoint = getattr(self, '_source_frame_checkpoint', None)
+        if (checkpoint is not None and ordinal < len(checkpoint['frames'])
+                and frame is checkpoint['frames'][ordinal]):
+            # A new anchor can label old frames and mark their rows emitted.
+            # Copy those mutable records before writing so rollback also
+            # retracts the current exposure's backward evidence. Native node
+            # arrays are never edited by propagation and remain shared.
+            from copy import deepcopy
+            frame = {key: deepcopy(value) if isinstance(value, (dict, list, set)) else value
+                     for key, value in frame.items()}
+            self.frames[ordinal] = frame
+        return frame
+
     def source_support_candidate_indices(self, measurement, exclusion_mask, *, source_ice_scope_mask):
         """Candidate indices needing real blur support before RGB release.
 
@@ -247,7 +277,7 @@ class IceSourceMaterialIdentityGraph:
         self.frames.append(frame)
         queue=deque()
         if ordinal:
-            before=self.frames[-2]
+            before=self._editable_frame(ordinal-1)
             edges=_actual_material_links(self.previous_gray,gray,before,frame,self.previous_mask,mask,device=self.device)
             for a,b,error,corr in edges:
                 evidence=dict(source_forward_backward_LK_error_px=error,current_material_context_correlation=corr,
@@ -789,7 +819,7 @@ class IceSourceMaterialIdentityGraph:
             source_RGB_decoded_again=False,projected_UV_used_as_measurements=False,visual_review_complete=False)
 
     def _label(self,fi,node,proof,neighbor,direction,queue):
-        frame=self.frames[fi]
+        frame=self._editable_frame(fi)
         if node in frame['label']:
             if frame['label'][node]['physical_material_id']!=proof['physical_material_id']:
                 raise ValueError('One original source material node reached competing physical identities')
@@ -803,6 +833,8 @@ class IceSourceMaterialIdentityGraph:
         queue.append((fi,node))
 
     def _new_rows(self,frame):
+        if getattr(self, '_source_frame_checkpoint', None) is not None:
+            frame = self._editable_frame(frame['ordinal'])
         groups={}
         for node,proof in frame['label'].items():
             if node in frame['emitted'] or proof['direction']=='anchor':continue

@@ -9,7 +9,9 @@ import numpy as np
 
 def file_ref(path):
     path = Path(path).resolve()
-    return dict(path=str(path), sha256=hashlib.sha256(path.read_bytes()).hexdigest())
+    with path.open('rb') as stream:
+        digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+    return dict(path=str(path), sha256=digest)
 
 
 class NativeSourceGeometry:
@@ -180,7 +182,7 @@ class NativeSourceGeometry:
 
 
 def accepted_packet_guides(packet, binding_record, acceptance, *, packet_path, binding_path, acceptance_path,
-                           source_binding, search_radius_px=18.):
+                           source_binding, search_radius_px=18., programme_scope=None):
     """Reuse exact accepted source UV and groups; historical world geometry is ignored."""
     from .vision_geometry import source_annotations_to_guides
     pref, bref, aref = map(file_ref, (packet_path, binding_path, acceptance_path))
@@ -190,6 +192,19 @@ def accepted_packet_guides(packet, binding_record, acceptance, *, packet_path, b
             or source['source_video_sha256'] != source_binding['source_sha256']
             or source['time_base'] != source_binding['time_base']):
         raise ValueError('Accepted source packet belongs to another native exposure')
+    if programme_scope is not None:
+        from .source_binding import canonical_source_binding
+        from .vision_geometry import _same_frame
+        original = dict(source_sha256=source['source_video_sha256'], source_pts=packet['source_pts'],
+            time_base=source['time_base'], native_hw=source['native_hw'],
+            shot_id=source.get('shot_id', packet.get('shot_id', source_binding['shot_id'])))
+        for key in ('event_id', 'rig_id', 'installation_id'):
+            if key in source or key in packet:
+                original[key] = source.get(key, packet.get(key))
+        adapted = canonical_source_binding(original, programme_scope, allow_legacy_event_installation=True)
+        _same_frame(source_binding, adapted)
+    elif source_binding.get('identity_schema') == 'rinkspace.source_installation.v2':
+        raise ValueError('Legacy source acceptance requires its registered installation mapping')
     if acceptance.get('accepted') is not True:
         raise ValueError('Explicit saved source acceptance is required for this adapter')
     rows = [r for r in acceptance['frames'] if r['native_pts'] == stamp]

@@ -8,6 +8,8 @@ import argparse
 import copy
 import hashlib
 import json
+import os
+import tempfile
 from pathlib import Path
 import sys
 import numpy as np
@@ -36,7 +38,22 @@ def checked(path):
 def save_json(path, value):
     path = checked(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + '\n', encoding='utf8')
+    # A stopped metadata update must leave either the old or the complete new
+    # JSON document. Multi-file completion is verified by the delta receipt.
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode='w', encoding='utf8', dir=path.parent,
+                                         prefix='.rs-', suffix='.tmp', delete=False) as stream:
+            temporary = Path(stream.name)
+            checked(temporary)
+            json.dump(value, stream, ensure_ascii=False, indent=2, allow_nan=False)
+            stream.write('\n')
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+    finally:
+        if temporary is not None and temporary.exists():
+            temporary.unlink()
 
 
 def binary(directory, name, values, dtype):
@@ -372,6 +389,137 @@ def export(prepared_dir, current_model_dir, original_model, output, *, data_root
 
 
 
+
+def _preflight_delta_metadata(root, *, geometry=False):
+    """Fail on missing/corrupt completion inputs before changing the export."""
+    mapping = json.loads((root / 'mapping.json').read_text(encoding='utf8'))
+    if geometry and not isinstance(mapping.get('reset_similarity'), list):
+        raise ValueError('Geometry export mapping lacks its reset comparison records')
+    initializer_path = root / 'initializer_manifest.json'
+    if initializer_path.exists():
+        initializer = json.loads(initializer_path.read_text(encoding='utf8'))
+        if not isinstance(initializer, dict):
+            raise ValueError('Invalid initializer manifest')
+        for path in [root / 'semantic/manifest.json',
+                     *(root / name for name in ('station.f64', 'path.u32', 'initial_row.f64', 'initial_alpha.f64'))]:
+            sha(path)
+
+
+
+def _binding_packet_matches(root, expected):
+    actual = sha(root / 'packet/manifest.json')
+    if actual == expected:
+        return True
+    # A subsequent reviewed geometry delta legitimately updates event_model.
+    # Accept only that authenticated successor, not an arbitrary new packet.
+    successor_path = root / 'geometry_delta_012.json'
+    if not successor_path.is_file():
+        return False
+    successor = json.loads(successor_path.read_text(encoding='utf8'))
+    if (successor.get('schema') != 'rinkfit.current_Ad12_I_static_geometry_delta.v1'
+            or successor.get('previous_packet_sha256') != expected
+            or successor.get('current_packet_sha256') != actual):
+        return False
+    previous_model = root / 'geometry_delta_previous_model.json'
+    packet = json.loads((root / 'packet/manifest.json').read_text(encoding='utf8'))
+    model_digest = sha(root / 'model.json')
+    return (previous_model.is_file()
+            and sha(previous_model) == successor['old_model']['sha256']
+            and model_digest == successor['current_model']['sha256']
+            and packet['event_model']['sha256'] == model_digest)
+
+
+
+def _verify_geometry_unchanged_inputs(root, result):
+    names = ('semantic/manifest.json', 'station.f64', 'path.u32', 'initial_row.f64', 'initial_alpha.f64')
+    expected = result.get('unchanged_current_inputs_sha256')
+    if expected is None:
+        # Geometry never changes these inputs. A legacy receipt may recover
+        # only from the existing initializer's previously recorded identities.
+        path = root / 'initializer_manifest.json'
+        if not path.is_file():
+            raise ValueError('Legacy geometry receipt lacks unchanged-input evidence')
+        initializer = json.loads(path.read_text(encoding='utf8'))
+        semantic = initializer.get('semantic_manifest', {})
+        descriptors = {'semantic/manifest.json':semantic,
+                       **{name:initializer.get('files', {}).get(name, {}) for name in names[1:]}}
+        if any(not item.get('sha256') or Path(item.get('path', '')).resolve() != (root/name).resolve()
+               for name,item in descriptors.items()):
+            raise ValueError('Legacy geometry receipt lacks complete unchanged-input evidence')
+        expected = {name:item['sha256'] for name,item in descriptors.items()}
+    if set(expected) != set(names):
+        raise ValueError('Incomplete unchanged-input geometry receipt')
+    actual = {name:sha(root/name) for name in names}
+    packet_digest = sha(root / 'packet/manifest.json')
+    expected_packet = result.get('current_packet_sha256')
+    if actual == expected and (expected_packet is None or expected_packet == packet_digest):
+        return
+    # A later reviewed binding may change semantic identity and station seeds.
+    # Require both ends of that exact delta, retaining all other input hashes.
+    successor_path = root / 'binding_delta_01.json'
+    if expected_packet is not None and successor_path.is_file():
+        successor = json.loads(successor_path.read_text(encoding='utf8'))
+        previous = successor.get('previous_input', {})
+        linked = (previous.get('packet_sha256') == expected_packet
+                  and previous.get('semantic_sha256') == expected['semantic/manifest.json']
+                  and previous.get('station_sha256') == expected['station.f64']
+                  and successor.get('current_packet_sha256') == packet_digest
+                  and successor.get('current_semantic_sha256') == actual['semantic/manifest.json']
+                  and successor.get('current_station_sha256') == actual['station.f64']
+                  and all(actual[name] == expected[name] for name in names[2:])
+                  and 'unchanged_array_sha256' in successor)
+        if linked and all(sha(path) == digest for path,digest in successor['unchanged_array_sha256'].items()):
+            return
+    raise ValueError('Geometry unchanged inputs differ from their recorded identities')
+
+
+def _finish_delta_metadata(root, receipt, result, *, geometry=False):
+    """Complete/retry metadata only after authenticating the applied state.
+
+    A receipt records the changed core files; it is not proof that the later
+    initializer and mapping writes completed. Re-entry repairs those writes
+    without applying the reviewed delta or changing source bytes again.
+    """
+    if geometry:
+        expected = result['current_model']['sha256']
+        packet = json.loads((root / 'packet/manifest.json').read_text(encoding='utf8'))
+        if sha(root / 'model.json') != expected or packet['event_model']['sha256'] != expected:
+            raise ValueError('Applied geometry differs from its recorded receipt')
+        _verify_geometry_unchanged_inputs(root, result)
+    else:
+        if not _binding_packet_matches(root, result['current_packet_sha256']):
+            raise ValueError('Applied binding differs from its recorded receipt: packet/manifest.json')
+        for name, key in (('semantic/manifest.json', 'current_semantic_sha256'),
+                          ('station.f64', 'current_station_sha256')):
+            if sha(root / name) != result[key]:
+                raise ValueError('Applied binding differs from its recorded receipt: ' + name)
+        if any(sha(path) != digest for path, digest in result['unchanged_array_sha256'].items()):
+            raise ValueError('Source array differs from the recorded binding receipt')
+    _preflight_delta_metadata(root, geometry=geometry)
+    sp = root / 'semantic/manifest.json'
+    initializer_path = root / 'initializer_manifest.json'
+    if initializer_path.exists():
+        initializer = json.loads(initializer_path.read_text(encoding='utf8'))
+        initializer['semantic_manifest'] = dict(path=str(sp), sha256=sha(sp))
+        initializer['files'] = {name:dict(path=str(root/name), sha256=sha(root/name))
+                                for name in ('station.f64', 'path.u32', 'initial_row.f64', 'initial_alpha.f64')}
+        save_json(initializer_path, initializer)
+    mapping_path = root / 'mapping.json'
+    mapping = json.loads(mapping_path.read_text(encoding='utf8'))
+    if geometry:
+        for value in mapping['reset_similarity']:
+            if value['curve_id'] == 'd78_material_012/path0' and 'reset_world_vs_d78_exact_max' in value:
+                value['pre_geometry_repair_reset_world_vs_d78_exact_max'] = value.pop('reset_world_vs_d78_exact_max')
+                value['final_geometry_is_explicit_verified_source_repair'] = True
+        for key in ('current_static_source_world_delta_max', 'original_camera_forward_delta_px_max'):
+            if key in mapping:
+                mapping['pre_geometry_repair_' + key] = mapping.pop(key)
+        mapping['specific_I_geometry_delta'] = dict(path=str(receipt), sha256=sha(receipt), affected_physical_entities=1)
+    else:
+        mapping['specific_binding_delta'] = dict(path=str(receipt), sha256=sha(receipt), affected_sources=len(result['records']))
+    save_json(mapping_path, mapping)
+
+
 def apply_material_delta(input_dir, delta_path):
     """Apply only explicitly reviewed material bindings and their station seeds.
 
@@ -392,8 +540,10 @@ def apply_material_delta(input_dir, delta_path):
     if receipt.exists():
         previous = json.loads(receipt.read_text(encoding='utf8'))
         if previous['reviewed_delta']['sha256'] == sha(delta_path):
+            _finish_delta_metadata(root, receipt, previous)
             return previous
         raise FileExistsError('A different source delta is already recorded')
+    _preflight_delta_metadata(root)
     def array(desc):
         p = Path(desc.get('file', desc.get('path')))
         if sha(p) != desc['sha256']:
@@ -484,16 +634,7 @@ def apply_material_delta(input_dir, delta_path):
         no_source_retired=True, all_other_source_bindings_unchanged=True, solver_started=False,
         unchanged_array_sha256=untouched)
     save_json(receipt, result)
-    initializer_path=root/'initializer_manifest.json'
-    if initializer_path.exists():
-        initializer=json.loads(initializer_path.read_text(encoding='utf8'))
-        initializer['semantic_manifest']=dict(path=str(sp),sha256=sha(sp))
-        initializer['files']={name:dict(path=str(root/name),sha256=sha(root/name))for name in ('station.f64','path.u32','initial_row.f64','initial_alpha.f64')}
-        save_json(initializer_path,initializer)
-    mapping_path = root / 'mapping.json'
-    mapping = json.loads(mapping_path.read_text(encoding='utf8'))
-    mapping['specific_binding_delta'] = dict(path=str(receipt), sha256=sha(receipt), affected_sources=len(changes))
-    save_json(mapping_path, mapping)
+    _finish_delta_metadata(root, receipt, result)
     return result
 
 
@@ -511,8 +652,12 @@ def apply_I_geometry_delta(input_dir, geometry_path):
     if receipt.exists():
         previous = json.loads(receipt.read_text(encoding='utf8'))
         if previous['current_geometry_evidence']['sha256'] == sha(geometry_path):
+            _finish_delta_metadata(root, receipt, previous, geometry=True)
             return previous
         raise FileExistsError('A different I geometry repair is already present')
+    _preflight_delta_metadata(root, geometry=True)
+    unchanged_inputs = {name:sha(root/name) for name in
+        ('semantic/manifest.json', 'station.f64', 'path.u32', 'initial_row.f64', 'initial_alpha.f64')}
     before = copy.deepcopy(model)
     ai = next(i for i, b in enumerate(model['blocks']) if b['name'] == 'ad/12')
     ad = np.asarray(model['blocks'][ai]['values'], dtype=float)
@@ -551,12 +696,15 @@ def apply_I_geometry_delta(input_dir, geometry_path):
     save_json(root / 'geometry_delta_previous_model.json', before)
     packet = json.loads(pp.read_text(encoding='utf8'))
     arrays_before = copy.deepcopy(packet['arrays'])
+    previous_packet_sha256 = sha(pp)
     save_json(mp, model)
     packet['event_model']['sha256'] = sha(mp)
     save_json(pp, packet)
     if arrays_before != packet['arrays']:
         raise AssertionError('A source array descriptor changed')
     result = dict(schema='rinkfit.current_Ad12_I_static_geometry_delta.v1',
+        previous_packet_sha256=previous_packet_sha256, current_packet_sha256=sha(pp),
+        unchanged_current_inputs_sha256=unchanged_inputs,
         current_geometry_evidence=dict(path=str(Path(geometry_path).resolve()), sha256=sha(geometry_path)),
         old_model=dict(path=str(root / 'geometry_delta_previous_model.json'), sha256=sha(root / 'geometry_delta_previous_model.json')),
         current_model=dict(path=str(mp), sha256=sha(mp)), records=repaired,
@@ -564,23 +712,7 @@ def apply_I_geometry_delta(input_dir, geometry_path):
         shield_011_and_every_other_path_unchanged=True, UV_PTS_ID_E_W_sigma_binding_and_auxiliary_files_unchanged=True,
         original_affine_witness_domain_passed=domain, solver_started=False)
     save_json(receipt, result)
-    initializer_path=root/'initializer_manifest.json'
-    if initializer_path.exists():
-        initializer=json.loads(initializer_path.read_text(encoding='utf8'))
-        initializer['semantic_manifest']=dict(path=str(sp),sha256=sha(sp))
-        initializer['files']={name:dict(path=str(root/name),sha256=sha(root/name))for name in ('station.f64','path.u32','initial_row.f64','initial_alpha.f64')}
-        save_json(initializer_path,initializer)
-    mapping_path = root / 'mapping.json'
-    mapping = json.loads(mapping_path.read_text(encoding='utf8'))
-    for v in mapping['reset_similarity']:
-        if v['curve_id'] == 'd78_material_012/path0' and 'reset_world_vs_d78_exact_max' in v:
-            v['pre_geometry_repair_reset_world_vs_d78_exact_max'] = v.pop('reset_world_vs_d78_exact_max')
-            v['final_geometry_is_explicit_verified_source_repair'] = True
-    for key in ('current_static_source_world_delta_max', 'original_camera_forward_delta_px_max'):
-        if key in mapping:
-            mapping['pre_geometry_repair_' + key] = mapping.pop(key)
-    mapping['specific_I_geometry_delta'] = dict(path=str(receipt), sha256=sha(receipt), affected_physical_entities=1)
-    save_json(mapping_path, mapping)
+    _finish_delta_metadata(root, receipt, result, geometry=True)
     return result
 
 

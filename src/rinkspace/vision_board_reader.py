@@ -41,6 +41,25 @@ def refine_board_readings(rgb, binding, guides, guided, *, authority, feedback, 
     front_authorized = authority['source_sha256'] == binding['source_sha256']
     authority = feedback.material_authority(authority) if front_authorized else authority
     packets = {}
+    for guide in guides:
+        proof=guide.get('source_board_view_evidence') or {}
+        if proof.get('kind')=='authenticated_original_board_material_frame':
+            from .vision_geometry import _same_frame
+            source=proof['source_binding']
+            # Stored same-exposure semantics must refer to the actual decoded
+            # source. Older transported views continue through their RGB flow.
+            if source.get('source_pts')==binding['source_pts']:
+                _same_frame(binding,source)
+                if proof['decoded_native_BGR_sha256']!=hashlib.sha256(np.ascontiguousarray(rgb[:,:,::-1]).tobytes()).hexdigest():
+                    raise ValueError('Stored board material frame differs from the current original RGB')
+            else:
+                previous=guide.get('hint_previous_source_binding') or {}
+                flow=guide.get('temporal_flow_supported')
+                valid=(guide.get('origin')=='temporal_source_search_hint' and flow is not None and _numpy(flow).any() and
+                    all(source.get(k)==previous.get(k)==binding.get(k) for k in
+                        ('source_sha256','time_base','shot_id','installation_id')) and
+                    int(source.get('source_pts',-1))<=int(previous.get('source_pts',-1))<int(binding['source_pts']))
+                if not valid:raise ValueError('Stored board view needs its own exposure or verified same-shot flow')
     for i, guide in enumerate(guides):
         if guide.get('kind') not in ('board_top','ice_contact') or (front_authorized and guide.get('source_board_view') == 'front_face'):
             continue
@@ -288,6 +307,89 @@ def dense_front_face_admission(rgb, binding, guides, guided, exclusion, *, devic
         status='current_RGB_paired_bands_bound_to_named_front_face', regions=regions,
         source_binding=binding, gaps_bridged=False, source_UV_created=False,
         detector_candidates_alone_certify_identity=False), packet
+
+
+def read_connected_board_gaps(rgb, binding, guides, guided, *, source_packet, face_receipt,
+        geometry, authority, feedback, prediction, classes, device, exclusion):
+    """Read missing parts of an actually paired and already identified face.
+
+    The existing source detector supplies blue/yellow material searches. Both
+    sides must correspond to current named physical readouts in the same run;
+    an unverified projection or an isolated blue strip cannot authorize a face.
+    Every appended output is freshly read by the ordered material readers.
+    """
+    import torch
+    from .vision_geometry import _same_frame
+    from .vision_navigation import _uncovered_query
+    report=dict(added_query_count=0,added_actual_point_count=0,
+        source_binding=dict(binding),front_face_inferred_from_projection=False,
+        existing_readings_rewritten=False,source_query_UV_used_as_output=False)
+    if source_packet is None or geometry is None:return report
+    source=source_packet.get('source',{})
+    _same_frame(binding,dict(source,source_pts=source.get('source_pts',source.get('native_pts'))))
+    if source.get('decoded_BGR_sha256') != hashlib.sha256(np.ascontiguousarray(rgb[:,:,::-1]).tobytes()).hexdigest():
+        raise ValueError('Connected board searches must come from this exact original RGB')
+    eligible={g['id']:g for g,r in zip(guides,guided['readings'])
+        if g.get('source_board_view')=='front_face' and g.get('identity_confirmed') is True
+        and g.get('identity_authority') and r.get('physical_id') and len(r['actual_source_uv'])}
+    paired={r['candidate_id']:r for r in face_receipt.get('regions',[])
+        if all(any(name in eligible for name in r['named_source_boundaries'].get(kind,[]))
+               for kind in ('board_top','ice_contact'))}
+    retained=[]
+    for g,r in zip(guides,guided['readings']):
+        points=np.asarray(_numpy(g['points_uv']),float).copy()
+        indices=np.asarray(_numpy(r['source_indices']),int)
+        points[indices]=_numpy(r['actual_source_uv'])
+        retained.append(dict(g,points_uv=points,last_measured_query_indices=indices))
+    additions=[]
+    for band in source_packet.get('boundary_candidates',[]):
+        anchor=paired.get(band['candidate_id'])
+        if anchor is None:continue
+        for kind,field,identity in (('board_top','blue_upper_uv','board.top'),
+                                    ('ice_contact','yellow_lower_uv','board.bottom')):
+            definition=geometry.lookup(identity)
+            if definition is None or definition.get('layer')!='board':continue
+            uv=np.asarray(band[field],float).reshape(-1,2)
+            if len(uv)<2:continue
+            tangent=np.gradient(uv,axis=0);normal=np.c_[-tangent[:,1],tangent[:,0]]
+            normal/=np.maximum(np.linalg.norm(normal,axis=1,keepdims=True),1e-9)
+            proof=dict(kind='current_RGB_connected_board_material_pair',source_binding=dict(binding),
+                source_material_reference=authority['reference'],source_candidate_id=band['candidate_id'],
+                current_named_boundaries=anchor['named_source_boundaries'],
+                source_frame_anchor_reading_indices=[i for i,g in enumerate(guides)
+                    if g['id'] in anchor['named_source_boundaries']['board_top']
+                    or g['id'] in anchor['named_source_boundaries']['ice_contact']],
+                decoded_native_RGB_sha256=hashlib.sha256(rgb.tobytes()).hexdigest(),
+                physical_identity_from_model_projection=False,human_pixel_acceptance=False)
+            query=dict(id=definition['id'],kind=kind,points_uv=uv,normals=normal,
+                segment_ids=np.zeros(len(uv),int),source_binding=dict(binding),
+                query_id=definition['id']+'/source_material_run/'+band['candidate_id'],
+                origin='source_annotation_search_hint',identity_confirmed=True,identity_authority=proof,
+                source_board_view='front_face',source_board_view_evidence=proof,
+                source_exclusion_mask=np.asarray(exclusion,bool).copy(),source_exclusion_binding=dict(binding),
+                search_radius_px=18.,sample_spacing_px=28.,candidate_navigation_only=True,
+                source_group_id='current_board_material:'+band['candidate_id']+':'+kind)
+            query=_uncovered_query(query,retained,geometry=geometry)
+            if query is not None:
+                additions.append(query);retained.append(query)
+    additions,native_binding=geometry.bind(additions)
+    if native_binding.get('unresolved'):raise ValueError('Connected board query lost its current native path')
+    fresh=dict(readings=[dict(expected_id=g['id'],physical_id=g['id'],kind=g['kind'],
+        primitive=g['primitive'],physical_role=g['physical_role'],identity_authority=g['identity_authority'],
+        origin=g['origin'],actual_source_uv=torch.empty((0,2),device=device),
+        source_indices=torch.empty(0,device=device,dtype=torch.long),
+        guide=dict(uv=torch.as_tensor(g['points_uv'],device=device),normals=torch.as_tensor(g['normals'],device=device),
+            segment_ids=torch.as_tensor(g['segment_ids'],device=device,dtype=torch.long),
+            closed=False,source_binding=dict(binding)),metadata=dict(source_point_count=len(g['points_uv']),
+                guide_position_is_measurement=False,localization_accuracy_validated=False)) for g in additions])
+    if additions:
+        report['material_reread']=refine_board_readings(rgb,binding,additions,fresh,authority=authority,feedback=feedback,
+            prediction=prediction,classes=classes,device=device)
+        guides.extend(additions);guided['readings'].extend(fresh['readings'])
+    report.update(added_query_count=len(additions),
+        added_actual_point_count=sum(len(r['actual_source_uv']) for r in fresh['readings']),
+        native_binding=native_binding)
+    return report
 
 
 def continue_front_face_admission(current, previous, binding, previous_binding, flow_pair, exclusion):

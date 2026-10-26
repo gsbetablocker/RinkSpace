@@ -87,6 +87,18 @@ def test_pending_preparation_does_not_retain_rejected_graph_nodes(tmp_path):
     assert next_selected['rows']==[]
 
 
+def test_disjoint_interface_queries_keep_their_read_profile_directions():
+    from rinkspace.vision_ice_temporal_identity import final_current_source_track_support
+    rgb=np.full((120,240,3),210,np.uint8);rgb[:60]=70
+    uv=np.array([[30.,59.5],[170.,59.5],[50.,59.5],[190.,59.5],[70.,59.5]])
+    normal=np.tile([0.,1.],(len(uv),1))
+    m=dict(candidate_uv=uv,candidate_sides=np.repeat(uv[:,None],2,axis=1),candidate_query=np.arange(len(uv)),
+        query_normal=normal,source_binding=dict(source_pts=20))
+    support=final_current_source_track_support(rgb,m,np.arange(len(uv)),operator='material_interface')
+    np.testing.assert_array_equal(support['source_normals'],normal)
+    np.testing.assert_array_equal(support['actual_uv'],uv)
+
+
 def test_historical_missing_material_keeps_reentry_without_stale_image_LK(tmp_path,monkeypatch):
     selector=selector_with_context(tmp_path)
     for pts,shift in ((10,0),(20,2)):

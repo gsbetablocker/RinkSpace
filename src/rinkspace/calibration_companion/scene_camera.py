@@ -75,11 +75,32 @@ class Camera:
         if not 0 < min_ray_sine < 1:
             raise ValueError('min_ray_sine must lie between 0 and 1')
         # Iterative inverse distortion with tighter stopping than the generic default.
-        undist = cv2.undistortPointsIter(uv.reshape(1,1,2), self.K_px,
-            self.distortion_opencv, None, None,
-            (cv2.TERM_CRITERIA_COUNT | cv2.TERM_CRITERIA_EPS, 100, 1e-12)).reshape(2)
+        try:
+            criteria = (cv2.TERM_CRITERIA_COUNT | cv2.TERM_CRITERIA_EPS, 100, 1e-12)
+            if hasattr(cv2, "undistortPointsIter"):
+                undist = cv2.undistortPointsIter(uv.reshape(1,1,2), self.K_px,
+                    self.distortion_opencv, None, None, criteria).reshape(2)
+            else:  # OpenCV 5 exposes criteria on undistortPoints itself.
+                undist = cv2.undistortPoints(uv.reshape(1,1,2), self.K_px,
+                    self.distortion_opencv, criteria=criteria).reshape(2)
+        except cv2.error:
+            return {'valid':False, 'reason':'inverse_distortion_failed', 'xyz':None, 'ray_sine':None}
+        if not np.isfinite(undist).all():
+            return {'valid':False, 'reason':'nonfinite_inverse_distortion', 'xyz':None, 'ray_sine':None}
         ray = self.R.T @ np.array([undist[0], undist[1], 1.0])
-        ray /= np.linalg.norm(ray)
+        length = np.linalg.norm(ray)
+        if not np.isfinite(length) or length <= 0:
+            return {'valid':False, 'reason':'nonfinite_inverse_camera_ray', 'xyz':None, 'ray_sine':None}
+        ray /= length
+        # Fixed-point inverse distortion may terminate without solving the
+        # requested pixel, especially outside the physical lens domain. Such
+        # a ray must not become a plausible-looking, "valid" ice coordinate.
+        projected, _ = self.project([self.center_xyz+ray])
+        roundtrip = float(np.linalg.norm(projected[0]-uv))
+        if not np.isfinite(roundtrip) or roundtrip > .05:
+            return {'valid':False, 'reason':'inverse_distortion_roundtrip_failed',
+                    'xyz':None, 'ray_sine':None,
+                    'inverse_reprojection_error_px':roundtrip if np.isfinite(roundtrip) else None}
         sine = float(abs(ray[2]))
         if sine < min_ray_sine:
             return {'valid':False, 'reason':'ray_near_parallel_to_ice','xyz':None,'ray_sine':sine}
@@ -88,6 +109,8 @@ class Camera:
             return {'valid':False, 'reason':'intersection_not_in_front_of_camera','xyz':None,'ray_sine':sine}
         xyz = self.center_xyz+distance*ray
         xyz[2]=0.0
+        if not np.isfinite(xyz).all():
+            return {'valid':False, 'reason':'nonfinite_ice_intersection', 'xyz':None, 'ray_sine':sine}
         if boundary_xy is not None:
             # Optional contact/boundary operation; calibration needs no Shapely.
             from shapely.geometry import Point, Polygon
