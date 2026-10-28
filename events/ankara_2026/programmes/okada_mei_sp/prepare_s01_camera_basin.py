@@ -18,6 +18,7 @@ from scipy.optimize import least_squares
 import prepare_native_s01 as prep
 from rinkspace.core.native import NativeCore
 from rinkspace.domain.motion_chart import UniformMotionChart, cubic_samples
+from rinkspace.domain.parameters import SceneParameterModel
 
 
 def snapshot(path):
@@ -30,7 +31,10 @@ def make_projection_feasible(out):
     state = snapshot(out / 'seed_state.npz')
     if (out / 'feasible_seed_state.npz').exists():
         raise ValueError('Existing feasible seed must not be overwritten')
-    observations, _, _ = prep.load_pixel_input(out)
+    observations, mapping, _ = prep.load_pixel_input(out)
+    model=SceneParameterModel(prep.read(prep.SCENE),prep.SCENE,optimize_scene=True)
+    prep.validate_snapshot_identity(state,model.initial_state.layout,prep.read(prep.CAMERA),mapping,points=observations,
+        point_input_sha256=prep.digest(out/'point_observations.npz'))
     if str(state['point_input_sha256']) != prep.digest(out/'point_observations.npz'):
         raise ValueError('Candidate input changed')
     camera = prep.camera_for_snapshot(prep.read(prep.CAMERA), state)
@@ -83,6 +87,9 @@ def prepare(out, fraction, interior_mount=False):
     state = snapshot(source)
     observations, mapping, _ = prep.load_pixel_input(prep.RUN)
     input_sha = prep.digest(prep.RUN / 'point_observations.npz')
+    model=SceneParameterModel(prep.read(prep.SCENE),prep.SCENE,optimize_scene=True)
+    prep.validate_snapshot_identity(state,model.initial_state.layout,prep.read(prep.CAMERA),mapping,points=observations,
+        point_input_sha256=input_sha)
     if str(state['point_input_sha256']) != input_sha:
         raise ValueError('Accepted state and current observations differ')
     for name in ('point_observations.npz', 'initialized_points.npz'):

@@ -450,7 +450,7 @@ def observed_signed_material_transition(values, signed_gradient, valid, index, s
 
 
 def read_source_board_rail_material_profiles(rgb, pair_packet, *, source_instances=(),
-        search_radius_px=36, sample_spacing_px=4):
+        search_radius_px=36, sample_spacing_px=4, exit_requires_current_blue_material=False):
     """Independently sample source blue-rail entry and internal blue/white exit.
 
     The blue material is a current-source candidate, not a universal rink color
@@ -516,6 +516,13 @@ def read_source_board_rail_material_profiles(rgb, pair_packet, *, source_instanc
         following = min([a[0] for a in bands if a[0] > band[-1]], default=len(offsets)-1)
         entering, leaving = np.arange(previous, peak), np.arange(peak, following)
         entering, leaving = entering[signed_valid[i, entering]], leaving[signed_valid[i, leaving]]
+        if exit_requires_current_blue_material:
+            # A white-to-red advertisement also decreases the signed blue
+            # channel. It is not the exit of the already identified blue cap.
+            # Restrict peak selection to the actual connected blue material;
+            # the output remains an original RGB derivative peak, never the
+            # classification-mask boundary.
+            leaving=leaving[leaving<=band[-1]]
         if not len(entering) or not len(leaving):
             missing.append(dict(query_index=i, reason='material_band_profile_clipped_or_entry_exit_missing'))
             continue
@@ -555,6 +562,7 @@ def read_source_board_rail_material_profiles(rgb, pair_packet, *, source_instanc
             actual_source_material_entry_uv=first, actual_source_material_exit_uv=last,
             entry_role_hypothesis='board_upper_rim_blue_material_entry',
             exit_role_hypothesis='board_internal_blue_to_white_material_interface',
+            exit_optical_peak_required_current_blue_material=exit_requires_current_blue_material,
             actual_entry_signed_gradient=float(signed[i, a]), actual_exit_signed_gradient=float(signed[i, b]),
             actual_source_material_normal_width_px=float(midpoint[b]-midpoint[a]),
             entry_transition_support_native_normal_intervals_px=intervals(eruns),

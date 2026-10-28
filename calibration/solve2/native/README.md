@@ -1,6 +1,6 @@
-# RinkSolve 2 数值后端
+# solve2 历史 Ceres 批量桥
 
-此目录只有本次新写的通用 Ceres 批量桥。物理模型、投影、原片时钟、实体身份、联合噪声与约束权威均由当前上游模块负责。没有调用旧求解器 DLL、PTX、源码或旧问题定义。
+本目录保留 solve2 的 Ceres 批量桥，物理模型、投影、源时钟、实体、联合噪声和约束由对应 rinksolve 上游负责。它属于历史后端，与当前 [native C++／CUDA LM](../../../native/README.md)使用不同的布局、状态和构建合同。
 
 ## 构建与加载
 
@@ -10,9 +10,9 @@
 & calibration\solve2\native\build.ps1
 ~~~
 
-公共依赖为项目 environments/cg22p 下的 Ceres 2.2.0 和 Data/runtime_tools/rf_deps 下的 Eigen、glog、gflags。MSVC 2022 14.44 编译。源码留项目；二进制、响应文件、构建日志和清单留 Data/runs/solve2_native。源码或构建入口变化产生新目录，不覆盖已加载 DLL。普通运行只加载本次构建清单与当前数据，不重放旧生产链，也不自动编译。
+公共依赖为项目 environments/cg22p 下的 Ceres 2.2.0 和 Data/runtime_tools/rf_deps 下的 Eigen、glog、gflags。MSVC 2022 14.44 编译。源码留项目；二进制、响应文件、构建日志和清单留 Data/runs/solve2_native。源码或构建入口变化产生新目录，不覆盖已加载 DLL。普通运行只加载所选构建清单与对应数据，不重放旧生产链，也不自动编译。
 
-Python 入口为 rinksolve.native_backend。NativeBackend(build_manifest) 加载明确的新桥及公共依赖。成功加载只证明 ABI 可用；没有宣称模型拟合合格。
+Python 入口为 rinksolve.native_backend。NativeBackend(build_manifest) 加载明确的桥及公共依赖。成功加载只证明 ABI 可用；没有宣称模型拟合合格。
 
 ## 最低可运行例子
 
@@ -41,7 +41,7 @@ assert result.usable
 # result.parameters 为独立只读新数组，约为 [2., 3.]。
 ~~~
 
-## 稀疏数据与当前模型对接
+## 稀疏数据与 rinksolve 模型对接
 
 1. model.pack_state(state, selected_block_ids) 返回数值向量和 ParameterView；每个 native 块保留 id、semantic_block_id、component_offset、size、vector_offset 和 owner。cubic controls 自动拆成每块三值，不能把 3,756 维整块接到每个像素。
 2. BatchLayout.block_ids/block_sizes 直接取这些 view 的 id/size；factor_blocks 列出各 factor 真正涉及的 native 块索引。交点、共享广告安装与固定 station 的身份不能在桥里改成逐帧变量。
@@ -66,12 +66,12 @@ on_iteration(event, current_parameters) 每次收到 Ceres 迭代结束时的当
 
 Data/runs/solve2_native/verification.json 记录实际非线性、稀疏 Schur、边界/常量、失败处理、当前状态回调、布局/精确类型与线程隔离测试。
 
-Data/runs/solve2_native/scale_benchmark.json 是已知解的合成问题，不是原片拟合：182,017 个 factor、1,252 个三维控制块、3,756 个参数、546,051 个 residual、6,552,612 个稀疏 Jacobian 值；20 线程 sparse normal，4 次迭代 0.789 秒，8 次全批 Python 调用，参数最大误差 9.44e-12。该基准未用 GPU，也没有计入真实物理投影或当前联合噪声核的成本，不能据此宣称 S01 已拟合或具备同样总速度。
+`Data/runs/solve2_native/scale_benchmark.json` 保存已知解合成问题的规模和性能；未计入真实投影／联合噪声成本，也未使用 GPU，不能推断真实节目速度或验收状态。
 
 
 ## 显式约束外层
 
-rinksolve.constrained 使用独立新写的 PHR augmented Lagrangian。ConstraintFamily 声明 equality(h=0) 或 less_equal(g<=0)、同量纲 unit、正 normalization_scale、scale_source、authority_refs 和 family 的 factor_indices；约束值、Jacobian、原 E 及其来源由调用者负责。工程 E 不是统计 sigma。目标与约束同 native parameter views，参数各分量也要显式 parameter_scales。
+rinksolve.constrained 使用 PHR augmented Lagrangian。ConstraintFamily 声明 equality(h=0) 或 less_equal(g<=0)、同量纲 unit、正 normalization_scale、scale_source、authority_refs 和 family 的 factor_indices；约束值、Jacobian、原 E 及其来源由调用者负责。工程 E 不是统计 sigma。目标与约束同 native parameter views，参数各分量也要显式 parameter_scales。
 
 q=raw/scale；等式采用 sqrt(rho)*(q+lambda/rho)，不等式采用 sqrt(rho)*max(0,q+lambda/rho)。不等式 lambda 始终非负。每个家族的有限 penalty、增长规则、上限、可行性/站立性/互补性阈值、inner 站立性阈值和 inner Ceres 参数均由 ALOptions 明确给出，没有硬编码物理默认值。
 
@@ -79,6 +79,6 @@ q=raw/scale；等式采用 sqrt(rho)*(q+lambda/rho)，不等式采用 sqrt(rho)*
 
 inner 达到 maxiter 或浮点 function tolerance 均不能代替实际 projected augmented gradient 检查；未达到声明 inner 精度则返回 inner_incomplete，保留最新接受 x 和原 lambda/rho，可继续同一个子问题。惩罚到有限上限且不可行时返回 penalty_limit_requires_review，不能无限加权或称为完成。外层 chunk 耗尽同样只是可续状态。诊断同时报告原单位 violation、归一化 feasibility、projected KKT stationarity、dual sign、complementarity 与排除 initial_state 后的 actual accepted steps。numerically_feasible_stationary 只代表当前数学问题通过声明数值标准，不能代替完整原片检验。
 
-Data/runs/solve2_native/al_verification.json 与 al_test_output.txt 记录已知 KKT、单位变换、原子续算、有无约束、maxiter 不伪完成、有限不可行诊断、bounds/fixed 变量与失败恢复测试。最初 inner 阈值严于 Ceres 非零残差代价浮点停止精度的证据保留于 al_initial_failure.json 与 test_constrained_initial.py；实际验证采用明确的 1e-7 inner/站立性目标，仍保留 1e-8 feasibility/complementarity。没有修改原片误差预算或物理约束来制造通过。
+`Data/runs/solve2_native/al_verification.json` 与 `al_test_output.txt` 保存已知 KKT、单位变换、原子续算、停止与失败恢复检查。早期失败保存在同目录原记录中；数值通过只针对所声明合同，不改变原片误差预算或物理约束。
 
 Explicit numerical unit metric: `NativeBackend.solve(parameter_scales=S)` uses the additive full-rank chart `Plus(x,d)=x+S*d`, `Minus(y,x)=(y-x)/S` (same ambient/tangent size), Ceres Jacobi scaling disabled and both LM diagonal limits fixed to one. Residual/Jacobian callbacks and bounds remain in original ambient units; no residual, prior, or frozen degree of freedom is added. The old `rs_batch_solve` ABI retains public Ceres defaults; the new `rs_batch_solve_scaled` export requires explicit finite positive scales. Runtime reports the actual chart ABI, metric flags, and scales hash.

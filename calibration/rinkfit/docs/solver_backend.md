@@ -1,8 +1,10 @@
 # Ceres／PHR 后端：已实现接口与本片接入合同
 
+本页描述 rinkfit 历史后端的模块合同，适用范围见[模块入口](../README.md)；当前 rebuild 的 native／GPU 能力见[实现状态](../../../docs/REBUILD.md)。
+
 本包已经包含能够编译运行的双阶段约束求解内核、真实 Ceres 因子包装、不可变整状态快照、停止／序列化续跑，以及独立原生逐行预算审计。`rinkfit_synthetic_demo` 是验证这些机制的 12 行合成有限材料例；它不读取比赛资料，也不代表已完成本片求解。
 
-本片的 182,017 行便携输入由 `rinkfit-start export-backend` 导出。下一步是把已核对的材料与原工程统计包编译为 `EventProblemBuilder`，链接现有后端，生成单独的 `rinkfit_event_fit`。准确的逐材料绑定见 `docs/event_integration.md`；本文件给出需要实现的 C++ 方法、数据和终止规则。
+历史启动包的 182017 行便携输入由 `rinkfit-start export-backend` 导出。下面的 `EventProblemBuilder`／`rinkfit_event_fit` 描述该包设计时的事件接入目标，不是当前任务安排；逐材料绑定见 [event_integration](event_integration.md)。当前代码范围与缺失输入见[模块入口](../README.md)。
 
 ## 1. 交付边界
 
@@ -12,7 +14,7 @@
 | `rinkfit_ceres` | Ceres LM、`SPARSE_NORMAL_CHOLESKY`、SuiteSparse；对全部一般约束使用外层 PHR | Ceres 自身支持一般不等式／等式 |
 | `rinkfit_synthetic_demo` | 已知有限水平／垂直线段、真实端点、已声明非严格顺序、共享相机、所有合法 S 联合优化 | 比赛 1,248 帧已经拟合；示例的假定安装或几何是真实比赛测量 |
 | `constraints.py` | NumPy 全行原生预算／profile／PHR 数学参考 | 大型物理求解器；完整物理重投影器；独立键与场景认证 |
-| `EventProblemBuilder` / `rinkfit_event_fit` | 本地 Codex 应依据下面的合同完成 | 把示例改名、输出 capability 声明即完成物理接入 |
+| `EventProblemBuilder` / `rinkfit_event_fit` | 历史启动包中的事件适配目标 | 把示例改名、输出 capability 声明即完成物理接入 |
 
 Ceres 官方只提供参数分量上下界，并不提供一般等式／不等式求解。返回 `false` 的因子用于真实算术域失败；把全部像素预算都这样处理会令不可行初值无法改进，且存在过早停止风险。[C1] 本实现把一般约束留给 PHR。
 

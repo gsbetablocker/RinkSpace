@@ -19,7 +19,7 @@ PREPARED=DATA/"runs/rebuild_a_20261024/prepared_s01_v2"
 OLD=DATA/"runs/rebuild_a_20261024/imported_d78"
 SCENE=ROOT/"events/ankara_2026/scene/field/model.json"
 CAMERA=Path(__file__).parent/"ad_cameras/s01.json"
-LIBRARY=DATA/"build/native_unclipped_20261027/rinkspace_core.dll"
+LIBRARY=DATA/"build/native_s01_audit_20261027/rinkspace_core.dll"
 # Identity comes from the reviewed packets' measurement_operator and the
 # two measured paint/ice shoulders, not the historical display suffix outer.
 C0_SOURCE_ID='d78_material_144/path0'
@@ -41,6 +41,90 @@ def camera_for_snapshot(camera,snapshot):
     for saved,key in [('fit_first_pts','first_pts'),('fit_stop_pts_exclusive','stop_pts_exclusive')]:
         if saved in snapshot:camera[key]=int(snapshot[saved])
     return camera
+
+
+SNAPSHOT_IDENTITY_FIELD='numeric_state_dependencies_json'
+
+
+def snapshot_dependency_identity(snapshot,layout,camera,mapping):
+    """Describe the meaning of saved numbers, separately from their values.
+
+    Native library builds are provenance, not a semantic identity gate: a
+    corrected implementation must be able to replay the same physical state.
+    """
+    from rinkspace.domain.camera import complete_camera_rig
+    layout_revision=layout.get('layout_revision');scene_revision=layout.get('scene_content_revision')
+    if not layout_revision or not scene_revision:
+        raise ValueError('Native snapshot requires an explicit scene parameter layout')
+    if mapping.get('scene_revision')!=scene_revision:
+        raise ValueError('Point mapping belongs to a different native scene revision')
+    camera_sha=digest(CAMERA);controls_sha=digest(CAMERA.parent/read(CAMERA)['controls_ref'])
+    if mapping.get('camera_sha256')!=camera_sha or mapping.get('control_sha256')!=controls_sha:
+        raise ValueError('Point mapping belongs to a different camera definition')
+    paths=mapping['path_ids']
+    if (not isinstance(paths,list) or not paths or any(not isinstance(p,str) or not p for p in paths)
+            or len(set(paths))!=len(paths)):
+        raise ValueError('Invalid native path registry')
+    controls=np.asarray(snapshot['controls']);rig=np.asarray(snapshot['rig'])
+    if (controls.ndim!=2 or controls.shape[1]!=3 or len(controls)<4
+            or not np.isfinite(controls).all()):
+        raise ValueError('Invalid saved native motion controls')
+    if rig.shape!=complete_camera_rig(camera).shape or not np.isfinite(rig).all():
+        raise ValueError('Saved rig does not match the current native camera layout')
+    effective=camera_for_snapshot(camera,snapshot)
+    path_sha=hashlib.sha256(json.dumps(paths,ensure_ascii=False,separators=(',',':')).encode()).hexdigest()
+    return dict(schema='rinkspace.s01_numeric_state_dependencies.v1',
+        parameter_layout_revision=layout_revision,scene_content_revision=scene_revision,
+        path_registry_sha256=path_sha,path_registry_count=len(paths),
+        camera_definition_sha256=camera_sha,camera_controls_sha256=controls_sha,
+        source_clock={key:camera[key] for key in ('source_id','reference_pts','time_base_num','time_base_den','image_width','image_height')},
+        motion_grid=dict(first_control_time=float(effective['first_control_time']),
+            control_dt=float(effective['control_dt']),control_count=len(controls)),
+        saved_motion_chart={key:np.asarray(snapshot[key]).item() for key in ('motion_knot_stride',
+            'motion_reference_time','fit_first_pts','fit_stop_pts_exclusive') if key in snapshot},
+        rig_storage_size=len(rig))
+
+
+def bind_snapshot_identity(snapshot,layout,camera,mapping,*,native_library=None):
+    """Bind a newly created state or an explicitly validated model migration.
+
+    Never use this to bless an unauthenticated old checkpoint with today's
+    files. Consumers must validate its original identity before migration.
+    """
+    identity=snapshot_dependency_identity(snapshot,layout,camera,mapping)
+    snapshot[SNAPSHOT_IDENTITY_FIELD]=np.array(json.dumps(identity,sort_keys=True,separators=(',',':'),allow_nan=False))
+    if native_library is not None:
+        snapshot['native_library_provenance_sha256']=np.array(digest(native_library))
+    return snapshot
+
+
+def validate_snapshot_identity(snapshot,layout,camera,mapping,*,points=None,point_input_sha256=None):
+    """Reject stale/unknown semantic bindings before interpreting saved values."""
+    if SNAPSHOT_IDENTITY_FIELD not in snapshot:
+        raise ValueError('Native snapshot has no dependency identity; 需要与当时模型/映射核对迁移，不允许用当前文件自证; preserve the original snapshot')
+    encoded=np.asarray(snapshot[SNAPSHOT_IDENTITY_FIELD])
+    if encoded.shape!=() or encoded.dtype.kind not in 'SU':
+        raise ValueError('Invalid native snapshot dependency identity encoding')
+    try:saved=json.loads(str(encoded.item()))
+    except (ValueError,TypeError) as exc:raise ValueError('Invalid native snapshot dependency identity') from exc
+    expected=snapshot_dependency_identity(snapshot,layout,camera,mapping)
+    if saved!=expected:
+        differing=sorted(key for key in set(expected)|set(saved) if saved.get(key)!=expected.get(key)) if isinstance(saved,dict) else ['schema']
+        raise ValueError('Native snapshot dependencies changed: '+', '.join(differing))
+    values=np.asarray(snapshot['scene_values'])
+    if values.shape!=(layout['size'],) or not np.isfinite(values).all():
+        raise ValueError('Invalid native snapshot scene values')
+    if point_input_sha256 is not None and str(snapshot.get('point_input_sha256',''))!=point_input_sha256:
+        raise ValueError('Snapshot does not belong to current point-only input')
+    if points is not None:
+        stations=np.asarray(snapshot['stations'])
+        if (not np.array_equal(snapshot.get('source_rows'),points['source_rows'])
+                or stations.shape!=points['stations'].shape or not np.isfinite(stations).all()):
+            raise ValueError('Snapshot point rows or station layout differ from current input')
+        fixed=points['kind']==0
+        if not np.array_equal(stations[fixed],points['stations'][fixed]):
+            raise ValueError('Fixed material station changed in native snapshot')
+    return camera_for_snapshot(camera,snapshot)
 
 def selected_s01_exposures():
     scope=read(Path(__file__).with_name('rebuild_scope.json'))
@@ -333,7 +417,8 @@ def prepare_pixel_observations():
         unresolved_packet_point_id_joins=len(evidence['missing']),unresolved_ids_do_not_remove_reviewed_source_points=True)
     mapping['native_parameters_replaced_by_dataset']=False
     np.savez(output,**points)
-    np.savez(RUN/'initialized_points.npz',stations=seeded,seed_screen_distance=distance)
+    np.savez(RUN/'initialized_points.npz',stations=seeded)
+    np.savez(RUN/'station_initialization_diagnostics.npz',seed_screen_distance=distance)
     for name in ('mapping.json','mapping_audit.npz'):
         p=RUN/name;backup=p.with_name(p.stem+'_before_c0'+p.suffix)
         if backup.exists():raise ValueError('Historical backup already exists: '+str(backup))

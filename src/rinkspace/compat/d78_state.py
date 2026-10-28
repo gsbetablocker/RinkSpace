@@ -10,6 +10,7 @@ import json
 from pathlib import Path
 import numpy as np
 from rinkspace.core.native import NativeCore
+from ..domain.camera import complete_camera_rig
 from .d78_entities import decode_entities
 from .d78_source import resolve_d78_source_binding
 
@@ -201,4 +202,4 @@ def project_native_pts(core, camera, controls, pts, xyz):
     if np.any(exposure<camera["first_pts"]) or np.any(exposure>=camera["stop_pts_exclusive"]):
         raise ValueError("PTS outside imported shot processing domain")
     times = (exposure.astype(np.int64)-int(camera["reference_pts"]))*camera["time_base_num"]/camera["time_base_den"]
-    return core.project_motion(camera["rig"], controls, camera["first_control_time"], camera["control_dt"], camera["image_height"], times, xyz)
+    return core.project_motion(complete_camera_rig(camera), controls, camera["first_control_time"], camera["control_dt"], camera["image_height"], times, xyz)

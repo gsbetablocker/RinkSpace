@@ -23,6 +23,9 @@ def stage(out=None,plan_path=None,*,preserve_unchanged_shapes=False):
     old_model=SceneParameterModel(source_scene,prep.SCENE,optimize_scene=True)
     blob=(prep.RUN/'accepted_pixels_latest.npz').read_bytes()
     with np.load(io.BytesIO(blob)) as f:saved={k:f[k] for k in f.files}
+    points,mapping,_=prep.load_pixel_input(prep.RUN);camera=prep.read(prep.CAMERA)
+    prep.validate_snapshot_identity(saved,old_model.initial_state.layout,camera,mapping,points=points,
+        point_input_sha256=prep.digest(prep.RUN/'point_observations.npz'))
     old_state=ParameterState(old_model.initial_state.layout,saved['scene_values'])
     input_hash=prep.digest(prep.RUN/'point_observations.npz')
     if str(saved['point_input_sha256'])!=input_hash:raise ValueError('Current checkpoint/input mismatch')
@@ -59,7 +62,6 @@ def stage(out=None,plan_path=None,*,preserve_unchanged_shapes=False):
         values[block['offset']:block['offset']+block['size']]=prior;copied.append(identity)
     new_state=ParameterState(new_model.initial_state.layout,values)
     snapshot={**saved,'scene_values':values}
-    np.savez(out/'seed_state.npz',**snapshot)
     # Hardlink only the immutable seven-field observation file; initializers
     # and receipts are independent so diagnostics cannot modify the live run.
     os.link(prep.RUN/'point_observations.npz',out/'point_observations.npz')
@@ -72,6 +74,8 @@ def stage(out=None,plan_path=None,*,preserve_unchanged_shapes=False):
     mapping['explicit_native_model_revision']=dict(definition=str(plan_path),definition_sha256=prep.digest(plan_path),
         dataset_overwrote_parameters=False,raw_observation_binding_unchanged=True)
     prep.write(out/'mapping.json',mapping)
+    prep.bind_snapshot_identity(snapshot,new_state.layout,camera,mapping)
+    np.savez(out/'seed_state.npz',**snapshot)
     with np.load(out/'point_observations.npz') as points:
         observed={mapping['path_ids'][i] for i in points['path_indices']}
     dependencies={b['id'] for b in new_state.blocks.values() if b['kind'] in ('board_shape','shared_geometry')}
@@ -116,6 +120,9 @@ def install():
     if str(saved['point_input_sha256'])!=validation['input_sha256']:
         raise ValueError('Staged accepted state/input mismatch')
     model=SceneParameterModel(candidate,candidate_path,optimize_scene=True)
+    points,mapping,_=prep.load_pixel_input(out)
+    prep.validate_snapshot_identity(saved,model.initial_state.layout,prep.read(prep.CAMERA),mapping,points=points,
+        point_input_sha256=validation['input_sha256'])
     state=ParameterState(model.initial_state.layout,saved['scene_values'])
     for block in state.blocks.values():
         if block['kind']=='print_shape' and (any(i>=4 for i in block['independent_local_indices'])

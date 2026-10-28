@@ -8,4 +8,4 @@ Ad3 与 Ad16 引用同一个模板及尺寸块，安装位置独立。Ad3 有原
 
 Ad3 当前数值源库位于节目目录的 [rows.npz](../../programmes/okada_mei_sp/ad3_sources/rows.npz) 和 [correspondence.json](../../programmes/okada_mei_sp/ad3_sources/correspondence.json)。共 7009 行、145 曝光，稳定身份、原 UV/PTS 及当前曲线注册表保留；角点别名不重复计权。源库仍为未激活的证据与候选，未被宣称为完整统计求解输入。
 
-原始广告图稿的官方提取来源、SHA 及历史地址保存在资产和来源索引中，完整 SVG 原件不随公开包分发。比赛原帧与叠加图保留在本机 Data；公开边界见[公开审阅说明](../../../../docs/GITHUB_REVIEW.md)。当前模板、尺寸、安装和 D3 投影不等于新拟合完成。
+原始广告图稿的官方提取来源、SHA 和历史地址保存在资产及来源索引中，完整 SVG、原帧和叠加图不随公开包分发，见[公开范围](../../../../docs/GITHUB_REVIEW.md)。本页描述基础模板与来源，联合拟合数值和人工确认以[节目入口](../../programmes/okada_mei_sp/README.md)为准。

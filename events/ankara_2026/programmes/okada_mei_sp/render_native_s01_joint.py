@@ -15,11 +15,14 @@ from rinkspace.review.draw import text,COLORS
 
 
 def render(snapshot_path,phase,label,stills=None,source_range_pts=None):
-    started=time.monotonic();core=NativeCore(prep.LIBRARY);raw_scene=prep.read(prep.SCENE);model=SceneParameterModel(raw_scene,prep.SCENE,optimize_scene=True)
-    snapshot_blob=snapshot_path.read_bytes()
-    snap=dict(np.load(io.BytesIO(snapshot_blob)));state=ParameterState(model.initial_state.layout,snap['scene_values']);native=NativeSceneGPU(prep.SCENE,core,parameter_state=state)
-    camera={**prep.camera_for_snapshot(prep.read(prep.CAMERA),snap),'rig':snap['rig'].tolist()};camera['rig']=complete_camera_rig(camera).tolist();controls=snap['controls'];z=dict(np.load(prep.RUN/'point_observations.npz'));mapping=prep.read(prep.RUN/'mapping.json')
-    if str(snap.get('point_input_sha256',''))!=prep.digest(prep.RUN/'point_observations.npz'):raise ValueError('Snapshot does not match current point input')
+    started=time.monotonic();raw_scene=prep.read(prep.SCENE);model=SceneParameterModel(raw_scene,prep.SCENE,optimize_scene=True)
+    snapshot_blob=snapshot_path.read_bytes();snap=dict(np.load(io.BytesIO(snapshot_blob),allow_pickle=False))
+    z,mapping,_=prep.load_pixel_input(prep.RUN)
+    camera=prep.validate_snapshot_identity(snap,model.initial_state.layout,prep.read(prep.CAMERA),mapping,points=z,
+        point_input_sha256=prep.digest(prep.RUN/'point_observations.npz'))
+    state=ParameterState(model.initial_state.layout,snap['scene_values']);core=NativeCore(prep.LIBRARY)
+    native=NativeSceneGPU(prep.SCENE,core,parameter_state=state)
+    camera={**camera,'rig':snap['rig'].tolist()};camera['rig']=complete_camera_rig(camera).tolist();controls=snap['controls']
     scope=prep.read(Path(__file__).with_name('rebuild_scope.json'));source={**scope['source'],**scope['source_clock']};tb=Fraction(1,12800);expected=prep.selected_s01_exposures()
     if not np.array_equal(np.unique(z['pts']),expected):raise ValueError('Incomplete S01 source exposure coverage')
     if prep.digest(source['registered_path'])!=source['sha256']:raise ValueError('Source video identity changed')

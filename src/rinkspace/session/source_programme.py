@@ -60,25 +60,32 @@ class ProgrammeLedger:
                 candidate_count INTEGER,measured_count INTEGER,identity_count INTEGER,
                 PRIMARY KEY(shot,pts));
         """)
-        pin=digest(job_path);old=self.db.execute("select value from meta where key='job_sha256'").fetchone()
+        pin=digest(job_path)
+        original=self.db.execute("select value from meta where key='job_sha256'").fetchone()
+        old=self.db.execute("select value from meta where key='current_job_sha256'").fetchone() or original
         if old and old[0]!=pin:
             try:
                 prior=Path(previous_job) if previous_job is not None else None
-                if prior is None or digest(prior)!=old[0]:
+                prior_pin=digest(prior) if prior is not None else None
+                if prior_pin not in {old[0],original[0]}:
                     raise ValueError('Resume job revision differs; provide its authenticated previous job')
                 current=json.loads(Path(job_path).read_text(encoding='utf-8-sig'))
                 original=json.loads(prior.read_text(encoding='utf-8-sig'))
                 if source_job_contract(current)!=source_job_contract(original):
                     raise ValueError('Resume revision changes the original source or exposure scope')
                 record=dict(job_path=str(Path(job_path).resolve()),job_sha256=pin,
-                    previous_job_path=str(prior.resolve()),previous_job_sha256=old[0],
+                    previous_job_path=str(prior.resolve()),previous_job_sha256=prior_pin,
                     original_frames_preserved=True,previous_task_instructions_used=False,
                     old_navigation_is_not_current_geometry_validation=True)
                 self.db.execute('insert or ignore into meta values(?,?)',
                     ('continuation_job/'+pin,json.dumps(record,sort_keys=True,separators=(',',':'))))
             except BaseException:
                 self.db.close();raise
-        self.db.execute("insert or ignore into meta values('job_sha256',?)",(pin,));self.db.commit()
+        # Keep the initial job pin as provenance, and remember the authorized
+        # current revision so its next restart needs no obsolete job file.
+        self.db.execute("insert or ignore into meta values('job_sha256',?)",(pin,))
+        self.db.execute("insert or replace into meta values('current_job_sha256',?)",(pin,))
+        self.db.commit()
 
     def commit(self, shot, pts, payload):
         data=json.dumps(payload,ensure_ascii=False,separators=(',',':'),allow_nan=False).encode()
@@ -198,7 +205,27 @@ def _verified_job(job_path):
         ref=job[name]
         if digest(job_reference_path(path,job,name))!=ref['sha256']:raise ValueError('Job input changed: '+name)
     if digest(job['source']['registered_path'])!=job['source']['sha256']:raise ValueError('Original video SHA differs')
-    if sum(s['native_frame_count'] for s in job['sequences'])!=7186:raise ValueError('Requested exposure registry differs')
+    scope=json.loads(job_reference_path(path,job,'scope_ref').read_text(encoding='utf-8-sig'))
+    from .source_read import _validated_sequences
+    sequences=_validated_sequences(job,scope)
+    selected=[batch['shot_id'] for batch,_ in sequences]
+    if (len(set(selected))!=len(selected) or selected!=job['selected_shot_ids']):
+        raise ValueError('Programme sequences must contain each selected shot exactly once')
+    for key in ('sha256','width','height'):
+        if job['source'].get(key)!=scope['source'].get(key):
+            raise ValueError('Programme source differs from its selected scope: '+key)
+    clock=job['source_clock'];expected_clock=scope['source_clock']
+    for key in ('time_base_num','time_base_den','native_pts_step'):
+        if type(clock.get(key)) is not int or clock[key]<=0:
+            raise ValueError('Programme native clock must contain positive integers')
+    if (Fraction(clock['time_base_num'],clock['time_base_den'])!=
+            Fraction(expected_clock['time_base_num'],expected_clock['time_base_den']) or
+            clock['native_pts_step']!=expected_clock['native_pts_step']):
+        raise ValueError('Programme native clock differs from its selected scope')
+    for batch,_ in sequences:
+        count=(batch['stop_pts_exclusive']-batch['first_pts'])//clock['native_pts_step']
+        if type(batch.get('native_frame_count')) is not int or batch['native_frame_count']!=count:
+            raise ValueError('Requested exposure registry differs from its native interval')
     return path,job
 
 
@@ -297,16 +324,20 @@ def run_programme(job_path, out, *, resume=False, interrupt_after_commit=None, p
     def report(event):
         record=dict(unix_time=time.time(),**_json_safe(event));line=json.dumps(record,ensure_ascii=True,allow_nan=False)
         log.write(line+'\n');print(line,flush=True)
-    library=Path(job['roots']['data'])/'build/gpu_sparse_20261026/rinkspace_core.dll'
-    geometry=NativeSourceGeometry(Path(job['roots']['repo'])/job['scene_ref']['path'],library)
+    print('MAIN LOG: '+str((out/'programme.log').resolve()),flush=True)
+    library=Path(job['roots']['data'])/'build/native_s01_audit_20261027/rinkspace_core.dll'
+    geometry=NativeSourceGeometry(job_reference_path(path,job,'scene_ref'),library)
     if not all(hasattr(geometry.core._lib,s) for s in ('rs_g1_create','rs_g3_attach','rs_g4_solve','rs_g2_sparse_info')):
         raise ValueError('Current native GPU capabilities unavailable')
-    scope=json.loads((Path(job['roots']['repo'])/job['scope_ref']['path']).read_text(encoding='utf-8-sig'))
-    config=json.loads((Path(job['roots']['repo'])/job['vision_config_ref']['path']).read_text(encoding='utf-8-sig'))
-    config['enable_candidate_admission']=True
+    scope=json.loads(job_reference_path(path,job,'scope_ref').read_text(encoding='utf-8-sig'))
+    config=json.loads(job_reference_path(path,job,'vision_config_ref').read_text(encoding='utf-8-sig'))
+    # Preserve the selected reader's explicit candidate-admission setting.
+    clock=Fraction(job['source_clock']['time_base_num'],job['source_clock']['time_base_den'])
+    step=job['source_clock']['native_pts_step']
+    expected_total=sum(s['native_frame_count'] for s in job['sequences'])
     runtime_config=out/'vision_runtime.json';write_json(runtime_config,config)
     reader=SourceRinkReader(runtime_config,native_geometry=geometry,programme_scope=scope,
-        source_reidentification=Path(job['roots']['repo'])/job['source_reidentification_ref']['path'])
+        source_reidentification=job_reference_path(path,job,'source_reidentification_ref'))
     source_index=SourceEvidenceIndex(path,out/'source_index.sqlite',reuse_from_job=previous_job)
     build_qualification_index(source_index,report)
     resolver=SourceSupportResolver(source_index.inputs,out/'source_support.sqlite')
@@ -328,16 +359,16 @@ def run_programme(job_path, out, *, resume=False, interrupt_after_commit=None, p
             report(dict(stage='shot_source_start',shot=sid,start_pts=start,warm_restart_anchor_pts=warm,exact_reader_memory_resume=False))
             with av.open(job['source']['registered_path']) as container:
                 stream=container.streams.video[0]
-                if str(stream.time_base)!='1/12800':raise ValueError('Actual source time base differs')
+                if Fraction(stream.time_base)!=clock:raise ValueError('Actual source time base differs')
                 container.seek(warm,stream=stream,backward=True)
                 for frame in container.decode(stream):
                     if frame.pts<warm:continue
                     if frame.pts>=shot['stop_pts_exclusive']:break
                     pts=int(frame.pts)
-                    if pts!=warm+len(decoded)*256:raise ValueError('Missing actual native source exposure')
+                    if pts!=warm+len(decoded)*step:raise ValueError('Missing actual native source exposure')
                     decoded.append(pts);rgb=frame.to_ndarray(format='rgb24')
                     sha=hashlib.sha256(rgb.tobytes()).hexdigest()
-                    binding=canonical_source_binding(dict(source_sha256=job['source']['sha256'],source_pts=pts,time_base='1/12800',
+                    binding=canonical_source_binding(dict(source_sha256=job['source']['sha256'],source_pts=pts,time_base=str(clock),
                         shot_id=sid,native_hw=list(rgb.shape[:2]),decoded_native_rgb_sha256=sha,evaluation_role='development'),scope)
                     record=process_exposure(reader,source_index,resolver,rgb,binding,state,reset=first);first=False
                     if pts in done:
@@ -345,7 +376,7 @@ def run_programme(job_path, out, *, resume=False, interrupt_after_commit=None, p
                         report(dict(stage='warm_restart_anchor_reread',shot=sid,pts=pts,duplicate_measurement_committed=False));continue
                     ledger.commit(sid,pts,record);commits+=1
                     if True:
-                        report(dict(stage='source_frame_committed',shot=sid,pts=pts,source_seconds=pts/12800,
+                        report(dict(stage='source_frame_committed',shot=sid,pts=pts,source_seconds=float(pts*clock),
                             committed_total=ledger.db.execute('select count(*) from frames').fetchone()[0],
                             measured=sum(c['localization']=='measured' for c in record['candidates']),
                             identified=sum(c['identity']=='confirmed' for c in record['candidates']),
@@ -355,7 +386,7 @@ def run_programme(job_path, out, *, resume=False, interrupt_after_commit=None, p
                         report(dict(stage='real_interruption_after_durable_frame',shot=sid,pts=pts));raise KeyboardInterrupt()
         verified=[p for p, in ledger.db.execute('select pts from frames where shot=? order by pts',(sid,))]
         if verified!=expected:raise ValueError('Shot has missing committed native exposures')
-        scope_path=Path(job['roots']['repo'])/job['scope_ref']['path']
+        scope_path=job_reference_path(path,job,'scope_ref')
         dependencies=navigation_dependencies(ledger,sid,geometry,camera_path,scope_path)
         accepted,reused,reuse_reason=navigation_result_target(out,sid,dependencies)
         report(dict(stage='native_navigation_resume_check',shot=sid,reused=reused,
@@ -368,7 +399,7 @@ def run_programme(job_path, out, *, resume=False, interrupt_after_commit=None, p
         data=dict(geometry=geometry,job=job,decoded_pts=[p for p, in ledger.db.execute('select pts from frames order by pts')],
             navigation_dir=navroot,index_ref=str(source_index.path),candidate_ledger_ref=str(out/'programme.sqlite'))
         inp=export_input(ledger.candidates(sid),feature_registry(geometry),data,None,'camera_navigation',revision)
-        prepared=revision/'prepared';prepare(inp,Path(job['roots']['repo'])/job['scope_ref']['path'],[sid],prepared,core=geometry.core)
+        prepared=revision/'prepared';prepare(inp,scope_path,[sid],prepared,core=geometry.core)
         report(dict(stage='native_gpu_navigation_start',shot=sid,prepared=str(prepared),main_log=str(out/'programme.log')))
         geometry.assert_unchanged()
         compiled=compile_navigation_problem(prepared,revision/'navigation_local_state.json',shot_id=sid,core=geometry.core)
@@ -392,12 +423,12 @@ def run_programme(job_path, out, *, resume=False, interrupt_after_commit=None, p
         finally:resident.close()
     geometry.assert_unchanged()
     total=ledger.db.execute('select count(*) from frames').fetchone()[0]
-    if total!=7186:raise ValueError('Complete target exposure count not reached')
+    if total!=expected_total:raise ValueError('Complete target exposure count not reached')
     result=dict(status='machine_result_pending_scoped_visual_review',processed_native_exposures=total,
         navigation_results=navigation_results,
         shot_counts=ledger.db.execute('select shot,count(*),sum(measured_count),sum(identity_count) from frames group by shot').fetchall(),
         wall_seconds=time.perf_counter()-started,main_log=str(out/'programme.log'),geometry_unchanged=True)
     from ..review.source_programme import render_programme
     result['review']=render_programme(job,ledger,geometry,out/'navigation',out/'review',report,
-        navigation_results=navigation_results)
+        navigation_results=navigation_results,job_path=path)
     write_json(out/'result.json',result);return result

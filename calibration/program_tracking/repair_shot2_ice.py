@@ -152,6 +152,26 @@ class SourceNormalProfiles(NativeProfiles):
         return output,diagnostic
 
 
+def filter_grey_circle_readouts(rows,rgb):
+    """Reuse S02 grey-circle versus crossing red-band material evidence."""
+    kept=[];rejected=[]
+    rgb=rgb.astype(np.float32)
+    red=rgb[...,0]-(rgb[...,1]+rgb[...,2])*.5
+    for row in rows:
+        ev=row['source_evidence'];uv=np.asarray(row['uv']);normal=np.asarray(ev['profile_normal'])
+        sides=np.asarray(ev['actual_source_sides_uv'])
+        outside=np.vstack([sides[0]-normal*5,sides[1]+normal*5])
+        sample=np.vstack([uv,outside]).astype(np.float32)
+        values=cv2.remap(red,sample[:,0][None],sample[:,1][None],cv2.INTER_LINEAR)[0]
+        red_contrast=float(values[0]-values[1:].mean())
+        if red_contrast>5:
+            rejected.append(dict(uv=row['uv'],reason='red_straight_band_crossing_grey_circle',red_chroma_contrast=red_contrast))
+            continue
+        ev['current_native_grey_C0_vs_red_straight_band_disambiguation']=dict(red_chroma_contrast=red_contrast)
+        kept.append(row)
+    return kept,rejected
+
+
 class CurrentHouseReader(SelectedHouseReader):
     """A nearby red straight band cannot impersonate the grey C0 paint."""
     def queries(self,group,index,role,parameters,spacing=35):
@@ -206,21 +226,7 @@ class CurrentHouseReader(SelectedHouseReader):
                 stats['eligible_native_material_readouts']-=len(role_failed)
                 stats['full_reader_support_admitted_readouts']=sum(r['role']==role for r in rows)
         if group is not self.groups.get('C0'):return rows,diagnostic
-        kept=[];rejected=[]
-        rgb=native.frame.rgb.astype(np.float32)
-        red=rgb[...,0]-(rgb[...,1]+rgb[...,2])*.5
-        for row in rows:
-            ev=row['source_evidence'];uv=np.asarray(row['uv']);normal=np.asarray(ev['profile_normal'])
-            sides=np.asarray(ev['actual_source_sides_uv'])
-            outside=np.vstack([sides[0]-normal*5,sides[1]+normal*5])
-            sample=np.vstack([uv,outside]).astype(np.float32)
-            values=cv2.remap(red,sample[:,0][None],sample[:,1][None],cv2.INTER_LINEAR)[0]
-            red_contrast=float(values[0]-values[1:].mean())
-            if red_contrast>5:
-                rejected.append(dict(uv=row['uv'],reason='red_straight_band_crossing_grey_circle',red_chroma_contrast=red_contrast))
-                continue
-            ev['current_native_grey_C0_vs_red_straight_band_disambiguation']=dict(red_chroma_contrast=red_contrast)
-            kept.append(row)
+        kept,rejected=filter_grey_circle_readouts(rows,native.frame.rgb)
         diagnostic.setdefault('outer',{}).update(eligible_native_material_readouts=len(kept),
             crossing_red_band_candidates=rejected)
         return kept,diagnostic

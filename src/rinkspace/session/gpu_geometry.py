@@ -5,29 +5,7 @@ from ..domain.scene_assets import read_scene_assets, scene_content_identity
 from ..domain.parameters import SceneParameterModel
 from ..domain.print_assets import frozen_print_curves, resolve_instance
 
-def complete_camera_rig(camera):
-    """Serialize the selected native camera, including its existing C1 wide hinge.
-
-    The knot is a model-basis setting; all four coefficients have solver chart
-    directions. An old proof that the hinge was inactive is provenance, not a
-    permission to omit it after freely fitted zoom enters that region.
-    """
-    import numpy as np
-    rig=np.asarray(camera['rig'],np.float64)
-    if rig.shape==(43,):return rig.copy()
-    if rig.shape!=(38,):raise ValueError('Unsupported native physical camera pack')
-    extension=camera.get('brown_wide_extension')
-    if extension is None:
-        proofs=camera.get('inactive_extension_proofs',[])
-        if proofs:
-            if len(proofs)!=1 or proofs[0].get('kind')!='wide_brown_hinge':raise ValueError('Unsupported native optics extension')
-            extension=proofs[0]['original_definition']
-    if extension is None:return rig.copy()
-    if extension.get('schema')!='rinkfit.source_supported_wide_brown_hinge.v1' or extension.get('power')!=2:raise ValueError('Unsupported native wide optics formula')
-    wide=np.asarray([extension['activation_log_f_native'],*extension['coefficients']],np.float64)
-    if wide.shape!=(5,) or not np.isfinite(wide).all():raise ValueError('Invalid current native wide optics values')
-    return np.r_[rig,wide]
-
+from ..domain.camera import complete_camera_rig
 
 def compile_geometry(scene, scene_path, core, *, parameter_state=None):
     if scene.get("schema")!="rinkspace.field_model.v1":
@@ -74,7 +52,7 @@ class NativeSceneGPU:
             "layer_counts":{layer:sum(p["layer"]==layer for p in self.paths.values()) for layer in ("ice","board","advertisement")},
             "unlocalized":self.unlocalized}
 
-    def resident(self, *, camera, controls, path_ids, stations, pts, observed, scene_directions=None, scene_lower=None, scene_upper=None):
+    def resident(self, *, camera, controls, path_ids, stations, pts, observed, scene_directions=None, scene_lower=None, scene_upper=None, motion_times=None, rigs=None, camera_ids=None):
         """Bind source coordinates to existing paths; geometry has no data-side setter."""
         import numpy as np
         from ..core.gpu import ResidentResidualProblem
@@ -90,10 +68,16 @@ class NativeSceneGPU:
         # Shared parameter references are retained by the selected records.
         order=list(dict.fromkeys(ids));indices={name:i for i,name in enumerate(order)}
         times=np.array([(int(p)-int(camera["reference_pts"]))*camera["time_base_num"]/camera["time_base_den"] for p in native_pts],np.float64)
+        if motion_times is not None:
+            # Disjoint shots can occupy separate spline-storage blocks. Their
+            # clocks are translated, never rescaled; original PTS stay in data.
+            times=np.asarray(motion_times,np.float64)
+            if times.shape!=native_pts.shape or not np.isfinite(times).all():
+                raise ValueError('One finite motion time is required per original source PTS')
         resident=ResidentResidualProblem(self.core,board=self.scene["board"],layout=self.scene["shared_layout"],
-            options=self.scene["shared_geometry_options"],rig=complete_camera_rig(camera),controls=controls,
+            options=self.scene["shared_geometry_options"],rig=complete_camera_rig(camera) if rigs is None else rigs,controls=controls,
             first_control_time=camera["first_control_time"],control_dt=camera["control_dt"],image_height=camera["image_height"],
-            codes=np.array([indices[name] for name in ids],np.int32),stations=stations,times=times,observed=observed)
+            codes=np.array([indices[name] for name in ids],np.int32),stations=stations,times=times,observed=observed,camera_ids=camera_ids)
         try:
             resident.configure_geometry([self.paths[name] for name in order])
             if scene_directions is not None:
@@ -194,6 +178,61 @@ def scene_coordinate_charts(state):
             positive={"curling_shared":[3,4],"lane_shared":[1],"hockey_shared":[1,2],
                 "hockey_faceoff_shared":[2,4],"hockey_ends_ellipse":list(range(6))}.get(name)
             if positive is None:raise ValueError("Shared geometry needs a declared native coordinate chart: "+name)
+            positive=block.get('positive_local_indices',positive)
             charts[offset+np.asarray(positive,dtype=int)]=1
             if name=="curling_shared":charts[offset+5:offset+8]=[3,4,5]
     return charts
+
+
+def initialize_curve_stations(native, *, camera, controls, path_ids, stations, pts,
+                              observed, kinds, motion_times=None, half_seconds=None, progress=None, backend='cuda'):
+    """Seed named-curve nuisance coordinates using current native projections.
+
+    Raw pixels, curve identity, camera and scene parameters are never altered.
+    Invalid seed geometry remains an explicit failure, not a point exclusion.
+    """
+    import collections
+    import numpy as np
+    if backend not in ('cpu','cuda'):raise ValueError('Unknown native station initialization backend')
+    groups=collections.defaultdict(list);samples={};stations=np.asarray(stations).copy()
+    for row,(pt,path,kind) in enumerate(zip(pts,path_ids,kinds)):
+        if kind==1:groups[(int(pt),path)].append(row)
+    for _,name in groups:
+        if name in samples:continue
+        path=native.paths[name]
+        if path['kind']==7:grid=np.linspace(0,native.core.board_perimeter(native.scene['board']),1025)
+        elif path['kind']==8:grid=np.unique(np.r_[path['knots'],np.linspace(0,1,129)])
+        else:grid=np.linspace(0,1,257 if path['kind'] in (1,6) else 129)
+        samples[name]=grid
+    unresolved=[];distance=np.full(len(stations),np.nan);done=0
+    def process(items):
+        nonlocal done
+        names=[];ss=[];clock=[];tm=[];ranges=[]
+        for (pt,name),rows in items:
+            grid=samples[name];begin=len(ss);names.extend([name]*len(grid));ss.extend(grid);clock.extend([pt]*len(grid))
+            if motion_times is not None:tm.extend([motion_times[rows[0]]]*len(grid))
+            ranges.append((begin,len(ss),rows))
+        ss=np.asarray(ss)
+        with native.resident(camera=camera,controls=controls,path_ids=names,stations=ss,pts=np.asarray(clock,np.int64),
+                observed=np.zeros((len(ss),2)),motion_times=np.asarray(tm) if motion_times is not None else None) as resident:
+            if half_seconds is not None:resident.configure_projection_time_support(half_seconds=half_seconds)
+            evaluated=resident.evaluate(backend)
+        for begin,end,rows in ranges:
+            uv=evaluated['values'][begin:end,3:5];status=evaluated['status'][begin:end];grid=ss[begin:end]
+            valid=(status[:-1]==0)&(status[1:]==0)
+            if not valid.any():unresolved.append(dict(row=rows[0],pts=int(pts[rows[0]]),path=path_ids[rows[0]],count=len(rows)));continue
+            left=uv[:-1][valid];delta=np.diff(uv,axis=0)[valid];length=np.einsum('ij,ij->i',delta,delta);lo=grid[:-1][valid];hi=grid[1:][valid]
+            for start in range(0,len(rows),128):
+                rr=np.asarray(rows[start:start+128]);d=observed[rr,None,:]-left[None,:,:]
+                t=np.clip(np.einsum('ijk,jk->ij',d,delta)/np.maximum(length,1e-300),0,1)
+                dist=np.sum((d-t[:,:,None]*delta)**2,axis=2);j=np.argmin(dist,axis=1);ii=np.arange(len(rr))
+                stations[rr]=lo[j]+t[ii,j]*(hi[j]-lo[j]);distance[rr]=np.sqrt(dist[ii,j])
+            done+=1
+        if progress:progress(dict(groups_done=done,groups_total=len(groups),unresolved_groups=len(unresolved)))
+    batch=[];count=0
+    for key,rows in groups.items():
+        n=len(samples[key[1]])
+        if batch and count+n>250000:process(batch);batch=[];count=0
+        batch.append((key,rows));count+=n
+    if batch:process(batch)
+    return stations,dict(unresolved=unresolved,groups=len(groups),seed_error_percentiles=np.percentile(distance[np.isfinite(distance)],[0,50,95,100]).tolist())

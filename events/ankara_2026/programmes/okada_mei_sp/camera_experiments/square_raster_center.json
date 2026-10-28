@@ -1,0 +1,45 @@
+{
+  "schema": "rinkspace.camera_experiment.v1",
+  "id": "square_raster_center",
+  "basis": {
+    "kind": "engineering_assumption",
+    "not_sony_measurement": true,
+    "description": "工程假设，不是 Sony Z190 实测标定：eta=0 即 fx=fy；cx_zoom=cy_zoom=0 即主点不随 log focal 变化；仅保留 k10+k11*z 径向项，k2、切向和 wide-hinge 系数固定为0。机械位置、旋转轴、杆臂、轴距、pupil1/pupil2仍可拟，不指定米制高度。scene_mode=frozen 只冻结此次输入的当前场景候选，不声明其几何真实。 假设输入是未经裁剪、缩放或重采样偏移的1920x1080栅格，像素中心坐标为u=0..1919、v=0..1079，因此把主点固定为(959.5,539.5)。该坐标约定和光轴居中都是待检验工程假设，绝非Sony实测主点；不得用于不同栅格。readout仍可拟。"
+  },
+  "active_camera_names": [
+    "R0_x",
+    "R0_y",
+    "R0_z",
+    "pan_axis_tangent1",
+    "pan_axis_tangent2",
+    "tilt_axis",
+    "pivot_x",
+    "pivot_y",
+    "pivot_z",
+    "lever_x",
+    "lever_y",
+    "lever_z",
+    "axis_spacing",
+    "pupil1",
+    "pupil2",
+    "k10",
+    "k11",
+    "readout"
+  ],
+  "fixed_rig_values": {
+    "eta": 0.0,
+    "cx_zoom": 0.0,
+    "cy_zoom": 0.0,
+    "k20": 0.0,
+    "k21": 0.0,
+    "p1": 0.0,
+    "p2": 0.0,
+    "wide_k1": 0.0,
+    "wide_k2": 0.0,
+    "wide_p1": 0.0,
+    "wide_p2": 0.0,
+    "cx": 959.5,
+    "cy": 539.5
+  },
+  "scene_mode": "frozen"
+}

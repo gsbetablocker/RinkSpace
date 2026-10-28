@@ -1,5 +1,6 @@
 """Audit actual local visibility separately from recognizing a whole advertisement."""
 from pathlib import Path
+from functools import lru_cache
 import sys,json,gzip,re,collections,time,itertools
 import numpy as np,cv2
 from scipy.spatial import cKDTree
@@ -10,6 +11,10 @@ CANONICAL_BY_AD={}
 CANONICAL_BY_PATH={}
 LOCAL_PRINT_SHARPNESS_ADS=set()
 BEST_INDEPENDENT_SHAPE_ADS=set()
+
+@lru_cache(maxsize=4)
+def native_material_roles(registry_path):
+    return {p['native_id']:p.get('role')for p in b.read(registry_path)['paths']}
 
 def group_name(name):
     if name.startswith('Ad1.'):return re.sub(r'_inner\d*$', '', name)
@@ -24,6 +29,17 @@ def group_name(name):
 def correlation(a,c):
     a=a-a.mean();c=c-c.mean()
     return float(np.sum(a*c)/max(np.linalg.norm(a)*np.linalg.norm(c),1e-9))
+
+def complete_named_source_reference(v,ref):
+    """A full photographed glyph can validate portions absent in an old crop.
+
+    This identifies reference scope only. Current RGB observability remains
+    required; neither artwork geometry nor a high score changes the native path.
+    """
+    paths=[p for p in ref['atlas']['paths']if p['path_id']==v['path']]
+    return (bool(paths) and not ref['atlas'].get('partial_source_reference',True) and
+        all(p.get('proof',{}).get('kind')=='visually_identified_actual_source_glyph_by_word_order'
+            and len(p['pixels'])>=4 and np.allclose(p['pixels'][0],p['pixels'][-1]) for p in paths))
 
 def reference_normal_width(ref,H,q,n):
     offsets=np.arange(-8.,8.001,.25)
@@ -50,7 +66,10 @@ def group_score(ref,H,group,gray,mask):
     # Borders remain partial observable arcs even when their clipped bbox is narrow.
     if any(s in group for s in ['_edge','_vertical','blue_bar','green_bar','blue_tile','red_field']):fine=False
     out=dict(fine_detail=fine,projected_source_extent=span.tolist(),current_structure_resolved=True)
-    if not fine:return out
+    if not fine:
+        out['current_structure_resolved']=None
+        out['local_material_confirmation_required']=True
+        return out
     if min(hi-lo)<7 or max(hi-lo)>1000:
         out.update(current_structure_resolved=False,reason='fine_entity_not_visible_as_a_two_dimensional_shape');return out
     yy,xx=np.mgrid[lo[1]:hi[1],lo[0]:hi[0]];xy=np.stack([xx,yy],-1).astype(float)
@@ -79,6 +98,7 @@ def group_score(ref,H,group,gray,mask):
 
 def frame_check(pt,records,doc,refs):
     im,gray,mask=r.current(pt);mask=cv2.dilate(mask,np.ones((3,3),np.uint8))
+    roles=native_material_roles(OUT/'native_entity_registry.json')
     present={int(ai):row[str(pt)] for ai,row in doc['records'].items() if str(pt) in row}
     by=collections.defaultdict(list)
     for ai,c in present.items():
@@ -90,8 +110,11 @@ def frame_check(pt,records,doc,refs):
         return cache[key]
     for name,vs in by.items():
         ad=int(name.split('.')[0][2:]);ca=CANONICAL_BY_PATH.get(name,[])+canonical.get(ad,[]);cvs=sorted([v for v in vs if v['atlas_id'] in ca],key=lambda v:ca.index(v['atlas_id']))
-        if cvs and ad in BEST_INDEPENDENT_SHAPE_ADS:
-            best[name]=max(cvs,key=lambda v:(getscore(v)['current_structure_resolved'],getscore(v).get('unblurred_shape_correlation',float(np.median(v['ncc'][v['valid']])) if v['valid'].any() else -1.)))
+        photographed=[v for v in vs if complete_named_source_reference(v,refs[v['atlas_id']]) and getscore(v)['current_structure_resolved'] is not False]
+        if photographed:
+            best[name]=max(photographed,key=lambda v:getscore(v).get('unblurred_shape_correlation',-1.))
+        elif cvs and ad in BEST_INDEPENDENT_SHAPE_ADS:
+            best[name]=max(cvs,key=lambda v:(getscore(v)['current_structure_resolved'] is not False,getscore(v).get('unblurred_shape_correlation',float(np.median(v['ncc'][v['valid']])) if v['valid'].any() else -1.)))
         else:best[name]=cvs[0] if cvs else max(vs,key=lambda v:np.median(v['ncc'][v['valid']]) if v['valid'].any() else -1.)
     for v in best.values():getscore(v)
     word=collections.defaultdict(list)
@@ -116,7 +139,7 @@ def frame_check(pt,records,doc,refs):
         if v is None:reason='current_source_entity_chart_unavailable'
         else:
             check=dict(getscore(v),identity_reference_atlas=v['atlas_id']);g=group_name(name)
-            if not check['current_structure_resolved']:reason=check.get('reason','current_fine_shape_strokes_not_individually_resolved')
+            if check['current_structure_resolved'] is False:reason=check.get('reason','current_fine_shape_strokes_not_individually_resolved')
             if v['atlas_id']==76 and g.split('_')[0] in word_bad:reason='small_text_row_smeared_into_bands'
             if re.match(r'Ad7\.(top|bottom)_\d+',name) and v['atlas_id']!=76:reason='fine_letter_has_no_independent_complete_source_identity'
             dist,qi=v['tree'].query(c['uv']);offsets=c['source_profile']['offsets'];width=float(offsets[2]-offsets[0]);limit=max(4.,width/2+2.)
@@ -139,6 +162,11 @@ def frame_check(pt,records,doc,refs):
                     separation=float(along[matches].min());check['opposed_source_interface_separation_px']=separation;check['observed_transition_width_px']=width
                     if width>separation:reason='individual_paint_interfaces_overlap_at_current_blur_scale'
             border=any(k in name for k in ['_edge','_vertical'])
+            if str(roles.get(c['path_id'],'')).startswith('letter_'):
+                sp=c['source_profile'];query=np.asarray(sp.get('search_uv',c['uv']))
+                pair=m.current_glyph_material_pair(gray,mask,v['q'],query,sp['normal'],sp['offsets'])
+                check['actual_glyph_material_pair']=pair
+                if not pair['resolved']:reason=pair['reason']
             if dist>limit and not border:reason='source_reference_disagrees_with_independent_entity_identity'
             if border and name.split('.')[0] in ['Ad2','Ad3','Ad4','Ad7']:
                 sp=c['source_profile'];base=np.asarray(sp.get('search_uv',c['uv']));normal=np.asarray(sp['normal']);off=np.array([sp['offsets'][0]-3,sp['offsets'][0]-1,sp['offsets'][2]+1,sp['offsets'][2]+3]);rgb=r.sample(im,(base+off[:,None]*normal)[None])[0];sides=np.stack([rgb[:2].mean(0),rgb[2:].mean(0)]);chroma=np.ptp(sides,axis=1)

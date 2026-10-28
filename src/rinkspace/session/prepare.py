@@ -185,6 +185,15 @@ def prepare(input_path, scope_path, shot_ids, out_dir, *, core=None, local_chart
                 "Selected shot is missing registered native exposures", shot_id=sid)
         domain = shot["camera_domain"]
         require(domain["first_pts"] <= wanted["first_pts"] and domain["stop_pts_exclusive"] >= wanted["stop_pts_exclusive"], "Camera state does not cover selected exposure domain", shot_id=sid)
+        # If a current camera is declared, validate its actual clock, pixels
+        # and coefficients. A camera_domain label alone can be stale or wrong.
+        # Registrations without a camera remain explicit structural-only inputs.
+        if shot.get('camera_ref') is not None:
+            from ..domain.runtime_rigs import _camera_data, _dependency
+            from ..domain.camera import validate_camera_source
+            camera_path = _dependency(relative(root, inp['shots_ref']), shot['camera_ref'], 'camera_ref')
+            camera, _, _, _, controls = _camera_data(camera_path)
+            validate_camera_source(camera, controls, shot, sources[source_lookup[source_id]])
         coverage.append({"shot_id": sid, "first_pts": int(pts[0]), "last_pts": int(pts[-1]),
                          "stop_pts_exclusive": wanted["stop_pts_exclusive"], "frames": len(pts)})
     for source_number, source in enumerate(sources):
@@ -278,7 +287,7 @@ def prepare(input_path, scope_path, shot_ids, out_dir, *, core=None, local_chart
     # A caller-supplied label is not a content identity. Bind exactly the current
     # dependencies consumed by this prepared revision, without walking history.
     dependency_revision = {
-        "input": inp["revision"], "scope": digest(scope_path),
+        "input": inp["revision"], "scope": digest(out/'scope.json'),
         "scene": scene_content_identity(scene_snapshot, out/'scene.json'),
         "rigs": digest(out/'rigs.json'), "shots": digest(out/'shots.json'),
         "rig_assets": {item['snapshot_path']: item['sha256'] for item in rig_dependencies},

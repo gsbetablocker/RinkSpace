@@ -26,7 +26,8 @@ def test_large_offsets_in_native_whitening_and_spline(tmp_path):
     view = source[source.index("struct LinearView"):source.index("RS_HD inline void linearize_row")]
     whiten = source[source.index("RS_HD inline double whiten_element"):
                     source.index("RS_HD inline void group_loss")]
-    header = ('#include "rinkspace/camera_state.hpp"\n#include <sys/mman.h>\n'
+    header = ('#include "rinkspace/camera_envelope.hpp"\n'
+              '#include "rinkspace/scene_derivatives.hpp"\n#include <sys/mman.h>\n'
               '#ifndef MAP_NORESERVE\n#define MAP_NORESERVE 0\n#endif\n'
               'using namespace rinkspace;\n')
     main = r"""

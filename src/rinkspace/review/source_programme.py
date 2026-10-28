@@ -24,20 +24,28 @@ def draw_points(raw,record):
             x,y=np.median(pts,axis=0).astype(int);label=name.rsplit('/',1)[-1]
             cv2.putText(canvas,label,(max(4,min(x,canvas.shape[1]-180)),max(55,min(y-8,canvas.shape[0]-8))),
                 cv2.FONT_HERSHEY_SIMPLEX,.38,color,1,cv2.LINE_AA)
-    b=record['source_binding'];pts=b['source_pts']
+    b=record['source_binding'];pts=b['source_pts'];tb=Fraction(b['time_base'])
     cv2.rectangle(canvas,(0,0),(canvas.shape[1],42),(22,22,22),-1)
-    cv2.putText(canvas,f"{b['shot_id'].upper()} | source {pts/12800:.3f}s | PTS {pts} | MACHINE - NOT REVIEWED",
+    cv2.putText(canvas,f"{b['shot_id'].upper()} | source {float(pts*tb):.3f}s | PTS {pts} | MACHINE - NOT REVIEWED",
         (12,19),cv2.FONT_HERSHEY_SIMPLEX,.5,(255,255,255),1,cv2.LINE_AA)
     cv2.putText(canvas,'GREEN: source pixels with identity | AMBER: source pixels, identity pending | NO MODEL GRID',
         (12,36),cv2.FONT_HERSHEY_SIMPLEX,.43,(210,210,210),1,cv2.LINE_AA)
     return canvas
 
 
-def current_review_navigation(job,ledger,geometry,navigation_root,navigation_results=None):
+def current_review_navigation(job,ledger,geometry,navigation_root,navigation_results=None,*,job_path=None):
     """Load the selected solve revision only after its source/native checks."""
     from ..session.source_programme import navigation_dependencies
     cameras={};references={}
-    scope_path=Path(job['roots']['repo'])/job['scope_ref']['path']
+    from ..session.source_inputs import job_reference_path
+    if job_path is not None:
+        scope_path=job_reference_path(job_path,job,'scope_ref')
+    else:
+        # Legacy direct review callers use repo-relative references; explicit
+        # package references require their owning job file, just as in solve.
+        ref=job['scope_ref'];root=ref.get('root','repo')
+        if root=='package':raise ValueError('Package-relative review scope requires its job path')
+        scope_path=Path(job['roots'][root])/ref['path']
     for shot in job['sequences']:
         sid=shot['shot_id']
         path=Path(navigation_results[sid]) if navigation_results else Path(navigation_root)/sid/'result.json'
@@ -55,15 +63,16 @@ def current_review_navigation(job,ledger,geometry,navigation_root,navigation_res
     return cameras,references
 
 
-def render_programme(job,ledger,geometry,navigation_root,out,report,*,navigation_results=None):
+def render_programme(job,ledger,geometry,navigation_root,out,report,*,navigation_results=None,job_path=None):
     """Reuse existing native projection, overlay, decoder and video verification."""
     out=Path(out);out.mkdir(parents=True,exist_ok=True)
     tb=Fraction(job['source_clock']['time_base_num'],job['source_clock']['time_base_den'])
     source=dict(job['source'],time_base_num=tb.numerator,time_base_den=tb.denominator)
-    expected=np.array([p for s in job['sequences'] for p in range(s['first_pts'],s['stop_pts_exclusive'],256)],np.int64)
+    step=job['source_clock']['native_pts_step']
+    expected=np.array([p for s in job['sequences'] for p in range(s['first_pts'],s['stop_pts_exclusive'],step)],np.int64)
     actual=np.array([p for p, in ledger.db.execute('select pts from frames order by pts')],np.int64)
     if not np.array_equal(expected,actual):raise ValueError('Full source review cannot omit native exposures')
-    cameras,references=current_review_navigation(job,ledger,geometry,navigation_root,navigation_results)
+    cameras,references=current_review_navigation(job,ledger,geometry,navigation_root,navigation_results,job_path=job_path)
     receipt=out/'review.json'
     if receipt.is_file() and json.loads(receipt.read_text(encoding='utf-8')).get('navigation_references')!=references:
         token=hashlib.sha256(json.dumps(references,sort_keys=True).encode()).hexdigest()
@@ -74,14 +83,15 @@ def render_programme(job,ledger,geometry,navigation_root,out,report,*,navigation
             if digest(out/v['path'])!=v.get('sha256'):raise ValueError('Saved source review video changed')
             validate_video(out/v['path'],expected,tb)
         return saved
-    paths=[out/'S02-S09_source_points.mp4',out/'S02-S09_native_GPU_navigation.mp4']
+    paths=[out/'source_points.mp4',out/'native_GPU_navigation.mp4']
     temporaries=[p.with_suffix('.partial.mp4') for p in paths]
     outputs=[];streams=[];timings=dict(decode_seconds=0.,point_draw_seconds=0.,native_projection_seconds=0.,grid_draw_seconds=0.,encode_seconds=0.)
     start=time.perf_counter();samples=geometry.samples
-    overview=top_down(samples['xyz'],samples['cuts'],height=source['height'],missing_count=40)
-    for p,width in zip(temporaries,(1920,2560)):
+    overview=top_down(samples['xyz'],samples['cuts'],height=source['height'],
+        missing_count=len(samples.get('missing_entities',[])))
+    for p,width in zip(temporaries,(source['width'],source['width']+overview.shape[1])):
         container=av.open(str(p),'w',options={'movflags':'+faststart','video_track_timescale':str(tb.denominator)})
-        stream=container.add_stream('libx264',rate=Fraction(50));stream.width=width;stream.height=1080;stream.pix_fmt='yuv420p'
+        stream=container.add_stream('libx264',rate=1/(tb*step));stream.width=width;stream.height=source['height'];stream.pix_fmt='yuv420p'
         stream.time_base=tb;stream.codec_context.time_base=tb;stream.options={'crf':'18','preset':'fast'}
         outputs.append(container);streams.append(stream)
     artifacts=[];count=0
@@ -113,7 +123,7 @@ def render_programme(job,ledger,geometry,navigation_root,out,report,*,navigation
             for packet in stream.encode():container.mux(packet)
     finally:
         for container in outputs:container.close()
-    _,after=current_review_navigation(job,ledger,geometry,navigation_root,navigation_results)
+    _,after=current_review_navigation(job,ledger,geometry,navigation_root,navigation_results,job_path=job_path)
     if after!=references:raise ValueError('Source or native navigation changed during review rendering')
     videos=[]
     for temporary,path in zip(temporaries,paths):

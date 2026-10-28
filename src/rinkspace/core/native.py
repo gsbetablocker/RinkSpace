@@ -216,8 +216,9 @@ class NativeCore:
         import numpy as np
         physical=np.ascontiguousarray(rig,np.float64);coefficients=np.ascontiguousarray(controls,np.float64)
         bounds=np.ascontiguousarray(limits,np.float64)
-        if physical.shape not in ((38,),(43,)) or coefficients.ndim!=2 or coefficients.shape[1]!=3 or bounds.shape not in ((10,),(19,),(21,)):
-            raise ValueError("envelope requires rig[38/43], controls[M,3], limits[10/19/21]")
+        valid_bounds=bounds.ndim==1 and (bounds.size in (10,19) or (bounds.size>=21 and (bounds.size-19)%2==0))
+        if physical.shape not in ((38,),(43,)) or coefficients.ndim!=2 or coefficients.shape[1]!=3 or not valid_bounds:
+            raise ValueError("envelope requires rig[38/43], controls[M,3], limits[10/19/19+2*shot_count]")
         out=np.empty(8,np.float64)
         self._call("rs_camera_envelope_evaluate",physical.ctypes.data_as(D),physical.size,
             coefficients.ctypes.data_as(D),len(coefficients),float(control_dt),bounds.ctypes.data_as(D),bounds.size,out.ctypes.data_as(D),out.size)

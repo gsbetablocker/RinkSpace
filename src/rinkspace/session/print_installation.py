@@ -241,7 +241,8 @@ def board_view(data,board,core,out):
 
 def _projection(core,camera,xyz,pts):
     time=(int(pts)-int(camera['reference_pts']))*camera['time_base_num']/camera['time_base_den']
-    return core.project_motion(camera['rig'],camera['controls'],camera['first_control_time'],
+    from ..domain.camera import complete_camera_rig
+    return core.project_motion(complete_camera_rig(camera),camera['controls'],camera['first_control_time'],
         camera['control_dt'],camera['image_height'],time,np.asarray(xyz))
 
 

@@ -72,7 +72,11 @@ def whole_colour_bands(point,normal,offsets,profile,valid,*,maximum_width=175,mi
  starts=np.flatnonzero(support&~np.r_[False,support[:-1]])
  ends=np.flatnonzero(support&~np.r_[support[1:],False]);out=[]
  for a,b in zip(starts,ends):
-  if b-a<max(3,minimum_width-1) or b-a>maximum_width+35:continue
+  # This is a low-level blurred support envelope, not the measured paint
+  # width. Its tails can be wider than maximum_width+35 even when the actual
+  # two half-level interfaces are within maximum_width. Enforce width after
+  # reading those interfaces; do not discard a valid diffuse band in advance.
+  if b-a<max(3,minimum_width-1):continue
   lo=max(0,a-22);hi=min(len(profile)-1,b+22)
   if lo==0 or hi==len(profile)-1 or not valid[lo:hi+1].all():continue
   x=offsets[lo:hi+1];y=raw[lo:hi+1]
@@ -207,7 +211,13 @@ class NestedHouseReader:
   for k in np.flatnonzero(visible):
    if last is None or np.linalg.norm(uv[k]-uv[last])>=spacing:ids.append(k);last=k
   if not ids:return np.empty(0),np.empty((0,2)),np.empty((0,2)),np.empty((0,2))
-  ids=np.array(ids);theta=theta[ids];uv=uv[ids];normal=normal[ids]
+  # A flattened circle can turn around before reaching the chord-distance
+  # spacing. Preserve its visible extrema as search queries; otherwise the
+  # small central disk can lose an entire side. These are NOT observations.
+  visible_ids=np.flatnonzero(visible)
+  for axis in (0,1):
+   ids.extend([int(visible_ids[np.argmin(uv[visible_ids,axis])]),int(visible_ids[np.argmax(uv[visible_ids,axis])])])
+  ids=np.unique(ids);theta=theta[ids];uv=uv[ids];normal=normal[ids]
   # The permitted source strip ends before the adjacent physical layer's
   # halfway boundary. The same shared world projection supplies every gap.
   radii=group['radii'];radius=radii[role];interval=np.tile([-75.,75.] if group['outline'] else [-25.,25.],(len(ids),1))
@@ -297,11 +307,18 @@ class NestedHouseReader:
   points=np.asarray(points,float);nearest=cv2.getClosestEllipsePoints((source_center.tolist(),axes.tolist(),float(angle)),points.astype(np.float32)).reshape(-1,2)
   delta=points-source_center;sign=np.sign(np.einsum('ij,ij->i',delta@source_matrix,delta)-1)
   return np.linalg.norm(nearest-points,axis=1)*sign
+ def closest_source_curve_points(self,curve,points):
+  ellipse=cv2.fitEllipse(np.asarray(curve,np.float32))
+  return cv2.getClosestEllipsePoints(ellipse,np.asarray(points,np.float32)).reshape(-1,2)
+ def initial_navigation(self,fid,index):
+  return np.zeros(6)
  def read(self,fid,index,native):
-  group=self.groups[fid];initial=np.zeros(6)
-  # A standalone re-read and a full replay use identical current-frame
-  # initialization. No stale previous-circle state can switch identities.
+  group=self.groups[fid];initial=np.asarray(self.initial_navigation(fid,index),float)
+  # Default callers remain stateless. A caller may supply authenticated
+  # same-shot source-motion navigation; it is never emitted as a reading.
   bound=np.array([90.,60.,.25,.18,.06,.25]) if fid=='C0' else np.array([40.,30.,.06,.05,.025,.08])
+  if initial.shape!=(6,) or not np.isfinite(initial).all() or np.any(abs(initial)>=bound):
+   raise ValueError('Circle source navigation must be finite and inside the existing search chart')
   fitted=initial;diagnostics={};rows=[]
   base_curves={role:self.projection(group,index,role,np.linspace(0,2*np.pi,513),None)[0] for role in group['radii']}
   conics={role:self.conic(curve) for role,curve in base_curves.items()}
@@ -339,9 +356,8 @@ class NestedHouseReader:
    # Emit correlated sparse representatives of this frame's jointly fitted
    # physical curve. Preserve every native material readout separately. The
    # fit is never used to fill a station without current source material.
-   ellipse=cv2.fitEllipse(np.asarray(curve,np.float32))
    actual=np.asarray([row['uv'] for row in selected],np.float32)
-   nearest=cv2.getClosestEllipsePoints(ellipse,actual).reshape(-1,2)
+   nearest=self.closest_source_curve_points(curve,actual)
    exact_errors=np.linalg.norm(nearest.astype(float)-actual.astype(float),axis=1)
    precise=[]
    for row,representative,error in zip(selected,nearest,exact_errors):

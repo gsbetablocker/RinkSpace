@@ -16,6 +16,35 @@ class PixelResidualGPU(unittest.TestCase):
             local_ids=np.arange(4,dtype=np.int32) if local else np.full(4,-1,np.int32),
             local_scales=np.full(4,.001) if local else np.zeros(0))
 
+    def test_trial_profiles_independent_curve_stations_before_acceptance(self):
+        rig=np.array(self.f.kw['rig']);rig[37]=0.
+        controls=np.tile([0.,0.,np.log(100.)],(8,1))
+        stations=np.array([.1,.32,.56,.81]);paths=[dict(kind=1,parameters=[0.,0.,0.,1.,0.,2*np.pi])]
+        kw={**self.f.kw,'rig':rig,'controls':controls,'codes':np.zeros(4,np.int32),'stations':stations}
+        rd=np.zeros((27,2));rd[15,0]=1.;rd[16,1]=1.
+        with ResidentResidualProblem(self.f.core,**kw) as p:
+            p.configure_geometry(paths);observed=p.evaluate('cuda')['values'][:,3:5]+[10.,-8.]
+        outputs=[]
+        for profiling in (False,True):
+            with ResidentResidualProblem(self.f.core,**{**kw,'observed':observed}) as p:
+                p.configure_geometry(paths);p.configure_camera_parameters(directions=rd,max_readout=.08)
+                p.configure_pixel_linearization(directions=np.zeros((8,3,2)),local_ids=np.arange(4,dtype=np.int32),local_scales=np.full(4,.001))
+                p.configure_solver(lower=np.zeros(4),upper=np.ones(4),initial_lambda=.001,
+                    device_budget_bytes=p.creation['free_after_alloc_bytes'],host_budget_bytes=2**30,
+                    profile_trial_stations=profiling)
+                p.refine_curve_stations(mode='global');summary=p.lm_step()['summary'];trial=p.export_state(trial=True)
+                outputs.append((summary,trial))
+                if profiling:
+                    self.assertTrue(summary['accepted'],summary)
+                    self.assertAlmostEqual(.5*sum(p.evaluate_errors()**2),summary['trial_cost'],places=9)
+                    refinement=p.refine_curve_stations(mode='global')
+                    self.assertLess(refinement['pixel_cost_decrease'],1e-8)
+        old,new=outputs
+        np.testing.assert_allclose(old[1]['rig'],new[1]['rig'],atol=1e-12,rtol=0)
+        np.testing.assert_array_equal(old[1]['controls'],new[1]['controls'])
+        self.assertLess(new[0]['trial_cost'],old[0]['trial_cost']-1e-6)
+
+
     def test_opposite_large_errors_cannot_cancel_or_be_downweighted(self):
         with ResidentResidualProblem(self.f.core,**self.f.kw) as p:
             prediction=p.evaluate('cuda')['values'][:,3:5]
@@ -46,9 +75,9 @@ class PixelResidualGPU(unittest.TestCase):
                 np.testing.assert_allclose(group['white_J'],j[i],rtol=1e-12,atol=1e-12)
 
     def test_many_camera_columns_fit_without_dense_gpu_normal_block_copies(self):
-        # The ad-complete S01 failed before cuDSS with duplicate triangular
-        # storage. Exercise a full physical camera block while keeping the
-        # public dense diagnostic and independent CPU equations unchanged.
+        # Independent pixels store two Jacobian rows, not a dense or triangular
+        # outer product per point. Check memory and the independent dense CPU
+        # equations together: reducing memory cannot change the normal blocks.
         n=128;q=27
         kw=dict(self.f.kw)
         for key in ('codes','stations','times','observed'):
@@ -57,7 +86,7 @@ class PixelResidualGPU(unittest.TestCase):
             p.configure_camera_parameters(directions=np.eye(q)*.001,max_readout=.02)
             plan=p.configure_pixel_linearization(directions=np.zeros((len(kw['controls']),3,q)),
                 local_ids=np.arange(n,dtype=np.int32),local_scales=np.full(n,.001))
-            self.assertLess(plan['device_bytes'],.9*8*plan['H_value_count'])
+            self.assertLess(plan['device_bytes'],.4*8*plan['H_value_count'])
             p.linearize('cuda');gpu=p.export_blocks('cuda')
             p.linearize('cpu');cpu=p.export_blocks('cpu')
             for key in cpu:np.testing.assert_allclose(gpu[key],cpu[key],rtol=1e-11,atol=1e-11)
@@ -266,9 +295,8 @@ class PixelResidualGPU(unittest.TestCase):
         # the unconstrained shared solution changes dx as well as dy. The free
         # station then crosses its endpoint, but that endpoint's multiplier
         # changes sign after the next shared projection: a deterministic cycle.
-        # For a fixed projected dx, the independent conditional optimum is
-        # s=clip((40.8-dx)/40, 0, 1). It is a valid descent candidate even when
-        # the projected joint iteration is not the exact constrained QP optimum.
+        # The joint constrained optimum is dy=0, dx=.4, s=1. Checking only
+        # the conditional station optimum would miss an incorrect shared step.
         rig=np.asarray(self.f.kw['rig']).copy();rig[37]=0.
         kw={**self.f.kw,'rig':rig,'controls':np.tile([0,0,np.log(100.)],(8,1)),
             'codes':np.array([0,1],np.int32),'stations':np.array([.5,0.]),
@@ -287,10 +315,12 @@ class PixelResidualGPU(unittest.TestCase):
                 damping_metric='jacobi',initial_lambda=1e-10)
             result=p.lm_step()['summary']
             self.assertTrue(result['accepted'],result)
-            self.assertEqual(result['reason_code'],5)
+            self.assertEqual(result['reason_code'],6)
             self.assertEqual(result['lambda_used'],1e-10)
             state=p.export_state();evaluated=p.evaluate('cuda')
             dx=state['rig'][26]-50.
+            self.assertAlmostEqual(dx,.4,places=7)
+            self.assertAlmostEqual(state['stations'][0],1.,places=9)
             self.assertAlmostEqual(state['stations'][0],np.clip((40.8-dx)/40.,0.,1.),places=8)
             self.assertGreaterEqual(state['rig'][27],50.-1e-10)
             self.assertEqual(state['stations'][1],0.)

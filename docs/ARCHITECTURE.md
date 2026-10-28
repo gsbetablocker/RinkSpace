@@ -1,6 +1,6 @@
 # 架构与模块职责
 
-本文描述目标结构和依赖方向。实际可用能力统一见 [REBUILD](REBUILD.md)，调用签名与数据格式见 [INTERFACES](INTERFACES.md)，数值方案见 [SOLVER](SOLVER.md)。目标结构不是已实现声明，也不指定本次任务的镜头顺序或审批阶段。
+本文描述模块职责与依赖方向；未实现的目标边界另行标明。实际能力见 [REBUILD](REBUILD.md)，调用签名与格式见 [INTERFACES](INTERFACES.md)，数值方案见 [SOLVER](SOLVER.md)。
 
 RinkSpace 输入有原生 PTS 的比赛原片、场景实体及观测，输出共同场地、每镜头相机、同源审阅和语义明确的运动员轨迹。赛事、节目与镜头是数据实例，其名字不得成为公共数学的分支条件。
 
@@ -19,8 +19,8 @@ RinkSpace 输入有原生 PTS 的比赛原片、场景实体及观测，输出�
 | `review/` | 同一核心的投影、同 PTS 对照及审阅导出；旧 review API 由包内 legacy 保留 |
 | `tracking/`、`analysis/` | 按明确的身体定义、尺度与缺失状态生成轨迹和统计；具体能力另验 |
 | `compat/` | 读取旧静态状态／观测并保留映射；目标是正常运行消费当前格式，现存兼容依赖见 REBUILD |
-| `native/include/rinkspace/`、`native/src/` | 公共数学、C ABI 与目标数值引擎；不读原片或识别赛事名称 |
-| `native/src/core_gpu.cu`、`gpu_linearization.cuh`、`gpu_solver.cuh` | 同源前向／导数、相关组累计、连通消元、cuDSS 与连续 LM |
+| `native/include/rinkspace/`、`native/src/` | 公共数学、C ABI 与驻留数值引擎；不读原片或识别赛事名称 |
+| `native/src/core_gpu.cu`、`gpu_linearization.cuh`、`gpu_solver.cuh` | 同源前向／导数、逐点或相关目标累计、连通消元、cuDSS 与连续 LM |
 | `events/<event>/` | 赛事实体、事实、安装时期、模型与节目绑定 |
 
 依赖方向为 `CLI → session/review/tracking → domain + core + media/storage`，观测准备使用 `domain + media + core`。native 不反向依赖 Python；渲染与残差共用前向数学。同名模块与包的消费者应一并迁移，不能让两份接口各自演进。

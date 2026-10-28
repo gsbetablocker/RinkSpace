@@ -242,9 +242,13 @@ def parameterize_print_assets(assets, *, group_overrides=()):
     for block in blocks.values():
         if block.get('kind') not in ('print_size', 'print_placement'):
             raise PrintBindingError('unsupported_initial_print_parameter_kind', block_id=block['id'])
-        block.update(active=block.get('values') is not None,
-                     tangent_size=block['size'] if block.get('values') is not None else 0,
-                     independent_local_indices=list(range(block['size'])) if block.get('values') is not None else [])
+        # Rebuilding artwork groups must preserve explicit installation/size
+        # constraints, including an instance's fixed board-parallel rotation.
+        active = block.get('values') is not None and block.get('active', True)
+        independent = (block.get('independent_local_indices', list(range(block['size'])))
+                       if active else [])
+        block.update(active=bool(active), tangent_size=len(independent),
+                     independent_local_indices=independent)
     for template in templates.values():
         paths = validate_template_topology(template)
         bindings, groups = {}, []

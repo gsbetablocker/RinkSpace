@@ -1,5 +1,7 @@
 # 本片事件适配：把已实现内核接到真实全源问题
 
+本页描述 rinkfit 历史后端的模块合同，适用范围见[模块入口](../README.md)；当前 rebuild 的 native／GPU 能力见[实现状态](../../../docs/REBUILD.md)。
+
 本文是初始架构到实际 `rinkfit_event_fit` 的具体实施接口。数学权威为 `../spec/design_contract.json` 和 `../spec/SPEC.html`；已经可编译运行的 Ceres 框架接口见 `solver_backend.md`。本文保留 2026-10-17 初始首镜头包的技术合同；当前公开源码的输入/设计文件缺口及入口见[模块 README](../README.md)，后续实现状态按实际代码和节目快照核实。
 
 ## 1. 数据已经在包中，原始义务固定
@@ -42,7 +44,7 @@ PTS 首项 256256，步长 256，即 50 fps。镜头相对时间原点设于 fra
 
 下列路径在审核快照中存在，应首先在**当前本机仓库**定位并读取，避免运行整个历史求解启动链：
 
-| 来源 | 本次用途 |
+| 来源 | 启动包用途 |
 |---|---|
 | `events/ankara_2026/programmes/okada_mei_sp/source_datasets/s1_ad5_id/binding.json` | 原始数据集绑定与来源引用 |
 | `events/ankara_2026/programmes/okada_mei_sp/source_datasets/shot1_fit_20261014/identity_fix2.json` | 场景关联/有限支持覆盖的版本线索；需以当前绑定为准 |

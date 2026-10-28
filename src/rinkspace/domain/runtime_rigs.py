@@ -17,6 +17,7 @@ from pathlib import Path
 import numpy as np
 
 from ..path_policy import guard_project_write
+from .camera import complete_camera_rig
 
 
 def _decode(raw, path):
@@ -56,8 +57,9 @@ def _camera_data(path):
     if camera.get("source_binding_verified") is False:
         raise ValueError(f"Unverified historical replay cannot become a prepared fit camera: {path}")
     rig = camera.get("rig")
-    if not isinstance(rig, list) or len(rig) != 38 or not all(_finite_number(v) for v in rig):
-        raise ValueError(f"Camera rig must contain 38 finite numbers: {path}")
+    if not isinstance(rig, list) or len(rig) not in (38, 43) or not all(_finite_number(v) for v in rig):
+        raise ValueError(f"Camera rig must contain 38 finite or 43 finite numbers: {path}")
+    complete_camera_rig(camera)  # Validate the whole effective optics definition.
     if not _finite_number(camera.get("first_control_time")):
         raise ValueError(f"Camera first_control_time must be finite: {path}")
     if not _finite_number(camera.get("control_dt")) or camera["control_dt"] <= 0:

@@ -14,8 +14,11 @@ RS_API int rs_camera_envelope_evaluate(const double* rig,size_t nr,const double*
     CameraEnvelope e{};MotionSpline s{controls,nc,0.,dt};
     if(!rig||(nr!=38&&nr!=43)||!out||(no!=4&&no!=8)||!s.valid()||!motion_rig(rig).valid()||!camera_envelope(limits,n,e))return 1;
     auto a=camera_envelope_check(motion_rig(rig),s,e);out[0]=a.margin;out[1]=a.kind;out[2]=a.cell;out[3]=a.u;
-    if(no==8){out[4]=a.channel;out[5]=a.kind>=7?a.kind-6:0;out[6]=a.limit;
-        out[7]=a.kind>=7?camera_spline_derivative(controls+3*size_t(a.cell-1),a.channel,a.u,dt,a.kind-6):0.;}
+    if(no==8){const bool derivative=a.kind>=7&&a.kind<=9;
+        out[4]=a.channel;out[5]=derivative?a.kind-6:0;out[6]=a.limit;
+        // kind 10 denotes missing row-time support, with channel == -1.
+        // It is not a fourth derivative and must never index controls[-1].
+        out[7]=derivative?camera_spline_derivative(controls+3*size_t(a.cell-1),a.channel,a.u,dt,a.kind-6):0.;}
     return 0;
 }
 namespace {

@@ -107,6 +107,27 @@ def test_current_complete_artworks_do_not_reopen_separate_line_or_logo_maps():
             assert block['independent_local_indices']==[]
 
 
+def test_ad26_parallel_constraint_survives_artwork_recompile_and_state_load():
+    from rinkspace.domain.parameters import ParameterState, SceneParameterModel
+    _, old, layout = next(r for r in definitions() if r[0]['advertisement_number'] == 13)
+    new = parameterize_print_layout(old, layout)
+    key = 'installation/Ad26/shared_placement'
+    for assets in (old, new):
+        blocks = {b['id']: b for b in assets['parameter_blocks']}
+        assert blocks[key]['independent_local_indices'] == [0, 1]
+        assert blocks[key]['values'][2] == np.pi
+        assert blocks['installation/Ad13/shared_placement']['independent_local_indices'] == [0, 1, 2]
+        assert blocks['size/Ad13_Ad26']['independent_local_indices'] == [0, 1]
+    scene = json.loads(SCENE.read_text(encoding='utf-8-sig'))
+    state = SceneParameterModel(scene, SCENE, optimize_scene=True).initial_state
+    column = state.blocks[key]['offset'] + 2
+    assert column not in state.active_columns()
+    bad = state.values.copy()
+    bad[column] += .01
+    with pytest.raises(ValueError, match='Constrained/frozen parameter coordinate changed'):
+        ParameterState(state.layout, bad)
+
+
 def test_physical_panel_domain_requires_explicit_boundary_and_source():
     _,old,layout=next(r for r in definitions() if r[0]['advertisement_number']==6)
     new=parameterize_print_layout(old,layout);template=new['templates'][0]

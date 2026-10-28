@@ -1,5 +1,7 @@
 # 事件种子转换：可直接加载的新状态向量
 
+本页描述 rinkfit 历史后端的模块合同，适用范围见[模块入口](../README.md)；当前 rebuild 的 native／GPU 能力见[实现状态](../../../docs/REBUILD.md)。
+
 `bootstrap.py` 读取本事件的 `data/seeds.json` 与 `data/camera_seeds.npz`，把保留的 1248 帧历史相机候选转换成新命名状态。它只做初值适配，不使用原始像素进行拟合，也不声称相机、场景或旧误差已经通过验收。
 
 ```bash

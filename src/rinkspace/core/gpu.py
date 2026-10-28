@@ -1,6 +1,7 @@
 """Thin binding for the resident native GPU solver. No geometry math here."""
 from __future__ import annotations
 import ctypes as c
+import time
 import numpy as np
 from .native import D, I, N, NativeCore
 L = c.POINTER(c.c_int64)
@@ -14,7 +15,7 @@ class ResidentResidualProblem:
     """
 
     def __init__(self, core: NativeCore, *, board, layout, options, rig, controls,
-                 first_control_time, control_dt, image_height, codes, stations, times, observed):
+                 first_control_time, control_dt, image_height, codes, stations, times, observed, camera_ids=None):
         self._lib = core._lib
         if not hasattr(self._lib, "rs_g1_create"):
             raise RuntimeError("native library was built without G1 CUDA capability")
@@ -38,21 +39,41 @@ class ResidentResidualProblem:
         self.control_count=len(controls)
         self.layout_count=layout.size
         self.rig_count=rig.size
+        if rig.ndim not in (1,2) or not rig.size:raise ValueError("invalid native camera array")
+        self.camera_count=1 if rig.ndim==1 else len(rig)
+        self.rig_size=rig.size//self.camera_count
+        self._camera_ids=np.zeros(self.count,np.int32) if camera_ids is None else np.asarray(camera_ids)
+        if (self._camera_ids.shape!=(self.count,) or self._camera_ids.dtype.kind not in "iu"
+                or np.any(self._camera_ids<0) or np.any(self._camera_ids>=self.camera_count)):
+            raise ValueError("One declared physical camera index is required per source row")
+        self._camera_ids=np.ascontiguousarray(self._camera_ids,np.int32)
         self._motion_first=float(first_control_time)
         self._motion_dt=float(control_dt)
         self._frame_time_bounds=(float(times.min()),float(times.max()))
+        self._frame_times=np.unique(times)
+        self._frame_times_by_camera=[times[self._camera_ids==i] for i in range(self.camera_count)]
         self.diagnostic_download_bytes=0
         if codes.shape!=(self.count,) or stations.shape!=(self.count,) or times.shape!=(self.count,) or observed.shape!=(self.count,2):
             raise ValueError("G1 row arrays must preserve one-to-one binding")
-        if board.shape!=(6,) or rig.shape not in ((38,),(43,)) or layout.ndim!=1 or controls.ndim!=2 or controls.shape[1]!=3:
+        if board.shape!=(6,) or (rig.ndim not in (1,2) or self.rig_size not in (38,43) or (rig.ndim==2 and rig.shape[1]!=self.rig_size)) or layout.ndim!=1 or controls.ndim!=2 or controls.shape[1]!=3:
             raise ValueError("invalid native model or camera shape")
         self._handle=c.c_void_p()
         metrics=np.zeros(10,np.float64)
         self._check(self._lib.rs_g1_create(board.ctypes.data_as(D),board.size,
-            layout.ctypes.data_as(D),layout.size,int(options),rig.ctypes.data_as(D),rig.size,
+            layout.ctypes.data_as(D),layout.size,int(options),rig.ctypes.data_as(D),self.rig_size,
             controls.ctypes.data_as(D),len(controls),float(first_control_time),float(control_dt),int(image_height),
             codes.ctypes.data_as(I),stations.ctypes.data_as(D),times.ctypes.data_as(D),
             observed.ctypes.data_as(D),self.count,c.byref(self._handle),metrics.ctypes.data_as(D),metrics.size))
+        if self.camera_count>1:
+            try:
+                fn=getattr(self._lib,"rs_gpu_set_camera_groups",None)
+                if fn is None:raise RuntimeError("Native library has no multi-camera resident capability")
+                fn.argtypes=[c.c_void_p,D,N,I,N,D];fn.restype=c.c_int
+                extra=np.zeros(1,np.float64)
+                self._check(fn(self._handle,rig.ctypes.data_as(D),rig.size,self._camera_ids.ctypes.data_as(I),self.count,extra.ctypes.data_as(D)))
+                metrics[3]+=extra[0];metrics[5]-=extra[0]
+            except BaseException:
+                self._lib.rs_g1_destroy(self._handle);self._handle=c.c_void_p();raise
         names=("wall_ms","context_init_ms","h2d_event_ms","owned_device_bytes","free_before_alloc_bytes",
                "free_after_alloc_bytes","total_device_bytes","device_index","compute_major","compute_minor")
         self.creation=dict(zip(names,metrics.tolist()))
@@ -112,6 +133,7 @@ class ResidentResidualProblem:
         self._check(self._lib.rs_g1_evaluate(self._handle,int(backend=="cuda"),
             self._out.ctypes.data_as(D),self._out.size,self._status.ctypes.data_as(I),self.count,
             metrics.ctypes.data_as(D),metrics.size))
+        if backend=="cuda":self.diagnostic_download_bytes+=self._out.nbytes+self._status.nbytes
         return {"values":self._out.copy(),"status":self._status.copy(),
                 "timings":dict(zip(("wall_ms","kernel_event_ms","d2h_event_ms"),metrics.tolist()))}
 
@@ -173,17 +195,21 @@ class ResidentResidualProblem:
         self.diagnostic_download_bytes+=values.nbytes
         return values
 
-    def configure_mount_constraints(self, *, side):
+    def configure_mount_constraints(self, *, side, camera_index=None):
         """Require the confirmed fixed pivot outside the rink, above ice, with a nonzero lever."""
         sides={"outside":1,"negative_y":2,"positive_y":3,"negative_x_end":4,"positive_x_end":5}
         if side not in sides:raise ValueError("unknown physical installation side")
-        fn=self._lib.rs_gpu_set_mount_constraints;fn.argtypes=[c.c_void_p,c.c_int];fn.restype=c.c_int
-        self._check(fn(self._handle,sides[side]))
+        if camera_index is None:
+            fn=self._lib.rs_gpu_set_mount_constraints;fn.argtypes=[c.c_void_p,c.c_int];fn.restype=c.c_int
+            self._check(fn(self._handle,sides[side]))
+        else:
+            fn=self._lib.rs_gpu_set_mount_constraints_for_camera;fn.argtypes=[c.c_void_p,c.c_int,c.c_int];fn.restype=c.c_int
+            self._check(fn(self._handle,int(camera_index),sides[side]))
 
     def configure_camera_envelope(self, *, forward_bounds, pupil_bounds, max_pan_tilt,
                                   max_tilt_deviation, elevation_bounds, roll_bounds,
                                   max_speed=None, max_acceleration=None, max_jerk=None,
-                                  frame_time_bounds=None):
+                                  frame_time_bounds=None,frame_time_intervals=None,camera_index=None):
         """Constrain the complete centre offset and continuous physical attitude.
 
         Distances use the current scene gauge; angles are radians. Unknown rig
@@ -192,6 +218,8 @@ class ResidentResidualProblem:
         select a shot interval containing every source exposure; each trial's
         own readout expands it to all rows. Complete intersecting cubic cells
         are certified, including up to one extra storage cell at each end.
+        frame_time_intervals selects an ordered union of disjoint shot spans;
+        it leaves edit gaps outside the physical trajectory certificate.
         Optional derivative maxima are triples in pan/tilt/log(f) order, with
         time measured in seconds. None/+inf leaves a limit unset. No limits are
         inferred from data, no source residuals are changed or weighted.
@@ -199,20 +227,33 @@ class ResidentResidualProblem:
         limits=np.ascontiguousarray([*forward_bounds,*pupil_bounds,max_pan_tilt,
             max_tilt_deviation,*elevation_bounds,*roll_bounds],np.float64)
         if limits.shape!=(10,):raise ValueError("camera envelope requires ten limits")
+        if frame_time_bounds is not None and frame_time_intervals is not None:
+            raise ValueError('Specify one interval or disjoint shot intervals, not both')
+        windows=frame_time_intervals
+        if frame_time_bounds is not None:windows=[frame_time_bounds]
         motion=(max_speed,max_acceleration,max_jerk)
-        if frame_time_bounds is not None or any(value is not None for value in motion):
+        if windows is not None or any(value is not None for value in motion):
             rows=[np.full(3,np.inf) if value is None else np.asarray(value,np.float64) for value in motion]
             if any(row.shape!=(3,) or np.any(~(row>0)) for row in rows):
                 raise ValueError("motion maxima require positive pan/tilt/log(f) triples; +inf leaves a limit unset")
             limits=np.concatenate((limits,*rows))
-        if frame_time_bounds is not None:
-            span=np.asarray(frame_time_bounds,np.float64)
-            if (span.shape!=(2,) or not np.isfinite(span).all() or span[1]<span[0]
-                    or span[0]>self._frame_time_bounds[0] or span[1]<self._frame_time_bounds[1]):
+        if windows is not None:
+            span=np.asarray(windows,np.float64)
+            if (span.ndim!=2 or span.shape[1]!=2 or not len(span) or not np.isfinite(span).all()
+                    or np.any(span[:,1]<span[:,0]) or np.any(span[1:,0]<=span[:-1,1])):
+                raise ValueError('Camera envelope intervals must be finite, ordered and disjoint')
+            frame_times=self._frame_times if camera_index is None else np.unique(self._frame_times_by_camera[int(camera_index)])
+            covered=np.zeros(len(frame_times),bool)
+            for lo,hi in span:covered|=(frame_times>=lo)&(frame_times<=hi)
+            if not covered.all():
                 raise ValueError('Camera envelope interval must contain every source exposure')
-            limits=np.r_[limits,(span-self._motion_first)/self._motion_dt]
-        fn=self._lib.rs_gpu_set_camera_envelope;fn.argtypes=[c.c_void_p,D,N];fn.restype=c.c_int
-        self._check(fn(self._handle,limits.ctypes.data_as(D),limits.size))
+            limits=np.r_[limits,((span-self._motion_first)/self._motion_dt).ravel()]
+        if camera_index is None:
+            fn=self._lib.rs_gpu_set_camera_envelope;fn.argtypes=[c.c_void_p,D,N];fn.restype=c.c_int
+            self._check(fn(self._handle,limits.ctypes.data_as(D),limits.size))
+        else:
+            fn=self._lib.rs_gpu_set_camera_envelope_for_camera;fn.argtypes=[c.c_void_p,c.c_int,D,N];fn.restype=c.c_int
+            self._check(fn(self._handle,int(camera_index),limits.ctypes.data_as(D),limits.size))
         self.camera_envelope_limits=limits
 
     def configure_projection_time_support(self, *, half_seconds):
@@ -239,7 +280,7 @@ class ResidentResidualProblem:
         for finite off-image predictions within that declared time interval.
         """
         directions=np.ascontiguousarray(directions,np.float64)
-        if directions.ndim!=2 or directions.shape[0]!=(31 if self.rig_count==43 else 27) or directions.shape[1]<=0:
+        if directions.ndim!=2 or directions.shape[0]!=self.camera_count*(31 if self.rig_size==43 else 27) or directions.shape[1]<=0:
             raise ValueError("physical camera directions must have shape (27, retained_columns)")
         lower=np.full(self.rig_count,-np.inf) if lower is None else np.ascontiguousarray(lower,np.float64)
         upper=np.full(self.rig_count,np.inf) if upper is None else np.ascontiguousarray(upper,np.float64)
@@ -259,7 +300,7 @@ class ResidentResidualProblem:
         self._check(fn(self._handle,int(trial),board.ctypes.data_as(D),board.size,
             layout.ctypes.data_as(D),layout.size,rig.ctypes.data_as(D),rig.size))
         self.diagnostic_download_bytes+=board.nbytes+layout.nbytes+rig.nbytes
-        return {"board":board,"layout":layout,"rig":rig}
+        return {"board":board,"layout":layout,"rig":rig if self.camera_count==1 else rig.reshape(self.camera_count,self.rig_size)}
 
     def configure_pixel_linearization(self, *, directions, local_ids, local_scales):
         """Unweighted raw UV distances; no statistical or pixel tolerance input.
@@ -428,7 +469,8 @@ class ResidentResidualProblem:
 
     def configure_solver(self, *, lower, upper, device_budget_bytes, host_budget_bytes,
                          initial_lambda_relative=1e-3, initial_lambda=0.0,
-                         acceptance_eta=1e-4, linear_tolerance=1e-8, damping_metric="identity"):
+                         acceptance_eta=1e-4, linear_tolerance=1e-8, damping_metric="identity",
+                         profile_trial_stations=False):
         """Attach native one-candidate LM. No Python numerical solve or update."""
         self._g2_backend("cuda")
         if not hasattr(self._lib,"rs_g3_attach"):
@@ -452,23 +494,93 @@ class ResidentResidualProblem:
         options=np.array([initial_lambda_relative,initial_lambda,acceptance_eta,linear_tolerance,
                           device_budget_bytes,host_budget_bytes],np.float64)
         if damping_metric not in ("identity","jacobi","jacobi_image_station","jacobi_image"):raise ValueError("unknown LM damping metric")
-        if damping_metric!="identity":options=np.r_[options,{"jacobi":1.,"jacobi_image_station":2.,"jacobi_image":3.}[damping_metric]]
+        if not isinstance(profile_trial_stations,bool):raise ValueError("profile_trial_stations must be boolean")
+        if profile_trial_stations and self.linearization_info.get('objective')!='unweighted_squared_pixel_distance':
+            raise ValueError("trial station profiling requires independent raw pixel factors")
+        if damping_metric!="identity" or profile_trial_stations:
+            options=np.r_[options,{"identity":0.,"jacobi":1.,"jacobi_image_station":2.,"jacobi_image":3.}[damping_metric]]
+        if profile_trial_stations:options=np.r_[options,1.]
         info=np.zeros(8,np.float64)
         self._check(self._lib.rs_g3_attach(self._handle,lower.ctypes.data_as(D),upper.ctypes.data_as(D),nl,
             options.ctypes.data_as(D),options.size,info.ctypes.data_as(D),info.size))
         self.solver_info=dict(zip(("setup_wall_ms","owned_device_bytes","max_local_dimension","reduced_CSR_nnz",
                                   "cudss_major","cudss_minor","cudss_patch","local_matrix_values"),info.tolist()))
         self.solver_info["damping_metric"]=damping_metric
+        self.solver_info["profile_trial_stations"]=profile_trial_stations
         return self.solver_info
 
-    def refine_curve_stations(self):
+    def evaluate_errors(self):
+        """All original pixel errors with an eight-byte-per-row CUDA download."""
+        if not self._handle.value:raise RuntimeError("resident problem is closed")
+        fn=getattr(self._lib,'rs_g1_evaluate_errors',None)
+        if fn is None:
+            evaluated=self.evaluate('cuda');errors=np.linalg.norm(evaluated['values'][:,9:11],axis=1)
+            errors[evaluated['status']!=0]=np.inf
+            return errors
+        fn.argtypes=[c.c_void_p,D,N];fn.restype=c.c_int;errors=np.empty(self.count)
+        self._check(fn(self._handle,errors.ctypes.data_as(D),errors.size));self.diagnostic_download_bytes+=errors.nbytes
+        return errors
+
+    def evaluate_rows(self, rows):
+        """Evaluate selected source rows using the same current native model."""
+        if not self._handle.value:raise RuntimeError("resident problem is closed")
+        raw=np.asarray(rows)
+        if raw.ndim!=1 or raw.dtype.kind not in 'iu' or np.any(raw<0) or np.any(raw>=self.count):
+            raise ValueError('evaluation rows outside the resident problem')
+        rows=np.ascontiguousarray(raw,np.int32);fn=getattr(self._lib,'rs_g1_evaluate_rows',None)
+        if fn is None:
+            evaluated=self.evaluate('cuda')
+            return dict(rows=rows,values=evaluated['values'][rows].copy(),status=evaluated['status'][rows].copy())
+        values=np.empty((len(rows),11));status=np.empty(len(rows),np.int32)
+        fn.argtypes=[c.c_void_p,I,N,D,N,I,N];fn.restype=c.c_int
+        self._check(fn(self._handle,rows.ctypes.data_as(I),len(rows),values.ctypes.data_as(D),values.size,status.ctypes.data_as(I),status.size))
+        self.diagnostic_download_bytes+=values.nbytes+status.nbytes
+        return dict(rows=rows,values=values,status=status)
+
+    def _objective_timings(self):
+        fn=getattr(self._lib,'rs_g3_objective_timings',None)
+        if fn is None:return {}
+        fn.argtypes=[c.c_void_p,D,N];fn.restype=c.c_int;values=np.empty(6)
+        self._check(fn(self._handle,values.ctypes.data_as(D),values.size))
+        return dict(zip(('pixel_loss','rig_domain','print_domain','scene_domain','camera_envelope','reduce_and_decide'),values.tolist()))
+
+    def refine_curve_stations(self, *, mode="global"):
         """Lower each ordinary point's exact raw pixel distance on its native curve."""
         if not getattr(self,'pixel_residuals',False) or not hasattr(self,'solver_info'):
             raise RuntimeError('independent raw pixel solver required for curve refinement')
-        info=np.zeros(6);fn=self._lib.rs_g3_refine_stations
-        fn.argtypes=[c.c_void_p,D,N];fn.restype=c.c_int
-        self._check(fn(self._handle,info.ctypes.data_as(D),info.size));self.diagnostic_download_bytes+=info.nbytes
+        if mode not in ("global","local"):raise ValueError('station refinement mode must be global or local')
+        info=np.zeros(6)
+        if mode=="local":
+            fn=getattr(self._lib,'rs_g3_refine_stations_ex',None)
+            if fn is None:raise RuntimeError('native library lacks warm station refinement')
+            fn.argtypes=[c.c_void_p,c.c_int,D,N];fn.restype=c.c_int
+            self._check(fn(self._handle,0,info.ctypes.data_as(D),info.size))
+        else:
+            fn=self._lib.rs_g3_refine_stations;fn.argtypes=[c.c_void_p,D,N];fn.restype=c.c_int
+            self._check(fn(self._handle,info.ctypes.data_as(D),info.size))
+        self.diagnostic_download_bytes+=info.nbytes
         return dict(zip(('changed_rows','pixel_cost_decrease','failed_rows','maximum_station_change','wall_ms','native_curve_samples'),info.tolist()))
+
+    def stationarity_diagnostics(self, *, tolerance=1e-7, include_constraints=False):
+        """Read original gradients and declared constraint normals without a step."""
+        fn=getattr(self._lib,'rs_g4_stationarity_diagnostics',None)
+        if fn is None:raise RuntimeError('native library lacks current-state constraint diagnostics')
+        fn.argtypes=[c.c_void_p,c.c_double,D,N];fn.restype=c.c_int;values=np.empty(12)
+        self._check(fn(self._handle,tolerance,values.ctypes.data_as(D),values.size));self.diagnostic_download_bytes+=values.nbytes
+        result=dict(zip(('raw_retained_gradient_inf','raw_station_gradient_inf','box_retained_gradient_inf','box_station_gradient_inf',
+            'cone_primal_residual','cone_complementarity_residual','cone_stationarity_residual','physical_feasibility_violation',
+            'objective','constraint_projected_gradient_inf','active_constraint_count','invalid'),values.tolist()))
+        result.update(stationarity_scope='declared_active_physical_tangent_cone',full_nonlinear_kkt_checked=True,
+            original_undamped_objective=True,normal_coordinates='retained solver chart; each constraint row has Euclidean unit norm')
+        if include_constraints:
+            count=int(values[10]);q=int(self.linearization_info['q']);faces=np.empty((count,24));jac=np.empty((count,q));gradient=np.empty((2,q))
+            export=self._lib.rs_g4_stationarity_export;export.argtypes=[c.c_void_p,D,N,D,N,D,N];export.restype=c.c_int
+            self._check(export(self._handle,faces.ctypes.data_as(D),faces.size,jac.ctypes.data_as(D),jac.size,gradient.ctypes.data_as(D),gradient.size))
+            self.diagnostic_download_bytes+=faces.nbytes+jac.nbytes+gradient.nbytes
+            result.update(constraint_records=faces,normalized_constraint_jacobian=jac,raw_retained_gradient=gradient[0],projected_retained_descent=gradient[1],
+                constraint_record_fields=['family','index','other','side','equality','sign','station','margin','active_scale','normalized_multiplier','gradient_norm',
+                    'camera_kind','camera_cell','camera_channel','camera_u','camera_sign','camera_minimum','camera_limit','nx','ny','nz','rate_u0','rate_u1','rate_sign_code'])
+        return result
 
     def lm_step(self):
         """Exactly one candidate: native linearize/eliminate/solve/retract/decide."""
@@ -477,7 +589,7 @@ class ResidentResidualProblem:
         summary=np.zeros(32,np.float64);timings=np.zeros(12,np.float64)
         self._check(self._lib.rs_g3_step(self._handle,summary.ctypes.data_as(D),summary.size,
                                        timings.ctypes.data_as(D),timings.size))
-        return self._step_record(summary,timings)
+        record=self._step_record(summary,timings);record["trial_objective_components_ms"]=self._objective_timings();return record
 
     @staticmethod
     def _step_record(summary,timings):
@@ -493,7 +605,8 @@ class ResidentResidualProblem:
         metrics["reason"]={0:"accepted_decrease_and_gain",1:"insufficient_actual_decrease_or_gain",
                            2:"nonpositive_prediction_or_no_feasible_step",3:"trial_domain_failure",
                            4:"repeated_active_set_retry_with_damping",
-                           5:"accepted_decrease_after_conditional_local_completion"}[int(metrics["reason_code"])]
+                           5:"accepted_decrease_after_conditional_local_completion",
+                           6:"accepted_decrease_after_bounded_joint_refinement"}[int(metrics["reason_code"])]
         return {"summary":metrics,"timings":dict(zip(("wall_ms","bounds_setup_event_ms","damp_local_eliminate_event_ms",
             "cudss_analysis_event_ms","cudss_factor_event_ms","cudss_solve_event_ms","backsub_bounds_event_ms",
             "retract_prediction_event_ms","trial_objective_event_ms","summary_d2h_event_ms","accept_commit_event_ms",
@@ -509,17 +622,36 @@ class ResidentResidualProblem:
         self._g2_backend("cuda")
         if not hasattr(self,"solver_info"):raise RuntimeError("G3 solver not attached")
         callback_type=c.CFUNCTYPE(None,D,D,c.c_double,c.c_double,c.c_void_p)
+        version_fn=getattr(self._lib,"rs_g4_stationarity_version",None)
+        version=0
+        if version_fn is not None:
+            version_fn.argtypes=[];version_fn.restype=c.c_int;version=int(version_fn())
+        stationarity_scope=("declared_active_physical_tangent_cone" if version==2 else
+                            "single_column_rig_boxes_and_station_boxes" if version==1 else
+                            "legacy_raw_retained_gradient_and_station_boxes")
         callback_errors=[]
+        callback_wall_ms=0.
+        diagnostic_bytes_before=self.diagnostic_download_bytes
         def report(summary,timings,gradient,numerical_rejections,context):
+            nonlocal callback_wall_ms
             if progress is None or callback_errors:return
+            callback_started=time.perf_counter()
             try:
                 record=self._step_record(np.ctypeslib.as_array(summary,shape=(32,)).copy(),
                                          np.ctypeslib.as_array(timings,shape=(12,)).copy())
-                record["projected_gradient_before"]=float(gradient)
+                record["trial_objective_components_ms"]=self._objective_timings()
+                record["projected_gradient_before"]=float(gradient) # legacy compatible alias
+                record["stationarity_scope"]=stationarity_scope
+                record["full_nonlinear_kkt_checked"]=version==2
+                if version==2:record["constraint_projected_gradient_before"]=float(gradient)
+                elif version==1:record["box_projected_gradient_before"]=float(gradient)
+                else:record["legacy_gradient_diagnostic_before"]=float(gradient)
                 record["numerical_factorization_rejections"]=int(numerical_rejections)
                 if progress(record) is False:self.request_stop()
             except BaseException as exc:
                 callback_errors.append(exc);self.request_stop()
+            finally:
+                callback_wall_ms+=1000*(time.perf_counter()-callback_started)
         numeric_type=c.CFUNCTYPE(None,c.c_int,c.c_double,c.c_double,c.c_void_p)
         def numeric_report(count,lam,nu,context):
             if numerical_progress is None or callback_errors:return
@@ -548,8 +680,34 @@ class ResidentResidualProblem:
             "last_step_inf","last_relative_cost_change","lambda_next","nu_next","wall_ms","linearizations",
             "symbolic_analyses","explicit_application_d2h_bytes","linearization_wall_ms","candidate_wall_ms","numerical_factorization_rejections"),out.tolist()))
         result["stop_reason"]={0:"projected_gradient_small",1:"accepted_step_and_cost_small",
-                               2:"floating_point_stagnation_without_convergence",3:"stopped_by_caller"}[int(out[0])]
+                               2:"floating_point_stagnation_without_convergence",3:"stopped_by_caller",
+                               4:"cost_progress_stagnation_without_convergence"}[int(out[0])]
         result["numerically_converged"]=out[0] in (0,1)
+        result["stationarity_version"]=version
+        result["stationarity_scope"]=stationarity_scope
+        result["full_nonlinear_kkt_checked"]=version==2
+        result["gradient_diagnostic_note"]=(
+            "projected_gradient_* are legacy aliases; coupled and nonlinear constraint "
+            "normals are not projected. A large diagnostic does not prove feasible descent.")
+        if version==2:
+            result["gradient_diagnostic_note"]="Original undamped objective; current declared physical constraint Jacobian and station tangent cone. No global optimum or camera calibration claim."
+            diagnostic=self.stationarity_diagnostics()
+            # A caller stop can interrupt the controller before its cone
+            # projection, leaving the raw gradient in that scratch slot.
+            # The completed, read-only check describes the returned state.
+            result["controller_reported_gradient_inf"]=result["projected_gradient_inf"]
+            result["constraint_projected_gradient_inf"]=result["projected_gradient_inf"]=diagnostic["constraint_projected_gradient_inf"]
+            result["final_cost"]=diagnostic.get("objective",result["final_cost"])
+            result["stationarity_diagnostics"]=diagnostic
+        elif version==1:result["box_projected_gradient_inf"]=result["projected_gradient_inf"]
+        else:result["legacy_gradient_diagnostic_inf"]=result["projected_gradient_inf"]
+        result["callback_wall_ms"]=callback_wall_ms
+        result["diagnostic_d2h_bytes_during_solve"]=self.diagnostic_download_bytes-diagnostic_bytes_before
+        result["instrumented_d2h_bytes_during_solve"]=(
+            result["explicit_application_d2h_bytes"]+result["diagnostic_d2h_bytes_during_solve"])
+        result["timing_scope"]={"wall_ms_includes_callbacks":True,
+                                "candidate_wall_ms_excludes_callbacks":True,
+                                "transfer_count_excludes_library_internal_transfers":True}
         result["tolerances"]={"gradient":gradient_tolerance,"step":step_tolerance,"relative_cost":relative_cost_tolerance}
         if callback_errors:raise callback_errors[0]
         return result

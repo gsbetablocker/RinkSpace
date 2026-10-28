@@ -31,6 +31,8 @@ def prepare(increment,delta):
     for key in ('scene_revision','camera_sha256','control_sha256'):
         require(m[key]==am[key],'Native authority mismatch: '+key)
     model=replacement.SceneParameterModel(prep.read(prep.SCENE),prep.SCENE,optimize_scene=True)
+    prep.validate_snapshot_identity(state,model.initial_state.layout,prep.read(prep.CAMERA),m,points=z,
+        point_input_sha256=hashes['point_observations.npz'])
     native=replacement.NativeSceneGPU(prep.SCENE,replacement.NativeCore(prep.LIBRARY),
         parameter_state=replacement.ParameterState(model.initial_state.layout,state['scene_values']))
     require(native.scene_revision==m['scene_revision'],'Current scene authority changed')

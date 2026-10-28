@@ -41,6 +41,8 @@ def prepare():
 
     core=replacement.NativeCore(prep.LIBRARY)
     model=replacement.SceneParameterModel(prep.read(prep.SCENE),prep.SCENE,optimize_scene=True)
+    prep.validate_snapshot_identity(snapshot,model.initial_state.layout,prep.read(prep.CAMERA),mapping,points=z,
+        point_input_sha256=hashes['point_observations.npz'])
     state=replacement.ParameterState(model.initial_state.layout,snapshot['scene_values'])
     native=replacement.NativeSceneGPU(prep.SCENE,core,parameter_state=state)
     camera={**prep.camera_for_snapshot(prep.read(prep.CAMERA),snapshot),'rig':snapshot['rig'].tolist()}

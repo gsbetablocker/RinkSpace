@@ -10,6 +10,7 @@ from pathlib import Path
 import numpy as np
 
 from ..domain.runtime_rigs import _camera_data
+from ..domain.camera import complete_camera_rig
 from ..path_policy import guard_project_write
 
 
@@ -76,7 +77,7 @@ def snapshot_exposure(camera_path, pts, core, out_dir):
     local_camera, local_controls, t = exposure_controls(camera, controls, pts)
     rows = np.array([0., (camera["image_height"]-1)/2, camera["image_height"]-1.])
     times = t+camera["rig"][37]*(rows/(camera["image_height"]-1)-.5)
-    evaluated = core.evaluate_motion_camera(local_camera["rig"], local_controls,
+    evaluated = core.evaluate_motion_camera(complete_camera_rig(local_camera), local_controls,
         local_camera["first_control_time"], local_camera["control_dt"], times)
     if np.any(evaluated["status"] != 0):
         raise ValueError("native exposure camera evaluation failed: "+str(evaluated["status"].tolist()))

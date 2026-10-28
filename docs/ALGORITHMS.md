@@ -1,6 +1,6 @@
 # 算法与观测说明
 
-本文解释可复用的处理方法与几何边界，不规定当前任务、固定实验次数或运行顺序。项目目标见 [README](../README.md)，选定结果见[离线审阅](GITHUB_REVIEW.md)；现有模块见 [架构与接口](ARCHITECTURE.md)。选择实验依据是真实原片中的错误类型。
+本文解释可复用方法与几何边界。项目目标见 [README](../README.md)，实现见[架构](ARCHITECTURE.md)与[能力说明](REBUILD.md)，历史结果见[离线审阅](GITHUB_REVIEW.md)。
 
 ## 素材、镜头与物理机位
 

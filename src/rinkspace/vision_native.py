@@ -79,6 +79,14 @@ class NativeSourceGeometry:
             return self.paths[identity]
         if 'ice.'+str(identity) in self.paths:
             return self.paths['ice.'+str(identity)]
+        # Historical S02 packets explicitly named the same blue half-ellipse
+        # perimeter with :boundary. This is a spelling adapter to an existing
+        # contour, never a new path or a conversion from an edge to a midline.
+        key=str(identity).removeprefix('ice.')
+        if key in ('goal_crease_left:boundary','goal_crease_right:boundary'):
+            row=self.paths.get('ice.'+key.removesuffix(':boundary'))
+            if row and row.get('measurement')=='contour' and row.get('role')=='physical_half_ellipse_boundary':
+                return row
         # Legacy source packets named an edge; the installed template may
         # store it as edge/path0. Resolve only a single current native path.
         candidates = {row['id']:row for key,row in self.paths.items()

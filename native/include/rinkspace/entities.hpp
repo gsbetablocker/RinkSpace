@@ -460,30 +460,33 @@ inline Status sample_entity_path(const double* bp,size_t nb,int kind,
 /* Native construction for the confirmed shared scene family v2.
  * legacy layout33: curling[8], lane[10], hockey[5], faceoff[6], ends[4].
  * layout35: same first29, ends[6]={axL,ayL,axR,ayR,trap_goal_half,trap_board_half}.
- * The two semiaxes of each actual blue crease are independent. Legacy33 keeps
- * its original circular replay interpretation; no old state is rewritten.
+ * Without option16 the two ends have independent semiaxes. Option16 shares
+ * ax/ay at e[0:2] and mirrors goal stations from positive f[1]; f[0],e[2:4]
+ * are then inactive storage. Legacy33 keeps its circular replay interpretation.
  * These are estimable geometry parameters, never observations or metre facts.
  */
 template<class T> RS_HD inline Status shared_entity_definition(const T* bp,size_t nb,const T* q,size_t nq,
                                       int code,int& kind,T* out,size_t no,unsigned options=0){
     using std::sin;using std::cos;using std::abs;using std::pow;
-    if(!bp||nb!=6||!q||(nq!=33&&nq!=35)||!out||!finite_array(q,nq)||(options&~15u))return Status::invalid_argument;
+    if(!bp||nb!=6||!q||(nq!=33&&nq!=35)||!out||!finite_array(q,nq)||(options&~31u))return Status::invalid_argument;
     if(((options&4u)||(options&8u))&&!(options&2u))return Status::invalid_argument;
+    if((options&16u)&&(!(options&2u)||nq!=35))return Status::invalid_argument;
     const bool ellipse=(nq==35&&(code==410||code==411));
     if(no!=(ellipse?8u:6u))return Status::invalid_argument;
     const BoardShapeValue<T> board{bp[0],bp[1],bp[2],bp[3],bp[4],bp[5]};
     if(!board.valid())return Status::invalid_argument;
     const T* c=q;const T* lane=q+8;const T* h=q+18;const T* f=q+23;const T* e=q+29;
+    const T goals[]={(options&16u)?-f[1]:f[0],f[1]};
     // Four equally spaced rows centred between y=+-board.half_width.
     // c[2] remains a legacy slot, not an independent DOF in this option.
     const T y0=(options&1u)?-1.5*c[3]:c[2];
-    if(!(c[0]<c[1]&&c[3]>0&&c[4]>0&&0<c[5]&&c[5]<c[6]&&c[6]<c[7]&&c[7]<1&&lane[1]>0&&h[1]>0&&h[2]>0&&((options&2u)||h[3]<h[4])&&f[0]<0&&f[1]>0))return Status::invalid_argument;
+    if(!(c[0]<c[1]&&c[3]>0&&c[4]>0&&0<c[5]&&c[5]<c[6]&&c[6]<c[7]&&c[7]<1&&lane[1]>0&&h[1]>0&&h[2]>0&&((options&2u)||h[3]<h[4])&&goals[0]<0&&goals[1]>0))return Status::invalid_argument;
     // A1/A4 and A2/A3 share rows and mirror about the transverse x=0 axis.
     // In this declared chart f[2]=common half longitudinal separation and
     // f[4]=common half transverse separation. f[3]/f[5] are inactive storage.
-    // Goal lines retain their independent positions; no goal mirror is added.
+    // Option16 additionally mirrors both goal lines and their attached ends.
     if(options&8u){
-        if(!(f[2]>0&&f[4]>0&&f[2]<std::min(-f[0],f[1])))return Status::invalid_argument;
+        if(!(f[2]>0&&f[4]>0&&f[2]<std::min(-goals[0],goals[1])))return Status::invalid_argument;
     }
     // Current Lane drawing support cannot extend past the left goal line.
     // Bounds are checked, never clamped, and each row retains its own support.
@@ -492,11 +495,11 @@ template<class T> RS_HD inline Status shared_entity_definition(const T* bp,size_
             const T end=lane[6+code-200];
             // Each connection passes R and ends strictly before N. Its
             // support stays independent of both R and the Lane right edge.
-            if(c[0]<f[0]||!(c[1]<end&&end<lane[0]))return Status::outside_support;
+            if(c[0]<goals[0]||!(c[1]<end&&end<lane[0]))return Status::outside_support;
         }
         if(code>=300&&code<312){
             for(int row=0;row<4;++row)
-                if(lane[2+row]<f[0]||lane[2+row]>lane[0])return Status::outside_support;
+                if(lane[2+row]<goals[0]||lane[2+row]>lane[0])return Status::outside_support;
         }
     }
     const T yaw=(options&2u)?0.:h[0];
@@ -511,7 +514,7 @@ template<class T> RS_HD inline Status shared_entity_definition(const T* bp,size_
         if(edge==1)return line({lane[0],hi,0},{lane[0],lo,0});
         return line({lane[0],lo,0},{lane[2+row],lo,0});}
     if(code>=400&&code<=404){
-        const T xs[]={0,-h[1],h[1],f[0],f[1]};const T x=xs[code-400];
+        const T xs[]={0,-h[1],h[1],goals[0],goals[1]};const T x=xs[code-400];
         if(options&2u){SegmentValue<T> carrier{};const auto status=board.vertical_section(x,carrier);
             if(status!=Status::ok)return status;return line(carrier.a,carrier.b);}
         return line(point(x,h[4]),point(x,h[3]));
@@ -520,14 +523,15 @@ template<class T> RS_HD inline Status shared_entity_definition(const T* bp,size_
     if(code>=406&&code<=409){
         if(options&8u){const T x[]={f[2],f[2],-f[2],-f[2]},y[]={-f[4],f[4],f[4],-f[4]};
             return circle(point(x[code-406],y[code-406]),h[2],0,2*pi);}
-        const T x[]={f[1]-f[3],f[1]-f[3],f[0]+f[2],f[0]+f[2]},y[]={-f[5],f[5],f[4],-f[4]};
+        const T x[]={goals[1]-f[3],goals[1]-f[3],goals[0]+f[2],goals[0]+f[2]},y[]={-f[5],f[5],f[4],-f[4]};
         return circle(point(x[code-406],y[code-406]),h[2],0,2*pi);}
 
     if(code==410||code==411){const int side=code-410;
-        if(nq==35){const T ax=e[side*2],ay=e[side*2+1],a0=side?pi/2:-pi/2;
+        if(nq==35){const int axes=(options&16u)?0:side*2;
+            const T ax=e[axes],ay=e[axes+1],a0=side?pi/2:-pi/2;
             if(!(ax>0&&ay>0))return Status::invalid_argument;
-            kind=6;store3(out,point(f[side],0));out[3]=ax;out[4]=ay;out[5]=yaw;out[6]=a0;out[7]=a0+pi;return Status::ok;}
-        const T a0=(side?pi/2:-pi/2)+yaw;return circle(point(f[side],0),e[side],a0,a0+pi);}
+            kind=6;store3(out,point(goals[side],0));out[3]=ax;out[4]=ay;out[5]=yaw;out[6]=a0;out[7]=a0+pi;return Status::ok;}
+        const T a0=(side?pi/2:-pi/2)+yaw;return circle(point(goals[side],0),e[side],a0,a0+pi);}
 
     if(code>=420&&code<=423){
         const int side=(code-420)/2;const T sign=side?1.:-1.,ysign=(code%2)?1.:-1.;
@@ -545,7 +549,7 @@ template<class T> RS_HD inline Status shared_entity_definition(const T* bp,size_
         const T dx=board.exponent*(pow(u,board.exponent-1)*(hit.x<0?-1.:1.)*ca/board.rx+pow(v,board.exponent-1)*(hit.y<0?-1.:1.)*sa/board.ry);
         if(abs(dx)<1e-12)return Status::degenerate;
         x-=membership(x)/dx;
-        return line(point(f[side],ysign*goal_half),point(x,y));
+        return line(point(goals[side],ysign*goal_half),point(x,y));
     }
     return Status::invalid_argument;
 }

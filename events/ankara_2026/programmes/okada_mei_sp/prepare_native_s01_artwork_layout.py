@@ -95,6 +95,9 @@ def anchor_ink_rectangle():
     old_model=SceneParameterModel(scene,scene_path,optimize_scene=True)
     with np.load(io.BytesIO((OUT/'accepted_pixels_latest.npz').read_bytes())) as archive:
         saved={key:archive[key] for key in archive.files}
+    points,mapping,_=prep.load_pixel_input(OUT);camera=prep.read(prep.CAMERA)
+    prep.validate_snapshot_identity(saved,old_model.initial_state.layout,camera,mapping,points=points,
+        point_input_sha256=prep.digest(OUT/'point_observations.npz'))
     backup.mkdir()
     snapshot_scene(scene_path,backup/'scene')
     for name in ('accepted_pixels_latest.npz','migration.json','fit_input_validation.json','activity_pixels.json'):
@@ -131,8 +134,10 @@ def anchor_ink_rectangle():
             values[b['offset']:b['offset']+b['size']]=new_model.initial_state[identity]
             reset.append(dict(block=identity,before=before[b['offset']:b['offset']+b['size']].tolist(),after=new_model.initial_state[identity].tolist()))
     if len(reset)!=1:raise ValueError('Expected only the Ad5 ink-frame map to be removed')
-    saved['scene_values']=values;np.savez(OUT/'seed_frame_anchor.npz',**saved)
+    saved['scene_values']=values
     mapping=prep.read(OUT/'mapping.json');mapping['scene_revision']=scene_content_identity(scene,scene_path);prep.write(OUT/'mapping.json',mapping)
+    prep.bind_snapshot_identity(saved,new_model.initial_state.layout,camera,mapping)
+    np.savez(OUT/'seed_frame_anchor.npz',**saved)
     migration.update(after_scene_revision=mapping['scene_revision'],definition_after_sha256=prep.digest(PLAN),
         ink_frame_revision=dict(ad=5,reset=reset,before=str(backup),camera_and_other_current_coordinates_preserved=True),
         active_coordinates={**migration['active_coordinates'],'print_shape':20})

@@ -1,0 +1,45 @@
+{
+  "schema": "rinkspace.camera_experiment.v1",
+  "id": "low_order_joint_current",
+  "basis": {
+    "kind": "engineering_assumption",
+    "not_sony_measurement": true,
+    "description": "Shared S01/S04 camera ablation. Fixed zero terms are explicit nested hypotheses; inactive scene is the accepted conditional scene, not measured geometry. Mechanical installation remains fitted under the same existing working envelope."
+  },
+  "active_camera_names": [
+    "R0_x",
+    "R0_y",
+    "R0_z",
+    "pan_axis_tangent1",
+    "pan_axis_tangent2",
+    "tilt_axis",
+    "pivot_x",
+    "pivot_y",
+    "pivot_z",
+    "lever_x",
+    "lever_y",
+    "lever_z",
+    "axis_spacing",
+    "pupil1",
+    "pupil2",
+    "cx",
+    "cy",
+    "eta",
+    "k10",
+    "k11",
+    "readout"
+  ],
+  "fixed_rig_values": {
+    "wide_k1": 0.0,
+    "wide_k2": 0.0,
+    "wide_p1": 0.0,
+    "wide_p2": 0.0,
+    "cx_zoom": 0.0,
+    "cy_zoom": 0.0,
+    "k20": 0.0,
+    "k21": 0.0,
+    "p1": 0.0,
+    "p2": 0.0
+  },
+  "scene_mode": "joint_current"
+}

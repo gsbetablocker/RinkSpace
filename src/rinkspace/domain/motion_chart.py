@@ -51,14 +51,14 @@ class UniformMotionChart:
         i,w=cubic_samples(len(self.refinement),self.first,self.dt,[self.reference_time])
         return w[0]@self.refinement[i[0]]
 
-    def directions(self):
-        """Columns for three moving channels, with two reference-angle gauges."""
+    def directions(self,*,reference_angle_gauge=True):
+        """Three moving channels; only the shared rig's first shot needs gauges."""
         w=self.reference_weights();pivot=int(np.argmax(np.abs(w)));columns=[];labels=[]
         for k in range(self.refinement.shape[1]):
             for channel in range(3):
-                if channel<2 and k==pivot:continue
+                if reference_angle_gauge and channel<2 and k==pivot:continue
                 d=np.zeros((len(self.refinement),3));d[:,channel]=self.refinement[:,k]
-                if channel<2:d[:,channel]-=self.refinement[:,pivot]*(w[k]/w[pivot])
+                if reference_angle_gauge and channel<2:d[:,channel]-=self.refinement[:,pivot]*(w[k]/w[pivot])
                 columns.append(d);labels.append((k,channel))
         return np.stack(columns,axis=2),labels
 

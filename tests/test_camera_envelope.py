@@ -186,8 +186,8 @@ class CameraEnvelopeTests(unittest.TestCase):
                 device_budget_bytes=p.creation['free_after_alloc_bytes'],host_budget_bytes=2**30)
             result=p.lm_step()['summary'];state=p.export_state();shared=p.export_step_system()['step'][:2]
             self.assertTrue(result['accepted'],result)
-            self.assertEqual(result['reason_code'],5)
-            self.assertEqual(result['bound_passes'],1)
+            self.assertEqual(result['reason_code'],6)
+            self.assertGreaterEqual(result['bound_passes'],1)
             # Independent scalar quadratic minimum for the returned shared step.
             for row in range(2):
                 tangent=J[row,:,2]
@@ -238,6 +238,84 @@ class CameraEnvelopeTests(unittest.TestCase):
             self.assertTrue(result['accepted'],result)
             self.assertGreater(result['predicted_decrease'],0.)
 
+    def test_curved_pupil_boundary_restoration_preserves_descent(self):
+        # The pupil vertex moves across spline cells while its tangent changes.
+        # A coupled axis-spacing/pupil step used to alternate tangents and then
+        # shrink the entire descent step. The exact optical domain, rather than
+        # its previous tangent or a looser bound, must hold at the final state.
+        f=fixture.G2GPU();f.setUp();rig=self.rig.copy();rig[20:24]=[.1,0.,-.1,.1];rig[27]=540.
+        limits=self.limits.copy();limits[0]=.075
+        kw={**f.kw,'rig':rig,'controls':self.controls,'image_height':1080,
+            'times':np.array([-.9,.4,1.7,2.9])}
+        rd=np.zeros((27,3));rd[12:15]=.1*np.eye(3)
+        plan=dict(directions=np.zeros((8,3,3)),local_ids=np.full(4,-1,np.int32),local_scales=np.zeros(0))
+        with ResidentResidualProblem(self.core,**kw) as p:
+            p.configure_camera_parameters(directions=rd,max_readout=.1)
+            p.configure_pixel_linearization(**plan);uv=p.evaluate('cuda')['values'][:,3:5];p.linearize()
+            J=p.probe_rows(np.arange(4))[:,:,:3].reshape(8,3)
+        damping=1e-4;S=J.T@J+damping*np.eye(3);rhs=S@np.array([-.3,-.4,.1])
+        observed=uv+np.linalg.lstsq(J.T,rhs,rcond=None)[0].reshape(4,2)
+        with ResidentResidualProblem(self.core,**{**kw,'observed':observed}) as p:
+            p.configure_camera_parameters(directions=rd,max_readout=.1)
+            p.configure_camera_envelope(forward_bounds=limits[:2],pupil_bounds=limits[2:4],
+                max_pan_tilt=limits[4],max_tilt_deviation=limits[5],
+                elevation_bounds=limits[6:8],roll_bounds=limits[8:10])
+            p.configure_pixel_linearization(**plan)
+            p.configure_solver(lower=np.zeros(0),upper=np.zeros(0),initial_lambda=damping,
+                device_budget_bytes=p.creation['free_after_alloc_bytes'],host_budget_bytes=2**30)
+            result=p.lm_step()['summary'];state=p.export_state()
+            self.assertTrue(result['accepted'],result)
+            self.assertLess(result['trial_cost'],.05*result['old_cost'])
+            self.assertEqual(result['trial_domain_failures'],0)
+            self.assertGreaterEqual(self.evaluate(rig=state['rig'],controls=state['controls'],limits=limits)[0],-4e-14)
+            np.testing.assert_array_equal(state['controls'],self.controls)
+
+    def test_curved_vertex_projection_matches_polynomial_minimum(self):
+        # Independent oracle: over z in [0,1], the active lower forward bound
+        # is p2 = 10*p1**2. Eliminate the unconstrained spacing coordinate;
+        # the Schur objective on that boundary is a quartic polynomial.
+        # Its derivative roots give the constrained minimum without calling
+        # the native boundary/projection implementation.
+        from numpy.polynomial import Polynomial
+        f=fixture.G2GPU();f.setUp();rig=self.rig.copy();rig[20:24]=[.1,0.,-.1,.1];rig[27]=540.
+        limits=self.limits.copy();limits[0]=.075
+        kw={**f.kw,'rig':rig,'controls':self.controls,'image_height':1080,
+            'times':np.array([-.9,.4,1.7,2.9])}
+        rd=np.zeros((27,3));rd[12:15]=.1*np.eye(3)
+        plan=dict(directions=np.zeros((8,3,3)),local_ids=np.full(4,-1,np.int32),local_scales=np.zeros(0))
+        with ResidentResidualProblem(self.core,**kw) as p:
+            p.configure_camera_parameters(directions=rd,max_readout=.1)
+            p.configure_pixel_linearization(**plan);uv=p.evaluate('cuda')['values'][:,3:5];p.linearize()
+            J=p.probe_rows(np.arange(4))[:,:,:3].reshape(8,3)
+        damping=1e-4;S=J.T@J+damping*np.eye(3)
+        for target in ([-.3,-.4,.1],[-.6,-.8,.2],[-1.,-1.,.2]):
+            with self.subTest(target=target):
+                target=np.asarray(target);rhs=S@target
+                d=[None,Polynomial([1.,10.]),Polynomial([-1.,0.,100.])]
+                d[0]=target[0]-(S[0,1]*(d[1]-target[1])+S[0,2]*(d[2]-target[2]))/S[0,0]
+                energy=sum(.5*S[i,j]*d[i]*d[j] for i in range(3) for j in range(3))-sum(rhs[i]*d[i] for i in range(3))
+                lo=(-1-np.sqrt(5.))/20;hi=-.05
+                candidates=[lo,hi]+[float(x.real) for x in energy.deriv().roots() if abs(x.imag)<1e-10 and lo<x.real<hi]
+                optimum=min(candidates,key=energy);expected=np.array([x(optimum) for x in d])
+                observed=uv+np.linalg.lstsq(J.T,rhs,rcond=None)[0].reshape(4,2)
+                with ResidentResidualProblem(self.core,**{**kw,'observed':observed}) as p:
+                    p.configure_camera_parameters(directions=rd,max_readout=.1)
+                    p.configure_camera_envelope(forward_bounds=limits[:2],pupil_bounds=limits[2:4],max_pan_tilt=limits[4],
+                        max_tilt_deviation=limits[5],elevation_bounds=limits[6:8],roll_bounds=limits[8:10])
+                    p.configure_pixel_linearization(**plan)
+                    p.configure_solver(lower=np.zeros(0),upper=np.zeros(0),initial_lambda=damping,
+                        device_budget_bytes=p.creation['free_after_alloc_bytes'],host_budget_bytes=2**30)
+                    result=p.lm_step()['summary'];step=p.export_step_system()['step'];state=p.export_state()
+                    self.assertTrue(result['accepted'],result)
+                    score=lambda x:float(rhs@x-.5*x@S@x)
+                    self.assertAlmostEqual(score(step),score(expected),places=8)
+                    p1,p2=state['rig'][22:24];z=-p1/(2*p2)
+                    values=np.array([0.,p1+p2,p1*z+p2*z*z])
+                    self.assertGreater(z,0.);self.assertLess(z,1.)
+                    self.assertGreaterEqual(values.min(),-.025-4e-14)
+                    self.assertLessEqual(values.max(),.1+4e-14)
+                    np.testing.assert_array_equal(state['controls'],self.controls)
+
     def test_nonlinear_pupil_zoom_cut_does_not_exclude_feasible_origin(self):
         # The accepted state is the KKT optimum of the linearized problem.
         # A trial-state tangent to pupil1 * log(f/fref) can exclude that state
@@ -266,6 +344,76 @@ class CameraEnvelopeTests(unittest.TestCase):
             result=p.lm_step()['summary'];system=p.export_step_system()
             np.testing.assert_allclose(system['step'],np.zeros(2),rtol=0,atol=1e-7)
             self.assertGreaterEqual(result['predicted_decrease'],-1e-10)
+
+    def test_attitude_opposing_rate_faces_match_independent_quadratic(self):
+        # Both angles vanish at the cell midpoint. The continuous attitude
+        # certificate reduces exactly to an L1 bound on their linear rates.
+        # Its opposing signs are distinct faces even at the zero-rate origin.
+        f=fixture.G2GPU();f.setUp();rig=self.rig.copy();rig[27]=540.
+        controls=np.tile([0.,.15,np.log(100.)],(4,1))
+        kw={**f.kw,'rig':rig,'controls':controls,'first_control_time':-1.,
+            'control_dt':1.,'times':np.array([.05,.3,.65,.95]),'image_height':1080}
+        directions=np.zeros((4,3,2));ramp=(np.arange(4)-1.5)*.2
+        directions[:,0,0]=ramp;directions[:,1,1]=ramp
+        plan=dict(directions=directions,local_ids=np.full(4,-1,np.int32),local_scales=np.zeros(0))
+        with ResidentResidualProblem(self.core,**kw) as p:
+            p.configure_pixel_linearization(**plan);uv=p.evaluate('cuda')['values'][:,3:5];p.linearize()
+            J=p.probe_rows(np.arange(4))[:,:,:2].reshape(8,2)
+        damping=1e-4;S=J.T@J+damping*np.eye(2)
+        radius=np.sin(np.radians(3))*np.cos(.15)/.1
+        rhs=S@np.array([radius,0.])+np.linalg.norm(S)*np.array([1.,0.])
+        observed=uv+np.linalg.lstsq(J.T,rhs,rcond=None)[0].reshape(4,2)
+        # Roll is the active attitude plane: midpoint roll margin divided by
+        # the normal length and the .1 rate padding per unit coefficient.
+        radius=np.sin(np.radians(3))*np.cos(.15)/.1
+        A=np.array([[1.,1.],[1.,-1.],[-1.,1.],[-1.,-1.]])
+        candidates=[];free=np.linalg.solve(S,rhs);inverse=np.linalg.inv(S)
+        for i in range(4):
+            a=A[i];x=free-inverse@a*((a@free-radius)/(a@inverse@a))
+            if np.all(A@x<=radius+1e-10):candidates.append(x)
+        for x in (np.array([radius,0]),np.array([-radius,0]),np.array([0,radius]),np.array([0,-radius])):
+            candidates.append(x)
+        expected=min(candidates,key=lambda x:.5*x@S@x-rhs@x)
+        with ResidentResidualProblem(self.core,**{**kw,'observed':observed}) as p:
+            p.configure_camera_envelope(forward_bounds=self.limits[:2],pupil_bounds=self.limits[2:4],
+                max_pan_tilt=self.limits[4],max_tilt_deviation=self.limits[5],
+                elevation_bounds=self.limits[6:8],roll_bounds=self.limits[8:10])
+            p.configure_pixel_linearization(**plan)
+            p.configure_solver(lower=np.zeros(0),upper=np.zeros(0),initial_lambda=damping,
+                device_budget_bytes=p.creation['free_after_alloc_bytes'],host_budget_bytes=2**30)
+            result=p.lm_step()['summary'];system=p.export_step_system()
+            np.testing.assert_allclose(system['step'],expected,rtol=0,atol=1e-8)
+            self.assertTrue(result['accepted'],result)
+            state=p.export_state()
+            self.assertGreaterEqual(self.evaluate(rig=state['rig'],controls=state['controls'])[0],-4e-14)
+
+    def test_disjoint_shots_skip_gap_but_gpu_keeps_both_envelopes(self):
+        f=fixture.G2GPU();f.setUp();rig=self.rig.copy();rig[27]=540.
+        controls=np.tile([0.,.15,np.log(100.)],(22,1));controls[8:13,1]=2.
+        times=np.array([1.2,2.8,17.2,18.8]);windows=np.array([[1.2,2.8],[17.2,18.8]])
+        kw={**f.kw,'rig':rig,'controls':controls,'image_height':1080,
+            'first_control_time':0.,'control_dt':1.,'times':times}
+        envelope=dict(forward_bounds=self.limits[:2],pupil_bounds=self.limits[2:4],max_pan_tilt=self.limits[4],
+            max_tilt_deviation=self.limits[5],elevation_bounds=self.limits[6:8],roll_bounds=self.limits[8:10])
+        limits=np.r_[self.limits,np.full(9,np.inf),windows.ravel()]
+        self.assertGreaterEqual(self.core.evaluate_camera_envelope(rig,controls,0.,1.,limits)['margin'],0.)
+        self.assertLess(self.core.evaluate_camera_envelope(rig,controls,0.,1.,np.r_[self.limits,np.full(9,np.inf),1.2,18.8])['margin'],0.)
+        with ResidentResidualProblem(self.core,**kw) as p:observed=p.evaluate('cuda')['values'][:,3:5]+[4.,0.]
+        with ResidentResidualProblem(self.core,**{**kw,'observed':observed}) as p:
+            rd=np.zeros((27,1));rd[15,0]=1.
+            p.configure_camera_parameters(directions=rd,max_readout=.1)
+            p.configure_camera_envelope(**envelope,frame_time_intervals=windows)
+            # Setter owns its window storage, on host and device.
+            windows[:]=-100.
+            p.configure_pixel_linearization(directions=np.zeros((22,3,1)),local_ids=np.full(4,-1,np.int32),local_scales=np.zeros(0))
+            p.configure_solver(lower=np.zeros(0),upper=np.zeros(0),initial_lambda=1e-6,
+                device_budget_bytes=p.creation['free_after_alloc_bytes'],host_budget_bytes=2**30)
+            result=p.lm_step()['summary'];self.assertTrue(result['accepted'],result)
+            self.assertLess(result['trial_cost'],1e-8)
+            np.testing.assert_array_equal(p.export_state()['controls'],controls)
+        with ResidentResidualProblem(self.core,**kw) as p:
+            with self.assertRaisesRegex(ValueError,'contain every source exposure'):
+                p.configure_camera_envelope(**envelope,frame_time_intervals=[[1.2,2.8],[18.0,18.8]])
 
     def test_selected_exposures_do_not_constrain_unused_allocation_but_include_readout(self):
         # A remote allocated halo has a bad attitude. The actual exposures

@@ -4,6 +4,7 @@ import argparse,json,sys
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]))
 import numpy as np
+import cv2
 from calibration.program_tracking.extract_single_frame_ice_source import ellipse_distance
 
 def ellipse(f):
@@ -37,6 +38,84 @@ def conflicts(features):
         reason='extra_outline_arc_reads_midpoint_of_already_identified_house_filled_paint_band_not_independent_thin_outline'))
       break
  return rejected
+
+
+def observed_house_fill(features, shape=(1080,1920)):
+ """Join corresponding *observed* interfaces into local paint patches.
+
+ No fitted ellipse or projected circle fills missing arcs. Both interfaces
+ must have actual ordered source support over the same angular interval.
+ The returned mask constrains other material searches; it supplies no UV.
+ """
+ mask=np.zeros(shape,np.uint8);patches=[]
+ for house in ('F1','F2','F3','F4','R1','R2','R3','R4'):
+  for outer,inner in (('outer','middle'),('inner','center')):
+   first=features.get(f'ice.{house}:{outer}',{}).get('rows',[])
+   second=features.get(f'ice.{house}:{inner}',{}).get('rows',[])
+   if len(first)<3 or len(second)<3 or any('theta'not in r for r in first+second):continue
+   def ordered(rows):
+    angle=np.asarray([r['theta']for r in rows]);uv=np.asarray([r['uv']for r in rows]);ix=np.argsort(angle);angle,uv=angle[ix],uv[ix]
+    return np.r_[angle[-1]-2*np.pi,angle,angle[0]+2*np.pi],np.vstack([uv[-1],uv,uv[0]])
+   a,p=ordered(first);b,q=ordered(second)
+   da=np.diff(a);db=np.diff(b)
+   limit_a=min(np.pi/4,3*float(np.median(da[da>0])))
+   limit_b=min(np.pi/4,3*float(np.median(db[db>0])))
+   for j in range(1,len(a)-1):
+    t=a[j:j+2]
+    if t[1]-t[0]>limit_a or np.linalg.norm(p[j+1]-p[j])>105:continue
+    k=np.searchsorted(b,t,side='right')-1
+    if (k<0).any()or(k>=len(b)-1).any()or np.any(np.diff(b)[k]>limit_b):continue
+    if any(np.linalg.norm(q[n+1]-q[n])>105 for n in k):continue
+    v=np.c_[np.interp(t,b,q[:,0]),np.interp(t,b,q[:,1])]
+    quad=np.array([p[j],p[j+1],v[1],v[0]],np.float32)
+    if cv2.contourArea(quad)<1:continue
+    cv2.fillPoly(mask,[np.rint(quad).astype(np.int32)],1)
+    patches.append(dict(house=house,band=f'{outer}-{inner}',actual_source_interface_quad=quad.tolist()))
+ return mask.astype(bool),patches
+
+
+def centreline_house_conflicts(features, entities, *, include_crosslines=False):
+ """Detect material ownership conflicts for all current-native centrelines.
+
+ The old outline-only audit missed Lane and connection readers. This check
+ also covers additions from gap recovery and packaging fallback paths.
+ """
+ mask,patches=observed_house_fill(features)
+ interior=cv2.distanceTransform(mask.astype('uint8'),cv2.DIST_L2,3)>2
+ cross=np.zeros_like(mask,dtype=np.uint8)
+ crossline_names={'ice.B1:segment0','ice.B2:segment0','ice.C:segment0'}
+ if include_crosslines:
+  # A coloured transverse stripe is not evidence for a separate thin lane
+  # or house connection at a crossing. Use only locally observed band sides;
+  # neither native projections nor fitted lines create exclusion pixels.
+  for name in crossline_names:
+   rows=[r for r in features.get(name,{}).get('rows',[])if r.get('source_evidence',{}).get('actual_source_sides_uv')]
+   if len(rows)<2:continue
+   uv=np.asarray([r['uv']for r in rows]);_,_,axes=np.linalg.svd(uv-uv.mean(0),full_matrices=False)
+   order=np.argsort((uv-uv.mean(0))@axes[0]);rows=[rows[i]for i in order]
+   for first,second in zip(rows,rows[1:]):
+    gap=np.linalg.norm(np.asarray(first['uv'])-second['uv'])
+    if gap<1 or gap>105:continue
+    a=np.asarray(first['source_evidence']['actual_source_sides_uv']);b=np.asarray(second['source_evidence']['actual_source_sides_uv'])
+    if np.sum((a-b[::-1])**2)<np.sum((a-b)**2):b=b[::-1]
+    quad=np.array([a[0],b[0],b[1],a[1]],np.float32)
+    if cv2.contourArea(quad)>=1:cv2.fillPoly(cross,[np.rint(quad).astype(np.int32)],1)
+ cross_interior=cv2.distanceTransform(cross,cv2.DIST_L2,3)>2
+ failures=[]
+ for name,feature in features.items():
+  path=entities.get(feature['native_path_id'],{})
+  if path.get('measurement')!='centreline':continue
+  for i,row in enumerate(feature['rows']):
+   x,y=np.rint(row['uv']).astype(int)
+   if 0<=y<interior.shape[0]and 0<=x<interior.shape[1]and interior[y,x]:
+    failures.append(dict(target_id=name,source_vertex_index=i,source_row_id=row['source_row_id'],uv=row['uv'],
+     reason='centreline_profile_inside_currently_measured_house_fill_requires_independent_material_support',
+     source_evidence=row.get('source_evidence',{})))
+   elif name not in crossline_names and 0<=y<cross.shape[0]and 0<=x<cross.shape[1]and cross_interior[y,x]:
+    failures.append(dict(target_id=name,source_vertex_index=i,source_row_id=row['source_row_id'],uv=row['uv'],
+     reason='thin_centreline_profile_reads_observed_red_or_blue_crossline_without_independent_material_support',
+     source_evidence=row.get('source_evidence',{})))
+ return failures,mask,patches
 
 def apply_rejections(packet,bad):
  look={(r['target_id'],r['segment_index'],r['source_vertex_index']) for r in bad}

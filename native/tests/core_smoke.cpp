@@ -1,5 +1,6 @@
 #include "rinkspace/core_api.h"
 #include "rinkspace/geometry.hpp"
+#include "rinkspace/camera_envelope.hpp"
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -8,6 +9,33 @@
 static void require(bool yes,const char* why){if(!yes)throw std::runtime_error(why);}
 static void close(double x,double y,double tol,const char* why){require(std::abs(x-y)<tol,why);}
 int main(){try{
+    {
+        // z(u)=u^3-1.5*u^2+.5625*u has a maximum at .25 and minimum
+        // at .75. Moving the cubic must update those two physical faces,
+        // without accumulating an obsolete tangent at every old root time.
+        rinkspace::MotionRig rig{};rig.fref=1.;rig.pupil1=1.;rig.pan={0,0,1};rig.tilt={1,0,0};
+        double controls[12]={0,0,-1.5625,0,0,.5,0,0,-.4375,0,0,1.625};
+        rinkspace::MotionSpline spline{controls,4,0.,1.};rinkspace::CameraEnvelope envelope{};
+        rinkspace::CameraConstraint first[2],moved[2];
+        auto collect=[&](rinkspace::CameraConstraint* faces){
+            int count=0;
+            rinkspace::camera_cell_constraints(rig,spline,envelope,1,[&](rinkspace::CameraConstraint a){
+                if(a.kind==3&&a.sign==1&&a.zoom_branch){require(count<2,"two cubic stationary roots");faces[count++]=a;}
+            });
+            require(count==2,"both interior zoom extrema retained");
+            if(faces[0].u>faces[1].u)std::swap(faces[0],faces[1]);
+        };
+        collect(first);close(first[0].u,.25,1e-14,"independent zoom maximum");close(first[1].u,.75,1e-14,"independent zoom minimum");
+        controls[8]+=.01;collect(moved);
+        require(first[0].u!=moved[0].u&&first[1].u!=moved[1].u,"control update moves extrema");
+        require(rinkspace::same_camera_constraint_face(first[0],moved[0]),"moving maximum replaces its old tangent");
+        require(rinkspace::same_camera_constraint_face(first[1],moved[1]),"moving minimum replaces its old tangent");
+        require(!rinkspace::same_camera_constraint_face(first[0],first[1]),"minimum and maximum remain separate");
+        auto endpoint=first[0];endpoint.zoom_branch=0;endpoint.u=0.;
+        require(!rinkspace::same_camera_constraint_face(first[0],endpoint),"fixed endpoint remains separate");
+        auto other=first[0];other.camera=1;
+        require(!rinkspace::same_camera_constraint_face(first[0],other),"two physical rigs retain separate faces");
+    }
     const double layout[]={-.31,.29,-.18,.12,.031,2./3.,1./3.,.08,.083,.41};
     const double left[]={-.43,-.41,-.44,-.42};double centres[24],lanes[72];
     require(rs_curling_centres(layout,10,4,centres,24)==0,"layout construction");

@@ -29,7 +29,7 @@
 python -B scripts/prepare_portable_profile.py template --metadata-only --profile events/ankara_2026/programmes/okada_mei_sp/strict_v6_source_fit_20261013.json --output configs/portable/strict_v6_source_fit_20261013.resources.json
 ~~~
 
-工具将模板输出限制在 configs/portable/，解析结果限制在 Data/runtime_tools/repository_validation/portable_profiles/，拒绝覆盖不同内容的既有文件。这是当前工具的实际路径检查，不是新加的项目审批或任务安排。
+工具将模板输出限制在 configs/portable/，解析结果限制在 Data/runtime_tools/repository_validation/portable_profiles/，拒绝覆盖不同内容的既有文件。
 
 --metadata-only 读取 profile、清单与存在性；参数、权重、NPZ 和检查点的 expected SHA 来自登记清单，标明此次未重新核验，所选 profile 小文件仍计算 SHA。不带该选项会读取登记资源核对身份；按实际任务选择。
 

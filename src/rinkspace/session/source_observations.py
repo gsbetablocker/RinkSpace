@@ -310,6 +310,14 @@ def _packet_direct_readouts(envelope, feature_index, feature, definition):
 
 def source_queries(candidates, binding, geometry, *, radius=18.):
     """Saved direct support can anchor search; unknown identity remains unknown."""
+    hw=binding.get('native_hw')
+    # Legacy source-only callers may lack an image binding. Do not invent its
+    # dimensions; current programme bindings always carry the decoded size.
+    height=width=np.inf
+    if hw is not None:
+        if len(hw)!=2 or any(type(v) is not int or v<=0 for v in hw):
+            raise ValueError('Source query binding needs positive native height/width')
+        height,width=hw
     groups=defaultdict(list)
     for c in candidates:
         if c.native_path_id and not c.withdrawal:
@@ -340,7 +348,7 @@ def source_queries(candidates, binding, geometry, *, radius=18.):
         return reference.get('jsonl_line_0based',candidate.source_ref.get('source_point_index',ordinal))
     for (identity,_view),rows in groups.items():
         uv=np.asarray([c.actual_uv if c.actual_uv is not None else c.original_uv for c in rows],float)
-        good=np.isfinite(uv).all(1)&(uv[:,0]>=0)&(uv[:,0]<1920)&(uv[:,1]>=0)&(uv[:,1]<1080)
+        good=np.isfinite(uv).all(1)&(uv[:,0]>=0)&(uv[:,0]<width)&(uv[:,1]>=0)&(uv[:,1]<height)
         rows=[c for c,k in zip(rows,good) if k];uv=uv[good]
         if len(uv)<2:continue
         # Keep per-source runs. Do not connect unrelated dense row ordering.
@@ -472,8 +480,11 @@ def feature_registry(geometry):
     return records,bindings
 
 
-def select_source_observations(measurements, by_feature, noise, purpose):
+def select_source_observations(measurements, by_feature, noise, purpose, *, image_size=(1920, 1080)):
     """Select original correlated evidence without independently counting rereads."""
+    width,height=image_size
+    if type(width) is not int or type(height) is not int or width<=0 or height<=0:
+        raise ValueError('Source image dimensions must be positive integers')
     chosen={};eligibility=[];eligible={};explicit_dependence=set()
     explicit_groups=list((noise or {}).get('groups',[]))
     explicit_members={oid for g in explicit_groups for oid in g['observation_ids']}
@@ -488,7 +499,7 @@ def select_source_observations(measurements, by_feature, noise, purpose):
         elif c.native_path_id not in by_feature:reason='no_current_native_path'
         elif c.normal is None and c.candidate_id not in explicit_members and not c.evidence.get('source_junction_normals'):reason='no_calibrated_W_or_actual_profile_normal'
         elif by_feature[c.native_path_id]['kind']=='finite_curve' and c.evidence.get('station_initial') is None:reason='no_compatible_navigation_station'
-        elif not (0<=c.actual_uv[0]<1920 and 0<=c.actual_uv[1]<1080):reason='outside_original_image'
+        elif not (0<=c.actual_uv[0]<width and 0<=c.actual_uv[1]<height):reason='outside_original_image'
         if reason:eligibility.append(dict(id=c.candidate_id,reason=reason));continue
         eligible[c.candidate_id]=c
         group=c.source_group_id or c.candidate_id
@@ -535,7 +546,8 @@ def export_input(measurements, features, source_index, noise, purpose, out):
     geometry=source_index['geometry'];job=source_index['job']
     registry,bindings=features
     by_feature={x['id']:x for x in registry}
-    rows,complete,eligibility=select_source_observations(measurements,by_feature,noise,purpose)
+    rows,complete,eligibility=select_source_observations(measurements,by_feature,noise,purpose,
+        image_size=(job['source']['width'],job['source']['height']))
     if purpose!='camera_navigation' and rows and not noise:
         raise ValueError('Engineering navigation weights cannot enter final geometry fitting')
     # This task's source-only selected rows expressly carry no independent W.

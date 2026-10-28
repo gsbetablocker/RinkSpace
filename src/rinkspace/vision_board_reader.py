@@ -3,6 +3,32 @@ import hashlib
 import numpy as np
 
 
+def source_front_face_top(rgb, binding, observed_top_uv, exclusion):
+    """Read the inside edge of the blue cap for front-face ad searches.
+
+    This is a search-domain boundary, not a new board observation. The top
+    geometry remains the upper cap edge. A guide at that upper edge must not
+    let an advertisement reader accept the same blue material as its panel.
+    """
+    from .vision_source_topology import read_source_board_rail_material_profiles
+    image = np.ascontiguousarray(rgb)
+    hints = np.asarray(observed_top_uv, float).reshape(-1, 2)
+    if not len(hints):
+        return np.empty((0, 2)), dict(status='no_observed_front_face_top')
+    packet = read_source_board_rail_material_profiles(image, dict(
+        source_binding=binding, RGB_sha256=hashlib.sha256(image.tobytes()).hexdigest(),
+        actual_source_top_uv=hints), source_instances=[dict(
+            object_id='current_source_exclusion', kind='occluder',
+            source_binding=binding, region_mask=np.asarray(exclusion,bool))], sample_spacing_px=1,
+        exit_requires_current_blue_material=True)
+    good = np.asarray(packet['primary_role_samples'],bool)
+    lower = np.asarray(packet['actual_source_blue_to_white_exit_uv'])[good]
+    return lower, dict(status='current_RGB_cap_exit_search_boundary',
+        source_binding=binding, lower_blue_cap_uv=lower.tolist(),
+        source_material_role_evidence=[e for e,k in zip(packet['source_material_role_evidence'],good) if k],
+        creates_observations=False)
+
+
 def _numpy(value):
     return value.detach().cpu().numpy() if hasattr(value, 'detach') else np.asarray(value)
 

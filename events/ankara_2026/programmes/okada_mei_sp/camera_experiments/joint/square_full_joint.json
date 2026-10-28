@@ -1,0 +1,45 @@
+{
+  "schema": "rinkspace.camera_experiment.v1",
+  "id": "square_full_joint",
+  "basis": {
+    "kind": "engineering_assumption",
+    "not_sony_measurement": true,
+    "description": "Square-pixel camera initialized from the accepted image fit, retaining all other optical terms and jointly adjusting the existing scene. This is a physical engineering hypothesis, not a factory calibration."
+  },
+  "active_camera_names": [
+    "R0_x",
+    "R0_y",
+    "R0_z",
+    "pan_axis_tangent1",
+    "pan_axis_tangent2",
+    "tilt_axis",
+    "pivot_x",
+    "pivot_y",
+    "pivot_z",
+    "lever_x",
+    "lever_y",
+    "lever_z",
+    "axis_spacing",
+    "pupil1",
+    "pupil2",
+    "cx",
+    "cy",
+    "cx_zoom",
+    "cy_zoom",
+    "k10",
+    "k11",
+    "k20",
+    "k21",
+    "p1",
+    "p2",
+    "readout",
+    "wide_k1",
+    "wide_k2",
+    "wide_p1",
+    "wide_p2"
+  ],
+  "fixed_rig_values": {
+    "eta": 0
+  },
+  "scene_mode": "joint_current"
+}

@@ -7,15 +7,23 @@ from rinkspace.core.native import NativeCore
 from rinkspace.session.gpu_geometry import NativeSceneGPU
 from rinkspace.domain.parameters import SceneParameterModel,ParameterState
 
+def finite_quantiles(values,quantiles):
+    values=np.asarray(values);values=values[np.isfinite(values)]
+    # An entirely invalid path has no numerical error percentile. Preserve its
+    # failure count and serialize missing statistics as null, never as success.
+    return np.percentile(values,quantiles).tolist() if len(values) else [None]*len(quantiles)
+
 def initialize(state_file=None):
-    core=NativeCore(prep.LIBRARY);native=NativeSceneGPU(prep.SCENE,core);camera=prep.read(prep.CAMERA)
+    camera=prep.read(prep.CAMERA)
     controls=np.load(prep.CAMERA.parent/camera['controls_ref']);mapping=prep.read(prep.RUN/'mapping.json');z=dict(np.load(prep.RUN/'point_observations.npz'))
-    snapshot=None
+    snapshot=None;parameter_state=None
     if state_file:
-        snapshot=dict(np.load(state_file));model=SceneParameterModel(prep.read(prep.SCENE),prep.SCENE,optimize_scene=True)
-        if str(snapshot.get('point_input_sha256',''))!=prep.digest(prep.RUN/'point_observations.npz'):raise ValueError('Initial native state has different point input')
-        native=NativeSceneGPU(prep.SCENE,core,parameter_state=ParameterState(model.initial_state.layout,snapshot['scene_values']))
+        snapshot=dict(np.load(state_file,allow_pickle=False));model=SceneParameterModel(prep.read(prep.SCENE),prep.SCENE,optimize_scene=True)
+        camera=prep.validate_snapshot_identity(snapshot,model.initial_state.layout,camera,mapping,points=z,
+            point_input_sha256=prep.digest(prep.RUN/'point_observations.npz'))
+        parameter_state=ParameterState(model.initial_state.layout,snapshot['scene_values'])
         camera={**camera,'rig':snapshot['rig'].tolist()};controls=snapshot['controls']
+    core=NativeCore(prep.LIBRARY);native=NativeSceneGPU(prep.SCENE,core,parameter_state=parameter_state)
     station=z['stations'].copy() if snapshot is None else snapshot['stations'].copy();groups=collections.defaultdict(list)
     for row,(pts,path,kind) in enumerate(zip(z['pts'],z['path_indices'],z['kind'])):
         if kind==1:groups[(int(pts),int(path))].append(row)
@@ -51,20 +59,23 @@ def initialize(state_file=None):
         if batch_count+len(samples[key[1]])>250000 and batch:process(batch);batch=[];batch_count=0
         batch.append((key,rows));batch_count+=len(samples[key[1]])
     if batch:process(batch)
-    np.savez(prep.RUN/'initialized_points.npz',stations=station,seed_screen_distance=distance)
+    np.savez(prep.RUN/'initialized_points.npz',stations=station)
+    np.savez(prep.RUN/'station_initialization_diagnostics.npz',seed_screen_distance=distance)
     if snapshot is not None:
         snapshot['stations']=station;np.savez(prep.RUN/'reseeded_pixels_state.npz',**snapshot)
     prep.write(prep.RUN/'station_initialization.json',dict(method='native_current_geometry_and_predicted_row_projection_named_curve_search',
         changed='nuisance_station_initial_values_only',camera_sha256=prep.digest(prep.CAMERA),scene_revision=native.scene_revision,
         dataset_native_parameters_overwritten=False,numeric_state_source=str(state_file) if state_file else None,unresolved_groups=invalid_groups,curve_rows=int(np.count_nonzero(z['kind']==1)),
-        seed_error_quantiles_px=np.nanpercentile(distance,[0,50,90,95,99,100]).tolist()))
+        seed_error_quantiles_px=finite_quantiles(distance,[0,50,90,95,99,100])))
     with native.resident(camera=camera,controls=controls,path_ids=[mapping['path_ids'][i] for i in z['path_indices']],stations=station,pts=z['pts'],observed=z['uv']) as resident:
         result=resident.evaluate('cuda');np.savez(prep.RUN/'initialized_pixel_evaluation.npz',values=result['values'],status=result['status'])
         status=result['status'];err=np.linalg.norm(result['values'][:,9:11],axis=1)
-        report=dict(invalid=int(np.count_nonzero(status)),status=dict(zip(*[x.tolist() for x in np.unique(status,return_counts=True)])),errors=np.nanpercentile(err,[0,50,90,95,99,100]).tolist(),paths=[])
+        report=dict(invalid=int(np.count_nonzero(status)),status=dict(zip(*[x.tolist() for x in np.unique(status,return_counts=True)])),errors=finite_quantiles(err,[0,50,90,95,99,100]),paths=[])
         for pid,path in enumerate(mapping['path_ids']):
             rr=np.flatnonzero(z['path_indices']==pid)
-            if len(rr):report['paths'].append(dict(path=path,rows=len(rr),invalid=int(np.count_nonzero(status[rr])),p50=float(np.nanmedian(err[rr])),p95=float(np.nanpercentile(err[rr],95))))
+            if len(rr):
+                p50,p95=finite_quantiles(err[rr],[50,95])
+                report['paths'].append(dict(path=path,rows=len(rr),invalid=int(np.count_nonzero(status[rr])),p50=p50,p95=p95))
         prep.write(prep.RUN/'initialized_evaluation.json',report)
         print(json.dumps({k:v for k,v in report.items() if k!='paths'}),flush=True)
 if __name__=='__main__':

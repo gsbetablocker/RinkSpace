@@ -3,7 +3,7 @@
   "scene_id": "ankara_2026.field",
   "revision": 35,
   "status": "unfitted_structure_candidate",
-  "native_family": "shared_geometry_v4_rink_axes_board_attached",
+  "native_family": "shared_geometry_v5_symmetric_goal_ends",
   "coordinate_unit": "rink_length_L_equals_1",
   "meters_per_unit": null,
   "dimensions_status": "全部具体尺寸与半轴数值尚未重新拟合；米制未验证",
@@ -39,16 +39,16 @@
     0.07166734932826517,
     -0.22669560694668842,
     0.2442864203241858,
-    -0.43141045125639144,
-    0.4336127321869141,
+    0.0,
+    0.43251159172165277,
     0.32942994703447126,
     0.0,
     0.11632316863468001,
     0.0,
-    0.030725692473989222,
-    0.02979388237148083,
-    0.030727153854278044,
-    0.02979529943286894,
+    0.030726423164133633,
+    0.029794590902174886,
+    0.0,
+    0.0,
     0.04909271224436863,
     0.06897419292230642
   ],
@@ -107,30 +107,60 @@
       "id": "hockey_faceoff_shared",
       "offset": 23,
       "size": 6,
-      "tangent_size": 4,
+      "tangent_size": 3,
       "independent_local_indices": [
-        0,
         1,
         2,
         4
       ],
       "inactive_storage_local_indices": [
+        0,
         3,
         5
       ],
       "values_meaning": [
-        "goal_left_x",
-        "goal_right_x",
+        "unused",
+        "goal_half_longitudinal_separation",
         "faceoff_half_longitudinal_separation",
         "unused",
         "faceoff_half_transverse_separation",
         "unused"
+      ],
+      "positive_local_indices": [
+        1,
+        2,
+        4
       ]
     },
     {
       "id": "hockey_ends_ellipse",
       "offset": 29,
-      "size": 6
+      "size": 6,
+      "tangent_size": 4,
+      "independent_local_indices": [
+        0,
+        1,
+        4,
+        5
+      ],
+      "inactive_storage_local_indices": [
+        2,
+        3
+      ],
+      "positive_local_indices": [
+        0,
+        1,
+        4,
+        5
+      ],
+      "values_meaning": [
+        "shared_crease_depth_semiaxis",
+        "shared_crease_transverse_semiaxis",
+        "unused",
+        "unused",
+        "trapezoid_goal_half_span",
+        "trapezoid_board_half_span"
+      ]
     }
   ],
   "ellipse_initialization": {
@@ -173,18 +203,18 @@
       0.2442864203241858
     ],
     "faceoff": [
-      -0.43141045125639144,
-      0.4336127321869141,
+      0.0,
+      0.43251159172165277,
       0.32942994703447126,
       0.0,
       0.11632316863468001,
       0.0
     ],
     "ends_ellipse": [
-      0.030725692473989222,
-      0.02979388237148083,
-      0.030727153854278044,
-      0.02979529943286894,
+      0.030726423164133633,
+      0.029794590902174886,
+      0.0,
+      0.0,
       0.04909271224436863,
       0.06897419292230642
     ]
@@ -1355,7 +1385,11 @@
         "entity/ice.goal_line_left"
       ],
       "model_line_width": null,
-      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3",
+      "closed": false,
+      "contour_domain": "half_ellipse_arc_only",
+      "centre_parent": "corresponding_goal_line_midpoint",
+      "closing_diameter_observable": false
     },
     {
       "id": "demo_initial/goal_crease_right",
@@ -1381,7 +1415,11 @@
         "entity/ice.goal_line_right"
       ],
       "model_line_width": null,
-      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3",
+      "closed": false,
+      "contour_domain": "half_ellipse_arc_only",
+      "centre_parent": "corresponding_goal_line_midpoint",
+      "closing_diameter_observable": false
     },
     {
       "id": "demo_initial/A3:outer",
@@ -1626,22 +1664,28 @@
       "same_end_faceoff_pair_symmetric": true,
       "same_end_inward_distance_shared": true,
       "C0_A1_A4_common_radius": true,
-      "cross_end_inward_distances_shared": false,
+      "cross_end_inward_distances_shared": true,
       "cross_end_transverse_separations_shared": true,
       "goal_lines_parallel_to_shared_paint_frame": true,
       "A1_A4_same_row": true,
       "A2_A3_same_row": true,
       "left_right_centres_mirror_about_C": true,
-      "goal_positions_mirrored": false
+      "goal_positions_mirrored": true
     },
     "M4": {
       "shape_family": "half_ellipse",
-      "independent_ax_ay_per_end": true,
-      "cross_end_axes_shared": false,
+      "independent_ax_ay_per_end": false,
+      "cross_end_axes_shared": true,
       "trapezoid_goal_and_board_half_spans_shared_between_sides": true,
       "trapezoid_goal_endpoint_parent": "actual_goal_line",
       "trapezoid_board_endpoint_parent": "same_continuous_board",
-      "ellipse_or_trapezoid_new_endpoint_UV": false
+      "ellipse_or_trapezoid_new_endpoint_UV": false,
+      "independent_depth_and_transverse_semiaxes": true,
+      "contour_arc_only": true,
+      "closing_diameter_is_crease_contour": false,
+      "crease_centre_equals_goal_line_midpoint": true,
+      "trapezoid_upper_lower_mirrored": true,
+      "trapezoid_left_right_mirrored": true
     },
     "M5": {
       "same_station_top_bottom_share_XY": true,
@@ -1677,7 +1721,7 @@
     "path": "../end_sources.json",
     "role": "preserved_source_references_not_additional_measurements_or_constraints"
   },
-  "shared_geometry_options": 15,
+  "shared_geometry_options": 31,
   "curling_layout_parameterization": {
     "kind": "four_equal_pitch_rows_centred_between_long_sides",
     "independent_local_indices": [
@@ -1782,7 +1826,7 @@
       ]
     },
     "shared_radius": "hockey_shared.common_radius",
-    "goal_positions_independent": true
+    "goal_positions_independent": false
   },
   "geometry_revision": 4,
   "geometry_review": {
@@ -2384,8 +2428,8 @@
         13,
         26
       ],
-      "path": "../ad13/assets_r3.json",
-      "sha256": "903ee6fe0e122e94112e3e315c9778403b53013fd09692cc2c54c18a67731ec2",
+      "path": "../ad13/assets_r4.json",
+      "sha256": "769c557b557df6a83a6966f54869ced8ac6dfc469ef03dacb6b7482b122ff53e",
       "template_id": "print_template/Ad13_Ad26",
       "instance_id": "print_instance/Ad13",
       "instance_ids": [
@@ -2460,5 +2504,18 @@
     ],
     "source_points_unchanged": true,
     "parameter_freedoms_unchanged": true
+  },
+  "goal_end_parameterization": {
+    "authority": "user_explicit_request_20261028",
+    "goal_lines": "x=-d and x=+d, endpoints on the same continuous board",
+    "creases": "same ax/ay at corresponding goal midpoint; opposite finite half-ellipse arcs",
+    "trapezoids": "shared goal/board half spans, reflected across both rink axes",
+    "crease_station_domain": [
+      0.0,
+      1.0
+    ],
+    "closing_diameter_observable": false,
+    "remaining_independent_dimensions": 5,
+    "observation_penalties_added": false
   }
 }

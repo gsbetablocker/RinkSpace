@@ -27,6 +27,77 @@ def _write_new(path, data):
     return path
 
 
+def symmetric_goal_end_initial_values(layout, *, reference_end=None):
+    """Project an old numeric initializer onto the explicitly requested ties.
+
+    This does not fit observations. Shared dimensions use the explicit reference
+    end, or arithmetic means when neither end was selected. Goal distance also
+    preserves existing Lane/F left-support feasibility.
+    The native evaluator, not this initializer, enforces the relations.
+    """
+    q = np.asarray(layout, dtype=float).copy()
+    if q.shape != (35,) or not np.isfinite(q).all() or min(q[29:35]) <= 0:
+        raise ValueError('Goal-end migration requires the explicit layout35 ellipse state')
+    if reference_end not in (None, 'left', 'right'):
+        raise ValueError('Explicit goal initializer reference must be left or right')
+    nominal = (q[24] - q[23]) / 2. if reference_end is None else (-q[23] if reference_end == 'left' else q[24])
+    axes = (q[29:31] + q[31:33]) / 2. if reference_end is None else q[29:31] if reference_end == 'left' else q[31:33]
+    distance = max(nominal, -min(q[0], *q[10:14]))
+    if distance <= q[25] or distance <= 0:
+        raise ValueError('Symmetric goal initial distance must enclose faceoff centres')
+    q[24] = distance
+    q[29:31] = axes
+    q[[23, 31, 32]] = 0.  # Explicit unused storage, never independent parameters.
+    return q.tolist()
+
+
+def constrain_symmetric_goal_ends(scene):
+    """Declare shared goal-line/crease/trapezoid geometry without changing UV."""
+    result = deepcopy(scene)
+    if result.get('schema') != 'rinkspace.field_model.v1' or not result.get('shared_geometry_options', 0) & 2:
+        raise ValueError('Symmetric goal ends require current rink-aligned board carriers')
+    if not result['shared_geometry_options'] & 16:
+        result['shared_layout'] = symmetric_goal_end_initial_values(result['shared_layout'])
+    result['shared_geometry_options'] |= 16
+    result['native_family'] = 'shared_geometry_v5_symmetric_goal_ends'
+    blocks = {b['id']: b for b in result['parameter_blocks']}
+    blocks['hockey_faceoff_shared'].update(tangent_size=3,
+        independent_local_indices=[1, 2, 4], inactive_storage_local_indices=[0, 3, 5],
+        positive_local_indices=[1, 2, 4],
+        values_meaning=['unused', 'goal_half_longitudinal_separation',
+                        'faceoff_half_longitudinal_separation', 'unused',
+                        'faceoff_half_transverse_separation', 'unused'])
+    blocks['hockey_ends_ellipse'].update(tangent_size=4,
+        independent_local_indices=[0, 1, 4, 5], inactive_storage_local_indices=[2, 3],
+        positive_local_indices=[0, 1, 4, 5],
+        values_meaning=['shared_crease_depth_semiaxis', 'shared_crease_transverse_semiaxis',
+                        'unused', 'unused', 'trapezoid_goal_half_span', 'trapezoid_board_half_span'])
+    result['constraints']['M3'].update(goal_positions_mirrored=True,
+                                      cross_end_inward_distances_shared=True)
+    result['constraints']['M4'].update(independent_ax_ay_per_end=False,
+        independent_depth_and_transverse_semiaxes=True, cross_end_axes_shared=True,
+        contour_arc_only=True, closing_diameter_is_crease_contour=False,
+        crease_centre_equals_goal_line_midpoint=True,
+        trapezoid_upper_lower_mirrored=True, trapezoid_left_right_mirrored=True)
+    result.setdefault('faceoff_parameterization', {})['goal_positions_independent'] = False
+    result['goal_end_parameterization'] = dict(
+        authority='user_explicit_request_20261028',
+        goal_lines='x=-d and x=+d, endpoints on the same continuous board',
+        creases='same ax/ay at corresponding goal midpoint; opposite finite half-ellipse arcs',
+        trapezoids='shared goal/board half spans, reflected across both rink axes',
+        crease_station_domain=[0., 1.], closing_diameter_observable=False,
+        remaining_independent_dimensions=5, observation_penalties_added=False)
+    for path in result['paths']:
+        if path.get('generated_code') in (410, 411):
+            path.update(closed=False, contour_domain='half_ellipse_arc_only',
+                        centre_parent='corresponding_goal_line_midpoint',
+                        closing_diameter_observable=False)
+    if 'initial_values' in result:
+        result['initial_values'].update(faceoff=result['shared_layout'][23:29],
+                                       ends_ellipse=result['shared_layout'][29:35])
+    return result
+
+
 def build_model(source_dir,curling_model_path,out_path=None,ellipse_parameters=None,ellipse_provenance=None):
     source_dir=Path(source_dir).resolve(strict=True)
     curling_model_path=Path(curling_model_path).resolve(strict=True)
@@ -37,7 +108,7 @@ def build_model(source_dir,curling_model_path,out_path=None,ellipse_parameters=N
     if len(q)!=33 or q[:8]!=curling['curling_parameters'] or q[8:18]!=curling['lane_parameters']:
         raise ValueError('M1/native parameter mapping differs')
     if ellipse_parameters is None:
-        raise ValueError('M4 requires four explicit independent half-ellipse semiaxes; a circle is not renamed as ellipse')
+        raise ValueError('M4 requires four explicit half-ellipse initializer slots before symmetry migration; a circle is not renamed as ellipse')
     axes=list(map(float,ellipse_parameters))
     if len(axes)!=4 or not np.isfinite(axes).all() or min(axes)<=0:
         raise ValueError('M4 half-ellipse semiaxes must be four finite positive values')
@@ -141,6 +212,7 @@ def build_model(source_dir,curling_model_path,out_path=None,ellipse_parameters=N
             path['label']=path['label'].replace(':outer',':centreline')
             path['role']='physical_material_centreline'
         if path.get('generated_code') in (420,421,422,423):path['role']='physical_material_centreline'
+    scene=constrain_symmetric_goal_ends(scene)
     if out_path is not None:_write_new(out_path,scene)
     return scene
 
@@ -232,6 +304,19 @@ def sample_model(scene,core,samples=361):
             'M3':{'common_circle_radius_spread':float(np.ptp(radii)),**m3},
             'M1':{'connection_stops_before_N':True,'physical_edge_count':12,'connection_count':4,'ring_boundary_count':32,'lane_left_not_before_left_goal_line':True,'lane_left_support_values':lane_left,'bottom_long_side_centre_gap':lower_gap,'top_long_side_centre_gap':upper_gap,'long_side_gap_difference':abs(lower_gap-upper_gap)},
             'path_count':len(shapes),'new_source_observations':0,'fit_executed':False}
+    if scene.get('shared_geometry_options',0)&16:
+        left,right=[np.asarray(by_code[k]['parameters']) for k in (410,411)]
+        mirror_x=np.array([-1.,1.,1.]);mirror_y=np.array([1.,-1.,1.])
+        m4={
+            'goal_line_mirror_error':float(np.max(abs(endpoints(403)*mirror_x-endpoints(404)))),
+            'crease_axes_difference':float(np.max(abs(left[3:5]-right[3:5]))),
+            'crease_centre_to_goal_midpoint_error':float(max(np.linalg.norm(by_code[k]['parameters'][:3]-endpoints(g).mean(0)) for k,g in ((410,403),(411,404)))),
+            'crease_mirror_error':float(np.max(abs(np.asarray(by_code[410]['xyz'])*mirror_x-np.asarray(by_code[411]['xyz'])[::-1]))),
+            'trapezoid_left_right_mirror_error':float(max(np.max(abs(endpoints(a)*mirror_x-endpoints(b))) for a,b in ((420,422),(421,423)))),
+            'trapezoid_upper_lower_mirror_error':float(max(np.max(abs(endpoints(a)*mirror_y-endpoints(b))) for a,b in ((420,421),(422,423)))),
+        }
+        if max(m4.values())>1e-11:raise ValueError('Native symmetric goal-end relation failed: '+str(m4))
+        checks['M4']=dict(**m4,contour_arc_only=True,closing_diameter_observable=False)
     errors=list(checks['M2'].values())+[checks['M3']['common_circle_radius_spread']]+[m3[s][k] for s in ('left','right') for k in ['inward_distance_difference','transverse_pair_asymmetry']]+([row_error,mirror_error] if scene.get('shared_geometry_options',0)&8 else [])
     if max(errors)>1e-11:raise ValueError('native structural relation failed: '+str(checks))
     return {'schema':'rinkspace.field_geometry.v1','scene_id':scene['scene_id'],'shapes':shapes,'nodes':nodes,

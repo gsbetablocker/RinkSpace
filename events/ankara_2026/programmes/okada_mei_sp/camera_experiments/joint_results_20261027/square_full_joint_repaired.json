@@ -1,0 +1,77 @@
+{
+  "schema": "rinkspace.square_camera_initialization_repair.v1",
+  "snapshot": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_s04_20261027\\camera_models\\square_repair\\review\\candidate_pixels.npz",
+  "snapshot_sha256": "c7bf576dc92a635fb254633c8fb1da1ce02f309cc42e2dba2d11fd72bf7c00c4",
+  "baseline_snapshot": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_s04_20261027\\joint_repaired\\review\\paused_accepted_pixels_latest.npz",
+  "baseline_sha256": "68b9e7475d475df875f42b1115c3567ab74e47a2d54cb6fedc199df16bbb40ac",
+  "baseline_unchanged": true,
+  "source_points_unchanged": true,
+  "rows": 569960,
+  "frames": 1936,
+  "invalid": 0,
+  "fx_over_fy": 1.0,
+  "baseline": {
+    "rms": 2.652067289456461,
+    "median": 1.1617922530253604,
+    "p95": 5.542935940654549,
+    "maximum": 45.64107278332906,
+    "above_20px": 240
+  },
+  "candidate": {
+    "rms": 2.65686435967151,
+    "median": 1.1622731120375294,
+    "p95": 5.556361296362923,
+    "maximum": 45.73412675775014,
+    "above_20px": 242
+  },
+  "shots": {
+    "s01": {
+      "baseline": {
+        "rms": 2.546642126513432,
+        "median": 1.19178520425225,
+        "p95": 5.194744817493035,
+        "maximum": 45.64107278332906,
+        "above_20px": 100
+      },
+      "candidate": {
+        "rms": 2.547918084285518,
+        "median": 1.1895407705880185,
+        "p95": 5.205507917520277,
+        "maximum": 45.73412675775014,
+        "above_20px": 102
+      },
+      "source_first_seconds": 22.12,
+      "source_last_seconds": 44.96
+    },
+    "s04": {
+      "baseline": {
+        "rms": 2.789693468592317,
+        "median": 1.115648061567367,
+        "p95": 5.95120679987455,
+        "maximum": 32.745554697533535,
+        "above_20px": 140
+      },
+      "candidate": {
+        "rms": 2.798888112323237,
+        "median": 1.1212022266244643,
+        "p95": 5.96831443212984,
+        "maximum": 32.6831678590542,
+        "above_20px": 140
+      },
+      "source_first_seconds": 58.28,
+      "source_last_seconds": 74.12
+    }
+  },
+  "physical": {
+    "pivot_height_conditional_m": 1.5806099728424088,
+    "optical_height_conditional_m": [
+      1.654023701021017,
+      1.660176690170463
+    ],
+    "board_height_conditional_m": 0.9932926274610668
+  },
+  "scene_was_jointly_optimized": true,
+  "physical_camera_validated": false,
+  "parameters": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\camera_experiments\\joint_results_20261027\\square_full_joint_repaired.npz",
+  "parameters_sha256": "6c10b6d094057e122081149ddb3349524f2cce2fd5771a126212bab05c4ba89b"
+}

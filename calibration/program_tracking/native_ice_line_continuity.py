@@ -82,6 +82,15 @@ def thin_material_width_limit(path, native):
     measured = getattr(native, '_thin_paint_width_reference', [])
     if len(measured) < 6:
         return None
+    reference_axis = getattr(native, '_thin_paint_width_reference_axis_xy', None)
+    if reference_axis is not None and path.get('xyz') is not None:
+        xyz=np.asarray(path['xyz'],float)
+        axis=xyz[-1,:2]-xyz[0,:2]
+        length=float(np.linalg.norm(axis))
+        if length and abs(float(axis@reference_axis)/length)<1.-1e-6:
+            # Apparent width and motion blur depend on transverse direction.
+            # A longitudinal stripe's image width cannot reject an end line.
+            return None
     width = float(np.median(measured))
     return dict(maximum_width_px=max(12., 1.75*width),
                 current_boundary_width_median_px=width,
@@ -101,6 +110,9 @@ def record_thin_material_width(path, native, rows):
     widths = [float(np.linalg.norm(np.diff(np.asarray(
         r['source_evidence']['actual_source_sides_uv'],float),axis=0))) for r in rows]
     native._thin_paint_width_reference = getattr(native, '_thin_paint_width_reference', []) + widths
+    if path.get('xyz') is not None:
+        xyz=np.asarray(path['xyz'],float);axis=xyz[-1,:2]-xyz[0,:2]
+        if np.linalg.norm(axis)>0:native._thin_paint_width_reference_axis_xy=axis/np.linalg.norm(axis)
 
 
 def current_material_intervals(stations, readout_stations, *, maximum_gap=260.):

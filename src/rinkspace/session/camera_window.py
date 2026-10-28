@@ -8,6 +8,7 @@ from pathlib import Path
 import numpy as np
 
 from ..domain.runtime_rigs import _camera_data
+from ..domain.camera import complete_camera_rig
 from ..path_policy import guard_project_write
 from .camera_exposure import exposure_controls
 
@@ -47,7 +48,7 @@ def snapshot_window(camera_path, pts, core, out_dir):
     local, coefficients, times = window_controls(camera, controls, pts)
     rows = np.array([0., (camera["image_height"]-1)/2, camera["image_height"]-1.])
     row_times = times[:, None]+camera["rig"][37]*(rows/(camera["image_height"]-1)-.5)
-    evaluated = core.evaluate_motion_camera(local["rig"], coefficients,
+    evaluated = core.evaluate_motion_camera(complete_camera_rig(local), coefficients,
         local["first_control_time"], local["control_dt"], row_times.ravel())
     if np.any(evaluated["status"] != 0):
         raise ValueError("native window row-state evaluation failed")

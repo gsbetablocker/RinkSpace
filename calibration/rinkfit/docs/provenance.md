@@ -1,8 +1,10 @@
 # 来源与复现
 
+本页描述 rinkfit 历史后端的模块合同，适用范围见[模块入口](../README.md)；当前 rebuild 的 native／GPU 能力见[实现状态](../../../docs/REBUILD.md)。
+
 初始包的数学方案原保存在 `spec/SPEC.html`，其中包含 US11176706B2、WACV 2020/2022、Javan 论文/演讲及 Ceres/OpenCV 等一手资料的核对与适用边界。`spec/source_review.json` 保存资料逐项用途。这些 spec 文件没有随当前公开源码提供，输入范围见[模块 README](../README.md)。本模块重新实现数学接口，没有引入 sportsfield_release 的网络代码、权重或训练资产；也没有移植专利正文作为项目代码。
 
-新代码以本次用户任务为范围，不新增第三方许可证声明来改变用户已有项目的权属。运行时 NumPy/SciPy、Ceres/Eigen/SuiteSparse 各自依赖仍由其发行版管理。本包不携带这些库的二进制。
+项目代码适用[根许可声明](../../../LICENSE.md)。NumPy／SciPy、Ceres／Eigen／SuiteSparse 分别适用原依赖许可，本目录不分发这些库的二进制。
 
 ## 数据与旧候选
 

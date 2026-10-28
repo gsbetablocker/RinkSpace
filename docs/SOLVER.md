@@ -1,6 +1,6 @@
-# RinkSpace 求解器重构设计：唯一数值核心与 GPU 执行路径
+# 求解方法与运行要求
 
-算法设计始于 2026-10-24；2026-10-25 文档审计后，本文只维护数值方案和运行要求。当前能力见 [REBUILD](REBUILD.md)，精确接口见 [INTERFACES](INTERFACES.md)。原生 GPU 已贯通连续 LM、数值停止及同一 handle 的停止／继续；磁盘完整 checkpoint/resume 尚未交付。设计不是运行回执或本次任务安排。
+本文维护共同数值模型、GPU 执行流程与运行要求。当前可调用能力见 [REBUILD](REBUILD.md)，精确接口见 [INTERFACES](INTERFACES.md)。驻留 GPU 连续 LM、安全停止与同 handle 继续已实现；聚合生命周期、增量准备缓存和完整磁盘恢复仍按各节所标目标理解。
 
 ## 1. 数值架构选择
 
@@ -69,7 +69,7 @@ project 与 residual evaluator 调用同一 geometry/projection 数学，渲染�
 
 增结属于外层 refinement，不在 LM trial 内改变图。候选区间需要跨源时刻、跨几何方向的真实材料证据与可观测的新导数列；单个错误身份、遮挡簇或广告失败不触发盲目加参。精确 knot insertion 先保持当前曲线，再开放新增自由度、更新 FactorPlan、RS 支撑及稀疏符号结构。
 
-增结与先验强度由预先划分的调参选择证据比较，采用的判据显式保存；最终检查组不参与选择。证据不足报告不足，拒绝且证据未变的候选不重复尝试。控制密度不改变原生 PTS、观测准入或完整镜头验收范围。旧稿的固定间隔、样本计数和下降百分比不作为已实现默认值。
+增结与先验强度由预先划分的调参选择证据比较，采用的判据显式保存；最终检查组不参与选择。证据不足报告不足，拒绝且证据未变的候选不重复尝试。控制密度不改变原生 PTS、观测准入或完整镜头验收范围。实际结点、容差与预算以所选配置及实现为准。
 
 参考角为零等规约仅消除参数化冗余，不能偷偷固定实际轴朝向。对于单平面、狭小视野、仅共线点等欠约束情况，不开放无法辨识的畸变/主点/几何组合。报告相关的参数列与证据覆盖；不足的自由度维持显式的条件假设，而不是让算法通过极端参数假装确定。
 
@@ -90,7 +90,7 @@ project 与 residual evaluator 调用同一 geometry/projection 数学，渲染�
 
 观测准入按 [BUILD_SPEC](rink_model/BUILD_SPEC.md#observation-eligibility)执行；数值残差与导入成功均不改变资格。源 UV、相关 W 和原状态保留。
 
-固定观测的像素误差：`r_i(theta)=project(X_i(theta_scene),theta_camera,t_i)-uv_i`。曲线观测为 `r_i(theta,u_i)`；真实边界/中心线的意义由实体测量定义决定。首版生产目标是明确几何观测的似然：原始光度 profile 用于准备阶段估计中心/边界的UV、噪声和相关关系，原始像素样本仍保留可追溯。已经明确的旧UV与W等价迁移；只能按旧Query模型解释、尚不能等价转换的源组单独标为需要适配，不能借Query参数改变像素身份或仅改标签冒充等价。源图搜索alpha不进入全局求解未知量；不为此另建第二套光度求解器。
+固定点像素误差为 `r_i(theta)=project(X_i(theta_scene),theta_camera,t_i)-uv_i`，曲线观测为 `r_i(theta,u_i)`。测量语义由实体定义，源 UV 不被模型投影覆盖。当前 native 可显式选择下述逐点像素目标或相关目标；旧查询仅在可保持原似然语义的接口中使用，不能改标签冒充等价。源图搜索 alpha 不作为独立全局未知量。
 
 逐点像素目标为 `F(theta,u) = 1/2 sum_i ||project_i(theta,u_i)-uv_i||^2`。此模式直接使用原始源像素，不接入观测权重、协方差、稳健降权或像素容许范围；数据不覆盖所选 native 参数。数值变量缩放和 LM 阻尼不属于观测加权。普通曲线 station 可沿其实体调整，但每个点各自保留两个原像素残差，不能先压缩后再用多个自由 station 抵消整组误差。
 
@@ -100,7 +100,7 @@ project 与 residual evaluator 调用同一 geometry/projection 数学，渲染�
               + 1/2 ||r_motion(theta)||^2
               + 1/2 ||r_measured_prior(theta)||^2`。
 
-`A_g` 是源相关组的白化算子，保持其行顺序、坐标单位与有效秩。不把人工像素容许误差当作噪声标准差。首版材料观测统一使用按有效秩归一的 Huber：`rho_d(s)=d*huber(s/d,delta)`，delta 为 RunOptions 中显式记录的白化后无量纲 RMS 阈值；`huber(a,delta)=a` 当 `a<=delta^2`，否则为 `2*delta*sqrt(a)-delta^2`。阈值归 RunOptions，不由某次拟合难易偷偷修改；已测先验和运动项为二次项。不能任意逐分量 robustify 一个可任意旋转的白化基并声称统计意义不变。
+`A_g` 是源相关组的白化算子，保持其行顺序、坐标单位与有效秩。不把人工像素容许误差当作噪声标准差。显式相关模式使用按有效秩归一的 Huber：`rho_d(s)=d*huber(s/d,delta)`，delta 为 RunOptions 中显式记录的白化后无量纲 RMS 阈值；`huber(a,delta)=a` 当 `a<=delta^2`，否则为 `2*delta*sqrt(a)-delta^2`。阈值归 RunOptions，不由某次拟合难易偷偷修改；已测先验和运动项为二次项。不能任意逐分量 robustify 一个可任意旋转的白化基并声称统计意义不变。
 
 - 已确认恒等几何关系已由构造实现，不再加入重复罚项。
 - 工程像素误差持续显示为验收指标，不以全局 b 的两阶段优化替代同一统计目标。
@@ -138,7 +138,7 @@ ActiveSet 依据当前任务、数据覆盖和可辨识性指定，不固定 S01
 
 ## 7. 一次迭代的精确定义
 
-在已定规和缩放的切空间中，逐相关组先应用白化及 `sqrt(rho_prime(s))` 稳健权重，再形成 `H=J^T J`、`g=J^T r`。这是明确的 Gauss–Newton / IRLS 近似，不把稳健损失的负曲率二阶项放入要求 SPD 的线性系统。trial 接受仍用未近似的实际总目标。参数单位缩放是数值变换，不是新的物理先验。首版在已声明的缩放切空间中采用 D=I，不再叠加另一套隐藏的自动单位缩放。相机角采用局部旋转/轴图；正尺寸采用 log；有限 station 使用有界活动集。
+在已定规和缩放的切空间中，逐点模式直接由原像素残差形成 `H=J^T J`、`g=J^T r`；显式相关模式先应用 W 与 `sqrt(rho_prime(s))`，形成 Gauss–Newton／IRLS 近似，不将稳健损失的负曲率项放入 SPD 系统。trial 接受重算所选真实目标。参数单位缩放不是物理先验；阻尼度量由配置显式选择，当前默认 D=I。相机使用局部旋转／轴图，正尺寸用 log，有限 station 使用有界活动集。
 
 把局部变量记为 l、保留变量记为 q。**LM 阻尼要在局部消元之前加入**：
 
@@ -158,8 +158,8 @@ cuDSS 求 `S*delta_q=rhs`，然后局部回代。固定交点没有 station，�
 
 ```cpp
 while (!stop_requested && !converged) {
-    // 准入、实体身份、源白化W与loss配置冻结；
-    // IRLS权重在每次已接受状态的新线性化处更新，拒绝trial内不变。
+    // 准入、实体身份与所选目标配置冻结；
+    // 相关模式在接受状态更新 IRLS 权重，拒绝 trial 内保持。
     auto lin = gpu.linearize_and_reduce(problem, accepted_state);
     for (;;) {
         auto damped = damp_before_elimination(lin, lambda, active_bounds);
@@ -177,14 +177,14 @@ while (!stop_requested && !converged) {
             break;
         }
         increase_damping();
-        if (pause_or_numerical_failure()) return checkpointed_status();
+        if (pause_or_numerical_failure()) return stopped_status(accepted_state);
     }
 }
 ```
 
 采用 Nielsen 式阻尼更新：实际下降且增益比 rho 大于显式接受阈值 eta 时接受，lambda 乘 max(1/3,1-(2*rho-1)^3)，nu 复位为 2；拒绝时 lambda 乘 nu、nu 加倍。初始阻尼结合缩放后的 H 对角设定；无可观测下降方向、非有限数或线性解失败需明确返回。
 
-只有在已接受状态重新线性化后，原目标的投影梯度满足容差，才声明数值收敛。边界截断或大阻尼造成的小步与小下降不能单独证明收敛；接受步与代价同时变小只细分停止原因，仍须通过投影梯度判据。容差和实际采用的运行预算保存在 RunOptions。当前连续控制器分别报告梯度收敛、同时满足梯度与接受步／代价判据、浮点停滞及调用者停止。本文不把历史稿中的次数、容差或内存数值冒充实现默认值。暂停、用户停止、预算耗尽、无可行步、不可辨识、数值失败和数值停止分别报告；预算耗尽不是收敛，也不是画面质量判据。
+只有在已接受状态重新线性化后，原目标的投影梯度满足容差，才声明数值收敛。边界截断或大阻尼造成的小步与小下降不能单独证明收敛；接受步与代价同时变小只细分停止原因，仍须通过投影梯度判据。容差和实际采用的运行预算保存在 RunOptions。当前连续控制器分别报告梯度收敛、同时满足梯度与接受步／代价判据、浮点停滞、代价进展停滞及调用者停止。代价进展停滞要求上一接受步的预测下降与实际下降（包含回调中的 station 精修）均低于已声明的相对代价容差；它返回非收敛，不设额外次数／时间上限，也不证明局部最小值。实际默认值以当前绑定与运行配置为准。暂停、用户停止、预算耗尽、无可行步、不可辨识、数值失败和数值停止分别报告；预算耗尽不是收敛，也不是画面质量判据。
 
 上述 `accepted_state` 仅表示优化器接受的一步，不表示用户验收。非有限数、深度错误、实体分支消失、RS 不可解、非正定或线性残差过大，都记录具体首批实体/参数 ID。错误 trial 不覆盖最后可用状态。
 
@@ -194,7 +194,7 @@ while (!stop_requested && !converged) {
 
 ### 常驻数据
 
-采用 SoA 连续数组：整数 PTS、shot index、entity index、UV、来源/相关组索引、有限支持、噪声因子和只读的实体拓扑。稳定字符串 ID 只保留在主机映射表和结果文件中，CUDA 热路径不遍历 Python 对象、JSON 或字符串。
+常驻 SoA 数组包括整数 PTS、镜头／实体索引、源 UV、有限支持与只读拓扑；相关模式另包含噪声因子与相关组。稳定字符串 ID 留在主机映射和结果文件，CUDA 热路径不遍历 Python 对象、JSON 或字符串。
 
 `FactorPlan` 在准备/布局改变时计算：各因子依赖参数块、块偏移、局部变量组、H 的 CSR/BSR 目标地址、分组归约顺序。正常迭代只更新值。完整 J 不作为主机常驻对象，也不在每次迭代回传。
 
@@ -203,7 +203,7 @@ while (!stop_requested && !converged) {
 ### 计算顺序
 
 1. 同一核计算场景点、运动、镜头、投影及必要局部导数。
-2. 按相关组应用白化和稳健权重，生成小组局部 J / 累计块；组超过 tile 大小时分块运算，但保留所有相关跨项。
+2. 逐点模式直接累计两个像素残差；相关模式按组应用 W 与稳健权重并保留所有交叉项，超出 tile 时分块计算。
 3. 对参数块对做分段归约，形成全局稀疏 H/g 及局部 Schur 资料。
 4. GPU 完成局部消元、写回约定 CSR 值；cuDSS 在相同 stream / 明确 event 依赖下分解求解。
 5. GPU 求 trial 目标。通常仅把标量目标、状态码、时序和少量诊断计数回传。
@@ -213,7 +213,7 @@ while (!stop_requested && !converged) {
 
 ### 精度与容量
 
-首先用 FP64 参考小数据建立数值正确性。生产候选可采用 FP32 几何/局部导数、FP64 块累计与线性求解，但必须测量真实条件数下的投影、导数方向与步长一致性；不默认 FP16/TF32。消费级卡上的 FP64 速度和稀疏填充必须实测，不能凭 TFLOPS 广告推断迭代耗时。
+当前 native 路径使用 FP64。混合精度属于待验证的优化选择，需先测量真实条件数下的投影、导数与步长一致性，不默认 FP16／TF32。GPU 的 FP64 速度和稀疏填充以实际输入测量，不能凭 TFLOPS 推断迭代耗时。
 
 启动时读取设备与主机可用容量，记录实际运行配置中的资源预算；本文不指定固定显存/内存配额。容量依据观测数组、块矩阵及分解填充估计，cuDSS 符号分析的内存估计参与判断，不能把配置预算说成实测占用。
 
@@ -236,7 +236,7 @@ GPU 求解能力需要实际贯通所声明因子子集的残差/导数、H/g �
 
 ## 11. Windows / 5070 Ti 构建与运行
 
-现有 CPU 核心的构建命令见 [native/README](../native/README.md)。完整 CUDA 生产生命周期仍为目标；G1–G3 的有界实现见 REBUILD。复用已有 Python、CMake、MSVC、CUDA 和依赖，记录版本并选择匹配 CUDA 主版本的 cuDSS，不因重构重复安装。
+CPU／CUDA／cuDSS 构建命令见 [native](../native/README.md)，连续 LM 与磁盘恢复的能力边界见 [REBUILD](REBUILD.md)。复用已有 Python、CMake、MSVC、CUDA 与匹配的 cuDSS，按实际构建记录版本。
 
 RTX 5070 Ti 的计算能力为 12.0，目标代码须由支持该卡的工具链编译并实际加载，不能用数据中心 Blackwell 的 sm_100 冒充。Windows cuDSS 的运行 DLL 在 bin，lib 保存链接库；依赖解析随所用版本验证，不能靠改 PATH 掩盖版本不匹配。
 
@@ -269,4 +269,4 @@ RTX 5070 Ti 的计算能力为 12.0，目标代码须由支持该卡的工具链
 6. Blackwell cubin/PTX 兼容： https://docs.nvidia.com/cuda/blackwell-compatibility-guide/
 7. 标准LM与Nielsen阻尼更新（第2.4、3.2节）： https://www2.imm.dtu.dk/pubdb/edoc/imm3215.pdf 。本文有界步、robust IRLS及默认阈值是项目实现选择，不能当作原文全部算法已适用于本项目的证明。
 
-仓库固定证据：`calibration/solve2/rinksolve/{model.py,parameterization.py,optimizer.py,projector.py,whitening.py}`、`calibration/solve2/native/gpu_batch_ceres.cpp`、`events/ankara_2026/model_constraints/geometry_relations_current.json`、`AGENTS.md`。旧设计针对提交 3e866a835dac26c461bb4ae436ae289814a1ae57 的判断只保留其历史范围；当前状态按 REBUILD 和所选源码/运行记录核对，不自动沿用旧缺陷结论。审计前完整原稿保存在 Data/maintenance/agents_audit_20261025/supporting_before.json 的本文件键。
+仓库实现入口为 [core_api.h](../native/include/rinkspace/core_api.h)、[GPU 薄绑定](../src/rinkspace/core/gpu.py)、[场景适配](../src/rinkspace/session/gpu_geometry.py)与[场景关系](../events/ankara_2026/model_constraints/geometry_relations_current.json)。历史 Ceres 对照的范围由其模块说明和冻结运行记录确定。

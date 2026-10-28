@@ -149,7 +149,12 @@ RS_API int rs_shared_entity_definition(const double* board,size_t nboard,const d
  * bit8 requires bit2: A1=(a,-b),A2=(a,b),A3=(-a,b),A4=(-a,-b),
  * where faceoff[2]=a and faceoff[4]=b are independent positive half-spans.
  * faceoff[3]/[5] are inactive storage; goal positions remain independent.
- * a must be inward of both goal lines. */
+   * a must be inward of both goal lines.
+   * bit16 requires bit2 and layout35: goal x = -/+faceoff[1]; both crease arcs
+   * use ends[0:2] as common ax/ay. faceoff[0],ends[2:4] are inactive storage.
+   * Both ends, including the upper/lower trapezoid sides, are exact mirrors.
+   * Crease centres coincide with goal-line midpoints; kind6 contains only
+   * the finite half-ellipse arc, never its closing diameter. */
 RS_API int rs_shared_entity_definition_with_options(const double* board,size_t nboard,const double* layout,size_t nlayout,int feature_code,unsigned options,int* kind,double* parameters,size_t nparameters);
 /* Continuous board-course chart. Output the nine arc-length segment joins;
  * these joins are topology/display metadata, never bounds on fit stations. */
@@ -245,6 +250,10 @@ RS_API int rs_gpu_attach_paths(void* handle,const int* paths,size_t npaths,
     const double* values,size_t nvalues,double* owned_device_bytes);
 RS_API int rs_g1_evaluate(void* handle,int backend,double* output,size_t no,int* statuses,size_t ns,
     double* metrics,size_t nm);
+/* Compact CUDA diagnostics use the identical row evaluator; invalid rows are +inf. */
+RS_API int rs_g1_evaluate_errors(void* handle,double* errors,size_t n);
+RS_API int rs_g1_evaluate_rows(void* handle,const int* rows,size_t n,double* values,size_t nv,int* statuses,size_t ns);
+RS_API int rs_g3_objective_timings(void* handle,double* values,size_t n);
 RS_API void rs_g1_destroy(void* handle);
 RS_API const char* rs_g1_last_error(void);
 
@@ -267,6 +276,7 @@ RS_API int rs_g2_attach_pixels(void* handle,int q,const double* dirs,size_t ndir
 // Native coordinate minimization of independent ordinary curve points.
 // Fixed corners and genuinely shared material stations are not changed.
 RS_API int rs_g3_refine_stations(void* handle,double* info,size_t ninfo);
+RS_API int rs_g3_refine_stations_ex(void* handle,int global_search,double* info,size_t ninfo);
 /* Metadata only: groups[G,6], components[C,7], packed local IDs[L].
  * Group: member begin/count,rank,W begin,component,white begin.
  * Component: local begin/count,group begin/count,dimension,H begin,g begin. */
@@ -314,6 +324,13 @@ RS_API int rs_g3_step(void* handle,double* summary,size_t nsummary,double* timin
  * summary[17] fields are named in the thin Python binding.
  */
 typedef void (*rs_lm_progress)(const double* summary,const double* timings,double gradient,double numerical_rejections,void* context);
+/* 0: legacy; 1: independent boxes; 2: declared physical tangent cone.
+ * Additive diagnostics preserve the existing G4 summary/tolerance ABI. */
+RS_API int rs_g4_stationarity_version(void);
+/* Read-only current-state diagnostics: 12 doubles, no optimizer step. */
+RS_API int rs_g4_stationarity_diagnostics(void* handle,double tolerance,double* summary,size_t nsummary);
+/* Last diagnostic: 24 doubles/face, normalized Jacobian[count,q], [raw,p][2,q]. */
+RS_API int rs_g4_stationarity_export(void* handle,double* faces,size_t nfaces,double* jacobian,size_t njacobian,double* gradient,size_t ngradient);
 RS_API int rs_g4_solve(void* handle,const double* tolerances,size_t ntolerances,
     rs_lm_progress callback,void* context,double* summary,size_t nsummary);
 /* Thread-safe stop request. Only this function may run concurrently with solve.
@@ -333,6 +350,11 @@ RS_API int rs_gpu_attach_scene(void* handle,const double* values,size_t nv,const
 RS_API int rs_gpu_set_scene_chart(void* handle,const int* chart,size_t n);
 RS_API int rs_scene_retract(const double* values,size_t n,const int* chart,const double* delta,double* out);
 RS_API int rs_gpu_export_scene(void* handle,int trial,double* values,size_t n);
+/* Attach multiple complete physical rigs and one camera index per original row,
+ * before geometry/linearization. The shared scene and source pixels are unchanged. */
+RS_API int rs_gpu_set_camera_groups(void* handle,const double* rigs,size_t nr,const int* ids,size_t count,double* bytes);
+RS_API int rs_gpu_set_mount_constraints_for_camera(void* handle,int camera,int side);
+RS_API int rs_gpu_set_camera_envelope_for_camera(void* handle,int camera,const double* limits,size_t n);
 RS_API int rs_gpu_set_mount_constraints(void* handle,int side);
 /* Full continuous camera envelope: forward lo/hi, pupil lo/hi, maximum pan
  * tilt from vertical and tilt-axis deviation from camera right, optical
@@ -345,7 +367,10 @@ RS_API int rs_gpu_set_mount_constraints(void* handle,int side);
  * n=21 additionally selects exposure-midpoint bounds in spline-grid coordinates
  * (time-first)/dt. They must contain all resident exposures. Every candidate's
  * signed readout expands these bounds to the full sensor-row interval; complete
- * intersecting cells are checked, not unused allocated extrapolation cells. */
+ * intersecting cells are checked, not unused allocated extrapolation cells.
+ * n=19+2*K accepts K ordered, disjoint exposure intervals in spline-grid
+ * coordinates. Their readout halos are certified independently; intervals
+ * between shots do not impose an invented camera trajectory. */
 RS_API int rs_gpu_set_camera_envelope(void* handle,const double* limits,size_t n);
 /* Independent diagnostic using the same native envelope. out[4] = minimum
  * signed margin, constraint kind, cubic cell, local u. Optional out[8] appends

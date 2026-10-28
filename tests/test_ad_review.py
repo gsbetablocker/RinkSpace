@@ -161,12 +161,14 @@ def test_d1_consumes_the_same_current_internal_geometry_as_d3(
     before = deepcopy(assets)
     state = {block['id']: deepcopy(block['values']) for block in assets['parameter_blocks']}
     if primary == 'print_instance/Ad1':
-        # Include an internal warp kink, analytic square and shared width in
-        # the same candidate. Frozen seed vertices cannot represent this state.
+        # The current complete-artwork chart allows one common affine update,
+        # while its six nonlinear warp coordinates are deliberately fixed.
+        # Combine that update with the analytic square and shared width; frozen
+        # seed vertices cannot represent the resulting candidate.
         warp = next(b for b in assets['parameter_blocks'] if b['kind'] == 'print_shape')
         state[warp['id']][0] += .075
-        state[warp['id']][4] += .35
-        state[warp['id']][5] -= .17
+        assert list(warp['independent_local_indices']) == [0, 1, 2, 3]
+        state[warp['id']][2] += math.log(1.1)
         square = next(b for b in assets['parameter_blocks'] if b['kind'] == 'print_square')
         state[square['id']][0] += .045
         state[square['id']][2] += .1

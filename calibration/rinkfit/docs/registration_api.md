@@ -1,5 +1,7 @@
 # 配准与关系图接口（S1 / S2 启动实现）
 
+本页描述 rinkfit 历史后端的模块合同，适用范围见[模块入口](../README.md)；当前 rebuild 的 native／GPU 能力见[实现状态](../../../docs/REBUILD.md)。
+
 本模块实际执行有限材料平面配准和关系图联合精化，使用 NumPy / SciPy 双精度计算。它是 v1.1 的启动层和局部比较器：不包含最终 Brown / 隐式行时间相机，不执行物理 Phase I / II，不输出全镜头 `t_hat`，也不把局部 H 的损失称为物理模型下界。
 
 `src/rinkfit_start/registration.py` 和 `graph.py` 不读取或修改主 NPZ。调用者向局部比较器提供一个真实平面的显式观测子集；完整原始义务继续留在主账本里。`RegistrationGraph` 接受全部帧 ID，孤立帧也保留。

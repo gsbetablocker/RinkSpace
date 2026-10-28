@@ -1,0 +1,45 @@
+{
+  "schema": "rinkspace.camera_experiment.v1",
+  "id": "square_center_pp_joint",
+  "basis": {
+    "kind": "engineering_assumption",
+    "not_sony_measurement": true,
+    "description": "Centered constant principal point as a conventional tripod-broadcast engineering approximation, not a Sony factory calibration. Seed from the corresponding fitted constant-principal-point state using native optical-axis ray transfer; keep fx/fy=1, other optics and the existing joint scene."
+  },
+  "active_camera_names": [
+    "R0_x",
+    "R0_y",
+    "R0_z",
+    "pan_axis_tangent1",
+    "pan_axis_tangent2",
+    "tilt_axis",
+    "pivot_x",
+    "pivot_y",
+    "pivot_z",
+    "lever_x",
+    "lever_y",
+    "lever_z",
+    "axis_spacing",
+    "pupil1",
+    "pupil2",
+    "k10",
+    "k11",
+    "k20",
+    "k21",
+    "p1",
+    "p2",
+    "readout",
+    "wide_k1",
+    "wide_k2",
+    "wide_p1",
+    "wide_p2"
+  ],
+  "fixed_rig_values": {
+    "eta": 0,
+    "cx_zoom": 0,
+    "cy_zoom": 0,
+    "cx": 959.5,
+    "cy": 539.5
+  },
+  "scene_mode": "joint_current"
+}

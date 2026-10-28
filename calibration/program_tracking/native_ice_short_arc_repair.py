@@ -7,10 +7,13 @@ from copy import copy
 import json,hashlib
 from pathlib import Path
 
-def short_native_outer_arc(reader,fid,index,native,output_root=None):
+def short_native_outer_arc(reader,fid,index,native,output_root=None,*,allow_outline=False,preserve_native_projection=False):
  group=reader.groups[fid]
- if group['outline']:return {},{}
+ if group['outline'] and not allow_outline:return {},{}
  parameters=np.zeros(6);navigation_reference=None
+ if hasattr(reader,'initial_navigation'):
+  parameters=np.asarray(reader.initial_navigation(fid,index),float).copy()
+  navigation_reference=getattr(reader,'navigation_record',{}).get(fid)
  # The F4 entry/exit slivers cannot determine a new shape. A nearby already
  # measured full same-house family supplies its fixed navigation correction;
  # current material profiles still determine the only free displacement.
@@ -42,20 +45,38 @@ def short_native_outer_arc(reader,fid,index,native,output_root=None):
  raw=np.asarray([r['uv'] for r in outer]);query=np.asarray([r['source_evidence']['query_uv'] for r in outer]);shift=np.einsum('ij,ij->i',raw-query,normal)
  initial=np.linalg.lstsq(normal@basis,shift,rcond=None)[0];initial=np.clip(initial,-24.9,24.9)
  curve=reader.projection(group,index,'outer',np.linspace(0,2*np.pi,513),None)[0];conic=reader.conic(curve);fixed_parameters=parameters.copy()
+ def source_distance(points, projected):
+  # The native distorted projection need not be an ellipse. In particular,
+  # fitting an ellipse to a large offscreen C0 can move its visible arc.
+  from rinkspace.review.point_connections import polyline_order
+  order,distance=polyline_order(points,projected)
+  arc=np.r_[0.,np.cumsum(np.linalg.norm(np.diff(projected,axis=0),axis=1))]
+  nearest=np.column_stack([np.interp(order,arc,projected[:,a])for a in (0,1)])
+  segment=np.clip(np.searchsorted(arc,order,side='right')-1,0,len(projected)-2)
+  tangent=projected[segment+1]-projected[segment]
+  delta=points-nearest;sign=np.sign(tangent[:,0]*delta[:,1]-tangent[:,1]*delta[:,0])
+  return distance*sign,nearest
  def residual(z):
   p=fixed_parameters.copy();p[:2]+=basis@z
-  return np.r_[reader.transformed_conic_exact_distance(conic,raw,p),z/25*.25]
+  distance=source_distance(raw,reader.source_transform(curve,p))[0]if preserve_native_projection else reader.transformed_conic_exact_distance(conic,raw,p)
+  return np.r_[distance,z/25*.25]
  def jacobian(z):
   columns=[]
   for j in range(rank):
    delta=np.eye(rank)[j]*.02;columns.append((residual(z+delta)-residual(z-delta))/.04)
   return np.asarray(columns).T
  fitted=least_squares(residual,initial,jac=jacobian,bounds=(-np.ones(rank)*25,np.ones(rank)*25),loss='soft_l1',f_scale=1.5,max_nfev=35)
- parameters[:2]+=basis@fitted.x;curve=reader.source_transform(curve,parameters);ellipse=cv2.fitEllipse(np.asarray(curve,np.float32))
- nearest=cv2.getClosestEllipsePoints(ellipse,raw.astype(np.float32)).reshape(-1,2);errors=np.linalg.norm(nearest-raw,axis=1);selected=[]
+ parameters[:2]+=basis@fitted.x;curve=reader.source_transform(curve,parameters)
+ if preserve_native_projection:nearest=source_distance(raw,curve)[1]
+ else:
+  ellipse=cv2.fitEllipse(np.asarray(curve,np.float32));nearest=cv2.getClosestEllipsePoints(ellipse,raw.astype(np.float32)).reshape(-1,2)
+ errors=np.linalg.norm(nearest-raw,axis=1);selected=[]
  for row,point,error in zip(outer,nearest,errors):
   if error>3:continue
   row=dict(row);row['representative_uv']=np.round(point.astype(float),4).tolist();row['representative_to_actual_material_px']=float(error);selected.append(row)
+ diagnostics['fixed_shape_translation']=dict(raw_count=len(raw),retained_count=len(selected),
+   parameters=parameters.tolist(),error_quantiles_px=np.quantile(errors,[0,.5,1]).tolist(),
+   native_distorted_projection_preserved=preserve_native_projection)
  if len(selected)<2:return {},diagnostics
  navigation=dict(kind='current_native_clipped_outer_arc_with_fixed_physical_circle_shape_and_identifiable_translation_only',house_id=fid,
   source_clock_anchor=group['anchor'],source_identity_authority=group['authority'],common_world_circle_center=group['center'].tolist(),common_radius_scale=1.,
@@ -67,4 +88,5 @@ def short_native_outer_arc(reader,fid,index,native,output_root=None):
   fixed_shape_navigation_reference=navigation_reference,
   current_F1_upper_advertisement_reflection_not_admitted=fid=='F1' and 831<=index<=859,
   current_source_readout_count=len(selected),no_points_created_between_or_outside_current_material_stations=True)
+ navigation['native_distorted_projection_preserved_without_ellipse_replacement']=preserve_native_projection
  return {'outer':dict(rows=selected,curve=curve,joint_group_navigation=navigation)},diagnostics

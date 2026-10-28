@@ -1,0 +1,627 @@
+{
+  "schema": "rinkspace.joint_camera_parameter_exports.v1",
+  "baseline_sha256": "68b9e7475d475df875f42b1115c3567ab74e47a2d54cb6fedc199df16bbb40ac",
+  "completed_candidates": 5,
+  "expected_candidates": 11,
+  "all_source_rows_retained": true,
+  "production_baseline_replaced": false,
+  "models": [
+    {
+      "model": "accepted_baseline",
+      "parameters": "accepted_baseline.npz",
+      "sha256": "434606310c7da4e5a05d35fb2c070331bced38eb536530c45606c0eccb5a1603",
+      "metrics": {
+        "rows": 569960,
+        "invalid": 0,
+        "cost": 2004395.689505573,
+        "rms": 2.652067289456012,
+        "median": 1.1617922530253604,
+        "p95": 5.542935940654551,
+        "p99": 9.132817582687833,
+        "maximum": 45.64107278332906,
+        "above_20px": 240
+      },
+      "physical": {
+        "pivot_height_conditional_m": 1.9999999999999933,
+        "lever_xyz_conditional_m": [
+          -0.04999999999999831,
+          -0.24999999999999828,
+          0.0649527081287385
+        ],
+        "axis_spacing_conditional_m": -0.04999999999999831,
+        "fx_over_fy": 1.3548430884492282,
+        "readout_ms": 18.9730725191644,
+        "reference_principal_point_px": [
+          773.2013119434997,
+          408.51642240182883
+        ],
+        "principal_point_zoom_coefficients": [
+          -166.00751057883727,
+          -79.10445174642891
+        ],
+        "pupil_coefficients_conditional_m": [
+          0.05207777963641853,
+          0.059993446094524214
+        ],
+        "pan_axis_tilt_deg": 0.6181749771184728,
+        "tilt_axis_camera_right_deviation_deg": 2.476118460658394,
+        "board_height_conditional_m": 1.3458943279525162,
+        "box_boundary_hits": [
+          {
+            "name": "Pz",
+            "side": "upper",
+            "value_conditional_m": 1.9999999999999933
+          },
+          {
+            "name": "lever_x",
+            "side": "lower",
+            "value_conditional_m": -0.04999999999999831
+          },
+          {
+            "name": "lever_y",
+            "side": "lower",
+            "value_conditional_m": -0.24999999999999828
+          },
+          {
+            "name": "axis_spacing",
+            "side": "lower",
+            "value_conditional_m": -0.04999999999999831
+          }
+        ]
+      },
+      "numerical": {
+        "stop_reason": "cost_progress_stagnation_without_convergence",
+        "numerically_converged": false,
+        "constraint_projected_gradient_inf": 4.445265336462398,
+        "total_trials": 27,
+        "total_accepted": 17,
+        "wall_ms": 149627.9798,
+        "stationarity_diagnostics": {
+          "raw_retained_gradient_inf": 7145.363658718383,
+          "raw_station_gradient_inf": 103.76933425864358,
+          "box_retained_gradient_inf": 7145.363658718383,
+          "box_station_gradient_inf": 0.6860369385308676,
+          "cone_primal_residual": 0,
+          "cone_complementarity_residual": 7.282200563043244e-9,
+          "cone_stationarity_residual": 5.7273985613171636e-21,
+          "physical_feasibility_violation": 0,
+          "objective": 2004395.6895055757,
+          "constraint_projected_gradient_inf": 4.445265336462398,
+          "active_constraint_count": 86,
+          "invalid": 0,
+          "stationarity_scope": "declared_active_physical_tangent_cone",
+          "full_nonlinear_kkt_checked": true,
+          "original_undamped_objective": true,
+          "normal_coordinates": "retained solver chart; each constraint row has Euclidean unit norm"
+        }
+      }
+    },
+    {
+      "model": "full_frozen",
+      "parameters": "full_frozen.npz",
+      "sha256": "49f147f9d96366effaa28fc2a4abe21e8f21efe79bea47e007d8850d2d9ff3c1",
+      "metrics": {
+        "rows": 569960,
+        "invalid": 0,
+        "cost": 2004395.685918002,
+        "rms": 2.6520672870826085,
+        "median": 1.1617901547405833,
+        "p95": 5.542928972993452,
+        "p99": 9.132832965390284,
+        "maximum": 45.641062482487904,
+        "above_20px": 240
+      },
+      "physical": {
+        "pivot_height_conditional_m": 1.9999999999999933,
+        "lever_xyz_conditional_m": [
+          -0.04999999999999831,
+          -0.24999999999999828,
+          0.0649543834559279
+        ],
+        "axis_spacing_conditional_m": -0.04999999999999831,
+        "fx_over_fy": 1.3548430410422592,
+        "readout_ms": 18.973034601507432,
+        "reference_principal_point_px": [
+          773.2031827442978,
+          408.52238357446953
+        ],
+        "principal_point_zoom_coefficients": [
+          -166.01064107085645,
+          -79.10799717809688
+        ],
+        "pupil_coefficients_conditional_m": [
+          0.052069730290197395,
+          0.059987582212941204
+        ],
+        "pan_axis_tilt_deg": 0.6181906681175309,
+        "tilt_axis_camera_right_deviation_deg": 2.4761909610362878,
+        "board_height_conditional_m": 1.3458943279525162,
+        "box_boundary_hits": [
+          {
+            "name": "Pz",
+            "side": "upper",
+            "value_conditional_m": 1.9999999999999933
+          },
+          {
+            "name": "lever_x",
+            "side": "lower",
+            "value_conditional_m": -0.04999999999999831
+          },
+          {
+            "name": "lever_y",
+            "side": "lower",
+            "value_conditional_m": -0.24999999999999828
+          },
+          {
+            "name": "axis_spacing",
+            "side": "lower",
+            "value_conditional_m": -0.04999999999999831
+          }
+        ]
+      },
+      "numerical": {
+        "stop_reason": "cost_progress_stagnation_without_convergence",
+        "numerically_converged": false,
+        "constraint_projected_gradient_inf": 0.686038026366216,
+        "total_trials": 8,
+        "total_accepted": 4,
+        "wall_ms": 36853.4398,
+        "stationarity_diagnostics": {
+          "raw_retained_gradient_inf": 2807.6782276650165,
+          "raw_station_gradient_inf": 103.77102419049778,
+          "box_retained_gradient_inf": 2807.6782276650165,
+          "box_station_gradient_inf": 0.686038026366216,
+          "cone_primal_residual": 0,
+          "cone_complementarity_residual": 0,
+          "cone_stationarity_residual": 0,
+          "physical_feasibility_violation": 0,
+          "objective": 2004395.6859180068,
+          "constraint_projected_gradient_inf": 0.686038026366216,
+          "active_constraint_count": 86,
+          "invalid": 0,
+          "stationarity_scope": "declared_active_physical_tangent_cone",
+          "full_nonlinear_kkt_checked": true,
+          "original_undamped_objective": true,
+          "normal_coordinates": "retained solver chart; each constraint row has Euclidean unit norm"
+        }
+      }
+    },
+    {
+      "model": "no_wide_frozen",
+      "parameters": "no_wide_frozen.npz",
+      "sha256": "f4b3d91defe837d0262abab348038952d7a9651eb15442e3a3822e30010e5c23",
+      "metrics": {
+        "rows": 569960,
+        "invalid": 0,
+        "cost": 2005239.903824186,
+        "rms": 2.6526257314577215,
+        "median": 1.1634879977423978,
+        "p95": 5.541029011431327,
+        "p99": 9.130918836604735,
+        "maximum": 45.65350398644816,
+        "above_20px": 240
+      },
+      "physical": {
+        "pivot_height_conditional_m": 1.9999999999999933,
+        "lever_xyz_conditional_m": [
+          -0.04999999999999831,
+          -0.24999999999999828,
+          0.06262689907154227
+        ],
+        "axis_spacing_conditional_m": -0.04999999999999831,
+        "fx_over_fy": 1.3547763906221768,
+        "readout_ms": 18.939824704725826,
+        "reference_principal_point_px": [
+          775.3153949978388,
+          407.1984146592502
+        ],
+        "principal_point_zoom_coefficients": [
+          -165.52041647141132,
+          -79.49994796837619
+        ],
+        "pupil_coefficients_conditional_m": [
+          0.033472377352603,
+          0.03446441300002935
+        ],
+        "pan_axis_tilt_deg": 0.6187669131286615,
+        "tilt_axis_camera_right_deviation_deg": 2.5360476348339955,
+        "board_height_conditional_m": 1.3458943279525162,
+        "box_boundary_hits": [
+          {
+            "name": "Pz",
+            "side": "upper",
+            "value_conditional_m": 1.9999999999999933
+          },
+          {
+            "name": "lever_x",
+            "side": "lower",
+            "value_conditional_m": -0.04999999999999831
+          },
+          {
+            "name": "lever_y",
+            "side": "lower",
+            "value_conditional_m": -0.24999999999999828
+          },
+          {
+            "name": "axis_spacing",
+            "side": "lower",
+            "value_conditional_m": -0.04999999999999831
+          }
+        ]
+      },
+      "numerical": {
+        "stop_reason": "cost_progress_stagnation_without_convergence",
+        "numerically_converged": false,
+        "constraint_projected_gradient_inf": 6.774902040459828,
+        "total_trials": 26,
+        "total_accepted": 17,
+        "wall_ms": 127504.1018,
+        "stationarity_diagnostics": {
+          "raw_retained_gradient_inf": 2898.2119264735584,
+          "raw_station_gradient_inf": 103.8242426168906,
+          "box_retained_gradient_inf": 2898.2119264735584,
+          "box_station_gradient_inf": 1.377058542427126,
+          "cone_primal_residual": 0,
+          "cone_complementarity_residual": 0,
+          "cone_stationarity_residual": 0,
+          "physical_feasibility_violation": 0,
+          "objective": 2005239.9038241864,
+          "constraint_projected_gradient_inf": 6.774902040459828,
+          "active_constraint_count": 86,
+          "invalid": 0,
+          "stationarity_scope": "declared_active_physical_tangent_cone",
+          "full_nonlinear_kkt_checked": true,
+          "original_undamped_objective": true,
+          "normal_coordinates": "retained solver chart; each constraint row has Euclidean unit norm"
+        }
+      }
+    },
+    {
+      "model": "constant_pp_frozen",
+      "parameters": "constant_pp_frozen.npz",
+      "sha256": "0acb8b726a1aa8177c5aba80ae489a9b227a5194b3d544aca5286a9438fc5b2b",
+      "metrics": {
+        "rows": 569960,
+        "invalid": 0,
+        "cost": 2010549.7758211405,
+        "rms": 2.6561354838458358,
+        "median": 1.1710395724132359,
+        "p95": 5.544586543431143,
+        "p99": 9.150507606046949,
+        "maximum": 45.15723127393262,
+        "above_20px": 243
+      },
+      "physical": {
+        "pivot_height_conditional_m": 1.9999999999999933,
+        "lever_xyz_conditional_m": [
+          -0.04999999999999831,
+          -0.24999999999999828,
+          0.13177448289948612
+        ],
+        "axis_spacing_conditional_m": -0.04999999999999831,
+        "fx_over_fy": 1.3553686392861197,
+        "readout_ms": 18.910502601841458,
+        "reference_principal_point_px": [
+          1052.418045471511,
+          502.6615142048161
+        ],
+        "principal_point_zoom_coefficients": [
+          0,
+          0
+        ],
+        "pupil_coefficients_conditional_m": [
+          0.10888983881519686,
+          0.027954019825929377
+        ],
+        "pan_axis_tilt_deg": 0.6157362776836156,
+        "tilt_axis_camera_right_deviation_deg": 4.208789162162438,
+        "board_height_conditional_m": 1.3458943279525162,
+        "box_boundary_hits": [
+          {
+            "name": "Pz",
+            "side": "upper",
+            "value_conditional_m": 1.9999999999999933
+          },
+          {
+            "name": "lever_x",
+            "side": "lower",
+            "value_conditional_m": -0.04999999999999831
+          },
+          {
+            "name": "lever_y",
+            "side": "lower",
+            "value_conditional_m": -0.24999999999999828
+          },
+          {
+            "name": "axis_spacing",
+            "side": "lower",
+            "value_conditional_m": -0.04999999999999831
+          }
+        ]
+      },
+      "numerical": {
+        "stop_reason": "cost_progress_stagnation_without_convergence",
+        "numerically_converged": false,
+        "constraint_projected_gradient_inf": 1.6780482859427295,
+        "total_trials": 43,
+        "total_accepted": 29,
+        "wall_ms": 584114.4601,
+        "stationarity_diagnostics": {
+          "raw_retained_gradient_inf": 3109.05955976247,
+          "raw_station_gradient_inf": 105.24918495773426,
+          "box_retained_gradient_inf": 2613.599192353457,
+          "box_station_gradient_inf": 0.4433125310476015,
+          "cone_primal_residual": 0,
+          "cone_complementarity_residual": 2.734604000881979e-17,
+          "cone_stationarity_residual": 0,
+          "physical_feasibility_violation": 0,
+          "objective": 2010549.7758211393,
+          "constraint_projected_gradient_inf": 1.6780482859427295,
+          "active_constraint_count": 87,
+          "invalid": 0,
+          "stationarity_scope": "declared_active_physical_tangent_cone",
+          "full_nonlinear_kkt_checked": true,
+          "original_undamped_objective": true,
+          "normal_coordinates": "retained solver chart; each constraint row has Euclidean unit norm"
+        }
+      }
+    },
+    {
+      "model": "low_order_frozen",
+      "parameters": "low_order_frozen.npz",
+      "sha256": "245960f85db4ddc6b72b0651b83a4b889dc062578b022c0eef6b3c19a0f81a08",
+      "metrics": {
+        "rows": 569960,
+        "invalid": 0,
+        "cost": 2023325.32513677,
+        "rms": 2.6645610038636764,
+        "median": 1.1857396477132898,
+        "p95": 5.56116121237073,
+        "p99": 9.173834511924383,
+        "maximum": 44.95036412474754,
+        "above_20px": 241
+      },
+      "physical": {
+        "pivot_height_conditional_m": 1.9999999999999933,
+        "lever_xyz_conditional_m": [
+          -0.04999999999999831,
+          -0.24999999999999828,
+          0.07132332113859832
+        ],
+        "axis_spacing_conditional_m": -0.04999999999999831,
+        "fx_over_fy": 1.3552817565907365,
+        "readout_ms": 18.917884645446026,
+        "reference_principal_point_px": [
+          922.368306251359,
+          465.18654385958905
+        ],
+        "principal_point_zoom_coefficients": [
+          0,
+          0
+        ],
+        "pupil_coefficients_conditional_m": [
+          0.03580070794727033,
+          -0.02194991129487757
+        ],
+        "pan_axis_tilt_deg": 0.6194742500999797,
+        "tilt_axis_camera_right_deviation_deg": 2.142141790273514,
+        "board_height_conditional_m": 1.3458943279525162,
+        "box_boundary_hits": [
+          {
+            "name": "Pz",
+            "side": "upper",
+            "value_conditional_m": 1.9999999999999933
+          },
+          {
+            "name": "lever_x",
+            "side": "lower",
+            "value_conditional_m": -0.04999999999999831
+          },
+          {
+            "name": "lever_y",
+            "side": "lower",
+            "value_conditional_m": -0.24999999999999828
+          },
+          {
+            "name": "axis_spacing",
+            "side": "lower",
+            "value_conditional_m": -0.04999999999999831
+          }
+        ]
+      },
+      "numerical": {
+        "stop_reason": "cost_progress_stagnation_without_convergence",
+        "numerically_converged": false,
+        "constraint_projected_gradient_inf": 19.067851787402745,
+        "total_trials": 63,
+        "total_accepted": 43,
+        "wall_ms": 328160.7999,
+        "stationarity_diagnostics": {
+          "raw_retained_gradient_inf": 3690.898272148704,
+          "raw_station_gradient_inf": 99.94525353534497,
+          "box_retained_gradient_inf": 3690.898272148704,
+          "box_station_gradient_inf": 0.27058033709348284,
+          "cone_primal_residual": 0,
+          "cone_complementarity_residual": 0,
+          "cone_stationarity_residual": 0,
+          "physical_feasibility_violation": 0,
+          "objective": 2023325.3251367703,
+          "constraint_projected_gradient_inf": 19.067851787402745,
+          "active_constraint_count": 86,
+          "invalid": 0,
+          "stationarity_scope": "declared_active_physical_tangent_cone",
+          "full_nonlinear_kkt_checked": true,
+          "original_undamped_objective": true,
+          "normal_coordinates": "retained solver chart; each constraint row has Euclidean unit norm"
+        }
+      }
+    },
+    {
+      "model": "square_frozen",
+      "parameters": "square_frozen.npz",
+      "sha256": "d9a709f75ebdfca9e718a41b21935e60cbd2300d4ba51038f97bdaba3774d463",
+      "metrics": {
+        "rows": 569960,
+        "invalid": 0,
+        "cost": 57611437.97724045,
+        "rms": 14.218283407246352,
+        "median": 5.622213301297585,
+        "p95": 32.42841245840222,
+        "p99": 47.961653956317534,
+        "maximum": 159.19564445287472,
+        "above_20px": 77056
+      },
+      "physical": {
+        "pivot_height_conditional_m": 1.254969191813868,
+        "lever_xyz_conditional_m": [
+          0.00014632564940485662,
+          -0.24999999999999803,
+          0.27670920405771765
+        ],
+        "axis_spacing_conditional_m": 0.04999999999999831,
+        "fx_over_fy": 1,
+        "readout_ms": 18.000038041008786,
+        "reference_principal_point_px": [
+          71.91892081199371,
+          457.58940049418067
+        ],
+        "principal_point_zoom_coefficients": [
+          0,
+          0
+        ],
+        "pupil_coefficients_conditional_m": [
+          -0.08231282357008206,
+          -0.07272616340379842
+        ],
+        "pan_axis_tilt_deg": 0.6494674248450175,
+        "tilt_axis_camera_right_deviation_deg": 4.999854470334924,
+        "board_height_conditional_m": 1.3458943279525162,
+        "box_boundary_hits": [
+          {
+            "name": "lever_y",
+            "side": "lower",
+            "value_conditional_m": -0.24999999999999803
+          },
+          {
+            "name": "axis_spacing",
+            "side": "upper",
+            "value_conditional_m": 0.04999999999999831
+          }
+        ]
+      },
+      "numerical": {
+        "stop_reason": "cost_progress_stagnation_without_convergence",
+        "numerically_converged": false,
+        "constraint_projected_gradient_inf": 2699682.7418092294,
+        "total_trials": 77,
+        "total_accepted": 46,
+        "wall_ms": 595147.7088,
+        "stationarity_diagnostics": {
+          "raw_retained_gradient_inf": 2699682.7418092294,
+          "raw_station_gradient_inf": 477.8918941927225,
+          "box_retained_gradient_inf": 2699682.7418092294,
+          "box_station_gradient_inf": 18.345386376141875,
+          "cone_primal_residual": 0,
+          "cone_complementarity_residual": 8.123020260167014e-7,
+          "cone_stationarity_residual": 9.333689376944676e-11,
+          "physical_feasibility_violation": 0,
+          "objective": 57611437.977240495,
+          "constraint_projected_gradient_inf": 2699682.7418092294,
+          "active_constraint_count": 89,
+          "invalid": 0,
+          "stationarity_scope": "declared_active_physical_tangent_cone",
+          "full_nonlinear_kkt_checked": true,
+          "original_undamped_objective": true,
+          "normal_coordinates": "retained solver chart; each constraint row has Euclidean unit norm"
+        }
+      }
+    }
+  ],
+  "local_comparison": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_s04_20261027\\camera_models\\comparison.html",
+  "local_visual_comparison": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_s04_20261027\\camera_models\\visual_comparison.html",
+  "latest_working_result": "square_center_pp_joint.npz",
+  "additional_results": [
+    {
+      "model": "square_full_joint_repaired",
+      "parameters": "square_full_joint_repaired.npz",
+      "sha256": "6c10b6d094057e122081149ddb3349524f2cce2fd5771a126212bab05c4ba89b",
+      "summary": "square_full_joint_repaired.json",
+      "fx_over_fy": 1,
+      "rms": 2.65686435967151,
+      "local_result": "D:/CodexData/RinkSpace_Data/runs/native_joint_s01_s04_20261027/camera_models/square_repair/result.json",
+      "videos": [
+        {
+          "shot": "s01",
+          "video": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_s04_20261027\\camera_models\\square_repair\\review\\fxfy1_s01.mp4",
+          "source_first_seconds": 22.12,
+          "source_last_seconds": 44.96,
+          "frames": 1143,
+          "verification": {
+            "decoded_frames": 1143,
+            "native_PTS_equal": true,
+            "display_speed": 1
+          }
+        },
+        {
+          "shot": "s04",
+          "video": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_s04_20261027\\camera_models\\square_repair\\review\\fxfy1_s04.mp4",
+          "source_first_seconds": 58.28,
+          "source_last_seconds": 74.12,
+          "frames": 793,
+          "verification": {
+            "decoded_frames": 793,
+            "native_PTS_equal": true,
+            "display_speed": 1
+          }
+        }
+      ]
+    },
+    {
+      "model": "square_constant_pp_joint",
+      "parameters": "square_constant_pp_joint.npz",
+      "sha256": "d06d9cf77b47995ca140bb591d3f5dfdabb5e3dc1deba821f851c46394403091",
+      "summary": "square_constant_pp_joint.json",
+      "rms": 2.659177103730056,
+      "camera_columns": 28,
+      "image_acceptance": "pending",
+      "local_result": "D:/CodexData/RinkSpace_Data/runs/native_joint_s01_s04_20261027/camera_models/center_pp_square/result.json"
+    },
+    {
+      "model": "square_center_pp_joint",
+      "parameters": "square_center_pp_joint.npz",
+      "sha256": "196833f2bf159c8454e29d47d9b61305eabbce81176599ed37423df5a1217ee5",
+      "summary": "square_center_pp_joint.json",
+      "rms": 2.66208441731565,
+      "camera_columns": 26,
+      "image_acceptance": "pending",
+      "local_result": "D:/CodexData/RinkSpace_Data/runs/native_joint_s01_s04_20261027/camera_models/center_pp_square/result.json",
+      "videos": [
+        {
+          "shot": "s01",
+          "video": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_s04_20261027\\camera_models\\center_pp_square\\review\\center_pp_s01.mp4",
+          "frames": 1143,
+          "source_first_seconds": 22.12,
+          "source_last_seconds": 44.96,
+          "verification": {
+            "decoded_frames": 1143,
+            "native_PTS_equal": true,
+            "display_speed": 1
+          }
+        },
+        {
+          "shot": "s04",
+          "video": "D:\\CodexData\\RinkSpace_Data\\runs\\native_joint_s01_s04_20261027\\camera_models\\center_pp_square\\review\\center_pp_s04.mp4",
+          "frames": 793,
+          "source_first_seconds": 58.28,
+          "source_last_seconds": 74.12,
+          "verification": {
+            "decoded_frames": 793,
+            "native_PTS_equal": true,
+            "display_speed": 1
+          }
+        }
+      ]
+    }
+  ],
+  "latest_user_accepted_result": "square_full_joint_repaired.npz"
+}

@@ -103,7 +103,7 @@ def full_pattern_score(ref,H,pt,source_image=None,allow_partial=False):
         ankara=np.array(['ANKARA' in p for p in entity_names]);words=np.array(['shot4_' in p for p in entity_names]);color_ok[ankara]&=purple[ankara]>.025;color_ok[words]&=(blue[words]>.025)&(purple[words]<.45)
     elif ad==6:color_ok&=red>.025
     elif ad==7:color_ok&=blue>.025
-    elif ad==8:color_ok&=blue>.025
+    elif ad==8 and not ref['atlas'].get('actual_source_material_colors'):color_ok&=blue>.025
     elif ad==9:color_ok&=red>.025
     passing=informative&(ncc>.45)&color_ok
     groups=[int(k) for k in np.unique(path_indices) if np.count_nonzero(passing&(path_indices==k))>=2]

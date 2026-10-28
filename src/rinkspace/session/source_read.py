@@ -168,6 +168,8 @@ def run_source_read(request_path, output):
     from ..vision import SourceRinkReader, _source_json
     request = load(request_path)
     output = guard_project_write(Path(output).resolve())
+    if output.exists() and any(output.iterdir()):
+        raise FileExistsError('Source read output contains prior evidence; choose a new run directory')
     output.mkdir(parents=True, exist_ok=True)
     scope = load(request['programme_scope'])
     sequences = _validated_sequences(request, scope)

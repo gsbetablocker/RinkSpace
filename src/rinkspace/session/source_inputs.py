@@ -617,14 +617,16 @@ class SourceEvidenceIndex:
             CREATE TABLE IF NOT EXISTS gaps(id TEXT PRIMARY KEY,shot TEXT,reason TEXT NOT NULL);
         """)
         identity=hashlib.sha256(job_bytes+routes_bytes).hexdigest()
-        old=self.db.execute("select value from meta where key='input_identity'").fetchone()
+        original=self.db.execute("select value from meta where key='input_identity'").fetchone()
+        old=self.db.execute("select value from meta where key='current_input_identity'").fetchone() or original
         if old and old[0]!=identity:
             try:
                 if reuse_from_job is None:
                     raise SourceInputError("Index belongs to another job/routes revision")
                 previous=Path(reuse_from_job).resolve();previous_bytes=previous.read_bytes();spec=_json(previous_bytes)
                 prior_routes=job_reference_path(previous,spec,'source_routes_ref').read_bytes()
-                if (hashlib.sha256(previous_bytes+prior_routes).hexdigest()!=old[0] or
+                prior_identity=hashlib.sha256(previous_bytes+prior_routes).hexdigest()
+                if (prior_identity not in {old[0],original[0]} or
                     hashlib.sha256(prior_routes).hexdigest()!=spec['source_routes_ref']['sha256']):
                     raise SourceInputError('Prior job does not authenticate the existing source index')
                 # Task instructions, native scene and camera revisions are not source
@@ -632,14 +634,20 @@ class SourceEvidenceIndex:
                 if prior_routes!=routes_bytes or source_job_contract(spec)!=source_job_contract(self.job):
                     raise SourceInputError('Source index reuse changes source routes, clock or exposure scope')
                 self.reuse_provenance=dict(previous_job=str(previous),previous_job_sha256=hashlib.sha256(previous_bytes).hexdigest(),
-                    authenticated_index_identity=old[0],current_job_sha256=hashlib.sha256(job_bytes).hexdigest(),
+                    authenticated_index_identity=prior_identity,current_job_sha256=hashlib.sha256(job_bytes).hexdigest(),
                     source_records_unchanged=True,previous_task_instructions_used=False)
             except BaseException:
                 self.db.close();raise
         if old is None:
             if read_only:
                 self.db.close();raise SourceInputError('Source index has no authenticated input identity')
-            self.db.execute("insert into meta values('input_identity',?)",(identity,));self.db.commit()
+            self.db.execute("insert into meta values('input_identity',?)",(identity,))
+        if not read_only:
+            if self.reuse_provenance is not None:
+                self.db.execute('insert or ignore into meta values(?,?)',
+                    ('continuation_input/'+identity,json.dumps(self.reuse_provenance,sort_keys=True,separators=(',',':'))))
+            self.db.execute("insert or replace into meta values('current_input_identity',?)",(identity,))
+            self.db.commit()
 
     def build(self, progress=None):
         if self.read_only:raise SourceInputError('Cannot build a read-only source index')

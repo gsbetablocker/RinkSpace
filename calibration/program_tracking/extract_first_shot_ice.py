@@ -203,7 +203,12 @@ class NativeProfiles:
    return self.sample_complete_colour_band(path,guide,spacing)
   local=dict(path)
   if path.get('_circle'):local['_projected_center']=np.asarray(cv2.fitEllipse(np.asarray(guide,np.float32))[0])
-  query,normal,interval=_source_queries(local,guide,np.ones(len(guide)),(1080,1920),spacing,radius)
+  support_radius=radius
+  if path.get('_separate_profile_support'):
+   # Identity bounds the centre search, not the extent needed to see both
+   # material flanks and their ice plateaus on a motion-blurred exposure.
+   support_radius+=.5*path.get('_maximum_width',60)+2*path.get('_maximum_sigma',15)
+  query,normal,interval=_source_queries(local,guide,np.ones(len(guide)),(1080,1920),spacing,support_radius)
   if not len(query):return [],dict(query_count=0)
   profiles=_batched_actual_profiles(self.frame,query,normal,interval,np.full(len(query),path['material_signal']))
   rows=[];offsets,values,smooth,valid=profiles
@@ -223,7 +228,8 @@ class NativeProfiles:
     evidence=dict(query_index=k,query_uv=query[k].tolist(),profile_normal=normal[k].tolist(),native_profile_shift_px=shift,
        actual_source_sides_uv=sides.tolist(),actual_source_side_quantiles_uv=quantiles.tolist(),signed_interface_iqr_contrast=contrast,
        transition_sigma_px=max(1.,sigma),measurement_origin='current_native_signed_RGB_material_profiles',material_signal=path['material_signal'],
-       actual_source_support_outside_person_and_broadcast_masks=True)
+       actual_source_support_outside_person_and_broadcast_masks=True,
+       center_search_radius_px=radius,material_profile_support_radius_px=support_radius)
     eligible.append((abs(shift),dict(uv=np.round(uv,4).tolist(),sigma_px=max(1.,sigma),source_evidence=evidence)))
    eligible.sort(key=lambda r:r[0])
    if path.get('_collect_line_candidates'):rows.extend(v[1] for v in eligible)
@@ -394,7 +400,8 @@ class Extractor:
   width_policy=thin_material_width_limit(p,native)
   if width_policy:local['_maximum_width']=width_policy['maximum_width_px']
   policy=p.get('_line_identity_policy',{})
-  rows,diagnostic=native.sample(local,guide,radius=100 if broad else policy.get('search_radius_px',32),spacing=55)
+  rows,diagnostic=native.sample(local,guide,radius=100 if broad else policy.get('search_radius_px',32),
+    spacing=p.get('_source_query_spacing_px',55))
   from calibration.program_tracking.native_ice_line_continuity import identity_filter
   rows=identity_filter(rows,guide,policy)
   f['native_static_line_identity_policy']=policy
@@ -603,22 +610,40 @@ class Extractor:
   by occurring near a model search strip.
   """
   byid={f['world_curve']:f for f in features if 'source_line_fit' in f and f['world_curve'] in LONG_LINE_ORDER}
-  labelled=[(cid,image_line(f)) for cid,f in byid.items() if cid in LINE_NAMES]
+  # Other shots may establish different finite source identities. Do not
+  # silently reuse S01's six human-labelled references for every camera.
+  reference_ids=set(getattr(self,'source_parallel_reference_ids',LINE_NAMES)) & set(LONG_LINE_ORDER)
+  photographic_references=hasattr(self,'source_parallel_reference_ids')
+  labelled=[(cid,image_line(f)) for cid,f in byid.items() if cid in reference_ids]
   samples=[(cid,z) for cid,z in labelled if z and z['readout_span_px']>=400 and z['readout_count']>=4]
   if not samples:samples=[(cid,z) for cid,z in labelled if z and z['readout_span_px']>=180 and z['readout_count']>=3]
   if not byid:return features,[],dict(status='no_long_parallel_line_points_this_frame')
-  c=self.cameras[index];r=cv2.Rodrigues(c[3:6])[0]
-  k=np.array([[np.exp(c[6]),c[10],c[8]],[0,np.exp(c[7]),c[9]],[0,0,1.]])
-  path=next(p for p in self.paths if p['curve_id']=='lane3:edge0');d=np.asarray(path['xyz'])[-1]-np.asarray(path['xyz'])[0]
-  vp=k@r@d
-  camera_a=float(vp[2]/(960*vp[2]-vp[0]))
+  if hasattr(self,'current_native_parallel_direction'):
+   direction=self.current_native_parallel_direction(index)
+   if direction is None:
+    source_pairs=[(a,b)for a in range(len(samples))for b in range(a)if abs(samples[a][1]['y960']-samples[b][1]['y960'])>100]
+    if not source_pairs:
+     return features,[],dict(status='native_parallel_direction_unavailable_and_source_family_insufficient',
+       actual_material_readouts_preserved=True,parallel_family_not_certified=True)
+    camera_a=float(np.median([(samples[a][1]['slope']-samples[b][1]['slope'])/(samples[a][1]['y960']-samples[b][1]['y960'])for a,b in source_pairs]))
+    camera_b=float(np.median([z['slope']-camera_a*z['y960']for _,z in samples]))
+   else:camera_a,camera_b=direction
+   camera_authority='current_native_projection_parallel_direction'
+  else:
+   c=self.cameras[index];r=cv2.Rodrigues(c[3:6])[0]
+   k=np.array([[np.exp(c[6]),c[10],c[8]],[0,np.exp(c[7]),c[9]],[0,0,1.]])
+   path=next(p for p in self.paths if p['curve_id']=='lane3:edge0');d=np.asarray(path['xyz'])[-1]-np.asarray(path['xyz'])[0]
+   vp=k@r@d
+   camera_a=float(vp[2]/(960*vp[2]-vp[0]));camera_b=float(-vp[1]/(960*vp[2]-vp[0]))
+   camera_authority='8a28_camera_parallel_direction'
   ys=np.asarray([z['y960'] for _,z in samples]);ms=np.asarray([z['slope'] for _,z in samples])
   pairs=[(ms[j]-ms[h])/(ys[j]-ys[h]) for j in range(len(ys)) for h in range(j) if abs(ys[j]-ys[h])>100]
-  if len(samples)>=3 and np.ptp(ys)>=180 and pairs:
-   aa=float(np.median(pairs));origin='robust_current_source_human_labelled_parallel_line_family'
+  if (len(samples)>=3 and np.ptp(ys)>=180 and pairs) or (photographic_references and len(samples)>=2 and pairs):
+   aa=float(np.median(pairs));origin='current_shot_photographic_parallel_line_family' if photographic_references else 'robust_current_source_human_labelled_parallel_line_family'
   elif samples:aa=camera_a;origin='camera_parallel_direction_stabilised_by_current_source_human_labelled_lines'
-  else:aa=camera_a;origin='8a28_camera_parallel_direction_identity_check_no_reliable_current_labelled_family_reference'
-  bb=float(np.median(ms-aa*ys)) if samples else float(-vp[1]/(960*vp[2]-vp[0]))
+  else:aa=camera_a;origin=camera_authority+'_identity_check_no_reliable_current_labelled_family_reference'
+  if photographic_references and samples and 'human_labelled' in origin:origin=origin.replace('human_labelled','photographic_identity')
+  bb=float(np.median(ms-aa*ys)) if samples else camera_b
   rejected=[];out=[];refined_out={}
   report=dict(status='checked',reference_origin=origin,slope_vs_y960=[aa,bb],reference_target_ids=['ice.'+cid for cid,_ in samples],
    rule='long lane boundaries and F-R centres share one source vanishing point and ordered distinct source rows; B/C cross-lines excluded')
@@ -644,7 +669,7 @@ class Extractor:
    out.append(f)
   # The model fixes physical row spacing; current source rows fix its image
   # projectivity. This is an identity check only, never an emitted model point.
-  source_rows=[f for f in out if f['world_curve'] in LINE_NAMES and 'source_line_fit' in f and image_line(f)['readout_span_px']>=400]
+  source_rows=[f for f in out if f['world_curve'] in reference_ids and 'source_line_fit' in f and image_line(f)['readout_span_px']>=400]
   coordinate={p['curve_id']:float(np.mean(np.asarray(p['xyz'])[:,1])) for p in self.paths if p['curve_id'] in LONG_LINE_ORDER}
   if len(source_rows)>=4:
    rr=np.asarray([coordinate[f['world_curve']] for f in source_rows]);yy=np.asarray([image_line(f)['y960'] for f in source_rows])
@@ -656,7 +681,7 @@ class Extractor:
    filtered=[]
    for f in out:
     cid=f['world_curve']
-    if cid not in LONG_LINE_ORDER or cid in LINE_NAMES or 'source_line_fit' not in f:filtered.append(f);continue
+    if cid not in LONG_LINE_ORDER or cid in reference_ids or 'source_line_fit' not in f:filtered.append(f);continue
     z=image_line(f);r0=coordinate[cid];pred=float((rowfit[0]*r0+rowfit[1])/(rowfit[2]*r0+1))
     nearest=float(np.clip(r0,rr.min(),rr.max()));den=1+rowfit[2]*r0;nearest_den=1+rowfit[2]*nearest
     # Near foreground rows enlarge source errors under projectivity. Their
@@ -670,7 +695,7 @@ class Extractor:
   # Different physical rows cannot bind the same actual material stroke.
   # Explicit human-labelled rows win a conflict with unlabelled model searches.
   ordered=sorted([f for f in out if f['world_curve'] in LONG_LINE_ORDER and 'source_line_fit' in f],
-    key=lambda f:(f['world_curve'] not in LINE_NAMES,-f['source_line_fit']['actual_native_readout_count']))
+    key=lambda f:(f['world_curve'] not in reference_ids,-f['source_line_fit']['actual_native_readout_count']))
   keep=[];remove=set()
   for f in ordered:
    cid=f['world_curve'];rank=LONG_LINE_ORDER.index(cid);z=image_line(f);conflict=None

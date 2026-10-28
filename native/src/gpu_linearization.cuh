@@ -5,6 +5,7 @@ struct GroupPlan {int begin,count,rank,weight,component;size_t white;};
 struct ComponentPlan {
     int local_begin,local_count,group_begin,group_count,dim;
     size_t h,g;int q_begin,q_count;size_t scatter,packed_h;
+    int normal_rank=0;
 };
 struct RowPlan {int begin,count;size_t jac;};
 struct ColumnPattern {int begin,count;size_t scatter;};
@@ -36,19 +37,31 @@ struct LinearView {
     const double *rig_directions=nullptr,*rig_lower=nullptr,*rig_upper=nullptr;double* rig_tangents=nullptr;double max_readout=0.;
     const double *scene_directions=nullptr,*scene_lower=nullptr,*scene_upper=nullptr;BoardCourseValue<LocalJet>* scene_courses=nullptr;const int* scene_active=nullptr;const int* scene_chart=nullptr;const double* scene_steps=nullptr;int mount_side=0;int* local_sides=nullptr;
     CameraEnvelope envelope{};
+    const CameraEnvelope* camera_envelopes=nullptr;const int* mount_sides=nullptr;
     bool pixel_residuals=false;
 };
+RS_HD inline LinearView camera_linear_view(LinearView l,size_t nr,size_t camera){
+    if(l.rig_directions)l.rig_directions+=camera*(nr==43?31:27)*l.q;
+    if(l.rig_tangents)l.rig_tangents+=camera*38*l.q;
+    if(l.rig_lower)l.rig_lower+=camera*nr;if(l.rig_upper)l.rig_upper+=camera*nr;
+    if(l.camera_envelopes)l.envelope=l.camera_envelopes[camera];
+    if(l.mount_sides)l.mount_side=l.mount_sides[camera];
+    return l;
+}
 RS_HD inline int column_position(const int* columns,int begin,int count,int value){
     int lo=0,hi=count;while(lo<hi){int m=lo+(hi-lo)/2;if(columns[begin+m]<value)lo=m+1;else hi=m;}
     return lo<count&&columns[begin+lo]==value?lo:-1;
 }
 RS_HD inline size_t upper_index(int n,int i,int j){return size_t(i)*n-size_t(i)*(i-1)/2+j-i;}
-// GPU normal blocks store each symmetric coefficient once. Public diagnostics
-// retain their existing dense row-major layout and offsets.
+// A single unweighted pixel factor has exactly two Jacobian rows. Store those
+// rows rather than its quadratic-size outer product. Correlated/multi-row
+// components retain packed symmetric storage. Public diagnostics stay dense.
 RS_HD inline double component_h(const double* h,const ComponentPlan& c,int i,int j){
+    if(c.normal_rank==2){const double* a=h+c.packed_h;return a[i]*a[j]+a[c.dim+i]*a[c.dim+j];}
     return h[c.packed_h+(i<=j?upper_index(c.dim,i,j):upper_index(c.dim,j,i))];
 }
-RS_HD inline void linearize_row(const View& v,const LinearView& l,size_t row,double* output,int* status,double* jac){
+RS_HD inline void linearize_row(const View& source,const LinearView& plan,size_t row,double* output,int* status,double* jac){
+    const auto camera=row_camera(source,row);const auto v=camera_view(source,camera);const auto l=camera_linear_view(plan,source.nr,camera);
     const auto rp=l.row_plan[row];int width=rp.count+1;
     double resolved[2];evaluate_row(v,row,output,status,resolved);
     for(int j=0;j<2*width;++j)jac[j]=std::numeric_limits<double>::quiet_NaN();
@@ -132,7 +145,8 @@ RS_HD inline double block_element(const LinearView& l,int ci,int row,int col,boo
 // tangent. Full original W and robust group weights select descent, including
 // shared material stations across rows. A local kink minimum is active only
 // for this linearization and is reconsidered after every global update.
-RS_HD bool corner_tangents(const View& v,const LinearView& l,int row,const double* output,double* left,double* right){
+RS_HD bool corner_tangents(const View& source,const LinearView& l,int row,const double* output,double* left,double* right){
+    const auto v=row_camera_view(source,size_t(row));
     double lo,hi;bool corner;if(!station_piece(v,row,v.stations[row],lo,hi,corner)||!corner)return false;
     double e=std::min(256*std::numeric_limits<double>::epsilon()*(1+fabs(v.stations[row])),.25*std::min(v.stations[row]-lo,hi-v.stations[row]));
     if(!(e>0))return false;Vec3 x=load3(output+11*size_t(row)),unused{},tangent{};
@@ -170,7 +184,7 @@ __global__ void scene_course_kernel(View v,LinearView l){
     l.scene_courses[k]=BoardCourseValue<LocalJet>({b[0],b[1],b[2],b[3],b[4],b[5]});
 }
 __global__ void rig_tangent_kernel(View v,LinearView l){
-    int q=blockIdx.x*blockDim.x+threadIdx.x;if(q<l.q)motion_rig_tangent(v.rig,l.rig_directions,l.q,q,l.rig_tangents);
+    int q=blockIdx.x*blockDim.x+threadIdx.x;if(q<l.q)for(size_t camera=0;camera<v.nrig;++camera){auto cv=camera_view(v,camera);auto cl=camera_linear_view(l,v.nr,camera);motion_rig_tangent(cv.rig,cl.rig_directions,l.q,q,cl.rig_tangents);}
 }
 __global__ void linearize_kernel(View v,LinearView l,double* output,int* status,double* jac){
     size_t row=size_t(blockIdx.x)*blockDim.x+threadIdx.x;
@@ -183,6 +197,11 @@ __global__ void whiten_kernel(LinearView l,const double* output,const double* ja
 __global__ void loss_kernel(LinearView l,const double* white,double* stats){int gi=blockIdx.x*blockDim.x+threadIdx.x;if(gi<l.ng)group_loss(l,gi,white,stats+3*size_t(gi));}
 __global__ void block_kernel(LinearView l,const double* white,const double* stats,double* h,double* gradient){
     int ci=blockIdx.x;auto c=l.components[ci];size_t square=size_t(c.dim)*c.dim;
+    if(c.normal_rank==2){auto g=l.groups[l.component_groups[c.group_begin]];
+        for(int i=threadIdx.x;i<c.dim;i+=blockDim.x){
+            h[c.packed_h+i]=white[g.white+1+i];h[c.packed_h+c.dim+i]=white[g.white+c.dim+2+i];
+            gradient[c.g+i]=block_element(l,ci,i,0,true,white,stats);}
+        return;}
     for(size_t i=threadIdx.x;i<square+c.dim;i+=blockDim.x){
         if(i<square){int row=int(i/c.dim),col=int(i%c.dim);if(col>=row)
             h[c.packed_h+upper_index(c.dim,row,col)]=block_element(l,ci,row,col,false,white,stats);}
@@ -252,12 +271,12 @@ struct Linearization {
         auto intern=[&](std::vector<int>& cols){std::sort(cols.begin(),cols.end());cols.erase(std::unique(cols.begin(),cols.end()),cols.end());
             auto it=pattern_ids.find(cols);if(it!=pattern_ids.end())return it->second;
             int id=bounded(patterns.size());patterns.push_back({bounded(columns.size()),bounded(cols.size()),0});columns.insert(columns.end(),cols.begin(),cols.end());pattern_ids.emplace(cols,id);return id;};
-        std::vector<int> rig_columns;
+        std::vector<std::vector<int>> rig_columns(v.nrig);
         if(rig_dirs){
             if(rig_q!=q)throw std::invalid_argument("joint camera/trajectory column count mismatch");
-            rig_directions.assign(rig_dirs,rig_dirs+size_t(v.nr==43?31:27)*q);rig_tangents.resize(size_t(38)*q);
-            rig_lower.assign(rig_lo,rig_lo+v.nr);rig_upper.assign(rig_hi,rig_hi+v.nr);
-            for(int j=0;j<q;++j){bool active=false;for(int k=0;k<(v.nr==43?31:27);++k)active|=rig_dirs[size_t(k)*q+j]!=0.;if(active)rig_columns.push_back(j);}
+            rig_directions.assign(rig_dirs,rig_dirs+v.nrig*size_t(v.nr==43?31:27)*q);rig_tangents.resize(v.nrig*size_t(38)*q);
+            rig_lower.assign(rig_lo,rig_lo+v.nr*v.nrig);rig_upper.assign(rig_hi,rig_hi+v.nr*v.nrig);
+            for(size_t camera=0;camera<v.nrig;++camera)for(int j=0;j<q;++j){bool active=false;for(int k=0;k<(v.nr==43?31:27);++k)active|=rig_dirs[(camera*(v.nr==43?31:27)+size_t(k))*q+j]!=0.;if(active)rig_columns[camera].push_back(j);}
         }
         std::vector<std::vector<int>> scene_columns(v.npaths);
         if(scene_dirs){
@@ -278,19 +297,19 @@ struct Linearization {
         }
         std::vector<std::vector<int>> control_columns(v.nc);
         for(size_t c=0;c<v.nc;++c)for(int j=0;j<q;++j)if(dirs[(3*c)*q+j]!=0||dirs[(3*c+1)*q+j]!=0||dirs[(3*c+2)*q+j]!=0)control_columns[c].push_back(j);
-        std::map<std::tuple<int,int,int>,int> support_patterns;row_plan.reserve(v.n);
+        std::map<std::tuple<int,int,int,int>,int> support_patterns;row_plan.reserve(v.n);
         MotionSpline spline{v.controls,v.nc,v.first,v.dt};
         for(size_t row=0;row<v.n;++row){int lo=0,hi=0;double basis[4];
             // Exactly the projection's declared time domain. In particular an
             // off-image root must not silently lose a crossed knot's columns.
             double begin=v.first+v.dt,end=v.first+(v.nc-2)*v.dt;
             if(v.projection_time_half>=0.){begin=std::max(begin,v.times[row]-v.projection_time_half);end=std::min(end,v.times[row]+v.projection_time_half);}
-            const double actual_half=std::abs(v.rig[37])/2;
+            const double actual_half=std::abs(row_camera_view(v,row).rig[37])/2;
             bool valid=finite_scalar(v.times[row])&&v.times[row]-actual_half>=begin-1e-12&&v.times[row]+actual_half<=end+1e-12&&
                 spline.basis(begin,lo,basis)==Status::ok&&spline.basis(end,hi,basis)==Status::ok;
             // Invalid source times stay in the problem and fail linearization.
-            auto key=std::make_tuple(valid?lo-1:-1,valid?hi+2:-1,scene_dirs?v.codes[row]:-1);auto found=support_patterns.find(key);int id;
-            if(found==support_patterns.end()){std::vector<int> cols=rig_columns;if(scene_dirs)cols.insert(cols.end(),scene_columns[v.codes[row]].begin(),scene_columns[v.codes[row]].end());if(valid)for(int c=std::get<0>(key);c<=std::get<1>(key);++c)cols.insert(cols.end(),control_columns[c].begin(),control_columns[c].end());id=intern(cols);support_patterns.emplace(key,id);}else id=found->second;
+            auto key=std::make_tuple(valid?lo-1:-1,valid?hi+2:-1,scene_dirs?v.codes[row]:-1,int(row_camera(v,row)));auto found=support_patterns.find(key);int id;
+            if(found==support_patterns.end()){std::vector<int> cols=rig_columns[row_camera(v,row)];if(scene_dirs)cols.insert(cols.end(),scene_columns[v.codes[row]].begin(),scene_columns[v.codes[row]].end());if(valid)for(int c=std::get<0>(key);c<=std::get<1>(key);++c)cols.insert(cols.end(),control_columns[c].begin(),control_columns[c].end());id=intern(cols);support_patterns.emplace(key,id);}else id=found->second;
             auto pat=patterns[id];row_plan.push_back({pat.begin,pat.count,jac_count});jac_count+=2*size_t(pat.count+1);max_row_q=std::max(max_row_q,pat.count);}
         std::vector<int> by_root(nlocal,-1);std::vector<std::vector<int>> locals,group_ids;
         for(size_t local=0;local<nlocal;++local){int r=root(int(local));if(by_root[r]<0){by_root[r]=bounded(locals.size());locals.emplace_back();group_ids.emplace_back();}locals[by_root[r]].push_back(int(local));}
@@ -303,7 +322,11 @@ struct Linearization {
             for(int gi:gg){auto g=groups[gi];for(int j=0;j<g.count;++j){auto rp=row_plan[members[g.begin+j]];cols.insert(cols.end(),columns.begin()+rp.begin,columns.begin()+rp.begin+rp.count);}}
             int id=intern(cols);auto pat=patterns[id];int dim=bounded(size_t(pat.count)+ll.size());component_patterns.push_back(id);
             components.push_back({bounded(component_locals.size()),bounded(ll.size()),bounded(component_groups.size()),bounded(gg.size()),dim,h_count,g_count,pat.begin,pat.count,0,packed_h_count});
-            h_count+=checked_product(size_t(dim),size_t(dim));packed_h_count+=checked_product(size_t(dim),size_t(dim)+1)/2;g_count+=dim;max_component_q=std::max(max_component_q,pat.count);
+            auto& component=components.back();
+            if(pixels&&gg.size()==1&&groups[gg[0]].count==1&&groups[gg[0]].rank==2)component.normal_rank=2;
+            h_count+=checked_product(size_t(dim),size_t(dim));
+            packed_h_count+=component.normal_rank==2?2*size_t(dim):checked_product(size_t(dim),size_t(dim)+1)/2;
+            g_count+=dim;max_component_q=std::max(max_component_q,pat.count);
             for(size_t j=0;j<ll.size();++j)local_column[ll[j]]=int(j);
             component_locals.insert(component_locals.end(),ll.begin(),ll.end());component_groups.insert(component_groups.end(),gg.begin(),gg.end());}
         for(size_t row=0;row<v.n;++row)if(ids[row]>=0)row_local_column[row]=local_column[ids[row]];
@@ -349,7 +372,7 @@ struct Linearization {
         const auto& l=host;cpu_output.resize(v.n*11);cpu_status.resize(v.n);cpu_jac.resize(jac_count);cpu_white.resize(white_count);cpu_stats.resize(3*size_t(l.ng));cpu_h.resize(h_count);cpu_g.resize(g_count);cpu_shared.assign(l.nnz+l.q,0.);
         if(host.scene_directions)for(int q=0;q<host.q;++q)scene_chart_direction(v.scene_values,v.nscene,host.scene_chart,host.scene_steps,host.q,q,scene_effective.data());
         if(host.scene_directions)for(int k=0;k<6;++k){LocalJet b[6];for(int j=0;j<6;++j)b[j]={v.board[j],j==k?1.:0.};scene_courses[k]=BoardCourseValue<LocalJet>({b[0],b[1],b[2],b[3],b[4],b[5]});}
-        if(host.rig_directions)for(int q=0;q<host.q;++q)motion_rig_tangent(v.rig,host.rig_directions,host.q,q,host.rig_tangents);
+        if(host.rig_directions)for(size_t camera=0;camera<v.nrig;++camera){auto cv=camera_view(v,camera);auto cl=camera_linear_view(host,v.nr,camera);for(int q=0;q<host.q;++q)motion_rig_tangent(cv.rig,cl.rig_directions,host.q,q,cl.rig_tangents);}
         for(size_t row=0;row<v.n;++row)linearize_row(v,l,row,cpu_output.data()+11*row,cpu_status.data()+row,cpu_jac.data()+row_plan[row].jac);
         for(int gi=0;gi<l.ng;++gi){auto g=groups[gi];int d=components[g.component].dim;for(int k=0;k<g.rank;++k)for(int col=0;col<d+1;++col)cpu_white[g.white+size_t(k)*(d+1)+col]=whiten_element(l,gi,k,col,cpu_output.data(),cpu_jac.data());group_loss(l,gi,cpu_white.data(),cpu_stats.data()+3*size_t(gi));}
         for(int ci=0;ci<l.ncomponents;++ci)for(int a=0;a<components[ci].local_count;++a)choose_corner_station(v,l,ci,a,cpu_output.data(),cpu_jac.data(),cpu_white.data(),cpu_stats.data());

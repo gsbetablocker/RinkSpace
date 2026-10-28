@@ -1,5 +1,7 @@
 # 可选 FP64 稀疏代数
 
+本目录属于 [rinkfit 历史后端](../../README.md)，当前 native LM 见[实现状态](../../../../docs/REBUILD.md)。
+
 本目录的 cuSPARSE 包装库由 src/rinkfit_start/gpu_sparse.py 的 GpuCsr 显式启用。只做不可变完整矩阵 A @ x；不求解、分解、优化或采用模型状态。导入模块不初始化 CUDA。
 
 当前支持 Windows、float64 数据、int32 索引、规范化 CSR。拒绝 float32、隐式索引缩窄、重复项及非有限值。使用 CUSPARSE_SPMV_CSR_ALG2 非转置运算；需要转置时调用方显式生成 CSR。上三角存储只代表上三角，不自动补对称、不改单位、不减行或裁 W。矩阵上传一次，每次传入并传回完整向量；错误显式报告，无静默 CPU 替代。

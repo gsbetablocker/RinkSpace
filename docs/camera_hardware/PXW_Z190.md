@@ -9,7 +9,7 @@
 - [型号注册表](../../configs/camera_hardware/sony_pxw_z190.json) 保存厂家能力。
 - [样本机位关联](../../configs/camera_hardware/okada_sp_installations_z190_v1.json) 保存来源、安装身份与历史散列。
 - 用户转述原记录（本地保存，未随仓库分发）：`D:/CodexData/RinkSpace_Data/events/ankara_2026/evidence/camera_hardware_20261001/user_report.md` 保留原证据等级。
-- [样本现行求解输入](../../configs/solver_runtime/okada_named66.json) 指向实际采用的机位安装与围挡外位置事实；关联表中的旧记录不代表最新运行采用值。
+- 当前重构输入与相机假设见[节目入口](../../events/ankara_2026/programmes/okada_mei_sp/README.md)。[okada_named66.json](../../configs/solver_runtime/okada_named66.json)属于历史后端输入，不代表当前 native 联合实验。
 
 厂家给出的固定镜头为 25 倍光学变焦，物理焦距 3.7–92.5 mm，35 mm 等效范围 28.8–720 mm；“1/3 型”三片 CMOS 不等于已测得感光宽度。[Sony 规格](https://www.sony.jp/xdcam/products/PXW-Z190/spec.html)
 
@@ -21,9 +21,9 @@
 
 固定三脚架／云台支点不等于固定光心。使用 [物理相机接口](../../calibration/program_tracking/z190_physical_camera.py) 时，各台安装偏移与光学参数独立，光心按姿态和实际启用的偏移计算；不能因为同型号就共享全部数值。
 
-当前节目处理使用 ISU 官方 1920×1080、50 fps 单节目原片，time_base=1/12800；第一镜头为源时间 20.020–44.960 秒的 1,248 个原生曝光。旧全场文件的 60 Hz 显示与重复曝光对应记录仅保留作历史，不再作为当前节目处理时钟。
+当前处理源为 ISU 官方 1920×1080、50 fps 单节目原片，time_base=1/12800。S01 物理镜头为 20.020–44.960 秒／1248 帧，当前重构处理从 22.120 秒／PTS 283136 开始，覆盖 1143 个曝光。旧全场源的 60 Hz 展示与重复曝光对应仅作历史事实。
 
-用户在装配记录中明确要求“第一版先把偏移视为不随变焦变化，跑出结果后再看是否需要加入变焦项”，这不是永久固定光学参数的要求。第一镜头的显式 `shared_zoom_camera` 绑定现可启用 [共享变焦接口](../../calibration/program_tracking/first_shot_zoom_camera.py)：主点横纵、k1、轴向光心四个共享斜率，统一通过原物理相机、行曝光求解和绘制路径。有效像素焦距是条件驱动，并非镜头编码器测量；系数由本赛事原片估计，不能声称是 Sony 标定值。相机仍有同一固定支点，各曝光保留姿态与有效焦距。启用或测试通过均不代表尾段已贴合，实际修复状态见 [节目审阅快照](../../events/ankara_2026/programmes/okada_mei_sp/review/README.md)。
+当前四镜头基线采用 fx/fy=1、居中常量主点和零主点变焦斜率，是工程近似，不能声称为 Sony 标定。完整 native 模型可表达随变焦入瞳／光学项，实际活动方向由运行配置决定。历史 [shared_zoom_camera 接口](../../calibration/program_tracking/first_shot_zoom_camera.py)保留另一套源模型的四个共享斜率，不能当作当前模型默认设置；有效像素焦距也不是镜头编码器实测值。
 
 ## 复用与历史
 

@@ -42,6 +42,18 @@ def physical_color(pid,im,q):
     if pid.startswith('Ad9.'):ok=red>.02
     return ok
 
+
+def photographed_material_colors(ref,H,im,q):
+    """Use the photographed word's palette, not its saturated vector artwork."""
+    off=np.mgrid[-4:5:4,-4:5:4].reshape(2,-1).T[:,::-1];dst=np.asarray(q)[:,None,:]+off
+    src=cv2.perspectiveTransform(dst.reshape(1,-1,2),np.linalg.inv(H))[0].reshape(dst.shape)
+    a=r.sample(ref['color'],src);c=r.sample(im,dst)
+    sa=np.ptp(a,axis=2)>20;sc=np.ptp(c,axis=2)>20;fa=sa.mean(1);fc=sc.mean(1)
+    da=np.stack([a[:,:,0]-a[:,:,1],a[:,:,2]-a[:,:,1]],axis=-1);dc=np.stack([c[:,:,0]-c[:,:,1],c[:,:,2]-c[:,:,1]],axis=-1)
+    va=(da*sa[:,:,None]).sum(1)/np.maximum(sa.sum(1)[:,None],1);vc=(dc*sc[:,:,None]).sum(1)/np.maximum(sc.sum(1)[:,None],1)
+    den=np.linalg.norm(va,axis=1)*np.linalg.norm(vc,axis=1);cos=np.divide((va*vc).sum(1),den,out=np.ones(len(va)),where=den>1)
+    return ~(((fa>.10)&(fc>.10)&(cos<.766))|((fa>.3)&(fc<.03))|((fc>.3)&(fa<.03)))
+
 def patch_score(ref,H,im,q,n,offset=0.):
     off=np.mgrid[-6:7:3,-6:7:3].reshape(2,-1).T[:,::-1]
     target=q[:,None,:]+off
@@ -68,6 +80,8 @@ def chart_paths(ref,chart,im,gray,mask):
         n[delta<0]*=-1
         photometric=patch_score(ref,H,gray,q,n)
         colors=physical_color(path['path_id'],im,q)
+        if ref['atlas'].get('actual_source_material_colors'):
+            colors=photographed_material_colors(ref,H,im,q)
         polarity=np.abs(delta)>2.
         valid=(~occluded)&colors&polarity
         answer.append(dict(path=path['path_id'],atlas_id=int(ref['atlas']['id']),source_path_index=pi,source_contour_sha256=path['contour_sha256'],H=H,reference_pixels=np.asarray(path['pixels'],float),q=q,n=n,s=s,valid=valid,occluded=occluded,color_ok=colors,polarity_ok=polarity,ncc=photometric,tree=cKDTree(q)))
@@ -77,6 +91,36 @@ def profile_reason(profile):
     flags=profile['source_flags'];q=np.asarray(profile['source_q10_q50_q90_normal_offsets_px'])
     if any(flags.values()) or not np.isfinite(q).all():return 'current_local_material_transition_unresolved'
     return None
+
+
+def current_glyph_material_pair(gray,mask,glyph_uv,query,normal,offsets):
+    """Check both measured plateaus against this exposure's glyph material.
+
+    A large glyph still needs this check: a weak edge on its colored
+    background must not inherit the identity of a nearby white letter.
+    The local two-class split is measured from the complete visible glyph,
+    never a native projection or a contrast threshold tuned to a failed row.
+    """
+    p=np.asarray(glyph_uv,float);lo=np.maximum(np.floor(p.min(0)-2).astype(int),[0,0]);hi=np.minimum(np.ceil(p.max(0)+3).astype(int),[gray.shape[1],gray.shape[0]])
+    if np.any(hi-lo<3):return dict(resolved=False,reason='glyph_source_context_clipped')
+    crop=gray[lo[1]:hi[1],lo[0]:hi[0]];visible=np.asarray(mask[lo[1]:hi[1],lo[0]:hi[0]])==0
+    values=crop[visible]
+    if len(values)<20:return dict(resolved=False,reason='glyph_source_context_occluded')
+    threshold,_=cv2.threshold(values.reshape(-1,1).astype('uint8'),0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    lower=values[values<=threshold];upper=values[values>threshold]
+    if not len(lower)or not len(upper):return dict(resolved=False,reason='glyph_has_no_two_visible_materials')
+    levels=np.array([np.median(lower),np.median(upper)]);boundary=float(levels.mean())
+    q=np.asarray(query,float);n=np.asarray(normal,float);off=np.asarray(offsets,float)
+    xy=q+np.array([off[0]-3,off[0]-1,off[-1]+1,off[-1]+3])[:,None]*n
+    h,w=gray.shape
+    if np.any(xy<0)or np.any(xy>[w-1,h-1]):return dict(resolved=False,reason='glyph_profile_source_border')
+    if np.any(r.sample(mask,xy[None])[0]>0):return dict(resolved=False,reason='glyph_profile_foreground')
+    sides=r.sample(gray,xy[None])[0].reshape(2,2).mean(1)
+    resolved=bool(sides[0]<boundary<sides[1])
+    return dict(resolved=resolved,reason=None if resolved else'profile_does_not_separate_current_glyph_materials',
+        actual_glyph_material_levels=levels.tolist(),actual_profile_plateau_levels=sides.tolist(),
+        current_material_class_boundary=boundary,query_uv=q.tolist(),source_neighborhood_xyxy=[*lo.tolist(),*hi.tolist()],
+        source_context_is_navigation_only=True)
 
 def read_profiles(im,frame,q,n):
     binding=dict(source_sha256=frame['source_video_sha256'],source_pts=frame['pts'],time_base='1/12800',shot_id=frame.get('shot_id','s01'),event_id='ankara_2026',rig_id='main',installation_id='main',pixel_domain='native_distorted',width=1920,height=1080)

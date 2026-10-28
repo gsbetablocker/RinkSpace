@@ -1,5 +1,7 @@
 # S3：显式度量图表到同一相机的初值原语
 
+本页描述 rinkfit 历史后端的模块合同，适用范围见[模块入口](../README.md)；当前 rebuild 的 native／GPU 能力见[实现状态](../../../docs/REBUILD.md)。
+
 `src/rinkfit_start/metric_upgrade.py` 实现一个可运行的 S3 初值步骤：给定**同一原生帧**中几个真正平面的图集 homography、显式度量升级 `Q_j` 和共享世界中的物理嵌入 `M_j`，联立恢复一个共同的 `3×4` 投影矩阵 `P`。
 
 该原语对应 v1.1 方案第 8.6 节和 `design_contract.json` 的 `registration_frontend.metric_upgrade`。它不估计未知图集的度量，不分解自由的物理 `4×3` 块，不跨焦段变化的帧叠加固定 `K`，也不生成最终物理约束。输出只供后续共同内参、正深度和固定云台初值回收使用。

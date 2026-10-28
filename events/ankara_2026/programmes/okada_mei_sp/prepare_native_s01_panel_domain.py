@@ -25,12 +25,15 @@ def stage():
     if OUT.exists():raise FileExistsError('Do not overwrite an existing model revision')
     OUT.mkdir()
     current=snapshot(prep.RUN/'accepted_pixels_latest.npz')
+    old=SceneParameterModel(prep.read(prep.SCENE),prep.SCENE,optimize_scene=True).initial_state
+    points,mapping,_=prep.load_pixel_input(prep.RUN);camera=prep.read(prep.CAMERA)
+    prep.validate_snapshot_identity(current,old.layout,camera,mapping,points=points,
+        point_input_sha256=prep.digest(prep.RUN/'point_observations.npz'))
     if str(current['point_input_sha256'])!=prep.digest(prep.RUN/'point_observations.npz'):
         raise ValueError('Current state/input mismatch')
     snapshot_scene(prep.SCENE,OUT/'before_scene')
     scene,_=snapshot_scene(prep.SCENE,OUT/'scene');scene_path=OUT/'scene/scene.json'
     shutil.copy2(prep.RUN/'accepted_pixels_latest.npz',OUT/'before_state.npz')
-    old=SceneParameterModel(prep.read(prep.SCENE),prep.SCENE,optimize_scene=True).initial_state
     changes=[]
     for ref,assets in read_scene_assets(scene,scene_path):
         number=ref['advertisement_number']
@@ -73,13 +76,14 @@ def stage():
             repairs.append(dict(ad=ref['advertisement_number'],block=block['id'],before_bounds=[lo.tolist(),hi.tolist()],
                 translation_delta=delta.tolist(),reason='Minimal feasible initial translation under the explicit physical panel relation; remains jointly fitted'))
     current['scene_values']=values
-    np.savez(OUT/'seed_state.npz',**current)
     os.link(prep.RUN/'point_observations.npz',OUT/'point_observations.npz')
     shutil.copy2(prep.RUN/'initialized_points.npz',OUT/'initialized_points.npz')
     receipt=prep.read(prep.RUN/'point_input.json');receipt['input']=str(OUT/'point_observations.npz');prep.write(OUT/'point_input.json',receipt)
     mapping=prep.read(prep.RUN/'mapping.json');mapping.update(scene_path=str(scene_path),
         scene_revision=scene_content_identity(scene,scene_path),current_point_input=str(OUT/'point_observations.npz'))
     prep.write(OUT/'mapping.json',mapping)
+    prep.bind_snapshot_identity(current,model.initial_state.layout,camera,mapping,native_library=LIBRARY)
+    np.savez(OUT/'seed_state.npz',**current)
     result=dict(schema='rinkspace.s01_print_panel_domain_revision.v1',assets=changes,initial_feasibility_repairs=repairs,
         before_scene_revision=scene_content_identity(prep.read(prep.SCENE),prep.SCENE),
         after_scene_revision=mapping['scene_revision'],before_snapshot_sha256=prep.digest(OUT/'before_state.npz'),
@@ -103,6 +107,10 @@ def install():
     if not (OUT/'stop_requested').exists() or not (prep.RUN/'stop_requested').exists():
         raise ValueError('Stop both numeric runs before installing')
     saved=snapshot(OUT/'accepted_pixels_latest.npz')
+    model=SceneParameterModel(candidate,candidate_path,optimize_scene=True)
+    points,mapping,_=prep.load_pixel_input(OUT)
+    prep.validate_snapshot_identity(saved,model.initial_state.layout,prep.read(prep.CAMERA),mapping,points=points,
+        point_input_sha256=report['point_input_sha256'])
     if str(saved['point_input_sha256'])!=report['point_input_sha256']:raise ValueError('Candidate state/input mismatch')
     audit=prep.read(OUT/'shape_review/report.json')
     if audit['snapshot_sha256']!=prep.digest(OUT/'accepted_pixels_latest.npz') or any(

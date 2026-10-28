@@ -12,6 +12,7 @@ import av
 import cv2
 import numpy as np
 from ..core.native import NativeCore
+from ..domain.camera import complete_camera_rig
 from ..domain.scene_assets import scene_content_identity, read_scene_assets
 from ..session.dataset import load_prepared, load_array, relative, digest
 from ..storage import AssetStore
@@ -85,8 +86,8 @@ def load_state(state_path, core, shot_ids):
         if any(camera.get(key) != value for key, value in expected.items()):
             raise ValueError('unsupported complete camera definition for '+shot_id)
         camera['controls'] = np.load(reference(camera_path.parent, camera['controls_ref']), allow_pickle=False)
-        if (np.asarray(camera['rig']).shape != (38,) or not np.isfinite(camera['rig']).all()
-                or camera['controls'].ndim != 2 or camera['controls'].shape[1] != 3
+        complete_camera_rig(camera)
+        if (camera['controls'].ndim != 2 or camera['controls'].shape[1] != 3
                 or len(camera['controls']) < 4 or not np.isfinite(camera['controls']).all()):
             raise ValueError('invalid complete camera arrays for '+shot_id)
         cameras[shot_id] = camera
@@ -96,7 +97,7 @@ def load_state(state_path, core, shot_ids):
 def project(core, camera, xyz, pts):
     # Subtract native int64 identities before conversion to floating seconds.
     frame_time = (int(pts)-int(camera['reference_pts']))*camera['time_base_num']/camera['time_base_den']
-    return core.project_motion(camera['rig'], camera['controls'], camera['first_control_time'],
+    return core.project_motion(complete_camera_rig(camera), camera['controls'], camera['first_control_time'],
                                camera['control_dt'], camera['image_height'], frame_time, xyz)
 
 
@@ -292,6 +293,7 @@ def render(prepared_dir, state_path, assets_path, shot_ids, library_path, out_di
                 artifacts.append({'kind':'complete_shot_overlay','path':str(path),'shot_id':shot_id,'source_id':source['id'],'first_pts':int(expected[0]),'last_pts':int(expected[-1]),'stop_pts_exclusive':window['stop_pts_exclusive'],'time_base_num':tb.numerator,'time_base_den':tb.denominator,'source_first_seconds':float(expected[0]*tb),'source_last_seconds':float(expected[-1]*tb),'frames':len(expected),'layers':['all_ice','all_board','all_advertisement_contours','entity_numbers','current_active_source_uv','same_model_top_view'],'verification':check})
                 timing[shot_id] = {'projection_seconds':sum(r['projection_seconds'] for r in records)}
         result = {'schema':'rinkspace.review.v1','state_id':state['state_id'],'prepared_revision':manifest['revision'],'source_ids':list(source_paths),'required_shot_ids':manifest['required_shot_ids'],'selected_shot_ids':requested,'scope_status':'complete' if set(requested)==set(manifest['required_shot_ids']) else 'subset','unselected_shot_ids':[s for s in manifest['required_shot_ids'] if s not in requested],'covered_pts':covered,'missing_pts':{},'entity_inventory':samples['inventory'],'missing_entities':samples['missing_entities'],'artifacts':artifacts,'comparison':comparison,'user_approval':'not_reviewed','fit_executed':False,'cuda_executed':False,'purpose':'replay_and_model_migration_review','state_path':str(Path(state_path).resolve()),'prepared_path':str(prepared_dir),'assets_path':str(Path(assets_path).resolve()),'log_path':str(log_path),'timings':{**timing,'total_seconds':time.perf_counter()-started},'external_d78_baseline':assets.get('d78_baseline')}
+        result['review_identity_differences'] = manifest.get('review_identity_differences', [])
         write(out/'review.json',result)
         return ReviewReceipt(result,str(out/'review.json'))
     except BaseException as exc:

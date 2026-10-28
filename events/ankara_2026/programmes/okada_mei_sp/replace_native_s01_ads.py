@@ -43,6 +43,8 @@ def prepare():
     with np.load(prep.RUN/'accepted_pixels_latest.npz',allow_pickle=False) as z:state={k:z[k] for k in z.files}
     require(str(state['point_input_sha256'])==current_hashes['point_observations.npz'] and equal(state['source_rows'],old['source_rows']),'Current numeric state belongs to another input')
     model=SceneParameterModel(prep.read(prep.SCENE),prep.SCENE,optimize_scene=True)
+    prep.validate_snapshot_identity(state,model.initial_state.layout,prep.read(prep.CAMERA),mapping,points=old,
+        point_input_sha256=current_hashes['point_observations.npz'])
     native=NativeSceneGPU(prep.SCENE,NativeCore(prep.LIBRARY),parameter_state=ParameterState(model.initial_state.layout,state['scene_values']))
     old_paths=np.asarray(mapping['path_ids'])[old['path_indices']]
     keep=np.flatnonzero([native.paths[p]['layer']!='advertisement' for p in old_paths])

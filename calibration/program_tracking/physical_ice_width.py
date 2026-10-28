@@ -11,6 +11,14 @@ import numpy as np
 from .projection import ground_xy,project_fast
 
 
+def _ground(camera,pixels):
+    return camera.ground_xy(pixels) if hasattr(camera,'ground_xy') else ground_xy(camera,pixels)
+
+
+def _project(camera,xyz):
+    return camera.project(xyz) if hasattr(camera,'project') else project_fast(camera,xyz)
+
+
 def physical_width_axis(path):
     """World-plane unit axis perpendicular to this named physical straight line."""
     xyz=np.asarray(path['xyz'],float)
@@ -30,17 +38,17 @@ def projected_width_profile(camera,path,query_uv,*,radius_px=90.,step_px=1.):
     the exact Brown-projected curve, including its nonuniform perspective scale.
     """
     query=np.asarray(query_uv,float).reshape(2)
-    xy,valid=ground_xy(camera,query[None])
+    xy,valid=_ground(camera,query[None])
     if not valid[0]:return None
     axis=physical_width_axis(path)
-    probe,_=project_fast(camera,np.c_[xy[0]+np.array([-.01,.01])[:,None]*axis,np.zeros(2)])
+    probe,_=_project(camera,np.c_[xy[0]+np.array([-.01,.01])[:,None]*axis,np.zeros(2)])
     derivative=(probe[1]-probe[0])/.02
     scale=float(np.linalg.norm(derivative))
     if not np.isfinite(scale) or scale<1e-6:return None
     offsets=np.arange(-radius_px,radius_px+step_px*.5,step_px)
     world_offsets=offsets/scale
     world_xy=xy[0]+world_offsets[:,None]*axis
-    uv,depth=project_fast(camera,np.c_[world_xy,np.zeros(len(world_xy))])
+    uv,depth=_project(camera,np.c_[world_xy,np.zeros(len(world_xy))])
     valid=np.isfinite(uv).all(1)&(depth>.05)&(uv>=[0.,0.]).all(1)&(uv<=[1919.,1079.]).all(1)
     return dict(query_uv=query,query_world_xy=xy[0],physical_width_axis_xy=axis,
                 query_width_direction_uv=derivative/scale,offsets=offsets,
@@ -55,10 +63,10 @@ def source_at_profile_offsets(profile,offsets):
 
 def ground_midpoint_from_source_sides(camera,sides_uv):
     sides=np.asarray(sides_uv,float).reshape(2,2)
-    xy,valid=ground_xy(camera,sides)
+    xy,valid=_ground(camera,sides)
     if not valid.all():return None
     center_xy=xy.mean(0)
-    center,depth=project_fast(camera,np.r_[center_xy,0.][None])
+    center,depth=_project(camera,np.r_[center_xy,0.][None])
     if not np.isfinite(center).all() or depth[0]<=.05:return None
     return center[0],center_xy,xy
 

@@ -1,7 +1,9 @@
 """Current-native search proposals. Nothing here produces measured pixels."""
 from __future__ import annotations
 import hashlib
+import json
 import numpy as np
+from ..domain.camera import complete_camera_rig
 from ..domain.scene_assets import scene_content_identity
 
 
@@ -31,16 +33,21 @@ def project_navigation(native_geometry, camera_state, native_pts, uncertainty):
     if camera_state.get('scene_revision',scene_revision)!=scene_revision:raise ValueError('Navigation scene revision differs')
     points=native_geometry.samples['xyz']
     t=(native_pts-int(camera['reference_pts']))*camera['time_base_num']/camera['time_base_den']
-    projected=native_geometry.core.project_motion(camera['rig'],controls,camera['first_control_time'],
+    rig=complete_camera_rig(camera)
+    projected=native_geometry.core.project_motion(rig,controls,camera['first_control_time'],
         camera['control_dt'],camera['image_height'],t,points)
-    revision=hashlib.sha256(controls.astype('<f8').tobytes()).hexdigest()
+    camera_identity={key:camera[key] for key in ('reference_pts','time_base_num','time_base_den',
+        'first_control_time','control_dt','image_width','image_height')}
+    camera_identity.update(rig=rig.tolist(),controls_shape=list(controls.shape),
+        controls_sha256=hashlib.sha256(controls.astype('<f8').tobytes()).hexdigest())
+    revision=hashlib.sha256(json.dumps(camera_identity,sort_keys=True,allow_nan=False).encode()).hexdigest()
     proposals=[]
     signals={row['native_path_id']:{'blue':'blue_excess','red':'red_excess','dark':'dark_band'}[row['material_signal']]
         for row in native_geometry.ice_inventory()}
     for cut in native_geometry.samples['cuts']:
         begin,end=cut['begin'],cut['end'];uv=projected['uv'][begin:end]
         good=(projected['status'][begin:end]==0)&np.isfinite(uv).all(1)
-        good&=(uv[:,0]>=-radius)&(uv[:,0]<1920+radius)&(uv[:,1]>=-radius)&(uv[:,1]<1080+radius)
+        good&=(uv[:,0]>=-radius)&(uv[:,0]<camera['image_width']+radius)&(uv[:,1]>=-radius)&(uv[:,1]<camera['image_height']+radius)
         idx=np.flatnonzero(good)
         if len(idx)<2:continue
         # Drawing samples can be dense. Retain actual native sample coordinates

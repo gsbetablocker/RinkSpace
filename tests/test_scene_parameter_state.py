@@ -162,7 +162,7 @@ def test_frozen_board_gauge_and_unlocalized_values_cannot_be_invented(model):
 def test_candidate_write_load_preserves_initial_values_and_checks_array_hash(model, tmp_path):
     state = model.initial_state
     identity = shape_block(model, 'print_instance/Ad2::'+OUTER)
-    candidate = changed(state, identity, 4)
+    candidate = changed(state, identity, 0)
     root = model.scene_path.parent
     first = write_parameter_state(root, state, name='initial.json')
     initial_bytes = (root/first['values_ref']['path']).read_bytes()
@@ -211,34 +211,46 @@ def test_prepared_state_is_self_contained_and_preserves_exact_accepted_pixels_ti
     for feature in features:
         assert dependencies['features'][feature['id']] == prepared_model.dependencies(feature['path_id'])
     identity = shape_block(prepared_model, 'print_instance/Ad2::'+OUTER)
-    candidate = changed(state, identity, 4)
+    candidate = changed(state, identity, 0)
     before = state_path.read_bytes()
     write_parameter_state(out, candidate, scene_ref=manifest['scene_ref'], name='candidate.json')
     assert state_path.read_bytes() == before
     np.testing.assert_array_equal(load_parameter_state(state_path).values, state.values)
 
 
-def test_internal_warp_changes_real_parent_and_hole_beyond_whole_print_affine(model, core):
+def test_complete_artwork_rejects_nonlinear_warp_and_keeps_parent_hole_affine(model, core):
     state = model.initial_state
     outer, hole = ('print_instance/Ad2::'+p for p in (OUTER, INNER))
     identity = shape_block(model, outer)
     assert identity == shape_block(model, hole)
-    candidate = changed(state, identity, 4, .45)
+    block = state.blocks[identity]
+    assert block['size'] == 10
+    assert list(block['independent_local_indices']) == [0, 1, 2, 3]
+    initial_values = state.values.copy()
+    for column in range(4, 10):
+        with pytest.raises(ValueError, match='frozen'):
+            changed(state, identity, column, .45)
+    np.testing.assert_array_equal(state.values, initial_values)
+    # The current complete artwork admits a common affine transform. Neither
+    # individual contours nor their holes may acquire a nonlinear warp.
+    candidate = changed(state, identity, 0, .045)
     stations = np.linspace(0., 1., 101)
     original, moved = [], []
     for path in (outer, hole):
         a = model.evaluate_print(path, stations, core, state=state, jacobian=False)
         b = model.evaluate_print(path, stations, core, state=candidate, jacobian=False)
         assert np.max(abs(a['material_uv']-b['material_uv'])) > 1e-6
+        np.testing.assert_allclose(b['material_uv'], a['material_uv']+[.045, 0.],
+                                   rtol=0., atol=1e-14)
         np.testing.assert_array_equal(a['material_uv'][0], a['material_uv'][-1])
         np.testing.assert_array_equal(b['material_uv'][0], b['material_uv'][-1])
         original.append(a['material_uv'])
         moved.append(b['material_uv'])
     original, moved = np.vstack(original), np.vstack(moved)
     design = np.column_stack([original, np.ones(len(original))])
-    # An unconstrained best affine map still cannot reproduce this local warp.
+    # One affine map must reproduce both the parent and its hole exactly.
     affine = np.linalg.lstsq(design, moved, rcond=None)[0]
-    assert np.max(abs(design@affine-moved)) > 1e-5
+    np.testing.assert_allclose(design@affine, moved, rtol=0., atol=1e-12)
     other = next(p for p in model.paths if p.startswith('print_instance/Ad1::'))
     np.testing.assert_array_equal(
         model.evaluate_print(other, stations, core, state=state, jacobian=False)['xyz'],
@@ -271,7 +283,8 @@ def test_domain_placement_logsize_and_shape_jacobians_match_independent_state_fd
     state = model.initial_state
     path = 'print_instance/Ad2::'+INNER
     identity = shape_block(model, path)
-    state = changed(state, identity, 4, .19)
+    assert list(state.blocks[identity]['independent_local_indices']) == [0, 1, 2, 3]
+    state = changed(state, identity, 2, .19)
     stations = [.043, .217, .481, .739, .927]
     result = model.evaluate_print(path, stations, core, state=state, jacobian=True)
     assert set(result['jacobians_by_block']) == set(model.dependencies(path))
@@ -290,7 +303,7 @@ def test_domain_placement_logsize_and_shape_jacobians_match_independent_state_fd
 
 
 @pytest.mark.parametrize('path,expected_shape_columns', [
-    ('print_instance/Ad2::'+INNER, 10),
+    ('print_instance/Ad2::'+INNER, 4),
     ('print_instance/Ad1::Ad1.print.SKATING_I', 4),
     ('print_instance/Ad5::Ad5.bottom_edge/path0', 0),
 ])
@@ -326,7 +339,7 @@ def test_active_geometry_jacobians_assemble_by_global_columns(
 def test_review_load_and_common_grid_resampling_keep_numeric_candidate(model, core):
     state = model.initial_state
     identity = shape_block(model, 'print_instance/Ad2::'+OUTER)
-    candidate = changed(state, identity, 4, .35)
+    candidate = changed(state, identity, 0, .35)
     root = model.scene_path.parent
     write_parameter_state(root, state, name='initial.json')
     write_parameter_state(root, candidate, name='candidate.json')

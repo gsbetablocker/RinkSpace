@@ -1,16 +1,12 @@
-# 历史原生支持定义保全
+# 历史原生支持
 
-返回 [当前环境说明](../../README.md)。逐项来源、SHA-256、字节数与源 stat 稳定性见 [source_preservation_manifest.json](source_preservation_manifest.json)。
+本目录保留 reference_callback／oneTBB 实验的五份原始构建、源码及许可文件，并提供对应接口说明。原文件身份、历史地址及原始说明的归档位置见 [source_preservation_manifest.json](source_preservation_manifest.json)。当前环境入口见 [environments/README](../../README.md)。
 
-2026-10-13 按原始字节保全 Data 中七个小型文件。复制前后核对源 stat，重读原件并逐字节比较副本；原件保持原位。目标已存在时只接受完全相同内容，不覆盖不同内容。
+| 子目录 | 公开内容 |
+|---|---|
+| [reference_callback](reference_callback/README.md) | GTSAM CustomFactor 引用回调接口、build.bat 与 build_manifest |
+| [tbb_control](tbb_control/README.md) | oneTBB global_control 接口、C++ 源码、build.bat 与 LICENSE |
 
-| 子目录 | 保全内容 | 作用与范围 |
-|---|---|---|
-| reference_callback/ | build.bat、build_manifest.json、README.md | 历史 GTSAM reference-preserving CustomFactor bridge 的构建方法与来源；C++ 主源码已在 calibration/program_tracking/native/reference_callback.cpp |
-| tbb_control/ | tbb_control.cpp、build.bat、README.md、LICENSE.txt | 原 README 所述的独立 oneTBB global_control 实验封装和相关发布包声明；不据此增加 named66 的生产后端依赖 |
+构建文件保留旧编译器、环境、vendor 与输出地址，不是当前机器的即用构建入口。原始 README 字节保存在既有 Data 文档归档中，清单的 archived_documents 分别登记原件和公开说明的身份。原 smoke／scaling／第三轮报告未随公开仓库分发。
 
-保全文件内的旧编译器、环境、include/lib 和输出路径均原样保留。这些文件是历史定义，并非可直接在另一台机器运行的构建入口。本次未执行 build、加载原生库、复制 vendor 或编译产物，也没有切换活动运行地址；runtime_activated=false。
-
-reference_callback 的历史 build_manifest 保存当时源码、扩展、GTSAM DLL 与三个 vendor archive 的身份记录。此次只对七个保全文本/源码文件重新计算 SHA，没有重读 archive、DLL、PYD 或环境二进制来认证其当前字节。
-
-tbb_control/LICENSE.txt 随其原 README 记述的官方 oneTBB 发布包头文件、x64 VC14 导入库和许可一起提取；其适用内容与来源以该原 README 及 LICENSE 原文为准。这份第三方声明不为整个 RinkSpace 项目赋予许可证，也不说明其他 vendor 或人体模型的许可。原 README 的历史实验和核验结果保持原文，不表示本次重新执行。
+`runtime_activated=false`，这些文件不增加 named66 或当前 native LM 的生产依赖。build_manifest 中的 archive、DLL 和 PYD 身份属于原实验记录。oneTBB 的原声明仅适用于所述第三方组件，不授予整个项目额外许可。

@@ -69,7 +69,8 @@ def prepare():
     write(OUT/'authority_inventory.json',authority)
     emit('source_preparation_complete',frames=len(vis),new_Ad1_charts=len(new),seconds=round(time.monotonic()-start,1))
 
-def inventory():
+def inventory(*, shot_id='s04', packet_dir=None):
+    packet_dir=Path(packet_dir) if packet_dir is not None else PROG/'source_datasets/shot4_20261014/frames'
     OUT.mkdir(exist_ok=True);WORK.mkdir(exist_ok=True);start=time.monotonic();alluv=[];allpts=[];allids=[];labels=[];ads=[];kinds=[];provenance=[];counts=collections.Counter();seen=set();framecount=0
     with gzip.open(OUT/'candidate_provenance.jsonl.gz','wt',encoding='utf8') as evidence:
         for pt in range(FIRST,LAST+1,256):
@@ -92,7 +93,7 @@ def inventory():
             if framecount%150==0:emit('source_inventory',frames=framecount,rows=len(alluv),seconds=round(time.monotonic()-start,1))
         # The earlier reviewed packets hold explicit names and manual/corner
         # provenance. Only actual readout coordinates are collected as candidates.
-        packets=sorted((PROG/'source_datasets/shot4_20261014/frames').glob('*.json'))
+        packets=sorted(packet_dir.glob('*.json'))
         for path in packets:
             d=b.read(path);packetsha=sha(path);pt=int(d['source_pts'])
             for feature in d.get('features',[]):
@@ -103,14 +104,14 @@ def inventory():
                     if points is None and seg.get('pixels_measured_in_this_frame'):points=seg.get('uv')
                     if points is None:counts['historical_curve_estimates_not_observations']+=len(seg.get('uv',[]));continue
                     for j,uv in enumerate(points):
-                        sid=f's04_reviewed_raw_{pt}_{label}_{si}_{j}';idx=len(alluv);alluv.append(uv);allpts.append(pt);allids.append(sid);labels.append(label);ads.append(int(match.group(1)));kinds.append(0)
+                        sid=f'{shot_id}_reviewed_raw_{pt}_{label}_{si}_{j}';idx=len(alluv);alluv.append(uv);allpts.append(pt);allids.append(sid);labels.append(label);ads.append(int(match.group(1)));kinds.append(0)
                         evidence.write(json.dumps(dict(source_row=idx,stable_id=sid,pts=pt,uv=uv,origin='earlier_named_actual_source_readout',source_packet=str(path),source_packet_sha256=packetsha,feature_id=label,segment=si,raw_point=j,previous_allowed_for_fit=feature.get('allowed_for_fit'),no_previous_fit_status_implicitly_promoted=True),ensure_ascii=False)+'\n');counts['earlier_named_raw_candidates']+=1
     z=dict(uv=np.asarray(alluv,float),pts=np.asarray(allpts,np.int64),ids=np.asarray(allids),labels=np.asarray(labels),ad=np.asarray(ads,np.int16),kind=np.asarray(kinds,np.uint8));np.savez_compressed(OUT/'original_ad_candidates.npz',**z)
-    sourcefiles=[PRINT/'final_manifest_anchor.json',PRINT/'final_index_anchor.jsonl.gz',REC/'dense234_v1/generation_v2/manifest.json',PROG/'source_datasets/dense234_20261020/result.json',PROG/'source_datasets/shot4_20261014/batch_manifest.json']
-    write(OUT/'source_inventory.json',dict(shot_id='s04',frames=framecount,counts=dict(counts),candidate_rows=len(alluv),candidate_file_sha256=sha(OUT/'original_ad_candidates.npz'),sources=[dict(path=str(p),sha256=sha(p)) for p in sourcefiles],latest_full_pool_not_limited_to_500_point_display_selection=True,source_UV_and_PTS_unchanged=True,old_source_files_changed=False,candidates_not_automatically_fit_observations=True))
+    sourcefiles=[PRINT/'final_manifest_anchor.json',PRINT/'final_index_anchor.jsonl.gz',REC/'dense234_v1/generation_v2/manifest.json',PROG/'source_datasets/dense234_20261020/result.json',packet_dir.parent/'batch_manifest.json']
+    write(OUT/'source_inventory.json',dict(shot_id=shot_id,frames=framecount,counts=dict(counts),candidate_rows=len(alluv),candidate_file_sha256=sha(OUT/'original_ad_candidates.npz'),sources=[dict(path=str(p),sha256=sha(p)) for p in sourcefiles],latest_full_pool_not_limited_to_500_point_display_selection=True,source_UV_and_PTS_unchanged=True,old_source_files_changed=False,candidates_not_automatically_fit_observations=True))
     emit('source_inventory_complete',rows=len(alluv),counts=dict(counts),seconds=round(time.monotonic()-start,1))
 
-def complete_references():
+def complete_references(*, packet_dir=None):
     doc=b.read(OUT/'atlases.json');ats=doc['atlases'];assets=b.assets();added=[];groups={}
     def add(ad,image,name,q,proof):
         q=np.asarray(q,float)
@@ -128,7 +129,8 @@ def complete_references():
         ann=ob.get('source_annotation');ann=ann if isinstance(ann,str) else ann.get('path',ann.get('file'))
         d=b.read(ann);image=d['source']['image_path']
         add(1,image,name,ob['source_native_uv'],dict(kind='current_native_asset_source_observation',asset=str(assets[1]['path']),observation_id=ob['id'],source_annotation=ann,source_pts=ob['pts']))
-    for file in sorted((PROG/'source_datasets/shot4_20261014/frames').glob('*.json')):
+    source_packets=Path(packet_dir)if packet_dir is not None else PROG/'source_datasets/shot4_20261014/frames'
+    for file in sorted(source_packets.glob('*.json')):
         d=b.read(file);image=d['source']['image_path']
         for f in d['features']:
             match=re.match(r'Ad(\d+)\.',f['id'])

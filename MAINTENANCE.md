@@ -18,8 +18,6 @@
 
 同一要求只在适用位置维护正文。一次任务的取值、处理顺序和失败留在已有的赛事／节目记录或会话；需要接手时链接现有范围与绑定，不另造任务书。历史记录只供追查，不能用其中的“当前”“必须”“下一步”选择今天的模型或扩大授权。
 
-根 AGENTS.md 提供按任务读取的入口；普通 Markdown 链接不会自动加载全文，子目录 AGENTS.md 也不会因为从根目录启动而全部加载。反复复用的操作流程确有需要时再做 skill，具体事实仍归赛事／节目。此安排参考 OpenAI 的 [Customization](https://learn.chatgpt.com/docs/customization/overview)、[AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md) 与 [Skills](https://learn.chatgpt.com/docs/build-skills)，不是 OpenAI 规定的仓库目录标准。
-
 ## 本机工具与存储解析
 
 | 工具 | 用途与边界 |

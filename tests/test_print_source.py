@@ -99,7 +99,11 @@ def test_arbitrary_image_preview_does_not_claim_a_verified_source_exposure(tmp_p
         'status': np.zeros(2, dtype=int), 'root_equality_px': np.zeros(2)}
     camera = {'image_width': 32, 'image_height': 24, 'source_id': 'declared_only', 'shot_id': 'test',
         'reference_pts': 0, 'time_base_num': 1, 'time_base_den': 12800,
-        'rig': [], 'controls': [], 'first_control_time': 0., 'control_dt': .02}
+        'rig': [1.,0.,0.,0.,1.,0.,0.,0.,1., 0.,0.,1., 1.,0.,0.,
+                0.,0.,0., .1,.1,.1, 0.,0.,0., 100.,2.,
+                16.,12.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.],
+        'controls': np.tile([0.,0.,np.log(100.)], (6,1)),
+        'first_control_time': -.04, 'control_dt': .02}
     data = {'instance_id': 'print_instance/test', 'paths': [{'id': 'test.top_edge',
         'role': 'panel_outer_boundary', 'xyz': [[0., 0., 0.], [1., 0., 0.]]}]}
     record = print_installation.source_view(data, {}, core, camera, image_path, 256, tmp_path)

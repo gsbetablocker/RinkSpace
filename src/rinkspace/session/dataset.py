@@ -306,11 +306,93 @@ def iter_current_observations(path, features, feature_indices, *, mask=None, pri
     require(count == len(feature_indices), 'Observation metadata row count differs from arrays')
 
 
+
+def verify_prepared_dependencies(root, manifest, *, purpose):
+    """Bind a current prepared revision to the bytes its consumers will read.
+
+    Only current snapshot dependencies are inspected. Provenance links to
+    historical production, original media and retired states are not followed.
+    Older structural fixtures without content identities retain their format.
+    """
+    expected = manifest.get('dependency_revision')
+    if expected is None:
+        return
+    require(isinstance(expected, dict), 'Malformed prepared dependency identity')
+    documents = {
+        'scope': manifest.get('scope_ref'), 'rigs': 'rigs.json', 'shots': 'shots.json',
+        'features': manifest.get('features_ref'), 'provenance': manifest.get('provenance_ref'),
+        'observations': manifest.get('observations_ref'), 'queries': manifest.get('query_constraints_ref'),
+        'parameter_layout': manifest.get('parameter_layout_ref'),
+        'factor_plan': manifest.get('factor_plan_ref'),
+        'parameter_dependencies': manifest.get('parameter_dependencies_ref'),
+    }
+    inspection_differences = []
+    for name, reference in documents.items():
+        if expected.get(name) is None:
+            continue
+        matches = reference is not None and digest(relative(root, reference)) == expected[name]
+        # Older prepare wrote the original scope file's hash but serialized its
+        # snapshot again. Whitespace/BOM differences are compatible only if the
+        # full scope semantics still reconstruct the saved revision below; do
+        # not read the original producer or replace its saved dependency hash.
+        if name == 'scope' and not matches:
+            continue
+        # An explicit review may inspect conflicting source metadata. This does
+        # not permit changed numeric inputs/cameras, or authorize those rows for
+        # fitting; surface the sidecar mismatch in the returned receipt.
+        if name == 'observations' and purpose == 'review' and not matches:
+            inspection_differences.append(name)
+            continue
+        require(matches,
+                'Prepared current dependency differs from its revision', dependency=name)
+    for reference, identity in expected.get('rig_assets', {}).items():
+        require(digest(relative(root, reference)) == identity,
+                'Prepared current camera dependency differs from its revision', dependency=reference)
+    if 'scene' in expected:
+        from ..domain.scene_assets import scene_content_identity
+        path = relative(root, manifest['scene_ref'])
+        require(scene_content_identity(read_json(path), path) == expected['scene'],
+                'Prepared current scene differs from its revision')
+    # The embedded registries are what numerical consumers use. Matching a
+    # sidecar hash alone would not detect an edited in-manifest registry.
+    for table in ('rigs', 'shots', 'features'):
+        if expected.get(table) is not None:
+            document = read_json(relative(root, documents[table]))
+            require(manifest.get(table) == document.get(table, []),
+                    'Prepared registry differs from its current snapshot', registry=table)
+    if expected.get('initial_parameters') is not None:
+        state = read_json(relative(root, manifest['initial_state_ref']))
+        desc = state['values_ref']
+        require(desc['sha256'] == expected['initial_parameters'],
+                'Prepared initial parameter identity changed')
+        load_array(root, desc, verify=True)
+    # Reconstruct the same content identity written by prepare. Do not accept
+    # updated hash descriptors, source clocks or activity under an old revision.
+    scope = read_json(relative(root, manifest['scope_ref']))
+    require(manifest['required_shot_ids'] == scope['required_shot_ids'],
+            'Prepared required shots differ from the current scope snapshot')
+    scope_status = ('complete' if set(manifest['selected_shot_ids']) == set(scope['required_shot_ids'])
+                    else 'subset')
+    require(manifest['scope_status'] == scope_status,
+            'Prepared scope status differs from the current scope snapshot')
+    identity = hashlib.sha256(json.dumps({
+        'input': manifest['input_revision'], 'selected': manifest['selected_shot_ids'],
+        'scope': scope, 'dependencies': expected, 'sources': manifest['sources'],
+        'shots': manifest['shots'], 'noise_groups': manifest['noise_groups'],
+        'model_configuration': manifest.get('model_configuration', {}),
+        'arrays': {k: v['sha256'] for k, v in manifest['arrays'].items()},
+    }, sort_keys=True, allow_nan=False).encode()).hexdigest()
+    require(identity == manifest['revision'], 'Prepared manifest differs from its content revision')
+    if inspection_differences:
+        manifest['review_identity_differences'] = inspection_differences
+
+
 def load_prepared(prepared_dir, *, purpose="fit", core=None):
     """Current-format structural load; does not rehash historical assets."""
     root = Path(prepared_dir).resolve()
     manifest = read_json(root / "manifest.json")
     require(manifest.get("schema") == "rinkspace.prepared.v1", "Unknown prepared format")
+    verify_prepared_dependencies(root, manifest, purpose=purpose)
     # These are the current prepared inputs, not historical producers. Reading
     # altered bytes under an unchanged revision would invalidate every later
     # state/prepared identity check, including read-only source overlays.
