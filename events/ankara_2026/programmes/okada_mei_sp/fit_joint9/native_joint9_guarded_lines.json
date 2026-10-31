@@ -1,0 +1,53 @@
+{
+  "schema": "rinkspace.native_joint9_candidate.v1",
+  "updated_utc": "2026-10-31T08:00:29.383843+00:00",
+  "status": "complete_video_candidate_for_source_review",
+  "source_interval_seconds": [
+    22.12,
+    188.68
+  ],
+  "native_exposures": 8329,
+  "fps": 50,
+  "observations": 1360063,
+  "scope": "S01-S09, three physical camera rigs, shared current native scene",
+  "source_admission_note": "Current source UV and identity corrections preserved. User subsequently authorized prior fullest S07-S09 records as source comparison; the earlier independent-only restriction was superseded.",
+  "prepared_problem": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\prepared_guarded_lines_corrected",
+  "frozen_problem": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\review_guarded_lines\\frozen_problem",
+  "full_state": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\review_guarded_lines\\frozen_state.npz",
+  "state_sha256": "5ed0c2d158e0ed262bddfd3f9b22e032bfbc5ef25d946853c1c51cd738488eea",
+  "compact_parameters": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_joint9\\native_joint9_guarded_lines.npz",
+  "compact_sha256": "ff9f73e7020f1eb3b8f212f04ed2a045fa5f45ffff6d3e3d9d7b25a14b51a17d",
+  "native_library": "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\native_core\\sm120\\dual_cycle\\rinkspace_core.dll",
+  "native_library_sha256": "01a4c74879e9024ee42b794562b0b00ba3aea0f88c055964d691b1471023fb4a",
+  "scene_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\field\\ice_tolerance_current.json",
+  "video": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\review_guarded_lines\\native_joint9_guarded_lines_complete.mp4",
+  "video_sha256": "3ce0628ab77ea1072e687dd7288bace0f35721a502213febaf91862ec14b9a57",
+  "video_verification": {
+    "decoded_frames": 8329,
+    "native_PTS_equal": true,
+    "display_speed": 1
+  },
+  "render_record": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\review_guarded_lines\\render_snapshot.json",
+  "source_visual_review": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\review_guarded_lines\\source_review.json",
+  "camera_physical_review": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\review_guarded_lines\\camera_physical_state.json",
+  "fit_log": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\joint_dual_cycle\\solve.jsonl",
+  "fit": {
+    "trials": 5,
+    "accepted": 3,
+    "final_cost": 4021229.730436427,
+    "stop_reason": "cost_progress_stagnation_without_convergence",
+    "native_controller_wall_ms": 97887.8589,
+    "stationarity_diagnostic_status": "nonconvergence_proved_by_free_coordinate"
+  },
+  "numerically_converged": false,
+  "whole_programme_accuracy_verified": false,
+  "user_visual_acceptance": false,
+  "performance_record": "D:/CodexData/RinkSpace_Data/runs/gpu_solver_20261029/gpu_solver_optimization.json",
+  "limitations": [
+    "CPU coupled-boundary correction still limits full-step performance; local exact-input acceleration is not a full-fit speed guarantee.",
+    "Nine-frame source review does not establish complete visible-feature recall or eliminate every wrong source point.",
+    "Camera mechanical/optical decomposition remains conditional; secondary/end envelope boundaries and the end axis-spacing lower bound remain active."
+  ],
+  "point_input_sha256": "cd73cb1ecb5091f2532502d2fefc7c56e7e69c46c0bd38300fde5a5b60086cd2",
+  "scene_sha256": "e71c4926d026d7bfdfa0972e47e2255b26703231e3f60d7eaee6886dc520adc7"
+}

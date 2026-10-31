@@ -30,13 +30,18 @@ def physical_width_axis(path):
     return np.array([-tangent[1],tangent[0]])
 
 
-def projected_width_profile(camera,path,query_uv,*,radius_px=90.,step_px=1.):
+def projected_width_profile(camera,path,query_uv,*,image_hw,radius_px=90.,step_px=1.):
     """Project a dense *physical* transverse section around a source search UV.
 
     ``offsets`` are search coordinates in locally scaled source pixels; they are
     not physical width measurements. ``world_offsets`` and ``source_uv`` retain
     the exact Brown-projected curve, including its nonuniform perspective scale.
+    ``image_hw`` is the actual decoded RGB shape, never a nominal source size.
     """
+    image_hw=np.asarray(image_hw)
+    if image_hw.shape!=(2,) or image_hw.dtype.kind not in 'iu' or np.any(image_hw<=0):
+        raise ValueError('Physical width requires positive integer decoded image height/width')
+    h,w=map(int,image_hw)
     query=np.asarray(query_uv,float).reshape(2)
     xy,valid=_ground(camera,query[None])
     if not valid[0]:return None
@@ -49,10 +54,10 @@ def projected_width_profile(camera,path,query_uv,*,radius_px=90.,step_px=1.):
     world_offsets=offsets/scale
     world_xy=xy[0]+world_offsets[:,None]*axis
     uv,depth=_project(camera,np.c_[world_xy,np.zeros(len(world_xy))])
-    valid=np.isfinite(uv).all(1)&(depth>.05)&(uv>=[0.,0.]).all(1)&(uv<=[1919.,1079.]).all(1)
+    valid=np.isfinite(uv).all(1)&(depth>.05)&(uv>=[0.,0.]).all(1)&(uv<=[w-1,h-1]).all(1)
     return dict(query_uv=query,query_world_xy=xy[0],physical_width_axis_xy=axis,
                 query_width_direction_uv=derivative/scale,offsets=offsets,
-                world_offsets=world_offsets,world_xy=world_xy,source_uv=uv,valid=valid)
+                world_offsets=world_offsets,world_xy=world_xy,source_uv=uv,valid=valid,image_hw=(h,w))
 
 
 def source_at_profile_offsets(profile,offsets):
@@ -73,6 +78,10 @@ def ground_midpoint_from_source_sides(camera,sides_uv):
 
 def sample_physical_width_field(rgb,profile,signal='dark',field=None):
     """Read native RGB on the exact projected section; no predicted values."""
+    if tuple(np.asarray(rgb).shape[:2])!=profile['image_hw']:
+        raise ValueError('Physical profile and decoded RGB image dimensions differ')
+    if field is not None and np.asarray(field).shape!=profile['image_hw']:
+        raise ValueError('Physical profile field and decoded RGB image dimensions differ')
     if field is None:
         rgb=np.asarray(rgb,np.float32)
         if signal=='dark':field=.2126*rgb[...,0]+.7152*rgb[...,1]+.0722*rgb[...,2]
@@ -85,14 +94,17 @@ def sample_physical_width_field(rgb,profile,signal='dark',field=None):
 
 def valid_profile_contributors(profile,exclusion_mask):
     """Require every bilinear source contributor in-frame and unexcluded."""
+    exclusion_mask=np.asarray(exclusion_mask,dtype=bool)
+    if exclusion_mask.shape!=profile['image_hw']:
+        raise ValueError('Physical profile exclusion mask and decoded RGB image dimensions differ')
     uv=np.asarray(profile['source_uv'],float)
     finite=np.isfinite(uv).all(1)
     floor=np.floor(np.where(np.isfinite(uv),uv,-100.)).astype(int)
-    h,w=np.asarray(exclusion_mask).shape
+    h,w=exclusion_mask.shape
     valid=np.asarray(profile['valid'],bool)&finite&(floor>=[0,0]).all(1)&(floor<=[w-2,h-2]).all(1)
     ids=np.flatnonzero(valid)
     for dy,dx in ((0,0),(0,1),(1,0),(1,1)):
-        valid[ids]&=~np.asarray(exclusion_mask,dtype=bool)[floor[ids,1]+dy,floor[ids,0]+dx]
+        valid[ids]&=~exclusion_mask[floor[ids,1]+dy,floor[ids,0]+dx]
     return valid
 
 

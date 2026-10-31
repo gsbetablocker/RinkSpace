@@ -4,6 +4,8 @@ The frozen model supplies a search region only. Material identity and UV are
 read from current paired blue/body/yellow topology; no model UV becomes data.
 This is a board-interface accuracy diagnostic, not full-scene certification.
 """
+
+from rinkspace.storage import resolve_asset
 from pathlib import Path
 from fractions import Fraction
 from collections import Counter,defaultdict
@@ -94,7 +96,7 @@ def evaluate(run,project,freeze_file,output,*,compiled_dir=None,gpu_dll=None,gpu
  import torch
  from rinkspace.vision_instances import SourcePersonBoxes,Sam2SourceInstances
  torch.set_num_threads(2);cv2.setNumThreads(1)
- detector=SourcePersonBoxes(project/'models/cache/yolo11n-pose.pt',dependency_paths=[project/'.venv-gpu/Lib/site-packages'],runtime_directory=out/'detector_runtime',device='cuda');provider=Sam2SourceInstances(project/'models/cache/sam2.1-hiera-tiny',device='cuda',reread_rgb=False,contour_stride=16)
+ detector=SourcePersonBoxes(resolve_asset(project, project/'models/cache/yolo11n-pose.pt'),dependency_paths=[resolve_asset(project, project/'.venv-gpu/Lib/site-packages')],runtime_directory=out/'detector_runtime',device='cuda');provider=Sam2SourceInstances(resolve_asset(project, project/'models/cache/sam2.1-hiera-tiny'),device='cuda',reread_rgb=False,contour_stride=16)
  if compiled_dir:
   from .joint_acceleration import install
   worlds=np.concatenate([scene.board(np.linspace(0,scene.perimeter,2049),scene.height*h) for h in (1.,0.)]);install(cg,frozen['model']['path'],out/'acceleration',worlds,compiled_dir,gpu_dll=gpu_dll,gpu_validation=gpu_validation)

@@ -17,12 +17,15 @@ def cone_program(tmp_path_factory):
         pytest.skip('existing C++ compiler required')
     directory = tmp_path_factory.mktemp('stationarity')
     code = (ROOT/'native/src/gpu_stationarity.cuh').read_text(encoding='utf-8')
-    code = code[code.index('template<class Equality>'):code.index('__global__ void lm_stationarity_project')]
+    code = code[code.index('inline int stationarity_free_coordinate_certificate'):code.index('__global__ void lm_stationarity_host_result')]
     cpp = directory/'cone.cpp'
     cpp.write_text('#include "rinkspace/core_types.hpp"\n#include <vector>\n#include <iostream>\n#include <iomanip>\nusing namespace rinkspace;\n'+code+r'''
-int main(){int q,m;std::cin>>q>>m;std::vector<double> g(q),a(size_t(q)*m),dual(m),p(q);std::vector<int> eq(m);
+int main(int argc,char** argv){int q,m;std::cin>>q>>m;std::vector<double> g(q),a(size_t(q)*m),dual(m),p(q);std::vector<int> eq(m);
  for(auto& x:g)std::cin>>x;for(auto& x:a)std::cin>>x;for(auto& x:eq)std::cin>>x;double certificate=0;
- bool ok=stationarity_cone(q,m,g.data(),a.data(),dual.data(),p.data(),[&](int i){return eq[i]!=0;},1e-12,certificate);
+ const bool sparse=argc>1&&std::string(argv[1])=="sparse",stop=argc>1&&std::string(argv[1])=="stop";
+ std::vector<int> offsets{0},columns;for(int i=0;i<m;++i){for(int j=0;j<q;++j)if(a[size_t(i)*q+j]!=0.)columns.push_back(j);offsets.push_back(int(columns.size()));}
+ if(argc>1&&std::string(argv[1])=="bound"){bool ok=stationarity_free_coordinate_norm(q,m,g.data(),a.data(),1e-7,certificate,p.data());std::cout<<ok<<' '<<std::setprecision(17)<<certificate;return 0;}
+ int checks=0;bool ok=stationarity_cone_interruptible(q,m,g.data(),a.data(),dual.data(),p.data(),[&](int i){return eq[i]!=0;},1e-12,certificate,nullptr,[&]{return stop&&++checks>=2;},nullptr,sparse?offsets.data():nullptr,columns.data());
  std::cout<<ok<<' '<<std::setprecision(17)<<certificate;for(double x:p)std::cout<<' '<<x;return 0;}
 ''', encoding='utf-8')
     executable = directory/('cone.exe' if os.name=='nt' else 'cone')
@@ -34,6 +37,7 @@ int main(){int q,m;std::cin>>q>>m;std::vector<double> g(q),a(size_t(q)*m),dual(m
     return executable
 
 
+@pytest.mark.parametrize('mode', ['dense','sparse'])
 @pytest.mark.parametrize('gradient,matrix,equality', [
     ([3.,0.], [[1.,0.]], [1]),
     ([3.,1.], [[1.,0.]], [1]),
@@ -54,11 +58,11 @@ int main(){int q,m;std::cin>>q>>m;std::vector<double> g(q),a(size_t(q)*m),dual(m
     ([3.,.11,2.], [[1.,0.,0.],[np.cos(.07),np.sin(.07),0.]], [1,1]),
     ([3.,.11,2.], [[1.,0.,0.],[-np.cos(.07),-np.sin(.07),0.]], [0,0]),
 ])
-def test_original_kernel_cone_matches_independent_cpu_oracle(cone_program, gradient, matrix, equality):
+def test_original_kernel_cone_matches_independent_cpu_oracle(cone_program, gradient, matrix, equality, mode):
     from scipy.optimize import minimize
     gradient=np.asarray(gradient);matrix=np.asarray(matrix).reshape(-1,len(gradient));equality=np.asarray(equality,bool)
     parts=[str(len(gradient)),str(len(matrix)),*map(str,gradient),*map(str,matrix.ravel()),*map(str,equality.astype(int))]
-    result=subprocess.run([str(cone_program)],input=' '.join(parts),text=True,capture_output=True,check=True,timeout=10)
+    result=subprocess.run([str(cone_program),mode],input=' '.join(parts),text=True,capture_output=True,check=True,timeout=10)
     values=np.fromstring(result.stdout,sep=' ')
     assert values[0]==1, result.stdout
     constraints=[]
@@ -70,6 +74,12 @@ def test_original_kernel_cone_matches_independent_cpu_oracle(cone_program, gradi
     assert oracle.success, oracle.message
     np.testing.assert_allclose(values[2:],oracle.x,atol=2e-11,rtol=0.)
     assert values[1]>=np.max(np.abs(values[2:]))
+
+
+def test_cancelled_projection_cannot_certify_convergence(cone_program):
+    result=subprocess.run([str(cone_program),'stop'],input='2 2 3 1 1 1 1 0 0 0',
+                          text=True,capture_output=True,check=True,timeout=10)
+    assert np.fromstring(result.stdout,sep=' ')[0]==0
 
 
 def optical_problem(*, offset, bound, coupled, solver_options=None):
@@ -117,9 +127,23 @@ def test_gpu_fixed_physical_coordinate_keeps_feasible_descent(coupled):
         def once(record):history.append(record);return False
         result=p.solve(progress=once)
         assert result['accepted']==1, result
-        assert history[0]['projected_gradient_before']>1.
-        assert result['projected_gradient_inf']==result['stationarity_diagnostics']['constraint_projected_gradient_inf']
-        assert 0.<result['projected_gradient_inf']<history[0]['projected_gradient_before']
+        before = history[0]['projected_gradient_before']
+        if history[0].get('stationarity_measure') == 'strict_nonconvergence_lower_bound':
+            assert before is None
+            assert not history[0]['full_nonlinear_kkt_checked']
+            before = history[0]['constraint_projected_gradient_lower_bound_before']
+        assert before > 1.
+        assert result['stop_reason']=='stopped_by_caller'
+        assert not result['numerically_converged']
+        assert result['stationarity_diagnostic_status']=='not_evaluated_after_caller_stop'
+        assert not result['full_nonlinear_kkt_checked']
+        assert result['projected_gradient_inf'] is None
+        assert result['constraint_projected_gradient_inf'] is None
+        assert result['stationarity_diagnostics']['status']=='not_evaluated_after_caller_stop'
+        assert not result['stationarity_diagnostics']['full_nonlinear_kkt_checked']
+        diagnostic=p.stationarity_diagnostics()
+        assert diagnostic['full_nonlinear_kkt_checked']
+        assert 0.<diagnostic['constraint_projected_gradient_inf']<before
         state=p.export_state();assert state['rig'][26]==50.
         assert state['rig'][27]>51.9
         assert p.solve()['numerically_converged']
@@ -274,3 +298,55 @@ def test_gpu_nonlinear_physical_boundary_uses_its_original_objective_gradient(fa
         p.configure_solver(lower=[],upper=[],device_budget_bytes=p.creation['free_after_alloc_bytes'],host_budget_bytes=2**30)
         return p
     assert_initial_constrained_optimum(make,[-1. if family=='mount' else 1.,0.])
+
+
+@pytest.mark.parametrize('gradient,matrix,expected', [
+    ([3.,4.],[[1.,0.]],4.),([9.,4.],[[1.,0.]],None),
+    ([3.,4.],np.empty((0,2)),4.),([0.,0.],[[1.,0.]],None),
+    ([3.,4.,20.],[[1.,0.,0.],[0.,1.,0.]],20.),
+    ([3.,4.,5.],[[1.,0.,0.],[0.,1.,0.]],None)])
+def test_free_coordinate_bound_is_exact_or_defers(cone_program,gradient,matrix,expected):
+    a=np.asarray(matrix);text=' '.join(map(str,[len(gradient),len(a),*gradient,*a.ravel(),*([0]*len(a))]))
+    r=subprocess.run([str(cone_program),'bound'],input=text,text=True,capture_output=True,check=True)
+    ok,norm=map(float,r.stdout.split())
+    assert bool(ok)==(expected is not None)
+    if expected is not None:assert norm==expected
+
+
+@pytest.mark.skipif(not os.environ.get('RINKSPACE_G4_LIBRARY'),reason='explicit CUDA/cuDSS library required')
+def test_free_coordinate_norm_preserves_physical_cone_and_joint_step(monkeypatch):
+    monkeypatch.setenv('RINKSPACE_STATIONARITY_BACKEND','cpu')
+    with optical_problem(offset=[3.,20.],bound=[50.,50.],coupled=False) as p:
+        oracle=p.stationarity_diagnostics()['constraint_projected_gradient_inf']
+    with optical_problem(offset=[3.,20.],bound=[50.,50.],coupled=False) as p:
+        history=[]
+        def once(record):history.append(record);return False
+        result=p.solve(progress=once)
+        assert result['accepted']==1
+        assert history[0]['projected_gradient_before']==pytest.approx(oracle,rel=1e-12,abs=1e-12)
+        assert history[0]['performance_cumulative']['stationarity_last_sweeps']==0
+        assert p.export_state()['rig'][26]==50.
+        # Explicit vector diagnostics must recompute the complete cone.
+        complete=p.stationarity_diagnostics(include_constraints=True)
+        assert complete['full_nonlinear_kkt_checked']
+        assert np.isfinite(complete['projected_retained_descent']).all()
+
+
+@pytest.mark.skipif(not os.environ.get('RINKSPACE_G4_LIBRARY'),reason='explicit CUDA/cuDSS library required')
+def test_free_coordinate_lower_bound_is_not_reported_as_full_gradient(monkeypatch):
+    monkeypatch.setenv('RINKSPACE_STATIONARITY_BACKEND','cpu')
+    with optical_problem(offset=[20.,3.],bound=[50.,np.inf],coupled=False) as p:
+        oracle=p.stationarity_diagnostics()['constraint_projected_gradient_inf']
+    with optical_problem(offset=[20.,3.],bound=[50.,np.inf],coupled=False) as p:
+        history=[]
+        def once(record):history.append(record);return False
+        result=p.solve(progress=once)
+        assert result['accepted']==1
+        record=history[0]
+        assert record['stationarity_measure']=='strict_nonconvergence_lower_bound'
+        assert record['projected_gradient_before'] is None
+        lower=record['constraint_projected_gradient_lower_bound_before']
+        assert 1e-6<lower<oracle
+        assert record['performance_cumulative']['stationarity_last_sweeps']==0
+        assert p.export_state()['rig'][26]>50.
+        assert not result['numerically_converged']

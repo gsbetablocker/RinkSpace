@@ -11,14 +11,19 @@ def dual_program(tmp_path_factory):
     compiler=shutil.which('g++') or shutil.which('cl')
     if compiler is None:pytest.skip('existing C++ compiler required')
     directory=tmp_path_factory.mktemp('projection_precision')
-    code=(ROOT/'native/src/gpu_solver.cuh').read_text(encoding='utf-8')
-    code=code[code.index('RS_HD inline double coupled_dual_residual'):code.index('__global__ void lm_coupled_dual')]
     cpp=directory/'dual.cpp'
-    cpp.write_text('#include "rinkspace/core_types.hpp"\n#include <vector>\n#include <iostream>\n#include <iomanip>\nusing namespace rinkspace;\n'+code+r'''
+    cpp.write_text('#include "rinkspace/coupled_dual.hpp"\n#include <vector>\n#include <iostream>\n#include <iomanip>\nusing namespace rinkspace;\n'+r'''
 int main(){int n;std::cin>>n;std::vector<double> g(n*n),b(n),d(n),e(n);
  for(auto& x:g)std::cin>>x;for(auto& x:b)std::cin>>x;for(auto& x:e)std::cin>>x;
- int sweeps=coupled_dual_minimize(n,n,g.data(),b.data(),d.data(),e.data());
- std::cout<<sweeps<<' '<<std::setprecision(17)<<coupled_dual_kkt(n,n,g.data(),b.data(),d.data(),e.data());
+ double kkt;int sweeps=coupled_dual_minimize(n,n,g.data(),b.data(),d.data(),e.data(),&kkt);
+ if(kkt!=coupled_dual_kkt(n,n,g.data(),b.data(),d.data(),e.data()))return 2;
+ const int stride=n+3;std::vector<double> padded(n*stride,std::numeric_limits<double>::quiet_NaN()),other(n);
+ for(int i=0;i<n;++i)for(int j=0;j<n;++j)padded[i*stride+j]=g[i*n+j];
+ double other_kkt;int other_sweeps=coupled_dual_minimize(n,stride,padded.data(),b.data(),other.data(),e.data(),&other_kkt);
+ if(sweeps!=other_sweeps||kkt!=other_kkt||d!=other)return 3;
+ double scale=1.;for(double value:b)scale=fmax(scale,fabs(value));
+ if(coupled_dual_unresolved(n,b.data(),kkt)!=(kkt>8*std::numeric_limits<double>::epsilon()*scale))return 4;
+ std::cout<<sweeps<<' '<<std::setprecision(17)<<kkt;
  for(auto x:d)std::cout<<' '<<x;return 0;}
 ''',encoding='utf-8')
     executable=directory/('dual.exe' if os.name=='nt' else 'dual')
@@ -62,3 +67,12 @@ def test_near_parallel_large_duals_do_not_loosen_primal_accuracy(dual_program,an
     assert np.all(dual[~eq]>=0)
     assert values[1]<2e-12,result.stdout
     assert np.min(a@point-b)>-2e-12
+
+
+def test_exhausted_dual_reports_the_last_computed_kkt(dual_program):
+    # Inconsistent equality faces exhaust the unchanged 4096-sweep attempt.
+    data='2 1 1 1 1 1 2 1 1'
+    result=subprocess.run([str(dual_program)],input=data,text=True,capture_output=True,check=True,timeout=10)
+    values=np.fromstring(result.stdout,sep=' ')
+    assert values[0]==4096
+    assert values[1]==1.

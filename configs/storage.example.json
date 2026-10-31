@@ -1,4 +1,10 @@
 {
   "schema_version": "rinkspace.storage.v1",
-  "data_root": "<absolute external Data directory>"
+  "data_root": "<absolute external Data directory>",
+  "legacy_paths": {
+    ".venv-gpu": "runtime_tools/vision_cuda",
+    ".venv-body": "runtime_tools/body_cuda",
+    "environments/body": "runtime_tools/body",
+    "models/cache": "cache/pretrained"
+  }
 }

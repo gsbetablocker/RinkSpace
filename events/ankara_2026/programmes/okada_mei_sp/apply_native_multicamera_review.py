@@ -66,6 +66,18 @@ def revise_observations(original, numeric_stations, manifest, path_ids, report):
     next_source_row = int(original['source_rows'].max()) + 1
     source_frames = set(map(int, original['pts']))
     ids = set(lookup)
+    path_lookup = {path: i for i, path in enumerate(path_ids)}
+    requested_groups = {(int(d['pts']), path_lookup[d['path_id']]) for d in additions}
+    existing_pixels = set()
+    if requested_groups:
+        requested_pts = [key[0] for key in requested_groups]
+        requested_paths = [key[1] for key in requested_groups]
+        possible = np.flatnonzero(keep & np.isin(z['pts'], requested_pts) & np.isin(z['path_indices'], requested_paths))
+        for i in possible:
+            group = (int(z['pts'][i]), int(z['path_indices'][i]))
+            if group in requested_groups:
+                existing_pixels.add((*group, *map(float, z['uv'][i])))
+    added_pixels = set()
     for number, d in enumerate(additions):
         _evidence(d)
         identity = d['observation_id']
@@ -74,7 +86,7 @@ def revise_observations(original, numeric_stations, manifest, path_ids, report):
         if int(d['pts']) != d['pts'] or d['pts'] not in source_frames:
             raise ValueError('Added point has no current source exposure')
         uv = _pixel(d['uv'])
-        path_index = path_ids.index(d['path_id'])
+        path_index = path_lookup[d['path_id']]
         shots = [s for s in manifest['shots'] if s['first_pts'] <= d['pts'] <= s['last_pts']]
         if len(shots) != 1:
             raise ValueError('Added point must belong to exactly one shot')
@@ -86,11 +98,12 @@ def revise_observations(original, numeric_stations, manifest, path_ids, report):
         station = float(d.get('station', .5))
         if not np.isfinite(station):
             raise ValueError('Invalid new station seed')
-        same = keep & (z['pts'] == d['pts']) & (z['path_indices'] == path_index)
-        if np.any(np.all(z['uv'][same] == uv, axis=1)):
+        pixel_key = (int(d['pts']), path_index, *map(float, uv))
+        if pixel_key in existing_pixels:
             raise ValueError('New point duplicates an existing measured pixel')
-        if any(r['pts'] == d['pts'] and r['path_id'] == d['path_id'] and r['uv'] == uv.tolist() for r in added_records):
+        if pixel_key in added_pixels:
             raise ValueError('Duplicate added measured pixel')
+        added_pixels.add(pixel_key)
         ids.add(identity)
         added_records.append(dict(d, uv=uv.tolist(), kind=kind, station=station,
                                   source_row=next_source_row + number, shot=shots[0]['id']))

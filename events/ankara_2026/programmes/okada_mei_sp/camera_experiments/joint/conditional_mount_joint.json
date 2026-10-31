@@ -1,0 +1,39 @@
+{
+  "schema": "rinkspace.camera_experiment.v1",
+  "id": "conditional_mount_joint",
+  "basis": {
+    "kind": "engineering_assumption",
+    "not_sony_measurement": true,
+    "description": "Conditional current-state experiment because the present Schur derivatives for lever_x, lever_y, lever_z, axis_spacing, pupil1 and pupil2 are weak. Omit only these six active chart directions and retain their supplied resume values as conditional assumptions; do not reset them to zero or replace them with historical values. This is not a Sony measurement or a calibrated installation. Keep the centered constant principal point, square-pixel assumptions, other optics and existing joint scene of square_center_pp_joint."
+  },
+  "active_camera_names": [
+    "R0_x",
+    "R0_y",
+    "R0_z",
+    "pan_axis_tangent1",
+    "pan_axis_tangent2",
+    "tilt_axis",
+    "pivot_x",
+    "pivot_y",
+    "pivot_z",
+    "k10",
+    "k11",
+    "k20",
+    "k21",
+    "p1",
+    "p2",
+    "readout",
+    "wide_k1",
+    "wide_k2",
+    "wide_p1",
+    "wide_p2"
+  ],
+  "fixed_rig_values": {
+    "eta": 0,
+    "cx_zoom": 0,
+    "cy_zoom": 0,
+    "cx": 959.5,
+    "cy": 539.5
+  },
+  "scene_mode": "joint_current"
+}

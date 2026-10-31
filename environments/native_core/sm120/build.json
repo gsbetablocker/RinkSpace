@@ -1,0 +1,123 @@
+{
+  "schema": "rinkspace.native_build.v1",
+  "date": "2026-10-29",
+  "library": "D:/OneDrive/codex_projs/RinkSpace/environments/native_core/sm120/rinkspace_core.dll",
+  "sha256": "30c517895661bf756a45dc27227d758f051e9e7a45fe22dc963515f37b5eced6",
+  "abi": 2,
+  "cuda_architecture": "120",
+  "cuda_fast_compile": "min",
+  "fp64": true,
+  "fmad": false,
+  "source_root": "D:/OneDrive/codex_projs/RinkSpace/native",
+  "frozen_source": "D:/CodexData/RinkSpace_Data/runs/gpu_solver_20261029/production_source",
+  "source_files": [
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "3b53c89dc1c4f71d04448c4713d0dd5978909964fa95f0f48e2b13e6bb914e0b"
+    },
+    {
+      "path": "include/rinkspace/box_stationarity.hpp",
+      "sha256": "6565331dcc8c02a5501294ad3bb11e7f8ee420b79718e3f26ae1b3184e3d42f8"
+    },
+    {
+      "path": "include/rinkspace/camera_chart.hpp",
+      "sha256": "93715d5338955b0f91e708408513252c4765c85f8501fe4253619c1b7ce19f71"
+    },
+    {
+      "path": "include/rinkspace/camera_envelope.hpp",
+      "sha256": "70cd9d7e00a54431946b6aafb06a59dc529746e8ac1b4711209e865c61793d88"
+    },
+    {
+      "path": "include/rinkspace/camera_state.hpp",
+      "sha256": "21648f13b47e2ff93648ccfc280d14e705f9256f220570c0ad74fa6653915198"
+    },
+    {
+      "path": "include/rinkspace/core_api.h",
+      "sha256": "32667e1c9c6e4df72c253679c58255f162dd412a8915ce59a69d0ccbd728b14a"
+    },
+    {
+      "path": "include/rinkspace/core_types.hpp",
+      "sha256": "019e09f224f79330c8c6724b9431adb470d2dc9f95a47b15dc936174889075e3"
+    },
+    {
+      "path": "include/rinkspace/entities.hpp",
+      "sha256": "0e13181f9cc5e4344f9565bcace9dac907f4f2b3c68feb32af909ecc3c7c7a62"
+    },
+    {
+      "path": "include/rinkspace/geometry.hpp",
+      "sha256": "177ca8fde7e58514e40736e4f61536edf8c1fcac66ed88979c3340e5300af9c5"
+    },
+    {
+      "path": "include/rinkspace/local_jet.hpp",
+      "sha256": "8b764927f701d16db871d96cf7bfea9ca34ebbc2eb211f63648f9a98b34a54de"
+    },
+    {
+      "path": "include/rinkspace/motion_derivatives.hpp",
+      "sha256": "7f30662dba0042023a6dec7600c8a1e5690ea64aadae815e24e484c4a214ac51"
+    },
+    {
+      "path": "include/rinkspace/projection.hpp",
+      "sha256": "677db4f77aa584df90be28fe1e1db954a7c551517126f77c587aab1997529336"
+    },
+    {
+      "path": "include/rinkspace/scene_derivatives.hpp",
+      "sha256": "977d10d7955f252c8a0d2b6a7d5a07ac6c81c7ee6ad4e793cd328667463c5301"
+    },
+    {
+      "path": "src/core_api.cpp",
+      "sha256": "dbe99d89f33523af94fc03c332e34c7c82954a074ebc6246aa3974bc2b80eaee"
+    },
+    {
+      "path": "src/core_gpu.cu",
+      "sha256": "68492407c65f0b082f90651574d0b14fe8ef7f0d348462c1a4dcc3cedc4d9b8b"
+    },
+    {
+      "path": "src/gpu_bounded_quadratic.cuh",
+      "sha256": "b6930fb2c8e5d33332f80b3472139a88b40d2b0c1bf053c62746a02744dabe19"
+    },
+    {
+      "path": "src/gpu_linearization.cuh",
+      "sha256": "35ddbb1979d422dedeb32b1622d29fe5d3933bcb04dd6e9f1c89f44bb81a6d91"
+    },
+    {
+      "path": "src/gpu_solver.cuh",
+      "sha256": "038beb18f870a7e12fddbfc60414cee5a636ba073a2a1bd22f4bfd28c70b7e9e"
+    },
+    {
+      "path": "src/gpu_station_refinement.cuh",
+      "sha256": "ba47243c01c3a69ff86d51a2d01069a4d0dd78cfcdb2a2779505469d03f60667"
+    },
+    {
+      "path": "src/gpu_stationarity.cuh",
+      "sha256": "534ece6d743e939be8b2a02324753dc3781eaffbf9c7796cf830a0c601979ecc"
+    },
+    {
+      "path": "tests/box_stationarity.cpp",
+      "sha256": "f209a0ac23c91e3c5e9d5de9bb6d1d152668dd825a0a3a5dd308d29ff7b45e30"
+    },
+    {
+      "path": "tests/core_smoke.cpp",
+      "sha256": "239c5b42f0f88b7f7b56a1f70c5f2cea9772468e28948d452f0c8c1249b82f6b"
+    }
+  ],
+  "build_log": "D:/CodexData/RinkSpace_Data/runs/gpu_solver_20261029/projection_cache_build.log",
+  "validation": {
+    "pytest": "D:/CodexData/RinkSpace_Data/runs/gpu_solver_20261029/tests_projection_cache.log",
+    "native": "D:/CodexData/RinkSpace_Data/runs/gpu_solver_20261029/ctest_projection_cache.log"
+  },
+  "inherited_constraint_fixes": [
+    "retain_original_descent",
+    "merge_pupil_vertex",
+    "check_dual_precision",
+    "distinct_cut_capacity"
+  ],
+  "performance_changes": [
+    "exact_nonzero_state_retraction",
+    "parallel_camera_retraction",
+    "parallel_cut_gram_assembly",
+    "parallel_stable_print_boundary_selection",
+    "reuse_station_projection_roots",
+    "finish_small_dual_at_existing_kkt_tolerance",
+    "per_camera_exposure_projection_context"
+  ]
+}

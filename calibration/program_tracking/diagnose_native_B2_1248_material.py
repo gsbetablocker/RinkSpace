@@ -13,7 +13,7 @@ records=[];canvas=np.full((1100,1900,3),245,np.uint8);crop=raw[400:610,1460:1920
 def mark(uv,color,radius=4):cv2.circle(overlay,tuple(np.rint((np.asarray(uv)-lo)*2).astype(int)),radius,color,-1)
 def line(points,color,width=1):cv2.polylines(overlay,[np.rint((np.asarray(points)-lo)*2).astype(int)],False,color,width)
 for row in feature['source_line_fit']['direct_readouts']:
- qi=row['source_evidence']['query_index'];profile=projected_width_profile(camera,path,row['source_evidence']['query_uv'],radius_px=90,step_px=1.)
+ qi=row['source_evidence']['query_index'];profile=projected_width_profile(camera,path,row['source_evidence']['query_uv'],image_hw=rgb.shape[:2],radius_px=90,step_px=1.)
  fields={signal:sample_physical_width_field(rgb,profile,signal) for signal in ('dark','blue')}
  choices=narrow_dark_paint(np.zeros(2),np.array([1.,0.]),profile['offsets'],fields['dark'],profile['valid']);choices.sort(key=lambda r:abs(r['uv'][0]));assert choices
  grey=restore_physical_profile_readout(camera,profile,choices[0]);evidence=grey['source_evidence'];sides=np.asarray(evidence['actual_source_sides_uv']);center=np.asarray(grey['uv']);width=np.linalg.norm(sides[1]-sides[0])

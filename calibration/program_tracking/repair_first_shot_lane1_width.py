@@ -19,10 +19,11 @@ class PhysicalLaneProfiles(NativeProfiles):
   super().__init__(rgb,source,exclusion);self.camera=camera
   f=np.asarray(self.frame.rgb,np.float32);self.luminance=.2126*f[...,0]+.7152*f[...,1]+.0722*f[...,2]
  def sample(self,path,guide,radius=90,spacing=55):
-  queries,_,_=_source_queries(path,guide,np.ones(len(guide)),(1080,1920),spacing,90)
+  h,w=self.frame.rgb.shape[:2]
+  queries,_,_=_source_queries(path,guide,np.ones(len(guide)),(h,w),spacing,90)
   rows=[]
   for k,query in enumerate(queries):
-   section=projected_width_profile(self.camera,path,query,radius_px=2.)
+   section=projected_width_profile(self.camera,path,query,image_hw=(h,w),radius_px=2.)
    if section is None:continue
    g0,g1=np.asarray(guide)[[0,-1]];v=g1-g0;v/=np.linalg.norm(v);normal=np.array([-v[1],v[0]])
    alignment=float(abs(section['query_width_direction_uv']@normal))
@@ -32,7 +33,7 @@ class PhysicalLaneProfiles(NativeProfiles):
    # cover just a few pixels across the visible band. Local reader offsets
    # are expressed in normal-coverage units so a 75 px wide-source gate is
    # not misapplied to a long, foreshortened physical section.
-   section=projected_width_profile(self.camera,path,query,radius_px=60./alignment,step_px=1./alignment)
+   section=projected_width_profile(self.camera,path,query,image_hw=(h,w),radius_px=60./alignment,step_px=1./alignment)
    if section is None or section['valid'].sum()<20:continue
    section['offsets']=section['offsets']*alignment
    values=sample_physical_width_field(self.frame.rgb,section,'dark',field=self.luminance)
@@ -61,7 +62,7 @@ class PhysicalLaneProfiles(NativeProfiles):
      continue
     support=source_at_profile_offsets(section,np.arange(np.ceil(lo),np.floor(hi)+1))
     context=np.vstack([support,np.asarray(e['actual_source_side_quantiles_uv']).reshape(-1,2)])
-    if (context<[0,0]).any()or(context>[1919,1079]).any():continue
+    if (context<[0,0]).any()or(context>[w-1,h-1]).any():continue
     ip=np.rint(context).astype(int)
     if self.mask[ip[:,1],ip[:,0]].any():continue
     e.pop('filled_house_band_is_not_an_outline',None)
@@ -84,8 +85,9 @@ def produce(indices):
  for index in indices:
   packet=read(RD/f'ice_candidates/{index:06}.json');source=packet['source'];path=dict(next(p for p in e.paths if p['curve_id']=='lane1:edge0'))
   guide,origin=e.guide(path,index)
-  inside=(guide>=[0,0]).all(1)&(guide<=[1919,1079]).all(1)
-  near=(guide>=[-30,-30]).all(1)&(guide<=[1949,1109]).all(1)
+  bgr=cv2.imread(source['image_path']);h,w=bgr.shape[:2]
+  inside=(guide>=[0,0]).all(1)&(guide<=[w-1,h-1]).all(1)
+  near=(guide>=[-30,-30]).all(1)&(guide<=[w+29,h+29]).all(1)
   if inside.sum()<2:
    if near.sum()<2:continue
    # The old camera is a search seed with a measured 8--14 px offset at
@@ -93,10 +95,10 @@ def produce(indices):
    # Move only the navigation line into the image; its RGB reading remains
    # mandatory and the shifted coordinate is never emitted as evidence.
    close=guide[near];shift=np.zeros(2)
-   if close[:,1].min()>1065:shift[1]=1065-close[:,1].min()
+   if close[:,1].min()>h-15:shift[1]=h-15-close[:,1].min()
    elif close[:,1].max()<14:shift[1]=14-close[:,1].max()
    guide=guide+shift;origin+=':offscreen_seed_search_halo_only'
-  bgr=cv2.imread(source['image_path']);broadcast,_=current_broadcast_exclusion(bgr);outside,_=current_ice_visible_domain(index)
+  broadcast,_=current_broadcast_exclusion(bgr);outside,_=current_ice_visible_domain(index)
   native=PhysicalLaneProfiles(cv2.cvtColor(bgr,cv2.COLOR_BGR2RGB),source,(cv2.imread(source['mask_path'],0)>0)|broadcast|outside,e.cameras[index])
   path['_line_identity_policy']=dict(current_identity_constrained=True,
    identity_source='8a28_named_lane1_long_edge_ground_width_section_current_source_material',reference_frame=index,

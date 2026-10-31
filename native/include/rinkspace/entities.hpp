@@ -1,5 +1,6 @@
 #pragma once
 #include "geometry.hpp"
+#include "ice_tolerance.hpp"
 #include <memory>
 
 namespace rinkspace {
@@ -466,12 +467,14 @@ inline Status sample_entity_path(const double* bp,size_t nb,int kind,
  * These are estimable geometry parameters, never observations or metre facts.
  */
 template<class T> RS_HD inline Status shared_entity_definition(const T* bp,size_t nb,const T* q,size_t nq,
-                                      int code,int& kind,T* out,size_t no,unsigned options=0){
+                                      int code,int& kind,T* out,size_t no,unsigned options=0,bool check_relations=true){
+    if(options&64u)return tolerant_shared_entity_definition(bp,nb,q,nq,code,kind,out,no,options,check_relations);
     using std::sin;using std::cos;using std::abs;using std::pow;
-    if(!bp||nb!=6||!q||(nq!=33&&nq!=35)||!out||!finite_array(q,nq)||(options&~31u))return Status::invalid_argument;
+    if(!bp||nb!=6||!q||(nq!=33&&nq!=35&&nq!=39)||!out||!finite_array(q,nq)||(options&~63u))return Status::invalid_argument;
     if(((options&4u)||(options&8u))&&!(options&2u))return Status::invalid_argument;
-    if((options&16u)&&(!(options&2u)||nq!=35))return Status::invalid_argument;
-    const bool ellipse=(nq==35&&(code==410||code==411));
+    if((options&16u)&&(!(options&2u)||nq<35))return Status::invalid_argument;
+    if((options&32u)&&nq!=39)return Status::invalid_argument;
+    const bool ellipse=(nq>=35&&(code==410||code==411));
     if(no!=(ellipse?8u:6u))return Status::invalid_argument;
     const BoardShapeValue<T> board{bp[0],bp[1],bp[2],bp[3],bp[4],bp[5]};
     if(!board.valid())return Status::invalid_argument;
@@ -513,6 +516,14 @@ template<class T> RS_HD inline Status shared_entity_definition(const T* bp,size_
         if(edge==0)return line({lane[2+row],hi,0},{lane[0],hi,0});
         if(edge==1)return line({lane[0],hi,0},{lane[0],lo,0});
         return line({lane[0],lo,0},{lane[2+row],lo,0});}
+    // Optional transverse marks. Option32 uses one common x for all four
+    // rows; the other three stored stations remain legacy inactive values.
+    // Both endpoints come from the corresponding lane's longitudinal sides.
+    if(code>=320&&code<324){
+        if(nq!=39)return Status::invalid_argument;
+        const int row=code-320;const T x=q[(options&32u)?35:35+row],y=y0+row*c[3];
+        if(x<lane[2+row]||x>lane[0])return Status::outside_support;
+        return line({x,y+lane[1]/2,0},{x,y-lane[1]/2,0});}
     if(code>=400&&code<=404){
         const T xs[]={0,-h[1],h[1],goals[0],goals[1]};const T x=xs[code-400];
         if(options&2u){SegmentValue<T> carrier{};const auto status=board.vertical_section(x,carrier);
@@ -527,7 +538,7 @@ template<class T> RS_HD inline Status shared_entity_definition(const T* bp,size_
         return circle(point(x[code-406],y[code-406]),h[2],0,2*pi);}
 
     if(code==410||code==411){const int side=code-410;
-        if(nq==35){const int axes=(options&16u)?0:side*2;
+        if(nq>=35){const int axes=(options&16u)?0:side*2;
             const T ax=e[axes],ay=e[axes+1],a0=side?pi/2:-pi/2;
             if(!(ax>0&&ay>0))return Status::invalid_argument;
             kind=6;store3(out,point(goals[side],0));out[3]=ax;out[4]=ay;out[5]=yaw;out[6]=a0;out[7]=a0+pi;return Status::ok;}
@@ -535,7 +546,7 @@ template<class T> RS_HD inline Status shared_entity_definition(const T* bp,size_
 
     if(code>=420&&code<=423){
         const int side=(code-420)/2;const T sign=side?1.:-1.,ysign=(code%2)?1.:-1.;
-        const T goal_half=e[nq==35?4:2],board_half=e[nq==35?5:3];
+        const T goal_half=e[nq>=35?4:2],board_half=e[nq>=35?5:3];
         if(!(goal_half>0&&board_half>0))return Status::invalid_argument;
         const T y=ysign*board_half;
         auto membership=[&](T x){const Vec3Value<T> p=point(x,y);const T u=std::max(T(0.),(abs(p.x)-(board.half_length-board.rx))/board.rx),v=std::max(T(0.),(abs(p.y)-(board.half_width-board.ry))/board.ry);return pow(u,board.exponent)+pow(v,board.exponent)-1.;};

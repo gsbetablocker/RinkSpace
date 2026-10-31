@@ -22,6 +22,7 @@ RS_HD inline double primal(LocalJet x){return x.a;}
 RS_HD inline LocalJet fmod(LocalJet x,LocalJet y){return {::fmod(x.a,y.a),x.v-::trunc(x.a/y.a)*y.v};}
 RS_HD inline LocalJet expm1(LocalJet x){return {::expm1(x.a),::exp(x.a)*x.v};}
 RS_HD inline LocalJet log(LocalJet x){return LocalJet(::log(x.a),x.v/x.a);}
+RS_HD inline LocalJet atan(LocalJet x){return LocalJet(::atan(x.a),x.v/(1+x.a*x.a));}
 RS_HD inline LocalJet abs(LocalJet x){return x.a<0?-x:x;}RS_HD inline bool isfinite(LocalJet x){return finite_scalar(x.a)&&finite_scalar(x.v);}
 RS_HD inline bool finite_scalar(LocalJet x){return finite_scalar(x.a)&&finite_scalar(x.v);}
 }

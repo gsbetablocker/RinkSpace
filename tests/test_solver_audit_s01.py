@@ -38,18 +38,18 @@ def test_compact_errors_and_selected_rows_equal_complete_evaluation():
         with pytest.raises(ValueError):p.evaluate_rows(np.array([p.count]))
 
 
-def test_tiny_cost_progress_with_nonzero_gradient_returns_nonconvergence():
+def test_tiny_overdamped_progress_recovers_before_claiming_convergence():
     with optical_problem(offset=[3.,2.],bound=[40.,60.],coupled=False,
                          solver_options=dict(damping_metric='jacobi',initial_lambda=1e10)) as p:
         records=[]
-        def progress(record):
-            records.append(record)
-            return len(records)<5 # Bound a regression of the previous bug.
-        result=p.solve(progress=progress,gradient_tolerance=1e-12,relative_cost_tolerance=1e-8)
-        assert result['stop_reason']=='cost_progress_stagnation_without_convergence'
-        assert not result['numerically_converged']
-        assert result['constraint_projected_gradient_inf']>1.
-        assert len(records)==1 and records[0]['summary']['accepted']
+        result=p.solve(progress=records.append,gradient_tolerance=1e-12,relative_cost_tolerance=1e-8)
+        assert result['numerically_converged']
+        assert result['constraint_projected_gradient_inf']<=1e-12
+        assert result['final_cost']<1e-20
+        assert result['performance_after']['damping_stagnation_recoveries']>0
+        assert len(records)>1 and records[0]['summary']['accepted']
+        assert records[0]['summary']['actual_decrease']<1e-8
+        assert records[-1]['summary']['lambda_used']<records[0]['summary']['lambda_used']
 
 
 def test_warm_station_refinement_and_final_global_search_keep_same_optimum():

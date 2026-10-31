@@ -4,6 +4,8 @@ Historical masks, body observations, rink and cameras remain unchanged. This
 presentation override is limited to the two user-reported severe losses.
 """
 from __future__ import annotations
+
+from rinkspace.storage import resolve_asset
 import argparse, hashlib, json, os, sys, time
 from pathlib import Path
 
@@ -11,8 +13,8 @@ ROOT=Path(__file__).resolve().parents[2]
 DATA=Path("D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp")
 OUT=DATA/"results/demo_full_20261016/v2"
 PACKET=DATA/"results/demo_last_shot_20261016/source_packet.npz"
-MODEL=ROOT / "models/cache/sam2.1-hiera-tiny"
-YOLO_MODEL=ROOT / "models/cache/yolo11n-pose.pt"
+MODEL=resolve_asset(ROOT, ROOT / "models/cache/sam2.1-hiera-tiny")
+YOLO_MODEL=resolve_asset(ROOT, ROOT / "models/cache/yolo11n-pose.pt")
 WINDOWS=((1300224,1306880),(1456384,1469952))
 FPS=50
 WH=(1920,1080)
@@ -131,7 +133,7 @@ def qa(source,targets,packed,rows,out):
 def build(samples=False):
     import cv2,numpy as np,torch
     cv2.setNumThreads(1);torch.set_num_threads(2)
-    sys.path.append(str(ROOT / ".venv-gpu/Lib/site-packages"))
+    sys.path.append(str(resolve_asset(ROOT, ROOT / ".venv-gpu/Lib/site-packages")))
     from ultralytics import YOLO
     from transformers import Sam2VideoModel,Sam2VideoProcessor
     OUT.mkdir(parents=True,exist_ok=True)

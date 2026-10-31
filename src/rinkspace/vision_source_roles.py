@@ -74,7 +74,7 @@ def organize_source_line_material_branches(readings, *, navigation_tangent_uv,
             pool.append(dict(query=query, branch=branch, original=item, uv=uv,
                 station=float(uv @ basis-center), value=float(uv @ normal), interval=interval))
         pools.append(pool)
-    covered = set(); seen_edges = set(); weights = np.zeros(len(readings), float)
+    covered = set(); seen_edges = set(); weights = np.zeros(len(readings), float); visible_intervals=[]
     for path in source_visible_paths:
         if (not isinstance(path, (list, tuple)) or not path
                 or any(type(i) is not int or not 0 <= i < len(readings) for i in path)):
@@ -87,10 +87,22 @@ def organize_source_line_material_branches(readings, *, navigation_tangent_uv,
             seen_edges.add(edge)
             distance = .5 * abs(station[last]-station[first])
             weights[first] += distance; weights[last] += distance
+            visible_intervals.append(sorted([float(station[first]),float(station[last])]))
         if len(path) == 1:
             weights[path[0]] = 1.
     if covered != set(range(len(readings))):
         raise ValueError('Every source query requires explicit visible path coverage')
+    # Explicit source-visible paths already separate foreground gaps. Use their
+    # union length for the distribution denominator; the absent physical span
+    # between those paths must not re-enter through a global station range.
+    # Geometry fitting below continues to use the unchanged physical stations.
+    visible_union=[]
+    for low,high in sorted(visible_intervals):
+        if visible_union and low<=visible_union[-1][1]:visible_union[-1][1]=max(high,visible_union[-1][1])
+        else:visible_union.append([low,high])
+    def visible_length_between(low,high):
+        return sum(max(0.,min(high,b)-max(low,a))for a,b in visible_union)
+    visible_station_span=visible_length_between(float(station.min()),float(station.max()))
     eligible = [i for i, pool in enumerate(pools) if pool]
     empty = dict(schema='rinkspace.source-line-material-role-organization.v1',
         source_geometry_role='line', actual_source_uv=np.empty((0, 2)),
@@ -179,8 +191,12 @@ def organize_source_line_material_branches(readings, *, navigation_tangent_uv,
         if overlap < .5*min(best['support'], row['support']):
             alternatives.append(row)
     rival = alternatives[0]['support'] if alternatives else 0.
+    selected_station=station[list(best['selected'])]
+    # Actual readouts across two clear fragments remain separated evidence of
+    # line direction even though the foreground interval supplies no length.
+    selected_station_span=float(np.ptp(selected_station))
     enough_span=(best['support'] >= minimum_source_span_fraction*weights.sum()
-        and np.ptp(station[list(best['selected'])]) >= minimum_source_span_fraction*np.ptp(station))
+        and selected_station_span >= minimum_source_span_fraction*visible_station_span)
     family_unique = best['support'] >= competing_support_ratio*rival and enough_span
     selected = best['selected'] if family_unique else {}
     rows, output, indices, branches, paths = [], [], [], [], []
@@ -215,5 +231,8 @@ def organize_source_line_material_branches(readings, *, navigation_tangent_uv,
         source_line_support_qualified=family_unique, readings=rows,
         actual_source_line_organizer=dict(basis=basis, normal=normal, station_center=center,
             coefficients=best['coef'], unique_source_support_length_px=best['support'],
+            source_visible_station_length_px=visible_station_span,
+            selected_actual_station_span_px=selected_station_span,
+            source_distribution_denominator_excludes_explicit_hidden_gaps=True,
             competing_family_support_length_px=rival, organizing_curve_is_not_output_measurement=True),
         global_source_line_organizer_ignores_local_contrast_dominance=True)

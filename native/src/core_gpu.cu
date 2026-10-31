@@ -5,6 +5,7 @@
 #include "rinkspace/camera_chart.hpp"
 #include "rinkspace/camera_envelope.hpp"
 #include "rinkspace/box_stationarity.hpp"
+#include "rinkspace/coupled_dual.hpp"
 #include "rinkspace/scene_derivatives.hpp"
 #include <tuple>
 #include <cuda_runtime.h>
@@ -58,7 +59,7 @@ RS_HD Status geometry_at(const View& v,size_t i,double station,Vec3& xyz,Vec3& t
     if(v.scene_paths){
         const auto& path=v.scene_paths[code];
         if(path.type==1){
-            auto st=shared_entity_definition(v.board,6,v.layout,v.nl,path.code,kind,parameters,(v.nl==35&&(path.code==410||path.code==411))?8:6,v.options);
+            auto st=shared_entity_definition(v.board,6,v.layout,v.nl,path.code,kind,parameters,(v.nl>=35&&(path.code==410||path.code==411))?8:6,v.options,false);
             if(st!=Status::ok)return st;return sample_entity_point(v.course,v.board[5],kind,parameters,nullptr,0,station,xyz,tangent);
         }
         if(path.type==2){
@@ -76,8 +77,8 @@ RS_HD Status geometry_at(const View& v,size_t i,double station,Vec3& xyz,Vec3& t
     }
     if(!((code>=100&&code<132)||(code>=200&&code<204)||(code>=300&&code<312)||(code>=400&&code<=415)))
         return static_cast<Status>(11);
-    const bool ellipse=v.nl==35&&(code==410||code==411);
-    auto st=shared_entity_definition(v.board,6,v.layout,v.nl,code,kind,parameters,ellipse?8:6,v.options);
+    const bool ellipse=v.nl>=35&&(code==410||code==411);
+    auto st=shared_entity_definition(v.board,6,v.layout,v.nl,code,kind,parameters,ellipse?8:6,v.options,false);
     if(st!=Status::ok)return st;
     return sample_entity_point(nullptr,v.board[5],kind,parameters,nullptr,0,station,xyz,tangent);
 }
@@ -145,9 +146,7 @@ RS_HD Status profile_projection(const View& source,size_t row,double station,Vec
     auto st=geometry_at(v,row,station,xyz,tangent);if(st!=Status::ok)return st;
     const auto rig=motion_rig(v.rig,v.nr==43?v.rig+38:nullptr);const MotionSpline spline{v.controls,v.nc,v.first,v.dt};
     st=project_motion(rig,spline,v.height,xyz,v.times[row],projection,v.projection_time_half);if(st!=Status::ok)return st;
-    double partials[8],weights[4];int cell;
-    st=motion_point_partials(rig,spline,v.height,xyz,tangent,v.times[row],projection,partials,cell,weights);
-    image_tangent={partials[3],partials[7]};return st;
+    return motion_station_partial(rig,spline,v.height,xyz,tangent,v.times[row],projection,image_tangent);
 }
 RS_HD Status resolve_profile(const View& v,size_t row,double& station,double& alpha,Vec3& xyz,Vec3& tangent,MotionProjection& projection,bool allow_alpha_extension=false){
     const double* p=v.profiles+17*v.profile_ids[row];station=v.stations[row];alpha=p[16];
@@ -267,13 +266,14 @@ RS_API int rs_g1_create(const double* board,size_t nb,const double* layout,size_
     void** handle,double* metrics,size_t nm){
     last_error.clear();if(handle)*handle=nullptr;
     const auto start=Clock::now();
-    if(!handle||!metrics||nm!=10||nb!=6||(nl!=33&&nl!=35)||(nr!=38&&nr!=43)||height<=1||!count||
+    if(!handle||!metrics||nm!=10||nb!=6||!shared_layout_size_valid(nl)||(nr!=38&&nr!=43)||height<=1||!count||
        !codes||!stations||!times||!observed||!finite_array(board,nb)||!finite_array(layout,nl)||
        !finite_array(rig,nr)||!motion_rig(rig,nr==43?rig+38:nullptr).valid()||
-       !MotionSpline{controls,nc,first,dt}.valid()||(options&~31u)||
-       ((options&16u)&&(!(options&2u)||nl!=35))){
+       !MotionSpline{controls,nc,first,dt}.valid()||!shared_options_valid(nl,options)){
         last_error="invalid G1 immutable problem";return 1;
     }
+    if(options&64u){int kind;double parameters[6];
+        if(shared_entity_definition(board,6,layout,nl,100,kind,parameters,6,options)!=Status::ok){last_error="invalid bounded ice geometry";return 1;}}
     std::unique_ptr<Problem> p;
     try {
         p.reset(new Problem);
@@ -459,6 +459,8 @@ RS_API int rs_gpu_attach_scene(void* handle,const double* values,size_t nv,const
             }
         }
         p->scene_paths=std::move(records);p->scene_data.assign(data,data+nd);p->scene_directions.assign(directions,directions+nj);p->scene_lower.assign(lower,lower+nv);p->scene_upper.assign(upper,upper+nv);p->scene_q=q;p->host.nscene=nv;
+        if(p->host.options&64u)for(size_t i=6+ice_nominal_size;i<6+ice_tolerance_layout_size;++i){
+            p->scene_lower[i]=std::max(p->scene_lower[i],-.01);p->scene_upper[i]=std::min(p->scene_upper[i],.01);}
         p->input.insert(p->input.end(),values,values+nv);p->d_scene_paths.upload(p->scene_paths,p->stream);p->d_scene_data.upload(p->scene_data,p->stream);
         cuda_check(cudaFree(p->device_input));p->device_input=nullptr;cuda_check(cudaMalloc(&p->device_input,p->input.size()*sizeof(double)));
         cuda_check(cudaMemcpyAsync(p->device_input,p->input.data(),p->input.size()*sizeof(double),cudaMemcpyHostToDevice,p->stream));cuda_check(cudaStreamSynchronize(p->stream));
@@ -639,7 +641,7 @@ RS_API int rs_g2_linearize(void* handle,int backend,double* summary,size_t ns,do
     try{
         if(backend==0){p->sync_host();l.cpu(p->host,summary);}
         else{
-            l.gpu_ready=false;
+            l.gpu_ready=false;++l.generation;
             cuda_check(cudaEventRecord(l.event[0],p->stream));
             if(l.device.scene_directions){scene_direction_kernel<<<(l.host.q+127)/128,128,0,p->stream>>>(p->device,l.device);scene_course_kernel<<<1,6,0,p->stream>>>(p->device,l.device);}
             if(l.device.rig_directions)rig_tangent_kernel<<<(l.host.q+127)/128,128,0,p->stream>>>(p->device,l.device);
@@ -649,12 +651,14 @@ RS_API int rs_g2_linearize(void* handle,int backend,double* summary,size_t ns,do
             cuda_check(cudaGetLastError());cuda_check(cudaEventRecord(l.event[2],p->stream));
             loss_kernel<<<(l.host.ng+127)/128,128,0,p->stream>>>(l.device,l.d_white.data,l.d_stats.data);
             cuda_check(cudaGetLastError());cuda_check(cudaEventRecord(l.event[3],p->stream));
-            corner_station_kernel<<<l.host.ncomponents,128,0,p->stream>>>(p->device,l.device,p->device_output,l.d_jac.data,l.d_white.data,l.d_stats.data);
-            whiten_kernel<<<l.host.ng,128,0,p->stream>>>(l.device,p->device_output,l.d_jac.data,l.d_white.data);
-            block_kernel<<<l.host.ncomponents,128,0,p->stream>>>(l.device,l.d_white.data,l.d_stats.data,l.d_h.data,l.d_g.data);
+            if(!l.scales.empty()){
+                corner_station_kernel<<<l.host.ncomponents,128,0,p->stream>>>(p->device,l.device,p->device_output,l.d_jac.data,l.d_white.data,l.d_stats.data);
+                whiten_corner_locals_kernel<<<l.host.ng,128,0,p->stream>>>(l.device,p->device_output,l.d_jac.data,l.d_white.data);
+            }
+            block_kernel<<<l.host.ncomponents,128,0,p->stream>>>(l.device,l.d_white.data,l.d_stats.data,l.h_values(),l.d_g.data);
             cuda_check(cudaGetLastError());
             cuda_check(cudaMemsetAsync(l.d_shared.data,0,l.d_shared.bytes(),p->stream));
-            shared_kernel<<<l.host.ncomponents,128,0,p->stream>>>(l.device,l.d_h.data,l.d_g.data,l.d_shared.data);
+            shared_kernel<<<l.host.ncomponents,128,0,p->stream>>>(l.device,l.h_values(),l.d_g.data,l.d_shared.data);
             cuda_check(cudaGetLastError());
             cuda_check(cudaMemsetAsync(l.d_summary.data,0,l.d_summary.bytes(),p->stream));
             summary_kernel<<<unsigned((std::max(p->host.n,size_t(l.host.ng))+127)/128),128,0,p->stream>>>(p->host.n,p->device_status,l.host.ng,l.d_stats.data,l.d_summary.data);
@@ -673,8 +677,8 @@ RS_API int rs_g2_export_sparse_blocks(void* handle,int backend,double* h,size_t 
     auto* p=static_cast<Problem*>(handle);if(!p||!p->linearization){last_error="missing G2 plan";return 1;}auto& l=*p->linearization;
     if((nh&&!h)||(ng&&!g)||!shared||nh!=l.h_count||ng!=l.g_count||nq!=l.host.nnz+l.host.q||(backend!=0&&backend!=1)||(backend==0?!l.cpu_ready:!l.gpu_ready)){last_error="invalid G2 explicit block export";return 1;}
     try{if(backend==0){std::copy(l.cpu_h.begin(),l.cpu_h.end(),h);std::copy(l.cpu_g.begin(),l.cpu_g.end(),g);std::copy(l.cpu_shared.begin(),l.cpu_shared.end(),shared);}
-        else{std::vector<double> packed(l.packed_h_count);
-            if(!packed.empty())cuda_check(cudaMemcpyAsync(packed.data(),l.d_h.data,packed.size()*sizeof(double),cudaMemcpyDeviceToHost,p->stream));
+        else{std::vector<double> packed(l.normal_storage_count());
+            if(!packed.empty())cuda_check(cudaMemcpyAsync(packed.data(),l.h_values(),packed.size()*sizeof(double),cudaMemcpyDeviceToHost,p->stream));
             if(ng)cuda_check(cudaMemcpyAsync(g,l.d_g.data,ng*sizeof(double),cudaMemcpyDeviceToHost,p->stream));cuda_check(cudaMemcpyAsync(shared,l.d_shared.data,nq*sizeof(double),cudaMemcpyDeviceToHost,p->stream));cuda_check(cudaStreamSynchronize(p->stream));
             for(const auto& c:l.components)for(int i=0;i<c.dim;++i)for(int j=0;j<c.dim;++j)h[c.h+size_t(i)*c.dim+j]=component_h(packed.data(),c,i,j);
         }return 0;
@@ -763,22 +767,30 @@ RS_API int rs_g4_request_stop(void* handle){
     p->stop_requested.store(true);return 0;
 }
 RS_API int rs_g4_stationarity_version(void){return 2;}
+RS_API int rs_g4_stationarity_cached_norm(void* handle,double* values,size_t n){
+    auto* p=static_cast<Problem*>(handle);if(!p||!p->solver||!p->linearization||!values||n!=5){last_error="invalid cached stationarity norm query";return 1;}
+    auto& s=*p->solver;auto& l=*p->linearization;bool valid=s.stationarity_valid&&l.gpu_ready&&s.stationarity_generation==l.generation;
+    values[0]=valid&&!s.stationarity_bound_only?1.:0.;values[1]=s.stationarity_projection_complete?1.:0.;
+    values[2]=s.stationarity_state_values[0];values[3]=s.stationarity_state_values[1];values[4]=s.stationarity_active_count;return 0;
+}
+RS_API int rs_g4_stationarity_cached_certificate(void* handle,double* values,size_t n){
+    auto* p=static_cast<Problem*>(handle);if(!p||!p->solver||!p->linearization||!values||n!=6){last_error="invalid cached stationarity certificate query";return 1;}
+    auto& s=*p->solver;auto& l=*p->linearization;bool valid=s.stationarity_valid&&l.gpu_ready&&s.stationarity_generation==l.generation;
+    values[0]=valid?1.:0.;values[1]=s.stationarity_projection_complete?1.:0.;
+    values[2]=s.stationarity_state_values[0];values[3]=s.stationarity_state_values[1];values[4]=s.stationarity_active_count;
+    values[5]=s.stationarity_projection_complete?1.:(s.stationarity_bound_only?3.:2.);return 0;
+}
 RS_API int rs_g4_stationarity_diagnostics(void* handle,double tolerance,double* out,size_t n){
     auto* p=static_cast<Problem*>(handle);last_error.clear();
     if(!p||!p->solver||!p->linearization||!out||n!=12||!finite_scalar(tolerance)||tolerance<=0){last_error="invalid stationarity diagnostic";return 1;}
     try{
         auto& solver=*p->solver;auto& lin=*p->linearization;
         if(!lin.gpu_ready){double summary[4],timings[8];int code=rs_g2_linearize(handle,1,summary,4,timings,8);if(code)return code;}
-        cuda_check(cudaMemsetAsync(solver.scalars.data,0,3*sizeof(double),p->stream));
-        const int count=std::max({lin.host.q,solver.view.nlocal,lin.host.ng});
-        lm_stationarity_start<<<(count+127)/128,128,0,p->stream>>>(lin.device,solver.view,lin.d_shared.data);
-        const std::atomic<bool> no_stop{false};solver.project_stationarity(p->device,lin.device,lin.d_shared.data,p->stream,tolerance,no_stop);
-        lm_stationarity<<<(count+127)/128,128,0,p->stream>>>(p->device,lin.device,solver.view,lin.d_g.data,lin.d_shared.data,lin.d_stats.data);
-        DeviceBuffer<double> metrics;metrics.allocate(8);cuda_check(cudaMemsetAsync(metrics.data,0,metrics.bytes(),p->stream));
+        double state[3];const std::atomic<bool> no_stop{false};solver.stationarity_state(p->device,lin,p->stream,tolerance,no_stop,state);
+        auto& metrics=solver.stationarity_metrics;cuda_check(cudaMemsetAsync(metrics.data,0,metrics.bytes(),p->stream));
         const int width=std::max({lin.host.q,solver.view.nlocal,solver.stationarity_active_count});
         lm_stationarity_metrics<<<(width+127)/128,128,0,p->stream>>>(p->device,lin.device,solver.view,lin.d_shared.data,lin.d_g.data,
             solver.stationarity_faces.data,solver.stationarity_active_count,solver.stationarity_matrix.data,solver.stationarity_dual.data,metrics.data);
-        double state[3];cuda_check(cudaMemcpyAsync(state,solver.scalars.data,sizeof(state),cudaMemcpyDeviceToHost,p->stream));
         cuda_check(cudaMemcpyAsync(out,metrics.data,metrics.bytes(),cudaMemcpyDeviceToHost,p->stream));cuda_check(cudaStreamSynchronize(p->stream));
         out[8]=state[0];out[9]=state[1];out[10]=solver.stationarity_active_count;out[11]=state[2];
         if(state[2]){last_error="stationarity projection failed; accepted state unchanged";return 23;}return 0;
@@ -790,18 +802,29 @@ RS_API int rs_g4_stationarity_export(void* handle,double* faces,size_t nf,double
     auto& solver=*p->solver;auto& lin=*p->linearization;size_t count=solver.stationarity_active_count,q=lin.host.q;
     if(nf!=24*count||nj!=count*q||ng!=2*q||(nf&&!faces)||(nj&&!jacobian)||!gradient){last_error="stationarity export shape";return 1;}
     try{
+        if(!solver.stationarity_valid||!solver.stationarity_projection_complete||!lin.gpu_ready||solver.stationarity_generation!=lin.generation){last_error="stationarity export requires a completed diagnostic for the current state";return 1;}
         if(count){DeviceBuffer<double> records;records.allocate(nf);
             lm_stationarity_export_faces<<<unsigned((count+127)/128),128,0,p->stream>>>(solver.stationarity_faces.data,int(count),solver.stationarity_dual.data,records.data);
             cuda_check(cudaMemcpyAsync(faces,records.data,nf*sizeof(double),cudaMemcpyDeviceToHost,p->stream));
             cuda_check(cudaMemcpyAsync(jacobian,solver.stationarity_matrix.data,nj*sizeof(double),cudaMemcpyDeviceToHost,p->stream));cuda_check(cudaStreamSynchronize(p->stream));}
         cuda_check(cudaMemcpyAsync(gradient,lin.d_shared.data+lin.host.nnz,q*sizeof(double),cudaMemcpyDeviceToHost,p->stream));
-        cuda_check(cudaMemcpyAsync(gradient+q,solver.residual.data,q*sizeof(double),cudaMemcpyDeviceToHost,p->stream));cuda_check(cudaStreamSynchronize(p->stream));return 0;
+        cuda_check(cudaMemcpyAsync(gradient+q,solver.stationarity_descent.data,q*sizeof(double),cudaMemcpyDeviceToHost,p->stream));cuda_check(cudaStreamSynchronize(p->stream));return 0;
     }catch(const std::exception& e){cudaStreamSynchronize(p->stream);last_error=e.what();return 23;}
 }
 RS_API int rs_g3_objective_timings(void* handle,double* values,size_t n){
     auto* p=static_cast<Problem*>(handle);last_error.clear();
     if(!p||!p->solver||!values||n!=6){last_error="invalid objective timing output";return 1;}
     std::copy(p->solver->objective_ms,p->solver->objective_ms+6,values);return 0;
+}
+// Cumulative host timing/counters; event spans remain in the existing step ABI.
+RS_API int rs_g4_performance_metrics(void* handle,double* values,size_t n){
+    auto* p=static_cast<Problem*>(handle);if(!p||!p->solver||!values||(n!=16&&n!=19)){last_error="invalid solver performance output";return 1;}
+    auto& s=*p->solver;double out[]={s.stationarity_wall_ms,double(s.stationarity_recomputations),double(s.stationarity_cache_hits),
+        s.stationarity_faces_ms,s.stationarity_cone_ms,s.stationarity_readback_ms,double(s.stationarity_active_count),double(s.stationarity_sweeps),
+        s.qp_line_wall_ms,double(s.qp_line_evaluations),s.trial_station_wall_ms,s.prediction_wall_ms,double(s.profile_restoration_calls),
+        double(s.trial_white.bytes()),double(s.envelope_projections),double(s.envelope_backtracks),
+        s.last_damping_energy,s.last_prediction,double(s.damping_recoveries)};
+    std::copy_n(out,n,values);return 0;
 }
 RS_API int rs_g4_solve(void* handle,const double* tol,size_t n,rs_lm_progress callback,void* context,double* out,size_t no){
     auto* p=static_cast<Problem*>(handle);last_error.clear();
@@ -812,7 +835,7 @@ RS_API int rs_g4_solve(void* handle,const double* tol,size_t n,rs_lm_progress ca
     auto& solver=*p->solver;auto& lin=*p->linearization;
     const int initial_trials=solver.trials,initial_accepted=solver.accepted;
     bool accepted_small=false,check_cost_progress=false;
-    double accepted_origin_cost=0.,accepted_prediction=0.;
+    double accepted_origin_cost=0.,accepted_prediction=0.,accepted_lambda=0.;
     double latest_step=0.,relative=0.,copies=0.,total_lin=0.,total_steps=0.;
     int linearizations=0;
     try{
@@ -822,25 +845,24 @@ RS_API int rs_g4_solve(void* handle,const double* tol,size_t n,rs_lm_progress ca
                 double v[4],t[8];int status=rs_g2_linearize(handle,1,v,4,t,8);if(status)return status;
                 lin_ms=t[0];total_lin+=lin_ms;copies+=32;++linearizations;
             }
-            cuda_check(cudaMemsetAsync(solver.scalars.data,0,3*sizeof(double),p->stream));
-            int stationarity_count=std::max({lin.host.q,solver.view.nlocal,lin.host.ng});
-            lm_stationarity_start<<<(stationarity_count+127)/128,128,0,p->stream>>>(lin.device,solver.view,lin.d_shared.data);
-            copies+=solver.project_stationarity(p->device,lin.device,lin.d_shared.data,p->stream,tol[0],p->stop_requested);
-            lm_stationarity<<<(stationarity_count+127)/128,128,0,p->stream>>>(p->device,lin.device,solver.view,lin.d_g.data,lin.d_shared.data,lin.d_stats.data);
-            cuda_check(cudaGetLastError());double state[3];
-            cuda_check(cudaMemcpyAsync(state,solver.scalars.data,sizeof(state),cudaMemcpyDeviceToHost,p->stream));
-            cuda_check(cudaStreamSynchronize(p->stream));copies+=sizeof(state);
+            double state[3];const auto stationarity_started=Clock::now();
+            try{copies+=solver.stationarity_state(p->device,lin,p->stream,tol[0],p->stop_requested,state,true);}
+            catch(const SolverStopped&){p->stop_requested.exchange(false);out[0]=3;break;}
+            const double stationarity_ms=millis(stationarity_started);
             out[4]=state[0];out[5]=state[1];
             if(state[2])throw std::runtime_error("original objective/constraint stationarity evaluation failed");
             if(p->stop_requested.exchange(false)){out[0]=3;break;}
             // A truncated/damped small step is not a stationarity certificate.
             // Recompute the projected gradient after acceptance before success.
             if(state[1]<=tol[0]){out[0]=accepted_small?1:0;break;}
-            // Re-evaluate after the callback's coordinate refinement. Tiny
-            // accepted decreases with a nonzero original projected gradient
-            // are stagnation, not convergence and not a reason to run forever.
-            if(check_cost_progress&&fabs(accepted_origin_cost-state[0])<=tol[2]*std::max(1.,fabs(accepted_origin_cost))&&
-               fabs(accepted_prediction)<=tol[2]*std::max(1.,fabs(accepted_origin_cost))){out[0]=4;break;}
+            // Re-evaluate after coordinate refinement. An over-damped tiny
+            // step is recoverable: retain the ordinary LM damping reduction.
+            // Only model stagnation not dominated by damping stops here.
+            if(check_cost_progress&&fabs(accepted_origin_cost-state[0])<=tol[2]*fabs(accepted_origin_cost)&&
+               fabs(accepted_prediction)<=tol[2]*fabs(accepted_origin_cost)){
+                if(solver.last_damping_energy>.5*accepted_prediction&&solver.lambda<accepted_lambda)++solver.damping_recoveries;
+                else{out[0]=4;break;}
+            }
             check_cost_progress=false;
             if(!finite_scalar(solver.lambda)||!finite_scalar(solver.nu))
                 throw std::runtime_error("LM damping overflow without convergence");
@@ -848,16 +870,16 @@ RS_API int rs_g4_solve(void* handle,const double* tol,size_t n,rs_lm_progress ca
             int status=rs_g3_step(handle,metrics,32,timings,12);
             if(status==25){p->stop_requested.exchange(false);last_error.clear();out[0]=3;break;}
             if(status)return status;
-            timings[11]=lin_ms;total_steps+=timings[0];timings[0]+=lin_ms;
+            timings[11]=lin_ms;total_steps+=timings[0];timings[0]+=lin_ms+stationarity_ms;
             copies+=metrics[23];latest_step=metrics[31];
             relative=fabs(metrics[12])/std::max(1.,fabs(metrics[1]));
             accepted_small=metrics[15]&&metrics[3]==1.&&latest_step<=tol[1]&&relative<=tol[2];
-            check_cost_progress=metrics[15]!=0.;accepted_origin_cost=metrics[1];accepted_prediction=metrics[11];
+            check_cost_progress=metrics[15]!=0.;accepted_origin_cost=metrics[1];accepted_prediction=metrics[11];accepted_lambda=metrics[0];
             if(callback)callback(metrics,timings,state[1],solver.numerical_rejections,context);
             // Rejected, unresolvable objective differences are reported explicitly,
             // never labelled as a successful small-step convergence.
             if(p->stop_requested.load())continue;
-            if(!metrics[15]&&metrics[16]!=4&&latest_step<=tol[1]&&metrics[8]==0&&
+            if(!metrics[15]&&metrics[16]!=4&&metrics[16]!=7&&latest_step<=tol[1]&&metrics[8]==0&&
                fabs(metrics[11])<=64*std::numeric_limits<double>::epsilon()*std::max(1.,fabs(metrics[1]))){
                 out[0]=2;break;
             }

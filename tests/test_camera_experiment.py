@@ -1,6 +1,8 @@
 """CPU-only contract tests for explicit camera ablations, not fit validation."""
 
 import copy
+import ast
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -174,6 +176,51 @@ class CameraExperimentTests(unittest.TestCase):
 
 
 class JointExperimentProtectionTests(unittest.TestCase):
+    def test_conditional_mount_removes_only_six_directions_and_retains_resume_values(self):
+        baseline = ce.read_camera_experiment(EXAMPLES / 'joint/square_center_pp_joint.json')
+        path = EXAMPLES / 'joint/conditional_mount_joint.json'
+        conditional = ce.read_camera_experiment(path)
+        omitted = {'lever_x', 'lever_y', 'lever_z', 'axis_spacing', 'pupil1', 'pupil2'}
+        self.assertEqual(conditional['active_camera_names'],
+                         [name for name in baseline['active_camera_names'] if name not in omitted])
+        self.assertEqual(conditional['fixed_rig_values'], baseline['fixed_rig_values'])
+        self.assertEqual(conditional['scene_mode'], 'joint_current')
+        self.assertTrue(conditional['basis']['not_sony_measurement'])
+        seed = rig()
+        original = seed.copy()
+        expected, baseline_indices, _ = ce.apply_camera_experiment(seed, baseline)
+        result, indices, metadata = ce.load_camera_experiment(path, seed)
+        np.testing.assert_array_equal(result, expected)
+        np.testing.assert_array_equal(result[18:24], original[18:24])
+        np.testing.assert_array_equal(seed, original)
+        self.assertEqual(set(metadata['inactive_retained_from_input']), omitted)
+        self.assertEqual(set(baseline_indices)-set(indices),
+                         {ce.CAMERA_NAMES.index(name) for name in omitted})
+
+    def test_multicamera_profile_loader_rejects_frozen_and_records_file_identity(self):
+        # Exercise the runner's exact small adapter without importing its
+        # native/GPU dependencies or entering solve().
+        path = EXAMPLES.parent / 'fit_native_multicamera.py'
+        tree = ast.parse(path.read_text(encoding='utf-8'))
+        node = next(node for node in tree.body if isinstance(node, ast.FunctionDef)
+                    and node.name == '_load_joint_camera_profile')
+        namespace = dict(Path=Path, hashlib=hashlib, load_camera_experiment=ce.load_camera_experiment)
+        exec(compile(ast.Module(body=[node], type_ignores=[]), str(path), 'exec'), namespace)
+        load = namespace['_load_joint_camera_profile']
+        selected = EXAMPLES / 'joint/conditional_mount_joint.json'
+        seed = rig()
+        result, indices, metadata = load(selected, seed)
+        self.assertEqual(metadata['profile_path'], str(selected.resolve()))
+        self.assertEqual(metadata['profile_file_sha256'], hashlib.sha256(selected.read_bytes()).hexdigest())
+        self.assertEqual(metadata['profile'], ce.read_camera_experiment(selected))
+        with tempfile.TemporaryDirectory() as folder:
+            frozen = Path(folder) / 'frozen.json'
+            frozen.write_text(json.dumps(profile()), encoding='utf-8')
+            original = seed.copy()
+            with self.assertRaisesRegex(ValueError, 'scene_mode=joint_current'):
+                load(frozen, seed)
+            np.testing.assert_array_equal(seed, original)
+
     def test_joint_baseline_directory_and_cross_profile_are_protected(self):
         with tempfile.TemporaryDirectory() as folder:
             root=Path(folder);config=root/'model.json';config.write_text(json.dumps(profile()),encoding='utf-8')

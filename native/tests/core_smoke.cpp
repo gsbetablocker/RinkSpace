@@ -1,6 +1,7 @@
 #include "rinkspace/core_api.h"
 #include "rinkspace/geometry.hpp"
 #include "rinkspace/camera_envelope.hpp"
+#include "rinkspace/motion_derivatives.hpp"
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -8,7 +9,142 @@
 
 static void require(bool yes,const char* why){if(!yes)throw std::runtime_error(why);}
 static void close(double x,double y,double tol,const char* why){require(std::abs(x-y)<tol,why);}
+
+// A large lens basis is not a large actual lens coefficient. This deliberately
+// exercises the same cancellation that an absolute-basis certificate misses,
+// while an independent pinhole/rotation oracle has an ordinary unique RS root.
+static void cancelled_zoom_rs_certificate(){
+    using namespace rinkspace;
+    constexpr int height=1080;constexpr double last=height-1,pan_rate=.05,tilt_rate=.08;
+    const double logf=std::log(1000.)-1.,focal=std::exp(logf);
+    const Vec3 xyz{2.4,.6,0.},tangent{.3,-.2,.1};
+    auto rotate=[=](Vec3 q,double t){
+        const double a=pan_rate*t,b=tilt_rate*t,px=std::cos(a)*q.x-std::sin(a)*q.y;
+        const double py=std::sin(a)*q.x+std::cos(a)*q.y;
+        return Vec3{px,std::cos(b)*py-std::sin(b)*q.z,std::sin(b)*py+std::cos(b)*q.z};
+    };
+    auto pinhole=[&](double time){
+        const Vec3 ray=rotate({xyz.x,xyz.y,xyz.z+3.},time);
+        return Vec2{960.+focal*ray.x/ray.z,539.5+focal*ray.y/ray.z};
+    };
+    for(int wide=0;wide<2;++wide){
+        MotionRig rig{};rig.R0={{1,0,0,0,1,0,0,0,1}};
+        rig.pan={0,0,1};rig.tilt={1,0,0};rig.pivot={0,0,-3};
+        rig.fref=1000.;rig.radius=2.;rig.cx=960.;rig.cy=539.5;
+        if(!wide){rig.k10=rig.k11=1000.;rig.k20=rig.k21=-1000.;}
+        else{
+            rig.wide_boundary=std::log(1000.);rig.k10=-1000.;rig.k20=1000.;
+            rig.wide_coefficients[0]=1000.;rig.wide_coefficients[1]=-1000.;
+            rig.p1=-25.;rig.p2=15.;rig.wide_coefficients[2]=25.;rig.wide_coefficients[3]=-15.;
+        }
+        double controls[24];
+        for(int i=0;i<8;++i){const double t=-2.+i;
+            controls[3*i]=pan_rate*t;controls[3*i+1]=tilt_rate*t;controls[3*i+2]=logf;}
+        MotionSpline spline{controls,8,-2.,1.};MotionCameraState centre{};
+        require(evaluate_motion_camera(rig,spline,0.,centre)==Status::ok,"cancelled lens snapshot");
+        require(std::abs(centre.camera.k1)+std::abs(centre.camera.k2)+
+            std::abs(centre.camera.p1)+std::abs(centre.camera.p2)<1e-8,"large bases cancel in actual lens");
+        require(std::abs(rig.k10)+std::abs(rig.k11)+std::abs(rig.wide_coefficients[0])>1000.,"regression retains large lens bases");
+        for(double tau:{-.02,.02}){
+            rig.tau=tau;double tiny=0.,whole=0.;
+            require(contraction_bound_window(rig,spline,xyz,0.,0.,height,tiny,true)==Status::ok,"zero-window actual-coefficient certificate");
+            require(contraction_bound_window(rig,spline,xyz,0.,std::abs(tau)/2,height,whole,true)==Status::ok,"whole-window cancelled-lens certificate");
+            require(tiny<=whole+1e-12&&whole<.01,"cancelled certificate tightens without waiving uniqueness");
+            MotionProjection root{};
+            require(project_motion(rig,spline,height,xyz,0.,root)==Status::ok,"cancelled lens has certified RS root");
+            double lo=0.,hi=last;
+            for(int i=0;i<80;++i){const double row=(lo+hi)/2;
+                if(row-pinhole(tau*(row/last-.5)).y>0)hi=row;else lo=row;}
+            const double row=(lo+hi)/2,time=tau*(row/last-.5);const Vec2 expected=pinhole(time);
+            close(root.row,row,1e-8,"independent cancelled-lens row root");
+            close(root.uv.x,expected.x,1e-8,"cancelled lens pinhole u");
+            close(root.uv.y,expected.y,1e-8,"cancelled lens pinhole v");
+            require(std::abs(root.equality)<1e-8,"cancelled lens predicted-row equality");
+            const Vec3 q{xyz.x,xyz.y,xyz.z+3.},ray=rotate(q,time),dx=rotate(tangent,time);
+            const double a=pan_rate*time,b=tilt_rate*time;
+            const double px=std::cos(a)*q.x-std::sin(a)*q.y,py=std::sin(a)*q.x+std::cos(a)*q.y;
+            const Vec3 velocity{-pan_rate*py,std::cos(b)*pan_rate*px-tilt_rate*ray.z,
+                std::sin(b)*pan_rate*px+tilt_rate*ray.y};
+            const double du_dt=focal*(velocity.x*ray.z-ray.x*velocity.z)/(ray.z*ray.z);
+            const double dv_dt=focal*(velocity.y*ray.z-ray.y*velocity.z)/(ray.z*ray.z);
+            const double du_ds=focal*(dx.x*ray.z-ray.x*dx.z)/(ray.z*ray.z);
+            const double dv_ds=focal*(dx.y*ray.z-ray.y*dx.z)/(ray.z*ray.z);
+            const double k=tau/last,den=1-k*dv_dt;
+            require(den>.99&&std::abs(k*dv_dt)<root.contraction,"independent implicit row derivative stays contractive");
+            Vec2 fast{};double full[8],weights[4];int cell=0;
+            require(motion_station_partial(rig,spline,height,xyz,tangent,0.,root,fast)==Status::ok,"cancelled lens station derivative");
+            require(motion_point_partials(rig,spline,height,xyz,tangent,0.,root,full,cell,weights)==Status::ok,"cancelled lens full derivative");
+            close(fast.x,du_ds+du_dt*k*dv_ds/den,1e-8,"independent implicit station u");
+            close(fast.y,dv_ds/den,1e-8,"independent implicit station v");
+            close(fast.x,full[3],1e-10,"cancelled full/contracted station u");
+            close(fast.y,full[7],1e-10,"cancelled full/contracted station v");
+            const double eps=1e-4;MotionProjection low{},high{};
+            require(project_motion(rig,spline,height,sub(xyz,mul(eps,tangent)),0.,low)==Status::ok,"cancelled station difference low");
+            require(project_motion(rig,spline,height,add(xyz,mul(eps,tangent)),0.,high)==Status::ok,"cancelled station difference high");
+            close(fast.x,(high.uv.x-low.uv.x)/(2*eps),2e-5,"cancelled station finite difference u");
+            close(fast.y,(high.uv.y-low.uv.y)/(2*eps),2e-5,"cancelled station finite difference v");
+            auto folded=rig;folded.k10-=4.;MotionInstant invalid{};Vec2 uv{};MotionProjection rejected{};
+            require(motion_instant(folded,spline,xyz,0.,invalid,uv)==static_cast<Status>(8),"actual nonmonotone lens rejected instantaneously");
+            require(project_motion(folded,spline,height,xyz,0.,rejected)==static_cast<Status>(8),"cancellation does not waive true optical fold");
+            for(double drift:{-1e-6,1e-6}){
+                double moving[24];std::copy(controls,controls+24,moving);
+                for(int i=0;i<8;++i)moving[3*i+2]+=drift*(-2.+i);
+                MotionSpline zoom{moving,8,-2.,1.};MotionProjection plain{},cached{};MotionProjectionContext context{};
+                prepare_motion_projection_context(rig,zoom,0.,context);
+                require(project_motion(rig,zoom,height,xyz,0.,plain)==Status::ok,"small signed zoom drift stays certified");
+                require(project_motion(rig,zoom,height,xyz,0.,cached,-1.,&context)==Status::ok,"cached signed zoom drift certificate");
+                close(cached.uv.x,plain.uv.x,1e-12,"drift cache u");close(cached.uv.y,plain.uv.y,1e-12,"drift cache v");
+                close(cached.row,plain.row,1e-12,"drift cache predicted row");
+                close(cached.contraction,plain.contraction,1e-12,"drift cache bound");
+                require(std::abs(plain.equality)<1e-8,"drift predicted-row equality");
+                for(int i=0;i<=16;++i){const double t=-.01+.02*i/16.;double kine[12];
+                    require(zoom.kinematics(t,kine)==Status::ok,"drift readout kinematics including endpoints");
+                    LocalJet tr[3];for(int c=0;c<3;++c)tr[c]=LocalJet(kine[c],kine[3+c]);
+                    MotionCameraStateValue<LocalJet> camera{};Vec2Value<LocalJet> value{};
+                    require(motion_camera_from_values(rig,tr,camera)==Status::ok,"drift actual signed optics");
+                    require(project_uv(camera.camera,Vec3Value<LocalJet>{xyz.x,xyz.y,xyz.z},value)==Status::ok,"drift analytic time derivative");
+                    require(std::abs(tau*value.y.v/last)<=plain.contraction,"window certificate covers actual endpoint/interior slope");
+                    MotionInstant before{},after{};Vec2 a_uv{},b_uv{};
+                    require(motion_instant(rig,zoom,xyz,t-eps,before,a_uv)==Status::ok,"drift time difference low");
+                    require(motion_instant(rig,zoom,xyz,t+eps,after,b_uv)==Status::ok,"drift time difference high");
+                    close(value.x.v,(b_uv.x-a_uv.x)/(2*eps),2e-5,"drift time finite difference u");
+                    close(value.y.v,(b_uv.y-a_uv.y)/(2*eps),2e-5,"drift time finite difference v");
+                }
+            }
+        }
+    }
+}
+
 int main(){try{
+    cancelled_zoom_rs_certificate();
+    {
+        rinkspace::MotionRig rig{};rig.R0={{1,0,0,0,1,0,0,0,1}};rig.pan={0,0,1};rig.tilt={1,0,0};rig.pivot={0,0,-3};
+        rig.fref=100;rig.radius=2;rig.cx=rig.cy=50;rig.k10=.02;rig.k11=-.001;rig.p1=.0003;
+        double controls[24];for(int i=0;i<8;++i){controls[3*i]=-.01+.003*i;controls[3*i+1]=-.02+.006*i;controls[3*i+2]=std::log(100.)+.001*i;}
+        rinkspace::MotionSpline spline{controls,8,-2.,1.};rinkspace::Vec3 tangent{.3,.7,.01};
+        for(double tau:{0.,.02,-.02})for(double y:{.1,4.}){
+            rig.tau=tau;rinkspace::Vec3 xyz{.2,y,0.};rinkspace::MotionProjection root{};
+            require(rinkspace::project_motion(rig,spline,101,xyz,.1,root)==rinkspace::Status::ok,"station tangent root");
+            rinkspace::MotionProjectionContext context{};rinkspace::prepare_motion_projection_context(rig,spline,.1,context);
+            rinkspace::MotionProjection cached{};
+            require(rinkspace::project_motion(rig,spline,101,xyz,.1,cached,-1.,&context)==rinkspace::Status::ok,"cached projection root");
+            close(cached.uv.x,root.uv.x,1e-12,"cache preserves u");close(cached.uv.y,root.uv.y,1e-12,"cache preserves v");
+            close(cached.row,root.row,1e-12,"cache preserves predicted row");close(cached.contraction,root.contraction,1e-12,"cache preserves uniqueness bound");
+            for(rinkspace::Vec3 invalid: {rinkspace::Vec3{0,0,-4},rinkspace::Vec3{20,20,0}}){
+                rinkspace::MotionProjection a{},b{};
+                require(rinkspace::project_motion(rig,spline,101,invalid,.1,a)==rinkspace::project_motion(rig,spline,101,invalid,.1,b,-1.,&context),"cache preserves optical/depth rejection");
+            }
+            double full[8],weights[4];int cell;rinkspace::Vec2 fast{};
+            require(rinkspace::motion_point_partials(rig,spline,101,xyz,tangent,.1,root,full,cell,weights)==rinkspace::Status::ok,"full motion partials");
+            require(rinkspace::motion_station_partial(rig,spline,101,xyz,tangent,.1,root,fast)==rinkspace::Status::ok,"contracted station partial");
+            close(fast.x,full[3],1e-10,"station partial preserves u");close(fast.y,full[7],1e-10,"station partial preserves v");
+            const double eps=1e-4;rinkspace::MotionProjection low{},high{};
+            require(rinkspace::project_motion(rig,spline,101,rinkspace::sub(xyz,rinkspace::mul(eps,tangent)),.1,low)==rinkspace::Status::ok,"station difference lower");
+            require(rinkspace::project_motion(rig,spline,101,rinkspace::add(xyz,rinkspace::mul(eps,tangent)),.1,high)==rinkspace::Status::ok,"station difference upper");
+            close(fast.x,(high.uv.x-low.uv.x)/(2*eps),2e-5,"station derivative finite difference u");
+            close(fast.y,(high.uv.y-low.uv.y)/(2*eps),2e-5,"station derivative finite difference v");
+        }
+    }
     {
         // z(u)=u^3-1.5*u^2+.5625*u has a maximum at .25 and minimum
         // at .75. Moving the cubic must update those two physical faces,

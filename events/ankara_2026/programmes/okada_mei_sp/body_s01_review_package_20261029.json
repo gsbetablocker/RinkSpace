@@ -1,0 +1,164 @@
+{
+  "schema": "rinkspace.body-review-package-selection.v1",
+  "event": "ankara_2026",
+  "programme": "okada_mei_sp",
+  "shot": "s01",
+  "package_basename": "body_s01_pro_review_20261029",
+  "source": {
+    "first_pts": 283136,
+    "last_pts": 575488,
+    "pts_step": 256,
+    "time_base_num": 1,
+    "time_base_den": 12800,
+    "target_exposures": 1143,
+    "lower_body_inferred_exposures": 125
+  },
+  "body_source_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+  ],
+  "body_modes": [
+    "fixed",
+    "pose",
+    "pose_contact"
+  ],
+  "footwear_stages": [
+    {
+      "id": "shoe_shared",
+      "directory": "footwear_v2/shared",
+      "observation_dataset": "footwear_v2",
+      "review": "footwear_s01_review_20261029.json",
+      "label_zh": "共享鞋体，腿部固定",
+      "selected": false
+    },
+    {
+      "id": "shoe_sparse",
+      "directory": "footwear_v2/articulated",
+      "observation_dataset": "footwear_v2",
+      "review": "footwear_s01_review_20261029.json",
+      "label_zh": "稀疏鞋轮廓＋腿部修正",
+      "selected": false
+    },
+    {
+      "id": "shoe_dense",
+      "directory": "footwear_v2/dense/articulated",
+      "observation_dataset": "footwear_v2/dense",
+      "review": "footwear_s01_dense_20261029.json",
+      "label_zh": "加密白鞋轮廓",
+      "selected": false
+    },
+    {
+      "id": "shoe_pose_white",
+      "directory": "footwear_v2/pose_transfer/observed_pose",
+      "observation_dataset": "footwear_v2/pose_transfer",
+      "review": "footwear_s01_dense_20261029.json",
+      "label_zh": "冻结鞋型，仅用新窗口白鞋轮廓调整姿态",
+      "selected": false
+    },
+    {
+      "id": "shoe_semantic",
+      "directory": "footwear_v2/semantic/articulated",
+      "observation_dataset": "footwear_v2/semantic",
+      "review": "footwear_s01_semantic_20261029.json",
+      "label_zh": "增补鞋头鞋跟后校准",
+      "selected": false
+    },
+    {
+      "id": "shoe_pose_semantic",
+      "directory": "footwear_v2/semantic_transfer/observed_pose",
+      "observation_dataset": "footwear_v2/semantic_transfer",
+      "review": "footwear_s01_pose_observations_20261029.json",
+      "label_zh": "最终开发候选：冻结鞋型＋新窗口方向语义",
+      "selected": true
+    }
+  ],
+  "programme_files": [
+    "body_s01_comparison_20261029.json",
+    "body_s01_parameters_20261029.npz",
+    "footwear_s01_comparison_20261029.json",
+    "footwear_s01_parameters_20261029.npz",
+    "footwear_s01_check_20261029.json",
+    "footwear_s01_dense_20261029.json",
+    "footwear_s01_geometry_check_20261029.json",
+    "footwear_s01_pose_observations_20261029.json",
+    "footwear_s01_review_20261029.json",
+    "footwear_s01_semantic_20261029.json",
+    "rebuild_scope.json",
+    "primary_source_selection.json"
+  ],
+  "images": [
+    "diagnostic_summary.png",
+    "opening_evidence.jpg",
+    "s01_source_overview.jpg",
+    "review_283136.jpg",
+    "review_321280.jpg",
+    "review_410368.jpg",
+    "review_461056.jpg",
+    "review_575488.jpg",
+    "detail_421888.png",
+    "detail_461056.png",
+    "footwear_v2/comparison_461056.png",
+    "footwear_v2/dense/source_qa_montage.png",
+    "footwear_v2/pose_transfer/check_336128.png",
+    "footwear_v2/pose_transfer/check_489216.png",
+    "footwear_v2/semantic_transfer/delivery/before_after_332800.png",
+    "footwear_v2/semantic_transfer/delivery/before_after_336128.png",
+    "footwear_v2/semantic_transfer/delivery/before_after_461056.png",
+    "footwear_v2/semantic_transfer/delivery/before_after_489216.png"
+  ],
+  "key_crop_pts": [
+    325120,
+    332800,
+    336128,
+    346624,
+    421888,
+    442880,
+    455680,
+    461056,
+    489216,
+    512000
+  ],
+  "footwear_npz_keep": [
+    "x",
+    "correction_knots",
+    "pts",
+    "equipment_uv",
+    "COCO_uv",
+    "nominal_blade_minimum_world_m",
+    "fit_frames"
+  ],
+  "historical_body_npz_keep": [
+    "x",
+    "position_knots",
+    "pts",
+    "P_world_m",
+    "G_world_m",
+    "Q_world",
+    "delta_local_rad",
+    "COCO_uv",
+    "blade_uv",
+    "source_fit_frames",
+    "source_qualified",
+    "heldout_frames",
+    "inferred"
+  ],
+  "review_questions_zh": [
+    "在相机冻结、骨盆也冻结的鞋体阶段，是否把原人体定位误差转移到了鞋型和局部腿姿态？",
+    "鞋部源轮廓的准入、物理左右脚身份、鞋头鞋跟定义是否充分且一致？",
+    "当前刚性鞋体和抛物线刀刃能否表达真实鞋跟块、安装高度、rocker、刃倾角和局部可见边？鞋后段卡下界意味着什么？",
+    "请核查残差单位、工程尺度、稀疏依赖、条件米制和停止条件，判断拟合曲线改善但开发检查未改善的原因。",
+    "应增加哪些有辨识力的原图观测或受控对照，才能允许接冰反馈给骨盆？",
+    "跨镜头人体约束尚未实现；在保持已满意场景质量的前提下，合理的后续接入边界是什么？"
+  ]
+}

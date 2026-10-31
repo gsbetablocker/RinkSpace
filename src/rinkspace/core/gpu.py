@@ -140,20 +140,27 @@ class ResidentResidualProblem:
 
     def configure_profiles(self, *, row_ids, numerator_u, numerator_v, denominator, alpha_bounds, station_bounds, initial_alpha, mode="exact"):
         """Attach immutable source rational cubics; query alpha is not a fitted variable."""
+        if mode not in ("exact","feasibility_restoration"):raise ValueError("unknown profile factor mode")
         ids=np.asarray(row_ids)
-        if ids.shape!=(self.count,) or ids.dtype.kind not in "iu":raise ValueError("one profile identity per source row is required")
-        ids=np.ascontiguousarray(ids,np.int32)
+        if (ids.shape!=(self.count,) or ids.dtype.kind not in "iu"
+                or np.any(ids<np.iinfo(np.int32).min) or np.any(ids>np.iinfo(np.int32).max)):
+            raise ValueError("profile identities require an int32-representable integer vector")
         a,b,d=[np.asarray(v,np.float64) for v in (numerator_u,numerator_v,denominator)]
+        if a.ndim!=2 or a.shape[1]!=4 or b.shape!=a.shape or d.shape!=a.shape:raise ValueError("rational cubic coefficient shape")
         count=len(a)
-        if a.shape!=(count,4) or b.shape!=a.shape or d.shape!=a.shape:raise ValueError("rational cubic coefficient shape")
+        if np.any(ids<-1) or np.any(ids>=count):raise ValueError("profile identity outside immutable source table")
+        ids=np.ascontiguousarray(ids,np.int32)
         ab=np.asarray(alpha_bounds,np.float64);sb=np.asarray(station_bounds,np.float64);seed=np.asarray(initial_alpha,np.float64)
         if ab.shape!=(count,2) or sb.shape!=(count,2) or seed.shape!=(count,):raise ValueError("profile finite domain shape")
         data=np.ascontiguousarray(np.c_[a,b,d,ab,sb,seed],np.float64)
-        fn=self._lib.rs_gpu_attach_profiles;fn.argtypes=[c.c_void_p,I,N,D,N];fn.restype=c.c_int
+        # Resolve both capabilities before attaching an immutable profile table.
+        # A Python validation/capability error must not leave a partial attach.
+        fn=self._lib.rs_gpu_attach_profiles
+        mode_fn=self._lib.rs_gpu_set_profile_mode
+        fn.argtypes=[c.c_void_p,I,N,D,N];fn.restype=c.c_int
+        mode_fn.argtypes=[c.c_void_p,c.c_int];mode_fn.restype=c.c_int
         self._check(fn(self._handle,ids.ctypes.data_as(I),ids.size,data.ctypes.data_as(D),data.size))
-        if mode not in ("exact","feasibility_restoration"):raise ValueError("unknown profile factor mode")
-        fn=self._lib.rs_gpu_set_profile_mode;fn.argtypes=[c.c_void_p,c.c_int];fn.restype=c.c_int
-        self._check(fn(self._handle,int(mode=="exact")))
+        self._check(mode_fn(self._handle,int(mode=="exact")))
         self.profile_count=count;self.profile_mode=mode
 
     def resolve_profile_roots(self, backend="cuda"):
@@ -167,6 +174,12 @@ class ResidentResidualProblem:
     def configure_scene_parameters(self, *, values, records, data, directions, lower=None, upper=None, charts=None):
         """Bind current scene state and immutable path/block references, then activate directions."""
         values,data,directions=[np.ascontiguousarray(a,np.float64) for a in (values,data,directions)]
+        records=np.asarray(records)
+        integral_records=(records.dtype.kind in "biu" or
+            (records.dtype.kind=="f" and np.isfinite(records).all() and np.equal(records,np.trunc(records)).all()))
+        if (not integral_records or np.any(records<np.iinfo(np.int32).min)
+                or np.any(records>np.iinfo(np.int32).max)):
+            raise ValueError("scene records require int32-representable integer identities")
         records=np.ascontiguousarray(records,np.int32)
         if values.ndim!=1 or data.ndim!=1 or records.ndim!=2 or records.shape[1]!=12:
             raise ValueError("common native scene shape")
@@ -175,16 +188,35 @@ class ResidentResidualProblem:
         lower=np.full(values.size,-np.inf) if lower is None else np.ascontiguousarray(lower,np.float64)
         upper=np.full(values.size,np.inf) if upper is None else np.ascontiguousarray(upper,np.float64)
         if lower.shape!=values.shape or upper.shape!=values.shape:raise ValueError("scene physical bound shape")
+        chart_fn=None
+        if charts is not None:
+            charts=np.asarray(charts)
+            if charts.shape!=values.shape:raise ValueError("scene chart shape")
+            integral_charts=(charts.dtype.kind in "biu" or
+                (charts.dtype.kind=="f" and np.isfinite(charts).all() and np.equal(charts,np.trunc(charts)).all()))
+            if not integral_charts or np.any(charts<0) or np.any(charts>5):
+                raise ValueError("scene chart codes must be integers from zero through five")
+            charts=np.ascontiguousarray(charts,np.int32)
+            # Mirror the existing native chart domain before attach, not after
+            # changing the handle. This does not introduce a new chart family.
+            if (not np.isfinite(values).all() or np.any(values[charts==1]<=0)
+                    or np.any(values[charts==2]<=1)):
+                raise ValueError("scene value outside coordinate chart")
+            for i in np.flatnonzero(charts>=3):
+                start=int(i)-int(charts[i]-3)
+                if (start<0 or start+2>=len(values)
+                        or not np.array_equal(charts[start:start+3],[3,4,5])
+                        or not 0<values[start]<values[start+1]<values[start+2]<1):
+                    raise ValueError("ordered radius chart mismatch")
+            chart_fn=self._lib.rs_gpu_set_scene_chart
+            chart_fn.argtypes=[c.c_void_p,I,N];chart_fn.restype=c.c_int
         fn=self._lib.rs_gpu_attach_scene
         fn.argtypes=[c.c_void_p,D,N,I,N,D,N,c.c_int,D,N,D,D];fn.restype=c.c_int
         self._check(fn(self._handle,values.ctypes.data_as(D),values.size,records.ctypes.data_as(I),records.size,
             data.ctypes.data_as(D),data.size,directions.shape[1],directions.ctypes.data_as(D),directions.size,
             lower.ctypes.data_as(D),upper.ctypes.data_as(D)))
-        if charts is not None:
-            charts=np.ascontiguousarray(charts,np.int32)
-            if charts.shape!=values.shape:raise ValueError("scene chart shape")
-            fn=self._lib.rs_gpu_set_scene_chart;fn.argtypes=[c.c_void_p,I,N];fn.restype=c.c_int
-            self._check(fn(self._handle,charts.ctypes.data_as(I),charts.size))
+        if chart_fn is not None:
+            self._check(chart_fn(self._handle,charts.ctypes.data_as(I),charts.size))
         self.scene_parameter_count=values.size
         return {"scene_parameters":values.size,"paths":len(records)}
 
@@ -606,11 +638,30 @@ class ResidentResidualProblem:
                            2:"nonpositive_prediction_or_no_feasible_step",3:"trial_domain_failure",
                            4:"repeated_active_set_retry_with_damping",
                            5:"accepted_decrease_after_conditional_local_completion",
-                           6:"accepted_decrease_after_bounded_joint_refinement"}[int(metrics["reason_code"])]
+                           6:"accepted_decrease_after_bounded_joint_refinement",
+                           7:"physical_constraint_restoration_retry_with_damping"}[int(metrics["reason_code"])]
         return {"summary":metrics,"timings":dict(zip(("wall_ms","bounds_setup_event_ms","damp_local_eliminate_event_ms",
             "cudss_analysis_event_ms","cudss_factor_event_ms","cudss_solve_event_ms","backsub_bounds_event_ms",
             "retract_prediction_event_ms","trial_objective_event_ms","summary_d2h_event_ms","accept_commit_event_ms",
             "linearization_wall_ms"),timings.tolist()))}
+
+    def performance_metrics(self):
+        """Cumulative native host timings and counters; no GPU readback."""
+        fn=getattr(self._lib,"rs_g4_performance_metrics",None)
+        if fn is None:return {}
+        fn.argtypes=[c.c_void_p,D,N];fn.restype=c.c_int
+        values=np.empty(19,np.float64)
+        status=fn(self._handle,values.ctypes.data_as(D),values.size)
+        if status==1:  # Compatibility with the first 16-field diagnostic ABI.
+            values=np.empty(16,np.float64)
+            status=fn(self._handle,values.ctypes.data_as(D),values.size)
+        self._check(status)
+        return dict(zip(("stationarity_wall_ms","stationarity_recomputations","stationarity_cache_hits",
+            "stationarity_faces_wall_ms","stationarity_cone_wall_ms","stationarity_readback_wall_ms",
+            "stationarity_active_faces","stationarity_last_sweeps","qp_line_wall_ms","qp_line_evaluations",
+            "trial_station_search_queued_wall_ms","prediction_event_ms","profile_restoration_calls",
+            "trial_residual_buffer_bytes","constraint_projections","constraint_backtracks",
+            "last_damping_energy","last_predicted_decrease","damping_stagnation_recoveries"),values.tolist()))
 
     def solve(self, *, gradient_tolerance=1e-7, step_tolerance=1e-6,
               relative_cost_tolerance=1e-10, progress=None, numerical_progress=None):
@@ -619,8 +670,10 @@ class ResidentResidualProblem:
         A stopped handle retains accepted state and damping for the next solve.
         Callback failures request a safe stop before propagating the exception.
         """
+        api_started=time.perf_counter()
         self._g2_backend("cuda")
         if not hasattr(self,"solver_info"):raise RuntimeError("G3 solver not attached")
+        performance_before=self.performance_metrics()
         callback_type=c.CFUNCTYPE(None,D,D,c.c_double,c.c_double,c.c_void_p)
         version_fn=getattr(self._lib,"rs_g4_stationarity_version",None)
         version=0
@@ -629,6 +682,19 @@ class ResidentResidualProblem:
         stationarity_scope=("declared_active_physical_tangent_cone" if version==2 else
                             "single_column_rig_boxes_and_station_boxes" if version==1 else
                             "legacy_raw_retained_gradient_and_station_boxes")
+        certificate_fn=getattr(self._lib,"rs_g4_stationarity_cached_certificate",None)
+        certificate_count=6
+        if certificate_fn is None:
+            certificate_fn=getattr(self._lib,"rs_g4_stationarity_cached_norm",None)
+            certificate_count=5
+        if certificate_fn is not None:
+            certificate_fn.argtypes=[c.c_void_p,D,N];certificate_fn.restype=c.c_int
+        def cached_stationarity_certificate():
+            values=np.zeros(6,np.float64)
+            if certificate_fn is not None:
+                self._check(certificate_fn(self._handle,values.ctypes.data_as(D),certificate_count))
+                if certificate_count==5:values[5]=1 if values[1] else 2
+            return values
         callback_errors=[]
         callback_wall_ms=0.
         diagnostic_bytes_before=self.diagnostic_download_bytes
@@ -640,10 +706,22 @@ class ResidentResidualProblem:
                 record=self._step_record(np.ctypeslib.as_array(summary,shape=(32,)).copy(),
                                          np.ctypeslib.as_array(timings,shape=(12,)).copy())
                 record["trial_objective_components_ms"]=self._objective_timings()
+                record["performance_cumulative"]=self.performance_metrics()
                 record["projected_gradient_before"]=float(gradient) # legacy compatible alias
                 record["stationarity_scope"]=stationarity_scope
                 record["full_nonlinear_kkt_checked"]=version==2
-                if version==2:record["constraint_projected_gradient_before"]=float(gradient)
+                if version==2:
+                    record["constraint_projected_gradient_before"]=float(gradient)
+                    # The certificate kind describes gradient_before even after
+                    # an accepted step invalidates its current-state generation.
+                    certificate_kind=int(cached_stationarity_certificate()[5])
+                    if certificate_kind in (2,3):
+                        record["full_projection_vector_computed"]=False
+                        record["full_nonlinear_kkt_checked"]=False
+                    if certificate_kind==3:
+                        record["projected_gradient_before"]=record["constraint_projected_gradient_before"]=None
+                        record["constraint_projected_gradient_lower_bound_before"]=float(gradient)
+                        record["stationarity_measure"]="strict_nonconvergence_lower_bound"
                 elif version==1:record["box_projected_gradient_before"]=float(gradient)
                 else:record["legacy_gradient_diagnostic_before"]=float(gradient)
                 record["numerical_factorization_rejections"]=int(numerical_rejections)
@@ -689,24 +767,83 @@ class ResidentResidualProblem:
         result["gradient_diagnostic_note"]=(
             "projected_gradient_* are legacy aliases; coupled and nonlinear constraint "
             "normals are not projected. A large diagnostic does not prove feasible descent.")
-        if version==2:
+        if int(out[0])==3:
+            # Stop can interrupt the controller before its cone projection.
+            # Read only the accepted-state objective; do not restart that work.
+            if version==2 and int(cached_stationarity_certificate()[5])==3:
+                result["controller_reported_gradient_lower_bound"]=result["projected_gradient_inf"]
+                result["controller_reported_gradient_inf"]=None
+            else:
+                result["controller_reported_gradient_inf"]=result["projected_gradient_inf"]
+            result["projected_gradient_inf"]=result["constraint_projected_gradient_inf"]=None
+            result["full_nonlinear_kkt_checked"]=False
+            result["stationarity_diagnostic_status"]="not_evaluated_after_caller_stop"
+            result["gradient_diagnostic_note"]="Caller stop skipped final tangent-cone projection; the controller-reported gradient measure is unverified for the returned state."
+            diagnostic_started=time.perf_counter()
+            result["final_cost"]=self.linearize("cuda")["summary"]["huber_cost"]
+            result["final_diagnostic_wall_ms"]=1000*(time.perf_counter()-diagnostic_started)
+            result["stationarity_diagnostics"]={
+                "status":"not_evaluated_after_caller_stop","full_nonlinear_kkt_checked":False,
+                "original_undamped_objective":True,"objective":result["final_cost"],
+                "constraint_projected_gradient_inf":None}
+        elif version==2:
             result["gradient_diagnostic_note"]="Original undamped objective; current declared physical constraint Jacobian and station tangent cone. No global optimum or camera calibration claim."
-            diagnostic=self.stationarity_diagnostics()
-            # A caller stop can interrupt the controller before its cone
-            # projection, leaving the raw gradient in that scratch slot.
-            # The completed, read-only check describes the returned state.
-            result["controller_reported_gradient_inf"]=result["projected_gradient_inf"]
+            diagnostic_started=time.perf_counter()
+            certificate=cached_stationarity_certificate()
+            certificate_kind=int(certificate[5])
+            if certificate_kind in (2,3) and result["numerically_converged"]:
+                raise RuntimeError("Native convergence requires the full stationarity projection vector")
+            if certificate[0] and certificate_kind in (2,3):
+                result["full_projection_vector_computed"]=False
+                result["full_nonlinear_kkt_checked"]=False
+                diagnostic={
+                    "full_projection_vector_computed":False,"full_nonlinear_kkt_checked":False,
+                    "stationarity_scope":stationarity_scope,"original_undamped_objective":True,
+                    "objective":float(certificate[2]),"active_constraint_count":float(certificate[4])}
+                if certificate_kind==2:
+                    result["stationarity_diagnostic_status"]="exact_norm_by_free_coordinate_bound"
+                    result["gradient_diagnostic_note"]=(
+                        "Original undamped objective; the free-coordinate maximum and the "
+                        "constrained-gradient L2 upper bound determine the exact projected "
+                        "infinity norm. This nonconverged-state diagnostic does not compute "
+                        "the full projection vector, KKT, dual, or feasibility residuals.")
+                    diagnostic["constraint_projected_gradient_inf"]=float(certificate[3])
+                else:
+                    result["stationarity_diagnostic_status"]="nonconvergence_proved_by_free_coordinate"
+                    result["constraint_projected_gradient_lower_bound"]=float(certificate[3])
+                    result["gradient_diagnostic_note"]=(
+                        "Original undamped objective; an unconstrained free coordinate "
+                        "strictly proves the projected infinity norm exceeds the declared "
+                        "gradient tolerance. Only a lower bound is known; the full projection "
+                        "norm, vector, KKT, dual, and feasibility residuals were not computed.")
+                    diagnostic["constraint_projected_gradient_inf"]=None
+                    diagnostic["constraint_projected_gradient_lower_bound"]=float(certificate[3])
+                diagnostic["status"]=result["stationarity_diagnostic_status"]
+            else:
+                diagnostic=self.stationarity_diagnostics(tolerance=gradient_tolerance)
+            result["final_diagnostic_wall_ms"]=1000*(time.perf_counter()-diagnostic_started)
+            if certificate_kind==3:
+                result["controller_reported_gradient_lower_bound"]=result["projected_gradient_inf"]
+                result["controller_reported_gradient_inf"]=None
+            else:
+                result["controller_reported_gradient_inf"]=result["projected_gradient_inf"]
             result["constraint_projected_gradient_inf"]=result["projected_gradient_inf"]=diagnostic["constraint_projected_gradient_inf"]
             result["final_cost"]=diagnostic.get("objective",result["final_cost"])
             result["stationarity_diagnostics"]=diagnostic
         elif version==1:result["box_projected_gradient_inf"]=result["projected_gradient_inf"]
         else:result["legacy_gradient_diagnostic_inf"]=result["projected_gradient_inf"]
+        result["native_controller_wall_ms"]=result["wall_ms"]
+        result["performance_before"]=performance_before
+        result["performance_after"]=self.performance_metrics()
+        result["solve_api_wall_ms"]=1000*(time.perf_counter()-api_started)
         result["callback_wall_ms"]=callback_wall_ms
         result["diagnostic_d2h_bytes_during_solve"]=self.diagnostic_download_bytes-diagnostic_bytes_before
         result["instrumented_d2h_bytes_during_solve"]=(
             result["explicit_application_d2h_bytes"]+result["diagnostic_d2h_bytes_during_solve"])
         result["timing_scope"]={"wall_ms_includes_callbacks":True,
                                 "candidate_wall_ms_excludes_callbacks":True,
+                                 "solve_api_wall_ms_includes_final_diagnostic":True,
+                                 "native_controller_wall_ms_excludes_final_diagnostic":True,
                                 "transfer_count_excludes_library_internal_transfers":True}
         result["tolerances"]={"gradient":gradient_tolerance,"step":step_tolerance,"relative_cost":relative_cost_tolerance}
         if callback_errors:raise callback_errors[0]

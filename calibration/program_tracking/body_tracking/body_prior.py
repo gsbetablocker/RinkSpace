@@ -17,6 +17,8 @@ inputs and shape are never joined across cuts or unknown-body gaps.
 """
 from __future__ import annotations
 
+from rinkspace.storage import resolve_asset
+
 import argparse
 import hashlib
 import json
@@ -44,7 +46,7 @@ except ImportError:
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
-GVHMR_ROOT = PROJECT_ROOT / "environments/body/GVHMR"
+GVHMR_ROOT = resolve_asset(PROJECT_ROOT, PROJECT_ROOT / "environments/body/GVHMR")
 GVHMR_CHECKPOINT = GVHMR_ROOT / "inputs/checkpoints/gvhmr/gvhmr_siga24_release.ckpt"
 HMR2_CHECKPOINT = GVHMR_ROOT / "inputs/checkpoints/hmr2/epoch=10-step=25000.ckpt"
 SMPLX_MODEL = GVHMR_ROOT / "inputs/checkpoints/body_models/smplx/SMPLX_NEUTRAL.npz"
@@ -507,7 +509,7 @@ def _upstream_runtime():
     import sys
     if not GVHMR_CHECKPOINT.is_file() or not HMR2_CHECKPOINT.is_file() or not SMPLX_MODEL.is_file():
         raise FileNotFoundError("Existing verified project GVHMR weights are missing")
-    expected_env = PROJECT_ROOT / ".venv-body"
+    expected_env = resolve_asset(PROJECT_ROOT, PROJECT_ROOT / ".venv-body")
     if not Path(sys.prefix).resolve().samefile(expected_env.resolve()):
         raise RuntimeError(f"Use existing GVHMR interpreter: {expected_env / 'Scripts/python.exe'}")
     if str(GVHMR_ROOT) not in sys.path:

@@ -41,4 +41,51 @@ class JointTimelineTest(unittest.TestCase):
             columns=[j for j,label in enumerate(labels) if label[0]==shot['id']]
             np.testing.assert_array_equal(directions[outside][:,:,columns],0.)
 
+def _clock_timeline(pts,ref=100,num=1,den=10,offset=0.):
+    shot=dict(row_begin=0,row_stop=len(pts),first_pts=int(np.min(pts)),
+        stop_pts_exclusive=int(np.max(pts))+1,reference_pts=ref,
+        time_base_num=num,time_base_den=den,control_begin=0,first_control_time=0.)
+    return ShotMotionTimeline([shot],1.,first=offset)
+
+
+class ClockTests(unittest.TestCase):
+    def test_unsigned_pre_reference(self):
+        pts=np.array([95,100,105],dtype=np.uint64)
+        np.testing.assert_array_equal(_clock_timeline(pts).row_times(pts),[-.5,0,.5])
+    def test_signed_difference_no_overflow(self):
+        pts=np.array([-10,-9],dtype=np.int64);ref=np.iinfo(np.int64).max
+        got=_clock_timeline(pts,ref=int(ref),num=1,den=1).row_times(pts)
+        np.testing.assert_array_equal(got,[float(int(v)-int(ref)) for v in pts])
+    def test_integer_multiplication_no_overflow(self):
+        pts=np.array([10**16,10**16+2],dtype=np.int64)
+        got=_clock_timeline(pts,ref=0,num=1000,den=1000).row_times(pts)
+        np.testing.assert_array_equal(got,[float(int(v)) for v in pts])
+    def test_pts_above_double_exact_range(self):
+        pts=np.array([2**53+1,2**53+2,2**53+3],dtype=np.int64)
+        np.testing.assert_array_equal(_clock_timeline(pts,ref=2**53,num=1,den=1).row_times(pts),[1,2,3])
+    def test_fractional_pts_rejected(self):
+        pts=np.array([95.25,100.5])
+        with self.assertRaises(ValueError):_clock_timeline(pts).row_times(pts)
+    def test_boolean_pts_rejected(self):
+        pts=np.array([False,True])
+        with self.assertRaises(ValueError):_clock_timeline(pts,ref=0).row_times(pts)
+    def test_noninteger_clock_rejected(self):
+        pts=np.array([1,2])
+        with self.assertRaises(ValueError):_clock_timeline(pts,num=1.5).row_times(pts)
+    def test_negative_timebase_rejected(self):
+        pts=np.array([1,2])
+        with self.assertRaises(ValueError):_clock_timeline(pts,num=-1).row_times(pts)
+    def test_signed_existing_clock_unchanged(self):
+        pts=np.array([283136,283392,283648],dtype=np.int64)
+        np.testing.assert_array_equal(_clock_timeline(pts,ref=283136,num=1,den=12800,offset=2).row_times(pts),[2,2.02,2.04])
+    def test_outside_shot_rejected(self):
+        pts=np.array([95,100]);t=_clock_timeline(pts);t.shots[0]['first_pts']=96
+        with self.assertRaises(ValueError):t.row_times(pts)
+    def test_multishot_order_preserved(self):
+        pts=np.array([1,2,100,105],np.uint64);t=_clock_timeline(pts)
+        t.shots=[dict(row_begin=0,row_stop=2,first_pts=1,stop_pts_exclusive=3,reference_pts=2,time_base_num=1,time_base_den=10),dict(row_begin=2,row_stop=4,first_pts=100,stop_pts_exclusive=106,reference_pts=105,time_base_num=1,time_base_den=10)]
+        for shot in t.shots:shot.update(control_begin=0,first_control_time=0)
+        np.testing.assert_array_equal(t.row_times(pts),[-.1,0,-.5,0])
+
+
 if __name__=='__main__':unittest.main()

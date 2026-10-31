@@ -69,7 +69,7 @@ def _batched_actual_profiles(frame, query_uv, normals, intervals, signals):
 
 
 def _actual_profile_candidates(point, normal, offsets, profile, smooth, *, operator, signal, transition,
-                               with_quantiles=False):
+                               with_quantiles=False, separate_bands=False):
     """Complete observed bands/interfaces, retaining all competing candidates."""
     if len(offsets) < 20:
         return []
@@ -91,12 +91,22 @@ def _actual_profile_candidates(point, normal, offsets, profile, smooth, *, opera
         active = mass > max(.25, noise)
         starts = np.flatnonzero(active & ~np.r_[False, active[:-1]])
         ends = np.flatnonzero(active & ~np.r_[active[1:], False])+1
+        reverse = mass < -floor
         merged = []
         for a, b in zip(starts, ends):
-            if merged and a-merged[-1][1] < 5:merged[-1][1] = int(b)
+            if (merged and a-merged[-1][1] < 5
+                    and (not separate_bands or not reverse[merged[-1][1]:a].any())):
+                merged[-1][1] = int(b)
             else:merged.append([int(a), int(b)])
         for a, b in merged:
             lo, hi = max(0, a-4), min(len(offsets)-1, b+4)
+            if separate_bands:
+                # A same-sign interface beyond a real reverse transition is
+                # another material edge, even inside the smoothing extension.
+                before = np.flatnonzero(reverse[lo:a])
+                after = np.flatnonzero(reverse[b:hi])
+                if len(before):lo += int(before[-1])+1
+                if len(after):hi = b+int(after[0])
             quantiles = quantile_interface(lo, hi, sign)
             if quantiles is None:continue
             uv = quantiles[1]
@@ -115,11 +125,23 @@ def _actual_profile_candidates(point, normal, offsets, profile, smooth, *, opera
     components = []
     for a, b in zip(starts, ends):
         if b-a < 3:continue
-        if components and a-components[-1][1]-1 <= 3:components[-1][1] = int(b)
+        if not separate_bands and components and a-components[-1][1]-1 <= 3:components[-1][1] = int(b)
         else:components.append([int(a), int(b)])
     sign = -1 if signal == "dark" else 1
-    for a, b in components:
+    for component_index, (a, b) in enumerate(components):
         lo, hi = max(0, a-10), min(len(offsets)-1, b+10)
+        if separate_bands:
+            # Returning to the measured background separates materials even
+            # when the bright gap is short. Keep each edge integration inside
+            # its own observed band; a second dark lobe is another candidate.
+            if component_index:
+                gap_start = components[component_index-1][1]+1
+                divider = gap_start+int(np.argmin(material[gap_start:a+1]))
+                lo = max(lo, divider)
+            if component_index+1 < len(components):
+                gap_stop = components[component_index+1][0]
+                divider = b+int(np.argmin(material[b:gap_stop]))
+                hi = min(hi, divider)
         mass = material[lo:hi+1]
         total = float(mass.sum())
         if total <= 0:continue
@@ -198,6 +220,32 @@ def ice_curve_inventory(scene, role_contract=None):
 
 def _source_queries(path, projected, depth, native_hw, spacing, radius):
     """Sample visible path search stations without converting samples to UV facts."""
+    if path.get('query_sampling') == 'continuous_arc_length':
+        from .session.projected_curve_queries import projected_curve_queries
+        points = np.asarray(projected, float)
+        good = np.isfinite(points).all(1) & np.isfinite(depth) & (depth > .05)
+        organized = projected_curve_queries(points, good, native_hw, spacing, radius,
+            closed=bool(path.get('closed', False)), center_uv=path.get('_projected_center'))
+        if path.get('profile_direction') == 'outward_radial':
+            points = organized['points_uv']
+            radial = points-np.asarray(path['_projected_center'])
+            length = np.linalg.norm(radial, axis=1)
+            keep = length > 4.
+            points, radial, length = points[keep], radial[keep], length[keep]
+            normal = radial/length[:, None]
+            intervals = np.c_[4.-length, np.full(len(length), radius)]
+            h, w = native_hw
+            # Uniform positions along the whole visible path still read along
+            # actual outward rays. Reclip those rays, not the old normals.
+            for axis, limit in ((0, w-1), (1, h-1)):
+                movement = np.abs(normal[:, axis]) > 1e-12
+                first = np.divide(4-points[:, axis], normal[:, axis], out=np.full(len(points), -np.inf), where=movement)
+                second = np.divide(limit-4-points[:, axis], normal[:, axis], out=np.full(len(points), np.inf), where=movement)
+                intervals[:, 0] = np.maximum(intervals[:, 0], np.minimum(first, second))
+                intervals[:, 1] = np.minimum(intervals[:, 1], np.maximum(first, second))
+            enough = intervals[:, 1]-intervals[:, 0] >= 20.
+            return points[enough], normal[enough], intervals[enough]
+        return organized['points_uv'], organized['normals'], organized['intervals']
     h, w = native_hw
     uv = np.asarray(projected, float)
     good = np.isfinite(uv).all(1) & np.isfinite(depth) & (depth > .05)
@@ -238,7 +286,12 @@ def _source_queries(path, projected, depth, native_hw, spacing, radius):
             point = start+distance*unit
             if output and np.linalg.norm(point-output[-1]) < spacing*.5:
                 continue
-            if path.get("_projected_center") is not None and (point-path["_projected_center"]) @ normal < 0:
+            if path.get('profile_direction')=='outward_radial':
+                radial=point-np.asarray(path['_projected_center'])
+                radial_length=float(np.linalg.norm(radial))
+                if radial_length<=4.:continue
+                normal_use=radial/radial_length
+            elif path.get("_projected_center") is not None and (point-path["_projected_center"]) @ normal < 0:
                 normal_use = -normal
             else:
                 normal_use = normal
@@ -247,6 +300,14 @@ def _source_queries(path, projected, depth, native_hw, spacing, radius):
     points = np.asarray(output, float).reshape(-1, 2)
     normals = np.asarray(normals, float).reshape(-1, 2)
     intervals = np.tile([-radius, radius], (len(points), 1)).astype(float)
+    if path.get('profile_direction')=='outward_radial' and len(points):
+        # An annulus ray starts inside the ring. Crossing its centre would
+        # read the opposite arc in reverse and swap inner/outer identities.
+        # The whole inside-to-outside ray is needed. A fixed-width strip can
+        # start inside a wide foreshortened annulus and misread pigment ripples
+        # as its entering interface, even though both reported edges are real
+        # RGB gradients. Frame clipping below still limits actual source data.
+        intervals[:,0]=4.-np.linalg.norm(points-path['_projected_center'],axis=1)
     # Fit the broad search into actually present native pixels with a halo.
     for axis, limit in ((0, w-1), (1, h-1)):
         movement = np.abs(normals[:, axis]) > 1e-12
@@ -275,11 +336,24 @@ class IceProgrammeSourceReader:
     """Single-stream complete ice measurement; no decode, solve, PNG or network."""
     def __init__(self, scene, *, source_sha256, time_base, role_contract=None,
                  sample_spacing_px=24., search_radius_px=128., use_batched_profiles=True,
-                 profile_backend='cpu'):
-        self.paths = ice_curve_inventory(scene, role_contract)
+                 profile_backend='cpu', native_paths=None, prepared_source_context=None, separate_bands=False):
+        self.paths = ice_curve_inventory(scene, role_contract) if native_paths is None else [dict(p) for p in native_paths]
+        if native_paths is not None:
+            required = {'curve_id','feature_id','world_curve_role','operator','material_signal','material_transition','native_path_id','xyz'}
+            if any(not required<=p.keys() for p in self.paths):raise ValueError('Incomplete native source-material inventory')
+            if len({p['native_path_id'] for p in self.paths})!=len(self.paths):raise ValueError('Duplicate native source path')
         self.source_sha256, self.time_base = source_sha256, time_base
+        self.prepared_source_context=prepared_source_context
+        if prepared_source_context is not None:
+            if (native_paths is None or prepared_source_context.get('source_sha256')!=source_sha256
+                    or prepared_source_context.get('time_base')!=time_base
+                    or not prepared_source_context.get('authority')):
+                raise ValueError('Prepared source context must bind this source, clock and explicit inventory authority')
         self.spacing, self.radius = float(sample_spacing_px), float(search_radius_px)
         self.use_batched_profiles = bool(use_batched_profiles)
+        self.separate_bands = bool(separate_bands)
+        if self.separate_bands and not self.use_batched_profiles:
+            raise ValueError("Separated band pairs require the complete batched source profiles")
         if profile_backend not in ('cpu', 'cuda'):
             raise ValueError('Source profile backend must be cpu or cuda')
         self.profile_backend = profile_backend
@@ -289,15 +363,15 @@ class IceProgrammeSourceReader:
         self.inventory = [{k: v for k, v in p.items() if k not in ("xyz", "center_xyz")}
                           for p in self.paths]
 
-    def read(self, rgb, pts, camera25, exclusion_mask, *, shot_id):
+    def read(self, rgb, pts, camera25, exclusion_mask, *, shot_id, native_projections=None):
         from calibration.program_tracking.projection import project_fast
         binding = dict(source_sha256=self.source_sha256, source_pts=pts,
                        time_base=self.time_base, native_hw=list(rgb.shape[:2]), shot_id=shot_id)
         from .feedback_runtime import SourceFeedbackRead
-        feedback = SourceFeedbackRead(binding,
+        feedback = (SourceFeedbackRead(binding,
             entity_ids=[p["feature_id"] for p in self._feedback_base_paths] + [p["curve_id"] for p in self._feedback_base_paths],
-            tags=["ice_paint", "measurement_operator"])
-        self.paths = feedback.apply_inventory(self._feedback_base_paths)
+            tags=["ice_paint", "measurement_operator"]) if self.prepared_source_context is None else None)
+        self.paths = feedback.apply_inventory(self._feedback_base_paths) if feedback is not None else [dict(p) for p in self._feedback_base_paths]
         self.inventory = [{k: v for k, v in p.items() if k not in ("xyz", "center_xyz")} for p in self.paths]
         frame = _MaterialProfileFrame(rgb, binding)
         rgb, binding = frame.rgb, frame.binding
@@ -308,10 +382,16 @@ class IceProgrammeSourceReader:
         curve_status = np.zeros(len(self.paths), np.uint8)
         batches = defaultdict(list)
         for ci, path in enumerate(self.paths):
-            projected, depth = project_fast(camera25, path["xyz"])
+            native_projection = None if native_projections is None else native_projections[path['native_path_id']]
+            if native_projection is None:
+                projected, depth = project_fast(camera25, path["xyz"])
+            else:
+                projected = np.asarray(native_projection['uv'])
+                depth = np.where(np.asarray(native_projection['valid']), 1., -1.)
             search_path = dict(path)
             if "center_xyz" in path:
-                search_path["_projected_center"] = project_fast(camera25, path["center_xyz"][None])[0][0]
+                search_path["_projected_center"] = (project_fast(camera25, path["center_xyz"][None])[0][0]
+                    if native_projection is None else np.asarray(native_projection['centre_uv']))
             points, normal, intervals = _source_queries(search_path, projected, depth, rgb.shape[:2], self.spacing, self.radius)
             if not len(points):
                 continue
@@ -348,7 +428,7 @@ class IceProgrammeSourceReader:
                     valid = valid_offsets[qi]
                     values = _actual_profile_candidates(query_uv[qi], query_normal[qi], offsets[qi, valid],
                         profiles[qi, valid], smoothed[qi, valid], operator=operator, signal=signal,
-                        transition=transition, with_quantiles=True)
+                        transition=transition, with_quantiles=True, separate_bands=self.separate_bands)
                     clean_count = 0
                     for uv, sides, source_bad, quantiles in values:
                         excluded = any(_candidate_context_excluded(exclusion, p, query_normal[qi]) for p in [uv, *sides])
@@ -428,6 +508,14 @@ class IceProgrammeSourceReader:
             visual_review_complete=False, projected_UV_used_as_measurements=False)
 
         result['resolved_measurement_roles'] = self.inventory
+        if feedback is None:
+            # The caller prepared and bound its rules once for this run.
+            # Each exposure still validates and measures its own original RGB.
+            result['consumed_case_sha256']=[]
+            result['consumed_fact_sha256']=[r['sha256'] for r in self.prepared_source_context['authority']]
+            result['source_feedback']=dict(status='prepared_source_context',context=self.prepared_source_context,
+                actual_native_RGB_sha256=frame.digest,history_replayed=False,fit_mutated=False)
+            return result
         result['consumed_case_sha256'] = sorted({ref['content_sha256'] for ref in feedback.used.values()})
         result['consumed_fact_sha256'] = sorted({ref['sha256'] for match in getattr(feedback, 'applicable', []) if match['case_id'] in feedback.used for ref in match['case'].get('evidence_refs', [])})
         result['source_feedback'] = feedback.finish(rgb, dict(

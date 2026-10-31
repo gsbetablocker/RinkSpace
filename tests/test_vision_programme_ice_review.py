@@ -70,3 +70,41 @@ def test_complete_inventory_keeps_all_house_layers_and_unresolved_path():
     assert [r['curve_id'] for r in inventory[:4]] == ['R1:'+r for r in ['outer', 'middle', 'inner', 'center']]
     assert inventory[-1]['operator'] == 'unresolved'
     assert all(not r['physical_identity_confirmed_by_navigation'] for r in inventory)
+
+
+def test_native_projection_is_only_a_query_and_never_the_measured_band():
+    rgb = np.full((180, 220, 3), 220, np.uint8)
+    rgb[62:83] = [115, 115, 170]
+    rgb = cv2.GaussianBlur(rgb, (0, 0), 1.)
+    path = dict(curve_id='B1:segment0', feature_id='B1', world_curve_role='segment0',
+        native_path_id='native/blue', xyz=np.array([[0., 0., 0.], [1., 0., 0.]]),
+        operator='paint_center', material_signal='blue', material_transition=None)
+    reader = IceProgrammeSourceReader(None, source_sha256='a'*64, time_base='1/90000',
+        sample_spacing_px=24., search_radius_px=40., native_paths=[path])
+    projection = {'native/blue':dict(uv=np.array([[30., 88.], [190., 88.]]), valid=np.ones(2, bool))}
+    result = reader.read(rgb, 100, None, np.zeros(rgb.shape[:2], bool), shot_id='synthetic',
+        native_projections=projection)
+    assert len(result['candidate_uv']) >= 4
+    np.testing.assert_allclose(result['candidate_uv'][:, 1], 72., atol=1.)
+    np.testing.assert_allclose(result['query_uv'][:, 1], 88.)
+    assert np.all(result['candidate_flags'] & 8)  # Pixel detection never names the entity.
+
+
+def test_prepared_source_rules_preserve_pixels_without_replaying_history(monkeypatch):
+    import rinkspace.feedback_runtime as feedback
+    rgb=np.full((180,220,3),220,np.uint8);rgb[62:83]=[115,115,170]
+    path=dict(curve_id='B1:segment0',feature_id='B1',world_curve_role='segment0',native_path_id='native/blue',
+        xyz=np.zeros((2,3)),operator='paint_center',material_signal='blue',material_transition=None)
+    kwargs=dict(source_sha256='a'*64,time_base='1/90000',sample_spacing_px=24.,search_radius_px=40.,native_paths=[path])
+    projection={'native/blue':dict(uv=np.array([[30.,88.],[190.,88.]]),valid=np.ones(2,bool))}
+    args=(rgb,100,None,np.zeros(rgb.shape[:2],bool))
+    old=IceProgrammeSourceReader(None,**kwargs).read(*args,shot_id='synthetic',native_projections=projection)
+    def unexpected(*args,**kwargs):raise AssertionError('prepared source must not rebuild history per exposure')
+    monkeypatch.setattr(feedback,'SourceFeedbackRead',unexpected)
+    context=dict(source_sha256='a'*64,time_base='1/90000',authority=[{'path':'test_authority','sha256':'b'*64}])
+    new=IceProgrammeSourceReader(None,**kwargs,prepared_source_context=context).read(*args,shot_id='synthetic',native_projections=projection)
+    for key in ('candidate_uv','candidate_side_quantiles_uv','candidate_flags','query_uv','query_normal'):
+        np.testing.assert_array_equal(new[key],old[key])
+    assert new['source_feedback']['history_replayed'] is False
+    with pytest.raises(ValueError,match='Prepared source context'):
+        IceProgrammeSourceReader(None,**kwargs,prepared_source_context={**context,'source_sha256':'c'*64})

@@ -11,8 +11,8 @@
 | 媒体工具 | PATH 中的 ffmpeg／ffprobe | `doctor` 报告实际路径 |
 | 当前 native CPU | C++17 编译器、CMake，运行 `scripts/build_core.py` | 同一几何与相机前向；[构建说明](../native/README.md) |
 | 当前 native CUDA／连续 LM | MSVC、CUDA；连续求解另需 cuDSS | 自有 C++／CUDA 路径，完整磁盘恢复尚未实现 |
-| 视觉 GPU | 本项目 `.venv-gpu` 与 `models/cache` | [本机隔离验证](gpu-local-validation.json)不等于取点准确性验收 |
-| 人体 | 本项目 `.venv-body` 与 `environments/body` | [上游与补丁身份](body-upstream-provenance.json)；完整推理及部分编译扩展仍有缺口 |
+| 视觉 GPU | Data 的 `runtime_tools/vision_cuda` 与 `cache/pretrained` | [原隔离验证](gpu-local-validation.json)不等于取点准确性验收；现位置见下文 |
+| 人体 | Data 的 `runtime_tools/body_cuda` 与 `runtime_tools/body` | [上游与补丁身份](body-upstream-provenance.json)；完整推理及部分编译扩展仍有缺口 |
 | 历史 Ceres 后端 | [rinkfit](../calibration/rinkfit/README.md)、[solve2](../calibration/solve2/native/README.md)、[原生 recipe](native-build-recipes-observed.json) | 与当前 native LM 的构建和状态合同分别解释 |
 | 历史 GTSAM | [独立候选配置](gtsam-reconstruction-candidate.yml) | NumPy 1.26／GTSAM 4.2.2 栈，与主 NumPy 2.x 分开，候选未验收 |
 
@@ -20,9 +20,18 @@
 
 ## 当前本机 GPU 与人体环境
 
-视觉解释器为 `.venv-gpu/Scripts/python.exe`，人体解释器为 `.venv-body/Scripts/python.exe`，包版本分别管理。SAM2／YOLO 位于 `models/cache`，GVHMR／PyTorch3D、人体权重和 ViTPose helper 位于 `environments/body`。这些环境及第三方大资产被 Git 忽略。
+视觉解释器为 `<Data>/runtime_tools/vision_cuda/Scripts/python.exe`，人体解释器为 `<Data>/runtime_tools/body_cuda/Scripts/python.exe`，包版本分别管理。SAM2／YOLO 等通用权重位于 `<Data>/cache/pretrained`，GVHMR／PyTorch3D 与人体上游源码位于 `<Data>/runtime_tools/body`；ViTPose helper 的源码与默认加载入口为仓库内 [source_helpers/run_vitpose_h.py](../calibration/program_tracking/body_tracking/source_helpers/run_vitpose_h.py)。旧逻辑地址 `.venv-gpu`、`.venv-body`、`models/cache` 和 `environments/body` 由 AssetStore 解析到 Data，不在 OneDrive 留运行副本。Data 根使用现有存储配置，不另设环境专用盘符。
 
-[gpu-local-validation.json](gpu-local-validation.json)记录 2026-10-25 的文件身份、包版本、实际模块／DLL 路径、CUDA／NVRTC 和本地模型加载检查，当前入口使用项目内资源。历史清单中的其他项目路径是来源地址。系统 Python、NVIDIA 驱动和 CUDA 工具链仍是外部系统依赖；隔离验证不覆盖空白 Windows 编译或完整人体推理。
+[gpu-local-validation.json](gpu-local-validation.json)保留 2026-10-25 的文件身份、包版本、当时模块／DLL 路径和本地模型加载检查；2026-10-30 的 Data 迁移记录保存在 Data 的 `maintenance/gpu_to_data_20261030`。历史清单中的路径是当时的来源地址，不是当前运行入口。系统 Python、NVIDIA 驱动和 CUDA 工具链仍是外部系统依赖；迁移不重新安装或升级它们。
+
+FootMR、CoTracker 的固定源码子集、逐文件 SHA、FootMR 的本地 namespace 接线及 RTMW／FootMR／CoTracker 权重来源保存在 [body-runtime-sources.json](body-runtime-sources.json)。[prepare_body_sources.py](prepare_body_sources.py) 默认只检查现有文件；追加 `--fetch` 才取得缺失的固定版本源码，不覆盖已有不同字节，也不安装包或下载权重：
+
+~~~console
+python -B environments/prepare_body_sources.py --data-root <外部Data绝对路径>
+python -B environments/prepare_body_sources.py --data-root <外部Data绝对路径> --fetch
+~~~
+
+该入口恢复当前选用的源码子集与接线，不表示完整人体环境已在空白机器验证。上游及权重许可分别见[第三方记录](../docs/THIRD_PARTY_ASSETS.md)。
 
 当前连续 GPU LM 使用项目内 `environments/cudss/0.8-cu13`，身份见 [cudss-local.json](cudss-local.json)。包装脚本使用 `--cudss <目录>`，直接 CMake 使用 `-DRINKSPACE_CUDSS_ROOT=<目录>`。CUDA／cuSOLVER 来自系统 `CUDA_PATH`；本机 CUDA 13 运行 DLL 位于其 `bin/x64`。实际加载的库由各构建／运行清单绑定。
 

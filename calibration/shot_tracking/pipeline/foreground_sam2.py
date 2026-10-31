@@ -6,11 +6,13 @@ frame is segmented independently from its own box and torso point prompt.
 Outputs stay inside runs/low_end_pm1/sam2_people/.
 
 Run with the verified CUDA 12.8 environment (RTX 5070 Ti):
-  D:/OneDrive/codex_projs/RinkSpace/.venv-gpu/Scripts/python.exe -B foreground_sam2.py --mode samples
-  D:/OneDrive/codex_projs/RinkSpace/.venv-gpu/Scripts/python.exe -B foreground_sam2.py --mode all
+  D:/CodexData/RinkSpace_Data/runtime_tools/vision_cuda/Scripts/python.exe -B foreground_sam2.py --mode samples
+  D:/CodexData/RinkSpace_Data/runtime_tools/vision_cuda/Scripts/python.exe -B foreground_sam2.py --mode all
 """
 
 from __future__ import annotations
+
+from rinkspace.storage import resolve_asset
 
 import argparse
 import hashlib
@@ -27,7 +29,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[3]
 RUN = ROOT / "calibration" / "shot_tracking" / "runs" / "low_end_pm1"
 OUT = RUN / "sam2_people"
-MODEL = ROOT / "models/cache/sam2.1-hiera-tiny"
+MODEL = resolve_asset(ROOT, ROOT / "models/cache/sam2.1-hiera-tiny")
 SAMPLE_INDICES = (0, 60, 120)
 FIRST_PTS = 104678400
 FRAME_COUNT = 121

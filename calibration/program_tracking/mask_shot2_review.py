@@ -1,6 +1,8 @@
 """Read current person exclusions only for selected official source frames."""
 from __future__ import annotations
 
+from rinkspace.storage import resolve_asset
+
 import hashlib
 import json
 import argparse
@@ -40,8 +42,8 @@ def run(indices=None, data=None):
     manifest = read(DATA / 'frame_manifest.json')
     shot_index = int(manifest['shot_scope']['shot_index'])
     provider = Sam2SourceInstances(DEFAULT_MODEL, device='cuda', reread_rgb=False, contour_stride=16)
-    detector = SourcePersonBoxes(ROOT / "models/cache/yolo11n-pose.pt",
-        dependency_paths=[ROOT / ".venv-gpu/Lib/site-packages"],
+    detector = SourcePersonBoxes(resolve_asset(ROOT, ROOT / "models/cache/yolo11n-pose.pt"),
+        dependency_paths=[resolve_asset(ROOT, ROOT / ".venv-gpu/Lib/site-packages")],
         runtime_directory=DATA / 'person_detector_runtime', device='cuda')
     tiles = []
     for row in manifest['frames']:

@@ -5,7 +5,7 @@ struct GroupPlan {int begin,count,rank,weight,component;size_t white;};
 struct ComponentPlan {
     int local_begin,local_count,group_begin,group_count,dim;
     size_t h,g;int q_begin,q_count;size_t scatter,packed_h;
-    int normal_rank=0;
+    int normal_rank=0,normal_stride=0;
 };
 struct RowPlan {int begin,count;size_t jac;};
 struct ColumnPattern {int begin,count;size_t scatter;};
@@ -29,6 +29,30 @@ template<int Op> __device__ double block_reduce(double value){
     for(int d=blockDim.x/2;d;d/=2){if(t<d){if constexpr(Op==0)work[t]+=work[t+d];else if constexpr(Op==1)work[t]=fmax(work[t],work[t+d]);else work[t]=fmin(work[t],work[t+d]);}__syncthreads();}
     double result=work[0];__syncthreads();return result;
 }
+// Exact nonzero support for repeated state updates. The original dense maps
+// remain authoritative for derivatives; column order and all nonzeros are kept.
+struct DirectionRowMap { const int* offsets=nullptr; const int* columns=nullptr; };
+RS_HD inline double direction_row_dot(const double* dense,int q,size_t row,DirectionRowMap map,const double* step,double alpha){
+    double value=0.;
+    if(map.offsets){for(int k=map.offsets[row];k<map.offsets[row+1];++k){int j=map.columns[k];value+=dense[row*size_t(q)+j]*(alpha*step[j]);}}
+    else for(int j=0;j<q;++j)value+=dense[row*size_t(q)+j]*(alpha*step[j]);
+    return value;
+}
+struct DirectionRowPlan {
+    std::vector<int> offsets,columns;DeviceBuffer<int> d_offsets,d_columns;
+    void prepare(const std::vector<double>& dense,int q){
+        if(dense.empty())return;offsets.push_back(0);
+        for(size_t row=0;row<dense.size()/q;++row){
+            for(int j=0;j<q;++j)if(dense[row*size_t(q)+j]!=0.)columns.push_back(j);
+            if(columns.size()>size_t(std::numeric_limits<int>::max()))throw std::invalid_argument("direction map exceeds int32 support");
+            offsets.push_back(int(columns.size()));
+        }
+    }
+    void upload(cudaStream_t stream){d_offsets.upload(offsets,stream);d_columns.upload(columns,stream);}
+    DirectionRowMap host()const{return {offsets.empty()?nullptr:offsets.data(),columns.data()};}
+    DirectionRowMap device()const{return {d_offsets.data,d_columns.data};}
+    size_t bytes()const{return sizeof(int)*(offsets.size()+columns.size());}
+};
 struct LinearView {
     const GroupPlan* groups;const ComponentPlan* components;const RowPlan* row_plan;
     const int *members,*component_groups,*row_local,*row_local_column,*columns,*scatter,*csr_offsets,*csr_columns;
@@ -39,9 +63,11 @@ struct LinearView {
     CameraEnvelope envelope{};
     const CameraEnvelope* camera_envelopes=nullptr;const int* mount_sides=nullptr;
     bool pixel_residuals=false;
+    DirectionRowMap motion_rows{},rig_rows{},scene_rows{};
 };
 RS_HD inline LinearView camera_linear_view(LinearView l,size_t nr,size_t camera){
     if(l.rig_directions)l.rig_directions+=camera*(nr==43?31:27)*l.q;
+    if(l.rig_rows.offsets)l.rig_rows.offsets+=camera*(nr==43?31:27);
     if(l.rig_tangents)l.rig_tangents+=camera*38*l.q;
     if(l.rig_lower)l.rig_lower+=camera*nr;if(l.rig_upper)l.rig_upper+=camera*nr;
     if(l.camera_envelopes)l.envelope=l.camera_envelopes[camera];
@@ -57,7 +83,7 @@ RS_HD inline size_t upper_index(int n,int i,int j){return size_t(i)*n-size_t(i)*
 // rows rather than its quadratic-size outer product. Correlated/multi-row
 // components retain packed symmetric storage. Public diagnostics stay dense.
 RS_HD inline double component_h(const double* h,const ComponentPlan& c,int i,int j){
-    if(c.normal_rank==2){const double* a=h+c.packed_h;return a[i]*a[j]+a[c.dim+i]*a[c.dim+j];}
+    if(c.normal_rank==2){const double* a=h+c.packed_h;const int stride=c.normal_stride?c.normal_stride:c.dim;return a[i]*a[j]+a[stride+i]*a[stride+j];}
     return h[c.packed_h+(i<=j?upper_index(c.dim,i,j):upper_index(c.dim,j,i))];
 }
 RS_HD inline void linearize_row(const View& source,const LinearView& plan,size_t row,double* output,int* status,double* jac){
@@ -194,12 +220,20 @@ __global__ void whiten_kernel(LinearView l,const double* output,const double* ja
     int gi=blockIdx.x;auto g=l.groups[gi];int dim=l.components[g.component].dim;
     for(size_t i=threadIdx.x;i<size_t(g.rank)*(dim+1);i+=blockDim.x)white[g.white+i]=whiten_element(l,gi,int(i/(dim+1)),int(i%(dim+1)),output,jac);
 }
+// Corner selection changes only local station columns; r, q and IRLS stay fixed.
+__global__ void whiten_corner_locals_kernel(LinearView l,const double* output,const double* jac,double* white){
+    int gi=blockIdx.x;auto g=l.groups[gi];auto c=l.components[g.component];
+    for(int a=threadIdx.x;a<c.local_count;a+=blockDim.x){bool changed=false;
+        for(int k=0;k<g.count;++k){int row=l.members[g.begin+k];if(l.row_local_column[row]==a&&l.local_sides[l.row_local[row]]!=0){changed=true;break;}}
+        if(changed)for(int k=0;k<g.rank;++k)white[g.white+size_t(k)*(c.dim+1)+c.q_count+1+a]=whiten_element(l,gi,k,c.q_count+1+a,output,jac);
+    }
+}
 __global__ void loss_kernel(LinearView l,const double* white,double* stats){int gi=blockIdx.x*blockDim.x+threadIdx.x;if(gi<l.ng)group_loss(l,gi,white,stats+3*size_t(gi));}
 __global__ void block_kernel(LinearView l,const double* white,const double* stats,double* h,double* gradient){
     int ci=blockIdx.x;auto c=l.components[ci];size_t square=size_t(c.dim)*c.dim;
     if(c.normal_rank==2){auto g=l.groups[l.component_groups[c.group_begin]];
         for(int i=threadIdx.x;i<c.dim;i+=blockDim.x){
-            h[c.packed_h+i]=white[g.white+1+i];h[c.packed_h+c.dim+i]=white[g.white+c.dim+2+i];
+            if(!c.normal_stride){h[c.packed_h+i]=white[g.white+1+i];h[c.packed_h+c.dim+i]=white[g.white+c.dim+2+i];}
             gradient[c.g+i]=block_element(l,ci,i,0,true,white,stats);}
         return;}
     for(size_t i=threadIdx.x;i<square+c.dim;i+=blockDim.x){
@@ -224,6 +258,7 @@ __global__ void summary_kernel(size_t n,const int* statuses,int ng,const double*
 struct Linearization {
     std::vector<double> directions,weights,scales,rig_directions,rig_tangents,rig_lower,rig_upper;
     DeviceBuffer<double> d_rig_directions,d_rig_tangents,d_rig_lower,d_rig_upper;
+    DirectionRowPlan motion_rows,rig_rows,scene_rows;
     std::vector<double> scene_directions,scene_lower,scene_upper;std::vector<BoardCourseValue<LocalJet>> scene_courses;std::vector<int> scene_active,scene_chart;DeviceBuffer<int> d_scene_active,d_scene_chart;std::vector<double> scene_effective;DeviceBuffer<double> d_scene_effective;
     DeviceBuffer<double> d_scene_directions,d_scene_lower,d_scene_upper;DeviceBuffer<BoardCourseValue<LocalJet>> d_scene_courses;
     std::vector<int> local_sides;DeviceBuffer<int> d_local_sides;
@@ -235,8 +270,10 @@ struct Linearization {
     DeviceBuffer<int> d_members,d_row_local,d_row_local_column,d_component_groups,d_columns,d_scatter,d_csr_offsets,d_csr_columns;
     DeviceBuffer<GroupPlan> d_groups;DeviceBuffer<ComponentPlan> d_components;DeviceBuffer<RowPlan> d_row_plan;
     cudaEvent_t event[6]{};LinearView host{},device{};
+    bool rank2_white_storage=false;
     size_t h_count=0,packed_h_count=0,g_count=0,white_count=0,jac_count=0;int max_row_q=0,max_component_q=0;
     bool cpu_ready=false,gpu_ready=false;
+    size_t generation=0; // Objective/configuration/layout are immutable on this plan.
     ~Linearization(){for(auto e:event)if(e)cudaEventDestroy(e);}
     static int bounded(size_t n){if(n>size_t(std::numeric_limits<int>::max()))throw std::invalid_argument("sparse index count exceeds int32 identities");return int(n);}
     void prepare(const View& v,int q,const double* dirs,size_t ndirs,const int* ids,size_t nids,
@@ -285,11 +322,19 @@ struct Linearization {
             scene_chart.assign(v.nscene,0);if(charts)std::copy_n(charts,v.nscene,scene_chart.data());scene_effective.resize(v.nscene*size_t(q));
             for(int j=0;j<q;++j)scene_chart_direction(v.scene_values,v.nscene,scene_chart.data(),scene_dirs,q,j,scene_effective.data());
             std::vector<std::vector<int>> parameter_columns(v.nscene);scene_active.assign(q,0);
-            for(size_t k=0;k<v.nscene;++k)for(int j=0;j<q;++j)if(scene_effective[k*q+j]!=0.){parameter_columns[k].push_back(j);scene_active[j]=1;}
+            for(size_t k=0;k<v.nscene;++k)for(int j=0;j<q;++j){
+                const int type=scene_chart[k];bool active=false;
+                if(type>=3&&type<=5){size_t start=k-size_t(type-3);for(int a=0;a<3;++a)active|=scene_dirs[(start+a)*q+j]!=0.;}
+                else active=scene_dirs[k*q+j]!=0.;
+                if(active){parameter_columns[k].push_back(j);scene_active[j]=1;}
+            }
             for(size_t k=0;k<v.npaths;++k){auto path=v.scene_paths[k];auto& cols=scene_columns[k];
                 auto include=[&](int begin,int count){for(int a=begin;a<begin+count;++a)cols.insert(cols.end(),parameter_columns[a].begin(),parameter_columns[a].end());};
                 int kind=v.paths[7*k];if(path.type||kind==3||kind==7)include(0,6);
-                if(path.type==1)include(6,int(v.nl));
+                if(path.type==1){
+                    if(v.nl!=ice_tolerance_layout_size||v.options!=127u||
+                       !ice_tolerance_layout_support(path.code,[&](int index){include(6+index,1);}))include(6,int(v.nl));
+                }
                 if(path.type==2){include(path.size,2);include(path.placement,3);if(path.family)include(path.shape,path.shape_count);}
                 std::sort(cols.begin(),cols.end());cols.erase(std::unique(cols.begin(),cols.end()),cols.end());
             }
@@ -331,13 +376,22 @@ struct Linearization {
             component_locals.insert(component_locals.end(),ll.begin(),ll.end());component_groups.insert(component_groups.end(),gg.begin(),gg.end());}
         for(size_t row=0;row<v.n;++row)if(ids[row]>=0)row_local_column[row]=local_column[ids[row]];
         for(auto& g:groups){g.white=white_count;white_count+=checked_product(size_t(g.rank),size_t(components[g.component].dim+1));}
+        // Independent raw-pixel components already own both exact Jacobian
+        // rows in white. Read that immutable linearization directly instead
+        // of keeping a second multi-GB rank-two copy. Mixed/shared/correlated
+        // components retain their existing packed normal storage.
+        rank2_white_storage=!components.empty()&&std::all_of(components.begin(),components.end(),[](const auto& c){return c.normal_rank==2;});
+        if(rank2_white_storage)for(auto& c:components){
+            const auto& g=groups[component_groups[c.group_begin]];c.packed_h=g.white+1;c.normal_stride=c.dim+1;
+        }
         std::vector<std::vector<int>> adjacency(q);for(int i=0;i<q;++i)adjacency[i].push_back(i);
         for(const auto& pat:patterns)for(int i=0;i<pat.count;++i){auto& a=adjacency[columns[pat.begin+i]];a.insert(a.end(),columns.begin()+pat.begin+i,columns.begin()+pat.begin+pat.count);}
         csr_offsets.push_back(0);for(auto& a:adjacency){std::sort(a.begin(),a.end());a.erase(std::unique(a.begin(),a.end()),a.end());csr_columns.insert(csr_columns.end(),a.begin(),a.end());csr_offsets.push_back(bounded(csr_columns.size()));}
         for(auto& pat:patterns){pat.scatter=scatter.size();for(int i=0;i<pat.count;++i){int global=columns[pat.begin+i];auto first=csr_columns.begin()+csr_offsets[global],last=csr_columns.begin()+csr_offsets[global+1];
             for(int j=i;j<pat.count;++j)scatter.push_back(int(std::lower_bound(first,last,columns[pat.begin+j])-csr_columns.begin()));}}
         for(size_t ci=0;ci<components.size();++ci)components[ci].scatter=patterns[component_patterns[ci]].scatter;
-        size_t planned=8*(directions.size()+weights.size()+scales.size()+jac_count+white_count+3*size_t(ng)+packed_h_count+g_count+csr_columns.size()+q+4)+
+        motion_rows.prepare(directions,q);rig_rows.prepare(rig_directions,q);scene_rows.prepare(scene_directions,q);
+        size_t planned=motion_rows.bytes()+rig_rows.bytes()+scene_rows.bytes()+8*(directions.size()+weights.size()+scales.size()+jac_count+white_count+3*size_t(ng)+(rank2_white_storage?0:packed_h_count)+g_count+csr_columns.size()+q+4)+
             4*(nlocal+members.size()+row_local.size()+row_local_column.size()+component_groups.size()+columns.size()+scatter.size()+csr_offsets.size()+csr_columns.size())+
             sizeof(GroupPlan)*groups.size()+sizeof(ComponentPlan)*components.size()+sizeof(RowPlan)*row_plan.size();
         planned+=8*(2*scene_directions.size()+scene_lower.size()+scene_upper.size()+rig_directions.size()+rig_tangents.size()+rig_lower.size()+rig_upper.size())+4*(scene_chart.size()+scene_active.size())+sizeof(BoardCourseValue<LocalJet>)*scene_courses.size();
@@ -348,9 +402,12 @@ struct Linearization {
         d_members.upload(members,stream);d_row_local.upload(row_local,stream);d_row_local_column.upload(row_local_column,stream);d_component_groups.upload(component_groups,stream);
         d_columns.upload(columns,stream);d_scatter.upload(scatter,stream);d_csr_offsets.upload(csr_offsets,stream);d_csr_columns.upload(csr_columns,stream);
         d_groups.upload(groups,stream);d_components.upload(components,stream);d_row_plan.upload(row_plan,stream);
-        d_jac.allocate(jac_count);d_white.allocate(white_count);d_stats.allocate(3*size_t(ng));d_h.allocate(packed_h_count);d_g.allocate(g_count);d_shared.allocate(csr_columns.size()+q);d_summary.allocate(4);
+        d_jac.allocate(jac_count);d_white.allocate(white_count);d_stats.allocate(3*size_t(ng));d_h.allocate(rank2_white_storage?0:packed_h_count);d_g.allocate(g_count);d_shared.allocate(csr_columns.size()+q);d_summary.allocate(4);
         device={d_groups.data,d_components.data,d_row_plan.data,d_members.data,d_component_groups.data,d_row_local.data,d_row_local_column.data,d_columns.data,d_scatter.data,d_csr_offsets.data,d_csr_columns.data,d_directions.data,d_scales.data,d_weights.data,q,ng,bounded(components.size()),csr_columns.size(),delta};
         host.pixel_residuals=device.pixel_residuals=pixels;
+        motion_rows.upload(stream);rig_rows.upload(stream);scene_rows.upload(stream);
+        host.motion_rows=motion_rows.host();host.rig_rows=rig_rows.host();host.scene_rows=scene_rows.host();
+        device.motion_rows=motion_rows.device();device.rig_rows=rig_rows.device();device.scene_rows=scene_rows.device();
         if(rig_dirs){
             d_rig_directions.upload(rig_directions,stream);d_rig_tangents.allocate(rig_tangents.size());d_rig_lower.upload(rig_lower,stream);d_rig_upper.upload(rig_upper,stream);
             host.rig_directions=rig_directions.data();host.rig_tangents=rig_tangents.data();host.rig_lower=rig_lower.data();host.rig_upper=rig_upper.data();host.max_readout=readout_support;
@@ -367,7 +424,9 @@ struct Linearization {
         host.mount_side=device.mount_side=mount_side;
         for(auto& e:event)cuda_check(cudaEventCreate(&e));
     }
-    size_t device_bytes()const{return d_local_sides.bytes()+d_scene_chart.bytes()+d_scene_effective.bytes()+d_scene_active.bytes()+d_scene_directions.bytes()+d_scene_lower.bytes()+d_scene_upper.bytes()+d_scene_courses.bytes()+d_rig_directions.bytes()+d_rig_tangents.bytes()+d_rig_lower.bytes()+d_rig_upper.bytes()+d_directions.bytes()+d_weights.bytes()+d_scales.bytes()+d_members.bytes()+d_row_local.bytes()+d_row_local_column.bytes()+d_component_groups.bytes()+d_columns.bytes()+d_scatter.bytes()+d_csr_offsets.bytes()+d_csr_columns.bytes()+d_groups.bytes()+d_components.bytes()+d_row_plan.bytes()+d_jac.bytes()+d_white.bytes()+d_stats.bytes()+d_h.bytes()+d_g.bytes()+d_shared.bytes()+d_summary.bytes();}
+    double* h_values()const{return rank2_white_storage?d_white.data:d_h.data;}
+    size_t normal_storage_count()const{return rank2_white_storage?white_count:packed_h_count;}
+    size_t device_bytes()const{return motion_rows.bytes()+rig_rows.bytes()+scene_rows.bytes()+d_local_sides.bytes()+d_scene_chart.bytes()+d_scene_effective.bytes()+d_scene_active.bytes()+d_scene_directions.bytes()+d_scene_lower.bytes()+d_scene_upper.bytes()+d_scene_courses.bytes()+d_rig_directions.bytes()+d_rig_tangents.bytes()+d_rig_lower.bytes()+d_rig_upper.bytes()+d_directions.bytes()+d_weights.bytes()+d_scales.bytes()+d_members.bytes()+d_row_local.bytes()+d_row_local_column.bytes()+d_component_groups.bytes()+d_columns.bytes()+d_scatter.bytes()+d_csr_offsets.bytes()+d_csr_columns.bytes()+d_groups.bytes()+d_components.bytes()+d_row_plan.bytes()+d_jac.bytes()+d_white.bytes()+d_stats.bytes()+d_h.bytes()+d_g.bytes()+d_shared.bytes()+d_summary.bytes();}
     void cpu(const View& v,double* summary){
         const auto& l=host;cpu_output.resize(v.n*11);cpu_status.resize(v.n);cpu_jac.resize(jac_count);cpu_white.resize(white_count);cpu_stats.resize(3*size_t(l.ng));cpu_h.resize(h_count);cpu_g.resize(g_count);cpu_shared.assign(l.nnz+l.q,0.);
         if(host.scene_directions)for(int q=0;q<host.q;++q)scene_chart_direction(v.scene_values,v.nscene,host.scene_chart,host.scene_steps,host.q,q,scene_effective.data());

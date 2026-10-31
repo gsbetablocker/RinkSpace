@@ -11,6 +11,7 @@ from __future__ import annotations
 from contextlib import nullcontext
 from pathlib import Path
 from typing import Any, Sequence
+from .storage import AssetStore
 
 import torch
 from torch import Tensor, nn
@@ -167,6 +168,8 @@ class RinkVisionNet(nn.Module):
         self.num_classes = int(num_classes)
         self.width = int(width)
         self.freeze_backbone = bool(freeze_backbone)
+        if backbone_path is not None:
+            backbone_path = AssetStore(Path(__file__).resolve().parents[2]).source(Path(backbone_path).resolve())
         self.class_names = (
             LANDMARK_CLASSES if num_classes == 5 else ("background",) + LANDMARK_CLASSES
         ) + tuple(f"extra_{i}" for i in range(6, num_classes))

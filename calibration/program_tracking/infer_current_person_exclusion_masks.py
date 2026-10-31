@@ -5,6 +5,8 @@ never read. Point/box prompts locate the foreground person, not rink evidence.
 """
 from __future__ import annotations
 
+from rinkspace.storage import resolve_asset
+
 import argparse
 import hashlib
 import json
@@ -23,7 +25,7 @@ from rinkspace.programme_source_stream import file_sha
 
 DEFAULT_SEQUENCE = Path("D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/okada_mei_sp/results/"
     "frame_by_frame_review_20261013/opening_100_50fps")
-DEFAULT_MODEL = ROOT / "models/cache/sam2.1-hiera-tiny"
+DEFAULT_MODEL = resolve_asset(ROOT, ROOT / "models/cache/sam2.1-hiera-tiny")
 
 
 def current_skin_seeds(rgb):

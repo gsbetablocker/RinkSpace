@@ -1,6 +1,7 @@
 """Native continuous LM, with planted native measurements rather than image claims."""
 import os
 import unittest
+from unittest.mock import patch
 import numpy as np
 import test_g3_gpu as fixture
 from rinkspace.core.native import NativeCore
@@ -80,9 +81,16 @@ class G4GPU(unittest.TestCase):
         with self.run_problem() as p:
             self.attach(p);history=[]
             def once(record):history.append(record);return False
-            stopped=p.solve(progress=once)
+            with patch.object(p,"stationarity_diagnostics",side_effect=AssertionError("caller stop must not project again")) as diagnostic:
+                stopped=p.solve(progress=once)
+                diagnostic.assert_not_called()
             self.assertEqual(stopped["stop_reason"],"stopped_by_caller")
             self.assertFalse(stopped["numerically_converged"])
+            self.assertFalse(stopped["full_nonlinear_kkt_checked"])
+            self.assertEqual(stopped["stationarity_diagnostic_status"],"not_evaluated_after_caller_stop")
+            self.assertIsNone(stopped["projected_gradient_inf"])
+            self.assertIsNone(stopped["constraint_projected_gradient_inf"])
+            self.assertIn("controller_reported_gradient_inf",stopped)
             self.assertEqual(stopped["trials"],1)
             self.assertAlmostEqual(p.linearize("cpu")["summary"]["huber_cost"],stopped["final_cost"],places=10)
             continued=[];result=p.solve(progress=continued.append)
@@ -99,12 +107,33 @@ class G4GPU(unittest.TestCase):
             self.assertTrue(np.isfinite(p.export_state()["controls"]).all())
             self.assertTrue(p.solve()["numerically_converged"])
 
-    def test_stop_before_first_candidate_keeps_original_state(self):
+    def test_stop_before_first_candidate_skips_projection_and_can_continue(self):
         with self.run_problem() as p:
-            self.attach(p);p.request_stop();result=p.solve()
+            self.attach(p)
+            initial_cost=p.linearize("cpu")["summary"]["huber_cost"]
+            self.assertGreater(initial_cost,0)
+            initial=p.export_state()
+            p.request_stop()
+            with patch.object(p,"stationarity_diagnostics",side_effect=AssertionError("caller stop must not project again")) as diagnostic:
+                result=p.solve()
+                diagnostic.assert_not_called()
             self.assertEqual(result["stop_reason"],"stopped_by_caller")
+            self.assertFalse(result["numerically_converged"])
+            self.assertFalse(result["full_nonlinear_kkt_checked"])
+            self.assertEqual(result["stationarity_diagnostic_status"],"not_evaluated_after_caller_stop")
+            self.assertIsNone(result["projected_gradient_inf"])
+            self.assertIsNone(result["constraint_projected_gradient_inf"])
+            self.assertIn("controller_reported_gradient_inf",result)
+            self.assertEqual(result["stationarity_diagnostics"]["status"],"not_evaluated_after_caller_stop")
+            self.assertFalse(result["stationarity_diagnostics"]["full_nonlinear_kkt_checked"])
             self.assertEqual(result["trials"],0)
-            np.testing.assert_array_equal(p.export_state()["controls"],self.kw["controls"])
+            self.assertEqual(result["accepted"],0)
+            self.assertAlmostEqual(result["final_cost"],initial_cost,places=10)
+            state=p.export_state()
+            for key in initial:np.testing.assert_array_equal(state[key],initial[key])
+            continued=p.solve()
+            self.assertTrue(continued["numerically_converged"])
+            self.assertLess(continued["final_cost"],1e-10)
 
     def test_camera_only_problem_needs_no_local_station_block(self):
         with ResidentResidualProblem(self.core,**self.kw) as target:

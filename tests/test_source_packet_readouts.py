@@ -1,4 +1,6 @@
 from copy import deepcopy
+import importlib
+from pathlib import Path
 from types import SimpleNamespace
 import pytest
 
@@ -193,3 +195,163 @@ def test_same_exposure_material_profile_definition_reaches_queries_without_nativ
     conflicted=source_queries(rows,binding,geometry)[0]
     assert 'material_outward_transition' not in conflicted
     assert conflicted['source_material_definition_evidence']['conflicting_transitions'] is True
+
+
+@pytest.fixture
+def centerline_qualifier(monkeypatch):
+    programme = Path(__file__).resolve().parents[1] / 'events/ankara_2026/programmes/okada_mei_sp'
+    monkeypatch.syspath_prepend(str(programme))
+    return importlib.import_module('qualify_centerline_precision')
+
+
+def _qualified_centerline_fixture(module, root, qualifier_sha256='current'):
+    folder = root/'previous/s02'
+    folder.mkdir(parents=True)
+    accepted = dict(source_reference=str(root/'256.npz'), candidate=0, pts=256,
+                    identity='B1:segment0', uv=[10.125, 20.25], path_id='native/B1')
+    rejected = dict(accepted, candidate=1, uv=[30.125, 20.25])
+    original = folder/'source_pixels.json'
+    links = folder/'source_qualification.json'
+    packet = folder/'source_verified.json'
+    module.run.write_json(original, dict(accepted=[accepted, rejected]))
+    excluded = {key: rejected[key] for key in ('source_reference', 'candidate', 'pts', 'identity')}
+    excluded['reason'] = 'original explicit source-shape exclusion'
+    qualification = dict(excluded=[excluded])
+    if qualifier_sha256 == 'current':qualifier_sha256 = module._qualifier_sha256()
+    if qualifier_sha256 is not None:qualification['qualifier_sha256'] = qualifier_sha256
+    module.run.write_json(links, qualification)
+    module.run.write_json(packet, dict(shot='s02', accepted=[accepted], fit_eligible=True,
+        source_packet=original.name, source_packet_sha256=module.run.digest(original),
+        source_links=links.name, source_links_sha256=module.run.digest(links)))
+    return packet, accepted, rejected, excluded
+
+
+def test_centerline_qualification_reuse_requires_exact_identity_and_uv(centerline_qualifier, tmp_path):
+    module = centerline_qualifier
+    packet, accepted, rejected, excluded = _qualified_centerline_fixture(module, tmp_path)
+    decisions, old_excluded, reference = module._reusable_decisions(packet, 's02')
+    assert decisions[module._exact_row_key(accepted)] == 'accepted'
+    assert decisions[module._exact_row_key(rejected)] == 'excluded'
+    assert old_excluded[module._exact_row_key(rejected)] == excluded
+    for row in (accepted, rejected):
+        for change in (dict(identity='B2:segment0'), dict(uv=[row['uv'][0]+.125, row['uv'][1]]),
+                       dict(pts=512), dict(source_reference=str(tmp_path/'other.npz'))):
+            assert module._exact_row_key(dict(row, **change)) not in decisions
+    assert module._exact_row_key({key: value for key, value in accepted.items() if key != 'uv'}) is None
+    assert module._exact_row_key(dict(accepted, uv=[[1., 2.], [3.]])) is None
+    assert reference['prior_excluded_count'] == 1
+    assert reference['decisions_reusable'] is True
+    assert reference['prior_qualifier_sha256'] == reference['current_qualifier_sha256'] == module._qualifier_sha256()
+    original_packet = module.run.read(packet)
+    module.run.write_json(packet, dict(original_packet, fit_eligible=False))
+    with pytest.raises(ValueError, match='fit_eligible'):
+        module._reusable_decisions(packet, 's02')
+    module.run.write_json(packet, original_packet)
+    # A valid candidate index alone cannot authenticate changed source data.
+    dependency = packet.parent/'source_pixels.json'
+    dependency.write_text(dependency.read_text(encoding='utf-8')+'\n', encoding='utf-8')
+    with pytest.raises(ValueError, match='dependency changed'):
+        module._reusable_decisions(packet, 's02')
+
+
+@pytest.mark.parametrize('reuse_mode', ['none', 'current', 'old', 'missing'])
+@pytest.mark.parametrize('fresh_present', [False, True])
+def test_centerline_qualification_checks_only_undecided_frames_and_copies_new_binding(
+        centerline_qualifier, tmp_path, monkeypatch, reuse_mode, fresh_present):
+    import numpy as np
+    module = centerline_qualifier
+    prior_sha = {'old': '0'*64, 'missing': None}.get(reuse_mode, 'current')
+    packet, accepted, rejected, excluded = _qualified_centerline_fixture(module, tmp_path, prior_sha)
+    invalidated = reuse_mode in ('old', 'missing')
+    np.savez(tmp_path/'256.npz', marker=np.array([0]))
+    np.savez(tmp_path/'512.npz', marker=np.array([1]))
+    fresh = dict(accepted, source_reference=str(tmp_path/'512.npz'), candidate=7,
+                 pts=512, identity='lane4:edge0', uv=[42.5, 61.25])
+    # Preserve new provenance even when the admission itself is inherited.
+    accepted = dict(accepted, new_parent='current-source-parent')
+    source = tmp_path/'new_source'
+    (source/'s02').mkdir(parents=True)
+    binding = dict(parent_source='new-capture-parent', inventory=[{'curve_id': 'B1'}, {'curve_id': 'lane4'}])
+    module.run.write_json(source/'binding.json', binding)
+    raw = source/'s02/source_pixels.json'
+    links = source/'s02/source_links.json'
+    current_rows = [accepted, rejected] + ([fresh] if fresh_present else [])
+    module.run.write_json(raw, dict(accepted=current_rows))
+    module.run.write_json(links, dict(edges=[]))
+    module.run.write_json(source/'s02/source_verified.json', dict(shot='s02', accepted=current_rows,
+        fit_eligible=True, source_packet=raw.name, source_packet_sha256=module.run.digest(raw),
+        source_links=str(links), source_links_sha256=module.run.digest(links), inherited_source='new-parent-reference'))
+    frame_requests, masks_read, qualifier_calls = [], [], []
+    def frames(sid, *, selected_pts=None):
+        frame_requests.append(selected_pts)
+        return {}, [dict(pts=pts, image=str(pts)) for pts in (256, 512)
+                    if selected_pts is None or pts in selected_pts]
+    def surfaces(frame, image):
+        masks_read.append(frame['pts'])
+        return dict(ice=np.ones((2, 2), bool)), {}
+    def qualify(measurement, curves, exclusion):
+        qualifier_calls.append(int(measurement['marker'][0]))
+        assert curves == [0, 1]  # The expanded inventory comes from the new source.
+        # Changed algorithms may reverse both old admission and old exclusion.
+        # Neither cached decision may suppress the actual current evaluation.
+        return [dict(candidate_ids=[int(invalidated)] if measurement['marker'][0] == 0 else [7])], []
+    monkeypatch.setattr(module.run, 'source_frames', frames)
+    monkeypatch.setattr(module.run, 'surfaces', surfaces)
+    monkeypatch.setattr(module.cv2, 'imread', lambda _: np.zeros((2, 2, 3), np.uint8))
+    monkeypatch.setattr(module, 'qualify_visible_line_fragments', qualify)
+    output = tmp_path/'qualified_output'
+    module.qualify(SimpleNamespace(source=source, output=output, shots=['s02'],
+        reuse_qualified_source=packet.parent.parent if reuse_mode != 'none' else None))
+    verified = module.run.read(output/'s02/source_verified.json')
+    result = module.run.read(output/'s02/source_qualification.json')
+    assert verified['accepted'] == [rejected if invalidated else accepted] + ([fresh] if fresh_present else [])
+    assert verified['source_packet'] == str(raw.resolve())
+    assert verified['inherited_source'] == 'new-parent-reference'
+    assert module.run.read(output/'binding.json')['inventory'] == binding['inventory']
+    assert module.run.read(output/'binding.json')['parent_source'] == 'new-capture-parent'
+    assert result['qualifier_sha256'] == module._qualifier_sha256()
+    if reuse_mode == 'current':
+        assert frame_requests == ([{512}] if fresh_present else [])
+        assert masks_read == ([512] if fresh_present else [])
+        assert qualifier_calls == ([1] if fresh_present else [])
+        assert result['excluded'] == [excluded]
+        assert result['reused_accepted_rows'] == result['reused_excluded_rows'] == 1
+    else:
+        expected_requests = [{256, 512} if fresh_present else {256}] if invalidated else [None]
+        assert frame_requests == expected_requests
+        assert masks_read == [256] + ([512] if fresh_present else [])
+        assert qualifier_calls == [0] + ([1] if fresh_present else [])
+        assert result['reused_accepted_rows'] == result['reused_excluded_rows'] == 0
+        if invalidated:
+            reference = result['reuse_qualified_source']
+            assert reference['decisions_reusable'] is False
+            assert reference['prior_qualifier_sha256'] == prior_sha
+            assert reference['current_qualifier_sha256'] == module._qualifier_sha256()
+            assert reference['decision_reuse_reason'] == (
+                'qualifier_sha256_missing_requalification_required' if reuse_mode == 'missing' else
+                'qualifier_sha256_changed_requalification_required')
+            assert result['excluded'] == [{key: accepted[key]
+                for key in ('pts', 'candidate', 'source_reference', 'identity')}]
+
+
+def test_selected_source_frames_skip_old_dependencies_but_keep_full_clock_validation(
+        centerline_qualifier, tmp_path, monkeypatch):
+    run = centerline_qualifier.run
+    frames = [dict(pts=pts, mask_path=str(tmp_path/f'{pts}.mask'), mask_sha256=f'mask-{pts}',
+                   board_source=str(tmp_path/f'{pts}.board')) for pts in (256, 512)]
+    scope = dict(shots=[dict(id='s02', processing=dict(first_pts=256, stop_pts_exclusive=768))])
+    dependencies = []
+    def read(path):
+        return deepcopy(scope if Path(path).name == 'rebuild_scope.json' else dict(frames=frames))
+    def digest(path):
+        dependencies.append(Path(path).name)
+        assert not Path(path).name.startswith('256.')
+        return 'mask-512' if str(path).endswith('.mask') else 'board-512'
+    monkeypatch.setattr(run, 'read', read)
+    monkeypatch.setattr(run, 'digest', digest)
+    _, selected = run.source_frames('s02', selected_pts={512})
+    assert [frame['pts'] for frame in selected] == [512]
+    assert dependencies == ['512.mask', '512.board']
+    frames.pop(0)
+    with pytest.raises(ValueError, match='full shot'):
+        run.source_frames('s02', selected_pts={512})

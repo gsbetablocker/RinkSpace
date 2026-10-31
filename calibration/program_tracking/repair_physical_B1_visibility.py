@@ -19,13 +19,14 @@ class LocalPhysicalBlue(NativeProfiles):
   super().__init__(rgb,source,mask);self.camera=camera
   rgb=np.asarray(rgb,np.float32);self.luminance=.2126*rgb[...,0]+.7152*rgb[...,1]+.0722*rgb[...,2]
  def sample_complete_colour_band(self,path,guide,spacing):
-  q,n,_=_source_queries(path,guide,np.ones(len(guide)),(1080,1920),35,40);rows=[];rejected=[]
+  h,w=self.frame.rgb.shape[:2]
+  q,n,_=_source_queries(path,guide,np.ones(len(guide)),(h,w),35,40);rows=[];rejected=[]
   for k,query in enumerate(q):
-   profile=projected_width_profile(self.camera,path,query,radius_px=1.)
+   profile=projected_width_profile(self.camera,path,query,image_hw=(h,w),radius_px=1.)
    if profile is None:continue
    cross=float(abs(profile['query_width_direction_uv']@n[k]))
    if cross<.04:continue
-   profile=projected_width_profile(self.camera,path,query,radius_px=42./cross,step_px=1./cross)
+   profile=projected_width_profile(self.camera,path,query,image_hw=(h,w),radius_px=42./cross,step_px=1./cross)
    profile['offsets']=profile['offsets']*cross
    values=sample_physical_width_field(self.frame.rgb,profile,'dark',field=self.luminance)
    valid=valid_profile_contributors(profile,self.mask);edges=np.flatnonzero(np.r_[True,valid[1:]!=valid[:-1],True]);candidates=[]
@@ -41,7 +42,7 @@ class LocalPhysicalBlue(NativeProfiles):
      rejected.append(dict(query=k,reason='outside_source_verified_B1_identity_or_not_complete_blue_strip_width',normal_distance_px=distance,normal_width_px=width));continue
     lo,hi=ev['complete_band_native_interval_px'];support=source_at_profile_offsets(profile,np.arange(np.ceil(lo),np.floor(hi)+1))
     context=np.vstack([support,np.asarray(ev['actual_source_side_quantiles_uv']).reshape(-1,2)])
-    if (context<[0,0]).any()or(context>[1919,1079]).any():continue
+    if (context<[0,0]).any()or(context>[w-1,h-1]).any():continue
     ip=np.rint(context).astype(int)
     if self.mask[ip[:,1],ip[:,0]].any():continue
     ev.pop('filled_house_band_is_not_an_outline',None);ev.pop('narrow_paint_width_px',None)

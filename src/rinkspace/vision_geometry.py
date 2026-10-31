@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from fractions import Fraction
 import hashlib
 from pathlib import Path
+from rinkspace.storage import AssetStore, resolve_asset
 from typing import Any, Mapping
 
 import numpy as np
@@ -146,8 +147,9 @@ class GPUFlow:
             raise RuntimeError("GPUFlow requires an available CUDA device")
         if isinstance(num_updates, bool) or not isinstance(num_updates, int) or num_updates <= 0:
             raise ValueError("RAFT updates must be a positive integer")
-        self.weights_path = Path(weights_path or Path(__file__).resolve().parents[2] /
-                                 "models/cache/raft_large_C_T_SKHT_V2-ff5fadd5.pth").resolve()
+        project = Path(__file__).resolve().parents[2]
+        self.weights_path = AssetStore(project).source(Path(weights_path).resolve() if weights_path is not None else
+                                 project / "models/cache/raft_large_C_T_SKHT_V2-ff5fadd5.pth")
         if not self.weights_path.is_file():
             raise FileNotFoundError(self.weights_path)
         self.weights_sha256 = hashlib.sha256(self.weights_path.read_bytes()).hexdigest()

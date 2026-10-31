@@ -23,6 +23,7 @@ class PhysicalBandProfiles(NativeProfiles):
       'red':color[...,0]-(color[...,1]+color[...,2])*.5}
 
  def values(self,profile,signal,tangent):
+  h,w=self.frame.rgb.shape[:2]
   uv=np.asarray(profile['source_uv'],np.float32)
   samples=uv[None]+np.arange(-3,4)[:,None,None]*tangent
   values=cv2.remap(self.fields[signal],samples[...,0].astype(np.float32),samples[...,1].astype(np.float32),cv2.INTER_LINEAR)
@@ -30,7 +31,7 @@ class PhysicalBandProfiles(NativeProfiles):
   floor=np.floor(samples).astype(int);valid=np.ones(samples.shape[:2],bool)
   for dx,dy in ((0,0),(1,0),(0,1),(1,1)):
    x=floor[...,0]+dx;y=floor[...,1]+dy
-   inside=(x>=0)&(x<1920)&(y>=0)&(y<1080)
+   inside=(x>=0)&(x<w)&(y>=0)&(y<h)
    good=np.zeros_like(inside);good[inside]=~self.mask[y[inside],x[inside]]
    valid&=good
   counts=valid.sum(0);self.last_tangent_valid_counts=counts
@@ -41,15 +42,16 @@ class PhysicalBandProfiles(NativeProfiles):
   return result
 
  def sample_complete_colour_band(self,path,guide,spacing):
-  q,n,_=_source_queries(path,guide,np.ones(len(guide)),(1080,1920),35,60)
+  h,w=self.frame.rgb.shape[:2]
+  q,n,_=_source_queries(path,guide,np.ones(len(guide)),(h,w),35,60)
   rows=[];rejected=[]
   for k,query in enumerate(q):
-   initial=projected_width_profile(self.camera,path,query,radius_px=1)
+   initial=projected_width_profile(self.camera,path,query,image_hw=(h,w),radius_px=1)
    if initial is None:continue
    cross=abs(float(initial['query_width_direction_uv']@n[k]))
    if cross<.01:continue
    radius=185 if path['material_signal']=='red' else 70
-   profile=projected_width_profile(self.camera,path,query,radius_px=radius/cross,step_px=1/cross)
+   profile=projected_width_profile(self.camera,path,query,image_hw=(h,w),radius_px=radius/cross,step_px=1/cross)
    # Scalar coordinates are normal-equivalent search units, while each
    # sample remains on the exact Brown-projected physical width section.
    profile['offsets']=profile['offsets']*cross
@@ -92,7 +94,7 @@ class PhysicalBandProfiles(NativeProfiles):
      ev['joint_band_width_px']=float(abs((sides[1]-sides[0])@n[k]))
      ev['physical_width_profile_native_sampling_step_px']=1/cross
      context=np.vstack([restored['uv'],sides,np.asarray(ev['actual_source_side_quantiles_uv']).reshape(-1,2)])
-     if (context<[0,0]).any() or (context>[1919,1079]).any():continue
+     if (context<[0,0]).any() or (context>[w-1,h-1]).any():continue
      ip=np.rint(context).astype(int)
      if self.mask[ip[:,1],ip[:,0]].any():continue
      rows.append(restored)

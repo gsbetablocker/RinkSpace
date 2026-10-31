@@ -4,7 +4,7 @@ import argparse,collections,io,json
 import numpy as np,cv2
 import prepare_native_joint_shots as p
 from rinkspace.domain.multi_shot_motion import ShotMotionTimeline
-from rinkspace.review.scene import sample_review_scene
+from rinkspace.review.scene import sample_native_review_scene
 from rinkspace.review.render import source_frames
 from rinkspace.review.draw import COLORS
 
@@ -26,7 +26,7 @@ def main(args):
     rows=np.flatnonzero(np.isin(z['pts'],selection));times=tl.row_times(z['pts'])
     with native.resident(camera=camera,rigs=v['rig'] if multi else None,camera_ids=camera_ids[rows] if multi else None,controls=v['controls'],path_ids=paths[rows].tolist(),stations=v['stations'][rows],pts=z['pts'][rows],observed=z['uv'][rows],motion_times=times[rows]) as rr:
         rr.configure_projection_time_support(half_seconds=m['max_readout']/2);pred=rr.evaluate('cuda')
-    samples=sample_review_scene(raw,core,scene,parameter_state=state,observed_path_ids=set(paths));world=samples['xyz']
+    samples=sample_native_review_scene(raw,core,scene,parameter_state=state,observed_path_ids=set(paths),native=native);world=samples['xyz']
     source_scope=p.read(p.HERE/'rebuild_scope.json');source={**source_scope['source'],**source_scope['source_clock']};records=[]
     for pt in sorted(selection):
         shot=next(s for s in m['shots'] if s['first_pts']<=pt<=s['last_pts']);t=(pt-shot['reference_pts'])/12800+tl.offset(shot)

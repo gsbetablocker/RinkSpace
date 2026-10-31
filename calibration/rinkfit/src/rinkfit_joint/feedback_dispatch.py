@@ -3,6 +3,8 @@
 Current-packet tasks cover board, ice and fixed advertisement operators. Old
 board-only scopes remain available only for explicitly legacy review jobs.
 """
+
+from rinkspace.storage import resolve_asset
 from pathlib import Path
 import os
 import subprocess
@@ -16,7 +18,7 @@ def source_reader_python(explicit=None):
         if not p.is_file():raise FileNotFoundError('Explicit source reader interpreter missing')
         return p
     project=Path(__file__).resolve().parents[4]
-    interpreter=project/'.venv-gpu/Scripts/python.exe'
+    interpreter=resolve_asset(project, project/'.venv-gpu/Scripts/python.exe')
     if not interpreter.is_file():
         raise FileNotFoundError('Project GPU interpreter missing: '+str(interpreter))
     return interpreter

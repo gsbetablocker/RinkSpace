@@ -12,6 +12,7 @@ from fractions import Fraction
 import hashlib
 from pathlib import Path
 from typing import Any, Mapping
+from .storage import AssetStore
 
 import numpy as np
 
@@ -528,7 +529,8 @@ class SourcePersonBoxes:
         import os
         import sys
         import torch
-        weights_path = Path(weights_path).resolve()
+        storage = AssetStore(Path(__file__).resolve().parents[2])
+        weights_path = storage.source(Path(weights_path).resolve())
         if not weights_path.is_file():
             raise FileNotFoundError(weights_path)
         configured = runtime_directory or os.environ.get("YOLO_CONFIG_DIR")
@@ -537,13 +539,13 @@ class SourcePersonBoxes:
             runtime.mkdir(parents=True, exist_ok=True)
             os.environ["YOLO_CONFIG_DIR"] = str(runtime)
         if vendor_path is not None:
-            vendor_path = Path(vendor_path).resolve()
+            vendor_path = storage.source(Path(vendor_path).resolve())
             if not (vendor_path/"ultralytics"/"__init__.py").is_file():
                 raise FileNotFoundError(vendor_path)
             if str(vendor_path) not in sys.path:
                 sys.path.append(str(vendor_path))
         for dependency in dependency_paths:
-            dependency = Path(dependency).resolve()
+            dependency = storage.source(Path(dependency).resolve())
             if not dependency.is_dir():
                 raise FileNotFoundError(dependency)
             # Append fallback libraries; never replace the active GPU runtime.
@@ -1474,7 +1476,7 @@ class Sam2SourceInstances:
         self.device = torch.device(device)
         if self.device.type != "cuda" or not torch.cuda.is_available():
             raise RuntimeError("SAM2 object reading requires the configured CUDA GPU")
-        checkpoint_path = Path(checkpoint_path).resolve()
+        checkpoint_path = AssetStore(Path(__file__).resolve().parents[2]).source(Path(checkpoint_path).resolve())
         weights = checkpoint_path / "model.safetensors"
         if not weights.is_file():
             raise FileNotFoundError(weights)

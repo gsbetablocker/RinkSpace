@@ -138,3 +138,35 @@ def sample_review_scene(scene, core, scene_path, *, print_stations=None, paramet
         derived.append(name)
     samples['inventory']['derived_display_paths'] = derived
     return samples
+
+
+def sample_native_review_scene(scene, core, scene_path, *, parameter_state=None,
+                               observed_path_ids=None, native=None):
+    """Draw the same current native paths consumed by residual evaluation.
+
+    The generic scene display can retain legacy material path coordinates. Scene
+    parameter updates must therefore be resolved through the native path table,
+    as in the complete programme renderer, before projecting ice or board paths.
+    """
+    from rinkspace.session.gpu_geometry import NativeSceneGPU
+    if native is None:
+        native = NativeSceneGPU(scene_path, core, parameter_state=parameter_state)
+    samples = sample_review_scene(scene, core, scene_path,
+        parameter_state=parameter_state, observed_path_ids=observed_path_ids)
+    chunks, cuts, offset = [], [], 0
+    for cut in samples['cuts']:
+        path = native.paths.get(cut['id'])
+        xyz = samples['xyz'][cut['begin']:cut['end']]
+        if path is not None and cut['layer'] != 'advertisement':
+            stations = (np.linspace(0, core.board_perimeter(native.scene['board']), 4097)
+                        if path['kind'] == 7 else np.linspace(*(path.get('support') or [0., 1.]),
+                                                             1025 if path['kind'] in (1, 6) else 129))
+            xyz = np.asarray(core.sample_path(native.scene['board'], path['kind'],
+                path['parameters'], path.get('vertices', []), stations))
+        chunks.append(xyz)
+        cuts.append({**cut, 'begin': offset, 'end': offset + len(xyz)})
+        offset += len(xyz)
+    samples['xyz'] = np.vstack(chunks)
+    samples['cuts'] = cuts
+    samples['native_paths_resolved'] = True
+    return samples

@@ -1,0 +1,154 @@
+{
+  "schema": "rinkspace.body-fixed-camera-comparison.v1",
+  "event": "ankara_2026",
+  "programme": "okada_mei_sp",
+  "shot": "s01",
+  "source_seconds": [
+    22.12,
+    44.96
+  ],
+  "native_exposures": 1143,
+  "lower_body_inferred_frames": 125,
+  "tested_visible_body_frames": 1018,
+  "output_definition": "SMPL-X pelvis centre P and its world vertical projection G=(P_x,P_y,0)",
+  "conclusions_zh": [
+    "局部姿态可修正组的身体二维重投影有小幅收益；不能据此认定真实三维位置更准确。",
+    "加入接冰后，模型刀刃的冰下状态明显减少，但诊断留出窗口尾部和未拟合手臂误差变差；不选为最终准确轨迹。",
+    "骨盆竖直投影对身体高度敏感。接冰组相对固定姿态的位移中位数约0.52条件米，最大约2.92条件米，不能解释为纠正了同等大小的真实误差。",
+    "相机、场景、原始取点和隔壁联合拟合输入均未由本实验修改；没有用历史展示轨迹或网络世界平移。"
+  ],
+  "comparison": [
+    {
+      "variant": "fixed",
+      "body_pixel_median": 6.537852824780452,
+      "body_pixel_p95": 18.240438567763576,
+      "diagnostic_body_pixel_median": 7.742780739843939,
+      "diagnostic_body_pixel_p95": 15.08596439768947,
+      "nonfit_arm_pixel_median": 13.095806791446458,
+      "ground_change_median_conditional_m": 0,
+      "ground_change_p95_conditional_m": 0,
+      "ground_change_maximum_conditional_m": 0,
+      "local_correction_p95_deg": 0,
+      "local_correction_maximum_deg": 0
+    },
+    {
+      "variant": "pose",
+      "body_pixel_median": 6.126364297853749,
+      "body_pixel_p95": 16.883401721581713,
+      "diagnostic_body_pixel_median": 7.591902936686703,
+      "diagnostic_body_pixel_p95": 14.356960282637193,
+      "nonfit_arm_pixel_median": 12.950990938247912,
+      "ground_change_median_conditional_m": 0.08472497286037242,
+      "ground_change_p95_conditional_m": 0.3758356287650739,
+      "ground_change_maximum_conditional_m": 0.4172010147659528,
+      "local_correction_p95_deg": 4.347373046548368,
+      "local_correction_maximum_deg": 13.105019545942094
+    },
+    {
+      "variant": "pose_contact",
+      "body_pixel_median": 6.521571757325662,
+      "body_pixel_p95": 18.29512726180753,
+      "diagnostic_body_pixel_median": 7.653686943384878,
+      "diagnostic_body_pixel_p95": 19.375976997983916,
+      "nonfit_arm_pixel_median": 15.337786273002745,
+      "ground_change_median_conditional_m": 0.5167475955948289,
+      "ground_change_p95_conditional_m": 2.721979005297789,
+      "ground_change_maximum_conditional_m": 2.919745115171329,
+      "local_correction_p95_deg": 8.535165350000735,
+      "local_correction_maximum_deg": 17.545786565276963
+    }
+  ],
+  "metric_status": "conditional",
+  "metres_per_scene_unit": 60,
+  "assumptions_zh": [
+    "冰场长轴1单位暂按60米，未实测。",
+    "共享体型按既有约1.53米身高审计缩放，未在原片独立量身。",
+    "鞋体有效垫高9厘米、五点弧形刀刃端部抬高12毫米为条件几何，未逐鞋测量。"
+  ],
+  "contact_zh": "四个粗原图刀刃区域用于接冰拟合，两个时刻及其前后100毫秒身体像素作开发诊断留出。非穿冰先验覆盖可见全身帧；留出接触高度不是独立三维真值。其余时刻接触状态未知，允许接冰滑行，不约束水平速度。",
+  "time_model": "native complete camera predicted-row implicit projection plus quadratic intra-exposure articulated body; exact-row diagnostic in comparison.json",
+  "validation_status_zh": "工程收敛及导数测试通过；画面等待用户审阅；无最终独立三维真值，未生成完整视频。",
+  "parameters_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\body_s01_parameters_20261029.npz",
+  "parameters_sha256": "c4e3098008710f526a16089e6e6da0dfefdf08d93eb9c2388832509c0d0aaa19",
+  "data_root": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029",
+  "data_report": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\comparison.json",
+  "source_binding": {
+    "schema": "rinkspace.fixed-camera-body-input.v1",
+    "shot": "s01",
+    "source_time_base": "1/12800",
+    "frames": 1143,
+    "source_seconds": [
+      22.12,
+      44.96
+    ],
+    "source_mapping": "confirmed_pixel_correspondence_ledger_only",
+    "source_UV_domain": "legacy_native_1920x1080_pixels_reused_on_confirmed_official_exposure; no old camera remapping",
+    "source_crop_affine_preserved": true,
+    "prior": "GVHMR image-conditioned local articulation; postproc=False; no network translation",
+    "global_orientation": "world binding established once through frozen current native camera",
+    "raw_clipped_frames": 119,
+    "lower_body_inferred_frames": 125,
+    "visibility_review": {
+      "lower_body_unreliable_before_pts": 314880,
+      "first_reviewed_full_body_pts": 314880,
+      "source_time_base": "1/12800",
+      "image": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/opening_evidence.jpg",
+      "conclusion": "22.260 s is cropped despite one legacy full-body flag; 24.300/24.440 s lower skate approaches or leaves the image bottom; 24.600 s is a reviewed complete body. Earlier lower-body geometry is inference, not an exposure-by-exposure claim that every frame is clipped."
+    },
+    "visibility_evidence_sha256": "30de672ae219c7643852d2da7fbfffcea61b700a42cc86238b1d7dad2df5488e",
+    "source_mapping_MAE_range": [
+      0.658212,
+      1.205729
+    ],
+    "metric_scale_status": "conditional",
+    "metres_per_scene_unit": 60,
+    "scale_basis": "declared working rink length in metres, not surveyed; no historical metres-per-scene-unit reused",
+    "body_scale": 0.9136808725841283,
+    "body_scale_basis": "existing shared-beta stature audit; approximate reported stature, not source measurement",
+    "frozen_inputs": {
+      "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\six_shot\\lane4_shared\\initial_pixels.npz": "c205f10937004c93529cf40cf3d6030750754146741178547db5abd052891544",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\six_shot\\lane4_shared\\joint_manifest.json": "e3a8ae550c7d16be26f7d64406c411362977a615de0d4bc5aca7b02c94dc6b0a",
+      "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\native_core\\sm120\\lane4_shared\\rinkspace_core.dll": "c52c5029d1fb826adf5745547d0af0e5ee967e521d2f10bd76f09abe26b70ce5",
+      "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\field\\lane_transverse_current.json": "cbd65837220a7f3aa04e6dd348b93c3d3e703499c00dc23bfbf279b090d6c700",
+      "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\history\\tracking_runs\\source_cadence_comparison\\O6j8L8TmfKo\\full_programme_alignment\\native60_to_official50.jsonl": "a9be37308b9a39fb55519a0be69c741c53a8216a81a60a2066fff25bdcf54dcc"
+    },
+    "native_library": "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\native_core\\sm120\\lane4_shared\\rinkspace_core.dll",
+    "scene_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\field\\lane_transverse_current.json",
+    "snapshot": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\six_shot\\lane4_shared\\initial_pixels.npz",
+    "run_root": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\six_shot\\lane4_shared",
+    "camera_updates_allowed": false,
+    "scene_updates_allowed": false,
+    "old_display_trajectory_used": false,
+    "GPU_body_inference_started": false
+  },
+  "model_sha256": "f3655f86d42e9a5a1cda80eabfa98895b06e51d44f07e707b352618f0ca3c753",
+  "files": {
+    "images": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\review_images.json",
+    "summary_plot": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\diagnostic_summary.png",
+    "detail_worst": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\detail_421888.png",
+    "detail_contact": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\detail_461056.png"
+  },
+  "reproduction": {
+    "module": "calibration.program_tracking.body_tracking.rebuild_body_fit",
+    "order": [
+      "fixed",
+      "pose",
+      "pose_contact"
+    ],
+    "warm_start": [
+      "none",
+      "fixed/result.npz",
+      "pose/result.npz"
+    ],
+    "input": "input.npz",
+    "input_sha256": "93a71022fc3c4d67a1ec4387f01a2e5513d96cdf50bc4728e0a290ca7590cc27",
+    "body_motion": "exposure",
+    "spline_spacing_s": 0.16
+  },
+  "tests": [
+    "test_rebuild_exposure_body: closed-form row solution, explicit out-of-image flag, true native body/contact directional derivative"
+  ],
+  "full_video_created": false,
+  "verification_report": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/verification.json",
+  "exposure_motion_approximation_p95_px": 0.29099822870924374
+}

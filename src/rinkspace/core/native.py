@@ -462,7 +462,7 @@ class NativeCore:
     def shared_geometry(self, board, layout, feature_code, options=0):
         kind = c.c_int()
         # Geometry6 is unchanged for legacy33 and all line/circle entities.
-        size = 8 if len(layout) == 35 and feature_code in (410, 411) else 6
+        size = 8 if len(layout) in (35, 39, 146) and feature_code in (410, 411) else 6
         out = (c.c_double * size)()
         if options:
             if not hasattr(self._lib, "rs_shared_entity_definition_with_options"):

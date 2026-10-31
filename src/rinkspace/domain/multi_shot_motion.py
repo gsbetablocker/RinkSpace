@@ -58,13 +58,38 @@ class ShotMotionTimeline:
     def count(self):return self.shots[-1]['control_stop']
 
     def row_times(self,pts):
-        pts=np.asarray(pts);out=np.empty(len(pts));covered=np.zeros(len(pts),bool)
+        pts=np.asarray(pts)
+        if pts.ndim!=1 or pts.dtype.kind not in "iu":
+            raise ValueError('Original PTS must be a one-dimensional integer array')
+        out=np.empty(len(pts));covered=np.zeros(len(pts),bool)
         for shot in self.shots:
             sl=slice(shot['row_begin'],shot['row_stop']);p=pts[sl]
             if np.any(covered[sl]) or not len(p):raise ValueError('Invalid shot row partition')
-            if np.any(p<shot['first_pts']) or np.any(p>=shot['stop_pts_exclusive']):
+            # Inspect integer extrema without unsigned/signed promotion.
+            low=int(p.min());high=int(p.max())
+            if low<shot['first_pts'] or high>=shot['stop_pts_exclusive']:
                 raise ValueError('Original PTS outside its shot')
-            out[sl]=(p-shot['reference_pts'])*shot['time_base_num']/shot['time_base_den']+self.offset(shot)
+            for name in ('reference_pts','time_base_num','time_base_den'):
+                if isinstance(shot[name],(bool,np.bool_)) or not isinstance(shot[name],(int,np.integer)):
+                    raise ValueError('Native clock metadata must use integer values')
+            reference=int(shot['reference_pts'])
+            numerator=int(shot['time_base_num']);denominator=int(shot['time_base_den'])
+            if numerator<=0 or denominator<=0:
+                raise ValueError('Native time base must be positive')
+            # Retain the vectorized path for normal native clocks. Only cases
+            # that cannot safely use int64 arithmetic need Python's wide ints.
+            lim=np.iinfo(np.int64);delta_low=low-reference;delta_high=high-reference
+            safe=(lim.min<=low<=high<=lim.max and lim.min<=reference<=lim.max
+                  and numerator<=lim.max and denominator<=lim.max
+                  and lim.min<=delta_low<=delta_high<=lim.max
+                  and lim.min<=delta_low*numerator<=delta_high*numerator<=lim.max)
+            if safe:
+                delta=p.astype(np.int64,copy=False)-np.int64(reference)
+                relative=(delta*numerator)/denominator
+            else:
+                relative=np.fromiter(((int(value)-reference)*numerator/denominator for value in p),
+                                     dtype=np.float64,count=len(p))
+            out[sl]=relative+self.offset(shot)
             covered[sl]=True
         if not covered.all():raise ValueError('Unassigned original observation')
         return out

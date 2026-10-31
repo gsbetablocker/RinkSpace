@@ -56,6 +56,11 @@ class NativeSceneGPU:
         """Bind source coordinates to existing paths; geometry has no data-side setter."""
         import numpy as np
         from ..core.gpu import ResidentResidualProblem
+        if self.scene.get('shared_geometry_options',0)&64:
+            from ..domain.ice_tolerance import scene_physical_bounds
+            required_lower,required_upper=scene_physical_bounds(self.parameter_state)
+            scene_lower=required_lower if scene_lower is None else np.maximum(required_lower,scene_lower)
+            scene_upper=required_upper if scene_upper is None else np.minimum(required_upper,scene_upper)
         ids=list(path_ids)
         missing=sorted(set(ids)-self.paths.keys())
         if missing:raise ValueError("Path is absent from the selected numeric native model: "+str(missing))
@@ -176,7 +181,8 @@ def scene_coordinate_charts(state):
         elif block["kind"]=="shared_geometry":
             name=block["id"].rsplit("/",1)[-1]
             positive={"curling_shared":[3,4],"lane_shared":[1],"hockey_shared":[1,2],
-                "hockey_faceoff_shared":[2,4],"hockey_ends_ellipse":list(range(6))}.get(name)
+                "hockey_faceoff_shared":[2,4],"hockey_ends_ellipse":list(range(6)),
+                "lane_transverse":[],"ice_tolerance":[]}.get(name)
             if positive is None:raise ValueError("Shared geometry needs a declared native coordinate chart: "+name)
             positive=block.get('positive_local_indices',positive)
             charts[offset+np.asarray(positive,dtype=int)]=1

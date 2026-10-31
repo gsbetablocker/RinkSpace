@@ -1,0 +1,2553 @@
+{
+  "schema": "rinkspace.s01-joint-round-delivery.v1",
+  "selected_research_candidate": "J1_s2",
+  "selection_reason_zh": "保留鞋尺寸固定、已做四窗口深度剖面的J1作为后续研究基线；J2仅降低少量目标且开发刃误差仍大，不据此宣称实物尺寸或真实深度已恢复。",
+  "accepted_for_contact_feedback": false,
+  "accepted_for_camera_feedback": false,
+  "production_body_binding_replaced": false,
+  "original_observations_modified": false,
+  "camera_updated": false,
+  "scene_updated": false,
+  "root_updated": true,
+  "contact_feedback": false,
+  "metric_scale_status": "historical experiment used obsolete default 60; current conversion is recorded separately",
+  "metres_per_scene_unit": 60,
+  "conditional_body_scale": 0.9136808725841283,
+  "source_time_base": [
+    1,
+    12800
+  ],
+  "source_first_last_pts": [
+    283136,
+    575488
+  ],
+  "source_exposures": 1143,
+  "lower_body_inferred_frames": 125,
+  "physical_foot_identity_independently_verified": false,
+  "numerically_converged": false,
+  "single_trajectory": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\body_s01_joint_candidate_20261029.npz",
+    "sha256": "a6bff2986324677a5751cf03c788e27b81fa52a772ff2eeafcb8c85ecaf52816",
+    "P_definition": "3D pelvis at common source mid-exposure time",
+    "G_definition": "vertical world projection (Px,Py,0), not COM or support skate"
+  },
+  "joint_magnitude_from_additional_controls_deg": {
+    "hip_left": {
+      "median": 6.175311655642557,
+      "p95": 18.31212354955496,
+      "maximum": 21.59639868399654
+    },
+    "hip_right": {
+      "median": 6.019241322407801,
+      "p95": 15.8106573016036,
+      "maximum": 26.144605448573124
+    },
+    "knee_left": {
+      "median": 2.480774719091694,
+      "p95": 6.274971829448276,
+      "maximum": 7.69337754163548
+    },
+    "knee_right": {
+      "median": 1.6109258400730015,
+      "p95": 5.612466714938961,
+      "maximum": 9.69269763872368
+    },
+    "ankle_left": {
+      "median": 9.067317055189699,
+      "p95": 23.562781814005632,
+      "maximum": 25.26877612463756
+    },
+    "ankle_right": {
+      "median": 9.940766288416025,
+      "p95": 23.44456686459522,
+      "maximum": 38.657684358184
+    }
+  },
+  "body_model_and_camera_bindings": {
+    "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\six_shot\\lane4_shared\\initial_pixels.npz": "c205f10937004c93529cf40cf3d6030750754146741178547db5abd052891544",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\six_shot\\lane4_shared\\joint_manifest.json": "e3a8ae550c7d16be26f7d64406c411362977a615de0d4bc5aca7b02c94dc6b0a",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\native_core\\sm120\\lane4_shared\\rinkspace_core.dll": "c52c5029d1fb826adf5745547d0af0e5ee967e521d2f10bd76f09abe26b70ce5",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\field\\lane_transverse_current.json": "cbd65837220a7f3aa04e6dd348b93c3d3e703499c00dc23bfbf279b090d6c700",
+    "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\history\\tracking_runs\\source_cadence_comparison\\O6j8L8TmfKo\\full_programme_alignment\\native60_to_official50.jsonl": "a9be37308b9a39fb55519a0be69c741c53a8216a81a60a2066fff25bdcf54dcc"
+  },
+  "actual_native_library_sha256": "c52c5029d1fb826adf5745547d0af0e5ee967e521d2f10bd76f09abe26b70ce5",
+  "model_provenance_files": [
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\models\\cache\\footmr\\footmr_checkpoint.ckpt.provenance.json",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\models\\cache\\rtmw\\provenance.json"
+  ],
+  "source_code_sha256": {
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\rebuild_exposure_body.py": "4ff5d53ca533830627ea1bd13ee5b2e8e900acf0876961dfdb2a3d25e378ef5b",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\rebuild_body_fit.py": "ab3401a1e6f085c34a449f3a6410b61dd3b27be119bcbce8801b1a46528ea27b",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\footwear_fit.py": "4bb8ba5f70668d09db1d36716ed5f9cc56940a10b9b1548ae4912d006047e6b3",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\footwear_pose_transfer.py": "91c33153ac87166e5c7f3059c7b7e9d62591d90af89fa3b2e71e8863d499259d",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\footwear_pixel_factors.py": "4ce944b38bb7de311f42a1cb425d882d1cba5bf273431160b16db507c7a98940",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\footwear_joint.py": "df47088c481225e9e4b412f93703613da31b0d2f97531e6078b8b737f4ea505e",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\footwear_profile.py": "e178ac267affe5643fee81394f06eb7f1dd73315d42affaf83f314d6cec1054c",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\footwear_joint_review.py": "01e2f0359143c3399ffe8f6a994a9bdec77a3a2399cbf12471a1e7be27c650a9",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\footwear_temporal_review.py": "2058aeb5d2a6b3a0ddc9f5f4cfb9ff5bdc17b4b1910c6acc15aa62e0fad3d0d8",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\footmr_contract.py": "d187c359c3512e73c5a3e0ba0b39e401affdeb247111b5994129e477e321a4b3",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\footmr_inference.py": "ce126fcd925e9b599b9d24f8c2ae14050eb741f5a0499658c4928ff4a9c72cae",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\footmr_native.py": "7ebe72475e24ebf621f76e19861305814e3ff5e38904fc97026e73d5e0fdbf6a",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\tests\\test_split_exposure_body.py": "41124cb32fec34c19ebbf06ad69cd4407425bbd6edc0bcec357f50b4def172d1",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\tests\\test_footwear_joint.py": "5b998a35a5ea8e11173513f1b0ec7ddff69ecd35005257004cf3bd3495db8463"
+  },
+  "artifact_sha256": {
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\input.npz": "93a71022fc3c4d67a1ec4387f01a2e5513d96cdf50bc4728e0a290ca7590cc27",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\compact_smplx.npz": "f3655f86d42e9a5a1cda80eabfa98895b06e51d44f07e707b352618f0ca3c753",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\camera_snapshot.npz": "74871e689211ed21011a5a2dcb26135435bdff6dbd98052b9eb08bdc49ff63ec",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\B5\\result.npz": "8b5fdb70f951ee692bb07e717ca31e620c718e6c3e689da5be9d5b73f408195d",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\B5\\initial_projection_only.npz": "b11c15e4ddadd692b60249e601e13e7831b0924a76d2c76daf9b409e67873180",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\footwear_s01_joint_semantics_v2_20261029.json": "32f38cb8ce5f4657695d681df1aa23eac1991b6f01c5992e1d39187da895881a",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\body_s01_joint_semantics_v2_controls_20261029.json": "d9f32b60fab3c7641d8473fc2c45c43a01e8fd5cdd25ad168a1b666b2894b894",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\wholebody\\wholebody_coco23.npz": "05c01102465a996de26fdc822ac8061e0303d2a1e61a64d9afd3fd2d22ee5b82",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\FootMR_input_J1\\footmr_input_contract.npz": "0724392ceb0ab6331e53521e86dac566883e77da54f6f731174433402f5a65cd",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\FootMR_J1\\candidate_50hz.npz": "c364cd5f8d1ee145ba43f78b4515d350a6cb735d9a9c88bcd99d3d61384d23a4",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\FootMR_native\\native_projection_report.json": "6e28bd4f5df9e08ee29d51ac60da4f2464bdc59913be222ae93c382904cd6b76",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\profiles_s2\\profiles.json": "e650d976330ded572fd8c89cec0fd98f1eadc8196d8b3a7a2d19f56c78644d17",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\review_s2_final\\comparison.json": "363424deb2089d32a804aefae9991952995f20e23c9a0ca9a30ca6379805a356",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\review_s2_final\\source_identity_diagnostic.json": "3e72850667fb9ac665bb65fcc32cda4f5c94baaa5fbf414d5e8e0d4221d21aac",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J0_s2\\result.npz": "4072d29318311a9fb64eb16bffe0ba156c0de2cd46e4f659942ea78d7fcc10d0",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J0_s2\\result.json": "dfd4fe02820f840e49f1fe4bcf827e17fd98ad6a067221383de5ddad85c2da54",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J0_s2\\config.json": "9fc508bb92aabbfde8f32d65f2e72e40d70f2f0eed0868ef1ba65d49c221e0c4",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J0_s2_footinit\\result.npz": "6f23b71a44b4f70f44272107eb2ed3a54f7c98715bcd74c767b891b369e8b6aa",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J0_s2_footinit\\result.json": "918ac3029962589ca02dea4f7ff73ccd5f99305c7e73344c21d2a1d0ee330d6a",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J0_s2_footinit\\config.json": "8dc5d0e676ebd6f80149286d6b5f57f03c8bfa35eb5f4e88ccae5d496076a1af",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\result.npz": "5bcfc447b3acb33cbd1a88299d1ebdf571e963aea069290f1065f1b3111487b2",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\result.json": "86f22ce73b3200e571e4b4a691f3cbdff5689ed09cc504e8421f959d43a37622",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\config.json": "ea288c913d436064f02813713b527d72b06897f6616db7318045ad0362742fe1",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2_alternative\\result.npz": "4a5e6e8b72dda415d6cf4b1121189d0d8ccfffbe85dec0332e0977cecbee85b4",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2_alternative\\result.json": "bdbea00209defd3061e804207c8552f9889af071428062421cdea77f661abd95",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2_alternative\\config.json": "32de4539cf8b56c036b9f38c4c40680bd30255a38b9cc90fb25e9fd8684b4c65",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J2_s2\\result.npz": "83f985cf6da26e56c3d3ba059ab1b6e0a0bc654b7a98e6dcef042c1d67a3a0e8",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J2_s2\\result.json": "3d5bcbc8b592050b2c704c9daaa31ea954a16016d092af4f54ba84d31871ead4",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J2_s2\\config.json": "48a68d2fe561c90e3e753a16edc45b4a41f9ee33a8f394165805de9a8dfdae60",
+    "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/next_round_20261029/FootMR_J1/report.json": "9fe64aaa88d04334caa0eac7efb0038d8c724a42b0ef89005bad5fd42436b84f",
+    "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/next_round_20261029/wholebody/report.json": "b36a8873fcac2a09272577a91e5f853ab8c1c95b30a574fe86a3f065f3e7755c",
+    "D:/OneDrive/codex_projs/RinkSpace/environments/body/FootMR/source_identity.json": "95c75e77e4b96f3efb10dafa4038dde6c3a116cd51c1176b8dc9370ffc4ac17a",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\models\\cache\\footmr\\footmr_checkpoint.ckpt.provenance.json": "2e4688ad60b017856afbd36d9f3adb2dc9f459b637ebce9a9ac41b62eeeb7ae3",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\models\\cache\\rtmw\\provenance.json": "393d6446b5f3368bea3da86dbea233af9e9fb5bf839c2e7a8a461ac25cbf518c",
+    "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/next_round_20261029/review_s2_final/RESULT_ZH.md": "f03a2b9f558d618cea1e09db389d962f51d944e025c88b1145f32f10c31d6b6b",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\review_s2_final\\RESULT_TECHNICAL_20261029.md": "4ec462833c2ccb0606a51cb427d3106a86add7351b06ba99637767429c42753a",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\review_s2_final\\RESULT_ZH.md": "f03a2b9f558d618cea1e09db389d962f51d944e025c88b1145f32f10c31d6b6b"
+  },
+  "development_summary": {
+    "schema": "rinkspace.s01-exposure-joint-footmr-comparison.v1",
+    "source_review_sha256": "32f38cb8ce5f4657695d681df1aa23eac1991b6f01c5992e1d39187da895881a",
+    "source_exposures": 1143,
+    "native_time_base": [
+      1,
+      12800
+    ],
+    "visible_lower_body_frames": 1018,
+    "inferred_lower_body_frames": 125,
+    "camera_updated": false,
+    "scene_updated": false,
+    "metric_scale_status": "historical values used default 60; superseded by current_metric_binding; body stature remains approximate",
+    "contact_feedback": false,
+    "all_checks_are_development": true,
+    "independent_3d_truth": false,
+    "semantic_binding_corrections": [
+      {
+        "pts": 325120,
+        "raw_uv_multiset_unchanged": true,
+        "same_previous_prediction_angle_before_deg": 105.53974177451484,
+        "same_previous_prediction_angle_after_deg": 74.46025822548518
+      },
+      {
+        "pts": 336128,
+        "raw_uv_multiset_unchanged": true,
+        "same_previous_prediction_angle_before_deg": 135.36538853553498,
+        "same_previous_prediction_angle_after_deg": 44.63461146446503
+      }
+    ],
+    "multistart": {
+      "reference": "J1_s2",
+      "alternative": "J1_s2_alternative",
+      "visible_root_difference_conditional_m": {
+        "count": 1018,
+        "median": 0.00668187022804011,
+        "p95": 0.034026120861395996,
+        "maximum": 0.042445648361514994
+      },
+      "visible_G_difference_conditional_m": {
+        "count": 1018,
+        "median": 0.006681110659925927,
+        "p95": 0.03402129982374006,
+        "maximum": 0.042442044570336984
+      },
+      "worst_source_seconds": 42.04,
+      "both_numerically_converged": false,
+      "interpretation": "A comparison of two terminated nonlinear basins, not proof of uniqueness or a physical uncertainty interval."
+    },
+    "body_source_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+    ],
+    "joint_source_exposures": 602,
+    "admitted_boot_contours": 206,
+    "fit_blade_curve_count": 7,
+    "fit_blade_original_vertices": 34,
+    "fit_blade_resampled_vertices_per_curve": 24,
+    "metrics": {
+      "B5": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\B5\\result.npz",
+        "sha256": "8b5fdb70f951ee692bb07e717ca31e620c718e6c3e689da5be9d5b73f408195d",
+        "body_visible13_px": {
+          "count": 13221,
+          "median": 6.109149675876968,
+          "p95": 16.872421027559515,
+          "maximum": 125.40344801238172
+        },
+        "body_partial_visible_points_px": {
+          "count": 861,
+          "median": 35.17975496471475,
+          "p95": 93.92541039232856,
+          "maximum": 136.8966284304274
+        },
+        "body_used_sample_px": {
+          "count": 7408,
+          "median": 6.37712966092274,
+          "p95": 24.52151829685891,
+          "maximum": 136.74097062874762
+        },
+        "body_development_excluded_window_px": {
+          "count": 286,
+          "median": 7.577119731562437,
+          "p95": 14.336190412693634,
+          "maximum": 18.88640141440326
+        },
+        "elbow_wrist_visible_px": {
+          "count": 4068,
+          "median": 12.948042669105417,
+          "p95": 32.9504894179081,
+          "maximum": 427.764677387808
+        },
+        "elbow_wrist_used_in_objective": false,
+        "worst_visible_body": {
+          "source_seconds": 40.76,
+          "coco_joint": 15,
+          "error_px": 125.40344801238172
+        },
+        "root_displacement_from_B5_conditional_m": {
+          "visible": {
+            "count": 1018,
+            "median": 0,
+            "p95": 0,
+            "maximum": 0
+          },
+          "inferred": {
+            "count": 125,
+            "median": 0,
+            "p95": 0,
+            "maximum": 0
+          },
+          "visible_absolute_along_ray": {
+            "count": 1018,
+            "median": 0,
+            "p95": 0,
+            "maximum": 0
+          },
+          "visible_transverse": {
+            "count": 1018,
+            "median": 0,
+            "p95": 0,
+            "maximum": 0
+          },
+          "visible_vertical": {
+            "count": 1018,
+            "median": 0,
+            "p95": 0,
+            "maximum": 0
+          }
+        },
+        "optimizer": {
+          "mode": "pose",
+          "success": true,
+          "status": 2,
+          "message": "`ftol` termination condition is satisfied.",
+          "cost": 5635.035355572902,
+          "optimality": 0.2490977488475209,
+          "numerically_converged": false,
+          "initial_cost_at_same_warm_parameters": 5635.102824137186,
+          "export_schema": "rinkspace.body-exposure-result.v2",
+          "nfev": 4,
+          "njev": 4,
+          "elapsed_seconds": 9.553575100027956,
+          "parts": {
+            "source_pixels": 5155.797732026439,
+            "root_acceleration": 135.25782608233862,
+            "root_rotation_curvature": 186.68749492053695,
+            "root_rotation_prior": 87.38167257748954,
+            "local_pose_prior": 31.03083416773658,
+            "local_pose_correction_acceleration": 38.87979579835812
+          },
+          "all_source_detector_reprojection_px": {
+            "n": 18642,
+            "median": 7.670162420704572,
+            "p95": 43.19969069144817,
+            "maximum": 748.3348045159732
+          },
+          "heldout_source_detector_reprojection_px": {
+            "n": 374,
+            "median": 9.11251683304674,
+            "p95": 22.878784223309598,
+            "maximum": 28.799509144469717
+          },
+          "local_correction_absolute_deg": {
+            "n": 10287,
+            "median": 0.9079762764950057,
+            "p95": 4.344191910572618,
+            "maximum": 13.106554808438597
+          },
+          "visible_body_pelvis_height_conditional_m": {
+            "n": 1018,
+            "median": 0.7704227344858077,
+            "p95": 0.9096886887599218,
+            "maximum": 0.9641845232678898
+          },
+          "contact_state_unknown_frames": 1137,
+          "source_frames": 1143,
+          "camera_parameters_changed": false,
+          "scene_parameters_changed": false,
+          "source_3d_accuracy_claim": false,
+          "rolling_shutter_body_motion": "split quadratic, five exact articulated samples; implicit native predicted row; camera and body share row time; outside-image body uses flagged endpoints"
+        }
+      },
+      "shoe_previous": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\footwear_v2\\semantic_transfer\\observed_pose\\result.npz",
+        "sha256": "d83d26da0a6f5a7b15be4d53394e311fee31c69d9dfdf09241765b54ecade740",
+        "body_visible13_px": {
+          "count": 13221,
+          "median": 6.299870256801192,
+          "p95": 18.110213240060634,
+          "maximum": 121.80322662826958
+        },
+        "body_partial_visible_points_px": {
+          "count": 861,
+          "median": 35.129399486510536,
+          "p95": 93.92564909626354,
+          "maximum": 136.8905632141808
+        },
+        "body_used_sample_px": {
+          "count": 7408,
+          "median": 6.621412094839362,
+          "p95": 25.10596990728656,
+          "maximum": 136.73965558119247
+        },
+        "body_development_excluded_window_px": {
+          "count": 286,
+          "median": 7.33797407735315,
+          "p95": 14.964069220289543,
+          "maximum": 18.82076382035326
+        },
+        "elbow_wrist_visible_px": {
+          "count": 4068,
+          "median": 12.956801307145774,
+          "p95": 32.96466625034082,
+          "maximum": 427.8245866248602
+        },
+        "elbow_wrist_used_in_objective": false,
+        "worst_visible_body": {
+          "source_seconds": 40.76,
+          "coco_joint": 15,
+          "error_px": 121.80322662826958
+        },
+        "root_displacement_from_B5_conditional_m": {
+          "visible": {
+            "count": 1018,
+            "median": 0.0002647529679773605,
+            "p95": 0.0008910292557699499,
+            "maximum": 0.0011186228579525745
+          },
+          "inferred": {
+            "count": 125,
+            "median": 0.0007277154858853555,
+            "p95": 0.0017830975257685441,
+            "maximum": 0.0018019763929233686
+          },
+          "visible_absolute_along_ray": {
+            "count": 1018,
+            "median": 0.0002571225660898979,
+            "p95": 0.0008901089335454491,
+            "maximum": 0.0011131485398814273
+          },
+          "visible_transverse": {
+            "count": 1018,
+            "median": 0.00004374717688901954,
+            "p95": 0.00012975573804432285,
+            "maximum": 0.00024501327296636287
+          },
+          "visible_vertical": {
+            "count": 1018,
+            "median": 0.0000287982021266453,
+            "p95": 0.00007105641020188623,
+            "maximum": 0.00013413186030430957
+          }
+        },
+        "optimizer": {
+          "optimizer_success": true,
+          "numerically_converged": false,
+          "termination": "`xtol` termination condition is satisfied.",
+          "cost": 874.3293773501271,
+          "optimality": 22.539444538800716,
+          "nfev": 33,
+          "njev": 18,
+          "elapsed_seconds": 65.53565990005154,
+          "parts": {
+            "boot_boundary": 483.1907737319409,
+            "blade_lower_edge": 22.27299430808333,
+            "boot_heel_toe_semantics": 93.0954299142551,
+            "source_knees": 103.52617442341578,
+            "shared_shape_prior": 7.721655621585659,
+            "leg_rotation_prior": 88.23002723249566,
+            "leg_correction_acceleration": 76.29232211835114
+          },
+          "equipment_geometry_changed": false,
+          "pelvis_changed": false,
+          "independent_3d_truth": false,
+          "knives_in_new_windows_fitted": false
+        },
+        "fit_blade_fixed_left_px": {
+          "count": 34,
+          "median": 2.7498790370053117,
+          "p95": 24.580272135083558,
+          "maximum": 39.714961788954334
+        },
+        "development_geometry_blade_fixed_left_px": {
+          "count": 13,
+          "median": 14.260985005334938,
+          "p95": 26.8221528656067,
+          "maximum": 28.725883773505494
+        },
+        "development_earlier_blade_fixed_left_px": {
+          "count": 15,
+          "median": 7.958132142205533,
+          "p95": 31.673209236305347,
+          "maximum": 42.94822313573018
+        },
+        "direction_angle_deg": {
+          "count": 11,
+          "median": 12.112438114877849,
+          "p95": 59.5474348449751,
+          "maximum": 74.46025822548518
+        },
+        "heel_toe_edge_error_px": {
+          "count": 22,
+          "median": 5.753262637709765,
+          "p95": 26.78507728157032,
+          "maximum": 29.78164127322475
+        },
+        "critical_direction": [
+          {
+            "mode": "shoe_previous",
+            "source_seconds": 25.4,
+            "pts": 325120,
+            "foot": 1,
+            "angle_deg": 74.46025822548518,
+            "projected_length_px": 18.073850008721273,
+            "source_length_px": 82.02438661763951,
+            "heel_toe_edge_error_px": [
+              27.188630750298156,
+              29.78164127322475
+            ]
+          },
+          {
+            "mode": "shoe_previous",
+            "source_seconds": 26.26,
+            "pts": 336128,
+            "foot": 1,
+            "angle_deg": 44.63461146446503,
+            "projected_length_px": 17.024801220506834,
+            "source_length_px": 64.19501538281614,
+            "heel_toe_edge_error_px": [
+              9.639501631597563,
+              19.11756137574153
+            ]
+          }
+        ],
+        "admitted_boot_source_contour_px": {
+          "count": 9888,
+          "median": 3.784746005287607,
+          "p95": 13.277703506912768,
+          "maximum": 33.138658975812994
+        },
+        "conditional_blade_height_diagnostic_m": {
+          "values": {
+            "count": 2036,
+            "median": -0.06015445669028516,
+            "p95": 0.17260054890161702,
+            "maximum": 0.5751790014789777
+          },
+          "negative_value_fraction": 0.7981335952848723,
+          "contact_state_inferred": false
+        }
+      },
+      "J0_s2": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J0_s2\\result.npz",
+        "sha256": "4072d29318311a9fb64eb16bffe0ba156c0de2cd46e4f659942ea78d7fcc10d0",
+        "body_visible13_px": {
+          "count": 13221,
+          "median": 5.992631894317391,
+          "p95": 16.047133470622217,
+          "maximum": 122.4127502680767
+        },
+        "body_partial_visible_points_px": {
+          "count": 861,
+          "median": 35.119447976466965,
+          "p95": 93.84873411345669,
+          "maximum": 136.82899933459632
+        },
+        "body_used_sample_px": {
+          "count": 7408,
+          "median": 6.2644500598319155,
+          "p95": 23.25542621265494,
+          "maximum": 136.6511137948408
+        },
+        "body_development_excluded_window_px": {
+          "count": 286,
+          "median": 7.12554227415821,
+          "p95": 14.9209270628629,
+          "maximum": 18.802560439215018
+        },
+        "elbow_wrist_visible_px": {
+          "count": 4068,
+          "median": 12.924126874132046,
+          "p95": 32.943580310209306,
+          "maximum": 427.73072834519814
+        },
+        "elbow_wrist_used_in_objective": false,
+        "worst_visible_body": {
+          "source_seconds": 40.76,
+          "coco_joint": 15,
+          "error_px": 122.4127502680767
+        },
+        "root_displacement_from_B5_conditional_m": {
+          "visible": {
+            "count": 1018,
+            "median": 0,
+            "p95": 0,
+            "maximum": 0
+          },
+          "inferred": {
+            "count": 125,
+            "median": 0,
+            "p95": 0,
+            "maximum": 0
+          },
+          "visible_absolute_along_ray": {
+            "count": 1018,
+            "median": 0,
+            "p95": 0,
+            "maximum": 0
+          },
+          "visible_transverse": {
+            "count": 1018,
+            "median": 0,
+            "p95": 0,
+            "maximum": 0
+          },
+          "visible_vertical": {
+            "count": 1018,
+            "median": 0,
+            "p95": 0,
+            "maximum": 0
+          }
+        },
+        "optimizer": {
+          "mode": "J0",
+          "optimizer_success": true,
+          "termination": "`ftol` termination condition is satisfied.",
+          "optimality": 2.5325299471049845,
+          "gradient_inf": 0.855578946956051,
+          "numerically_converged": false,
+          "cost": 5980.07874753954,
+          "parts": {
+            "visible_boot_edges": 477.41951085954014,
+            "visible_blade_curves": 8.67950748838962,
+            "boot_direction_endpoints": 40.27912283759887,
+            "body_pixels": 5158.850783495756,
+            "leg_prior": 88.95372380343468,
+            "leg_acceleration": 64.90062454420033,
+            "root_acceleration": 135.25782608233862,
+            "conditional_shape_prior": 5.737648428280431
+          },
+          "nfev": 33,
+          "njev": 28,
+          "seconds": 106.60708650003653,
+          "camera_updated": false,
+          "root_updated": false,
+          "contact_feedback": false,
+          "footwear_installation_gauge": "three boot_align values frozen at declared conditional equipment reference",
+          "blade_candidates": [
+            {
+              "pts": 325120,
+              "foot": 1,
+              "selected_candidate": "blade_left",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 332800,
+              "foot": 0,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 346624,
+              "foot": 1,
+              "selected_candidate": "blade_left",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 455680,
+              "foot": 0,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 455680,
+              "foot": 1,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 461056,
+              "foot": 0,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 461056,
+              "foot": 1,
+              "selected_candidate": "blade_left",
+              "source_side_confirmed": false
+            }
+          ],
+          "user_accepted": false
+        },
+        "fit_blade_fixed_left_px": {
+          "count": 34,
+          "median": 3.661669302154033,
+          "p95": 14.767752200430731,
+          "maximum": 16.817306893563114
+        },
+        "development_geometry_blade_fixed_left_px": {
+          "count": 13,
+          "median": 14.295059097101063,
+          "p95": 27.89190299649365,
+          "maximum": 33.36129162447453
+        },
+        "development_earlier_blade_fixed_left_px": {
+          "count": 15,
+          "median": 8.270201852009913,
+          "p95": 26.85553988437119,
+          "maximum": 37.14921859754084
+        },
+        "direction_angle_deg": {
+          "count": 11,
+          "median": 12.028089427002156,
+          "p95": 23.145395543189295,
+          "maximum": 24.174889777658333
+        },
+        "heel_toe_edge_error_px": {
+          "count": 22,
+          "median": 5.720016380756871,
+          "p95": 13.895714526790758,
+          "maximum": 23.48997814825961
+        },
+        "critical_direction": [
+          {
+            "mode": "J0_s2",
+            "source_seconds": 25.4,
+            "pts": 325120,
+            "foot": 1,
+            "angle_deg": 22.115901308720254,
+            "projected_length_px": 88.04783913077318,
+            "source_length_px": 82.02438661763951,
+            "heel_toe_edge_error_px": [
+              8.088201395640638,
+              5.210402288707254
+            ]
+          },
+          {
+            "mode": "J0_s2",
+            "source_seconds": 26.26,
+            "pts": 336128,
+            "foot": 1,
+            "angle_deg": 16.850259376608978,
+            "projected_length_px": 58.34421088417596,
+            "source_length_px": 64.19501538281614,
+            "heel_toe_edge_error_px": [
+              8.749577498982017,
+              23.48997814825961
+            ]
+          }
+        ],
+        "admitted_boot_source_contour_px": {
+          "count": 9888,
+          "median": 3.8578795349788475,
+          "p95": 13.242205137720479,
+          "maximum": 31.277009336183838
+        },
+        "conditional_blade_height_diagnostic_m": {
+          "values": {
+            "count": 2036,
+            "median": -0.059935317061750204,
+            "p95": 0.18019456983584534,
+            "maximum": 0.5775342737764693
+          },
+          "negative_value_fraction": 0.7956777996070727,
+          "contact_state_inferred": false
+        },
+        "equipment_parameters": {
+          "shoe_rear": 0.025000000480777423,
+          "shoe_front": 0.20626047203171843,
+          "shoe_width": 0.08820071638223104,
+          "ankle_to_sole": 0.13342442307652932,
+          "upper_height": 0.06156049957326905,
+          "blade_drop": 0.029567310296141767,
+          "blade_rear_extension": 0.011609877276106524,
+          "blade_front_extension": 0.016293233697755358,
+          "rocker_rise": 0.012119615647436289,
+          "toe_rise": 0.011355408650252075,
+          "boot_align_x": 0.06988900002407754,
+          "boot_align_y": -0.06448704354998597,
+          "boot_align_z": 0.21975639724237883,
+          "blade_pitch": 0.22776270551702998
+        }
+      },
+      "J0_s2_footinit": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J0_s2_footinit\\result.npz",
+        "sha256": "6f23b71a44b4f70f44272107eb2ed3a54f7c98715bcd74c767b891b369e8b6aa",
+        "body_visible13_px": {
+          "count": 13221,
+          "median": 5.9665459052219525,
+          "p95": 15.923101158149848,
+          "maximum": 121.16613945206612
+        },
+        "body_partial_visible_points_px": {
+          "count": 861,
+          "median": 35.120045638839315,
+          "p95": 93.84997461669296,
+          "maximum": 136.8275590359401
+        },
+        "body_used_sample_px": {
+          "count": 7408,
+          "median": 6.217209589952301,
+          "p95": 23.347931087956606,
+          "maximum": 136.64833681308545
+        },
+        "body_development_excluded_window_px": {
+          "count": 286,
+          "median": 7.118814229687752,
+          "p95": 14.33656359383745,
+          "maximum": 18.761069277570652
+        },
+        "elbow_wrist_visible_px": {
+          "count": 4068,
+          "median": 12.914553555882858,
+          "p95": 32.932594105053305,
+          "maximum": 427.6982158866514
+        },
+        "elbow_wrist_used_in_objective": false,
+        "worst_visible_body": {
+          "source_seconds": 40.76,
+          "coco_joint": 15,
+          "error_px": 121.16613945206612
+        },
+        "root_displacement_from_B5_conditional_m": {
+          "visible": {
+            "count": 1018,
+            "median": 0,
+            "p95": 0,
+            "maximum": 0
+          },
+          "inferred": {
+            "count": 125,
+            "median": 0,
+            "p95": 0,
+            "maximum": 0
+          },
+          "visible_absolute_along_ray": {
+            "count": 1018,
+            "median": 0,
+            "p95": 0,
+            "maximum": 0
+          },
+          "visible_transverse": {
+            "count": 1018,
+            "median": 0,
+            "p95": 0,
+            "maximum": 0
+          },
+          "visible_vertical": {
+            "count": 1018,
+            "median": 0,
+            "p95": 0,
+            "maximum": 0
+          }
+        },
+        "optimizer": {
+          "mode": "J0",
+          "optimizer_success": true,
+          "termination": "`ftol` termination condition is satisfied.",
+          "optimality": 6.896045487519379,
+          "gradient_inf": 2.3342083125285824,
+          "numerically_converged": false,
+          "cost": 5967.427342701297,
+          "parts": {
+            "visible_boot_edges": 473.2198780469936,
+            "visible_blade_curves": 7.713666977316404,
+            "boot_direction_endpoints": 44.061113263042884,
+            "body_pixels": 5152.9850005067565,
+            "leg_prior": 82.80048325157952,
+            "leg_acceleration": 65.65172614498636,
+            "root_acceleration": 135.25782608233862,
+            "conditional_shape_prior": 5.737648428280431
+          },
+          "nfev": 28,
+          "njev": 24,
+          "seconds": 96.41268730000593,
+          "camera_updated": false,
+          "root_updated": false,
+          "contact_feedback": false,
+          "footwear_installation_gauge": "three boot_align values frozen at declared conditional equipment reference",
+          "blade_candidates": [
+            {
+              "pts": 325120,
+              "foot": 1,
+              "selected_candidate": "blade_left",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 332800,
+              "foot": 0,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 346624,
+              "foot": 1,
+              "selected_candidate": "blade_left",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 455680,
+              "foot": 0,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 455680,
+              "foot": 1,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 461056,
+              "foot": 0,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 461056,
+              "foot": 1,
+              "selected_candidate": "blade_left",
+              "source_side_confirmed": false
+            }
+          ],
+          "user_accepted": false
+        },
+        "fit_blade_fixed_left_px": {
+          "count": 34,
+          "median": 3.3254667363319763,
+          "p95": 14.684418727232437,
+          "maximum": 17.21804875508522
+        },
+        "development_geometry_blade_fixed_left_px": {
+          "count": 13,
+          "median": 13.943779055820443,
+          "p95": 28.661093994941314,
+          "maximum": 34.20976841362962
+        },
+        "development_earlier_blade_fixed_left_px": {
+          "count": 15,
+          "median": 8.878239069308352,
+          "p95": 24.027197480190857,
+          "maximum": 27.6583926683486
+        },
+        "direction_angle_deg": {
+          "count": 11,
+          "median": 12.176013091288235,
+          "p95": 23.153744892754062,
+          "maximum": 24.31362200325606
+        },
+        "heel_toe_edge_error_px": {
+          "count": 22,
+          "median": 5.6895921486122845,
+          "p95": 16.20359898293552,
+          "maximum": 25.3736870981898
+        },
+        "critical_direction": [
+          {
+            "mode": "J0_s2_footinit",
+            "source_seconds": 25.4,
+            "pts": 325120,
+            "foot": 1,
+            "angle_deg": 21.993867782252067,
+            "projected_length_px": 89.52946319929308,
+            "source_length_px": 82.02438661763951,
+            "heel_toe_edge_error_px": [
+              6.654349466582284,
+              6.424298589313378
+            ]
+          },
+          {
+            "mode": "J0_s2_footinit",
+            "source_seconds": 26.26,
+            "pts": 336128,
+            "foot": 1,
+            "angle_deg": 17.783708018384733,
+            "projected_length_px": 62.32512674451357,
+            "source_length_px": 64.19501538281614,
+            "heel_toe_edge_error_px": [
+              7.106772399397481,
+              25.3736870981898
+            ]
+          }
+        ],
+        "admitted_boot_source_contour_px": {
+          "count": 9888,
+          "median": 3.9094421252396003,
+          "p95": 13.088404495346186,
+          "maximum": 32.02144464630454
+        },
+        "conditional_blade_height_diagnostic_m": {
+          "values": {
+            "count": 2036,
+            "median": -0.060585053411860504,
+            "p95": 0.17234830143632413,
+            "maximum": 0.5750127946129522
+          },
+          "negative_value_fraction": 0.8020628683693517,
+          "contact_state_inferred": false
+        },
+        "equipment_parameters": {
+          "shoe_rear": 0.025000000480777423,
+          "shoe_front": 0.20626047203171843,
+          "shoe_width": 0.08820071638223104,
+          "ankle_to_sole": 0.13342442307652932,
+          "upper_height": 0.06156049957326905,
+          "blade_drop": 0.029567310296141767,
+          "blade_rear_extension": 0.011609877276106524,
+          "blade_front_extension": 0.016293233697755358,
+          "rocker_rise": 0.012119615647436289,
+          "toe_rise": 0.011355408650252075,
+          "boot_align_x": 0.06988900002407754,
+          "boot_align_y": -0.06448704354998597,
+          "boot_align_z": 0.21975639724237883,
+          "blade_pitch": 0.22776270551702998
+        },
+        "model_boot_angular_speed_deg_s": {
+          "count": 2032,
+          "median": 173.6804480412826,
+          "p95": 580.0814929195293,
+          "maximum": 1325.056067024819
+        },
+        "temporal_model_quantities_are_not_observed_truth": true
+      },
+      "J1_s2": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\result.npz",
+        "sha256": "5bcfc447b3acb33cbd1a88299d1ebdf571e963aea069290f1065f1b3111487b2",
+        "body_visible13_px": {
+          "count": 13221,
+          "median": 5.972050239700599,
+          "p95": 16.0369784834669,
+          "maximum": 121.56082163146436
+        },
+        "body_partial_visible_points_px": {
+          "count": 861,
+          "median": 35.26196781346974,
+          "p95": 93.82944365747638,
+          "maximum": 136.80638204298657
+        },
+        "body_used_sample_px": {
+          "count": 7408,
+          "median": 6.189553408618175,
+          "p95": 23.45904465094258,
+          "maximum": 136.61391965029355
+        },
+        "body_development_excluded_window_px": {
+          "count": 286,
+          "median": 7.417323681468757,
+          "p95": 14.626271966787142,
+          "maximum": 18.85798191650416
+        },
+        "elbow_wrist_visible_px": {
+          "count": 4068,
+          "median": 12.943930253799756,
+          "p95": 33.122517283878764,
+          "maximum": 425.85294402328327
+        },
+        "elbow_wrist_used_in_objective": false,
+        "worst_visible_body": {
+          "source_seconds": 40.76,
+          "coco_joint": 15,
+          "error_px": 121.56082163146436
+        },
+        "root_displacement_from_B5_conditional_m": {
+          "visible": {
+            "count": 1018,
+            "median": 0.05685856431685275,
+            "p95": 0.1563588722719449,
+            "maximum": 0.17280679753524694
+          },
+          "inferred": {
+            "count": 125,
+            "median": 0.0048098382075921,
+            "p95": 0.07535613879026411,
+            "maximum": 0.07797467871334068
+          },
+          "visible_absolute_along_ray": {
+            "count": 1018,
+            "median": 0.05681236995268822,
+            "p95": 0.1563310304810184,
+            "maximum": 0.17270745774038215
+          },
+          "visible_transverse": {
+            "count": 1018,
+            "median": 0.001885599793649373,
+            "p95": 0.004240327841764383,
+            "maximum": 0.006418245555526697
+          },
+          "visible_vertical": {
+            "count": 1018,
+            "median": 0.001337202499483603,
+            "p95": 0.0042082225141300495,
+            "maximum": 0.006301232298209891
+          }
+        },
+        "optimizer": {
+          "mode": "J1",
+          "optimizer_success": true,
+          "termination": "`ftol` termination condition is satisfied.",
+          "optimality": 8.588602246313359,
+          "gradient_inf": 8.193086970932812,
+          "numerically_converged": false,
+          "cost": 5946.980116832626,
+          "parts": {
+            "visible_boot_edges": 458.93958775372613,
+            "visible_blade_curves": 7.260474050012359,
+            "boot_direction_endpoints": 40.50560697767293,
+            "body_pixels": 5149.0425735225635,
+            "leg_prior": 82.876201360495,
+            "leg_acceleration": 66.13299715084185,
+            "root_acceleration": 136.4850275890342,
+            "conditional_shape_prior": 5.737648428280431
+          },
+          "nfev": 27,
+          "njev": 23,
+          "seconds": 103.01902720000362,
+          "camera_updated": false,
+          "root_updated": true,
+          "contact_feedback": false,
+          "footwear_installation_gauge": "three boot_align values frozen at declared conditional equipment reference",
+          "blade_candidates": [
+            {
+              "pts": 325120,
+              "foot": 1,
+              "selected_candidate": "blade_left",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 332800,
+              "foot": 0,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 346624,
+              "foot": 1,
+              "selected_candidate": "blade_left",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 455680,
+              "foot": 0,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 455680,
+              "foot": 1,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 461056,
+              "foot": 0,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 461056,
+              "foot": 1,
+              "selected_candidate": "blade_left",
+              "source_side_confirmed": false
+            }
+          ],
+          "user_accepted": false
+        },
+        "fit_blade_fixed_left_px": {
+          "count": 34,
+          "median": 3.077805579344826,
+          "p95": 14.739511770994184,
+          "maximum": 15.88336316943507
+        },
+        "development_geometry_blade_fixed_left_px": {
+          "count": 13,
+          "median": 13.473906708593212,
+          "p95": 28.464857795100603,
+          "maximum": 33.840790889017285
+        },
+        "development_earlier_blade_fixed_left_px": {
+          "count": 15,
+          "median": 9.54134027843389,
+          "p95": 24.24454624123055,
+          "maximum": 28.16115846620205
+        },
+        "direction_angle_deg": {
+          "count": 11,
+          "median": 12.095923033936007,
+          "p95": 23.232500342748224,
+          "maximum": 24.357723412182967
+        },
+        "heel_toe_edge_error_px": {
+          "count": 22,
+          "median": 5.527110050863652,
+          "p95": 14.786353099933164,
+          "maximum": 24.34912868675499
+        },
+        "critical_direction": [
+          {
+            "mode": "J1_s2",
+            "source_seconds": 25.4,
+            "pts": 325120,
+            "foot": 1,
+            "angle_deg": 22.107277273313482,
+            "projected_length_px": 89.30436095865325,
+            "source_length_px": 82.02438661763951,
+            "heel_toe_edge_error_px": [
+              6.491671284110715,
+              6.422665942378488
+            ]
+          },
+          {
+            "mode": "J1_s2",
+            "source_seconds": 26.26,
+            "pts": 336128,
+            "foot": 1,
+            "angle_deg": 17.47289990863573,
+            "projected_length_px": 61.55958425135658,
+            "source_length_px": 64.19501538281614,
+            "heel_toe_edge_error_px": [
+              6.261487969357869,
+              24.34912868675499
+            ]
+          }
+        ],
+        "admitted_boot_source_contour_px": {
+          "count": 9888,
+          "median": 3.8512041568637354,
+          "p95": 13.016389616722355,
+          "maximum": 27.941192731979378
+        },
+        "conditional_blade_height_diagnostic_m": {
+          "values": {
+            "count": 2036,
+            "median": -0.05869031187321837,
+            "p95": 0.17845759348425067,
+            "maximum": 0.5761280883993835
+          },
+          "negative_value_fraction": 0.8005893909626719,
+          "contact_state_inferred": false
+        },
+        "equipment_parameters": {
+          "shoe_rear": 0.025000000480777423,
+          "shoe_front": 0.20626047203171843,
+          "shoe_width": 0.08820071638223104,
+          "ankle_to_sole": 0.13342442307652932,
+          "upper_height": 0.06156049957326905,
+          "blade_drop": 0.029567310296141767,
+          "blade_rear_extension": 0.011609877276106524,
+          "blade_front_extension": 0.016293233697755358,
+          "rocker_rise": 0.012119615647436289,
+          "toe_rise": 0.011355408650252075,
+          "boot_align_x": 0.06988900002407754,
+          "boot_align_y": -0.06448704354998597,
+          "boot_align_z": 0.21975639724237883,
+          "blade_pitch": 0.22776270551702998
+        },
+        "model_boot_angular_speed_deg_s": {
+          "count": 2032,
+          "median": 174.3975559641831,
+          "p95": 580.2273728686364,
+          "maximum": 1323.3003716008895
+        },
+        "temporal_model_quantities_are_not_observed_truth": true
+      },
+      "J1_s2_alternative": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2_alternative\\result.npz",
+        "sha256": "4a5e6e8b72dda415d6cf4b1121189d0d8ccfffbe85dec0332e0977cecbee85b4",
+        "body_visible13_px": {
+          "count": 13221,
+          "median": 6.000500440653059,
+          "p95": 16.135332688980366,
+          "maximum": 122.18282243806767
+        },
+        "body_partial_visible_points_px": {
+          "count": 861,
+          "median": 35.31769533374161,
+          "p95": 93.82684406259828,
+          "maximum": 136.79564852454604
+        },
+        "body_used_sample_px": {
+          "count": 7408,
+          "median": 6.231048189222933,
+          "p95": 23.36325216585956,
+          "maximum": 136.60121898337704
+        },
+        "body_development_excluded_window_px": {
+          "count": 286,
+          "median": 7.365516534147655,
+          "p95": 15.01370828031031,
+          "maximum": 18.86407202126132
+        },
+        "elbow_wrist_visible_px": {
+          "count": 4068,
+          "median": 12.936076454873547,
+          "p95": 33.19741977987642,
+          "maximum": 426.10050579112243
+        },
+        "elbow_wrist_used_in_objective": false,
+        "worst_visible_body": {
+          "source_seconds": 40.76,
+          "coco_joint": 15,
+          "error_px": 122.18282243806767
+        },
+        "root_displacement_from_B5_conditional_m": {
+          "visible": {
+            "count": 1018,
+            "median": 0.06239118724479262,
+            "p95": 0.15801886856354017,
+            "maximum": 0.18497308243537314
+          },
+          "inferred": {
+            "count": 125,
+            "median": 0.004270060687194389,
+            "p95": 0.10145554456680479,
+            "maximum": 0.10475239541494799
+          },
+          "visible_absolute_along_ray": {
+            "count": 1018,
+            "median": 0.062316250706883305,
+            "p95": 0.15797007249002593,
+            "maximum": 0.18486749758806786
+          },
+          "visible_transverse": {
+            "count": 1018,
+            "median": 0.001893827644346541,
+            "p95": 0.004417998163619208,
+            "maximum": 0.006483241181678775
+          },
+          "visible_vertical": {
+            "count": 1018,
+            "median": 0.0013616030422720637,
+            "p95": 0.004285179757945329,
+            "maximum": 0.006733267600032233
+          }
+        },
+        "optimizer": {
+          "mode": "J1",
+          "optimizer_success": true,
+          "termination": "`ftol` termination condition is satisfied.",
+          "optimality": 24.687944893350966,
+          "gradient_inf": 24.687944893350966,
+          "numerically_converged": false,
+          "cost": 5957.077554575739,
+          "parts": {
+            "visible_boot_edges": 461.2576857756662,
+            "visible_blade_curves": 7.778756454171056,
+            "boot_direction_endpoints": 37.6284339672014,
+            "body_pixels": 5153.409217400424,
+            "leg_prior": 89.23821965822557,
+            "leg_acceleration": 65.11654964153286,
+            "root_acceleration": 136.91104325023653,
+            "conditional_shape_prior": 5.737648428280431
+          },
+          "nfev": 42,
+          "njev": 38,
+          "seconds": 164.71059869998135,
+          "camera_updated": false,
+          "root_updated": true,
+          "contact_feedback": false,
+          "footwear_installation_gauge": "three boot_align values frozen at declared conditional equipment reference",
+          "blade_candidates": [
+            {
+              "pts": 325120,
+              "foot": 1,
+              "selected_candidate": "blade_left",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 332800,
+              "foot": 0,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 346624,
+              "foot": 1,
+              "selected_candidate": "blade_left",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 455680,
+              "foot": 0,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 455680,
+              "foot": 1,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 461056,
+              "foot": 0,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 461056,
+              "foot": 1,
+              "selected_candidate": "blade_left",
+              "source_side_confirmed": false
+            }
+          ],
+          "user_accepted": false
+        },
+        "fit_blade_fixed_left_px": {
+          "count": 34,
+          "median": 3.104033936207578,
+          "p95": 15.01528293068047,
+          "maximum": 15.882353278216485
+        },
+        "development_geometry_blade_fixed_left_px": {
+          "count": 13,
+          "median": 14.13611283106869,
+          "p95": 28.36500337469276,
+          "maximum": 33.698484172208666
+        },
+        "development_earlier_blade_fixed_left_px": {
+          "count": 15,
+          "median": 8.723439632702364,
+          "p95": 26.964838130975068,
+          "maximum": 37.39603111537593
+        },
+        "direction_angle_deg": {
+          "count": 11,
+          "median": 12.109607735852912,
+          "p95": 23.33585883879764,
+          "maximum": 24.281923520943685
+        },
+        "heel_toe_edge_error_px": {
+          "count": 22,
+          "median": 5.270883723823496,
+          "p95": 12.808245534524682,
+          "maximum": 22.755206173405522
+        },
+        "critical_direction": [
+          {
+            "mode": "J1_s2_alternative",
+            "source_seconds": 25.4,
+            "pts": 325120,
+            "foot": 1,
+            "angle_deg": 22.389794156651593,
+            "projected_length_px": 87.56440668646906,
+            "source_length_px": 82.02438661763951,
+            "heel_toe_edge_error_px": [
+              7.808053428289663,
+              5.25774378882553
+            ]
+          },
+          {
+            "mode": "J1_s2_alternative",
+            "source_seconds": 26.26,
+            "pts": 336128,
+            "foot": 1,
+            "angle_deg": 16.60435939098748,
+            "projected_length_px": 58.29113410589724,
+            "source_length_px": 64.19501538281614,
+            "heel_toe_edge_error_px": [
+              7.898952719365465,
+              22.755206173405522
+            ]
+          }
+        ],
+        "admitted_boot_source_contour_px": {
+          "count": 9888,
+          "median": 3.8046505386004306,
+          "p95": 13.096550832277476,
+          "maximum": 28.382754502152476
+        },
+        "conditional_blade_height_diagnostic_m": {
+          "values": {
+            "count": 2036,
+            "median": -0.05673354878332462,
+            "p95": 0.1844098550276027,
+            "maximum": 0.5796812850638746
+          },
+          "negative_value_fraction": 0.7927308447937131,
+          "contact_state_inferred": false
+        },
+        "equipment_parameters": {
+          "shoe_rear": 0.025000000480777423,
+          "shoe_front": 0.20626047203171843,
+          "shoe_width": 0.08820071638223104,
+          "ankle_to_sole": 0.13342442307652932,
+          "upper_height": 0.06156049957326905,
+          "blade_drop": 0.029567310296141767,
+          "blade_rear_extension": 0.011609877276106524,
+          "blade_front_extension": 0.016293233697755358,
+          "rocker_rise": 0.012119615647436289,
+          "toe_rise": 0.011355408650252075,
+          "boot_align_x": 0.06988900002407754,
+          "boot_align_y": -0.06448704354998597,
+          "boot_align_z": 0.21975639724237883,
+          "blade_pitch": 0.22776270551702998
+        }
+      },
+      "J2_s2": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J2_s2\\result.npz",
+        "sha256": "83f985cf6da26e56c3d3ba059ab1b6e0a0bc654b7a98e6dcef042c1d67a3a0e8",
+        "body_visible13_px": {
+          "count": 13221,
+          "median": 5.96272391559971,
+          "p95": 15.962543869624335,
+          "maximum": 121.01649121464452
+        },
+        "body_partial_visible_points_px": {
+          "count": 861,
+          "median": 35.25898197345677,
+          "p95": 93.83049894744914,
+          "maximum": 136.80996860612368
+        },
+        "body_used_sample_px": {
+          "count": 7408,
+          "median": 6.1555091002572215,
+          "p95": 23.31332530820147,
+          "maximum": 136.6176340955992
+        },
+        "body_development_excluded_window_px": {
+          "count": 286,
+          "median": 7.401423634410387,
+          "p95": 14.700411893309237,
+          "maximum": 19.58696525847324
+        },
+        "elbow_wrist_visible_px": {
+          "count": 4068,
+          "median": 12.922512028004046,
+          "p95": 33.077089172312455,
+          "maximum": 426.2562189087119
+        },
+        "elbow_wrist_used_in_objective": false,
+        "worst_visible_body": {
+          "source_seconds": 40.76,
+          "coco_joint": 15,
+          "error_px": 121.01649121464452
+        },
+        "root_displacement_from_B5_conditional_m": {
+          "visible": {
+            "count": 1018,
+            "median": 0.06229127903354581,
+            "p95": 0.17189146354765897,
+            "maximum": 0.20913974028050514
+          },
+          "inferred": {
+            "count": 125,
+            "median": 0.005922925614638453,
+            "p95": 0.08056009021769511,
+            "maximum": 0.08350666390289552
+          },
+          "visible_absolute_along_ray": {
+            "count": 1018,
+            "median": 0.06223748746057334,
+            "p95": 0.17186108796308672,
+            "maximum": 0.20902970351633024
+          },
+          "visible_transverse": {
+            "count": 1018,
+            "median": 0.0019263075777348675,
+            "p95": 0.004467813800084045,
+            "maximum": 0.007149566751241547
+          },
+          "visible_vertical": {
+            "count": 1018,
+            "median": 0.001434620734261316,
+            "p95": 0.004923829046220434,
+            "maximum": 0.006854432385177689
+          }
+        },
+        "optimizer": {
+          "mode": "J2",
+          "optimizer_success": true,
+          "termination": "`ftol` termination condition is satisfied.",
+          "optimality": 10.488266777555234,
+          "gradient_inf": 10.488266777555234,
+          "numerically_converged": false,
+          "cost": 5938.317544042499,
+          "parts": {
+            "visible_boot_edges": 456.76113174434715,
+            "visible_blade_curves": 7.992506049999783,
+            "boot_direction_endpoints": 38.838173641392245,
+            "body_pixels": 5146.208563316136,
+            "leg_prior": 80.93357206607739,
+            "leg_acceleration": 65.37958526294628,
+            "root_acceleration": 136.58370510059214,
+            "conditional_shape_prior": 5.620306861006025
+          },
+          "nfev": 20,
+          "njev": 13,
+          "seconds": 69.51230699999724,
+          "camera_updated": false,
+          "root_updated": true,
+          "contact_feedback": false,
+          "footwear_installation_gauge": "three boot_align values frozen at declared conditional equipment reference",
+          "blade_candidates": [
+            {
+              "pts": 325120,
+              "foot": 1,
+              "selected_candidate": "blade_left",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 332800,
+              "foot": 0,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 346624,
+              "foot": 1,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 455680,
+              "foot": 0,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 455680,
+              "foot": 1,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 461056,
+              "foot": 0,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 461056,
+              "foot": 1,
+              "selected_candidate": "blade_left",
+              "source_side_confirmed": false
+            }
+          ],
+          "user_accepted": false
+        },
+        "fit_blade_fixed_left_px": {
+          "count": 34,
+          "median": 3.302635183881011,
+          "p95": 14.720892480777847,
+          "maximum": 16.98349362010048
+        },
+        "development_geometry_blade_fixed_left_px": {
+          "count": 13,
+          "median": 13.120579755873974,
+          "p95": 27.903599828888147,
+          "maximum": 33.14798764058424
+        },
+        "development_earlier_blade_fixed_left_px": {
+          "count": 15,
+          "median": 8.041201664189046,
+          "p95": 24.28949792415746,
+          "maximum": 28.192737574881065
+        },
+        "direction_angle_deg": {
+          "count": 11,
+          "median": 12.054070544421867,
+          "p95": 21.451755172770376,
+          "maximum": 21.585988301773057
+        },
+        "heel_toe_edge_error_px": {
+          "count": 22,
+          "median": 5.035516674808374,
+          "p95": 13.84639947552147,
+          "maximum": 24.474715633398226
+        },
+        "critical_direction": [
+          {
+            "mode": "J2_s2",
+            "source_seconds": 25.4,
+            "pts": 325120,
+            "foot": 1,
+            "angle_deg": 21.585988301773057,
+            "projected_length_px": 86.73604105574192,
+            "source_length_px": 82.02438661763951,
+            "heel_toe_edge_error_px": [
+              7.0438698317538835,
+              6.333165347325138
+            ]
+          },
+          {
+            "mode": "J2_s2",
+            "source_seconds": 26.26,
+            "pts": 336128,
+            "foot": 1,
+            "angle_deg": 18.933508201359313,
+            "projected_length_px": 59.88296405923703,
+            "source_length_px": 64.19501538281614,
+            "heel_toe_edge_error_px": [
+              5.644124119530616,
+              24.474715633398226
+            ]
+          }
+        ],
+        "admitted_boot_source_contour_px": {
+          "count": 9888,
+          "median": 3.798991598470042,
+          "p95": 12.844236400195667,
+          "maximum": 27.862940284067655
+        },
+        "conditional_blade_height_diagnostic_m": {
+          "values": {
+            "count": 2036,
+            "median": -0.0543176264051872,
+            "p95": 0.1824004245514018,
+            "maximum": 0.5797852631725647
+          },
+          "negative_value_fraction": 0.7858546168958742,
+          "contact_state_inferred": false
+        },
+        "equipment_parameters": {
+          "shoe_rear": 0.025000000480777423,
+          "shoe_front": 0.19393184640934896,
+          "shoe_width": 0.08338058967302794,
+          "ankle_to_sole": 0.13342442307652932,
+          "upper_height": 0.06156049957326905,
+          "blade_drop": 0.029567310296141767,
+          "blade_rear_extension": 0.011609877276106524,
+          "blade_front_extension": 0.016293233697755358,
+          "rocker_rise": 0.012119615647436289,
+          "toe_rise": 0.011355408650252075,
+          "boot_align_x": 0.06988900002407754,
+          "boot_align_y": -0.06448704354998597,
+          "boot_align_z": 0.21975639724237883,
+          "blade_pitch": 0.22776270551702998
+        },
+        "model_boot_angular_speed_deg_s": {
+          "count": 2032,
+          "median": 173.57548973521082,
+          "p95": 579.9834632366416,
+          "maximum": 1324.5970436285395
+        },
+        "temporal_model_quantities_are_not_observed_truth": true
+      },
+      "FootMR_parent_J1": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1\\result.npz",
+        "sha256": "4fd78ada2fb0e3b7591df41f47c1033377e9486a107886946797b2ec2112fc74",
+        "body_visible13_px": {
+          "count": 13221,
+          "median": 6.0147899562729,
+          "p95": 16.153526910535263,
+          "maximum": 122.22948884472693
+        },
+        "body_partial_visible_points_px": {
+          "count": 861,
+          "median": 35.28186744284602,
+          "p95": 93.82770059355845,
+          "maximum": 136.7966562833466
+        },
+        "body_used_sample_px": {
+          "count": 7408,
+          "median": 6.260435966646662,
+          "p95": 23.357106785331304,
+          "maximum": 136.60248221359385
+        },
+        "body_development_excluded_window_px": {
+          "count": 286,
+          "median": 7.358273070309144,
+          "p95": 14.948010818405793,
+          "maximum": 18.86640878116886
+        },
+        "elbow_wrist_visible_px": {
+          "count": 4068,
+          "median": 12.944664371919796,
+          "p95": 33.22592252324051,
+          "maximum": 425.2536488053135
+        },
+        "elbow_wrist_used_in_objective": false,
+        "worst_visible_body": {
+          "source_seconds": 40.76,
+          "coco_joint": 15,
+          "error_px": 122.22948884472693
+        },
+        "root_displacement_from_B5_conditional_m": {
+          "visible": {
+            "count": 1018,
+            "median": 0.05597100898984901,
+            "p95": 0.13397617963073852,
+            "maximum": 0.18165227460399952
+          },
+          "inferred": {
+            "count": 125,
+            "median": 0.0032968482055534118,
+            "p95": 0.08104090486324803,
+            "maximum": 0.08376462821029428
+          },
+          "visible_absolute_along_ray": {
+            "count": 1018,
+            "median": 0.05594855241177569,
+            "p95": 0.13391543972345085,
+            "maximum": 0.18154977369157857
+          },
+          "visible_transverse": {
+            "count": 1018,
+            "median": 0.0018101808849779462,
+            "p95": 0.004613151386945091,
+            "maximum": 0.006314984390324063
+          },
+          "visible_vertical": {
+            "count": 1018,
+            "median": 0.001139230916795797,
+            "p95": 0.0036743706183882618,
+            "maximum": 0.006681748234578344
+          }
+        },
+        "optimizer": {
+          "mode": "J1",
+          "optimizer_success": true,
+          "termination": "`ftol` termination condition is satisfied.",
+          "optimality": 20.206627837837,
+          "gradient_inf": 20.206627837837,
+          "numerically_converged": false,
+          "cost": 6095.536449414371,
+          "parts": {
+            "visible_boot_edges": 482.04119711372243,
+            "visible_blade_curves": 21.928957640120338,
+            "boot_direction_endpoints": 107.30750425232411,
+            "body_pixels": 5161.3997932536895,
+            "leg_prior": 104.91738052258313,
+            "leg_acceleration": 75.55282683338064,
+            "root_acceleration": 136.65114137027265,
+            "conditional_shape_prior": 5.737648428280431
+          },
+          "nfev": 30,
+          "njev": 25,
+          "seconds": 108.66607380000642,
+          "camera_updated": false,
+          "root_updated": true,
+          "contact_feedback": false,
+          "footwear_installation_gauge": "three boot_align values frozen at declared conditional equipment reference",
+          "blade_candidates": [
+            {
+              "pts": 325120,
+              "foot": 1,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 332800,
+              "foot": 0,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 346624,
+              "foot": 1,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 455680,
+              "foot": 0,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 455680,
+              "foot": 1,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 461056,
+              "foot": 0,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 461056,
+              "foot": 1,
+              "selected_candidate": "blade_left",
+              "source_side_confirmed": false
+            }
+          ],
+          "user_accepted": false
+        },
+        "fit_blade_fixed_left_px": {
+          "count": 34,
+          "median": 3.736616649327737,
+          "p95": 24.795148901140852,
+          "maximum": 40.20302906684034
+        },
+        "development_geometry_blade_fixed_left_px": {
+          "count": 13,
+          "median": 14.402943053057644,
+          "p95": 27.9737728613024,
+          "maximum": 33.39303164402898
+        },
+        "development_earlier_blade_fixed_left_px": {
+          "count": 15,
+          "median": 8.654346433453725,
+          "p95": 26.972196786511315,
+          "maximum": 37.3723670111532
+        },
+        "direction_angle_deg": {
+          "count": 11,
+          "median": 11.93261308074646,
+          "p95": 61.471232154373645,
+          "maximum": 74.05248749649233
+        },
+        "heel_toe_edge_error_px": {
+          "count": 22,
+          "median": 5.624966446251719,
+          "p95": 27.535904950206625,
+          "maximum": 30.244153709966007
+        },
+        "critical_direction": [
+          {
+            "mode": "FootMR_parent_J1",
+            "source_seconds": 25.4,
+            "pts": 325120,
+            "foot": 1,
+            "angle_deg": 74.05248749649233,
+            "projected_length_px": 13.470563736383166,
+            "source_length_px": 82.02438661763951,
+            "heel_toe_edge_error_px": [
+              25.129616405341874,
+              30.244153709966007
+            ]
+          },
+          {
+            "mode": "FootMR_parent_J1",
+            "source_seconds": 26.26,
+            "pts": 336128,
+            "foot": 1,
+            "angle_deg": 48.88997681225496,
+            "projected_length_px": 31.91785201749659,
+            "source_length_px": 64.19501538281614,
+            "heel_toe_edge_error_px": [
+              4.852754211512213,
+              27.662551715725826
+            ]
+          }
+        ],
+        "admitted_boot_source_contour_px": {
+          "count": 9888,
+          "median": 3.858601373004879,
+          "p95": 13.311472715851998,
+          "maximum": 30.546462844280576
+        },
+        "conditional_blade_height_diagnostic_m": {
+          "values": {
+            "count": 2036,
+            "median": -0.057653634960728686,
+            "p95": 0.18391998165914847,
+            "maximum": 0.5794362136120292
+          },
+          "negative_value_fraction": 0.7981335952848723,
+          "contact_state_inferred": false
+        },
+        "equipment_parameters": {
+          "shoe_rear": 0.025000000480777423,
+          "shoe_front": 0.20626047203171843,
+          "shoe_width": 0.08820071638223104,
+          "ankle_to_sole": 0.13342442307652932,
+          "upper_height": 0.06156049957326905,
+          "blade_drop": 0.029567310296141767,
+          "blade_rear_extension": 0.011609877276106524,
+          "blade_front_extension": 0.016293233697755358,
+          "rocker_rise": 0.012119615647436289,
+          "toe_rise": 0.011355408650252075,
+          "boot_align_x": 0.06988900002407754,
+          "boot_align_y": -0.06448704354998597,
+          "boot_align_z": 0.21975639724237883,
+          "blade_pitch": 0.22776270551702998
+        }
+      },
+      "FootMR_conditional": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\FootMR_native\\conditional_installation.npz",
+        "sha256": "96d2666b7f41afb0897d2dc45e095a0d75c039657041d437bb9b75401b4d0b59",
+        "body_visible13_px": {
+          "count": 13221,
+          "median": 6.01520579062271,
+          "p95": 16.22470568659485,
+          "maximum": 122.11924451328777
+        },
+        "body_partial_visible_points_px": {
+          "count": 861,
+          "median": 35.28186744284602,
+          "p95": 93.82770059355845,
+          "maximum": 136.7966562833466
+        },
+        "body_used_sample_px": {
+          "count": 7408,
+          "median": 6.239823208648787,
+          "p95": 23.50570406179184,
+          "maximum": 136.60248221359385
+        },
+        "body_development_excluded_window_px": {
+          "count": 286,
+          "median": 7.390163186528413,
+          "p95": 14.84010512912841,
+          "maximum": 18.780994608892513
+        },
+        "elbow_wrist_visible_px": {
+          "count": 4068,
+          "median": 12.943055204328758,
+          "p95": 33.24147484537453,
+          "maximum": 425.1768223795788
+        },
+        "elbow_wrist_used_in_objective": false,
+        "worst_visible_body": {
+          "source_seconds": 40.76,
+          "coco_joint": 15,
+          "error_px": 122.11924451328777
+        },
+        "root_displacement_from_B5_conditional_m": {
+          "visible": {
+            "count": 1018,
+            "median": 0.05597100898984901,
+            "p95": 0.13397617963073852,
+            "maximum": 0.18165227460399952
+          },
+          "inferred": {
+            "count": 125,
+            "median": 0.0032968482055534118,
+            "p95": 0.08104090486324803,
+            "maximum": 0.08376462821029428
+          },
+          "visible_absolute_along_ray": {
+            "count": 1018,
+            "median": 0.05594855241177569,
+            "p95": 0.13391543972345085,
+            "maximum": 0.18154977369157857
+          },
+          "visible_transverse": {
+            "count": 1018,
+            "median": 0.0018101808849779462,
+            "p95": 0.004613151386945091,
+            "maximum": 0.006314984390324063
+          },
+          "visible_vertical": {
+            "count": 1018,
+            "median": 0.001139230916795797,
+            "p95": 0.0036743706183882618,
+            "maximum": 0.006681748234578344
+          }
+        },
+        "fit_blade_fixed_left_px": {
+          "count": 34,
+          "median": 10.00742211402081,
+          "p95": 21.48846590494603,
+          "maximum": 31.514978591211893
+        },
+        "development_geometry_blade_fixed_left_px": {
+          "count": 13,
+          "median": 10.513865054615296,
+          "p95": 18.778794985732276,
+          "maximum": 20.379554862587668
+        },
+        "development_earlier_blade_fixed_left_px": {
+          "count": 15,
+          "median": 4.731084165334344,
+          "p95": 25.288171849404982,
+          "maximum": 29.3173319592992
+        },
+        "direction_angle_deg": {
+          "count": 11,
+          "median": 18.459887470616177,
+          "p95": 36.69352751322121,
+          "maximum": 40.613701539983595
+        },
+        "heel_toe_edge_error_px": {
+          "count": 22,
+          "median": 16.543657531422802,
+          "p95": 33.20770222465292,
+          "maximum": 36.00212815785165
+        },
+        "critical_direction": [
+          {
+            "mode": "FootMR_conditional",
+            "source_seconds": 25.4,
+            "pts": 325120,
+            "foot": 1,
+            "angle_deg": 31.1453294076453,
+            "projected_length_px": 75.27295980257377,
+            "source_length_px": 82.02438661763951,
+            "heel_toe_edge_error_px": [
+              23.323876064420812,
+              19.137375810996094
+            ]
+          },
+          {
+            "mode": "FootMR_conditional",
+            "source_seconds": 26.26,
+            "pts": 336128,
+            "foot": 1,
+            "angle_deg": 32.77335348645883,
+            "projected_length_px": 53.17831680128111,
+            "source_length_px": 64.19501538281614,
+            "heel_toe_edge_error_px": [
+              5.220964224397534,
+              30.689409034646353
+            ]
+          }
+        ],
+        "admitted_boot_source_contour_px": {
+          "count": 9888,
+          "median": 4.722083725100485,
+          "p95": 15.97370010016233,
+          "maximum": 37.94622762340148
+        },
+        "conditional_blade_height_diagnostic_m": {
+          "values": {
+            "count": 2036,
+            "median": -0.060579556849086336,
+            "p95": 0.19787582632953613,
+            "maximum": 0.581396033767077
+          },
+          "negative_value_fraction": 0.8241650294695482,
+          "contact_state_inferred": false
+        },
+        "equipment_parameters": {
+          "shoe_rear": 0.025000000480777423,
+          "shoe_front": 0.20626047203171843,
+          "shoe_width": 0.08820071638223104,
+          "ankle_to_sole": 0.13342442307652932,
+          "upper_height": 0.06156049957326905,
+          "blade_drop": 0.029567310296141767,
+          "blade_rear_extension": 0.011609877276106524,
+          "blade_front_extension": 0.016293233697755358,
+          "rocker_rise": 0.012119615647436289,
+          "toe_rise": 0.011355408650252075,
+          "boot_align_x": 0.06988900002407754,
+          "boot_align_y": -0.06448704354998597,
+          "boot_align_z": 0.21975639724237883,
+          "blade_pitch": 0.22776270551702998
+        }
+      },
+      "FootMR_zero_installation": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\FootMR_native\\zero_installation.npz",
+        "sha256": "953ed40527159aa99825173f581146e178118eac622ceb5e1d0506c0067e2cfa",
+        "body_visible13_px": {
+          "count": 13221,
+          "median": 6.01520579062271,
+          "p95": 16.22470568659485,
+          "maximum": 122.11924451328777
+        },
+        "body_partial_visible_points_px": {
+          "count": 861,
+          "median": 35.28186744284602,
+          "p95": 93.82770059355845,
+          "maximum": 136.7966562833466
+        },
+        "body_used_sample_px": {
+          "count": 7408,
+          "median": 6.239823208648787,
+          "p95": 23.50570406179184,
+          "maximum": 136.60248221359385
+        },
+        "body_development_excluded_window_px": {
+          "count": 286,
+          "median": 7.390163186528413,
+          "p95": 14.84010512912841,
+          "maximum": 18.780994608892513
+        },
+        "elbow_wrist_visible_px": {
+          "count": 4068,
+          "median": 12.943055204328758,
+          "p95": 33.24147484537453,
+          "maximum": 425.1768223795788
+        },
+        "elbow_wrist_used_in_objective": false,
+        "worst_visible_body": {
+          "source_seconds": 40.76,
+          "coco_joint": 15,
+          "error_px": 122.11924451328777
+        },
+        "root_displacement_from_B5_conditional_m": {
+          "visible": {
+            "count": 1018,
+            "median": 0.05597100898984901,
+            "p95": 0.13397617963073852,
+            "maximum": 0.18165227460399952
+          },
+          "inferred": {
+            "count": 125,
+            "median": 0.0032968482055534118,
+            "p95": 0.08104090486324803,
+            "maximum": 0.08376462821029428
+          },
+          "visible_absolute_along_ray": {
+            "count": 1018,
+            "median": 0.05594855241177569,
+            "p95": 0.13391543972345085,
+            "maximum": 0.18154977369157857
+          },
+          "visible_transverse": {
+            "count": 1018,
+            "median": 0.0018101808849779462,
+            "p95": 0.004613151386945091,
+            "maximum": 0.006314984390324063
+          },
+          "visible_vertical": {
+            "count": 1018,
+            "median": 0.001139230916795797,
+            "p95": 0.0036743706183882618,
+            "maximum": 0.006681748234578344
+          }
+        },
+        "fit_blade_fixed_left_px": {
+          "count": 34,
+          "median": 9.305823436887184,
+          "p95": 20.755657694608757,
+          "maximum": 26.029725135693216
+        },
+        "development_geometry_blade_fixed_left_px": {
+          "count": 13,
+          "median": 12.81459402302752,
+          "p95": 29.23762248372787,
+          "maximum": 41.85167374512334
+        },
+        "development_earlier_blade_fixed_left_px": {
+          "count": 15,
+          "median": 8.102346246071251,
+          "p95": 32.22923459697479,
+          "maximum": 39.869823578385386
+        },
+        "direction_angle_deg": {
+          "count": 11,
+          "median": 12.85292641957744,
+          "p95": 36.00127512055264,
+          "maximum": 38.68412911134867
+        },
+        "heel_toe_edge_error_px": {
+          "count": 22,
+          "median": 14.497068569056363,
+          "p95": 27.702362853758988,
+          "maximum": 35.30334590923845
+        },
+        "critical_direction": [
+          {
+            "mode": "FootMR_zero_installation",
+            "source_seconds": 25.4,
+            "pts": 325120,
+            "foot": 1,
+            "angle_deg": 27.470410653255538,
+            "projected_length_px": 81.71865946594872,
+            "source_length_px": 82.02438661763951,
+            "heel_toe_edge_error_px": [
+              23.695434357365997,
+              9.262366952942442
+            ]
+          },
+          {
+            "mode": "FootMR_zero_installation",
+            "source_seconds": 26.26,
+            "pts": 336128,
+            "foot": 1,
+            "angle_deg": 33.318421129756615,
+            "projected_length_px": 41.888233148981314,
+            "source_length_px": 64.19501538281614,
+            "heel_toe_edge_error_px": [
+              20.390999189351838,
+              24.936578522716374
+            ]
+          }
+        ],
+        "admitted_boot_source_contour_px": {
+          "count": 9888,
+          "median": 4.895274587759655,
+          "p95": 17.01421333045345,
+          "maximum": 38.43585081445836
+        },
+        "conditional_blade_height_diagnostic_m": {
+          "values": {
+            "count": 2036,
+            "median": -0.05528674490948354,
+            "p95": 0.17854589450569475,
+            "maximum": 0.5645477373166838
+          },
+          "negative_value_fraction": 0.8163064833005894,
+          "contact_state_inferred": false
+        },
+        "equipment_parameters": {
+          "shoe_rear": 0.025000000480777423,
+          "shoe_front": 0.20626047203171843,
+          "shoe_width": 0.08820071638223104,
+          "ankle_to_sole": 0.13342442307652932,
+          "upper_height": 0.06156049957326905,
+          "blade_drop": 0.029567310296141767,
+          "blade_rear_extension": 0.011609877276106524,
+          "blade_front_extension": 0.016293233697755358,
+          "rocker_rise": 0.012119615647436289,
+          "toe_rise": 0.011355408650252075,
+          "boot_align_x": 0,
+          "boot_align_y": 0,
+          "boot_align_z": 0,
+          "blade_pitch": 0.22776270551702998
+        }
+      }
+    },
+    "profile_summary": [
+      {
+        "source_seconds": 26.26,
+        "axis": "depth",
+        "lowest_sampled_data_offset_m": 0,
+        "data_cost_at_zero": 235.35512279870366,
+        "data_cost_at_best": 235.35512279870366,
+        "offsets_m": [
+          -2.5,
+          -1.25,
+          -0.5,
+          0,
+          0.5,
+          1.25,
+          2.5
+        ],
+        "data_cost_change_from_zero": [
+          1708.6578860280142,
+          374.63975308679767,
+          52.987792826595495,
+          0,
+          67.65013983016277,
+          385.3286974069481,
+          1456.9640999692635
+        ],
+        "probability_interval": false
+      },
+      {
+        "source_seconds": 26.26,
+        "axis": "lateral",
+        "lowest_sampled_data_offset_m": 0,
+        "data_cost_at_zero": 235.35512279870366,
+        "data_cost_at_best": 235.35512279870366,
+        "offsets_m": [
+          -0.5,
+          0,
+          0.5
+        ],
+        "data_cost_change_from_zero": [
+          37062.99337863272,
+          0,
+          37289.36616507934
+        ],
+        "probability_interval": false
+      },
+      {
+        "source_seconds": 32.96,
+        "axis": "depth",
+        "lowest_sampled_data_offset_m": 0,
+        "data_cost_at_zero": 88.39107308896817,
+        "data_cost_at_best": 88.39107308896817,
+        "offsets_m": [
+          -2.5,
+          -1.25,
+          -0.5,
+          0,
+          0.5,
+          1.25,
+          2.5
+        ],
+        "data_cost_change_from_zero": [
+          101.69432738445445,
+          24.18047392699829,
+          3.7967141468363366,
+          0,
+          3.166920830141919,
+          19.550049060052686,
+          75.55042864564516
+        ],
+        "probability_interval": false
+      },
+      {
+        "source_seconds": 32.96,
+        "axis": "lateral",
+        "lowest_sampled_data_offset_m": 0,
+        "data_cost_at_zero": 88.39107308896817,
+        "data_cost_at_best": 88.39107308896817,
+        "offsets_m": [
+          -0.5,
+          0,
+          0.5
+        ],
+        "data_cost_change_from_zero": [
+          16395.56062585791,
+          0,
+          18383.886666682498
+        ],
+        "probability_interval": false
+      },
+      {
+        "source_seconds": 36.02,
+        "axis": "depth",
+        "lowest_sampled_data_offset_m": 0,
+        "data_cost_at_zero": 93.6978711034767,
+        "data_cost_at_best": 93.6978711034767,
+        "offsets_m": [
+          -2.5,
+          -1.25,
+          -0.5,
+          0,
+          0.5,
+          1.25,
+          2.5
+        ],
+        "data_cost_change_from_zero": [
+          150.620373073172,
+          27.25393242717786,
+          1.1117678664499238,
+          0,
+          10.67524067978647,
+          47.80823984683937,
+          157.2679919972544
+        ],
+        "probability_interval": false
+      },
+      {
+        "source_seconds": 36.02,
+        "axis": "lateral",
+        "lowest_sampled_data_offset_m": 0,
+        "data_cost_at_zero": 93.6978711034767,
+        "data_cost_at_best": 93.6978711034767,
+        "offsets_m": [
+          -0.5,
+          0,
+          0.5
+        ],
+        "data_cost_change_from_zero": [
+          16070.353454402833,
+          0,
+          12909.258894945584
+        ],
+        "probability_interval": false
+      },
+      {
+        "source_seconds": 38.22,
+        "axis": "depth",
+        "lowest_sampled_data_offset_m": 0,
+        "data_cost_at_zero": 60.23205646114067,
+        "data_cost_at_best": 60.23205646114067,
+        "offsets_m": [
+          -2.5,
+          -1.25,
+          -0.5,
+          0,
+          0.5,
+          1.25,
+          2.5
+        ],
+        "data_cost_change_from_zero": [
+          72.90952293080622,
+          19.316893417781984,
+          3.6746155720287277,
+          0,
+          0.9690045428530283,
+          11.157541166583002,
+          51.73671220190249
+        ],
+        "probability_interval": false
+      },
+      {
+        "source_seconds": 38.22,
+        "axis": "lateral",
+        "lowest_sampled_data_offset_m": 0,
+        "data_cost_at_zero": 60.23205646114067,
+        "data_cost_at_best": 60.23205646114067,
+        "offsets_m": [
+          -0.5,
+          0,
+          0.5
+        ],
+        "data_cost_change_from_zero": [
+          15175.261535992246,
+          0,
+          12966.364577557986
+        ],
+        "probability_interval": false
+      }
+    ],
+    "curve_scoring_note": "Original unsampled source vertices to the same fixed blade_left edge for historical comparison. Candidate-best entire edge is reported separately and is optimistic, not physical side confirmation.",
+    "temporal_note": "Global splines and FootMR offline 120-frame windows use time context. Source-only 81-frame continuity review corrected two bindings; failed long LK tracks are not fitting data. Angular speeds are model outputs, not validation of true pose."
+  },
+  "multistart": {
+    "reference": "J1_s2",
+    "alternative": "J1_s2_alternative",
+    "visible_root_difference_conditional_m": {
+      "count": 1018,
+      "median": 0.00668187022804011,
+      "p95": 0.034026120861395996,
+      "maximum": 0.042445648361514994
+    },
+    "visible_G_difference_conditional_m": {
+      "count": 1018,
+      "median": 0.006681110659925927,
+      "p95": 0.03402129982374006,
+      "maximum": 0.042442044570336984
+    },
+    "worst_source_seconds": 42.04,
+    "both_numerically_converged": false,
+    "interpretation": "A comparison of two terminated nonlinear basins, not proof of uniqueness or a physical uncertainty interval."
+  },
+  "source_identity_diagnostic": {
+    "schema": "rinkspace.source-temporal-identity-diagnostic.v1",
+    "pts": 521728,
+    "source_seconds": 40.76,
+    "neighbour_pts": [
+      521472,
+      521984
+    ],
+    "coco_indices": [
+      13,
+      14,
+      15,
+      16
+    ],
+    "unmodified_assignment_temporal_innovation_px": [
+      78.83133697509766,
+      77.56361389160156,
+      132.58006286621094,
+      130.07984924316406
+    ],
+    "paired_swap_hypothesis_temporal_innovation_px": [
+      2.77820086479187,
+      2.7683870792388916,
+      1.3395711183547974,
+      1.9465339183807373
+    ],
+    "comparison_is_source_only": true,
+    "hypothesis": "one-exposure left/right knee and ankle label reversal candidate",
+    "human_reviewed": false,
+    "original_observations_changed": false,
+    "used_to_refit": false,
+    "source_image": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\review_s2_final\\worst_body_temporal_source.png"
+  },
+  "missing_physical_evidence_zh": [
+    "跨遮挡与转身的物理左/右脚身份独立确认；现仍为COCO轨迹假设。",
+    "冰靴解剖踝帧到鞋壳/刀刃的可信安装与尺寸对应；shoe_rear仍条件性停在0.025 m数值下界。",
+    "原生PTS下每只刀刃实际接冰/腾空/未知状态及可见承重段；当前外鞋H/T、足点和最低模型刃点均不能代替接触测量。",
+    "接触项投入前需消除26.260/38.220 s的15–30 px系统几何偏差；当前不把整段模型刀刃压地。"
+  ],
+  "validation": {
+    "exposure_patch_tests": "5 passed earlier in this round; preserved 3-node replay, 5-node exact-row FK/derivatives, footwear fast/full and sparse support",
+    "new_regression_tests": "3 passed in 2.22 s: source-pixel preservation, empty blade local window, corrected joint active-block derivatives",
+    "joint_directional_derivatives_report": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\joint_derivative_check.json",
+    "footmr_native_common_rotation_checks": 203,
+    "footmr_maximum_rotation_error": 6.106226635438361e-15,
+    "path_check": "80288 entries checked, 0 overlimit, 0 read errors before final known-short outputs",
+    "python_ast_files": 14,
+    "final_trajectory_roundtrip": true,
+    "old_package_audits_rerun": false
+  },
+  "links": {
+    "source_comparison": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\review_s2_final\\source_joint_comparison.png",
+    "temporal_source": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\temporal_source\\continuous_shoe_source.png",
+    "temporal_model": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\review_s2_final\\temporal_direction.png",
+    "depth_profile": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\profiles_s2\\depth_lateral_profiles.png",
+    "per_curve": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\review_s2_final\\blade_curves.csv",
+    "per_foot_direction": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\review_s2_final\\directions.csv",
+    "main_report": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\review_s2_final\\RESULT_ZH.md"
+  },
+  "final_report_sha256": "cd655ea00ee46a0a0c39fb4c442a7d6a877239d28c296e9b9d58555df7863aea",
+  "metric_conversion_correction": {
+    "date": "2026-10-30",
+    "old_experiment_default": 60,
+    "project_bound_scale": 60.00104512261907,
+    "relative_difference": 0.00001741871031790687,
+    "corrected_input": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\blade_tracking_20261030\\metric_input\\input.npz",
+    "uniform_conversion_receipt": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\blade_tracking_20261030\\metric_validation.json",
+    "source_experiments_preserved": true,
+    "old_meter_reporting_superseded": true,
+    "coordinate_conversion_is_not_a_localization_improvement": true
+  },
+  "current_metric_trajectory": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\body_s01_joint_trajectory_metric_20261030.npz",
+    "sha256": "1075d5a0e0bdbb2476f734475fa06915aa3a08e27f7d3b8e77d52422a847cd0a",
+    "unit_reexpression_only": true,
+    "body_refit_performed": false,
+    "source_parameters": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\body_s01_joint_candidate_20261029.npz"
+  },
+  "blade_review_20261030": {
+    "binding": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\blade_s01_tracking_20261030.json",
+    "report": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\blade_tracking_20261030\\RESULT_ZH.md",
+    "body_fit_admission": false
+  },
+  "current_metric_binding": {
+    "schema": "rinkspace.native-body-uniform-metric-binding.v1",
+    "policy": "equal_weight_squared_dimension_error",
+    "formula": "s=(60*L+30*W)/(L*L+W*W)",
+    "conversion": "XYZ_m = s * XYZ_scene",
+    "metres_per_scene_unit": 60.00104512261907,
+    "source_span_xy_scene_units": [
+      1,
+      0.49995645094823604
+    ],
+    "converted_span_xy_m": [
+      60.00104512261907,
+      29.997909572689597
+    ],
+    "snapshot": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\six_shot\\lane4_shared\\initial_pixels.npz",
+      "sha256": "c205f10937004c93529cf40cf3d6030750754146741178547db5abd052891544"
+    },
+    "scene": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\field\\lane_transverse_current.json",
+      "sha256": "cbd65837220a7f3aa04e6dd348b93c3d3e703499c00dc23bfbf279b090d6c700"
+    },
+    "implementation": "rinkspace.metric_scale.estimate_uniform_scale",
+    "camera_scene_or_source_observations_modified": false,
+    "corrected_input": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\blade_tracking_20261030\\metric_input\\input.npz",
+    "corrected_input_sha256": "efdea4b380ad713301a19acf86410d9c6df20f76e6fc1e093d02f370680a3cc2",
+    "receipt": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\blade_tracking_20261030\\metric_validation.json"
+  },
+  "current_blade_tracking": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/blade_s01_tracking_20261030.json",
+  "artifact_role_zh": "历史人体实验，旧参数文件按当时误填的60计算，原文件不重写；当前项目米制换算及仅换算单位的轨迹另列。"
+}

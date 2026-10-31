@@ -1,0 +1,2658 @@
+{
+  "schema": "rinkspace.field_model.v1",
+  "scene_id": "ankara_2026.field",
+  "revision": 37,
+  "status": "unfitted_structure_candidate",
+  "native_family": "shared_geometry_v7_collinear_lane_transverse",
+  "coordinate_unit": "rink_length_L_equals_1",
+  "meters_per_unit": null,
+  "dimensions_status": "全部具体尺寸与半轴数值尚未重新拟合；米制未验证",
+  "board": [
+    0.5,
+    0.24997822547411802,
+    0.14106702528459217,
+    0.14558602166751172,
+    1.9758131818951394,
+    0.016951277029498328
+  ],
+  "shared_layout": [
+    -0.33556602136379976,
+    0.22336217634716463,
+    -0.16793266369901455,
+    0.1160239101070319,
+    0.031277551923360396,
+    0.14562846342484845,
+    0.3497845256869089,
+    0.6626999263168422,
+    0.31506300494930073,
+    0.08030168743444902,
+    -0.43161218352179886,
+    -0.43159180594314084,
+    -0.4315900101617077,
+    -0.43161218352179875,
+    0.3077879076890378,
+    0.29192660960043176,
+    0.29604428473767946,
+    0.2893796024792103,
+    0.0,
+    0.11722492396516278,
+    0.07331313064207563,
+    -0.22669560694668842,
+    0.2442864203241858,
+    0.0,
+    0.43161218352191244,
+    0.3310552200807312,
+    0.0,
+    0.11807102719735856,
+    0.0,
+    0.0323980756468468,
+    0.029174638175716937,
+    0.0,
+    0.0,
+    0.0546455734571991,
+    0.07370523834134862,
+    -0.23005834681240278,
+    -0.22981027110478214,
+    0.0,
+    0.0
+  ],
+  "parameter_blocks": [
+    {
+      "id": "curling_shared",
+      "offset": 0,
+      "size": 8,
+      "tangent_size": 7,
+      "independent_local_indices": [
+        0,
+        1,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "derived_local_coordinates": [
+        {
+          "index": 2,
+          "expression": "-1.5 * pitch",
+          "depends_on": [
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lane_shared",
+      "offset": 8,
+      "size": 10
+    },
+    {
+      "id": "hockey_shared",
+      "offset": 18,
+      "size": 5,
+      "tangent_size": 2,
+      "independent_local_indices": [
+        1,
+        2
+      ],
+      "derived_local_coordinates": [
+        {
+          "index": 0,
+          "expression": "0 (rink axes)"
+        }
+      ],
+      "inactive_storage_local_indices": [
+        3,
+        4
+      ],
+      "inactive_storage_note": "old y supports are not current carrier endpoints; all five endpoints are board intersections"
+    },
+    {
+      "id": "hockey_faceoff_shared",
+      "offset": 23,
+      "size": 6,
+      "tangent_size": 3,
+      "independent_local_indices": [
+        1,
+        2,
+        4
+      ],
+      "inactive_storage_local_indices": [
+        0,
+        3,
+        5
+      ],
+      "values_meaning": [
+        "unused",
+        "goal_half_longitudinal_separation",
+        "faceoff_half_longitudinal_separation",
+        "unused",
+        "faceoff_half_transverse_separation",
+        "unused"
+      ],
+      "positive_local_indices": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "id": "hockey_ends_ellipse",
+      "offset": 29,
+      "size": 6,
+      "tangent_size": 4,
+      "independent_local_indices": [
+        0,
+        1,
+        4,
+        5
+      ],
+      "inactive_storage_local_indices": [
+        2,
+        3
+      ],
+      "positive_local_indices": [
+        0,
+        1,
+        4,
+        5
+      ],
+      "values_meaning": [
+        "shared_crease_depth_semiaxis",
+        "shared_crease_transverse_semiaxis",
+        "unused",
+        "unused",
+        "trapezoid_goal_half_span",
+        "trapezoid_board_half_span"
+      ]
+    },
+    {
+      "id": "lane_transverse",
+      "offset": 35,
+      "size": 4,
+      "tangent_size": 1,
+      "independent_local_indices": [
+        0
+      ],
+      "inactive_storage_local_indices": [
+        1,
+        2,
+        3
+      ],
+      "positive_local_indices": [],
+      "values_meaning": [
+        "common_F_transverse_X",
+        "inactive_legacy_lane2_X",
+        "inactive_legacy_lane3_X",
+        "inactive_legacy_lane4_X"
+      ],
+      "shared_by": [
+        "ice/lane1:F_transverse",
+        "ice/lane2:F_transverse",
+        "ice/lane3:F_transverse",
+        "ice/lane4:F_transverse"
+      ]
+    }
+  ],
+  "ellipse_initialization": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\calibration\\runs\\solver_acceleration_20261003\\user_corrected_programme_candidate\\latest9a8c_world66_initialization_ONLY.json",
+    "sha256": "48ec149a8d5edab9e60246ddcb28d7a4fdaddb3b7e1d711fe4c951bdd6d3a4b5",
+    "json_pointer": "/geometry_initializer_auxiliary/crease_unit",
+    "role": "preserved_old_model_shape_envelope_initializer_only_not_source_UV_or_prior",
+    "method": "multiply preserved end radius by original unit-shape inward and transverse envelopes",
+    "axis_ratio_fixed": false,
+    "new_source_observations": 0
+  },
+  "initial_values": {
+    "curling": [
+      -0.3267793347585769,
+      0.2216935467714872,
+      -0.16793266369901455,
+      0.11195510913267637,
+      0.030752039540055082,
+      0.0955313160856598,
+      0.3512742417551614,
+      0.6722234383826853
+    ],
+    "lane": [
+      0.3050394071021374,
+      0.07990963018229574,
+      -0.4262325056110806,
+      -0.43141045125639144,
+      -0.42808806486792245,
+      -0.42332300919134297,
+      0.28870989767277927,
+      0.28610563161752317,
+      0.28926126086495885,
+      0.28295000237008744
+    ],
+    "hockey": [
+      0.0,
+      0.11436232471941903,
+      0.07166734932826517,
+      -0.22669560694668842,
+      0.2442864203241858
+    ],
+    "faceoff": [
+      0.0,
+      0.43251159172165277,
+      0.32942994703447126,
+      0.0,
+      0.11632316863468001,
+      0.0
+    ],
+    "ends_ellipse": [
+      0.030726423164133633,
+      0.029794590902174886,
+      0.0,
+      0.0,
+      0.04909271224436863,
+      0.06897419292230642
+    ]
+  },
+  "paths": [
+    {
+      "id": "d78_material_146/path0",
+      "label": "ice.F1:outer",
+      "entity_id": "entity/ice.F1",
+      "generated_code": 103,
+      "row": 1,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_147/path0",
+      "label": "ice.F2:inner",
+      "entity_id": "entity/ice.F2",
+      "generated_code": 105,
+      "row": 2,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_148/path0",
+      "label": "ice.F2:middle",
+      "entity_id": "entity/ice.F2",
+      "generated_code": 106,
+      "row": 2,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_149/path0",
+      "label": "ice.F2:outer",
+      "entity_id": "entity/ice.F2",
+      "generated_code": 107,
+      "row": 2,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_150/path0",
+      "label": "ice.F3:inner",
+      "entity_id": "entity/ice.F3",
+      "generated_code": 109,
+      "row": 3,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_151/path0",
+      "label": "ice.F3:middle",
+      "entity_id": "entity/ice.F3",
+      "generated_code": 110,
+      "row": 3,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_152/path0",
+      "label": "ice.F3:outer",
+      "entity_id": "entity/ice.F3",
+      "generated_code": 111,
+      "row": 3,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_153/path0",
+      "label": "ice.F4:inner",
+      "entity_id": "entity/ice.F4",
+      "generated_code": 113,
+      "row": 4,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_154/path0",
+      "label": "ice.F4:middle",
+      "entity_id": "entity/ice.F4",
+      "generated_code": 114,
+      "row": 4,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_155/path0",
+      "label": "ice.F4:outer",
+      "entity_id": "entity/ice.F4",
+      "generated_code": 115,
+      "row": 4,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_156/path0",
+      "label": "ice.R3:inner",
+      "entity_id": "entity/ice.R3",
+      "generated_code": 125,
+      "row": 3,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_157/path0",
+      "label": "ice.R3:middle",
+      "entity_id": "entity/ice.R3",
+      "generated_code": 126,
+      "row": 3,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_158/path0",
+      "label": "ice.R3:outer",
+      "entity_id": "entity/ice.R3",
+      "generated_code": 127,
+      "row": 3,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_159/path0",
+      "label": "ice.R4:inner",
+      "entity_id": "entity/ice.R4",
+      "generated_code": 129,
+      "row": 4,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_160/path0",
+      "label": "ice.R4:middle",
+      "entity_id": "entity/ice.R4",
+      "generated_code": 130,
+      "row": 4,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_161/path0",
+      "label": "ice.R4:outer",
+      "entity_id": "entity/ice.R4",
+      "generated_code": 131,
+      "row": 4,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_162/path0",
+      "label": "ice.house_connection_F2_R2:segment0",
+      "entity_id": "entity/ice.house_connection_F2_R2",
+      "generated_code": 201,
+      "row": 2,
+      "role": "physical_connection_centreline",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "endpoint_roles": [
+        "support_at_F_centre_not_observed_terminal",
+        "independent_drawing_support_not_observed_terminal"
+      ],
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_163/path0",
+      "label": "ice.house_connection_F3_R3:segment0",
+      "entity_id": "entity/ice.house_connection_F3_R3",
+      "generated_code": 202,
+      "row": 3,
+      "role": "physical_connection_centreline",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "endpoint_roles": [
+        "support_at_F_centre_not_observed_terminal",
+        "independent_drawing_support_not_observed_terminal"
+      ],
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_164/path0",
+      "label": "ice.house_connection_F4_R4:segment0",
+      "entity_id": "entity/ice.house_connection_F4_R4",
+      "generated_code": 203,
+      "row": 4,
+      "role": "physical_connection_centreline",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "endpoint_roles": [
+        "support_at_F_centre_not_observed_terminal",
+        "independent_drawing_support_not_observed_terminal"
+      ],
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_165/path0",
+      "label": "ice.lane1:edge0",
+      "entity_id": "entity/ice.lane1",
+      "generated_code": 300,
+      "row": 1,
+      "role": "physical_lane_edge",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "left_support_is_physical_endpoint": false,
+      "right_corner_role": "physical_structure_corner_not_new_UV",
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_166/path0",
+      "label": "ice.lane2:edge0",
+      "entity_id": "entity/ice.lane2",
+      "generated_code": 303,
+      "row": 2,
+      "role": "physical_lane_edge",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "left_support_is_physical_endpoint": false,
+      "right_corner_role": "physical_structure_corner_not_new_UV",
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_167/path0",
+      "label": "ice.lane2:edge2",
+      "entity_id": "entity/ice.lane2",
+      "generated_code": 305,
+      "row": 2,
+      "role": "physical_lane_edge",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "left_support_is_physical_endpoint": false,
+      "right_corner_role": "physical_structure_corner_not_new_UV",
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_168/path0",
+      "label": "ice.lane3:edge0",
+      "entity_id": "entity/ice.lane3",
+      "generated_code": 306,
+      "row": 3,
+      "role": "physical_lane_edge",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "left_support_is_physical_endpoint": false,
+      "right_corner_role": "physical_structure_corner_not_new_UV",
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_169/path0",
+      "label": "ice.lane3:edge2",
+      "entity_id": "entity/ice.lane3",
+      "generated_code": 308,
+      "row": 3,
+      "role": "physical_lane_edge",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "left_support_is_physical_endpoint": false,
+      "right_corner_role": "physical_structure_corner_not_new_UV",
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_170/path0",
+      "label": "ice.lane4:edge2",
+      "entity_id": "entity/ice.lane4",
+      "generated_code": 311,
+      "row": 4,
+      "role": "physical_lane_edge",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "left_support_is_physical_endpoint": false,
+      "right_corner_role": "physical_structure_corner_not_new_UV",
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/F4:center",
+      "label": "ice.F4:center",
+      "entity_id": "entity/ice.F4",
+      "generated_code": 112,
+      "row": 4,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/R4:center",
+      "label": "ice.R4:center",
+      "entity_id": "entity/ice.R4",
+      "generated_code": 128,
+      "row": 4,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/F3:center",
+      "label": "ice.F3:center",
+      "entity_id": "entity/ice.F3",
+      "generated_code": 108,
+      "row": 3,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/R3:center",
+      "label": "ice.R3:center",
+      "entity_id": "entity/ice.R3",
+      "generated_code": 124,
+      "row": 3,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/F2:center",
+      "label": "ice.F2:center",
+      "entity_id": "entity/ice.F2",
+      "generated_code": 104,
+      "row": 2,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/R2:outer",
+      "label": "ice.R2:outer",
+      "entity_id": "entity/ice.R2",
+      "generated_code": 123,
+      "row": 2,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/R2:middle",
+      "label": "ice.R2:middle",
+      "entity_id": "entity/ice.R2",
+      "generated_code": 122,
+      "row": 2,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/R2:inner",
+      "label": "ice.R2:inner",
+      "entity_id": "entity/ice.R2",
+      "generated_code": 121,
+      "row": 2,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/R2:center",
+      "label": "ice.R2:center",
+      "entity_id": "entity/ice.R2",
+      "generated_code": 120,
+      "row": 2,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/F1:middle",
+      "label": "ice.F1:middle",
+      "entity_id": "entity/ice.F1",
+      "generated_code": 102,
+      "row": 1,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/F1:inner",
+      "label": "ice.F1:inner",
+      "entity_id": "entity/ice.F1",
+      "generated_code": 101,
+      "row": 1,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/F1:center",
+      "label": "ice.F1:center",
+      "entity_id": "entity/ice.F1",
+      "generated_code": 100,
+      "row": 1,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/R1:outer",
+      "label": "ice.R1:outer",
+      "entity_id": "entity/ice.R1",
+      "generated_code": 119,
+      "row": 1,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/R1:middle",
+      "label": "ice.R1:middle",
+      "entity_id": "entity/ice.R1",
+      "generated_code": 118,
+      "row": 1,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/R1:inner",
+      "label": "ice.R1:inner",
+      "entity_id": "entity/ice.R1",
+      "generated_code": 117,
+      "row": 1,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/R1:center",
+      "label": "ice.R1:center",
+      "entity_id": "entity/ice.R1",
+      "generated_code": 116,
+      "row": 1,
+      "role": "named_ring_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "contour",
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/lane4:0",
+      "label": "ice.lane4:edge0",
+      "entity_id": "entity/ice.lane4",
+      "generated_code": 309,
+      "row": 4,
+      "role": "physical_lane_edge",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "left_support_is_physical_endpoint": false,
+      "right_corner_role": "physical_structure_corner_not_new_UV",
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/lane4:1",
+      "label": "ice.lane4:edge1",
+      "entity_id": "entity/ice.lane4",
+      "generated_code": 310,
+      "row": 4,
+      "role": "physical_lane_edge",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "left_support_is_physical_endpoint": false,
+      "right_corner_role": "physical_structure_corner_not_new_UV",
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/lane3:1",
+      "label": "ice.lane3:edge1",
+      "entity_id": "entity/ice.lane3",
+      "generated_code": 307,
+      "row": 3,
+      "role": "physical_lane_edge",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "left_support_is_physical_endpoint": false,
+      "right_corner_role": "physical_structure_corner_not_new_UV",
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/lane2:1",
+      "label": "ice.lane2:edge1",
+      "entity_id": "entity/ice.lane2",
+      "generated_code": 304,
+      "row": 2,
+      "role": "physical_lane_edge",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "left_support_is_physical_endpoint": false,
+      "right_corner_role": "physical_structure_corner_not_new_UV",
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/lane1:1",
+      "label": "ice.lane1:edge1",
+      "entity_id": "entity/ice.lane1",
+      "generated_code": 301,
+      "row": 1,
+      "role": "physical_lane_edge",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "left_support_is_physical_endpoint": false,
+      "right_corner_role": "physical_structure_corner_not_new_UV",
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/lane1:2",
+      "label": "ice.lane1:edge2",
+      "entity_id": "entity/ice.lane1",
+      "generated_code": 302,
+      "row": 1,
+      "role": "physical_lane_edge",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "left_support_is_physical_endpoint": false,
+      "right_corner_role": "physical_structure_corner_not_new_UV",
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/house_connection_F1_R1:0",
+      "label": "ice.house_connection_F1_R1:segment0",
+      "entity_id": "entity/ice.house_connection_F1_R1",
+      "generated_code": 200,
+      "row": 1,
+      "role": "physical_connection_centreline",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "endpoint_roles": [
+        "support_at_F_centre_not_observed_terminal",
+        "independent_drawing_support_not_observed_terminal"
+      ],
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_142/path0",
+      "label": "ice.B1:segment0",
+      "entity_id": "entity/ice.B1",
+      "generated_code": 401,
+      "layer": "ice",
+      "stage": "M2",
+      "role": "physical_material_centreline",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "measurement": "centreline",
+      "endpoint_roles": [
+        "derived_ice_boundary_intersection",
+        "derived_ice_boundary_intersection"
+      ],
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3",
+      "endpoint_parent_ids": [
+        "entity/ice.B1",
+        "entity/board.continuous"
+      ],
+      "finite_support_role": "actual_generated_line_between_boundary_intersections"
+    },
+    {
+      "id": "d78_material_143/path0",
+      "label": "ice.B2:segment0",
+      "entity_id": "entity/ice.B2",
+      "generated_code": 402,
+      "layer": "ice",
+      "stage": "M2",
+      "role": "physical_material_centreline",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "measurement": "centreline",
+      "endpoint_roles": [
+        "derived_ice_boundary_intersection",
+        "derived_ice_boundary_intersection"
+      ],
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3",
+      "endpoint_parent_ids": [
+        "entity/ice.B2",
+        "entity/board.continuous"
+      ],
+      "finite_support_role": "actual_generated_line_between_boundary_intersections"
+    },
+    {
+      "id": "d78_material_144/path0",
+      "label": "ice.C0:centreline",
+      "entity_id": "entity/ice.C0",
+      "generated_code": 405,
+      "layer": "ice",
+      "stage": "M2",
+      "role": "physical_material_centreline",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "d78_material_145/path0",
+      "label": "ice.C:segment0",
+      "entity_id": "entity/ice.C",
+      "generated_code": 400,
+      "layer": "ice",
+      "stage": "M2",
+      "role": "physical_material_centreline",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "measurement": "centreline",
+      "endpoint_roles": [
+        "derived_ice_boundary_intersection",
+        "derived_ice_boundary_intersection"
+      ],
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3",
+      "endpoint_parent_ids": [
+        "entity/ice.C",
+        "entity/board.continuous"
+      ],
+      "finite_support_role": "actual_generated_line_between_boundary_intersections"
+    },
+    {
+      "id": "demo_initial/A1:outer",
+      "label": "ice.A1:centreline",
+      "entity_id": "entity/ice.A1",
+      "generated_code": 406,
+      "layer": "ice",
+      "stage": "M3",
+      "role": "physical_material_centreline",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/A2:outer",
+      "label": "ice.A2:centreline",
+      "entity_id": "entity/ice.A2",
+      "generated_code": 407,
+      "layer": "ice",
+      "stage": "M3",
+      "role": "physical_material_centreline",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/goal_line_left:0",
+      "label": "ice.goal_line_left:segment0",
+      "entity_id": "entity/ice.goal_line_left",
+      "generated_code": 403,
+      "layer": "ice",
+      "stage": "M3",
+      "role": "physical_material_centreline",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "measurement": "centreline",
+      "endpoint_roles": [
+        "derived_ice_boundary_intersection",
+        "derived_ice_boundary_intersection"
+      ],
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3",
+      "endpoint_parent_ids": [
+        "entity/ice.goal_line_left",
+        "entity/board.continuous"
+      ],
+      "finite_support_role": "actual_generated_line_between_boundary_intersections"
+    },
+    {
+      "id": "demo_initial/goal_line_right:0",
+      "label": "ice.goal_line_right:segment0",
+      "entity_id": "entity/ice.goal_line_right",
+      "generated_code": 404,
+      "layer": "ice",
+      "stage": "M3",
+      "role": "physical_material_centreline",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "measurement": "centreline",
+      "endpoint_roles": [
+        "derived_ice_boundary_intersection",
+        "derived_ice_boundary_intersection"
+      ],
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3",
+      "endpoint_parent_ids": [
+        "entity/ice.goal_line_right",
+        "entity/board.continuous"
+      ],
+      "finite_support_role": "actual_generated_line_between_boundary_intersections"
+    },
+    {
+      "id": "demo_initial/goal_crease_left",
+      "label": "ice.goal_crease_left",
+      "entity_id": "entity/ice.goal_crease_left",
+      "generated_code": 410,
+      "layer": "ice",
+      "stage": "M4",
+      "role": "physical_half_ellipse_boundary",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "measurement": "contour",
+      "endpoint_roles": [
+        "unmeasured_goal_line_attachment",
+        "unmeasured_goal_line_attachment"
+      ],
+      "endpoint_parent_ids": [
+        "entity/ice.goal_crease_left",
+        "entity/ice.goal_line_left"
+      ],
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3",
+      "closed": false,
+      "contour_domain": "half_ellipse_arc_only",
+      "centre_parent": "corresponding_goal_line_midpoint",
+      "closing_diameter_observable": false
+    },
+    {
+      "id": "demo_initial/goal_crease_right",
+      "label": "ice.goal_crease_right",
+      "entity_id": "entity/ice.goal_crease_right",
+      "generated_code": 411,
+      "layer": "ice",
+      "stage": "M4",
+      "role": "physical_half_ellipse_boundary",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "measurement": "contour",
+      "endpoint_roles": [
+        "unmeasured_goal_line_attachment",
+        "unmeasured_goal_line_attachment"
+      ],
+      "endpoint_parent_ids": [
+        "entity/ice.goal_crease_right",
+        "entity/ice.goal_line_right"
+      ],
+      "model_line_width": null,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3",
+      "closed": false,
+      "contour_domain": "half_ellipse_arc_only",
+      "centre_parent": "corresponding_goal_line_midpoint",
+      "closing_diameter_observable": false
+    },
+    {
+      "id": "demo_initial/A3:outer",
+      "label": "ice.A3:centreline",
+      "entity_id": "entity/ice.A3",
+      "generated_code": 408,
+      "layer": "ice",
+      "stage": "M3",
+      "role": "physical_material_centreline",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/A4:outer",
+      "label": "ice.A4:centreline",
+      "entity_id": "entity/ice.A4",
+      "generated_code": 409,
+      "layer": "ice",
+      "stage": "M3",
+      "role": "physical_material_centreline",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/goal_trapezoid_left_lower_outer:0",
+      "label": "ice.goal_trapezoid_left_lower_outer:segment0",
+      "entity_id": "entity/ice.goal_trapezoid_left_lower_outer",
+      "generated_code": 420,
+      "layer": "ice",
+      "stage": "M4",
+      "role": "physical_material_centreline",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "measurement": "centreline",
+      "endpoint_roles": [
+        "unmeasured_goal_line_attachment",
+        "unmeasured_board_attachment"
+      ],
+      "endpoint_parent_ids": [
+        [
+          "entity/ice.goal_trapezoid_left_lower_outer",
+          "entity/ice.goal_line_left"
+        ],
+        [
+          "entity/ice.goal_trapezoid_left_lower_outer",
+          "entity/board.continuous"
+        ]
+      ],
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/goal_trapezoid_left_upper_outer:0",
+      "label": "ice.goal_trapezoid_left_upper_outer:segment0",
+      "entity_id": "entity/ice.goal_trapezoid_left_upper_outer",
+      "generated_code": 421,
+      "layer": "ice",
+      "stage": "M4",
+      "role": "physical_material_centreline",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "measurement": "centreline",
+      "endpoint_roles": [
+        "unmeasured_goal_line_attachment",
+        "unmeasured_board_attachment"
+      ],
+      "endpoint_parent_ids": [
+        [
+          "entity/ice.goal_trapezoid_left_upper_outer",
+          "entity/ice.goal_line_left"
+        ],
+        [
+          "entity/ice.goal_trapezoid_left_upper_outer",
+          "entity/board.continuous"
+        ]
+      ],
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/goal_trapezoid_right_lower_outer:0",
+      "label": "ice.goal_trapezoid_right_lower_outer:segment0",
+      "entity_id": "entity/ice.goal_trapezoid_right_lower_outer",
+      "generated_code": 422,
+      "layer": "ice",
+      "stage": "M4",
+      "role": "physical_material_centreline",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "measurement": "centreline",
+      "endpoint_roles": [
+        "unmeasured_goal_line_attachment",
+        "unmeasured_board_attachment"
+      ],
+      "endpoint_parent_ids": [
+        [
+          "entity/ice.goal_trapezoid_right_lower_outer",
+          "entity/ice.goal_line_right"
+        ],
+        [
+          "entity/ice.goal_trapezoid_right_lower_outer",
+          "entity/board.continuous"
+        ]
+      ],
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "demo_initial/goal_trapezoid_right_upper_outer:0",
+      "label": "ice.goal_trapezoid_right_upper_outer:segment0",
+      "entity_id": "entity/ice.goal_trapezoid_right_upper_outer",
+      "generated_code": 423,
+      "layer": "ice",
+      "stage": "M4",
+      "role": "physical_material_centreline",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "measurement": "centreline",
+      "endpoint_roles": [
+        "unmeasured_goal_line_attachment",
+        "unmeasured_board_attachment"
+      ],
+      "endpoint_parent_ids": [
+        [
+          "entity/ice.goal_trapezoid_right_upper_outer",
+          "entity/ice.goal_line_right"
+        ],
+        [
+          "entity/ice.goal_trapezoid_right_upper_outer",
+          "entity/board.continuous"
+        ]
+      ],
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "board/continuous/bottom",
+      "label": "board.bottom",
+      "entity_id": "entity/board.continuous",
+      "native_kind": 7,
+      "parameters": [
+        0.0
+      ],
+      "layer": "board",
+      "stage": "M5",
+      "role": "physical_board_ice_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "station_domain": {
+        "kind": "unbounded_periodic",
+        "coordinate": "unwrapped_global_course_arc_length",
+        "period": "board_perimeter",
+        "hard_segment_bounds": false
+      },
+      "source_segment_aliases_preserved": true,
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "board/continuous/top",
+      "label": "board.top",
+      "entity_id": "entity/board.continuous",
+      "native_kind": 7,
+      "parameters": [
+        1.0
+      ],
+      "layer": "board",
+      "stage": "M5",
+      "role": "physical_board_top_boundary",
+      "source_observation_ids": [],
+      "creates_source_observation": false,
+      "station_domain": {
+        "kind": "unbounded_periodic",
+        "coordinate": "unwrapped_global_course_arc_length",
+        "period": "board_perimeter",
+        "hard_segment_bounds": false
+      },
+      "source_segment_aliases_preserved": true,
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "ice/lane1:F_transverse",
+      "label": "ice.lane1:F_transverse",
+      "entity_id": "entity/ice.lane1",
+      "generated_code": 320,
+      "row": 1,
+      "role": "physical_lane_transverse_mark",
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3",
+      "source_identity": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\six_shot\\registration\\s05_lane_crossbars\\s05\\paired_whole_line_atlas\\source_candidates_admitted.json",
+      "creates_source_observation": false,
+      "structure_authority": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\model_constraints\\lane_transverse_20261029.json",
+      "shared_station_parameter": "lane_transverse[0]"
+    },
+    {
+      "id": "ice/lane2:F_transverse",
+      "label": "ice.lane2:F_transverse",
+      "entity_id": "entity/ice.lane2",
+      "generated_code": 321,
+      "row": 2,
+      "role": "physical_lane_transverse_mark",
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3",
+      "source_identity": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\six_shot\\registration\\s05_lane_crossbars\\s05\\paired_whole_line_atlas\\source_candidates_admitted.json",
+      "creates_source_observation": false,
+      "structure_authority": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\model_constraints\\lane_transverse_20261029.json",
+      "shared_station_parameter": "lane_transverse[0]"
+    },
+    {
+      "id": "ice/lane3:F_transverse",
+      "label": "ice.lane3:F_transverse",
+      "entity_id": "entity/ice.lane3",
+      "generated_code": 322,
+      "row": 3,
+      "role": "physical_lane_transverse_mark",
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3",
+      "creates_source_observation": false,
+      "structure_authority": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\model_constraints\\lane_transverse_20261029.json",
+      "shared_station_parameter": "lane_transverse[0]"
+    },
+    {
+      "id": "ice/lane4:F_transverse",
+      "label": "ice.lane4:F_transverse",
+      "entity_id": "entity/ice.lane4",
+      "generated_code": 323,
+      "row": 4,
+      "role": "physical_lane_transverse_mark",
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3",
+      "creates_source_observation": false,
+      "structure_authority": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\model_constraints\\lane_transverse_20261029.json",
+      "shared_station_parameter": "lane_transverse[0]"
+    }
+  ],
+  "constraints": {
+    "M1": {
+      "F_R_columns": true,
+      "paired_centres_same_y": true,
+      "equal_row_pitch": true,
+      "common_four_ring_radii": true,
+      "equal_lane_width": true,
+      "collinear_lane_right_edges": true,
+      "lane_left_closed": false,
+      "equal_lane_lengths": false,
+      "connection_end_equals_lane_right": false,
+      "connection_stops_before_lane_right": true,
+      "equal_bottom_top_long_side_clearance": true,
+      "lane_left_not_before_left_goal_line": true,
+      "lane_transverse_count": 4,
+      "lane_transverse_collinear": true,
+      "lane_transverse_parallel_short_side": true,
+      "lane_transverse_endpoints_on_own_lane_sides": true
+    },
+    "M2": {
+      "C0_centre_from_scene_origin": true,
+      "C_passes_C0_centre": true,
+      "B1_B2_parallel_to_C": true,
+      "B1_B2_symmetric_about_C": true,
+      "shared_paint_frame": "fixed_to_rink_axes",
+      "independent_line_rotations": false,
+      "blue_separation_numeric_is_fitted": false,
+      "carriers_parallel_to_rink_short_axis": true,
+      "carrier_endpoints_on_same_ice_boundary": true
+    },
+    "M3": {
+      "same_end_faceoff_pair_symmetric": true,
+      "same_end_inward_distance_shared": true,
+      "C0_A1_A4_common_radius": true,
+      "cross_end_inward_distances_shared": true,
+      "cross_end_transverse_separations_shared": true,
+      "goal_lines_parallel_to_shared_paint_frame": true,
+      "A1_A4_same_row": true,
+      "A2_A3_same_row": true,
+      "left_right_centres_mirror_about_C": true,
+      "goal_positions_mirrored": true
+    },
+    "M4": {
+      "shape_family": "half_ellipse",
+      "independent_ax_ay_per_end": false,
+      "cross_end_axes_shared": true,
+      "trapezoid_goal_and_board_half_spans_shared_between_sides": true,
+      "trapezoid_goal_endpoint_parent": "actual_goal_line",
+      "trapezoid_board_endpoint_parent": "same_continuous_board",
+      "ellipse_or_trapezoid_new_endpoint_UV": false,
+      "independent_depth_and_transverse_semiaxes": true,
+      "contour_arc_only": true,
+      "closing_diameter_is_crease_contour": false,
+      "crease_centre_equals_goal_line_midpoint": true,
+      "trapezoid_upper_lower_mirrored": true,
+      "trapezoid_left_right_mirrored": true
+    },
+    "M5": {
+      "same_station_top_bottom_share_XY": true,
+      "continuous_course": true,
+      "top_bottom_height_independent_XY": false,
+      "fit_station_coordinate": "unwrapped_global_course_arc_length",
+      "hard_segment_bounds": false,
+      "internal_seams_are_not_bounds": true
+    }
+  },
+  "curling_support_revision": {
+    "authority": "用户：让S2-S4全部画到N线左侧，这些中线不会穿过N线。",
+    "previous_model_ref": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\history\\scene_1025\\ec6bf7c6d603c2b820cb.json",
+    "previous_S2_S4_support_x": [
+      0.47284478144093817,
+      0.471851520192459,
+      0.49120252785890195
+    ],
+    "role": "仅绘制支持数值修正；终点未获原片测量，不是观测或尺寸先验。",
+    "S1_unchanged": true,
+    "equal_length_constraint_added": false,
+    "new_source_observations": 0
+  },
+  "source_model": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\history\\scene_1025\\cccc1ac07e454eb0ded6.json",
+  "source_model_sha256": "cccc1ac07e454eb0ded6fa72137d2d33b67939f30b67326dbd17b5c4f72ba519",
+  "M1_model": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\history\\scene_1025\\6274b18a0b9d857f827f.json",
+  "M1_model_revision": 2,
+  "new_source_observations": 0,
+  "fit_executed": false,
+  "user_approval": "not_reviewed",
+  "scope": "M1--M5 geometry only; no camera, advertisements, solver or new source readings",
+  "endpoint_source_references": {
+    "path": "../end_sources.json",
+    "role": "preserved_source_references_not_additional_measurements_or_constraints"
+  },
+  "shared_geometry_options": 63,
+  "curling_layout_parameterization": {
+    "kind": "four_equal_pitch_rows_centred_between_long_sides",
+    "independent_local_indices": [
+      0,
+      1,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "derived_local_coordinates": [
+      {
+        "index": 2,
+        "expression": "-1.5 * pitch",
+        "depends_on": [
+          3
+        ]
+      }
+    ],
+    "free_y0": false,
+    "equal_bottom_top_long_side_clearance": true
+  },
+  "symmetry_revision": {
+    "authority": "用户确认F1/R1到下长边与F4/R4到上长边距离相等",
+    "previous_model_ref": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\history\\scene_1025\\ec6bf7c6d603c2b820cb.json",
+    "previous_y0": -0.17624724277040774,
+    "new_derived_y0": -0.16793266369901455,
+    "all_M1_paths_follow_same_row_coordinate": true,
+    "new_source_observations": 0,
+    "fit_executed": false
+  },
+  "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3",
+  "measurement_definition": "只有F1–F4/R1–R4八组靶圈与半椭圆蓝区使用contour；其余曲线只有centreline，模型零线宽，无旧外/内边缘定义、别名或回退。",
+  "board_station_policy_id": "continuous_unwrapped_course.v1",
+  "short_axis_carriers": {
+    "direction": "rink_short_side",
+    "shared_yaw": 0.0,
+    "yaw_is_independent": false,
+    "endpoint_construction": "intersection_with_same_continuous_ice_boundary",
+    "codes": [
+      400,
+      401,
+      402,
+      403,
+      404
+    ]
+  },
+  "lane_left_support_constraint": {
+    "lower_parent": "ice.goal_line_left",
+    "lower_coordinate": "goal_left_x",
+    "all_rows_independent": true,
+    "left_cap": false,
+    "equal_length": false,
+    "initial_shift_only": 0.01038102122026352
+  },
+  "latest_geometry_revision": {
+    "previous_model_ref": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\history\\scene_1025\\9f9c30b89282bfae99ac.json",
+    "authority": "用户新增A1/A4、A2/A3各自共行并关于场地横向中轴对称",
+    "previous_faceoff_values": [
+      -0.43141045125639144,
+      0.4336127321869141,
+      0.10308167335218821,
+      0.1030816160221748,
+      0.11632316863468005,
+      0.11632316863467998
+    ],
+    "half_longitudinal_initial": 0.32942994703447126,
+    "half_transverse_initial": 0.11632316863468001,
+    "new_source_observations": 0,
+    "fit_executed": false
+  },
+  "faceoff_parameterization": {
+    "kind": "rows_mirror_across_transverse_rink_axis",
+    "mirror_axis": "C line, x=0",
+    "same_rows": [
+      [
+        "A1",
+        "A4"
+      ],
+      [
+        "A2",
+        "A3"
+      ]
+    ],
+    "centres": {
+      "A1": [
+        "+a",
+        "-b"
+      ],
+      "A2": [
+        "+a",
+        "+b"
+      ],
+      "A3": [
+        "-a",
+        "+b"
+      ],
+      "A4": [
+        "-a",
+        "-b"
+      ]
+    },
+    "shared_radius": "hockey_shared.common_radius",
+    "goal_positions_independent": false
+  },
+  "geometry_revision": 4,
+  "geometry_review": {
+    "status": "user_confirmed_structure",
+    "authority": "user_20261024_geometry_work_orders_complete",
+    "scope": "M1-M5_and_later_confirmed_relations",
+    "dimensions_refitted": false,
+    "metric_scale_verified": false
+  },
+  "advertisement_assets": [
+    {
+      "advertisement_number": 2,
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\native_authority\\prints\\p000.json",
+      "sha256": "9d83cdc30e1f87568340c07983e66efedcb4b78f0c05c049aab639974d4adee3",
+      "template_id": "print_template/Ad2",
+      "instance_id": "print_instance/Ad2",
+      "binding_status": "D3_continuous_board_installed_initial_not_refitted",
+      "placement_refitted": false,
+      "template_shape_status": "source_rebuilt_pending_user_visual_review",
+      "text": "ISU-SKATING.COM",
+      "text_content_authority": "direct_user_confirmation",
+      "background_texture_paths": 0,
+      "advertisement_numbers": [
+        2,
+        15
+      ],
+      "instance_ids": [
+        "print_instance/Ad2",
+        "print_instance/Ad15"
+      ],
+      "identity_only_instance_ids": [
+        "print_instance/Ad15"
+      ],
+      "shared_size_block_id": "artwork_pair/Ad2-Ad15/size",
+      "installation_seed_ref": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\history\\scene_1025\\b0659c61ae8fa790c1c7.json",
+      "internal_geometry_status": "shared_parameter_state_available_not_fitted",
+      "template_acceptance": {
+        "parameterization_changed_without_source_or_approval_changes": true
+      },
+      "parameter_state_review_ref": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\result.json",
+      "visual_review_status": "previous_visual_results_preserved_before_parameter_state",
+      "source_index_ref_role": "unchanged_source_evidence_from_reference_template",
+      "reference_template_asset": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\before\\events\\ankara_2026\\scene\\ad2\\assets_r5.json",
+      "reference_template_asset_sha256": "a3a2bfc282f95f41478b6b33453f81053bf57782934365ff141874ef037e6be2",
+      "installation_seed_ref_sha256": "b0659c61ae8fa790c1c7a90b647dea95758ad92e5352adb8cb6f51e1f10d801a"
+    },
+    {
+      "advertisement_number": 1,
+      "advertisement_numbers": [
+        1,
+        14
+      ],
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\native_authority\\prints\\p001.json",
+      "sha256": "9a08dc860881debc6295bb9782ce0bdb8624b31aac8d5bdf0cdee2c7ce623811",
+      "template_id": "print_template/Ad1",
+      "instance_id": "print_instance/Ad1",
+      "instance_ids": [
+        "print_instance/Ad1",
+        "print_instance/Ad14"
+      ],
+      "shared_size_block_id": "artwork_pair/Ad1-Ad14/size",
+      "binding_status": "D3_continuous_board_installed_initial_not_refitted",
+      "placement_refitted": false,
+      "text": "ALL SKATING. ONE APP.",
+      "source_observations_created": false,
+      "template_paths": 26,
+      "model_content": [
+        "large_readable_text",
+        "defined_glyph_holes",
+        "poster_outer_edges",
+        "large_QR_white_outer_frame"
+      ],
+      "excluded_from_model": [
+        "QR_modules",
+        "phone_outlines_and_UI",
+        "small_ISU_logo_strokes",
+        "small_decorations"
+      ],
+      "camera_refs": {
+        "print_instance/Ad1": "../../programmes/okada_mei_sp/ad1_cameras/s03.json",
+        "print_instance/Ad14": "../../programmes/okada_mei_sp/ad1_cameras/s06.json"
+      },
+      "installation_review_ref": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\history\\scene_1025\\a9a0126cdc4778bf566f.json",
+      "qr_frame_shape": "unfolded_square",
+      "internal_geometry_status": "shared_parameter_state_available_not_fitted",
+      "template_acceptance": {
+        "parameterization_changed_without_source_or_approval_changes": true
+      },
+      "parameter_state_review_ref": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\result.json",
+      "visual_review_status": "previous_visual_results_preserved_before_parameter_state",
+      "source_index_ref_role": "unchanged_source_evidence_from_reference_template",
+      "reference_template_asset": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\before\\events\\ankara_2026\\scene\\ad1\\assets_r4.json",
+      "reference_template_asset_sha256": "a69718cf74ff307a89efe518641e2e425a6a9e080b20b0694a5acf025ab9709a",
+      "installation_review_ref_sha256": "a9a0126cdc4778bf566f4b86391ad06828d76777b316286f355bb41f17c68abe"
+    },
+    {
+      "advertisement_number": 3,
+      "advertisement_numbers": [
+        3,
+        16
+      ],
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\native_authority\\prints\\p002.json",
+      "sha256": "67ef1ef9d4b5e457e6695395202e89197e57e6d8d0eebceb5c2bb8774e9b39a4",
+      "template_id": "print_template/Ad3",
+      "instance_id": "print_instance/Ad3",
+      "instance_ids": [
+        "print_instance/Ad3",
+        "print_instance/Ad16"
+      ],
+      "unlocalized_instance_ids": [
+        "print_instance/Ad16"
+      ],
+      "shared_size_block_id": "artwork_pair/Ad3-Ad16/size",
+      "binding_status": "D3_adopted_continuous_board_installed_initial_not_refitted",
+      "placement_refitted": false,
+      "template_paths": 19,
+      "model_content": [
+        "hexagonal_mark",
+        "買取",
+        "poster_outer_edges"
+      ],
+      "excluded_from_model": [
+        "大",
+        "吉",
+        "decorative_fine_details"
+      ],
+      "source_observations_created": false,
+      "source_index_ref": "../ad3/source_r3.json",
+      "installation_review_ref": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\history\\scene_1025\\2810ab673ea7ab3189a4.json",
+      "template_acceptance": {
+        "authority": "direct_user_acceptance_20261024_current_chat",
+        "reacceptance_required": false,
+        "source_task": "ad3_ad16_template_delivery",
+        "parameterization_changed_without_source_or_approval_changes": true
+      },
+      "internal_geometry_status": "shared_parameter_state_available_not_fitted",
+      "parameter_state_review_ref": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\result.json",
+      "visual_review_status": "previous_visual_results_preserved_before_parameter_state",
+      "source_index_ref_role": "unchanged_source_evidence_from_reference_template",
+      "reference_template_asset": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\before\\events\\ankara_2026\\scene\\ad3\\assets_r3.json",
+      "reference_template_asset_sha256": "d5aaa7b285b48bc8eff3d1adaac95ac6144f487934ed8682b8263abc6219e46c",
+      "installation_review_ref_sha256": "2810ab673ea7ab3189a4d24a23acfb8d4040e6af02c5a9dc76a8565ad7c999e9"
+    },
+    {
+      "advertisement_number": 4,
+      "advertisement_numbers": [
+        4,
+        17
+      ],
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\native_authority\\prints\\p003.json",
+      "sha256": "2b83108c86ea495173f73b5627b1044fac84b609e7f230178d8f07c4ac02dade",
+      "template_id": "print_template/Ad4",
+      "instance_id": "print_instance/Ad4",
+      "instance_ids": [
+        "print_instance/Ad4",
+        "print_instance/Ad17"
+      ],
+      "unlocalized_instance_ids": [],
+      "shared_size_block_id": "print_size/Ad4_17",
+      "binding_status": "D3_continuous_board_installed_initial_not_refitted",
+      "placement_refitted": false,
+      "template_paths": 33,
+      "model_content": [
+        "ANKARA_native_single_frame_outline",
+        "JUNIOR GRAND PRIX",
+        "defined_glyph_holes",
+        "poster_outer_edges"
+      ],
+      "excluded_from_model": [
+        "athlete_silhouette",
+        "small_FIGURE_SKATING",
+        "gradient_texture",
+        "withdrawn_K_mosaic_seam",
+        "distorted_ANKARA_initializer"
+      ],
+      "source_observations_created": false,
+      "source_index_ref": "../ad4/sources_r3.json",
+      "installation_review_ref": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\history\\scene_1025\\2cef59b787e4c1910205.json",
+      "template_acceptance": {
+        "authority": "user_requested_shape_correction",
+        "status": "pending_user_review",
+        "parameterization_changed_without_source_or_approval_changes": true
+      },
+      "D3_review_paths": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad4\\ad4\\result.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad4\\ad17\\result.json"
+      ],
+      "internal_geometry_status": "shared_parameter_state_available_not_fitted",
+      "parameter_state_review_ref": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\result.json",
+      "visual_review_status": "previous_visual_results_preserved_before_parameter_state",
+      "source_index_ref_role": "unchanged_source_evidence_from_reference_template",
+      "reference_template_asset": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\before\\events\\ankara_2026\\scene\\ad4\\assets_r3.json",
+      "reference_template_asset_sha256": "4d05af2f21592e5ed740424586dfb0817fc6e22b7721830e31fc115ec1d2589d",
+      "installation_review_ref_sha256": "2cef59b787e4c191020552beb330b8bd3a18f676cffdb03a1d3380d60eaa371c"
+    },
+    {
+      "advertisement_number": 5,
+      "advertisement_numbers": [
+        5,
+        18
+      ],
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\native_authority\\prints\\p004.json",
+      "sha256": "2769da67efacd272eeb324d40155a126d839dd509c4e677e13c265f7b308ebb7",
+      "template_id": "print_template/Ad5",
+      "instance_id": "print_instance/Ad5",
+      "instance_ids": [
+        "print_instance/Ad5",
+        "print_instance/Ad18"
+      ],
+      "unlocalized_instance_ids": [],
+      "shared_size_block_id": "print_size/Ad5_18",
+      "binding_status": "D3_continuous_board_installed_initial_not_refitted",
+      "placement_refitted": false,
+      "template_paths": 32,
+      "model_content": [
+        "large_40_mark",
+        "MEIWA",
+        "明和地所",
+        "defined_glyph_holes",
+        "blue_green_logo_outer_boundary"
+      ],
+      "excluded_from_model": [
+        "small_th_anniversary",
+        "background_texture",
+        "incorrect_whole_poster_border_interpretation"
+      ],
+      "source_observations_created": false,
+      "source_index_ref": "../ad5/sources.json",
+      "installation_review_ref": "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad5\\result.json",
+      "template_acceptance": {
+        "authority": "agent_review_only",
+        "status": "pending_user_review",
+        "parameterization_changed_without_source_or_approval_changes": true
+      },
+      "D3_review_paths": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad5\\ad5\\result.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad5\\ad18\\result.json"
+      ],
+      "internal_geometry_status": "shared_parameter_state_available_not_fitted",
+      "parameter_state_review_ref": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\result.json",
+      "visual_review_status": "previous_visual_results_preserved_before_parameter_state",
+      "source_index_ref_role": "unchanged_source_evidence_from_reference_template",
+      "reference_template_asset": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\before\\events\\ankara_2026\\scene\\ad5\\assets.json",
+      "reference_template_asset_sha256": "26217172c3d1263ebec3296855fc406888e20fc4bfd6d14a2937d45b566ad0eb",
+      "installation_review_ref_sha256": "c3c95eaef18ef8fdcee47aa14282db72db268ad2d7e548bd0b669dfb3260423c"
+    },
+    {
+      "advertisement_number": 6,
+      "advertisement_numbers": [
+        6,
+        19
+      ],
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\native_authority\\prints\\p005.json",
+      "sha256": "ef251178bed427ae754eabfc79a047c0ebd368bcddd8f2c76cc305a27ed72151",
+      "template_id": "print_template/Ad6",
+      "instance_id": "print_instance/Ad6",
+      "instance_ids": [
+        "print_instance/Ad6",
+        "print_instance/Ad19"
+      ],
+      "unlocalized_instance_ids": [],
+      "shared_size_block_id": "print_size/Ad6_19",
+      "binding_status": "D3_continuous_board_installed_initial_not_refitted",
+      "placement_refitted": false,
+      "template_paths": 20,
+      "model_content": [
+        "オリエンタルバイオ",
+        "separate_katakana_strokes",
+        "clear_glyph_holes",
+        "poster_outer_edges"
+      ],
+      "excluded_from_model": [
+        "red_background_texture",
+        "unsupported_candidate_bindings"
+      ],
+      "source_observations_created": false,
+      "source_index_ref": "../ad6/sources_r2.json",
+      "installation_review_ref": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\history\\scene_1025\\9fd31476d3da624d7f07.json",
+      "template_acceptance": {
+        "authority": "user_requested_shape_correction",
+        "status": "pending_user_review",
+        "parameterization_changed_without_source_or_approval_changes": true
+      },
+      "D3_review_paths": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad6\\ad6\\result.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad6\\ad19\\result.json"
+      ],
+      "internal_geometry_status": "shared_parameter_state_available_not_fitted",
+      "parameter_state_review_ref": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\result.json",
+      "visual_review_status": "previous_visual_results_preserved_before_parameter_state",
+      "source_index_ref_role": "unchanged_source_evidence_from_reference_template",
+      "reference_template_asset": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\before\\events\\ankara_2026\\scene\\ad6\\assets_r2.json",
+      "reference_template_asset_sha256": "3860deaa2d52d8592bcae4584f69c90551ebcc755665113ba652efa8fddf4aff",
+      "installation_review_ref_sha256": "9fd31476d3da624d7f075c0c87580d21a0c032b20516ca6211cdb95e3b714f38"
+    },
+    {
+      "advertisement_number": 7,
+      "advertisement_numbers": [
+        7,
+        20
+      ],
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\native_authority\\prints\\p006.json",
+      "sha256": "b766fb6fa30d666884a1d3d7a2ed88de302b8ec822dd7435e791bc8afdccdd02",
+      "template_id": "print_template/Ad7",
+      "instance_id": "print_instance/Ad7",
+      "instance_ids": [
+        "print_instance/Ad7",
+        "print_instance/Ad20"
+      ],
+      "unlocalized_instance_ids": [],
+      "shared_size_block_id": "print_size/Ad7_20",
+      "binding_status": "D3_continuous_board_installed_initial_not_refitted",
+      "placement_refitted": false,
+      "template_paths": 42,
+      "model_content": [
+        "ISU_logo",
+        "INTERNATIONAL",
+        "SKATING_UNION",
+        "defined_holes_and_open_arcs",
+        "poster_outer_edges"
+      ],
+      "excluded_from_model": [
+        "repeated_path_arc_evidence",
+        "synthetic_top_bottom_source_rows"
+      ],
+      "source_observations_created": false,
+      "source_index_ref": "../ad7/sources_r3.json",
+      "installation_review_ref": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\history\\scene_1025\\4a75ac0072e137ca7bf6.json",
+      "template_acceptance": {
+        "authority": "user_requested_shape_correction",
+        "status": "pending_user_review",
+        "parameterization_changed_without_source_or_approval_changes": true
+      },
+      "D3_review_paths": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad7\\ad7\\result.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad7\\ad20\\result.json"
+      ],
+      "internal_geometry_status": "shared_parameter_state_available_not_fitted",
+      "parameter_state_review_ref": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\result.json",
+      "visual_review_status": "previous_visual_results_preserved_before_parameter_state",
+      "source_index_ref_role": "unchanged_source_evidence_from_reference_template",
+      "reference_template_asset": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\before\\events\\ankara_2026\\scene\\ad7\\assets_r3.json",
+      "reference_template_asset_sha256": "f116182d62d9dd08f709f09731f9636d1b3cfc9e4b38d95211b954d4b9d50a6b",
+      "installation_review_ref_sha256": "4a75ac0072e137ca7bf6340ae0306d29b80baa5b7a87a3dbeeafd50d2fdc2889"
+    },
+    {
+      "advertisement_number": 8,
+      "advertisement_numbers": [
+        8,
+        21
+      ],
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\native_authority\\prints\\p007.json",
+      "sha256": "cd8c0aef38d80683418643e8cd3c3be01f6f5f2a9df40087bd319b9a9677fbbc",
+      "template_id": "print_template/Ad8",
+      "instance_id": "print_instance/Ad8",
+      "instance_ids": [
+        "print_instance/Ad8",
+        "print_instance/Ad21"
+      ],
+      "unlocalized_instance_ids": [],
+      "shared_size_block_id": "artwork_pair/Ad8-Ad21/size",
+      "binding_status": "D3_continuous_board_installed_initial_not_refitted",
+      "placement_refitted": false,
+      "template_paths": 14,
+      "model_content": [
+        "blue_block_boundary",
+        "white_W_symbol",
+        "WYNDHAM",
+        "D_A_holes"
+      ],
+      "excluded_from_model": [
+        "withdrawn_Ankara_small_text",
+        "trademark",
+        "false_WY_bridge"
+      ],
+      "source_observations_created": false,
+      "source_index_ref": "../ad8/selected_sources.json",
+      "installation_review_ref": "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad8\\result.json",
+      "template_acceptance": {
+        "authority": "agent_review_only",
+        "status": "pending_user_review",
+        "parameterization_changed_without_source_or_approval_changes": true
+      },
+      "D3_review_paths": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad8\\ad8\\result.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad8\\ad21\\result.json"
+      ],
+      "internal_geometry_status": "shared_parameter_state_available_not_fitted",
+      "parameter_state_review_ref": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\result.json",
+      "visual_review_status": "previous_visual_results_preserved_before_parameter_state",
+      "source_index_ref_role": "unchanged_source_evidence_from_reference_template",
+      "reference_template_asset": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\before\\events\\ankara_2026\\scene\\ad8\\assets_r2.json",
+      "reference_template_asset_sha256": "86e5dcdf249f9a67ec00d1364f28ac9a769c84b29c5b5008ac8cc37a6d8c041b",
+      "installation_review_ref_sha256": "b76acd23444cc3789cd2a9cd1233455d063bc4b6bc86362130bed1e08802e5df"
+    },
+    {
+      "advertisement_number": 9,
+      "advertisement_numbers": [
+        9,
+        22
+      ],
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\native_authority\\prints\\p008.json",
+      "sha256": "09735b2a8d2db86184c7894265aceb149b05826fcfca81fceef6eec23ccda1a6",
+      "template_id": "print_template/Ad9",
+      "instance_id": "print_instance/Ad9",
+      "instance_ids": [
+        "print_instance/Ad9",
+        "print_instance/Ad22"
+      ],
+      "unlocalized_instance_ids": [],
+      "shared_size_block_id": "artwork_pair/Ad9-Ad22/size",
+      "binding_status": "D3_continuous_board_installed_initial_not_refitted",
+      "placement_refitted": false,
+      "template_paths": 4,
+      "model_content": [
+        "matching_red_badge_boundary",
+        "can_large_letters"
+      ],
+      "excluded_from_model": [
+        "decorative_flourishes",
+        "small_script",
+        "1957",
+        "different_official_logo_version"
+      ],
+      "source_observations_created": false,
+      "source_index_ref": "../ad9/selected_sources.json",
+      "installation_review_ref": "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad9\\result.json",
+      "template_acceptance": {
+        "authority": "agent_review_only",
+        "status": "pending_user_review",
+        "parameterization_changed_without_source_or_approval_changes": true
+      },
+      "D3_review_paths": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad9\\ad9\\result.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad9\\ad22\\result.json"
+      ],
+      "internal_geometry_status": "shared_parameter_state_available_not_fitted",
+      "parameter_state_review_ref": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\result.json",
+      "visual_review_status": "previous_visual_results_preserved_before_parameter_state",
+      "source_index_ref_role": "unchanged_source_evidence_from_reference_template",
+      "reference_template_asset": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\before\\events\\ankara_2026\\scene\\ad9\\assets_r2.json",
+      "reference_template_asset_sha256": "da2404cba5147baa0ba0be6c826982bbff4ac67425bea39193d83a65f1d4b9a6",
+      "installation_review_ref_sha256": "18865006acc9707c3b76fcd5a60efcc27b312acaedbb11abe2acf395768983d0"
+    },
+    {
+      "advertisement_number": 10,
+      "advertisement_numbers": [
+        10,
+        23
+      ],
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\native_authority\\prints\\p009.json",
+      "sha256": "0dc9787118872182e8be3e30f9d4023c851097355510216b9f1ce197937e8695",
+      "template_id": "print_template/Ad10",
+      "instance_id": "print_instance/Ad10",
+      "instance_ids": [
+        "print_instance/Ad10",
+        "print_instance/Ad23"
+      ],
+      "unlocalized_instance_ids": [],
+      "shared_size_block_id": "artwork_pair/Ad10-Ad23/size",
+      "binding_status": "D3_continuous_board_installed_initial_not_refitted",
+      "placement_refitted": false,
+      "template_paths": 13,
+      "model_content": [
+        "SPORTOTO_eight_letters",
+        "three_O_holes",
+        "large_upper_lower_arcs"
+      ],
+      "excluded_from_model": [
+        "small_text",
+        "background_texture"
+      ],
+      "source_observations_created": false,
+      "source_index_ref": "../ad10/selected_sources.json",
+      "installation_review_ref": "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad10\\result.json",
+      "template_acceptance": {
+        "authority": "agent_review_only",
+        "status": "pending_user_review",
+        "parameterization_changed_without_source_or_approval_changes": true
+      },
+      "D3_review_paths": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad10\\ad10\\result.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad10\\ad23\\result.json"
+      ],
+      "internal_geometry_status": "shared_parameter_state_available_not_fitted",
+      "parameter_state_review_ref": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\result.json",
+      "visual_review_status": "previous_visual_results_preserved_before_parameter_state",
+      "source_index_ref_role": "unchanged_source_evidence_from_reference_template",
+      "reference_template_asset": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\before\\events\\ankara_2026\\scene\\ad10\\assets.json",
+      "reference_template_asset_sha256": "b50e4d6135539e7369309b31b74a3405eee9ae6352c82c2a6148a467eac91eeb",
+      "installation_review_ref_sha256": "babebce545e2d3fab09787624c29a29cfd92ba767e4eb538d91b9e9450de1831"
+    },
+    {
+      "advertisement_number": 11,
+      "advertisement_numbers": [
+        11,
+        24
+      ],
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\native_authority\\prints\\p010.json",
+      "sha256": "68b4d0b97d9cf5e1d25b255423cfcf155552c05db2c462c744145b320b485419",
+      "template_id": "print_template/Ad11_Ad24",
+      "instance_id": "print_instance/Ad11",
+      "instance_ids": [
+        "print_instance/Ad11",
+        "print_instance/Ad24"
+      ],
+      "unlocalized_instance_ids": [],
+      "shared_size_block_id": "size/Ad11_Ad24",
+      "binding_status": "D3_continuous_board_installed_initial_not_refitted",
+      "placement_refitted": false,
+      "template_paths": 7,
+      "model_content": [
+        "外环双边",
+        "盾形双边",
+        "红色盾面",
+        "新月",
+        "星"
+      ],
+      "excluded_from_model": [
+        "小环绕字",
+        "2006",
+        "冰鞋细节"
+      ],
+      "source_observations_created": false,
+      "source_index_ref": "../ad11/source.json",
+      "installation_review_ref": "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad11\\result.json",
+      "template_acceptance": {
+        "authority": "agent_review_only",
+        "status": "pending_user_review",
+        "parameterization_changed_without_source_or_approval_changes": true
+      },
+      "D3_review_paths": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad11\\ad11\\result.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad11\\ad24\\result.json"
+      ],
+      "internal_geometry_status": "shared_parameter_state_available_not_fitted",
+      "parameter_state_review_ref": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\result.json",
+      "visual_review_status": "previous_visual_results_preserved_before_parameter_state",
+      "source_index_ref_role": "unchanged_source_evidence_from_reference_template",
+      "reference_template_asset": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\before\\events\\ankara_2026\\scene\\ad11\\assets.json",
+      "reference_template_asset_sha256": "d334f25eb599cc53d671f6b90bb47df848d79cb13560cd48e3c58a7ee9b7312e",
+      "installation_review_ref_sha256": "10871a4355049ede1042892009c756b58e1323bd8d2bc250e4fc01162fd6fba7"
+    },
+    {
+      "advertisement_number": 12,
+      "advertisement_numbers": [
+        12,
+        25
+      ],
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\native_authority\\prints\\p011.json",
+      "sha256": "767825d50015036cf75a930bc975e07e62f4a2dc72c08def1785ea36448cc2e1",
+      "template_id": "print_template/Ad12_Ad25",
+      "instance_id": "print_instance/Ad12",
+      "instance_ids": [
+        "print_instance/Ad12",
+        "print_instance/Ad25"
+      ],
+      "unlocalized_instance_ids": [],
+      "shared_size_block_id": "size/Ad12_Ad25",
+      "binding_status": "D3_continuous_board_installed_initial_not_refitted",
+      "placement_refitted": false,
+      "template_paths": 34,
+      "model_content": [
+        "T.C.",
+        "ANKARA",
+        "BÜYÜKŞEHİR",
+        "BELEDİYESİ",
+        "盾形大外框",
+        "可靠字母内孔"
+      ],
+      "excluded_from_model": [
+        "徽章小字",
+        "清真寺及细塔",
+        "微小星形"
+      ],
+      "source_observations_created": false,
+      "source_index_ref": "../ad12/source_r2.json",
+      "installation_review_ref": "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad12\\result.json",
+      "template_acceptance": {
+        "authority": "agent_review_only",
+        "status": "pending_user_review",
+        "parameterization_changed_without_source_or_approval_changes": true
+      },
+      "D3_review_paths": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad12\\ad12\\result.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad12\\ad25\\result.json"
+      ],
+      "internal_geometry_status": "shared_parameter_state_available_not_fitted",
+      "parameter_state_review_ref": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\result.json",
+      "visual_review_status": "previous_visual_results_preserved_before_parameter_state",
+      "source_index_ref_role": "unchanged_source_evidence_from_reference_template",
+      "reference_template_asset": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\before\\events\\ankara_2026\\scene\\ad12\\assets_r2.json",
+      "reference_template_asset_sha256": "b48e5a975be4b05df95304ee0c01f50315f82b464b2c02a8e248d64cd31e5834",
+      "installation_review_ref_sha256": "8beec9ea1933776f5d2c6d6797eda07176042c21bec765a0395fc889db20c7bd"
+    },
+    {
+      "advertisement_number": 13,
+      "advertisement_numbers": [
+        13,
+        26
+      ],
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\native_authority\\prints\\p012.json",
+      "sha256": "ccf8e0cc7c70f760a67d9e711c43a096f138e5d83da7e691f9f9c8b6d90baa03",
+      "template_id": "print_template/Ad13_Ad26",
+      "instance_id": "print_instance/Ad13",
+      "instance_ids": [
+        "print_instance/Ad13",
+        "print_instance/Ad26"
+      ],
+      "unlocalized_instance_ids": [],
+      "shared_size_block_id": "size/Ad13_Ad26",
+      "binding_status": "D3_continuous_board_installed_initial_not_refitted",
+      "placement_refitted": false,
+      "template_paths": 34,
+      "model_content": [
+        "T.C. GENÇLİK VE",
+        "SPOR BAKANLIĞI",
+        "existing_defined_letter_holes",
+        "large_outer_ring"
+      ],
+      "excluded_from_model": [
+        "small_stars",
+        "stylized_athletes",
+        "fine_emblem_interior",
+        "fragmented_ring_parts",
+        "texture"
+      ],
+      "source_observations_created": false,
+      "source_index_ref": "../ad13/source_r2.json",
+      "installation_review_ref": "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad13\\result.json",
+      "template_acceptance": {
+        "authority": "agent_review_only",
+        "status": "pending_user_review",
+        "parameterization_changed_without_source_or_approval_changes": true
+      },
+      "D3_review_paths": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad13\\ad13\\result.json",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\rebuild_ads_20261025\\final\\ad13\\ad26\\result.json"
+      ],
+      "internal_geometry_status": "shared_parameter_state_available_not_fitted",
+      "parameter_state_review_ref": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\result.json",
+      "visual_review_status": "previous_visual_results_preserved_before_parameter_state",
+      "source_index_ref_role": "unchanged_source_evidence_from_reference_template",
+      "reference_template_asset": "D:\\CodexData\\RinkSpace_Data\\runs\\print_state_20261025\\before\\events\\ankara_2026\\scene\\ad13\\assets_r2.json",
+      "reference_template_asset_sha256": "b4c4ae9019675e3c868ab283dae589c14ac3d679e5399e99c85b1409f3500ca2",
+      "installation_review_ref_sha256": "c82df493a716ad647cc634895ad27c48cb112ddacfb5a1b67f5ec3abe79af704"
+    }
+  ],
+  "advertisement_installation_review": {
+    "instance_id": "print_instance/Ad2",
+    "native_kind": 5,
+    "status": "initial_not_refitted",
+    "source_pts": 319488,
+    "time_base": "1/12800",
+    "fit_executed": false,
+    "field_geometry_changed": false
+  },
+  "archive_ref": "../archive.json",
+  "print_layout_revision": {
+    "schema": "rinkspace.event_print_layout_components.v1",
+    "definition_sha256": "c1bca0ae4aab7aa6e511c6709ae416a08ef99c7ba08a4303091c15570cdca369",
+    "policy": "One positive affine map for each complete ordinary printed artwork; analytic frames retain their existing construction; no per-line or per-logo deformation",
+    "source_path_identities_and_vertices_unchanged": true,
+    "physical_ad_size_not_declared_measured": true,
+    "analytic_ink_anchor": "Ad5 graphic frame is part of the same printed artwork"
+  },
+  "print_panel_domain_revision": {
+    "kind": "physical_unit_panel",
+    "advertisements": [
+      2,
+      3,
+      4,
+      6,
+      7
+    ],
+    "source_points_unchanged": true,
+    "parameter_freedoms_unchanged": true
+  },
+  "goal_end_parameterization": {
+    "authority": "user_explicit_request_20261028",
+    "goal_lines": "x=-d and x=+d, endpoints on the same continuous board",
+    "creases": "same ax/ay at corresponding goal midpoint; opposite finite half-ellipse arcs",
+    "trapezoids": "shared goal/board half spans, reflected across both rink axes",
+    "crease_station_domain": [
+      0.0,
+      1.0
+    ],
+    "closing_diameter_observable": false,
+    "remaining_independent_dimensions": 5,
+    "observation_penalties_added": false
+  },
+  "lane_transverse_revision": {
+    "authority": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\model_constraints\\lane_transverse_20261029.json",
+    "authority_sha256": "d194399337835360a10f3d68123bfd22e5014f408c48f25ff2fc1cb481f0a759",
+    "native_option": 32,
+    "collinear": true,
+    "independent_X_stations": false,
+    "independent_positions": 1,
+    "parallel_to_rink_short_side": true,
+    "Y_endpoints_shared_with_existing_lane_sides": true,
+    "lane3_lane4_paths_added": true,
+    "initial_X": -0.23005834681240278,
+    "initial_X_basis": "arithmetic mean of previous fitted Lane1/Lane2 positions; initializer only",
+    "previous_fitted_X": [
+      -0.2303064225200234,
+      -0.22981027110478214
+    ],
+    "new_source_observations": 0,
+    "refit_executed": false,
+    "user_pixel_accuracy_acceptance": false
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "schema": "rinkspace.body-review-package-receipt.v1",
+  "archive": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\offline_review\\body_s01_pro_review_20261029.zip",
+  "bytes": 42881483,
+  "sha256": "1d97ccad3f3044f8f256357f63edaf20a42d9dbf1c0134484dd6728e9f243726",
+  "manifest_sha256": "484fdd068d3260ba4465bc6487d94b91bbe723b8f04ff82b64a7e79cacf6a4c3",
+  "files": 689,
+  "uncompressed_bytes": 54621576,
+  "native_source_hashes_verified": 22,
+  "source_python_files": 62,
+  "source_crop_catalog_frames": 158,
+  "stages": 14,
+  "offline_verification": {
+    "schema": "rinkspace.offline-body-review-audit.v1",
+    "verified_files": 688,
+    "all_file_hashes_and_sizes_match": true,
+    "all_stage_index_links_resolve": true,
+    "manifest_self_hash_is_external": true,
+    "no_network_or_author_data_paths_used": true,
+    "metrics": {
+      "body_visible_source_pixel_errors": {
+        "fixed": {
+          "n": 13221,
+          "median": 6.537852824780452,
+          "p95": 18.240438567763576,
+          "maximum": 135.91656274433507
+        },
+        "pose": {
+          "n": 13221,
+          "median": 6.126364297853749,
+          "p95": 16.883401721581713,
+          "maximum": 125.25521617473476
+        },
+        "pose_contact": {
+          "n": 13221,
+          "median": 6.521571757325662,
+          "p95": 18.29512726180753,
+          "maximum": 127.20796022655524
+        }
+      },
+      "footwear_curve_pixel_errors": {
+        "previous_B": {
+          "fitted_blade_curves": {
+            "n": 168,
+            "median": 11.257863304265399,
+            "p95": 27.943246954834873,
+            "maximum": 42.290147680714
+          },
+          "development_blade_curves": {
+            "n": 72,
+            "median": 12.104623429975273,
+            "p95": 33.528055092632336,
+            "maximum": 42.75580597527466
+          }
+        },
+        "calibrated_blind_pose": {
+          "fitted_blade_curves": {
+            "n": 168,
+            "median": 2.0511263716981034,
+            "p95": 20.23560035711905,
+            "maximum": 38.320508145640744
+          },
+          "development_blade_curves": {
+            "n": 72,
+            "median": 20.38265194310356,
+            "p95": 45.305039115561655,
+            "maximum": 52.88669642067184
+          }
+        },
+        "calibrated_observed_pose": {
+          "fitted_blade_curves": {
+            "n": 168,
+            "median": 2.3707003286281942,
+            "p95": 21.08041015265981,
+            "maximum": 39.714961788954334
+          },
+          "development_blade_curves": {
+            "n": 72,
+            "median": 13.945858393642881,
+            "p95": 24.211332921439336,
+            "maximum": 28.725883773505494
+          }
+        }
+      },
+      "source_exposures": 1143,
+      "lower_body_inferred": 125,
+      "final_pelvis_equals_B": true,
+      "footwear_geometry_frozen_during_pose_inference": true,
+      "contact_feedback_disabled": true,
+      "external_3d_accuracy_verified": false
+    },
+    "pixels": {
+      "packet_identity_matches": true,
+      "target_decoded_exposures": 1143,
+      "all_source_crop_RGB_hashes_match": true,
+      "source_crops_checked": 158,
+      "all_target_decoded_bgr_pixels_match_recorded_original": true
+    }
+  },
+  "verification_report": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/offline_review/offline_audit_verified.json",
+  "package_entry": "README.md",
+  "archive_hash_unchanged_after_verification": true
+}

@@ -1,0 +1,113 @@
+{
+  "schema": "rinkspace.native_build.v1",
+  "date": "2026-10-29",
+  "library": "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\native_core\\sm120\\lane4_shared\\rinkspace_core.dll",
+  "sha256": "c52c5029d1fb826adf5745547d0af0e5ee967e521d2f10bd76f09abe26b70ce5",
+  "abi": 2,
+  "cuda_architecture": "120",
+  "cuda_fast_compile": "min",
+  "fp64": true,
+  "fmad": false,
+  "frozen_source": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\six_shot\\lane4_shared\\native_source",
+  "build_log": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\six_shot\\lane4_shared\\build.log",
+  "source_files": [
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "3b53c89dc1c4f71d04448c4713d0dd5978909964fa95f0f48e2b13e6bb914e0b"
+    },
+    {
+      "path": "include/rinkspace/box_stationarity.hpp",
+      "sha256": "6565331dcc8c02a5501294ad3bb11e7f8ee420b79718e3f26ae1b3184e3d42f8"
+    },
+    {
+      "path": "include/rinkspace/camera_chart.hpp",
+      "sha256": "93715d5338955b0f91e708408513252c4765c85f8501fe4253619c1b7ce19f71"
+    },
+    {
+      "path": "include/rinkspace/camera_envelope.hpp",
+      "sha256": "70cd9d7e00a54431946b6aafb06a59dc529746e8ac1b4711209e865c61793d88"
+    },
+    {
+      "path": "include/rinkspace/camera_state.hpp",
+      "sha256": "21648f13b47e2ff93648ccfc280d14e705f9256f220570c0ad74fa6653915198"
+    },
+    {
+      "path": "include/rinkspace/core_api.h",
+      "sha256": "90aa14d20a6aa513054748e972e106c90ce3a45c16f80daeaceec7e52627c3ce"
+    },
+    {
+      "path": "include/rinkspace/core_types.hpp",
+      "sha256": "019e09f224f79330c8c6724b9431adb470d2dc9f95a47b15dc936174889075e3"
+    },
+    {
+      "path": "include/rinkspace/entities.hpp",
+      "sha256": "bfd2cc7d0d61a882b8648222a19ebadad512d6a6162601fdf711484492e8beab"
+    },
+    {
+      "path": "include/rinkspace/geometry.hpp",
+      "sha256": "177ca8fde7e58514e40736e4f61536edf8c1fcac66ed88979c3340e5300af9c5"
+    },
+    {
+      "path": "include/rinkspace/local_jet.hpp",
+      "sha256": "8b764927f701d16db871d96cf7bfea9ca34ebbc2eb211f63648f9a98b34a54de"
+    },
+    {
+      "path": "include/rinkspace/motion_derivatives.hpp",
+      "sha256": "7f30662dba0042023a6dec7600c8a1e5690ea64aadae815e24e484c4a214ac51"
+    },
+    {
+      "path": "include/rinkspace/projection.hpp",
+      "sha256": "677db4f77aa584df90be28fe1e1db954a7c551517126f77c587aab1997529336"
+    },
+    {
+      "path": "include/rinkspace/scene_derivatives.hpp",
+      "sha256": "977d10d7955f252c8a0d2b6a7d5a07ac6c81c7ee6ad4e793cd328667463c5301"
+    },
+    {
+      "path": "src/core_api.cpp",
+      "sha256": "dbe99d89f33523af94fc03c332e34c7c82954a074ebc6246aa3974bc2b80eaee"
+    },
+    {
+      "path": "src/core_gpu.cu",
+      "sha256": "2c05c25dc670d3a53dbdbfb36ae8b435567188f942436c1292b05524ff90af4f"
+    },
+    {
+      "path": "src/gpu_bounded_quadratic.cuh",
+      "sha256": "b6930fb2c8e5d33332f80b3472139a88b40d2b0c1bf053c62746a02744dabe19"
+    },
+    {
+      "path": "src/gpu_linearization.cuh",
+      "sha256": "35ddbb1979d422dedeb32b1622d29fe5d3933bcb04dd6e9f1c89f44bb81a6d91"
+    },
+    {
+      "path": "src/gpu_solver.cuh",
+      "sha256": "038beb18f870a7e12fddbfc60414cee5a636ba073a2a1bd22f4bfd28c70b7e9e"
+    },
+    {
+      "path": "src/gpu_stationarity.cuh",
+      "sha256": "534ece6d743e939be8b2a02324753dc3781eaffbf9c7796cf830a0c601979ecc"
+    },
+    {
+      "path": "src/gpu_station_refinement.cuh",
+      "sha256": "ba47243c01c3a69ff86d51a2d01069a4d0dd78cfcdb2a2779505469d03f60667"
+    },
+    {
+      "path": "tests/box_stationarity.cpp",
+      "sha256": "f209a0ac23c91e3c5e9d5de9bb6d1d152668dd825a0a3a5dd308d29ff7b45e30"
+    },
+    {
+      "path": "tests/core_smoke.cpp",
+      "sha256": "239c5b42f0f88b7f7b56a1f70c5f2cea9772468e28948d452f0c8c1249b82f6b"
+    }
+  ],
+  "change": "Option32: all four lane transverse marks use shared layout[35]; slots36..38 inactive.",
+  "inherited_solver_optimization": "Current workspace optimized solver; no optimizer algorithm edits in this revision.",
+  "validation": {
+    "related_pytest_passed": 19,
+    "native_ctest_passed": 2,
+    "preview_review": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\six_shot\\lane4_shared\\native_lane4_topview.png",
+      "conclusion": "All four orange transverse segments share one vertical carrier and terminate on their own lane upper/lower long sides."
+    }
+  }
+}

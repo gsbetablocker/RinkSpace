@@ -1,9 +1,9 @@
 {
   "schema": "rinkspace.field_model.v1",
   "scene_id": "ankara_2026.field",
-  "revision": 35,
+  "revision": 36,
   "status": "unfitted_structure_candidate",
-  "native_family": "shared_geometry_v5_symmetric_goal_ends",
+  "native_family": "shared_geometry_v7_collinear_lane_transverse",
   "coordinate_unit": "rink_length_L_equals_1",
   "meters_per_unit": null,
   "dimensions_status": "全部具体尺寸与半轴数值尚未重新拟合；米制未验证",
@@ -50,7 +50,11 @@
     0.0,
     0.0,
     0.04909271224436863,
-    0.06897419292230642
+    0.06897419292230642,
+    -0.23005834681240278,
+    -0.23005834681240278,
+    -0.23005834681240278,
+    -0.23005834681240278
   ],
   "parameter_blocks": [
     {
@@ -160,6 +164,33 @@
         "unused",
         "trapezoid_goal_half_span",
         "trapezoid_board_half_span"
+      ]
+    },
+    {
+      "id": "lane_transverse",
+      "offset": 35,
+      "size": 4,
+      "tangent_size": 1,
+      "independent_local_indices": [
+        0
+      ],
+      "inactive_storage_local_indices": [
+        1,
+        2,
+        3
+      ],
+      "positive_local_indices": [],
+      "values_meaning": [
+        "common_F_transverse_X",
+        "inactive_legacy_lane2_X",
+        "inactive_legacy_lane3_X",
+        "inactive_legacy_lane4_X"
+      ],
+      "shared_by": [
+        "ice/lane1:F_transverse",
+        "ice/lane2:F_transverse",
+        "ice/lane3:F_transverse",
+        "ice/lane4:F_transverse"
       ]
     }
   ],
@@ -1632,6 +1663,86 @@
       "measurement": "centreline",
       "model_line_width": 0.0,
       "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3"
+    },
+    {
+      "id": "ice/lane1:F_transverse",
+      "label": "ice.lane1:F_transverse",
+      "entity_id": "entity/ice.lane1",
+      "generated_code": 320,
+      "row": 1,
+      "role": "physical_lane_transverse_mark",
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3",
+      "creates_source_observation": false,
+      "structure_authority": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\model_constraints\\lane_transverse_20261029.json",
+      "shared_station_parameter": "lane_transverse[0]"
+    },
+    {
+      "id": "ice/lane2:F_transverse",
+      "label": "ice.lane2:F_transverse",
+      "entity_id": "entity/ice.lane2",
+      "generated_code": 321,
+      "row": 2,
+      "role": "physical_lane_transverse_mark",
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3",
+      "creates_source_observation": false,
+      "structure_authority": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\model_constraints\\lane_transverse_20261029.json",
+      "shared_station_parameter": "lane_transverse[0]"
+    },
+    {
+      "id": "ice/lane3:F_transverse",
+      "label": "ice.lane3:F_transverse",
+      "entity_id": "entity/ice.lane3",
+      "generated_code": 322,
+      "row": 3,
+      "role": "physical_lane_transverse_mark",
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3",
+      "creates_source_observation": false,
+      "structure_authority": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\model_constraints\\lane_transverse_20261029.json",
+      "shared_station_parameter": "lane_transverse[0]"
+    },
+    {
+      "id": "ice/lane4:F_transverse",
+      "label": "ice.lane4:F_transverse",
+      "entity_id": "entity/ice.lane4",
+      "generated_code": 323,
+      "row": 4,
+      "role": "physical_lane_transverse_mark",
+      "layer": "ice",
+      "stage": "M1",
+      "finite_support": [
+        0.0,
+        1.0
+      ],
+      "measurement": "centreline",
+      "model_line_width": 0.0,
+      "measurement_policy_id": "ankara_2026.curve_measurement.user_20261024.v3",
+      "creates_source_observation": false,
+      "structure_authority": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\model_constraints\\lane_transverse_20261029.json",
+      "shared_station_parameter": "lane_transverse[0]"
     }
   ],
   "constraints": {
@@ -1647,7 +1758,11 @@
       "connection_end_equals_lane_right": false,
       "connection_stops_before_lane_right": true,
       "equal_bottom_top_long_side_clearance": true,
-      "lane_left_not_before_left_goal_line": true
+      "lane_left_not_before_left_goal_line": true,
+      "lane_transverse_count": 4,
+      "lane_transverse_collinear": true,
+      "lane_transverse_parallel_short_side": true,
+      "lane_transverse_endpoints_on_own_lane_sides": true
     },
     "M2": {
       "C0_centre_from_scene_origin": true,
@@ -1721,7 +1836,7 @@
     "path": "../end_sources.json",
     "role": "preserved_source_references_not_additional_measurements_or_constraints"
   },
-  "shared_geometry_options": 31,
+  "shared_geometry_options": 63,
   "curling_layout_parameterization": {
     "kind": "four_equal_pitch_rows_centred_between_long_sides",
     "independent_local_indices": [
@@ -2517,5 +2632,25 @@
     "closing_diameter_observable": false,
     "remaining_independent_dimensions": 5,
     "observation_penalties_added": false
+  },
+  "lane_transverse_revision": {
+    "authority": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\model_constraints\\lane_transverse_20261029.json",
+    "authority_sha256": "d194399337835360a10f3d68123bfd22e5014f408c48f25ff2fc1cb481f0a759",
+    "native_option": 32,
+    "collinear": true,
+    "independent_X_stations": false,
+    "independent_positions": 1,
+    "parallel_to_rink_short_side": true,
+    "Y_endpoints_shared_with_existing_lane_sides": true,
+    "lane3_lane4_paths_added": true,
+    "initial_X": -0.23005834681240278,
+    "initial_X_basis": "arithmetic mean of previous fitted Lane1/Lane2 positions; initializer only",
+    "previous_fitted_X": [
+      -0.2303064225200234,
+      -0.22981027110478214
+    ],
+    "new_source_observations": 0,
+    "refit_executed": false,
+    "user_pixel_accuracy_acceptance": false
   }
 }

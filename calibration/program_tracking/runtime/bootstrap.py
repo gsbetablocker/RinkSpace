@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
+from rinkspace.storage import resolve_asset
+
 from pathlib import Path
 import sys
 
 
 ROOT = Path(__file__).resolve().parents[3]
 MAIN_SITE = ROOT / ".venv" / "Lib" / "site-packages"
-GPU_SITE = ROOT / ".venv-gpu" / "Lib" / "site-packages"
+GPU_SITE = resolve_asset(ROOT, ROOT / ".venv-gpu") / "Lib" / "site-packages"
 
 
 def add_geometry_dependencies() -> tuple[str, ...]:

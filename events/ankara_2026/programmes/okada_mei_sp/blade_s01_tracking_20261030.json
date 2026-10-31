@@ -1,0 +1,268 @@
+{
+  "schema": "rinkspace.s01-blade-tracking-review.v1",
+  "source_time_base": [
+    1,
+    12800
+  ],
+  "source_first_last_pts": [
+    283136,
+    575488
+  ],
+  "source_exposures": 1143,
+  "source_time_range_seconds": [
+    22.12,
+    44.96
+  ],
+  "source_fps": 50,
+  "video": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\blade_tracking_20261030\\continuous\\local_source_review\\S01_blades_continuous.mp4",
+  "video_sha256": "09bc803443a6cb3c5783dfe69c74deaa209b4d560e8ce7a906e5555ab2cad931",
+  "video_playback_zero_is_source_seconds": 22.12,
+  "output_native_exposures_verified": true,
+  "selected_review_method": "source-anchored native image motion in short windows; not a completed autonomous blade tracker",
+  "source_anchor_curves": 55,
+  "source_anchor_times": 37,
+  "new_assistant_source_reads": 40,
+  "source_readers_are_not_human_confirmation": true,
+  "counts": {
+    "image_candidate_unconfirmed": [
+      578,
+      590
+    ],
+    "not_located": [
+      456,
+      460
+    ],
+    "source_annotation": [
+      27,
+      27
+    ],
+    "tracked_candidate": [
+      82,
+      66
+    ]
+  },
+  "counts_are_coverage_not_accuracy": true,
+  "source_initialization_self_errors_are_not_validation": true,
+  "maximum_source_distance_frames": 20,
+  "source_image_motion_checks": {
+    "adjacent_image_motion_agrees": 1254,
+    "adjacent_image_motion_disagrees": 8,
+    "target_not_located": 71,
+    "visible_fragments_do_not_overlap": 34,
+    "adjacent_image_motion_unresolved": 2
+  },
+  "two_sided_candidates_with_adjacent_motion_conflict": [
+    {
+      "previous_pts": 472832,
+      "pts": 473088,
+      "source_seconds": 36.96,
+      "track": "B",
+      "state": "adjacent_image_motion_disagrees",
+      "current_status": "tracked_candidate",
+      "image_motion_supported": true,
+      "overlap_error_px": 5.287558589313739,
+      "full_curve_distance_px": 8.05078238984223,
+      "valid_material_points": 34,
+      "forward_backward_pixel_error": 0.20425130426883698
+    },
+    {
+      "previous_pts": 480000,
+      "pts": 480256,
+      "source_seconds": 37.52,
+      "track": "A",
+      "state": "adjacent_image_motion_disagrees",
+      "current_status": "tracked_candidate",
+      "image_motion_supported": true,
+      "overlap_error_px": 5.716244320587428,
+      "full_curve_distance_px": 6.787107120626294,
+      "valid_material_points": 26,
+      "forward_backward_pixel_error": 0.35971319675445557
+    }
+  ],
+  "independent_of_initialization_development_curve_checks": [
+    {
+      "role": "development",
+      "pts": 336128,
+      "source_seconds": 26.26,
+      "foot": 0,
+      "status": "image_candidate_unconfirmed",
+      "source_vertices": 5,
+      "median_px": 3.817030101106987,
+      "p95_px": 31.918032162031327,
+      "other_track_median_px": null,
+      "points_not_located": false,
+      "source_distances_include_uncovered_vertices": true,
+      "source_vertices_covered_within_5px": 0.6,
+      "visible_fragment_overlap_error_px": 4.112243446758071,
+      "tracking_initialization_at_this_source_time": false
+    },
+    {
+      "role": "development",
+      "pts": 336128,
+      "source_seconds": 26.26,
+      "foot": 1,
+      "status": "not_located",
+      "source_vertices": 4,
+      "median_px": null,
+      "p95_px": null,
+      "other_track_median_px": 173.1790020825283,
+      "points_not_located": true,
+      "source_distances_include_uncovered_vertices": true,
+      "source_vertices_covered_within_5px": null,
+      "visible_fragment_overlap_error_px": null,
+      "tracking_initialization_at_this_source_time": false
+    },
+    {
+      "role": "development",
+      "pts": 489216,
+      "source_seconds": 38.22,
+      "foot": 1,
+      "status": "not_located",
+      "source_vertices": 4,
+      "median_px": null,
+      "p95_px": null,
+      "other_track_median_px": 105.1207377480693,
+      "points_not_located": true,
+      "source_distances_include_uncovered_vertices": true,
+      "source_vertices_covered_within_5px": null,
+      "visible_fragment_overlap_error_px": null,
+      "tracking_initialization_at_this_source_time": false
+    },
+    {
+      "role": "earlier_development",
+      "pts": 392192,
+      "source_seconds": 30.64,
+      "foot": 1,
+      "status": "not_located",
+      "source_vertices": 5,
+      "median_px": null,
+      "p95_px": null,
+      "other_track_median_px": 106.63999193329354,
+      "points_not_located": true,
+      "source_distances_include_uncovered_vertices": true,
+      "source_vertices_covered_within_5px": null,
+      "visible_fragment_overlap_error_px": null,
+      "tracking_initialization_at_this_source_time": false
+    },
+    {
+      "role": "earlier_development",
+      "pts": 542720,
+      "source_seconds": 42.4,
+      "foot": 1,
+      "status": "tracked_candidate",
+      "source_vertices": 5,
+      "median_px": 2.5975181033700627,
+      "p95_px": 15.76920436416123,
+      "other_track_median_px": null,
+      "points_not_located": false,
+      "source_distances_include_uncovered_vertices": true,
+      "source_vertices_covered_within_5px": 0.8,
+      "visible_fragment_overlap_error_px": 2.5975181033700627,
+      "tracking_initialization_at_this_source_time": false
+    },
+    {
+      "role": "earlier_development",
+      "pts": 544768,
+      "source_seconds": 42.56,
+      "foot": 1,
+      "status": "tracked_candidate",
+      "source_vertices": 5,
+      "median_px": 4.302618766943901,
+      "p95_px": 13.007247081390375,
+      "other_track_median_px": null,
+      "points_not_located": false,
+      "source_distances_include_uncovered_vertices": true,
+      "source_vertices_covered_within_5px": 0.6,
+      "visible_fragment_overlap_error_px": 2.2295607525717287,
+      "tracking_initialization_at_this_source_time": false
+    }
+  ],
+  "development_checks_are_not_independent_3d_truth": true,
+  "source_annotation_file": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\blade_tracking_20261030\\continuous\\local_source_review\\source_anchors_at_start.json",
+  "source_annotation_sha256": "806bb20255178c9551f9717caaa14067a7749b2ab7fe74afb5184edb7eec17e7",
+  "source_annotation_current_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\blade_s01_source_dense_20261030.json",
+  "candidate_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\blade_s01_candidates_20261030.npz",
+  "candidate_sha256": "0c104e3ed2380a1d31d7069627eb4e6947448c9fc240dfb444091cb9d7ad16c7",
+  "metric_binding_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\body_s01_metric_binding_20261030.json",
+  "metric": {
+    "schema": "rinkspace.native-body-uniform-metric-binding.v1",
+    "policy": "equal_weight_squared_dimension_error",
+    "formula": "s=(60*L+30*W)/(L*L+W*W)",
+    "conversion": "XYZ_m = s * XYZ_scene",
+    "metres_per_scene_unit": 60.00104512261907,
+    "source_span_xy_scene_units": [
+      1,
+      0.49995645094823604
+    ],
+    "converted_span_xy_m": [
+      60.00104512261907,
+      29.997909572689597
+    ],
+    "snapshot": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\six_shot\\lane4_shared\\initial_pixels.npz",
+      "sha256": "c205f10937004c93529cf40cf3d6030750754146741178547db5abd052891544"
+    },
+    "scene": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\field\\lane_transverse_current.json",
+      "sha256": "cbd65837220a7f3aa04e6dd348b93c3d3e703499c00dc23bfbf279b090d6c700"
+    },
+    "implementation": "rinkspace.metric_scale.estimate_uniform_scale",
+    "camera_scene_or_source_observations_modified": false,
+    "corrected_input": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\blade_tracking_20261030\\metric_input\\input.npz",
+    "corrected_input_sha256": "efdea4b380ad713301a19acf86410d9c6df20f76e6fc1e093d02f370680a3cc2",
+    "receipt": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\blade_tracking_20261030\\metric_validation.json"
+  },
+  "acceptance": {
+    "metric_conversion_fixed": true,
+    "two_blades_continuously_reliably_tracked": false,
+    "anatomical_foot_identity_confirmed": false,
+    "contact_state_confirmed": false,
+    "whole_video_human_acceptance": false,
+    "body_or_camera_fit_admission": false
+  },
+  "conclusions_zh": [
+    "米制入口、导出和绘图改用项目统一换算；这轮没有重拟合身体或相机。",
+    "已有覆盖全部1143次原片曝光的刀线检查视频；仍有明显漏检和身份不确定，未达到整段持续跟住两刀的要求。",
+    "40条新增原图取样改善了短段覆盖，但不是自动识别成果；29秒一条旧取样本身偏到刀外，已修正并保留旧版。",
+    "相邻画面检查仍有8处分歧，其中2处前后起点相符却与相邻画面不符；候选标签不能直接当作可靠观测。",
+    "当前所有刀线均未获准用于身体或相机拟合；接冰、腾空与左右身份仍需逐段确证。"
+  ],
+  "frozen_original_inputs": {
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\input.npz": "93a71022fc3c4d67a1ec4387f01a2e5513d96cdf50bc4728e0a290ca7590cc27",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\compact_smplx.npz": "f3655f86d42e9a5a1cda80eabfa98895b06e51d44f07e707b352618f0ca3c753",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\six_shot\\lane4_shared\\initial_pixels.npz": "c205f10937004c93529cf40cf3d6030750754146741178547db5abd052891544"
+  },
+  "camera_scene_and_original_observations_unchanged": true,
+  "code_sha256": {
+    "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/body_tracking/rebuild_prepare.py": "72413d991e8cfb9200dfcbf6b889d77f341ce69c1d3358d9dbeeb8d55edaac9e",
+    "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/body_tracking/rebuild_body_deliver.py": "5e0972db412fef81c98ec9aeaf6d2e3214501b7d7a8d08442fccf521b774c431",
+    "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/body_tracking/blade_tracking.py": "495f1a3c1ba05097cdcb4613e47ccc71af84396ece0dcc0c138c27b15e8f13a4",
+    "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/body_tracking/blade_temporal.py": "fb4d096ef909d65cd7f46f4435842d1e92171791edbf553772ceabcd52d64803",
+    "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/body_tracking/blade_review.py": "53665c0781e7bde9c846fa78e7613ecf6a5643ac8d78d2258097d5a6f79e283d",
+    "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/body_tracking/blade_cotracker.py": "082e68b1c0cd9606b222eff350ec830b43ca44a3f1745e9468e7ee5a8972d429",
+    "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/body_tracking/blade_cotracker_review.py": "6845784d72638bc850090bcbe602cab7228acccafe4151351a1afc82e8bd1dab",
+    "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/body_tracking/blade_track_checks.py": "6a34a41c38e07be4d9f658b8b136019f7a7d21a867a485b26e758ea3d021a576",
+    "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/body_tracking/blade_local_tracks.py": "63d56293a3083838eda0d30b6e2017b69517fc98918548761b81a71cdc3f3394"
+  },
+  "tests": {
+    "native_metric_checks_passed": 4,
+    "blade_geometry_motion_checks_passed": 7,
+    "tests_do_not_establish_visual_accuracy": true
+  },
+  "cotracker_alternative": {
+    "directory": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\blade_tracking_20261030\\continuous\\cotracker_full",
+    "report_sha256": "1435d0d601c4ecb9c864a0063749d03a5b3064acbfcd23a9c85689e356c8a5b6",
+    "review_directory": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\blade_tracking_20261030\\continuous\\cotracker_review",
+    "accepted": false,
+    "reason_zh": "整段仍大量丢失，且可将两条候选追到同一把刀；输入中29秒一条起点也有偏差，不能据此作模型的一般准确性结论。"
+  },
+  "preserved_failed_drafts": [
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\blade_tracking_20261030\\continuous\\first_pass_failed",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\blade_tracking_20261030\\continuous\\cotracker_review",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\blade_tracking_20261030\\continuous\\local_source_initial"
+  ],
+  "no_new_body_fit": true,
+  "neighbouring_joint_fit_modified": false,
+  "plain_language_report": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/blade_tracking_20261030/RESULT_ZH.md",
+  "plain_language_report_sha256": "b1200f467efe4ec892280876c11277696f6c576f27c0382bc88ecbfa389ee1c7"
+}

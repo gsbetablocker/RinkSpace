@@ -1,0 +1,24 @@
+{
+  "schema": "rinkspace.user_geometry_confirmation.v1",
+  "event_id": "ankara_2026",
+  "date": "2026-10-29",
+  "authority": "explicit_current_user_message",
+  "user_statement": "Lane3 Lane4也有对应的连接各自lane上下长边的短线段，这四条短线段共线并且与冰场短边平行。",
+  "reference_image": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\six_shot\\lane4_shared\\user_reference.png",
+  "reference_image_sha256": "d56628975276828a57b2d9734c608348e402eebc4ca47923a79899234956321f",
+  "entities": [
+    "ice/lane1:F_transverse",
+    "ice/lane2:F_transverse",
+    "ice/lane3:F_transverse",
+    "ice/lane4:F_transverse"
+  ],
+  "facts": {
+    "all_four_exist": true,
+    "collinear": true,
+    "parallel_to_rink_short_axis": true,
+    "endpoints_on_own_lane_sides": true
+  },
+  "interpretation": "One common X coordinate; each segment spans its own lane width in Y at Z=0.",
+  "numeric_X_not_user_measured": true,
+  "new_source_pixels": 0
+}

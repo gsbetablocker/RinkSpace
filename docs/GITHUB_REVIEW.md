@@ -5,7 +5,7 @@
 <a id="public-cleanup"></a>
 ## 公开资产与存储边界
 
-公开树保留项目源码、当前场景定义、小型参数、来源索引、必要数值观测和选定的冻结审阅包。当前场景结构由 [field/model.json](../events/ankara_2026/scene/field/model.json) 及其资产引用确定；求解后的数值状态由对应运行快照另行绑定。资产库存见[场景索引](../events/ankara_2026/scene/README.md)，输入和人工确认见[节目入口](../events/ankara_2026/programmes/okada_mei_sp/README.md#有界结果与人工确认)。
+公开树保留项目源码、当前场景定义、小型参数、来源索引、必要数值观测和选定的冻结审阅包。名义场景、冰面容差版本与资产库存见[场景索引](../events/ankara_2026/scene/README.md)；求解后的数值状态由对应候选绑定，输入和人工确认见[节目入口](../events/ankara_2026/programmes/okada_mei_sp/README.md#有界结果与人工确认)。
 
 比赛视频、截图、叠加画面、完整第三方广告图稿、安装环境和编译库不随公开源码分发。大型运行输入、检查点、日志和诊断产物留在本机 Data；选定离线包的具体范围见下文。环境版本清单不等于附带安装包，公开源码也不保证所有本机实验可仅凭克隆复跑。
 
@@ -17,7 +17,7 @@
 
 ## 当前模型与数值来源
 
-当前开发工作区已接通共同 native 几何、时变相机、prepare／review 和连续 GPU LM。真实四镜头联合输入与冻结历史包分别登记；完整磁盘恢复、全节目自动取点和完整节目验收的缺口见 [REBUILD](REBUILD.md)。
+当前开发工作区已接通共同 native 几何、时变相机、prepare／review 和连续 GPU LM。当前候选覆盖 S01–S09 九镜头、三个物理机位，已执行真实联合拟合并导出完整回放；候选尚未数值收敛，完整原片视觉验收尚未完成。精确输入与状态见[节目结果绑定](../events/ankara_2026/programmes/okada_mei_sp/fit_joint9/native_joint9_guarded_lines.json)，完整磁盘恢复、全节目自动取点和准确性验证的缺口见 [REBUILD](REBUILD.md)。
 
 广告的小型相机与控制数组见 [ad_cameras](../events/ankara_2026/programmes/okada_mei_sp/ad_cameras/)。Ad3 的[数值行库](../events/ankara_2026/programmes/okada_mei_sp/ad3_sources/rows.npz)／[对应表](../events/ankara_2026/programmes/okada_mei_sp/ad3_sources/correspondence.json)，以及 Ad7 的[数值行库](../events/ankara_2026/programmes/okada_mei_sp/ad7_sources/rows.npz)／[对应表](../events/ankara_2026/programmes/okada_mei_sp/ad7_sources/correspondence.json)保留源 UV、PTS 与身份，不含广播图像缓冲区。来源候选和参考轮廓不因公开、导入或测试通过而自动获得拟合资格。
 
@@ -57,7 +57,7 @@ Python 的 `Review.read(原路径或逻辑路径)` 可读取字节。`resource_m
 
 2026-10-21 的六镜头运行已停止，精确输入和状态见 [status.json](../events/ankara_2026/programmes/okada_mei_sp/fit_joint6/status.json)及 [scope.json](../events/ankara_2026/programmes/okada_mei_sp/fit_joint6/scope.json)。历史 GPU 确实执行，候选未收敛或验收；observed-row 粗初始化没有通过严格滚动快门验收，保存检查点不代表具备严格恢复入口。
 
-撤回的资格数不等于错点率，其余 active 也不表示全部准确。公开树保留代码与状态，大型数值输入、日志、检查点及原片证据在对应 Data 补充包中。它与当前四镜头实验分开解释。
+撤回的资格数不等于错点率，其余 active 也不表示全部准确。公开树保留代码与状态，大型数值输入、日志、检查点及原片证据在对应 Data 补充包中。它与当前九镜头候选分开解释。
 
 ## 复现限制
 

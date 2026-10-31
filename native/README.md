@@ -23,18 +23,24 @@ ctest --test-dir D:\CodexData\RinkSpace_Data\build\core -C Release --output-on-f
 CUDA 构建需已有 MSVC／CUDA 开发环境：
 
 ~~~powershell
-.venv-gpu/Scripts/python.exe scripts/build_core.py --out D:\CodexData\RinkSpace_Data\build\core_cuda --cuda --generator Ninja --cmake "<已有cmake.exe>"
+D:\CodexData\RinkSpace_Data\runtime_tools\vision_cuda\Scripts\python.exe scripts/build_core.py --out D:\CodexData\RinkSpace_Data\build\core_cuda --cuda --generator Ninja --cmake "<已有cmake.exe>"
 ~~~
 
 连续 GPU LM 另需 cuDSS：在脚本命令追加 `--cudss <项目绝对路径>/environments/cudss/0.8-cu13`。直接 CMake 使用 `-DRINKSPACE_CUDSS_ROOT=<cuDSS目录>`。依赖版本与本机配置见[环境说明](../environments/README.md)。
 
+`--cuda-fast-compile min` 可显式选择较少削弱运行优化的编译路径；默认 `0` 仍保留完整优化。不同选项必须在相同输入上实测，不能按编译速度推断求解速度。
+
 原生检查验证数学、导数与状态合同；尺寸和安装由调用方传入，前向成功不等于米制准确或真实镜头验收通过。
+
+小型 CPU 约束对偶通过 `coupled_dual.hpp` 复用乘子未变化时的残差，并交错计算两条独立的有序归约；精确重复的浮点状态按完整周期跳过，保留原第 4096 次状态和失败判定。`rinkspace_coupled_dual` 检查新旧乘子、KKT 和返回次数逐位一致，可传入 `RINKSPACE_TRACE_DUAL_INPUT` 保存的困难样本作同输入检查。此优化不改变物理边界、精度或像素目标，局部同输入提速不代表完整拟合具有固定加速倍率。
 
 ## 共同几何与投影
 
 CPU／GPU 共用 `geometry.hpp`、`entities.hpp`、`camera_state.hpp` 和 `projection.hpp` 中的实体、完整相机与投影。几何包含冰面、连续围挡、固定点和广告；不支持的实体返回逐行状态。
 
 共享冰面几何选项 16（须同时启用坐标架选项 2，且采用 layout35）将两条球门线构造成 `x=±d`，两端半椭圆共用 `ax/ay`，球门区只包含有限圆弧，梯形四边共用两项半开口跨度并关于两条场地中轴镜像。CPU/GPU 使用同一构造和导数；旧选项 0–15 的参数含义保持不变。具体参数槽见 `core_api.h`，赛事启用状态由当前 scene 声明。
+
+共享冰面选项 64（同时启用原选项 1–32）使用 layout146：前 39 项为原共同名义参数，后 107 项是相对名义量的有界偏差。尺寸允许 ±1%，位置和斜率的归一化定义见 `domain/ice_tolerance.py` 和 `ice_tolerance.hpp`。图元类型、接点、分支与严格顺序保留；206 个有限关系面在 CPU/GPU 前向、可行步和停止判据中采用同一函数及自动导数，偏差盒边界由 native 强制交集。全部偏差为零时复现选项 63。`rinkspace_ice_tolerance` 检查全部偏差与关系面导数、接线和边界，Python 回归另检查 CUDA 与有限合成拟合。
 
 隐式滚动快门求解使用同一源时钟、光学域和唯一曝光根判定。有限的画外预测仍按同一方程评估和求导，图像矩形不约束 station、相机或共享场景。图像裁切只用于显示，不能钳改残差或丢掉失败点。
 
@@ -56,11 +62,23 @@ CPU／GPU 共用 `geometry.hpp`、`entities.hpp`、`camera_state.hpp` 和 `proje
 
 station 的数值缩放只改变坐标。固定点无 station，共享材料点保留共同身份。原始查询不能另设自由查询 station；`feasibility_restoration` 仅用于显式有效域恢复，不是最终查询目标。
 
-`refine_curve_stations(mode="global"|"local")` 在当前实体上寻找像素距离更小的对应位置，保持原 UV、PTS、实体、相机和场景不变。可选 `profile_trial_stations` 在联合候选判定前搜索对应，仅适用于独立原始像素模式。缓存采样是搜索工具，不是新观测。
+`refine_curve_stations(mode="global"|"local")` 在当前实体上寻找像素距离更小的对应位置，保持原 UV、PTS、实体、相机和场景不变。可选 `profile_trial_stations` 在联合候选判定前搜索对应，仅适用于独立原始像素模式。缓存采样是搜索工具，不是新观测。 独立像素站点的局部细化以真实 native cost 做有区间保护的抛物线插值／黄金分割，减少非零残差圆弧中切线 Gauss–Newton 的往返；已达数值精度的光滑点跳过额外搜索，折角仍完整检查。有限支持、周期展开支持和固定／共享站点身份继续由原调用约定约束。
 
 `configure_solver` 接收参数边界和可用内存；`solve(progress=...)` 在 C++ 内连续完成线性化、连通局部块消元、cuDSS 稀疏求解、可行更新及真实目标接受／拒绝。曲线有限支持和物理参数边界进入联合约束，图像边缘不进入可行域。接受后重算线性化，拒绝不覆盖接受状态。
 
 `request_stop()` 或进度回调返回 `False` 可安全停止；再次对同一 handle 调用 `solve()` 保留阻尼和接受状态继续。`export_state()` 导出 rig、控制点、station 和共享场景，不包含完整优化器磁盘恢复状态。安全停止、浮点停滞、缺乏进展和数值收敛分别报告，数值收敛不等于人工验收。
+
+## 性能诊断
+
+`performance_metrics()` 返回原生累计耗时、KKT 检查／缓存命中次数、活跃面数、QP 线搜索次数、预测事件时间、候选残差缓冲大小及阻尼贡献。`solve_api_wall_ms` 包含最终证书诊断；`native_controller_wall_ms` 不含它。GPU 事件区间与主机墙钟可能重叠，不能相加。`trial_station_search_queued_wall_ms` 包含调用时尚未完成的同流工作。
+
+原始像素候选直接累计两维残差；相关组仍用原 W／Huber，只保存 rank 个候选残差。秩二预测以 Jd 计算，角点仅刷新受影响的 station 白化列，原相关组权重完整保留。曲线搜索把时间方向先收缩到单方向 AD，保留原滚动快门根和光学域。
+
+驻点证书按已接受状态的 GPU 线性化版本、请求精度与执行路径缓存；拒绝步可以复用，接受、曲线细化或重线性化后重新计算。证书保存在独立缓冲，试探步不能覆盖它。失败和中断不进入缓存。状态更新预编译精确非零参数映射，保持列顺序；相机按机位并行更新，约束 Gram 的各交叉积独立并行，广告最差面的归约保留原来的平局顺序。曲线精修复用刚接受候选的滚动快门投影根；同一物理机位与曝光共用相机姿态和样条变化率缓存，每次候选重建，逐点深度、光学域、全读出区间收缩界及画外根扩展仍独立检查。小型对偶在原 KKT 精度满足时立即结束。相机与广告面并行枚举后按原顺序压紧；`RINKSPACE_STATIONARITY_FACE_BACKEND=serial` 保留串行参考路径。
+
+`RINKSPACE_STATIONARITY_BACKEND=cpu` 用原生 CPU 执行同一 FP64 锥投影，按精确非零列计算，不按阈值丢弃法向分量；几何、导数、Schur 与 cuDSS 仍在 GPU。`gpu` 保留设备参考路径；`RINKSPACE_STATIONARITY_CPU_SPARSE=0` 和 `RINKSPACE_STATIONARITY_CACHE=0` 可用于对照。可选稀疏索引不足主机预算时沿用稠密算法。
+
+极小下降不会自动判为收敛。阻尼仍主导模型步时，允许既有 LM 降低阻尼继续恢复；近零目标仍按实际相对下降判断进展，最终收敛必须通过原目标的约束梯度检查。
 
 ## 工程检查
 

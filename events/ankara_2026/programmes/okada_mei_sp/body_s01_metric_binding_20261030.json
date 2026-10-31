@@ -1,0 +1,28 @@
+{
+  "schema": "rinkspace.native-body-uniform-metric-binding.v1",
+  "policy": "equal_weight_squared_dimension_error",
+  "formula": "s=(60*L+30*W)/(L*L+W*W)",
+  "conversion": "XYZ_m = s * XYZ_scene",
+  "metres_per_scene_unit": 60.00104512261907,
+  "source_span_xy_scene_units": [
+    1.0,
+    0.49995645094823604
+  ],
+  "converted_span_xy_m": [
+    60.00104512261907,
+    29.997909572689597
+  ],
+  "snapshot": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261028\\six_shot\\lane4_shared\\initial_pixels.npz",
+    "sha256": "c205f10937004c93529cf40cf3d6030750754146741178547db5abd052891544"
+  },
+  "scene": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\field\\lane_transverse_current.json",
+    "sha256": "cbd65837220a7f3aa04e6dd348b93c3d3e703499c00dc23bfbf279b090d6c700"
+  },
+  "implementation": "rinkspace.metric_scale.estimate_uniform_scale",
+  "camera_scene_or_source_observations_modified": false,
+  "corrected_input": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\blade_tracking_20261030\\metric_input\\input.npz",
+  "corrected_input_sha256": "efdea4b380ad713301a19acf86410d9c6df20f76e6fc1e093d02f370680a3cc2",
+  "receipt": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\blade_tracking_20261030\\metric_validation.json"
+}

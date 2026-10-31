@@ -1,0 +1,77 @@
+{
+  "schema": "rinkspace.native_build.v1",
+  "date": "2026-10-31",
+  "library": "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\native_core\\sm120\\dynamic_cuts\\rinkspace_core.dll",
+  "library_sha256": "98542b66c067b5006293a6abdf2e78c105996c0530920f5d2466c2804a7facb3",
+  "abi": 2,
+  "cuda_architecture": "120",
+  "cuda_fast_compile": "min",
+  "fp64": true,
+  "fmad": false,
+  "parent_library": "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\native_core\\sm120\\ice1pct_station\\rinkspace_core.dll",
+  "parent_library_sha256": "7cf32af34bbd141365e0dbcc05cace8681a9adad70ecec2794a4c177e358adac",
+  "source_files": [
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\native\\CMakeLists.txt",
+      "sha256": "c78786a4f487bac6963f53d67ee5e74f6acd91042f8df5ccab4c471daeaab505"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\native\\include\\rinkspace\\core_api.h",
+      "sha256": "3d78ff02ffcd99a103e83f09fef308f243f14c68c0da4f36cc9bd238b59494b8"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\native\\src\\core_api.cpp",
+      "sha256": "dbe99d89f33523af94fc03c332e34c7c82954a074ebc6246aa3974bc2b80eaee"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\native\\src\\core_gpu.cu",
+      "sha256": "6c1b1f1765d00ad88367ae4a26d1cf3b7cdda4ba51cfbc4fb26aa3466427b300"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\native\\src\\gpu_bounded_quadratic.cuh",
+      "sha256": "b6930fb2c8e5d33332f80b3472139a88b40d2b0c1bf053c62746a02744dabe19"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\native\\src\\gpu_linearization.cuh",
+      "sha256": "35ddbb1979d422dedeb32b1622d29fe5d3933bcb04dd6e9f1c89f44bb81a6d91"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\native\\src\\gpu_solver.cuh",
+      "sha256": "b46af97b42cd7d35491fca0efeb659b9bb1a7f70ccc425b8e1c993eabb58c6a4"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\native\\src\\gpu_station_refinement.cuh",
+      "sha256": "3f5fac1c6d214793f8ad132ba292f704dd4dcbf54f713ff58ddf0fc4d1a8ef64"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\native\\src\\gpu_stationarity.cuh",
+      "sha256": "dfb617e3ebac72c5c85d77d7c78f96d622c50b4505c28e36a629c800b43178aa"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\native\\tests\\box_stationarity.cpp",
+      "sha256": "f209a0ac23c91e3c5e9d5de9bb6d1d152668dd825a0a3a5dd308d29ff7b45e30"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\native\\tests\\core_smoke.cpp",
+      "sha256": "239c5b42f0f88b7f7b56a1f70c5f2cea9772468e28948d452f0c8c1249b82f6b"
+    },
+    {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\native\\tests\\ice_tolerance.cpp",
+      "sha256": "d0f22a90a5c5d589015ad72ab9f73f22b5400f86543354b379dca6bc743a539f"
+    }
+  ],
+  "build_log": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\build_native.log",
+  "change": "Dynamically retain all physical-constraint cuts; failed inner restoration rejects and retries with LM damping instead of shrinking the whole shared step to zero.",
+  "validation": {
+    "ctest_passed": 3,
+    "pytest_passed": 45,
+    "subtests_passed": 30,
+    "pytest_log": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\native_dynamic_tests.log",
+    "constraint_capacity_regression": {
+      "cpu_and_gpu_tests_passed": 2,
+      "log": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\native_dynamic_growth_tests.log",
+      "evidence": "107 deviations exercise 65th-cut capacity growth, feasible descent and full physical domain"
+    }
+  },
+  "model_and_objective_unchanged": true
+}

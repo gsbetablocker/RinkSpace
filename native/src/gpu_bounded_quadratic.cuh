@@ -19,8 +19,8 @@ __global__ void lm_qp_line_components(LinearView l,SolverView s,const double* h,
         }
         if(c.normal_rank==2){double value[2]{},direction[2]{};
             for(int j=0;j<q;++j){int k=l.columns[c.q_begin+j];double x=s.applied[k]+alpha*(s.step[k]-s.applied[k]),d=s.step[k]-s.applied[k];
-                slope+=g[c.g+j]*d;for(int row=0;row<2;++row){double a=h[c.packed_h+size_t(row)*c.dim+j];value[row]+=a*x;direction[row]+=a*d;}}
-            for(int row=0;row<2;++row){if(c.local_count)value[row]+=h[c.packed_h+size_t(row)*c.dim+q]*local;
+                slope+=g[c.g+j]*d;for(int row=0;row<2;++row){double a=h[c.packed_h+size_t(row)*(c.normal_stride?c.normal_stride:c.dim)+j];value[row]+=a*x;direction[row]+=a*d;}}
+            for(int row=0;row<2;++row){if(c.local_count)value[row]+=h[c.packed_h+size_t(row)*(c.normal_stride?c.normal_stride:c.dim)+q]*local;
                 slope+=value[row]*direction[row];curvature+=direction[row]*direction[row];}
         }else{
             for(int i=0;i<q;++i){int ki=l.columns[c.q_begin+i];double di=s.step[ki]-s.applied[ki],gradient=g[c.g+i],along=0.;

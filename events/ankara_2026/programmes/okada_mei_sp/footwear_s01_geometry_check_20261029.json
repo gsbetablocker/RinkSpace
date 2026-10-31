@@ -1,0 +1,112 @@
+{
+  "schema": "rinkspace.fixed-equipment-geometry-check.v1",
+  "event": "ankara_2026",
+  "programme": "okada_mei_sp",
+  "shot": "s01",
+  "source_time_base": "1/12800",
+  "geometry_frozen_before_curves_read": true,
+  "white_boot_pixels_used_for_pose_inference": true,
+  "blade_curves": [
+    {
+      "pts": 336128,
+      "foot": 0,
+      "uv": [
+        [
+          872,
+          1024
+        ],
+        [
+          887,
+          1029
+        ],
+        [
+          908,
+          1031
+        ],
+        [
+          929,
+          1031
+        ],
+        [
+          942,
+          1028
+        ]
+      ],
+      "sigma_px": 3.5,
+      "partial": true,
+      "role": "geometry_check",
+      "definition": "visible lower blade edge segment in original pixels; no contact point or complete physical endpoints established",
+      "source_grid": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/footwear_v2/dense/check_blade_grid_336128.png",
+      "human_confirmed": false,
+      "reviewer": "assistant_source_visual_review_without_model_overlay",
+      "used_to_fit_geometry": false,
+      "used_to_infer_pose": false
+    },
+    {
+      "pts": 336128,
+      "foot": 1,
+      "uv": [
+        [
+          1044,
+          978
+        ],
+        [
+          1062,
+          975
+        ],
+        [
+          1083,
+          968
+        ],
+        [
+          1102,
+          959
+        ]
+      ],
+      "sigma_px": 4,
+      "partial": true,
+      "role": "geometry_check",
+      "definition": "visible lower blade edge segment in original pixels; no contact point or complete physical endpoints established",
+      "source_grid": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/footwear_v2/dense/check_blade_grid_336128.png",
+      "human_confirmed": false,
+      "reviewer": "assistant_source_visual_review_without_model_overlay",
+      "used_to_fit_geometry": false,
+      "used_to_infer_pose": false
+    },
+    {
+      "pts": 489216,
+      "foot": 1,
+      "uv": [
+        [
+          755,
+          799
+        ],
+        [
+          772,
+          799
+        ],
+        [
+          789,
+          797
+        ],
+        [
+          802,
+          793
+        ]
+      ],
+      "sigma_px": 3,
+      "partial": true,
+      "role": "geometry_check",
+      "definition": "visible lower blade edge segment in original pixels; no contact point or complete physical endpoints established",
+      "source_grid": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/footwear_v2/dense/check_blade_grid_489216.png",
+      "human_confirmed": false,
+      "reviewer": "assistant_source_visual_review_without_model_overlay",
+      "used_to_fit_geometry": false,
+      "used_to_infer_pose": false
+    }
+  ],
+  "independent_external_3d_truth": false,
+  "original_whole_frame_holdout_status": "failed generalization diagnostic; retained as development evidence",
+  "calibration_parameters_source": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/footwear_v2/dense/articulated/result.npz",
+  "pose_parameters_source": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/footwear_v2/pose_transfer/observed_pose/result.npz"
+}

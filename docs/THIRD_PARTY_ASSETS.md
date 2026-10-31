@@ -4,7 +4,7 @@
 
 ## 当前资源位置与身份记录
 
-当前视觉与人体运行使用项目内 `.venv-gpu`、`.venv-body`、`models/cache` 和 `environments/body`，这些本机资源被 Git 忽略。位置、包版本与隔离检查见[环境说明](../environments/README.md)、[GPU 本机记录](../environments/gpu-local-validation.json)及[人体上游身份](../environments/body-upstream-provenance.json)。
+当前视觉与人体运行使用 Data 中的 GPU 环境、通用权重和人体上游资源；旧逻辑地址 `.venv-gpu`、`.venv-body`、`models/cache` 和 `environments/body` 通过存储映射解析。位置、包版本与隔离检查见[环境说明](../environments/README.md)、[原 GPU 本机记录](../environments/gpu-local-validation.json)及[人体上游身份](../environments/body-upstream-provenance.json)。
 
 [third-party-assets.json](../environments/third-party-assets.json)与[观察版本](../environments/observed-python311-windows.json)是 2026-10-11 的历史盘点，保留迁移前地址和当时元数据，不能作为今天的运行配置。历史大模型 SHA 继承原资源记录；原盘点的存在性／大小检查不等于重新散列全部权重。
 
@@ -13,6 +13,9 @@
 | SAM2／rink_vision.pt | [模型来源记录](../models/rink_vision.provenance.json)、[SAM2 原许可](../models/SAM2_LICENSE.txt) | 固定基础修订、编码器逐字节对应与既有训练事实；派生模型不重标 MIT |
 | GVHMR | 上游提交 `6ec3ca39336c50492c0fae65fba2fb831fc7d866`，[固定许可](https://raw.githubusercontent.com/zju3dv/GVHMR/6ec3ca39336c50492c0fae65fba2fb831fc7d866/LICENSE)与[本地许可副本](../environments/third_party_patches/GVHMR_LICENSE.txt) | 自定义教育／研究／非营利及衍生修改非商业条件；本地三处补丁另行保留 |
 | PyTorch3D | 上游提交 `75ebeeaea0908c5527e7b1e305fbc7681382db47`，观察版本 0.7.8，[固定许可](https://raw.githubusercontent.com/facebookresearch/pytorch3d/75ebeeaea0908c5527e7b1e305fbc7681382db47/LICENSE) | BSD 三条款及 LICENSE-3RD-PARTY；根许可不代替全部嵌入组件核查 |
+| FootMR | 提交 `530da95641f906b42ba6792df8e55c1dd667f98d`；[固定来源与文件 SHA](../environments/body-runtime-sources.json)、[固定许可](https://raw.githubusercontent.com/twehrbein/FootMR/530da95641f906b42ba6792df8e55c1dd667f98d/LICENSE) | 上游文件保留在 Data；自定义研究／非营利及 GVHMR 衍生条件。本地 namespace 接线单独记录 |
+| CoTracker | 提交 `82e02e8029753ad4ef13cf06be7f4fc5facdda4d`；[固定来源与文件 SHA](../environments/body-runtime-sources.json)、[固定许可](https://raw.githubusercontent.com/facebookresearch/co-tracker/82e02e8029753ad4ef13cf06be7f4fc5facdda4d/LICENSE.md) | 上游源码与权重留 Data；所选源码许可为 CC BY-NC 4.0，不额外授予商业或分发权利 |
+| RTMW／RTMLib | [现有权重来源、归档与 ONNX SHA](../environments/body-runtime-sources.json) | 外部推理依赖；源码、模型及环境不随本次公开树分发，分别适用上游条款 |
 | HMR2／ViTPose／人体工具 | 由 GVHMR 树使用，具体来源见机器清单 | 独立上游修订与全部许可尚有缺口，不自动继承 GVHMR 根许可 |
 | smplx Python 包 | 历史观察版本 0.1.28；随安装包保存的 LICENSE，另见[官方代码许可](https://github.com/vchoutas/smplx/blob/main/LICENSE) | METADATA 为 UNKNOWN，随包条款含非商业、非转让及禁止分发条件，精确 wheel 身份未确定 |
 | Ultralytics | 历史环境分别观察到 8.4.131／8.2.42，[官方仓库](https://github.com/ultralytics/ultralytics) | 相应 METADATA 标 AGPL-3.0；当前进程版本由所选专用环境确定 |
@@ -21,7 +24,7 @@
 
 [body_prior.py](../calibration/program_tracking/body_tracking/body_prior.py)连接 GVHMR／SMPL-X，[observations.py](../calibration/program_tracking/body_tracking/observations.py)连接 ViTPose／YOLO，[bootstrap.py](../calibration/program_tracking/runtime/bootstrap.py)解析本机 GPU 环境。旧盘点中的 FSrotation、FSpathing、SkatePoseSingles 和 MotionTrail 地址是迁移来源，当前入口按上述本机配置解析。
 
-[run_vitpose_h.py](../calibration/program_tracking/body_tracking/source_helpers/run_vitpose_h.py)及[来源记录](../calibration/program_tracking/body_tracking/source_helpers/run_vitpose_h.provenance.json)保留 helper 身份，原副本 SHA256 为 `8da96207e0c5a4f20a6d43aacb3f718d3d86c265716ae1fd23b2b166d1a4c172`。helper 与 [calibration companion](../src/rinkspace/calibration_companion/provenance.json)按项目自有辅助代码登记，实际加载的 GVHMR／ViTPose 等依赖仍适用各自条款。
+[run_vitpose_h.py](../calibration/program_tracking/body_tracking/source_helpers/run_vitpose_h.py)及[来源记录](../calibration/program_tracking/body_tracking/source_helpers/run_vitpose_h.provenance.json)保留 helper 身份，原副本 SHA256 为 `8da96207e0c5a4f20a6d43aacb3f718d3d86c265716ae1fd23b2b166d1a4c172`。helper 与 [calibration companion](../src/rinkspace/calibration_companion/provenance.json)按项目自有辅助代码登记，默认 helper 已直接使用该仓库副本，Data 中的历史副本字节相同；实际加载的 GVHMR／ViTPose 等依赖仍适用各自条款。
 
 GVHMR 的 `geo_transform.py`、`preproc/__init__.py` 和 `wis3d_utils.py` 修改为延迟导入 KNN、SimpleVO 和 Wis3D。[补丁](../environments/third_party_patches/gvhmr-local.patch) SHA256 为 `0b1ff6e654a618ea85bc9eabe2facccf2dbbfd0d1378bae7c16c570c97e0d2f7`；恢复需匹配上游修订及本地文件身份。相关研究为 Zehong Shen 等，*World-Grounded Human Motion Recovery via Gravity-View Coordinates*，SIGGRAPH Asia 2024：[论文](https://arxiv.org/abs/2409.06662)、[官方项目](https://zju3dv.github.io/gvhmr)。
 

@@ -129,6 +129,18 @@ class PixelResidualGPU(unittest.TestCase):
             before=p.export_state();p.refine_curve_stations();after=p.export_state()
             np.testing.assert_array_equal(before['stations'][1:],after['stations'][1:])
 
+    def test_mixed_shared_pixel_blocks_match_cpu_after_station_refinement(self):
+        # One shared station joins two observations, alongside an independent
+        # station and fixed point. The mixed layout must preserve every block.
+        with ResidentResidualProblem(self.f.core,**self.f.kw) as p:
+            p.configure_pixel_linearization(directions=self.f.directions,
+                local_ids=np.array([0,1,1,-1]),local_scales=np.full(2,.001))
+            p.configure_solver(lower=np.zeros(2),upper=np.ones(2),
+                device_budget_bytes=p.creation['free_after_alloc_bytes'],host_budget_bytes=2**30)
+            p.refine_curve_stations();p.linearize('cuda');gpu=p.export_blocks('cuda')
+            p.linearize('cpu');cpu=p.export_blocks('cpu')
+            for key in cpu:np.testing.assert_allclose(gpu[key],cpu[key],rtol=1e-11,atol=1e-11)
+
     def test_near_horizontal_edge_keeps_nearest_point_instead_of_sliding_hundreds_of_pixels(self):
         rig=np.asarray(self.f.kw['rig']).copy();rig[24:28]=[1000.,2.,0.,0.]
         kw={**self.f.kw,'rig':rig,'controls':np.tile([0.,0.,np.log(1000.)],(8,1)),

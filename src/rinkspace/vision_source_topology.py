@@ -831,6 +831,16 @@ def _ordered_foot_material_pairs(profiles, ice, board_height_px, semantic_search
     admissible = (entering[:, :, None] & exit_candidates &
         (span_px[None] >= 2) & (span_px[None] <= max_width[:, None, None]) &
         (warm_fraction >= .7) & (contrast_enter >= .006) & (contrast_exit >= .006) & inside_complete)
+    optical_admissible=admissible.clone()
+    component_fraction=None
+    if 'source_material_component_support' in profiles:
+        component_fraction=interval_mean(profiles['source_material_component_support'].float())
+        # An unrelated red advertisement also has positive warm gamma. Its
+        # platform must not inherit the confirmed yellow-strip role merely
+        # because it has the strongest 1D fall. Require actual yellow pixels
+        # from a long thin 2D material body between its observed entry/exit.
+        component_samples=component_fraction*count[None]
+        admissible &= (component_fraction>=.5)&(component_samples>=4)
     contrast = torch.minimum(contrast_enter, contrast_exit)
     consistency = torch.exp(-variance/(contrast.square()+1e-5))
     exit_strength = torch.maximum((-derivative).clamp_min(0)[:, None, :],
@@ -916,6 +926,10 @@ def _ordered_foot_material_pairs(profiles, ice, board_height_px, semantic_search
         selected_pair_score=best, selected_band_width_px=physical_fall['offset_native_px']-profiles['rgb_gradient_offsets_native_px'][entry],
         all_ordered_pair_indices_profile_entry_exit=candidate_indices,
         all_ordered_pair_scores=candidate_scores,
+        all_optical_ordered_pair_indices_before_source_component_role=torch.nonzero(optical_admissible),
+        selected_source_component_support_fraction=(component_fraction[torch.arange(n,device=rgb.device),entry,optical_exit]
+            if component_fraction is not None else torch.ones(n,device=rgb.device)),
+        source_2D_material_component_role_applied=component_fraction is not None,
         selected_inside_warm_gamma=inside[torch.arange(n, device=rgb.device), entry, exit],
         selected_inside_pale_fraction=fixed_colour_fraction[torch.arange(n, device=rgb.device), entry, exit],
         selected_inside_source_warm_fraction=warm_fraction[torch.arange(n, device=rgb.device), entry, exit],
@@ -1181,6 +1195,7 @@ def _ordered_board_foot_profile_batches(profiles, ice, board_height_px, semantic
         semantic={key:value[start:stop] for key,value in semantic_profiles.items()} if semantic_profiles else None
         row=_ordered_foot_material_pairs(part,ice,np.asarray(board_height_px)[start:stop],semantic)
         row['all_ordered_pair_indices_profile_entry_exit'][:,0]+=start
+        row['all_optical_ordered_pair_indices_before_source_component_role'][:,0]+=start
         rows.append(row)
     def merge(values):
         first=values[0]
@@ -1657,7 +1672,8 @@ def source_graphic_material_support_conflicts(profiles, pair_evidence, graphics)
 
 def read_board_foot_material_profiles(rgb, instances, topology, *, material_role_authority,
                                     device="cuda", search_radius_px=48., sample_spacing_px=4.,
-                                    prediction=None, classes=(),source_query_points_uv=None,source_query_normals=None):
+                                    prediction=None, classes=(),source_query_points_uv=None,source_query_normals=None,
+                                    source_material_component_support=None):
     """Read both observed material interfaces; a board foot is part of the board.
 
     The caller supplies the event's directly confirmed warm-yellow foot role.
@@ -1739,6 +1755,15 @@ def read_board_foot_material_profiles(rgb, instances, topology, *, material_role
             semantic_profiles={name:sampled[...,list(classes).index(name)]
                                for name in ("ice_contact","background","ice_paint","ad_boundary","shadow_or_reflection")
                                if name in classes}
+        if source_material_component_support is not None:
+            support=np.asarray(source_material_component_support,bool)
+            if support.shape!=(h,w):raise ValueError('Source material component support differs from RGB')
+            coordinates=profiles['sampled_native_uv']
+            xy=torch.round(coordinates).long()
+            in_image=(xy[...,0]>=0)&(xy[...,0]<w)&(xy[...,1]>=0)&(xy[...,1]<h)
+            support_tensor=torch.as_tensor(support,device=device)
+            profiles['source_material_component_support']=in_image&support_tensor[
+                xy[...,1].clamp(0,h-1),xy[...,0].clamp(0,w-1)]
         ordered = _ordered_board_foot_profile_batches(profiles,ice,board_height,semantic_profiles)
         transition_support=source_material_transition_support(profiles,ordered)
         side_evidence=_source_material_ice_side_evidence(profiles,ordered['exit_index'],semantic_profiles)

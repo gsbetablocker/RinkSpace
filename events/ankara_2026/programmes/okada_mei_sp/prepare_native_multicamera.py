@@ -24,10 +24,12 @@ FIELDS=old.FIELDS
 
 
 def snapshot_identity(layout,mapping,manifest):
- return dict(schema='rinkspace.multicamera_joint_dependencies.v1',scene_revision=layout['scene_content_revision'],
+ result=dict(schema='rinkspace.multicamera_joint_dependencies.v1',scene_revision=layout['scene_content_revision'],
   layout_revision=layout['layout_revision'],point_input_sha256=manifest['point_input_sha256'],
   paths_sha256=hashlib.sha256(json.dumps(mapping['path_ids'],separators=(',',':')).encode()).hexdigest(),
   shots=manifest['shots'],cameras=manifest['cameras'],control_dt=manifest['control_dt'],first_control_time=manifest['first_control_time'],max_readout=manifest['max_readout'])
+ if 'camera_parameterization' in manifest:result['camera_parameterization']=manifest['camera_parameterization']
+ return result
 
 
 def bind_snapshot(v,layout,mapping,manifest):

@@ -1,0 +1,51 @@
+{
+  "schema": "rinkspace.root-leg-footwear-comparison.v1",
+  "event": "ankara_2026",
+  "programme": "okada_mei_sp",
+  "shot": "s01",
+  "base_body_file": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/next_round_20261029/B5/result.npz",
+  "source_review_file": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/footwear_s01_joint_20261029.json",
+  "observation_dataset": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/footwear_v2/semantic_transfer",
+  "root_reference": "B5",
+  "installation_gauge": "all three conditional boot alignment values fixed",
+  "shared_geometry_J2": [
+    "shoe_front",
+    "shoe_width"
+  ],
+  "profile": {
+    "source_seconds": [
+      26.26,
+      32.96,
+      36.02,
+      38.22
+    ],
+    "depth_offsets_conditional_m": [
+      -2.5,
+      -1.25,
+      -0.5,
+      0,
+      0.5,
+      1.25,
+      2.5
+    ],
+    "lateral_offsets_conditional_m": [
+      -0.5,
+      0,
+      0.5
+    ],
+    "window_half_width_s": 0.6,
+    "envelope_sigma_s": 0.35,
+    "reference_candidate": "J1",
+    "type": "continuous root-offset envelope, fixed other root degrees, reoptimized local leg spline controls; data and engineering priors separate",
+    "expand_if_data_minimum_on_boundary": true,
+    "probabilistic_confidence_interval": false
+  },
+  "footmr": {
+    "commit": "530da95641f906b42ba6792df8e55c1dd667f98d",
+    "model_fps": 30,
+    "wholebody_backend": "RTMW-l 384x288 ONNX",
+    "network_device": "CPU",
+    "candidate_only": true,
+    "contact_feedback": false
+  }
+}

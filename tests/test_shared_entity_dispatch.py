@@ -71,7 +71,7 @@ def test_half_ellipse_is_not_misclassified_as_circle(model,core,code):
 def test_generic_inventory_keeps_all_paths_and_samples_entire_board_course(model,core):
     before=deepcopy(model)
     sampled=sample_entities(model,core,samples=65)
-    assert sampled['inventory']['path_count']==66
+    assert sampled['inventory']['path_count']==70
     assert set(sampled['inventory']['path_ids'])=={p['id'] for p in model['paths']}
     assert sum(c['kind']=='ice_circle' for c in sampled['cuts'])==37
     assert sum(c['kind']=='ice_ellipse' for c in sampled['cuts'])==2
@@ -160,7 +160,52 @@ def test_absent_options_preserve_explicit_legacy_replay(model,core):
     legacy=deepcopy(model);legacy.pop('shared_geometry_options')
     with pytest.raises(ValueError):native_definition(legacy,path_for(legacy,406),core)
     legacy['schema']='rinkspace.scene.shared.v1'
+    # The current mirrored chart leaves the old left-goal slot inactive.
+    # A legacy replay supplies that independent value explicitly.
+    legacy['shared_layout'][23]=-legacy['shared_layout'][24]
     path=path_for(legacy,406)
     kind,parameters=native_definition(legacy,path,core)
     assert (kind,parameters)==core.shared_geometry(legacy['board'],legacy['shared_layout'],406,options=0)
     assert resolve_path(legacy,path,core)['parameters']==parameters
+
+
+def test_transverse_lane_marks_share_sides_but_have_independent_stations(model,core):
+    layout=model['shared_layout'][:35]+[-.23,-.22,0.,0.]
+    options=model['shared_geometry_options']&~32
+    for row in range(2):
+        kind,p=core.shared_geometry(model['board'],layout,320+row,options=options)
+        y=(row-1.5)*layout[3]
+        assert kind==0
+        np.testing.assert_array_equal(p,[layout[35+row],y+layout[9]/2,0.,layout[35+row],y-layout[9]/2,0.])
+    layout[35]=layout[8]+.01
+    with pytest.raises(NativeError):
+        core.shared_geometry(model['board'],layout,320,options=options)
+    # One unsupported lane cannot move or invalidate a different row's mark.
+    assert core.shared_geometry(model['board'],layout,321,options=options)[0]==0
+
+
+def test_optional_lane_marks_preserve_all_existing_generated_geometry(model,core):
+    legacy=model['shared_layout'][:35];layout=legacy+[-.23,-.22,0.,0.]
+    options=model['shared_geometry_options']&~32
+    for path in model['paths']:
+        if 'generated_code' not in path or 320<=path['generated_code']<324:continue
+        before=core.shared_geometry(model['board'],legacy,path['generated_code'],options=options)
+        after=core.shared_geometry(model['board'],layout,path['generated_code'],options=options)
+        assert before==after
+    with pytest.raises(NativeError):
+        core.shared_geometry(model['board'],legacy,320,options=options)
+
+
+def test_four_lane_transverse_marks_share_one_coordinate_and_actual_lane_sides(model,core):
+    layout=model['shared_layout'][:35]+[-.23,-.22,.11,.19]
+    options=model['shared_geometry_options']|32
+    for row in range(4):
+        kind,p=core.shared_geometry(model['board'],layout,320+row,options=options)
+        hi=core.shared_geometry(model['board'],layout,300+row*3,options=options)[1][1]
+        lo=core.shared_geometry(model['board'],layout,302+row*3,options=options)[1][1]
+        assert kind==0
+        np.testing.assert_array_equal(p,[-.23,hi,0.,-.23,lo,0.])
+    layout[35]=layout[8]+.01
+    for row in range(4):
+        with pytest.raises(NativeError):core.shared_geometry(model['board'],layout,320+row,options=options)
+    with pytest.raises(NativeError):core.shared_geometry(model['board'],layout[:35],100,options=options)

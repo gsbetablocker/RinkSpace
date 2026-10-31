@@ -81,10 +81,10 @@
   },
   "hockey_engineering_references_m": {
     "common_radius": 4.5,
-    "faceoff_inward_from_goal": 6.0,
-    "faceoff_half_transverse_separation": 7.0,
-    "blue_pair_separation": 15.0,
-    "goal_to_actual_end": 4.0,
+    "faceoff_inward_from_goal": 6,
+    "faceoff_half_transverse_separation": 7,
+    "blue_pair_separation": 15,
+    "goal_to_actual_end": 4,
     "trapezoid_goal_outer_span": 6.8,
     "trapezoid_board_outer_span": 8.6,
     "policy": "标准尺寸作工程参考，允许现场施工与尺度估计误差；中线/蓝线不可混用旧三等分规则。"
@@ -122,6 +122,13 @@
       "endpoint_equals_Lane_right_edge": false,
       "terminal_source_UV_identified": false,
       "equal_length_asserted": false
+    },
+    "transverse_marks": {
+      "authority": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\model_constraints\\lane_transverse_20261029.json",
+      "count": 4,
+      "relation": "Lane1–Lane4 内部短线段共线、平行冰场短边，各自连接本 Lane 上下长边；一个共同 X 自由度。",
+      "native_option": 32,
+      "new_source_pixels": 0
     }
   },
   "curling_engineering_references_m": {
@@ -163,5 +170,20 @@
     "old_UV_relabelled": false,
     "obsolete_definitions_allowed": false,
     "inactive_legacy_definitions_allowed": false
+  },
+  "ice_metric_tolerance": {
+    "schema": "rinkspace.ice_tolerance.v1",
+    "authority": "user_explicit_request_20261030_current_chat",
+    "relative_limit": 0.01,
+    "reference": "each actual metric relative to its declared common nominal value",
+    "scene": "../scene/field/ice_tolerance_current.json",
+    "native_option": 64,
+    "layout_size": 146,
+    "deviation_count": 107,
+    "new_deviations_initial_value": 0,
+    "nominal_requirement_text_preserved": true,
+    "primitive_and_attachment_and_strict_order_preserved": true,
+    "ads_and_board_model_unchanged": true,
+    "formal_fit_started": false
   }
 }

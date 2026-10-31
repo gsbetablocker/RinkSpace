@@ -14,6 +14,28 @@ from rinkspace.workspace import load_sources, source_directory, source_path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+@pytest.mark.parametrize("legacy,target", [
+    (".venv-gpu", "runtime_tools/vision_cuda"),
+    (".venv-body", "runtime_tools/body_cuda"),
+    ("environments/body", "runtime_tools/body"),
+    ("models/cache", "cache/pretrained"),
+])
+def test_gpu_resources_prefer_configured_data_copy(tmp_path, legacy, target):
+    project, data = tmp_path / "project", tmp_path / "data"
+    (project / "configs").mkdir(parents=True)
+    config = json.loads((ROOT / "configs/storage.defaults.json").read_text("utf8"))
+    config.update(data_root=str(data), legacy_root=str(project))
+    (project / "configs/storage.defaults.json").write_text(json.dumps(config), "utf8")
+    old, current = project / legacy / "resource.bin", data / target / "resource.bin"
+    for path, value in ((old, b"old"), (current, b"verified")):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(value)
+    store = AssetStore(project)
+    assert store.resolve(old, must_exist=True) == current
+    old.unlink()
+    assert store.resolve(legacy + "/resource.bin", must_exist=True) == current
+
+
 @pytest.fixture
 def stored_project(tmp_path):
     project, data = tmp_path / "project", tmp_path / "data"

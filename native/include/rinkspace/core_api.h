@@ -136,6 +136,10 @@ RS_API int rs_print_square_vertices(const double* parameters,size_t nparameters,
  * Feature410/411 on layout35 returns kind6 and eight ellipse parameters
  * [cx,cy,z,ax,ay,yaw,a0,a1]; other entities return their original six values.
  * rs_sample_entity_path kind6 evaluates that same finite ellipse/arc.
+ * Optional layout39 appends four independent transverse lane-mark stations.
+ * Features320..323 span the corresponding lane's shared side boundaries;
+ * omitted path records do not generate marks. All layout35 entities retain
+ * exactly the same meaning, including the elliptical end geometry.
  */
 RS_API int rs_shared_entity_definition(const double* board,size_t nboard,const double* layout,size_t nlayout,int feature_code,int* kind,double* parameters,size_t nparameters);
 /* Additive options; bit0 derives four-row y0=-1.5*pitch. Unknown bits fail.
@@ -154,7 +158,18 @@ RS_API int rs_shared_entity_definition(const double* board,size_t nboard,const d
    * use ends[0:2] as common ax/ay. faceoff[0],ends[2:4] are inactive storage.
    * Both ends, including the upper/lower trapezoid sides, are exact mirrors.
    * Crease centres coincide with goal-line midpoints; kind6 contains only
-   * the finite half-ellipse arc, never its closing diameter. */
+   * the finite half-ellipse arc, never its closing diameter.
+   * bit32 requires layout39: transverse marks320..323 share layout[35]
+   * as their x coordinate. Slots36..38 are inactive legacy storage. Each
+   * mark connects its own lane's longitudinal sides, parallel to rink Y.
+   * bit64 requires ALL bits1..32 and layout146: first39 retain the nominal
+   * layout39 meaning; next107 are dimensionless deviations in [-.01,+.01].
+   * Dimensions multiply their common nominal value by (1+deviation);
+   * positions use declared local nominal sizes, directions use drift/run.
+   * Finite typed coordinate groups are declared in ice_tolerance.hpp and
+   * domain/ice_tolerance.py. Line/circle/ellipse kinds, shared attachment nodes,
+   * ring/row/carrier order and finite supports remain exact. No penalty terms.
+   * Zero deviations reproduce option63; old options/layouts remain unchanged. */
 RS_API int rs_shared_entity_definition_with_options(const double* board,size_t nboard,const double* layout,size_t nlayout,int feature_code,unsigned options,int* kind,double* parameters,size_t nparameters);
 /* Continuous board-course chart. Output the nine arc-length segment joins;
  * these joins are topology/display metadata, never bounds on fit stations. */
@@ -327,6 +342,15 @@ typedef void (*rs_lm_progress)(const double* summary,const double* timings,doubl
 /* 0: legacy; 1: independent boxes; 2: declared physical tangent cone.
  * Additive diagnostics preserve the existing G4 summary/tolerance ABI. */
 RS_API int rs_g4_stationarity_version(void);
+// Current-state cache: valid, full vector, objective, exact norm, active faces.
+RS_API int rs_g4_stationarity_cached_norm(void* handle,double* values,size_t count);
+// As above plus kind: 1 full projection, 2 exact scalar norm, 3 strict lower bound.
+// Lower bounds only prove nonconvergence; they never authorize convergence.
+RS_API int rs_g4_stationarity_cached_certificate(void* handle,double* values,size_t count);
+/* Optional performance telemetry: 19 values (16-field prefix accepted).
+ * Last fields: latest damping energy, predicted decrease, damping recoveries.
+ * Host counters/event spans; this getter performs no device synchronization. */
+RS_API int rs_g4_performance_metrics(void* handle,double* values,size_t count);
 /* Read-only current-state diagnostics: 12 doubles, no optimizer step. */
 RS_API int rs_g4_stationarity_diagnostics(void* handle,double tolerance,double* summary,size_t nsummary);
 /* Last diagnostic: 24 doubles/face, normalized Jacobian[count,q], [raw,p][2,q]. */

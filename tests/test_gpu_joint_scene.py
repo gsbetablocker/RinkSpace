@@ -57,6 +57,51 @@ class JointSceneGPU(unittest.TestCase):
                         result=sample.evaluate("cuda");np.testing.assert_array_equal(result["status"],0);uv.append(result["values"][:,3:5])
                 np.testing.assert_allclose(gpu[:,:,j],(uv[1]-uv[0])/(2*epsilon),atol=3e-7,rtol=2e-4,err_msg=f"scene coordinate {index}")
 
+    def test_lane_transverse_39_coordinate_layout_has_dynamic_cuda_derivatives(self):
+        self.check_lane_transverse_derivatives(shared=False)
+
+    def test_four_collinear_lane_marks_have_one_shared_cuda_derivative(self):
+        self.check_lane_transverse_derivatives(shared=True)
+
+    def check_lane_transverse_derivatives(self,shared):
+        state=np.r_[self.kw['board'],self.kw['layout'],[-.23,-.22,0.,0.]]
+        indices=[8,9,15,41,42,43,44] if shared else [8,9,15,41,42]
+        count=4 if shared else 2;rows=5*count
+        directions=np.eye(len(state))[:,indices]*.001
+        records=np.zeros((count,12),np.int32);records[:,0]=1;records[:,1]=np.arange(320,320+count)
+        def make(values):
+            kw={**self.kw,'board':values[:6],'layout':values[6:45],
+                'options':32 if shared else 0,'codes':np.repeat(np.arange(count,dtype=np.int32),5),
+                'stations':np.tile([.1,.3,.5,.7,.9],count),'times':np.linspace(0.,.1,rows),
+                'observed':np.zeros((rows,2))}
+            problem=ResidentResidualProblem(self.core,**kw)
+            paths=[]
+            for code in range(320,320+count):
+                kind,parameters=self.core.shared_geometry(values[:6],values[6:45],code,options=kw['options'])
+                paths.append(dict(kind=kind,parameters=parameters))
+            problem.configure_geometry(paths)
+            problem.configure_scene_parameters(values=values,records=records,data=np.zeros(1),directions=directions)
+            return problem
+        with make(state) as problem:
+            problem.configure_pixel_linearization(directions=np.zeros((8,3,len(indices))),
+                local_ids=np.full(rows,-1,np.int32),local_scales=np.zeros(0))
+            problem.linearize()
+            jac=problem.probe_rows(np.arange(rows))
+            problem.linearize('cpu')
+            np.testing.assert_allclose(jac,problem.probe_rows(np.arange(rows),'cpu'),atol=2e-10,rtol=1e-9)
+            for j,index in enumerate(indices):
+                uv=[];epsilon=.002
+                for sign in (-1,1):
+                    with make(state+sign*epsilon*directions[:,j]) as sample:
+                        result=sample.evaluate('cuda');np.testing.assert_array_equal(result['status'],0)
+                        uv.append(result['values'][:,3:5])
+                np.testing.assert_allclose(jac[:,:,j],(uv[1]-uv[0])/(2*epsilon),atol=3e-7,rtol=2e-4)
+            self.assertGreater(np.linalg.norm(jac[:5,:,3]),0.)
+            if shared:
+                self.assertGreater(np.linalg.norm(jac[-5:,:,3]),0.)
+                np.testing.assert_array_equal(jac[:,:,4:],0.)
+            else:np.testing.assert_array_equal(jac[5:,:,3],0.)
+
     def test_real_lm_updates_scene_and_exported_board_is_consistent(self):
         for index in (1,4,6,41,43,46,50,58,62):
             with self.subTest(index=index):

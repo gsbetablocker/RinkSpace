@@ -1,0 +1,359 @@
+{
+  "schema": "rinkspace.body-runtime-sources.v1",
+  "observed_date": "2026-10-31",
+  "scope": "Pinned source subsets and local namespace integration; no upstream source, environment, model weights or broadcast media are bundled.",
+  "components": {
+    "footmr": {
+      "commit": "530da95641f906b42ba6792df8e55c1dd667f98d",
+      "repository": "https://github.com/twehrbein/FootMR",
+      "files": [
+        {
+          "file": "hmr4d/network/footmr/foot_transformer.py",
+          "bytes": 4289,
+          "sha256": "85be3b6a23e59deb7149ca5439aabbd6c7f77f09e0774081aab8988dceb743c5"
+        },
+        {
+          "file": "hmr4d/network/base_arch/transformer/encoder_rope.py",
+          "bytes": 3595,
+          "sha256": "ee979aff549f04d88f00f0497db8d95aaf88cf41b046098b3a94c6181285e14e"
+        },
+        {
+          "file": "hmr4d/network/base_arch/transformer/layer.py",
+          "bytes": 244,
+          "sha256": "17394bafe0a8c1e94349a307c2847cbb05dc843d2b075f0e5db190d63f11dc7c"
+        },
+        {
+          "file": "hmr4d/utils/net_utils.py",
+          "bytes": 6534,
+          "sha256": "5a20c4b009880f7125f8c53f54c84e1db6518f133021ded4ce4e45f2bcf3c6e5"
+        },
+        {
+          "file": "LICENSE",
+          "bytes": 1018,
+          "sha256": "7b810abf532390c65c69e2ea73912f6eba0bc4d1d552a822f4a746aea8528fe1"
+        },
+        {
+          "file": "requirements.txt",
+          "bytes": 819,
+          "sha256": "d004ac2f14b523210a18c6aa74957e6b7602ba294c33af0b707a08d9ed147e2d"
+        },
+        {
+          "file": "hmr4d/network/base_arch/embeddings/rotary_embedding.py",
+          "bytes": 2197,
+          "sha256": "590f00248bc5b289b4230463a7c735db46c1c6293b2a9c050d47a711c6cce137"
+        },
+        {
+          "file": "hmr4d/utils/pylogger.py",
+          "bytes": 2029,
+          "sha256": "7a30993a41902b3eaab4c4fa7d150cb4d0b1b1e039cb74076a373cff7f07c4bc"
+        }
+      ],
+      "integration_files": [
+        {
+          "file": "hmr4d/network/base_arch/embeddings/__init__.py",
+          "bytes": 75,
+          "sha256": "f48500898630a2c5651288cb15b7b7cbcfebbb2daae70853afa503ab867afe74",
+          "origin": "local pkgutil namespace integration; not copied author code",
+          "content_utf8": "from pkgutil import extend_path\r\n__path__=extend_path(__path__, __name__)\r\n"
+        },
+        {
+          "file": "hmr4d/network/base_arch/transformer/__init__.py",
+          "bytes": 75,
+          "sha256": "f48500898630a2c5651288cb15b7b7cbcfebbb2daae70853afa503ab867afe74",
+          "origin": "local pkgutil namespace integration; not copied author code",
+          "content_utf8": "from pkgutil import extend_path\r\n__path__=extend_path(__path__, __name__)\r\n"
+        },
+        {
+          "file": "hmr4d/network/base_arch/__init__.py",
+          "bytes": 75,
+          "sha256": "f48500898630a2c5651288cb15b7b7cbcfebbb2daae70853afa503ab867afe74",
+          "origin": "local pkgutil namespace integration; not copied author code",
+          "content_utf8": "from pkgutil import extend_path\r\n__path__=extend_path(__path__, __name__)\r\n"
+        },
+        {
+          "file": "hmr4d/network/footmr/__init__.py",
+          "bytes": 75,
+          "sha256": "f48500898630a2c5651288cb15b7b7cbcfebbb2daae70853afa503ab867afe74",
+          "origin": "local pkgutil namespace integration; not copied author code",
+          "content_utf8": "from pkgutil import extend_path\r\n__path__=extend_path(__path__, __name__)\r\n"
+        },
+        {
+          "file": "hmr4d/network/__init__.py",
+          "bytes": 75,
+          "sha256": "f48500898630a2c5651288cb15b7b7cbcfebbb2daae70853afa503ab867afe74",
+          "origin": "local pkgutil namespace integration; not copied author code",
+          "content_utf8": "from pkgutil import extend_path\r\n__path__=extend_path(__path__, __name__)\r\n"
+        },
+        {
+          "file": "hmr4d/utils/__init__.py",
+          "bytes": 75,
+          "sha256": "f48500898630a2c5651288cb15b7b7cbcfebbb2daae70853afa503ab867afe74",
+          "origin": "local pkgutil namespace integration; not copied author code",
+          "content_utf8": "from pkgutil import extend_path\r\n__path__=extend_path(__path__, __name__)\r\n"
+        },
+        {
+          "file": "hmr4d/__init__.py",
+          "bytes": 75,
+          "sha256": "f48500898630a2c5651288cb15b7b7cbcfebbb2daae70853afa503ab867afe74",
+          "origin": "local pkgutil namespace integration; not copied author code",
+          "content_utf8": "from pkgutil import extend_path\r\n__path__=extend_path(__path__, __name__)\r\n"
+        }
+      ],
+      "runtime": "existing .venv-body; torch 2.7.1+cu128; timm 0.9.12; FootMR inference executed on CPU with 2 threads",
+      "data_path": "runtime_tools/body/FootMR",
+      "source_manifest_sha256": "95c75e77e4b96f3efb10dafa4038dde6c3a116cd51c1176b8dc9370ffc4ac17a",
+      "license_url": "https://raw.githubusercontent.com/twehrbein/FootMR/530da95641f906b42ba6792df8e55c1dd667f98d/LICENSE",
+      "license_scope": "Upstream custom education/research/nonprofit terms; GVHMR derivative conditions apply."
+    },
+    "cotracker": {
+      "repository": "https://github.com/facebookresearch/co-tracker",
+      "commit": "82e02e8029753ad4ef13cf06be7f4fc5facdda4d",
+      "files": [
+        {
+          "file": "LICENSE.md",
+          "sha256": "1d8ca66080a2701508a70be4ddad4be28c509bcc3397a682fb8edf767fdd7a00",
+          "bytes": 19332
+        },
+        {
+          "file": "cotracker/__init__.py",
+          "sha256": "34bd8069c54764e7b8d73a78905dbe6467140a2f73170875128f6ca4d8cdd0aa",
+          "bytes": 197
+        },
+        {
+          "file": "cotracker/datasets/__init__.py",
+          "sha256": "34bd8069c54764e7b8d73a78905dbe6467140a2f73170875128f6ca4d8cdd0aa",
+          "bytes": 197
+        },
+        {
+          "file": "cotracker/datasets/dataclass_utils.py",
+          "sha256": "85081775c3b4c74b456cc4e6f164d559cac77adecce28b010b527a46a2efb488",
+          "bytes": 6247
+        },
+        {
+          "file": "cotracker/datasets/dr_dataset.py",
+          "sha256": "e70e9eeb66c08f40c4312268768532050ca5e269e1d84503cc12fdefc4db5969",
+          "bytes": 5296
+        },
+        {
+          "file": "cotracker/datasets/kubric_movif_dataset.py",
+          "sha256": "c8cb9537c44cfbff1c13b2251a5947126f0baa65fe7ced48edf2218493c6c663",
+          "bytes": 20085
+        },
+        {
+          "file": "cotracker/datasets/real_dataset.py",
+          "sha256": "889edb66f65151dfac3271c91ecc47c1490508f54cc1fe0f7860e699f9a1da1e",
+          "bytes": 8417
+        },
+        {
+          "file": "cotracker/datasets/tap_vid_datasets.py",
+          "sha256": "2806cc6c1d5df1703c942feb05154a7b78ffa8ac4cb2fb032876ce3cf335699b",
+          "bytes": 9580
+        },
+        {
+          "file": "cotracker/datasets/utils.py",
+          "sha256": "05c40c9dbc51f588cd5d889b3abd9795eb55a0a720d60519fedde54baeaac3c6",
+          "bytes": 3531
+        },
+        {
+          "file": "cotracker/evaluation/__init__.py",
+          "sha256": "34bd8069c54764e7b8d73a78905dbe6467140a2f73170875128f6ca4d8cdd0aa",
+          "bytes": 197
+        },
+        {
+          "file": "cotracker/evaluation/core/__init__.py",
+          "sha256": "34bd8069c54764e7b8d73a78905dbe6467140a2f73170875128f6ca4d8cdd0aa",
+          "bytes": 197
+        },
+        {
+          "file": "cotracker/evaluation/core/eval_utils.py",
+          "sha256": "4f23ce75896694a8f5d8f7e5650c15d4f74a2e7135ae176c8295621d60916cb9",
+          "bytes": 6181
+        },
+        {
+          "file": "cotracker/evaluation/core/evaluator.py",
+          "sha256": "9432df1c94f9786e4ef579632d9b8cd6b2e7680800564d50e38588ed7bb56274",
+          "bytes": 10695
+        },
+        {
+          "file": "cotracker/evaluation/evaluate.py",
+          "sha256": "5b7f886332ed7772567c0ae83ae5275a716fe69129a66ffc9168cd1a397e646d",
+          "bytes": 6518
+        },
+        {
+          "file": "cotracker/models/__init__.py",
+          "sha256": "34bd8069c54764e7b8d73a78905dbe6467140a2f73170875128f6ca4d8cdd0aa",
+          "bytes": 197
+        },
+        {
+          "file": "cotracker/models/bootstap_predictor.py",
+          "sha256": "7e25e4d8884b0bc01c72b2e00eb7da0f0e1e97ea1e4944818f16baee6347cfe3",
+          "bytes": 2305
+        },
+        {
+          "file": "cotracker/models/build_cotracker.py",
+          "sha256": "72a2d04fafb26c7f2ee0d7236fa63d5a7adbc9a9f1bab1d68f41bdd1ea657c89",
+          "bytes": 1500
+        },
+        {
+          "file": "cotracker/models/core/__init__.py",
+          "sha256": "34bd8069c54764e7b8d73a78905dbe6467140a2f73170875128f6ca4d8cdd0aa",
+          "bytes": 197
+        },
+        {
+          "file": "cotracker/models/core/cotracker/__init__.py",
+          "sha256": "34bd8069c54764e7b8d73a78905dbe6467140a2f73170875128f6ca4d8cdd0aa",
+          "bytes": 197
+        },
+        {
+          "file": "cotracker/models/core/cotracker/blocks.py",
+          "sha256": "65a742fbec3d6a6eed26d40fc7d1179c609b7a35e2cd4b1146ea7800089d6823",
+          "bytes": 13946
+        },
+        {
+          "file": "cotracker/models/core/cotracker/cotracker.py",
+          "sha256": "711df4fc7d109824e52f8e111df396a2e7d844796084f1f6a4419690c14e6b28",
+          "bytes": 21682
+        },
+        {
+          "file": "cotracker/models/core/cotracker/cotracker3_offline.py",
+          "sha256": "41cff5b775ca071ff12bce23ef7887cb639171da84a32e0d75194661101ce238",
+          "bytes": 8701
+        },
+        {
+          "file": "cotracker/models/core/cotracker/cotracker3_online.py",
+          "sha256": "4c8bfce5546d85ba22c6b5292b870ad2aa0af1e0b6ba5a22e644c39bb496475e",
+          "bytes": 20945
+        },
+        {
+          "file": "cotracker/models/core/cotracker/losses.py",
+          "sha256": "fe23dacbfa563f9499e39f78338aad046145211d80f4674e723a6625afb22043",
+          "bytes": 4228
+        },
+        {
+          "file": "cotracker/models/core/embeddings.py",
+          "sha256": "9c1066f2d3b44317454126ff79256d4aa07f12e736bb09fdf598a09696aa4dde",
+          "bytes": 3968
+        },
+        {
+          "file": "cotracker/models/core/model_utils.py",
+          "sha256": "8f13adb13866cba3b1b0ad90f7c961918f71d75e912d8b6ccf77906b81c95a8c",
+          "bytes": 14150
+        },
+        {
+          "file": "cotracker/models/evaluation_predictor.py",
+          "sha256": "7bb03606c08638de28f79abfcf8bd03eb0c42bfd811e6bb8a00d752a2a943597",
+          "bytes": 7156
+        },
+        {
+          "file": "cotracker/predictor.py",
+          "sha256": "783536d6c77790fa6c8e005f2df1d6bd4f0d8955c2c67d464bfb4e64d366375f",
+          "bytes": 11500
+        },
+        {
+          "file": "cotracker/utils/__init__.py",
+          "sha256": "34bd8069c54764e7b8d73a78905dbe6467140a2f73170875128f6ca4d8cdd0aa",
+          "bytes": 197
+        },
+        {
+          "file": "cotracker/utils/train_utils.py",
+          "sha256": "235bd0cfeb0285125f0d372649fe97496847b1afefccf05188f0d0694f417151",
+          "bytes": 8703
+        },
+        {
+          "file": "cotracker/utils/visualizer.py",
+          "sha256": "0b5fef184d44c408568559a634821968b6907d2b526b967d2a4bbd843b0fc587",
+          "bytes": 13064
+        },
+        {
+          "file": "cotracker/version.py",
+          "sha256": "a8b2612b07c2cbeb2d32c99711fb1c2829571938776fb8188812c66c9b129949",
+          "bytes": 221
+        },
+        {
+          "file": "hubconf.py",
+          "sha256": "7f43a7007762cf71d771fa218047b7e9011f1ec0705270aa7e5b10de157274f3",
+          "bytes": 4048
+        },
+        {
+          "file": "setup.py",
+          "sha256": "efe939de63c26ad3045fcde411893429f83d4cdfe1909a184897cf9aa803e5ab",
+          "bytes": 462
+        }
+      ],
+      "data_path": "runtime_tools/body/CoTracker",
+      "source_manifest_sha256": "676d354e36778736b2137bba86ef9e27c2ad6c6982cd6cdd0d733ca569d3f0f0",
+      "license_url": "https://raw.githubusercontent.com/facebookresearch/co-tracker/82e02e8029753ad4ef13cf06be7f4fc5facdda4d/LICENSE.md",
+      "license_scope": "Upstream CC BY-NC 4.0; no extra redistribution or commercial rights granted."
+    }
+  },
+  "weights": [
+    {
+      "component": "footmr",
+      "data_path": "cache/pretrained/footmr/footmr_checkpoint.ckpt",
+      "original_provenance_sha256": "2e4688ad60b017856afbd36d9f3adb2dc9f459b637ebce9a9ac41b62eeeb7ae3",
+      "observed_provenance": {
+        "url": "https://cloud.tnt.uni-hannover.de/public.php/webdav/checkpoints/footmr/footmr_checkpoint.ckpt",
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\models\\cache\\footmr\\footmr_checkpoint.ckpt",
+        "bytes": 178872284,
+        "sha256": "2d31d8b5f7079c86dc176472909d4b3c14db801f0bcd9f99571637d0a860407a",
+        "download_seconds": 447.35206484794617
+      },
+      "distribution": "External dependency only; obtain under upstream terms, not downloaded by prepare_body_sources.py."
+    },
+    {
+      "component": "cotracker",
+      "data_path": "cache/pretrained/cotracker/scaled_online.pth",
+      "original_provenance_sha256": "71cb4e2be2b77d4366bdfae409cf42d27ce0c484c349b69e8de66b8da9644a82",
+      "observed_provenance": {
+        "url": "https://huggingface.co/facebook/cotracker3/resolve/main/scaled_online.pth",
+        "sha256": "205d34789f19699d64b22cf93f9b697f15f28d4025240e31532e504109837218",
+        "bytes": 101695610,
+        "source_commit": "82e02e8029753ad4ef13cf06be7f4fc5facdda4d",
+        "license_file": "D:\\OneDrive\\codex_projs\\RinkSpace\\environments\\body\\CoTracker\\LICENSE.md",
+        "runtime": "existing .venv-body; CPU inference, two threads, CUDA_VISIBLE_DEVICES empty"
+      },
+      "distribution": "External dependency only; obtain under upstream terms, not downloaded by prepare_body_sources.py."
+    },
+    {
+      "component": "rtmw",
+      "data_path": "cache/pretrained/rtmw/rtmw_l_384x288.onnx",
+      "original_provenance_sha256": "393d6446b5f3368bea3da86dbea233af9e9fb5bf839c2e7a8a461ac25cbf518c",
+      "observed_provenance": {
+        "source_url": "https://download.openmmlab.com/mmpose/v1/projects/rtmw/onnx_sdk/rtmw-dw-x-l_simcc-cocktail14_270e-384x288_20231122.zip",
+        "archive_sha256": "a87e1af41a0a067776dba7d46e1c21c8f6e9f18e247e0e606718dd1f31e96ffd",
+        "member": "end2end.onnx",
+        "onnx_sha256": "bd033156e5104c4f5d2edfe0453e02661e30a2f3da453ec93c8764d561b83054"
+      },
+      "distribution": "External dependency only; obtain under upstream terms, not downloaded by prepare_body_sources.py."
+    }
+  ],
+  "observed_dependencies": {
+    "status": "Selected installed distribution versions observed without importing inference engines; not a complete environment lock or clean-machine validation.",
+    "body_cuda": {
+      "numpy": "1.26.4",
+      "scipy": "1.13.1",
+      "torch": "2.7.1+cu128",
+      "torchvision": "0.22.1+cu128",
+      "timm": "0.9.12",
+      "einops": "0.8.1",
+      "opencv-python": "4.10.0.84",
+      "av": "13.0.0",
+      "rich": "13.9.4",
+      "omegaconf": "2.3.1",
+      "hydra-core": "1.3.2"
+    },
+    "vision_cuda": {
+      "numpy": "2.4.6",
+      "scipy": "1.17.1",
+      "torch": "2.7.1+cu128",
+      "torchvision": "0.22.1+cu128",
+      "rtmlib": "0.0.16",
+      "onnxruntime": "1.31.1",
+      "opencv-python": "5.0.0.93",
+      "opencv-python-headless": "5.0.0.93",
+      "av": "18.1.0",
+      "imageio-ffmpeg": "0.6.0",
+      "rich": "15.0.0"
+    }
+  }
+}

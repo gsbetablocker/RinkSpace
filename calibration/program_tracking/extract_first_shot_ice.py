@@ -196,7 +196,9 @@ def prepare_guides():
 
 class NativeProfiles:
  def __init__(self,rgb,source,exclusion):
-  self.frame=_MaterialProfileFrame(rgb,dict(source_sha256=source['source_video_sha256'],source_pts=source['native_pts'],time_base=source['time_base'],native_hw=[1080,1920],shot_id=1))
+  if np.asarray(exclusion).shape!=np.asarray(rgb).shape[:2]:
+   raise ValueError('Exclusion mask and decoded RGB image dimensions differ')
+  self.frame=_MaterialProfileFrame(rgb,dict(source_sha256=source['source_video_sha256'],source_pts=source['native_pts'],time_base=source['time_base'],native_hw=list(np.asarray(rgb).shape[:2]),shot_id=1))
   self.mask=exclusion;self.archive={}
  def sample(self,path,guide,radius=28,spacing=48):
   if path['feature_id'] in ('B1','B2','C'):

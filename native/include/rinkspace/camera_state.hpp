@@ -158,8 +158,8 @@ RS_HD inline Status evaluate_motion_camera(const MotionRig& r,const MotionSpline
     double tr[3];const auto status=s.evaluate(time,tr);if(status!=Status::ok)return status;
     return motion_camera_from_values(r,tr,out);
 }
-RS_HD inline Status motion_instant(const MotionRig& r,const MotionSpline& s,Vec3 X,double time,MotionInstant& out,Vec2& uv){
-    auto status=evaluate_motion_camera(r,s,time,out);if(status!=Status::ok)return status;
+RS_HD inline Status motion_instant_from_camera(const MotionRig& r,const MotionCameraState& camera,Vec3 X,MotionInstant& out,Vec2& uv){
+    static_cast<MotionCameraState&>(out)=camera;
     const auto& c=out.camera;out.ray=apply(c.rotation,sub(X,c.centre));out.depth=out.ray.z;
     if(!finite(out.ray))return Status::nonfinite;if(out.depth<=0)return Status::behind_camera;
     const double x=out.ray.x/out.depth,y=out.ray.y/out.depth,r2=x*x+y*y;
@@ -168,13 +168,38 @@ RS_HD inline Status motion_instant(const MotionRig& r,const MotionSpline& s,Vec3
     if(!(lower>1e-10))return static_cast<Status>(8);
     return project(c,X,uv);
 }
+RS_HD inline Status motion_instant(const MotionRig& r,const MotionSpline& s,Vec3 X,double time,MotionInstant& out,Vec2& uv){
+    MotionCameraState camera{};auto status=evaluate_motion_camera(r,s,time,camera);if(status!=Status::ok)return status;
+    return motion_instant_from_camera(r,camera,X,out,uv);
+}
+// Per-camera/exposure quantities are independent of the candidate 3-D point.
+// They may be reused only while the current rig and motion controls are fixed.
+// Point-dependent depth, optical validity and contraction bounds remain exact.
+struct MotionProjectionContext {
+    MotionCameraState centre{},lower{},upper{};double source_time=0.,time=0.,half=0.,rates[3]{};
+    Status rates_status=Status::ok,centre_status=Status::ok,lower_status=Status::ok,upper_status=Status::ok;
+};
+RS_HD inline void prepare_motion_projection_context(const MotionRig& r,const MotionSpline& s,double time,MotionProjectionContext& context){
+    context.source_time=time;const double half=std::abs(r.tau)/2,lo=time-half,hi=time+half;
+    context.half=(hi-lo)/2;context.time=lo+context.half;
+    context.rates_status=r.tau==0.?Status::ok:s.rates(context.time-context.half,context.time+context.half,context.rates);
+    context.centre_status=evaluate_motion_camera(r,s,context.time,context.centre);
+    if(r.tau==0.){context.lower=context.upper=context.centre;context.lower_status=context.upper_status=context.centre_status;}
+    else{context.lower_status=evaluate_motion_camera(r,s,time-r.tau/2,context.lower);
+        context.upper_status=evaluate_motion_camera(r,s,time+r.tau/2,context.upper);}
+}
 /* Sufficient analytic bound over the ENTIRE source row-time interval. Cubic
  * derivative extrema and rigid-body/Brown norm bounds exclude multiple row
  * roots. This is a floating-point padded bound, not interval arithmetic.
  */
-RS_HD inline Status contraction_bound_window(const MotionRig& r,const MotionSpline& s,Vec3 X,double t,double half,int height,double& bound,bool directional=false){
-    double rates[3];auto status=s.rates(t-half,t+half,rates);if(status!=Status::ok)return status;
-    MotionInstant m{};Vec2 uv{};status=motion_instant(r,s,X,t,m,uv);if(status!=Status::ok)return status;
+RS_HD inline Status contraction_bound_window(const MotionRig& r,const MotionSpline& s,Vec3 X,double t,double half,int height,double& bound,bool directional=false,const MotionProjectionContext* context=nullptr){
+    const bool cached=context&&context->time==t&&context->half==half;
+    double rates[3];auto status=Status::ok;
+    if(cached){status=context->rates_status;for(int i=0;i<3;++i)rates[i]=context->rates[i];}
+    else status=s.rates(t-half,t+half,rates);if(status!=Status::ok)return status;
+    MotionInstant m{};Vec2 uv{};
+    if(cached){status=context->centre_status;if(status==Status::ok)status=motion_instant_from_camera(r,context->centre,X,m,uv);}
+    else status=motion_instant(r,s,X,t,m,uv);if(status!=Status::ok)return status;
     const double omega=rates[0]+rates[1],zd=rates[2],zabs=std::abs(m.z)+zd*half;
     const double speed3=omega*(std::sqrt(dot(sub(X,r.pivot),sub(X,r.pivot)))+std::abs(r.spacing))+(std::abs(r.pupil1)+2*std::abs(r.pupil2)*zabs)*zd;
     Vec3 velocity_bound{speed3,speed3,speed3},span{speed3*half,speed3*half,speed3*half};
@@ -206,19 +231,28 @@ RS_HD inline Status contraction_bound_window(const MotionRig& r,const MotionSpli
     const double zmin=m.depth-span.z;if(!(zmin>0))return static_cast<Status>(9);
     const double x=(std::abs(m.ray.x)+span.x)/zmin,y=(std::abs(m.ray.y)+span.y)/zmin,r2=x*x+y*y,radius=std::sqrt(r2);
     const double xp=(velocity_bound.x+x*velocity_bound.z)/zmin,yp=(velocity_bound.y+y*velocity_bound.z)/zmin;
-    const double hinge=std::max(0.,r.wide_boundary-m.logf+zd*half),basis=hinge*hinge,hinge_rate=2*hinge*zd;
-    const double k1=std::abs(r.k10)+std::abs(r.k11)*zabs+std::abs(r.wide_coefficients[0])*basis,k2=std::abs(r.k20)+std::abs(r.k21)*zabs+std::abs(r.wide_coefficients[1])*basis,p1=std::abs(r.p1)+std::abs(r.wide_coefficients[2])*basis,p2=std::abs(r.p2)+std::abs(r.wide_coefficients[3])*basis;
+    const double hinge=std::max(0.,r.wide_boundary-m.logf+zd*half),hinge_rate=2*hinge*zd;
+    // Bound the actual coefficient over this window. Bounding each zoom
+    // basis separately loses cancellations in the SAME lens polynomial and
+    // does not tighten as a rejected window is subdivided. The centre value
+    // plus a derivative bound covers the complete interval, including a
+    // crossing of the C1 wide-zoom hinge, without changing the lens model.
+    const double k1span=(std::abs(r.k11)*zd+std::abs(r.wide_coefficients[0])*hinge_rate)*half;
+    const double k2span=(std::abs(r.k21)*zd+std::abs(r.wide_coefficients[1])*hinge_rate)*half;
+    const double k1=std::abs(m.camera.k1)+k1span,k2=std::abs(m.camera.k2)+k2span;
+    const double p1=std::abs(m.camera.p1)+std::abs(r.wide_coefficients[2])*hinge_rate*half;
+    const double p2=std::abs(m.camera.p2)+std::abs(r.wide_coefficients[3])*hinge_rate*half;
     const double L=1+k1*r2+k2*r2*r2,jyx=2*x*y*(k1+2*k2*r2)+2*p1*x+2*p2*y,jyy=L+2*y*y*(k1+2*k2*r2)+6*p1*y+2*p2*x;
     const double ybrown=y*L+p1*(r2+2*y*y)+2*p2*x*y,direct=y*(std::abs(r.k11)*r2+std::abs(r.k21)*r2*r2)*zd+hinge_rate*(y*(std::abs(r.wide_coefficients[0])*r2+std::abs(r.wide_coefficients[1])*r2*r2)+std::abs(r.wide_coefficients[2])*(r2+2*y*y)+2*std::abs(r.wide_coefficients[3])*x*y);
     const double fymax=std::exp(m.logf+zd*half-r.eta/2),speed=std::nextafter((fymax*(ybrown*zd+jyx*xp+jyy*yp+direct)+std::abs(r.cyz)*zd)*(1+2e-10)+1e-8,std::numeric_limits<double>::infinity());
     bound=std::abs(r.tau)*speed/(height-1);
-    const double k1lo=m.camera.k1-(std::abs(r.k11)*zd+std::abs(r.wide_coefficients[0])*hinge_rate)*half,k2lo=m.camera.k2-(std::abs(r.k21)*zd+std::abs(r.wide_coefficients[1])*hinge_rate)*half;
+    const double k1lo=m.camera.k1-k1span,k2lo=m.camera.k2-k2span;
     const double fold=std::fmin(quadratic_min(k1lo,k2lo,r2),quadratic_min(3*k1lo,5*k2lo,r2))-6*std::hypot(p1,p2)*radius;
     return radius<=r.radius&&fold>1e-10&&finite_scalar(bound)&&bound<1-1e-9?Status::ok:static_cast<Status>(9);
 }
-RS_HD inline Status contraction_bound_interval(const MotionRig& r,const MotionSpline& s,Vec3 X,double lo_time,double hi_time,int height,double& bound){
+RS_HD inline Status contraction_bound_interval(const MotionRig& r,const MotionSpline& s,Vec3 X,double lo_time,double hi_time,int height,double& bound,const MotionProjectionContext* context=nullptr){
     const double half=(hi_time-lo_time)/2,t=lo_time+half;
-    auto status=contraction_bound_window(r,s,X,t,half,height,bound);
+    auto status=contraction_bound_window(r,s,X,t,half,height,bound,false,context);
     if(status!=static_cast<Status>(9))return status;
     // A failed sufficient whole-interval estimate is not a physical fold.
     // Certify a covering partition with the SAME depth, optical-domain and
@@ -239,9 +273,9 @@ RS_HD inline Status contraction_bound_interval(const MotionRig& r,const MotionSp
     }
     bound=maximum;return Status::ok;
 }
-RS_HD inline Status contraction_bound(const MotionRig& r,const MotionSpline& s,Vec3 X,double t,int height,double& bound){
+RS_HD inline Status contraction_bound(const MotionRig& r,const MotionSpline& s,Vec3 X,double t,int height,double& bound,const MotionProjectionContext* context=nullptr){
     const double half=std::abs(r.tau)/2;
-    return contraction_bound_interval(r,s,X,t-half,t+half,height,bound);
+    return contraction_bound_interval(r,s,X,t-half,t+half,height,bound,context);
 }
 struct MotionProjection {Vec2 uv;double depth,row,equality,contraction;};
 // The pixel plane is not clipped to the raster. A finite prediction just beyond
@@ -250,17 +284,21 @@ struct MotionProjection {Vec2 uv;double depth,row,equality,contraction;};
 // every added interval. Never substitute the observed row or clamp row time.
 // time_half is an optional declared computational support in seconds; a joint
 // plan uses its compiled motion support. A negative value uses spline support.
-RS_HD inline Status project_motion(const MotionRig& r,const MotionSpline& s,int height,Vec3 X,double time,MotionProjection& out,double time_half=-1.){
+RS_HD inline Status project_motion(const MotionRig& r,const MotionSpline& s,int height,Vec3 X,double time,MotionProjection& out,double time_half=-1.,const MotionProjectionContext* context=nullptr){
     if(!finite(X)||!finite_scalar(time))return Status::invalid_argument;
+    if(context&&context->source_time!=time)context=nullptr;
     if(r.tau==0.){
-        MotionInstant current{};auto status=motion_instant(r,s,X,time,current,out.uv);
+        MotionInstant current{};auto status=context?context->centre_status:Status::ok;
+        if(status==Status::ok)status=context?motion_instant_from_camera(r,context->centre,X,current,out.uv):motion_instant(r,s,X,time,current,out.uv);
         if(status!=Status::ok)return status;
         out.depth=current.depth;out.row=out.uv.y;out.equality=out.contraction=0.;return Status::ok;
     }
-    auto status=contraction_bound(r,s,X,time,height,out.contraction);if(status!=Status::ok)return status;
+    auto status=contraction_bound(r,s,X,time,height,out.contraction,context);if(status!=Status::ok)return status;
     MotionInstant a{},b{};Vec2 ua{},ub{};const double last=height-1;
-    status=motion_instant(r,s,X,time-r.tau/2,a,ua);if(status!=Status::ok)return status;
-    status=motion_instant(r,s,X,time+r.tau/2,b,ub);if(status!=Status::ok)return status;
+    status=context?context->lower_status:Status::ok;
+    if(status==Status::ok)status=context?motion_instant_from_camera(r,context->lower,X,a,ua):motion_instant(r,s,X,time-r.tau/2,a,ua);if(status!=Status::ok)return status;
+    status=context?context->upper_status:Status::ok;
+    if(status==Status::ok)status=context?motion_instant_from_camera(r,context->upper,X,b,ub):motion_instant(r,s,X,time+r.tau/2,b,ub);if(status!=Status::ok)return status;
     double lo=0,hi=last,flo=-ua.y,fhi=last-ub.y;
     double first=s.first+s.dt,stop=s.first+(s.count-2)*s.dt;
     if(time_half>=0.){first=std::max(first,time-time_half);stop=std::min(stop,time+time_half);}

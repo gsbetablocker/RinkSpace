@@ -4,28 +4,33 @@
 namespace rinkspace {
 /* Finite coordinate charts: additive, positive log, log(exponent-1), and
  * three ordered (0,1) radii expressed by four positive interval lengths. */
+RS_HD inline double scene_chart_component(const double* values,const int* chart,
+    const double* directions,int q,int column,size_t i){
+    double d=directions[i*q+column];int type=chart?chart[i]:0;
+    if(type==1)d*=values[i];else if(type==2)d*=values[i]-1.;
+    else if(type>=3&&type<=5){size_t start=i-(type-3);double ratio=values[i],previous=0.;d=0.;
+        for(int k=0;k<3;++k){double gap=values[start+k]-previous;previous=values[start+k];d+=gap*((start+k<=i?1.:0.)-ratio)*directions[(start+k)*q+column];}}
+    return d;
+}
 RS_HD inline void scene_chart_direction(const double* values,size_t n,const int* chart,
     const double* directions,int q,int column,double* out){
-    for(size_t i=0;i<n;++i){double d=directions[i*q+column];int type=chart?chart[i]:0;
-        if(type==1)d*=values[i];else if(type==2)d*=values[i]-1.;
-        else if(type>=3&&type<=5){size_t start=i-(type-3);double ratio=values[i],previous=0.;d=0.;
-            for(int k=0;k<3;++k){double gap=values[start+k]-previous;previous=values[start+k];d+=gap*((start+k<=i?1.:0.)-ratio)*directions[(start+k)*q+column];}}
-        out[i*q+column]=d;
-    }
+    for(size_t i=0;i<n;++i)out[i*q+column]=scene_chart_component(values,chart,directions,q,column,i);
 }
-RS_HD inline double scene_chart_retract(const double* values,const int* chart,size_t index,const double* directions,int q,const double* step,double alpha){
-    int type=chart?chart[index]:0;double delta=0.;
-    for(int j=0;j<q;++j)delta+=directions[index*q+j]*(alpha*step[j]);
+template<class Delta> RS_HD inline double scene_chart_retract_delta(const double* values,const int* chart,size_t index,Delta delta_at){
+    int type=chart?chart[index]:0;double delta=delta_at(index);
     if(type==0)return values[index]+delta;
     if(type==1)return delta==0.?values[index]:values[index]*std::exp(delta);
     if(type==2)return delta==0.?values[index]:1.+(values[index]-1.)*std::exp(delta);
     size_t start=index-(type-3);double logits[4],previous=0.;bool moved=false;
-    for(int k=0;k<3;++k){double d=0.;for(int j=0;j<q;++j)d+=directions[(start+k)*q+j]*(alpha*step[j]);
+    for(int k=0;k<3;++k){double d=delta_at(start+k);
         moved|=d!=0.;logits[k]=std::log(values[start+k]-previous)+d;previous=values[start+k];}
     if(!moved)return values[index];logits[3]=std::log(1.-values[start+2]);
     double maximum=std::max(std::max(logits[0],logits[1]),std::max(logits[2],logits[3])),sum=0.,prefix=0.;
     for(int k=0;k<4;++k){double w=std::exp(logits[k]-maximum);sum+=w;if(start+k<=index)prefix+=w;}
     return prefix/sum;
+}
+RS_HD inline double scene_chart_retract(const double* values,const int* chart,size_t index,const double* directions,int q,const double* step,double alpha){
+    return scene_chart_retract_delta(values,chart,index,[&](size_t row){double d=0.;for(int j=0;j<q;++j)d+=directions[row*q+j]*(alpha*step[j]);return d;});
 }
 /* Immutable identity references, all values are in the common scene state.
  * family: 0 unchanged material seed, 1 monotone shape10, 2 unfolded square,
@@ -77,9 +82,10 @@ RS_HD inline Status scene_print_chart(const ScenePath& path,const double* data,c
 }
 RS_HD inline Status shared_scene_point(const double* board,const double* layout,size_t nl,unsigned options,int code,
     double station,const double* directions,int q,int column,Vec3& xyz,Vec3& derivative){
-    LocalJet b[6],params[8],values[35];for(int i=0;i<6;++i)b[i]={board[i],directions?directions[size_t(i)*q+column]:0.};
+    if(!shared_layout_size_valid(nl))return Status::invalid_argument;
+    LocalJet b[6],params[8],values[ice_tolerance_layout_size];for(int i=0;i<6;++i)b[i]={board[i],directions?directions[size_t(i)*q+column]:0.};
     for(size_t i=0;i<nl;++i)values[i]={layout[i],directions?directions[(6+i)*q+column]:0.};
-    int kind;auto st=shared_entity_definition(b,6,values,nl,code,kind,params,(nl==35&&(code==410||code==411))?8:6,options);
+    int kind;auto st=shared_entity_definition(b,6,values,nl,code,kind,params,(nl>=35&&(code==410||code==411))?8:6,options,false);
     if(st!=Status::ok)return st;
     auto x=sample_planar_primitive(kind,params,LocalJet(station));
     xyz={x.x.a,x.y.a,x.z.a};derivative={x.x.v,x.y.v,x.z.v};

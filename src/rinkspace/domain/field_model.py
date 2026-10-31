@@ -317,6 +317,18 @@ def sample_model(scene,core,samples=361):
         }
         if max(m4.values())>1e-11:raise ValueError('Native symmetric goal-end relation failed: '+str(m4))
         checks['M4']=dict(**m4,contour_arc_only=True,closing_diameter_observable=False)
+    if scene.get('shared_geometry_options',0)&32:
+        marks=[endpoints(320+row) for row in range(4)]
+        xs=np.concatenate([line[:,0] for line in marks])
+        endpoint_error=max(float(np.max(abs(line[:,1]-np.array([
+            by_code[300+3*row]['parameters'][1],by_code[302+3*row]['parameters'][1]]))))
+            for row,line in enumerate(marks))
+        relation=dict(count=4,shared_X_spread=float(np.ptp(xs)),
+            short_side_parallel_error=float(max(abs(line[1,0]-line[0,0]) for line in marks)),
+            lane_side_endpoint_error=endpoint_error)
+        if max(relation[k] for k in ('shared_X_spread','short_side_parallel_error','lane_side_endpoint_error'))>1e-12:
+            raise ValueError('Native collinear lane transverse relation failed: '+str(relation))
+        checks['M1']['transverse_marks']=relation
     errors=list(checks['M2'].values())+[checks['M3']['common_circle_radius_spread']]+[m3[s][k] for s in ('left','right') for k in ['inward_distance_difference','transverse_pair_asymmetry']]+([row_error,mirror_error] if scene.get('shared_geometry_options',0)&8 else [])
     if max(errors)>1e-11:raise ValueError('native structural relation failed: '+str(checks))
     return {'schema':'rinkspace.field_geometry.v1','scene_id':scene['scene_id'],'shapes':shapes,'nodes':nodes,
