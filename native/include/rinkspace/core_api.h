@@ -288,6 +288,12 @@ RS_API int rs_g2_attach(void* handle,int q,const double* dirs,size_t ndirs,const
 // sigma, covariance, robust threshold, source query, or pixel error allowance.
 RS_API int rs_g2_attach_pixels(void* handle,int q,const double* dirs,size_t ndirs,const int* row_local,size_t nrows,
     const double* local_scales,size_t nlocal,double* info,size_t ninfo);
+/* Exact CSR map of flattened [control,channel] rows to retained columns.
+ * Sorted unique columns, finite nonzero FP64 values; dense ABI remains valid. */
+RS_API int rs_g2_attach_sparse_directions(void* handle,int q,const double* values,size_t nv,const int* direction_offsets,size_t no,
+    const int* direction_columns,size_t nc,const int* row_local,size_t nrows,const double* local_scales,size_t nlocal,
+    const int* offsets,int ng,const int* members,size_t nmembers,const int* ranks,const int* weight_offsets,
+    const double* weights,size_t nweights,double huber_delta,int pixels,double* info,size_t ninfo);
 // Native coordinate minimization of independent ordinary curve points.
 // Fixed corners and genuinely shared material stations are not changed.
 RS_API int rs_g3_refine_stations(void* handle,double* info,size_t ninfo);
@@ -347,10 +353,13 @@ RS_API int rs_g4_stationarity_cached_norm(void* handle,double* values,size_t cou
 // As above plus kind: 1 full projection, 2 exact scalar norm, 3 strict lower bound.
 // Lower bounds only prove nonconvergence; they never authorize convergence.
 RS_API int rs_g4_stationarity_cached_certificate(void* handle,double* values,size_t count);
-/* Optional performance telemetry: 19 values (16-field prefix accepted).
- * Last fields: latest damping energy, predicted decrease, damping recoveries.
+/* Optional performance telemetry: query rs_g4_performance_metrics_count().
+ * Legacy 16/19/51-field prefixes remain accepted. Extended fields split
+ * coupled correction, generation caches, capacity and working-set attempts.
  * Host counters/event spans; this getter performs no device synchronization. */
 RS_API int rs_g4_performance_metrics(void* handle,double* values,size_t count);
+RS_API int rs_g4_performance_metrics_count(void);
+RS_API int rs_g4_ice_relation_hits(void* handle,double* values,size_t n);
 /* Read-only current-state diagnostics: 12 doubles, no optimizer step. */
 RS_API int rs_g4_stationarity_diagnostics(void* handle,double tolerance,double* summary,size_t nsummary);
 /* Last diagnostic: 24 doubles/face, normalized Jacobian[count,q], [raw,p][2,q]. */
@@ -372,6 +381,8 @@ RS_API int rs_gpu_set_profile_mode(void* handle,int enabled);
 RS_API int rs_gpu_profile_roots(void* handle,int backend,double* roots,size_t nr,int* status,size_t ns);
 RS_API int rs_gpu_attach_scene(void* handle,const double* values,size_t nv,const int* paths,size_t np,const double* data,size_t nd,int q,const double* directions,size_t nj,const double* lower,const double* upper);
 RS_API int rs_gpu_set_scene_chart(void* handle,const int* chart,size_t n);
+/* Optional finite actual-X/log-radius chart, still exporting layout146. */
+RS_API int rs_gpu_ice_actual_chart_version(void);
 RS_API int rs_scene_retract(const double* values,size_t n,const int* chart,const double* delta,double* out);
 RS_API int rs_gpu_export_scene(void* handle,int trial,double* values,size_t n);
 /* Attach multiple complete physical rigs and one camera index per original row,
@@ -401,6 +412,10 @@ RS_API int rs_gpu_set_camera_envelope(void* handle,const double* limits,size_t n
  * channel, derivative order, declared limit and signed derivative value.
  * Kinds 7/8/9 check speed/acceleration/jerk exactly over each cubic cell;
  * their margin is 1-abs(derivative)/limit. No numerical fitting. */
+/* Optional n=20+2*K envelope: limits[19]=1 joins the focal domains of the
+ * declared shots for pupil/full-forward extrema only; attitude/motion remain
+ * separate across cuts. Old 10/19/19+2*K layouts keep their old semantics. */
+RS_API int rs_camera_joined_zoom_domain_version(void);
 RS_API int rs_camera_envelope_evaluate(const double* rig,size_t nr,const double* controls,size_t nc,double dt,
     const double* limits,size_t n,double* out,size_t no);
 RS_API int rs_gpu_configure_camera(void* handle,int q,const double* directions,size_t n,const double* lower,const double* upper,size_t nb,double max_readout);

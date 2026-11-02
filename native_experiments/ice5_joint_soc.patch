@@ -1,0 +1,127 @@
+--- frozen/include/rinkspace/ice_tolerance.hpp
++++ ice5/include/rinkspace/ice_tolerance.hpp
+@@ -8,7 +8,7 @@
+ // previous trial. The old layouts and options retain their original meanings.
+ constexpr int ice_nominal_size=39,ice_deviation_count=107;
+ constexpr int ice_tolerance_layout_size=ice_nominal_size+ice_deviation_count;
+-constexpr double ice_relative_tolerance=.01;
++constexpr double ice_relative_tolerance=.05;
+ constexpr int ice_tolerance_margin_count=206;
+ RS_HD inline bool shared_layout_size_valid(size_t n){return n==33||n==35||n==39||n==ice_tolerance_layout_size;}
+ RS_HD inline bool shared_options_valid(size_t n,unsigned options){
+@@ -121,7 +121,7 @@
+     auto positive=[&](auto compute){if(requested<0||requested==id)visit(id,compute());++id;};
+     auto strict=[&](auto compute){positive([&](){return compute()-64*std::numeric_limits<double>::epsilon();});};
+     auto relative=[&](auto actual,T nominal,T scale){
+-        if(requested<0||requested==id||requested==id+1){const T e=actual()-nominal,t=.01*scale;
++        if(requested<0||requested==id||requested==id+1){const T e=actual()-nominal,t=ice_relative_tolerance*scale;
+             positive([&](){return t-e;});positive([&](){return t+e;});}else id+=2;};
+     const T pitch=q[3],width=q[9],margin=g.board.half_width-1.5*pitch;
+     for(int column=0;column<2;++column){
+@@ -251,7 +251,7 @@
+     IceToleranceGeometry<T> g(bp,q);
+     if(!g.board.valid()||!(q[0]<q[1]&&q[3]>0&&q[4]>0&&0<q[5]&&q[5]<q[6]&&q[6]<q[7]&&q[7]<1&&q[9]>0&&
+         q[19]>0&&q[20]>0&&q[24]>0&&q[25]>0&&q[27]>0&&q[29]>0&&q[30]>0&&q[33]>0&&q[34]>0&&g.board.half_width>1.5*q[3]))return Status::invalid_argument;
+-    if(check_relations)for(int i=0;i<ice_deviation_count;++i)if(abs(g.d[i])>.01)return Status::outside_support;
++    if(check_relations)for(int i=0;i<ice_deviation_count;++i)if(abs(g.d[i])>ice_relative_tolerance)return Status::outside_support;
+     if(check_relations)for(int index=0;index<5;++index){SegmentValue<T> line{};if(g.carrier(index,line)!=Status::ok)return Status::outside_support;}
+     bool valid=true;if(check_relations)ice_tolerance_margins(g,[&](int,T value){if(!finite_scalar(value)||value < -1e-14)valid=false;});
+     if(!valid)return Status::outside_support;
+--- frozen/include/rinkspace/ice_actual_witness.hpp
++++ ice5/include/rinkspace/ice_actual_witness.hpp
+@@ -1,5 +1,5 @@
+ #pragma once
+-#include "core_types.hpp"
++#include "ice_tolerance.hpp"
+ 
+ namespace rinkspace {
+ 
+@@ -14,7 +14,7 @@
+ };
+ 
+ namespace ice_actual_detail {
+-constexpr double epsilon=.01;
++constexpr double epsilon=ice_relative_tolerance;
+ 
+ RS_HD inline double midpoint(double low,double high){
+     // Avoid overflow, including an interval that straddles zero. This also
+@@ -147,7 +147,7 @@
+             if(value>maximum)maximum=value;
+         }
+         const double range=maximum-minimum;
+-        if(!finite_scalar(range) || range>.02*pitch)return false;
++        if(!finite_scalar(range) || range>2*epsilon*pitch)return false;
+         const double delta=epsilon*pitch;
+         double low=maximum-delta,high=minimum+delta;
+         if(low < -largest)low=-largest;
+@@ -178,8 +178,8 @@
+         }
+         // Positive division preserves extrema: these are max(r/1.01) and
+         // min(r/.99). Intersect an overflowing upper endpoint with finite R.
+-        const double low=maximum/1.01;
+-        double high=minimum/.99;
++        const double low=maximum/(1+epsilon);
++        double high=minimum/(1-epsilon);
+         if(high>largest)high=largest;
+         if(!(low>0.) || !choose_nominal(minimum,maximum,pitch,true,low,high,result.radius[layer]))return false;
+         for(int house=0;house<8;++house){
+--- frozen/src/core_gpu.cu
++++ ice5/src/core_gpu.cu
+@@ -493,7 +493,7 @@
+         std::vector<double> scene_data(data,data+nd),scene_directions(directions,directions+nj);
+         std::vector<double> scene_lower(lower,lower+nv),scene_upper(upper,upper+nv),input=p->input;
+         if(p->host.options&64u)for(size_t i=6+ice_nominal_size;i<6+ice_tolerance_layout_size;++i){
+-            scene_lower[i]=std::max(scene_lower[i],-.01);scene_upper[i]=std::min(scene_upper[i],.01);}
++            scene_lower[i]=std::max(scene_lower[i],-ice_relative_tolerance);scene_upper[i]=std::min(scene_upper[i],ice_relative_tolerance);}
+         input.insert(input.end(),values,values+nv);
+         DeviceBuffer<ScenePath> device_paths;DeviceBuffer<double> device_data,device_input;
+         // Keep both old views and their owners valid until every upload succeeds.
+@@ -525,7 +525,7 @@
+             const bool witness=i==6||i==7||(i>=10&&i<=13);
+             if(witness){if(finite_scalar(p->scene_lower[i])||finite_scalar(p->scene_upper[i])){last_error="nominal ice bounds require legacy chart";return 1;}
+                 for(int j=0;j<p->scene_q;++j)if(p->scene_directions[i*size_t(p->scene_q)+j]!=0.){last_error="nominal witness cannot have an independent actual-chart direction";return 1;}}
+-            else if(p->scene_lower[i]!=-.01||p->scene_upper[i]!=.01){last_error="tighter ice deviation bounds require legacy chart";return 1;}}
++            else if(p->scene_lower[i]!=-ice_relative_tolerance||p->scene_upper[i]!=ice_relative_tolerance){last_error="tighter ice deviation bounds require legacy chart";return 1;}}
+     }
+     for(size_t i=0;i<n;++i){int type=chart[i];double v=p->host.scene_values[i];
+         if((type<0||(type>5&&(type<10||type>13)))||(type==1&&v<=0)||(type==2&&v<=1)){last_error="scene value outside coordinate chart";return 1;}
+--- frozen/src/gpu_solver.cuh
++++ ice5/src/gpu_solver.cuh
+@@ -455,14 +455,14 @@
+     const int first=pair/8,second=pair%8;const double* q=v.layout;
+     auto direction=[&](int row){return column<0?0.:l.scene_steps[size_t(row)*l.q+column];};
+     if(kind==6){const int a=4*group+first,b=4*group+second;double pitch=q[3];
+-        double margin=pitch*(.02-(q[39+4+a]-q[39+4+b]));
+-        double derivative=column<0?0.:.02*scene_chart_component(v.scene_values,l.scene_chart,l.scene_steps,l.q,column,9)-direction(49+a)+direction(49+b);
++        double margin=pitch*(2*ice_relative_tolerance-(q[39+4+a]-q[39+4+b]));
++        double derivative=column<0?0.:2*ice_relative_tolerance*scene_chart_component(v.scene_values,l.scene_chart,l.scene_steps,l.q,column,9)-direction(49+a)+direction(49+b);
+         return {margin,derivative};}
+     const int a=4*first+group,b=4*second+group;
+     // At the exact old +/-1% box faces both normalized witness endpoints
+     // equal one. A difference of three logarithms can spuriously be negative
+     // there; compare the same witness interval before taking log1p instead.
+-    const double low=(1.+q[39+16+a])/1.01,high=(1.+q[39+16+b])/.99;
++    const double low=(1.+q[39+16+a])/(1+ice_relative_tolerance),high=(1.+q[39+16+b])/(1-ice_relative_tolerance);
+     return {std::log1p((high-low)/low),-direction(61+a)+direction(61+b)};
+ }
+ __global__ void lm_retained_pick(View accepted,View trial,LinearView l,SolverView s,RetainedConstraint* choice){
+--- frozen/include/rinkspace/core_api.h
++++ ice5/include/rinkspace/core_api.h
+@@ -25,6 +25,7 @@
+ /* ABI 2 adds physical time-varying projection; existing ABI 1 functions keep
+  * their signatures. Added statuses: 8 optical domain, 9 uncertified row root,
+  * 10 row root numerical failure. CUDA/LM entry points are additive below. */
++RS_API double rs_ice_relative_tolerance(void);
+ RS_API int rs_decode_d78_camera(const double* chart,size_t nc,double* rig,size_t nr);
+ /* Additive ABI2 camera evaluation at explicit times (seconds in the spline
+  * clock). output has 24 values per time: pan,tilt,log_f,zoom_log_ratio,
+--- frozen/src/core_api.cpp
++++ ice5/src/core_api.cpp
+@@ -9,6 +9,7 @@
+ #include <limits>
+ 
+ using namespace rinkspace;
++RS_API double rs_ice_relative_tolerance(void){return ice_relative_tolerance;}
+ RS_API int rs_camera_envelope_evaluate(const double* rig,size_t nr,const double* controls,size_t nc,double dt,
+     const double* limits,size_t n,double* out,size_t no){
+     CameraEnvelope e{};MotionSpline s{controls,nc,0.,dt};

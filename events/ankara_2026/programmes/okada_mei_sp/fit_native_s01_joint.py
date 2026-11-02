@@ -9,19 +9,22 @@ from rinkspace.domain.motion_chart import UniformMotionChart
 from rinkspace.session.gpu_geometry import NativeSceneGPU,scene_coordinate_charts,complete_camera_rig
 
 
-def mount_configuration(metres,rig):
-    path=prep.ROOT/'events/ankara_2026/model_constraints/camera_hardware/z190_mount_working_ranges_20261026.json'
+def mount_configuration(metres,rig,configuration_path=None):
+    path=Path(configuration_path) if configuration_path is not None else prep.ROOT/'events/ankara_2026/model_constraints/camera_hardware/z190_mount_working_ranges_20261026.json'
     fact=prep.read(path);w=fact['working_ranges'];offset=w['complete_tilt_axis_to_projection_centre_camera_m']
     lower=np.full(len(rig),-np.inf);upper=np.full(len(rig),np.inf)
     lower[17]=w['single_pan_reference_height_above_ice_m']['lower']/metres;upper[17]=w['single_pan_reference_height_above_ice_m']['upper']/metres
     lower[18:21]=np.asarray(offset['lower'])/metres;upper[18:21]=np.asarray(offset['upper'])/metres
     lower[21]=w['axis_spacing_m']['lower']/metres;upper[21]=w['axis_spacing_m']['upper']/metres
+    if 'readout_seconds' in w:
+        lower[37]=w['readout_seconds']['lower'];upper[37]=w['readout_seconds']['upper']
     envelope=dict(forward_bounds=[offset['lower'][2]/metres,offset['upper'][2]/metres],
         pupil_bounds=[w['zoom_pupil_shift_from_reference_m']['lower']/metres,w['zoom_pupil_shift_from_reference_m']['upper']/metres],
         max_pan_tilt=np.radians(w['pan_axis_angle_from_vertical_degrees']['upper']),
         max_tilt_deviation=np.radians(w['tilt_axis_angle_from_camera_right_degrees']['upper']),
         elevation_bounds=np.radians([w['first_shot_optical_axis_elevation_degrees'][k] for k in ('lower','upper')]).tolist(),
         roll_bounds=np.radians([w['first_shot_body_roll_degrees'][k] for k in ('lower','upper')]).tolist())
+    if fact.get('joined_zoom_domain',False):envelope['joined_zoom_domain']=True
     # Numeric motion limits require an explicit sourced/labelled working
     # configuration. Their absence is recorded, never silently filled in.
     motion=fact.get('continuous_motion_working_limits')

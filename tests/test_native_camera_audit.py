@@ -66,12 +66,15 @@ def test_duplicate_measurements_do_not_add_source_frames_and_outside_rows_fail()
 
 
 @pytest.mark.parametrize('override',[False,True])
-def test_main_sends_missing_middle_frame_to_motion_and_lens_native_interfaces(tmp_path,monkeypatch,override):
+@pytest.mark.parametrize('clock_offset',[0,256])
+def test_main_sends_missing_middle_frame_to_motion_and_lens_native_interfaces(tmp_path,monkeypatch,override,clock_offset):
     root=tmp_path/'prepared';root.mkdir()
     library=tmp_path/'runtime.dll';library.write_bytes(b'No native runtime is loaded by this test')
     bound=tmp_path/'bound.dll';bound.write_bytes(b'Actual state runtime, mocked by this test')
     selected=bound if override else library
     m=manifest();m.update(native_library=str(library),native_library_sha256=audit.digest(library))
+    if clock_offset:
+        m['shots'][0]['exposure_pts_offsets']=[dict(first_pts=768,offset_pts=clock_offset,source_step_pts=256)]
     (root/'joint_manifest.json').write_text(json.dumps(m),encoding='utf8')
     np.savez(root/'point_observations.npz',pts=np.array([512,1024],np.int64))
     state=dict(controls=np.zeros((8,3)),rig=np.zeros((1,43)),
@@ -91,8 +94,9 @@ def test_main_sends_missing_middle_frame_to_motion_and_lens_native_interfaces(tm
         return core
     monkeypatch.setattr(audit,'NativeCore',load_core)
     motion_calls=[];lens_calls=[]
-    def motion(actual_core,rig,controls,first,dt,times,seconds,scale):
+    def motion(actual_core,rig,controls,first,dt,times,seconds,scale,*,source_mapper):
         assert actual_core is core
+        np.testing.assert_allclose(source_mapper(times),seconds,rtol=0,atol=1e-14)
         np.testing.assert_array_equal(controls,state['controls'])
         motion_calls.append((times.copy(),seconds.copy()))
         report=dict(channels=dict(pan=dict(speed=dict(continuous_peak=0.),acceleration=dict(continuous_peak=0.))))
@@ -106,7 +110,8 @@ def test_main_sends_missing_middle_frame_to_motion_and_lens_native_interfaces(tm
     output=tmp_path/'audit.json'
     audit.main(SimpleNamespace(run_root=root,baseline=baseline,candidate=candidate,output=output,
                                native_library=bound if override else None))
-    expected_times=np.array([.02,.04,.06]);expected_seconds=np.array([512,768,1024])/12800
+    expected_times=np.array([.02,.04,.06])+np.array([0,clock_offset,clock_offset])/12800
+    expected_seconds=np.array([512,768,1024])/12800
     assert len(motion_calls)==len(lens_calls)==2
     for (times,seconds),lens_times in zip(motion_calls,lens_calls):
         np.testing.assert_allclose(times,expected_times,rtol=0,atol=1e-14)

@@ -194,15 +194,30 @@ class ResidentResidualProblem:
             if charts.shape!=values.shape:raise ValueError("scene chart shape")
             integral_charts=(charts.dtype.kind in "biu" or
                 (charts.dtype.kind=="f" and np.isfinite(charts).all() and np.equal(charts,np.trunc(charts)).all()))
-            if not integral_charts or np.any(charts<0) or np.any(charts>5):
-                raise ValueError("scene chart codes must be integers from zero through five")
+            if not integral_charts or np.any(~np.isin(charts,[0,1,2,3,4,5,10,11,12,13])):
+                raise ValueError("scene chart codes must identify a finite supported chart")
             charts=np.ascontiguousarray(charts,np.int32)
+            if np.any(charts>=10):
+                from ..domain.ice_actual_chart import ACTUAL_X_INDICES, ACTUAL_RADIUS_INDICES, NOMINAL_WITNESS_INDICES
+                expected={**{int(i):10 for i in ACTUAL_X_INDICES},**{int(i):11 for i in ACTUAL_RADIUS_INDICES},
+                    **{int(i):12 if i in (6,7) else 13 for i in NOMINAL_WITNESS_INDICES}}
+                if (len(values)<152 or charts[9]!=1 or any(charts[i]!=code for i,code in expected.items())
+                        or set(np.flatnonzero(charts>=10))!=set(expected)):
+                    raise ValueError("actual ice chart requires its complete finite layout146 pattern")
+                if not hasattr(self._lib,'rs_gpu_ice_actual_chart_version'):
+                    raise RuntimeError("native library does not support actual ice chart")
+                if (np.any(np.isfinite(lower[NOMINAL_WITNESS_INDICES])) or np.any(np.isfinite(upper[NOMINAL_WITNESS_INDICES]))
+                        or np.any(directions[NOMINAL_WITNESS_INDICES]!=0.)):
+                    raise ValueError("nominal ice bounds or directions require legacy chart")
+                actual=np.r_[ACTUAL_X_INDICES,ACTUAL_RADIUS_INDICES]
+                if np.any(lower[actual]>-.01) or np.any(upper[actual]<.01):
+                    raise ValueError("tighter ice deviation bounds require legacy chart")
             # Mirror the existing native chart domain before attach, not after
             # changing the handle. This does not introduce a new chart family.
             if (not np.isfinite(values).all() or np.any(values[charts==1]<=0)
                     or np.any(values[charts==2]<=1)):
                 raise ValueError("scene value outside coordinate chart")
-            for i in np.flatnonzero(charts>=3):
+            for i in np.flatnonzero((charts>=3)&(charts<=5)):
                 start=int(i)-int(charts[i]-3)
                 if (start<0 or start+2>=len(values)
                         or not np.array_equal(charts[start:start+3],[3,4,5])
@@ -241,7 +256,7 @@ class ResidentResidualProblem:
     def configure_camera_envelope(self, *, forward_bounds, pupil_bounds, max_pan_tilt,
                                   max_tilt_deviation, elevation_bounds, roll_bounds,
                                   max_speed=None, max_acceleration=None, max_jerk=None,
-                                  frame_time_bounds=None,frame_time_intervals=None,camera_index=None):
+                                  frame_time_bounds=None,frame_time_intervals=None,camera_index=None,joined_zoom_domain=False):
         """Constrain the complete centre offset and continuous physical attitude.
 
         Distances use the current scene gauge; angles are radians. Unknown rig
@@ -269,6 +284,9 @@ class ResidentResidualProblem:
             if any(row.shape!=(3,) or np.any(~(row>0)) for row in rows):
                 raise ValueError("motion maxima require positive pan/tilt/log(f) triples; +inf leaves a limit unset")
             limits=np.concatenate((limits,*rows))
+        if joined_zoom_domain:
+            if windows is None:raise ValueError("Joined zoom domain requires explicit shot intervals")
+            if not hasattr(self._lib,"rs_camera_joined_zoom_domain_version"):raise ValueError("Native library lacks joined focal-domain constraints")
         if windows is not None:
             span=np.asarray(windows,np.float64)
             if (span.ndim!=2 or span.shape[1]!=2 or not len(span) or not np.isfinite(span).all()
@@ -279,6 +297,7 @@ class ResidentResidualProblem:
             for lo,hi in span:covered|=(frame_times>=lo)&(frame_times<=hi)
             if not covered.all():
                 raise ValueError('Camera envelope interval must contain every source exposure')
+            if joined_zoom_domain:limits=np.r_[limits,1.]
             limits=np.r_[limits,((span-self._motion_first)/self._motion_dt).ravel()]
         if camera_index is None:
             fn=self._lib.rs_gpu_set_camera_envelope;fn.argtypes=[c.c_void_p,D,N];fn.restype=c.c_int
@@ -370,18 +389,39 @@ class ResidentResidualProblem:
             if a.ndim!=1 or a.dtype.kind not in "iu" or np.any(a<np.iinfo(np.int32).min) or np.any(a>np.iinfo(np.int32).max):
                 raise ValueError("G2 indices require native int32 vectors")
             return np.ascontiguousarray(a,np.int32)
-        directions=np.ascontiguousarray(directions,np.float64)
         local_scales=np.ascontiguousarray(local_scales,np.float64)
         weights=np.ascontiguousarray(weights,np.float64)
         local_ids,group_offsets,members,ranks,weight_offsets=map(ints,(local_ids,group_offsets,members,ranks,weight_offsets))
-        if directions.ndim!=3 or directions.shape[:2]!=(self.control_count,3) or directions.shape[2]<=0:
-            raise ValueError("G2 directions must map the existing controls")
+        sparse_directions=hasattr(directions,'tocsr')
+        if sparse_directions:
+            directions=directions.tocsr(copy=True)
+            if directions.ndim!=2 or directions.shape[0]!=3*self.control_count or directions.shape[1]<=0 or not directions.has_canonical_format:
+                raise ValueError("CSR directions require canonical flattened control/channel rows")
+            directions.eliminate_zeros();directions.sort_indices()
+            direction_offsets=ints(directions.indptr);direction_columns=ints(directions.indices)
+            direction_values=np.ascontiguousarray(directions.data,np.float64);q=directions.shape[1]
+            if not np.isfinite(direction_values).all():raise ValueError("Finite sparse direction values required")
+        else:
+            directions=np.ascontiguousarray(directions,np.float64)
+            if directions.ndim!=3 or directions.shape[:2]!=(self.control_count,3) or directions.shape[2]<=0:
+                raise ValueError("G2 directions must map the existing controls")
+            q=directions.shape[2]
         if local_scales.ndim!=1 or weights.ndim!=1 or local_ids.shape!=(self.count,) or members.shape!=(self.count,):
             raise ValueError("G2 row binding or local scales shape")
         if len(group_offsets)!=len(ranks)+1 or len(weight_offsets)!=len(ranks)+1:
             raise ValueError("G2 complete group offset shape")
         info=np.zeros(12,np.float64)
-        if _pixel_residuals:
+        if sparse_directions:
+            fn=getattr(self._lib,'rs_g2_attach_sparse_directions',None)
+            if fn is None:raise RuntimeError('Selected DLL does not support sparse motion directions')
+            fn.argtypes=[c.c_void_p,c.c_int,D,N,I,N,I,N,I,N,D,N,I,c.c_int,I,N,I,I,D,N,c.c_double,c.c_int,D,N];fn.restype=c.c_int
+            self._check(fn(self._handle,q,direction_values.ctypes.data_as(D),direction_values.size,
+                direction_offsets.ctypes.data_as(I),direction_offsets.size,direction_columns.ctypes.data_as(I),direction_columns.size,
+                local_ids.ctypes.data_as(I),local_ids.size,local_scales.ctypes.data_as(D),local_scales.size,
+                group_offsets.ctypes.data_as(I),len(ranks),members.ctypes.data_as(I),members.size,
+                ranks.ctypes.data_as(I),weight_offsets.ctypes.data_as(I),weights.ctypes.data_as(D),weights.size,
+                float(huber_delta),int(_pixel_residuals),info.ctypes.data_as(D),info.size))
+        elif _pixel_residuals:
             self._check(self._lib.rs_g2_attach_pixels(self._handle,directions.shape[2],directions.ctypes.data_as(D),directions.size,
                 local_ids.ctypes.data_as(I),local_ids.size,local_scales.ctypes.data_as(D),local_scales.size,
                 info.ctypes.data_as(D),info.size))
@@ -650,7 +690,9 @@ class ResidentResidualProblem:
         fn=getattr(self._lib,"rs_g4_performance_metrics",None)
         if fn is None:return {}
         fn.argtypes=[c.c_void_p,D,N];fn.restype=c.c_int
-        values=np.empty(19,np.float64)
+        count=getattr(self._lib,"rs_g4_performance_metrics_count",None)
+        if count is not None:count.argtypes=[];count.restype=c.c_int
+        values=np.empty(count() if count is not None else 19,np.float64)
         status=fn(self._handle,values.ctypes.data_as(D),values.size)
         if status==1:  # Compatibility with the first 16-field diagnostic ABI.
             values=np.empty(16,np.float64)
@@ -661,7 +703,35 @@ class ResidentResidualProblem:
             "stationarity_active_faces","stationarity_last_sweeps","qp_line_wall_ms","qp_line_evaluations",
             "trial_station_search_queued_wall_ms","prediction_event_ms","profile_restoration_calls",
             "trial_residual_buffer_bytes","constraint_projections","constraint_backtracks",
-            "last_damping_energy","last_predicted_decrease","damping_stagnation_recoveries"),values.tolist()))
+            "last_damping_energy","last_predicted_decrease","damping_stagnation_recoveries",
+            "coupled_boundary_wall_ms","coupled_checks_wall_ms","coupled_rhs_wall_ms","coupled_rhs_solves",
+            "coupled_readback_wall_ms","coupled_readback_bytes","coupled_cpu_dual_wall_ms","coupled_dual_calls",
+            "coupled_max_cuts","coupled_sum_cuts","coupled_executed_sweeps","coupled_logical_sweeps",
+            "coupled_skipped_sweeps","coupled_residual_evaluations","coupled_residual_cache_hits",
+            "coupled_unresolved","coupled_normal_restorations","coupled_cut_adds","coupled_cut_replaces",
+            "coupled_cut_merges","coupled_dual_upload_bytes","factor_generation","linearization_generation",
+            "coupled_response_cache_hits","damping_metric_rebuilds","damping_metric_cache_hits",
+            "stationarity_face_storage_bytes","motion_direction_device_bytes","camera_constraint_sizeof",
+            "stationarity_face_sizeof","coupled_boundary_calls","sparse_direction_value_bytes",
+            "dual_working_attempts","dual_working_successes","dual_working_fallbacks","dual_working_iterations",
+            "dual_working_factorizations","station_unique_geometry_samples","station_projection_samples",
+            "shared_domain_checks","shared_feasibility_repairs","shared_feasibility_backtracks","shared_domain_failures_before_station_search",
+            "shared_domain_check_wall_ms","last_domain_failure_family","last_domain_failure_index","last_domain_failure_component",
+            "last_domain_failure_camera","last_domain_failure_value","last_domain_failure_lower","last_domain_failure_upper",
+            "last_domain_failure_margin","stationarity_subspace_recoveries","last_stationarity_recovery_mode",
+            "ice_box_cuts","ice_relation_cuts","ice_canonical_aliases_removed","ice_affine_batches","ice_extra_rhs_columns",
+            "ice_value_and_jac_queued_wall_ms","ice_nonlinear_correction_backtracks","ice_actual_chart_enabled",
+            "last_ice_worst_margin","last_ice_maximum_abs_deviation","last_coupled_dual_kkt","stationarity_recovery_trials",
+            "joint_seed_faces","joint_seed_rhs_batches","joint_seed_preloads","joint_soc_attempts","joint_soc_model_descents",
+            "coupled_roundoff_restorations","coupled_roundoff_inset_updates",
+            "coupled_dual_warm_fallbacks","cauchy_line_expansions","coupled_roundoff_dual_repairs"),values.tolist()))
+
+    def ice_relation_hits(self):
+        fn=getattr(self._lib,'rs_g4_ice_relation_hits',None)
+        if fn is None:return {}
+        values=np.empty(206,np.float64);fn.argtypes=[c.c_void_p,D,N];fn.restype=c.c_int
+        self._check(fn(self._handle,values.ctypes.data_as(D),values.size))
+        return {int(i):int(values[i]) for i in np.flatnonzero(values)}
 
     def solve(self, *, gradient_tolerance=1e-7, step_tolerance=1e-6,
               relative_cost_tolerance=1e-10, progress=None, numerical_progress=None):
@@ -707,6 +777,7 @@ class ResidentResidualProblem:
                                          np.ctypeslib.as_array(timings,shape=(12,)).copy())
                 record["trial_objective_components_ms"]=self._objective_timings()
                 record["performance_cumulative"]=self.performance_metrics()
+                record["ice_relation_hits_cumulative"]=self.ice_relation_hits()
                 record["projected_gradient_before"]=float(gradient) # legacy compatible alias
                 record["stationarity_scope"]=stationarity_scope
                 record["full_nonlinear_kkt_checked"]=version==2

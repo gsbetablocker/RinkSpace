@@ -87,6 +87,7 @@ def share_radial(core,m,z,v,old,timeline,magnification):
 
 def linear_pupil(core,m,z,v,old,timeline):
     result={k:a.copy() for k,a in v.items()};notes=[]
+    working_envelope_path=prepared.camera_working_envelope_path(m)
     for i,rig in enumerate(v['rig']):
         rows=np.concatenate([np.arange(s['row_begin'],s['row_stop']) for s in m['shots'] if s['camera_index']==i])
         t=timeline.row_times(z['pts'])[rows]+rig[37]*(old['values'][rows,6]/1079-.5)
@@ -95,7 +96,7 @@ def linear_pupil(core,m,z,v,old,timeline):
         X=np.c_[np.ones(len(zoom)),zoom]
         unconstrained=np.linalg.lstsq(X,forward,rcond=None)[0]
         scale=prepared.read(prepared.ROOT/'events/ankara_2026/model_constraints/ankara_2026_metric_scale_assumed_v1.json')['converted_span_xy_m'][0]
-        lo,hi,envelope,_,_=mount_configuration(scale,rig)
+        lo,hi,envelope,_,_=mount_configuration(scale,rig,working_envelope_path)
         from audit_camera_physical_state import zoom_extrema
         ranges=[]
         for shot,window in zip(m['shots'],timeline.frame_windows(),strict=True):
@@ -142,6 +143,7 @@ def linear_pupil(core,m,z,v,old,timeline):
 def main(args):
     out=guard_project_write(args.output);out.mkdir(parents=True,exist_ok=False)
     root=args.run_root;m=prepared.read(root/'joint_manifest.json');mapping=prepared.read(root/'mapping.json')
+    working_envelope_path=prepared.camera_working_envelope_path(m)
     z=prepared.npz(root/'point_observations.npz');v=prepared.npz(args.state)
     for key,sha in [('scene_path','scene_file_sha256'),('native_library','native_library_sha256')]:
         if prepared.digest(m[key])!=m[sha]:raise ValueError('Current dependency changed')
@@ -182,13 +184,14 @@ def main(args):
     scale=prepared.read(prepared.ROOT/'events/ankara_2026/model_constraints/ankara_2026_metric_scale_assumed_v1.json')['converted_span_xy_m'][0]
     envelopes=[]
     for i,rig in enumerate(candidate['rig']):
-        lo,hi,envelope,_,_=mount_configuration(scale,rig)
+        lo,hi,envelope,config,_=mount_configuration(scale,rig,working_envelope_path)
         box=np.flatnonzero((rig<lo-3e-14)|(rig>hi+3e-14)).tolist()
         windows=timeline.frame_windows()[[j for j,s in enumerate(m['shots']) if s['camera_index']==i]]
         limits=[*envelope['forward_bounds'],*envelope['pupil_bounds'],envelope['max_pan_tilt'],envelope['max_tilt_deviation'],
             *envelope['elevation_bounds'],*envelope['roll_bounds'],*([np.inf]*9),*((windows-timeline.first)/timeline.dt).ravel()]
         cert=core.evaluate_camera_envelope(rig,candidate['controls'],timeline.first,timeline.dt,limits)
-        envelopes.append(dict(camera_index=i,outside_scalar_storage_indices=box,continuous=cert))
+        envelopes.append(dict(camera_index=i,outside_scalar_storage_indices=box,continuous=cert,
+            working_envelope_config=str(config),working_envelope_config_sha256=prepared.digest(config)))
     prepared.write(out/'initialization.json',dict(schema='rinkspace.camera_model_initialization.v1',stage=args.stage,
         previous_state=str(args.state),previous_state_sha256=old_hash,point_input_sha256=m['point_input_sha256'],
         controls_scene_stations_unchanged=True,source_uv_unchanged=True,fit_started=False,

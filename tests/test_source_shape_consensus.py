@@ -49,6 +49,22 @@ def test_missing_source_curve_is_not_filled_from_known_shape():
     assert known_shape_profile_hypotheses(z, [3]) == []
 
 
+def test_broad_paint_edges_do_not_excuse_inaccurate_circle_midpoints():
+    z=measured_arcs()
+    original={k:v.copy() for k,v in z.items()}
+    displaced=np.arange(5,len(z['candidate_uv']),7)
+    z['candidate_uv'][displaced] += 9.*z['query_normal'][displaced]
+    # Broad transitions still contain the real curve; their central readout
+    # wanders off it. Such reads may locate paint but must not constrain a fit.
+    z['candidate_side_quantiles_uv'][:,:,0] -= 12.*z['query_normal'][:,None]
+    z['candidate_side_quantiles_uv'][:,:,2] += 12.*z['query_normal'][:,None]
+    before=z['candidate_uv'].copy()
+    hypotheses=known_shape_profile_hypotheses(z,[0],midline_tolerance_px=3.)
+    assert hypotheses and len(hypotheses[0]['candidate_ids'])>=50
+    assert not set(hypotheses[0]['candidate_ids']) & set(displaced)
+    np.testing.assert_array_equal(z['candidate_uv'],before)
+
+
 def test_nested_layers_can_explain_common_camera_aspect_change():
     angle = np.linspace(.3, 2.8, 73)
     q = np.vstack([np.c_[radius*400*np.cos(angle), radius*60*np.sin(angle)]

@@ -126,7 +126,7 @@ def main(args):
         for shot, selection in zip(manifest['shots'], selections):
             rig=state['rig'][shot['camera_index']] if multicamera else state['rig'];pivot=rig[15:18]
             shot_rows = np.arange(shot['row_begin'],shot['row_stop'])
-            shot_times = (selection-shot['reference_pts'])/12800+timeline.offset(shot)
+            shot_times = timeline.exposure_time(shot, selection)
             poses = core.evaluate_motion_camera(rig,controls,timeline.first,timeline.dt,shot_times)
             if poses['status'].any(): raise ValueError('Invalid source camera pose')
             video = out/(args.label+'_'+shot['id']+'.mp4'); records = []

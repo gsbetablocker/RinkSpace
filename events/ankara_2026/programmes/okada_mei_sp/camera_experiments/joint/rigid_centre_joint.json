@@ -1,0 +1,44 @@
+{
+  "schema": "rinkspace.camera_experiment.v1",
+  "id": "rigid_centre_joint",
+  "basis": {
+    "kind": "engineering_assumption",
+    "not_sony_measurement": true,
+    "description": "Centred compact head with fixed projection-centre mounting offset [0, upward 8cm, forward 10cm]. This nominal rigid camera approximation removes unsupported mechanical/zoom-pupil decomposition; its suitability must retain the current source view in a complete joint fit. It is not a Sony pupil calibration."
+  },
+  "active_camera_names": [
+    "R0_x",
+    "R0_y",
+    "R0_z",
+    "pan_axis_tangent1",
+    "pan_axis_tangent2",
+    "tilt_axis",
+    "pivot_x",
+    "pivot_y",
+    "pivot_z",
+    "k10",
+    "k11",
+    "k20",
+    "k21",
+    "p1",
+    "p2",
+    "readout",
+    "wide_k1",
+    "wide_k2",
+    "wide_p1",
+    "wide_p2"
+  ],
+  "fixed_rig_values": {
+    "eta": 0,
+    "cx_zoom": 0,
+    "cy_zoom": 0,
+    "cx": 959.5,
+    "cy": 539.5,
+    "lever_x": 0,
+    "axis_spacing": 0,
+    "lever_z": 0.0016796436806939456,
+    "pupil1": 0,
+    "pupil2": 0
+  },
+  "scene_mode": "joint_current"
+}

@@ -16,9 +16,11 @@ struct CameraEnvelope {
     // coordinates. Each candidate's own readout expands it to all sensor rows.
     bool windowed=false;double frame_lo=0,frame_hi=0;
     const double* frame_windows=nullptr;size_t frame_window_count=0;
+    bool joined_zoom_domain=false; // constrain the lens curve between disjoint observed focal ranges
 };
 inline bool camera_envelope(const double* p,size_t n,CameraEnvelope& e){
-    if(!p||(n!=10&&n!=19&&(n<21||(n-19)%2))||!finite_array(p,10)||p[0]>=p[1]||p[2]>=p[3]||p[2]>0||p[3]<0||
+    const bool joined=n>=22&&n%2==0;const size_t start=joined?20:19;
+    if(!p||(n!=10&&n!=19&&(n<start+2||(n-start)%2))||(joined&&p[19]!=1.)||!finite_array(p,10)||p[0]>=p[1]||p[2]>=p[3]||p[2]>0||p[3]<0||
        p[4]<=0||p[4]>=1.5707963267948966||p[5]<=0||p[5]>=1.5707963267948966||
        p[6]>=p[7]||p[6]<=-1.5707963267948966||p[7]>=1.5707963267948966||
        p[8]>=p[9]||p[8]<=-1.5707963267948966||p[9]>=1.5707963267948966)return false;
@@ -26,11 +28,12 @@ inline bool camera_envelope(const double* p,size_t n,CameraEnvelope& e){
     if(n>=19)for(int order=0;order<3;++order)for(int channel=0;channel<3;++channel){
         const double limit=p[10+3*order+channel];if(!(limit>0))return false;e.motion_max[order][channel]=limit;
     }
+    e.joined_zoom_domain=joined;
     if(n>=21){
-        if(!finite_array(p+19,n-19))return false;
-        for(size_t i=19;i<n;i+=2)if(p[i]<1||p[i+1]<p[i]||(i>19&&p[i]<=p[i-1]))return false;
-        e.windowed=true;e.frame_lo=p[19];e.frame_hi=p[n-1];
-        e.frame_windows=p+19;e.frame_window_count=(n-19)/2;
+        if(!finite_array(p+start,n-start))return false;
+        for(size_t i=start;i<n;i+=2)if(p[i]<1||p[i+1]<p[i]||(i>start&&p[i]<=p[i-1]))return false;
+        e.windowed=true;e.frame_lo=p[start];e.frame_hi=p[n-1];
+        e.frame_windows=p+start;e.frame_window_count=(n-start)/2;
     }
     return true;
 }
@@ -108,7 +111,16 @@ RS_HD inline int camera_quadratic_roots(double a,double b,double c,double* roots
     const double d=b*b-4*a*c;if(d<0)return 0;const double q=-.5*(b+std::copysign(std::sqrt(d),b));
     if(q==0){roots[0]=-b/(2*a);return 1;}roots[0]=q/a;roots[1]=c/q;return 2;
 }
-template<class Visit> RS_HD inline void camera_cell_constraints(const MotionRig& r,const MotionSpline& s,const CameraEnvelope& e,int cell,Visit visit){
+// Exact zoom extrema in one complete cubic cell. No attitude or trajectory
+// is invented between cuts: only the common lens polynomial is connected.
+RS_HD inline void camera_zoom_cell_extent(const double* c,double fref,double& lo,double& hi){
+    double us[4]={0,1,0,0},roots[2];int count=2;
+    const double da=(-c[2]+3*c[5]-3*c[8]+c[11])/2,db=c[2]-2*c[5]+c[8],dc=(c[8]-c[2])/2;
+    const int nr=camera_quadratic_roots(da,db,dc,roots);
+    for(int i=0;i<nr;++i)if(roots[i]>0&&roots[i]<1)us[count++]=roots[i];
+    for(int i=0;i<count;++i){const double z=camera_spline_value(c,2,us[i])-std::log(fref);lo=std::fmin(lo,z);hi=std::fmax(hi,z);}
+}
+template<class Visit> RS_HD inline void camera_cell_constraints(const MotionRig& r,const MotionSpline& s,const CameraEnvelope& e,int cell,Visit visit,const double* joined_zoom_extent=nullptr){
     const double* c=s.controls+3*size_t(cell-1);
     if(e.windowed){
         const double half=std::abs(r.tau)/(2*s.dt);
@@ -141,7 +153,25 @@ template<class Visit> RS_HD inline void camera_cell_constraints(const MotionRig&
         a.sign=1;a.minimum=e.pupil_lo;offer(a);a.sign=-1;a.minimum=-e.pupil_hi;offer(a);
         a.kind=4;a.sign=1;a.minimum=e.forward_lo;offer(a);a.sign=-1;a.minimum=-e.forward_hi;offer(a);
     }
-    if(r.pupil2!=0){const double z=-r.pupil1/(2*r.pupil2);if(z>zlo&&z<zhi){
+    if(r.pupil2!=0){const double z=-r.pupil1/(2*r.pupil2);
+        bool exposed=z>zlo&&z<zhi;
+        if(e.joined_zoom_domain&&e.windowed){
+            const double half=std::abs(r.tau)/(2*s.dt);
+            const int first=int(std::fmax(1.,std::ceil(e.frame_windows[0]-half-1.)));
+            // One witness cell emits any vertex in a focal gap. Its value and
+            // derivatives depend only on pupil1/pupil2/lever_z; existing kind
+            // 5/6 faces already use that rig-wide identity in the GPU solver.
+            if(cell==first&&!exposed){
+                double all_lo=joined_zoom_extent?joined_zoom_extent[0]:INFINITY,all_hi=joined_zoom_extent?joined_zoom_extent[1]:-INFINITY;
+                if(!joined_zoom_extent)for(size_t window=0;window<e.frame_window_count;++window){
+                    const int begin=int(std::fmax(1.,std::ceil(e.frame_windows[2*window]-half-1.)));
+                    const int end=int(std::fmin(double(s.count)-3.,std::floor(e.frame_windows[2*window+1]+half)));
+                    for(int other=begin;other<=end;++other)camera_zoom_cell_extent(s.controls+3*size_t(other-1),r.fref,all_lo,all_hi);
+                }
+                exposed=z>all_lo&&z<all_hi;
+            }
+        }
+        if(exposed){
         a={};a.kind=5;a.sign=1;a.minimum=e.pupil_lo;offer(a);a.sign=-1;a.minimum=-e.pupil_hi;offer(a);
         a.kind=6;a.sign=1;a.minimum=e.forward_lo;offer(a);a.sign=-1;a.minimum=-e.forward_hi;offer(a);
     }}
@@ -160,9 +190,9 @@ template<class Visit> RS_HD inline void camera_cell_constraints(const MotionRig&
         }
     }
 }
-RS_HD inline CameraConstraint camera_cell_constraint(const MotionRig& r,const MotionSpline& s,const CameraEnvelope& e,int cell){
+RS_HD inline CameraConstraint camera_cell_constraint(const MotionRig& r,const MotionSpline& s,const CameraEnvelope& e,int cell,const double* joined_zoom_extent=nullptr){
     CameraConstraint worst{};worst.cell=cell;worst.margin=std::numeric_limits<double>::max();
-    camera_cell_constraints(r,s,e,cell,[&](CameraConstraint a){if(!finite_scalar(a.margin)||a.margin<worst.margin)worst=a;});
+    camera_cell_constraints(r,s,e,cell,[&](CameraConstraint a){if(!finite_scalar(a.margin)||a.margin<worst.margin)worst=a;},joined_zoom_extent);
     return worst;
 }
 inline CameraConstraint camera_envelope_check(const MotionRig& r,const MotionSpline& s,const CameraEnvelope& e){

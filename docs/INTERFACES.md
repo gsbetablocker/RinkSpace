@@ -192,11 +192,13 @@ prepare与拟合重载共同检查packed members为int64一维、weights为float
 
 `session.gpu_geometry.NativeSceneGPU(scene_path, core)` 编译当前场景，支持冰面、连续围挡、固定点与已定位广告。数值路径表仅包含本次 `path_ids` 引用的路径，完整场景库存仍保留；无观测实例不因此获得验收，未定位实例不生成安装。
 
-`resident(*, camera, controls, path_ids, stations, pts, observed, scene_directions=None, scene_lower=None, scene_upper=None, motion_times=None, rigs=None, camera_ids=None)` 返回同一驻留问题。整数 PTS 先相减再转换秒；`motion_times` 是显式平移后的秒坐标，不能缩放时间。多机位 `rigs` 与逐行 `camera_ids` 保持 rig 归属；`scene_directions` 按共同 ParameterState 的活动列连接场景，未传时场景冻结。
+`resident(*, camera, controls, path_ids, stations, pts, observed, scene_directions=None, scene_lower=None, scene_upper=None, scene_charts=None, motion_times=None, rigs=None, camera_ids=None)` 返回同一驻留问题。整数 PTS 先相减再转换秒；`motion_times` 是显式平移后的秒坐标，不能缩放时间。多机位 `rigs` 与逐行 `camera_ids` 保持 rig 归属；`scene_directions` 按共同 ParameterState 的活动列连接场景，未传时场景冻结。
 
 ### 完整相机、运动与共享场景〔已实现〕
 
 `configure_scene_parameters(values=..., records=..., data=..., directions=..., lower=..., upper=..., charts=...)` 接入共同几何、尺寸、安装与当前版式。`configure_camera_parameters(directions=..., max_readout=..., lower=..., upper=...)` 接入完整相机方向：基础 rig38 每机位 27 行，广角扩展 rig43 每机位 31 行；多机位按 rig 顺序堆叠为 `[rig_count * chart_size, retained_columns]`。物理范围按 rig 打包；长度与参考角规约显式保留。
+
+支持 layout146 的实际冰面坐标时，`rs_gpu_ice_actual_chart_version()=1`。完整图式使用代码 10 表示八个实际 X 增量、11 表示 32 个实际 log-radius 增量，12／13 表示六个旧名义量的见证输出。选择器 `actual_ice_chart_configuration` 仅消去这六个冗余方向，保留旧数值存储；存在额外名义量限制或不兼容活动方向时回退旧坐标。重新构造见证不对极值选择求导。原 107 个偏差盒界与 206 条关系继续验证最终状态；新坐标的梯度数值不能直接当作旧坐标的驻点证据。
 
 基础 chart 包含完整参考姿态、两转轴、支点、杆臂、轴间距、随变焦入瞳与光学、读出时间。广角 Brown 扩展保留所选 log-f 结点及其下方平方 hinge 的四个系数。`domain.camera.complete_camera_rig` 打包当前完整定义；兼容导入器不支持的旧扩展必须明确失败，不能省略后冒称等价。
 
@@ -204,9 +206,15 @@ prepare与拟合重载共同检查packed members为int64一维、weights为float
 
 `ShotMotionTimeline` 为各镜头分配独立运动块，只平移存储时钟，保持源 PTS、秒尺度和读出时长。共享 rig 不要求切镜间运动连续。首段参考角规约与后续自由参考角按实际方向矩阵保存。
 
+`camera_parameterization.active_names_per_rig` 可为每台相机声明全局 profile 的活动名称子集，长度与 cameras 一致；不能重新打开 profile 中关闭的方向。该字段参与快照依赖绑定，完整 joint 仍使用全部原始观测、运动及场景列，被删标量在每次保存时对照初值检查。`camera_coupling.v1` 中仅共享 readout 的组不需要光学倍率、fref 或 wide 边界字段；其他光学共享仍按原约定检查。共用读出通过同一 retained 列实现，不增加残差罚项。
+
+Shot 可选 `local_motion_refinement=[{first_pts,last_pts,target_stride,channels?}]` 在已有源时间窗内追加更细的嵌套 cubic 方向；目标 stride 必须整除原 stride。可选 channels 为 pan／tilt／log_f 的非空子集；未给出时包含三轴，原有方向仍全部保留。准备阶段只修改活动空间的绑定，数值 controls／rig／scene／stations 和源输入保持原值。方向在窗外为零，沿用原镜头参考角规约与曝光端点延拓；相对原方向空间用 QR 去除重复列。未声明该字段时方向与原行为一致。
+
 `continue_exposure_halos` 可将每段首尾三次曲线延续到读出 halo；初始 controls 与 `directions(continue_endpoint_cubics=True)` 必须一致使用。它保持首至末帧中心区间的轨迹与前两阶导数，保留内部运动空间，不跨切镜延续，也不在输出端平滑。默认表示与实际运行选择分别保存。
 
 `configure_camera_envelope` 可选择 `frame_time_bounds=(begin,end)` 或互斥的 `frame_time_intervals=[...]`。区间必须覆盖 resident 中的全部源曝光，native 按候选实际读出扩展完整传感器行时间。速度／加速度／jerk 的 pan、tilt、log(f) 三元边界通过各三次区间解析极值检查；`None`／正无穷表示未设限。实际物理范围由运行配置给出。
+
+`joined_zoom_domain=True` 另外对同一机组全部声明曝光区间（含行读出支撑）的最小至最大 log(f) 检查完整前向入瞳二次曲线，包括未拍到的中间焦段；切镜间的运动仍分开。该选项要求 `rs_camera_joined_zoom_domain_version()>=1`，C ABI 的 limits 为 `20+2K` 项，索引 19 为启用标志、索引 20 起为 K 个曝光区间。旧 10／19／`19+2K` 布局保持原义；未观测焦段不由此变成新的源观测。
 
 `project_motion` 对有限画外预测继续求同一隐式滚动快门方程，并认证深度、光学域、时间支持与唯一根。图像矩形不约束 station 或相机，渲染才裁切。`max_readout` 为稀疏列编译保留曝光中点前后相应支持；固定 rig 可在编译前用 `configure_projection_time_support(half_seconds=...)` 明确计算区间，必须包含完整允许读出。越界明确失败，不遗漏跨结点导数。
 
@@ -237,6 +245,8 @@ prepare与拟合重载共同检查packed members为int64一维、weights为float
 
 有限 station 端点、rig／scene 范围、安装、印刷包含关系与连续相机包络参与同一候选修正。共享约束沿当前联合 Schur 度量恢复可行性，再核对原非线性域；不能单独裁剪参数后沿用未修正步的预测下降。图像边缘不属于该约束集合。
 
+冰面内部工作面按有限元数据去除 14 个精确同义面，保留近乎平行但不同的关系。关系导数只访问其结构支持列；仿射偏差界共享当前 Schur 分解，批量求解多 RHS，并允许对偶工作面释放。非线性修正仅对同一关系面的真实余量作回退。内部越界分离点可以暂用未受界的旧坐标表示实际几何；它不构成合法见证或可接受状态。station 搜索前和联合二次线搜索后均复验原全域，失败回退不放宽容差。同一候选最后一次复验后若只改变 station，可复用其共享 rig／scene／连续包络证据；`RINKSPACE_SHARED_DOMAIN_CACHE=0` 保留重复复验的对照路径。
+
 有观测印刷路径按实际有限节点、形变分段或解析端点检查围挡高度及已声明底板包含关系。安装检查包括支点正高度、非零杆臂、围挡外侧及已声明一侧；重复的同义外侧条件不重复计入。共享几何与安装共同求导，未观测路径不凭旧初值约束本次问题。
 
 独立原始像素／标量 station 使用原界内的条件局部最小值与联合二次 merit 搜索，接受分支 `reason_code=6`。相关／多局部量分支可返回条件局部补全接受 `reason_code=5` 或重复活动集增阻尼重试 `reason_code=4`。这些状态不证明一般约束非线性问题的精确最优。
@@ -249,7 +259,9 @@ prepare与拟合重载共同检查packed members为int64一维、weights为float
 
 ### 连续原生 LM〔已实现〕
 
-`solve(gradient_tolerance=1e-7, step_tolerance=1e-6, relative_cost_tolerance=1e-10, ...)` 调用 native 连续控制器，无隐含次数／时间上限。每个接受状态重线性化，只有原目标投影梯度通过容差才报告数值收敛；小步、边界截断或大阻尼不单独触发成功。上一接受步的预测与实际下降同时低于相对容差时返回 `cost_progress_stagnation_without_convergence`，属于非收敛停止。
+`solve(gradient_tolerance=1e-7, step_tolerance=1e-6, relative_cost_tolerance=1e-10, ...)` 调用 native 连续控制器，无隐含次数／时间上限。每个接受状态重线性化，只有原目标投影梯度通过容差才报告数值收敛；小步、边界截断或大阻尼不单独触发成功。CPU 辅助锥投影路径可用原生非负最小二乘选择活跃工作面，去除零法向与精确重复法向，并在当前 Schur 分解中重新求联合方向。选择阶段的乘子不跨度量复用；未选面仍由完整分离器检查。仍无进展才返回 `cost_progress_stagnation_without_convergence`，属于非收敛停止。
+
+联合二次线搜索若穿出非线性物理域，可采用已验证下降的可行端点或 Schur 度量下的二阶可行性修正。修正候选必须降低同一阻尼二次模型，局部 station 在原界内条件最小化；其后仍按原像素目标、原物理域与真实增益比接受。工作面选择的线性锥方向不构成有限步下降或完整非线性收敛证书。
 
 `request_stop()` 或进度回调返回 `False` 在安全边界停止；同一 handle 再调用 `solve()` 保留接受状态、lambda 和 nu。回调异常先安全停止再抛出。当前 `export_state` 不包含完整优化器内部状态，不是磁盘严格恢复。
 

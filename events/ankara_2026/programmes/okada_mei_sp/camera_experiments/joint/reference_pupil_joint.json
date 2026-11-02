@@ -1,0 +1,44 @@
+{
+  "schema": "rinkspace.camera_experiment.v1",
+  "id": "reference_pupil_joint",
+  "basis": {
+    "kind": "engineering_assumption",
+    "not_sony_measurement": true,
+    "description": "Retain source-required quadratic zoom-pupil variation, with a fixed +5cm forward projection-centre reference at one explicitly recorded focal reference per camera. This removes the independent axial reference/mount offset direction. References are re-expressed from the retained view without changing its projection; no manufacturer pupil calibration is claimed."
+  },
+  "active_camera_names": [
+    "R0_x",
+    "R0_y",
+    "R0_z",
+    "pan_axis_tangent1",
+    "pan_axis_tangent2",
+    "tilt_axis",
+    "pivot_x",
+    "pivot_y",
+    "pivot_z",
+    "pupil1",
+    "pupil2",
+    "k10",
+    "k11",
+    "k20",
+    "k21",
+    "p1",
+    "p2",
+    "readout",
+    "wide_k1",
+    "wide_k2",
+    "wide_p1",
+    "wide_p2"
+  ],
+  "fixed_rig_values": {
+    "eta": 0,
+    "cx_zoom": 0,
+    "cy_zoom": 0,
+    "cx": 959.5,
+    "cy": 539.5,
+    "lever_x": 0,
+    "axis_spacing": 0,
+    "lever_z": 0.0008398218403469728
+  },
+  "scene_mode": "joint_current"
+}

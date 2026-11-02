@@ -209,7 +209,8 @@ def _initialize_touched(new, numeric, shots, touched, state, manifest, mapping, 
                   "reference_pts": shot["reference_pts"],
                   "time_base_num": shot["time_base_num"], "time_base_den": shot["time_base_den"],
                   "control_dt": manifest["control_dt"],
-                  "first_control_time": shot["first_control_time"]}
+                  "first_control_time": shot["first_control_time"],
+                  "exposure_pts_offsets": shot.get("exposure_pts_offsets",[])}
         seeded, note = initialize_curve_stations(
             native, camera=camera,
             controls=state["controls"][shot["control_begin"]:shot["control_stop"]],

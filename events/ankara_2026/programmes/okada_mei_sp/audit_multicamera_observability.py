@@ -12,6 +12,7 @@ import os
 import time
 
 import numpy as np
+from scipy.sparse import csr_matrix, hstack
 
 os.environ.setdefault('CUDA_PATH', r'D:/Program Files/CUDA')
 import prepare_native_multicamera as prepared
@@ -109,6 +110,9 @@ def main(args):
 
         emit('read_only_audit_start', log=str(log_path), optimizer_started=False)
         m = prepared.read(args.run_root/'joint_manifest.json')
+        activity_path = args.activity or args.run_root/'joint_fit/activity.json'
+        activity_hash = prepared.digest(activity_path)
+        activity = prepared.read(activity_path)
         mapping = prepared.read(args.run_root/'mapping.json')
         input_path = args.run_root/'point_observations.npz'
         input_hash = prepared.digest(input_path)
@@ -141,11 +145,16 @@ def main(args):
                 raise ValueError('State exposure halo differs: '+shot['id'])
         paths = [mapping['path_ids'][i] for i in z['path_indices']]
         native = NativeSceneGPU(m['scene_path'], core, parameter_state=state)
-        motion, labels = timeline.directions(continue_endpoint_cubics=True)
+        motion, labels = timeline.directions(continue_endpoint_cubics=True, sparse=True)
         nm = len(labels)
         parameterization = m.get('camera_parameterization', {})
         profile_path = Path(parameterization.get('profile_path') or prepared.HERE/'camera_experiments/joint/square_center_pp_joint.json')
-        coupling = read_camera_coupling(parameterization['coupling_path']) if parameterization.get('coupling_path') else None
+        if parameterization.get('profile_sha256') and prepared.digest(profile_path) != parameterization['profile_sha256']:
+            raise ValueError('Declared camera profile differs')
+        coupling_path = parameterization.get('coupling_path')
+        coupling = read_camera_coupling(coupling_path) if coupling_path else None
+        if parameterization.get('coupling_sha256') and prepared.digest(coupling_path) != parameterization['coupling_sha256']:
+            raise ValueError('Declared camera coupling differs')
         rig = v['rig'].copy()
         indices = []
         for i in range(len(m['cameras'])):
@@ -161,13 +170,21 @@ def main(args):
         steps = chart_steps()
         camera_rd, camera_layout = build_multicamera_directions(rig, indices, steps, coupling)
         nc = camera_rd.shape[1]
+        charts = scene_coordinate_charts(state)
+        ice_configuration = None
+        if activity.get('ice_chart', {}).get('version') == 'actual_x_log_radius_v1':
+            from rinkspace.domain.ice_actual_chart import actual_ice_chart_configuration
+            if not hasattr(core._lib, 'rs_gpu_ice_actual_chart_version') or native.scene.get('shared_geometry_options') != 127:
+                raise ValueError('Declared actual ice chart is unavailable')
+            ice_configuration = actual_ice_chart_configuration(state.values, charts, active, relative_limit=native.ice_relative_limit)
+            if ice_configuration is None:
+                raise ValueError('Actual ice chart cannot represent the delivered scene')
+            charts, active = ice_configuration['charts'], ice_configuration['active']
         q = nm+nc+len(active)
-        directions = np.zeros((len(v['controls']), 3, q))
-        directions[:, :, :nm] = .001*motion
+        directions = hstack((.001*motion, csr_matrix((3*len(v['controls']), q-nm))), format='csr')
         del motion
         rd = np.zeros((31*len(indices), q))
         sd = np.zeros((len(state.values), q))
-        charts = scene_coordinate_charts(state)
         steps = chart_steps()
         records = []
         for r in camera_layout['column_records']:
@@ -183,15 +200,17 @@ def main(args):
             block = next(b for b in state.blocks.values() if b['available'] and b['offset'] <= k < b['offset']+b['size'])
             kind = block['kind']
             step = .01 if charts[k] > 0 or kind == 'print_size' else (.0002 if kind == 'print_placement' and k-block['offset'] < 2 else (.001 if kind == 'print_placement' else (.002 if kind.startswith('print_') else .001)))
+            if ice_configuration is not None:
+                step = ice_configuration['steps'].get(int(k), step)
             sd[k, nm+nc+j] = step
             column_names.append(block['id']+'/'+str(k-block['offset']))
-        activity = prepared.read(args.run_root/'joint_fit/activity.json')
         if (nm, nc, len(active), q) != (activity['motion_columns'], activity.get('unique_camera_columns',sum(activity['camera_columns_per_rig'])), activity['scene_columns'], activity['retained_columns']):
             raise ValueError('Current declared activity differs')
         if [list(ix) for ix in indices] != activity['active_camera_chart_indices_per_rig'] or labels != [tuple(x) for x in activity['motion_labels']]:
             raise ValueError('Current activity column identities differ')
         metres = prepared.read(prepared.ROOT/'events/ankara_2026/model_constraints/ankara_2026_metric_scale_assumed_v1.json')['converted_span_xy_m'][0]
-        bounds = [single.mount_configuration(metres, r) for r in rig]
+        working_envelope_path = prepared.camera_working_envelope_path(m)
+        bounds = [single.mount_configuration(metres, r, working_envelope_path) for r in rig]
         lower = np.concatenate([b[0] for b in bounds])
         upper = np.concatenate([b[1] for b in bounds])
         for i in range(len(rig)):
@@ -211,7 +230,7 @@ def main(args):
              active_camera_chart_indices=[list(ix) for ix in indices])
         with native.resident(camera=camera, rigs=rig, camera_ids=camera_ids, controls=v['controls'],
                 path_ids=paths, stations=v['stations'], pts=z['pts'], observed=z['uv'],
-                scene_directions=sd, motion_times=times) as resident:
+                scene_directions=sd, scene_charts=charts, motion_times=times) as resident:
             resident.configure_camera_parameters(directions=rd, lower=lower, upper=upper, max_readout=m['max_readout'])
             for i in range(len(rig)):
                 resident.configure_mount_constraints(side=m['cameras'][i].get('mount_side', 'negative_y'), camera_index=i)
@@ -269,6 +288,8 @@ def main(args):
                     profiled_pixel_derivative_norm=float(np.sqrt(max(0., normalized_delta@pair['profiled']@normalized_delta))),
                     separate_pixel_derivative_norms=(abs(normalized_delta)*np.sqrt(np.maximum(0., np.diag(pair['profiled'])))).tolist(),
                     limitation='Finite state difference evaluated only in the candidate local tangent with free nuisance directions; not a nonlinear forward comparison or feasible-bound certificate.')
+        if prepared.digest(activity_path) != activity_hash:
+            raise RuntimeError('Declared activity changed during diagnostic')
         if prepared.digest(args.state) != state_hash or prepared.digest(input_path) != input_hash:
             raise RuntimeError('Input files changed during diagnostic')
         if original != {key: array_digest(v[key]) for key in original} or array_digest(z['uv']) != uv_hash:
@@ -276,6 +297,8 @@ def main(args):
         np.savez(normal_path, normal=normal)
         report = dict(schema='rinkspace.native_multicamera_observability.v1',
             state=str(args.state), state_sha256=state_hash, point_input=str(input_path), point_input_sha256=input_hash,
+            activity_path=str(activity_path), activity_sha256=activity_hash, scene_chart=activity.get('ice_chart'),
+            motion_direction_storage='sparse',
             source_uv_sha256=uv_hash, source_pts_sha256=pts_hash,
             native_library=m['native_library'], native_library_sha256=m['native_library_sha256'],
             scene_path=m['scene_path'], scene_file_sha256=m['scene_file_sha256'],
@@ -306,4 +329,5 @@ if __name__ == '__main__':
     for name in ('run-root', 'state', 'output', 'log'):
         parser.add_argument('--'+name, type=Path, required=True)
     parser.add_argument('--baseline', type=Path)
+    parser.add_argument('--activity', type=Path, help='Explicit production activity for the frozen state')
     main(parser.parse_args())

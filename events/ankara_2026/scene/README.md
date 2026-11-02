@@ -13,11 +13,11 @@ F1–F4/R1–R4 八组靶圈的 center、inner、middle、outer 四层圆，以�
 
 ## 当前资产与审核状态
 
-场景结构入口为 [field/model.json](field/model.json)，当前广告版本由其 advertisement_assets 及 SHA 确定。该文件保存 `unfitted_structure_candidate` 基础结构与初值；已求解参数位于运行的 ParameterState／数值快照，不能把基础文件当成最新拟合状态，也不能把它的状态扩展为“从未进行过真实拟合”。冰面／围挡保留 M1–M5 已确认结构关系，尺寸、相机物理和已验证米制仍需相应证据。
+名义结构入口为 [field/model.json](field/model.json)；当前暂定最终状态使用 [field/ad4_physical_supported.json](field/ad4_physical_supported.json)，实际广告版本由所选场景的 advertisement_assets 及 SHA 确定。名义文件保存 `unfitted_structure_candidate` 基础结构与初值；已求解参数位于运行的 ParameterState／数值快照，不能把基础文件当成最新拟合状态，也不能把它的状态扩展为“从未进行过真实拟合”。冰面／围挡保留 M1–M5 已确认结构关系，尺寸、相机物理和已验证米制仍需相应证据。
 
-13 套共享模板对应 26 个广告身份，每对共享模板和尺寸，安装独立；Ad15、Ad16 未定位，其余实例有源参考。基础模型包含 68 条冰面、2 条围挡、558 条已定位广告路径，共 628 条；固定交点等 Feature 按实际输入另行编译。
+下表列出名义模型的基础资产；当前运行资产以所选场景的引用为准。名义模型中，13 套共享模板对应 26 个广告身份，每对共享模板和尺寸，安装独立；Ad15、Ad16 未定位，其余实例有源参考。基础模型包含 68 条冰面、2 条围挡、558 条已定位广告路径，共 628 条；固定交点等 Feature 按实际输入另行编译。
 
-| 配对 | 当前模板资产 | 模板路径数 | 资产类型 |
+| 配对 | 名义模板资产 | 模板路径数 | 资产类型 |
 |---|---|---:|---|
 | Ad1 / Ad14 | [assets_r5.json](ad1/assets_r5.json) | 26 | 基础数值模板 |
 | Ad2 / Ad15 | [assets_r6.json](ad2/assets_r6.json) | 21 | 基础数值模板 |
@@ -38,7 +38,8 @@ F1–F4/R1–R4 八组靶圈的 center、inner、middle、outer 四层圆，以�
 | 版本 | 结构入口 | native 布局与范围 |
 |---|---|---|
 | 严格名义结构 | [field/model.json](field/model.json) | 选项合计 63、layout39；共享关系由构造严格满足 |
-| 当前候选的冰面容差结构 | [field/ice_tolerance_current.json](field/ice_tolerance_current.json) | 选项合计 127、layout146；在名义结构后增加 107 个相对偏差 |
+| 冰面容差初始化结构 | [field/ice_tolerance_current.json](field/ice_tolerance_current.json) | 选项合计 127、layout146；在名义结构后增加 107 个相对偏差 |
+| 当前九镜头运行场景 | [field/ad4_physical_supported.json](field/ad4_physical_supported.json) | 选项合计 127、layout146；具体资产及数值状态由当前结果绑定确定 |
 | Lane 横段迁移快照 | [field/lane_transverse_current.json](field/lane_transverse_current.json) | 选项合计 63、layout39；保留容差版本之前的结构与初值 |
 
 容差版本的尺寸、位置与方向按 `ice_tolerance` 声明相对共同名义量允许 ±1%。长度以对应名义尺寸归一化，位置采用局部参照长度，方向采用横向漂移／前进长度；迭代不会重新归零共同名义量。图元类型、共享接点、同一靶圈内部同心关系、有限支持与严格顺序保留；其他共线、平行、等距与对称关系按声明放宽。该版本已用于六镜头真实拟合及当前九镜头候选，数值状态和验收范围见[节目入口](../programmes/okada_mei_sp/README.md)。

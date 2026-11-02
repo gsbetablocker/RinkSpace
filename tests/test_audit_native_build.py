@@ -25,7 +25,7 @@ def test_build_finds_the_library_produced_by_cmake(tmp_path, monkeypatch, platfo
     def build(command, **kwargs):
         if "--build" in command:
             (output / filename).write_bytes(b"mock toolchain output")
-        return SimpleNamespace(returncode=0)
+        return SimpleNamespace(returncode=0, stdout="mock toolchain version", stderr="")
 
     monkeypatch.setattr(module.subprocess, "run", build)
     assert module.main() == 0

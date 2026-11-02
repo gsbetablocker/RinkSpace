@@ -1,0 +1,538 @@
+{
+  "schema": "rinkspace.final_camera_state_review.v1",
+  "status": "provisional_final_full_programme_fit_review_complete",
+  "recorded_at_utc": "2026-11-02T03:20:12.458Z",
+  "event_id": "ankara_2026",
+  "programme_id": "okada_mei_sp",
+  "requested_final_record": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_solver_refined_1102.json",
+  "state": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/solver_speed_validation/continue_1102/fit_completion/accepted_pixels_latest.npz",
+    "sha256": "b9f1cb81c8f11163152e7ca4fea16494cad91951be304dfe7c2182c6db4fabec",
+    "compact_path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_solver_refined_1102.npz",
+    "compact_sha256": "d6cfde1474a23d594a0395351ebbdb0ee15a6560ef77b27f069d239ee95bb3f3"
+  },
+  "native_library": {
+    "path": "D:/CodexData/RinkSpace_Data/build/solver_continue_1102/rinkspace_core.dll",
+    "sha256": "606f94386d26a3c6683dcbf881ce75d64de08ab2cc27a9a4effbf2ea698ad080",
+    "provenance": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/solver_speed_validation/continue_1102/provenance.json",
+    "frozen_source": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/solver_speed_validation/continue_1102/source_final"
+  },
+  "render_directory": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/review_camera_solver_refined_1102",
+  "audit_directory": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/solver_refined_review_1102",
+  "scope": {
+    "source_frames": 8329,
+    "source_seconds": [
+      22.12,
+      188.68
+    ],
+    "source_rows": 2213335,
+    "original_source_pts": true,
+    "optimizer_started": false,
+    "parameters_modified": false,
+    "observations_modified": false,
+    "new_observations": false,
+    "projection_math": "same native DLL bound to the final state",
+    "continuous_video_visually_accepted": false
+  },
+  "conclusion": {
+    "new_clear_picture_regression_in_11_compared_stills": false,
+    "numerical_projection_failure": false,
+    "all_camera_physical_issues_resolved": false,
+    "plain_language_zh": "所查截图未见新增明显画面退步，全程未发现数值投影失效；S08局部运动和亚帧加速度尖峰仍需区分源运动与模型轨迹。入瞳贴工程边界及畸变分项抵消本身均不构成已确认物理异常，不因这两个现象单独重拟合。",
+    "current_fit_designation": "provisional_final"
+  },
+  "fit_error_pixels": {
+    "min": 4.173249238559667e-8,
+    "median": 0.9572086823639472,
+    "p95": 4.7777770758116045,
+    "p99": 8.526240443200013,
+    "max": 32.27536844348662,
+    "rms": 2.3149557590293455
+  },
+  "rigs": [
+    {
+      "id": "main_long_side",
+      "fx_over_fy": 1,
+      "principal_point": [
+        959.5,
+        539.5
+      ],
+      "principal_zoom_slope": [
+        0,
+        0
+      ],
+      "pivot_conditional_m": [
+        0.5759414982978143,
+        -15.428685234014834,
+        1.6105829866971164
+      ],
+      "lever_camera_conditional_m": [
+        0,
+        -0.08,
+        0.05
+      ],
+      "axis_spacing_conditional_m": 0,
+      "readout_ms": 18.483463322593185,
+      "pan_axis_tilt_degrees": 0.45028752349513895,
+      "tilt_axis_deviation_degrees": 1.5884488448639196,
+      "complete_forward_conditional_m": [
+        0.013325499610892792,
+        0.299999995112229
+      ],
+      "continuous_joined_pupil_range_including_zoom_gaps": {
+        "zoom_log_ratio": [
+          -1.6825243003610781,
+          1.010849274466901
+        ],
+        "pupil_shift_m": [
+          -0.03667450038910721,
+          0.24999999511222906
+        ],
+        "complete_forward_m": [
+          0.013325499610892792,
+          0.299999995112229
+        ]
+      },
+      "minimum_working_envelope_margin": 8.209713551338149e-11,
+      "reference_pivot_change_from_previous_working_model_m": [
+        -0.001840264471678732,
+        -0.00047877350009351005,
+        0.0002185230249622805
+      ]
+    },
+    {
+      "id": "secondary_long_side",
+      "fx_over_fy": 1,
+      "principal_point": [
+        959.5,
+        539.5
+      ],
+      "principal_zoom_slope": [
+        0,
+        0
+      ],
+      "pivot_conditional_m": [
+        17.505005386328897,
+        -15.163740004879747,
+        1.4177088222800853
+      ],
+      "lever_camera_conditional_m": [
+        0,
+        -0.08,
+        0.05
+      ],
+      "axis_spacing_conditional_m": 0,
+      "readout_ms": 18.483463322593185,
+      "pan_axis_tilt_degrees": 0.39801345482031336,
+      "tilt_axis_deviation_degrees": 3.7575705589133173,
+      "complete_forward_conditional_m": [
+        -0.09999999999185981,
+        0.29948255329372847
+      ],
+      "continuous_joined_pupil_range_including_zoom_gaps": {
+        "zoom_log_ratio": [
+          -0.9880963927791715,
+          0.4367156934180496
+        ],
+        "pupil_shift_m": [
+          -0.1499999999918598,
+          0.24948255329372845
+        ],
+        "complete_forward_m": [
+          -0.09999999999185981,
+          0.29948255329372847
+        ]
+      },
+      "minimum_working_envelope_margin": 1.367263507273675e-13,
+      "reference_pivot_change_from_previous_working_model_m": [
+        0.00020974172354115694,
+        0.00005060362062359047,
+        0.00027033107212171004
+      ]
+    },
+    {
+      "id": "end",
+      "fx_over_fy": 1,
+      "principal_point": [
+        959.5,
+        539.5
+      ],
+      "principal_zoom_slope": [
+        0,
+        0
+      ],
+      "pivot_conditional_m": [
+        -28.746945239563676,
+        -10.73526739323158,
+        1.4395524963339594
+      ],
+      "lever_camera_conditional_m": [
+        0,
+        -0.08,
+        0.05
+      ],
+      "axis_spacing_conditional_m": 0,
+      "readout_ms": 18.483463322593185,
+      "pan_axis_tilt_degrees": 0.8278394418114723,
+      "tilt_axis_deviation_degrees": 0.9142782450962391,
+      "complete_forward_conditional_m": [
+        -0.0999999999037586,
+        0.09396544380389878
+      ],
+      "continuous_joined_pupil_range_including_zoom_gaps": {
+        "zoom_log_ratio": [
+          -0.11312165997115287,
+          1.59636151092929
+        ],
+        "pupil_shift_m": [
+          -0.1499999999037586,
+          0.043965443803898774
+        ],
+        "complete_forward_m": [
+          -0.0999999999037586,
+          0.09396544380389878
+        ]
+      },
+      "minimum_working_envelope_margin": 1.616512696270278e-12,
+      "reference_pivot_change_from_previous_working_model_m": [
+        -0.0028576633607535484,
+        0.0006151665701725761,
+        -0.00006995107509832899
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "pupil_bounds",
+      "kind": "uncalibrated_effective_optical_parameter_not_confirmed_anomaly",
+      "severity": "information",
+      "description_zh": "主机位前向等效投影中心到+30cm工程上限，次机位和端机位到-10cm工程下限；次机位变焦跨度约39.95cm。该量是相对俯仰轴参考点的轴向等效光学中心，不是实体杆臂。单凭命中非厂家标定边界，不能判为物理错误，也不能证明数值是真实Z190标定。",
+      "newly_introduced": false,
+      "engineering_decision": {
+        "retain_zoom_pupil_terms": true,
+        "retain_current_state": true,
+        "refit_solely_because_bound_hit": false,
+        "physical_pupil_curve_independently_validated": false,
+        "complete_forward_working_interval_m": [
+          -0.1,
+          0.3
+        ],
+        "expand_current_bounds": false
+      }
+    },
+    {
+      "id": "s08_motion",
+      "kind": "measured_source_motion_mismatch",
+      "source_seconds": [
+        136.18,
+        136.22
+      ],
+      "worst_pair_median_error_px": 5.553096084304904,
+      "description_zh": "S08开头两对相邻曝光的运动差中位数约5.55px和4.42px，原片约30.07/29.03px，模型约24.20/24.45px，仍存在局部运动不一致。136.38–136.40秒还有约4.07px。原片136.24–136.26秒49.57px大位移则被模型50.11px跟住，差中位数0.925px。",
+      "newly_introduced": false,
+      "previous_worst_pair_median_error_px": 5.598539407689204
+    },
+    {
+      "id": "subframe_derivatives",
+      "kind": "remaining_continuous_motion_physical_concern",
+      "description_zh": "S05末帧读出窗口101.649s的pan加速度约-4079.8度/秒²；S08首帧读出窗口136.1508s约+1335.7度/秒²。尖峰数值有限且未导致域失败，但帧间原片运动不等于这些亚帧导数得到物理验证。S05末对源位移-45.37px、模型-46.35px，原片确有大位移。",
+      "newly_introduced": false
+    },
+    {
+      "id": "distortion_compensation",
+      "kind": "coefficient_decomposition_not_confirmed_physical_failure",
+      "description_zh": "端机位S05/S08的分项幅度之和RMS与净畸变RMS之比分别约3.23/3.21；分项抵消本身可以来自多项式基函数表示，不能用此比值作为必须修复或删除参数的阈值。端机位三个镜头全程9x7采样无域失效和非正Jacobian，最小采样行列式约0.972。系数并未独立标定，但本现象不提供单独重拟合的依据。",
+      "newly_introduced": false,
+      "severity": "information",
+      "engineering_decision": {
+        "retain_current_distortion_terms": true,
+        "refit_solely_to_reduce_component_cancellation": false,
+        "physical_failure_established_by_cancellation_ratio": false,
+        "individual_coefficients_independently_calibrated": false
+      }
+    }
+  ],
+  "trajectory_and_optics": {
+    "exposures": 8329,
+    "invalid_optical_probe_frames": 0,
+    "nonpositive_sampled_jacobians": 0,
+    "minimum_sampled_jacobian": 0.811628890778823,
+    "maximum_sampled_optical_displacement_px": 39.25151150421411,
+    "cross_cut_derivatives_computed": false,
+    "source_flow_windows": [
+      {
+        "group": "other_windows",
+        "shot": "s02",
+        "pairs": 12,
+        "valid_pairs": 12,
+        "missing_pairs": [],
+        "worst_median_error_pixels": 0.8142753541406785,
+        "worst_source_seconds": 56.28
+      },
+      {
+        "group": "other_windows",
+        "shot": "s05",
+        "pairs": 12,
+        "valid_pairs": 12,
+        "missing_pairs": [],
+        "worst_median_error_pixels": 2.3619792267155635,
+        "worst_source_seconds": 101.54
+      },
+      {
+        "group": "other_windows",
+        "shot": "s07",
+        "pairs": 15,
+        "valid_pairs": 14,
+        "missing_pairs": [
+          {
+            "shot": "s07",
+            "pts": 1458688,
+            "next_pts": 1458944,
+            "source_seconds": 113.96,
+            "mask_source_paths": [],
+            "status": "missing_source_board_or_ad_edges"
+          }
+        ],
+        "worst_median_error_pixels": 3.5587246885386485,
+        "worst_source_seconds": 114.1
+      },
+      {
+        "group": "other_windows",
+        "shot": "s08",
+        "pairs": 12,
+        "valid_pairs": 12,
+        "missing_pairs": [],
+        "worst_median_error_pixels": 1.4210188367217835,
+        "worst_source_seconds": 143.54
+      },
+      {
+        "group": "s08_opening",
+        "shot": "s08",
+        "pairs": 20,
+        "valid_pairs": 20,
+        "missing_pairs": [],
+        "worst_median_error_pixels": 5.553096084304904,
+        "worst_source_seconds": 136.18
+      }
+    ]
+  },
+  "solver_stop": {
+    "reason": "cost_progress_stagnation_without_convergence",
+    "numerically_converged": false,
+    "note_zh": "原记录为下降停滞退出，仍明确记录未满足一阶收敛；本次不续算。"
+  },
+  "visual_review": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/solver_refined_review_1102/visual_comparison.json",
+    "pairs": 11,
+    "summary": "所查的 11 对图中新旧整体视觉上接近，未见新增明显的大幅冰线、围挡或广告偏移，也没有可凭这些静态帧确认的明显改善。S07 快速摇镜广告未见此前失败分支所述程度的明显退步；S07 和 S08 局部运动模糊使精确比较受限。",
+    "full_video_visual_acceptance": false
+  },
+  "receipts": {
+    "physical": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/solver_refined_review_1102/physical.json",
+    "camera_motion_optics": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/solver_refined_review_1102/cameras.json",
+    "other_source_motion": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/solver_refined_review_1102/motion_windows.json",
+    "s08_source_motion": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/solver_refined_review_1102/s08_opening_motion.json",
+    "trajectory_plot": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/solver_refined_review_1102/camera_diagnostics.png",
+    "stills_manifest": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/solver_refined_review_1102/stills/manifest.json",
+    "render_snapshot": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/review_camera_solver_refined_1102/render_snapshot.json"
+  },
+  "limits": [
+    "米制由当前59.536436893975605m/L条件尺度换算，不是现场测量。",
+    "18.483ms是共用的交付帧有效行时差；实际拍摄模式和传感器读出未确认。",
+    "图像复核是11对关键帧，不替代用户完整视频验收。",
+    "原片运动对照使用静止围挡局部跟踪，S07有1对因缺少可用围挡/广告支持未比较。",
+    "没有修改参数、扩展拟合或重编译DLL。"
+  ],
+  "video": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\review_camera_solver_refined_1102\\camera_solver_refined_1102_complete.mp4",
+    "sha256": "58d430957f0c36814bc0cd5990238672f3701226c3a29b5544e924f26d6f7c31",
+    "source_seconds": [
+      22.12,
+      188.68
+    ],
+    "frames": 8329,
+    "fps": 50,
+    "verification": {
+      "decoded_frames": 8329,
+      "native_PTS_equal": true,
+      "display_speed": 1
+    },
+    "shots": [
+      {
+        "shot": "s01",
+        "video": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\review_camera_solver_refined_1102\\camera_solver_refined_1102_s01.mp4",
+        "frames": 1143,
+        "verification": {
+          "decoded_frames": 1143,
+          "native_PTS_equal": true,
+          "display_speed": 1
+        }
+      },
+      {
+        "shot": "s02",
+        "video": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\review_camera_solver_refined_1102\\camera_solver_refined_1102_s02.mp4",
+        "frames": 567,
+        "verification": {
+          "decoded_frames": 567,
+          "native_PTS_equal": true,
+          "display_speed": 1
+        }
+      },
+      {
+        "shot": "s03",
+        "video": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\review_camera_solver_refined_1102\\camera_solver_refined_1102_s03.mp4",
+        "frames": 98,
+        "verification": {
+          "decoded_frames": 98,
+          "native_PTS_equal": true,
+          "display_speed": 1
+        }
+      },
+      {
+        "shot": "s04",
+        "video": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\review_camera_solver_refined_1102\\camera_solver_refined_1102_s04.mp4",
+        "frames": 793,
+        "verification": {
+          "decoded_frames": 793,
+          "native_PTS_equal": true,
+          "display_speed": 1
+        }
+      },
+      {
+        "shot": "s05",
+        "video": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\review_camera_solver_refined_1102\\camera_solver_refined_1102_s05.mp4",
+        "frames": 1376,
+        "verification": {
+          "decoded_frames": 1376,
+          "native_PTS_equal": true,
+          "display_speed": 1
+        }
+      },
+      {
+        "shot": "s06",
+        "video": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\review_camera_solver_refined_1102\\camera_solver_refined_1102_s06.mp4",
+        "frames": 486,
+        "verification": {
+          "decoded_frames": 486,
+          "native_PTS_equal": true,
+          "display_speed": 1
+        }
+      },
+      {
+        "shot": "s07",
+        "video": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\review_camera_solver_refined_1102\\camera_solver_refined_1102_s07.mp4",
+        "frames": 1239,
+        "verification": {
+          "decoded_frames": 1239,
+          "native_PTS_equal": true,
+          "display_speed": 1
+        }
+      },
+      {
+        "shot": "s08",
+        "video": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\review_camera_solver_refined_1102\\camera_solver_refined_1102_s08.mp4",
+        "frames": 372,
+        "verification": {
+          "decoded_frames": 372,
+          "native_PTS_equal": true,
+          "display_speed": 1
+        }
+      },
+      {
+        "shot": "s09",
+        "video": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\review_camera_solver_refined_1102\\camera_solver_refined_1102_s09.mp4",
+        "frames": 2255,
+        "verification": {
+          "decoded_frames": 2255,
+          "native_PTS_equal": true,
+          "display_speed": 1
+        }
+      }
+    ]
+  },
+  "requested_inputs_verified_unchanged": [
+    {
+      "path": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/solver_speed_validation/continue_1102/fit_completion/accepted_pixels_latest.npz",
+      "sha256": "b9f1cb81c8f11163152e7ca4fea16494cad91951be304dfe7c2182c6db4fabec",
+      "unchanged": true
+    },
+    {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_solver_refined_1102.npz",
+      "sha256": "d6cfde1474a23d594a0395351ebbdb0ee15a6560ef77b27f069d239ee95bb3f3",
+      "unchanged": true
+    },
+    {
+      "path": "D:/CodexData/RinkSpace_Data/build/solver_continue_1102/rinkspace_core.dll",
+      "sha256": "606f94386d26a3c6683dcbf881ce75d64de08ab2cc27a9a4effbf2ea698ad080",
+      "unchanged": true
+    }
+  ],
+  "compact_equals_final_global_arrays": true,
+  "numeric_state_exported": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\review_camera_solver_refined_1102\\frozen_state.npz",
+  "numeric_state_sha256": "b9f1cb81c8f11163152e7ca4fea16494cad91951be304dfe7c2182c6db4fabec",
+  "interpretation_correction": {
+    "date": "2026-11-02",
+    "previous_classification": "Pupil bound hit was grouped as one of four remaining problems",
+    "correction": "Bound hit alone is not a confirmed physical anomaly; retain terms and current state without a refit solely for boundary contact.",
+    "source_url": "https://optics.ansys.com/hc/en-us/articles/42661958583571-Paraxial-vs-Real-pupils-in-optical-system",
+    "numeric_state_modified": false
+  },
+  "distortion_interpretation_correction": {
+    "date": "2026-11-02",
+    "previous_classification": "Distortion component cancellation grouped as a remaining issue",
+    "correction": "Not a confirmed physical anomaly or a mandatory repair merely from component cancellation; assess the combined mapping.",
+    "numeric_state_modified": false,
+    "primary_model_reference": "https://docs.opencv.org/4.x/d9/d0c/group__calib3d.html"
+  },
+  "designation": {
+    "status": "provisional_final",
+    "label_zh": "冈田芽衣短节目完整拟合的暂定最终状态",
+    "designated_on": "2026-11-02",
+    "authority": "explicit_user_instruction",
+    "user_instruction_zh": "那就在项目记录里把当前状态明确为冈田芽衣短节目完整拟合的暂定最终状态",
+    "shot_ids": [
+      "s01",
+      "s02",
+      "s03",
+      "s04",
+      "s05",
+      "s06",
+      "s07",
+      "s08",
+      "s09"
+    ],
+    "physical_cameras": 3,
+    "source_seconds": [
+      22.12,
+      188.68
+    ],
+    "source_time_base": "1/12800",
+    "source_first_pts": 283136,
+    "source_last_pts": 2415104,
+    "source_exposures": 8329,
+    "full_state_frozen": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\review_camera_solver_refined_1102\\frozen_state.npz",
+      "sha256": "b9f1cb81c8f11163152e7ca4fea16494cad91951be304dfe7c2182c6db4fabec"
+    },
+    "compact_parameters": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_solver_refined_1102.npz",
+    "compact_parameters_sha256": "d6cfde1474a23d594a0395351ebbdb0ee15a6560ef77b27f069d239ee95bb3f3",
+    "native_library": "D:/CodexData/RinkSpace_Data/build/solver_continue_1102/rinkspace_core.dll",
+    "native_library_sha256": "606f94386d26a3c6683dcbf881ce75d64de08ab2cc27a9a4effbf2ea698ad080",
+    "engineering_decisions": {
+      "retain_zoom_pupil_terms": true,
+      "complete_forward_working_interval_m": [
+        -0.1,
+        0.3
+      ],
+      "expand_current_bounds": false,
+      "retain_current_end_camera_distortion_terms": true,
+      "refit_for_bound_contact_or_component_cancellation_alone": false,
+      "bounds_are_manufacturer_calibration": false
+    },
+    "remaining_local_observations": [
+      "S08开头少数曝光仍有约4–6px局部运动偏差。",
+      "S05末曝光、S08首曝光读出窗口仍有亚帧加速度尖峰，尚不能作为已验证的真实云台轨迹。"
+    ],
+    "independent_physical_calibration_complete": false
+  }
+}

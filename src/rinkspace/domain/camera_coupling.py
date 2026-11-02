@@ -20,15 +20,18 @@ def read_camera_coupling(path):
     if not isinstance(config.get('groups'),list):raise ValueError('Coupling groups required')
     used=set()
     for g in config['groups']:
-        cameras=g['camera_indices'];names=g['shared_names'];mags=g['delivery_magnifications']
+        cameras=g['camera_indices'];names=g['shared_names']
         if len(cameras)<2 or len(set(cameras))!=len(cameras) or any(type(i) is not int or i<0 for i in cameras):
             raise ValueError('Distinct nonnegative physical camera indices required')
-        if len(mags)!=len(cameras) or not np.isfinite(mags).all() or min(mags)<=0:
-            raise ValueError('One fixed positive delivery magnification per camera required')
+        if names!=['readout']:
+            mags=g['delivery_magnifications']
+            if len(mags)!=len(cameras) or not np.isfinite(mags).all() or min(mags)<=0:
+                raise ValueError('One fixed positive delivery magnification per camera required')
         if not names or len(set(names))!=len(names) or set(names)-_SCALAR_STORAGE_INDEX.keys():
             raise ValueError('Only named independent scalar native coordinates may be shared')
-        if not np.isfinite(g['reference_focal_base_pixels']) or g['reference_focal_base_pixels']<=0 or not np.isfinite(g['wide_boundary_base_log_f']):
-            raise ValueError('Fixed optical reference conventions required')
+        if names!=['readout']:
+            if not np.isfinite(g['reference_focal_base_pixels']) or g['reference_focal_base_pixels']<=0 or not np.isfinite(g['wide_boundary_base_log_f']):
+                raise ValueError('Fixed optical reference conventions required')
         for i in cameras:
             for name in names:
                 if (i,name) in used:raise ValueError('Camera coordinate belongs to two groups')
@@ -49,11 +52,13 @@ def build_multicamera_directions(rigs,indices,scales,coupling=None):
     for j,g in enumerate(groups):
         cameras=g['camera_indices']
         if max(cameras)>=len(rigs):raise ValueError('Shared camera index outside current input')
-        for i,mag in zip(cameras,g['delivery_magnifications'],strict=True):
-            if not np.isclose(rigs[i,24],g['reference_focal_base_pixels']*mag,rtol=2e-13,atol=0):
-                raise ValueError('Shared camera focal reference differs from delivery mode')
-            if not np.isclose(rigs[i,38],g['wide_boundary_base_log_f']+np.log(mag),rtol=0,atol=2e-13):
-                raise ValueError('Shared camera wide basis differs from delivery mode')
+        # Readout shares timing only; each camera keeps its optical conventions.
+        if g['shared_names']!=['readout']:
+            for i,mag in zip(cameras,g['delivery_magnifications'],strict=True):
+                if not np.isclose(rigs[i,24],g['reference_focal_base_pixels']*mag,rtol=2e-13,atol=0):
+                    raise ValueError('Shared camera focal reference differs from delivery mode')
+                if not np.isclose(rigs[i,38],g['wide_boundary_base_log_f']+np.log(mag),rtol=0,atol=2e-13):
+                    raise ValueError('Shared camera wide basis differs from delivery mode')
         for name in g['shared_names']:
             chart=CAMERA_NAMES.index(name);storage=_SCALAR_STORAGE_INDEX[name]
             active=[chart in indices[i] for i in cameras]

@@ -66,4 +66,22 @@ RS_HD inline Status motion_curve_partials(const MotionRig& rig,const MotionSplin
         frame_time,root,jac,cell,weights);
 }
 
+// One world-point Jacobian at the already certified rolling-row root. The
+// existing motion partials already include row elimination, so their time
+// contraction is the SAME pullback used by motion_rig_projection_direction.
+RS_HD inline Status motion_scene_partials(const MotionRig& rig,const MotionSpline& spline,int height,
+    Vec3 xyz,double frame_time,const MotionProjection& root,const double* motion_partials,double* jac){
+    const double t=frame_time+rig.tau*(root.row/(height-1)-.5);
+    double tr[3],w[4],dw[4],rate[3]{};int cell;
+    auto st=spline.evaluate(t,tr);if(st!=Status::ok)return st;
+    st=spline.basis(t,cell,w,dw);if(st!=Status::ok)return st;
+    for(int c=0;c<3;++c)for(int j=0;j<4;++j)rate[c]+=dw[j]*spline.controls[3*size_t(cell-1+j)+c];
+    double total[2]{};for(int d=0;d<2;++d)for(int c=0;c<3;++c)total[d]+=motion_partials[4*d+c]*rate[c];
+    MotionCameraState camera{};st=motion_camera_from_values(rig,tr,camera);if(st!=Status::ok)return st;
+    Vec2 uv{};double spatial[6];st=project(camera.camera,xyz,uv,spatial);if(st!=Status::ok)return st;
+    const double k=rig.tau/(height-1);
+    for(int d=0;d<2;++d)for(int a=0;a<3;++a)jac[3*d+a]=spatial[3*d+a]+total[d]*(k*spatial[3+a]);
+    return finite_array(jac,6)?Status::ok:Status::nonfinite;
+}
+
 }

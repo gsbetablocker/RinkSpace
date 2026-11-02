@@ -17,7 +17,8 @@ from continuous_quadratic_rig_optin import QuadraticRigCameraModel
 
 
 SOURCE_DIR = Path(__file__).resolve().parent / 'native' / 'quadratic_source_edge'
-DEFAULT_BINARY_DIR = SOURCE_DIR / 'bin'
+from rinkspace.storage import AssetStore
+DEFAULT_BINARY_DIR = AssetStore(Path(__file__).resolve().parents[2]).resolve(SOURCE_DIR / 'bin')
 MODULE_NAME = 'native_source_edge_quadratic_prod'
 CAPABILITY = 'physical15_quadratic_logzoom_roles_v1'
 
@@ -37,7 +38,7 @@ class QuadraticNativeEdgeManager(NativeEdgeManager):
         self.active_keys = set(map(int, active_keys))
         self.threads = int(threads)
         self.cache = bool(cache)
-        self.binary_dir = Path(binary_dir or DEFAULT_BINARY_DIR).resolve()
+        self.binary_dir = AssetStore(Path(__file__).resolve().parents[2]).source(Path(binary_dir or DEFAULT_BINARY_DIR).resolve())
         self.module_name = MODULE_NAME
         self._owner_thread = threading.get_ident()
         self._records = {}

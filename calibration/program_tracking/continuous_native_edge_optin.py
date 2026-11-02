@@ -85,7 +85,9 @@ class NativeEdgeManager:
         self.active_keys = set(map(int, active_keys))
         self.threads = int(threads)
         self.cache = bool(cache)
-        self.binary_dir = Path(binary_dir or DEFAULT_BINARY_DIR).resolve()
+        from rinkspace.storage import AssetStore
+        self.binary_dir = AssetStore(Path(__file__).resolve().parents[2]).source(
+            Path(binary_dir or DEFAULT_BINARY_DIR).resolve())
         if module_name not in ('native_source_edge_prod','native_source_edge_trial_prod'):
             raise ValueError('Unknown native source-edge module')
         self.module_name = module_name

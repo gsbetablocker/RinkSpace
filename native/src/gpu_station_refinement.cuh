@@ -5,6 +5,7 @@
 struct StationSample {int row,periodic;double s;};
 struct StationFrame {int camera;double time;};
 struct StationSpan {int begin=0,count=0,periodic=0;double lo=0,hi=1,lower=0,upper=1;};
+struct StationGeometry {Vec3 xyz;Status status;};
 RS_HD inline Status station_projection(const View& source,int row,double s,MotionProjection& p,const MotionProjectionContext* context=nullptr){
     const auto v=row_camera_view(source,size_t(row));
     Vec3 x{},t{};auto status=geometry_at(v,row,s,x,t);if(status!=Status::ok)return status;
@@ -30,10 +31,22 @@ __global__ void station_frame_context_kernel(View v,const StationFrame* frames,s
     size_t k=size_t(blockIdx.x)*blockDim.x+threadIdx.x;if(k>=count)return;const auto frame=frames[k];auto cv=camera_view(v,size_t(frame.camera));
     prepare_motion_projection_context(motion_rig(cv.rig,cv.nr==43?cv.rig+38:nullptr),{cv.controls,cv.nc,cv.first,cv.dt},frame.time,contexts[k]);
 }
-__global__ void station_sample_kernel(View v,const StationSample* samples,size_t count,Vec2* uv,const int* frame_ids,const MotionProjectionContext* contexts){
+__global__ void station_geometry_kernel(View v,const StationSample* samples,size_t count,StationGeometry* geometry){
+    size_t k=size_t(blockIdx.x)*blockDim.x+threadIdx.x;if(k>=count)return;
+    const auto a=samples[k];const auto cv=row_camera_view(v,size_t(a.row));Vec3 tangent{};
+    const double s=a.s*(a.periodic?v.course->perimeter():1.);
+    geometry[k].status=geometry_at(cv,a.row,s,geometry[k].xyz,tangent);
+}
+__global__ void station_sample_kernel(View v,const StationSample* samples,size_t count,Vec2* uv,const int* frame_ids,const MotionProjectionContext* contexts,
+        const int* geometry_ids=nullptr,const StationGeometry* geometry=nullptr){
     size_t k=size_t(blockIdx.x)*blockDim.x+threadIdx.x;if(k>=count)return;
     auto a=samples[k];double s=a.s*(a.periodic?v.course->perimeter():1.);Vec2 p{};
-    if(station_uv(v,a.row,s,p,contexts+frame_ids[a.row])!=Status::ok)p.x=p.y=std::numeric_limits<double>::quiet_NaN();uv[k]=p;
+    Status status;
+    if(geometry){const auto g=geometry[geometry_ids[k]];status=g.status;
+        if(status==Status::ok){const auto cv=row_camera_view(v,size_t(a.row));MotionProjection projection{};
+            status=project_motion(motion_rig(cv.rig,cv.nr==43?cv.rig+38:nullptr),{cv.controls,cv.nc,cv.first,cv.dt},cv.height,g.xyz,cv.times[a.row],projection,cv.projection_time_half,contexts+frame_ids[a.row]);p=projection.uv;}}
+    else status=station_uv(v,a.row,s,p,contexts+frame_ids[a.row]);
+    if(status!=Status::ok)p.x=p.y=std::numeric_limits<double>::quiet_NaN();uv[k]=p;
 }
 // The pixel objective along a projected curve can have much more curvature
 // than J_s^T J_s, especially for a foreshortened circle with nonzero residual.
@@ -102,7 +115,7 @@ RS_HD inline void station_bounded_refine(const View& v,int row,const StationSpan
         }
     }
 }
-__global__ void station_refine_kernel(View v,const StationSpan* spans,const StationSample* samples,const Vec2* grid,const int* frame_ids,const MotionProjectionContext* contexts,double* stats,bool global_search=true){
+__global__ void station_refine_kernel(View v,const StationSpan* spans,const StationSample* samples,const Vec2* grid,const int* frame_ids,const MotionProjectionContext* contexts,double* stats,bool global_search=true,double* output=nullptr,int* statuses=nullptr){
     int row=blockIdx.x*blockDim.x+threadIdx.x;if(size_t(row)>=v.n)return;auto span=spans[row];if(!span.count)return;
     const double unit=span.periodic?v.course->perimeter():1.,lo=span.lower,hi=span.upper;
     const auto context=contexts+frame_ids[row];
@@ -133,13 +146,16 @@ __global__ void station_refine_kernel(View v,const StationSpan* spans,const Stat
     station_bounded_refine(v,row,span,unit,context,s,best,best_projection);
     if(best<before&&s>=lo&&s<=hi){const_cast<double*>(v.stations)[row]=s;atomicAdd(stats,1.);
         if(finite_scalar(before))atomicAdd(stats+1,before-best);
-        atomic_max_nonnegative(stats+3,fabs(s-original));}
+        atomic_max_nonnegative(stats+3,fabs(s-original));
+        if(output)evaluate_row(v,size_t(row),output+11*row,statuses+row);}
 }
 struct StationRefinement {
+    DeviceBuffer<ScenePrimitive<double>> primitives;
     DeviceBuffer<StationSample> samples;DeviceBuffer<StationSpan> spans;
     DeviceBuffer<Vec2> grid;DeviceBuffer<double> stats;
     DeviceBuffer<StationFrame> frames;DeviceBuffer<int> frame_ids;DeviceBuffer<MotionProjectionContext> contexts;
-    size_t bytes()const{return samples.bytes()+spans.bytes()+grid.bytes()+stats.bytes()+frames.bytes()+frame_ids.bytes()+contexts.bytes();}
+    DeviceBuffer<StationSample> geometry_samples;DeviceBuffer<int> geometry_ids;DeviceBuffer<StationGeometry> geometry;
+    size_t bytes()const{return primitives.bytes()+samples.bytes()+spans.bytes()+grid.bytes()+stats.bytes()+frames.bytes()+frame_ids.bytes()+contexts.bytes()+geometry_samples.bytes()+geometry_ids.bytes()+geometry.bytes();}
     void prepare(const View& v,const Linearization& l,const double* lo,const double* hi,cudaStream_t stream){
         if(!l.host.pixel_residuals)return;
         std::vector<int> uses(l.scales.size(),0);for(int id:l.row_local)if(id>=0)++uses[id];
@@ -165,18 +181,35 @@ struct StationRefinement {
         for(size_t row=0;row<v.n;++row)if(domains[row].count){auto key=std::make_pair(int(row_camera(v,row)),v.times[row]);auto found=frame_cache.find(key);
             if(found==frame_cache.end()){int id=Linearization::bounded(frame_source.size());frame_source.push_back({key.first,key.second});frame_cache.emplace(key,id);frame_indices[row]=id;}
             else frame_indices[row]=found->second;}
+        // Source geometry is camera/time independent. Share only exact path,
+        // periodic chart and sample-coordinate identities; recompute values
+        // for EVERY trial scene, never reuse values across scene generations.
+        std::vector<StationSample> geometry_source;std::vector<int> geometry_indices;
+        const char* geometry_option=std::getenv("RINKSPACE_STATION_GEOMETRY_CACHE");
+        if(geometry_option&&std::string(geometry_option)!="0"&&std::string(geometry_option)!="1")throw std::invalid_argument("RINKSPACE_STATION_GEOMETRY_CACHE must be 0 or 1");
+        if(!geometry_option||std::string(geometry_option)=="1"){
+            std::map<std::tuple<int,int,double>,int> geometry_cache;geometry_indices.reserve(source.size());
+            for(const auto a:source){auto key=std::make_tuple(v.codes[a.row],a.periodic,a.s);auto found=geometry_cache.find(key);
+                if(found==geometry_cache.end()){int id=Linearization::bounded(geometry_source.size());geometry_source.push_back(a);geometry_cache.emplace(key,id);geometry_indices.push_back(id);}
+                else geometry_indices.push_back(found->second);}}
         size_t free,total;cuda_check(cudaMemGetInfo(&free,&total));
         size_t planned=source.size()*(sizeof(StationSample)+sizeof(Vec2))+domains.size()*sizeof(StationSpan)+4*sizeof(double)+
-            frame_source.size()*(sizeof(StationFrame)+sizeof(MotionProjectionContext))+frame_indices.size()*sizeof(int);
+            frame_source.size()*(sizeof(StationFrame)+sizeof(MotionProjectionContext))+frame_indices.size()*sizeof(int)+
+            geometry_source.size()*(sizeof(StationSample)+sizeof(StationGeometry))+geometry_indices.size()*sizeof(int)+(v.scene_paths?v.npaths*sizeof(ScenePrimitive<double>):0);
         if(planned>free)throw std::runtime_error("native curve search exceeds available device memory");
         samples.upload(source,stream);spans.upload(domains,stream);grid.allocate(source.size());stats.allocate(4);
         frames.upload(frame_source,stream);frame_ids.upload(frame_indices,stream);contexts.allocate(frame_source.size());
+        geometry_samples.upload(geometry_source,stream);geometry_ids.upload(geometry_indices,stream);geometry.allocate(geometry_source.size());
+        if(v.scene_paths)primitives.allocate(v.npaths);
     }
-    void run(const View& v,cudaStream_t stream,double* out,bool global_search=true){
+    void run(View v,cudaStream_t stream,double* out,bool global_search=true,double* output=nullptr,int* statuses=nullptr){
+        if(primitives.count){scene_primitive_value_kernel<<<unsigned((v.npaths+127)/128),128,0,stream>>>(v,primitives.data);v.primitives=primitives.data;}
         cuda_check(cudaMemsetAsync(stats.data,0,stats.bytes(),stream));
         if(samples.count){station_frame_context_kernel<<<unsigned((frames.count+127)/128),128,0,stream>>>(v,frames.data,frames.count,contexts.data);
-            if(global_search)station_sample_kernel<<<unsigned((samples.count+127)/128),128,0,stream>>>(v,samples.data,samples.count,grid.data,frame_ids.data,contexts.data);
-            station_refine_kernel<<<unsigned((v.n+127)/128),128,0,stream>>>(v,spans.data,samples.data,grid.data,frame_ids.data,contexts.data,stats.data,global_search);}
+            if(global_search){
+                if(geometry_samples.count)station_geometry_kernel<<<unsigned((geometry_samples.count+127)/128),128,0,stream>>>(v,geometry_samples.data,geometry_samples.count,geometry.data);
+                station_sample_kernel<<<unsigned((samples.count+127)/128),128,0,stream>>>(v,samples.data,samples.count,grid.data,frame_ids.data,contexts.data,geometry_ids.data,geometry.data);}
+            station_refine_kernel<<<unsigned((v.n+127)/128),128,0,stream>>>(v,spans.data,samples.data,grid.data,frame_ids.data,contexts.data,stats.data,global_search,output,statuses);}
         cuda_check(cudaGetLastError());cuda_check(cudaMemcpyAsync(out,stats.data,stats.bytes(),cudaMemcpyDeviceToHost,stream));cuda_check(cudaStreamSynchronize(stream));
     }
 };

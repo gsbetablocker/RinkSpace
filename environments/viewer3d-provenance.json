@@ -1,0 +1,95 @@
+{
+  "schema": "rinkspace.viewer3d-dependencies.v1",
+  "observed_on": "2026-11-02",
+  "runtime_data_path": "runtime_tools/results3d",
+  "lock_file": "environments/requirements-viewer3d.lock.txt",
+  "default_window_backend": "pyglet",
+  "default_backend_reason": "Pyglet window/render event integration uses its BSD license; project glue remains under the existing project statement. The upstream AITViewer lock still declares Qt packages, which are recorded without being bundled.",
+  "scope": "Selected installed source/metadata/license evidence, not a blanket licence certification of all installed packages or model/data use.",
+  "packages": [
+    {
+      "name": "aitviewer",
+      "version": "1.14.2",
+      "installed_metadata_sha256": "74a5d6b12e0d3821402cd04f1f6aba08c8fb6e6d1365499a719f65bcf5c7c828",
+      "installed_license_path": "runtime_tools/results3d/Lib/site-packages/aitviewer-1.14.2.dist-info/licenses/LICENSE",
+      "license_copy": "environments/third_party_licenses/AITVIEWER_LICENSE.txt",
+      "license_sha256": "af36cb9fbff9989714a8de12ff7493f719e99cde1519e09f44c770c67a9a181c",
+      "observed_license": "MIT",
+      "metadata_license_fields": [
+        "License-File: LICENSE"
+      ],
+      "bundled_implementation": false
+    },
+    {
+      "name": "pyglet",
+      "version": "2.1.19",
+      "installed_metadata_sha256": "711e8af18ece67326453a7a3f73b3979c16d017ba5a058ae0abd264c5d51858e",
+      "installed_license_path": "runtime_tools/results3d/Lib/site-packages/pyglet-2.1.19.dist-info/licenses/LICENSE",
+      "license_copy": "environments/third_party_licenses/PYGLET_LICENSE.txt",
+      "license_sha256": "57e7eecb673c8d40cf3192633c4807fba8c81685329a37e1b763e1556d5ded34",
+      "observed_license": "BSD-3-Clause",
+      "metadata_license_fields": [
+        "License-File: LICENSE"
+      ],
+      "bundled_implementation": false
+    },
+    {
+      "name": "PyQt6",
+      "version": "6.12.0",
+      "installed_metadata_sha256": "6bc6d0a20ec19f4e37e30bba95773a7bb6389121bf08771d10b791657d3c6230",
+      "installed_license_path": "runtime_tools/results3d/Lib/site-packages/pyqt6-6.12.0.dist-info/licenses/LICENSE",
+      "license_copy": "environments/third_party_licenses/PYQT6_GPL3.txt",
+      "license_sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "observed_license": "GPL-3.0 (installed open-source distribution); commercial licensing offered separately",
+      "metadata_license_fields": [
+        "License-Expression: GPL-3.0-only",
+        "License-File: LICENSE"
+      ],
+      "bundled_implementation": false
+    },
+    {
+      "name": "PyQt6-Qt6",
+      "version": "6.12.0",
+      "installed_metadata_sha256": "12bfc7fc0155792e1f52ad544687a0baa2a3f10f8d8bf4930a0a74c9ccbfe3d1",
+      "installed_license_path": "runtime_tools/results3d/Lib/site-packages/pyqt6_qt6-6.12.0.dist-info/LICENSE",
+      "license_copy": "environments/third_party_licenses/PYQT6_QT6_LICENSE.txt",
+      "license_sha256": "6c671e2912ec69c0832f32066c0313cee5fdc3bbcbce237822e89f3da58edd4e",
+      "observed_license": "LGPL v3 per installed package; component terms remain separate",
+      "metadata_license_fields": [
+        "License: LGPL v3"
+      ],
+      "bundled_implementation": false
+    }
+  ],
+  "source_evidence": [
+    {
+      "data_path": "runtime_tools/results3d/Lib/site-packages/aitviewer/viewer.py",
+      "bytes": 83038,
+      "sha256": "bd4bb7613514c9893ddd9c3bbf4771aae52f239efb52943d0372347677e14edb"
+    },
+    {
+      "data_path": "runtime_tools/results3d/Lib/site-packages/aitviewer/aitvconfig.yaml",
+      "bytes": 820,
+      "sha256": "424a157d819012b35a257e7c138f0ed759e6fa78f35b3f136c666326cc06dc91"
+    },
+    {
+      "data_path": "runtime_tools/results3d/Lib/site-packages/moderngl_window/context/pyglet/window.py",
+      "bytes": 13138,
+      "sha256": "181b1521614fdf6ecf241d9d3826814bd80e87a737edd72eda9e3610fbf2732d"
+    }
+  ],
+  "model_boundary": {
+    "smplx_python": "0.1.28; separate upstream licence; metadata UNKNOWN is not an affirmative grant",
+    "smplx_model": "Existing registered model stays in Data; account/model terms remain applicable",
+    "display_cache": "Full-body surfaces and saved result caches stay in Data/cache/results3d; not included in public Git"
+  },
+  "runtime_verification": {
+    "method": "Application API + own OpenGL renderer; no desktop UI input",
+    "checks": 27,
+    "passed": true,
+    "window_type": "pyglet",
+    "qt_modules_loaded": [],
+    "record_data_path": "maintenance/publish_rebuild_20261102/viewer_check/verification/checks.json",
+    "accuracy_acceptance": false
+  }
+}

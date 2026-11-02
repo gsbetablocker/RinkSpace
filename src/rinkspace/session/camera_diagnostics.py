@@ -21,14 +21,16 @@ def _peak(values, seconds):
 
 
 def inspect_shot_motion(core, rig, controls, first, dt, times, source_seconds,
-                        metres_per_unit=None):
+                        metres_per_unit=None, *, source_mapper=None):
     """Inspect one uninterrupted shot, including its actual readout halo."""
     times = np.asarray(times, float)
     seconds = np.asarray(source_seconds, float)
     if (times.ndim != 1 or len(times) < 3 or times.shape != seconds.shape
             or not np.all(np.diff(times) > 0)
-            or not np.allclose(np.diff(times), np.diff(seconds), rtol=0, atol=1e-10)):
+            or not np.all(np.diff(seconds)>0)
+            or (source_mapper is None and not np.allclose(np.diff(times), np.diff(seconds), rtol=0, atol=1e-10))):
         raise ValueError('One monotonic native shot clock is required')
+    source_at=(lambda t:np.asarray(t)+seconds[0]-times[0]) if source_mapper is None else source_mapper
     state = core.evaluate_motion_camera(rig, controls, first, dt, times)
     k = core.evaluate_motion_kinematics(controls, first, dt, times)
     if np.any(state['status']) or np.any(k['status']):
@@ -44,20 +46,22 @@ def inspect_shot_motion(core, rig, controls, first, dt, times, source_seconds,
             channels[name][order] = dict(
                 sampled=_extent(values), sampled_peak=_peak(values, seconds),
                 continuous_peak=dict(signed_value=float(extrema['value'][d, c]*factor),
-                    source_seconds=float(extrema['time'][d, c]+seconds[0]-times[0]),
+                    source_seconds=float(source_at(extrema['time'][d,c])),
                     native_cell=int(extrema['cell'][d, c])))
     rotations = state['rotation']
     rel = rotations[1:] @ rotations[:-1].transpose(0, 2, 1)
     angle = np.arccos(np.clip((np.trace(rel, axis1=1, axis2=2)-1)/2, -1, 1))
     angular_step = angle*180/np.pi
     centre = state['centre']
-    velocity = np.gradient(centre, seconds, axis=0, edge_order=2)
-    acceleration = np.gradient(velocity, seconds, axis=0, edge_order=2)
+    velocity = np.gradient(centre, times, axis=0, edge_order=2)
+    acceleration = np.gradient(velocity, times, axis=0, edge_order=2)
     scale = 1. if metres_per_unit is None else float(metres_per_unit)
     centre_speed = np.linalg.norm(velocity, axis=1)*scale
     centre_acceleration = np.linalg.norm(acceleration, axis=1)*scale
     summary = dict(frame_count=len(times), source_interval=[float(seconds[0]), float(seconds[-1])],
-        exposure_interval=[float(span[0]+seconds[0]-times[0]), float(span[1]+seconds[0]-times[0])],
+        exposure_interval=[float(source_at(span[0])),float(source_at(span[1]))],
+        native_exposure_interval=list(map(float,span)),
+        source_labels='recorded source frame centres, with interpolation only for continuous extrema',
         angular_units='degrees / seconds**derivative_order',
         zoom_units='log(f_pixels) / seconds**derivative_order',
         continuous_extrema_include_signed_readout=True,
@@ -65,7 +69,7 @@ def inspect_shot_motion(core, rig, controls, first, dt, times, source_seconds,
         focal_pixels=_extent(state['fx']), focal_max_min_ratio=float(state['fx'].max()/state['fx'].min()),
         focal_frame_relative_step=_extent(np.diff(state['fx'])/state['fx'][:-1]),
         angular_frame_step_deg=_extent(angular_step),
-        angular_frame_speed_peak=_peak(angular_step/np.diff(seconds), seconds[1:]),
+        angular_frame_speed_peak=_peak(angular_step/np.diff(times), seconds[1:]),
         centre=dict(units='conditional metres' if metres_per_unit else 'scene units',
             source='native fixed pivot, articulated axes, lever and zoom pupil; no free per-frame translation',
             component_span=(np.ptp(centre, axis=0)*scale).tolist(),

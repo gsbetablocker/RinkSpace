@@ -29,7 +29,21 @@ def snapshot_identity(layout,mapping,manifest):
   paths_sha256=hashlib.sha256(json.dumps(mapping['path_ids'],separators=(',',':')).encode()).hexdigest(),
   shots=manifest['shots'],cameras=manifest['cameras'],control_dt=manifest['control_dt'],first_control_time=manifest['first_control_time'],max_readout=manifest['max_readout'])
  if 'camera_parameterization' in manifest:result['camera_parameterization']=manifest['camera_parameterization']
+ if 'camera_working_envelope' in manifest:result['camera_working_envelope']=manifest['camera_working_envelope']
  return result
+
+
+def camera_working_envelope_path(manifest):
+ """Verify an explicit configuration binding; absent bindings retain old defaults."""
+ if 'camera_working_envelope' not in manifest:return None
+ binding=manifest['camera_working_envelope']
+ if not isinstance(binding,dict):raise ValueError('Camera working envelope must bind path and sha256')
+ name=binding.get('path');sha=binding.get('sha256')
+ if not isinstance(name,str) or not name or not Path(name).is_absolute():raise ValueError('Camera working envelope path must be absolute')
+ if not isinstance(sha,str) or len(sha)!=64 or any(c not in '0123456789abcdef' for c in sha.lower()):raise ValueError('Invalid camera working envelope sha256')
+ path=Path(name)
+ if digest(path)!=sha.lower():raise ValueError('Camera working envelope checksum differs')
+ return path
 
 
 def bind_snapshot(v,layout,mapping,manifest):

@@ -16,6 +16,8 @@
 | FootMR | 提交 `530da95641f906b42ba6792df8e55c1dd667f98d`；[固定来源与文件 SHA](../environments/body-runtime-sources.json)、[固定许可](https://raw.githubusercontent.com/twehrbein/FootMR/530da95641f906b42ba6792df8e55c1dd667f98d/LICENSE) | 上游文件保留在 Data；自定义研究／非营利及 GVHMR 衍生条件。本地 namespace 接线单独记录 |
 | CoTracker | 提交 `82e02e8029753ad4ef13cf06be7f4fc5facdda4d`；[固定来源与文件 SHA](../environments/body-runtime-sources.json)、[固定许可](https://raw.githubusercontent.com/facebookresearch/co-tracker/82e02e8029753ad4ef13cf06be7f4fc5facdda4d/LICENSE.md) | 上游源码与权重留 Data；所选源码许可为 CC BY-NC 4.0，不额外授予商业或分发权利 |
 | RTMW／RTMLib | [现有权重来源、归档与 ONNX SHA](../environments/body-runtime-sources.json) | 外部推理依赖；源码、模型及环境不随本次公开树分发，分别适用上游条款 |
+| AITViewer／Pyglet | 指定安装版本 1.14.2／2.1.19，分别附 [MIT](../environments/third_party_licenses/AITVIEWER_LICENSE.txt)／[BSD](../environments/third_party_licenses/PYGLET_LICENSE.txt)；[安装身份](../environments/viewer3d-provenance.json) | 外部实现留 Data；项目播放器显式使用 Pyglet 窗口后端 |
+| PyQt6／Qt | 安装锁中的 6.12.0 发行物；PyQt6 附 GPLv3，Qt 包元数据标 LGPL v3，证据见[播放器核查](LICENSING_REVIEW.md#viewer3d) | 不随公开树附带运行库；使用 Qt 后端或组合分发须另核适用条件，不能把 PyQt6 标为 LGPL |
 | HMR2／ViTPose／人体工具 | 由 GVHMR 树使用，具体来源见机器清单 | 独立上游修订与全部许可尚有缺口，不自动继承 GVHMR 根许可 |
 | smplx Python 包 | 历史观察版本 0.1.28；随安装包保存的 LICENSE，另见[官方代码许可](https://github.com/vchoutas/smplx/blob/main/LICENSE) | METADATA 为 UNKNOWN，随包条款含非商业、非转让及禁止分发条件，精确 wheel 身份未确定 |
 | Ultralytics | 历史环境分别观察到 8.4.131／8.2.42，[官方仓库](https://github.com/ultralytics/ultralytics) | 相应 METADATA 标 AGPL-3.0；当前进程版本由所选专用环境确定 |

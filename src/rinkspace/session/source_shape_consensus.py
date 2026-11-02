@@ -11,13 +11,15 @@ import cv2
 from .material_rings import ellipse_matrix
 
 
-def known_shape_profile_hypotheses(measurement, curves, fragments=()):
+def known_shape_profile_hypotheses(measurement, curves, fragments=(), *, midline_tolerance_px=None):
     """Compare partial arcs without fitting an unconstrained ellipse to them.
 
     Native query curves set shape and relative geometry. Actual q25..q75
     intervals decide final support; ambiguous source reads remain alternatives.
     This neither supplies physical identity nor qualifies data for fitting.
     """
+    if midline_tolerance_px is not None and (not np.isfinite(midline_tolerance_px) or midline_tolerance_px<=0):
+        raise ValueError('A source midline tolerance must be finite and positive')
     curves = np.asarray(curves, int)
     qcurve = np.asarray(measurement['query_curve'], int)
     query = np.asarray(measurement['candidate_query'], int)
@@ -130,6 +132,14 @@ def known_shape_profile_hypotheses(measurement, curves, fragments=()):
                 endpoints = quantiles[ids[rows]][:, [0, 2]]-transformed_center
                 value = np.einsum('nqi,ij,nqj->nq', endpoints, transformed_matrix, endpoints)-1.
                 supported[rows] &= value[:, 0]*value[:, 1] <= 0.
+                if midline_tolerance_px is not None:
+                    # Broad material transitions locate paint but do not make
+                    # an irregular midpoint into an accurate circle sample.
+                    delta=uv[ids[rows]]-transformed_center
+                    level=np.einsum('ni,ij,nj->n',delta,transformed_matrix,delta)-1.
+                    gradient=2.*delta@transformed_matrix
+                    normal_error=np.abs(level)/np.maximum(np.linalg.norm(gradient,axis=1),1e-12)
+                    supported[rows] &= normal_error<=midline_tolerance_px
             unique = np.zeros(len(ids), bool)
             for group in groups:
                 good = group[supported[group]]
@@ -154,6 +164,7 @@ def known_shape_profile_hypotheses(measurement, curves, fragments=()):
                 known_projected_shape_preserved_to_first_order=True,
                 exact_shared_conic_inside_original_transition=True,
                 source_transition_intervals_used=True, source_UV_unchanged=True,
+                source_midline_tolerance_px=midline_tolerance_px,
                 fit_eligible=False, physical_identity_confirmed=False,
                 score=float(len(selected)))
             old = alternatives.get(tuple(selected_ids))

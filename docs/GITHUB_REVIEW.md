@@ -17,7 +17,7 @@
 
 ## 当前模型与数值来源
 
-当前开发工作区已接通共同 native 几何、时变相机、prepare／review 和连续 GPU LM。当前候选覆盖 S01–S09 九镜头、三个物理机位，已执行真实联合拟合并导出完整回放；候选尚未数值收敛，完整原片视觉验收尚未完成。精确输入与状态见[节目结果绑定](../events/ankara_2026/programmes/okada_mei_sp/fit_joint9/native_joint9_guarded_lines.json)，完整磁盘恢复、全节目自动取点和准确性验证的缺口见 [REBUILD](REBUILD.md)。
+当前开发工作区已接通共同 native 几何、时变相机、prepare／review 和连续 GPU LM。当前采用 `camera_solver_refined_1102` 暂定最终状态，覆盖 S01–S09 九镜头、三个物理机位，已执行真实联合拟合并导出完整回放；该状态未达到一阶数值收敛，独立物理标定和完整节目准确性验证仍未完成。精确输入、数值状态、原生库与视频见[当前结果绑定](../events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_solver_refined_1102.json)，人工确认范围见[节目入口](../events/ankara_2026/programmes/okada_mei_sp/README.md#有界结果与人工确认)，能力缺口见 [REBUILD](REBUILD.md)。
 
 广告的小型相机与控制数组见 [ad_cameras](../events/ankara_2026/programmes/okada_mei_sp/ad_cameras/)。Ad3 的[数值行库](../events/ankara_2026/programmes/okada_mei_sp/ad3_sources/rows.npz)／[对应表](../events/ankara_2026/programmes/okada_mei_sp/ad3_sources/correspondence.json)，以及 Ad7 的[数值行库](../events/ankara_2026/programmes/okada_mei_sp/ad7_sources/rows.npz)／[对应表](../events/ankara_2026/programmes/okada_mei_sp/ad7_sources/correspondence.json)保留源 UV、PTS 与身份，不含广播图像缓冲区。来源候选和参考轮廓不因公开、导入或测试通过而自动获得拟合资格。
 

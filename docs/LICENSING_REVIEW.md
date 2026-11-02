@@ -1,6 +1,6 @@
 # 公开分发与分项许可
 
-本页汇总已有许可核查及分发范围。基础核查记录于 2026-10-19，后续场景数值资产沿用相同边界；不是对全部私有历史、已安装环境或所有用途的许可认证。项目采用[分项许可与权利范围声明](../LICENSE.md)，第三方来源见 [THIRD_PARTY_ASSETS](THIRD_PARTY_ASSETS.md)。
+本页汇总已有许可核查及分发范围。基础核查记录于 2026-10-19，2026-11-02 补核三维播放器及现用人体依赖；后续场景数值资产沿用相同边界；不是对全部私有历史、已安装环境或所有用途的许可认证。项目采用[分项许可与权利范围声明](../LICENSE.md)，第三方来源见 [THIRD_PARTY_ASSETS](THIRD_PARTY_ASSETS.md)。
 
 ## 项目与第三方内容
 
@@ -15,7 +15,18 @@
 | GVHMR 补丁 | 固定上游提交 `6ec3ca39336c50492c0fae65fba2fb831fc7d866`；[原许可](../environments/third_party_patches/GVHMR_LICENSE.txt)、补丁和研究引用见[资产说明](THIRD_PARTY_ASSETS.md)，保留上游教育／研究／非营利及衍生修改非商业条件 |
 | Ceres／Abseil、SciPy、oneTBB | 原许可证和署名保留；分别适用 BSD、嵌入组件的 Apache 等原条件，项目声明不缩减第三方授权 |
 | 项目辅助代码 | ViTPose helper 与 calibration companion 按项目分项声明处理；[helper 来源](../calibration/program_tracking/body_tracking/source_helpers/run_vitpose_h.provenance.json)、[companion 来源](../src/rinkspace/calibration_companion/provenance.json)保留，实际运行依赖仍适用原许可 |
-| 外部模型与框架 | GVHMR、HMR2、ViTPose、SMPL-X、YOLO 未打包进公开 Git 内容；RAFT 位于被忽略的本地缓存，PIDNet／SMP／co-tracker 在已核查实现中仅有参考链接 |
+| 外部模型与框架 | GVHMR、HMR2、ViTPose、SMPL-X、YOLO、RAFT 及 RTMW 运行实现／权重留在 Data；[FootMR 与 CoTracker 的当前源码接线、固定提交和权重身份](../environments/body-runtime-sources.json)已实际接入，不能再将 CoTracker 描述成仅有参考链接。PIDNet／SMP 仍按原核查范围解释 |
+
+<a id="viewer3d"></a>
+## 三维播放器与外部窗口依赖
+
+[播放器](RESULTS_3D_PLAYER_ZH.md)连接外部 AITViewer 1.14.2；本机该发行物附 MIT 许可，Pyglet 2.1.19 附 BSD 三条款许可。原文、安装元数据 SHA 与源码证据见[播放器依赖记录](../environments/viewer3d-provenance.json)。这描述指定版本的现有字节，不给全部历史版本或整个仓库改标 MIT。
+
+本项目显式选择 Pyglet 窗口后端。AITViewer 上游默认配置和安装依赖仍含 PyQt6；本机 PyQt6 6.12.0 发行物附 GPLv3，PyQt6-Qt6 6.12.0 元数据标 LGPL v3，二者不能混为一项 LGPL 依赖。[Riverbank 官方说明](https://en.riverbankcomputing.com/software/pyqt)列出 GPLv3 与商业许可两种路径；本记录未取得商业授权材料。若改为 Qt 后端或分发含 Qt／PyQt 的组合程序，需按实际使用与原许可另行核对，不能沿用项目保留权利声明作为第三方授权。
+
+公开树仅保留连接源码、依赖定义、许可原文与身份记录，不附播放器安装环境或 Qt／PyQt 实现。安装锁中出现库、运行时实际加载库以及组合分发是不同事实；默认后端选择不替代整个依赖闭包的许可核查。
+
+完整人体显示还使用外部 SMPL-X Python 包和已登记模型，继续适用其各自条款。完整表面、姿态显示缓存及检查图均留在 Data；数值输出和显示几何的存在不授予模型再分发或商业许可。
 
 ## 比赛素材与数值观测
 

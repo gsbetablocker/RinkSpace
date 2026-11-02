@@ -17,10 +17,10 @@ __device__ inline void stationarity_faces_range(View v,LinearView l,SolverView s
     size_t camera_index=0;
     auto offer=[&](StationarityFace a,double margin,double scale=1.){
         const double eps=stationarity_active_tolerance(scale);
-        if(!finite_scalar(margin)){count[1]=1;return;}
-        if(margin < -eps)count[1]=1;
+        if(!finite_scalar(margin)){count[1]|=1;return;}
+        if(margin < -eps)count[1]|=1;
         if(!a.equality&&margin>eps)return;
-        if(size_t(count[0])>=capacity){count[1]=1;return;}
+        if(count[0]==std::numeric_limits<int>::max()||(faces&&size_t(count[0])>=capacity)){count[1]|=2;return;}
         if(a.family==0)a.index+=int(camera_index*v.nr);else if(a.family==3)a.index=int(camera_index);else if(a.family==5)a.index+=int(4*camera_index);
         a.margin=margin;a.scale=scale;if(faces)faces[count[0]]=a;++count[0];
     };
@@ -47,9 +47,18 @@ __device__ inline void stationarity_faces_range(View v,LinearView l,SolverView s
     camera_index=0;
     if(l.scene_directions){
         if(only_print<0){
-        for(size_t k=0;k<v.nscene;++k)bounds(1,int(k),v.scene_values[k],l.scene_lower[k],l.scene_upper[k]);
+        for(size_t k=0;k<v.nscene;++k){if(l.scene_chart&&l.scene_chart[k]>=ice_chart_actual_x)continue;
+            bounds(1,int(k),v.scene_values[k],l.scene_lower[k],l.scene_upper[k]);}
         if(v.options&64u){IceToleranceGeometry<double> g(v.board,v.layout);
-            ice_tolerance_margins(g,[&](int id,double margin){StationarityFace a{};a.family=6;a.index=id;offer(a,margin);});}
+            ice_tolerance_margins(g,[&](int id,double margin){
+                if(!finite_scalar(margin)||margin< -stationarity_active_tolerance())count[1]|=1;
+                if(ice_relation_is_independent(id)){StationarityFace a{};a.family=6;a.index=id;offer(a,margin);}});}
+        if(ice_actual_chart_enabled(l.scene_chart)){
+            for(int group=0;group<6;++group){const int kind=group<2?6:7,n=group<2?4:8,id=group<2?group:group-2;
+                // Enumerating on demand retains every numerically active tie;
+                // interior max/min ties are not active faces.
+                for(int i=0;i<n;++i)for(int j=0;j<n;++j)if(i!=j){StationarityFace a{};a.family=7;a.index=id;a.other=8*i+j;a.side=kind;
+                    offer(a,ice_actual_pair_value(v,l,kind,id,a.other,-1).a);}}}
         if((v.options&4u)&&!(v.options&64u)){
             auto relation=[&](int high,int low,double minimum=0.){
                 StationarityFace a{};a.family=2;a.index=6+high;a.other=6+low;
@@ -65,7 +74,7 @@ __device__ inline void stationarity_faces_range(View v,LinearView l,SolverView s
         if(only_camera!=-3)for(size_t i=only_print<0?0:size_t(only_print);i<(only_print<0?s.print_count:size_t(only_print+1));++i){
             const auto probe=s.print_probes[i];const auto path=v.scene_paths[probe.path];
             Vec2Value<LocalJet> chart{},material{};
-            if(scene_print_chart(path,v.scene_data,v.scene_values,nullptr,0,0,LocalJet(probe.station),chart,&material)!=Status::ok){count[1]=1;continue;}
+            if(scene_print_chart(path,v.scene_data,v.scene_values,nullptr,0,0,LocalJet(probe.station),chart,&material)!=Status::ok){count[1]|=1;continue;}
             StationarityFace a{};a.family=4;a.index=probe.path;a.station=probe.station;
             offer(a,chart.y.a,v.board[5]);a.side=1;offer(a,v.board[5]-chart.y.a,v.board[5]);
             if(path.code==1){double width=exp(v.scene_values[path.size]),height=exp(v.scene_values[path.size+1]);
@@ -112,11 +121,12 @@ __device__ inline void stationarity_faces_range(View v,LinearView l,SolverView s
                     double r1=sign1*camera_spline_derivative(c,1,times[1][j],v.dt,1);
                     if(maximum[1]-r1>stationarity_active_tolerance(maximum[1]))continue;
                     a.camera.rate_u[0]=times[0][i];a.camera.rate_u[1]=times[1][j];
+                    a.camera.rate_branch[0]=i;a.camera.rate_branch[1]=j;
                     a.camera.rate_sign[0]=sign0;a.camera.rate_sign[1]=sign1;
                     offer(a,camera_constraint_value(rig,c,v.dt,a.camera));
                 }
             }
-        });
+        },s.joined_zoom_extent?s.joined_zoom_extent+2*camera_index:nullptr);
     }    }
 
 }
@@ -149,14 +159,17 @@ __global__ void lm_stationarity_cell_faces(View v,LinearView l,SolverView s,Stat
     else stationarity_faces_range(v,l,s,nullptr,stationarity_cell_capacity,counts+3*i,int(i/cells),int(i%cells)+1);
 }
 __global__ void lm_stationarity_face_offsets(int cells,int* counts,size_t capacity,int* total){
-    if(threadIdx.x||blockIdx.x)return;int next=total[0];
-    for(int i=0;i<cells;++i){counts[3*i+2]=next;next+=counts[3*i];total[1]|=counts[3*i+1];}
-    if(size_t(next)>capacity){total[1]=1;next=int(capacity);}total[0]=next;
+    if(threadIdx.x||blockIdx.x)return;int64_t next=total[0];
+    for(int i=0;i<cells;++i){
+        if(next>std::numeric_limits<int>::max()){total[1]|=2;return;}
+        counts[3*i+2]=int(next);next+=counts[3*i];total[1]|=counts[3*i+1];}
+    if(next>std::numeric_limits<int>::max()||size_t(next)>capacity){total[1]|=2;return;}total[0]=int(next);
 }
 __device__ inline double stationarity_direction(View v,LinearView l,SolverView s,StationarityFace a,int j){
     size_t camera=a.family==0?size_t(a.index)/v.nr:(a.family==3?size_t(a.index):(a.family==5?size_t(a.index)/4:0));
     if(a.family==0)a.index%=int(v.nr);else if(a.family==5)a.index%=4;
     l=camera_linear_view(l,v.nr,camera);v=camera_view(v,camera);
+    if(a.family==7)return ice_actual_pair_value(v,l,a.side,a.index,a.other,j).v;
     if(a.family==6)return (!l.scene_active||l.scene_active[j])?ice_relation_value(v,l,a.index,j).v:0.;
     if(a.family==1)return a.sign*l.scene_directions[size_t(a.index)*l.q+j];
     if(a.family==2)return l.scene_directions[size_t(a.index)*l.q+j]+(a.side?1.:-1.)*l.scene_directions[size_t(a.other)*l.q+j];
@@ -174,7 +187,7 @@ __device__ inline double stationarity_direction(View v,LinearView l,SolverView s
     LocalJet d[27],p[38];for(int k=0;k<27;++k)d[k]={0.,l.rig_directions?l.rig_directions[size_t(k)*l.q+j]:0.};
     if(retract_motion_rig(v.rig,d,p)!=Status::ok)return NAN;
     if(a.family==0)return a.sign*p[a.index].v;
-    LocalJet controls[12];for(int k=0;k<12;++k){size_t i=3*size_t(a.camera.cell-1)+k;controls[k]={v.controls[i],l.directions[i*l.q+j]};}
+    LocalJet controls[12];for(int k=0;k<12;++k){size_t i=3*size_t(a.camera.cell-1)+k;controls[k]={v.controls[i],direction_value(l.directions,l.q,i,j,l.motion_rows)};}
     return camera_constraint_value(rig_from_values(p),controls,v.dt,a.camera).v;
 }
 __global__ void lm_stationarity_directions(View v,LinearView l,SolverView s,const StationarityFace* faces,int count,double* matrix){

@@ -1,12 +1,20 @@
 #pragma once
 #include "local_jet.hpp"
 #include "entities.hpp"
+#include "ice_actual_chart.hpp"
 namespace rinkspace {
 /* Finite coordinate charts: additive, positive log, log(exponent-1), and
  * three ordered (0,1) radii expressed by four positive interval lengths. */
 RS_HD inline double scene_chart_component(const double* values,const int* chart,
     const double* directions,int q,int column,size_t i){
     double d=directions[i*q+column];int type=chart?chart[i]:0;
+    if(type==ice_chart_witness_x||type==ice_chart_witness_radius)return 0.;
+    if(type==ice_chart_actual_x){
+        // Differentiate actual X directly. The nominal witness is held only
+        // for this pullback; its nonsmooth min/max export is never image AD.
+        const double pitch=values[9],dp=values[9]*directions[9*size_t(q)+column];
+        return (d-values[i]*dp)/pitch;}
+    if(type==ice_chart_actual_log_radius)return (1.+values[i])*d;
     if(type==1)d*=values[i];else if(type==2)d*=values[i]-1.;
     else if(type>=3&&type<=5){size_t start=i-(type-3);double ratio=values[i],previous=0.;d=0.;
         for(int k=0;k<3;++k){double gap=values[start+k]-previous;previous=values[start+k];d+=gap*((start+k<=i?1.:0.)-ratio)*directions[(start+k)*q+column];}}
@@ -18,6 +26,11 @@ RS_HD inline void scene_chart_direction(const double* values,size_t n,const int*
 }
 template<class Delta> RS_HD inline double scene_chart_retract_delta(const double* values,const int* chart,size_t index,Delta delta_at){
     int type=chart?chart[index]:0;double delta=delta_at(index);
+    if(type>=ice_chart_actual_x){
+        bool moved=delta_at(9)!=0.;for(int i=49;i<57;++i)moved|=delta_at(i)!=0.;for(int i=61;i<93;++i)moved|=delta_at(i)!=0.;
+        if(!moved)return values[index];IceActualWitness witness{};
+        if(!ice_actual_chart_retract(values,delta_at,witness))return std::numeric_limits<double>::quiet_NaN();
+        return ice_actual_export_component(witness,index);}
     if(type==0)return values[index]+delta;
     if(type==1)return delta==0.?values[index]:values[index]*std::exp(delta);
     if(type==2)return delta==0.?values[index]:1.+(values[index]-1.)*std::exp(delta);

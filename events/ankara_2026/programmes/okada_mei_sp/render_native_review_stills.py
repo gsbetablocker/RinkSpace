@@ -174,8 +174,7 @@ def render(run_root, state_path, output, selected, *, native_library=None):
             if len(raw_frames) != 1 or raw_frames[0][0] != pts:
                 raise ValueError('Exact source frame missing')
             raw = raw_frames[0][1]
-            motion_time = ((pts-shot['reference_pts'])*shot['time_base_num']/shot['time_base_den']
-                           +timeline.offset(shot))
+            motion_time = timeline.exposure_time(shot, pts)
             with ResidentResidualProblem(core,board=native.scene['board'],layout=native.scene['shared_layout'],
                     options=native.scene['shared_geometry_options'],rig=rig,controls=state['controls'],
                     first_control_time=timeline.first,control_dt=timeline.dt,image_height=height,

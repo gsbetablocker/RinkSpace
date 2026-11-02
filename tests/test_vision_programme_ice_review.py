@@ -4,7 +4,7 @@ import pytest
 
 from rinkspace.vision_programme_ice_review import (
     IceProgrammeSourceReader, _actual_profile_candidates, _batched_actual_profiles,
-    ice_curve_inventory)
+    ice_curve_inventory, straight_ice_material_signal)
 from rinkspace.vision_source_shapes import _MaterialProfileFrame, read_source_chromatic_stroke_centers
 
 
@@ -44,6 +44,26 @@ def test_two_distinct_observed_bands_remain_two_candidates():
     assert np.allclose([c[0][1] for c in candidates], [66., 116.], atol=1)
 
 
+def test_red_material_is_read_even_when_gray_contrast_is_absent():
+    # Equal-luminance red paint: grayscale alone cannot identify its two sides.
+    rgb = np.full((180, 220, 3), 180, np.uint8)
+    rgb[62:83] = [235, 159, 145]
+    rgb = cv2.GaussianBlur(rgb, (0, 0), 1.)
+    path = dict(curve_id='C:segment0', feature_id='C', world_curve_role='segment0',
+        native_path_id='native/red', xyz=np.array([[0., 0., 0.], [1., 0., 0.]]),
+        operator='paint_center', material_signal=straight_ice_material_signal('C'),
+        material_transition=None)
+    reader = IceProgrammeSourceReader(None, source_sha256='a'*64, time_base='1/90000',
+        sample_spacing_px=24., search_radius_px=40., native_paths=[path])
+    result = reader.read(rgb, 100, None, np.zeros(rgb.shape[:2], bool), shot_id='synthetic',
+        native_projections={'native/red':dict(uv=np.array([[30., 88.], [190., 88.]]), valid=np.ones(2, bool))})
+    assert len(result['candidate_uv']) >= 4
+    np.testing.assert_allclose(result['candidate_uv'][:, 1], 72., atol=1.)
+    assert straight_ice_material_signal('goal_trapezoid_far') == 'red'
+    assert straight_ice_material_signal('B2') == 'blue'
+    assert straight_ice_material_signal('lane4') == 'dark'
+
+
 def test_compound_material_cache_cannot_cross_exposure_or_mutable_RGB():
     rgb = np.full((100, 100, 3), 220, np.uint8)
     frame = _MaterialProfileFrame(rgb, binding(rgb))
@@ -55,6 +75,24 @@ def test_compound_material_cache_cannot_cross_exposure_or_mutable_RGB():
         read_source_chromatic_stroke_centers(frame.rgb, binding=binding(rgb, 101), **common)
     with pytest.raises(ValueError, match='original RGB differ'):
         read_source_chromatic_stroke_centers(frame.rgb, binding=binding(rgb), expected_RGB_sha256='b'*64, **common)
+
+
+def test_strong_reflection_cannot_hide_a_separate_weaker_paint_candidate():
+    rgb=np.full((180,220,3),200,np.uint8)
+    rgb[40:55]=[250,100,100]
+    rgb[100:115]=[204,200,200]
+    rgb=cv2.GaussianBlur(rgb,(0,0),1.)
+    path=dict(curve_id='A:centreline',feature_id='A',world_curve_role='centreline',
+        native_path_id='native/red',xyz=np.zeros((2,3)),operator='paint_center',
+        material_signal='red',material_transition=None)
+    reader=IceProgrammeSourceReader(None,source_sha256='a'*64,time_base='1/90000',
+        sample_spacing_px=24.,search_radius_px=70.,native_paths=[path],separate_bands=True)
+    result=reader.read(rgb,100,None,np.zeros(rgb.shape[:2],bool),shot_id='synthetic',
+        native_projections={'native/red':dict(uv=np.array([[30.,80.],[190.,80.]]),valid=np.ones(2,bool))})
+    y=result['candidate_uv'][:,1]
+    assert np.count_nonzero(np.abs(y-47.)<1.)>=4
+    assert np.count_nonzero(np.abs(y-107.)<1.)>=4
+    assert np.all(result['candidate_flags'] & 8)  # Neither band has an inferred physical identity yet.
 
 
 def test_complete_inventory_keeps_all_house_layers_and_unresolved_path():

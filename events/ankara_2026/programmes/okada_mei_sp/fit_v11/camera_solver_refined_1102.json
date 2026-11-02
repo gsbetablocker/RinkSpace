@@ -1,0 +1,415 @@
+{
+  "schema": "rinkspace.gpu_solver_refined_working_model.v1",
+  "status": "provisional_final_full_programme_fit",
+  "event_id": "ankara_2026",
+  "programme_id": "okada_mei_sp",
+  "source_run": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/joint_camera_consolidated",
+  "source_model_record": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_consolidated_1102.json",
+  "state": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/solver_speed_validation/continue_1102/fit_completion/accepted_pixels_latest.npz",
+    "sha256": "b9f1cb81c8f11163152e7ca4fea16494cad91951be304dfe7c2182c6db4fabec",
+    "compact_path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_solver_refined_1102.npz",
+    "compact_sha256": "d6cfde1474a23d594a0395351ebbdb0ee15a6560ef77b27f069d239ee95bb3f3"
+  },
+  "native_library": {
+    "path": "D:/CodexData/RinkSpace_Data/build/solver_continue_1102/rinkspace_core.dll",
+    "sha256": "606f94386d26a3c6683dcbf881ce75d64de08ab2cc27a9a4effbf2ea698ad080",
+    "provenance": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/solver_speed_validation/continue_1102/provenance.json",
+    "frozen_source": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/solver_speed_validation/continue_1102/source_final"
+  },
+  "prepared": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\physical_repair_1101\\prepared_shared_timing",
+  "camera_profile": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\camera_experiments\\joint\\reference_pupil_joint.json",
+    "sha256": "d5a066f04c15a5b21f23ff397027fb7e65a1bcf0cd272b4b3883260b6c6a3a19"
+  },
+  "camera_coupling": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/camera_experiments/joint/shared_readout_working.json",
+  "point_input_sha256": "ecb7012af725c94026ba85c9249e731e560c20d2f2189efd25cb28113512f5fb",
+  "scene_sha256": "8694e1ffc6f794072e9ed24ee5a5120081ffa28a3ae09ece4e3eb353dc1418d8",
+  "rows": 2213335,
+  "shots": {
+    "s01": {
+      "before": {
+        "rows": 279126,
+        "invalid": 0,
+        "cost": 1195396.2598690693,
+        "rms": 2.926650068767313,
+        "median": 1.3093983351923075,
+        "p95": 6.188675681939152,
+        "p99": 10.26160347144131,
+        "maximum": 25.94995618953432,
+        "above_20px": 90
+      },
+      "after": {
+        "rows": 279126,
+        "invalid": 0,
+        "cost": 1192252.721532199,
+        "rms": 2.9227994238774375,
+        "median": 1.308652779386613,
+        "p95": 6.175709639656114,
+        "p99": 10.250334409491884,
+        "maximum": 25.898191928570522,
+        "above_20px": 92
+      }
+    },
+    "s02": {
+      "before": {
+        "rows": 135187,
+        "invalid": 0,
+        "cost": 641851.8285216804,
+        "rms": 3.0815195258896906,
+        "median": 1.3369179394852642,
+        "p95": 6.565324438585782,
+        "p99": 11.25109823934652,
+        "maximum": 31.62448924253522,
+        "above_20px": 36
+      },
+      "after": {
+        "rows": 135187,
+        "invalid": 0,
+        "cost": 641539.6242401133,
+        "rms": 3.0807699910553388,
+        "median": 1.3362449459916599,
+        "p95": 6.565585645790825,
+        "p99": 11.247803151721838,
+        "maximum": 31.633602111205743,
+        "above_20px": 37
+      }
+    },
+    "s03": {
+      "before": {
+        "rows": 45053,
+        "invalid": 0,
+        "cost": 150609.71870031123,
+        "rms": 2.585708951522139,
+        "median": 1.455064082116867,
+        "p95": 4.664504275468281,
+        "p99": 9.842309262412202,
+        "maximum": 19.14589836737606,
+        "above_20px": 0
+      },
+      "after": {
+        "rows": 45053,
+        "invalid": 0,
+        "cost": 151307.79544738572,
+        "rms": 2.5916944103945982,
+        "median": 1.4598813402144357,
+        "p95": 4.688351896419254,
+        "p99": 9.85066091342486,
+        "maximum": 19.171660845350278,
+        "above_20px": 0
+      }
+    },
+    "s04": {
+      "before": {
+        "rows": 194046,
+        "invalid": 0,
+        "cost": 684579.1048711175,
+        "rms": 2.656283778138924,
+        "median": 1.0507719258259391,
+        "p95": 5.751694781010493,
+        "p99": 9.617423543974855,
+        "maximum": 24.000048006423917,
+        "above_20px": 9
+      },
+      "after": {
+        "rows": 194046,
+        "invalid": 0,
+        "cost": 683693.9135176,
+        "rms": 2.654565875855439,
+        "median": 1.0457438794464864,
+        "p95": 5.753045069221638,
+        "p99": 9.605058089866489,
+        "maximum": 23.946815098865695,
+        "above_20px": 9
+      }
+    },
+    "s05": {
+      "before": {
+        "rows": 483702,
+        "invalid": 0,
+        "cost": 1205857.7087402707,
+        "rms": 2.2329247541209036,
+        "median": 1.0264563833504914,
+        "p95": 4.550495298772097,
+        "p99": 7.716201611880289,
+        "maximum": 32.28355356183195,
+        "above_20px": 30
+      },
+      "after": {
+        "rows": 483702,
+        "invalid": 0,
+        "cost": 1207324.1986510702,
+        "rms": 2.234282114373538,
+        "median": 1.0276693153951149,
+        "p95": 4.551863309147684,
+        "p99": 7.719639982779395,
+        "maximum": 32.27536844348502,
+        "above_20px": 32
+      }
+    },
+    "s06": {
+      "before": {
+        "rows": 142406,
+        "invalid": 0,
+        "cost": 671674.4995562282,
+        "rms": 3.07135688972417,
+        "median": 1.3528914213973722,
+        "p95": 6.4050888306308345,
+        "p99": 11.384155505526557,
+        "maximum": 30.909067925811648,
+        "above_20px": 63
+      },
+      "after": {
+        "rows": 142406,
+        "invalid": 0,
+        "cost": 671981.9505414403,
+        "rms": 3.072059747780763,
+        "median": 1.353301572459972,
+        "p95": 6.4030643117342025,
+        "p99": 11.3948022499648,
+        "maximum": 31.0210212857522,
+        "above_20px": 63
+      }
+    },
+    "s07": {
+      "before": {
+        "rows": 279466,
+        "invalid": 0,
+        "cost": 502066.293887749,
+        "rms": 1.8955316548506398,
+        "median": 0.8150676562499566,
+        "p95": 3.9108269427077005,
+        "p99": 6.6943082967728875,
+        "maximum": 31.397986362304852,
+        "above_20px": 10
+      },
+      "after": {
+        "rows": 279466,
+        "invalid": 0,
+        "cost": 500544.1173996539,
+        "rms": 1.89265601469124,
+        "median": 0.8149697387769398,
+        "p95": 3.9026429526382453,
+        "p99": 6.693465955181618,
+        "maximum": 31.336303159680742,
+        "above_20px": 8
+      }
+    },
+    "s08": {
+      "before": {
+        "rows": 61909,
+        "invalid": 0,
+        "cost": 222872.10855656015,
+        "rms": 2.6832798185764375,
+        "median": 1.2756573541884242,
+        "p95": 5.304232382157539,
+        "p99": 9.698290950685054,
+        "maximum": 23.49942819536258,
+        "above_20px": 8
+      },
+      "after": {
+        "rows": 61909,
+        "invalid": 0,
+        "cost": 223045.07735762346,
+        "rms": 2.684320849867066,
+        "median": 1.2755859318633318,
+        "p95": 5.308369787262589,
+        "p99": 9.713793548516536,
+        "maximum": 23.50983940040539,
+        "above_20px": 8
+      }
+    },
+    "s09": {
+      "before": {
+        "rows": 592440,
+        "invalid": 0,
+        "cost": 659512.8936483548,
+        "rms": 1.4921224217916953,
+        "median": 0.6785503975844616,
+        "p95": 3.082162052472517,
+        "p99": 5.249853391326686,
+        "maximum": 18.7263093756132,
+        "above_20px": 0
+      },
+      "after": {
+        "rows": 592440,
+        "invalid": 0,
+        "cost": 658964.0511603635,
+        "rms": 1.4915014251133865,
+        "median": 0.6736588186271717,
+        "p95": 3.0798042641165044,
+        "p99": 5.25574047369374,
+        "maximum": 18.7472655878818,
+        "above_20px": 0
+      }
+    }
+  },
+  "physical_cameras": 3,
+  "model": {
+    "raw_pixels": true,
+    "weights": false,
+    "robust_loss": false,
+    "ice_tolerance": 0.01,
+    "joined_zoom_pupil_domain": true,
+    "independent_optics": true,
+    "shared_readout": true,
+    "all_original_points_and_domains_retained": true
+  },
+  "result": {
+    "old_cost": 5934420.416351348,
+    "final_cost": 5930653.449847411,
+    "decrease": 3766.9665039367974,
+    "decrease_percent": 0.06347656956621278,
+    "old_rms": 2.315690836250503,
+    "final_rms": 2.3149557590292296,
+    "old_boundary_check_mean_ms": 37.35101746870627,
+    "final_boundary_check_mean_ms": 1.725168267831147,
+    "old_shared_domain_check_mean_ms": 148.47432268518517,
+    "final_shared_domain_check_mean_ms": 7.5831875,
+    "last_run_trials": 6,
+    "last_run_wall_s": 30.631686000000002,
+    "last_run_mean_s": 5.105281000000001,
+    "last_run_dual_s": 1.5088314999999983,
+    "roundoff_dual_repairs": 83,
+    "stop_reason": "cost_progress_stagnation_without_convergence",
+    "numerically_converged": false,
+    "visual_acceptance": false,
+    "invalid": 0,
+    "last_accepted_decrease": 0.007788040675222874,
+    "stationarity_diagnostics": {
+      "full_projection_vector_computed": false,
+      "full_nonlinear_kkt_checked": false,
+      "stationarity_scope": "declared_active_physical_tangent_cone",
+      "original_undamped_objective": true,
+      "objective": 5930653.449847447,
+      "active_constraint_count": 188,
+      "constraint_projected_gradient_inf": null,
+      "constraint_projected_gradient_lower_bound": 2573.2966385087557,
+      "status": "nonconvergence_proved_by_free_coordinate"
+    }
+  },
+  "earlier_strict_stop": {
+    "run": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/solver_speed_validation/continue_1102/fit_final",
+    "relative_cost_tolerance": 1e-12,
+    "stop_reason": "cost_progress_stagnation_without_convergence",
+    "last_predicted_decrease": 6.341642096842222e-7,
+    "last_actual_decrease": 2.60770320892334e-8
+  },
+  "final_stop_policy": {
+    "relative_cost_tolerance": 1e-7,
+    "reason": "User explicitly requested stopping after this repair if only subunit improvement remained and no clear further descent or optimization point was found."
+  },
+  "speed_audit": {
+    "previous_sparse_storage_and_motion_retraction": "retained and active",
+    "previous_station_geometry_and_camera_context_caches": "retained and active",
+    "previous_dual_working_set_and_refinement": "present in old DLL; header SHA matched workspace before changes",
+    "four_original_boundary_corrections": "retained",
+    "regressions_or_new_hotspots": [
+      "serial retained-boundary selection",
+      "joined focal-domain witness scanning all cells in one lane",
+      "serial 512-interval BoardCourse integration",
+      "mode 2 recovery repeating the ordinary joint-face path",
+      "Cauchy line search capped at arbitrary unit length",
+      "roundoff-limited dual failures entering long fallback before primal restoration"
+    ]
+  },
+  "changes": [
+    "parallel stable retained separator and parallel joined-focal extrema, with original CPU oracle",
+    "parallel independent BoardCourse integrals, original quadrature and ordered prefix",
+    "preserve descent candidate and polish identical near-zero primal separator",
+    "warm-start fallback with better feasible original-KKT iterate",
+    "use projected Cauchy recovery directly and bracket beyond unit step",
+    "route roundoff-limited failed KKT to original primal restoration; never certify it as solved"
+  ],
+  "validation": {
+    "gpu_final_correction": "40 tests and 26 subtests passed",
+    "gpu_geometry_and_constraints": "53 tests and 43 subtests passed for preceding identical geometry implementation",
+    "dual": "39 algebraic cases passed, plus transactional stop and roundoff-routing assertions",
+    "compact_equals_final_global_arrays": true,
+    "source_and_library_bindings_checked": true,
+    "full_visual_review": false
+  },
+  "logs": {
+    "main": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/solver_speed_validation/continue_1102/fit_completion/solve.jsonl",
+    "progress": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/solver_speed_validation/continue_1102/fit_completion/fit_progress.log",
+    "result": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/solver_speed_validation/continue_1102/fit_completion/result.json",
+    "performance": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/solver_speed_validation/continue_1102/performance_summary.json"
+  },
+  "changed_files": [
+    "native/src/gpu_solver.cuh",
+    "native/src/gpu_stationarity.cuh",
+    "native/src/core_gpu.cu",
+    "native/include/rinkspace/camera_envelope.hpp",
+    "native/include/rinkspace/coupled_dual_working_set.hpp",
+    "native/include/rinkspace/geometry.hpp",
+    "native/tests/coupled_dual_working_set.cpp",
+    "src/rinkspace/core/gpu.py",
+    "native/README.md"
+  ],
+  "solver_stop_status": "stopped_without_significant_further_descent_per_latest_user_request",
+  "designation": {
+    "status": "provisional_final",
+    "label_zh": "冈田芽衣短节目完整拟合的暂定最终状态",
+    "designated_on": "2026-11-02",
+    "authority": "explicit_user_instruction",
+    "user_instruction_zh": "那就在项目记录里把当前状态明确为冈田芽衣短节目完整拟合的暂定最终状态",
+    "shot_ids": [
+      "s01",
+      "s02",
+      "s03",
+      "s04",
+      "s05",
+      "s06",
+      "s07",
+      "s08",
+      "s09"
+    ],
+    "physical_cameras": 3,
+    "source_seconds": [
+      22.12,
+      188.68
+    ],
+    "source_time_base": "1/12800",
+    "source_first_pts": 283136,
+    "source_last_pts": 2415104,
+    "source_exposures": 8329,
+    "full_state_frozen": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\review_camera_solver_refined_1102\\frozen_state.npz",
+      "sha256": "b9f1cb81c8f11163152e7ca4fea16494cad91951be304dfe7c2182c6db4fabec"
+    },
+    "compact_parameters": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_solver_refined_1102.npz",
+    "compact_parameters_sha256": "d6cfde1474a23d594a0395351ebbdb0ee15a6560ef77b27f069d239ee95bb3f3",
+    "native_library": "D:/CodexData/RinkSpace_Data/build/solver_continue_1102/rinkspace_core.dll",
+    "native_library_sha256": "606f94386d26a3c6683dcbf881ce75d64de08ab2cc27a9a4effbf2ea698ad080",
+    "engineering_decisions": {
+      "retain_zoom_pupil_terms": true,
+      "complete_forward_working_interval_m": [
+        -0.1,
+        0.3
+      ],
+      "expand_current_bounds": false,
+      "retain_current_end_camera_distortion_terms": true,
+      "refit_for_bound_contact_or_component_cancellation_alone": false,
+      "bounds_are_manufacturer_calibration": false
+    },
+    "remaining_local_observations": [
+      "S08开头少数曝光仍有约4–6px局部运动偏差。",
+      "S05末曝光、S08首曝光读出窗口仍有亚帧加速度尖峰，尚不能作为已验证的真实云台轨迹。"
+    ],
+    "independent_physical_calibration_complete": false
+  },
+  "review": {
+    "record_json": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_solver_refined_1102_review.json",
+    "record_md": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/solver_refined_review_1102/camera_solver_refined_1102_review.md",
+    "render_snapshot": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/review_camera_solver_refined_1102/render_snapshot.json",
+    "complete_video": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\review_camera_solver_refined_1102\\camera_solver_refined_1102_complete.mp4",
+    "complete_video_sha256": "58d430957f0c36814bc0cd5990238672f3701226c3a29b5544e924f26d6f7c31",
+    "verification": {
+      "decoded_frames": 8329,
+      "native_PTS_equal": true,
+      "display_speed": 1
+    },
+    "user_designation": "provisional_final",
+    "designation_date": "2026-11-02"
+  }
+}

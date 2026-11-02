@@ -22,6 +22,7 @@
 
 | 工具 | 用途与边界 |
 |---|---|
+| [scripts/build_core.py](scripts/build_core.py)、[构建说明](native/README.md#构建与检查) | 原生 CPU／CUDA 构建；`--check-toolchain` 先检查原生子进程访问及现有工具，记录实际工具路径与版本 |
 | [INSTALL_LOCAL.cmd](INSTALL_LOCAL.cmd)、[START_LOCAL.cmd](START_LOCAL.cmd) | 基础安装与本地服务；安装器选择 dev/acquisition，不含 advanced |
 | [START_POINT_EDITOR.cmd](START_POINT_EDITOR.cmd)、[参数](START_POINT_EDITOR.ps1) | 指定 Dataset、Media、SourceMedia、Model、Port，编辑有源身份的观测 |
 | [refresh_project_entry.py](scripts/refresh_project_entry.py) | 刷新 Data 中的结果面板，保留 CURRENT_TASK 与冻结绑定 |
@@ -30,6 +31,8 @@
 共享映射为 [storage.defaults.json](configs/storage.defaults.json)。新机器可复制 [storage.example.json](configs/storage.example.json) 为受忽略的 `configs/storage.json`，填入绝对 Data 根，或设置 `RINKSPACE_DATA_ROOT`。显式 `AssetStore(root, data_root=...)` 优先于环境变量和本机文件；未配置 Data 时，通用工作台使用受忽略的 outputs，pytest 缓存使用系统临时目录。
 
 GPU Python 环境位于 Data 的 `runtime_tools/vision_cuda`、`runtime_tools/body_cuda`，人体上游运行资源位于 `runtime_tools/body`，通用预训练权重缓存位于 `cache/pretrained`。运行入口通过同一 AssetStore 映射解析；OneDrive 保存依赖定义、来源记录与赛事最终模型，不保存这些大型运行副本。
+
+原生库、cuDSS 和历史 Ceres 运行副本分别位于 Data 的 `runtime_tools/native_core`、`runtime_tools/cudss` 和 `runtime_tools/ceres`。旧地址在共享映射中保留；源码、构建身份、补丁与许可仍在 OneDrive。历史 source_datasets 审阅页面按 `AssetStore.review_page()` 定位到 Data/results，旧页面精确路径也可通过同一映射查询。
 
 `AssetStore.project_entry()` 定位到 `Data/workbench/START_HERE.html`；Web `/` 在该文件存在时显示面板，否则显示通用工作台。审阅页经 source_datasets → results 定位 Data 产物。旧根页面和历史快捷方式仅本机保留；刷新器可用旧页面首次初始化，无冻结绑定时无需生成面板。
 

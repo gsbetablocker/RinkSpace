@@ -1,0 +1,39 @@
+{
+  "schema": "rinkspace.camera_parameter_interpretation.v1",
+  "event_id": "ankara_2026",
+  "model": "Sony PXW-Z190 delivered-image working camera",
+  "scope": "Meaning of the retained zoom-pupil coordinates; not a new fitted degree of freedom",
+  "sources": [
+    {
+      "title": "Ansys Optics: Paraxial vs. Real pupils in optical system",
+      "url": "https://optics.ansys.com/hc/en-us/articles/42661958583571-Paraxial-vs-Real-pupils-in-optical-system",
+      "supports": "Entrance pupil is the optical image of the aperture stop; its position is distinct from the physical stop and can change with the optical configuration."
+    },
+    {
+      "title": "Edmund Optics: Telecentric Design Topics",
+      "url": "https://www.edmundoptics.co.uk/knowledge-center/application-notes/imaging/telecentric-design-topics",
+      "supports": "Entrance pupil is the stop image in object space; physical lens-element positions and entrance-pupil position are different quantities."
+    }
+  ],
+  "model_meaning": {
+    "vertical_lever": "Off-axis height between the tilt-axis reference and the optical axis, chosen upward8cm from compact visible assembly.",
+    "forward_reference": "Projection-centre position along the camera optical axis at the recorded focal reference. Fixed +5cm as a selected reference constraint; it is not an independently fitted solid arm.",
+    "pupil_terms": "Linear/quadratic change of the effective axial projection centre relative to that reference. Their sum with the reference is the quantity evaluated over the entire joined observed focal span.",
+    "readout": "One shared effective monotone row-time span in the selected three-camera working model, not a measurement of original capture mode."
+  },
+  "decisions": {
+    "constant_centre_branch": "Rejected from visible S07 advertising drift; source-required zoom-pupil variation retained.",
+    "reference_branch": "Initial full-source projection preserved to numerical roundoff while removing three independent forward-reference coordinates.",
+    "working_forward_interval_m": [
+      -0.1,
+      0.3
+    ],
+    "working_forward_interval_status": "Explicit engineering guard for this programme model. It is not measured from the Sony body outline, and the pupil is not a piece of hardware that must lie at a visible screw or inside the housing.",
+    "manufacturer_pupil_positions_or_sensor_timing_measured": false
+  },
+  "related_receipts": [
+    "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/rigid_centre_visual_review.json",
+    "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/prepared_reference_optics/reference_pupil_receipt.json",
+    "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/capture_mode_current_facts.json"
+  ]
+}

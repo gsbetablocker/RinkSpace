@@ -9,6 +9,7 @@
 #include <limits>
 
 using namespace rinkspace;
+RS_API int rs_camera_joined_zoom_domain_version(void){return 1;}
 RS_API int rs_camera_envelope_evaluate(const double* rig,size_t nr,const double* controls,size_t nc,double dt,
     const double* limits,size_t n,double* out,size_t no){
     CameraEnvelope e{};MotionSpline s{controls,nc,0.,dt};

@@ -118,7 +118,11 @@ def _actual_profile_candidates(point, normal, offsets, profile, smooth, *, opera
     flank = min(10, max(3, len(offsets)//10))
     background = np.linspace(float(np.median(profile[:flank])), float(np.median(profile[-flank:])), len(profile))
     material = np.maximum(background-smooth if signal == "dark" else smooth-background, 0.)
-    material_floor = max(2., 3*noise, .1*float(material.max()))
+    # A bright reflection elsewhere in this search profile cannot set the
+    # detection threshold for a weaker painted line. Keep every band above
+    # the local source-noise floor; subsequent shape/identity checks resolve
+    # the alternatives without inventing pixels or assigning fit weights.
+    material_floor = max(2., 3*noise)
     active = material > material_floor
     starts = np.flatnonzero(active & ~np.r_[False, active[:-1]])
     ends = np.flatnonzero(active & ~np.r_[active[1:], False])
@@ -158,6 +162,15 @@ def _actual_profile_candidates(point, normal, offsets, profile, smooth, *, opera
         item = (center, np.asarray([entering[1], leaving[1]]), cropped)
         candidates.append((*item, np.asarray([entering, leaving])) if with_quantiles else item)
     return candidates
+
+
+def straight_ice_material_signal(feature_id):
+    """Use the painted material, consistently for scene and native inventories."""
+    if feature_id in ("B1", "B2"):
+        return "blue"
+    if feature_id == "C" or feature_id.startswith(("goal_line", "goal_trapezoid")):
+        return "red"
+    return "dark"
 
 
 def ice_curve_inventory(scene, role_contract=None):
@@ -201,7 +214,7 @@ def ice_curve_inventory(scene, role_contract=None):
             for index, points in enumerate(feature["segments_xyz"]):
                 xyz = np.concatenate([np.linspace(a, b, 129)[:-1] for a, b in zip(points[:-1], points[1:])] + [np.asarray(points[-1:])])
                 name = feature["id"]
-                signal = "blue" if name in ("B1", "B2") else ("red" if name == "C" or name.startswith(("goal_line", "goal_trapezoid")) else "dark")
+                signal = straight_ice_material_signal(name)
                 add(feature, f"segment{index}", xyz, "paint_center", signal)
         elif kind == "polygon" and feature["id"].startswith("lane"):
             for index, points in enumerate(feature.get("paint_segments_xyz", [])):

@@ -1,0 +1,72 @@
+{
+  "schema": "rinkspace.user_source_curve_identity.v1",
+  "authority": "User explicit three-color identity correction in this chat, 2026-11-02",
+  "source_video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "shot": "s08",
+  "reference_pts": 1742848,
+  "time_base": "1/12800",
+  "reference_native_BGR_sha256": "a7986128847f4d40d4bb5b8120850b2d43fcac9107991e9ecd59ca7feeddffcb",
+  "annotation": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/s08_user_ice_identity_1742848.png",
+    "sha256": "591dcabfd02333ea0c39c5c3b6f952330443fdfbc8baefcc3e2ac33ee96f6ff8",
+    "used_for_identity_and_search_navigation_only": true,
+    "used_as_measured_UV": false
+  },
+  "guide_scope": [
+    1742848,
+    1747968
+  ],
+  "search_half_width_px": 64,
+  "identity_seed_band_px": 16,
+  "curves": [
+    {
+      "native_path_id": "d78_material_169/path0",
+      "identity": "lane3 lower longitudinal side / ice.lane3:edge2",
+      "user_color": "red",
+      "source_search_polyline": [
+        [
+          1028,
+          1056
+        ],
+        [
+          1918,
+          987
+        ]
+      ]
+    },
+    {
+      "native_path_id": "d78_material_142/path0",
+      "identity": "B1",
+      "user_color": "purple",
+      "source_search_polyline": [
+        [
+          192,
+          640
+        ],
+        [
+          1918,
+          767
+        ]
+      ]
+    },
+    {
+      "native_path_id": "ice/lane3:F_transverse",
+      "identity": "new left-side lane3 transverse connector between its longitudinal sides",
+      "user_color": "blue",
+      "source_search_polyline": [
+        [
+          320,
+          864
+        ],
+        [
+          1696,
+          979
+        ]
+      ]
+    }
+  ],
+  "measurement_policy": "Existing native ice centreline definition; all precise UV must be reread from original RGB paired material boundaries.",
+  "user_identity_confirmed": true,
+  "user_pixel_accuracy_accepted": false,
+  "user_candidate_grid_accepted": false
+}

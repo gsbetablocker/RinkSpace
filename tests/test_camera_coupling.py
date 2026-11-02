@@ -1,7 +1,10 @@
 """The fixed delivery-mode model shares lens functions, not scene coordinates."""
+import json
 import numpy as np
 import pytest
-from rinkspace.domain.camera_coupling import build_multicamera_directions,change_zoom_reference
+from rinkspace.domain.camera_coupling import (
+    build_multicamera_directions,change_zoom_reference,read_camera_coupling,
+)
 from rinkspace.domain.camera_experiment import CAMERA_NAMES
 
 
@@ -39,6 +42,8 @@ def test_shared_manifold_and_mode_mismatch_are_rejected():
     with pytest.raises(ValueError,match='manifold'):build_multicamera_directions(bad,active,np.ones(31),config)
     bad=rigs.copy();bad[0,24]+=1
     with pytest.raises(ValueError,match='reference'):build_multicamera_directions(bad,active,np.ones(31),config)
+    bad=rigs.copy();bad[0,38]+=.001
+    with pytest.raises(ValueError,match='wide basis'):build_multicamera_directions(bad,active,np.ones(31),config)
 
 
 def test_reference_change_preserves_complete_forward_and_optics():
@@ -50,3 +55,78 @@ def test_reference_change_preserves_complete_forward_and_optics():
     for base,slope in [(26,29),(27,30),(31,32),(33,34)]:
         np.testing.assert_allclose(old[base]+old[slope]*a,new[base]+new[slope]*b,atol=1e-13)
     assert new[38]==old[38]
+
+
+def readout_only_coupling():
+    return dict(schema='rinkspace.camera_coupling.v1',id='shared_readout',
+        hardware_calibrated=False,basis='Explicit engineering comparison, not field calibration',
+        groups=[dict(id='timing',camera_indices=[0,1,2],shared_names=['readout'])])
+
+
+def test_readout_only_group_preserves_distinct_optical_references(tmp_path):
+    rigs,_=rigs_and_coupling();rigs[:,37]=.008;before=rigs.copy()
+    path=tmp_path/'readout.json';path.write_text(json.dumps(readout_only_coupling()),encoding='utf-8')
+    config=read_camera_coupling(path)
+    scales=np.linspace(.1,3.1,31);active=[tuple(range(31))]*3
+    rd,meta=build_multicamera_directions(rigs,active,scales,config)
+    assert rd.shape==(93,91)
+    assert meta['unique_camera_columns']==91
+    chart=CAMERA_NAMES.index('readout')
+    rows=rd[np.arange(3)*31+chart]
+    np.testing.assert_array_equal(rows,np.repeat(rows[:1],3,axis=0))
+    assert np.count_nonzero(rows[0])==1
+    assert rows[0].max()==scales[chart]
+    step=np.linspace(-.01,.01,91);local=(rd@step).reshape(3,31)
+    np.testing.assert_array_equal(local[:,chart],np.repeat(local[0,chart],3))
+    np.testing.assert_array_equal(rigs,before)
+    assert meta['shared_coordinates']==[
+        dict(group='timing',parameter='readout',cameras=[0,1,2],active=True)]
+    # Unrelated optical directions stay camera-local.
+    assert not np.array_equal(rd[20],rd[31+20])
+
+
+def test_shared_readout_can_be_inactive_for_all_cameras():
+    rigs,_=rigs_and_coupling();rigs[:,37]=.008
+    active=[(20,)]*3
+    rd,meta=build_multicamera_directions(rigs,active,np.ones(31),readout_only_coupling())
+    assert rd.shape==(93,3)
+    assert not meta['shared_coordinates'][0]['active']
+    assert not rd[np.arange(3)*31+CAMERA_NAMES.index('readout')].any()
+
+
+@pytest.mark.parametrize('active_readout',[True,False])
+def test_shared_readout_requires_exact_initial_equality(active_readout):
+    rigs,_=rigs_and_coupling();rigs[:,37]=.008
+    rigs[2,37]=np.nextafter(rigs[2,37],np.inf)
+    chart=CAMERA_NAMES.index('readout');active=[(chart,) if active_readout else ()]*3
+    with pytest.raises(ValueError,match='manifold: readout'):
+        build_multicamera_directions(rigs,active,np.ones(31),readout_only_coupling())
+
+
+@pytest.mark.parametrize('selected_cameras',[(0,),(0,1)])
+def test_shared_readout_rejects_partial_activation(selected_cameras):
+    rigs,_=rigs_and_coupling();rigs[:,37]=.008
+    chart=CAMERA_NAMES.index('readout')
+    active=[(chart,) if i in selected_cameras else () for i in range(3)]
+    with pytest.raises(ValueError,match='Select all linked cameras'):
+        build_multicamera_directions(rigs,active,np.ones(31),readout_only_coupling())
+
+
+@pytest.mark.parametrize('names',[['k10'],['readout','k10']])
+@pytest.mark.parametrize('missing',[
+    'delivery_magnifications','reference_focal_base_pixels','wide_boundary_base_log_f'])
+def test_optical_and_mixed_groups_still_require_optical_conventions(tmp_path,names,missing):
+    _,legacy=rigs_and_coupling();config=readout_only_coupling()
+    group=legacy['groups'][0];group['shared_names']=names;del group[missing]
+    config['groups']=[group]
+    path=tmp_path/'optics.json';path.write_text(json.dumps(config),encoding='utf-8')
+    with pytest.raises(KeyError,match=missing):read_camera_coupling(path)
+
+
+@pytest.mark.parametrize('names',[['k10'],['readout','k10']])
+@pytest.mark.parametrize(('storage','message'),[(24,'reference'),(38,'wide basis')])
+def test_optical_and_mixed_groups_still_reject_misaligned_references(names,storage,message):
+    rigs,config=rigs_and_coupling();config['groups'][0]['shared_names']=names
+    rigs[0,storage]+=.001
+    with pytest.raises(ValueError,match=message):
+        build_multicamera_directions(rigs,[tuple(range(31))]*3,np.ones(31),config)

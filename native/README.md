@@ -20,13 +20,15 @@ cmake --build D:\CodexData\RinkSpace_Data\build\core --config Release
 ctest --test-dir D:\CodexData\RinkSpace_Data\build\core -C Release --output-on-failure
 ~~~
 
-CUDA 构建需已有 MSVC／CUDA 开发环境：
+CUDA 构建复用已有 MSVC／CUDA。脚本在 Windows 上先检查原生子进程能否进入项目、输出和临时目录，以及读取源码、写入输出；再按需用 `vswhere` 找到现有 `vcvars64.bat` 并载入 MSVC 环境。也可用 `--vcvars <现有vcvars64.bat>` 指定安装。CMake、Ninja 可从该开发环境发现：
 
 ~~~powershell
-D:\CodexData\RinkSpace_Data\runtime_tools\vision_cuda\Scripts\python.exe scripts/build_core.py --out D:\CodexData\RinkSpace_Data\build\core_cuda --cuda --generator Ninja --cmake "<已有cmake.exe>"
+D:\CodexData\RinkSpace_Data\runtime_tools\vision_cuda\Scripts\python.exe scripts/build_core.py --out D:\CodexData\RinkSpace_Data\build\core_cuda --cuda --generator Ninja
 ~~~
 
-连续 GPU LM 另需 cuDSS：在脚本命令追加 `--cudss <项目绝对路径>/environments/cudss/0.8-cu13`。直接 CMake 使用 `-DRINKSPACE_CUDSS_ROOT=<cuDSS目录>`。依赖版本与本机配置见[环境说明](../environments/README.md)。
+连续 GPU LM 另需 cuDSS：在脚本命令追加 `--cudss <外部Data绝对路径>/runtime_tools/cudss/0.8-cu13`。直接 CMake 使用 `-DRINKSPACE_CUDSS_ROOT=<cuDSS目录>`。依赖版本与本机配置见[环境说明](../environments/README.md)。
+
+追加 `--check-toolchain` 仅检查环境，不配置或编译；完整构建使用同一命令去掉该选项。`toolchain.json` 记录实际工具路径与版本，`build.json` 记录构建命令；重试时 `build.log` 追加保留失败日志。Windows 的编译器探测使用与产物一致的 Release 配置，仍执行真实编译和链接。
 
 `--cuda-fast-compile min` 可显式选择较少削弱运行优化的编译路径；默认 `0` 仍保留完整优化。不同选项必须在相同输入上实测，不能按编译速度推断求解速度。
 
@@ -41,6 +43,12 @@ CPU／GPU 共用 `geometry.hpp`、`entities.hpp`、`camera_state.hpp` 和 `proje
 共享冰面几何选项 16（须同时启用坐标架选项 2，且采用 layout35）将两条球门线构造成 `x=±d`，两端半椭圆共用 `ax/ay`，球门区只包含有限圆弧，梯形四边共用两项半开口跨度并关于两条场地中轴镜像。CPU/GPU 使用同一构造和导数；旧选项 0–15 的参数含义保持不变。具体参数槽见 `core_api.h`，赛事启用状态由当前 scene 声明。
 
 共享冰面选项 64（同时启用原选项 1–32）使用 layout146：前 39 项为原共同名义参数，后 107 项是相对名义量的有界偏差。尺寸允许 ±1%，位置和斜率的归一化定义见 `domain/ice_tolerance.py` 和 `ice_tolerance.hpp`。图元类型、接点、分支与严格顺序保留；206 个有限关系面在 CPU/GPU 前向、可行步和停止判据中采用同一函数及自动导数，偏差盒边界由 native 强制交集。全部偏差为零时复现选项 63。`rinkspace_ice_tolerance` 检查全部偏差与关系面导数、接线和边界，Python 回归另检查 CUDA 与有限合成拟合。
+
+`ice_relation_meta.hpp` 为 206 个原关系维护有限类型、精确同义面和结构支持。内部修正去除 14 个重复面，原 206 面仍是最终域检查；136／147 等仅近乎平行的面不会合并。仿射偏差界可在同一 cuDSS 分解下按多 RHS 求响应，并进入允许工作面释放的小 QP。容量按真实 RHS 数和约束面数增长，计入设备预算。
+
+`ice_actual_chart.hpp`／`ice_actual_witness.hpp` 支持八个实际 X 和 32 个实际 log-radius 的等价坐标，消去六个名义见证自由度，未固定其余几何零方向。输出仍为旧 layout146，见证必须通过原 inclusive ±1% 盒和全部关系。名义 X 使用极值区间中点，半径使用共同合法区间，逆变换采用稳定差分；失败不裁剪实际几何或放宽容差。联合 QP 的越界分离点可暂用未受界偏差表达几何，最终状态仍须原域合法。CPU 三项 `ice_relation_meta`、`ice_actual_witness`、`ice_actual_chart` 与 `tests/test_ice_actual_chart_gpu.py` 分别核验元数据、见证、导数和 CUDA 约束步；合成测试不替代真实节目验证。
+
+历史 ±5% 冰面候选的独立源码保存在 [ice5_joint_soc](../native_experiments/ice5_joint_soc/)，差异见 [ice5_joint_soc.patch](../native_experiments/ice5_joint_soc.patch)。本节构建入口与当前核心回归使用 `native/` 中的 ±1% 实现；实验树保留供追查原候选。
 
 隐式滚动快门求解使用同一源时钟、光学域和唯一曝光根判定。有限的画外预测仍按同一方程评估和求导，图像矩形不约束 station、相机或共享场景。图像裁切只用于显示，不能钳改残差或丢掉失败点。
 
@@ -78,7 +86,11 @@ station 的数值缩放只改变坐标。固定点无 station，共享材料点�
 
 `RINKSPACE_STATIONARITY_BACKEND=cpu` 用原生 CPU 执行同一 FP64 锥投影，按精确非零列计算，不按阈值丢弃法向分量；几何、导数、Schur 与 cuDSS 仍在 GPU。`gpu` 保留设备参考路径；`RINKSPACE_STATIONARITY_CPU_SPARSE=0` 和 `RINKSPACE_STATIONARITY_CACHE=0` 可用于对照。可选稀疏索引不足主机预算时沿用稠密算法。
 
-极小下降不会自动判为收敛。阻尼仍主导模型步时，允许既有 LM 降低阻尼继续恢复；近零目标仍按实际相对下降判断进展，最终收敛必须通过原目标的约束梯度检查。
+保留参数边界按列并行检查，并以原串行顺序确定有限值平局和 NaN 失败面；实际冰面仍检查全部原始关系。跨镜头连续焦段的三次样条极值按机位并行归约，每次重建候选后刷新，包含未拍到焦段内的入瞳极值；CPU 原完整扫描仍用于独立检查。围挡弧长缓存的 512 个独立积分区间在 GPU 并行计算，仍使用原 16 点积分及按区间先后顺序的前缀累加。
+
+小对偶满足 KKT、但原始边界仍因舍入返回同一个近零负值时，保留当前非零下降候选，转入同一 Schur 度量的局部可行性精修；必要时增加向内的舍入保护量。原始物理域与像素增益检查不变。`coupled_roundoff_restorations` 与 `coupled_roundoff_inset_updates` 记录这两条路径，避免把重复同一数值切面误作需要提高全局阻尼的失败。
+
+极小下降不会自动判为收敛。CPU 辅助驻点路径通过 `gpu_joint_seed.cuh` 复用原生 NNLS 工作集，从完整活跃锥选择联合 Schur 步的初始面；只去除零法向和精确重复，不将触及约束的坐标逐个冻结。NNLS 仅选择面，响应与乘子在实际 Schur 度量中重求，原分离器继续覆盖全部物理域。二次线搜索可使用保持同一模型下降的二阶可行性修正，最终仍核对原像素增益。普通路径已包含联合活跃面，极小预测时直接尝试投影梯度方向，避免以另一个模式编号重复相同步；该方向的二次线搜索会在导数仍为负时扩展区间，不把任意归一化倍率 1 当作步长上限。小对偶回退可使用工作集尝试中原 KKT 残差更小的可行中间解。若失败残差已落入原 FP64 有序内积的前向误差界，则仍记录为未满足原 KKT，直接转入原可行性恢复，避免在舍入噪声上消耗慢回退；`coupled_roundoff_dual_repairs` 记录此路径。只有原完整 KKT 通过时才把对偶标为求准，候选更新始终另行通过全部原物理域与原目标增益检查。恢复位于完整 station 搜索前，阻尼主导时继续原 LM 恢复。最终收敛必须通过原目标的约束梯度检查；不同坐标的梯度范数不直接比较，实际冰面坐标结果另保留旧坐标驻点检查。
 
 ## 工程检查
 

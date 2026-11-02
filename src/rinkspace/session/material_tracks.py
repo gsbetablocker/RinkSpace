@@ -370,6 +370,86 @@ def source_line_reference_support(reference_uv, measured_uv, query_indices):
                 matched_reference_uv=supported.tolist())
 
 
+def source_line_reference_conflict(reference_uv, measured_uv, measured_quantiles, *, tolerance_px=3.,
+                                   known_straight_extension=False):
+    """Identify a new band contradicted by same-exposure source line evidence.
+
+    This uses registered source UV, never the camera projection or a residual.
+    A displaced paint midpoint is allowed while the old readout lies within
+    the actual measured paint sides. An unrelated parallel band is not allowed
+    to inherit an identity through a temporal match at a later crossing.
+    Curved/inconsistent old evidence proves nothing. For an explicitly known
+    straight primitive, its source orientation also tests a new interval beyond
+    the old samples, with the endpoint uncertainty propagated to that interval.
+    This identity test never creates source pixels in the unmeasured gap.
+    """
+    reference=np.unique(np.asarray(reference_uv,float).reshape(-1,2),axis=0)
+    measured=np.asarray(measured_uv,float).reshape(-1,2)
+    bounds=np.asarray(measured_quantiles,float)
+    if bounds.shape!=(len(measured),2,3,2):raise ValueError('Paired source quantiles required')
+    answer=dict(contradicted=False,reference_supported=False,compared_candidates=[],
+                conflicting_candidates=[],source_only=True,model_projection_used=False)
+    if len(reference)<3 or not np.isfinite(reference).all():return answer
+    origin=reference.mean(0);_,_,vh=np.linalg.svd(reference-origin,full_matrices=False)
+    tangent=vh[0];normal=np.array([-tangent[1],tangent[0]])
+    along=(reference-origin)@tangent;scatter=np.abs((reference-origin)@normal)
+    if np.ptp(along)<56. or np.quantile(scatter,.95)>tolerance_px:return answer
+    answer.update(reference_supported=True,reference_span_px=float(np.ptp(along)),
+                  reference_normal_p95_px=float(np.quantile(scatter,.95)))
+    position=(measured-origin)@tangent
+    finite=np.isfinite(bounds).all(axis=(1,2,3))
+    compared=np.flatnonzero(finite if known_straight_extension else
+        finite&(position>=along.min())&(position<=along.max()))
+    across=(bounds[compared]-origin)@normal
+    low=across.min(axis=(1,2));high=across.max(axis=(1,2))
+    outside=np.maximum(along.min()-position[compared],0.)+np.maximum(position[compared]-along.max(),0.)
+    uncertainty=tolerance_px*(1.+2.*outside/np.ptp(along))
+    bad=compared[(low>uncertainty)|(high < -uncertainty)]
+    # The reference already establishes the line's direction. A short new
+    # fragment does not need to establish that direction again to contradict
+    # it: otherwise three reads on a nearby house/parallel lane could inherit
+    # the line identity just because their span is below the seed threshold.
+    # One bad endpoint still cannot veto an otherwise supported long fragment;
+    # a fragment whose every measured band conflicts has no supported part.
+    conflict=len(bad)>=3 or (len(bad)>0 and len(bad)==len(measured))
+    answer.update(contradicted=bool(conflict),compared_candidates=compared.tolist(),
+                  conflicting_candidates=bad.tolist(),known_straight_extension=bool(known_straight_extension),
+                  new_source_coordinates_generated=False)
+    return answer
+
+
+def split_visible_source_arcs(measurement, fragment):
+    """Keep disconnected measured spans separate in the identity graph.
+
+    A known circle or straight line may organize several pieces, but recognizing
+    one piece does not identify an unrelated material on another span. The gap
+    limit is the existing 105px source-fragment neighborhood, not new UV.
+    """
+    query=np.asarray(measurement['candidate_query'],int)
+    guide=np.asarray(measurement['query_uv'],float)
+    uv=np.asarray(measurement['candidate_uv'],float)
+    ids=sorted(fragment['candidate_ids'],key=lambda i:int(query[i]))
+    groups=[]
+    for i in ids:
+        if not groups:
+            groups.append([i]);continue
+        last=groups[-1][-1];a,b=int(query[last]),int(query[i])
+        gap=float(np.linalg.norm(np.diff(guide[a:b+1],axis=0),axis=1).sum())
+        if gap>105. or np.linalg.norm(uv[i]-uv[last])>105.:groups.append([])
+        groups[-1].append(i)
+    result=[]
+    for group in groups:
+        pieces=[]
+        for i in group:
+            if not pieces or query[i]!=query[pieces[-1][-1]]+1:pieces.append([])
+            pieces[-1].append(i)
+        result.append(dict(fragment,candidate_ids=group,source_visible_candidate_pieces=pieces,
+            query_first=int(query[group[0]]),query_last=int(query[group[-1]]),
+            span_px=sum(float(np.linalg.norm(np.diff(uv[p],axis=0),axis=1).sum()) for p in pieces),
+            identity_support_scope='this_measured_arc_only'))
+    return result
+
+
 def source_nodes(rgb, measurement, fragments, inventory):
     """One node per exact original candidate, carrying real RGB descriptors."""
     ids = np.unique([i for f in fragments for i in f['candidate_ids']]).astype(int)

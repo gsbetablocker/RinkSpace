@@ -64,7 +64,8 @@ def main(args):
     protected = {str(manifest_path):digest(manifest_path),
                  manifest['native_library']:manifest['native_library_sha256']}
     states = []
-    for name,path in (('baseline',args.baseline),('candidate',args.candidate)):
+    for name,path in (('baseline',getattr(args,'baseline',None)),('candidate',args.candidate)):
+        if path is None:continue
         protected[str(path)] = digest(path)
         with np.load(path,allow_pickle=False) as loaded:
             state = {key:loaded[key] for key in loaded.files}
@@ -105,11 +106,12 @@ def main(args):
                         'time_base_num', 'time_base_den', 'first_control_time', 'first_pts', 'last_pts'):
                 if recorded[key] != current[key]:
                     raise ValueError('State shot binding differs: '+key)
+            if recorded.get('exposure_pts_offsets', []) != current.get('exposure_pts_offsets', []):
+                raise ValueError('State shot binding differs: exposure_pts_offsets')
         shots = {}
         for shot, (pts, coverage) in zip(manifest['shots'], exposures, strict=True):
             seconds = pts*shot['time_base_num']/shot['time_base_den']
-            times = ((pts-shot['reference_pts'])*shot['time_base_num']/shot['time_base_den']
-                     + timeline.offset(shot))
+            times = timeline.exposure_time(shot, pts)
             rig = state['rig'][shot['camera_index']]
             support = [timeline.first+(shot['control_begin']+1)*timeline.dt,
                        timeline.first+(shot['control_stop']-2)*timeline.dt]
@@ -117,7 +119,8 @@ def main(args):
             if halo[0] < support[0]-1e-10 or halo[1] > support[1]+1e-10:
                 raise ValueError('Readout crosses this independent shot support: '+shot['id'])
             motion, arrays, camera = inspect_shot_motion(core, rig, state['controls'],
-                timeline.first, timeline.dt, times, seconds, scale)
+                timeline.first, timeline.dt, times, seconds, scale,
+                source_mapper=lambda x: timeline.source_seconds_at(shot, x))
             optics, lens_arrays = inspect_lens_forward(core, rig, state['controls'],
                 timeline.first, timeline.dt, times, seconds, camera, 1920, 1080)
             shots[shot['id']] = dict(camera_index=shot['camera_index'], source_coverage=coverage, motion=motion, optics=optics)
@@ -140,8 +143,9 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    for name in ('run-root', 'baseline', 'candidate', 'output'):
+    for name in ('run-root', 'candidate', 'output'):
         parser.add_argument('--'+name, type=Path, required=True)
+    parser.add_argument('--baseline',type=Path,help='Optional second state bound to the same declared native runtime')
     parser.add_argument('--native-library',type=Path,
         help='Explicit actual DLL; its SHA256 must match both frozen states')
     main(parser.parse_args())

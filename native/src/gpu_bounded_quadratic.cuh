@@ -3,6 +3,61 @@
  * station intervals. The shared line is safeguarded before changing its active
  * set, preventing the full-step face cycle and uphill conditional completion.
  */
+struct QuadraticLine {double a,b,c,e,diagonal;};
+__global__ void lm_qp_capture_line(LinearView l,SolverView s,double* anchor,double* direction){
+    int j=blockIdx.x*blockDim.x+threadIdx.x;if(j<l.q){anchor[j]=s.applied[j];direction[j]=s.step[j]-s.applied[j];}
+}
+__global__ void lm_qp_apply_saved_line(LinearView l,SolverView s,const double* anchor,const double* direction,double alpha,double* out){
+    int j=blockIdx.x*blockDim.x+threadIdx.x;double change=0.;if(j<l.q){double x=alpha==0.?anchor[j]:anchor[j]+alpha*direction[j];
+        change=fabs(x-anchor[j]);s.step[j]=s.applied[j]=x;}
+    change=block_reduce<1>(change);if(!threadIdx.x)atomic_max_nonnegative(out+3,change);
+}
+__device__ inline QuadraticLine lm_qp_line_at(LinearView l,SolverView s,const double* h,const double* g,int ci){
+    const auto c=l.components[ci];const int q=c.q_count;QuadraticLine line{};
+    if(c.local_count){int id=s.locals[c.local_begin];line.c=g[c.g+q];
+        for(int j=0;j<q;++j){int k=l.columns[c.q_begin+j];double b=component_h(h,c,q,j);
+            line.c+=b*s.applied[k];line.e+=b*(s.step[k]-s.applied[k]);}
+        line.diagonal=component_h(h,c,q,q)+s.scalars[0]*s.damping[l.q+id];}
+    if(c.normal_rank==2){double x[2]{},d[2]{};
+        for(int j=0;j<q;++j){int k=l.columns[c.q_begin+j];double direction=s.step[k]-s.applied[k];line.a+=g[c.g+j]*direction;
+            for(int row=0;row<2;++row){double a=h[c.packed_h+size_t(row)*(c.normal_stride?c.normal_stride:c.dim)+j];x[row]+=a*s.applied[k];d[row]+=a*direction;}}
+        for(int row=0;row<2;++row){line.a+=x[row]*d[row];line.b+=d[row]*d[row];}
+    }else for(int i=0;i<q;++i){int ki=l.columns[c.q_begin+i];double d=s.step[ki]-s.applied[ki],gradient=g[c.g+i],along=0.;
+        for(int j=0;j<q;++j){int kj=l.columns[c.q_begin+j];double a=component_h(h,c,i,j);gradient+=a*s.applied[kj];along+=a*(s.step[kj]-s.applied[kj]);}
+        line.a+=gradient*d;line.b+=d*along;}
+    return line;
+}
+__global__ void lm_qp_prepare_line(LinearView l,SolverView s,const double* h,const double* g,QuadraticLine* lines){
+    int ci=blockIdx.x*blockDim.x+threadIdx.x;if(ci<l.ncomponents)lines[ci]=lm_qp_line_at(l,s,h,g,ci);
+}
+// Exact difference of the same damped, conditionally minimized quadratic.
+// Stable differences avoid subtracting two complete large merit totals.
+__global__ void lm_qp_endpoint_change(LinearView l,SolverView s,const double* h,const double* g,const QuadraticLine* lines,double* out){
+    int ci=blockIdx.x*blockDim.x+threadIdx.x;double change=0.,scale=0.;
+    if(ci<l.ncomponents){const auto c=l.components[ci];const auto line=lines?lines[ci]:lm_qp_line_at(l,s,h,g,ci);
+        change=line.a+.5*line.b;scale=fabs(line.a)+.5*fabs(line.b);
+        if(c.local_count){int id=s.locals[c.local_begin];const double lo=s.delta_lower[id],hi=s.delta_upper[id];
+            if(!(lo<=hi)||!finite_scalar(line.c)||!finite_scalar(line.e)||(lo!=hi&&(!(line.diagonal>0.)||!finite_scalar(line.diagonal))))change=INFINITY;
+            else{const double u0=lo==hi?lo:fmax(lo,fmin(hi,-line.c/line.diagonal));
+                const double u1=lo==hi?lo:fmax(lo,fmin(hi,-(line.c+line.e)/line.diagonal));
+                const double du=u1-u0,x=line.e*u0,y=du==0.?0.:(line.c+line.e)*du,z=du==0.?0.:.5*line.diagonal*du*(u1+u0);
+                change+=x+y+z;scale+=fabs(x)+fabs(y)+fabs(z);}}}
+    change=block_reduce<0>(change);scale=block_reduce<0>(scale);if(!threadIdx.x){atomicAdd(out,change);atomicAdd(out+1,scale);}
+}
+__global__ void lm_qp_endpoint_damping(LinearView l,SolverView s,double* out){
+    int j=blockIdx.x*blockDim.x+threadIdx.x;double value=0.;if(j<l.q)value=.5*s.scalars[0]*s.damping[j]*(s.step[j]-s.applied[j])*(s.step[j]+s.applied[j]);
+    double scale=block_reduce<0>(fabs(value));value=block_reduce<0>(value);if(!threadIdx.x){atomicAdd(out,value);atomicAdd(out+1,scale);}
+}
+__global__ void lm_qp_line_coefficients(LinearView l,SolverView s,const QuadraticLine* lines,double alpha,double* out){
+    int ci=blockIdx.x*blockDim.x+threadIdx.x;double slope=0.,curvature=0.,scale=0.;
+    if(ci<l.ncomponents){auto line=lines[ci];auto c=l.components[ci];double local=0.;bool free=false;
+        if(c.local_count){int id=s.locals[c.local_begin];double lo=s.delta_lower[id],hi=s.delta_upper[id];
+            if(!(lo<=hi)||!finite_scalar(line.c)||(lo!=hi&&(!(line.diagonal>0)||!finite_scalar(line.diagonal))))slope=INFINITY;
+            else{local=lo==hi?lo:fmax(lo,fmin(hi,-(line.c+alpha*line.e)/line.diagonal));free=local>lo&&local<hi;}}
+        slope+=line.a+alpha*line.b+line.e*local;curvature=line.b-(free?line.e*line.e/line.diagonal:0.);scale=fabs(slope);}
+    slope=block_reduce<0>(slope);curvature=block_reduce<0>(curvature);scale=block_reduce<0>(scale);
+    if(!threadIdx.x){atomicAdd(out,slope);atomicAdd(out+1,curvature);atomicAdd(out+2,scale);}
+}
 __global__ void lm_qp_save_active(LinearView l,SolverView s){
     int i=blockIdx.x*blockDim.x+threadIdx.x;if(i>=s.nlocal)return;
     s.applied[l.q+i]=s.blocked[i]?(s.active_delta[i]==s.delta_lower[i]?1.:2.):0.;

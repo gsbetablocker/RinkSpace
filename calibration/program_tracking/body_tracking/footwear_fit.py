@@ -110,7 +110,14 @@ class FootwearProblem:
             first=moving_projection(self.projector,allworld[:,:,selected],frames)
             uv_all=np.full((len(frames),113,2),np.nan);world_all=np.full((len(frames),113,3),np.nan)
             uv_all[:,selected]=first['uv'];world_all[:,selected]=first['world']
-            needed=np.unique([r['frame'] for r in self.blade_rows]).astype(int);blade_ids=np.r_[np.arange(14,48),np.arange(62,96)]
+            # A full-equipment silhouette needs blade vertices even without a
+            # separate blade-curve observation in that exposure.
+            required=np.unique([r['frame'] for r in self.blade_rows]+
+                [r['frame'] for r in self.visible_rows if r['observed_kind']!='boot_external_contour']).astype(int)
+            # Observation frame indices are local to self.frames, not an
+            # arbitrary subset/order supplied to this state evaluator.
+            needed=np.flatnonzero(np.isin(frames,self.frames[required]))
+            blade_ids=np.r_[np.arange(14,48),np.arange(62,96)]
             blade_iterations=0
             if len(needed):
                 blade_projection=moving_projection(self.projector,allworld[needed][:,:,blade_ids],np.asarray(frames)[needed]);blade_iterations=blade_projection['row_iterations']
@@ -154,7 +161,12 @@ class FootwearProblem:
                 residual=(edge[0]+alpha*vector-source)/row['sigma_px']
                 add(residual,'boot_heel_toe_semantics',fi)
         for fi in range(self.n):
-            difference=(state['body_uv'][fi,[13,14]]-self.knee_uv[fi])*self.knee_mask[fi,:,None]/12
+            # An excluded missing source coordinate may be NaN; NaN*0 is not
+            # zero. Preserve row layout and compute only qualified residuals.
+            difference=np.zeros((2,2),dtype=float)
+            np.subtract(state['body_uv'][fi,[13,14]],self.knee_uv[fi],out=difference,
+                        where=self.knee_mask[fi,:,None])
+            difference/=12
             add(difference,'source_knees',fi)
         # Residual units and engineering scales are explicit in config. These
         # priors are not learned noise, measured uncertainty, or scene weights.

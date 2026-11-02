@@ -1,0 +1,29 @@
+{
+  "schema": "rinkspace.source_exposure_clock_working.v1",
+  "source_step_pts": 256,
+  "time_base_num": 1,
+  "time_base_den": 12800,
+  "source_PTS_preserved": true,
+  "status": "source-supported conditional working exposure clock; capture cause not independently identified",
+  "shots": {
+    "s08": [
+      {
+        "first_pts": 1744128,
+        "offset_pts": 256,
+        "source_step_pts": 256,
+        "reason": "Source 136.240→136.260 displacement 49.57 px, neighboring 27.21/23.47 px; one additional nominal exposure interval models the image jump.",
+        "evidence": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/source_flow_dense_window.json"
+      }
+    ],
+    "s05": [
+      {
+        "first_pts": 1300992,
+        "offset_pts": 512,
+        "source_step_pts": 256,
+        "reason": "Source 101.620→101.640 displacement about -45.37 px versus about -15.29 px immediately before; two additional nominal exposure intervals are a conditional explanation.",
+        "evidence": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/final_source_motion.json"
+      }
+    ]
+  },
+  "interpretation": "Fixed relative exposure offsets are independent of the unchanged source presentation clock and are not optimized per frame. A source image jump does not by itself prove its capture or delivery cause."
+}

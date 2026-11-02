@@ -15,6 +15,7 @@ from rinkspace.domain.multi_shot_motion import ShotMotionTimeline
 from rinkspace.domain.parameters import SceneParameterModel, ParameterState
 from rinkspace.session.gpu_geometry import NativeSceneGPU
 from rinkspace.path_policy import guard_project_write
+from export_native_six_review import _manifest_for_library, _verify_native_library_binding
 
 
 def read(path):
@@ -80,14 +81,20 @@ def lens_map(core,rig,focal,grid):
 def main(args):
     started=time.monotonic(); output=guard_project_write(args.output)
     if output.exists() or output.with_suffix('.npz').exists():raise FileExistsError(output)
-    m=read(args.run_root/'joint_manifest.json');mapping=read(args.run_root/'mapping.json')
+    prepared_manifest=read(args.run_root/'joint_manifest.json')
+    m=_manifest_for_library(prepared_manifest,getattr(args,'native_library',None))
+    working_envelope_path=prepared.camera_working_envelope_path(m)
+    mapping=read(args.run_root/'mapping.json')
     identities={str(p):digest(p) for p in [args.state,args.run_root/'point_observations.npz',
         args.run_root/'joint_manifest.json',args.run_root/'mapping.json',Path(m['scene_path']),Path(m['native_library'])]}
     if identities[str(args.run_root/'point_observations.npz')]!=m['point_input_sha256']:
         raise ValueError('Point input identity differs')
     for key,sha in [('scene_path','scene_file_sha256'),('native_library','native_library_sha256')]:
         if identities[m[key]]!=m[sha]:raise ValueError('Current dependency differs: '+key)
-    z=prepared.npz(args.run_root/'point_observations.npz');v=prepared.npz(args.state)
+    with np.load(args.run_root/'point_observations.npz',allow_pickle=False) as points:
+        z={key:points[key] for key in ('pts','source_rows','kind','stations','uv','path_indices')}
+    v=prepared.npz(args.state)
+    _verify_native_library_binding(m,v)
     model=SceneParameterModel(read(m['scene_path']),Path(m['scene_path']),optimize_scene=True)
     prepared.validate_snapshot(v,model.initial_state.layout,mapping,m,z)
     state=ParameterState(model.initial_state.layout,v['scene_values'])
@@ -107,6 +114,9 @@ def main(args):
     ev=evaluation['values']; errors=np.linalg.norm(ev[:,9:11],axis=1)
     report=dict(schema='rinkspace.native_camera_physical_state.v1',state=str(args.state),identities=identities,
         rows=len(times),source_exposures=len(np.unique(z['pts'])),metric_scale=metres,
+        prepared_native_library=prepared_manifest['native_library'],
+        selected_native_library=m['native_library'],
+        native_library_override_explicit=getattr(args,'native_library',None) is not None,
         metric_status='conditional assumed metres, not surveyed',scale_source=str(scale_file),
         state_modified=False,optimizer_started=False,station_refinement=False,source_uv_modified=False,
         whole_state_error_pixels=summary(errors),rigs=[],shots={},common_focal_lens_maps=[],
@@ -117,10 +127,10 @@ def main(args):
     arrays={}
     for s in m['shots']:
         sid=s['id'];sl=slice(s['row_begin'],s['row_stop']); rig=v['rig'][s['camera_index']]
-        pts=z['pts'][sl]; tt=times[sl];e=ev[sl];source_origin=s['reference_pts']/12800-timeline.offset(s)
+        pts=z['pts'][sl]; tt=times[sl];e=ev[sl];source_at=lambda t:timeline.source_seconds_at(s,t)
         row_times=tt+rig[37]*(e[:,6]/1079-.5)
         frames,inverse=np.unique(pts,return_inverse=True)
-        ftime=(frames-s['reference_pts'])/12800+timeline.offset(s)
+        ftime=timeline.exposure_time(s,frames)
         first_rows=np.full(len(frames),np.inf);last_rows=np.full(len(frames),-np.inf)
         np.minimum.at(first_rows,inverse,row_times);np.maximum.at(last_rows,inverse,row_times)
         pose=core.evaluate_motion_camera(rig,v['controls'],timeline.first,timeline.dt,ftime)
@@ -149,7 +159,7 @@ def main(args):
         for j,(a,b) in enumerate(zip(first_rows,last_rows)):
             ext=core.motion_derivative_extrema(v['controls'],timeline.first,timeline.dt,[a,b])
             larger=np.abs(ext['value'])>np.abs(peak_values)
-            peak_values[larger]=ext['value'][larger];peak_times[larger]=ext['time'][larger]+source_origin
+            peak_values[larger]=ext['value'][larger];peak_times[larger]=source_at(ext['time'][larger])
             peak_frames[larger]=frames[j]
         rows_motion={}
         for c,name in enumerate(('pan','tilt','log_f')):
@@ -162,7 +172,7 @@ def main(args):
         wide=optical['log_f']<rig[38]
         report['shots'][sid]=dict(camera_index=s['camera_index'],frames=len(frames),rows=len(pts),
             source_interval=[float(frames[0]/12800),float(frames[-1]/12800)],
-            observed_row_time_interval=[float(first_rows.min()+source_origin),float(last_rows.max()+source_origin)],
+            observed_row_time_interval=[float(source_at(first_rows.min())),float(source_at(last_rows.max()))],
             observed_row_strips_continuous_derivative_peaks=rows_motion,
             errors_pixels=summary(errors[sl]),solved_row_range=summary(e[:,6]),
             full_row_root_max_equality_px=float(np.max(abs(e[:,7]))),root_contraction_bound=summary(e[:,8]),
@@ -178,13 +188,21 @@ def main(args):
             pupil=pupil_range(rig,zoom_range,metres),wide_extension_rows=int(np.count_nonzero(wide)),
             wide_extension_frames=len(np.unique(pts[wide])),wide_extension_source_interval=None if not np.any(wide) else
                 [float(pts[wide].min()/12800),float(pts[wide].max()/12800)])
+        kinematics=core.evaluate_motion_kinematics(v['controls'],timeline.first,timeline.dt,ftime)
+        if np.any(kinematics['status']) or np.any(pose['status']):
+            raise ValueError('Invalid source-exposure camera trajectory')
+        arrays[sid+'_pts']=frames
+        arrays[sid+'_kinematics']=kinematics['values']
+        arrays[sid+'_fx']=pose['fx']
+        arrays[sid+'_rotation']=pose['rotation']
         arrays[sid+'_source_seconds']=frames/12800
-        arrays[sid+'_row_min_seconds']=first_rows+source_origin;arrays[sid+'_row_max_seconds']=last_rows+source_origin
+        arrays[sid+'_row_min_seconds']=source_at(first_rows);arrays[sid+'_row_max_seconds']=source_at(last_rows)
         print(json.dumps(dict(event='shot_checked',shot=sid,rows=len(pts),brown_check_px=discrepancy)),flush=True)
     perimeter=core.board_perimeter(v['board']);stations=np.linspace(0,perimeter,4097)[:-1]
     boundary=np.asarray(core.board_points(v['board'],stations,np.zeros(len(stations))))[:,:2]
     for i,rig in enumerate(v['rig']):
-        cam=m['cameras'][i];lo,hi,envelope,config,_=mount_configuration(metres,rig)
+        cam=m['cameras'][i];lo,hi,envelope,config,_=mount_configuration(metres,rig,working_envelope_path)
+        identities[str(config)]=digest(config)
         hits=[]
         for k,name in [(17,'pivot_z'),(18,'lever_x'),(19,'lever_y'),(20,'lever_z'),(21,'axis_spacing')]:
             distance=min(abs(rig[k]-lo[k]),abs(rig[k]-hi[k]))*metres
@@ -194,7 +212,7 @@ def main(args):
         limits=[*envelope['forward_bounds'],*envelope['pupil_bounds'],envelope['max_pan_tilt'],
                 envelope['max_tilt_deviation'],*envelope['elevation_bounds'],*envelope['roll_bounds'],
                 *([np.inf]*9),*((windows-timeline.first)/timeline.dt).ravel()]
-        certificate=core.evaluate_camera_envelope(rig,v['controls'],timeline.first,timeline.dt,limits)
+        certificate=core.evaluate_camera_envelope(rig,v['controls'],timeline.first,timeline.dt,limits,joined_zoom_domain=envelope.get('joined_zoom_domain',False))
         R=rig[:9].reshape(3,3);j=int(np.argmin(np.linalg.norm(boundary-rig[15:17],axis=1)));step=perimeter/len(stations)
         near=minimize_scalar(lambda s:np.sum((np.asarray(core.board_point(v['board'],s%perimeter,0.))[:2]-rig[15:17])**2),
             bounds=[stations[j]-2*step,stations[j]+2*step],method='bounded',options={'xatol':1e-13})
@@ -207,6 +225,7 @@ def main(args):
             pivot_conditional_m=(rig[15:18]*metres).tolist(),lever_camera_conditional_m=(rig[18:21]*metres).tolist(),
             axis_spacing_conditional_m=float(rig[21]*metres),readout_ms=float(rig[37]*1000),
             scalar_working_bound_hits=hits,working_envelope_native_certificate=certificate,working_envelope_config=str(config),
+            working_envelope_config_sha256=identities[str(config)],working_envelope_binding_explicit=working_envelope_path is not None,
             nearest_model_board_horizontal_distance_m=float(np.sqrt(near.fun)*metres),
             R0_orthogonality_error=float(np.max(abs(R@R.T-np.eye(3)))),R0_determinant=float(np.linalg.det(R)),
             pan_axis_vertical_angle_degrees=float(np.degrees(np.arccos(np.clip(rig[11],-1,1)))),
@@ -244,4 +263,6 @@ def main(args):
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ('run-root','state','output'):parser.add_argument('--'+name,type=Path,required=True)
+    parser.add_argument('--native-library',type=Path,
+        help='Explicit frozen DLL; its SHA256 must match the state provenance')
     main(parser.parse_args())

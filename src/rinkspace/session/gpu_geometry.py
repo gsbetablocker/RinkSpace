@@ -37,6 +37,10 @@ class NativeSceneGPU:
         self.core=core
         self.scene_path=Path(scene_path).resolve()
         scene=json.loads(self.scene_path.read_text(encoding="utf-8-sig"))
+        self.ice_relative_limit=None
+        if scene.get('shared_geometry_options',0)&64:
+            from ..domain.ice_tolerance import scene_relative_limit
+            self.ice_relative_limit=scene_relative_limit(scene,core)
         self.parameter_state=parameter_state or SceneParameterModel(scene,self.scene_path).initial_state
         self.scene,self.paths=compile_geometry(scene,self.scene_path,core,parameter_state=self.parameter_state)
         self.scene_revision=scene_content_identity(scene,self.scene_path)
@@ -52,13 +56,13 @@ class NativeSceneGPU:
             "layer_counts":{layer:sum(p["layer"]==layer for p in self.paths.values()) for layer in ("ice","board","advertisement")},
             "unlocalized":self.unlocalized}
 
-    def resident(self, *, camera, controls, path_ids, stations, pts, observed, scene_directions=None, scene_lower=None, scene_upper=None, motion_times=None, rigs=None, camera_ids=None):
+    def resident(self, *, camera, controls, path_ids, stations, pts, observed, scene_directions=None, scene_lower=None, scene_upper=None, scene_charts=None, motion_times=None, rigs=None, camera_ids=None):
         """Bind source coordinates to existing paths; geometry has no data-side setter."""
         import numpy as np
         from ..core.gpu import ResidentResidualProblem
         if self.scene.get('shared_geometry_options',0)&64:
             from ..domain.ice_tolerance import scene_physical_bounds
-            required_lower,required_upper=scene_physical_bounds(self.parameter_state)
+            required_lower,required_upper=scene_physical_bounds(self.parameter_state,self.ice_relative_limit)
             scene_lower=required_lower if scene_lower is None else np.maximum(required_lower,scene_lower)
             scene_upper=required_upper if scene_upper is None else np.minimum(required_upper,scene_upper)
         ids=list(path_ids)
@@ -73,6 +77,9 @@ class NativeSceneGPU:
         # Shared parameter references are retained by the selected records.
         order=list(dict.fromkeys(ids));indices={name:i for i,name in enumerate(order)}
         times=np.array([(int(p)-int(camera["reference_pts"]))*camera["time_base_num"]/camera["time_base_den"] for p in native_pts],np.float64)
+        if camera.get("exposure_pts_offsets"):
+            from ..domain.multi_shot_motion import exposure_offset_seconds
+            times+=exposure_offset_seconds(camera,native_pts)
         if motion_times is not None:
             # Disjoint shots can occupy separate spline-storage blocks. Their
             # clocks are translated, never rescaled; original PTS stay in data.
@@ -88,7 +95,8 @@ class NativeSceneGPU:
             if scene_directions is not None:
                 records,data=compile_joint_scene_records(self.scene,self.scene_path,self.parameter_state,order,core=self.core)
                 resident.configure_scene_parameters(values=self.parameter_state.values,records=records,data=data,
-                    directions=scene_directions,lower=scene_lower,upper=scene_upper,charts=scene_coordinate_charts(self.parameter_state))
+                    directions=scene_directions,lower=scene_lower,upper=scene_upper,
+                    charts=scene_coordinate_charts(self.parameter_state) if scene_charts is None else scene_charts)
         except BaseException:resident.close();raise
         return resident
 
@@ -200,15 +208,20 @@ def initialize_curve_stations(native, *, camera, controls, path_ids, stations, p
     import collections
     import numpy as np
     if backend not in ('cpu','cuda'):raise ValueError('Unknown native station initialization backend')
-    groups=collections.defaultdict(list);samples={};stations=np.asarray(stations).copy()
+    groups=collections.defaultdict(list);samples={};stations=np.asarray(stations,dtype=np.float64).copy()
     for row,(pt,path,kind) in enumerate(zip(pts,path_ids,kinds)):
         if kind==1:groups[(int(pt),path)].append(row)
     for _,name in groups:
         if name in samples:continue
         path=native.paths[name]
         if path['kind']==7:grid=np.linspace(0,native.core.board_perimeter(native.scene['board']),1025)
-        elif path['kind']==8:grid=np.unique(np.r_[path['knots'],np.linspace(0,1,129)])
-        else:grid=np.linspace(0,1,257 if path['kind'] in (1,6) else 129)
+        else:
+            lo,hi=finite_path_support(path)
+            grid=np.linspace(lo,hi,257 if path['kind'] in (1,6) else 129)
+            if path['kind']==8:
+                knots=np.asarray(path['knots'])
+                grid=np.unique(np.r_[knots[(knots>=lo)&(knots<=hi)],grid])
+                if len(grid)==1:grid=np.repeat(grid,2)
         samples[name]=grid
     unresolved=[];distance=np.full(len(stations),np.nan);done=0
     def process(items):
@@ -241,4 +254,8 @@ def initialize_curve_stations(native, *, camera, controls, path_ids, stations, p
         if batch and count+n>250000:process(batch);batch=[];count=0
         batch.append((key,rows));count+=n
     if batch:process(batch)
-    return stations,dict(unresolved=unresolved,groups=len(groups),seed_error_percentiles=np.percentile(distance[np.isfinite(distance)],[0,50,95,100]).tolist())
+    errors=distance[np.isfinite(distance)]
+    # No curves is a valid no-op; total projection failure retains its explicit
+    # unresolved records instead of failing while summarizing an empty sample.
+    percentiles=np.percentile(errors,[0,50,95,100]).tolist() if len(errors) else []
+    return stations,dict(unresolved=unresolved,groups=len(groups),seed_error_percentiles=percentiles)

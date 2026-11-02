@@ -92,5 +92,25 @@ class CameraDiagnosticAuditTests(unittest.TestCase):
                          'finite differences of native centres at original exposure times')
 
 
+    def test_source_labels_do_not_rescale_physical_centre_speed(self):
+        rig = self.rig.copy()
+        rig[22:24] = [.2, 0.]
+        controls = self.controls.copy()
+        controls[:, :2] = [0., .1]
+        seconds = np.array([51.05, 51.08, 51.10])
+        mapper = lambda t: np.interp(t, self.times, seconds)
+        summary, arrays, _ = inspect_shot_motion(
+            self.core, rig, controls, self.first, self.dt, self.times,
+            seconds, 60., source_mapper=mapper)
+        # Fixed attitude and pupil=.2*log(f/300) give a straight native path
+        # at .2*.1 scene units/s, regardless of the recorded source labels.
+        self.assertAlmostEqual(summary['centre']['sampled_speed']['min'], 1.2, places=10)
+        self.assertAlmostEqual(summary['centre']['sampled_speed']['max'], 1.2, places=10)
+        np.testing.assert_array_equal(arrays['native_times'], self.times)
+        np.testing.assert_array_equal(arrays['source_seconds'], seconds)
+        np.testing.assert_allclose(summary['native_exposure_interval'], [.04, .16], atol=1e-14)
+        np.testing.assert_array_equal(summary['exposure_interval'], mapper([.04, .16]))
+
+
 if __name__ == '__main__':
     unittest.main()

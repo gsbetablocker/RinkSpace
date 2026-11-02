@@ -182,6 +182,15 @@ public:
         const T lengths[]={x,c,y,c,x,c,y,c};breaks_[0]=0;
         for(int i=0;i<8;++i)breaks_[i+1]=breaks_[i]+lengths[i];
     }
+    // Independent quadrature intervals may be computed concurrently. Prefix
+    // accumulation retains the scalar constructor's original FP64 order.
+    RS_HD BoardCourseValue(BoardShapeValue<T> b,const T* intervals):shape_(b){
+        arc_[0]=0;for(int i=0;i<cells;++i)arc_[i+1]=arc_[i]+intervals[i];
+        const T x=2*(b.half_length-b.rx),y=2*(b.half_width-b.ry),c=arc_[cells];
+        const T lengths[]={x,c,y,c,x,c,y,c};breaks_[0]=0;
+        for(int i=0;i<8;++i)breaks_[i+1]=breaks_[i]+lengths[i];
+    }
+    RS_HD static T interval_length(BoardShapeValue<T> b,int cell){return integrate_shape(b,cell*step(),(cell+1)*step());}
     RS_HD T perimeter()const{return breaks_[8];}
     RS_HD T corner_length()const{return arc_[cells];}
     RS_HD const std::array<T,9>& breaks()const{return breaks_;}
@@ -212,12 +221,13 @@ public:
     }
 private:
     RS_HD static constexpr double step(){return (pi/2)/cells;}
-    RS_HD T integrate(T lo,T hi)const{
+    RS_HD T integrate(T lo,T hi)const{return integrate_shape(shape_,lo,hi);}
+    RS_HD static T integrate_shape(BoardShapeValue<T> shape,T lo,T hi){
         // Positive half of the standard 16-point Gauss-Legendre rule.
         static constexpr double nodes[]={.095012509837637440185,.28160355077925891323,.45801677765722738634,.61787624440264374845,.75540440835500303390,.86563120238783174388,.94457502307323257608,.98940093499164993260};
         static constexpr double weights[]={.18945061045506849629,.18260341504492358887,.16915651939500253819,.14959598881657673208,.12462897125553387205,.09515851168249278481,.062253523938647892863,.027152459411754094852};
         const T mid=(lo+hi)/2,half=(hi-lo)/2;T sum=0;
-        for(int i=0;i<8;++i)sum+=weights[i]*(shape_.speed(mid-half*nodes[i])+shape_.speed(mid+half*nodes[i]));
+        for(int i=0;i<8;++i)sum+=weights[i]*(shape.speed(mid-half*nodes[i])+shape.speed(mid+half*nodes[i]));
         return half*sum;
     }
     RS_HD T angle(T target)const{

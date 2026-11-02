@@ -1,5 +1,6 @@
 #pragma once
 #include "geometry.hpp"
+#include "ice_relation_meta.hpp"
 
 namespace rinkspace {
 // Option64: layout39 nominal geometry followed by 107 dimensionless deviations.
@@ -115,54 +116,107 @@ template<class T> struct IceToleranceGeometry {
 // stopping cone. Sampling points are not parameters. All lengths are normalized
 // by a declared LOCAL nominal size; directions use transverse drift / run.
 // Both signs of a relative relation are separate inequalities margin>=0.
-template<class T,class Visit> RS_HD inline void ice_tolerance_margins(const IceToleranceGeometry<T>& g,Visit visit){
+template<class T,class Visit> RS_HD inline void ice_tolerance_margins(const IceToleranceGeometry<T>& g,Visit visit,int requested=-1){
     const T* q=g.q;int id=0;
-    auto positive=[&](T margin){visit(id++,margin);};
-    auto strict=[&](T margin){positive(margin-64*std::numeric_limits<double>::epsilon());};
-    auto relative=[&](T actual,T nominal,T scale){const T e=actual-nominal,t=.01*scale;positive(t-e);positive(t+e);};
+    auto positive=[&](auto compute){if(requested<0||requested==id)visit(id,compute());++id;};
+    auto strict=[&](auto compute){positive([&](){return compute()-64*std::numeric_limits<double>::epsilon();});};
+    auto relative=[&](auto actual,T nominal,T scale){
+        if(requested<0||requested==id||requested==id+1){const T e=actual()-nominal,t=.01*scale;
+            positive([&](){return t-e;});positive([&](){return t+e;});}else id+=2;};
     const T pitch=q[3],width=q[9],margin=g.board.half_width-1.5*pitch;
     for(int column=0;column<2;++column){
-        for(int row=0;row<3;++row)relative(g.house(column*4+row+1).y-g.house(column*4+row).y,pitch,pitch);
-        relative(g.house(column*4).y,-1.5*pitch,margin);
-        relative(g.house(column*4+3).y,1.5*pitch,margin);
+        if(requested>=0&&(requested<id||requested>=id+10)){id+=10;continue;}
+        for(int row=0;row<3;++row)relative([&](){return g.house(column*4+row+1).y-g.house(column*4+row).y;},pitch,pitch);
+        relative([&](){return g.house(column*4).y;},-1.5*pitch,margin);
+        relative([&](){return g.house(column*4+3).y;},1.5*pitch,margin);
     }
-    for(int i=0;i<8;++i)for(int ring=0;ring<3;++ring)strict(g.radius(i,ring+1)-g.radius(i,ring));
+    for(int i=0;i<8;++i)for(int ring=0;ring<3;++ring)strict([&](){return g.radius(i,ring+1)-g.radius(i,ring);});
     for(int row=0;row<4;++row){
+        const int count=row<3?36:34;if(requested>=0&&(requested<id||requested>=id+count)){id+=count;continue;}
         const auto f=g.house(row),r=g.house(row+4);
-        strict(r.x-f.x);relative(g.centre_slope(row),T(0),T(1));
+        strict([&](){return r.x-f.x;});relative([&](){return g.centre_slope(row);},T(0),T(1));
         const auto rt=g.lane_node(row,1,false),rb=g.lane_node(row,-1,false);
         const auto ct=g.lane_node(row,1,true),cb=g.lane_node(row,-1,true);
         const T left=q[10+row],end=q[14+row];
-        strict(rt.x-left);strict(rb.x-left);positive(ct.x-left);positive(cb.x-left);
-        strict(rt.x-ct.x);strict(rb.x-cb.x);strict(end-r.x);
+        strict([&](){return rt.x-left;});strict([&](){return rb.x-left;});positive([&](){return ct.x-left;});positive([&](){return cb.x-left;});
+        strict([&](){return rt.x-ct.x;});strict([&](){return rb.x-cb.x;});strict([&](){return end-r.x;});
         // Centreline end is its own unmeasured support, strictly before N.
         const T k=g.d[60+row],x0=q[8]+width*g.d[56+row];
-        strict(x0+k*(g.centre_y(row,end)-g.row_y(row))-end);
+        strict([&](){return x0+k*(g.centre_y(row,end)-g.row_y(row))-end;});
         for(int sign=-1;sign<=1;sign+=2){
             const auto right=sign>0?rt:rb,cross=sign>0?ct:cb;
-            relative(right.x,q[8],width);relative(cross.x,q[35],width);
-            relative(g.side_slope(row,sign),T(0),T(1));
-            relative(g.width(row,left),width,width);relative(g.width(row,right.x),width,width);
+            relative([&](){return right.x;},q[8],width);relative([&](){return cross.x;},q[35],width);
+            relative([&](){return g.side_slope(row,sign);},T(0),T(1));
+            relative([&](){return g.width(row,left);},width,width);relative([&](){return g.width(row,right.x);},width,width);
             // Left-open support cannot cross the actual tilted left goal.
-            const T y=g.side_y(row,sign,left);
-            positive(left-(g.carrier_x(3)+g.carrier_slope(3)*y));
+            positive([&](){const T y=g.side_y(row,sign,left);return left-(g.carrier_x(3)+g.carrier_slope(3)*y);});
         }
-        positive(f.x-(g.carrier_x(3)+g.carrier_slope(3)*f.y));
+        positive([&](){return f.x-(g.carrier_x(3)+g.carrier_slope(3)*f.y);});
         if(row<3){const T lo=std::min(left,q[11+row]),hi=std::max(rt.x,g.lane_node(row+1,1,false).x);
-            strict(g.side_y(row+1,-1,lo)-g.side_y(row,1,lo));
-            strict(g.side_y(row+1,-1,hi)-g.side_y(row,1,hi));}
+            strict([&](){return g.side_y(row+1,-1,lo)-g.side_y(row,1,lo);});
+            strict([&](){return g.side_y(row+1,-1,hi)-g.side_y(row,1,hi);});}
     }
     const int order[]={3,1,0,2,4};
     for(int i=0;i<4;++i)for(int sign=-1;sign<=1;sign+=2){const T y=sign*g.board.half_width;
-        strict(g.carrier_x(order[i+1])+g.carrier_slope(order[i+1])*y-g.carrier_x(order[i])-g.carrier_slope(order[i])*y);}
-    for(int i=0;i<4;++i){const auto p=g.faceoff(i);const int side=i<2?4:3;
-        strict(i<2?g.carrier_x(side)+g.carrier_slope(side)*p.y-p.x:p.x-g.carrier_x(side)-g.carrier_slope(side)*p.y);
+        strict([&](){return g.carrier_x(order[i+1])+g.carrier_slope(order[i+1])*y-g.carrier_x(order[i])-g.carrier_slope(order[i])*y;});}
+    for(int i=0;i<4;++i){if(requested>=0&&(requested<id||requested>=id+3)){id+=3;continue;}const auto p=g.faceoff(i);const int side=i<2?4:3;
+        strict([&](){return i<2?g.carrier_x(side)+g.carrier_slope(side)*p.y-p.x:p.x-g.carrier_x(side)-g.carrier_slope(side)*p.y;});
         const T goal_span=q[33]*(1+g.d[99+i]),board_span=q[34]*(1+g.d[103+i]);
-        strict(g.board.half_width-board_span);
+        strict([&](){return g.board.half_width-board_span;});
         SegmentValue<T> goal{};g.carrier(3+i/2,goal);
         using std::sqrt;const auto diff=sub(goal.a,goal.b);
-        strict(sqrt(diff.x*diff.x+diff.y*diff.y)/2-goal_span);
+        strict([&](){return sqrt(diff.x*diff.x+diff.y*diff.y)/2-goal_span;});
     }
+}
+template<class T> RS_HD inline T ice_tolerance_margin(const IceToleranceGeometry<T>& g,int relation){
+    T result=std::numeric_limits<double>::quiet_NaN();
+    ice_tolerance_margins(g,[&](int,T value){result=value;},relation);return result;
+}
+
+// Ambient board/layout support of a finite relation. This follows the typed
+// construction, never the derivative's value at one fitted state. Some
+// cancelling intermediates deliberately retain conservative support.
+template<class Include> RS_HD inline bool ice_relation_source_support(int relation,Include include){
+    const auto meta=ice_relation_meta(relation);if(!meta.valid())return false;
+    auto q=[&](int i){include(6+i);};auto d=[&](int i){q(ice_nominal_size+i);};
+    auto row_y=[&](){include(1);q(3);for(int i=0;i<4;++i)d(i);};
+    auto house_x=[&](int i){q(i<4?0:1);q(3);d(4+i);};
+    auto house=[&](int i){house_x(i);row_y();if(i>=4)d(12+i%4);};
+    auto centre=[&](int row){house(row);house(row+4);};
+    auto width=[&](int row){house_x(row);house_x(row+4);q(9);d(48+row);d(52+row);};
+    auto side=[&](int row){centre(row);width(row);};
+    auto node=[&](int row,bool transverse){side(row);q(transverse?35:8);d((transverse?64:56)+row);d((transverse?68:60)+row);};
+    auto carrier=[&](int index,bool endpoints){q(index==0?20:(index<3?19:24));d(72+index);d(77+index);if(endpoints)for(int i=0;i<5;++i)include(i);};
+    const int row=meta.row;
+    switch(meta.family){
+        case IceRelationFamily::row_gap:
+            q(3);d(row);if(meta.column){d(12+row);d(13+row);}break;
+        case IceRelationFamily::row_clearance:
+            row_y();if(meta.column)d(12+row);break;
+        case IceRelationFamily::ring_order:{int house_id=4*meta.column+row;
+            q(4);q(5+meta.index);if(meta.index+1<3)q(6+meta.index);d(16+4*house_id+meta.index);d(17+4*house_id+meta.index);break;}
+        case IceRelationFamily::lane_house_order:house_x(row);house_x(row+4);break;
+        case IceRelationFamily::lane_centre_slope:centre(row);break;
+        case IceRelationFamily::lane_right_after_left:node(row,false);q(10+row);break;
+        case IceRelationFamily::lane_transverse_after_left:node(row,true);q(10+row);break;
+        case IceRelationFamily::lane_right_after_transverse:node(row,false);node(row,true);break;
+        case IceRelationFamily::lane_centre_end_after_house:house_x(row+4);q(14+row);break;
+        case IceRelationFamily::lane_centre_end_before_right:node(row,false);q(14+row);break;
+        case IceRelationFamily::lane_right_x:node(row,false);break;
+        case IceRelationFamily::lane_transverse_x:node(row,true);break;
+        case IceRelationFamily::lane_side_slope:side(row);break;
+        case IceRelationFamily::lane_width_left:width(row);q(10+row);break;
+        case IceRelationFamily::lane_width_right:width(row);node(row,false);break;
+        case IceRelationFamily::lane_left_goal_support:side(row);q(10+row);carrier(3,false);break;
+        case IceRelationFamily::lane_house_goal_support:house(row);carrier(3,false);break;
+        case IceRelationFamily::lane_separation:side(row);side(row+1);q(10+row);q(11+row);node(row,false);node(row+1,false);break;
+        case IceRelationFamily::carrier_order:{const int order[]={3,1,0,2,4};include(1);carrier(order[meta.index],false);carrier(order[meta.index+1],false);break;}
+        case IceRelationFamily::faceoff_goal_order:q(20);q(25);q(27);d(82+meta.index);d(86+meta.index);carrier(meta.index<2?4:3,false);break;
+        case IceRelationFamily::trapezoid_board_support:include(1);q(34);d(103+meta.index);break;
+        case IceRelationFamily::trapezoid_goal_support:carrier(3+meta.index/2,true);q(33);d(99+meta.index);break;
+        default:return false;
+    }
+    return true;
 }
 
 // Structural support of the spatial primitive, valid throughout layout146.

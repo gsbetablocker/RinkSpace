@@ -12,6 +12,7 @@
 | 当前 native CPU | C++17 编译器、CMake，运行 `scripts/build_core.py` | 同一几何与相机前向；[构建说明](../native/README.md) |
 | 当前 native CUDA／连续 LM | MSVC、CUDA；连续求解另需 cuDSS | 自有 C++／CUDA 路径，完整磁盘恢复尚未实现 |
 | 视觉 GPU | Data 的 `runtime_tools/vision_cuda` 与 `cache/pretrained` | [原隔离验证](gpu-local-validation.json)不等于取点准确性验收；现位置见下文 |
+| 三维结果播放器 | [安装脚本](install_viewer3d.ps1)、[固定依赖](requirements-viewer3d.lock.txt) | Windows x64 / Python 3.11；Data/runtime_tools/results3d，CPU Torch + AITViewer；[使用说明](../docs/RESULTS_3D_PLAYER_ZH.md) |
 | 人体 | Data 的 `runtime_tools/body_cuda` 与 `runtime_tools/body` | [上游与补丁身份](body-upstream-provenance.json)；完整推理及部分编译扩展仍有缺口 |
 | 历史 Ceres 后端 | [rinkfit](../calibration/rinkfit/README.md)、[solve2](../calibration/solve2/native/README.md)、[原生 recipe](native-build-recipes-observed.json) | 与当前 native LM 的构建和状态合同分别解释 |
 | 历史 GTSAM | [独立候选配置](gtsam-reconstruction-candidate.yml) | NumPy 1.26／GTSAM 4.2.2 栈，与主 NumPy 2.x 分开，候选未验收 |
@@ -33,7 +34,11 @@ python -B environments/prepare_body_sources.py --data-root <外部Data绝对路�
 
 该入口恢复当前选用的源码子集与接线，不表示完整人体环境已在空白机器验证。上游及权重许可分别见[第三方记录](../docs/THIRD_PARTY_ASSETS.md)。
 
-当前连续 GPU LM 使用项目内 `environments/cudss/0.8-cu13`，身份见 [cudss-local.json](cudss-local.json)。包装脚本使用 `--cudss <目录>`，直接 CMake 使用 `-DRINKSPACE_CUDSS_ROOT=<目录>`。CUDA／cuSOLVER 来自系统 `CUDA_PATH`；本机 CUDA 13 运行 DLL 位于其 `bin/x64`。实际加载的库由各构建／运行清单绑定。
+当前连续 GPU LM 使用 Data 的 `runtime_tools/cudss/0.8-cu13`，身份见 [cudss-local.json](cudss-local.json)；其中的旧逻辑地址 `environments/cudss/0.8-cu13` 经 AssetStore 解析。包装脚本使用 `--cudss <目录>`，直接 CMake 使用 `-DRINKSPACE_CUDSS_ROOT=<目录>`。CUDA／cuSOLVER 来自系统 `CUDA_PATH`；本机 CUDA 13 运行 DLL 位于其 `bin/x64`。实际加载的库由各构建／运行清单绑定。
+
+原生库的 `environments/native_core` 旧地址映射到 `Data/runtime_tools/native_core`；构建身份 JSON 留在源码树。历史 Ceres 安装运行副本位于 `Data/runtime_tools/ceres/{cg22,cg22p,cg22f}`，源码头文件、补丁、许可与构建定义保留在 OneDrive。历史 source-edge PYD／DLL 位于 `Data/runtime_tools/program_tracking_native`，读取时使用同一存储映射。
+
+三维播放器的固定依赖和许可证据见 [viewer3d-provenance.json](viewer3d-provenance.json)。默认窗口使用 Pyglet；锁文件仍保留 AITViewer 声明的 Qt 依赖，实际条件见[许可核查](../docs/LICENSING_REVIEW.md#viewer3d)。环境与完整人体缓存均留 Data。
 
 ## 基础检查与完整回归
 

@@ -6,7 +6,16 @@ set "RS_BASE=D:\CodexData\RinkSpace_program_tracking_tmp\solver_acceleration"
 set "RS_ENV=D:\CodexData\RinkSpace_program_tracking_tmp\gtsam-env"
 set "RS_VENDOR=%RS_BASE%\round3\native\reference_callback\vendor"
 set "RS_TBB=%RS_BASE%\round3\native\tbb_control"
-set "RS_BIN=%~dp0bin"
+for %%R in ("%~dp0..\..\..\..") do set "RS_PROJECT=%%~fR"
+set "PYTHONPATH=%RS_PROJECT%\src;%PYTHONPATH%"
+set "PYTHONDONTWRITEBYTECODE=1"
+set "RS_BIN="
+for /f "delims=" %%R in ('call "%RS_PROJECT%\.venv\Scripts\python.exe" -B -c "from rinkspace.storage import AssetStore, configured_data_root; import sys; configured_data_root(sys.argv[1]); print(AssetStore(sys.argv[1]).resolve(sys.argv[2]))" "%RS_PROJECT%" "%~dp0bin"') do set "RS_BIN=%%R"
+if not defined RS_BIN exit /b 1
+if /i "%~1"=="--print-output" (
+  echo %RS_BIN%
+  exit /b 0
+)
 if not exist "%RS_BIN%" mkdir "%RS_BIN%"
 if errorlevel 1 exit /b 1
 cd /d "%~dp0"

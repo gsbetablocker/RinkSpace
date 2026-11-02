@@ -82,7 +82,31 @@ def enable_ice_tolerances(scene):
     return result
 
 
-def scene_physical_bounds(state):
+def scene_relative_limit(scene, core=None):
+    """Read an explicit scene limit and reject a mismatched native model."""
+    declaration = scene.get('ice_tolerance', {})
+    limit = float(declaration.get('relative_limit', RELATIVE_LIMIT))
+    if not np.isfinite(limit) or not 0 < limit < 1:
+        raise ValueError('Ice relative tolerance must be finite and between zero and one')
+    coordinates = declaration.get('coordinates', [])
+    if coordinates and (len(coordinates) != DEVIATION_COUNT or any(
+            float(c['lower']) != -limit or float(c['upper']) != limit for c in coordinates)):
+        raise ValueError('Ice coordinate bounds differ from the declared scene tolerance')
+    if core is not None:
+        import ctypes
+        getter = getattr(core._lib, 'rs_ice_relative_tolerance', None)
+        if getter is None:
+            native_limit = RELATIVE_LIMIT  # Existing option-64 ABI is exactly +/-1%.
+        else:
+            getter.argtypes = []
+            getter.restype = ctypes.c_double
+            native_limit = float(getter())
+        if native_limit != limit:
+            raise ValueError(f'Scene/native ice tolerance mismatch: {limit} != {native_limit}')
+    return limit
+
+
+def scene_physical_bounds(state, relative_limit=RELATIVE_LIMIT):
     """Intersect caller bounds with these native mandatory deviation bounds."""
     lower = np.full(len(state.values), -np.inf)
     upper = np.full(len(state.values), np.inf)
@@ -91,8 +115,8 @@ def scene_physical_bounds(state):
             if block['size'] != DEVIATION_COUNT:
                 raise ValueError('Native ice deviation block size differs')
             span = slice(block['offset'], block['offset'] + block['size'])
-            lower[span] = -RELATIVE_LIMIT
-            upper[span] = RELATIVE_LIMIT
+            lower[span] = -relative_limit
+            upper[span] = relative_limit
     return lower, upper
 
 

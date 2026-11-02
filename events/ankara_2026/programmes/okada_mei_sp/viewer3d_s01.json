@@ -1,0 +1,58 @@
+{
+  "schema": "rinkspace.result-viewer.v1",
+  "event": "ankara_2026",
+  "programme": "okada_mei_sp",
+  "shot": "s01",
+  "source_run": "runs/body_s01_20261029",
+  "metric_binding": "events/ankara_2026/programmes/okada_mei_sp/body_s01_metric_binding_20261030.json",
+  "model_asset": "environments/body/GVHMR/inputs/checkpoints/body_models/smplx/SMPLX_NEUTRAL.npz",
+  "default_variant": "j1",
+  "initial_source_pts": 461056,
+  "variants": [
+    {
+      "id": "j1",
+      "label": "当前：根位置与腿姿态联合",
+      "kind": "joint",
+      "result": "next_round_20261029/J1_s2/result.npz",
+      "base": "next_round_20261029/B5/result.npz"
+    },
+    {
+      "id": "j2",
+      "label": "对照：同时调整鞋尺寸",
+      "kind": "joint",
+      "result": "next_round_20261029/J2_s2/result.npz",
+      "base": "next_round_20261029/B5/result.npz"
+    },
+    {
+      "id": "j0",
+      "label": "对照：只修腿，根位置固定",
+      "kind": "joint",
+      "result": "next_round_20261029/J0_s2_footinit/result.npz",
+      "base": "next_round_20261029/B5/result.npz"
+    },
+    {
+      "id": "b5",
+      "label": "旧 B：局部姿态（五节点曝光）",
+      "kind": "body",
+      "result": "next_round_20261029/B5/result.npz"
+    },
+    {
+      "id": "b",
+      "label": "旧 B：局部姿态",
+      "kind": "body",
+      "result": "pose/result.npz"
+    },
+    {
+      "id": "c",
+      "label": "旧 C：粗接冰对照",
+      "kind": "body",
+      "result": "pose_contact/result.npz"
+    },
+    {
+      "id": "a",
+      "label": "旧 A：固定局部姿态",
+      "kind": "body",
+      "result": "fixed/result.npz"
+    }
+  ]
+}

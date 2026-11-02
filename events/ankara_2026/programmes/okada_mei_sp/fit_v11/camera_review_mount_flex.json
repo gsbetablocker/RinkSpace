@@ -1,0 +1,226 @@
+{
+  "schema": "rinkspace.joint_mount_flex_camera_review.v1",
+  "recorded_local_date": "2026-11-01",
+  "event_id": "ankara_2026",
+  "programme_id": "okada_mei_sp",
+  "status": "read_only_diagnosis_complete",
+  "selected_baseline": "joint_mount_flex",
+  "scope": {
+    "shots": [
+      "s01",
+      "s02",
+      "s03",
+      "s04",
+      "s05",
+      "s06",
+      "s07",
+      "s08",
+      "s09"
+    ],
+    "physical_cameras": 3,
+    "source_first_pts": 283136,
+    "source_last_pts": 2415104,
+    "time_base": "1/12800",
+    "source_seconds": [
+      22.12,
+      188.68
+    ],
+    "source_exposures": 8329,
+    "active_observation_rows": 2212874
+  },
+  "state": {
+    "full": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/joint_mount_flex/accepted_pixels_latest.npz",
+    "frozen": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/review_baseline_1pct/frozen_state.npz",
+    "sha256": "b7ab8e53cbd4a1146f5456a3698d6bba43de84a961dec9d373b94be3d2ca2570",
+    "compact": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\focus_mount_flex_1pct.npz",
+    "compact_sha256": "08b1d518f00e51f37a164f74aafdc8bac76014203f66f13aa787efb713beeb9d",
+    "video": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\review_baseline_1pct\\baseline_1pct_complete.mp4",
+    "video_sha256": "24b0d553fa6ef365348ebc39e717cae894209641803de2a92bee4cbac4a382c9",
+    "render_record": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/review_baseline_1pct/render_snapshot.json"
+  },
+  "problem": {
+    "frozen_run_root": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\review_baseline_1pct\\frozen_problem",
+    "point_input_sha256": "12fdb234c0f0c11d9c2328e8eb7e919e2936fc6f9b22bd2b7089f95a0be4a4ec",
+    "scene_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\field\\ad4_camera_rectified_candidate.json",
+    "scene_sha256": "297d0119b7f5d18864976d6292dfb5195a33f274b2f5b2a27f001e66a933605e",
+    "native_library": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\solver_speed_validation\\pro_20261101\\constrained_progress_1101\\joint_step_resume\\rinkspace_core.dll",
+    "native_library_sha256": "098cbe02950a2305d86ab8dc27ea25599471f343e85800f7e9fd4dac109cca10",
+    "source_video": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4",
+    "source_video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+  },
+  "activity": {
+    "motion_columns": 4500,
+    "independent_camera_columns": 72,
+    "scene_columns": 257,
+    "retained_columns": 4829,
+    "ice_tolerance": 0.01,
+    "raw_pixel_objective": true,
+    "observation_weights": false,
+    "robust_loss": false
+  },
+  "numeric_fit": {
+    "final_cost": 5911391.277500462,
+    "rms_original_pixels": 2.311434057270496,
+    "p95_original_pixels": 4.775653027611611,
+    "maximum_original_pixels": 33.29825393509798,
+    "invalid_rows": 0,
+    "stop_reason": "stopped_by_caller",
+    "numerically_converged": false
+  },
+  "user_feedback": {
+    "source": "latest user request in this chat",
+    "quote": "我对网格的贴合基本满意，虽然还有局部贴合不完全的地方",
+    "applies_to": "current joint_mount_flex complete-nine-shot baseline",
+    "physical_parameters_accepted": false,
+    "all_source_correspondences_accepted": false
+  },
+  "diagnostics": {
+    "physical_state": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/camera_review_20261101/physical_state.json",
+    "full_motion_and_optics": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/camera_review_20261101/motion_optics.json",
+    "full_data_observability": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/camera_review_20261101/observability.json",
+    "source_temporal_check": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/camera_review_20261101/source_motion.json",
+    "source_patch_verification": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/camera_review_20261101/source_motion_template_check.json",
+    "s08_source_support": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/camera_review_20261101/s08_source_support.json",
+    "zoom_compensation": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/camera_review_20261101/model_details.json",
+    "motion_plot": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/camera_review_20261101/source_motion_comparison.png",
+    "zoom_plot": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/camera_review_20261101/model_details.png",
+    "source_sequence": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/camera_review_20261101/s08_source_board_sequence.png"
+  },
+  "findings": [
+    {
+      "id": "s08_start_motion",
+      "status": "source_confirmed_projection_motion_mismatch",
+      "source_range_seconds": [
+        136.16,
+        136.24
+      ],
+      "evidence": {
+        "source_dx_first_pair_px": 30.6700439453125,
+        "native_dx_first_pair_px": 220.73548845083394,
+        "first_pair_tracks": 676,
+        "patch_dx_first_three_pairs_px": [
+          31,
+          32,
+          31
+        ],
+        "patch_correlations": [
+          0.9980942010879517,
+          0.9987943172454834,
+          0.9987789988517761
+        ],
+        "second_frame_horizontal_curve_rows": 64,
+        "second_frame_other_rows": 0
+      },
+      "recommendation": "First priority: repair the local motion initialization and missing distinct material/temporal constraints while protecting the current projection outside this interval. Exact source or station-binding cause is not yet isolated."
+    },
+    {
+      "id": "s05_tail_motion",
+      "status": "local_temporal_mismatch",
+      "source_range_seconds": [
+        101.6,
+        101.64
+      ],
+      "pair_median_errors_px": [
+        9.455946899199054,
+        9.657656115146343
+      ],
+      "recommendation": "Second priority if local motion repair proceeds; confirm the actual texture and source constraints for the last frames. Not evidence for restarting all shots."
+    },
+    {
+      "id": "mechanical_height_decomposition",
+      "status": "data_ambiguity",
+      "softest_normalized_profile_eigenvalues": [
+        4.505732786604104e-8,
+        4.137750647406042e-9,
+        5.26379913061959e-10
+      ],
+      "dominant_combination": "pivot_z plus lever_y with nearly cancelling projected height",
+      "all_lever_y_m": -0.08,
+      "all_axis_spacing_m": -0.05,
+      "metric_status": "conditional assumed metres",
+      "recommendation": "Retain current numerical branch for now. Do not interpret bound values as measured hardware dimensions; no whole-scene freeze and no blind repeat of the previous parameter deletion."
+    },
+    {
+      "id": "pupil_curve",
+      "status": "unobserved_zoom_gap_overshoot",
+      "end_vertex_focal_pixels": 14277.76745210874,
+      "end_complete_forward_m": -0.10720977818526635,
+      "working_lower_m": -0.1,
+      "observed_shot_intervals_guarded": true,
+      "recommendation": "If the camera is reused over its whole focal range, apply the complete-offset envelope across the joined focal domain. The separate +/-10cm displacement from an arbitrary focal reference is not a reference-invariant hardware limit; do not delete pupil2 merely to remove a bound hit."
+    },
+    {
+      "id": "fixed_mode_hypothesis",
+      "status": "event_mode_unconfirmed",
+      "fixed_radial_coupling_magnifications_main_secondary": [
+        2,
+        1
+      ],
+      "main_widest_focal_pixels": 1526.0612492748614,
+      "main_widest_ideal_horizontal_degrees": 64.31866415495013,
+      "recommendation": "The expanded wide-angle support raises a conflict with a literal always-on 2x main-camera extender interpretation. Distinguish a convenient radial-coordinate coupling from the real field setting; neither force all modes to 1 nor add a freely varying crop without source evidence."
+    },
+    {
+      "id": "readout",
+      "status": "effective_coefficients_not_hardware_calibrated",
+      "readout_ms": [
+        17.694540374463006,
+        21.63622917200901,
+        14.706218083623234
+      ],
+      "delivered_frame_period_ms": 20,
+      "measured_capture_and_output_chain_available": false,
+      "recommendation": "Secondary 21.64ms deserves capture/output-mode verification. Do not declare it physically impossible solely from the delivered 50fps clock or clamp it to 20ms without that information."
+    },
+    {
+      "id": "radial_compensation",
+      "status": "valid_forward_but_weak_high_order_combinations",
+      "main_widest_corner_horizontal_px": {
+        "k1": 87.55455532432619,
+        "k2": -109.32878556244918,
+        "tangential": -3.195921308692362,
+        "net": -24.97015154681536
+      },
+      "minimum_sampled_lens_jacobian_determinant": 0.6794457916716605,
+      "sampled_nonpositive_jacobians": 0,
+      "shared_optical_profile_min_eigenvalue": 0.000008039579525609113,
+      "recommendation": "Keep the current fitted map. If later simplifying, transfer the effective distortion over the whole observed focal domain; do not zero isolated coefficients or immediately add higher radial orders."
+    }
+  ],
+  "action_order": [
+    "Local source-confirmed motion mismatch: S08 start, then S05 tail if needed.",
+    "Clarify full-focal pupil envelope and focal-reference-dependent displacement bound before broader reuse.",
+    "Verify real capture/output and magnification settings before changing the mode or readout model.",
+    "Consider weak mechanical/radial simplification only with an initialization preserving the accepted projection; no extra degrees currently justified."
+  ],
+  "read_only": {
+    "optimizer_started": false,
+    "parameter_state_writes": 0,
+    "station_refinement_calls": 0,
+    "source_uv_writes": 0,
+    "source_admission_changes": 0,
+    "original_state_hash_unchanged": true
+  },
+  "verification": {
+    "diagnostic_tests": "22 passed",
+    "log": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/camera_review_20261101/diagnostic_tests.log",
+    "actual_full_native_source_forward_rows": 2212874,
+    "actual_native_camera_jacobian_rows": 2212874,
+    "registered_exposures_in_motion_optics": 8329,
+    "source_motion_pairs_requested": 63,
+    "source_motion_pairs_compared": 58,
+    "source_motion_pairs_missing_edges": 5,
+    "complete_video_played_by_agent": false,
+    "new_full_video_generated": false
+  },
+  "limitations": [
+    "Metre values use 59.536436893975605 m/L as an assumed conversion, not a surveyed metric calibration.",
+    "The local observability profile removes free curve-station tangents and all other camera/scene/motion tangents; inequalities are not treated as measurements. It is not a calibrated covariance or a feasible nonlinear replacement state.",
+    "Source optical-flow/patch checks cover five selected problem windows, not independent full-programme accuracy.",
+    "No actual camera serial, crop/extender, stabilization, capture/readout calibration or head measurements were added."
+  ],
+  "official_sources": [
+    "https://www.sony.jp/xdcam/products/PXW-Z190/spec.html",
+    "https://pro.sony/ue_US/products/handheld-camcorders/pxw-z190"
+  ]
+}

@@ -4,7 +4,7 @@ RinkSpace 研究如何从花样滑冰转播中恢复冰场、连续围挡、广�
 
 项目处于研究验证阶段。当前开发分支为 `rebuild`；本页描述该分支的工作区能力，公开默认分支和冻结审阅包各有自己的版本范围。安卡拉赛事与冈田芽衣节目是开发样本，完整节目定位、相机物理参数、人体空间位置及跨赛事能力尚未完成验证。
 
-当前原生核心支持 CPU／GPU 共用几何、完整时变相机、共享场景与曲线位置的联合连续 LM，可安全停止并在同一进程继续。真实样本已接入 S01–S09 九镜头、三个物理机位，完成真实联合拟合与完整候选回放；当前候选未数值收敛，完整画面、源特征覆盖与相机物理参数仍待验证。已有人工网格反馈只对应各自快照，范围与当前结果见[节目入口](events/ankara_2026/programmes/okada_mei_sp/README.md)。完整磁盘断点恢复和全节目自动取点尚未交付，能力与缺口见[实现状态](docs/REBUILD.md)。
+当前原生核心支持 CPU／GPU 共用几何、完整时变相机、共享场景与曲线位置的联合连续 LM，可安全停止并在同一进程继续。冈田芽衣短节目已接入 S01–S09 九镜头、三个物理机位，完成真实联合拟合与完整回放；当前采用用户指定的 `camera_solver_refined_1102` 暂定最终状态。该状态未达到一阶数值收敛，局部投影运动、源特征覆盖与独立物理标定仍有限制，精确绑定和人工确认范围见[节目入口](events/ankara_2026/programmes/okada_mei_sp/README.md)。完整磁盘断点恢复和全节目自动取点尚未交付，能力与缺口见[实现状态](docs/REBUILD.md)。
 
 **冈田芽衣短节目的重构处理起点为原片 22.120 秒，PTS 283136，原生时基 1/12800。** 当前处理范围与历史物理镜头范围的差别见[范围文件](events/ankara_2026/programmes/okada_mei_sp/rebuild_scope.json)和[源时间说明](events/ankara_2026/programmes/okada_mei_sp/README.md#analysis-start)解释。起点前的原片与观测保留，不进入当前拟合。
 
@@ -32,6 +32,7 @@ python -m pytest tests/test_geometry.py tests/test_motion.py tests/test_mosaic.p
 
 | 内容 | 入口 |
 |---|---|
+| 三维检查 S01 人体结果 | 双击根目录 START_3D_RESULTS.cmd；[操作说明](docs/RESULTS_3D_PLAYER_ZH.md) |
 | 代码结构、算法与接口 | [架构](docs/ARCHITECTURE.md)、[求解方法](docs/SOLVER.md)、[接口合同](docs/INTERFACES.md) |
 | 已实现能力与缺口 | [实现状态](docs/REBUILD.md)、[原生核心](native/README.md) |
 | 当前赛事模型与节目输入 | [安卡拉场景](events/ankara_2026/scene/README.md)、[冈田芽衣短节目](events/ankara_2026/programmes/okada_mei_sp/README.md) |

@@ -9,8 +9,17 @@ from .rebuild_prepare import load,digest
 
 
 def run(root,review_path,dataset,geometry_source,exposure_nodes=3):
-    p=FootwearProblem(root,review_path,'articulated',dataset=dataset,exposure_nodes=exposure_nodes);source=load(geometry_source);geometry=source['x'][:len(INITIAL)].copy()
-    x0=source['x'][len(INITIAL):].copy();out=Path(dataset)/'observed_pose'
+    p=FootwearProblem(root,review_path,'articulated',dataset=dataset,exposure_nodes=exposure_nodes);source=load(geometry_source)
+    values=np.asarray(source['x'])
+    if values.shape!=(p.size,) or values.dtype.kind not in 'iuf' or not np.isfinite(values).all():
+        raise ValueError('Transferred footwear state must match the finite current parameter layout')
+    # Equal coefficient counts do not establish an equal spline. Never relabel
+    # old controls with today's knots or silently resample a saved pose.
+    knots=np.asarray(source.get('correction_knots'))
+    if knots.shape!=p.knots.shape or not np.array_equal(knots,p.knots):
+        raise ValueError('Transferred footwear correction knots differ from the current spline')
+    geometry=values[:len(INITIAL)].copy()
+    x0=values[len(INITIAL):].copy();out=Path(dataset)/'observed_pose'
     if out.exists():raise FileExistsError(out)
     out.mkdir();(out/'source_review_at_run.json').write_bytes(Path(review_path).read_bytes());start=time.perf_counter()
     def full(x):return np.r_[geometry,x]

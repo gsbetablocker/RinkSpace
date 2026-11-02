@@ -8,6 +8,21 @@ from __future__ import annotations
 import ctypes as c
 from pathlib import Path
 from typing import Sequence
+from threading import Lock
+
+
+_DLL_DIRECTORY_HANDLES = {}
+_DLL_DIRECTORY_LOCK = Lock()
+
+
+def _runtime_dll_directory(directory):
+    """Keep one process-wide Windows search registration per runtime directory."""
+    import os
+    directory = Path(directory).resolve()
+    with _DLL_DIRECTORY_LOCK:
+        if directory not in _DLL_DIRECTORY_HANDLES:
+            _DLL_DIRECTORY_HANDLES[directory] = os.add_dll_directory(str(directory))
+        return _DLL_DIRECTORY_HANDLES[directory]
 
 
 D = c.POINTER(c.c_double)
@@ -33,7 +48,10 @@ class NativeCore:
     ABI_VERSION = 2
 
     def __init__(self, library_path: str | Path):
-        self.library_path = Path(library_path).resolve(strict=True)
+        from rinkspace.storage import AssetStore
+        project = Path(__file__).resolve().parents[3]
+        assets = AssetStore(project)
+        self.library_path = assets.source(Path(library_path).resolve()).resolve(strict=True)
         self._dll_dirs = []
         if __import__("os").name == "nt":
             import os, json
@@ -43,13 +61,11 @@ class NativeCore:
             if cuda: directories.extend([Path(cuda)/"bin"/"x64",Path(cuda)/"bin"])
             local = project/"environments/cudss-local.json"
             if local.is_file():
-                root = (project/json.loads(local.read_text(encoding="utf-8"))["root"]).resolve()
-                if not root.is_relative_to(project):
-                    raise ValueError("cuDSS runtime must remain inside this project")
+                root = assets.resolve(project/json.loads(local.read_text(encoding="utf-8"))["root"], must_exist=True)
                 directories.append(root/"bin")
             for directory in directories:
                 if directory.is_dir():
-                    self._dll_dirs.append(os.add_dll_directory(str(directory)))
+                    self._dll_dirs.append(_runtime_dll_directory(directory))
         self._lib = c.CDLL(str(self.library_path))
         self._lib.rs_core_abi_version.argtypes = []
         self._lib.rs_core_abi_version.restype = c.c_int
@@ -211,12 +227,16 @@ class NativeCore:
         self._call("rs_decode_d78_camera", _d(chart), len(chart), out, 38)
         return list(out)
 
-    def evaluate_camera_envelope(self, rig, controls, first_control_time, control_dt, limits):
+    def evaluate_camera_envelope(self, rig, controls, first_control_time, control_dt, limits, *, joined_zoom_domain=False):
         """Exact native continuous envelope diagnostic; this never changes state."""
         import numpy as np
         physical=np.ascontiguousarray(rig,np.float64);coefficients=np.ascontiguousarray(controls,np.float64)
         bounds=np.ascontiguousarray(limits,np.float64)
-        valid_bounds=bounds.ndim==1 and (bounds.size in (10,19) or (bounds.size>=21 and (bounds.size-19)%2==0))
+        if joined_zoom_domain:
+            if bounds.ndim!=1 or bounds.size<21 or (bounds.size-19)%2:raise ValueError("Joined zoom domain requires explicit shot intervals")
+            if not hasattr(self._lib,"rs_camera_joined_zoom_domain_version"):raise ValueError("Native library lacks joined focal-domain constraints")
+            bounds=np.r_[bounds[:19],1.,bounds[19:]]
+        valid_bounds=bounds.ndim==1 and (bounds.size in (10,19) or (bounds.size>=21 and (bounds.size-19)%2==0) or (bounds.size>=22 and bounds.size%2==0 and bounds[19]==1.))
         if physical.shape not in ((38,),(43,)) or coefficients.ndim!=2 or coefficients.shape[1]!=3 or not valid_bounds:
             raise ValueError("envelope requires rig[38/43], controls[M,3], limits[10/19/19+2*shot_count]")
         out=np.empty(8,np.float64)

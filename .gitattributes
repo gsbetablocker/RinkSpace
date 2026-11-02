@@ -4,6 +4,9 @@
 # This post-experiment snapshot retains one original indented blank line.
 # Its exact bytes are referenced in configs/rotation_experiment_lock.json.
 scripts/run_rotation_photometric.py whitespace=-blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# Preserve the original third-party licence and unified-diff context bytes.
+environments/third_party_licenses/PYGLET_LICENSE.txt whitespace=-blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+native_experiments/ice5_joint_soc.patch whitespace=-blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 *.png binary
 *.jpg binary
 *.mp4 binary

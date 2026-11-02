@@ -1,0 +1,430 @@
+{
+  "schema": "rinkspace.consolidated_camera_working_model.v1",
+  "status": "candidate_complete_and_native_pts_verified",
+  "event_id": "ankara_2026",
+  "programme_id": "okada_mei_sp",
+  "source_video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "source_interval_seconds": [
+    22.12,
+    188.68
+  ],
+  "source_exposures": 8329,
+  "point_rows": 2213335,
+  "point_input_sha256": "ecb7012af725c94026ba85c9249e731e560c20d2f2189efd25cb28113512f5fb",
+  "prepared": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/prepared_shared_timing",
+  "state": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/camera_consolidated_final_state.npz",
+    "sha256": "827c55f6e33eccd88f9704b1aee7d12aed2fafb6db4a29b09f824375155b911d",
+    "compact_path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_consolidated_1102.npz",
+    "compact_sha256": "670501f7fb1320b3aa81d4792e9763dd8d986ce9eaf825ac5bbeb1759af0b1a0"
+  },
+  "original_baseline": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/joint_mount_flex/accepted_pixels_latest.npz",
+    "sha256": "b7ab8e53cbd4a1146f5456a3698d6bba43de84a961dec9d373b94be3d2ca2570",
+    "compact": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/focus_mount_flex_1pct.npz",
+    "compact_sha256": "08b1d518f00e51f37a164f74aafdc8bac76014203f66f13aa787efb713beeb9d",
+    "unchanged_verified": true,
+    "user_visual_acceptance": "2026-11-01 original joint_mount_flex only",
+    "protected_files_verified_at_delivery": [
+      {
+        "path": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/joint_mount_flex/accepted_pixels_latest.npz",
+        "sha256": "b7ab8e53cbd4a1146f5456a3698d6bba43de84a961dec9d373b94be3d2ca2570"
+      },
+      {
+        "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/focus_mount_flex_1pct.npz",
+        "sha256": "08b1d518f00e51f37a164f74aafdc8bac76014203f66f13aa787efb713beeb9d"
+      },
+      {
+        "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/scene/field/ad4_camera_rectified_candidate.json",
+        "sha256": "297d0119b7f5d18864976d6292dfb5195a33f274b2f5b2a27f001e66a933605e"
+      },
+      {
+        "path": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/review_baseline_1pct/frozen_problem/point_observations.npz",
+        "sha256": "12fdb234c0f0c11d9c2328e8eb7e919e2936fc6f9b22bd2b7089f95a0be4a4ec"
+      }
+    ]
+  },
+  "parent_picture_baseline": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/ice_pan_final_state.npz",
+    "sha256": "5cd5dade2699efd3f25d65816aff9dc306662c0c3a9367f4bd6c5d75409c7d60",
+    "compact_path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_physical_pan_1102.npz",
+    "compact_sha256": "f722e7e3277f4972bd02202e98abdfbaf3f7381b0d6edfc2e463393866bf205c"
+  },
+  "native_library": {
+    "path": "D:/CodexData/RinkSpace_Data/build/camera_zoom_domain_1101/rinkspace_core.dll",
+    "sha256": "6f1732c2f666d6fa407c85f931e51e0ec1a5fd49ac9ebcee05fd2c63b84d99cd"
+  },
+  "processed_reported_items": [
+    {
+      "item": "fx/fy and principal point",
+      "decision": "Retain square centred camera, no zoom principal-point drift",
+      "values": {
+        "fx_over_fy": 1,
+        "principal_point": [
+          959.5,
+          539.5
+        ],
+        "principal_zoom_slope": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "item": "weak mount-height and axis decomposition",
+      "decision": "Upward8cm vertical nominal; centred lateral offset and intersecting axes, no free per-frame camera centre",
+      "values": {
+        "vertical_offset_m": -0.08,
+        "lateral_offset_m": 0,
+        "axis_spacing_m": 0
+      }
+    },
+    {
+      "item": "independent forward-reference and zoom-pupil compensation",
+      "decision": "Remove independent lever_z direction; fixed+5cm optical reference at the recorded focal reference. Keep source-required linear/quadratic zoom-pupil variation.",
+      "reference_m": 0.05,
+      "reference_records": [
+        {
+          "camera_index": 0,
+          "previous_focal_reference_pixels": 10644.698469804609,
+          "new_focal_reference_pixels": 8185.605002084032,
+          "reference_forward_m": 0.05,
+          "joined_focal_span_pixels": [
+            1516.3500094761148,
+            22399.85907014316
+          ]
+        },
+        {
+          "camera_index": 1,
+          "previous_focal_reference_pixels": 5322.3492349023045,
+          "new_focal_reference_pixels": 12302.342178352932,
+          "reference_forward_m": 0.05,
+          "joined_focal_span_pixels": [
+            4578.57489192979,
+            19065.528966214042
+          ]
+        },
+        {
+          "camera_index": 2,
+          "previous_focal_reference_pixels": 7962.674475164726,
+          "new_focal_reference_pixels": 4089.6220689344746,
+          "reference_forward_m": 0.05,
+          "joined_focal_span_pixels": [
+            3651.740599456499,
+            20152.565356255323
+          ]
+        }
+      ],
+      "initial_reference_conversion_projection_max_px": 5.7813417872345456e-11,
+      "rejected_constant_centre_visual_check": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/rigid_centre_visual_review.json"
+    },
+    {
+      "item": "pupil between-shot focal gaps",
+      "decision": "Continuous joined-focal-domain guard retained over every physical-camera focal span",
+      "working_full_forward_interval_m": [
+        -0.1,
+        0.3
+      ],
+      "meaning": "Combined effective axial projection-centre function, not a solid mechanical rod or measured Sony pupil range",
+      "interpretation_record": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/model_constraints/camera_hardware/pupil_interpretation_20261102.json"
+    },
+    {
+      "item": "unsupported2:1 optical coupling",
+      "decision": "Removed; every camera retains independent optical curves and focal/wide references. Only row time is shared."
+    },
+    {
+      "item": "readout clipping and independent timing compensation",
+      "decision": "One common fitted row-time scalar for the same-model camera working hypothesis",
+      "shared_readout_ms": 18.48480534666012,
+      "engineering_model_not_confirmed_capture_mode": true,
+      "capture_facts": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/capture_mode_current_facts.json"
+    },
+    {
+      "item": "weak high-order radial directions",
+      "decision": "Remove wide_k2 from main and secondary cameras using projection-preserving coefficient transfer; retain it for end camera to preserve the full focal-domain map",
+      "warm_map_max_px": [
+        0.26256,
+        0.287903,
+        0
+      ],
+      "all_camera_optics_independent": true,
+      "migration_receipt": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/prepared_optics_subfamily/optics_subfamily_receipt.json"
+    },
+    {
+      "item": "S08/S05 source-inconsistent endpoint motion",
+      "decision": "Retain repaired original-source observations and source-supported S08 local pan refinement; no PTS remapping or zoom-shape anchor",
+      "source_motion_final": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/camera_consolidated_final_s08_source_motion.json",
+      "other_windows_final": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/camera_consolidated_final_other_source_motion.json"
+    }
+  ],
+  "parameterization": {
+    "motion_columns": 4516,
+    "unique_camera_columns": 62,
+    "scene_columns": 257,
+    "active_names_per_rig": [
+      [
+        "R0_x",
+        "R0_y",
+        "R0_z",
+        "pan_axis_tangent1",
+        "pan_axis_tangent2",
+        "tilt_axis",
+        "pivot_x",
+        "pivot_y",
+        "pivot_z",
+        "pupil1",
+        "pupil2",
+        "k10",
+        "k11",
+        "k20",
+        "k21",
+        "p1",
+        "p2",
+        "readout",
+        "wide_k1",
+        "wide_p1",
+        "wide_p2"
+      ],
+      [
+        "R0_x",
+        "R0_y",
+        "R0_z",
+        "pan_axis_tangent1",
+        "pan_axis_tangent2",
+        "tilt_axis",
+        "pivot_x",
+        "pivot_y",
+        "pivot_z",
+        "pupil1",
+        "pupil2",
+        "k10",
+        "k11",
+        "k20",
+        "k21",
+        "p1",
+        "p2",
+        "readout",
+        "wide_k1",
+        "wide_p1",
+        "wide_p2"
+      ],
+      [
+        "R0_x",
+        "R0_y",
+        "R0_z",
+        "pan_axis_tangent1",
+        "pan_axis_tangent2",
+        "tilt_axis",
+        "pivot_x",
+        "pivot_y",
+        "pivot_z",
+        "pupil1",
+        "pupil2",
+        "k10",
+        "k11",
+        "k20",
+        "k21",
+        "p1",
+        "p2",
+        "readout",
+        "wide_k1",
+        "wide_k2",
+        "wide_p1",
+        "wide_p2"
+      ]
+    ],
+    "coupling_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\camera_experiments\\joint\\shared_readout_working.json",
+    "profile_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\camera_experiments\\joint\\reference_pupil_joint.json",
+    "geometry_joint": true,
+    "source_observations_or_weights_changed_this_round": false,
+    "raw_pixel_objective_unchanged": true,
+    "source_clock_remapping": false
+  },
+  "physical_values": [
+    {
+      "id": "main_long_side",
+      "pivot_conditional_m": [
+        0.577781762769493,
+        -15.42820646051474,
+        1.6103644636721541
+      ],
+      "reference_offset_camera_m": [
+        0,
+        -0.08,
+        0.05
+      ],
+      "readout_ms": 18.48480534666012,
+      "pan_axis_vertical_angle_deg": 0.45093010642246284,
+      "tilt_axis_right_angle_deg": 1.5773904553600457,
+      "full_forward_joined_range_m": [
+        0.012955202986501466,
+        0.2999999955839038
+      ]
+    },
+    {
+      "id": "secondary_long_side",
+      "pivot_conditional_m": [
+        17.504795644605355,
+        -15.16379060850037,
+        1.4174384912079636
+      ],
+      "reference_offset_camera_m": [
+        0,
+        -0.08,
+        0.05
+      ],
+      "readout_ms": 18.48480534666012,
+      "pan_axis_vertical_angle_deg": 0.39849880693976614,
+      "tilt_axis_right_angle_deg": 3.756190752919541,
+      "full_forward_joined_range_m": [
+        -0.09999999999474783,
+        0.2995030474323889
+      ]
+    },
+    {
+      "id": "end",
+      "pivot_conditional_m": [
+        -28.744087576202922,
+        -10.735882559801752,
+        1.4396224474090578
+      ],
+      "reference_offset_camera_m": [
+        0,
+        -0.08,
+        0.05
+      ],
+      "readout_ms": 18.48480534666012,
+      "pan_axis_vertical_angle_deg": 0.8288044273683034,
+      "tilt_axis_right_angle_deg": 0.9183392660261891,
+      "full_forward_joined_range_m": [
+        -0.099999999913168,
+        0.09399184904886655
+      ]
+    }
+  ],
+  "optimization": {
+    "stop_reason": "stopped_by_caller",
+    "trials": 63,
+    "accepted": 33,
+    "numerically_converged": false,
+    "raw_rms_px": 2.3156908362505866,
+    "result_path": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/joint_camera_consolidated/result.json"
+  },
+  "checks": {
+    "all8329_exposures_sampled_optics_valid": true,
+    "physical": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/camera_consolidated_final_parameters.json",
+    "motion_and_optics": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/camera_consolidated_final_motion_optics.json",
+    "same_material_projection_change": {
+      "median": 0.0922408538365357,
+      "p95": 0.8986511204472174,
+      "p99": 1.834523328834838,
+      "maximum": 6.1546941221031926,
+      "rms": 0.4539388778182716
+    },
+    "projection_comparison": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/camera_consolidated_final_projection_change.json",
+    "visual_review": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/consolidated_final_visual_review.json",
+    "visual_review_sha256": "91a9981d6a69132e4ba6cdba7393e9721755b5c31a15175263c726ea7cc79451",
+    "source_motion_other_summary": {
+      "s02": {
+        "compared": 12,
+        "missing": 0,
+        "max_pair_median_difference_px": 0.8180222425178438
+      },
+      "s05": {
+        "compared": 12,
+        "missing": 0,
+        "max_pair_median_difference_px": 2.361673510722392
+      },
+      "s07": {
+        "compared": 14,
+        "missing": 1,
+        "max_pair_median_difference_px": 3.8962022576843944
+      },
+      "s08": {
+        "compared": 12,
+        "missing": 0,
+        "max_pair_median_difference_px": 1.4168531167338596
+      }
+    },
+    "critical_s08_pair": {
+      "shot": "s08",
+      "pts": 1743872,
+      "next_pts": 1744128,
+      "source_seconds": 136.24,
+      "mask_source_paths": [
+        [
+          "explicit_original_source_board_interior_ROI",
+          [
+            16,
+            430,
+            1888,
+            130
+          ]
+        ]
+      ],
+      "status": "compared",
+      "tracks": 748,
+      "source_dx_median_px": 49.56939697265625,
+      "native_dx_median_px": 50.11982298767157,
+      "source_dy_median_px": 0.3404388427734375,
+      "native_dy_median_px": -0.13857218338827693,
+      "source_displacement_px": {
+        "median": 49.574988351978455,
+        "p95": 59.171682668449876,
+        "max": 63.063502451554825
+      },
+      "native_vs_source_displacement_px": {
+        "median": 0.9297725849375562,
+        "p95": 3.0250451072207074,
+        "max": 4.260440766041472
+      },
+      "inverse_source_reprojection_max_px": 3.9918304554419006e-10
+    }
+  },
+  "receipts": [
+    "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/prepared_optics_subfamily/optics_subfamily_receipt.json",
+    "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/prepared_reference_optics/reference_pupil_receipt.json",
+    "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/prepared_shared_timing/shared_readout_receipt.json"
+  ],
+  "limitations": {
+    "scope": "A parsimonious source-consistent working model for the complete current programme; not a factory hardware calibration.",
+    "nominal_mount_and_reference_values_not_surveyed": true,
+    "actual_capture_deinterlacing_crop_mode_unconfirmed": true,
+    "shared_row_time_is_selected_engineering_model": true,
+    "axial_pupil_working_bounds_not_measured_from_housing": true,
+    "residual_local_image_mismatches_remain": true,
+    "visual_review_is_representative_stills_not_full_user_acceptance": true
+  },
+  "review": {
+    "directory": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/review_camera_consolidated_1102",
+    "video": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/review_camera_consolidated_1102/camera_consolidated_1102_complete.mp4",
+    "render_snapshot": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/review_camera_consolidated_1102/render_snapshot.json",
+    "user_visual_acceptance": false,
+    "status": "complete_and_native_pts_verified",
+    "video_sha256": "5235bfa499ae601be8e006abd702fe28bc26426fdb32577bd0c4c6f7c82e8a4b",
+    "render_snapshot_sha256": "13f6801d233e65b67c6604a0619472310e4b9afc1cc1de388b9fe0e811e86a50",
+    "verification": {
+      "decoded_frames": 8329,
+      "native_PTS_equal": true,
+      "display_speed": 1
+    }
+  },
+  "protected_files_verified": [
+    {
+      "path": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/joint_mount_flex/accepted_pixels_latest.npz",
+      "sha256": "b7ab8e53cbd4a1146f5456a3698d6bba43de84a961dec9d373b94be3d2ca2570"
+    },
+    {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/focus_mount_flex_1pct.npz",
+      "sha256": "08b1d518f00e51f37a164f74aafdc8bac76014203f66f13aa787efb713beeb9d"
+    },
+    {
+      "path": "D:/CodexData/RinkSpace_Data/runs/native_programme_20261031/feature_refinement_1101/focus_repair_1pct/physical_repair_1101/ice_pan_final_state.npz",
+      "sha256": "5cd5dade2699efd3f25d65816aff9dc306662c0c3a9367f4bd6c5d75409c7d60"
+    },
+    {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/scene/field/ad4_camera_rectified_candidate.json",
+      "sha256": "297d0119b7f5d18864976d6292dfb5195a33f274b2f5b2a27f001e66a933605e"
+    }
+  ]
+}

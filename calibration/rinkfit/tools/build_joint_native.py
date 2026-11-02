@@ -4,6 +4,9 @@ from concurrent.futures import ThreadPoolExecutor
 import argparse, hashlib, importlib.util, json, os, re, shutil, subprocess, time
 
 ROOT=Path(__file__).resolve().parents[3]
+import sys
+sys.path.insert(0,str(ROOT/'src'))
+from rinkspace.storage import AssetStore
 SOURCES=('augmented_lagrangian','checkpoint','ceres_backend','event_model','event_builder','joint_model','joint_packet','joint_builder','joint_capture','joint_al','joint_gpu_cache','joint_gpu_driver','joint_recovery','joint_fit')
 
 def digest(path):
@@ -63,7 +66,7 @@ def save_source_snapshot(destination, cpp, sources, executable_sha, validator_ab
 def build(output,compiler=None,jobs=3,ceres_prefix=None):
     started=time.perf_counter();out=Path(output).resolve();cpp=ROOT/'calibration/rinkfit/cpp';inc=cpp/'include';out.mkdir(parents=True,exist_ok=True)
     spec=importlib.util.spec_from_file_location('rinkfit_existing_environment',cpp/'gpu_rows/build.py');environment=importlib.util.module_from_spec(spec);spec.loader.exec_module(environment)
-    env=environment.environment();prefix=Path(ceres_prefix).resolve()if ceres_prefix else ROOT/'environments/cg22p';runtime=[str(prefix/'bin'),str(environment.D/'glog/Library/bin'),str(environment.D/'gflags/Library/bin')]
+    env=environment.environment();prefix=AssetStore(ROOT).source(Path(ceres_prefix).resolve()) if ceres_prefix else AssetStore(ROOT).resolve(ROOT/'environments/cg22p');runtime=[str(prefix/'bin'),str(environment.D/'glog/Library/bin'),str(environment.D/'gflags/Library/bin')]
     cuda=os.environ.get('CUDA_PATH')
     if cuda:runtime.append(str(Path(cuda)/'bin/x64'))
     env['PATH']=os.pathsep.join(runtime)+os.pathsep+env['PATH'];compiler=compiler or shutil.which('cl.exe',path=env['PATH'])
