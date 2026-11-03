@@ -102,7 +102,7 @@ def inspect_checkpoint(problem,saved,path,out):
         interpretation='Instantaneous vertical diagnostic only; not a trajectory or image-quality feasibility proof',
         support_band_m=list(SUPPORT_BAND),feasibility_tolerance_m=FEASIBILITY_TOLERANCE,
         source_support_optimization_weights=[dict(label=list(label),weight=float(weight)) for label,weight in
-            zip(value['contact']['labels'],value['contact']['weights']) if label[0]==35200000000 and 'source_support' in label[1]],
+            zip(value.get('raw_ice',value['contact'])['labels'],value.get('raw_ice',value['contact'])['weights']) if label[0]==35200000000 and 'source_support' in label[1]],
         root_vertical_counterfactual=counterfactual,
         threshold_status='first-round debugging values, not calibrated acceptance criteria')
     write_json(out/'start_3520_diagnosis.json',diagnosis)

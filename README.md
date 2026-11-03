@@ -10,6 +10,8 @@ RinkSpace 研究如何从花样滑冰转播中恢复冰场、连续围挡、广�
 
 S01 已接入可撤销观测关联、唯一全身状态、共享足鞋配准和开头时序修复。[START_3D_COMPARISON.cmd](START_3D_COMPARISON.cmd)从原片22.120秒比较旧结果与“22.90秒后下探、扶腰后展开”候选，[START_BOOT_INSPECTION.cmd](START_BOOT_INSPECTION.cmd)提供透明鞋与剖面检查。实际改善、穿冰／离冰残留和窗口范围见[节目记录](events/ankara_2026/programmes/okada_mei_sp/README.md)；这仍是局部研究结果，完整节目人体追踪尚未完成。
 
+新的人体整合、三段 A/B 与根轨迹修正已保存供审阅，均未通过准确性验收；根轨迹仍异常，部分图像误差变差。[节目记录](events/ankara_2026/programmes/okada_mei_sp/README.md#人体整合与根轨迹对照2026-11-04未验收)与[机器可读索引](events/ankara_2026/programmes/okada_mei_sp/body_integration_1104.json)区分代码、实际结果和缺项。[START_3D_INTEGRATION.cmd](START_3D_INTEGRATION.cmd)选择 S01、跳跃、步法或旋转，保留现有 S01 默认对照。
+
 ## 快速试用：合成数据
 
 使用 Python 3.11 或更新环境，在仓库根目录运行：

@@ -46,7 +46,7 @@ def test_batch_features_matches_exact_reference_for_random_proper_poses(syntheti
                 np.testing.assert_allclose(world, witness["point"], atol=2e-12)
 
 
-def test_constraints_match_reference_bounds_and_expanded_time_weights(synthetic_binding):
+def test_constraints_match_reference_bounds_and_separate_source_weights(synthetic_binding):
     b = synthetic_binding
     rng = np.random.default_rng(41103)
     times = np.array([0., .02, .06, .10, .16])
@@ -75,7 +75,9 @@ def test_constraints_match_reference_bounds_and_expanded_time_weights(synthetic_
                                 allowed_penetration_m=ALLOWANCE, supports=bands)
         adapted = contact_inequalities(frame, normalization_m=NORMALIZATION)
         expected.extend(adapted["margin_m"])
-        weights.extend([time_weights[i]]*len(adapted["g"]))
+        # Collision quadrature follows the grid; a discrete source exposure
+        # keeps its native50 measure even when that grid changes.
+        weights.extend([time_weights[i]]*2+[.02]*(len(adapted["g"])-2))
     np.testing.assert_allclose(actual["margin_m"], expected, atol=2e-14)
     np.testing.assert_allclose(actual["g"], np.asarray(expected)/NORMALIZATION, atol=3e-12)
     np.testing.assert_array_equal(actual["weights"], weights)
@@ -201,7 +203,8 @@ def test_real_joint_replay_and_shared_body_jacobian(source_skate_fixture,state_k
             local[mid], state["frames"][mid], problem.binding.sample_ids, double_precision=True)
         replay = problem.shared_replay(x[:17], x[17:], base)
         assert len(problem.body.gear.blade_rows) > 0
-        np.testing.assert_array_equal(replay, base["residual"])
+        np.testing.assert_array_equal(replay["residual"], base["residual"])
+        np.testing.assert_array_equal(replay["compatibility_residual"], base["compatibility_residual"])
         value = problem.evaluate(x, True)
         for block in ("shared", "body", "joint"):
             direction = np.zeros_like(x)

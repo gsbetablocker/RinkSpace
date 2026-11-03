@@ -7,6 +7,7 @@ import pytest
 
 from calibration.program_tracking.body_tracking import skate_delivery as delivery
 from calibration.program_tracking.body_tracking.skate_template import SkateParameters
+from calibration.program_tracking.body_tracking.skate_checkpoint import checkpoint_identity
 
 
 def test_parameter_replay_preserves_layers_nan_payload_and_signed_zero(tmp_path):
@@ -103,6 +104,8 @@ def test_delivery_retains_old_candidate_and_uses_actual_source_scope(tmp_path, m
                               surface=object(), record=lambda: {'parameter_provenance': {}})
     ref = SimpleNamespace(p={'pts': pts}, times=pts/12800.-22.12, binding=binding,
                           new_refinements=[(HaloWindow(), np.arange(69.)), (ContinuousShotWindow(), np.zeros(69))])
+    saved.update(checkpoint_identity(binding, project, {}))
+    np.savez_compressed(checkpoint, **saved)
     monkeypatch.setattr(delivery, 'export_candidate', lambda *args: dict(packet))
     from calibration.program_tracking.body_tracking import skate_review, skate_rocker_review, skate_collar_review
     monkeypatch.setattr(skate_review, 'review_candidate', lambda *args: dict(same_state_template_replay={}, source_preservation={}))

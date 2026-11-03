@@ -106,7 +106,7 @@ class WindowState:
         return self.reference.world(reference,self.increments(x,t))
 
 
-def camera_binding(project,reference,record_path=None,*,native_library=None):
+def camera_binding(project,reference,record_path=None,*,native_library=None,shot_id='s01'):
     """Use the selected frozen native camera, without re-running preparation."""
     from rinkspace.core.native import NativeCore
     from rinkspace.domain.multi_shot_motion import ShotMotionTimeline
@@ -116,7 +116,7 @@ def camera_binding(project,reference,record_path=None,*,native_library=None):
     record_path=Path(record_path or project/'events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_solver_refined_1102.json')
     record=json.loads(record_path.read_text(encoding='utf8'))
     state=load(record['state']['compact_path']);dep=json.loads(str(state['joint_numeric_dependencies_json']))
-    shot=next(s for s in dep['shots'] if s['id']=='s01')
+    shot=next(s for s in dep['shots'] if s['id']==shot_id)
     timeline=ShotMotionTimeline(dep['shots'],dep['control_dt'],dep['first_control_time'])
     p=dict(reference.p)
     # Keep the complete packed control array and its explicit time translation.
@@ -126,15 +126,20 @@ def camera_binding(project,reference,record_path=None,*,native_library=None):
     recorded_library=record['native_library']['path']
     library=str(native_library or os.environ.get('RINKSPACE_BODY_NATIVE_LIBRARY') or recorded_library)
     projector=FixedNativeProjector(p,library)
+    # NativeCore resolves registered migrations before loading the binary.
+    # Record/hash that actual file, never a missing or stale legacy alias.
+    loaded_library=str(projector.core.library_path)
     pose=projector.core.evaluate_motion_camera(p['rig'],p['controls'],timeline.first,timeline.dt,p['motion_times'])
     if pose['status'].any():raise ValueError('Current camera failed at a source midpoint')
     scale=estimate_uniform_scale(2*state['board'][:2])
     info=dict(record=str(record_path),state_path=record['state']['compact_path'],
-        state_sha256=digest(record['state']['compact_path']),native_library=library,native_library_sha256=digest(library),
+        state_sha256=digest(record['state']['compact_path']),native_library=loaded_library,native_library_sha256=digest(loaded_library),
         shot=shot,metres_per_scene_unit=scale,solver_metres_per_scene_unit=float(p['metres_per_scene_unit']),
         length_export_ratio=scale/float(p['metres_per_scene_unit']),camera_changed_during_fit=False,
         source_time_base=[1,12800],old_reference_reprojected_on_current_camera=True,
         prepared=record['prepared'])
+    if loaded_library!=library:
+        info['requested_native_library']=library
     if str(library)!=str(recorded_library):
         info.update(recorded_native_library=recorded_library,native_library_override=True)
     return projector,info,state,pose

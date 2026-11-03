@@ -1,0 +1,1918 @@
+{
+  "schema": "rinkspace.body-integration-review.v1",
+  "updated_date": "2026-11-04",
+  "base_commit": "663b3f7dc3b3f5f87a936f300263f56e6e88ca59",
+  "status": "not_accepted; user_requested_public_code_review",
+  "scope": "Preserved satisfied S01; one complete S01 integration candidate; 3 complete jump/spin/step clips with original A/B and subsequent root corrections. No full-nine-shot body fitting.",
+  "accepted_baseline": {
+    "parameters": "skate_s01_1103.npz",
+    "sha256": "3b58dac5f7363dfc5e051fc75ef8602dd3810a0ebc370c57a24542745bc5090c",
+    "unchanged_five_protected_files": {
+      "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\skate_s01_1103.npz": true,
+      "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\skate_s01_1103.json": true,
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_s01_1103\\fit\\candidate.npz": true,
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_s01_1103\\fit\\last_accepted.npz": true,
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_s01_1103\\fitted\\result.npz": true
+    },
+    "player_default": "skate_s01_1103",
+    "user_visual_preference_does_not_establish_3d_accuracy": true
+  },
+  "historical_s01_integration": {
+    "binding": "skate_s01_integrated_1103.json",
+    "parameters": "skate_s01_integrated_1103.npz",
+    "role": "Earlier complete-S01 attempt, before the latest finite ice policy; not a new S01 soft-ice run; preserved as failed comparison."
+  },
+  "ice": {
+    "configuration": "ice_soft_1103.json",
+    "finite_objective": true,
+    "separate_penetration_and_evidence_gated_hover": true,
+    "ice_in_AL": false,
+    "ice_is_delivery_gate": false,
+    "shared_normalization_changed": false,
+    "no_new_1mm_or_uniform_cm_acceptance_threshold": true
+  },
+  "checkpoint_identity": {
+    "required_fixed_fields": 8,
+    "missing_or_mismatched_identity_rejected": true,
+    "legacy_identity_invented_or_migrated": false
+  },
+  "initialization_and_motion": {
+    "pose_origin": "Same clip uniform-25Hz GVHMR camera-space pose; SO(3) interpolation to original native-50Hz timeline. Original framewise body-size depth initializers retained as failed references.",
+    "no_historical_S01_body_pose_anchor_on_new_clips": true,
+    "root_recipe": "root_trajectory_1103.json",
+    "step_root_uses_satisfied_S01_as_explicit_initializer": true,
+    "root_regularization": "actual root acceleration in continuous_root; subsequent continuous_pose keeps that root curve fixed",
+    "spin_entry": "79-82 seconds includes real entry and a change-foot airborne phase; overall phase extent is not a drift error measure",
+    "ankle_proxy_not_blade_or_contact_truth": true,
+    "additional_source_support_rows_from_initializer": 0,
+    "network_static_probability_used_as_contact_truth": false,
+    "flight_COM": "Not run on real clips; no admitted segment mass/COM model. Pure kernels do not establish a real COM or substitute pelvis for COM.",
+    "spin_policy": "No fixed centre or uniform yaw; stable-glide factor disabled in spin. B reuses A within floating-point equivalence."
+  },
+  "quality_and_budget": {
+    "image_guard_baseline": "Each optimization stage starts its image guard at that stage input; a corrected initialization can already be worse than previous A/B. The public comparison flags that regression and does not accept it.",
+    "configured_combined_wall_seconds_per_candidate": 120,
+    "configured_combined_accepted_steps": 8,
+    "actual_overrun": "Initial solves only checked time at safe evaluation boundaries; an expensive Jacobian exceeded configured wall time. Actual seconds are retained per run.",
+    "evaluation_reservation": "Code added from measured Jacobian times and unit tested; no further real fit was started to validate the new early-reservation exit.",
+    "remaining": [
+      "Original A/B and root candidates still rejected by user",
+      "Root/image fit tradeoff unresolved",
+      "Inherited root SO(3) jumps remain",
+      "Support/flight ambiguity and sparse source evidence remain",
+      "Model witness heights are not actual-contact truth"
+    ],
+    "current_computation": "stopped; no automatic retries or penalty increases"
+  },
+  "clips": {
+    "jump_s02": {
+      "source": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4",
+        "sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+        "native_size_wh": [
+          1920,
+          1080
+        ],
+        "time_base": [
+          1,
+          12800
+        ],
+        "pts_range": [
+          575744,
+          665600
+        ]
+      },
+      "source_time_base": [
+        1,
+        12800
+      ],
+      "original_AB": {
+        "A": {
+          "source_exposures": 352,
+          "native_cadence_pts": [
+            256
+          ],
+          "body_observation_error_px": {
+            "count": 5960,
+            "median": 6.75043683660946,
+            "p95": 25.237238916214423,
+            "maximum": 274.2865466147201
+          },
+          "minimum_raw_model_witness_height_m": -0.1633588277643733,
+          "minimum_semantic_margin_m": -0.1613588277643733,
+          "source_support_gaps": [
+            {
+              "pts": 628224,
+              "source_seconds": 49.08,
+              "raw_height_m": -0.10856238500318682
+            },
+            {
+              "pts": 630272,
+              "source_seconds": 49.24,
+              "raw_height_m": -0.11623716642611395
+            },
+            {
+              "pts": 644096,
+              "source_seconds": 50.32,
+              "raw_height_m": -0.02965855801968763
+            },
+            {
+              "pts": 646144,
+              "source_seconds": 50.48,
+              "raw_height_m": -0.03492978692694279
+            }
+          ],
+          "maximum_root_step_deg": 60.570960407102106,
+          "maximum_cavity_breach_m": 0.001996674597507006,
+          "contact_unknown_foot_frames": 700,
+          "heldout_blade_curves": [
+            {
+              "pts": 627200,
+              "source_seconds": 49.0,
+              "physical_foot": 1,
+              "side_candidate": 1,
+              "source_side_confirmed": false,
+              "source_points_in_curve": 4,
+              "resampled_curve_points": 24,
+              "curve_statistics": {
+                "count": 24,
+                "median": 5.837741645796426,
+                "p95": 7.670318241183633,
+                "maximum": 7.937710707799352
+              },
+              "sigma_px": 5.0,
+              "role": "heldout_development_approximate_visible_blade_segment"
+            },
+            {
+              "pts": 645120,
+              "source_seconds": 50.4,
+              "physical_foot": 1,
+              "side_candidate": 0,
+              "source_side_confirmed": false,
+              "source_points_in_curve": 4,
+              "resampled_curve_points": 24,
+              "curve_statistics": {
+                "count": 24,
+                "median": 4.047082694086654,
+                "p95": 8.32427052029006,
+                "maximum": 9.335872129312493
+              },
+              "sigma_px": 4.0,
+              "role": "heldout_development_approximate_visible_blade_segment"
+            }
+          ],
+          "numerical_convergence": false,
+          "parameters": "action_jump_s02_A_1103.npz",
+          "large_result": {
+            "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\jump_s02\\A\\fitted\\result.npz",
+            "sha256": "768dcac0ef52f1b677362549a3cf5aebbb1ed1b3e6deb97c0fe223a2150a3d26"
+          }
+        },
+        "B": {
+          "source_exposures": 352,
+          "native_cadence_pts": [
+            256
+          ],
+          "body_observation_error_px": {
+            "count": 5960,
+            "median": 6.754003811058868,
+            "p95": 25.251498606553476,
+            "maximum": 274.2881391195064
+          },
+          "minimum_raw_model_witness_height_m": -0.18139530792870312,
+          "minimum_semantic_margin_m": -0.17939530792870312,
+          "source_support_gaps": [
+            {
+              "pts": 628224,
+              "source_seconds": 49.08,
+              "raw_height_m": -0.10888272622840822
+            },
+            {
+              "pts": 630272,
+              "source_seconds": 49.24,
+              "raw_height_m": -0.12692498662485432
+            },
+            {
+              "pts": 644096,
+              "source_seconds": 50.32,
+              "raw_height_m": -0.03201423793235562
+            },
+            {
+              "pts": 646144,
+              "source_seconds": 50.48,
+              "raw_height_m": -0.03772570120759057
+            }
+          ],
+          "maximum_root_step_deg": 60.56426868948831,
+          "maximum_cavity_breach_m": 0.0019713890101829773,
+          "contact_unknown_foot_frames": 700,
+          "heldout_blade_curves": [
+            {
+              "pts": 627200,
+              "source_seconds": 49.0,
+              "physical_foot": 1,
+              "side_candidate": 1,
+              "source_side_confirmed": false,
+              "source_points_in_curve": 4,
+              "resampled_curve_points": 24,
+              "curve_statistics": {
+                "count": 24,
+                "median": 6.049829361223383,
+                "p95": 8.312020949109227,
+                "maximum": 8.705158708887627
+              },
+              "sigma_px": 5.0,
+              "role": "heldout_development_approximate_visible_blade_segment"
+            },
+            {
+              "pts": 645120,
+              "source_seconds": 50.4,
+              "physical_foot": 1,
+              "side_candidate": 0,
+              "source_side_confirmed": false,
+              "source_points_in_curve": 4,
+              "resampled_curve_points": 24,
+              "curve_statistics": {
+                "count": 24,
+                "median": 4.951248268968927,
+                "p95": 8.179581957808876,
+                "maximum": 8.418193387420423
+              },
+              "sigma_px": 4.0,
+              "role": "heldout_development_approximate_visible_blade_segment"
+            }
+          ],
+          "numerical_convergence": false,
+          "parameters": "action_jump_s02_B_1103.npz",
+          "large_result": {
+            "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\jump_s02\\B\\fitted\\result.npz",
+            "sha256": "cdfdcfab3bf7906f7f7f94665f7b85a291627a2806ff705e8c111096c6f0e75c"
+          }
+        }
+      },
+      "root_repair": {
+        "A": {
+          "parameters": "action_jump_s02_A_root_pose_1103.npz",
+          "initial_reference": "action_jump_s02_A_root_reference_1103.npz",
+          "large_result": {
+            "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\jump_s02\\root_repair\\A_pose\\fitted\\result.npz",
+            "sha256": "0bb70a3c6c114b8c339ab9cd724f16f5085a763c1133ef8869d9752033ee18ea"
+          },
+          "diagnostics": {
+            "path_xy_m": 34.6843781829828,
+            "range_xy_m": [
+              28.16541389894817,
+              6.809113519464648
+            ],
+            "speed_xy_mps": {
+              "count": 351,
+              "median": 5.137298217752207,
+              "p95": 7.227017413678778,
+              "maximum": 7.877950606134364
+            },
+            "acceleration_xy_mps2": {
+              "count": 350,
+              "median": 4.247611426555975,
+              "p95": 11.6211323935818,
+              "maximum": 17.361428156883058
+            },
+            "body_image_px": {
+              "count": 5960,
+              "median": 10.924309888108738,
+              "p95": 56.54902722895247,
+              "maximum": 272.7809976428892
+            },
+            "body_fit_px": {
+              "count": 5858,
+              "median": 10.943784456042575,
+              "p95": 56.75581606745442,
+              "maximum": 272.7809976428892
+            },
+            "ankle_proxy_px": {
+              "count": 696,
+              "median": 8.440459154056814,
+              "p95": 57.03102573106608,
+              "maximum": 188.01269464247133
+            },
+            "maximum_root_angle_step_deg": 60.54265878486873,
+            "minimum_raw_witness_height_m": -0.042613201840364066,
+            "minimum_semantic_margin_m": -0.040613201840364065,
+            "maximum_cavity_violation_m": 0.0018962104555786112,
+            "support_exposures": [
+              {
+                "pts": 628224,
+                "seconds": 49.08,
+                "raw_height_m": -0.009811769959349712
+              },
+              {
+                "pts": 630272,
+                "seconds": 49.24,
+                "raw_height_m": -0.03109940236921246
+              },
+              {
+                "pts": 644096,
+                "seconds": 50.32,
+                "raw_height_m": 0.0025697915704784003
+              },
+              {
+                "pts": 646144,
+                "seconds": 50.48,
+                "raw_height_m": -0.007249378365297783
+              }
+            ],
+            "heldout_shoe_curves": [
+              {
+                "pts": 627200,
+                "seconds": 49.0,
+                "physical_foot": 1,
+                "curve_error_px": {
+                  "count": 24,
+                  "median": 10.655282272804659,
+                  "p95": 14.168014926034354,
+                  "maximum": 14.279258166488754
+                },
+                "sigma_px": 5.0,
+                "role": "heldout_development_approximate_visible_blade_segment",
+                "blade_side_unknown": true
+              },
+              {
+                "pts": 645120,
+                "seconds": 50.4,
+                "physical_foot": 1,
+                "curve_error_px": {
+                  "count": 24,
+                  "median": 5.785439681099371,
+                  "p95": 14.873311918575332,
+                  "maximum": 16.31624420788411
+                },
+                "sigma_px": 4.0,
+                "role": "heldout_development_approximate_visible_blade_segment",
+                "blade_side_unknown": true
+              }
+            ],
+            "unknown_contact_foot_frames": 704,
+            "state_pts_consistent": true,
+            "pelvis_projection_is_world_P_xy": true,
+            "independent_3d_truth": false
+          },
+          "image_median_change_fraction": 0.618311548204292,
+          "image_regression_vs_previous_AB": true,
+          "reused_A": false,
+          "root_run": {
+            "configured": {
+              "wall_seconds": 120.0,
+              "max_accepted": 8,
+              "max_outer": 1,
+              "stagnation_window": 4,
+              "min_violation_improvement_m": 0.0001,
+              "max_image_cost_increase": 0.05,
+              "max_pose_cost_increase": 0.1,
+              "allow_penalty_growth": false
+            },
+            "actual_seconds": 16.23519299999316,
+            "accepted_steps": 4,
+            "stop": [
+              {
+                "code": "violation_stagnation",
+                "category": "stagnation",
+                "message": "Best physical violation did not improve enough over accepted steps.",
+                "accepted_window": 4,
+                "improvement_m": 5.898059818321144e-17,
+                "required_improvement_m": 0.0001,
+                "best_violation_m": 0.005373401403231451
+              }
+            ]
+          },
+          "pose_run": {
+            "configured": {
+              "wall_seconds": 103.76480700000684,
+              "max_accepted": 4,
+              "max_outer": 1,
+              "stagnation_window": 4,
+              "min_violation_improvement_m": 0.0001,
+              "max_image_cost_increase": 0.05,
+              "max_pose_cost_increase": 0.1,
+              "allow_penalty_growth": false
+            },
+            "actual_seconds": 122.34903499999928,
+            "accepted_steps": 2,
+            "stop": [
+              {
+                "code": "wall_budget",
+                "category": "budget",
+                "message": "Wall-time budget reached.",
+                "elapsed_seconds": 122.34903499999928,
+                "limit_seconds": 103.76480700000684
+              }
+            ]
+          },
+          "code_and_cache_replay": {
+            "parameter_fixed_identity_valid": true,
+            "initial_reference_sha256_valid": true,
+            "replay_maximum_error": {
+              "P_m": 0.0,
+              "Q": 0.0,
+              "local_R": 0.0
+            },
+            "cache": "D:\\CodexData\\RinkSpace_Data\\cache\\results3d\\action_jump_s02\\A_root_ce1a7a228310151854ee",
+            "cache_state_and_pts_match": true,
+            "common_body_shoe_P_G_coco_match": true
+          },
+          "numerically_converged": false,
+          "user_accepted": false,
+          "physical_accuracy_accepted": false
+        },
+        "B": {
+          "parameters": "action_jump_s02_B_root_pose_1103.npz",
+          "initial_reference": "action_jump_s02_B_root_reference_1103.npz",
+          "large_result": {
+            "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\jump_s02\\root_repair\\B_pose\\fitted\\result.npz",
+            "sha256": "75195fa12a069ad4c515fa22ff99295cee8b583d7fcdf70251156786b368b0c3"
+          },
+          "diagnostics": {
+            "path_xy_m": 34.6843508356549,
+            "range_xy_m": [
+              28.165434010991483,
+              6.809114281061021
+            ],
+            "speed_xy_mps": {
+              "count": 351,
+              "median": 5.136941301633173,
+              "p95": 7.227016995067736,
+              "maximum": 7.877950493130254
+            },
+            "acceleration_xy_mps2": {
+              "count": 350,
+              "median": 4.247577157914344,
+              "p95": 11.621102196113522,
+              "maximum": 17.361450589265267
+            },
+            "body_image_px": {
+              "count": 5960,
+              "median": 10.925044832251054,
+              "p95": 56.4367039280496,
+              "maximum": 272.78022388810103
+            },
+            "body_fit_px": {
+              "count": 5858,
+              "median": 10.952303031900847,
+              "p95": 56.70662283673619,
+              "maximum": 272.78022388810103
+            },
+            "ankle_proxy_px": {
+              "count": 696,
+              "median": 8.404194309104964,
+              "p95": 56.000189940495616,
+              "maximum": 187.971189693918
+            },
+            "maximum_root_angle_step_deg": 60.537376042099034,
+            "minimum_raw_witness_height_m": -0.059445067252349756,
+            "minimum_semantic_margin_m": -0.057445067252349755,
+            "maximum_cavity_violation_m": 0.0018340394860412315,
+            "support_exposures": [
+              {
+                "pts": 628224,
+                "seconds": 49.08,
+                "raw_height_m": -0.01377072025670409
+              },
+              {
+                "pts": 630272,
+                "seconds": 49.24,
+                "raw_height_m": -0.043142886063789396
+              },
+              {
+                "pts": 644096,
+                "seconds": 50.32,
+                "raw_height_m": 0.0003992234968314438
+              },
+              {
+                "pts": 646144,
+                "seconds": 50.48,
+                "raw_height_m": -0.008570288323908467
+              }
+            ],
+            "heldout_shoe_curves": [
+              {
+                "pts": 627200,
+                "seconds": 49.0,
+                "physical_foot": 1,
+                "curve_error_px": {
+                  "count": 24,
+                  "median": 9.538910597480875,
+                  "p95": 13.000258864747247,
+                  "maximum": 13.574507108538889
+                },
+                "sigma_px": 5.0,
+                "role": "heldout_development_approximate_visible_blade_segment",
+                "blade_side_unknown": true
+              },
+              {
+                "pts": 645120,
+                "seconds": 50.4,
+                "physical_foot": 1,
+                "curve_error_px": {
+                  "count": 24,
+                  "median": 5.643734271091083,
+                  "p95": 13.11941180887107,
+                  "maximum": 14.50726847989882
+                },
+                "sigma_px": 4.0,
+                "role": "heldout_development_approximate_visible_blade_segment",
+                "blade_side_unknown": true
+              }
+            ],
+            "unknown_contact_foot_frames": 704,
+            "state_pts_consistent": true,
+            "pelvis_projection_is_world_P_xy": true,
+            "independent_3d_truth": false
+          },
+          "image_median_change_fraction": 0.6175656896080823,
+          "image_regression_vs_previous_AB": true,
+          "reused_A": false,
+          "root_run": {
+            "configured": {
+              "wall_seconds": 120.0,
+              "max_accepted": 8,
+              "max_outer": 1,
+              "stagnation_window": 4,
+              "min_violation_improvement_m": 0.0001,
+              "max_image_cost_increase": 0.05,
+              "max_pose_cost_increase": 0.1,
+              "allow_penalty_growth": false
+            },
+            "actual_seconds": 16.664323799996055,
+            "accepted_steps": 4,
+            "stop": [
+              {
+                "code": "violation_stagnation",
+                "category": "stagnation",
+                "message": "Best physical violation did not improve enough over accepted steps.",
+                "accepted_window": 4,
+                "improvement_m": 0.0,
+                "required_improvement_m": 0.0001,
+                "best_violation_m": 0.005383642789680628
+              }
+            ]
+          },
+          "pose_run": {
+            "configured": {
+              "wall_seconds": 103.33567620000395,
+              "max_accepted": 4,
+              "max_outer": 1,
+              "stagnation_window": 4,
+              "min_violation_improvement_m": 0.0001,
+              "max_image_cost_increase": 0.05,
+              "max_pose_cost_increase": 0.1,
+              "allow_penalty_growth": false
+            },
+            "actual_seconds": 123.26507820000552,
+            "accepted_steps": 2,
+            "stop": [
+              {
+                "code": "wall_budget",
+                "category": "budget",
+                "message": "Wall-time budget reached.",
+                "elapsed_seconds": 123.26507820000552,
+                "limit_seconds": 103.33567620000395
+              }
+            ]
+          },
+          "code_and_cache_replay": {
+            "parameter_fixed_identity_valid": true,
+            "initial_reference_sha256_valid": true,
+            "replay_maximum_error": {
+              "P_m": 0.0,
+              "Q": 0.0,
+              "local_R": 0.0
+            },
+            "cache": "D:\\CodexData\\RinkSpace_Data\\cache\\results3d\\action_jump_s02\\B_root_1c9a1f73f215f9c7e08c",
+            "cache_state_and_pts_match": true,
+            "common_body_shoe_P_G_coco_match": true
+          },
+          "numerically_converged": false,
+          "user_accepted": false,
+          "physical_accuracy_accepted": false
+        }
+      },
+      "phase_evidence": {
+        "shot_id": "s02",
+        "intervals": [
+          {
+            "start_pts": 627712,
+            "end_pts": 630784,
+            "physical_foot": 1,
+            "phase": "stable_glide",
+            "origin": "video_observation",
+            "confidence": 0.6,
+            "boundary_uncertainty_pts": [
+              512,
+              512
+            ],
+            "human_confirmed": false,
+            "edge": "unknown"
+          },
+          {
+            "start_pts": 643840,
+            "end_pts": 646912,
+            "physical_foot": 1,
+            "phase": "stable_glide",
+            "origin": "video_observation",
+            "confidence": 0.6,
+            "boundary_uncertainty_pts": [
+              512,
+              512
+            ],
+            "human_confirmed": false,
+            "edge": "unknown"
+          }
+        ],
+        "supports": [
+          {
+            "id": "review_628224_foot1",
+            "pts": 628224,
+            "feet": [
+              1
+            ],
+            "physical_side": "right",
+            "edge": "unknown",
+            "mode": "glide",
+            "confidence": 0.65,
+            "human_confirmed": false,
+            "source": "assistant direct source-image review; development evidence",
+            "source_support_weight_s": 0.02,
+            "source_support_weight_basis": "one native50 observation; not shutter duration or labelled interval",
+            "source_time_base": [
+              1,
+              12800
+            ],
+            "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\source_review\\glide_brackets.png"
+          },
+          {
+            "id": "review_630272_foot1",
+            "pts": 630272,
+            "feet": [
+              1
+            ],
+            "physical_side": "right",
+            "edge": "unknown",
+            "mode": "glide",
+            "confidence": 0.65,
+            "human_confirmed": false,
+            "source": "assistant direct source-image review; development evidence",
+            "source_support_weight_s": 0.02,
+            "source_support_weight_basis": "one native50 observation; not shutter duration or labelled interval",
+            "source_time_base": [
+              1,
+              12800
+            ],
+            "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\source_review\\glide_brackets.png"
+          },
+          {
+            "id": "review_644096_foot1",
+            "pts": 644096,
+            "feet": [
+              1
+            ],
+            "physical_side": "right",
+            "edge": "unknown",
+            "mode": "glide",
+            "confidence": 0.65,
+            "human_confirmed": false,
+            "source": "assistant direct source-image review; development evidence",
+            "source_support_weight_s": 0.02,
+            "source_support_weight_basis": "one native50 observation; not shutter duration or labelled interval",
+            "source_time_base": [
+              1,
+              12800
+            ],
+            "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\source_review\\glide_brackets.png"
+          },
+          {
+            "id": "review_646144_foot1",
+            "pts": 646144,
+            "feet": [
+              1
+            ],
+            "physical_side": "right",
+            "edge": "unknown",
+            "mode": "glide",
+            "confidence": 0.65,
+            "human_confirmed": false,
+            "source": "assistant direct source-image review; development evidence",
+            "source_support_weight_s": 0.02,
+            "source_support_weight_basis": "one native50 observation; not shutter duration or labelled interval",
+            "source_time_base": [
+              1,
+              12800
+            ],
+            "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\source_review\\glide_brackets.png"
+          }
+        ],
+        "heldout_pts": [
+          627200,
+          645120
+        ],
+        "flight_intervals": [
+          {
+            "start_pts": 617216,
+            "end_pts": 621824,
+            "physical_foot": null,
+            "phase": "airborne",
+            "origin": "video_observation",
+            "confidence": 0.7,
+            "boundary_uncertainty_pts": [
+              512,
+              512
+            ],
+            "human_confirmed": false,
+            "edge": "unknown"
+          },
+          {
+            "start_pts": 637696,
+            "end_pts": 640256,
+            "physical_foot": null,
+            "phase": "airborne",
+            "origin": "video_observation",
+            "confidence": 0.65,
+            "boundary_uncertainty_pts": [
+              512,
+              512
+            ],
+            "human_confirmed": false,
+            "edge": "unknown"
+          }
+        ],
+        "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+        "source_time_base": [
+          1,
+          12800
+        ],
+        "glide_sigma_mps": 0.8,
+        "evidence_status": "assistant source review, not human-confirmed contact truth",
+        "review_images": [
+          "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\source_review\\glide_brackets.png",
+          "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\source_review\\jump_s02_identity_review.png"
+        ],
+        "unknown_policy": "unlabelled exposures, physical sides and edges remain unknown; source body keypoints are not blade observations"
+      },
+      "acceptance": "User reported original A/B drift and rejected the subsequent result again on 2026-11-04; all are unaccepted research candidates."
+    },
+    "step_s01": {
+      "source": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4",
+        "sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+        "native_size_wh": [
+          1920,
+          1080
+        ],
+        "time_base": [
+          1,
+          12800
+        ],
+        "pts_range": [
+          320000,
+          448000
+        ]
+      },
+      "source_time_base": [
+        1,
+        12800
+      ],
+      "original_AB": {
+        "A": {
+          "source_exposures": 501,
+          "native_cadence_pts": [
+            256
+          ],
+          "body_observation_error_px": {
+            "count": 8500,
+            "median": 5.608913182542789,
+            "p95": 18.509288966020144,
+            "maximum": 385.77883902835816
+          },
+          "minimum_raw_model_witness_height_m": -0.16667774332714447,
+          "minimum_semantic_margin_m": -0.16467774332714447,
+          "source_support_gaps": [
+            {
+              "pts": 333824,
+              "source_seconds": 26.08,
+              "raw_height_m": 0.03876278796041128
+            },
+            {
+              "pts": 335616,
+              "source_seconds": 26.22,
+              "raw_height_m": 0.030028939057104034
+            },
+            {
+              "pts": 387072,
+              "source_seconds": 30.24,
+              "raw_height_m": 0.016595171897214694
+            },
+            {
+              "pts": 389120,
+              "source_seconds": 30.4,
+              "raw_height_m": 0.002044891830832652
+            }
+          ],
+          "maximum_root_step_deg": 11.287341809628304,
+          "maximum_cavity_breach_m": 0.0038021867018426143,
+          "contact_unknown_foot_frames": 998,
+          "heldout_blade_curves": [
+            {
+              "pts": 346624,
+              "source_seconds": 27.08,
+              "physical_foot": 1,
+              "side_candidate": 0,
+              "source_side_confirmed": false,
+              "source_points_in_curve": 6,
+              "resampled_curve_points": 24,
+              "curve_statistics": {
+                "count": 24,
+                "median": 1.0352575468104435,
+                "p95": 5.005798711211001,
+                "maximum": 5.9507956866765745
+              },
+              "sigma_px": 3,
+              "role": "heldout_from_current_AB; used_in_historical_S01_fit"
+            }
+          ],
+          "numerical_convergence": false,
+          "parameters": "action_step_s01_A_1103.npz",
+          "large_result": {
+            "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\step_s01\\A\\fitted\\result.npz",
+            "sha256": "808e7a3ef3c741c5264b35a713ca5cfd0ab82fb5c290bbc58356bdb8f6049639"
+          }
+        },
+        "B": {
+          "source_exposures": 501,
+          "native_cadence_pts": [
+            256
+          ],
+          "body_observation_error_px": {
+            "count": 8500,
+            "median": 5.608294018602145,
+            "p95": 18.50541828551209,
+            "maximum": 385.7582358138796
+          },
+          "minimum_raw_model_witness_height_m": -0.16665161994479033,
+          "minimum_semantic_margin_m": -0.16465161994479036,
+          "source_support_gaps": [
+            {
+              "pts": 333824,
+              "source_seconds": 26.08,
+              "raw_height_m": 0.038469484282100376
+            },
+            {
+              "pts": 335616,
+              "source_seconds": 26.22,
+              "raw_height_m": 0.027661103062996815
+            },
+            {
+              "pts": 387072,
+              "source_seconds": 30.24,
+              "raw_height_m": 0.012356761985104997
+            },
+            {
+              "pts": 389120,
+              "source_seconds": 30.4,
+              "raw_height_m": 0.001398096231757318
+            }
+          ],
+          "maximum_root_step_deg": 11.287803915114885,
+          "maximum_cavity_breach_m": 0.003799242232583678,
+          "contact_unknown_foot_frames": 998,
+          "heldout_blade_curves": [
+            {
+              "pts": 346624,
+              "source_seconds": 27.08,
+              "physical_foot": 1,
+              "side_candidate": 0,
+              "source_side_confirmed": false,
+              "source_points_in_curve": 6,
+              "resampled_curve_points": 24,
+              "curve_statistics": {
+                "count": 24,
+                "median": 1.0472023226086051,
+                "p95": 5.029315168695114,
+                "maximum": 5.975501786087435
+              },
+              "sigma_px": 3,
+              "role": "heldout_from_current_AB; used_in_historical_S01_fit"
+            }
+          ],
+          "numerical_convergence": false,
+          "parameters": "action_step_s01_B_1103.npz",
+          "large_result": {
+            "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\step_s01\\B\\fitted\\result.npz",
+            "sha256": "dc0f06c76edb287ee816fe09cdd767bf28a2c54e6d70420effaa8dd3c0588720"
+          }
+        }
+      },
+      "root_repair": {
+        "A": {
+          "parameters": "action_step_s01_A_root_pose_1103.npz",
+          "initial_reference": "action_step_s01_A_root_reference_1103.npz",
+          "large_result": {
+            "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\step_s01\\root_repair\\A_pose\\fitted\\result.npz",
+            "sha256": "bf067a3982d9d8a5386b1706ca81ae5d183b7f95058b8c411584c98d0556ecc3"
+          },
+          "diagnostics": {
+            "path_xy_m": 44.057568836712605,
+            "range_xy_m": [
+              26.240867950056217,
+              15.245056342815383
+            ],
+            "speed_xy_mps": {
+              "count": 500,
+              "median": 4.230577128033964,
+              "p95": 6.513001801901681,
+              "maximum": 7.771963897068648
+            },
+            "acceleration_xy_mps2": {
+              "count": 499,
+              "median": 3.5360437241113454,
+              "p95": 10.137320220313347,
+              "maximum": 12.95808001693
+            },
+            "body_image_px": {
+              "count": 8500,
+              "median": 7.44891996530682,
+              "p95": 23.09845034260798,
+              "maximum": 401.39369334953045
+            },
+            "body_fit_px": {
+              "count": 8398,
+              "median": 7.408022238680781,
+              "p95": 23.131768915439693,
+              "maximum": 401.39369334953045
+            },
+            "ankle_proxy_px": {
+              "count": 1000,
+              "median": 7.4131515059896405,
+              "p95": 22.163288325009596,
+              "maximum": 41.17257763612545
+            },
+            "maximum_root_angle_step_deg": 11.271689658614308,
+            "minimum_raw_witness_height_m": -0.12426625398738332,
+            "minimum_semantic_margin_m": -0.12226625398738332,
+            "maximum_cavity_violation_m": 0.003348874533964243,
+            "support_exposures": [
+              {
+                "pts": 333824,
+                "seconds": 26.08,
+                "raw_height_m": 0.04352631467551499
+              },
+              {
+                "pts": 335616,
+                "seconds": 26.22,
+                "raw_height_m": -0.02504639260246412
+              },
+              {
+                "pts": 387072,
+                "seconds": 30.24,
+                "raw_height_m": 0.003254656124222936
+              },
+              {
+                "pts": 389120,
+                "seconds": 30.4,
+                "raw_height_m": -0.03907501609064439
+              }
+            ],
+            "heldout_shoe_curves": [
+              {
+                "pts": 346624,
+                "seconds": 27.08,
+                "physical_foot": 1,
+                "curve_error_px": {
+                  "count": 24,
+                  "median": 9.942441294555284,
+                  "p95": 10.8213263537371,
+                  "maximum": 10.870988981857861
+                },
+                "sigma_px": 3,
+                "role": "heldout_from_current_AB; used_in_historical_S01_fit",
+                "blade_side_unknown": true
+              }
+            ],
+            "unknown_contact_foot_frames": 1002,
+            "state_pts_consistent": true,
+            "pelvis_projection_is_world_P_xy": true,
+            "independent_3d_truth": false
+          },
+          "image_median_change_fraction": 0.32805050156434556,
+          "image_regression_vs_previous_AB": true,
+          "reused_A": false,
+          "root_run": {
+            "configured": {
+              "wall_seconds": 120.0,
+              "max_accepted": 8,
+              "max_outer": 1,
+              "stagnation_window": 4,
+              "min_violation_improvement_m": 0.0001,
+              "max_image_cost_increase": 0.05,
+              "max_pose_cost_increase": 0.1,
+              "allow_penalty_growth": false
+            },
+            "actual_seconds": 24.88986499999737,
+            "accepted_steps": 4,
+            "stop": [
+              {
+                "code": "violation_stagnation",
+                "category": "stagnation",
+                "message": "Best physical violation did not improve enough over accepted steps.",
+                "accepted_window": 4,
+                "improvement_m": 0.0,
+                "required_improvement_m": 0.0001,
+                "best_violation_m": 0.0038021867018425376
+              }
+            ]
+          },
+          "pose_run": {
+            "configured": {
+              "wall_seconds": 95.11013500000263,
+              "max_accepted": 4,
+              "max_outer": 1,
+              "stagnation_window": 4,
+              "min_violation_improvement_m": 0.0001,
+              "max_image_cost_increase": 0.05,
+              "max_pose_cost_increase": 0.1,
+              "allow_penalty_growth": false
+            },
+            "actual_seconds": 115.85185629999614,
+            "accepted_steps": 1,
+            "stop": [
+              {
+                "code": "wall_budget",
+                "category": "budget",
+                "message": "Wall-time budget reached.",
+                "elapsed_seconds": 115.85185629999614,
+                "limit_seconds": 95.11013500000263
+              }
+            ]
+          },
+          "code_and_cache_replay": {
+            "parameter_fixed_identity_valid": true,
+            "initial_reference_sha256_valid": true,
+            "replay_maximum_error": {
+              "P_m": 0.0,
+              "Q": 0.0,
+              "local_R": 0.0
+            },
+            "cache": "D:\\CodexData\\RinkSpace_Data\\cache\\results3d\\action_step_s01\\A_root_17b9a0bf907577e7e1e2",
+            "cache_state_and_pts_match": true,
+            "common_body_shoe_P_G_coco_match": true
+          },
+          "numerically_converged": false,
+          "user_accepted": false,
+          "physical_accuracy_accepted": false
+        },
+        "B": {
+          "parameters": "action_step_s01_B_root_pose_1103.npz",
+          "initial_reference": "action_step_s01_B_root_reference_1103.npz",
+          "large_result": {
+            "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\step_s01\\root_repair\\B_pose\\fitted\\result.npz",
+            "sha256": "e569043ac7e327db61dfcdba8e75e558c62e3d093c506ee57977d17409a6de7b"
+          },
+          "diagnostics": {
+            "path_xy_m": 44.05750634232042,
+            "range_xy_m": [
+              26.240856762026255,
+              15.245053181200113
+            ],
+            "speed_xy_mps": {
+              "count": 500,
+              "median": 4.230571519695317,
+              "p95": 6.512970863101448,
+              "maximum": 7.77196093735323
+            },
+            "acceleration_xy_mps2": {
+              "count": 499,
+              "median": 3.5358970117019237,
+              "p95": 10.137236665531889,
+              "maximum": 12.958107034518752
+            },
+            "body_image_px": {
+              "count": 8500,
+              "median": 7.448559362113353,
+              "p95": 23.11035517812603,
+              "maximum": 401.36366631220386
+            },
+            "body_fit_px": {
+              "count": 8398,
+              "median": 7.4118951645675155,
+              "p95": 23.1425987248764,
+              "maximum": 401.36366631220386
+            },
+            "ankle_proxy_px": {
+              "count": 1000,
+              "median": 7.40352011607152,
+              "p95": 22.17061662446826,
+              "maximum": 41.767137752281926
+            },
+            "maximum_root_angle_step_deg": 11.272244332805665,
+            "minimum_raw_witness_height_m": -0.12425349817767084,
+            "minimum_semantic_margin_m": -0.12225349817767084,
+            "maximum_cavity_violation_m": 0.003349285975948291,
+            "support_exposures": [
+              {
+                "pts": 333824,
+                "seconds": 26.08,
+                "raw_height_m": 0.04319708868910589
+              },
+              {
+                "pts": 335616,
+                "seconds": 26.22,
+                "raw_height_m": -0.02796581478053685
+              },
+              {
+                "pts": 387072,
+                "seconds": 30.24,
+                "raw_height_m": -0.0018153717111446495
+              },
+              {
+                "pts": 389120,
+                "seconds": 30.4,
+                "raw_height_m": -0.0398302597028732
+              }
+            ],
+            "heldout_shoe_curves": [
+              {
+                "pts": 346624,
+                "seconds": 27.08,
+                "physical_foot": 1,
+                "curve_error_px": {
+                  "count": 24,
+                  "median": 9.927323463119995,
+                  "p95": 10.815851805249524,
+                  "maximum": 10.861226210352855
+                },
+                "sigma_px": 3,
+                "role": "heldout_from_current_AB; used_in_historical_S01_fit",
+                "blade_side_unknown": true
+              }
+            ],
+            "unknown_contact_foot_frames": 1002,
+            "state_pts_consistent": true,
+            "pelvis_projection_is_world_P_xy": true,
+            "independent_3d_truth": false
+          },
+          "image_median_change_fraction": 0.32813282210369743,
+          "image_regression_vs_previous_AB": true,
+          "reused_A": false,
+          "root_run": {
+            "configured": {
+              "wall_seconds": 120.0,
+              "max_accepted": 8,
+              "max_outer": 1,
+              "stagnation_window": 4,
+              "min_violation_improvement_m": 0.0001,
+              "max_image_cost_increase": 0.05,
+              "max_pose_cost_increase": 0.1,
+              "allow_penalty_growth": false
+            },
+            "actual_seconds": 26.60956299999816,
+            "accepted_steps": 4,
+            "stop": [
+              {
+                "code": "violation_stagnation",
+                "category": "stagnation",
+                "message": "Best physical violation did not improve enough over accepted steps.",
+                "accepted_window": 4,
+                "improvement_m": 6.201636426617085e-17,
+                "required_improvement_m": 0.0001,
+                "best_violation_m": 0.003799242232583519
+              }
+            ]
+          },
+          "pose_run": {
+            "configured": {
+              "wall_seconds": 93.39043700000184,
+              "max_accepted": 4,
+              "max_outer": 1,
+              "stagnation_window": 4,
+              "min_violation_improvement_m": 0.0001,
+              "max_image_cost_increase": 0.05,
+              "max_pose_cost_increase": 0.1,
+              "allow_penalty_growth": false
+            },
+            "actual_seconds": 119.9371558999992,
+            "accepted_steps": 1,
+            "stop": [
+              {
+                "code": "wall_budget",
+                "category": "budget",
+                "message": "Wall-time budget reached.",
+                "elapsed_seconds": 119.9371558999992,
+                "limit_seconds": 93.39043700000184
+              }
+            ]
+          },
+          "code_and_cache_replay": {
+            "parameter_fixed_identity_valid": true,
+            "initial_reference_sha256_valid": true,
+            "replay_maximum_error": {
+              "P_m": 0.0,
+              "Q": 0.0,
+              "local_R": 0.0
+            },
+            "cache": "D:\\CodexData\\RinkSpace_Data\\cache\\results3d\\action_step_s01\\B_root_c6a19c07ccb2d4b55afa",
+            "cache_state_and_pts_match": true,
+            "common_body_shoe_P_G_coco_match": true
+          },
+          "numerically_converged": false,
+          "user_accepted": false,
+          "physical_accuracy_accepted": false
+        }
+      },
+      "phase_evidence": {
+        "shot_id": "s01",
+        "intervals": [
+          {
+            "start_pts": 333824,
+            "end_pts": 335872,
+            "physical_foot": 0,
+            "phase": "stable_glide",
+            "origin": "video_observation",
+            "confidence": 0.6,
+            "boundary_uncertainty_pts": [
+              512,
+              512
+            ],
+            "human_confirmed": false,
+            "edge": "unknown"
+          },
+          {
+            "start_pts": 387072,
+            "end_pts": 389120,
+            "physical_foot": 1,
+            "phase": "stable_glide",
+            "origin": "video_observation",
+            "confidence": 0.6,
+            "boundary_uncertainty_pts": [
+              512,
+              512
+            ],
+            "human_confirmed": false,
+            "edge": "unknown"
+          }
+        ],
+        "supports": [
+          {
+            "id": "review_333824_foot0",
+            "pts": 333824,
+            "feet": [
+              0
+            ],
+            "physical_side": "left",
+            "edge": "unknown",
+            "mode": "glide",
+            "confidence": 0.65,
+            "human_confirmed": false,
+            "source": "assistant direct source-image review; development evidence",
+            "source_support_weight_s": 0.02,
+            "source_support_weight_basis": "one native50 observation; not shutter duration or labelled interval",
+            "source_time_base": [
+              1,
+              12800
+            ],
+            "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\source_review\\glide_brackets.png"
+          },
+          {
+            "id": "review_335616_foot0",
+            "pts": 335616,
+            "feet": [
+              0
+            ],
+            "physical_side": "left",
+            "edge": "unknown",
+            "mode": "glide",
+            "confidence": 0.65,
+            "human_confirmed": false,
+            "source": "assistant direct source-image review; development evidence",
+            "source_support_weight_s": 0.02,
+            "source_support_weight_basis": "one native50 observation; not shutter duration or labelled interval",
+            "source_time_base": [
+              1,
+              12800
+            ],
+            "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\source_review\\glide_brackets.png"
+          },
+          {
+            "id": "review_387072_foot1",
+            "pts": 387072,
+            "feet": [
+              1
+            ],
+            "physical_side": "right",
+            "edge": "unknown",
+            "mode": "glide",
+            "confidence": 0.65,
+            "human_confirmed": false,
+            "source": "assistant direct source-image review; development evidence",
+            "source_support_weight_s": 0.02,
+            "source_support_weight_basis": "one native50 observation; not shutter duration or labelled interval",
+            "source_time_base": [
+              1,
+              12800
+            ],
+            "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\source_review\\glide_brackets.png"
+          },
+          {
+            "id": "review_389120_foot1",
+            "pts": 389120,
+            "feet": [
+              1
+            ],
+            "physical_side": "right",
+            "edge": "unknown",
+            "mode": "glide",
+            "confidence": 0.65,
+            "human_confirmed": false,
+            "source": "assistant direct source-image review; development evidence",
+            "source_support_weight_s": 0.02,
+            "source_support_weight_basis": "one native50 observation; not shutter duration or labelled interval",
+            "source_time_base": [
+              1,
+              12800
+            ],
+            "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\source_review\\glide_brackets.png"
+          }
+        ],
+        "heldout_pts": [
+          346624,
+          389120
+        ],
+        "flight_intervals": [],
+        "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+        "source_time_base": [
+          1,
+          12800
+        ],
+        "glide_sigma_mps": 0.8,
+        "evidence_status": "assistant source review, not human-confirmed contact truth",
+        "review_images": [
+          "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\source_review\\glide_brackets.png",
+          "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\source_review\\step_s01_identity_review.png"
+        ],
+        "unknown_policy": "unlabelled exposures, physical sides and edges remain unknown; source body keypoints are not blade observations"
+      },
+      "acceptance": "User reported original A/B drift and rejected the subsequent result again on 2026-11-04; all are unaccepted research candidates."
+    },
+    "spin_s05": {
+      "source": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4",
+        "sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+        "native_size_wh": [
+          1920,
+          1080
+        ],
+        "time_base": [
+          1,
+          12800
+        ],
+        "pts_range": [
+          972800,
+          1216000
+        ]
+      },
+      "source_time_base": [
+        1,
+        12800
+      ],
+      "original_AB": {
+        "A": {
+          "source_exposures": 951,
+          "native_cadence_pts": [
+            256
+          ],
+          "body_observation_error_px": {
+            "count": 15988,
+            "median": 18.35520578760574,
+            "p95": 90.92522716645074,
+            "maximum": 518.299542144039
+          },
+          "minimum_raw_model_witness_height_m": -0.37180947937857917,
+          "minimum_semantic_margin_m": -0.36980947937857916,
+          "source_support_gaps": [
+            {
+              "pts": 977920,
+              "source_seconds": 76.4,
+              "raw_height_m": 0.012831521955056747
+            },
+            {
+              "pts": 1029120,
+              "source_seconds": 80.4,
+              "raw_height_m": 0.07219798450262255
+            },
+            {
+              "pts": 1080320,
+              "source_seconds": 84.4,
+              "raw_height_m": 0.030328504817325127
+            }
+          ],
+          "maximum_root_step_deg": 90.67623318837411,
+          "maximum_cavity_breach_m": 0.003199768691784762,
+          "contact_unknown_foot_frames": 1899,
+          "heldout_blade_curves": [
+            {
+              "pts": 1062400,
+              "source_seconds": 83.0,
+              "physical_foot": 1,
+              "side_candidate": 0,
+              "source_side_confirmed": false,
+              "source_points_in_curve": 4,
+              "resampled_curve_points": 24,
+              "curve_statistics": {
+                "count": 24,
+                "median": 19.411619462037333,
+                "p95": 32.44916109591548,
+                "maximum": 33.891032046801854
+              },
+              "sigma_px": 5.0,
+              "role": "heldout_development_approximate_visible_blade_segment"
+            }
+          ],
+          "numerical_convergence": false,
+          "parameters": "action_spin_s05_A_1103.npz",
+          "large_result": {
+            "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\spin_s05\\A\\fitted\\result.npz",
+            "sha256": "674bbb186bbb6c3d239e0917f4dcf895ed1a7b0e4e2e282aae7da7404cc11101"
+          }
+        },
+        "B": {
+          "source_exposures": 951,
+          "native_cadence_pts": [
+            256
+          ],
+          "body_observation_error_px": {
+            "count": 15988,
+            "median": 18.35520578760574,
+            "p95": 90.92522716645074,
+            "maximum": 518.2995421440392
+          },
+          "minimum_raw_model_witness_height_m": -0.37180947937857906,
+          "minimum_semantic_margin_m": -0.36980947937857905,
+          "source_support_gaps": [
+            {
+              "pts": 977920,
+              "source_seconds": 76.4,
+              "raw_height_m": 0.012831521955056744
+            },
+            {
+              "pts": 1029120,
+              "source_seconds": 80.4,
+              "raw_height_m": 0.07219798450262255
+            },
+            {
+              "pts": 1080320,
+              "source_seconds": 84.4,
+              "raw_height_m": 0.030328504817325127
+            }
+          ],
+          "maximum_root_step_deg": 90.67623318837411,
+          "maximum_cavity_breach_m": 0.003199768691784762,
+          "contact_unknown_foot_frames": 1899,
+          "heldout_blade_curves": [
+            {
+              "pts": 1062400,
+              "source_seconds": 83.0,
+              "physical_foot": 1,
+              "side_candidate": 0,
+              "source_side_confirmed": false,
+              "source_points_in_curve": 4,
+              "resampled_curve_points": 24,
+              "curve_statistics": {
+                "count": 24,
+                "median": 19.41161946203767,
+                "p95": 32.44916109591584,
+                "maximum": 33.89103204680221
+              },
+              "sigma_px": 5.0,
+              "role": "heldout_development_approximate_visible_blade_segment"
+            }
+          ],
+          "numerical_convergence": false,
+          "parameters": "action_spin_s05_B_1103.npz",
+          "large_result": {
+            "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\spin_s05\\B\\fitted\\result.npz",
+            "sha256": "ca7f9530ff71c3752d793b388760278af18ace423bd71f747d1a3a9b07498400"
+          }
+        }
+      },
+      "root_repair": {
+        "A": {
+          "parameters": "action_spin_s05_A_root_1103.npz",
+          "initial_reference": "action_spin_s05_A_root_reference_1103.npz",
+          "large_result": {
+            "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\spin_s05\\root_repair\\A\\fitted\\result.npz",
+            "sha256": "056d79a232accce2e216c5fae93f29a11a6e6709d587f96f96d3def4341eaeb7"
+          },
+          "diagnostics": {
+            "path_xy_m": 39.05992836397288,
+            "range_xy_m": [
+              11.47422030825401,
+              12.95954750085652
+            ],
+            "speed_xy_mps": {
+              "count": 950,
+              "median": 0.761259589465002,
+              "p95": 6.286363222409031,
+              "maximum": 8.317726606729627
+            },
+            "acceleration_xy_mps2": {
+              "count": 949,
+              "median": 3.791922052910652,
+              "p95": 20.037923356075577,
+              "maximum": 39.33735552394351
+            },
+            "body_image_px": {
+              "count": 15988,
+              "median": 29.520391261694755,
+              "p95": 106.64050078812437,
+              "maximum": 480.31893015652247
+            },
+            "body_fit_px": {
+              "count": 15890,
+              "median": 29.476125004221956,
+              "p95": 106.4786087106041,
+              "maximum": 480.31893015652247
+            },
+            "ankle_proxy_px": {
+              "count": 1828,
+              "median": 20.65924394642179,
+              "p95": 166.04526299835362,
+              "maximum": 480.31893015652247
+            },
+            "maximum_root_angle_step_deg": 90.67623318837411,
+            "minimum_raw_witness_height_m": -0.07700609317885222,
+            "minimum_semantic_margin_m": -0.07500609317885222,
+            "maximum_cavity_violation_m": 0.0031997686917848173,
+            "support_exposures": [
+              {
+                "pts": 977920,
+                "seconds": 76.4,
+                "raw_height_m": 0.012861873981476058
+              },
+              {
+                "pts": 1029120,
+                "seconds": 80.4,
+                "raw_height_m": -0.017562642739550074
+              },
+              {
+                "pts": 1080320,
+                "seconds": 84.4,
+                "raw_height_m": 0.0023058733198527666
+              }
+            ],
+            "heldout_shoe_curves": [
+              {
+                "pts": 1062400,
+                "seconds": 83.0,
+                "physical_foot": 1,
+                "curve_error_px": {
+                  "count": 24,
+                  "median": 19.016197009847552,
+                  "p95": 21.961350470622538,
+                  "maximum": 22.310661225249294
+                },
+                "sigma_px": 5.0,
+                "role": "heldout_development_approximate_visible_blade_segment",
+                "blade_side_unknown": true
+              }
+            ],
+            "unknown_contact_foot_frames": 1902,
+            "state_pts_consistent": true,
+            "pelvis_projection_is_world_P_xy": true,
+            "independent_3d_truth": false,
+            "landed_spin_82_92p9": {
+              "range_xy_m": [
+                1.0298754571020652,
+                0.8073892906514946
+              ],
+              "path_xy_m": 5.310363461536722
+            }
+          },
+          "image_median_change_fraction": 0.6082844073384484,
+          "image_regression_vs_previous_AB": true,
+          "reused_A": false,
+          "root_run": {
+            "configured": {
+              "wall_seconds": 120.0,
+              "max_accepted": 8,
+              "max_outer": 1,
+              "stagnation_window": 4,
+              "min_violation_improvement_m": 0.0001,
+              "max_image_cost_increase": 0.05,
+              "max_pose_cost_increase": 0.1,
+              "allow_penalty_growth": false
+            },
+            "actual_seconds": 39.29163020000124,
+            "accepted_steps": 4,
+            "stop": [
+              {
+                "code": "violation_stagnation",
+                "category": "stagnation",
+                "message": "Best physical violation did not improve enough over accepted steps.",
+                "accepted_window": 4,
+                "improvement_m": 0.0,
+                "required_improvement_m": 0.0001,
+                "best_violation_m": 0.023319084072951135
+              }
+            ]
+          },
+          "pose_run": {
+            "configured": {
+              "wall_seconds": 80.70836979999876,
+              "max_accepted": 4,
+              "max_outer": 1,
+              "stagnation_window": 4,
+              "min_violation_improvement_m": 0.0001,
+              "max_image_cost_increase": 0.05,
+              "max_pose_cost_increase": 0.1,
+              "allow_penalty_growth": false
+            },
+            "actual_seconds": 112.19731639999372,
+            "accepted_steps": 0,
+            "stop": [
+              {
+                "code": "wall_budget",
+                "category": "budget",
+                "message": "Wall-time budget reached.",
+                "elapsed_seconds": 112.19731639999372,
+                "limit_seconds": 80.70836979999876
+              }
+            ]
+          },
+          "code_and_cache_replay": {
+            "parameter_fixed_identity_valid": true,
+            "initial_reference_sha256_valid": true,
+            "replay_maximum_error": {
+              "P_m": 0.0,
+              "Q": 0.0,
+              "local_R": 0.0
+            },
+            "cache": "D:\\CodexData\\RinkSpace_Data\\cache\\results3d\\action_spin_s05\\A_root_b9ed0ee39c109fc4bd7a",
+            "cache_state_and_pts_match": true,
+            "common_body_shoe_P_G_coco_match": true
+          },
+          "numerically_converged": false,
+          "user_accepted": false,
+          "physical_accuracy_accepted": false
+        },
+        "B": {
+          "parameters": "action_spin_s05_A_root_1103.npz",
+          "initial_reference": "action_spin_s05_A_root_reference_1103.npz",
+          "large_result": {
+            "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\spin_s05\\root_repair\\A\\fitted\\result.npz",
+            "sha256": "056d79a232accce2e216c5fae93f29a11a6e6709d587f96f96d3def4341eaeb7"
+          },
+          "diagnostics": {
+            "path_xy_m": 39.05992836397288,
+            "range_xy_m": [
+              11.47422030825401,
+              12.95954750085652
+            ],
+            "speed_xy_mps": {
+              "count": 950,
+              "median": 0.761259589465002,
+              "p95": 6.286363222409031,
+              "maximum": 8.317726606729627
+            },
+            "acceleration_xy_mps2": {
+              "count": 949,
+              "median": 3.791922052910652,
+              "p95": 20.037923356075577,
+              "maximum": 39.33735552394351
+            },
+            "body_image_px": {
+              "count": 15988,
+              "median": 29.520391261694755,
+              "p95": 106.64050078812437,
+              "maximum": 480.31893015652247
+            },
+            "body_fit_px": {
+              "count": 15890,
+              "median": 29.476125004221956,
+              "p95": 106.4786087106041,
+              "maximum": 480.31893015652247
+            },
+            "ankle_proxy_px": {
+              "count": 1828,
+              "median": 20.65924394642179,
+              "p95": 166.04526299835362,
+              "maximum": 480.31893015652247
+            },
+            "maximum_root_angle_step_deg": 90.67623318837411,
+            "minimum_raw_witness_height_m": -0.07700609317885222,
+            "minimum_semantic_margin_m": -0.07500609317885222,
+            "maximum_cavity_violation_m": 0.0031997686917848173,
+            "support_exposures": [
+              {
+                "pts": 977920,
+                "seconds": 76.4,
+                "raw_height_m": 0.012861873981476058
+              },
+              {
+                "pts": 1029120,
+                "seconds": 80.4,
+                "raw_height_m": -0.017562642739550074
+              },
+              {
+                "pts": 1080320,
+                "seconds": 84.4,
+                "raw_height_m": 0.0023058733198527666
+              }
+            ],
+            "heldout_shoe_curves": [
+              {
+                "pts": 1062400,
+                "seconds": 83.0,
+                "physical_foot": 1,
+                "curve_error_px": {
+                  "count": 24,
+                  "median": 19.016197009847552,
+                  "p95": 21.961350470622538,
+                  "maximum": 22.310661225249294
+                },
+                "sigma_px": 5.0,
+                "role": "heldout_development_approximate_visible_blade_segment",
+                "blade_side_unknown": true
+              }
+            ],
+            "unknown_contact_foot_frames": 1902,
+            "state_pts_consistent": true,
+            "pelvis_projection_is_world_P_xy": true,
+            "independent_3d_truth": false,
+            "landed_spin_82_92p9": {
+              "range_xy_m": [
+                1.0298754571020652,
+                0.8073892906514946
+              ],
+              "path_xy_m": 5.310363461536722
+            }
+          },
+          "image_median_change_fraction": 0.6082844073384484,
+          "image_regression_vs_previous_AB": true,
+          "reused_A": true,
+          "root_run": {
+            "configured": {
+              "wall_seconds": 120.0,
+              "max_accepted": 8,
+              "max_outer": 1,
+              "stagnation_window": 4,
+              "min_violation_improvement_m": 0.0001,
+              "max_image_cost_increase": 0.05,
+              "max_pose_cost_increase": 0.1,
+              "allow_penalty_growth": false
+            },
+            "actual_seconds": 39.29163020000124,
+            "accepted_steps": 4,
+            "stop": [
+              {
+                "code": "violation_stagnation",
+                "category": "stagnation",
+                "message": "Best physical violation did not improve enough over accepted steps.",
+                "accepted_window": 4,
+                "improvement_m": 0.0,
+                "required_improvement_m": 0.0001,
+                "best_violation_m": 0.023319084072951135
+              }
+            ]
+          },
+          "pose_run": null,
+          "code_and_cache_replay": {
+            "parameter_fixed_identity_valid": true,
+            "initial_reference_sha256_valid": true,
+            "replay_maximum_error": {
+              "P_m": 0.0,
+              "Q": 0.0,
+              "local_R": 0.0
+            },
+            "cache": "D:\\CodexData\\RinkSpace_Data\\cache\\results3d\\action_spin_s05\\B_root_b9ed0ee39c109fc4bd7a",
+            "cache_state_and_pts_match": true,
+            "common_body_shoe_P_G_coco_match": true
+          },
+          "numerically_converged": false,
+          "user_accepted": false,
+          "physical_accuracy_accepted": false
+        }
+      },
+      "phase_evidence": {
+        "shot_id": "s05",
+        "intervals": [
+          {
+            "start_pts": 1011200,
+            "end_pts": 1189120,
+            "physical_foot": 1,
+            "phase": "spin",
+            "origin": "video_observation",
+            "confidence": 0.6,
+            "boundary_uncertainty_pts": [
+              512,
+              512
+            ],
+            "human_confirmed": false,
+            "edge": "unknown"
+          }
+        ],
+        "supports": [
+          {
+            "id": "review_977920_foot1",
+            "pts": 977920,
+            "feet": [
+              1
+            ],
+            "physical_side": "right",
+            "edge": "unknown",
+            "mode": "glide",
+            "confidence": 0.65,
+            "human_confirmed": false,
+            "source": "assistant direct source-image review; development evidence",
+            "source_support_weight_s": 0.02,
+            "source_support_weight_basis": "one native50 observation; not shutter duration or labelled interval",
+            "source_time_base": [
+              1,
+              12800
+            ],
+            "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\source_review\\spin_s05_identity_review.png",
+            "action_phase": "spin",
+            "mode_semantics": "runner support feature membership; not stable-glide motion label"
+          },
+          {
+            "id": "review_1029120_foot1",
+            "pts": 1029120,
+            "feet": [
+              1
+            ],
+            "physical_side": "right",
+            "edge": "unknown",
+            "mode": "glide",
+            "confidence": 0.65,
+            "human_confirmed": false,
+            "source": "assistant direct source-image review; development evidence",
+            "source_support_weight_s": 0.02,
+            "source_support_weight_basis": "one native50 observation; not shutter duration or labelled interval",
+            "source_time_base": [
+              1,
+              12800
+            ],
+            "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\source_review\\spin_s05_identity_review.png",
+            "action_phase": "spin",
+            "mode_semantics": "runner support feature membership; not stable-glide motion label"
+          },
+          {
+            "id": "review_1080320_foot1",
+            "pts": 1080320,
+            "feet": [
+              1
+            ],
+            "physical_side": "right",
+            "edge": "unknown",
+            "mode": "glide",
+            "confidence": 0.65,
+            "human_confirmed": false,
+            "source": "assistant direct source-image review; development evidence",
+            "source_support_weight_s": 0.02,
+            "source_support_weight_basis": "one native50 observation; not shutter duration or labelled interval",
+            "source_time_base": [
+              1,
+              12800
+            ],
+            "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\source_review\\spin_s05_identity_review.png",
+            "action_phase": "spin",
+            "mode_semantics": "runner support feature membership; not stable-glide motion label"
+          }
+        ],
+        "heldout_pts": [
+          1062400,
+          1152000
+        ],
+        "flight_intervals": [],
+        "comparison_role": "negative control: spin source phase must not enable stable-glide residual; no forced uniform yaw or frozen centre",
+        "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+        "source_time_base": [
+          1,
+          12800
+        ],
+        "glide_sigma_mps": 0.8,
+        "evidence_status": "assistant source review, not human-confirmed contact truth",
+        "review_images": [
+          "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\source_review\\glide_brackets.png",
+          "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\source_review\\spin_s05_identity_review.png"
+        ],
+        "unknown_policy": "unlabelled exposures, physical sides and edges remain unknown; source body keypoints are not blade observations"
+      },
+      "acceptance": "User reported original A/B drift and rejected the subsequent result again on 2026-11-04; all are unaccepted research candidates."
+    }
+  },
+  "public_parameter_fields": "body_parameters_1103_fields.json",
+  "verification_source_index": "body_verification_sources_1103.json",
+  "offline_only": {
+    "root_review": "runs/body_s01_20261029/action_integration_1103/pelvis_drift_diagnostic/ROOT_DRIFT_REVIEW_ZH.md",
+    "camera_state_audit": "runs/body_s01_20261029/action_integration_1103/pelvis_drift_diagnostic/camera_and_state.json",
+    "raw_frames_and_visual_reports": "runs/body_s01_20261029/action_integration_1103/",
+    "models_and_weights": "runtime_tools/body and cache/pretrained; obtain upstream models under their own terms",
+    "full_results_and_display_geometry": "runs/body_s01_20261029 and cache/results3d; not included in public parameters"
+  },
+  "independent_3d_truth": false
+}

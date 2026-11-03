@@ -81,18 +81,24 @@ class ContactAL:
         inspect raw metre violations and the inner solver's stationarity.
         Reclassification or geometry-row changes require fresh row identities.
         """
-        if not 0 < required_reduction < 1 or growth <= 1:
+        if not 0 < required_reduction < 1 or not np.isfinite(growth) or growth <= 1:
             raise ValueError('Invalid reduction/growth parameters')
         g = self._checked(g)
         violation = float(np.max(np.maximum(-g, 0.0), initial=0.0))
-        self.multiplier = np.maximum(0.0, self.multiplier - self.penalty*g)
+        # Validate the complete candidate update before mutating AL state.
+        # A large feasible g may project a negative overflow to zero; a
+        # nonfinite stored multiplier must instead be an explicit failure.
+        with np.errstate(over='ignore', invalid='ignore'):
+            multiplier = np.maximum(0.0, self.multiplier - self.penalty*g)
+        if not np.isfinite(multiplier).all():
+            raise FloatingPointError('Multiplier overflow; report contact restoration failure')
         increase = (self.previous_violation is not None and violation >
                     required_reduction*self.previous_violation)
-        if increase:
-            penalty = self.penalty*growth
-            if not np.isfinite(penalty):
-                raise FloatingPointError('Penalty overflow; report contact restoration failure')
-            self.penalty = penalty
+        penalty = self.penalty*growth if increase else self.penalty
+        if not np.isfinite(penalty):
+            raise FloatingPointError('Penalty overflow; report contact restoration failure')
+        self.multiplier = multiplier
+        self.penalty = penalty
         self.previous_violation = violation
         return dict(max_normalized_violation=violation,
                     penalty=float(self.penalty), penalty_increased=bool(increase))

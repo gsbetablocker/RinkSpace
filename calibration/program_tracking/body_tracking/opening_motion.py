@@ -35,6 +35,28 @@ def surface_contact_vectors(palms, waist, softness=.03):
     return np.sum(weights[..., None]*difference, axis=2)
 
 
+def hand_waist_skin_ids(surface):
+    """The existing source-reviewed sliding palm/waist material patches."""
+    shaped=surface.shaped
+    rest=(shaped-surface.body.J[0])*surface.body.scale
+    torso=surface.weights[:,[0,1,2,3,6,9]].sum(axis=1)>.8
+    waist=np.flatnonzero(torso & (rest[:,0]<-.05) & (rest[:,1]>0) & (rest[:,1]<.28))
+    hand_ids=np.flatnonzero(surface.weights[:,[21,*range(40,55)]].sum(axis=1)>.8)
+    centres=.45*surface.body.J[21]+.55*surface.body.J[[40,43,49]]
+    _,nearest=cKDTree(shaped[hand_ids]).query(centres,k=8)
+    if not len(waist):raise ValueError('Body model has no right waist surface patch')
+    return waist,hand_ids[nearest]
+
+
+def hand_waist_vectors(reference,world,waist_ids,palm_ids):
+    local=np.einsum('nji,nkj->nki',world['Q'],world['native']-world['P'][:,None])
+    ids=np.r_[waist_ids,palm_ids.ravel()]
+    skin=reference.binding.surface.sample_vertices(local,world['frames'],vertex_ids=ids,double_precision=True)
+    waist=skin[:,:len(waist_ids)]
+    palms=skin[:,len(waist_ids):].reshape(len(local),3,8,3).mean(axis=2)
+    return surface_contact_vectors(palms,waist).reshape(len(local),9)
+
+
 class MotionWindow(OpeningWindow):
     def __init__(self, reference, seconds, mode):
         super().__init__(reference, seconds, mode)
@@ -163,23 +185,7 @@ class MotionProblem(FullBodyProblem):
         self.support_mask = reference.p['pts'][self.frames]/12800. <= ATTACH_START
         seconds = reference.p['pts'][self.frames]/12800.
         self.hand_weight = 1-smoothstep((seconds-HAND_RELEASE_START)/(HAND_RELEASE_END-HAND_RELEASE_START))
-        surface = reference.binding.surface
-        shaped = surface.shaped
-        rest = (shaped-surface.body.J[0])*surface.body.scale
-        torso = surface.weights[:, [0, 1, 2, 3, 6, 9]].sum(axis=1) > .8
-        # The right lateral waist between pelvis and lower chest, in the
-        # existing model's rest frame. Contact may slide over this whole patch.
-        self.waist_ids = np.flatnonzero(torso & (rest[:, 0] < -.05) &
-            (rest[:, 1] > 0) & (rest[:, 1] < .28))
-        hand = surface.weights[:, [21, *range(40, 55)]].sum(axis=1) > .8
-        hand_ids = np.flatnonzero(hand)
-        # Three palm centres between the wrist and finger-base joints. Each is
-        # an average of neighbouring skin vertices, not an invented wrist UV.
-        centres = .45*surface.body.J[21]+.55*surface.body.J[[40, 43, 49]]
-        _, nearest = cKDTree(shaped[hand_ids]).query(centres, k=8)
-        self.palm_ids = hand_ids[nearest]
-        if not len(self.waist_ids):
-            raise ValueError('Body model has no right waist surface patch')
+        self.waist_ids,self.palm_ids=hand_waist_skin_ids(reference.binding.surface)
 
     def visible_boot_edges(self, world):
         return edges_for(world, self.frames, self.projector, self.reference.binding)
@@ -193,13 +199,7 @@ class MotionProblem(FullBodyProblem):
         support = -.001*logsumexp(-feet/.001, axis=1)
         depth = np.maximum(-feet, 0)
         penetration = np.where(depth < .001, depth**2/.002, depth-.0005)
-        local_joints = np.einsum('nji,nkj->nki', world['Q'], world['native']-world['P'][:, None])
-        ids = np.r_[self.waist_ids, self.palm_ids.ravel()]
-        surface = self.reference.binding.surface.sample_vertices(local_joints,
-            world['frames'], vertex_ids=ids, double_precision=True)
-        waist = surface[:, :len(self.waist_ids)]
-        palms = surface[:, len(self.waist_ids):].reshape(self.n, 3, 8, 3).mean(axis=2)
-        hand = surface_contact_vectors(palms, waist).reshape(self.n, 9)
+        hand = hand_waist_vectors(self.reference,world,self.waist_ids,self.palm_ids)
         hand = hand*self.hand_weight[:, None]/(.02*np.sqrt(3))
         # Geometric nonpenetration plus a weak lowest-blade support envelope.
         # No torso-upright, fixed location, or actual-velocity factor.

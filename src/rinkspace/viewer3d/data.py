@@ -215,6 +215,15 @@ class ResultCatalog:
         Historical tables without an explicit PTS field retain that format.
         """
         from io import BytesIO
+        # Generic action clips bind their warning array to the same explicit
+        # input PTS. Preserve the supplied warning flags without certifying identity.
+        if self.config.get('source_identity_field'):
+            key=self.config['source_identity_field']
+            if key not in self.packet:raise ValueError('Configured source identity field is absent')
+            flags=np.asarray(self.packet[key])
+            if flags.shape!=self.pts.shape or flags.dtype.kind!='b':
+                raise ValueError('Source identity warnings must be boolean and match the clip exposures')
+            return flags.copy(),digest(self.root/'input.npz')
         path=self.project/'events/ankara_2026/programmes/okada_mei_sp/body_s01_joint_candidate_20261029.npz'
         raw=path.read_bytes()
         with np.load(BytesIO(raw),allow_pickle=False) as z:

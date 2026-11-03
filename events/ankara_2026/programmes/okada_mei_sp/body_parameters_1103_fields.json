@@ -1,7 +1,7 @@
 {
   "schema": "rinkspace.body-control-field-audit.v1",
-  "audit_date": "2026-11-03",
-  "scope": "Five compact S01 control packages; file identities and complete array field metadata only.",
+  "audit_date": "2026-11-04",
+  "scope": "Five previous compact S01 packages plus 25 subsequent S01/event initialization, control and root-reference packages; complete field metadata, no model/template/image payload.",
   "files": [
     {
       "path": "opening_motion_1103.npz",
@@ -792,6 +792,3944 @@
           "array_bytes": 124
         }
       ]
+    },
+    {
+      "path": "action_jump_s02_A_1103.npz",
+      "bytes": 26996,
+      "sha256": "4271da6312e7ec77845764d42f0fe5b4e25b1ecbfe603c4925e9c59a08ec015f",
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1629",
+          "shape": [],
+          "array_bytes": 6516
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            1466
+          ],
+          "array_bytes": 11728
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            25
+          ],
+          "array_bytes": 200
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            69
+          ],
+          "array_bytes": 552
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            2111
+          ],
+          "array_bytes": 16888
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            1412
+          ],
+          "array_bytes": 11296
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "prior_identity_json",
+          "dtype": "<U282",
+          "shape": [],
+          "array_bytes": 1128
+        },
+        {
+          "name": "initial_state_file",
+          "dtype": "<U32",
+          "shape": [],
+          "array_bytes": 128
+        },
+        {
+          "name": "ice_soft_policy_json",
+          "dtype": "<U172",
+          "shape": [],
+          "array_bytes": 688
+        },
+        {
+          "name": "ice_mode",
+          "dtype": "<U21",
+          "shape": [],
+          "array_bytes": 84
+        },
+        {
+          "name": "al_row_scope",
+          "dtype": "<U27",
+          "shape": [],
+          "array_bytes": 108
+        },
+        {
+          "name": "ice_is_delivery_gate",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        }
+      ],
+      "role": "unaccepted replayable candidate controls"
+    },
+    {
+      "path": "action_jump_s02_A_root_1103.npz",
+      "bytes": 17107,
+      "sha256": "5797999a8225e4e4924dbf281a0da28872c53d16011e05e66e66c251051e52e2",
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1629",
+          "shape": [],
+          "array_bytes": 6516
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            80
+          ],
+          "array_bytes": 640
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            25
+          ],
+          "array_bytes": 200
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            3
+          ],
+          "array_bytes": 24
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            2111
+          ],
+          "array_bytes": 16888
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            1412
+          ],
+          "array_bytes": 11296
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "ice_mode",
+          "dtype": "<U21",
+          "shape": [],
+          "array_bytes": 84
+        },
+        {
+          "name": "ice_is_delivery_gate",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "al_row_scope",
+          "dtype": "<U27",
+          "shape": [],
+          "array_bytes": 108
+        },
+        {
+          "name": "ice_soft_policy_json",
+          "dtype": "<U172",
+          "shape": [],
+          "array_bytes": 688
+        },
+        {
+          "name": "initial_state_file",
+          "dtype": "<U84",
+          "shape": [],
+          "array_bytes": 336
+        },
+        {
+          "name": "initial_state_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "root_seed_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "prior_identity_json",
+          "dtype": "<U479",
+          "shape": [],
+          "array_bytes": 1916
+        }
+      ],
+      "role": "unaccepted replayable candidate controls"
+    },
+    {
+      "path": "action_jump_s02_A_root_pose_1103.npz",
+      "bytes": 28808,
+      "sha256": "79ef068f4ca61de84a663dc24c52e7e13be3564a6ecf8734dcd8656115c78c8c",
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1629",
+          "shape": [],
+          "array_bytes": 6516
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "base_layer_0_x",
+          "dtype": "<f8",
+          "shape": [
+            63
+          ],
+          "array_bytes": 504
+        },
+        {
+          "name": "base_layer_0_knots",
+          "dtype": "<f8",
+          "shape": [
+            25
+          ],
+          "array_bytes": 200
+        },
+        {
+          "name": "base_layer_0_active",
+          "dtype": "<i8",
+          "shape": [
+            3
+          ],
+          "array_bytes": 24
+        },
+        {
+          "name": "base_layer_0_seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "base_layer_0_state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            1403
+          ],
+          "array_bytes": 11224
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            25
+          ],
+          "array_bytes": 200
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            66
+          ],
+          "array_bytes": 528
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            2111
+          ],
+          "array_bytes": 16888
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            1412
+          ],
+          "array_bytes": 11296
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "ice_mode",
+          "dtype": "<U21",
+          "shape": [],
+          "array_bytes": 84
+        },
+        {
+          "name": "ice_is_delivery_gate",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "al_row_scope",
+          "dtype": "<U27",
+          "shape": [],
+          "array_bytes": 108
+        },
+        {
+          "name": "ice_soft_policy_json",
+          "dtype": "<U172",
+          "shape": [],
+          "array_bytes": 688
+        },
+        {
+          "name": "initial_state_file",
+          "dtype": "<U84",
+          "shape": [],
+          "array_bytes": 336
+        },
+        {
+          "name": "initial_state_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "prior_identity_json",
+          "dtype": "<U468",
+          "shape": [],
+          "array_bytes": 1872
+        }
+      ],
+      "role": "unaccepted replayable candidate controls"
+    },
+    {
+      "path": "action_jump_s02_A_root_reference_1103.npz",
+      "bytes": 545778,
+      "sha256": "a321fe576244fd40259653242957bbd6ae39b776d432cfc8b3d30e763fdbfcb2",
+      "fields": [
+        {
+          "name": "pts",
+          "dtype": "<i8",
+          "shape": [
+            352
+          ],
+          "array_bytes": 2816
+        },
+        {
+          "name": "P",
+          "dtype": "<f8",
+          "shape": [
+            352,
+            3
+          ],
+          "array_bytes": 8448
+        },
+        {
+          "name": "Q",
+          "dtype": "<f8",
+          "shape": [
+            352,
+            3,
+            3
+          ],
+          "array_bytes": 25344
+        },
+        {
+          "name": "local_R",
+          "dtype": "<f8",
+          "shape": [
+            352,
+            21,
+            3,
+            3
+          ],
+          "array_bytes": 532224
+        },
+        {
+          "name": "root_origin",
+          "dtype": "<U68",
+          "shape": [],
+          "array_bytes": 272
+        },
+        {
+          "name": "previous_arm_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1629",
+          "shape": [],
+          "array_bytes": 6516
+        }
+      ],
+      "role": "explicit root reference including saved pose parameters"
+    },
+    {
+      "path": "action_jump_s02_B_1103.npz",
+      "bytes": 26998,
+      "sha256": "ac008db0e01bccf77894a881d77dc4120bb4c1f86cb23274b4b4bc0965ee99c6",
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1629",
+          "shape": [],
+          "array_bytes": 6516
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            1466
+          ],
+          "array_bytes": 11728
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            25
+          ],
+          "array_bytes": 200
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            69
+          ],
+          "array_bytes": 552
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            2111
+          ],
+          "array_bytes": 16888
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            1412
+          ],
+          "array_bytes": 11296
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "prior_identity_json",
+          "dtype": "<U282",
+          "shape": [],
+          "array_bytes": 1128
+        },
+        {
+          "name": "initial_state_file",
+          "dtype": "<U32",
+          "shape": [],
+          "array_bytes": 128
+        },
+        {
+          "name": "ice_soft_policy_json",
+          "dtype": "<U172",
+          "shape": [],
+          "array_bytes": 688
+        },
+        {
+          "name": "ice_mode",
+          "dtype": "<U21",
+          "shape": [],
+          "array_bytes": 84
+        },
+        {
+          "name": "al_row_scope",
+          "dtype": "<U27",
+          "shape": [],
+          "array_bytes": 108
+        },
+        {
+          "name": "ice_is_delivery_gate",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        }
+      ],
+      "role": "unaccepted replayable candidate controls"
+    },
+    {
+      "path": "action_jump_s02_B_root_1103.npz",
+      "bytes": 17100,
+      "sha256": "51dec3ada3e05e140a83d3215cc53d7bdaf062e4384cc3a36fd8d4ef6abb7159",
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1629",
+          "shape": [],
+          "array_bytes": 6516
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            80
+          ],
+          "array_bytes": 640
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            25
+          ],
+          "array_bytes": 200
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            3
+          ],
+          "array_bytes": 24
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            2111
+          ],
+          "array_bytes": 16888
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            1412
+          ],
+          "array_bytes": 11296
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "ice_mode",
+          "dtype": "<U21",
+          "shape": [],
+          "array_bytes": 84
+        },
+        {
+          "name": "ice_is_delivery_gate",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "al_row_scope",
+          "dtype": "<U27",
+          "shape": [],
+          "array_bytes": 108
+        },
+        {
+          "name": "ice_soft_policy_json",
+          "dtype": "<U172",
+          "shape": [],
+          "array_bytes": 688
+        },
+        {
+          "name": "initial_state_file",
+          "dtype": "<U84",
+          "shape": [],
+          "array_bytes": 336
+        },
+        {
+          "name": "initial_state_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "root_seed_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "prior_identity_json",
+          "dtype": "<U479",
+          "shape": [],
+          "array_bytes": 1916
+        }
+      ],
+      "role": "unaccepted replayable candidate controls"
+    },
+    {
+      "path": "action_jump_s02_B_root_pose_1103.npz",
+      "bytes": 28809,
+      "sha256": "c6d971802438beac4288ef06f96b6e69af74dad58110e76ec135ff57597bed5f",
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1629",
+          "shape": [],
+          "array_bytes": 6516
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "base_layer_0_x",
+          "dtype": "<f8",
+          "shape": [
+            63
+          ],
+          "array_bytes": 504
+        },
+        {
+          "name": "base_layer_0_knots",
+          "dtype": "<f8",
+          "shape": [
+            25
+          ],
+          "array_bytes": 200
+        },
+        {
+          "name": "base_layer_0_active",
+          "dtype": "<i8",
+          "shape": [
+            3
+          ],
+          "array_bytes": 24
+        },
+        {
+          "name": "base_layer_0_seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "base_layer_0_state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            1403
+          ],
+          "array_bytes": 11224
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            25
+          ],
+          "array_bytes": 200
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            66
+          ],
+          "array_bytes": 528
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            2111
+          ],
+          "array_bytes": 16888
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            1412
+          ],
+          "array_bytes": 11296
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "ice_mode",
+          "dtype": "<U21",
+          "shape": [],
+          "array_bytes": 84
+        },
+        {
+          "name": "ice_is_delivery_gate",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "al_row_scope",
+          "dtype": "<U27",
+          "shape": [],
+          "array_bytes": 108
+        },
+        {
+          "name": "ice_soft_policy_json",
+          "dtype": "<U172",
+          "shape": [],
+          "array_bytes": 688
+        },
+        {
+          "name": "initial_state_file",
+          "dtype": "<U84",
+          "shape": [],
+          "array_bytes": 336
+        },
+        {
+          "name": "initial_state_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "prior_identity_json",
+          "dtype": "<U468",
+          "shape": [],
+          "array_bytes": 1872
+        }
+      ],
+      "role": "unaccepted replayable candidate controls"
+    },
+    {
+      "path": "action_jump_s02_B_root_reference_1103.npz",
+      "bytes": 545748,
+      "sha256": "e3274f8198f31cd53e86a79ea24e18451c3408e180fea81b17a1661929f401da",
+      "fields": [
+        {
+          "name": "pts",
+          "dtype": "<i8",
+          "shape": [
+            352
+          ],
+          "array_bytes": 2816
+        },
+        {
+          "name": "P",
+          "dtype": "<f8",
+          "shape": [
+            352,
+            3
+          ],
+          "array_bytes": 8448
+        },
+        {
+          "name": "Q",
+          "dtype": "<f8",
+          "shape": [
+            352,
+            3,
+            3
+          ],
+          "array_bytes": 25344
+        },
+        {
+          "name": "local_R",
+          "dtype": "<f8",
+          "shape": [
+            352,
+            21,
+            3,
+            3
+          ],
+          "array_bytes": 532224
+        },
+        {
+          "name": "root_origin",
+          "dtype": "<U68",
+          "shape": [],
+          "array_bytes": 272
+        },
+        {
+          "name": "previous_arm_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1629",
+          "shape": [],
+          "array_bytes": 6516
+        }
+      ],
+      "role": "explicit root reference including saved pose parameters"
+    },
+    {
+      "path": "action_jump_s02_initial_1103.npz",
+      "bytes": 541395,
+      "sha256": "8db21e14220cadf12eb1ae678e46e604caecb24178ae17a4e6ce90dd4a13a277",
+      "fields": [
+        {
+          "name": "pts",
+          "dtype": "<i8",
+          "shape": [
+            352
+          ],
+          "array_bytes": 2816
+        },
+        {
+          "name": "P",
+          "dtype": "<f8",
+          "shape": [
+            352,
+            3
+          ],
+          "array_bytes": 8448
+        },
+        {
+          "name": "Q",
+          "dtype": "<f8",
+          "shape": [
+            352,
+            3,
+            3
+          ],
+          "array_bytes": 25344
+        },
+        {
+          "name": "local_R",
+          "dtype": "<f8",
+          "shape": [
+            352,
+            21,
+            3,
+            3
+          ],
+          "array_bytes": 532224
+        }
+      ],
+      "role": "historical failed per-exposure initialization"
+    },
+    {
+      "path": "action_spin_s05_A_1103.npz",
+      "bytes": 53150,
+      "sha256": "b56333e9a7091670978596bfd2d568464abb89e74e0f1a1d7aca2b4d5c1d2fda",
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1634",
+          "shape": [],
+          "array_bytes": 6536
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            3536
+          ],
+          "array_bytes": 28288
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            55
+          ],
+          "array_bytes": 440
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            69
+          ],
+          "array_bytes": 552
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            5705
+          ],
+          "array_bytes": 45640
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            3808
+          ],
+          "array_bytes": 30464
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "prior_identity_json",
+          "dtype": "<U282",
+          "shape": [],
+          "array_bytes": 1128
+        },
+        {
+          "name": "initial_state_file",
+          "dtype": "<U32",
+          "shape": [],
+          "array_bytes": 128
+        },
+        {
+          "name": "ice_soft_policy_json",
+          "dtype": "<U172",
+          "shape": [],
+          "array_bytes": 688
+        },
+        {
+          "name": "ice_mode",
+          "dtype": "<U21",
+          "shape": [],
+          "array_bytes": 84
+        },
+        {
+          "name": "al_row_scope",
+          "dtype": "<U27",
+          "shape": [],
+          "array_bytes": 108
+        },
+        {
+          "name": "ice_is_delivery_gate",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        }
+      ],
+      "role": "unaccepted replayable candidate controls"
+    },
+    {
+      "path": "action_spin_s05_A_root_1103.npz",
+      "bytes": 28017,
+      "sha256": "6bedd81552da025b5ab25631b4bde6b34d8a83bfe306aa53d642f41c3a60daac",
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1634",
+          "shape": [],
+          "array_bytes": 6536
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            170
+          ],
+          "array_bytes": 1360
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            55
+          ],
+          "array_bytes": 440
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            3
+          ],
+          "array_bytes": 24
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            5705
+          ],
+          "array_bytes": 45640
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            3808
+          ],
+          "array_bytes": 30464
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "ice_mode",
+          "dtype": "<U21",
+          "shape": [],
+          "array_bytes": 84
+        },
+        {
+          "name": "ice_is_delivery_gate",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "al_row_scope",
+          "dtype": "<U27",
+          "shape": [],
+          "array_bytes": 108
+        },
+        {
+          "name": "ice_soft_policy_json",
+          "dtype": "<U172",
+          "shape": [],
+          "array_bytes": 688
+        },
+        {
+          "name": "initial_state_file",
+          "dtype": "<U84",
+          "shape": [],
+          "array_bytes": 336
+        },
+        {
+          "name": "initial_state_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "root_seed_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "prior_identity_json",
+          "dtype": "<U479",
+          "shape": [],
+          "array_bytes": 1916
+        }
+      ],
+      "role": "unaccepted replayable candidate controls"
+    },
+    {
+      "path": "action_spin_s05_A_root_pose_1103.npz",
+      "bytes": 29295,
+      "sha256": "fbd2d77b7f53240f37f83f51115e3c0be8a59a6ea58b9fc1a7c7a887c57711b7",
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1634",
+          "shape": [],
+          "array_bytes": 6536
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "base_layer_0_x",
+          "dtype": "<f8",
+          "shape": [
+            153
+          ],
+          "array_bytes": 1224
+        },
+        {
+          "name": "base_layer_0_knots",
+          "dtype": "<f8",
+          "shape": [
+            55
+          ],
+          "array_bytes": 440
+        },
+        {
+          "name": "base_layer_0_active",
+          "dtype": "<i8",
+          "shape": [
+            3
+          ],
+          "array_bytes": 24
+        },
+        {
+          "name": "base_layer_0_seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "base_layer_0_state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            3383
+          ],
+          "array_bytes": 27064
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            55
+          ],
+          "array_bytes": 440
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            66
+          ],
+          "array_bytes": 528
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            5705
+          ],
+          "array_bytes": 45640
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            3808
+          ],
+          "array_bytes": 30464
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "ice_mode",
+          "dtype": "<U21",
+          "shape": [],
+          "array_bytes": 84
+        },
+        {
+          "name": "ice_is_delivery_gate",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "al_row_scope",
+          "dtype": "<U27",
+          "shape": [],
+          "array_bytes": 108
+        },
+        {
+          "name": "ice_soft_policy_json",
+          "dtype": "<U172",
+          "shape": [],
+          "array_bytes": 688
+        },
+        {
+          "name": "initial_state_file",
+          "dtype": "<U84",
+          "shape": [],
+          "array_bytes": 336
+        },
+        {
+          "name": "initial_state_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "prior_identity_json",
+          "dtype": "<U468",
+          "shape": [],
+          "array_bytes": 1872
+        }
+      ],
+      "role": "unaccepted replayable candidate controls"
+    },
+    {
+      "path": "action_spin_s05_A_root_reference_1103.npz",
+      "bytes": 1466080,
+      "sha256": "fe74fbd48944764e75d394b58246cbe6ac819035eb39afbe5335ab624d21aeec",
+      "fields": [
+        {
+          "name": "pts",
+          "dtype": "<i8",
+          "shape": [
+            951
+          ],
+          "array_bytes": 7608
+        },
+        {
+          "name": "P",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            3
+          ],
+          "array_bytes": 22824
+        },
+        {
+          "name": "Q",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            3,
+            3
+          ],
+          "array_bytes": 68472
+        },
+        {
+          "name": "local_R",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            21,
+            3,
+            3
+          ],
+          "array_bytes": 1437912
+        },
+        {
+          "name": "root_origin",
+          "dtype": "<U68",
+          "shape": [],
+          "array_bytes": 272
+        },
+        {
+          "name": "previous_arm_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1634",
+          "shape": [],
+          "array_bytes": 6536
+        }
+      ],
+      "role": "explicit root reference including saved pose parameters"
+    },
+    {
+      "path": "action_spin_s05_B_1103.npz",
+      "bytes": 53148,
+      "sha256": "5e06b9f225489b6a71f9bbca184579324f86fdf3f0b37eeda593e6c1bc1266f8",
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1634",
+          "shape": [],
+          "array_bytes": 6536
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            3536
+          ],
+          "array_bytes": 28288
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            55
+          ],
+          "array_bytes": 440
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            69
+          ],
+          "array_bytes": 552
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            5705
+          ],
+          "array_bytes": 45640
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            3808
+          ],
+          "array_bytes": 30464
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "prior_identity_json",
+          "dtype": "<U282",
+          "shape": [],
+          "array_bytes": 1128
+        },
+        {
+          "name": "initial_state_file",
+          "dtype": "<U32",
+          "shape": [],
+          "array_bytes": 128
+        },
+        {
+          "name": "ice_soft_policy_json",
+          "dtype": "<U172",
+          "shape": [],
+          "array_bytes": 688
+        },
+        {
+          "name": "ice_mode",
+          "dtype": "<U21",
+          "shape": [],
+          "array_bytes": 84
+        },
+        {
+          "name": "al_row_scope",
+          "dtype": "<U27",
+          "shape": [],
+          "array_bytes": 108
+        },
+        {
+          "name": "ice_is_delivery_gate",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        }
+      ],
+      "role": "unaccepted replayable candidate controls"
+    },
+    {
+      "path": "action_spin_s05_initial_1103.npz",
+      "bytes": 1462155,
+      "sha256": "82b150663179658ca32b20e874ea282c8a824344701fce6f80d24646ece5cc33",
+      "fields": [
+        {
+          "name": "pts",
+          "dtype": "<i8",
+          "shape": [
+            951
+          ],
+          "array_bytes": 7608
+        },
+        {
+          "name": "P",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            3
+          ],
+          "array_bytes": 22824
+        },
+        {
+          "name": "Q",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            3,
+            3
+          ],
+          "array_bytes": 68472
+        },
+        {
+          "name": "local_R",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            21,
+            3,
+            3
+          ],
+          "array_bytes": 1437912
+        }
+      ],
+      "role": "historical failed per-exposure initialization"
+    },
+    {
+      "path": "action_step_s01_A_1103.npz",
+      "bytes": 33954,
+      "sha256": "1707368f66bcfe362f08a406bc04eda8d5e0a20382e85d7038220cfe3bfc7c22",
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1626",
+          "shape": [],
+          "array_bytes": 6504
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            2018
+          ],
+          "array_bytes": 16144
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            33
+          ],
+          "array_bytes": 264
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            69
+          ],
+          "array_bytes": 552
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            3005
+          ],
+          "array_bytes": 24040
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            2008
+          ],
+          "array_bytes": 16064
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "prior_identity_json",
+          "dtype": "<U282",
+          "shape": [],
+          "array_bytes": 1128
+        },
+        {
+          "name": "initial_state_file",
+          "dtype": "<U32",
+          "shape": [],
+          "array_bytes": 128
+        },
+        {
+          "name": "ice_soft_policy_json",
+          "dtype": "<U172",
+          "shape": [],
+          "array_bytes": 688
+        },
+        {
+          "name": "ice_mode",
+          "dtype": "<U21",
+          "shape": [],
+          "array_bytes": 84
+        },
+        {
+          "name": "al_row_scope",
+          "dtype": "<U27",
+          "shape": [],
+          "array_bytes": 108
+        },
+        {
+          "name": "ice_is_delivery_gate",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        }
+      ],
+      "role": "unaccepted replayable candidate controls"
+    },
+    {
+      "path": "action_step_s01_A_root_1103.npz",
+      "bytes": 20046,
+      "sha256": "7b0caafe0264310035fe658355c24b8428794f8362940832b25d5923dc201fb6",
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1626",
+          "shape": [],
+          "array_bytes": 6504
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            104
+          ],
+          "array_bytes": 832
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            33
+          ],
+          "array_bytes": 264
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            3
+          ],
+          "array_bytes": 24
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            3005
+          ],
+          "array_bytes": 24040
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            2008
+          ],
+          "array_bytes": 16064
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "ice_mode",
+          "dtype": "<U21",
+          "shape": [],
+          "array_bytes": 84
+        },
+        {
+          "name": "ice_is_delivery_gate",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "al_row_scope",
+          "dtype": "<U27",
+          "shape": [],
+          "array_bytes": 108
+        },
+        {
+          "name": "ice_soft_policy_json",
+          "dtype": "<U172",
+          "shape": [],
+          "array_bytes": 688
+        },
+        {
+          "name": "initial_state_file",
+          "dtype": "<U84",
+          "shape": [],
+          "array_bytes": 336
+        },
+        {
+          "name": "initial_state_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "root_seed_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "prior_identity_json",
+          "dtype": "<U479",
+          "shape": [],
+          "array_bytes": 1916
+        }
+      ],
+      "role": "unaccepted replayable candidate controls"
+    },
+    {
+      "path": "action_step_s01_A_root_pose_1103.npz",
+      "bytes": 35832,
+      "sha256": "201187031f5ff40f9c9c00ea57e561024d2e988ec764f5c1621655d8c45696e5",
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1626",
+          "shape": [],
+          "array_bytes": 6504
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "base_layer_0_x",
+          "dtype": "<f8",
+          "shape": [
+            87
+          ],
+          "array_bytes": 696
+        },
+        {
+          "name": "base_layer_0_knots",
+          "dtype": "<f8",
+          "shape": [
+            33
+          ],
+          "array_bytes": 264
+        },
+        {
+          "name": "base_layer_0_active",
+          "dtype": "<i8",
+          "shape": [
+            3
+          ],
+          "array_bytes": 24
+        },
+        {
+          "name": "base_layer_0_seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "base_layer_0_state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            1931
+          ],
+          "array_bytes": 15448
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            33
+          ],
+          "array_bytes": 264
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            66
+          ],
+          "array_bytes": 528
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            3005
+          ],
+          "array_bytes": 24040
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            2008
+          ],
+          "array_bytes": 16064
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "ice_mode",
+          "dtype": "<U21",
+          "shape": [],
+          "array_bytes": 84
+        },
+        {
+          "name": "ice_is_delivery_gate",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "al_row_scope",
+          "dtype": "<U27",
+          "shape": [],
+          "array_bytes": 108
+        },
+        {
+          "name": "ice_soft_policy_json",
+          "dtype": "<U172",
+          "shape": [],
+          "array_bytes": 688
+        },
+        {
+          "name": "initial_state_file",
+          "dtype": "<U84",
+          "shape": [],
+          "array_bytes": 336
+        },
+        {
+          "name": "initial_state_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "prior_identity_json",
+          "dtype": "<U468",
+          "shape": [],
+          "array_bytes": 1872
+        }
+      ],
+      "role": "unaccepted replayable candidate controls"
+    },
+    {
+      "path": "action_step_s01_A_root_reference_1103.npz",
+      "bytes": 774752,
+      "sha256": "adabfcdff13c673176a8e7dbfd7f530be61acf41fc93bcab2a60aa56d8db97da",
+      "fields": [
+        {
+          "name": "pts",
+          "dtype": "<i8",
+          "shape": [
+            501
+          ],
+          "array_bytes": 4008
+        },
+        {
+          "name": "P",
+          "dtype": "<f8",
+          "shape": [
+            501,
+            3
+          ],
+          "array_bytes": 12024
+        },
+        {
+          "name": "Q",
+          "dtype": "<f8",
+          "shape": [
+            501,
+            3,
+            3
+          ],
+          "array_bytes": 36072
+        },
+        {
+          "name": "local_R",
+          "dtype": "<f8",
+          "shape": [
+            501,
+            21,
+            3,
+            3
+          ],
+          "array_bytes": 757512
+        },
+        {
+          "name": "root_origin",
+          "dtype": "<U68",
+          "shape": [],
+          "array_bytes": 272
+        },
+        {
+          "name": "previous_arm_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1626",
+          "shape": [],
+          "array_bytes": 6504
+        }
+      ],
+      "role": "explicit root reference including saved pose parameters"
+    },
+    {
+      "path": "action_step_s01_B_1103.npz",
+      "bytes": 33970,
+      "sha256": "9a8ceb11071e56bae6267d8aab53de144bb3bcb6a7d1260e33e29a75a0ac9445",
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1626",
+          "shape": [],
+          "array_bytes": 6504
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            2018
+          ],
+          "array_bytes": 16144
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            33
+          ],
+          "array_bytes": 264
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            69
+          ],
+          "array_bytes": 552
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            3005
+          ],
+          "array_bytes": 24040
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            2008
+          ],
+          "array_bytes": 16064
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "prior_identity_json",
+          "dtype": "<U282",
+          "shape": [],
+          "array_bytes": 1128
+        },
+        {
+          "name": "initial_state_file",
+          "dtype": "<U32",
+          "shape": [],
+          "array_bytes": 128
+        },
+        {
+          "name": "ice_soft_policy_json",
+          "dtype": "<U172",
+          "shape": [],
+          "array_bytes": 688
+        },
+        {
+          "name": "ice_mode",
+          "dtype": "<U21",
+          "shape": [],
+          "array_bytes": 84
+        },
+        {
+          "name": "al_row_scope",
+          "dtype": "<U27",
+          "shape": [],
+          "array_bytes": 108
+        },
+        {
+          "name": "ice_is_delivery_gate",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        }
+      ],
+      "role": "unaccepted replayable candidate controls"
+    },
+    {
+      "path": "action_step_s01_B_root_1103.npz",
+      "bytes": 20044,
+      "sha256": "2003ff397faca5a58740eec5e9a1ed87800d0550240f319557af280cff63aca4",
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1626",
+          "shape": [],
+          "array_bytes": 6504
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            104
+          ],
+          "array_bytes": 832
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            33
+          ],
+          "array_bytes": 264
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            3
+          ],
+          "array_bytes": 24
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            3005
+          ],
+          "array_bytes": 24040
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            2008
+          ],
+          "array_bytes": 16064
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "ice_mode",
+          "dtype": "<U21",
+          "shape": [],
+          "array_bytes": 84
+        },
+        {
+          "name": "ice_is_delivery_gate",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "al_row_scope",
+          "dtype": "<U27",
+          "shape": [],
+          "array_bytes": 108
+        },
+        {
+          "name": "ice_soft_policy_json",
+          "dtype": "<U172",
+          "shape": [],
+          "array_bytes": 688
+        },
+        {
+          "name": "initial_state_file",
+          "dtype": "<U84",
+          "shape": [],
+          "array_bytes": 336
+        },
+        {
+          "name": "initial_state_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "root_seed_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "prior_identity_json",
+          "dtype": "<U479",
+          "shape": [],
+          "array_bytes": 1916
+        }
+      ],
+      "role": "unaccepted replayable candidate controls"
+    },
+    {
+      "path": "action_step_s01_B_root_pose_1103.npz",
+      "bytes": 35802,
+      "sha256": "88d3746bf1f8fdedd3c8985dd6806090a6a415241507133ce2976e24a1818996",
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1626",
+          "shape": [],
+          "array_bytes": 6504
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "base_layer_0_x",
+          "dtype": "<f8",
+          "shape": [
+            87
+          ],
+          "array_bytes": 696
+        },
+        {
+          "name": "base_layer_0_knots",
+          "dtype": "<f8",
+          "shape": [
+            33
+          ],
+          "array_bytes": 264
+        },
+        {
+          "name": "base_layer_0_active",
+          "dtype": "<i8",
+          "shape": [
+            3
+          ],
+          "array_bytes": 24
+        },
+        {
+          "name": "base_layer_0_seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "base_layer_0_state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            1931
+          ],
+          "array_bytes": 15448
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            33
+          ],
+          "array_bytes": 264
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            66
+          ],
+          "array_bytes": 528
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            3005
+          ],
+          "array_bytes": 24040
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            2008
+          ],
+          "array_bytes": 16064
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "ice_mode",
+          "dtype": "<U21",
+          "shape": [],
+          "array_bytes": 84
+        },
+        {
+          "name": "ice_is_delivery_gate",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "al_row_scope",
+          "dtype": "<U27",
+          "shape": [],
+          "array_bytes": 108
+        },
+        {
+          "name": "ice_soft_policy_json",
+          "dtype": "<U172",
+          "shape": [],
+          "array_bytes": 688
+        },
+        {
+          "name": "initial_state_file",
+          "dtype": "<U84",
+          "shape": [],
+          "array_bytes": 336
+        },
+        {
+          "name": "initial_state_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "prior_identity_json",
+          "dtype": "<U468",
+          "shape": [],
+          "array_bytes": 1872
+        }
+      ],
+      "role": "unaccepted replayable candidate controls"
+    },
+    {
+      "path": "action_step_s01_B_root_reference_1103.npz",
+      "bytes": 774693,
+      "sha256": "b8c2673da24f65322d9fc414d133e1d6f6cbc80518348c18b9456ce5c3f96900",
+      "fields": [
+        {
+          "name": "pts",
+          "dtype": "<i8",
+          "shape": [
+            501
+          ],
+          "array_bytes": 4008
+        },
+        {
+          "name": "P",
+          "dtype": "<f8",
+          "shape": [
+            501,
+            3
+          ],
+          "array_bytes": 12024
+        },
+        {
+          "name": "Q",
+          "dtype": "<f8",
+          "shape": [
+            501,
+            3,
+            3
+          ],
+          "array_bytes": 36072
+        },
+        {
+          "name": "local_R",
+          "dtype": "<f8",
+          "shape": [
+            501,
+            21,
+            3,
+            3
+          ],
+          "array_bytes": 757512
+        },
+        {
+          "name": "root_origin",
+          "dtype": "<U68",
+          "shape": [],
+          "array_bytes": 272
+        },
+        {
+          "name": "previous_arm_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1626",
+          "shape": [],
+          "array_bytes": 6504
+        }
+      ],
+      "role": "explicit root reference including saved pose parameters"
+    },
+    {
+      "path": "action_step_s01_initial_1103.npz",
+      "bytes": 770423,
+      "sha256": "c4a9d61ce199c3f727408680189e3fbcbfac0fb1a1624430299ae456220ad3d1",
+      "fields": [
+        {
+          "name": "pts",
+          "dtype": "<i8",
+          "shape": [
+            501
+          ],
+          "array_bytes": 4008
+        },
+        {
+          "name": "P",
+          "dtype": "<f8",
+          "shape": [
+            501,
+            3
+          ],
+          "array_bytes": 12024
+        },
+        {
+          "name": "Q",
+          "dtype": "<f8",
+          "shape": [
+            501,
+            3,
+            3
+          ],
+          "array_bytes": 36072
+        },
+        {
+          "name": "local_R",
+          "dtype": "<f8",
+          "shape": [
+            501,
+            21,
+            3,
+            3
+          ],
+          "array_bytes": 757512
+        }
+      ],
+      "role": "historical failed per-exposure initialization"
+    },
+    {
+      "path": "skate_s01_integrated_1103.npz",
+      "bytes": 121123,
+      "sha256": "77e8f40a0d5072aefad05dff4de144d688d49db88df7b2a6fdfcc936cf4fd8a0",
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1626",
+          "shape": [],
+          "array_bytes": 6504
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "base_layer_0_x",
+          "dtype": "<f8",
+          "shape": [
+            3362
+          ],
+          "array_bytes": 26896
+        },
+        {
+          "name": "base_layer_0_knots",
+          "dtype": "<f8",
+          "shape": [
+            86
+          ],
+          "array_bytes": 688
+        },
+        {
+          "name": "base_layer_0_active",
+          "dtype": "<i8",
+          "shape": [
+            41
+          ],
+          "array_bytes": 328
+        },
+        {
+          "name": "base_layer_0_seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "base_layer_0_state_kind",
+          "dtype": "<U9",
+          "shape": [],
+          "array_bytes": 36
+        },
+        {
+          "name": "base_layer_1_x",
+          "dtype": "<f8",
+          "shape": [
+            4209
+          ],
+          "array_bytes": 33672
+        },
+        {
+          "name": "base_layer_1_knots",
+          "dtype": "<f8",
+          "shape": [
+            65
+          ],
+          "array_bytes": 520
+        },
+        {
+          "name": "base_layer_1_active",
+          "dtype": "<i8",
+          "shape": [
+            69
+          ],
+          "array_bytes": 552
+        },
+        {
+          "name": "base_layer_1_seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "base_layer_1_state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            4226
+          ],
+          "array_bytes": 33808
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            65
+          ],
+          "array_bytes": 520
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            69
+          ],
+          "array_bytes": 552
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            6857
+          ],
+          "array_bytes": 54856
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            18304
+          ],
+          "array_bytes": 146432
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "shared_x",
+          "dtype": "<f8",
+          "shape": [
+            17
+          ],
+          "array_bytes": 136
+        }
+      ],
+      "role": "unaccepted replayable candidate controls"
     }
   ],
   "observed_contents": [

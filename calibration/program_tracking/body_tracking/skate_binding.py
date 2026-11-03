@@ -274,7 +274,7 @@ class SkateBinding(FootwearBinding):
         rows=np.concatenate((anchor.reshape(n,-1),outside.reshape(n,-1),m['support'].reshape(n,-1)/(.005/self.ratio)),axis=1)
         if getattr(self,'collar_constraints_enabled',False):
             collar=self.collar_metrics(joints,frames,samples,x)
-            rows=np.c_[rows,collar['breach_solver']/(.003/self.ratio)]
+            rows=np.c_[rows,collar.get('residual_breach_solver',collar['breach_solver'])/(.003/self.ratio)]
         return rows
 
     def record(self):

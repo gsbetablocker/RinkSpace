@@ -14,6 +14,7 @@ from .rebuild_prepare import load, digest
 from .skate_binding import TEMPLATE_VERSION, BINDING_VERSION
 from .skate_template import profile_height
 from .skate_physics import fk_state, constraints, ALLOWANCE, SUPPORT_BAND
+from .skate_checkpoint import checkpoint_identity, validate_checkpoint_identity
 
 
 def export_candidate(root, out, ref, camera, info, evidence):
@@ -24,7 +25,7 @@ def export_candidate(root, out, ref, camera, info, evidence):
     its witness position follows the solver-state coordinate unit.
     """
     root,out=Path(root),Path(out)
-    source_path=root/'opening_timing_1103/hand_polish/fitted/result.npz'
+    source_path=Path(getattr(ref,'export_source_path',root/'opening_timing_1103/hand_polish/fitted/result.npz'))
     source=load(source_path);binding=ref.binding;layout=binding.layout
     pts=np.asarray(ref.p['pts']);times=np.asarray(ref.times);n=len(pts)
     np.testing.assert_array_equal(source['pts'],pts)
@@ -197,18 +198,24 @@ def _delivery_identity(programme,delivery_name,variant_id,pts):
 
 
 def deliver(project,root,out,ref,camera,info,evidence,problem,report,catalog=None,*,
-            delivery_name='skate_contact_1103',variant_id='skate1103'):
+            delivery_name='skate_contact_1103',variant_id='skate1103',make_default=True):
     """Persist replayable small parameters, full-S01 impact and player binding."""
-    from dataclasses import asdict
     from .fullbody_round import write_json
     from .skate_review import review_candidate
     from rinkspace.viewer3d.data import ResultCatalog
     from rinkspace.viewer3d.prepare import prepare_variant
     project,root,out=map(Path,(project,root,out))
     programme=project/'events/ankara_2026/programmes/okada_mei_sp'
+    checkpoint=Path(report.get('candidate_checkpoint',out/'fit/result.npz'))
+    saved=load(checkpoint)
+    binding=ref.binding
+    validate_checkpoint_identity(saved,checkpoint_identity(binding,project,info))
+    if not _byte_equal(saved['x'][:17],binding.x):
+        raise ValueError('Checkpoint shared_x differs from current binding')
+    parameters=dict(saved,shared_x=np.asarray(binding.x).copy())
+    _parameter_replay_checks(parameters,saved,binding.x)
     identity=_delivery_identity(programme,delivery_name,variant_id,ref.p['pts'])
     packet=export_candidate(root,out,ref,camera,info,evidence)
-    checkpoint=Path(report.get('candidate_checkpoint',out/'fit/result.npz'))
     fit_report='fit/candidate.json' if report.get('candidate_checkpoint') else 'fit/result.json'
     packet.update(stopping_reason_json=np.array(json.dumps(report.get('stop'))),
         solver_config_json=np.array(json.dumps(dict(solver=fit_report,inputs='inputs.json',
@@ -246,13 +253,6 @@ def deliver(project,root,out,ref,camera,info,evidence,problem,report,catalog=Non
                         if type(ws).__name__=='ContinuousShotWindow' else 'one body state, C2 attachment; no separate shoe trajectory'))
     write_json(out/'validation.json',validation)
     param_path=identity['parameter_path'];record_path=identity['record_path']
-    saved=load(checkpoint)
-    parameters=dict(saved,shared_x=binding.x,base_skate_parameters_json=np.array(json.dumps(asdict(binding.base_parameters))),
-        R_FB_initial=binding.R0,t_FB_initial_solver=binding.t0,
-        camera_binding_json=np.array(json.dumps(info,sort_keys=True)),
-        parent_hand_parameters_sha256=np.array(digest(programme/'opening_hand_1103.npz')),
-        parent_timing_parameters_sha256=np.array(digest(programme/'opening_timing_1103.npz')),
-        template_version=np.array(TEMPLATE_VERSION),binding_version=np.array(BINDING_VERSION))
     if param_path.exists():
         prior=load(param_path)
         if set(prior)!=set(parameters) or any(prior[k].tobytes()!=np.asarray(v).tobytes() for k,v in parameters.items()):
@@ -275,10 +275,16 @@ def deliver(project,root,out,ref,camera,info,evidence,problem,report,catalog=Non
         body_refinement_intervals_seconds=[list(ws.seconds) for ws,_ in ref.new_refinements],
         parameter_binding=str(record_path.relative_to(project)).replace('\\','/'))
     config['variants']=[v for v in config['variants'] if v['id']!=variant_id]+[definition]
-    config.update(default_variant=variant_id,initial_source_pts=identity['initial_source_pts'],initial_view='side',
-        initial_wear_inspection=True,comparison_variants=identity['comparisons'])
+    if make_default:
+        config.update(default_variant=variant_id,initial_source_pts=identity['initial_source_pts'],initial_view='side',
+            initial_wear_inspection=True,comparison_variants=identity['comparisons'])
+    else:
+        config['comparison_variants']=list(dict.fromkeys(config.get('comparison_variants',[])+[variant_id]))
     write_json(config_path,config)
-    command=project/'START_3D_COMPARISON.cmd'
+    command=project/('START_3D_COMPARISON.cmd' if make_default else 'START_3D_INTEGRATION.cmd')
+    for path in (command,param_path,record_path):
+        if len(str(path.resolve()).encode('utf-16-le'))//2>=260 or len(path.name.encode('utf-16-le'))//2>255:
+            raise ValueError('OneDrive output path exceeds the Windows path contract')
     command.write_text('@echo off\ncall "%~dp0START_3D_RESULTS.cmd" -Config "%~dp0events\\ankara_2026\\programmes\\okada_mei_sp\\viewer3d_fullbody_1102.json" -Variant '+variant_id+' -Fresh %*\n',encoding='utf8')
     source_seconds=[float(seconds[0]),float(seconds[-1])]
     continuous_mask=np.zeros(len(seconds),bool)

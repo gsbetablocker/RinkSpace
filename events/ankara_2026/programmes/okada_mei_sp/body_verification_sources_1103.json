@@ -29,6 +29,30 @@
       "parameterization": "Explicit project/root/output/parameter/binding/report arguments; expected hashes read from the existing binding, current exact input key preferred then unique slash-normalized historical body_s01_20261029/input.npz; original strict heading/FK comparisons retained.",
       "verification_report": "maintenance/publication_20261103/opening_verification_cli.json",
       "verified": true
+    },
+    {
+      "data_source": "runs/body_s01_20261029/action_integration_1103/prepare_and_check_delivery.py",
+      "original_sha256": "3452911f4cf8944c4130ec96ee2e388fedd593e5d9839ef236d3641ef7a4dda7",
+      "repository_source": "calibration/program_tracking/body_tracking/source_helpers/prepare_action_delivery_1103.py",
+      "repository_sha256": "3452911f4cf8944c4130ec96ee2e388fedd593e5d9839ef236d3641ef7a4dda7",
+      "parameterization": "Exact original bytes; fixed local paths and import-time execution retained. Run explicitly as a script only; not a portable/safe import API.",
+      "role": "Historical original A/B 69-column delivery and cache identity check; can prepare viewer caches.",
+      "verification_report": "runs/body_s01_20261029/action_integration_1103/final_delivery_checks.json",
+      "verified": true,
+      "executed_during_publication": false,
+      "side_effects": "May rewrite preparation inputs or construct/reuse viewer caches; never auto-run during publication, tests, startup or normal fitting."
+    },
+    {
+      "data_source": "runs/body_s01_20261029/action_integration_1103/verify_live_derivatives.py",
+      "original_sha256": "b90714d99ac241693c5378976adfbe70e2b23094c66d8aa81e76698af7000232",
+      "repository_source": "calibration/program_tracking/body_tracking/source_helpers/verify_action_live_derivatives_1103.py",
+      "repository_sha256": "b90714d99ac241693c5378976adfbe70e2b23094c66d8aa81e76698af7000232",
+      "parameterization": "Exact original bytes; fixed local paths and import-time execution retained. Run explicitly as a script only; not a portable/safe import API.",
+      "role": "Historical actual 69-column action/ice derivative check; initialize_clip can rewrite preparation records.",
+      "verification_report": "runs/body_s01_20261029/action_integration_1103/live_derivative_check.json",
+      "verified": true,
+      "executed_during_publication": false,
+      "side_effects": "May rewrite preparation inputs or construct/reuse viewer caches; never auto-run during publication, tests, startup or normal fitting."
     }
   ],
   "verification": {
@@ -89,5 +113,7 @@
   ],
   "data_inventory_review": "maintenance/publication_20261103/data_code_review_summary.json",
   "solver_started": false,
-  "accuracy_accepted": false
+  "accuracy_accepted": false,
+  "updated_date": "2026-11-04",
+  "data_inventory_review_1104": "maintenance/publication_20261104/data_code_audit.json"
 }

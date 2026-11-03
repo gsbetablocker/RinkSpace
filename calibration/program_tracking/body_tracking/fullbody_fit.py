@@ -67,7 +67,16 @@ class FullBodyProblem:
         if abs(self.tau)/2>np.min(np.diff(reference.times))+1e-12:raise ValueError('Readout crosses an additional source-pose knot')
         self.ref=reference.at(self.times);self.B=self.state.basis(self.times).reshape(self.n,5,self.state.m)
         self.eval_basis=self.B.reshape(-1,self.state.m)
-        self.gear,self.gear_sources=footwear_rows(reference.root,self.frames,reference.p['pts'])
+        provided=getattr(reference,'footwear_observations',None)
+        if provided is None:
+            self.gear,self.gear_sources=footwear_rows(reference.root,self.frames,reference.p['pts'])
+        else:
+            from types import SimpleNamespace
+            lookup={int(reference.p['pts'][f]):i for i,f in enumerate(self.frames)}
+            def observations(name):
+                return [dict(row,frame=lookup[int(row['pts'])])for row in provided.get(name,[])if int(row['pts']) in lookup]
+            self.gear=SimpleNamespace(visible_rows=observations('visible_rows'),blade_rows=observations('blade_rows'),landmark_rows=observations('landmark_rows'))
+            self.gear_sources=provided.get('provenance',{'status':'explicit clip evidence; absent categories stay unobserved'})
         fi=[];pi=[]
         for f in range(self.n):
             ids=self.layout.body_landmarks.tolist()
@@ -91,15 +100,22 @@ class FullBodyProblem:
         self.spline_rows=np.concatenate([v[1] for v in self.spline_scatter])
         self.spline_cols=np.concatenate([v[2] for v in self.spline_scatter])
         # Sample actual delta/velocity/acceleration, with the taper included.
-        self.prior_matrices=[]
+        self.prior_matrices=[];self.prior_offsets={}
         active=self.state.active;angular=active>=3
         for order,linear_scale,angular_degrees,name in [(0,.35,25,'reference_deviation'),(1,3.,400,'correction_velocity'),(2,15.,800,'correction_acceleration')]:
             scale=np.where(angular,np.deg2rad(angular_degrees),linear_scale)
             B=csr_matrix(self.state.basis(reference.times[self.frames],order))
             # Integral quadrature at native cadence; 25 Hz-equivalent old scale.
             matrix=kron(B,csr_matrix(np.diag(1/scale)),format='csr')/np.sqrt(2)
+            if order==2 and getattr(self.state,'regularize_actual_root',False):
+                if np.any(active>=3):raise ValueError('Actual-root regularization requires translation-only controls')
+                name='actual_root_acceleration'
+                self.prior_offsets[name]=(reference.root_derivative(reference.times[self.frames],2)[:,active]/scale/np.sqrt(2)).ravel()
             self.prior_matrices.append((name,matrix))
         self.cache=None;self.cache_x=None
+
+    def prior_rows(self,x):
+        return [(name,matrix@x+getattr(self,'prior_offsets',{}).get(name,0.)) for name,matrix in self.prior_matrices]
 
     def body_factors(self,uv):
         fi,j=self.of,self.oj;sig=self.obs['sigma_px'][self.frames[fi],j]
@@ -167,8 +183,9 @@ class FullBodyProblem:
             U=coo_matrix((np.concatenate(vv),(self.spline_rows,self.spline_cols)),shape=(uv.size,self.size)).tocsr()
             U.eliminate_zeros();matrices=[BA@U,GA@U]
             phase['sparse_chain_seconds']=time.perf_counter()-start
+        prior_values=dict(self.prior_rows(x))
         for name,matrix in self.prior_matrices:
-            r=matrix@x;residual.append(r);parts[name]=float(r@r/2)
+            r=prior_values[name];residual.append(r);parts[name]=float(r@r/2)
             if jacobian:matrices.append(matrix)
         r=np.concatenate(residual);J=vstack(matrices,format='csr') if jacobian else None
         self.cache_x=np.array(x,copy=True);self.evaluations+=1

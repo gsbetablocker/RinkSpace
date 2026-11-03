@@ -3,7 +3,7 @@ from pathlib import Path
 import argparse,json,time,copy
 import numpy as np
 from scipy.optimize import least_squares
-from scipy.sparse import csr_matrix,hstack,vstack
+from scipy.sparse import csr_matrix,hstack,vstack,diags
 from .rebuild_prepare import load,digest
 from .fullbody_state import FrozenReference,WindowState,matrices
 from .fullbody_fit import FullBodyProblem,footwear_rows
@@ -15,8 +15,10 @@ from .skate_binding import SkateBinding,SHAPE_NAMES
 from .skate_physics import (fk_state,constraints,body_constraint_jacobian,
     ALLOWANCE,NORMALIZATION,FEASIBILITY_TOLERANCE,SUPPORT_BAND)
 from .contact_feasibility import ContactAL,physical_feasibility
+from .ice_soft import IceSoftPolicy,ice_soft_rows
 from .fullbody_round import write_json
 from .footwear_layout import OBSERVATION_LAYOUT
+from .skate_checkpoint import checkpoint_identity,validate_checkpoint_identity
 
 
 class SkateReference(FrozenReference):
@@ -52,11 +54,20 @@ def build(project,root,out,rocker_ft=7.):
     np.testing.assert_array_equal(ws.active,saved['active']);parent.refinements.append((ws,saved['x']))
     ref=SkateReference(parent)
     ref.binding=SkateBinding(ref,parent.binding.surface,info,rocker_ft)
+    ref.fixed_checkpoint_identity=checkpoint_identity(ref.binding,project,info)
     return ref,camera,info,catalog
 
 
-def source_evidence(root):
+def source_evidence(root,*,shot_id='s01',source_pts=None,records=None):
     """Few actual source-image reviews; no propagation of unknown labels."""
+    if records is not None:
+        result=copy.deepcopy(records)
+        if any('source_support_weight_s' not in r for r in result):
+            raise ValueError('Generic clips require explicit source support measures')
+        if source_pts is not None:
+            wanted=set(map(int,source_pts));result=[r for r in result if int(r['pts']) in wanted]
+        return result
+    if shot_id!='s01':return []
     times=(26.22,35.20,35.60,36.02,36.60,39.78,43.86)
     notes={26.22:'One blade visibly supports while the other foot is raised.',
         35.20:'Nearer skate lower edge on ice; farther foot lifted/uncertain.',
@@ -70,7 +81,11 @@ def source_evidence(root):
         source='assistant direct review of existing unresized source crop, development',
         confidence=.8 if t in (26.22,35.60,36.02,43.86) else .65,
         mode='glide',feet=[0,1],physical_side='unknown',edge='unknown',
-        temporal_scope='this exposure midpoint only',note=notes[t],human_confirmed=False) for t in times]
+        source_support_weight_s=256/12800,
+        source_support_weight_basis='one native 50Hz S01 source observation; objective measure, not shutter/contact duration',
+        source_time_base=[1,12800],shot_id=shot_id,
+        temporal_scope='this exposure midpoint only',note=notes[t],human_confirmed=False) for t in times
+        if source_pts is None or round(t*12800) in set(map(int,source_pts))]
 
 
 class SharedRegistration(Registration):
@@ -128,6 +143,27 @@ class ContinuousShotWindow(WindowState):
         return values
 
 
+class ContinuousRootWindow(ContinuousShotWindow):
+    """Translation of the single body/skate state over a complete clip."""
+    regularize_actual_root=True
+
+    def __init__(self,reference,seconds,mode='full'):
+        super().__init__(reference,seconds,mode)
+        self.active=np.arange(3,dtype=int);self.d=3;self.size=self.m*self.d
+
+
+class ContinuousPoseWindow(ContinuousShotWindow):
+    """All body rotations on one curve, with the repaired root held fixed."""
+    def __init__(self,reference,seconds,mode='full'):
+        super().__init__(reference,seconds,mode)
+        self.active=np.arange(3,69,dtype=int);self.d=66;self.size=self.m*self.d
+
+
+def window_factory(kind):
+    return {'halo_1103':HaloWindow,'continuous_shot':ContinuousShotWindow,
+        'continuous_root':ContinuousRootWindow,'continuous_pose':ContinuousPoseWindow}[kind]
+
+
 def checkpoint_state_kind(saved):
     return str(saved.get('state_kind',np.array('halo_1103')))
 
@@ -135,7 +171,7 @@ def checkpoint_state_kind(saved):
 def state_from_packet(reference,saved,prefix=''):
     """Reconstruct the actual control basis, without fitting another spline."""
     kind=str(saved.get(prefix+'state_kind',np.array('halo_1103')))
-    factory={'halo_1103':HaloWindow,'continuous_shot':ContinuousShotWindow}[kind]
+    factory=window_factory(kind)
     state=factory(reference,tuple(map(float,saved[prefix+'seconds'])),'full')
     np.testing.assert_array_equal(state.knots,saved[prefix+'knots'])
     np.testing.assert_array_equal(state.active,saved[prefix+'active'])
@@ -149,7 +185,7 @@ def base_layer_packet(reference):
         prefix=f'base_layer_{i}_'
         packet.update({prefix+'x':np.asarray(controls).copy(),prefix+'knots':state.knots.copy(),
             prefix+'active':state.active.copy(),prefix+'seconds':np.asarray(state.seconds),
-            prefix+'state_kind':np.array('continuous_shot' if isinstance(state,ContinuousShotWindow) else 'halo_1103')})
+            prefix+'state_kind':np.array('continuous_pose' if isinstance(state,ContinuousPoseWindow) else 'continuous_root' if isinstance(state,ContinuousRootWindow) else 'continuous_shot' if isinstance(state,ContinuousShotWindow) else 'halo_1103')})
     return packet
 
 
@@ -168,7 +204,7 @@ def restore_checkpoint_layers(reference,saved,include_primary=False):
 
 class ContactBodyProblem(BootWindowProblem):
     def __init__(self,reference,camera,ledger,seconds,log=None,state_kind='halo_1103'):
-        factory={'halo_1103':HaloWindow,'continuous_shot':ContinuousShotWindow}[state_kind]
+        factory=window_factory(state_kind)
         FullBodyProblem.__init__(self,reference,camera,ledger,seconds,'full',log,state_factory=factory)
         self.binding=reference.binding;self.mid_times=reference.times[self.frames]
         self.mid_ref=reference.at(self.mid_times);self.binding_key=None
@@ -182,10 +218,15 @@ class ContactBodyProblem(BootWindowProblem):
 
 
 class JointContactProblem:
-    def __init__(self,reference,camera,ledger,seconds,evidence,output,log,state_kind='halo_1103'):
+    def __init__(self,reference,camera,ledger,seconds,evidence,output,log,state_kind='halo_1103',*,optimize_shared=True,ice_policy=None):
         self.reference=reference;self.binding=reference.binding;self.camera=camera
         self.output=Path(output);self.log=log;self.start=time.perf_counter();self.outer=0;self.accepted=0
         self.state_kind=state_kind
+        self.optimize_shared=bool(optimize_shared)
+        if ice_policy is None:
+            config=Path(__file__).resolve().parents[3]/'events/ankara_2026/programmes/okada_mei_sp/ice_soft_1103.json'
+            ice_policy=IceSoftPolicy(**json.loads(config.read_text(encoding='utf-8'))['policy'])
+        self.ice_policy=ice_policy
         self.saved_base_layers=base_layer_packet(reference)
         self.compatibility_width=self.binding.compatibility_width
         self.cavity_labels=['left_foot_cavity','right_foot_cavity']
@@ -193,6 +234,8 @@ class JointContactProblem:
             self.cavity_labels+=['left_shank_collar','right_shank_collar']
         self.cavity_rows_per_frame=len(self.cavity_labels)
         self.body=ContactBodyProblem(reference,camera,ledger,seconds,log,state_kind)
+        from .opening_live import OpeningLiveFactors
+        self.source_motion=OpeningLiveFactors(self.body)
         self.size=self.body.size+17;self.cache=None;self.cache_x=None
         self.evidence=evidence;self.origin=reference.p['pts'][0]/12800.
         nodes=self.body.times
@@ -207,7 +250,8 @@ class JointContactProblem:
         e=self.contact(x)
         extra_labels=[('neutral',s) for s in self.cavity_labels]
         extra_labels += [(int(p)*78125,s) for p in self.reference.p['pts'][self.body.frames] for s in self.cavity_labels]
-        labels=e['labels']+extra_labels
+        # Ice is finite objective data, never an augmented-Lagrangian row.
+        labels=extra_labels
         self.al=ContactAL.zeros(len(labels),penalty=10. if old is None else old[0].penalty)
         if len(set(labels))!=len(labels):raise ValueError('Duplicate global physical row identity')
         if old is not None:
@@ -254,7 +298,8 @@ class JointContactProblem:
         mid=np.arange(self.body.n)*5+2
         samples=self._replay_samples
         compat=b.compatibility_rows(local[mid],s['frames'][mid],samples)/np.sqrt(2)
-        return np.r_[br,gr,*[m@body_x for _,m in self.body.prior_matrices],compat.ravel()]
+        return dict(residual=np.r_[br,gr,*[r for _,r in self.body.prior_rows(body_x)],compat.ravel()],
+            compatibility_residual=compat.ravel())
 
     def shared_column(self,c,x,base):
         # Each worker owns its binding and small template cache. Body/FK,
@@ -272,9 +317,10 @@ class JointContactProblem:
             neutral=b.compatibility_rows(b.neutral_native,b.neutral_frames,b.neutral_samples).ravel()
             state=fk_state(r,self.physics_ref,delta)
             e=constraints(b,state,self.physics_times,self.origin,self.evidence)
-            foot=np.r_[self.cavity_margins(neutral)[0],self.cavity_margins(replay[-self.body.n*self.compatibility_width:]*np.sqrt(2))[0]]/NORMALIZATION
-            residuals.append(np.r_[np.sqrt(.02)*replay,neutral,shared_prior(trial[:17])])
-            guards.append(np.r_[e['g'],foot])
+            foot=np.r_[self.cavity_margins(neutral)[0],self.cavity_margins(replay['compatibility_residual']*np.sqrt(2))[0]]/NORMALIZATION
+            residuals.append(np.r_[np.sqrt(.02)*replay['residual'],neutral,shared_prior(trial[:17]),
+                ice_soft_rows(e,self.ice_policy)['residual']])
+            guards.append(foot)
         return (residuals[0]-residuals[1])/(2*h),(guards[0]-guards[1])/(2*h)
 
     def evaluate(self,x,jacobian=False):
@@ -286,16 +332,19 @@ class JointContactProblem:
         data=np.sqrt(.02)*base['residual']
         neutral=self.binding.compatibility_rows(self.binding.neutral_native,self.binding.neutral_frames,self.binding.neutral_samples).ravel()
         prior=shared_prior(x[:17]);rdata=np.r_[data,neutral,prior]
-        e=self.contact(x,jacobian)
+        raw_ice=self.contact(x,jacobian)
+        ice=ice_soft_rows(raw_ice,self.ice_policy)
+        rdata=np.r_[rdata,ice['residual']]
+        e=dict(raw_ice)
         neutral_margin,neutral_which=self.cavity_margins(neutral)
-        dynamic_rows=base['residual'][-self.body.n*self.compatibility_width:]*np.sqrt(2)
+        dynamic_rows=base['compatibility_residual']*np.sqrt(2)
         dynamic_margin,dynamic_which=self.cavity_margins(dynamic_rows)
         foot_margins=np.r_[neutral_margin,dynamic_margin]
-        e['margin_m']=np.r_[e['margin_m'],foot_margins]
-        e['g']=np.r_[e['g'],foot_margins/NORMALIZATION]
-        e['weights']=np.r_[e['weights'],np.ones(self.cavity_rows_per_frame),np.repeat(
+        e['margin_m']=foot_margins
+        e['g']=foot_margins/NORMALIZATION
+        e['weights']=np.r_[np.ones(self.cavity_rows_per_frame),np.repeat(
             np.r_[.01,np.full(self.body.n-2,.02),.01] if self.body.n>1 else [.02],self.cavity_rows_per_frame)]
-        e['labels']=e['labels']+self.foot_row_labels
+        e['labels']=self.foot_row_labels.copy()
         if e['labels']!=self.row_labels:raise ValueError('Contact row identities changed inside inner solve')
         collar_unknown=0
         if jacobian or self.binding.collar_constraints_enabled:
@@ -306,32 +355,48 @@ class JointContactProblem:
                 collar_unknown+=int(self.binding.collar_metrics(self.binding.neutral_native,self.binding.neutral_frames,
                     self.binding.neutral_samples)['unknown'].sum())
         if jacobian:
-            columns=self.body.execution.map_columns(lambda c:self.shared_column(c,x,base),range(17))
-            shapeJ,shapeG=zip(*columns)
+            if getattr(self,'optimize_shared',True):
+                columns=self.body.execution.map_columns(lambda c:self.shared_column(c,x,base),range(17))
+                shapeJ,shapeG=zip(*columns)
+                shared_data=csr_matrix(np.stack(shapeJ,1));shared_g=csr_matrix(np.stack(shapeG,1))
+            else:
+                shared_data=csr_matrix((len(rdata),17));shared_g=csr_matrix((len(e['g']),17))
             self.binding.x=x[:17].copy()
-            bodyJ=vstack((np.sqrt(.02)*base['jac'],csr_matrix((len(neutral)+len(prior),self.body.size))),format='csr')
-            Jdata=hstack((csr_matrix(np.stack(shapeJ,1)),bodyJ),format='csr')
+            ice_body_J=diags(ice['derivative_per_margin_m']*NORMALIZATION)@raw_ice['body_jac'][ice['indices']]
+            bodyJ=vstack((np.sqrt(.02)*base['jac'],csr_matrix((len(neutral)+len(prior),self.body.size)),ice_body_J),format='csr')
+            Jdata=hstack((shared_data,bodyJ),format='csr')
             select=[]
             for i in range(self.body.n):
                 select.extend(i*self.compatibility_width+12+f*8+dynamic_which[i,f] for f in range(2))
                 if self.binding.collar_constraints_enabled:select.extend([i*self.compatibility_width+32,i*self.compatibility_width+33])
-            compatibility_J=base['jac'][-self.body.n*self.compatibility_width:]
+            compatibility_J=base['compatibility_jacobian']
             foot_body_J=vstack((csr_matrix((self.cavity_rows_per_frame,self.body.size)),
                 compatibility_J[select]*(-.003*np.sqrt(2)/NORMALIZATION)),format='csr')
-            full_body_J=vstack((e['body_jac'],foot_body_J),format='csr')
-            Jg=hstack((csr_matrix(np.stack(shapeG,1)),full_body_J),format='csr')
+            Jg=hstack((shared_g,foot_body_J),format='csr')
         else:Jdata=Jg=None
+        motion=self.source_motion.evaluate(x[17:],jacobian)
+        action=getattr(self,'action_factors',None)
+        extra=action.evaluate(x[17:],jacobian) if action is not None else dict(residual=np.empty(0),jac=csr_matrix((0,self.size)),parts={},metrics={})
+        rdata=np.r_[rdata,motion['residual'],extra['residual']]
+        if jacobian:
+            motion_J=hstack((csr_matrix((len(motion['residual']),17)),motion['jac']),format='csr')
+            Jdata=vstack((Jdata,motion_J,extra['jac']),format='csr')
         ral,Jal=self.al.residual_and_jacobian(e['g'],Jg,row_weights=e['weights'])
         r=np.r_[rdata,ral];J=vstack((Jdata,Jal),format='csr') if jacobian else None
         gate=physical_feasibility(e['margin_m'],tolerance_m=FEASIBILITY_TOLERANCE,row_labels=e['labels'])
+        gate['scope']='foot_cavity_and_collar_only; ice excluded from feasibility'
         gate['collar_unknown_sections']=collar_unknown
+        gate['ice_is_delivery_gate']=False
         if collar_unknown:gate['feasible']=False
-        parts=dict(data=float(data@data/2),neutral_fit=float(neutral@neutral/2),shared_prior=float(prior@prior/2),contact_AL=float(ral@ral/2))
+        parts=dict(**ice['parts'],data=float(data@data/2),neutral_fit=float(neutral@neutral/2),shared_prior=float(prior@prior/2),contact_AL=float(ral@ral/2),
+            source_motion=float(motion['residual']@motion['residual']/2),action=float(extra['residual']@extra['residual']/2))
         image_names=('body_pixels','visible_boot_edges','visible_blade_curves','boot_direction_endpoints')
         pose_names=('reference_deviation','correction_velocity','correction_acceleration')
-        v=dict(residual=r,jac=J,parts=parts,contact=e,gate=gate,
+        v=dict(residual=r,jac=J,parts=parts,contact=e,raw_ice=raw_ice,ice=ice,gate=gate,
             image_cost=sum(base['parts'].get(name,0.) for name in image_names),
-            pose_cost=sum(base['parts'].get(name,0.) for name in pose_names),raw_data_parts=dict(base['parts']))
+            pose_cost=sum(base['parts'].get(name,0.) for name in pose_names),
+            source_motion_metrics=motion['metrics'],action_metrics=extra['metrics'],
+            raw_data_parts={**base['parts'],**motion['parts'],**extra['parts']})
         self.cache_x=x.copy();self.cache=v
         self.log.write(json.dumps(dict(event='joint_evaluation',outer=self.outer,with_jacobian=jacobian,
             seconds=time.perf_counter()-self.start,evaluation_seconds=time.perf_counter()-tick,cost=float(r@r/2),
@@ -352,13 +417,17 @@ class JointContactProblem:
         return out
 
     def checkpoint_fields(self,x):
-        return dict(self.saved_base_layers,x=np.asarray(x).copy(),knots=self.body.state.knots,
+        return dict(self.reference.fixed_checkpoint_identity,**self.saved_base_layers,
+            x=np.asarray(x).copy(),knots=self.body.state.knots,
             active=self.body.state.active,seconds=self.body.state.seconds,physics_times=self.physics_times,
             multiplier=self.al.multiplier,penalty=np.array(self.al.penalty),state_kind=np.array(self.state_kind),
-            collar_constraints_enabled=np.array(self.binding.collar_constraints_enabled))
+            collar_constraints_enabled=np.array(self.binding.collar_constraints_enabled),
+            ice_mode=np.array('finite_soft_objective'),ice_is_delivery_gate=np.array(False),
+            al_row_scope=np.array('foot_cavity_and_collar_only'),
+            ice_soft_policy_json=np.array(json.dumps(vars(self.ice_policy),sort_keys=True)))
 
     def solve(self,initial=None,run_policy=None):
-        from .skate_run_policy import RunPolicy,Monitor
+        from .skate_run_policy import RunPolicy,Monitor,CandidateRetention
         self.output.mkdir(parents=True,exist_ok=True)
         prior=self.output/'last_accepted.npz'
         if prior.exists():
@@ -372,13 +441,13 @@ class JointContactProblem:
         monitor=Monitor(run_policy or RunPolicy(),now=time.perf_counter())
         write_json(self.output/'run_policy.json',monitor.record())
         x=np.r_[self.binding.x,np.zeros(self.body.size)] if initial is None else initial.copy()
-        if initial is None:x=self.restoration_seed(x)
+        # No root-height restoration: flight/unknown must not be glued to ice.
         lo,hi=shared_bounds(self.binding)
         angular=np.tile(self.body.state.active>=3,self.body.state.m)
         lower=np.r_[lo,np.where(angular,-np.pi,-np.inf)];upper=np.r_[hi,np.where(angular,np.pi,np.inf)]
         # All coefficients of the one body curve participate. Cubic knots
         # describe a continuous curve; they do not define independent clips.
-        selection=np.arange(self.size)
+        selection=np.arange(0 if getattr(self,'optimize_shared',True) else 17,self.size)
         self.parameter_selection=selection
         frozen_initial=x.copy()
         def expand(z):
@@ -392,40 +461,75 @@ class JointContactProblem:
         for name in ('skate_integration.py','skate_binding.py','skate_physics.py','skate_template.py',
                      'skate_contact.py','contact_feasibility.py','footwear_layout.py','fullbody_fit.py',
                      'fullbody_state.py','boot_integration.py','body_execution.py','footwear_pixel_factors.py','skate_run_policy.py',
-                     'skate_collar_factors.py'):
+                      'skate_collar_factors.py','skate_checkpoint.py','opening_live.py',
+                      'opening_motion.py','opening_timing.py','skating_action_factors.py',
+                      'ice_soft.py','action_live.py','action_integration.py','root_trajectory.py','root_repair.py'):
             path=Path(__file__).with_name(name);implementation[name]=digest(path)
             (source_dir/name).write_bytes(path.read_bytes())
         write_json(self.output/'kernel_manifest.json',implementation)
+        write_json(self.output/'ice_soft_policy.json',dict(policy=vars(self.ice_policy),
+            role='finite objective only; no multiplier, feasibility threshold or continuation'))
         class StopFit(Exception):pass
-        last_x=x.copy();last_value=self.evaluate(x,False)
-        monitor.observe(now=time.perf_counter(),violation_m=last_value['gate']['max_violation_m'],
-            image_cost=last_value['image_cost'],pose_cost=last_value['pose_cost'])
+        retention=CandidateRetention()
+        def observe_candidate(z,value,*,accepted=False):
+            metrics={name:dict(unit='deg' if name.endswith('_deg') else 'm',value=v)
+                for name,v in value.get('source_motion_metrics',{}).items()}
+            unknown=value['gate'].get('collar_unknown_sections',0)
+            failures=[dict(code='collar_unknown_sections',category='domain',count=unknown,
+                message='Collar section unavailable; finite domain residual is not a penetration measurement.')] if unknown else []
+            status=monitor.observe(now=time.perf_counter(),accepted=accepted,
+                violation_m=value['gate']['max_violation_m'],image_cost=value['image_cost'],
+                pose_cost=value['pose_cost'],quality_metrics=metrics,quality_failures=failures)
+            retention.observe(z,value,step=self.accepted,decision=status,metrics=monitor.latest)
+            self.binding.x=z[:17].copy()
+            np.savez_compressed(self.output/'attempt.pending.npz',**self.checkpoint_fields(z))
+            (self.output/'attempt.pending.npz').replace(self.output/'last_attempt.npz')
+            if not status['quality_failed']:
+                np.savez_compressed(self.output/'good.pending.npz',**self.checkpoint_fields(z))
+                (self.output/'good.pending.npz').replace(self.output/'last_good.npz')
+                np.savez_compressed(self.output/'accepted.pending.npz',**self.checkpoint_fields(z))
+                (self.output/'accepted.pending.npz').replace(self.output/'last_accepted.npz')
+            write_json(self.output/'candidate_selection.json',retention.record())
+            return status
+        initial_value=self.evaluate(x,False)
+        observe_candidate(x,initial_value)
         def save_candidate(reason):
+            selected=retention.selected
+            if selected is None:
+                write_json(self.output/'candidate.json',dict(event='candidate_unavailable',stop=reason,
+                    selection=retention.record(),candidate_checkpoint=None))
+                raise RuntimeError('No quality-valid candidate; last_attempt retained for diagnosis')
+            last_x=selected.x
             self.binding.x=last_x[:17].copy()
+            self.cache=self.cache_x=None
+            self.body.cache=self.body.cache_x=None
+            self.body.binding_key=None
+            last_value=self.evaluate(last_x,False)
             np.savez_compressed(self.output/'candidate.pending.npz',**self.checkpoint_fields(last_x))
             (self.output/'candidate.pending.npz').replace(self.output/'candidate.npz')
             record=dict(event='candidate_saved',stop=reason,candidate_checkpoint=str(self.output/'candidate.npz'),
                 source_seconds=list(self.body.state.seconds),parts=last_value['parts'],**last_value['gate'],
                 raw_data_parts=last_value['raw_data_parts'],numerical_convergence=False,user_accepted=False,
-                acceptance_calibrated=False,run_policy=monitor.record(),state_kind=self.state_kind)
+                acceptance_calibrated=False,run_policy=monitor.record(),state_kind=self.state_kind,
+                selection=retention.record(),source_motion_metrics=last_value.get('source_motion_metrics',{}))
             self.log.write(json.dumps(record)+'\n');write_json(self.output/'candidate.json',record)
             return last_x,record
+        jacobian_seconds=float(getattr(self,'jacobian_seconds_hint',0.))
         def guarded(z,jacobian=False):
-            if monitor.observe(now=time.perf_counter())['stop']:raise StopFit()
-            return self.evaluate(expand(z),jacobian)
+            nonlocal jacobian_seconds
+            now=time.perf_counter()
+            if monitor.reserve_evaluation(now=now,estimated_seconds=jacobian_seconds if jacobian else 0.)['stop']:raise StopFit()
+            value=self.evaluate(expand(z),jacobian)
+            if jacobian:jacobian_seconds=max(jacobian_seconds,time.perf_counter()-now)
+            return value
         while True:
             self.cache=None;self.cache_x=None;self.outer+=1
             def accepted(reduced):
-                nonlocal last_x,last_value
                 z=expand(reduced)
-                self.accepted+=1;v=self.evaluate(z,True)
-                last_x=z.copy();last_value=v
-                np.savez_compressed(self.output/'accepted.pending.npz',**self.checkpoint_fields(z),outer=np.array(self.outer))
-                (self.output/'accepted.pending.npz').replace(self.output/'last_accepted.npz')
+                self.accepted+=1;v=self.evaluate(z,False)
                 self.log.write(json.dumps(dict(event='accepted',outer=self.outer,iteration=self.accepted,
                     cost=float(v['residual']@v['residual']/2),parts=v['parts'],**v['gate']))+'\n')
-                status=monitor.observe(now=time.perf_counter(),accepted=True,violation_m=v['gate']['max_violation_m'],
-                    image_cost=v['image_cost'],pose_cost=v['pose_cost'])
+                status=observe_candidate(z,v,accepted=True)
                 write_json(self.output/'run_policy.json',monitor.record())
                 if status['stop']:raise StopFit()
             try:
@@ -434,40 +538,22 @@ class JointContactProblem:
                     callback=accepted,tr_options=dict(atol=1e-7,btol=1e-7))
             except StopFit:
                 return save_candidate(monitor.record())
-            x=expand(fit.x);value=self.evaluate(x,True)
-            last_x=x.copy();last_value=value
+            x=expand(fit.x);value=self.evaluate(x,False)
+            status=observe_candidate(x,value)
+            if status['stop']:return save_candidate(status)
             np.savez_compressed(self.output/f'outer_{self.outer:02d}.npz',x=x,multiplier=self.al.multiplier,
                 penalty=self.al.penalty,physics_times=self.physics_times)
             record=dict(event='outer_complete',outer=self.outer,stop=str(fit.message),optimality=float(fit.optimality),
                 penalty=self.al.penalty,parts=value['parts'],**value['gate'])
             self.log.write(json.dumps(record)+'\n');write_json(self.output/'latest.json',record)
-            dense=np.unique(np.r_[np.arange(self.body.state.bounds_time[0],self.body.state.bounds_time[1],.0025),self.physics_times])
-            check=self.contact(x,times=dense)
-            gate=physical_feasibility(check['margin_m'],tolerance_m=FEASIBILITY_TOLERANCE,row_labels=check['labels'])
-            if gate['feasible'] and value['gate']['feasible']:
-                record.update(dense_gate=gate,temporal_check_step_s=.0025,finite_sampling_is_not_continuous_proof=True,
-                    source_seconds=self.body.state.seconds,accepted_iterations=self.accepted,
-                    numerical_convergence=fit.optimality<=1e-4,source_supported_exposures=[r for r in self.evidence if self.body.state.seconds[0]<=r['pts']/12800<=self.body.state.seconds[1]])
-                np.savez_compressed(self.output/'result.npz',**self.checkpoint_fields(x))
-                write_json(self.output/'result.json',record);return x,record
-            status=monitor.observe(now=time.perf_counter(),outer_completed=self.outer)
-            if status['stop']:return save_candidate(status)
-            # Add only newly exposed violating physical times, without creating
-            # fictitious source exposures. Existing multiplier identities stay.
-            bad={check['rows'][i][0] for i,m in enumerate(check['margin_m']) if m < -FEASIBILITY_TOLERANCE}
-            new=np.array([dense[i] for i in sorted(bad)])
-            selected=new[~np.isin(np.round(new,10),self.physics_times)]
-            previous_al=(self.al.multiplier.copy(),self.al.penalty,self.al.previous_violation)
-            update=self.al.update_after_inner_solve(value['contact']['g'])
-            status=monitor.observe(now=time.perf_counter(),penalty_growth_requested=update['penalty_increased'])
-            if status['stop']:
-                self.al.multiplier,self.al.penalty,self.al.previous_violation=previous_al
-                return save_candidate(status)
-            if len(selected):
-                old=(self.al,self.row_labels);self.set_physics_times(np.r_[self.physics_times,selected],old)
-            if not np.isfinite(self.al.penalty) or self.al.penalty>1/np.finfo(float).eps:
-                record.update(failed=True,reason='AL penalty beyond floating-point conditioning; candidate retained')
-                write_json(self.output/'failure.json',record);raise RuntimeError(record['reason'])
+            # One bounded inner solve. Ice diagnostics never trigger another solve,
+            # an AL update, a denser feasibility gate, or prevent delivery.
+            record.update(ice_is_delivery_gate=False,ice_mode='finite_soft_objective',
+                source_seconds=self.body.state.seconds,accepted_iterations=self.accepted,
+                numerical_convergence=fit.optimality<=1e-4)
+            write_json(self.output/'result.json',record)
+            return save_candidate(dict(reason='inner_solver_return',message=str(fit.message),
+                ice_is_delivery_gate=False))
 
 
 def initial_scan(ref):
@@ -494,17 +580,41 @@ def main(argv=None):
     p.add_argument('--checkpoint',help='Read-only candidate replay/export; never starts a solve')
     p.add_argument('--run-policy',help='Explicit joint-correction budget JSON; defaults are saved with each run')
     p.add_argument('--delivery-name');p.add_argument('--variant-id')
-    args=p.parse_args(argv);project,root,out=map(Path,(args.project,args.root,args.output));out.mkdir(parents=True,exist_ok=True)
+    p.add_argument('--preserve-viewer-default',action='store_true',help='Register a candidate while retaining the current viewer default')
+    args=p.parse_args(argv);project,root,out=map(Path,(args.project,args.root,args.output))
+    # A replay request must fail before building models or writing run records.
+    # Missing/mistyped checkpoints are never permission to start a new solve.
+    if args.checkpoint is not None:
+        if args.stage not in ('export','run'):
+            p.error('--checkpoint is read-only; use --stage export or run')
+        if args.base_checkpoint or args.warm_start:
+            p.error('--checkpoint cannot be combined with a fitting seed')
+    replay_path=Path(args.checkpoint) if args.checkpoint is not None else out/'fit/result.npz'
+    replay_requested=args.stage=='export' or args.checkpoint is not None
+    if replay_requested and not replay_path.is_file():
+        raise FileNotFoundError(replay_path)
+    replay_mode=replay_requested or (args.stage=='run' and replay_path.exists())
+    base_path=Path(args.base_checkpoint or args.warm_start) if (args.base_checkpoint or args.warm_start) else None
+    saved_path=replay_path if replay_mode else base_path
+    if saved_path is not None:
+        validate_checkpoint_identity(load(saved_path))
     print(json.dumps(dict(main_log=str(out/'fit_progress.jsonl'))),flush=True)
     ref,camera,info,catalog=build(project,root,out,args.rocker_ft)
+    saved=None
+    if saved_path is not None:
+        saved=load(saved_path)
+        validate_checkpoint_identity(saved,ref.fixed_checkpoint_identity)
+    out.mkdir(parents=True,exist_ok=True)
     def delivery_options(kind):
         return dict(delivery_name=args.delivery_name or ('skate_s01_1103' if kind=='continuous_shot' else 'skate_contact_1103'),
-            variant_id=args.variant_id or ('skate_s01_1103' if kind=='continuous_shot' else 'skate1103'))
-    replay_path=Path(args.checkpoint) if args.checkpoint else out/'fit/result.npz'
-    if args.stage in ('export','run') and replay_path.exists():
+            variant_id=args.variant_id or ('skate_s01_1103' if kind=='continuous_shot' else 'skate1103'),
+            make_default=not args.preserve_viewer_default)
+    # Keep the requested mode even if a file disappears after preflight:
+    # load() must report that failure, not fall through into registration.
+    if replay_mode:
         # Export consumes the actual fitted boundary and shared parameters.
         # It must not recalibrate the input or replace its initial scan.
-        saved=load(replay_path);ref.binding.x=saved['x'][:17].copy()
+        ref.binding.x=saved['x'][:17].copy()
         restore_checkpoint_layers(ref,saved)
         if bool(saved.get('collar_constraints_enabled',False)):ref.binding.enable_collar_constraints()
         evidence=json.loads((out/'source_evidence.json').read_text(encoding='utf8'))
@@ -524,9 +634,13 @@ def main(argv=None):
         return
     evidence=source_evidence(root);write_json(out/'source_evidence.json',evidence)
     obs=root/'boot_integration_1102/observations.npz'
-    base_path=Path(args.base_checkpoint or args.warm_start) if (args.base_checkpoint or args.warm_start) else None
     contract=dict(schema='rinkspace.body-skate-contact.v1',camera=info,parent=digest(root/'opening_timing_1103/hand_polish/fitted/result.npz'),
-        observations_sha256=digest(obs),allowance_m=ALLOWANCE,support_band_m=SUPPORT_BAND,feasibility_tolerance_m=FEASIBILITY_TOLERANCE,
+        observations_sha256=digest(obs),
+        ice_soft_policy=json.loads((project/'events/ankara_2026/programmes/okada_mei_sp/ice_soft_1103.json').read_text(encoding='utf-8')),
+        ice_mode='finite_soft_objective',ice_is_delivery_gate=False,
+        legacy_raw_diagnostics=dict(semantic_allowance_m=ALLOWANCE,support_band_m=SUPPORT_BAND,
+            reference_band_is_not_a_fit_target=True),
+        structural_diagnostics=dict(tolerance_m=FEASIBILITY_TOLERANCE,scope='foot_cavity_and_collar_only'),
         quadrature='duration integral; existing 50Hz blocks times0.02; physical exact-time trapezoidal weights',
         execution_only='run_body_performance launcher',source_time_base=[1,12800],camera_frozen=True,shape_names=SHAPE_NAMES,
         preserved_candidate=None if base_path is None else dict(path=str(base_path),sha256=digest(base_path),
@@ -541,7 +655,7 @@ def main(argv=None):
             source=out/name
             if source.exists():source.replace(history/name)
     if base_path is not None:
-        saved=load(base_path);ref.binding.x=saved['x'][:17].copy()
+        ref.binding.x=saved['x'][:17].copy()
         restore_checkpoint_layers(ref,saved,include_primary=True)
     elif (out/'registration.npz').exists():ref.binding.x=load(out/'registration.npz')['x']
     else:

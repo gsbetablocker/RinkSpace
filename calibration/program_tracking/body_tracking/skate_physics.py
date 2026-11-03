@@ -14,6 +14,27 @@ ALLOWANCE={'runner':.002,'toe_pick':.005,'solid_guard':0.}
 NORMALIZATION=.005
 FEASIBILITY_TOLERANCE=.001
 SUPPORT_BAND=(-.002,.003)
+# A legacy source support row represents one native 50 Hz observation in
+# this pipeline. Its objective weight is fixed, unlike collision quadrature.
+# This is NOT shutter/readout duration or an asserted duration of contact.
+LEGACY_SOURCE_SUPPORT_WEIGHT_S=256/12800
+
+
+def source_support_weight_s(record):
+    """Fixed measure of a discrete source observation, independent of grid.
+
+    Old S01 evidence has no weight field and keeps a 0.02 s native-cadence
+    measure, matching the existing image-block convention. New evidence
+    should record source_support_weight_s explicitly. Confidence metadata
+    is not silently treated as a calibrated statistical weight.
+    """
+    value=record.get('source_support_weight_s',LEGACY_SOURCE_SUPPORT_WEIGHT_S)
+    if isinstance(value,(bool,np.bool_)):
+        raise ValueError('source_support_weight_s must be finite and positive')
+    value=float(value)
+    if not np.isfinite(value) or value<=0:
+        raise ValueError('source_support_weight_s must be finite and positive')
+    return value
 
 
 def fk_state(reference,ref,delta):
@@ -72,6 +93,7 @@ def constraints(binding,state,times,source_origin,evidence):
     clearance=clear[ni,feet,k];q=features['local_point'][ni,feet,k]
     witness=state['O']+np.einsum('nfij,nfj->nfi',state['R'],q)
     margins=[];rows=[];labels=[];weights=[];values=[];upper_rows=[];gaps=np.full(n,np.nan)
+    support_groups=[]
     tw=trapezoid_time_weights(times,singleton_duration_s=.02)
     for i,t in enumerate(times):
         time_id=int(round((t+source_origin)*1e9))
@@ -82,18 +104,28 @@ def constraints(binding,state,times,source_origin,evidence):
         # A source image constrains only its own exposure midpoint, not a
         # fabricated dense run of contact labels between reviewed images.
         matches=[r for r in evidence if abs(t+source_origin-r['pts']/12800.)<1e-8]
-        if matches:
-            r=matches[0];members=r.get('feet',[0,1]);kind=r.get('mode','glide')
+        for r in matches:
+            members=r.get('feet',[0,1]);kind=r.get('mode','glide')
+            # Known flight and unknown contact receive only the universal
+            # nonpenetration rows above. They are not support observations.
+            if kind in ('airborne','unknown'):continue
+            weight=source_support_weight_s(r)
             allowed_ids=binding.packet()['template']['support_feature_ids'][kind]
             choices=[(h[i,f,j],f,j) for f in members for j,name in enumerate(features['ids']) if name in allowed_ids]
-            height,f,j=min(choices);point=features['local_point'][i,f,j];gaps[i]=height
+            height,f,j=min(choices);point=features['local_point'][i,f,j]
+            # Retain the historical minimum-height diagnostic; individual
+            # groups are also exported so double support is not collapsed.
+            gaps[i]=height if np.isnan(gaps[i]) else min(gaps[i],height)
+            support_groups.append(dict(frame_index=i,id=r['id'],height_m=float(height),
+                witness_foot=int(f),witness_feature=features['ids'][j],weight_s=weight))
             for side,bound,sign in [('lower',SUPPORT_BAND[0],1.),('upper',SUPPORT_BAND[1],-1.)]:
                 margins.append(sign*(height-bound));rows.append((i,f,point,sign))
                 upper_rows.append(-1)
-                labels.append((time_id,r['id']+':'+side));weights.append(tw[i]);values.append(height)
+                labels.append((time_id,r['id']+':'+side));weights.append(weight);values.append(height)
     return dict(margin_m=np.asarray(margins),g=np.asarray(margins)/NORMALIZATION,
         rows=rows,labels=labels,weights=np.asarray(weights),clearance=clearance,row_upper_vertex=upper_rows,
-        support_height=gaps,witness=witness,features=features,values=np.asarray(values),times=np.asarray(times))
+        support_height=gaps,support_groups=support_groups,witness=witness,features=features,
+        values=np.asarray(values),times=np.asarray(times))
 
 
 def body_constraint_jacobian(reference,state,delta,active,B,evaluation):

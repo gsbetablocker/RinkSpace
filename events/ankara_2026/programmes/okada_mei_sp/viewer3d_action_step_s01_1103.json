@@ -1,0 +1,61 @@
+{
+  "schema": "rinkspace.result-viewer.v1",
+  "event": "ankara_2026",
+  "programme": "okada_mei_sp",
+  "shot": "action_step_s01",
+  "source_run": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\step_s01",
+  "scene_root": "runs/body_s01_20261029/fullbody_1102",
+  "scene_label": "camera_solver_refined_1102 冻结场景",
+  "metric_binding": "runs/body_s01_20261029/fullbody_1102/metric_binding.json",
+  "metric_binding_base": "data",
+  "model_asset": "environments/body/GVHMR/inputs/checkpoints/body_models/smplx/SMPLX_NEUTRAL.npz",
+  "default_variant": "A_root",
+  "initial_source_pts": 320000,
+  "initial_view": "side",
+  "initial_wear_inspection": true,
+  "comparison_variants": [
+    "A",
+    "A_root"
+  ],
+  "variants": [
+    {
+      "id": "A",
+      "label": "step_s01 A 基础路线",
+      "kind": "fullbody",
+      "result": "A/fitted/result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "same_uniform25_gvhmr",
+      "body_refinement_intervals_seconds": []
+    },
+    {
+      "id": "B",
+      "label": "step_s01 B 有证据门控动作因子",
+      "kind": "fullbody",
+      "result": "B/fitted/result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "same_uniform25_gvhmr",
+      "body_refinement_intervals_seconds": []
+    },
+    {
+      "id": "A_root",
+      "label": "step_s01 A 根轨迹修正（图像待复核）",
+      "kind": "fullbody",
+      "result": "root_repair/A_pose/fitted/result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "same_uniform25_gvhmr_then_saved_A_pose_root_repair",
+      "body_refinement_intervals_seconds": []
+    },
+    {
+      "id": "B_root",
+      "label": "step_s01 B 根轨迹修正（图像待复核）",
+      "kind": "fullbody",
+      "result": "root_repair/B_pose/fitted/result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "same_uniform25_gvhmr_then_saved_B_pose_root_repair",
+      "body_refinement_intervals_seconds": []
+    }
+  ],
+  "source_identity_field": "source_identity_suspect",
+  "review_status": "unaccepted diagnostic candidates; no automatic B selection",
+  "root_repair_status": "unaccepted candidate; reduced root drift; inspect image regression and remaining pose/contact failures"
+}

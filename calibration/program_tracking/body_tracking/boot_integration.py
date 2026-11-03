@@ -133,7 +133,7 @@ class BootWindowProblem(FullBodyProblem):
         samples=self.binding.surface.sample_vertices(local[midpoint],s['frames'][midpoint],
             self.binding.sample_ids,double_precision=True)
         return dict(state=s,local=local,midpoint=midpoint,samples=samples,
-            priors=[matrix@x for _,matrix in self.prior_matrices],rows=len(value['residual']))
+            priors=[residual for _,residual in self.prior_rows(x)],rows=len(value['residual']))
 
     def registration_residual_from_replay(self,shared,packet):
         """Re-evaluate every shoe-dependent term without another body LBS.
@@ -187,6 +187,10 @@ class BootWindowProblem(FullBodyProblem):
             cc=np.broadcast_to(kn[:,None,None]*self.state.d+np.arange(self.state.d),val.shape).ravel()
             J=coo_matrix((val.ravel(),(rr,cc)),shape=(rows,self.size)).tocsr();J.eliminate_zeros()
             base['jac']=vstack((base['jac'],J),format='csr')
+        first=len(base['residual'])
+        base['compatibility_residual']=extra.ravel()
+        base['compatibility_jacobian']=J if jacobian else None
+        base.setdefault('block_slices',{})['foot_compatibility']=slice(first,first+rows)
         base['residual']=np.r_[base['residual'],extra.ravel()]
         base['parts']['foot_cavity_support']=float(np.sum(extra**2)/2);base['foot_compatibility_added']=True
         return base

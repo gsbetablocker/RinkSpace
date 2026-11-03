@@ -4,6 +4,19 @@
 
 第一次默认停在原片 **36.020 秒**，以后记住退出时的帧、结果版本和观察角度。窗口左边的下拉框可切换已保存的 S01 人体结果，切换时保持帧号和视角。
 
+## 2026-11-04 三段动作与根轨迹失败对照
+
+双击 [START_3D_INTEGRATION.cmd](../START_3D_INTEGRATION.cmd)，选择 S01、跳跃（原片44.98–52.00秒）、步法（25.00–35.00秒）或旋转（76.00–95.00秒）。S01保持 `skate_s01_1103` 为默认；三段默认显示 `A_root`，保留 `A`、`B`、`A_root`、`B_root` 四项，同源PTS切换。旋转 `B_root` 明确复用与B数值等价的A根修正，没有独立B根拟合。
+
+以下命令分别供用户打开选定候选及仅核对配置。本轮公开整理只执行 `-Check`，不打开窗口：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\START_3D_INTEGRATION.ps1 -Clip jump -Variant A_root -Fresh
+powershell -NoProfile -ExecutionPolicy Bypass -File .\START_3D_INTEGRATION.ps1 -Check
+```
+
+骨盆投影漂移、继承的朝向突跳和部分图像误差退化尚未解决；A/B与根修正都不能当作准确轨迹。完整数值、SHA和实际停止原因见[整合审阅索引](../events/ankara_2026/programmes/okada_mei_sp/body_integration_1104.json)。两份新回收的历史核对脚本有写入副作用，非播放器启动依赖；不要通过导入来检查。下列较早候选和数值按各自版本解释，旧毫米级调试带不用于新增软项验收。
+
 ## 2026-11-03 全S01连续候选：当前人工审核入口
 
 [START_3D_COMPARISON.cmd](../START_3D_COMPARISON.cmd)以 `Fresh` 进入 `skate_s01_1103`，从原片 **22.12秒、side全身视角**开始，按50fps连续播放至44.96秒。整段1143曝光共用一条全69自由度的连续修正曲线，没有内部冻结窗口。`full1102`、`hand1103`及已封存的`skate1103`可同PTS比较。普通入口及用户会话保留；本轮后台检查不打开或控制桌面窗口。

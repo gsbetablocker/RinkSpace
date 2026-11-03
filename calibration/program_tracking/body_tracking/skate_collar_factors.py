@@ -183,13 +183,19 @@ def evaluate(binding,joints,frames,samples=None):
 
     samples, if supplied, must be full-surface vertices at prepare().sample_ids
     in the same native body-local solver unit as joints. Unknown rows return
-    zero solely for residual assembly; they are never valid zero-penetration
-    observations. No framewise external reviewer or optimizer is called.
+    zero in the *measurement* field, with a separate finite domain penalty
+    for residual assembly. Unknown sections invalidate quality selection;
+    they are never valid zero-penetration observations.
     """
     spec=prepare(binding);joints,frames=np.asarray(joints),np.asarray(frames);n=len(joints)
     breach=np.zeros((n,2));unknown=np.ones((n,2),bool);reason=np.full((n,2),spec.inner_unknown_reason,dtype='<U48')
     count=np.zeros((n,2),int);minimum=np.full((n,2),np.nan)
-    result=dict(breach_solver=breach,unknown=unknown,unknown_reason=reason,sample_count=count,
+    # A geometry-sized domain penalty prevents a lost section reducing the
+    # objective. It is not a measured penetration or a new contact tolerance.
+    domain_size=max(float(np.linalg.norm(np.ptp(spec.inner_vertices,axis=0))),np.finfo(float).eps)
+    residual_breach=np.full((n,2),domain_size)
+    result=dict(breach_solver=breach,residual_breach_solver=residual_breach,
+                unknown=unknown,unknown_reason=reason,sample_count=count,
                 minimum_sample_gap_solver=minimum)
     if n==0 or spec.inner_unknown_reason:return result
     if samples is None:samples=binding.surface.sample_vertices(joints,frames,spec.sample_ids,double_precision=True)
@@ -219,4 +225,5 @@ def evaluate(binding,joints,frames,samples=None):
                 values=np.where(mask,gap,np.inf).min(axis=1)
                 minimum[first:last,foot]=np.where(good,values,np.nan)
                 breach[first:last,foot]=np.where(good,np.maximum(-values,0.),0.)
+                residual_breach[first:last,foot]=np.where(good,breach[first:last,foot],domain_size)
     return result

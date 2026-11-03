@@ -1,0 +1,122 @@
+{
+  "schema": "rinkspace.root-initialization-recipe.v1",
+  "source_time_base": [
+    1,
+    12800
+  ],
+  "role": "Conditional candidate initialization only. No added support rows, blade pixels, hard root/ice constraint, fixed spin centre, speed cap or acceptance threshold.",
+  "source_review_origin": "assistant direct native-source image review; not human confirmed",
+  "source_review_files": [
+    "runs/body_s01_20261029/action_integration_1103/pelvis_drift_diagnostic/spin_s05_phase_review.png",
+    "runs/body_s01_20261029/action_integration_1103/pelvis_drift_diagnostic/spin_entry_review.png",
+    "runs/body_s01_20261029/action_integration_1103/pelvis_drift_diagnostic/jump_s02_phase_review.png"
+  ],
+  "clips": {
+    "spin_s05": {
+      "root_origin": "source_proxy_runner",
+      "exclude_support_proxy_seconds": [
+        [
+          80.5,
+          80.74
+        ],
+        [
+          81.28,
+          81.64
+        ]
+      ],
+      "known_proxy_foot_seconds": [
+        [
+          79,
+          80.5,
+          1
+        ],
+        [
+          80.74,
+          81.28,
+          0
+        ],
+        [
+          81.64,
+          92.9,
+          1
+        ]
+      ],
+      "phase_overrides": [
+        {
+          "seconds": [
+            79,
+            81.64
+          ],
+          "feet": [
+            0,
+            1
+          ],
+          "phase": "unknown"
+        },
+        {
+          "seconds": [
+            79,
+            80.5
+          ],
+          "feet": [
+            1
+          ],
+          "phase": "entry_right_support"
+        },
+        {
+          "seconds": [
+            80.74,
+            81.28
+          ],
+          "feet": [
+            0
+          ],
+          "phase": "entry_left_support"
+        },
+        {
+          "seconds": [
+            81.34,
+            81.52
+          ],
+          "feet": [
+            0,
+            1
+          ],
+          "phase": "entry_airborne"
+        }
+      ],
+      "boundary_uncertainty_seconds": 0.04,
+      "unknown_physical_sides_preserved": true
+    },
+    "jump_s02": {
+      "root_origin": "source_proxy_runner",
+      "exclude_support_proxy_seconds": [
+        [
+          48.1,
+          48.8
+        ],
+        [
+          49.6,
+          50.25
+        ]
+      ],
+      "known_proxy_foot_seconds": [],
+      "phase_overrides": [],
+      "unknown_physical_sides_preserved": true
+    },
+    "step_s01": {
+      "root_origin": "accepted_s01",
+      "accepted_initial_root_result": "skate_s01_1103/fitted/result.npz",
+      "exclude_support_proxy_seconds": [],
+      "known_proxy_foot_seconds": [],
+      "phase_overrides": [],
+      "body_pose_from_accepted_S01_used": false
+    }
+  },
+  "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "native_size_wh": [
+    1920,
+    1080
+  ],
+  "human_confirmed": false
+}
