@@ -343,6 +343,70 @@ class VariantTransactionTests(unittest.TestCase):
         mode(player,False)
         self.assertEqual(player.visible,visible)
 
+    def versioned_fixture(self):
+        f=SwitchFixture(self.path);f.definition['shell_topology']='saved';s=f.sequence.state
+        s.update(template_version=np.array('fixture.v1'),
+                 skate_lower=np.arange(3*2*24*3,dtype=float).reshape(3,2,24,3),
+                 skate_upper=np.arange(3*2*20*3,dtype=float).reshape(3,2,20,3),
+                 skate_lower_faces=np.array([[0,1,2],[3,4,5],[6,7,8],[9,10,11]]),
+                 skate_lower_face_parts=np.array(['runner','toe_pick','plate','pillar']),
+                 skate_upper_faces=np.array([[0,1,2],[3,4,5],[6,7,8],[9,10,11]]),
+                 skate_upper_region_ids=np.arange(4),skate_R=np.broadcast_to(np.eye(3),(3,2,3,3)).copy(),
+                 skate_edge=np.zeros((3,2,2,8,3)),skate_witness=np.zeros((3,2,3)),
+                 skate_reference=np.ones((3,2,3)),skate_cavity=np.ones((3,2,18,3)),
+                 skate_cavity_faces=np.array([[0,1,2]]),skate_footbed=np.ones((3,2,8,3)))
+        f.fail_hull=True
+        f.player.visible.update(contact=True,skate_reference=True)
+        return f
+
+    def test_versioned_skate_renders_full_saved_parts_edges_and_witness_without_old_adapter_shell(self):
+        f=self.versioned_fixture();before={key:value.copy() for key,value in f.sequence.state.items()}
+        f.switch(f.player,'new')
+        meshes=[(args,kw) for args,kw in f.mesh_inputs if kw['name'].startswith('Boot candidate')]
+        for foot,(args,kw) in enumerate(meshes):
+            np.testing.assert_array_equal(args[0],before['skate_upper'][:,foot])
+            np.testing.assert_array_equal(args[1],before['skate_upper_faces'])
+        lower=[(args,kw) for args,kw in f.mesh_inputs if kw['name'].startswith('Saved connected skate solids')]
+        self.assertEqual(len(lower),2)
+        for args,kw in lower:
+            foot=int(kw['name'][-1])-1
+            np.testing.assert_array_equal(args[0],before['skate_lower'][:,foot])
+            np.testing.assert_array_equal(args[1],before['skate_lower_faces'])
+            self.assertEqual(kw['face_colors'].shape,(4,4))
+        names=[node.name for node in f.created]
+        self.assertEqual(sum(name.startswith('Exact blade edge') for name in names),4)
+        self.assertEqual(sum(name.startswith('Nonpenetration witness') for name in names),2)
+        self.assertEqual(sum(name.startswith('Fixed blade material reference trajectory') for name in names),2)
+        self.assertFalse(any(name.startswith('Blade lower edge strip') for name in names))
+        for key,value in before.items():np.testing.assert_array_equal(f.sequence.state[key],value)
+
+    def test_versioned_skate_section_uses_saved_lateral_regions_and_preserves_tongue(self):
+        f=self.versioned_fixture();f.player.boot_section=3;s=f.sequence.state
+        # Camera is on the positive local-y side. Keep the bridges and tongue.
+        s['skate_upper'][:]=0.
+        f.switch(f.player,'new')
+        meshes=[args for args,kw in f.mesh_inputs if kw['name'].startswith('Boot candidate')]
+        for args in meshes:np.testing.assert_array_equal(args[1],s['skate_upper_faces'][[0,2,3]])
+        np.testing.assert_array_equal(s['skate_upper'],0.)
+
+    def test_versioned_contact_constructor_failure_preserves_current_variant(self):
+        f=self.versioned_fixture();f.fail_constructor='Nonpenetration witness 2'
+        self.assert_switch_failure(f)
+
+    def test_millimetre_chart_leaves_unknown_support_intervals_open(self):
+        calls=[]
+        draw=SimpleNamespace(**{name:(lambda *args,_name=name:calls.append((_name,args)))
+                                for name in ('add_line','add_circle_filled','add_rect_filled')})
+        gui=SimpleNamespace(text=lambda _:None,get_cursor_screen_pos=lambda:(10.,20.),
+                            get_content_region_available=lambda:(400.,200.),get_window_draw_list=lambda:draw,
+                            get_color_u32_rgba=lambda *args:1,dummy=lambda *args:None)
+        method=switch_method(dict(np=np,imgui=gui),name='gui_height_plot')
+        player=SimpleNamespace(frame=1,catalog=SimpleNamespace(seconds=np.array([10.,10.02,10.05,10.10])))
+        method(player,'support',[(np.array([np.nan,1.,np.nan,2.]),(1.,1.,1.,1.))],band=(-2.,3.))
+        self.assertFalse(any(name=='add_line' and len(args)==6 for name,args in calls))
+        self.assertEqual(sum(name=='add_circle_filled' for name,_ in calls),2)
+        for _,args in calls:self.assertTrue(np.isfinite(args).all())
+
 
 if __name__ == '__main__':
     unittest.main()

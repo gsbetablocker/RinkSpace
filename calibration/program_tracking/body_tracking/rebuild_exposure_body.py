@@ -33,18 +33,23 @@ def row_weights(row,node_count=3):
     return value,derivative
 
 
-def moving_projection(projector,nodes,frames,*,jacobian=False):
+def moving_projection(projector,nodes,frames,*,jacobian=False,projection=None):
     node_count=nodes.shape[1]
     if node_count not in (3,5):raise ValueError("Expected 3 or 5 exposure nodes")
-    uv=projector.project(nodes[:,node_count//2],frames)
-    for iteration in range(64):
-        weights,_=row_weights(uv[:,:,1],node_count);world=np.einsum('nkl,nlkc->nkc',weights,nodes)
-        new=projector.project(world,frames)
-        error=float(np.max(np.abs(new-uv)));uv=new
-        if error<1e-8:break
-    else:raise ValueError('Moving-body row projection failed to converge')
-    weights,dw=row_weights(uv[:,:,1],node_count);world=np.einsum('nkl,nlkc->nkc',weights,nodes)
-    out=dict(uv=uv,world=world,row_weights=weights,row_iterations=iteration+1,inside_exposure_rows=(uv[:,:,1]>=0)&(uv[:,:,1]<=1079))
+    if projection is None:
+        uv=projector.project(nodes[:,node_count//2],frames)
+        for iteration in range(64):
+            weights,_=row_weights(uv[:,:,1],node_count);world=np.einsum('nkl,nlkc->nkc',weights,nodes)
+            new=projector.project(world,frames)
+            error=float(np.max(np.abs(new-uv)));uv=new
+            if error<1e-8:break
+        else:raise ValueError('Moving-body row projection failed to converge')
+        weights,dw=row_weights(uv[:,:,1],node_count);world=np.einsum('nkl,nlkc->nkc',weights,nodes)
+        out=dict(uv=uv,world=world,row_weights=weights,row_iterations=iteration+1,inside_exposure_rows=(uv[:,:,1]>=0)&(uv[:,:,1]<=1079))
+    else:
+        # Internal same-state fun->jac reuse. Caller owns exact x/binding keys.
+        out=dict(projection);uv=out['uv'];world=out['world'];weights=out['row_weights']
+        _,dw=row_weights(uv[:,:,1],node_count)
     if jacobian:
         _,jp=projector.with_jacobian(world,frames)
         wrow=np.einsum('nkl,nlkc->nkc',dw,nodes)

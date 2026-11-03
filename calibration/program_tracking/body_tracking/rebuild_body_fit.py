@@ -29,10 +29,30 @@ class FixedNativeProjector:
         if np.any(r['status']):raise ValueError('Native projection domain failure: '+str(np.unique(r['status'],return_counts=True)))
         return r['uv'].reshape(points.shape[0],points.shape[1],2)
     def with_jacobian(self,world,indices):
+        if getattr(self.core,'supports_motion_xyz_jacobian',False):
+            points=np.asarray(world,float);frames=np.asarray(indices,int)
+            times=np.repeat(self.p['motion_times'][frames],points.shape[1])
+            result=self.core.project_motion_xyz_jacobian(self.p['rig'],self.p['controls'],
+                float(self.p['first_control_time']),float(self.p['control_dt']),1080,
+                times,points.reshape(-1,3)/self.scale)
+            if np.any(result['status']):
+                raise ValueError('Native motion XYZ derivative domain failure: '+str(np.unique(result['status'],return_counts=True)))
+            return result['uv'].reshape(*points.shape[:2],2),result['jacobian_xyz'].reshape(*points.shape[:2],2,3)/self.scale
         uv=self.project(world,indices);j=np.empty((*uv.shape,3));step=1e-5
-        for axis in range(3):
-            a=world.copy();b=world.copy();a[:,:,axis]+=step;b[:,:,axis]-=step
-            j[:,:,:,axis]=(self.project(a,indices)-self.project(b,indices))/(2*step)
+        def side(task):
+            axis,sign=task;trial=world.copy();trial[:,:,axis]+=sign*step
+            return self.project(trial,indices)
+        execution=getattr(self,'body_execution',None)
+        if execution is not None and execution.config.backend=='cpu' and execution.config.workers>1:
+            # Each native call has its own arrays and per-point scratch state.
+            # Only this fixed-camera read path is shared, never mutable fitting
+            # state or a native solver handle.
+            values=execution.map_columns(side,[(axis,sign) for axis in range(3) for sign in (1,-1)])
+            for axis in range(3):j[:,:,:,axis]=(values[2*axis]-values[2*axis+1])/(2*step)
+        else:
+            for axis in range(3):
+                a=world.copy();b=world.copy();a[:,:,axis]+=step;b[:,:,axis]-=step
+                j[:,:,:,axis]=(self.project(a,indices)-self.project(b,indices))/(2*step)
         return uv,j
 
 

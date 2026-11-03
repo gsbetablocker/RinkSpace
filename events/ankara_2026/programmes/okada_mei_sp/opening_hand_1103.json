@@ -1,0 +1,342 @@
+{
+  "schema": "rinkspace.opening-hand-on-timing-binding.v1",
+  "event": "ankara_2026",
+  "programme": "okada_mei_sp",
+  "source_seconds": [
+    22.12,
+    25.0
+  ],
+  "source_time_base": [
+    1,
+    12800
+  ],
+  "affected_exposures": 145,
+  "lower_body_inferred_exposures": 125,
+  "input_contract": {
+    "schema": "rinkspace.opening-hand-polish-input.v1",
+    "camera": {
+      "record": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\camera_solver_refined_1102.json",
+      "state_path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_solver_refined_1102.npz",
+      "state_sha256": "d6cfde1474a23d594a0395351ebbdb0ee15a6560ef77b27f069d239ee95bb3f3",
+      "native_library": "D:/CodexData/RinkSpace_Data/build/solver_continue_1102/rinkspace_core.dll",
+      "native_library_sha256": "606f94386d26a3c6683dcbf881ce75d64de08ab2cc27a9a4effbf2ea698ad080",
+      "shot": {
+        "camera_index": 0,
+        "control_begin": 0,
+        "control_stop": 1152,
+        "first_control_time": 1.96,
+        "first_pts": 283136,
+        "id": "s01",
+        "knot_stride": 10,
+        "last_pts": 575488,
+        "motion_reference_time": 2.1,
+        "reference_pts": 256256,
+        "row_begin": 0,
+        "row_stop": 279126,
+        "source_coverage": {
+          "expected_exposures": 1143,
+          "missing_exposures": 0,
+          "missing_ranges": [],
+          "observed_exposures": 1143,
+          "partial_source_coverage": false,
+          "synthetic_rows_added": 0
+        },
+        "stop_pts_exclusive": 575744,
+        "time_base_den": 12800,
+        "time_base_num": 1
+      },
+      "metres_per_scene_unit": 59.96169706678219,
+      "solver_metres_per_scene_unit": 60.0,
+      "length_export_ratio": 0.9993616177797032,
+      "camera_changed_during_fit": false,
+      "source_time_base": [
+        1,
+        12800
+      ],
+      "old_reference_reprojected_on_current_camera": true,
+      "prepared": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\physical_repair_1101\\prepared_shared_timing"
+    },
+    "parent_sha256": "bc2614e11b4bce2206132502cf97d3c6e051683edcf27f313e0619c98b9f4712",
+    "translation_seed_sha256": "9dbfc858d2c09df1848738527cd8b1df63c54264e1e863689627bea67a09ef67",
+    "raw_cache_sha256": "eef70333e9d45257b1409bb21301ac5fec6e5db740b2ea2c8eb6e6552098fa2b",
+    "clock_map_sha256": "a9be37308b9a39fb55519a0be69c741c53a8216a81a60a2066fff25bdcf54dcc",
+    "preparation_sha256": "333414d1b0a6bbeb260a6ab43b5eebfa63de86f1c4fb10f8c5158c84ffa991d7",
+    "observations_sha256": "071b266d1c689f70b7a2985c059cef0c6c6623bd18b94565180f13ba996ee973",
+    "source_seconds": [
+      22.12,
+      25.0
+    ],
+    "lower_pose_release_end": 24.6,
+    "parent_attachment_start": 24.44,
+    "actual_velocity_factor": false,
+    "fixed_location_factor": false,
+    "upright_factor": false,
+    "support_scale_m": 0.08,
+    "penetration_scale_m": 0.03,
+    "blade_minimum_softness_m": 0.001,
+    "penetration_C1_transition_m": 0.001,
+    "hand_waist_relation": {
+      "hold_until": 23.1,
+      "released_at": 23.4,
+      "surface_distance_scale_m": 0.02,
+      "sliding_softness_m": 0.03,
+      "palm_skin_patches": 3,
+      "evidence": "Existing19.960s preparation image and source22.12-23.08s; user confirms right hand on waist"
+    },
+    "implementation_sha256": "23268a6a4dc6e537a7482ce62f5410f274377ddf727ed226a0ef2254b76cbcd6",
+    "base_implementation_sha256": "778e381a74c87df72f268d341d59958d2425acad8a944a1d26d5dce00af40459",
+    "quiet_phase_seconds": [
+      22.12,
+      22.9
+    ],
+    "quiet_body_native_joints": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "quiet_position_scale_m": 0.01,
+    "quiet_rotation_scale_deg": 1.0,
+    "quiet_support_scale_m": 0.01,
+    "quiet_body_time_equality_factor": true,
+    "user_correction": "Until about22.90 only hands move; lowering begins afterwards. Reject previous1.11m opening displacement.",
+    "base_timing_parameters": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\opening_timing_1103.npz",
+      "sha256": "b90bf7b42131905bd84e05cedf753e1af25eade5f70d88406d293d0a5292753e"
+    },
+    "body_timing_fit_sha256": "71743cec7292b9435ca57d2b3b9251e66258c77574ecff0e8096c40e7aac8af3",
+    "hand_polish_seconds": [
+      22.12,
+      23.4
+    ],
+    "hand_polish_native_joints": [
+      17,
+      19,
+      21
+    ],
+    "hand_contact_patch_rest_y_m": [
+      -0.12,
+      0.28
+    ],
+    "body_timing_frozen": true,
+    "hand_polish_reason": "Keep source-timed trunk/legs/translation exact; permit fingers-down palm contact on right waist and upper hip"
+  },
+  "camera": {
+    "record": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\camera_solver_refined_1102.json",
+    "state_path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_solver_refined_1102.npz",
+    "state_sha256": "d6cfde1474a23d594a0395351ebbdb0ee15a6560ef77b27f069d239ee95bb3f3",
+    "native_library": "D:/CodexData/RinkSpace_Data/build/solver_continue_1102/rinkspace_core.dll",
+    "native_library_sha256": "606f94386d26a3c6683dcbf881ce75d64de08ab2cc27a9a4effbf2ea698ad080",
+    "shot": {
+      "camera_index": 0,
+      "control_begin": 0,
+      "control_stop": 1152,
+      "first_control_time": 1.96,
+      "first_pts": 283136,
+      "id": "s01",
+      "knot_stride": 10,
+      "last_pts": 575488,
+      "motion_reference_time": 2.1,
+      "reference_pts": 256256,
+      "row_begin": 0,
+      "row_stop": 279126,
+      "source_coverage": {
+        "expected_exposures": 1143,
+        "missing_exposures": 0,
+        "missing_ranges": [],
+        "observed_exposures": 1143,
+        "partial_source_coverage": false,
+        "synthetic_rows_added": 0
+      },
+      "stop_pts_exclusive": 575744,
+      "time_base_den": 12800,
+      "time_base_num": 1
+    },
+    "metres_per_scene_unit": 59.96169706678219,
+    "solver_metres_per_scene_unit": 60.0,
+    "length_export_ratio": 0.9993616177797032,
+    "camera_changed_during_fit": false,
+    "source_time_base": [
+      1,
+      12800
+    ],
+    "old_reference_reprojected_on_current_camera": true,
+    "prepared": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\physical_repair_1101\\prepared_shared_timing"
+  },
+  "parameters": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\opening_hand_1103.npz",
+    "sha256": "ec424429fb333e23ba492a31c064a639fd1beb344a1cad1dacac70491d8ffcda"
+  },
+  "result": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_timing_1103\\hand_polish\\fitted\\result.npz",
+    "sha256": "b51774080fd82a9d98575ebe71b4786391c4ec5ebed034ee72859b7679f52d68"
+  },
+  "translation_seed": "Previous opening trajectory is only the translation reference; no actual zero velocity or fixed-position factor",
+  "articulation": "Source-confirmed quiet P/Q/trunk/legs until22.90, with freely fitted common opening state; arms/wrists/head stay dynamic. Body increments after22.90 release into raw motion by24.60.",
+  "wrist": "Right shoulder/elbow/wrist-only polish on frozen source-timed body; palm can slide over right waist and upper hip, relation released23.10-23.40s; fingers default",
+  "blade_plane": "1mm soft minimum and C1 penetration transition; weak support envelope, no identified physical contact point; quiet-phase support envelope scale1cm, physical blade station unknown",
+  "boundary": "C2 attachment at25s; all five body/gear arrays exactly equal to boot parent from25s inclusive",
+  "evidence": {
+    "inputs.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_timing_1103\\hand_polish\\inputs.json",
+      "sha256": "614b1875375195e5b0d80d9a219c64bbe241ad8a481db9c4d212630ff78f491f"
+    },
+    "ledger.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_timing_1103\\hand_polish\\ledger.json",
+      "sha256": "fa065f53f520af42ce39384b154f1a8989e6e8cfbd71651498cd33bd7a1c29cc"
+    },
+    "fit/config.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_timing_1103\\hand_polish\\fit\\config.json",
+      "sha256": "1019758d9472cf8319d9e51859876a6a68b4abcf94750e5e2f62e74e48c4ac4e"
+    },
+    "fit/result.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_timing_1103\\hand_polish\\fit\\result.json",
+      "sha256": "5a408650fed99dfa619a99a3747fedf07481bd76587a6905690bf18d289440ad"
+    },
+    "derivative_checks.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_timing_1103\\hand_polish\\derivative_checks.json",
+      "sha256": "926fa77be3116e7794ab2e1b14449d225d14258835d6c6147c36d1d1d2fc4d08"
+    },
+    "motion_report.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_timing_1103\\hand_polish\\motion_report.json",
+      "sha256": "273f08c43de3ae25e618ad387c729613780dbd9d26531679bd231ed3b77d3ffc"
+    },
+    "hand_waist_report.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_timing_1103\\hand_polish\\hand_waist_report.json",
+      "sha256": "b8313c600cdbca3ec5f27211ac1ddbc8ecea9adae96f20245e86e4b2a228aaf5"
+    },
+    "results.txt": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_timing_1103\\hand_polish\\results.txt",
+      "sha256": "a8fd8b08ab9aa5ab154367f8c4fa73b33748d1ae955e3dbfc217e5a46f258efe"
+    },
+    "verification.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_timing_1103\\hand_polish\\verification.json",
+      "sha256": "b79ff361b08bc912b2940c9d5083d35454f628a1746095dd1423ef6c90c9b9a4"
+    },
+    "source_motion_comparison.png": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_timing_1103\\hand_polish\\source_motion_comparison.png",
+      "sha256": "9fd7a129d615062a8a5dd37a8d70885e141cd92c7a4f6b024b0bdf7cbd77532b"
+    },
+    "visual_diagnostics.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_timing_1103\\hand_polish\\visual_diagnostics.json",
+      "sha256": "cb0d463e49adbdd4954b06327049e971353f0026aadc32c8feb863db6787266b"
+    },
+    "motion_curves.png": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_timing_1103\\hand_polish\\motion_curves.png",
+      "sha256": "7b682709d03a6cf6aca6cecad2ccf03ec6067324a1df2d4a4938d05dc3561c8f"
+    },
+    "motion_visual_review.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_timing_1103\\hand_polish\\motion_visual_review.json",
+      "sha256": "5ff33faf179791a37e7a4f911319a3111daabd146ee4e35951407006ff396c0c"
+    },
+    "player_check/checks.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_timing_1103\\hand_polish\\player_check\\checks.json",
+      "sha256": "9a4b40de146ec5de1af537e747ffcce41021370f27e77aa83f3ce0f786f6de03"
+    },
+    "side_check/checks.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_timing_1103\\hand_polish\\side_check\\checks.json",
+      "sha256": "07ca57a9b9f90589740a8049364c549cdcb2d3552d4a291bb70c44eddc6a1ad1"
+    },
+    "timing_report.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_timing_1103\\hand_polish\\timing_report.json",
+      "sha256": "7c2e4aeed121e8de9e8fdcfdc8fedd0b8c98d22d405e92aedcec29279a359ef3"
+    },
+    "arm_scope_verification.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_timing_1103\\hand_polish\\arm_scope_verification.json",
+      "sha256": "41a79984230cc3684c34618ff328c65c61e9edb7e1f78eb4a8581f9b056656e5"
+    }
+  },
+  "cache": "D:\\CodexData\\RinkSpace_Data\\cache\\results3d\\s01\\hand1103_04253ad3b5e9fae08c70",
+  "viewer_config": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\viewer3d_fullbody_1102.json",
+  "viewer_entry": "D:\\OneDrive\\codex_projs\\RinkSpace\\START_3D_COMPARISON.cmd",
+  "replay_verification": {
+    "schema": "rinkspace.opening-motion-replay.v1",
+    "one_drive_parameter_replay_max_absolute": {
+      "P": 0.0,
+      "Q": 0.0,
+      "local_R": 0.0,
+      "native": 0.0,
+      "gear": 0.0
+    },
+    "source_pts_preserved": true,
+    "observations_unchanged": true,
+    "lower_body_inference_preserved": true,
+    "after_25_exact": true,
+    "camera_unchanged": true,
+    "parent_unchanged": true,
+    "all_float_arrays_finite": true,
+    "derivative_checks": [
+      {
+        "block": "upper_limb",
+        "maximum_absolute": 5.916210369522057e-08,
+        "relative_norm": 9.716389355493513e-09
+      },
+      {
+        "block": "wrist",
+        "maximum_absolute": 7.14457394895146e-08,
+        "relative_norm": 5.830163849305612e-08
+      }
+    ],
+    "passed": true
+  },
+  "accuracy_accepted": false,
+  "independent_3d_truth": false,
+  "implementation": {
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\opening_motion_delivery.py": "192b1c8fd4c391c8af13dcd220c9c76f0118fdd46deb3c43bde3ac01b36c5686",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\opening_motion.py": "778e381a74c87df72f268d341d59958d2425acad8a944a1d26d5dce00af40459",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\opening_motion_review.py": "09cec3adce661fb2d0aa0908242c8d630d4e0c30813ad6d0fdd25d35d0d12d56",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\scripts\\run_opening_motion.py": "7b9df591f46ad1904c3b845ae7534db04f557d878eec7dff89e0bb364d578191",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\scripts\\deliver_opening_motion.py": "e07e1bee7a29b4442733521e94b7abecb5b12a93491f6e065e44ace888200c46",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\opening_timing.py": "469b60a2b2eaf39196c3c58386b9e451186676893363d672d24221b5f084e846",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\scripts\\run_opening_timing.py": "992bf67fc2b7297a5f0292f31cd2ae99cb06769548317844eb1d93e46f7396bc",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\scripts\\deliver_opening_timing.py": "0be94eae9c4fc373dbf9d9584be1a9023abcacd218f3052e42f0cfceb0f1a7c5",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\opening_timing_review.py": "5b7822c8ec80e8790b042a12fa5c0ce808d26997bb7ebc11148a3f5148db0895",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\opening_hand_polish.py": "23268a6a4dc6e537a7482ce62f5410f274377ddf727ed226a0ef2254b76cbcd6",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\scripts\\run_opening_hand.py": "d18c73c41ab0d81c9ab56dcf0657bc199ac18db641f465b8db916a82be4b52f1",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\scripts\\deliver_opening_hand.py": "318a0e57c950b108e8693ff22c3bb1951b5e8b54040723daded287c35db698a6"
+  },
+  "quiet_phase_seconds": [
+    22.12,
+    22.9
+  ],
+  "user_motion_correction": "Until about22.90 only hands move; lowering begins afterwards. Reject previous1.11m opening displacement.",
+  "rejected_dynamic_candidate": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_motion_1103\\fitted\\result.npz",
+  "quiet_body_time_equality": {
+    "position_scale_m": 0.01,
+    "rotation_scale_deg": 1.0,
+    "interpretation": "Soft time-equality only during source-confirmed quiet phase; no fixed world location or later zero-velocity condition"
+  },
+  "body_timing_parameters": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\opening_timing_1103.npz",
+    "sha256": "b90bf7b42131905bd84e05cedf753e1af25eade5f70d88406d293d0a5292753e"
+  },
+  "hand_polish_seconds": [
+    22.12,
+    23.4
+  ],
+  "hand_polish_native_joints": [
+    17,
+    19,
+    21
+  ],
+  "arm_scope_verification": {
+    "schema": "rinkspace.opening-hand-scope.v1",
+    "P_exact": true,
+    "Q_exact": true,
+    "gear_exact": true,
+    "other_local_R_exact": true,
+    "after_hand_end_exact": true,
+    "passed": true
+  },
+  "hand_contact_patch_rest_y_m": [
+    -0.12,
+    0.28
+  ]
+}

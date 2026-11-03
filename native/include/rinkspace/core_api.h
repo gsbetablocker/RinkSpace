@@ -56,6 +56,19 @@ RS_API int rs_project_motion(const double* rig,size_t nr,const double* controls,
     double first_control_time,double control_dt,int image_height,
     const double* times,size_t nt,const double* xyz,size_t count,
     double* output,size_t no,int* point_status,size_t ns);
+/* Additive ABI2 capability. Uses the same certified predicted-row root as
+ * rs_project_motion. output[count,6] has the unchanged forward fields above;
+ * jacobian_xyz[count,2,3] is d(source UV)/d(world XYZ), row-major, including
+ * implicit camera row-time derivatives. A failed row keeps NaN in BOTH arrays.
+ * threads is a per-call positive CPU worker count, never a global OMP setting.
+ * OpenMP builds evaluate independent rows in parallel; other builds are serial
+ * and report that through rs_motion_projection_openmp_enabled(). */
+RS_API int rs_project_motion_xyz_jacobian(const double* rig,size_t nr,
+    const double* controls,size_t n_controls,double first_control_time,double control_dt,
+    int image_height,const double* times,size_t nt,const double* xyz,size_t count,
+    double* output,size_t no,double* jacobian_xyz,size_t njac,
+    int* point_status,size_t ns,int threads);
+RS_API int rs_motion_projection_openmp_enabled(void);
 RS_API int rs_sample_entity_path(const double* board,size_t nboard,int kind,
     const double* parameters,size_t nparameters,const double* vertices,size_t nvertices,
     const double* stations,size_t n,double* xyz,size_t nxyz,int* status,size_t nstatus);

@@ -6,7 +6,11 @@
 #include "rinkspace/camera_envelope.hpp"
 #include "rinkspace/scene_derivatives.hpp"
 #include "rinkspace/entities.hpp"
+#include "rinkspace/motion_derivatives.hpp"
 #include <limits>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 using namespace rinkspace;
 RS_API int rs_camera_joined_zoom_domain_version(void){return 1;}
@@ -244,6 +248,52 @@ int rs_project_motion(const double* rig,size_t nr,const double* controls,size_t 
     try{for(size_t i=0;i<count;++i){MotionProjection p{};status[i]=code(project_motion(physical,spline,height,load3(xyz+3*i),times[i],p));
         if(!status[i]){output[6*i]=p.uv.x;output[6*i+1]=p.uv.y;output[6*i+2]=p.depth;output[6*i+3]=p.row;output[6*i+4]=p.equality;output[6*i+5]=p.contraction;}}
     }catch(...){nan_out(output,no);return code(Status::invalid_argument);}return 0;
+}
+int rs_motion_projection_openmp_enabled(void){
+#ifdef _OPENMP
+    return 1;
+#else
+    return 0;
+#endif
+}
+int rs_project_motion_xyz_jacobian(const double* rig,size_t nr,
+    const double* controls,size_t n_controls,double first,double dt,int height,
+    const double* times,size_t nt,const double* xyz,size_t count,
+    double* output,size_t no,double* jacobian_xyz,size_t njac,int* status,size_t ns,int threads){
+    if((nr!=38&&nr!=43)||!rig||!finite_array(rig,nr)||
+        !motion_rig(rig,nr==43?rig+38:nullptr).valid()||height<2||threads<1||
+        !counts(count,6,no)||!counts(count,6,njac)||nt!=count||ns!=count||
+        count>static_cast<size_t>(std::numeric_limits<std::ptrdiff_t>::max())||
+        (count&&(!times||!xyz||!output||!jacobian_xyz||!status)))return code(Status::invalid_argument);
+    const MotionSpline spline{controls,n_controls,first,dt};
+    if(!spline.valid())return code(Status::invalid_argument);
+    const auto physical=motion_rig(rig,nr==43?rig+38:nullptr);
+    nan_out(output,no);nan_out(jacobian_xyz,njac);
+#ifdef _OPENMP
+    const int workers=static_cast<int>(std::min<size_t>(static_cast<size_t>(threads),count?count:1));
+    // Each point owns all scratch and output. No reductions, camera mutation,
+    // global thread-setting changes, or exceptions cross an OpenMP boundary.
+    #pragma omp parallel for schedule(static) num_threads(workers) if(workers>1 && !omp_in_parallel())
+#endif
+    for(std::ptrdiff_t row=0;row<static_cast<std::ptrdiff_t>(count);++row){
+        const size_t i=static_cast<size_t>(row);status[i]=code(Status::invalid_argument);
+        try{
+            const auto point=load3(xyz+3*i);MotionProjection root{};
+            auto st=project_motion(physical,spline,height,point,times[i],root);
+            double motion_jac[8],weights[4],spatial_jac[6];int cell=0;
+            if(st==Status::ok)st=motion_point_partials(physical,spline,height,point,{0.,0.,0.},
+                times[i],root,motion_jac,cell,weights);
+            if(st==Status::ok)st=motion_scene_partials(physical,spline,height,point,times[i],root,
+                motion_jac,spatial_jac);
+            status[i]=code(st);
+            if(st==Status::ok){
+                double* out=output+6*i;out[0]=root.uv.x;out[1]=root.uv.y;out[2]=root.depth;
+                out[3]=root.row;out[4]=root.equality;out[5]=root.contraction;
+                std::copy(spatial_jac,spatial_jac+6,jacobian_xyz+6*i);
+            }
+        }catch(...){status[i]=code(Status::invalid_argument);}
+    }
+    return 0;
 }
 int rs_curling_centres(const double* p,size_t np,size_t rows,double* xyz,size_t nxyz){
     if(!valid_curling(p,np)||!valid_rows(rows)||!xyz||!counts(rows,6,nxyz))return code(Status::invalid_argument);

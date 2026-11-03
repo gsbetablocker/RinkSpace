@@ -6,6 +6,7 @@ uniform ratio. This conversion is not a fit or an accuracy improvement.
 """
 from pathlib import Path
 import json
+import os
 import numpy as np
 from scipy.interpolate import BSpline
 from scipy.spatial.transform import Rotation, Slerp
@@ -105,7 +106,7 @@ class WindowState:
         return self.reference.world(reference,self.increments(x,t))
 
 
-def camera_binding(project,reference,record_path=None):
+def camera_binding(project,reference,record_path=None,*,native_library=None):
     """Use the selected frozen native camera, without re-running preparation."""
     from rinkspace.core.native import NativeCore
     from rinkspace.domain.multi_shot_motion import ShotMotionTimeline
@@ -122,7 +123,9 @@ def camera_binding(project,reference,record_path=None):
     p.update(rig=state['rig'][shot['camera_index']],controls=state['controls'],
         first_control_time=np.array(timeline.first),control_dt=np.array(timeline.dt),
         motion_times=timeline.exposure_time(shot,p['pts']))
-    library=record['native_library']['path'];projector=FixedNativeProjector(p,library)
+    recorded_library=record['native_library']['path']
+    library=str(native_library or os.environ.get('RINKSPACE_BODY_NATIVE_LIBRARY') or recorded_library)
+    projector=FixedNativeProjector(p,library)
     pose=projector.core.evaluate_motion_camera(p['rig'],p['controls'],timeline.first,timeline.dt,p['motion_times'])
     if pose['status'].any():raise ValueError('Current camera failed at a source midpoint')
     scale=estimate_uniform_scale(2*state['board'][:2])
@@ -132,4 +135,6 @@ def camera_binding(project,reference,record_path=None):
         length_export_ratio=scale/float(p['metres_per_scene_unit']),camera_changed_during_fit=False,
         source_time_base=[1,12800],old_reference_reprojected_on_current_camera=True,
         prepared=record['prepared'])
+    if str(library)!=str(recorded_library):
+        info.update(recorded_native_library=recorded_library,native_library_override=True)
     return projector,info,state,pose

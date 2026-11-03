@@ -7,6 +7,7 @@ import numpy as np
 import cv2
 from scipy.sparse import coo_matrix
 from .footwear_fit import sample_polyline
+from .footwear_layout import OBSERVATION_LAYOUT
 
 
 def nearest(points,line,closed=False):
@@ -44,8 +45,8 @@ def nearest_segment(points,vertices,edges):
     return distance,which,alpha[rows,which],unit
 
 
-def _boot_edge_rows(boot_edges,frame,foot):
-    """Local shell indices 0..13, keyed by (frame,foot) or nested by frame/foot."""
+def _boot_edge_rows(boot_edges,frame,foot,layout=OBSERVATION_LAYOUT):
+    """Local shell indices, keyed by (frame,foot) or nested by frame/foot."""
     from collections.abc import Mapping
     try:
         if isinstance(boot_edges,Mapping):
@@ -59,13 +60,13 @@ def _boot_edge_rows(boot_edges,frame,foot):
     edges=np.asarray(value)
     if edges.ndim!=2 or edges.shape[1]!=2 or not len(edges) or edges.dtype.kind not in 'iu':
         raise ValueError(f'No admissible explicit boot edges for observed frame={frame}, foot={foot}; no convex-hull fallback')
-    if np.any(edges<0) or np.any(edges>=14) or np.any(edges[:,0]==edges[:,1]):
-        raise ValueError('Boot edges must reference distinct local outer-shell vertices 0..13')
+    if np.any(edges<0) or np.any(edges>=layout.shell_count) or np.any(edges[:,0]==edges[:,1]):
+        raise ValueError(f'Boot edges must reference distinct local outer-shell vertices 0..{layout.shell_count-1}')
     return edges
 
 
-def pixel_factors(uv,problem,body=True,blade_side_candidates=True,boot_edges=None):
-    """uv=(N,113,2); return residual, dres/d(flat uv), parts, choices.
+def pixel_factors(uv,problem,body=True,blade_side_candidates=True,boot_edges=None,layout=OBSERVATION_LAYOUT):
+    """uv=(N,layout.point_count,2); return residual, dres/d(flat uv), parts, choices.
 
     boot_edges=None replays the historical projected convex hull. An explicit
     per-frame/foot edge set is mandatory once supplied; it never falls back to
@@ -82,25 +83,25 @@ def pixel_factors(uv,problem,body=True,blade_side_candidates=True,boot_edges=Non
         columns=np.asarray(columns,int);derivative=np.asarray(derivative,float)
         rr.extend(np.repeat(np.arange(offset,offset+len(value)),columns.shape[1]));cc.extend(columns.ravel());vv.extend(derivative.ravel());offset+=len(value)
     def curve(observed,fi,ids,scale,name,closed=False):
-        distance,k,a,u=nearest(observed,uv[fi,ids],closed);end=(k+1)%len(ids);pairs=np.stack((ids[k],ids[end]),1);columns=((fi*113+pairs[:,:,None])*2+np.arange(2)[None,None]).reshape(len(k),4)
+        distance,k,a,u=nearest(observed,uv[fi,ids],closed);end=(k+1)%len(ids);pairs=np.stack((ids[k],ids[end]),1);columns=((fi*layout.point_count+pairs[:,:,None])*2+np.arange(2)[None,None]).reshape(len(k),4)
         derivative=np.concatenate(((1-a[:,None])*u,a[:,None]*u),axis=1)/scale
         add(distance/scale,name,columns,derivative)
     for row in problem.visible_rows:
         if row.get('reverse_boundary',True):raise ValueError('Joint experiment requires explicitly partial source-only contours')
-        fi=row['frame'];base=row['foot']*48
+        fi=row['frame'];shell_ids=layout.footwear_landmarks(row['foot'],'shell')
         if boot_edges is None:
-            ids=np.arange(14)+base;h=cv2.convexHull(uv[fi,ids].astype(np.float32),returnPoints=False).ravel()
+            ids=shell_ids;h=cv2.convexHull(uv[fi,ids].astype(np.float32),returnPoints=False).ravel()
             curve(row['observed'],fi,ids[h],row['sigma_px']*np.sqrt(48),'visible_boot_edges',True)
         else:
-            edges=_boot_edge_rows(boot_edges,fi,row['foot'])+base
+            edges=shell_ids[_boot_edge_rows(boot_edges,fi,row['foot'],layout)]
             distance,k,alpha,unit=nearest_segment(row['observed'],uv[fi],edges)
-            pairs=edges[k];columns=((fi*113+pairs[:,:,None])*2+np.arange(2)[None,None]).reshape(len(k),4)
+            pairs=edges[k];columns=((fi*layout.point_count+pairs[:,:,None])*2+np.arange(2)[None,None]).reshape(len(k),4)
             scale=row['sigma_px']*np.sqrt(48)
             derivative=np.concatenate(((1-alpha[:,None])*unit,alpha[:,None]*unit),axis=1)/scale
             add(distance/scale,'visible_boot_edges',columns,derivative)
     for row in problem.blade_rows:
-        fi,foot=row['frame'],row['foot'];source=sample_polyline(row['uv'],24);candidates=[np.arange(14,31)+foot*48]
-        if blade_side_candidates:candidates.append(np.arange(31,48)+foot*48)
+        fi,foot=row['frame'],row['foot'];source=sample_polyline(row['uv'],24);candidates=[layout.footwear_landmarks(foot,'edge_negative_y')]
+        if blade_side_candidates:candidates.append(layout.footwear_landmarks(foot,'edge_positive_y'))
         best=min(range(len(candidates)),key=lambda i:float(np.sum(nearest(source,uv[fi,candidates[i]])[0]**2)));ids=candidates[best];choices.append(dict(pts=row['pts'],foot=foot,selected_candidate='blade_left' if best==0 else 'blade_right',source_side_confirmed=False))
         curve(source,fi,ids,row['sigma_px']*np.sqrt(24),'visible_blade_curves')
         if not row['partial']:
@@ -111,12 +112,12 @@ def pixel_factors(uv,problem,body=True,blade_side_candidates=True,boot_edges=Non
     for row in problem.landmark_rows:
         fi,foot=row['frame'],row['foot']
         # Finite outer-boot heel/toe lower edges; never bare-foot or bony ankle points.
-        for name,pair in [('heel',[0,7]),('toe',[1,8])]:
-            ids=np.asarray(pair)+foot*48;a,b=uv[fi,ids];v=b-a;point=np.asarray(row[name]);den=max(float(v@v),1e-16);raw=float((point-a)@v/den);alpha=np.clip(raw,0,1);q=a+alpha*v;Ja=(1-alpha)*np.eye(2);Jb=alpha*np.eye(2)
+        for name in ('heel','toe'):
+            ids=layout.footwear_landmarks(foot,name);a,b=uv[fi,ids];v=b-a;point=np.asarray(row[name]);den=max(float(v@v),1e-16);raw=float((point-a)@v/den);alpha=np.clip(raw,0,1);q=a+alpha*v;Ja=(1-alpha)*np.eye(2);Jb=alpha*np.eye(2)
             if 0<raw<1:
                 da=(-(point-a)+(2*alpha-1)*v)/den;db=((point-a)-2*alpha*v)/den;Ja+=np.outer(v,da);Jb+=np.outer(v,db)
-            columns=np.tile(((fi*113+ids[:,None])*2+np.arange(2)).ravel(),(2,1));derivative=np.c_[Ja,Jb]/row['sigma_px'];add((q-point)/row['sigma_px'],'boot_direction_endpoints',columns,derivative)
+            columns=np.tile(((fi*layout.point_count+ids[:,None])*2+np.arange(2)).ravel(),(2,1));derivative=np.c_[Ja,Jb]/row['sigma_px'];add((q-point)/row['sigma_px'],'boot_direction_endpoints',columns,derivative)
     if body:
         ids=problem.body_problem.indices;frames=problem.frames;qualified=problem.p['source_qualified'][frames][:,ids]&(~problem.body_problem.hold[frames,None])
-        fi,ki=np.nonzero(qualified);point_ids=ids[ki]+96;error=(uv[fi,point_ids]-problem.p['source_uv'][frames[fi],ids[ki]])/problem.body_problem.sig[ki,None];columns=((fi*113+point_ids)[:,None]*2+np.arange(2)).reshape(-1,1);weight=np.repeat(1/problem.body_problem.sig[ki],2)[:,None];add(error,'body_pixels',columns,weight)
+        fi,ki=np.nonzero(qualified);point_ids=layout.body_landmarks[ids[ki]];error=(uv[fi,point_ids]-problem.p['source_uv'][frames[fi],ids[ki]])/problem.body_problem.sig[ki,None];columns=((fi*layout.point_count+point_ids)[:,None]*2+np.arange(2)).reshape(-1,1);weight=np.repeat(1/problem.body_problem.sig[ki],2)[:,None];add(error,'body_pixels',columns,weight)
     vector=np.concatenate(residual) if residual else np.empty(0);A=coo_matrix((vv,(rr,cc)),shape=(len(vector),uv.size)).tocsr();return vector,A,parts,choices

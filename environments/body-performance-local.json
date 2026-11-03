@@ -1,0 +1,23 @@
+{
+  "schema": "rinkspace.body-performance-profile.v1",
+  "default_backend": "cpu",
+  "native_library": "runs/body_perf_1103/native_cpu/rinkspace_core.dll",
+  "cuda_path": "D:/Program Files/CUDA",
+  "cpu": {
+    "python_base": "project",
+    "python": ".venv/Scripts/python.exe",
+    "workers": 4,
+    "native_threads": 4
+  },
+  "cuda": {
+    "python_base": "data",
+    "python": "runtime_tools/vision_cuda/Scripts/python.exe",
+    "workers": 1,
+    "native_threads": 4,
+    "gpu_batch_size": 512,
+    "perturbation_batch": 4,
+    "max_batch_samples": 4096
+  },
+  "evidence": "runs/body_perf_1103/integration_summary.json",
+  "scope": "execution only; existing entry point owns observations, objective, state, bounds, checkpoints and stopping conditions"
+}

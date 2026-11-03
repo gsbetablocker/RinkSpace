@@ -1,0 +1,35 @@
+{
+  "schema": "rinkspace.user-handoff-source.v1",
+  "received_date": "2026-11-03",
+  "source_kind": "user_provided_reference_implementation",
+  "archive": {
+    "data_relative_path": "handoff/1103/skate_fix/RinkSpace_Body_Skate_Fix_20261103.zip",
+    "sha256": "8ef2f43e3fac392cbc0d8da1ddbcd34e06c77f95999a3146dcbcccb39601ee5b",
+    "publicly_redistributed": false
+  },
+  "members": [
+    {
+      "archive_member": "RinkSpace_Body_Skate_Fix_20261103/code/skate_template.py",
+      "sha256": "5a01a07640adaae32bc909a6c24e6267f69fcee8876956df1a4d1ebc76f8a4a5",
+      "integrated_path": "calibration/program_tracking/body_tracking/skate_template.py"
+    },
+    {
+      "archive_member": "RinkSpace_Body_Skate_Fix_20261103/code/skate_contact.py",
+      "sha256": "9b67433aed052d44c3171b574e38ce7d84b4b69f1387823f724766f0162437d6",
+      "integrated_path": "calibration/program_tracking/body_tracking/skate_contact.py"
+    },
+    {
+      "archive_member": "RinkSpace_Body_Skate_Fix_20261103/code/contact_feasibility.py",
+      "sha256": "a1aba5f32217c61fc5e286fd92fcb8054629f72e6fedcc02af4431d4aaf8b3bb",
+      "integrated_path": "calibration/program_tracking/body_tracking/contact_feasibility.py"
+    },
+    {
+      "archive_member": "RinkSpace_Body_Skate_Fix_20261103/code/test_skate_template.py",
+      "sha256": "f4c5c21f7afcd20d9df6157759ba3ea346282bd818cc67644761e8be4066c7dd",
+      "integrated_path": "tests/test_skate_template.py"
+    }
+  ],
+  "integration": "Reference implementations adapted to the shared body state, native camera projection and viewer; source member hashes identify the received bytes, not subsequent adaptations.",
+  "licensing": "No separate open-source licence supplied in the handoff. Provenance does not grant additional rights; project and third-party terms remain separately applicable.",
+  "geometry_status": "Brand-independent engineering starting point, not an athlete measurement or a product scan. Contact tolerances remain uncalibrated."
+}

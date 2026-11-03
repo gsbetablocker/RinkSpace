@@ -39,6 +39,13 @@ GVHMR 的 DPVO 子模块在历史盘点中为空，[固定安装说明](https://
 
 它针对项目现有 14 点鞋壳提供开放鞋口连接，交接包未附单独开源许可证、品牌 CAD、人体模型或预训练权重。来源登记不构成独立权利转让，不据研究文献链接认定复制了 FIND／SUPR 实现，也不为该文件推定 MIT 等许可；项目声明仍仅适用于作者实际享有权利的部分。
 
+<a id="skate-handoff"></a>
+### 通用下鞋与冰刀参考实现的用户交接来源
+
+`skate_template.py`、`skate_contact.py`、`contact_feasibility.py` 及模板测试来自用户提供的 `RinkSpace_Body_Skate_Fix_20261103.zip`，随后接入共同人体状态、原生投影及播放器。原包留在 `Data/handoff/1103/skate_fix/`；包与源成员 SHA、接入路径见[来源索引](../calibration/program_tracking/body_tracking/skate_handoff.provenance.json)。原始诊断脚本、交接文档和运行证据继续留 Data。
+
+该参考模板是通用工程初值，不是品牌扫描、选手鞋的实测模型或已经标定的接冰阈值。交接包未附单独开源许可证；来源登记不额外授予第三方权利，也不为交接实现推定 MIT 等许可。拟合参数与失败状态的公开范围见[参数核查](LICENSING_REVIEW.md#body-parameters)。
+
 ## 权重与小型数据
 
 | 资产 | 登记字节数 | 来源与限制 |

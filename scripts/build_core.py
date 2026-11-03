@@ -144,6 +144,7 @@ def main() -> int:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--cmake", help="Path to an already installed CMake")
     parser.add_argument("--cuda", action="store_true", help="Build the optional G1/G2 CUDA evaluator and linearization")
+    parser.add_argument("--openmp", action="store_true", help="Parallelize independent CPU body projection rows")
     parser.add_argument("--cudss", type=Path, help="Existing project-owned cuDSS root; enables one native LM candidate")
     parser.add_argument("--generator", help="Existing CMake generator, e.g. Ninja")
     parser.add_argument("--cuda-architectures", default="native", help="CMake CUDA architectures; default builds for the installed GPU")
@@ -174,6 +175,7 @@ def main() -> int:
         commands = [[cmake, "-S", str(project/"native"), "-B", str(output), "-DCMAKE_BUILD_TYPE=Release", "-DBUILD_TESTING=OFF"],
                     [cmake, "--build", str(output), "--config", "Release"]]
         commands[0].append("-DRINKSPACE_ENABLE_CUDA="+("ON" if args.cuda else "OFF"))
+        commands[0].append("-DRINKSPACE_ENABLE_OPENMP="+("ON" if args.openmp else "OFF"))
         commands[0].append("-DRINKSPACE_CUDSS_ROOT="+(str(args.cudss.resolve(strict=True)) if args.cudss else ""))
         if os.name == "nt":
             commands[0].append("-DCMAKE_TRY_COMPILE_CONFIGURATION=Release")
@@ -185,7 +187,7 @@ def main() -> int:
         expected = ("rinkspace_core.dll" if os.name == "nt" else
                     "librinkspace_core.dylib" if sys.platform == "darwin" else
                     "librinkspace_core.so")
-    elif not args.cuda and os.name != "nt" and sys.platform != "darwin" and shutil.which("g++"):
+    elif not args.cuda and not args.openmp and os.name != "nt" and sys.platform != "darwin" and shutil.which("g++"):
         expected = "librinkspace_core.so"
         commands = [[shutil.which("g++"), "-std=c++17", "-O2", "-Wall", "-Wextra", "-Wpedantic", "-fPIC", "-shared",
                      "-DRINKSPACE_CORE_BUILD", "-I"+str(project/"native/include"), str(project/"native/src/core_api.cpp"), "-o", str(output/expected)]]
@@ -213,7 +215,7 @@ def main() -> int:
         print(f"Expected exactly one {expected}; found {len(candidates)}. Check {log}", file=sys.stderr)
         return 2
     result = {"library": str(candidates[0].resolve()), "log": str(log), "cpu_core_built": True,
-              "cuda_built": args.cuda, "cuda_architectures": args.cuda_architectures if args.cuda else None, "cuda_fast_compile": args.cuda_fast_compile if args.cuda else None, "lm_candidate_implemented": bool(args.cudss), "nonlinear_solver_implemented": bool(args.cudss),
+              "openmp_requested": args.openmp, "cuda_built": args.cuda, "cuda_architectures": args.cuda_architectures if args.cuda else None, "cuda_fast_compile": args.cuda_fast_compile if args.cuda else None, "lm_candidate_implemented": bool(args.cudss), "nonlinear_solver_implemented": bool(args.cudss),
               "native_geometry_plan_implemented": bool(args.cuda), "persistent_resume_implemented": False, "toolchain": toolchain, "commands": commands}
     (output/"build.json").write_text(json.dumps(result, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
     print(json.dumps(result, ensure_ascii=False, indent=2))

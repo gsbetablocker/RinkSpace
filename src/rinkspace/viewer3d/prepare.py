@@ -26,6 +26,10 @@ class FullSurface:
         np.testing.assert_allclose(shape[ids],self.body.z['shapedirs'],rtol=1e-7,atol=1e-8)
         np.testing.assert_allclose(self.posedirs.reshape(486,-1,3)[:,ids],self.body.z['posedirs'].reshape(486,-1,3),rtol=1e-7,atol=1e-8)
         self.compact_vertex_ids=ids
+        # One immutable selected-vertex cache per surface; the usual foot
+        # subset replaces the one-off complete neutral surface without keeping
+        # a second full FP64 model resident.
+        self._sample_double_cache=None
 
     def forward(self,pose,delta,leg):
         result=self.body.forward(pose,delta,additional_rotations=extra_rotations(leg),with_frames=True)
@@ -54,17 +58,49 @@ class FullSurface:
             parent=self.body.parents[j];rot[:,j]=rot[:,parent]@local[:,j]
             position[:,j]=position[:,parent]+np.einsum('nij,j->ni',rot[:,parent],self.body.J[j]-self.body.J[parent])
         translation=position-np.einsum('njab,jb->nja',rot,self.body.J)
-        dtype=np.float64 if double_precision else np.float32
-        feature=(local[:,1:]-np.eye(3)).reshape(n,486).astype(dtype)
-        if vertex_ids is None:shaped,posedirs,weights=self.shaped,self.posedirs,self.weights
-        else:
-            ids=np.asarray(vertex_ids)
-            if ids.ndim!=1 or ids.dtype.kind not in 'iu' or np.any(ids<0) or np.any(ids>=len(self.shaped)):raise ValueError('Invalid SMPL-X vertex indices')
-            shaped=self.shaped[ids];posedirs=self.posedirs.reshape(486,-1,3)[:,ids].reshape(486,-1);weights=self.weights[ids]
+        ids=None if vertex_ids is None else np.asarray(vertex_ids)
+        if ids is not None and (ids.ndim!=1 or ids.dtype.kind not in 'iu' or np.any(ids<0) or np.any(ids>=len(self.shaped))):
+            raise ValueError('Invalid SMPL-X vertex indices')
         if double_precision:
-            shaped=shaped.astype(np.float64);posedirs=posedirs.astype(np.float64);weights=weights.astype(np.float64)
+            # Preserve order and duplicates in the exact selection key. The
+            # cache belongs to this model instance and length scale. Changing
+            # the model arrays/rotation owner invalidates it; these prepared
+            # model tensors are otherwise immutable during fitting.
+            ids_key=None if ids is None else (ids.dtype.str,ids.tobytes())
+            key=(id(self.body),self.body.scale,id(self.shaped),id(self.posedirs),id(self.weights),self.body.default.tobytes(),ids_key)
+            entry=getattr(self,'_sample_double_cache',None)
+            if entry is None or entry[0]!=key:
+                if ids is None:
+                    shaped=self.shaped.astype(np.float64)
+                    posedirs=self.posedirs.astype(np.float64)
+                    weights=self.weights.astype(np.float64)
+                else:
+                    shaped=self.shaped[ids].astype(np.float64)
+                    posedirs=self.posedirs.reshape(486,-1,3)[:,ids].reshape(486,-1).astype(np.float64)
+                    weights=self.weights[ids].astype(np.float64)
+                tail=(self.body.default-np.eye(3)).reshape(297)
+                shaped=shaped+(tail@posedirs[189:]).reshape(-1,3)
+                body_posedirs=np.ascontiguousarray(posedirs[:189])
+                weights_T=np.ascontiguousarray(weights.T)
+                for array in (shaped,body_posedirs,weights_T):array.setflags(write=False)
+                entry=(key,(shaped,body_posedirs,weights_T))
+                # Publish only a completed immutable entry. Concurrent first
+                # calls may duplicate preparation; they share no work buffer.
+                self._sample_double_cache=entry
+            shaped,body_posedirs,weights_T=entry[1]
+            feature=(local[:,1:22]-np.eye(3)).reshape(n,189)
+            posed=shaped+(feature@body_posedirs).reshape(n,-1,3)
+            blend_r=(rot.reshape(n,55,9).transpose(0,2,1)@weights_T).transpose(0,2,1).reshape(n,len(shaped),3,3)
+            blend_t=(translation.transpose(0,2,1)@weights_T).transpose(0,2,1)
+            vertices=np.einsum('nvab,nvb->nva',blend_r,posed)+blend_t
+            return (vertices-self.body.J[0])*self.body.scale
+        # Keep the existing display path and float32 operation order unchanged.
+        feature=(local[:,1:]-np.eye(3)).reshape(n,486).astype(np.float32)
+        if ids is None:shaped,posedirs,weights=self.shaped,self.posedirs,self.weights
+        else:
+            shaped=self.shaped[ids];posedirs=self.posedirs.reshape(486,-1,3)[:,ids].reshape(486,-1);weights=self.weights[ids]
         posed=shaped+(feature@posedirs).reshape(n,-1,3)
-        r=rot.astype(dtype);t=translation.astype(dtype)
+        r=rot.astype(np.float32);t=translation.astype(np.float32)
         blend_r=np.einsum('vj,njab->nvab',weights,r,optimize=True)
         blend_t=np.einsum('vj,nja->nva',weights,t,optimize=True)
         vertices=np.einsum('nvab,nvb->nva',blend_r,posed)+blend_t
@@ -144,9 +180,11 @@ def prepare_variant(catalog,variant,surface=None):
             cache_state['window_mask']=state['saved']['window_mask']
             cache_state.update(state['footwear'])
         np.savez_compressed(staging/'state.npz',**cache_state)
+        versioned_skate=fullbody and 'template_version' in state['footwear']
         dynamic_surface=fullbody and 'boot_surface' in state['footwear']
         equipment_description='saved fixed-topology boot surface with local dynamic upper; rigid lower-boot and blade attachment' if dynamic_surface else ('saved rigid 14-vertex shell and lower-edge strip' if fullbody or state['geometry'] is not None else 'original five-point blade proxy; no fitted boot shell in this old variant')
-        metadata=dict(schema='rinkspace.viewer-mesh-cache.v2',identity=identity,variant=v,frames=n,vertices_per_frame=len(surface.shaped),source_time_base=[1,12800],source_first_last_pts=[int(catalog.pts[0]),int(catalog.pts[-1])],world_up='Z',display_unit='metre',display_metres_per_scene_unit=catalog.scale,old_result_metres_per_scene_unit=catalog.legacy_scale,candidate_metres_per_scene_unit=state['metres_per_scene_unit'],body_length_ratio=state['length_ratio'],uniform_unit_reexpression_ratio=ratio,time_semantics='all body vertices, native joints and equipment evaluated at common source mid-exposure; rolling-shutter row samples are not mixed into a 3D pose',surface='full 10475-vertex SMPL-X model with effective local_R_mid' if fullbody else 'full 10475-vertex SMPL-X model with existing shared beta and pose corrections',equipment=equipment_description,source_result=str(catalog.result_path(v).resolve()),saved_coco_mid_maximum_reconstruction_error_m=max_saved_error,saved_native22_mid_maximum_reconstruction_error_m=max_native_error,full_vs_compact_coco_maximum_error_m=max_surface_error,saved_nominal_blade_minimum_maximum_error_m=max_blade_error,no_new_pose_or_root_fit=True,no_neural_inference=True,no_foot_lock_or_ground_snapping=True,accuracy_accepted=False,seconds=time.perf_counter()-start)
+        if versioned_skate:equipment_description='saved connected lower-skate solids, fixed-topology articulated upper and cavity, exact dual edges and contact witnesses; legacy landmarks are observation adapters only'
+        metadata=dict(schema='rinkspace.viewer-mesh-cache.v3',identity=identity,variant=v,frames=n,vertices_per_frame=len(surface.shaped),source_time_base=[1,12800],source_first_last_pts=[int(catalog.pts[0]),int(catalog.pts[-1])],world_up='Z',display_unit='metre',display_metres_per_scene_unit=catalog.scale,old_result_metres_per_scene_unit=catalog.legacy_scale,candidate_metres_per_scene_unit=state['metres_per_scene_unit'],body_length_ratio=state['length_ratio'],uniform_unit_reexpression_ratio=ratio,time_semantics='all body vertices, native joints and equipment evaluated at common source mid-exposure; rolling-shutter row samples are not mixed into a 3D pose',surface='full 10475-vertex SMPL-X model with effective local_R_mid' if fullbody else 'full 10475-vertex SMPL-X model with existing shared beta and pose corrections',equipment=equipment_description,source_result=str(catalog.result_path(v).resolve()),saved_coco_mid_maximum_reconstruction_error_m=max_saved_error,saved_native22_mid_maximum_reconstruction_error_m=max_native_error,full_vs_compact_coco_maximum_error_m=max_surface_error,saved_nominal_blade_minimum_maximum_error_m=max_blade_error,no_new_pose_or_root_fit=True,no_neural_inference=True,no_foot_lock_or_ground_snapping=True,accuracy_accepted=False,seconds=time.perf_counter()-start)
         if fullbody:
             footwear=state['footwear']
             if 'body_refinement_window_mask' in footwear:
@@ -163,8 +201,10 @@ def prepare_variant(catalog,variant,surface=None):
                 binding_frames=int(np.count_nonzero(footwear['footwear_binding_applied_mask']))
                 metadata.update(footwear_binding_applied_frames=binding_frames,
                                 footwear_binding_scope='shared across all S01 exposures' if binding_frames==n else 'saved application mask')
-            metadata['candidate_provenance']={k:value.tolist() for k,value in state['saved'].items() if ('reference' in k or 'ledger' in k) and value.dtype.kind in 'USbiuf'}
-            metadata['footwear_display']=dict(topology=v.get('shell_topology','saved' if 'boot_surface' in state['footwear'] else 'open_collar'),saved_dynamic_surface='boot_surface' in state['footwear'],retriangulated=False,coordinates_modified=False)
+            metadata['candidate_provenance']={k:value.tolist() for k,value in state['saved'].items() if ('reference' in k or 'ledger' in k) and k!='skate_reference_world_mid' and value.dtype.kind in 'USbiuf'}
+            metadata['footwear_display']=dict(topology='saved' if versioned_skate else v.get('shell_topology','saved' if dynamic_surface else 'open_collar'),saved_dynamic_surface=dynamic_surface or versioned_skate,retriangulated=False,coordinates_modified=False)
+            if versioned_skate:
+                metadata['footwear_display'].update(template_version=str(footwear['template_version']),binding_version=str(footwear['binding_version']),parameter_provenance=json.loads(str(footwear['parameter_provenance_json'])),contact_witness='moving minimum; not a material-point velocity',support_gap='eligible support-group minimum raw height; NaN means unknown',clearance='minimum height plus semantic allowed entry')
         (staging/'metadata.json').write_text(json.dumps(metadata,ensure_ascii=False,indent=2),encoding='utf8')
     assert staging.resolve().is_relative_to(catalog.cache_root.resolve()) and path.resolve().is_relative_to(catalog.cache_root.resolve())
     if path.exists():raise FileExistsError('Another cache preparation finished; preserve both paths')

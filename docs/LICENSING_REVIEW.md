@@ -33,9 +33,11 @@
 
 2026-11-03 逐字段核对 [body_fullbody_1102.npz](../events/ankara_2026/programmes/okada_mei_sp/body_fullbody_1102.npz)、[boot_integration_1102.npz](../events/ankara_2026/programmes/okada_mei_sp/boot_integration_1102.npz) 与 [opening_repair_1102.npz](../events/ankara_2026/programmes/okada_mei_sp/opening_repair_1102.npz)：公开内容为节目控制量、源时间、尺度、绑定和来源身份。足鞋绑定还含项目简化鞋壳／内腔拓扑及按本机模型筛选的足部顶点索引；开头参数含既有缓存姿态先验转换的局部旋转，以及本次拟合的初始值和修正量。
 
-这三份参数不含 SMPL-X 模板、形变基、蒙皮权重、人体面表或完整人体表面；`compact_smplx`、模型文件和完整表面缓存继续留在 Data。需要按原许可取得相应模型与本地输入才能重放，参数文件不替代这些依赖。[SMPL-X 官方模型条款](https://smpl-x.is.tue.mpg.de/modellicense.html)与代码包许可分别核对；当前网页不替代已安装版本附带的许可原文。该字段检查不认证第三方先验或所有数值输出可自由再分发、商用，也不将独立优化的控制值直接等同于上游附带的模型动画。
+同日补核 `opening_motion_1103`、`opening_timing_1103`、`opening_hand_1103`、`skate_contact_1103` 与 `skate_s01_1103` 五份 NPZ。[逐字段索引](../events/ankara_2026/programmes/okada_mei_sp/body_parameters_1103_fields.json)保留文件 SHA、字节数、字段名、dtype 和 shape；前三份包含控制向量、局部旋转与姿态先验、源 PTS／身份及少量顶点索引，后两份包含共享鞋形控制、连续修正层、结点、约束算法状态与绑定身份。
 
-开放鞋口参考实现的用户交接来源见[第三方资产记录](THIRD_PARTY_ASSETS.md#boot-handoff)。此次补充来源和分发边界，项目分项许可与第三方原条款保持不变。
+这八份参数不含 SMPL-X 模板、形变基、蒙皮权重、人体面表、完整人体表面或广播像素缓冲区；`compact_smplx`、模型文件和完整表面缓存继续留在 Data。需要按原许可取得相应模型与本地输入才能重放，参数文件不替代这些依赖。[SMPL-X 官方模型条款](https://smpl-x.is.tue.mpg.de/modellicense.html)与代码包许可分别核对；当前网页不替代已安装版本附带的许可原文。该字段检查不认证第三方先验或所有数值输出可自由再分发、商用，也不将独立优化的控制值直接等同于上游附带的模型动画。
+
+开放鞋口与通用下鞋／冰刀参考实现的用户交接来源见[第三方资产记录](THIRD_PARTY_ASSETS.md#boot-handoff)及[鞋刀交接记录](THIRD_PARTY_ASSETS.md#skate-handoff)。此次补充来源和分发边界，项目分项许可与第三方原条款保持不变。
 
 ## 比赛素材与数值观测
 

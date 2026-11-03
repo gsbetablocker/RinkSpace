@@ -120,6 +120,14 @@ def verify(config,output,project=None,data_root=None,variants=('ref1102','obs110
         report['window_class']=type(player.window).__module__+'.'+type(player.window).__name__
         check('standalone headless backend',player.window_type=='headless' and player.window.name=='headless')
         player._init_scene()
+        # export=True omits the GUI and cannot catch actual ImGui upload
+        # failures. Exercise the same overlay renderer as the native window.
+        player.on_render(0.,0.,export=False)
+        player.on_render(.02,.02,export=False)
+        usage=player.imgui.rinkspace_buffer_usage
+        check('actual GUI buffers fit rendered command lists',bool(usage) and all(
+            row['required_bytes']>0 and row['required_bytes']<=row['capacity_bytes'] for row in usage.values()),**usage)
+        report['gui_buffer_usage']=usage
         check('native source sequence and full surface',player.scene.n_frames==len(catalog.pts) and player.sequence.vertices.shape==(len(catalog.pts),10475,3))
         check('ordered source exposures',np.all(np.diff(catalog.pts)>0))
         if configured_comparison:
@@ -190,9 +198,17 @@ def verify(config,output,project=None,data_root=None,variants=('ref1102','obs110
                     check('referenced shoe normals finite and nonzero',np.isfinite(lengths).all() and np.all(lengths>0),variant=name,shoe=node.name)
                     details=dict(shoe=node.name,faces=len(faces),unused_vertices=np.setdiff1d(np.arange(len(points)),used).tolist(),minimum_used_normal_length=float(lengths.min()))
                     if boot_section==3:
-                        axis=points[7:].mean(axis=0)-points[:7].mean(axis=0)
-                        side=1 if float(axis@(player.scene.camera.position-points.mean(axis=0)))>=0 else 0
-                        same_side=(faces>=7).all(axis=1) if side else (faces<7).all(axis=1)
+                        if 'template_version' in state:
+                            foot=int(node.name.rsplit(' ',1)[-1])-1
+                            check('section uses saved upper vertices',np.allclose(points,state['skate_upper'][frame,foot],atol=1e-7),variant=name,shoe=node.name)
+                            axis=state['skate_R'][frame,foot,:,1]
+                            side=int(float(axis@(player.scene.camera.position-points.mean(axis=0)))>=0)
+                            removed=state['skate_upper_faces'][state['skate_upper_region_ids']==side]
+                            same_side=np.array([any(np.array_equal(face,row) for row in removed) for face in faces])
+                        else:
+                            axis=points[7:].mean(axis=0)-points[:7].mean(axis=0)
+                            side=1 if float(axis@(player.scene.camera.position-points.mean(axis=0)))>=0 else 0
+                            same_side=(faces>=7).all(axis=1) if side else (faces<7).all(axis=1)
                         check('section removes actual camera-facing side',not np.any(same_side),variant=name,shoe=node.name,removed_side=side)
                         details['removed_camera_side']=side
                     entries[-1]['boot_face_audit'].append(details)
@@ -266,7 +282,7 @@ def main():
     parser.add_argument('--variants',nargs='+',default=['ref1102','obs1102','full1102'])
     parser.add_argument('--seconds',nargs='+',type=float,default=[36.02,26.26])
     parser.add_argument('--wear-inspection',action='store_true')
-    parser.add_argument('--view',choices=['free','feet','feet_oblique','feet_side','side','end','top','rink'],default='free')
+    parser.add_argument('--view',choices=['free','feet','feet_oblique','feet_side','feet_end','side','end','top','rink'],default='free')
     parser.add_argument('--boot-section',type=int,choices=[0,1,2,3],default=0,help='0: full shell, 1/2: remove fixed side, 3: remove side facing observing camera')
     parser.add_argument('--inspection-layers',nargs='*',choices=['footbed','cavity','axes'],default=[],help='Independent optional diagnostic overlays; default is a clean physical comparison')
     parser.add_argument('--fit-comparison-bounds',action='store_true',help='Diagnostic orthographic camera fitting all selected candidates at the same source PTS; keeps the requested view direction')

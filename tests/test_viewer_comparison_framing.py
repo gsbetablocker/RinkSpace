@@ -151,3 +151,16 @@ def test_feet_normal_and_restored_views_do_not_apply_comparison_framing(tmp_path
     assert player.comparison_framing is None and calls==[]
     if view=='feet_oblique':assert player.scene.camera.ortho_size==.34
     else:assert not player.scene.camera.is_ortho
+
+
+@pytest.mark.parametrize('view,axis',[('feet_side',1),('feet_end',0)])
+def test_dense_skate_inspection_camera_uses_saved_template_frame_and_never_moves_mesh(tmp_path,view,axis):
+    player,sequences,_=app_fixture(tmp_path);state=player.sequence.state
+    lower=np.arange(2*24*3,dtype=float).reshape(1,2,24,3)/100
+    R=np.array([[0.,-1.,0.],[1.,0.,0.],[0.,0.,1.]])
+    state.update(skate_lower=lower.copy(),skate_R=np.broadcast_to(R,(1,2,3,3)).copy())
+    player.set_view(view)
+    center=lower[0].reshape(-1,3).mean(axis=0)
+    np.testing.assert_allclose(player.scene.camera.target,center)
+    np.testing.assert_allclose(player.scene.camera.position,center+R[:,axis]*.95+[0.,0.,.16])
+    np.testing.assert_array_equal(state['skate_lower'],lower)

@@ -42,6 +42,58 @@ def _faces(value,vertices,label):
     return value.astype(np.int32,copy=False)
 
 
+def _text_scalar(value,label):
+    value=np.asarray(value)
+    if value.shape!=() or value.dtype.kind!='U' or not str(value):raise ValueError('Invalid '+label)
+    return value
+
+
+def skate_state(saved,n,ratio):
+    """Read the versioned, already attached skate without another transform.
+
+    The legacy 48 landmarks remain observations only. All geometry and lengths
+    receive exactly the same display-unit reexpression as the saved body.
+    """
+    out={key:_text_scalar(saved[key],key) for key in ('template_version','binding_version','parameter_provenance_json')}
+    if not isinstance(json.loads(str(out['parameter_provenance_json'])),dict):raise ValueError('Invalid parameter provenance')
+    for part in ('lower','upper','cavity','footbed'):
+        source='skate_'+part+'_world_mid';points=np.asarray(saved[source])
+        if points.ndim!=4 or points.shape[:2]!=(n,2) or points.shape[2]<3 or points.shape[-1]!=3 or not np.isfinite(points).all():raise ValueError('Invalid '+source)
+        out['skate_'+part]=points*ratio
+        if part!='footbed':
+            key='skate_'+part+'_faces';faces=_faces(saved[key],points.shape[2],key)
+            if faces.ndim!=2 or not len(faces):raise ValueError('Invalid shared topology: '+key)
+            out[key]=faces
+    parts=np.asarray(saved['skate_lower_face_parts'])
+    if parts.shape!=(len(out['skate_lower_faces']),) or parts.dtype.kind!='U' or np.any(parts==''):raise ValueError('Invalid skate lower face parts')
+    out['skate_lower_face_parts']=parts
+    regions=np.asarray(saved['skate_upper_region_ids'])
+    if regions.shape!=(len(out['skate_upper_faces']),) or regions.dtype.kind not in 'iu' or np.any(~np.isin(regions,[0,1,2,3])):raise ValueError('Invalid skate upper regions')
+    out['skate_upper_region_ids']=regions
+    edge=np.asarray(saved['skate_edge_world_mid'])
+    if edge.ndim!=5 or edge.shape[:3]!=(n,2,2) or edge.shape[3]<2 or edge.shape[-1]!=3 or not np.isfinite(edge).all():raise ValueError('Invalid exact skate edges')
+    out['skate_edge']=edge*ratio
+    for part in ('witness','reference','origin'):
+        key='skate_'+part+'_world_mid'
+        out['skate_'+part]=_array(saved[key],(n,2,3),key)*ratio
+    out['skate_R']=_rotations(saved['skate_R_world_mid'],(n,2,3,3),'skate T_WB rotation')
+    out['skate_clearance_m']=_array(saved['skate_clearance_m_mid'],(n,2),'skate clearance')*ratio
+    gap=np.asarray(saved['skate_support_gap_m_mid'])
+    if gap.shape!=(n,) or np.isinf(gap).any():raise ValueError('Invalid skate support candidate height')
+    out['skate_support_gap_m']=gap*ratio
+    mode=np.asarray(saved['skate_contact_mode_mid'])
+    if mode.shape!=(n,2) or mode.dtype.kind!='U' or np.any(~np.isin(mode,['unknown','airborne','glide','pick'])):raise ValueError('Invalid skate contact mode')
+    out['skate_contact_mode']=mode
+    confidence=_array(saved['skate_contact_confidence_mid'],(n,2),'skate contact confidence')
+    if np.any((confidence<0)|(confidence>1)):raise ValueError('Invalid skate contact confidence')
+    out['skate_contact_confidence']=confidence
+    if 'skate_collar_boundary' in saved:
+        ids=np.asarray(saved['skate_collar_boundary'])
+        if ids.ndim!=1 or len(ids)<3 or ids.dtype.kind not in 'iu' or np.any(ids<0) or np.any(ids>=out['skate_upper'].shape[2]):raise ValueError('Invalid skate collar boundary')
+        out['skate_collar_boundary']=ids
+    return out
+
+
 def footwear_state(saved,n,ratio):
     """Validate/cache saved footwear, without evaluating or deforming it.
 
@@ -55,6 +107,9 @@ def footwear_state(saved,n,ratio):
             mask=np.asarray(saved[key])
             if mask.shape!=(n,) or mask.dtype.kind!='b':raise ValueError('Invalid '+key)
             out[key]=mask
+    if 'template_version' in saved:
+        out.update(skate_state(saved,n,ratio))
+        return out
     for source,target in [('boot_surface_world_mid','boot_surface'),('footbed_world_mid','footbed'),('cavity_world_mid','cavity'),('anchors_world_mid','anchors')]:
         if source not in saved:continue
         values=np.asarray(saved[source])
@@ -150,7 +205,7 @@ class ResultCatalog:
             paths=[self.root/'input.npz',self.root/'compact_smplx.npz',self.model_path,Path(__file__),Path(__file__).with_name('prepare.py'),self.project/'calibration/program_tracking/body_tracking/rebuild_body_geometry.py',self.project/'calibration/program_tracking/body_tracking/footwear_geometry.py']
             if hasattr(self,'scene_root'):paths.extend([self.scene_root/'review_scene.npz',self.scene_root/'review_scene.json',self.camera_path])
             if getattr(self,'metric_path',None):paths.append(self.metric_path)
-            self._common_fingerprint=dict(files={str(p):digest(p) for p in paths},display_metres_per_scene_unit=self.scale,time_semantics='common source mid-exposure',schema='rinkspace.viewer-mesh-cache.v2')
+            self._common_fingerprint=dict(files={str(p):digest(p) for p in paths},display_metres_per_scene_unit=self.scale,time_semantics='common source mid-exposure',schema='rinkspace.viewer-mesh-cache.v3')
         return self._common_fingerprint
 
     def source_identity(self):
@@ -173,6 +228,12 @@ class ResultCatalog:
         v=self.variant(variant) if isinstance(variant,str) else variant
         _,warning_identity=self.source_identity()
         identity=dict(common=self.common_fingerprint(),result=digest(self.result_path(v)),kind=v['kind'],source_identity_sha256=warning_identity)
+        # Versioned templates, attachment transforms, provenance and every
+        # saved render/contact array are content-bound by the result SHA. The
+        # viewer never evaluates an external template or binding dependency.
+        with np.load(self.result_path(v),allow_pickle=False) as saved:
+            if 'template_version' in saved:
+                identity['skate_versions']={key:str(_text_scalar(saved[key],key)) for key in ('template_version','binding_version')}
         if 'metres_per_scene_unit' in v:identity['candidate_metres_per_scene_unit']=v['metres_per_scene_unit']
         if 'shell_topology' in v:identity['shell_topology']=v['shell_topology']
         if 'base' in v:identity['base']=digest(self.root/v['base'])

@@ -2,11 +2,67 @@
 
 双击项目根目录的 [START_3D_RESULTS.cmd](../START_3D_RESULTS.cmd)。无需输入命令；打开的是独立三维窗口。
 
-第一次默认停在原片 **36.020 秒**，以后记住退出时的帧、结果版本和观察角度。窗口左边的下拉框可切换七份已保存的 S01 人体结果，切换时保持帧号和视角。
+第一次默认停在原片 **36.020 秒**，以后记住退出时的帧、结果版本和观察角度。窗口左边的下拉框可切换已保存的 S01 人体结果，切换时保持帧号和视角。
 
-## 2026-11-02 开头裁切修复
+## 2026-11-03 全S01连续候选：当前人工审核入口
 
-双击 [START_3D_COMPARISON.cmd](../START_3D_COMPARISON.cmd)，从原片 **22.120 秒**打开同一播放器。下拉框的“修复前：全身与冰鞋结果”和“修复后：开头站姿、位置与转身”保留相同源 PTS 和观察角度。该入口使用 `Fresh` 从开头进入，普通播放器入口仍可恢复原会话。
+[START_3D_COMPARISON.cmd](../START_3D_COMPARISON.cmd)以 `Fresh` 进入 `skate_s01_1103`，从原片 **22.12秒、side全身视角**开始，按50fps连续播放至44.96秒。整段1143曝光共用一条全69自由度的连续修正曲线，没有内部冻结窗口。`full1102`、`hand1103`及已封存的`skate1103`可同PTS比较。普通入口及用户会话保留；本轮后台检查不打开或控制桌面窗口。
+
+[本轮候选绑定](../events/ankara_2026/programmes/okada_mei_sp/skate_s01_1103.json)、[紧凑参数](../events/ankara_2026/programmes/okada_mei_sp/skate_s01_1103.npz)保存完整旧base和新的整段修正。实际计算于907.009秒预算出口停止，3个接受步，未加罚；随后只导出、复核并生成缓存。源50Hz最大非穿透违例89.549→7.705mm，鞋口单截面超出40.504→3.996mm，但26.22秒支持候选仍高于冰面32.113mm，43.86秒12.077mm。刀线P95 26.571→35.542px、开场静稳关节变化4.371°→12.460°也保留为失败。开场语义因子只继承了base状态，未在本次继续约束；零姿态成本初值下相对10%出口不适用。**候选没有通过PRO物理及开场保持验收。**
+
+`Data/runs/body_s01_20261029/skate_s01_1103/physical_overview.png`总览整段非穿透、明确支持曝光、generic foot内腔和鞋口截面；`postfit_audit.json`保留姿态回归。无窗口播放器388项检查通过，并逐一播放全部1143曝光，PTS无跳过或重复；这些只验证结果接线与回放。物理S01的20.02–22.12秒不在当前身体输入中，左右脚／刃身份和未审支撑曝光仍unknown。支持3mm上界及1mm余量仍未标定。
+
+## 较早鞋刀候选（保留对照）
+
+在同一入口选择 `skate1103`，可回看原片35.20秒的旧候选。左侧“同侧视角”“足鞋正视”和“鞋壳剖面”可检查足鞋；剖面可隐藏朝向观察相机的一侧。切换维持源PTS与观察角度。
+
+[候选绑定](../events/ankara_2026/programmes/okada_mei_sp/skate_contact_1103.json)、[紧凑参数](../events/ankara_2026/programmes/okada_mei_sp/skate_contact_1103.npz)连接已封存的第2轮外迭代、累计24个接受步；源检查点SHA256为 `08a414b1a2ca9874ca5c964235b3c74f1f4c77274b8c58228cb9966b250a6e4b`。旧求解的身体窗口为28.12–43.80秒，新共享鞋刀回放全部1143个源曝光。输入22.12–44.96秒不包含物理镜头20.02秒起的完整范围。
+
+此候选**已转人工审核，不再优化，未通过准确性验收**。核心2.5ms密检最大非穿透违例1.188411mm，全修正窗口最大1.658310mm；35.20秒支持候选高度4.142277mm，核心generic foot内腔最大越界0.894770mm。全S01源曝光最大非穿透约束违例89.548823mm（25.04秒），鞋口单截面最大超出40.504mm（25.54秒）；单截面不能认证三维穿戴。26.22／39.78／43.86秒支持候选高度为66.609／−2.165／37.076mm，物理左右脚仍未知。核心同源刀线中位数3.188→9.130px、P95 7.892→12.994px的退化已触发审核出口。3mm和1mm仍是未标定调试量。
+
+`Data/runs/body_s01_20261029/skate_contact_1103/`中的`validation.json`、`fit/candidate.json`、`parameter_replay.json`及`collar_gap.json`分别保存同源比较、停止候选、参数回放与鞋口限制。播放器实际side检查240项、81曝光50fps连续播放、内腔检查89项和正视检查通过；相关80项测试与2个子测试通过，均不替代物理或原片审核。
+
+整段曲线的实际运行和限制见上节。[预算策略](../events/ankara_2026/programmes/okada_mei_sp/skate_run_policy_1103.json)为900秒／8个接受步／1轮外迭代，禁止自动加罚；它不追溯应用于这份累计24个接受步的旧候选。相对质量出口只有在初值为正时可比较。
+
+## 2026-11-03 开头时序修复
+
+在[同一比较播放器](../START_3D_COMPARISON.cmd)切换 `hand1103`，可定位原片22.120秒检查“开场扶腰、22.90秒后下探与展开”。用户已明确纠正：基本到22.90秒只有手部动作，然后才下探。前一动态候选的下探过早和开头约一秒1.11米平移错误，已标作失败对照保留。新的静稳条件只覆盖22.12–22.90秒的躯干和腿，手臂和手腕继续动态；22.90秒后开放下探、起身和转动。最终右臂局部精修保持这份身体时序逐数组不变，手指仍为模型默认形状。
+
+[时序参数与证据](../events/ankara_2026/programmes/okada_mei_sp/opening_timing_1103.json)连接完整结果；`Data/runs/body_s01_20261029/opening_timing_1103/timing_report.json`单独报告22.12–22.90秒的平移、高度和角度变化，并与两份失败候选使用相同源PTS比较。源图与三维检查图只辅助定位错误，屏外下肢、深度和接触仍按证据范围解释。
+
+[最终右臂与时序绑定](../events/ankara_2026/programmes/okada_mei_sp/opening_hand_1103.json)保存 `hand1103`，运行产物在上述时序目录的`hand_polish/`。静稳段XY跨度6.07cm、高度下降1.26cm，下探最低点23.26秒；残留腕点偏差、穿冰和离冰见节目记录。该版本会同时加载时序紧凑参数和右臂紧凑参数。
+
+复用已保存的时序拟合，导出、审阅并更新同一播放器：
+
+```powershell
+& 'D:\OneDrive\codex_projs\RinkSpace\.venv\Scripts\python.exe' -I -B -X utf8 'D:\OneDrive\codex_projs\RinkSpace\scripts\run_opening_timing.py' --root 'D:\CodexData\RinkSpace_Data\runs\body_s01_20261029' --output 'D:\CodexData\RinkSpace_Data\runs\body_s01_20261029\opening_timing_1103' --stage export
+& 'D:\OneDrive\codex_projs\RinkSpace\.venv\Scripts\python.exe' -I -B -X utf8 'D:\OneDrive\codex_projs\RinkSpace\scripts\review_opening_timing.py' --root 'D:\CodexData\RinkSpace_Data\runs\body_s01_20261029' --output 'D:\CodexData\RinkSpace_Data\runs\body_s01_20261029\opening_timing_1103'
+& 'D:\OneDrive\codex_projs\RinkSpace\.venv\Scripts\python.exe' -I -B -X utf8 'D:\OneDrive\codex_projs\RinkSpace\scripts\deliver_opening_timing.py' --root 'D:\CodexData\RinkSpace_Data\runs\body_s01_20261029' --output 'D:\CodexData\RinkSpace_Data\runs\body_s01_20261029\opening_timing_1103'
+& 'D:\OneDrive\codex_projs\RinkSpace\.venv\Scripts\python.exe' -I -B -X utf8 'D:\OneDrive\codex_projs\RinkSpace\scripts\run_opening_hand.py' --root 'D:\CodexData\RinkSpace_Data\runs\body_s01_20261029' --output 'D:\CodexData\RinkSpace_Data\runs\body_s01_20261029\opening_timing_1103\hand_polish' --stage export
+& 'D:\OneDrive\codex_projs\RinkSpace\.venv\Scripts\python.exe' -I -B -X utf8 'D:\OneDrive\codex_projs\RinkSpace\scripts\review_opening_timing.py' --root 'D:\CodexData\RinkSpace_Data\runs\body_s01_20261029' --output 'D:\CodexData\RinkSpace_Data\runs\body_s01_20261029\opening_timing_1103\hand_polish'
+& 'D:\OneDrive\codex_projs\RinkSpace\.venv\Scripts\python.exe' -I -B -X utf8 'D:\OneDrive\codex_projs\RinkSpace\scripts\deliver_opening_hand.py' --root 'D:\CodexData\RinkSpace_Data\runs\body_s01_20261029' --output 'D:\CodexData\RinkSpace_Data\runs\body_s01_20261029\opening_timing_1103\hand_polish'
+```
+
+主日志是该目录`fit_progress.jsonl`。静态源图入口仍用下节的`review_opening_motion_visuals.py`，增加`--source-dir <opening_motion_1103目录>`复用既有源图，避免复制或重新解码素材。
+
+## 2026-11-03 动态修复失败历史
+
+该历史结果现标为“失败候选：下探过早与开头1.11米平移”，与“旧版：固定姿态与近静止条件（失败对照）”均可在同一播放器切换。历史窗口22.12–25.00秒，共145个曝光；骨盆实际平移和竖直速度自由，右手扶腰关系在23.10–23.40秒释放，25秒处连续接回足鞋父版。
+
+结果、完整源图对照与剩余失败见[本轮绑定](../events/ankara_2026/programmes/okada_mei_sp/opening_motion_1103.json)。Data中的 `motion_report.json`、`hand_waist_report.json`、`source_motion_comparison.png` 和 `motion_curves.png` 分别保留同一观测分母、手腰模型距离、源图投影和逐曝光动作变化。屏外腿部及手指仍有推断；显示程序不宣告接触或准确性通过。
+
+复用已有拟合结果导出，再核验OneDrive参数并更新同一播放器缓存：
+
+```powershell
+& 'D:\OneDrive\codex_projs\RinkSpace\.venv\Scripts\python.exe' -I -B -X utf8 'D:\OneDrive\codex_projs\RinkSpace\scripts\run_opening_motion.py' --root 'D:\CodexData\RinkSpace_Data\runs\body_s01_20261029' --output 'D:\CodexData\RinkSpace_Data\runs\body_s01_20261029\opening_motion_1103' --stage export
+& 'D:\OneDrive\codex_projs\RinkSpace\.venv\Scripts\python.exe' -I -B -X utf8 'D:\OneDrive\codex_projs\RinkSpace\scripts\deliver_opening_motion.py' --root 'D:\CodexData\RinkSpace_Data\runs\body_s01_20261029' --output 'D:\CodexData\RinkSpace_Data\runs\body_s01_20261029\opening_motion_1103'
+```
+
+`--stage run`用于缺失拟合时的实际求解；主日志是该目录 `fit_progress.jsonl`。静态图入口 `scripts/review_opening_motion_visuals.py --root <同上> --output <同上>`使用已有源图片和保存结果，在现有 `Data/runtime_tools/vision_cuda` 绘图环境运行。它不解码或生成视频。
+
+## 2026-11-02 开头裁切修复历史
+
+该历史开头结果现标为“旧版：固定姿态与近静止条件（失败对照）”，可在同一播放器切换并保持源PTS与观察角度。[START_3D_COMPARISON.cmd](../START_3D_COMPARISON.cmd)当前以 `Fresh` 从22.12秒进入全S01候选；开头时序和右臂版本保留，普通播放器入口仍可恢复原会话。
 
 修复覆盖 **22.12–25.00 秒、145 个曝光**；前 **22.12–24.44 秒、117 个曝光**使用近原地转身条件，末段连续衔接父版。原片 **19.960 秒**准备画面作为辅助曝光：复用 `secondary_long_side` 的冻结安装和完整光学模型，只求这一帧的 pan、tilt、log(f)，把实际 native 几何投回源图。MEIWA 蓝绿条参与该帧相机拟合，两条冰面线另行检查；B2 与 F2–R2 的交点和可见交叉腿姿势用于开头初始化及软约束。身体、下鞋和刀具继续由同一状态求值，原始屏外下肢观测没有补造。
 
@@ -58,7 +114,7 @@
 
 ## 2026-11-02 全身短段对照
 
-双击 [START_3D_COMPARISON.cmd](../START_3D_COMPARISON.cmd)，使用同一个播放器加载[本轮绑定](../events/ankara_2026/programmes/okada_mei_sp/viewer3d_fullbody_1102.json)；当前默认从开头22.120秒进入，可定位到36.020秒检查上一轮短段。下拉框保留原 J1、修订观测后的旧根／腿自由度、全身与根朝向候选，以及历史 B5／J2 参考；切换保持源 PTS 和视角。
+双击 [START_3D_COMPARISON.cmd](../START_3D_COMPARISON.cmd)，使用同一个播放器加载[本轮绑定](../events/ankara_2026/programmes/okada_mei_sp/viewer3d_fullbody_1102.json)；当前默认从22.12秒进入全S01连续候选，可切回全身短段并定位36.020秒。下拉框保留原 J1、修订观测后的旧根／腿自由度、全身与根朝向候选，以及历史 B5／J2 参考；切换保持源 PTS 和视角。
 
 本轮三组共同冻结 `camera_solver_refined_1102` 的 native 冰场与相机，条件尺度为 59.96169706678219 米／场景单位。人体表面、骨架和鞋刀共用唯一全身状态；曝光中点几何与滚动快门逐行投影分别保存。场景尺度换算不是拟合改善。
 
@@ -105,7 +161,7 @@
 
 ## 打开的究竟是哪份结果
 
-默认结果为 **J1_s2：根位置与腿姿态联合**。另有 J2_s2（同时调整鞋尺寸）、J0_s2_footinit（根固定只修腿）、旧 B5、旧 B、旧 C、旧 A。准确性均未验收；这个播放器提供可检查的三维解释，不提高结果本身的精度。
+普通 `START_3D_RESULTS.cmd` 的原配置默认结果为 **J1_s2：根位置与腿姿态联合**，另有 J2_s2（同时调整鞋尺寸）、J0_s2_footinit（根固定只修腿）、旧 B5、旧 B、旧 C、旧 A。比较入口当前默认是 `skate_s01_1103`，并保留 `skate1103`、`hand1103`。准确性均未验收；播放器提供可检查的三维解释，不提高结果本身的精度。
 
 冰场读取所选人体结果配套的冻结 review_scene。其他场景或拟合状态的更新不会自动改变这份结果；切换到新结果需要在节目绑定中登记对应的参数、场景和源时间。
 

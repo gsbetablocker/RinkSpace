@@ -9,6 +9,7 @@ from rinkspace.viewer3d.prepare import FullSurface
 from .footwear_binding import FootwearBinding,IntegratedBodyState
 from .footwear_observations import visible_shell_edges,audit_observation_semantics
 from .footwear_pixel_factors import pixel_factors
+from .footwear_layout import OBSERVATION_LAYOUT
 from .fullbody_fit import FullBodyProblem,footwear_rows
 from .fullbody_state import camera_binding
 from .fullbody_round import write_json
@@ -17,12 +18,20 @@ from .rebuild_exposure_body import moving_projection
 from .boot_delivery import check_inputs,deliver
 
 
-def edges_for(world,frames,camera,binding):
+def camera_centres(camera,frames):
+    """Frozen-camera data, shared by all footwear trials in one problem."""
     pose=camera.core.evaluate_motion_camera(camera.p['rig'],camera.p['controls'],float(camera.p['first_control_time']),
         float(camera.p['control_dt']),camera.p['motion_times'][frames])
-    centre=pose['centre']*camera.scale
-    return {(i,f):visible_shell_edges(world[i,f*48:f*48+14],binding.faces,centre[i])
-            for i in range(len(frames)) for f in (0,1)}
+    if np.any(pose['status']):raise ValueError('Native camera failed at a footwear source midpoint')
+    return pose['centre']*camera.scale
+
+
+def edges_for(world,frames,camera,binding,*,centres=None):
+    centre=camera_centres(camera,frames) if centres is None else centres
+    layout=getattr(binding,'layout',OBSERVATION_LAYOUT)
+    faces=getattr(binding,'adapter_faces',binding.faces)
+    return {(i,f):visible_shell_edges(world[i,layout.footwear_landmarks(f,'shell')],faces,centre[i])
+            for i in range(len(frames)) for f in range(len(layout.sides))}
 
 
 def save_baseline_diagnostics(reference,binding,info,output):
@@ -53,6 +62,7 @@ class Registration:
         wanted=sorted({r['pts'] for r in allgear.landmark_rows+allgear.blade_rows}|{336128,421888,461056,489216,521728})
         wanted=[p for p in wanted if not any(a-1e-9<=p/12800<=b+1e-9 for a,b in exclude_windows)]
         self.frames=np.asarray([int(np.searchsorted(reference.p['pts'],p)) for p in wanted])
+        self.camera_centres=camera_centres(camera,self.frames)
         self.gear,self.sources=footwear_rows(reference.root,self.frames,reference.p['pts'])
         t=reference.times[self.frames]
         self.times=(t[:,None]+np.linspace(-.5,.5,5)*float(camera.p['rig'][37])).ravel()
@@ -68,7 +78,7 @@ class Registration:
         gear=b.evaluate(s['P'],s['Q'],self.local,s['frames'],x=x)
         W=np.concatenate((gear['gear'].reshape(-1,96,3),s['coco']),1).reshape(len(self.frames),5,113,3)
         uv=moving_projection(self.camera,W,self.frames)['uv']
-        edge=edges_for(W[:,2],self.frames,self.camera,b)
+        edge=edges_for(W[:,2],self.frames,self.camera,b,centres=self.camera_centres)
         pixels,_,parts,_=pixel_factors(uv,self.gear,body=False,boot_edges=edge)
         neutral=b.compatibility_rows(b.neutral_native,b.neutral_frames,b.neutral_samples,x=x).ravel()*2
         dynamic=b.compatibility_rows(self.local[self.mid],s['frames'][self.mid],self.samples,x=x).ravel()/np.sqrt(len(self.frames))*2
@@ -103,12 +113,57 @@ class BootWindowProblem(FullBodyProblem):
         super().__init__(reference,camera,ledger,seconds,'full',log)
         self.binding=reference.binding;self.mid_times=reference.times[self.frames]
         self.mid_ref=reference.at(self.mid_times);self.binding_key=None
+        self.camera_centres=camera_centres(camera,self.frames)
 
     def visible_boot_edges(self,world):
-        return edges_for(world,self.frames,self.projector,self.binding)
+        return edges_for(world,self.frames,self.projector,self.binding,centres=self.camera_centres)
+
+    def prepare_registration_replay(self,x,value):
+        """Keep only body quantities invariant to the 14 shared shoe columns.
+
+        This packet is local to one JointBootProblem linearization. In
+        particular it is never reused after body controls/reference/camera or
+        observation data change. Subclasses with additional residuals use the
+        ordinary evaluator until they explicitly supply an equivalent replay.
+        """
+        if type(self) is not BootWindowProblem:return None
+        s=value['world']
+        local=np.einsum('nji,nkj->nki',s['Q'],s['native']-s['P'][:,None])
+        midpoint=np.arange(self.n)*5+2
+        samples=self.binding.surface.sample_vertices(local[midpoint],s['frames'][midpoint],
+            self.binding.sample_ids,double_precision=True)
+        return dict(state=s,local=local,midpoint=midpoint,samples=samples,
+            priors=[matrix@x for _,matrix in self.prior_matrices],rows=len(value['residual']))
+
+    def registration_residual_from_replay(self,shared,packet):
+        """Re-evaluate every shoe-dependent term without another body LBS.
+
+        Shoe deformation, row-time projection, visible edges, nearest finite
+        segments, blade side selection and cavity/support all remain live.
+        The complete selected projection batch is retained, so stopping the
+        implicit-row iteration has the same numerical semantics as evaluate.
+        No shared binding state or another window's cache is mutated here.
+        """
+        s=packet['state'];local=packet['local'];mid=packet['midpoint']
+        gear=self.binding.evaluate(s['P'],s['Q'],local,s['frames'],x=shared)
+        W=np.concatenate((gear['gear'].reshape(-1,96,3),s['coco']),axis=1).reshape(self.n,5,113,3)
+        nodes=W[self.fi,:,self.pi][:,:,None]
+        proj=moving_projection(self.projector,nodes,self.frames[self.fi],jacobian=False)
+        uv=np.full((self.n,113,2),np.nan);uv[self.fi,self.pi]=proj['uv'][:,0]
+        body,_,_,_=self.body_factors(uv)
+        if self.gear.visible_rows or self.gear.blade_rows or self.gear.landmark_rows:
+            footwear,_,_,_=pixel_factors(uv,self.gear,body=False,blade_side_candidates=True,
+                boot_edges=self.visible_boot_edges(W[:,2]))
+        else:footwear=np.empty(0)
+        extra=self.binding.compatibility_rows(local[mid],s['frames'][mid],packet['samples'],x=shared)/np.sqrt(2)
+        residual=np.concatenate([body,footwear,*packet['priors'],extra.ravel()])
+        if len(residual)!=packet['rows']:raise ValueError('Shared registration replay changed residual layout')
+        return residual
 
     def compatibility(self,delta):
-        s=self.reference.world(self.mid_ref,delta)
+        return self.compatibility_from_state(self.reference.world(self.mid_ref,delta))
+
+    def compatibility_from_state(self,s):
         j=np.einsum('nji,nkj->nki',s['Q'],s['native']-s['P'][:,None])
         return self.binding.compatibility_rows(j,s['frames'])/np.sqrt(2)
 
@@ -119,11 +174,12 @@ class BootWindowProblem(FullBodyProblem):
         if base.get('foot_compatibility_added'):return base
         d=self.state.increments(x,self.mid_times);extra=self.compatibility(d);rows=extra.size;blocks=[]
         if jacobian:
-            derivatives=[];h=1e-5
-            for active in self.state.active:
-                if active<6:derivatives.append(np.zeros_like(extra));continue
-                a=d.copy();b=d.copy();a[:,active]+=h;b[:,active]-=h
-                derivatives.append((self.compatibility(a)-self.compatibility(b))/(2*h))
+            start=time.perf_counter();columns=self.state.active[self.state.active>=6]
+            values=self.execution.state_differences(self.reference,self.mid_ref,d,columns,
+                self.compatibility_from_state,step=1e-5)
+            physical=dict(zip(map(int,columns),values))
+            derivatives=[np.zeros_like(extra) if active<6 else physical[int(active)] for active in self.state.active]
+            base['phases']['compatibility_derivatives_seconds']=time.perf_counter()-start
             local=np.stack(derivatives,-1);B=self.state.basis(self.mid_times)
             rr=[];cc=[];vv=[];fr,kn=np.nonzero(B)
             val=local[fr]*B[fr,kn,None,None]
@@ -150,24 +206,35 @@ class JointBootProblem:
     def evaluate(self,x,jacobian=False):
         if self.cached_x is not None and np.array_equal(x,self.cached_x) and (not jacobian or self.cached['jac'] is not None):return self.cached
         self.binding.x=x[:14].copy();static=self.registration.residual(x[:14]);parts=dict(registration=self.registration.last_parts)
-        values=[];localJ=[]
+        values=[];localJ=[];replay=[]
         for i,w in enumerate(self.windows):
             v=w.evaluate(x[self.offsets[i]:self.offsets[i+1]],jacobian);values.append(v['residual']);parts[f'window_{i+1}']=v['parts'].copy()
-            if jacobian:localJ.append(v['jac'])
+            if jacobian:
+                localJ.append(v['jac'])
+                replay.append(w.prepare_registration_replay(x[self.offsets[i]:self.offsets[i+1]],v)
+                    if hasattr(w,'prepare_registration_replay') else None)
         residual=np.r_[static,*values];J=None
         if jacobian:
             # Only 14 newly shared registration/size variables are differenced
             # as global columns. Body columns reuse local FK/exposure chains.
             cols=[];h=1e-6
-            for k in range(14):
-                side=[]
-                for sign in (1,-1):
-                    y=x[:14].copy();y[k]+=sign*h;self.binding.x=y
-                    rs=[self.registration.residual(y)]
-                    for i,w in enumerate(self.windows):rs.append(w.evaluate(x[self.offsets[i]:self.offsets[i+1]],False)['residual'])
-                    side.append(np.concatenate(rs))
-                cols.append((side[0]-side[1])/(2*h))
-            self.binding.x=x[:14].copy()
+            try:
+                for k in range(14):
+                    side=[]
+                    for sign in (1,-1):
+                        y=x[:14].copy();y[k]+=sign*h
+                        rs=[self.registration.residual(y)]
+                        for i,w in enumerate(self.windows):
+                            if replay[i] is not None:
+                                rs.append(w.registration_residual_from_replay(y,replay[i]))
+                            else:
+                                # Preserve arbitrary existing window variants.
+                                self.binding.x=y
+                                rs.append(w.evaluate(x[self.offsets[i]:self.offsets[i+1]],False)['residual'])
+                        side.append(np.concatenate(rs))
+                    cols.append((side[0]-side[1])/(2*h))
+            finally:
+                self.binding.x=x[:14].copy()
             bodyJ=vstack([csr_matrix((len(static),sum(self.sizes))),block_diag(localJ,format='csr')],format='csr')
             J=hstack((csr_matrix(np.stack(cols,1)),bodyJ),format='csr');J.eliminate_zeros()
         self.calls+=1

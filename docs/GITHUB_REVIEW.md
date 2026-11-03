@@ -15,7 +15,7 @@
 
 公开前核对实际依赖，移出重复资产和可再生中间文件，并同步核对代码与测试引用。原始 UV、整数 PTS、统计 W、人工确认和失败证据保留在对应数值记录或归档中。原件 SHA 与[公开派生身份](../configs/privacy_derivatives.json)分别描述各自字节，不能互换。整理资产不授权提交、推送或改写历史。
 
-S01 全身、足鞋和开头修复的公开范围为实现源码、测试、播放器配置、三份小型控制参数及其来源／失败索引；详见[节目记录](../events/ankara_2026/programmes/okada_mei_sp/README.md)和[参数许可核查](LICENSING_REVIEW.md#body-parameters)。完整拟合输出、SMPL-X 紧凑模型与完整表面、原图及叠图仍位于 `Data/runs/body_s01_20261029/` 和 `Data/cache/results3d/`，不随这些参数包发布。绑定里的历史绝对路径记录当时运行身份，重放需使用本机 Data 配置及相符输入。
+S01 全身、足鞋和开头修复的公开范围为实现源码、测试、播放器配置、三份 1102 与五份 1103 小型控制参数及其来源／失败索引；详见[节目记录](../events/ankara_2026/programmes/okada_mei_sp/README.md)、[新增参数字段索引](../events/ankara_2026/programmes/okada_mei_sp/body_parameters_1103_fields.json)和[参数许可核查](LICENSING_REVIEW.md#body-parameters)。完整拟合输出、SMPL-X 紧凑模型与完整表面、原图及叠图仍位于 `Data/runs/body_s01_20261029/` 和 `Data/cache/results3d/`，不随这些参数包发布。绑定里的历史绝对路径记录当时运行身份，重放需使用本机 Data 配置及相符输入。`skate_s01_1103` 保留预算停止、接冰未通过、鞋刀图像尾部误差变差及开头姿态回退的结论；公开参数不表示候选通过准确性验收。
 
 ## 当前模型与数值来源
 

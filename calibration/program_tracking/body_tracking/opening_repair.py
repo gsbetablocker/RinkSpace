@@ -103,7 +103,10 @@ class OpeningProblem(FullBodyProblem):
     def visible_boot_edges(self,world):return edges_for(world,self.frames,self.projector,self.reference.binding)
 
     def physical_rows(self,delta):
-        s=self.reference.world(self.mid_ref,delta);torso=s['native'][:,12]-s['native'][:,0]
+        return self.physical_rows_from_state(self.reference.world(self.mid_ref,delta))
+
+    def physical_rows_from_state(self,s):
+        torso=s['native'][:,12]-s['native'][:,0]
         torso/=np.linalg.norm(torso,axis=1)[:,None]
         # A coarse standing condition from the user's observed opening; no
         # individual blade station/physical left-right identity is declared.
@@ -122,10 +125,10 @@ class OpeningProblem(FullBodyProblem):
         velocity=(self.reference_velocity+self.state.basis(self.mid_times,1)@x.reshape(self.state.m,self.state.d)[:,:3])
         velocity=velocity/self.velocity_scale*self.standing[:,None]/np.sqrt(2)
         if jacobian:
-            h=1e-5;columns=[]
-            for active in self.state.active:
-                a=d.copy();b=d.copy();a[:,active]+=h;b[:,active]-=h
-                columns.append((self.physical_rows(a)-self.physical_rows(b))/(2*h))
+            start=time.perf_counter()
+            columns=self.execution.state_differences(self.reference,self.mid_ref,d,self.state.active,
+                self.physical_rows_from_state,step=1e-5)
+            base['phases']['opening_derivatives_seconds']=time.perf_counter()-start
             local=np.stack(columns,-1);B=self.state.basis(self.mid_times);fr,kn=np.nonzero(B)
             val=local[fr]*B[fr,kn,None,None]
             rr=np.broadcast_to(fr[:,None,None]*physical.shape[1]+np.arange(physical.shape[1])[None,:,None],val.shape).ravel()

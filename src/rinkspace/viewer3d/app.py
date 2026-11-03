@@ -13,6 +13,7 @@ from aitviewer.renderables.skeletons import Skeletons
 from aitviewer.renderables.spheres import Spheres
 from .data import ResultCatalog, CachedSequence, shell_triangles, ribbon_triangles, simplify_curve
 from .framing import fit_comparison_camera
+from .imgui_buffers import install_dynamic_buffers
 
 
 class FrameObserver(Node):
@@ -32,6 +33,7 @@ class ResultsPlayer(Viewer):
             background_color=[.12, .15, .19, 1.], font_size=16,
             export_dir=str(catalog.session_root)))
         super().__init__(title='RinkSpace 三维结果播放器 · S01', size=size)
+        install_dynamic_buffers(self.imgui)
         # pyimgui retains filename bytes on this IO wrapper.
         self._imgui_io = imgui.get_io()
         self._imgui_io.ini_file_name = str(catalog.session_root / 'imgui.ini')
@@ -56,7 +58,8 @@ class ResultsPlayer(Viewer):
         self.ice_alpha = .48
         self.visible = dict(surface=True, skeleton=True, shoes=True, trajectory=True, pelvis=True,
                             rink_lines=True, boards=True, ice=True, wear=False,
-                            footbed=False, cavity=False, axes=False, collar=False)
+                            footbed=False, cavity=False, axes=False, collar=False,
+                            contact=True, skate_reference=False)
         self.layers = {}
         self.variant_nodes = []
         self.last_p = None
@@ -135,20 +138,28 @@ class ResultsPlayer(Viewer):
         s = sequence.state
         last_p = s['P'][frame].copy()
         connections = np.asarray([(int(p),j) for j,p in enumerate(s['parents']) if j and p>=0],np.int32)
-        dynamic='boot_surface' in s
+        versioned_skate='template_version' in s
+        dynamic=versioned_skate or 'boot_surface' in s
         topology=definition.get('shell_topology','saved' if dynamic else 'open_collar')
         if dynamic and topology!='saved':raise ValueError('A saved dynamic boot surface requires its fixed saved topology')
         if not dynamic and topology not in ('open_collar','closed_hull'):raise ValueError('Historical boot requires open_collar or closed_hull topology')
-        boot_surface=s.get('boot_surface',s['gear'][:,:,:14])
+        boot_surface=s['skate_upper'] if versioned_skate else s.get('boot_surface',s['gear'][:,:,:14])
         shells={}
         for foot in range(2):
             if s['gear'].shape[2]!=48:continue
-            if dynamic:faces=s['boot_faces'][foot] if s['boot_faces'].ndim==3 else s['boot_faces']
+            if versioned_skate:faces=s['skate_upper_faces']
+            elif dynamic:faces=s['boot_faces'][foot] if s['boot_faces'].ndim==3 else s['boot_faces']
             elif topology=='closed_hull':faces=shell_triangles(boot_surface[0,foot],topology='closed_hull')
             else:faces=shell_triangles(boot_surface[0,foot])
             section=getattr(self,'boot_section',0)
             if section:
-                if section==3:
+                if versioned_skate:
+                    region=0 if section==1 else 1
+                    if section==3:
+                        camera_vector=np.asarray(self.scene.camera.position)-boot_surface[frame,foot].mean(axis=0)
+                        region=int(float(s['skate_R'][frame,foot,:,1]@camera_vector)>=0)
+                    faces=faces[s['skate_upper_region_ids']!=region]
+                elif section==3:
                     # Remove the actual side facing this observing camera. Use
                     # side centroids in the current frame, never alter vertices.
                     points=boot_surface[frame,foot];center=points.mean(axis=0)
@@ -156,8 +167,9 @@ class ResultsPlayer(Viewer):
                     camera_vector=np.asarray(self.scene.camera.position)-center
                     remove_first=float(axis@camera_vector)<0
                 else:remove_first=section==1
-                side=(faces<7).all(axis=1) if remove_first else (faces>=7).all(axis=1)
-                faces=faces[~side]
+                if not versioned_skate:
+                    side=(faces<7).all(axis=1) if remove_first else (faces>=7).all(axis=1)
+                    faces=faces[~side]
             shells[foot]=faces
         layers = self.layers.copy()
         nodes = []
@@ -174,8 +186,24 @@ class ResultsPlayer(Viewer):
             equipment=[]
             for foot,color in enumerate([(.98,.43,.14,1),(.12,.85,1.,1)]):
                 gear=s['gear'][:,foot]
-                if gear.shape[1]==48:
-                    alpha=.40 if getattr(self,'wear_inspection',False) else getattr(self,'boot_alpha',.62)
+                if versioned_skate:
+                    alpha=getattr(self,'boot_alpha',.40 if getattr(self,'wear_inspection',False) else .62)
+                    equipment.append(keep(Meshes(boot_surface[:,foot],shells[foot],color=(*color[:3],alpha),
+                        name='Boot candidate '+str(foot+1),pickable=False,cast_shadow=False)))
+                    parts=s['skate_lower_face_parts']
+                    face_colors=np.tile((*color[:3],1.),(len(parts),1))
+                    for part in np.unique(parts):
+                        if 'pick' in str(part):face_colors[parts==part]=(.95,.83,.38,1.)
+                        elif 'runner' in str(part) or 'blade' in str(part):face_colors[parts==part]=(.78,.84,.91,1.)
+                        elif 'plate' in str(part) or 'pillar' in str(part) or 'pedestal' in str(part):face_colors[parts==part]=(.56,.63,.71,1.)
+                    equipment.append(keep(Meshes(s['skate_lower'][:,foot],s['skate_lower_faces'],face_colors=face_colors,
+                        flat_shading=True,name='Saved connected skate solids '+str(foot+1),pickable=False,cast_shadow=False)))
+                    for edge in range(2):
+                        equipment.append(keep(Lines(s['skate_edge'][:,foot,edge],r_base=.0012,
+                            color=(1.,.95,.25,1.) if edge==0 else (.85,.65,1.,1.),
+                            name='Exact blade edge local '+str(edge)+' foot '+str(foot+1),is_selectable=False)))
+                elif gear.shape[1]==48:
+                    alpha=getattr(self,'boot_alpha',.40 if getattr(self,'wear_inspection',False) else .62)
                     shell=keep(Meshes(boot_surface[:,foot],shells[foot],color=(*color[:3],alpha),
                         name='Boot candidate '+str(foot+1),pickable=False,cast_shadow=False))
                     strip=keep(Meshes(gear[:,14:],ribbon_triangles(17),color=color,
@@ -185,21 +213,37 @@ class ResultsPlayer(Viewer):
                 else:equipment.append(keep(Lines(gear,r_base=.004,color=color,name='Old blade proxy '+str(foot+1),is_selectable=False)))
             layers['shoes']=equipment
             footbed_nodes=[];cavity_nodes=[];axis_nodes=[];collar_nodes=[]
-            if topology!='closed_hull' and s['gear'].shape[2]==48:
+            contact_nodes=[];reference_nodes=[]
+            if versioned_skate:
+                for foot in range(2):
+                    contact_nodes.append(keep(Spheres(s['skate_witness'][:,foot,None],radius=.004,
+                        color=(1.,.2,.35,1.),name='Nonpenetration witness '+str(foot+1),is_selectable=False)))
+                    reference_nodes.append(keep(Lines(s['skate_reference'][:,foot],r_base=.002,
+                        color=(.35,1.,.55,1.) if foot==0 else (.4,.65,1.,1.),
+                        name='Fixed blade material reference trajectory '+str(foot+1),is_selectable=False)))
+                    reference_nodes.append(keep(Spheres(s['skate_reference'][:,foot,None],radius=.003,
+                        color=(.35,1.,.55,1.),name='Fixed blade material reference '+str(foot+1),is_selectable=False)))
+                    if 'skate_collar_boundary' in s:
+                        ids=s['skate_collar_boundary'];loop=np.r_[ids,ids[:1]]
+                        collar_nodes.append(keep(Lines(boot_surface[:,foot,loop],r_base=.002,
+                            color=(1.,.95,.2,1.),name='Saved open collar boundary '+str(foot+1),is_selectable=False)))
+            elif topology!='closed_hull' and s['gear'].shape[2]==48:
                 loop=np.array([4,5,12,11,4])
                 for foot in range(2):
                     collar_nodes.append(keep(Lines(boot_surface[:,foot,loop],r_base=.004,
                         color=(1.,.95,.2,1) if foot==0 else (1.,.3,.85,1),
                         name='Open collar boundary '+str(foot+1),is_selectable=False)))
-            if 'footbed' in s:
+            footbed_key='skate_footbed' if versioned_skate else 'footbed'
+            if footbed_key in s:
                 for foot in range(2):
-                    points=s['footbed'][:,foot];loop=np.concatenate([points,points[:,:1]],axis=1)
+                    points=s[footbed_key][:,foot];loop=np.concatenate([points,points[:,:1]],axis=1)
                     footbed_nodes.append(keep(Lines(loop,r_base=.0025,color=(1.,.9,.25,1),name='Footbed proxy '+str(foot+1),is_selectable=False)))
-            if 'cavity' in s:
+            cavity_key='skate_cavity' if versioned_skate else 'cavity'
+            if cavity_key in s:
                 for foot in range(2):
-                    faces=s['cavity_faces'][foot] if s['cavity_faces'].ndim==3 else s['cavity_faces']
+                    faces=s['skate_cavity_faces'] if versioned_skate else (s['cavity_faces'][foot] if s['cavity_faces'].ndim==3 else s['cavity_faces'])
                     edges=np.unique(np.sort(np.concatenate([faces[:,[0,1]],faces[:,[1,2]],faces[:,[2,0]]]),axis=1),axis=0)
-                    points=s['cavity'][:,foot][:,edges].reshape(len(self.catalog.pts),-1,3)
+                    points=s[cavity_key][:,foot][:,edges].reshape(len(self.catalog.pts),-1,3)
                     cavity_nodes.append(keep(Lines(points,mode='lines',r_base=.0015,color=(.75,.55,1.,.7),name='Cavity prior '+str(foot+1),is_selectable=False)))
             if 'anchors' in s:
                 for index,label in enumerate(s['anchor_labels']):
@@ -210,14 +254,15 @@ class ResultsPlayer(Viewer):
                     points=s['axes'][:,:,index].reshape(len(self.catalog.pts),-1,3)
                     color=[(.95,.25,.25,1),(.3,.95,.3,1),(.3,.6,1.,1)][index%3]
                     axis_nodes.append(keep(Lines(points,mode='lines',r_base=.0025,color=color,name='Axis '+str(label),is_selectable=False)))
-            layers.update(wear=[],footbed=footbed_nodes,cavity=cavity_nodes,axes=axis_nodes,collar=collar_nodes)
+            layers.update(wear=[],footbed=footbed_nodes,cavity=cavity_nodes,axes=axis_nodes,collar=collar_nodes,
+                          contact=contact_nodes,skate_reference=reference_nodes)
             trajectory=keep(Lines(s['G'],r_base=.018,color=(1.,.75,.12,1),name='Whole S01 pelvis vertical projection',is_selectable=False))
             layers['trajectory']=[trajectory]
             vertical=keep(Lines(np.stack([s['P'],s['G']],axis=1),r_base=.007,color=(1.,.27,.67,1),name='P to G world vertical',is_selectable=False))
             pelvis=keep(Spheres(s['P'][:,None],radius=.032,color=(1.,.27,.67,1),name='P pelvis',is_selectable=False))
             ground=keep(Spheres(s['G'][:,None],radius=.04,color=(1.,.78,.12,1),name='G pelvis projection',is_selectable=False))
             layers['pelvis']=[vertical,pelvis,ground]
-            for key in ('surface','skeleton','shoes','trajectory','pelvis','wear','footbed','cavity','axes','collar'):
+            for key in ('surface','skeleton','shoes','trajectory','pelvis','wear','footbed','cavity','axes','collar','contact','skate_reference'):
                 for node in layers[key]:
                     node.current_frame_id=frame
                     node.enabled=self.visible.get(key,False)
@@ -246,23 +291,26 @@ class ResultsPlayer(Viewer):
 
     def apply_visibility(self):
         for key,nodes in self.layers.items():
-            for node in nodes:node.enabled=self.visible[key]
+            for node in nodes:node.enabled=self.visible.get(key,False)
 
     def set_wear_inspection(self,enabled,diagnostic_layers=()):
         """A clean physical comparison; optional proxies are separate layers."""
         self.wear_inspection=bool(enabled)
         if enabled:
-            if not hasattr(self,'_pre_wear_visibility'):self._pre_wear_visibility=self.visible.copy()
+            if not hasattr(self,'_pre_wear_visibility'):
+                self._pre_wear_visibility=self.visible.copy()
+                self._pre_wear_boot_alpha=getattr(self,'boot_alpha',.62);self.boot_alpha=.40
             self.visible.update(surface=True,shoes=True,skeleton=False,trajectory=False,pelvis=False,
                                 rink_lines=False,boards=False,ice=False,wear=True,collar=True,
                                 footbed='footbed' in diagnostic_layers,cavity='cavity' in diagnostic_layers,axes='axes' in diagnostic_layers)
         else:
             if hasattr(self,'_pre_wear_visibility'):
                 self.visible.update(self._pre_wear_visibility);del self._pre_wear_visibility
+                self.boot_alpha=self._pre_wear_boot_alpha;del self._pre_wear_boot_alpha
             self.visible.update(wear=False,collar=False,footbed=False,cavity=False,axes=False)
         self.apply_visibility()
         for node in self.layers.get('shoes',[]):
-            if node.name.startswith('Boot candidate'):node.color=(*node.color[:3],.40 if enabled else self.boot_alpha)
+            if node.name.startswith('Boot candidate'):node.color=(*node.color[:3],self.boot_alpha)
 
     def frame_changed(self, frame):
         p=self.sequence.state['P'][frame]
@@ -309,14 +357,19 @@ class ResultsPlayer(Viewer):
             cam.position=p+[8,0,0];cam.target=p;cam.is_ortho=True;cam.ortho_size=1.5
         elif view=='rink':
             cam.position=np.array([42.,-48.,40.]);cam.target=np.zeros(3);self.follow=False
-        elif view in ('feet','feet_oblique','feet_side'):
-            p=self.sequence.state['gear'][self.frame].reshape(-1,3).mean(axis=0)
+        elif view in ('feet','feet_oblique','feet_side','feet_end'):
+            state=self.sequence.state
+            p=state.get('skate_lower',state['gear'])[self.frame].reshape(-1,3).mean(axis=0)
             if view=='feet_oblique':offset=[.40,-.65,.95]
-            elif view=='feet_side':
-                points=self.sequence.state.get('boot_surface',self.sequence.state['gear'][:,:,:14])[self.frame]
-                axis=np.mean(points[:,7:]-points[:,:7],axis=(0,1))
-                if np.linalg.norm(axis)<1e-8:axis=np.mean(points[0,7:]-points[0,:7],axis=0)
-                axis/=np.linalg.norm(axis)
+            elif view in ('feet_side','feet_end'):
+                if 'skate_R' in state:axis=state['skate_R'][self.frame,0,:,1 if view=='feet_side' else 0].copy()
+                else:
+                    points=state.get('boot_surface',state['gear'][:,:,:14])[self.frame]
+                    axis=np.mean(points[:,7:]-points[:,:7],axis=(0,1))
+                    if np.linalg.norm(axis)<1e-8:axis=np.mean(points[0,7:]-points[0,:7],axis=0)
+                    if np.linalg.norm(axis)<1e-8:axis=np.array([0.,1.,0.])
+                    axis/=np.linalg.norm(axis)
+                    if view=='feet_end':axis=np.cross(axis,[0.,0.,1.])
                 offset=axis*.95+np.array([0.,0.,.16])
             else:offset=[.55,-.75,.4]
             cam.position=p+offset;cam.target=p;cam.is_ortho=True;cam.ortho_size=.34
@@ -325,7 +378,7 @@ class ResultsPlayer(Viewer):
         if fit_comparison and view in ('free','top','side','end') and self.catalog.config.get('comparison_variants'):
             self.comparison_framing=fit_comparison_camera(self,self.comparison_sequences(),self.frame,
                 left_inset=min(getattr(self,'control_panel_width',425)+28,self.window_size[0]-1))
-        self.view_label={'top':'俯视','side':'侧视 XZ','end':'侧视 YZ','rink':'全冰场','free':'自由视角','feet':'足鞋近看','feet_oblique':'鞋口斜俯视','feet_side':'足鞋同侧剖切视角'}[view]
+        self.view_label={'top':'俯视','side':'侧视 XZ','end':'侧视 YZ','rink':'全冰场','free':'自由视角','feet':'足鞋近看','feet_oblique':'鞋口斜俯视','feet_side':'足鞋同侧剖切视角','feet_end':'足鞋正视'}[view]
         self.save_session()
 
     def save_session(self):
@@ -355,6 +408,36 @@ class ResultsPlayer(Viewer):
 
     def center_view_on_selection(self):
         if hasattr(self,'sequence'):self.set_view('free')
+
+    def gui_height_plot(self,label,series,band=None):
+        """Plot saved millimetres against source time, leaving NaN gaps open."""
+        imgui.text(label)
+        finite=[np.asarray(values)[np.isfinite(values)] for values,_ in series]
+        samples=np.concatenate([values for values in finite if len(values)]+[np.array([-6.,6.])])
+        low,high=float(samples.min()),float(samples.max());pad=max(1.,(high-low)*.08)
+        low-=pad;high+=pad
+        imgui.text('%.1f 至 %.1f 条件毫米  |  原片 %.2f–%.2f 秒'%(low,high,self.catalog.seconds[0],self.catalog.seconds[-1]))
+        x,y=imgui.get_cursor_screen_pos();width=max(100.,imgui.get_content_region_available()[0]);height=72.
+        draw=imgui.get_window_draw_list()
+        color=imgui.get_color_u32_rgba
+        draw.add_rect_filled(x,y,x+width,y+height,color(.07,.09,.12,1.))
+        def py(value):return y+height-(value-low)/(high-low)*height
+        if band is not None:
+            draw.add_rect_filled(x,py(band[1]),x+width,py(band[0]),color(.3,.65,.35,.20))
+        draw.add_line(x,py(0.),x+width,py(0.),color(.65,.7,.75,.65))
+        seconds=self.catalog.seconds
+        px=x+(seconds-seconds[0])/(seconds[-1]-seconds[0])*width
+        for values,rgba in series:
+            values=np.asarray(values);valid=np.isfinite(values)
+            for index in np.flatnonzero(valid[:-1]&valid[1:]):
+                draw.add_line(float(px[index]),py(float(values[index])),float(px[index+1]),py(float(values[index+1])),color(*rgba),1.5)
+            # Isolated supported exposures remain visible without inventing a
+            # continuous support interval through neighbouring unknowns.
+            isolated=valid & ~np.r_[False,valid[:-1]] & ~np.r_[valid[1:],False]
+            for index in np.flatnonzero(isolated):
+                draw.add_circle_filled(float(px[index]),py(float(values[index])),1.5,color(*rgba))
+        cursor=float(px[self.frame]);draw.add_line(cursor,y,cursor,y+height,color(1.,1.,1.,.8))
+        imgui.dummy(width,height)
 
     def gui_rinkspace(self):
         imgui.set_next_window_position(14,14,condition=imgui.FIRST_USE_EVER)
@@ -434,6 +517,13 @@ class ResultsPlayer(Viewer):
             if imgui.button('鞋口斜俯视'):self.set_view('feet_oblique')
             imgui.same_line()
             if imgui.button('同侧视角'):self.set_view('feet_side')
+            imgui.same_line()
+            if imgui.button('足鞋正视'):self.set_view('feet_end')
+            imgui.set_next_item_width(175)
+            changed,self.boot_alpha=imgui.slider_float('鞋帮透明度',self.boot_alpha,.08,1.,format='%.2f')
+            if changed:
+                for node in self.layers['shoes']:
+                    if node.name.startswith('Boot candidate'):node.color=(*node.color[:3],self.boot_alpha)
             for label,key in [('足床与锚点','footbed'),('内腔线框','cavity'),('小腿/下鞋/刀具坐标轴','axes'),('标色鞋口边界','collar')]:
                 changed,self.visible[key]=imgui.checkbox(label,self.visible[key])
                 if changed:self.apply_visibility()
@@ -443,10 +533,10 @@ class ResultsPlayer(Viewer):
                 previous=self.boot_section;self.boot_section=section
                 try:self.load_variant(self.variant['id'])
                 except Exception as error:self.boot_section=previous;self.error=str(error)
-            topology=self.variant.get('shell_topology','saved' if 'boot_surface' in s else 'open_collar')
+            topology=self.variant.get('shell_topology','saved' if 'template_version' in s or 'boot_surface' in s else 'open_collar')
             imgui.text('鞋面拓扑：'+{'closed_hull':'历史封闭凸包','open_collar':'22 面开放鞋口','saved':'保存的固定拓扑 / 动态上帮'}.get(topology,topology))
             if self.wear_inspection:
-                if 'cavity' not in s:imgui.text_wrapped('本结果没有保存内腔、足床与锚点，开放鞋口本身不代表穿合完成。')
+                if 'cavity' not in s and 'skate_cavity' not in s:imgui.text_wrapped('本结果没有保存内腔、足床与锚点，开放鞋口本身不代表穿合完成。')
                 if 'anchor_labels' in s:imgui.text_wrapped('锚点（红/绿/黄/青）：'+' / '.join(str(x) for x in s['anchor_labels']))
                 if 'axis_labels' in s:imgui.text_wrapped('小腿 / 下鞋 / 刀具轴：XYZ 依次为红 / 绿 / 蓝')
                 for key,label in [('cavity_penetration','内腔越界'),('heel_drift','足跟偏移'),('forefoot_error','前掌错位')]:
@@ -461,9 +551,30 @@ class ResultsPlayer(Viewer):
                 imgui.text_wrapped('内腔/间隙为工程先验；有效转角不等同解剖背屈/内翻，形变系数不代表材料刚度。')
             imgui.text('粉色 P：骨盆；黄色 G：骨盆竖直投影')
             imgui.text('橙 / 青：两只鞋刀，左右身份尚未确认')
-            imgui.text('接冰状态：未知（显示程序不强制贴冰）')
-            if gear.shape[1]==5:imgui.text_colored('此旧版只有刀刃代理，没有拟合鞋壳',1.,.7,.35)
-            else:imgui.text('鞋刀：保存的刚性鞋壳与刀刃下缘')
+            if 'template_version' in s:
+                imgui.text_wrapped('鞋刀模板：'+str(s['template_version'])+'；绑定：'+str(s['binding_version']))
+                imgui.text('鞋刀：保存的完整下鞋实体、上鞋与精确双刃')
+                for label,key in [('最低非穿透 witness 点（粉红）','contact'),('刀上固定参考点与整段轨迹','skate_reference')]:
+                    changed,self.visible[key]=imgui.checkbox(label,self.visible[key])
+                    if changed:self.apply_visibility()
+                for foot in range(2):
+                    mode=str(s['skate_contact_mode'][f,foot]);confidence=s['skate_contact_confidence'][f,foot]
+                    label={'unknown':'未知','airborne':'腾空','glide':'滑行候选','pick':'刀齿候选'}[mode]
+                    imgui.text('足 %d 接触：%s；保存置信度 %.2f'%(foot,label,confidence))
+                imgui.text('允许入冰后的最小余量 0/1：%.2f / %.2f 条件毫米'%tuple(s['skate_clearance_m'][f]*1000))
+                gap=s['skate_support_gap_m'][f]
+                imgui.text('已知支持组候选最低高：'+('未知' if not np.isfinite(gap) else '%.2f 条件毫米'%(gap*1000)))
+                self.gui_height_plot('最小非穿透余量（橙 / 青）；零线为允许边界',
+                    [(s['skate_clearance_m'][:,0]*1000,(.98,.43,.14,1.)),(s['skate_clearance_m'][:,1]*1000,(.12,.85,1.,1.))])
+                band=np.array([-2.,3.])*self.sequence.meta['uniform_unit_reexpression_ratio']
+                self.gui_height_plot('已知支持组候选最低高；空白为未知',
+                    [(s['skate_support_gap_m']*1000,(.55,1.,.65,1.))],band=band)
+                imgui.text_wrapped('绿带 %.2f 至 %.2f 条件毫米为首轮工程支持范围（候选原单位 −2 至 +3 毫米）。候选最低高不判定具体哪只足接冰。witness 会沿刀弧移动，其导数不是刀具速度。'%tuple(band))
+                imgui.text_wrapped('刃线按局部 y 两侧显示，未推定内/外刃；真实入冰量和压力未知。')
+            else:
+                imgui.text('接冰状态：未知（显示程序不强制贴冰）')
+                if gear.shape[1]==5:imgui.text_colored('此旧版只有刀刃代理，没有拟合鞋壳',1.,.7,.35)
+                else:imgui.text('鞋刀：保存的刚性鞋壳与刀刃下缘')
             if bool(s['source_lower_body_inferred'][f]):imgui.text_colored('本帧下肢观测不足，含推断',1.,.45,.35)
             if bool(s['source_identity_suspect'][f]):imgui.text_colored('本帧存在左右身份疑点',1.,.45,.35)
             imgui.text('统一世界坐标：Z 向上；单位：米')

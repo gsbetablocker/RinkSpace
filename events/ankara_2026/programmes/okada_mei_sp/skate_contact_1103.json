@@ -1,0 +1,200 @@
+{
+  "schema": "rinkspace.skate-contact-delivery.v1",
+  "template_version": "rinkspace.metric-lower-skate.v1",
+  "binding_version": "rinkspace.section-foot-skate.v1",
+  "parameters": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\skate_contact_1103.npz",
+    "sha256": "41b470cc867e6b3b9cafb4e1ff626f6631f3d77e265377a65eeb7f0ea63718c1"
+  },
+  "run": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_contact_1103",
+  "camera": {
+    "record": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\camera_solver_refined_1102.json",
+    "state_path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_solver_refined_1102.npz",
+    "state_sha256": "d6cfde1474a23d594a0395351ebbdb0ee15a6560ef77b27f069d239ee95bb3f3",
+    "native_library": "D:\\CodexData\\RinkSpace_Data\\runs\\body_perf_1103\\native_cpu\\rinkspace_core.dll",
+    "native_library_sha256": "d228146cee739fe255d2b12c0ba9cb00647d5e6a2dffadcf0f2f53354a3bb71f",
+    "shot": {
+      "camera_index": 0,
+      "control_begin": 0,
+      "control_stop": 1152,
+      "first_control_time": 1.96,
+      "first_pts": 283136,
+      "id": "s01",
+      "knot_stride": 10,
+      "last_pts": 575488,
+      "motion_reference_time": 2.1,
+      "reference_pts": 256256,
+      "row_begin": 0,
+      "row_stop": 279126,
+      "source_coverage": {
+        "expected_exposures": 1143,
+        "missing_exposures": 0,
+        "missing_ranges": [],
+        "observed_exposures": 1143,
+        "partial_source_coverage": false,
+        "synthetic_rows_added": 0
+      },
+      "stop_pts_exclusive": 575744,
+      "time_base_den": 12800,
+      "time_base_num": 1
+    },
+    "metres_per_scene_unit": 59.96169706678219,
+    "solver_metres_per_scene_unit": 60.0,
+    "length_export_ratio": 0.9993616177797032,
+    "camera_changed_during_fit": false,
+    "source_time_base": [
+      1,
+      12800
+    ],
+    "old_reference_reprojected_on_current_camera": true,
+    "prepared": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\physical_repair_1101\\prepared_shared_timing",
+    "recorded_native_library": "D:/CodexData/RinkSpace_Data/build/solver_continue_1102/rinkspace_core.dll",
+    "native_library_override": true
+  },
+  "body_parent": {
+    "hand_parameters": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\opening_hand_1103.npz",
+    "timing_parameters": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\opening_timing_1103.npz"
+  },
+  "body_refinement_intervals_seconds": [
+    [
+      28.12,
+      43.8
+    ]
+  ],
+  "shared_shape_scope": "all S01, cache replay outside optimized body interval",
+  "engineering_allowance_m": {
+    "runner": 0.002,
+    "toe_pick": 0.005,
+    "solid_guard": 0.0
+  },
+  "support_band_m": [
+    -0.002,
+    0.003
+  ],
+  "candidate_core_feasible": false,
+  "user_accepted": false,
+  "independent_3d_truth": false,
+  "acceptance_status": "uncalibrated debugging thresholds; pending human visual review",
+  "parameter_provenance": {
+    "primary_rocker": {
+      "status": "manufacturer_candidate_prior_not_athlete_measurement",
+      "candidates_m": [
+        2.1336,
+        2.4384
+      ],
+      "sources": [
+        "https://www.mkblades.com/gold-star",
+        "https://www.johnwilsonskates.com/gold-seal"
+      ]
+    },
+    "blade_width": {
+      "status": "generic_prior_not_athlete_measurement",
+      "default_m": 0.0038,
+      "source_interval_m": [
+        0.003556,
+        0.0039369999999999995
+      ],
+      "source": "https://pnmresources.s3.amazonaws.com/pID-677/topic-430268/PSA%20EL%20Mem%20Package%20Course%203%20-%20Understanding%20The%20Figure%20Skating%20Blade.pdf"
+    },
+    "other_defaults": "Engineering initialization only; dimensions, secondary profile, hollow, tooth locations and mounting heights require shared calibration",
+    "bounds": "Broad implementation/unit guards; not physiological or equipment standards"
+  },
+  "evidence": {
+    "inputs.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_contact_1103\\inputs.json",
+      "sha256": "a849876749dfd063769bc8bd00f73b90ea41975baca043daf5ee74e5b47629fa"
+    },
+    "binding.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_contact_1103\\binding.json",
+      "sha256": "c0370de6167e387ce129b8abff0e7709eaa65d2573fdc4fc188cc58ae3def778"
+    },
+    "validation.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_contact_1103\\validation.json",
+      "sha256": "80699e07c122b933c620739b3b94ea2614d5cef33e3b6c06477cdf39d05fead1"
+    },
+    "fit/candidate.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_contact_1103\\fit\\candidate.json",
+      "sha256": "20ee4f203613d78780c342ad3514773ab9fb34127007057441b3f98bc50a6f26"
+    },
+    "fit/kernel_manifest.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_contact_1103\\fit\\kernel_manifest.json",
+      "sha256": "81ef428063efc8ea0952f87bc41a1d45acfcfaf513170751468c981a1c60cfc0"
+    },
+    "source_evidence.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_contact_1103\\source_evidence.json",
+      "sha256": "1a6b6b0f50ddaeab0335db557cadcaaf608fd950b82926302ce5b26541441965"
+    },
+    "parameter_replay.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_contact_1103\\parameter_replay.json",
+      "sha256": "d9054501e2cf5e77aae050333075d6622fdc3a0b78c77a43c8b2d107a7e42a0d"
+    },
+    "fitted/result.npz": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_contact_1103\\fitted\\result.npz",
+      "sha256": "4c917c6ca8823e8d2816cee24cc77e93f631bacb7d3821ad70e06aa0c4e7e526"
+    },
+    "collar_gap.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_contact_1103\\collar_gap.json",
+      "sha256": "90b92ee8717255d226c354438f3678c2c915a5d2a5b7ea855f15a056e5e859f7"
+    },
+    "start_3520_diagnosis": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_contact_1103\\fit\\start_3520_diagnosis.json",
+      "sha256": "fa26fb984148aa79ce8c876326fe099ff79666e34a5add9fe28b9054a29e7d87"
+    },
+    "basis_audit": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_contact_1103_diagnostics\\basis_audit.json",
+      "sha256": "b4197e6a550ffe2c4294e2597dda8b3fb589badfb687a1706cb73c3c484427b1"
+    },
+    "rocker_comparison": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_contact_1103\\rocker_comparison.json",
+      "sha256": "2c3204b1fed475e5f70a33e6e1f4bafd9b3b8dc273f19a1c3f345a5036f46d95"
+    },
+    "player_side": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_contact_1103\\player_check\\side\\checks.json",
+      "sha256": "3014de0cf8fbab377cbb4fefc403fe6465d2dac475063d6c7fe9d40173b27b05",
+      "passed": true,
+      "checks": 240
+    },
+    "player_cavity": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_contact_1103\\player_check\\cavity\\checks.json",
+      "sha256": "8f306fd9115ec994df77a31906979f3a4e6047ad5815e807ebdfc8ac06e3263d",
+      "passed": true,
+      "checks": 89
+    },
+    "player_front": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_contact_1103\\player_check\\front\\checks.json",
+      "sha256": "c91dd67155de6a733fcdc466fa3b22193e65178b75885cd8577493caae2f08d3",
+      "passed": true,
+      "checks": 51
+    }
+  },
+  "viewer_config": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\viewer3d_fullbody_1102.json",
+  "viewer_command": "D:\\OneDrive\\codex_projs\\RinkSpace\\START_3D_COMPARISON.cmd",
+  "accepted_checkpoint_sha256": "08a414b1a2ca9874ca5c964235b3c74f1f4c77274b8c58228cb9966b250a6e4b",
+  "current_status": "candidate preserved for human review; not physically accepted",
+  "new_continuous_configuration": {
+    "prepared": true,
+    "run": false,
+    "source_exposure_centres_seconds": [
+      22.12,
+      44.96
+    ],
+    "state": "one continuous P/Q/local_R curve with all69 increments; no interior temporal freeze",
+    "omitted_source_footage_continuity": "unknown"
+  },
+  "run_policy": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\skate_run_policy_1103.json",
+    "sha256": "9bce414d45835ea27e353ca2efe03ebab0b11333591156fc9922d4fe521640f4",
+    "used_on_current_candidate": false,
+    "budget_applies_to": "joint correction; checked at evaluation/callback boundaries"
+  },
+  "visual_review": {
+    "reviewed_images": [
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_contact_1103\\player_check\\side\\compare_450560.png",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_contact_1103\\player_check\\side\\compare_509184.png",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_contact_1103\\player_check\\cavity\\compare_450560.png",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_contact_1103\\player_check\\cavity\\compare_326912.png"
+    ],
+    "findings": "The lower template and cavity are actually rendered. Core transparent sections and the 25.54s collar intersection remain visible; these views do not establish source-image or 3D truth.",
+    "human_confirmed": false
+  }
+}

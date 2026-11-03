@@ -42,6 +42,20 @@ python -B environments/prepare_body_sources.py --data-root <外部Data绝对路�
 
 三维播放器的固定依赖和许可证据见 [viewer3d-provenance.json](viewer3d-provenance.json)。默认窗口使用 Pyglet；锁文件仍保留 AITViewer 声明的 Qt 依赖，实际条件见[许可核查](../docs/LICENSING_REVIEW.md#viewer3d)。环境与完整人体缓存均留 Data。
 
+## 人体求解执行优化
+
+[性能启动入口](../scripts/run_body_performance.py)给现有 Python 求解命令设置子进程环境，原参数原样传递。切换原生库时使用独立候选目录和已有参数作 warm-start，使旧目录的输入记录保持原样。例如将当前时序入口及其已有参数接在后面：
+
+~~~console
+python -B scripts/run_body_performance.py scripts/run_opening_timing.py --root <Data>/runs/body_s01_20261029 --output <独立候选目录> --stage fit --warm-start <已有参数.npz>
+~~~
+
+[本机配置](body-performance-local.json)从 AssetStore 的 Data 根解析独立 CPU 投影库，默认 CPU 身体 workers=4、native_threads=4、BLAS=1。先加 `--show-command` 可只打印命令；`--backend cuda`使用已有 vision_cuda（SciPy 支持 callback）和一个 FP64 身体 owner。原 body_cuda 的 SciPy 1.13.1 不支持当前拟合 callback，因此未选作 CUDA 求解解释器。轻量附加依赖见 [requirements-body-performance.txt](requirements-body-performance.txt)。
+
+该入口复用全身、鞋体、开头及其派生问题，不改相机记录、观测、损失、参数布局和停止条件。移除启动包装即可回到原执行配置；环境只作用于新子进程，已有运行不会切换。新库可用 `python -B scripts/build_core.py --out <Data内构建目录> --generator Ninja --openmp`重建，CPU／GPU 场地库仍分别保存。
+
+同状态测量入口为 [profile_body_solver.py](../scripts/profile_body_solver.py)，`--kind`支持 fullbody、boot、opening、motion、timing；`--state`可指定正在求解的检查点的只读副本。测量只评估残差／Jacobian，不启动拟合。当前本机结果位于 `<Data>/runs/body_perf_1103`。数值对照和实际测量范围见其中的 integration_summary.json；算子与单次评估加速不代表整轮拟合或画面质量已验收。
+
 ## 基础检查与完整回归
 
 ~~~console

@@ -463,6 +463,77 @@ def test_invalid_saved_footwear_cannot_publish(tmp_path,field,value):
     assert not list(c.cache_root.glob('fixture_*/metadata.json'))
 
 
+def add_versioned_skate(c):
+    n=len(c.pts);rng=np.random.default_rng(1103)
+    values={key:np.array(value) for key,value in dict(template_version='skate.fixture.v1',binding_version='binding.fixture.v1',parameter_provenance_json='{"source":"synthetic engineering check"}').items()}
+    for part,count in [('lower',24),('upper',20),('cavity',18),('footbed',8)]:
+        values['skate_'+part+'_world_mid']=rng.normal(size=(n,2,count,3))
+        if part!='footbed':values['skate_'+part+'_faces']=np.array([[0,1,2],[3,4,5],[6,7,8],[9,10,11]],np.int32)
+    values.update(skate_lower_face_parts=np.array(['outsole','runner','toe_pick','front_pedestal']),
+                  skate_upper_region_ids=np.arange(4),skate_edge_world_mid=rng.normal(size=(n,2,2,8,3)),
+                  skate_witness_world_mid=rng.normal(size=(n,2,3)),skate_reference_world_mid=rng.normal(size=(n,2,3)),
+                  skate_origin_world_mid=rng.normal(size=(n,2,3)),skate_R_world_mid=np.broadcast_to(np.eye(3),(n,2,3,3)).copy(),
+                  skate_clearance_m_mid=np.array([[-.001,.002],[.003,-.004],[.002,.005]]),
+                  skate_support_gap_m_mid=np.array([np.nan,.001,np.nan]),
+                  skate_contact_mode_mid=np.full((n,2),'unknown'),skate_contact_confidence_mid=np.zeros((n,2)),
+                  skate_collar_boundary=np.array([12,13,14,15]))
+    replace_npz(c.root/'result.npz',**values)
+    return values
+
+
+def test_versioned_skate_bake_preserves_dense_topology_unknown_support_and_one_unit_conversion(tmp_path):
+    c=fullbody_catalog(tmp_path);add_footwear(c);saved=add_versioned_skate(c)
+    # Presence of the new schema selects the full upper, not the old adapter.
+    seq=DATA.CachedSequence(PREPARE.prepare_variant(c,'fixture',MatrixSurface()))
+    assert seq.state['skate_upper'].shape==(3,2,20,3)
+    assert 'boot_surface' not in seq.state
+    for key,value in saved.items():
+        if key.endswith('_world_mid') and key!='skate_R_world_mid':
+            target=key.removesuffix('_world_mid')
+            np.testing.assert_array_equal(seq.state[target],value*3)
+    for key in ('skate_clearance_m','skate_support_gap_m'):
+        np.testing.assert_array_equal(seq.state[key],saved[key+'_mid']*3)
+    for key in ('skate_lower_faces','skate_upper_faces','skate_upper_region_ids','skate_lower_face_parts','skate_R_world_mid'):
+        target=key.removesuffix('_world_mid')
+        np.testing.assert_array_equal(seq.state[target],saved[key])
+    assert np.isnan(seq.state['skate_support_gap_m'][[0,2]]).all()
+    assert np.all(seq.state['skate_contact_mode']=='unknown')
+    display=seq.meta['footwear_display']
+    assert display['template_version']=='skate.fixture.v1'
+    assert not display['coordinates_modified'] and not display['retriangulated']
+    assert 'connected lower-skate solids' in seq.meta['equipment']
+    assert seq.meta['identity']['skate_versions']['binding_version']=='binding.fixture.v1'
+
+
+@pytest.mark.parametrize('field,value',[
+    ('skate_upper_faces',np.array([[0,1,20]])),
+    ('skate_upper_region_ids',np.array([0,1,2,4])),
+    ('skate_lower_face_parts',np.array(['one'])),
+    ('skate_edge_world_mid',np.zeros((3,2,1,8,3))),
+    ('skate_R_world_mid',np.zeros((3,2,3,3))),
+    ('skate_clearance_m_mid',np.full((3,2),np.nan)),
+    ('skate_support_gap_m_mid',np.array([0.,np.inf,np.nan])),
+    ('skate_contact_confidence_mid',np.full((3,2),1.1)),
+    ('skate_contact_mode_mid',np.full((3,2),'inferred_contact')),
+    ('template_version',np.array(['not scalar'])),
+    ('parameter_provenance_json',np.array('[]')),
+])
+def test_invalid_versioned_skate_cannot_publish(tmp_path,field,value):
+    c=fullbody_catalog(tmp_path);add_versioned_skate(c);replace_npz(c.root/'result.npz',**{field:value})
+    with pytest.raises(ValueError):PREPARE.prepare_variant(c,'fixture',MatrixSurface())
+    assert not list(c.cache_root.glob('fixture_*/metadata.json'))
+
+
+def test_versioned_skate_cache_identity_includes_versions_and_saved_geometry(tmp_path):
+    c=fullbody_catalog(tmp_path);saved=add_versioned_skate(c)
+    first,_=c.cache_path('fixture')
+    replace_npz(c.root/'result.npz',binding_version=np.array('binding.fixture.v2'))
+    second,identity=c.cache_path('fixture')
+    assert second!=first and identity['skate_versions']['binding_version']=='binding.fixture.v2'
+    replace_npz(c.root/'result.npz',skate_lower_world_mid=saved['skate_lower_world_mid']+.001)
+    third,_=c.cache_path('fixture');assert third!=second
+
+
 def synthetic_skinning_surface():
     """Small, nontrivial skinning model; no external body asset is loaded."""
     rng=np.random.default_rng(20261102);surface=PREPARE.FullSurface.__new__(PREPARE.FullSurface)

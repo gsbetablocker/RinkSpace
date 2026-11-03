@@ -8,7 +8,7 @@ RinkSpace 研究如何从花样滑冰转播中恢复冰场、连续围挡、广�
 
 **冈田芽衣短节目的重构处理起点为原片 22.120 秒，PTS 283136，原生时基 1/12800。** 当前处理范围与历史物理镜头范围的差别见[范围文件](events/ankara_2026/programmes/okada_mei_sp/rebuild_scope.json)和[源时间说明](events/ankara_2026/programmes/okada_mei_sp/README.md#analysis-start)解释。起点前的原片与观测保留；19.960 秒准备画面另作开头人体姿势和位置辅助，不改变节目处理起点。
 
-S01 已接入可撤销观测关联、唯一全身状态、共享足鞋配准和开头裁切修复。[START_3D_COMPARISON.cmd](START_3D_COMPARISON.cmd)从原片 22.120 秒比较修复前后，[START_BOOT_INSPECTION.cmd](START_BOOT_INSPECTION.cmd)提供透明鞋与剖面检查。实际改善、穿冰／离冰残留和窗口范围见[节目记录](events/ankara_2026/programmes/okada_mei_sp/README.md)；这仍是局部研究结果，完整节目人体追踪尚未完成。
+S01 已接入可撤销观测关联、唯一全身状态、共享足鞋配准和开头时序修复。[START_3D_COMPARISON.cmd](START_3D_COMPARISON.cmd)从原片22.120秒比较旧结果与“22.90秒后下探、扶腰后展开”候选，[START_BOOT_INSPECTION.cmd](START_BOOT_INSPECTION.cmd)提供透明鞋与剖面检查。实际改善、穿冰／离冰残留和窗口范围见[节目记录](events/ankara_2026/programmes/okada_mei_sp/README.md)；这仍是局部研究结果，完整节目人体追踪尚未完成。
 
 ## 快速试用：合成数据
 

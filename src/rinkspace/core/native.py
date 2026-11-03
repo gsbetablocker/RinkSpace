@@ -67,6 +67,7 @@ class NativeCore:
                 if directory.is_dir():
                     self._dll_dirs.append(_runtime_dll_directory(directory))
         self._lib = c.CDLL(str(self.library_path))
+        self.motion_projection_threads = 1
         self._lib.rs_core_abi_version.argtypes = []
         self._lib.rs_core_abi_version.restype = c.c_int
         version = self._lib.rs_core_abi_version()
@@ -100,6 +101,8 @@ class NativeCore:
 
         # Additive capabilities preserve loading of historical ABI2 libraries.
         optional = {
+            "rs_project_motion_xyz_jacobian": [D,N,D,N,c.c_double,c.c_double,c.c_int,D,N,D,N,D,N,D,N,I,N,c.c_int],
+            "rs_motion_projection_openmp_enabled": [],
             "rs_evaluate_motion_camera": [D,N,D,N,c.c_double,c.c_double,D,N,D,N,I,N],
             "rs_evaluate_motion_kinematics": [D,N,c.c_double,c.c_double,D,N,D,N,I,N],
             "rs_motion_derivative_extrema": [D,N,c.c_double,c.c_double,c.c_double,c.c_double,D,N],
@@ -317,6 +320,54 @@ class NativeCore:
                    out.ctypes.data_as(D), out.size, status.ctypes.data_as(I), len(status))
         return {"uv": out[:, :2], "depth": out[:, 2], "row": out[:, 3], "root_equality_px": out[:, 4],
                 "contraction_bound": out[:, 5], "status": status}
+
+    @property
+    def supports_motion_xyz_jacobian(self) -> bool:
+        """Whether this loaded ABI2 binary supplies analytic moving-camera XYZ derivatives."""
+        return hasattr(self._lib, "rs_project_motion_xyz_jacobian")
+
+    @property
+    def supports_parallel_motion_projection(self) -> bool:
+        """Compile-time OpenMP support; a requested thread count is not measured utilization."""
+        return (hasattr(self._lib, "rs_motion_projection_openmp_enabled")
+                and bool(self._lib.rs_motion_projection_openmp_enabled()))
+
+    def project_motion_xyz_jacobian(self, rig, controls, first_control_time, control_dt,
+                                    image_height, frame_times, xyz):
+        """Exact frozen-rig XYZ derivatives at the same certified implicit row root.
+
+        XYZ and its Jacobian use the native scene length unit. The caller owns
+        conversion to metres. Invalid rows retain NaNs and explicit statuses;
+        this method never substitutes another camera family or finite differences.
+        The per-call CPU thread count is ``motion_projection_threads`` (default 1).
+        """
+        import operator
+        import numpy as np
+        if not self.supports_motion_xyz_jacobian:
+            raise ValueError("native library lacks analytic moving-camera XYZ Jacobians")
+        requested_threads = getattr(self, "motion_projection_threads", 1)
+        if isinstance(requested_threads, bool):
+            raise ValueError("motion projection thread count must be a positive integer")
+        threads = operator.index(requested_threads)
+        if not 1 <= threads <= 2147483647:
+            raise ValueError("motion projection thread count is outside the C int range")
+        points = np.ascontiguousarray(xyz, dtype=np.float64)
+        coefficients = np.ascontiguousarray(controls, dtype=np.float64)
+        physical = np.ascontiguousarray(rig, dtype=np.float64)
+        if (physical.shape not in ((38,), (43,)) or points.ndim != 2 or points.shape[1] != 3
+                or coefficients.ndim != 2 or coefficients.shape[1] != 3):
+            raise ValueError("motion Jacobian requires rig[38 or 43], XYZ[N,3], controls[M,3]")
+        times = np.ascontiguousarray(np.broadcast_to(np.asarray(frame_times, dtype=np.float64), (len(points),)))
+        out = np.full((len(points), 6), np.nan, dtype=np.float64)
+        jac = np.full((len(points), 2, 3), np.nan, dtype=np.float64)
+        status = np.empty(len(points), dtype=np.int32)
+        self._call("rs_project_motion_xyz_jacobian", physical.ctypes.data_as(D), physical.size,
+                   coefficients.ctypes.data_as(D), len(coefficients), float(first_control_time), float(control_dt), int(image_height),
+                   times.ctypes.data_as(D), len(times), points.ctypes.data_as(D), len(points),
+                   out.ctypes.data_as(D), out.size, jac.ctypes.data_as(D), jac.size,
+                   status.ctypes.data_as(I), len(status), threads)
+        return {"uv": out[:, :2], "depth": out[:, 2], "row": out[:, 3], "root_equality_px": out[:, 4],
+                "contraction_bound": out[:, 5], "jacobian_xyz": jac, "status": status}
 
     def sample_path(self, board, kind, parameters, vertices, stations):
         flat = [value for point in vertices for value in point]

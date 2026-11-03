@@ -9,7 +9,6 @@ from pathlib import Path
 import sys, json
 import numpy as np
 from scipy.spatial.transform import Rotation
-from .rebuild_prepare import load, digest
 
 # SMPL-X native joint index and local flexion axis. Left/right remain physical.
 POSE_DOFS=((1,0),(2,0),(4,0),(5,0),(7,0),(8,0),(3,0),(6,0),(9,0))
@@ -19,6 +18,7 @@ DOF_NAMES=('left_hip_flexion','right_hip_flexion','left_knee_flexion','right_kne
 
 def export_compact(root, project):
     """Materialize existing model tensors on CPU; never initialize CUDA."""
+    from .rebuild_prepare import load, digest
     project,root=Path(project),Path(root)
     sys.path.insert(0,str(resolve_asset(project, project/'environments/body/GVHMR')))
     import torch
@@ -61,7 +61,10 @@ def export_compact(root, project):
 
 class CompactBody:
     def __init__(self,path,beta,scale,*,lift=.09,rocker=.012):
-        z=load(path)
+        # Loading the compact forward model does not need video/inference/native
+        # dependencies imported by the preparation pipeline.
+        with np.load(path,allow_pickle=False) as source:
+            z={k:source[k].copy() for k in source.files}
         # Preserve double precision through FK; float32 in-place joint positions
         # otherwise corrupt small local-rotation derivatives.
         z={k:(v.astype(np.float64) if v.dtype.kind=='f' else v) for k,v in z.items()}
@@ -73,6 +76,14 @@ class CompactBody:
         self.posedirs=z['posedirs'].reshape(486,-1)
         self.W=z['lbs_weights'];self.reg=z['smplx2coco17_interestd']
         self.default=Rotation.from_rotvec(z['other_default_pose'].reshape(33,3)).as_matrix()
+        self._joint_offsets=self.J-self.J[self.parents]
+        self._weights_T=np.ascontiguousarray(self.W.T)
+        # Body joints 1..21 vary; the 33 hand/face rotations are fixed in both
+        # ordinary entry points. Fold only those constant pose-blend terms.
+        # Keep the general path for explicit corrections to a tail joint.
+        self._body_posedirs=np.ascontiguousarray(self.posedirs[:189])
+        tail_feature=(self.default-np.eye(3)).reshape(297)
+        self._shaped_with_default_pose=self.shaped+(tail_feature@self.posedirs[189:]).reshape(-1,3)
         alpha=np.linspace(0,1,5)
         rest=z['rest_patch_centroids'];height=z['rest_patch_height']
         patch=rest[:,0,None]*(1-alpha[None,:,None])+rest[:,1,None]*alpha[None,:,None]
@@ -91,7 +102,8 @@ class CompactBody:
         if additional_rotations is not None:
             for j,correction in additional_rotations.items():
                 local[:,int(j)]=local[:,int(j)]@Rotation.from_rotvec(np.asarray(correction,float)).as_matrix()
-        return self._forward_local_rotations(local,with_frames=with_frames)
+        fixed_tail=additional_rotations is None or all(0<=int(j)<22 for j in additional_rotations)
+        return self._forward_local_rotations(local,with_frames=with_frames,fixed_tail=fixed_tail)
 
     def forward_rotations(self,body_local_R,*,with_frames=False):
         """Effective rotations of native joints 1..21; world root is external.
@@ -108,21 +120,29 @@ class CompactBody:
         local=np.broadcast_to(np.eye(3),(n,55,3,3)).copy()
         local[:,1:22]=body_local_R
         local[:,22:]=self.default
-        return self._forward_local_rotations(local,with_frames=with_frames)
+        return self._forward_local_rotations(local,with_frames=with_frames,fixed_tail=True)
 
-    def _forward_local_rotations(self,local,*,with_frames=False):
+    def _forward_local_rotations(self,local,*,with_frames=False,fixed_tail=False):
         n=len(local)
         rotation=local.copy();position=np.broadcast_to(self.J,(n,55,3)).copy()
         for j in range(1,55):
             parent=self.parents[j];rotation[:,j]=rotation[:,parent]@local[:,j]
-            position[:,j]=position[:,parent]+np.einsum('nij,j->ni',rotation[:,parent],self.J[j]-self.J[parent])
+            position[:,j]=position[:,parent]+np.einsum('nij,j->ni',rotation[:,parent],self._joint_offsets[j])
         translation=position-np.einsum('njab,jb->nja',rotation,self.J)
-        feature=(local[:,1:]-np.eye(3)).reshape(n,486)
-        posed=self.shaped+(feature@self.posedirs).reshape(n,-1,3)
-        blend_R=np.einsum('vj,njab->nvab',self.W,rotation,optimize=True)
-        blend_t=np.einsum('vj,nja->nva',self.W,translation,optimize=True)
+        if fixed_tail:
+            feature=(local[:,1:22]-np.eye(3)).reshape(n,189)
+            posed=self._shaped_with_default_pose+(feature@self._body_posedirs).reshape(n,-1,3)
+        else:
+            feature=(local[:,1:]-np.eye(3)).reshape(n,486)
+            posed=self.shaped+(feature@self.posedirs).reshape(n,-1,3)
+        # Explicit contractions avoid rebuilding einsum paths and pack each
+        # small matrix product across the batch. All buffers remain call-local
+        # so one immutable model can serve independent CPU workers.
+        vertices_count=len(self.W)
+        blend_R=(rotation.reshape(n,55,9).transpose(0,2,1)@self._weights_T).transpose(0,2,1).reshape(n,vertices_count,3,3)
+        blend_t=(translation.transpose(0,2,1)@self._weights_T).transpose(0,2,1)
         vertices=np.einsum('nvab,nvb->nva',blend_R,posed)+blend_t
-        coco=np.einsum('vj,nvc->njc',self.reg,vertices)-self.J[0]
+        coco=(vertices.transpose(0,2,1)@self.reg).transpose(0,2,1)-self.J[0]
         native=position[:,:22]-self.J[0]
         blade=self.scale*native[:,[7,8],None]+np.einsum('nfab,fkb->nfka',rotation[:,[7,8]],self.blade_relative)
         out=(coco*self.scale,native*self.scale,blade)

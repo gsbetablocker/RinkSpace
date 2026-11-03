@@ -1,0 +1,811 @@
+{
+  "schema": "rinkspace.body-control-field-audit.v1",
+  "audit_date": "2026-11-03",
+  "scope": "Five compact S01 control packages; file identities and complete array field metadata only.",
+  "files": [
+    {
+      "path": "opening_motion_1103.npz",
+      "bytes": 130896,
+      "sha256": "e243435ca52dca1c614de273d97987e903b1abe4f87f4bbef82550693c3ac6c8",
+      "fields": [
+        {
+          "name": "raw_official_pts",
+          "dtype": "<i8",
+          "shape": [
+            77
+          ],
+          "array_bytes": 616
+        },
+        {
+          "name": "raw_legacy_pts",
+          "dtype": "<i8",
+          "shape": [
+            77
+          ],
+          "array_bytes": 616
+        },
+        {
+          "name": "raw_cache_rows",
+          "dtype": "<i8",
+          "shape": [
+            77
+          ],
+          "array_bytes": 616
+        },
+        {
+          "name": "local_R",
+          "dtype": "<f8",
+          "shape": [
+            77,
+            21,
+            3,
+            3
+          ],
+          "array_bytes": 116424
+        },
+        {
+          "name": "Q_world",
+          "dtype": "<f8",
+          "shape": [
+            77,
+            3,
+            3
+          ],
+          "array_bytes": 5544
+        },
+        {
+          "name": "source_time_base",
+          "dtype": "<i8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "raw_cache_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "clock_map_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            850
+          ],
+          "array_bytes": 6800
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            21
+          ],
+          "array_bytes": 168
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            50
+          ],
+          "array_bytes": 400
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "taper",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "preparation_local_R",
+          "dtype": "<f8",
+          "shape": [
+            21,
+            3,
+            3
+          ],
+          "array_bytes": 1512
+        },
+        {
+          "name": "preparation_P",
+          "dtype": "<f8",
+          "shape": [
+            3
+          ],
+          "array_bytes": 24
+        },
+        {
+          "name": "preparation_Q",
+          "dtype": "<f8",
+          "shape": [
+            3,
+            3
+          ],
+          "array_bytes": 72
+        },
+        {
+          "name": "waist_vertex_ids",
+          "dtype": "<i8",
+          "shape": [
+            249
+          ],
+          "array_bytes": 1992
+        },
+        {
+          "name": "palm_vertex_ids",
+          "dtype": "<i8",
+          "shape": [
+            3,
+            8
+          ],
+          "array_bytes": 192
+        },
+        {
+          "name": "input_contract_json",
+          "dtype": "<U2743",
+          "shape": [],
+          "array_bytes": 10972
+        }
+      ]
+    },
+    {
+      "path": "opening_timing_1103.npz",
+      "bytes": 131188,
+      "sha256": "b90bf7b42131905bd84e05cedf753e1af25eade5f70d88406d293d0a5292753e",
+      "fields": [
+        {
+          "name": "raw_official_pts",
+          "dtype": "<i8",
+          "shape": [
+            77
+          ],
+          "array_bytes": 616
+        },
+        {
+          "name": "raw_legacy_pts",
+          "dtype": "<i8",
+          "shape": [
+            77
+          ],
+          "array_bytes": 616
+        },
+        {
+          "name": "raw_cache_rows",
+          "dtype": "<i8",
+          "shape": [
+            77
+          ],
+          "array_bytes": 616
+        },
+        {
+          "name": "local_R",
+          "dtype": "<f8",
+          "shape": [
+            77,
+            21,
+            3,
+            3
+          ],
+          "array_bytes": 116424
+        },
+        {
+          "name": "Q_world",
+          "dtype": "<f8",
+          "shape": [
+            77,
+            3,
+            3
+          ],
+          "array_bytes": 5544
+        },
+        {
+          "name": "source_time_base",
+          "dtype": "<i8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "raw_cache_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "clock_map_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            850
+          ],
+          "array_bytes": 6800
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            21
+          ],
+          "array_bytes": 168
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            50
+          ],
+          "array_bytes": 400
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "taper",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "preparation_local_R",
+          "dtype": "<f8",
+          "shape": [
+            21,
+            3,
+            3
+          ],
+          "array_bytes": 1512
+        },
+        {
+          "name": "preparation_P",
+          "dtype": "<f8",
+          "shape": [
+            3
+          ],
+          "array_bytes": 24
+        },
+        {
+          "name": "preparation_Q",
+          "dtype": "<f8",
+          "shape": [
+            3,
+            3
+          ],
+          "array_bytes": 72
+        },
+        {
+          "name": "waist_vertex_ids",
+          "dtype": "<i8",
+          "shape": [
+            249
+          ],
+          "array_bytes": 1992
+        },
+        {
+          "name": "palm_vertex_ids",
+          "dtype": "<i8",
+          "shape": [
+            3,
+            8
+          ],
+          "array_bytes": 192
+        },
+        {
+          "name": "input_contract_json",
+          "dtype": "<U3208",
+          "shape": [],
+          "array_bytes": 12832
+        }
+      ]
+    },
+    {
+      "path": "opening_hand_1103.npz",
+      "bytes": 126527,
+      "sha256": "ec424429fb333e23ba492a31c064a639fd1beb344a1cad1dacac70491d8ffcda",
+      "fields": [
+        {
+          "name": "raw_official_pts",
+          "dtype": "<i8",
+          "shape": [
+            77
+          ],
+          "array_bytes": 616
+        },
+        {
+          "name": "raw_legacy_pts",
+          "dtype": "<i8",
+          "shape": [
+            77
+          ],
+          "array_bytes": 616
+        },
+        {
+          "name": "raw_cache_rows",
+          "dtype": "<i8",
+          "shape": [
+            77
+          ],
+          "array_bytes": 616
+        },
+        {
+          "name": "local_R",
+          "dtype": "<f8",
+          "shape": [
+            77,
+            21,
+            3,
+            3
+          ],
+          "array_bytes": 116424
+        },
+        {
+          "name": "Q_world",
+          "dtype": "<f8",
+          "shape": [
+            77,
+            3,
+            3
+          ],
+          "array_bytes": 5544
+        },
+        {
+          "name": "source_time_base",
+          "dtype": "<i8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "raw_cache_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "clock_map_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            108
+          ],
+          "array_bytes": 864
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            16
+          ],
+          "array_bytes": 128
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            9
+          ],
+          "array_bytes": 72
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "taper",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "preparation_local_R",
+          "dtype": "<f8",
+          "shape": [
+            21,
+            3,
+            3
+          ],
+          "array_bytes": 1512
+        },
+        {
+          "name": "preparation_P",
+          "dtype": "<f8",
+          "shape": [
+            3
+          ],
+          "array_bytes": 24
+        },
+        {
+          "name": "preparation_Q",
+          "dtype": "<f8",
+          "shape": [
+            3,
+            3
+          ],
+          "array_bytes": 72
+        },
+        {
+          "name": "waist_vertex_ids",
+          "dtype": "<i8",
+          "shape": [
+            322
+          ],
+          "array_bytes": 2576
+        },
+        {
+          "name": "palm_vertex_ids",
+          "dtype": "<i8",
+          "shape": [
+            3,
+            8
+          ],
+          "array_bytes": 192
+        },
+        {
+          "name": "input_contract_json",
+          "dtype": "<U3823",
+          "shape": [],
+          "array_bytes": 15292
+        }
+      ]
+    },
+    {
+      "path": "skate_contact_1103.npz",
+      "bytes": 60306,
+      "sha256": "41b470cc867e6b3b9cafb4e1ff626f6631f3d77e265377a65eeb7f0ea63718c1",
+      "fields": [
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            3379
+          ],
+          "array_bytes": 27032
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            86
+          ],
+          "array_bytes": 688
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            41
+          ],
+          "array_bytes": 328
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            4758
+          ],
+          "array_bytes": 38064
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            11098
+          ],
+          "array_bytes": 88784
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "outer",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "shared_x",
+          "dtype": "<f8",
+          "shape": [
+            17
+          ],
+          "array_bytes": 136
+        },
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1626",
+          "shape": [],
+          "array_bytes": 6504
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        }
+      ]
+    },
+    {
+      "path": "skate_s01_1103.npz",
+      "bytes": 87314,
+      "sha256": "3b58dac5f7363dfc5e051fc75ef8602dd3810a0ebc370c57a24542745bc5090c",
+      "fields": [
+        {
+          "name": "base_layer_count",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "base_layer_0_x",
+          "dtype": "<f8",
+          "shape": [
+            3362
+          ],
+          "array_bytes": 26896
+        },
+        {
+          "name": "base_layer_0_knots",
+          "dtype": "<f8",
+          "shape": [
+            86
+          ],
+          "array_bytes": 688
+        },
+        {
+          "name": "base_layer_0_active",
+          "dtype": "<i8",
+          "shape": [
+            41
+          ],
+          "array_bytes": 328
+        },
+        {
+          "name": "base_layer_0_seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "base_layer_0_state_kind",
+          "dtype": "<U9",
+          "shape": [],
+          "array_bytes": 36
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            4226
+          ],
+          "array_bytes": 33808
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            65
+          ],
+          "array_bytes": 520
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            69
+          ],
+          "array_bytes": 552
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            6857
+          ],
+          "array_bytes": 54856
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            18304
+          ],
+          "array_bytes": 146432
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "shared_x",
+          "dtype": "<f8",
+          "shape": [
+            17
+          ],
+          "array_bytes": 136
+        },
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1626",
+          "shape": [],
+          "array_bytes": 6504
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        }
+      ]
+    }
+  ],
+  "observed_contents": [
+    "optimized control vectors and local rotations including inherited pose priors",
+    "source PTS, scales, binding hashes and limited vertex-selection indices",
+    "shared lower-skate controls, spline layers/knots and augmented-Lagrangian state"
+  ],
+  "excluded_contents": [
+    "SMPL-X body template, shape/pose blend bases, skinning weights and full-body topology",
+    "complete body surfaces or pixel buffers"
+  ],
+  "limits": [
+    "This field inventory is not a licence grant or a certification of third-party output rights.",
+    "Matching control replay and source PTS do not certify pose, image or ice-contact accuracy.",
+    "skate_s01_1103 remains a budget-stopped candidate with failed contact and image/pose regressions recorded in its binding."
+  ]
+}
