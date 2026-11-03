@@ -1,0 +1,5043 @@
+{
+  "schema": "rinkspace.programme-body-short-windows.v1",
+  "event": "ankara_2026",
+  "programme": "okada_mei_sp",
+  "shot": "s01",
+  "status": "runnable development candidate; not user accepted or independent 3D validation",
+  "source_time_base": [
+    1,
+    12800
+  ],
+  "available_source_seconds": [
+    22.12,
+    44.96
+  ],
+  "optimized_source_seconds": [
+    [
+      24.5,
+      27.0
+    ],
+    [
+      32.2,
+      33.8
+    ],
+    [
+      35.2,
+      36.8
+    ],
+    [
+      37.4,
+      39.0
+    ],
+    [
+      40.0,
+      41.5
+    ]
+  ],
+  "optimized_source_frames": 445,
+  "unchanged_reference_frames": 698,
+  "complete_programme_body_tracking": false,
+  "camera": {
+    "record": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\camera_solver_refined_1102.json",
+    "state_path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_solver_refined_1102.npz",
+    "state_sha256": "d6cfde1474a23d594a0395351ebbdb0ee15a6560ef77b27f069d239ee95bb3f3",
+    "native_library": "D:/CodexData/RinkSpace_Data/build/solver_continue_1102/rinkspace_core.dll",
+    "native_library_sha256": "606f94386d26a3c6683dcbf881ce75d64de08ab2cc27a9a4effbf2ea698ad080",
+    "shot": {
+      "camera_index": 0,
+      "control_begin": 0,
+      "control_stop": 1152,
+      "first_control_time": 1.96,
+      "first_pts": 283136,
+      "id": "s01",
+      "knot_stride": 10,
+      "last_pts": 575488,
+      "motion_reference_time": 2.1,
+      "reference_pts": 256256,
+      "row_begin": 0,
+      "row_stop": 279126,
+      "source_coverage": {
+        "expected_exposures": 1143,
+        "missing_exposures": 0,
+        "missing_ranges": [],
+        "observed_exposures": 1143,
+        "partial_source_coverage": false,
+        "synthetic_rows_added": 0
+      },
+      "stop_pts_exclusive": 575744,
+      "time_base_den": 12800,
+      "time_base_num": 1
+    },
+    "metres_per_scene_unit": 59.96169706678219,
+    "solver_metres_per_scene_unit": 60.0,
+    "length_export_ratio": 0.9993616177797032,
+    "camera_changed_during_fit": false,
+    "source_time_base": [
+      1,
+      12800
+    ],
+    "old_reference_reprojected_on_current_camera": true,
+    "prepared": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\physical_repair_1101\\prepared_shared_timing"
+  },
+  "scene": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\review_scene.npz",
+    "sha256": "8103812a1cc6d3eab9bfb29d89a381328a1cfa15d386d6102f273af7d3c4c669"
+  },
+  "metric_scale": "conditional uniform native scene scale, not independently measured",
+  "compact_parameters": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\body_fullbody_1102.npz",
+    "sha256": "04445f99c84672e1c8a805901153a846801d71a31732335d62c73c9de53b4992"
+  },
+  "state_contract": {
+    "global_root": "Q_ref @ Exp(root_delta)",
+    "pelvis": "P_ref + delta_P",
+    "local_rotations": "21 local matrices R_ref @ Exp(delta_local); body root identity",
+    "reference": "original pose @ B9 @ leg correction, folded exactly once",
+    "continuous_time": "cubic local controls, C2 quintic attachment to the unchanged reference",
+    "ownership": "one state drives full mesh, skeleton, shoes and blades; common midpoint separate from row-time projection",
+    "contact": "unknown; no ice snapping or inferred physical left/right blade identity"
+  },
+  "observation_ledger": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\ledger.json",
+    "sha256": "62f245c3dc070493ecea5471993d34b80525dd7173670e6eab66d4ca3b489f8e",
+    "observations": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\observations.npz",
+    "observations_sha256": "c7cb38e3acd8bf9a18796ec604048bc2fd35f76e66ce645ede34b6872545b2d4",
+    "changes": [
+      {
+        "shot_id": "s01",
+        "pts": 320512,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 10,
+        "hypothesis_id": "right_wrist",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 10,
+        "original_uv": [
+          921.2197265625,
+          605.3440551757812
+        ],
+        "original_raw_score": 0.3917157053947449,
+        "alternative_source_id": "RTMW133",
+        "alternative_semantic_index": 10,
+        "alternative_uv": [
+          871.5615234375,
+          248.0682373046875
+        ],
+        "alternative_raw_score": 2.565037250518799,
+        "adoption": "selected_local_overlay",
+        "physical_left_right_status": "local_semantic_association_reviewed",
+        "visibility": "reviewed_with_blur; see evidence",
+        "uncertainty": {
+          "sigma_px": 8.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "status": "assistant_source_reviewed",
+          "evidence": "source_review/right_wrist.jpg",
+          "source_pts": [
+            320256,
+            320512,
+            320768
+          ],
+          "conclusion_zh": "原右腕点落在裙部；抬起的手腕在头上方，RTMW与前后帧同一只手腕一致。选RTMW单点候选；运动模糊及像素误差仍存在。",
+          "human_confirmed": false
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 332288,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 9,
+        "hypothesis_id": "left_wrist",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 9,
+        "original_uv": [
+          787.7678833007812,
+          461.09375
+        ],
+        "original_raw_score": 0.48243534564971924,
+        "alternative_source_id": "RTMW133",
+        "alternative_semantic_index": 9,
+        "alternative_uv": [
+          1120.3900146484375,
+          240.88087463378906
+        ],
+        "alternative_raw_score": 5.074747085571289,
+        "adoption": "selected_local_overlay",
+        "physical_left_right_status": "local_semantic_association_reviewed",
+        "visibility": "reviewed_with_blur; see evidence",
+        "uncertainty": {
+          "sigma_px": 8.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "status": "assistant_source_reviewed",
+          "evidence": "source_review/left_wrist.jpg",
+          "source_pts": [
+            332032,
+            332288,
+            332544
+          ],
+          "conclusion_zh": "原左腕点落在画面左侧另一只手，左腕实际在画面右上方抬臂末端；RTMW同语义与邻帧一致。",
+          "human_confirmed": false
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 521728,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 13,
+        "hypothesis_id": "knee_ankle_identity",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 13,
+        "original_uv": [
+          880.077392578125,
+          646.2247314453125
+        ],
+        "original_raw_score": 0.9036320447921753,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 14,
+        "alternative_uv": [
+          940.064208984375,
+          699.1607666015625
+        ],
+        "alternative_raw_score": 0.881689190864563,
+        "adoption": "selected_local_overlay",
+        "physical_left_right_status": "local_semantic_association_reviewed",
+        "visibility": "reviewed_with_blur; see evidence",
+        "uncertainty": {
+          "sigma_px": 6.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "status": "assistant_source_reviewed",
+          "evidence": "source_review/knee_ankle_identity.jpg",
+          "source_pts": [
+            521472,
+            521728,
+            521984
+          ],
+          "conclusion_zh": "连续原图腿运动连贯，原COCO该单帧13/14及15/16身份同时交换；仅重绑该帧四个原始像素，不改变坐标。RTMW邻帧身份一致。",
+          "human_confirmed": false
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 521728,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 14,
+        "hypothesis_id": "knee_ankle_identity",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 14,
+        "original_uv": [
+          940.064208984375,
+          699.1607666015625
+        ],
+        "original_raw_score": 0.881689190864563,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 13,
+        "alternative_uv": [
+          880.077392578125,
+          646.2247314453125
+        ],
+        "alternative_raw_score": 0.9036320447921753,
+        "adoption": "selected_local_overlay",
+        "physical_left_right_status": "local_semantic_association_reviewed",
+        "visibility": "reviewed_with_blur; see evidence",
+        "uncertainty": {
+          "sigma_px": 6.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "status": "assistant_source_reviewed",
+          "evidence": "source_review/knee_ankle_identity.jpg",
+          "source_pts": [
+            521472,
+            521728,
+            521984
+          ],
+          "conclusion_zh": "连续原图腿运动连贯，原COCO该单帧13/14及15/16身份同时交换；仅重绑该帧四个原始像素，不改变坐标。RTMW邻帧身份一致。",
+          "human_confirmed": false
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 521728,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 15,
+        "hypothesis_id": "knee_ankle_identity",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 15,
+        "original_uv": [
+          883.668212890625,
+          762.6778564453125
+        ],
+        "original_raw_score": 0.8451306223869324,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 16,
+        "alternative_uv": [
+          1014.3035888671875,
+          775.861328125
+        ],
+        "alternative_raw_score": 0.8525561690330505,
+        "adoption": "selected_local_overlay",
+        "physical_left_right_status": "local_semantic_association_reviewed",
+        "visibility": "reviewed_with_blur; see evidence",
+        "uncertainty": {
+          "sigma_px": 7.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "status": "assistant_source_reviewed",
+          "evidence": "source_review/knee_ankle_identity.jpg",
+          "source_pts": [
+            521472,
+            521728,
+            521984
+          ],
+          "conclusion_zh": "连续原图腿运动连贯，原COCO该单帧13/14及15/16身份同时交换；仅重绑该帧四个原始像素，不改变坐标。RTMW邻帧身份一致。",
+          "human_confirmed": false
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 521728,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 16,
+        "hypothesis_id": "knee_ankle_identity",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 16,
+        "original_uv": [
+          1014.3035888671875,
+          775.861328125
+        ],
+        "original_raw_score": 0.8525561690330505,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 15,
+        "alternative_uv": [
+          883.668212890625,
+          762.6778564453125
+        ],
+        "alternative_raw_score": 0.8451306223869324,
+        "adoption": "selected_local_overlay",
+        "physical_left_right_status": "local_semantic_association_reviewed",
+        "visibility": "reviewed_with_blur; see evidence",
+        "uncertainty": {
+          "sigma_px": 7.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "status": "assistant_source_reviewed",
+          "evidence": "source_review/knee_ankle_identity.jpg",
+          "source_pts": [
+            521472,
+            521728,
+            521984
+          ],
+          "conclusion_zh": "连续原图腿运动连贯，原COCO该单帧13/14及15/16身份同时交换；仅重绑该帧四个原始像素，不改变坐标。RTMW邻帧身份一致。",
+          "human_confirmed": false
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 315136,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 8,
+        "hypothesis_id": "arm_2464",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 8,
+        "original_uv": [
+          969.22314453125,
+          355.9891357421875
+        ],
+        "original_raw_score": 0.7359802722930908,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 8,
+        "alternative_uv": [
+          969.22314453125,
+          355.9891357421875
+        ],
+        "alternative_raw_score": 0.7359802722930908,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 7.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 315136,
+          "joint": 8,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2464",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2464.jpg",
+          "conclusion_zh": "肘与头发/躯干混合，原检测及RTMW不能确定位置；保留未知，不根据模型挑选候选。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 315392,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 8,
+        "hypothesis_id": "arm_2464",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 8,
+        "original_uv": [
+          981.213134765625,
+          496.40826416015625
+        ],
+        "original_raw_score": 0.3341786563396454,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 8,
+        "alternative_uv": [
+          981.213134765625,
+          496.40826416015625
+        ],
+        "alternative_raw_score": 0.3341786563396454,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 7.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 315392,
+          "joint": 8,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2464",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2464.jpg",
+          "conclusion_zh": "肘与头发/躯干混合，原检测及RTMW不能确定位置；保留未知，不根据模型挑选候选。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 315648,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 8,
+        "hypothesis_id": "arm_2464",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 8,
+        "original_uv": [
+          881.217529296875,
+          208.587890625
+        ],
+        "original_raw_score": 0.8485422134399414,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 8,
+        "alternative_uv": [
+          881.217529296875,
+          208.587890625
+        ],
+        "alternative_raw_score": 0.8485422134399414,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 7.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 315648,
+          "joint": 8,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2464",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2464.jpg",
+          "conclusion_zh": "肘与头发/躯干混合，原检测及RTMW不能确定位置；保留未知，不根据模型挑选候选。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 320512,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 8,
+        "hypothesis_id": "arm_2504",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 8,
+        "original_uv": [
+          878.91943359375,
+          530.1815795898438
+        ],
+        "original_raw_score": 0.6638537645339966,
+        "alternative_source_id": "RTMW133",
+        "alternative_semantic_index": 8,
+        "alternative_uv": [
+          884.825439453125,
+          322.8287048339844
+        ],
+        "alternative_raw_score": 2.771571159362793,
+        "adoption": "selected_local_overlay",
+        "physical_left_right_status": "local_semantic_association_reviewed",
+        "visibility": "visible with motion blur",
+        "uncertainty": {
+          "sigma_px": 7.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 320512,
+          "joint": 8,
+          "operation": "use_rtmw",
+          "hypothesis_id": "arm_2504",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "visible with motion blur",
+          "evidence": "source_review/extra/arm_2504.jpg",
+          "conclusion_zh": "原右肘落腰臀，同语义RTMW位于上举臂近头侧，与前后原图连贯。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 320768,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 8,
+        "hypothesis_id": "arm_2504",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 8,
+        "original_uv": [
+          879.625,
+          531.40966796875
+        ],
+        "original_raw_score": 0.7190796136856079,
+        "alternative_source_id": "RTMW133",
+        "alternative_semantic_index": 8,
+        "alternative_uv": [
+          899.0008544921875,
+          324.2718811035156
+        ],
+        "alternative_raw_score": 2.608173131942749,
+        "adoption": "selected_local_overlay",
+        "physical_left_right_status": "local_semantic_association_reviewed",
+        "visibility": "visible with motion blur",
+        "uncertainty": {
+          "sigma_px": 7.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 320768,
+          "joint": 8,
+          "operation": "use_rtmw",
+          "hypothesis_id": "arm_2504",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "visible with motion blur",
+          "evidence": "source_review/extra/arm_2504.jpg",
+          "conclusion_zh": "原右肘落腰臀，同语义RTMW位于上举臂近头侧，与前后原图连贯。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 323328,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 7,
+        "hypothesis_id": "arm_2528",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 7,
+        "original_uv": [
+          900.478271484375,
+          415.9093933105469
+        ],
+        "original_raw_score": 0.692166805267334,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 7,
+        "alternative_uv": [
+          900.478271484375,
+          415.9093933105469
+        ],
+        "alternative_raw_score": 0.692166805267334,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 7.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 323328,
+          "joint": 7,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2528",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2528.jpg",
+          "conclusion_zh": "两臂语义及模糊重叠处不能可靠分辨，不交换左右，不采用拟合残差筛选。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 323328,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 9,
+        "hypothesis_id": "arm_2528",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 9,
+        "original_uv": [
+          896.9354248046875,
+          467.3034362792969
+        ],
+        "original_raw_score": 0.8420641422271729,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 9,
+        "alternative_uv": [
+          896.9354248046875,
+          467.3034362792969
+        ],
+        "alternative_raw_score": 0.8420641422271729,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 8.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 323328,
+          "joint": 9,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2528",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2528.jpg",
+          "conclusion_zh": "两臂语义及模糊重叠处不能可靠分辨，不交换左右，不采用拟合残差筛选。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 323584,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 7,
+        "hypothesis_id": "arm_2528",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 7,
+        "original_uv": [
+          927.5321044921875,
+          300.7044372558594
+        ],
+        "original_raw_score": 0.6171190738677979,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 7,
+        "alternative_uv": [
+          927.5321044921875,
+          300.7044372558594
+        ],
+        "alternative_raw_score": 0.6171190738677979,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 7.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 323584,
+          "joint": 7,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2528",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2528.jpg",
+          "conclusion_zh": "两臂语义及模糊重叠处不能可靠分辨，不交换左右，不采用拟合残差筛选。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 323584,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 9,
+        "hypothesis_id": "arm_2528",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 9,
+        "original_uv": [
+          920.978759765625,
+          237.77536010742188
+        ],
+        "original_raw_score": 0.6186318397521973,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 9,
+        "alternative_uv": [
+          920.978759765625,
+          237.77536010742188
+        ],
+        "alternative_raw_score": 0.6186318397521973,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 8.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 323584,
+          "joint": 9,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2528",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2528.jpg",
+          "conclusion_zh": "两臂语义及模糊重叠处不能可靠分辨，不交换左右，不采用拟合残差筛选。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 323840,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 7,
+        "hypothesis_id": "arm_2528",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 7,
+        "original_uv": [
+          935.6900634765625,
+          298.1065979003906
+        ],
+        "original_raw_score": 0.42406997084617615,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 7,
+        "alternative_uv": [
+          935.6900634765625,
+          298.1065979003906
+        ],
+        "alternative_raw_score": 0.42406997084617615,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 7.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 323840,
+          "joint": 7,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2528",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2528.jpg",
+          "conclusion_zh": "两臂语义及模糊重叠处不能可靠分辨，不交换左右，不采用拟合残差筛选。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 323840,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 9,
+        "hypothesis_id": "arm_2528",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 9,
+        "original_uv": [
+          939.0406494140625,
+          246.06863403320312
+        ],
+        "original_raw_score": 0.4120243191719055,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 9,
+        "alternative_uv": [
+          939.0406494140625,
+          246.06863403320312
+        ],
+        "alternative_raw_score": 0.4120243191719055,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 8.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 323840,
+          "joint": 9,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2528",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2528.jpg",
+          "conclusion_zh": "两臂语义及模糊重叠处不能可靠分辨，不交换左右，不采用拟合残差筛选。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 334336,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 10,
+        "hypothesis_id": "wrist_2612",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 10,
+        "original_uv": [
+          949.1687622070312,
+          613.320556640625
+        ],
+        "original_raw_score": 0.4255220890045166,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 10,
+        "alternative_uv": [
+          949.1687622070312,
+          613.320556640625
+        ],
+        "alternative_raw_score": 0.4255220890045166,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 8.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 334336,
+          "joint": 10,
+          "operation": "exclude",
+          "hypothesis_id": "wrist_2612",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/wrist_2612.jpg",
+          "conclusion_zh": "原腕落衣服/臀部，RTMW候选也不能从源图确认另一只腕的位置。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 334592,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 10,
+        "hypothesis_id": "wrist_2612",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 10,
+        "original_uv": [
+          942.46142578125,
+          595.2938232421875
+        ],
+        "original_raw_score": 0.2739633619785309,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 10,
+        "alternative_uv": [
+          942.46142578125,
+          595.2938232421875
+        ],
+        "alternative_raw_score": 0.2739633619785309,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 8.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 334592,
+          "joint": 10,
+          "operation": "exclude",
+          "hypothesis_id": "wrist_2612",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/wrist_2612.jpg",
+          "conclusion_zh": "原腕落衣服/臀部，RTMW候选也不能从源图确认另一只腕的位置。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 341248,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 7,
+        "hypothesis_id": "arm_2668",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 7,
+        "original_uv": [
+          947.3829345703125,
+          524.775146484375
+        ],
+        "original_raw_score": 0.5995272397994995,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 7,
+        "alternative_uv": [
+          947.3829345703125,
+          524.775146484375
+        ],
+        "alternative_raw_score": 0.5995272397994995,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 7.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 341248,
+          "joint": 7,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2668",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2668.jpg",
+          "conclusion_zh": "原点落腰裙或脸部，肘轮廓与头发混合，腕候选在头上方模糊手部；位置/左右身份不足以确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 341248,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 9,
+        "hypothesis_id": "arm_2668",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 9,
+        "original_uv": [
+          974.9417724609375,
+          630.474609375
+        ],
+        "original_raw_score": 0.563853919506073,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 9,
+        "alternative_uv": [
+          974.9417724609375,
+          630.474609375
+        ],
+        "alternative_raw_score": 0.563853919506073,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 8.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 341248,
+          "joint": 9,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2668",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2668.jpg",
+          "conclusion_zh": "原点落腰裙或脸部，肘轮廓与头发混合，腕候选在头上方模糊手部；位置/左右身份不足以确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 341504,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 7,
+        "hypothesis_id": "arm_2668",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 7,
+        "original_uv": [
+          963.0704345703125,
+          535.999755859375
+        ],
+        "original_raw_score": 0.5531760454177856,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 7,
+        "alternative_uv": [
+          963.0704345703125,
+          535.999755859375
+        ],
+        "alternative_raw_score": 0.5531760454177856,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 7.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 341504,
+          "joint": 7,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2668",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2668.jpg",
+          "conclusion_zh": "原点落腰裙或脸部，肘轮廓与头发混合，腕候选在头上方模糊手部；位置/左右身份不足以确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 341504,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 9,
+        "hypothesis_id": "arm_2668",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 9,
+        "original_uv": [
+          985.275146484375,
+          643.1112060546875
+        ],
+        "original_raw_score": 0.6757944226264954,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 9,
+        "alternative_uv": [
+          985.275146484375,
+          643.1112060546875
+        ],
+        "alternative_raw_score": 0.6757944226264954,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 8.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 341504,
+          "joint": 9,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2668",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2668.jpg",
+          "conclusion_zh": "原点落腰裙或脸部，肘轮廓与头发混合，腕候选在头上方模糊手部；位置/左右身份不足以确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 341760,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 7,
+        "hypothesis_id": "arm_2668",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 7,
+        "original_uv": [
+          1025.270263671875,
+          313.4403076171875
+        ],
+        "original_raw_score": 0.8625067472457886,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 7,
+        "alternative_uv": [
+          1025.270263671875,
+          313.4403076171875
+        ],
+        "alternative_raw_score": 0.8625067472457886,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 7.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 341760,
+          "joint": 7,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2668",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2668.jpg",
+          "conclusion_zh": "原点落腰裙或脸部，肘轮廓与头发混合，腕候选在头上方模糊手部；位置/左右身份不足以确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 341760,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 9,
+        "hypothesis_id": "arm_2668",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 9,
+        "original_uv": [
+          1056.8599853515625,
+          254.90985107421875
+        ],
+        "original_raw_score": 0.8841086626052856,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 9,
+        "alternative_uv": [
+          1056.8599853515625,
+          254.90985107421875
+        ],
+        "alternative_raw_score": 0.8841086626052856,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 8.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 341760,
+          "joint": 9,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2668",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2668.jpg",
+          "conclusion_zh": "原点落腰裙或脸部，肘轮廓与头发混合，腕候选在头上方模糊手部；位置/左右身份不足以确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 457984,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 7,
+        "hypothesis_id": "arms_3580",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 7,
+        "original_uv": [
+          703.5007934570312,
+          467.8774108886719
+        ],
+        "original_raw_score": 0.7687087059020996,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 7,
+        "alternative_uv": [
+          703.5007934570312,
+          467.8774108886719
+        ],
+        "alternative_raw_score": 0.7687087059020996,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 7.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 457984,
+          "joint": 7,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 457984,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 8,
+        "hypothesis_id": "arms_3580",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 8,
+        "original_uv": [
+          669.4926147460938,
+          473.5520324707031
+        ],
+        "original_raw_score": 0.42680609226226807,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 8,
+        "alternative_uv": [
+          669.4926147460938,
+          473.5520324707031
+        ],
+        "alternative_raw_score": 0.42680609226226807,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 7.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 457984,
+          "joint": 8,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 457984,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 9,
+        "hypothesis_id": "arms_3580",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 9,
+        "original_uv": [
+          701.29052734375,
+          456.2587585449219
+        ],
+        "original_raw_score": 0.7857934832572937,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 9,
+        "alternative_uv": [
+          701.29052734375,
+          456.2587585449219
+        ],
+        "alternative_raw_score": 0.7857934832572937,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 8.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 457984,
+          "joint": 9,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 457984,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 10,
+        "hypothesis_id": "arms_3580",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 10,
+        "original_uv": [
+          793.0652465820312,
+          638.13623046875
+        ],
+        "original_raw_score": 0.4560261070728302,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 10,
+        "alternative_uv": [
+          793.0652465820312,
+          638.13623046875
+        ],
+        "alternative_raw_score": 0.4560261070728302,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 8.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 457984,
+          "joint": 10,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 458240,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 7,
+        "hypothesis_id": "arms_3580",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 7,
+        "original_uv": [
+          737.5717163085938,
+          563.1114501953125
+        ],
+        "original_raw_score": 0.5872328281402588,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 7,
+        "alternative_uv": [
+          737.5717163085938,
+          563.1114501953125
+        ],
+        "alternative_raw_score": 0.5872328281402588,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 7.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 458240,
+          "joint": 7,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 458240,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 8,
+        "hypothesis_id": "arms_3580",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 8,
+        "original_uv": [
+          737.0025024414062,
+          568.582275390625
+        ],
+        "original_raw_score": 0.600555419921875,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 8,
+        "alternative_uv": [
+          737.0025024414062,
+          568.582275390625
+        ],
+        "alternative_raw_score": 0.600555419921875,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 7.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 458240,
+          "joint": 8,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 458240,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 9,
+        "hypothesis_id": "arms_3580",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 9,
+        "original_uv": [
+          784.0646362304688,
+          622.98779296875
+        ],
+        "original_raw_score": 0.3785631060600281,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 9,
+        "alternative_uv": [
+          784.0646362304688,
+          622.98779296875
+        ],
+        "alternative_raw_score": 0.3785631060600281,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 8.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 458240,
+          "joint": 9,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 458240,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 10,
+        "hypothesis_id": "arms_3580",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 10,
+        "original_uv": [
+          786.7401733398438,
+          636.2913818359375
+        ],
+        "original_raw_score": 0.5269999504089355,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 10,
+        "alternative_uv": [
+          786.7401733398438,
+          636.2913818359375
+        ],
+        "alternative_raw_score": 0.5269999504089355,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 8.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 458240,
+          "joint": 10,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 458496,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 7,
+        "hypothesis_id": "arms_3580",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 7,
+        "original_uv": [
+          705.7186889648438,
+          494.302978515625
+        ],
+        "original_raw_score": 0.40902599692344666,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 7,
+        "alternative_uv": [
+          705.7186889648438,
+          494.302978515625
+        ],
+        "alternative_raw_score": 0.40902599692344666,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 7.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 458496,
+          "joint": 7,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 458496,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 8,
+        "hypothesis_id": "arms_3580",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 8,
+        "original_uv": [
+          743.8220825195312,
+          569.614013671875
+        ],
+        "original_raw_score": 0.5143505930900574,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 8,
+        "alternative_uv": [
+          743.8220825195312,
+          569.614013671875
+        ],
+        "alternative_raw_score": 0.5143505930900574,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 7.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 458496,
+          "joint": 8,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 458496,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 9,
+        "hypothesis_id": "arms_3580",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 9,
+        "original_uv": [
+          699.2849731445312,
+          489.20648193359375
+        ],
+        "original_raw_score": 0.33554065227508545,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 9,
+        "alternative_uv": [
+          699.2849731445312,
+          489.20648193359375
+        ],
+        "alternative_raw_score": 0.33554065227508545,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 8.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 458496,
+          "joint": 9,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 458496,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 10,
+        "hypothesis_id": "arms_3580",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 10,
+        "original_uv": [
+          789.7622680664062,
+          638.1993408203125
+        ],
+        "original_raw_score": 0.5863692164421082,
+        "alternative_source_id": "COCO17",
+        "alternative_semantic_index": 10,
+        "alternative_uv": [
+          789.7622680664062,
+          638.1993408203125
+        ],
+        "alternative_raw_score": 0.5863692164421082,
+        "adoption": "excluded_pending_review",
+        "physical_left_right_status": "unconfirmed",
+        "visibility": "unconfirmed",
+        "uncertainty": {
+          "sigma_px": 8.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 458496,
+          "joint": 10,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      },
+      {
+        "shot_id": "s01",
+        "pts": 522240,
+        "time_base": [
+          1,
+          12800
+        ],
+        "joint": 13,
+        "hypothesis_id": "leg_4080",
+        "original_source_id": "COCO17",
+        "original_semantic_index": 13,
+        "original_uv": [
+          889.588134765625,
+          651.4647827148438
+        ],
+        "original_raw_score": 0.49103236198425293,
+        "alternative_source_id": "RTMW133",
+        "alternative_semantic_index": 13,
+        "alternative_uv": [
+          966.7008056640625,
+          705.8792114257812
+        ],
+        "alternative_raw_score": 3.8845653533935547,
+        "adoption": "selected_local_overlay",
+        "physical_left_right_status": "local_semantic_association_reviewed",
+        "visibility": "visible with motion blur",
+        "uncertainty": {
+          "sigma_px": 6.0,
+          "calibrated": false
+        },
+        "evidence": {
+          "pts": 522240,
+          "joint": 13,
+          "operation": "use_rtmw",
+          "hypothesis_id": "leg_4080",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "visible with motion blur",
+          "evidence": "source_review/extra/leg_4080.jpg",
+          "conclusion_zh": "原13与14挤在同一弯腿膝部，RTMW13在另一条腿膝部并与相邻帧连贯；不涉及接冰结论。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        "reason": "source image and adjacent identity; no selection by model residual"
+      }
+    ],
+    "changed_points": 9,
+    "excluded_points": 29,
+    "decisions": {
+      "320512": {
+        "status": "assistant_source_reviewed",
+        "evidence": "source_review/right_wrist.jpg",
+        "source_pts": [
+          320256,
+          320512,
+          320768
+        ],
+        "conclusion_zh": "原右腕点落在裙部；抬起的手腕在头上方，RTMW与前后帧同一只手腕一致。选RTMW单点候选；运动模糊及像素误差仍存在。",
+        "human_confirmed": false
+      },
+      "332288": {
+        "status": "assistant_source_reviewed",
+        "evidence": "source_review/left_wrist.jpg",
+        "source_pts": [
+          332032,
+          332288,
+          332544
+        ],
+        "conclusion_zh": "原左腕点落在画面左侧另一只手，左腕实际在画面右上方抬臂末端；RTMW同语义与邻帧一致。",
+        "human_confirmed": false
+      },
+      "521728": {
+        "status": "assistant_source_reviewed",
+        "evidence": "source_review/knee_ankle_identity.jpg",
+        "source_pts": [
+          521472,
+          521728,
+          521984
+        ],
+        "conclusion_zh": "连续原图腿运动连贯，原COCO该单帧13/14及15/16身份同时交换；仅重绑该帧四个原始像素，不改变坐标。RTMW邻帧身份一致。",
+        "human_confirmed": false
+      },
+      "additional_associations": [
+        {
+          "pts": 315136,
+          "joint": 8,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2464",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2464.jpg",
+          "conclusion_zh": "肘与头发/躯干混合，原检测及RTMW不能确定位置；保留未知，不根据模型挑选候选。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 315392,
+          "joint": 8,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2464",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2464.jpg",
+          "conclusion_zh": "肘与头发/躯干混合，原检测及RTMW不能确定位置；保留未知，不根据模型挑选候选。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 315648,
+          "joint": 8,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2464",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2464.jpg",
+          "conclusion_zh": "肘与头发/躯干混合，原检测及RTMW不能确定位置；保留未知，不根据模型挑选候选。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 320512,
+          "joint": 8,
+          "operation": "use_rtmw",
+          "hypothesis_id": "arm_2504",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "visible with motion blur",
+          "evidence": "source_review/extra/arm_2504.jpg",
+          "conclusion_zh": "原右肘落腰臀，同语义RTMW位于上举臂近头侧，与前后原图连贯。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 320768,
+          "joint": 8,
+          "operation": "use_rtmw",
+          "hypothesis_id": "arm_2504",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "visible with motion blur",
+          "evidence": "source_review/extra/arm_2504.jpg",
+          "conclusion_zh": "原右肘落腰臀，同语义RTMW位于上举臂近头侧，与前后原图连贯。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 323328,
+          "joint": 7,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2528",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2528.jpg",
+          "conclusion_zh": "两臂语义及模糊重叠处不能可靠分辨，不交换左右，不采用拟合残差筛选。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 323328,
+          "joint": 9,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2528",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2528.jpg",
+          "conclusion_zh": "两臂语义及模糊重叠处不能可靠分辨，不交换左右，不采用拟合残差筛选。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 323584,
+          "joint": 7,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2528",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2528.jpg",
+          "conclusion_zh": "两臂语义及模糊重叠处不能可靠分辨，不交换左右，不采用拟合残差筛选。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 323584,
+          "joint": 9,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2528",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2528.jpg",
+          "conclusion_zh": "两臂语义及模糊重叠处不能可靠分辨，不交换左右，不采用拟合残差筛选。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 323840,
+          "joint": 7,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2528",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2528.jpg",
+          "conclusion_zh": "两臂语义及模糊重叠处不能可靠分辨，不交换左右，不采用拟合残差筛选。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 323840,
+          "joint": 9,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2528",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2528.jpg",
+          "conclusion_zh": "两臂语义及模糊重叠处不能可靠分辨，不交换左右，不采用拟合残差筛选。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 334336,
+          "joint": 10,
+          "operation": "exclude",
+          "hypothesis_id": "wrist_2612",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/wrist_2612.jpg",
+          "conclusion_zh": "原腕落衣服/臀部，RTMW候选也不能从源图确认另一只腕的位置。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 334592,
+          "joint": 10,
+          "operation": "exclude",
+          "hypothesis_id": "wrist_2612",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/wrist_2612.jpg",
+          "conclusion_zh": "原腕落衣服/臀部，RTMW候选也不能从源图确认另一只腕的位置。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 341248,
+          "joint": 7,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2668",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2668.jpg",
+          "conclusion_zh": "原点落腰裙或脸部，肘轮廓与头发混合，腕候选在头上方模糊手部；位置/左右身份不足以确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 341248,
+          "joint": 9,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2668",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2668.jpg",
+          "conclusion_zh": "原点落腰裙或脸部，肘轮廓与头发混合，腕候选在头上方模糊手部；位置/左右身份不足以确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 341504,
+          "joint": 7,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2668",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2668.jpg",
+          "conclusion_zh": "原点落腰裙或脸部，肘轮廓与头发混合，腕候选在头上方模糊手部；位置/左右身份不足以确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 341504,
+          "joint": 9,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2668",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2668.jpg",
+          "conclusion_zh": "原点落腰裙或脸部，肘轮廓与头发混合，腕候选在头上方模糊手部；位置/左右身份不足以确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 341760,
+          "joint": 7,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2668",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2668.jpg",
+          "conclusion_zh": "原点落腰裙或脸部，肘轮廓与头发混合，腕候选在头上方模糊手部；位置/左右身份不足以确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 341760,
+          "joint": 9,
+          "operation": "exclude",
+          "hypothesis_id": "arm_2668",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arm_2668.jpg",
+          "conclusion_zh": "原点落腰裙或脸部，肘轮廓与头发混合，腕候选在头上方模糊手部；位置/左右身份不足以确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 457984,
+          "joint": 7,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 457984,
+          "joint": 8,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 457984,
+          "joint": 9,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 457984,
+          "joint": 10,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 458240,
+          "joint": 7,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 458240,
+          "joint": 8,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 458240,
+          "joint": 9,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 458240,
+          "joint": 10,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 458496,
+          "joint": 7,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 458496,
+          "joint": 8,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 458496,
+          "joint": 9,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 458496,
+          "joint": 10,
+          "operation": "exclude",
+          "hypothesis_id": "arms_3580",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "unconfirmed",
+          "evidence": "source_review/extra/arms_3580.jpg",
+          "conclusion_zh": "手臂在头后与躯干高度重叠且模糊，检测点落头/躯干/裙边或空白，身份和点位无法确认。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        },
+        {
+          "pts": 522240,
+          "joint": 13,
+          "operation": "use_rtmw",
+          "hypothesis_id": "leg_4080",
+          "status": "assistant_source_reviewed",
+          "human_confirmed": false,
+          "visibility": "visible with motion blur",
+          "evidence": "source_review/extra/leg_4080.jpg",
+          "conclusion_zh": "原13与14挤在同一弯腿膝部，RTMW13在另一条腿膝部并与相邻帧连贯；不涉及接冰结论。",
+          "reviewer": "source image review, gpt-6.1-terra max; integrated by main session"
+        }
+      ],
+      "revision_history": {
+        "observations_v1": "history/observations_v1",
+        "reason": "source review of exposed maximum residual; residual triggered inspection, never determines association choice"
+      }
+    },
+    "previous_revision": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\history\\observations_v1"
+  },
+  "reference_hashes": {
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\compact_smplx.npz": "f3655f86d42e9a5a1cda80eabfa98895b06e51d44f07e707b352618f0ca3c753",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\input.npz": "93a71022fc3c4d67a1ec4387f01a2e5513d96cdf50bc4728e0a290ca7590cc27",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\B5\\result.npz": "8b5fdb70f951ee692bb07e717ca31e620c718e6c3e689da5be9d5b73f408195d",
+    "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\result.npz": "5bcfc447b3acb33cbd1a88299d1ebdf571e963aea069290f1065f1b3111487b2"
+  },
+  "windows": {
+    "legacy": [
+      {
+        "window": 1,
+        "seconds": [
+          24.5,
+          27.0
+        ],
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\legacy\\w1\\result.npz",
+        "sha256": "6c2408c290273717e2035a1bc68221b4374409fd1207005620bbf2c443754dfc",
+        "config": {
+          "schema": "rinkspace.fullbody-window.v1",
+          "mode": "legacy",
+          "window_seconds": [
+            24.5,
+            27.0
+          ],
+          "source_pts": [
+            313600,
+            313856,
+            314112,
+            314368,
+            314624,
+            314880,
+            315136,
+            315392,
+            315648,
+            315904,
+            316160,
+            316416,
+            316672,
+            316928,
+            317184,
+            317440,
+            317696,
+            317952,
+            318208,
+            318464,
+            318720,
+            318976,
+            319232,
+            319488,
+            319744,
+            320000,
+            320256,
+            320512,
+            320768,
+            321024,
+            321280,
+            321536,
+            321792,
+            322048,
+            322304,
+            322560,
+            322816,
+            323072,
+            323328,
+            323584,
+            323840,
+            324096,
+            324352,
+            324608,
+            324864,
+            325120,
+            325376,
+            325632,
+            325888,
+            326144,
+            326400,
+            326656,
+            326912,
+            327168,
+            327424,
+            327680,
+            327936,
+            328192,
+            328448,
+            328704,
+            328960,
+            329216,
+            329472,
+            329728,
+            329984,
+            330240,
+            330496,
+            330752,
+            331008,
+            331264,
+            331520,
+            331776,
+            332032,
+            332288,
+            332544,
+            332800,
+            333056,
+            333312,
+            333568,
+            333824,
+            334080,
+            334336,
+            334592,
+            334848,
+            335104,
+            335360,
+            335616,
+            335872,
+            336128,
+            336384,
+            336640,
+            336896,
+            337152,
+            337408,
+            337664,
+            337920,
+            338176,
+            338432,
+            338688,
+            338944,
+            339200,
+            339456,
+            339712,
+            339968,
+            340224,
+            340480,
+            340736,
+            340992,
+            341248,
+            341504,
+            341760,
+            342016,
+            342272,
+            342528,
+            342784,
+            343040,
+            343296,
+            343552,
+            343808,
+            344064,
+            344320,
+            344576,
+            344832,
+            345088,
+            345344,
+            345600
+          ],
+          "time_base": [
+            1,
+            12800
+          ],
+          "active_state_columns": [
+            0,
+            1,
+            2,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            15,
+            18,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
+          "state_layout": "P[0:3], right root Q[3:6], right local native1..21[6:69]",
+          "source_frames": 126,
+          "body_points": 2089,
+          "knots": [
+            2.379999999999999,
+            2.379999999999999,
+            2.379999999999999,
+            2.379999999999999,
+            2.779999999999999,
+            3.179999999999999,
+            3.5799999999999987,
+            3.9799999999999986,
+            4.379999999999999,
+            4.7799999999999985,
+            4.879999999999999,
+            4.879999999999999,
+            4.879999999999999,
+            4.879999999999999
+          ],
+          "taper_seconds": 0.2,
+          "boundary": "C2 quintic envelope returns to unchanged reference; outside window unchanged",
+          "frozen": [
+            "camera",
+            "scene",
+            "beta",
+            "body scale",
+            "bone lengths",
+            "shared equipment",
+            "boot installation",
+            "wrists",
+            "neck",
+            "collars"
+          ],
+          "wrist_orientation_observable": false,
+          "physical_contact_factor": false,
+          "reference_hashes": {
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\input.npz": "93a71022fc3c4d67a1ec4387f01a2e5513d96cdf50bc4728e0a290ca7590cc27",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\compact_smplx.npz": "f3655f86d42e9a5a1cda80eabfa98895b06e51d44f07e707b352618f0ca3c753",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\B5\\result.npz": "8b5fdb70f951ee692bb07e717ca31e620c718e6c3e689da5be9d5b73f408195d",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\result.npz": "5bcfc447b3acb33cbd1a88299d1ebdf571e963aea069290f1065f1b3111487b2"
+          },
+          "priors": "engineering reference/velocity/acceleration, no contact or gait assumptions",
+          "prior_scales": {
+            "root_displacement_m": 0.35,
+            "angular_displacement_deg": 25,
+            "root_velocity_m_s": 3,
+            "angular_velocity_deg_s": 400,
+            "root_acceleration_m_s2": 15,
+            "angular_acceleration_deg_s2": 800
+          },
+          "robust_body": "2D isotropic pseudo-Huber, c=2 after engineering sigma",
+          "equipment_sources": {
+            "review_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\source_review.json",
+            "review_sha256": "32f38cb8ce5f4657695d681df1aa23eac1991b6f01c5992e1d39187da895881a",
+            "admission_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\footwear_v2\\pose_transfer\\admission.json",
+            "admission_sha256": "42a9f82b1ac520fa88b11b43c650e8ab4c1c0abd309f527e0ad2695df899c451"
+          },
+          "observation_array_sha256": "c7cb38e3acd8bf9a18796ec604048bc2fd35f76e66ce645ede34b6872545b2d4",
+          "backend": "scipy sparse TRF/LSMR; native camera with existing moving-body implicit-row chain",
+          "derivative": "analytic root P/Q; local physical rotation finite differences at exposure nodes; sparse spline chain",
+          "ftol": 1e-07,
+          "xtol": 1e-07,
+          "gtol": 0.0001,
+          "no_iteration_or_time_budget": true,
+          "initial_cost": 6835.866791676512,
+          "initial_parts": {
+            "body_pixels": 6500.724110944644,
+            "visible_boot_edges": 288.3688545444363,
+            "visible_blade_curves": 5.4869783069739935,
+            "boot_direction_endpoints": 41.28684788045816,
+            "reference_deviation": 0.0,
+            "correction_velocity": 0.0,
+            "correction_acceleration": 0.0
+          }
+        },
+        "report": {
+          "mode": "legacy",
+          "window": [
+            24.5,
+            27.0
+          ],
+          "nfev": 33,
+          "njev": 28,
+          "accepted_iterations": 27,
+          "stopping_reason": "`ftol` termination condition is satisfied.",
+          "status": 2,
+          "optimality": 8.313327082096773,
+          "numerically_converged": false,
+          "gradient_inf": 8.313327082096773,
+          "initial_cost": 6835.866791676512,
+          "final_cost": 3690.8187498440093,
+          "initial_parts": {
+            "body_pixels": 6500.724110944644,
+            "visible_boot_edges": 288.3688545444363,
+            "visible_blade_curves": 5.4869783069739935,
+            "boot_direction_endpoints": 41.28684788045816,
+            "reference_deviation": 0.0,
+            "correction_velocity": 0.0,
+            "correction_acceleration": 0.0
+          },
+          "final_parts": {
+            "body_pixels": 3413.17016501016,
+            "visible_boot_edges": 176.34280537261168,
+            "visible_blade_curves": 7.60296456418328,
+            "boot_direction_endpoints": 32.10152691439005,
+            "reference_deviation": 19.97465990433485,
+            "correction_velocity": 1.8432201107834572,
+            "correction_acceleration": 39.78340796754593
+          },
+          "elapsed_seconds": 24.08257760000015,
+          "body_points": 2089,
+          "variables": 170,
+          "blade_choices": [
+            {
+              "pts": 325120,
+              "foot": 1,
+              "selected_candidate": "blade_left",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 332800,
+              "foot": 0,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            }
+          ],
+          "user_accepted": false,
+          "independent_3d_truth": false
+        }
+      },
+      {
+        "window": 2,
+        "seconds": [
+          32.2,
+          33.8
+        ],
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\legacy\\w2\\result.npz",
+        "sha256": "5426e15d3e2b9ed5643be922831bd26f88065a6e2b0cbbd5457108d0b09150dd",
+        "config": {
+          "schema": "rinkspace.fullbody-window.v1",
+          "mode": "legacy",
+          "window_seconds": [
+            32.2,
+            33.8
+          ],
+          "source_pts": [
+            412160,
+            412416,
+            412672,
+            412928,
+            413184,
+            413440,
+            413696,
+            413952,
+            414208,
+            414464,
+            414720,
+            414976,
+            415232,
+            415488,
+            415744,
+            416000,
+            416256,
+            416512,
+            416768,
+            417024,
+            417280,
+            417536,
+            417792,
+            418048,
+            418304,
+            418560,
+            418816,
+            419072,
+            419328,
+            419584,
+            419840,
+            420096,
+            420352,
+            420608,
+            420864,
+            421120,
+            421376,
+            421632,
+            421888,
+            422144,
+            422400,
+            422656,
+            422912,
+            423168,
+            423424,
+            423680,
+            423936,
+            424192,
+            424448,
+            424704,
+            424960,
+            425216,
+            425472,
+            425728,
+            425984,
+            426240,
+            426496,
+            426752,
+            427008,
+            427264,
+            427520,
+            427776,
+            428032,
+            428288,
+            428544,
+            428800,
+            429056,
+            429312,
+            429568,
+            429824,
+            430080,
+            430336,
+            430592,
+            430848,
+            431104,
+            431360,
+            431616,
+            431872,
+            432128,
+            432384,
+            432640
+          ],
+          "time_base": [
+            1,
+            12800
+          ],
+          "active_state_columns": [
+            0,
+            1,
+            2,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            15,
+            18,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
+          "state_layout": "P[0:3], right root Q[3:6], right local native1..21[6:69]",
+          "source_frames": 81,
+          "body_points": 1377,
+          "knots": [
+            10.080000000000002,
+            10.080000000000002,
+            10.080000000000002,
+            10.080000000000002,
+            10.480000000000002,
+            10.880000000000003,
+            11.280000000000003,
+            11.679999999999996,
+            11.679999999999996,
+            11.679999999999996,
+            11.679999999999996
+          ],
+          "taper_seconds": 0.2,
+          "boundary": "C2 quintic envelope returns to unchanged reference; outside window unchanged",
+          "frozen": [
+            "camera",
+            "scene",
+            "beta",
+            "body scale",
+            "bone lengths",
+            "shared equipment",
+            "boot installation",
+            "wrists",
+            "neck",
+            "collars"
+          ],
+          "wrist_orientation_observable": false,
+          "physical_contact_factor": false,
+          "reference_hashes": {
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\input.npz": "93a71022fc3c4d67a1ec4387f01a2e5513d96cdf50bc4728e0a290ca7590cc27",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\compact_smplx.npz": "f3655f86d42e9a5a1cda80eabfa98895b06e51d44f07e707b352618f0ca3c753",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\B5\\result.npz": "8b5fdb70f951ee692bb07e717ca31e620c718e6c3e689da5be9d5b73f408195d",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\result.npz": "5bcfc447b3acb33cbd1a88299d1ebdf571e963aea069290f1065f1b3111487b2"
+          },
+          "priors": "engineering reference/velocity/acceleration, no contact or gait assumptions",
+          "prior_scales": {
+            "root_displacement_m": 0.35,
+            "angular_displacement_deg": 25,
+            "root_velocity_m_s": 3,
+            "angular_velocity_deg_s": 400,
+            "root_acceleration_m_s2": 15,
+            "angular_acceleration_deg_s2": 800
+          },
+          "robust_body": "2D isotropic pseudo-Huber, c=2 after engineering sigma",
+          "equipment_sources": {
+            "review_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\source_review.json",
+            "review_sha256": "32f38cb8ce5f4657695d681df1aa23eac1991b6f01c5992e1d39187da895881a",
+            "admission_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\footwear_v2\\pose_transfer\\admission.json",
+            "admission_sha256": "42a9f82b1ac520fa88b11b43c650e8ab4c1c0abd309f527e0ad2695df899c451"
+          },
+          "observation_array_sha256": "2c80ff984fc08ae2098241deb0925f60b0ba1039906135fae7162229d3a03a90",
+          "backend": "scipy sparse TRF/LSMR; native camera with existing moving-body implicit-row chain",
+          "derivative": "analytic root P/Q; local physical rotation finite differences at exposure nodes; sparse spline chain",
+          "ftol": 1e-07,
+          "xtol": 1e-07,
+          "gtol": 0.0001,
+          "no_iteration_or_time_budget": true,
+          "initial_cost": 4750.719981198954,
+          "initial_parts": {
+            "body_pixels": 4579.470467031082,
+            "visible_boot_edges": 171.24951416787144,
+            "reference_deviation": 0.0,
+            "correction_velocity": 0.0,
+            "correction_acceleration": 0.0
+          }
+        },
+        "report": {
+          "mode": "legacy",
+          "window": [
+            32.2,
+            33.8
+          ],
+          "nfev": 44,
+          "njev": 44,
+          "accepted_iterations": 43,
+          "stopping_reason": "`ftol` termination condition is satisfied.",
+          "status": 2,
+          "optimality": 0.197337584398958,
+          "numerically_converged": false,
+          "gradient_inf": 0.197337584398958,
+          "initial_cost": 4750.719981198954,
+          "final_cost": 1810.7837062433193,
+          "initial_parts": {
+            "body_pixels": 4579.470467031082,
+            "visible_boot_edges": 171.24951416787144,
+            "reference_deviation": 0.0,
+            "correction_velocity": 0.0,
+            "correction_acceleration": 0.0
+          },
+          "final_parts": {
+            "body_pixels": 1689.2194372268254,
+            "visible_boot_edges": 69.8675370509982,
+            "reference_deviation": 20.715917379992696,
+            "correction_velocity": 1.4309109679995364,
+            "correction_acceleration": 29.549903617504
+          },
+          "elapsed_seconds": 22.287478199999896,
+          "body_points": 1377,
+          "variables": 119,
+          "blade_choices": [],
+          "user_accepted": false,
+          "independent_3d_truth": false
+        }
+      },
+      {
+        "window": 3,
+        "seconds": [
+          35.2,
+          36.8
+        ],
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\legacy\\w3\\result.npz",
+        "sha256": "bd898d17f735dfd959a4f7a0ae711bd66f3897f2b393e686a9d4b0630d47de98",
+        "config": {
+          "schema": "rinkspace.fullbody-window.v1",
+          "mode": "legacy",
+          "window_seconds": [
+            35.2,
+            36.8
+          ],
+          "source_pts": [
+            450560,
+            450816,
+            451072,
+            451328,
+            451584,
+            451840,
+            452096,
+            452352,
+            452608,
+            452864,
+            453120,
+            453376,
+            453632,
+            453888,
+            454144,
+            454400,
+            454656,
+            454912,
+            455168,
+            455424,
+            455680,
+            455936,
+            456192,
+            456448,
+            456704,
+            456960,
+            457216,
+            457472,
+            457728,
+            457984,
+            458240,
+            458496,
+            458752,
+            459008,
+            459264,
+            459520,
+            459776,
+            460032,
+            460288,
+            460544,
+            460800,
+            461056,
+            461312,
+            461568,
+            461824,
+            462080,
+            462336,
+            462592,
+            462848,
+            463104,
+            463360,
+            463616,
+            463872,
+            464128,
+            464384,
+            464640,
+            464896,
+            465152,
+            465408,
+            465664,
+            465920,
+            466176,
+            466432,
+            466688,
+            466944,
+            467200,
+            467456,
+            467712,
+            467968,
+            468224,
+            468480,
+            468736,
+            468992,
+            469248,
+            469504,
+            469760,
+            470016,
+            470272,
+            470528,
+            470784,
+            471040
+          ],
+          "time_base": [
+            1,
+            12800
+          ],
+          "active_state_columns": [
+            0,
+            1,
+            2,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            15,
+            18,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
+          "state_layout": "P[0:3], right root Q[3:6], right local native1..21[6:69]",
+          "source_frames": 81,
+          "body_points": 1365,
+          "knots": [
+            13.080000000000002,
+            13.080000000000002,
+            13.080000000000002,
+            13.080000000000002,
+            13.480000000000002,
+            13.880000000000003,
+            14.280000000000003,
+            14.679999999999996,
+            14.679999999999996,
+            14.679999999999996,
+            14.679999999999996
+          ],
+          "taper_seconds": 0.2,
+          "boundary": "C2 quintic envelope returns to unchanged reference; outside window unchanged",
+          "frozen": [
+            "camera",
+            "scene",
+            "beta",
+            "body scale",
+            "bone lengths",
+            "shared equipment",
+            "boot installation",
+            "wrists",
+            "neck",
+            "collars"
+          ],
+          "wrist_orientation_observable": false,
+          "physical_contact_factor": false,
+          "reference_hashes": {
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\input.npz": "93a71022fc3c4d67a1ec4387f01a2e5513d96cdf50bc4728e0a290ca7590cc27",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\compact_smplx.npz": "f3655f86d42e9a5a1cda80eabfa98895b06e51d44f07e707b352618f0ca3c753",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\B5\\result.npz": "8b5fdb70f951ee692bb07e717ca31e620c718e6c3e689da5be9d5b73f408195d",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\result.npz": "5bcfc447b3acb33cbd1a88299d1ebdf571e963aea069290f1065f1b3111487b2"
+          },
+          "priors": "engineering reference/velocity/acceleration, no contact or gait assumptions",
+          "prior_scales": {
+            "root_displacement_m": 0.35,
+            "angular_displacement_deg": 25,
+            "root_velocity_m_s": 3,
+            "angular_velocity_deg_s": 400,
+            "root_acceleration_m_s2": 15,
+            "angular_acceleration_deg_s2": 800
+          },
+          "robust_body": "2D isotropic pseudo-Huber, c=2 after engineering sigma",
+          "equipment_sources": {
+            "review_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\source_review.json",
+            "review_sha256": "32f38cb8ce5f4657695d681df1aa23eac1991b6f01c5992e1d39187da895881a",
+            "admission_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\footwear_v2\\pose_transfer\\admission.json",
+            "admission_sha256": "42a9f82b1ac520fa88b11b43c650e8ab4c1c0abd309f527e0ad2695df899c451"
+          },
+          "observation_array_sha256": "c7cb38e3acd8bf9a18796ec604048bc2fd35f76e66ce645ede34b6872545b2d4",
+          "backend": "scipy sparse TRF/LSMR; native camera with existing moving-body implicit-row chain",
+          "derivative": "analytic root P/Q; local physical rotation finite differences at exposure nodes; sparse spline chain",
+          "ftol": 1e-07,
+          "xtol": 1e-07,
+          "gtol": 0.0001,
+          "no_iteration_or_time_budget": true,
+          "initial_cost": 13000.731864588995,
+          "initial_parts": {
+            "body_pixels": 11795.419214546462,
+            "visible_boot_edges": 728.2432296962462,
+            "visible_blade_curves": 71.1317508061887,
+            "boot_direction_endpoints": 405.9376695400982,
+            "reference_deviation": 0.0,
+            "correction_velocity": 0.0,
+            "correction_acceleration": 0.0
+          }
+        },
+        "report": {
+          "mode": "legacy",
+          "window": [
+            35.2,
+            36.8
+          ],
+          "nfev": 57,
+          "njev": 57,
+          "accepted_iterations": 56,
+          "stopping_reason": "`ftol` termination condition is satisfied.",
+          "status": 2,
+          "optimality": 0.8099013126918911,
+          "numerically_converged": false,
+          "gradient_inf": 0.8099013126918911,
+          "initial_cost": 13000.731864588995,
+          "final_cost": 2101.765737104681,
+          "initial_parts": {
+            "body_pixels": 11795.419214546462,
+            "visible_boot_edges": 728.2432296962462,
+            "visible_blade_curves": 71.1317508061887,
+            "boot_direction_endpoints": 405.9376695400982,
+            "reference_deviation": 0.0,
+            "correction_velocity": 0.0,
+            "correction_acceleration": 0.0
+          },
+          "final_parts": {
+            "body_pixels": 1904.1204556784617,
+            "visible_boot_edges": 128.42352235525024,
+            "visible_blade_curves": 1.358704512860251,
+            "boot_direction_endpoints": 5.471250389533876,
+            "reference_deviation": 15.650082925879548,
+            "correction_velocity": 2.3430899474514337,
+            "correction_acceleration": 44.39863129524416
+          },
+          "elapsed_seconds": 30.354914199999257,
+          "body_points": 1365,
+          "variables": 119,
+          "blade_choices": [
+            {
+              "pts": 455680,
+              "foot": 0,
+              "selected_candidate": "blade_left",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 455680,
+              "foot": 1,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 461056,
+              "foot": 0,
+              "selected_candidate": "blade_left",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 461056,
+              "foot": 1,
+              "selected_candidate": "blade_left",
+              "source_side_confirmed": false
+            }
+          ],
+          "user_accepted": false,
+          "independent_3d_truth": false
+        }
+      },
+      {
+        "window": 4,
+        "seconds": [
+          37.4,
+          39.0
+        ],
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\legacy\\w4\\result.npz",
+        "sha256": "b5ee7db97f858ed13113600840c6fcf495b497a9cb685394fb24a5680ac5c0cb",
+        "config": {
+          "schema": "rinkspace.fullbody-window.v1",
+          "mode": "legacy",
+          "window_seconds": [
+            37.4,
+            39.0
+          ],
+          "source_pts": [
+            478720,
+            478976,
+            479232,
+            479488,
+            479744,
+            480000,
+            480256,
+            480512,
+            480768,
+            481024,
+            481280,
+            481536,
+            481792,
+            482048,
+            482304,
+            482560,
+            482816,
+            483072,
+            483328,
+            483584,
+            483840,
+            484096,
+            484352,
+            484608,
+            484864,
+            485120,
+            485376,
+            485632,
+            485888,
+            486144,
+            486400,
+            486656,
+            486912,
+            487168,
+            487424,
+            487680,
+            487936,
+            488192,
+            488448,
+            488704,
+            488960,
+            489216,
+            489472,
+            489728,
+            489984,
+            490240,
+            490496,
+            490752,
+            491008,
+            491264,
+            491520,
+            491776,
+            492032,
+            492288,
+            492544,
+            492800,
+            493056,
+            493312,
+            493568,
+            493824,
+            494080,
+            494336,
+            494592,
+            494848,
+            495104,
+            495360,
+            495616,
+            495872,
+            496128,
+            496384,
+            496640,
+            496896,
+            497152,
+            497408,
+            497664,
+            497920,
+            498176,
+            498432,
+            498688,
+            498944,
+            499200
+          ],
+          "time_base": [
+            1,
+            12800
+          ],
+          "active_state_columns": [
+            0,
+            1,
+            2,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            15,
+            18,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
+          "state_layout": "P[0:3], right root Q[3:6], right local native1..21[6:69]",
+          "source_frames": 81,
+          "body_points": 1377,
+          "knots": [
+            15.279999999999998,
+            15.279999999999998,
+            15.279999999999998,
+            15.279999999999998,
+            15.679999999999998,
+            16.08,
+            16.479999999999997,
+            16.88,
+            16.88,
+            16.88,
+            16.88
+          ],
+          "taper_seconds": 0.2,
+          "boundary": "C2 quintic envelope returns to unchanged reference; outside window unchanged",
+          "frozen": [
+            "camera",
+            "scene",
+            "beta",
+            "body scale",
+            "bone lengths",
+            "shared equipment",
+            "boot installation",
+            "wrists",
+            "neck",
+            "collars"
+          ],
+          "wrist_orientation_observable": false,
+          "physical_contact_factor": false,
+          "reference_hashes": {
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\input.npz": "93a71022fc3c4d67a1ec4387f01a2e5513d96cdf50bc4728e0a290ca7590cc27",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\compact_smplx.npz": "f3655f86d42e9a5a1cda80eabfa98895b06e51d44f07e707b352618f0ca3c753",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\B5\\result.npz": "8b5fdb70f951ee692bb07e717ca31e620c718e6c3e689da5be9d5b73f408195d",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\result.npz": "5bcfc447b3acb33cbd1a88299d1ebdf571e963aea069290f1065f1b3111487b2"
+          },
+          "priors": "engineering reference/velocity/acceleration, no contact or gait assumptions",
+          "prior_scales": {
+            "root_displacement_m": 0.35,
+            "angular_displacement_deg": 25,
+            "root_velocity_m_s": 3,
+            "angular_velocity_deg_s": 400,
+            "root_acceleration_m_s2": 15,
+            "angular_acceleration_deg_s2": 800
+          },
+          "robust_body": "2D isotropic pseudo-Huber, c=2 after engineering sigma",
+          "equipment_sources": {
+            "review_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\source_review.json",
+            "review_sha256": "32f38cb8ce5f4657695d681df1aa23eac1991b6f01c5992e1d39187da895881a",
+            "admission_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\footwear_v2\\pose_transfer\\admission.json",
+            "admission_sha256": "42a9f82b1ac520fa88b11b43c650e8ab4c1c0abd309f527e0ad2695df899c451"
+          },
+          "observation_array_sha256": "2c80ff984fc08ae2098241deb0925f60b0ba1039906135fae7162229d3a03a90",
+          "backend": "scipy sparse TRF/LSMR; native camera with existing moving-body implicit-row chain",
+          "derivative": "analytic root P/Q; local physical rotation finite differences at exposure nodes; sparse spline chain",
+          "ftol": 1e-07,
+          "xtol": 1e-07,
+          "gtol": 0.0001,
+          "no_iteration_or_time_budget": true,
+          "initial_cost": 5246.647553048333,
+          "initial_parts": {
+            "body_pixels": 4953.546316881523,
+            "visible_boot_edges": 282.67469265600977,
+            "boot_direction_endpoints": 10.426543510799942,
+            "reference_deviation": 0.0,
+            "correction_velocity": 0.0,
+            "correction_acceleration": 0.0
+          }
+        },
+        "report": {
+          "mode": "legacy",
+          "window": [
+            37.4,
+            39.0
+          ],
+          "nfev": 42,
+          "njev": 37,
+          "accepted_iterations": 36,
+          "stopping_reason": "`ftol` termination condition is satisfied.",
+          "status": 2,
+          "optimality": 1.1225872313992753,
+          "numerically_converged": false,
+          "gradient_inf": 1.1225872313992753,
+          "initial_cost": 5246.647553048333,
+          "final_cost": 1320.5990778747378,
+          "initial_parts": {
+            "body_pixels": 4953.546316881523,
+            "visible_boot_edges": 282.67469265600977,
+            "boot_direction_endpoints": 10.426543510799942,
+            "reference_deviation": 0.0,
+            "correction_velocity": 0.0,
+            "correction_acceleration": 0.0
+          },
+          "final_parts": {
+            "body_pixels": 1217.4127013146028,
+            "visible_boot_edges": 72.2802939271047,
+            "boot_direction_endpoints": 0.6565724056169298,
+            "reference_deviation": 12.18198473193817,
+            "correction_velocity": 1.330562996083788,
+            "correction_acceleration": 16.736962499390884
+          },
+          "elapsed_seconds": 18.93880750000062,
+          "body_points": 1377,
+          "variables": 119,
+          "blade_choices": [],
+          "user_accepted": false,
+          "independent_3d_truth": false
+        }
+      },
+      {
+        "window": 5,
+        "seconds": [
+          40.0,
+          41.5
+        ],
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\legacy\\w5\\result.npz",
+        "sha256": "b3a5a73e7ad9d528af6de4445b8c4f9564c42ff93a157657f2a261ba46838bef",
+        "config": {
+          "schema": "rinkspace.fullbody-window.v1",
+          "mode": "legacy",
+          "window_seconds": [
+            40.0,
+            41.5
+          ],
+          "source_pts": [
+            512000,
+            512256,
+            512512,
+            512768,
+            513024,
+            513280,
+            513536,
+            513792,
+            514048,
+            514304,
+            514560,
+            514816,
+            515072,
+            515328,
+            515584,
+            515840,
+            516096,
+            516352,
+            516608,
+            516864,
+            517120,
+            517376,
+            517632,
+            517888,
+            518144,
+            518400,
+            518656,
+            518912,
+            519168,
+            519424,
+            519680,
+            519936,
+            520192,
+            520448,
+            520704,
+            520960,
+            521216,
+            521472,
+            521728,
+            521984,
+            522240,
+            522496,
+            522752,
+            523008,
+            523264,
+            523520,
+            523776,
+            524032,
+            524288,
+            524544,
+            524800,
+            525056,
+            525312,
+            525568,
+            525824,
+            526080,
+            526336,
+            526592,
+            526848,
+            527104,
+            527360,
+            527616,
+            527872,
+            528128,
+            528384,
+            528640,
+            528896,
+            529152,
+            529408,
+            529664,
+            529920,
+            530176,
+            530432,
+            530688,
+            530944,
+            531200
+          ],
+          "time_base": [
+            1,
+            12800
+          ],
+          "active_state_columns": [
+            0,
+            1,
+            2,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            15,
+            18,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
+          "state_layout": "P[0:3], right root Q[3:6], right local native1..21[6:69]",
+          "source_frames": 76,
+          "body_points": 1292,
+          "knots": [
+            17.88,
+            17.88,
+            17.88,
+            17.88,
+            18.279999999999998,
+            18.679999999999996,
+            19.079999999999995,
+            19.38,
+            19.38,
+            19.38,
+            19.38
+          ],
+          "taper_seconds": 0.2,
+          "boundary": "C2 quintic envelope returns to unchanged reference; outside window unchanged",
+          "frozen": [
+            "camera",
+            "scene",
+            "beta",
+            "body scale",
+            "bone lengths",
+            "shared equipment",
+            "boot installation",
+            "wrists",
+            "neck",
+            "collars"
+          ],
+          "wrist_orientation_observable": false,
+          "physical_contact_factor": false,
+          "reference_hashes": {
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\input.npz": "93a71022fc3c4d67a1ec4387f01a2e5513d96cdf50bc4728e0a290ca7590cc27",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\compact_smplx.npz": "f3655f86d42e9a5a1cda80eabfa98895b06e51d44f07e707b352618f0ca3c753",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\B5\\result.npz": "8b5fdb70f951ee692bb07e717ca31e620c718e6c3e689da5be9d5b73f408195d",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\result.npz": "5bcfc447b3acb33cbd1a88299d1ebdf571e963aea069290f1065f1b3111487b2"
+          },
+          "priors": "engineering reference/velocity/acceleration, no contact or gait assumptions",
+          "prior_scales": {
+            "root_displacement_m": 0.35,
+            "angular_displacement_deg": 25,
+            "root_velocity_m_s": 3,
+            "angular_velocity_deg_s": 400,
+            "root_acceleration_m_s2": 15,
+            "angular_acceleration_deg_s2": 800
+          },
+          "robust_body": "2D isotropic pseudo-Huber, c=2 after engineering sigma",
+          "equipment_sources": {
+            "review_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\source_review.json",
+            "review_sha256": "32f38cb8ce5f4657695d681df1aa23eac1991b6f01c5992e1d39187da895881a",
+            "admission_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\footwear_v2\\pose_transfer\\admission.json",
+            "admission_sha256": "42a9f82b1ac520fa88b11b43c650e8ab4c1c0abd309f527e0ad2695df899c451"
+          },
+          "observation_array_sha256": "c7cb38e3acd8bf9a18796ec604048bc2fd35f76e66ce645ede34b6872545b2d4",
+          "backend": "scipy sparse TRF/LSMR; native camera with existing moving-body implicit-row chain",
+          "derivative": "analytic root P/Q; local physical rotation finite differences at exposure nodes; sparse spline chain",
+          "ftol": 1e-07,
+          "xtol": 1e-07,
+          "gtol": 0.0001,
+          "no_iteration_or_time_budget": true,
+          "initial_cost": 3384.6811264751805,
+          "initial_parts": {
+            "body_pixels": 3308.954799355825,
+            "visible_boot_edges": 75.72632711935448,
+            "reference_deviation": 0.0,
+            "correction_velocity": 0.0,
+            "correction_acceleration": 0.0
+          }
+        },
+        "report": {
+          "mode": "legacy",
+          "window": [
+            40.0,
+            41.5
+          ],
+          "nfev": 58,
+          "njev": 58,
+          "accepted_iterations": 57,
+          "stopping_reason": "`ftol` termination condition is satisfied.",
+          "status": 2,
+          "optimality": 0.38164334039492825,
+          "numerically_converged": false,
+          "gradient_inf": 0.3413156178406315,
+          "initial_cost": 3384.6811264751805,
+          "final_cost": 1321.2266387435782,
+          "initial_parts": {
+            "body_pixels": 3308.954799355825,
+            "visible_boot_edges": 75.72632711935448,
+            "reference_deviation": 0.0,
+            "correction_velocity": 0.0,
+            "correction_acceleration": 0.0
+          },
+          "final_parts": {
+            "body_pixels": 1220.4912413338739,
+            "visible_boot_edges": 47.37446245167096,
+            "reference_deviation": 24.794315195692477,
+            "correction_velocity": 2.1619224329179034,
+            "correction_acceleration": 26.404697329423517
+          },
+          "elapsed_seconds": 28.610371400000076,
+          "body_points": 1292,
+          "variables": 119,
+          "blade_choices": [],
+          "user_accepted": false,
+          "independent_3d_truth": false
+        }
+      }
+    ],
+    "full": [
+      {
+        "window": 1,
+        "seconds": [
+          24.5,
+          27.0
+        ],
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\full\\w1\\result.npz",
+        "sha256": "56713492fdb70a2e057143a529925609e3ada76d63b098ef55c238b48b86a31c",
+        "config": {
+          "schema": "rinkspace.fullbody-window.v1",
+          "mode": "full",
+          "window_seconds": [
+            24.5,
+            27.0
+          ],
+          "source_pts": [
+            313600,
+            313856,
+            314112,
+            314368,
+            314624,
+            314880,
+            315136,
+            315392,
+            315648,
+            315904,
+            316160,
+            316416,
+            316672,
+            316928,
+            317184,
+            317440,
+            317696,
+            317952,
+            318208,
+            318464,
+            318720,
+            318976,
+            319232,
+            319488,
+            319744,
+            320000,
+            320256,
+            320512,
+            320768,
+            321024,
+            321280,
+            321536,
+            321792,
+            322048,
+            322304,
+            322560,
+            322816,
+            323072,
+            323328,
+            323584,
+            323840,
+            324096,
+            324352,
+            324608,
+            324864,
+            325120,
+            325376,
+            325632,
+            325888,
+            326144,
+            326400,
+            326656,
+            326912,
+            327168,
+            327424,
+            327680,
+            327936,
+            328192,
+            328448,
+            328704,
+            328960,
+            329216,
+            329472,
+            329728,
+            329984,
+            330240,
+            330496,
+            330752,
+            331008,
+            331264,
+            331520,
+            331776,
+            332032,
+            332288,
+            332544,
+            332800,
+            333056,
+            333312,
+            333568,
+            333824,
+            334080,
+            334336,
+            334592,
+            334848,
+            335104,
+            335360,
+            335616,
+            335872,
+            336128,
+            336384,
+            336640,
+            336896,
+            337152,
+            337408,
+            337664,
+            337920,
+            338176,
+            338432,
+            338688,
+            338944,
+            339200,
+            339456,
+            339712,
+            339968,
+            340224,
+            340480,
+            340736,
+            340992,
+            341248,
+            341504,
+            341760,
+            342016,
+            342272,
+            342528,
+            342784,
+            343040,
+            343296,
+            343552,
+            343808,
+            344064,
+            344320,
+            344576,
+            344832,
+            345088,
+            345344,
+            345600
+          ],
+          "time_base": [
+            1,
+            12800
+          ],
+          "active_state_columns": [
+            0,
+            1,
+            2,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            15,
+            18,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            3,
+            4,
+            5,
+            12,
+            13,
+            14,
+            21,
+            22,
+            23,
+            30,
+            31,
+            32,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62
+          ],
+          "state_layout": "P[0:3], right root Q[3:6], right local native1..21[6:69]",
+          "source_frames": 126,
+          "body_points": 2089,
+          "knots": [
+            2.379999999999999,
+            2.379999999999999,
+            2.379999999999999,
+            2.379999999999999,
+            2.779999999999999,
+            3.179999999999999,
+            3.5799999999999987,
+            3.9799999999999986,
+            4.379999999999999,
+            4.7799999999999985,
+            4.879999999999999,
+            4.879999999999999,
+            4.879999999999999,
+            4.879999999999999
+          ],
+          "taper_seconds": 0.2,
+          "boundary": "C2 quintic envelope returns to unchanged reference; outside window unchanged",
+          "frozen": [
+            "camera",
+            "scene",
+            "beta",
+            "body scale",
+            "bone lengths",
+            "shared equipment",
+            "boot installation",
+            "wrists",
+            "neck",
+            "collars"
+          ],
+          "wrist_orientation_observable": false,
+          "physical_contact_factor": false,
+          "reference_hashes": {
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\input.npz": "93a71022fc3c4d67a1ec4387f01a2e5513d96cdf50bc4728e0a290ca7590cc27",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\compact_smplx.npz": "f3655f86d42e9a5a1cda80eabfa98895b06e51d44f07e707b352618f0ca3c753",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\B5\\result.npz": "8b5fdb70f951ee692bb07e717ca31e620c718e6c3e689da5be9d5b73f408195d",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\result.npz": "5bcfc447b3acb33cbd1a88299d1ebdf571e963aea069290f1065f1b3111487b2"
+          },
+          "priors": "engineering reference/velocity/acceleration, no contact or gait assumptions",
+          "prior_scales": {
+            "root_displacement_m": 0.35,
+            "angular_displacement_deg": 25,
+            "root_velocity_m_s": 3,
+            "angular_velocity_deg_s": 400,
+            "root_acceleration_m_s2": 15,
+            "angular_acceleration_deg_s2": 800
+          },
+          "robust_body": "2D isotropic pseudo-Huber, c=2 after engineering sigma",
+          "equipment_sources": {
+            "review_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\source_review.json",
+            "review_sha256": "32f38cb8ce5f4657695d681df1aa23eac1991b6f01c5992e1d39187da895881a",
+            "admission_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\footwear_v2\\pose_transfer\\admission.json",
+            "admission_sha256": "42a9f82b1ac520fa88b11b43c650e8ab4c1c0abd309f527e0ad2695df899c451"
+          },
+          "observation_array_sha256": "c7cb38e3acd8bf9a18796ec604048bc2fd35f76e66ce645ede34b6872545b2d4",
+          "backend": "scipy sparse TRF/LSMR; native camera with existing moving-body implicit-row chain",
+          "derivative": "analytic root P/Q; local physical rotation finite differences at exposure nodes; sparse spline chain",
+          "ftol": 1e-07,
+          "xtol": 1e-07,
+          "gtol": 0.0001,
+          "no_iteration_or_time_budget": true,
+          "initial_cost": 6835.866791676512,
+          "initial_parts": {
+            "body_pixels": 6500.724110944644,
+            "visible_boot_edges": 288.3688545444363,
+            "visible_blade_curves": 5.4869783069739935,
+            "boot_direction_endpoints": 41.28684788045816,
+            "reference_deviation": 0.0,
+            "correction_velocity": 0.0,
+            "correction_acceleration": 0.0
+          }
+        },
+        "report": {
+          "mode": "full",
+          "window": [
+            24.5,
+            27.0
+          ],
+          "nfev": 51,
+          "njev": 51,
+          "accepted_iterations": 50,
+          "stopping_reason": "`ftol` termination condition is satisfied.",
+          "status": 2,
+          "optimality": 2.103976099334143,
+          "numerically_converged": false,
+          "gradient_inf": 2.103976099334143,
+          "initial_cost": 6835.866791676512,
+          "final_cost": 2901.7781506044,
+          "initial_parts": {
+            "body_pixels": 6500.724110944644,
+            "visible_boot_edges": 288.3688545444363,
+            "visible_blade_curves": 5.4869783069739935,
+            "boot_direction_endpoints": 41.28684788045816,
+            "reference_deviation": 0.0,
+            "correction_velocity": 0.0,
+            "correction_acceleration": 0.0
+          },
+          "final_parts": {
+            "body_pixels": 2528.393728810233,
+            "visible_boot_edges": 175.0234383488968,
+            "visible_blade_curves": 7.187401045305845,
+            "boot_direction_endpoints": 30.542400617490493,
+            "reference_deviation": 62.032950359530986,
+            "correction_velocity": 3.9238998184598524,
+            "correction_acceleration": 94.6743316044817
+          },
+          "elapsed_seconds": 114.33352159999959,
+          "body_points": 2089,
+          "variables": 410,
+          "blade_choices": [
+            {
+              "pts": 325120,
+              "foot": 1,
+              "selected_candidate": "blade_left",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 332800,
+              "foot": 0,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            }
+          ],
+          "user_accepted": false,
+          "independent_3d_truth": false
+        }
+      },
+      {
+        "window": 2,
+        "seconds": [
+          32.2,
+          33.8
+        ],
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\full\\w2\\result.npz",
+        "sha256": "880d1c010bf6838a776d292e93d47c32dada0f341f9dfb510ab18cc9ae8c72fc",
+        "config": {
+          "schema": "rinkspace.fullbody-window.v1",
+          "mode": "full",
+          "window_seconds": [
+            32.2,
+            33.8
+          ],
+          "source_pts": [
+            412160,
+            412416,
+            412672,
+            412928,
+            413184,
+            413440,
+            413696,
+            413952,
+            414208,
+            414464,
+            414720,
+            414976,
+            415232,
+            415488,
+            415744,
+            416000,
+            416256,
+            416512,
+            416768,
+            417024,
+            417280,
+            417536,
+            417792,
+            418048,
+            418304,
+            418560,
+            418816,
+            419072,
+            419328,
+            419584,
+            419840,
+            420096,
+            420352,
+            420608,
+            420864,
+            421120,
+            421376,
+            421632,
+            421888,
+            422144,
+            422400,
+            422656,
+            422912,
+            423168,
+            423424,
+            423680,
+            423936,
+            424192,
+            424448,
+            424704,
+            424960,
+            425216,
+            425472,
+            425728,
+            425984,
+            426240,
+            426496,
+            426752,
+            427008,
+            427264,
+            427520,
+            427776,
+            428032,
+            428288,
+            428544,
+            428800,
+            429056,
+            429312,
+            429568,
+            429824,
+            430080,
+            430336,
+            430592,
+            430848,
+            431104,
+            431360,
+            431616,
+            431872,
+            432128,
+            432384,
+            432640
+          ],
+          "time_base": [
+            1,
+            12800
+          ],
+          "active_state_columns": [
+            0,
+            1,
+            2,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            15,
+            18,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            3,
+            4,
+            5,
+            12,
+            13,
+            14,
+            21,
+            22,
+            23,
+            30,
+            31,
+            32,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62
+          ],
+          "state_layout": "P[0:3], right root Q[3:6], right local native1..21[6:69]",
+          "source_frames": 81,
+          "body_points": 1377,
+          "knots": [
+            10.080000000000002,
+            10.080000000000002,
+            10.080000000000002,
+            10.080000000000002,
+            10.480000000000002,
+            10.880000000000003,
+            11.280000000000003,
+            11.679999999999996,
+            11.679999999999996,
+            11.679999999999996,
+            11.679999999999996
+          ],
+          "taper_seconds": 0.2,
+          "boundary": "C2 quintic envelope returns to unchanged reference; outside window unchanged",
+          "frozen": [
+            "camera",
+            "scene",
+            "beta",
+            "body scale",
+            "bone lengths",
+            "shared equipment",
+            "boot installation",
+            "wrists",
+            "neck",
+            "collars"
+          ],
+          "wrist_orientation_observable": false,
+          "physical_contact_factor": false,
+          "reference_hashes": {
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\input.npz": "93a71022fc3c4d67a1ec4387f01a2e5513d96cdf50bc4728e0a290ca7590cc27",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\compact_smplx.npz": "f3655f86d42e9a5a1cda80eabfa98895b06e51d44f07e707b352618f0ca3c753",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\B5\\result.npz": "8b5fdb70f951ee692bb07e717ca31e620c718e6c3e689da5be9d5b73f408195d",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\result.npz": "5bcfc447b3acb33cbd1a88299d1ebdf571e963aea069290f1065f1b3111487b2"
+          },
+          "priors": "engineering reference/velocity/acceleration, no contact or gait assumptions",
+          "prior_scales": {
+            "root_displacement_m": 0.35,
+            "angular_displacement_deg": 25,
+            "root_velocity_m_s": 3,
+            "angular_velocity_deg_s": 400,
+            "root_acceleration_m_s2": 15,
+            "angular_acceleration_deg_s2": 800
+          },
+          "robust_body": "2D isotropic pseudo-Huber, c=2 after engineering sigma",
+          "equipment_sources": {
+            "review_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\source_review.json",
+            "review_sha256": "32f38cb8ce5f4657695d681df1aa23eac1991b6f01c5992e1d39187da895881a",
+            "admission_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\footwear_v2\\pose_transfer\\admission.json",
+            "admission_sha256": "42a9f82b1ac520fa88b11b43c650e8ab4c1c0abd309f527e0ad2695df899c451"
+          },
+          "backend": "scipy sparse TRF/LSMR; native camera with existing moving-body implicit-row chain",
+          "derivative": "analytic root P/Q; local physical rotation finite differences at exposure nodes; sparse spline chain",
+          "ftol": 1e-07,
+          "xtol": 1e-07,
+          "gtol": 0.0001,
+          "no_iteration_or_time_budget": true,
+          "initial_cost": 4750.719981198954,
+          "initial_parts": {
+            "body_pixels": 4579.470467031082,
+            "visible_boot_edges": 171.24951416787144,
+            "reference_deviation": 0.0,
+            "correction_velocity": 0.0,
+            "correction_acceleration": 0.0
+          }
+        },
+        "report": {
+          "mode": "full",
+          "window": [
+            32.2,
+            33.8
+          ],
+          "nfev": 48,
+          "njev": 38,
+          "accepted_iterations": 37,
+          "stopping_reason": "`ftol` termination condition is satisfied.",
+          "status": 2,
+          "optimality": 2.7264931231360086,
+          "numerically_converged": false,
+          "gradient_inf": 2.7264931231360086,
+          "initial_cost": 4750.719981198954,
+          "final_cost": 1394.6397146681722,
+          "initial_parts": {
+            "body_pixels": 4579.470467031082,
+            "visible_boot_edges": 171.24951416787144,
+            "reference_deviation": 0.0,
+            "correction_velocity": 0.0,
+            "correction_acceleration": 0.0
+          },
+          "final_parts": {
+            "body_pixels": 1212.2775285898003,
+            "visible_boot_edges": 68.66429381375721,
+            "reference_deviation": 42.390115080245764,
+            "correction_velocity": 3.0161560044059676,
+            "correction_acceleration": 68.29162117996361
+          },
+          "elapsed_seconds": 46.68462129999989,
+          "body_points": 1377,
+          "variables": 287,
+          "blade_choices": [],
+          "user_accepted": false,
+          "independent_3d_truth": false
+        }
+      },
+      {
+        "window": 3,
+        "seconds": [
+          35.2,
+          36.8
+        ],
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\full\\w3\\result.npz",
+        "sha256": "6bd7541f72317e84d467056ca87fe5579f4aa39c2c683594f67827f02c2ab820",
+        "config": {
+          "schema": "rinkspace.fullbody-window.v1",
+          "mode": "full",
+          "window_seconds": [
+            35.2,
+            36.8
+          ],
+          "source_pts": [
+            450560,
+            450816,
+            451072,
+            451328,
+            451584,
+            451840,
+            452096,
+            452352,
+            452608,
+            452864,
+            453120,
+            453376,
+            453632,
+            453888,
+            454144,
+            454400,
+            454656,
+            454912,
+            455168,
+            455424,
+            455680,
+            455936,
+            456192,
+            456448,
+            456704,
+            456960,
+            457216,
+            457472,
+            457728,
+            457984,
+            458240,
+            458496,
+            458752,
+            459008,
+            459264,
+            459520,
+            459776,
+            460032,
+            460288,
+            460544,
+            460800,
+            461056,
+            461312,
+            461568,
+            461824,
+            462080,
+            462336,
+            462592,
+            462848,
+            463104,
+            463360,
+            463616,
+            463872,
+            464128,
+            464384,
+            464640,
+            464896,
+            465152,
+            465408,
+            465664,
+            465920,
+            466176,
+            466432,
+            466688,
+            466944,
+            467200,
+            467456,
+            467712,
+            467968,
+            468224,
+            468480,
+            468736,
+            468992,
+            469248,
+            469504,
+            469760,
+            470016,
+            470272,
+            470528,
+            470784,
+            471040
+          ],
+          "time_base": [
+            1,
+            12800
+          ],
+          "active_state_columns": [
+            0,
+            1,
+            2,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            15,
+            18,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            3,
+            4,
+            5,
+            12,
+            13,
+            14,
+            21,
+            22,
+            23,
+            30,
+            31,
+            32,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62
+          ],
+          "state_layout": "P[0:3], right root Q[3:6], right local native1..21[6:69]",
+          "source_frames": 81,
+          "body_points": 1365,
+          "knots": [
+            13.080000000000002,
+            13.080000000000002,
+            13.080000000000002,
+            13.080000000000002,
+            13.480000000000002,
+            13.880000000000003,
+            14.280000000000003,
+            14.679999999999996,
+            14.679999999999996,
+            14.679999999999996,
+            14.679999999999996
+          ],
+          "taper_seconds": 0.2,
+          "boundary": "C2 quintic envelope returns to unchanged reference; outside window unchanged",
+          "frozen": [
+            "camera",
+            "scene",
+            "beta",
+            "body scale",
+            "bone lengths",
+            "shared equipment",
+            "boot installation",
+            "wrists",
+            "neck",
+            "collars"
+          ],
+          "wrist_orientation_observable": false,
+          "physical_contact_factor": false,
+          "reference_hashes": {
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\input.npz": "93a71022fc3c4d67a1ec4387f01a2e5513d96cdf50bc4728e0a290ca7590cc27",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\compact_smplx.npz": "f3655f86d42e9a5a1cda80eabfa98895b06e51d44f07e707b352618f0ca3c753",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\B5\\result.npz": "8b5fdb70f951ee692bb07e717ca31e620c718e6c3e689da5be9d5b73f408195d",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\result.npz": "5bcfc447b3acb33cbd1a88299d1ebdf571e963aea069290f1065f1b3111487b2"
+          },
+          "priors": "engineering reference/velocity/acceleration, no contact or gait assumptions",
+          "prior_scales": {
+            "root_displacement_m": 0.35,
+            "angular_displacement_deg": 25,
+            "root_velocity_m_s": 3,
+            "angular_velocity_deg_s": 400,
+            "root_acceleration_m_s2": 15,
+            "angular_acceleration_deg_s2": 800
+          },
+          "robust_body": "2D isotropic pseudo-Huber, c=2 after engineering sigma",
+          "equipment_sources": {
+            "review_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\source_review.json",
+            "review_sha256": "32f38cb8ce5f4657695d681df1aa23eac1991b6f01c5992e1d39187da895881a",
+            "admission_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\footwear_v2\\pose_transfer\\admission.json",
+            "admission_sha256": "42a9f82b1ac520fa88b11b43c650e8ab4c1c0abd309f527e0ad2695df899c451"
+          },
+          "observation_array_sha256": "c7cb38e3acd8bf9a18796ec604048bc2fd35f76e66ce645ede34b6872545b2d4",
+          "backend": "scipy sparse TRF/LSMR; native camera with existing moving-body implicit-row chain",
+          "derivative": "analytic root P/Q; local physical rotation finite differences at exposure nodes; sparse spline chain",
+          "ftol": 1e-07,
+          "xtol": 1e-07,
+          "gtol": 0.0001,
+          "no_iteration_or_time_budget": true,
+          "initial_cost": 13000.731864588995,
+          "initial_parts": {
+            "body_pixels": 11795.419214546462,
+            "visible_boot_edges": 728.2432296962462,
+            "visible_blade_curves": 71.1317508061887,
+            "boot_direction_endpoints": 405.9376695400982,
+            "reference_deviation": 0.0,
+            "correction_velocity": 0.0,
+            "correction_acceleration": 0.0
+          }
+        },
+        "report": {
+          "mode": "full",
+          "window": [
+            35.2,
+            36.8
+          ],
+          "nfev": 50,
+          "njev": 45,
+          "accepted_iterations": 44,
+          "stopping_reason": "`ftol` termination condition is satisfied.",
+          "status": 2,
+          "optimality": 0.683262429884758,
+          "numerically_converged": false,
+          "gradient_inf": 0.4708699127588851,
+          "initial_cost": 13000.731864588995,
+          "final_cost": 1805.6382771434085,
+          "initial_parts": {
+            "body_pixels": 11795.419214546462,
+            "visible_boot_edges": 728.2432296962462,
+            "visible_blade_curves": 71.1317508061887,
+            "boot_direction_endpoints": 405.9376695400982,
+            "reference_deviation": 0.0,
+            "correction_velocity": 0.0,
+            "correction_acceleration": 0.0
+          },
+          "final_parts": {
+            "body_pixels": 1569.3381118830637,
+            "visible_boot_edges": 127.1996820395183,
+            "visible_blade_curves": 1.3143338506697955,
+            "boot_direction_endpoints": 4.860270698721472,
+            "reference_deviation": 28.424231877717116,
+            "correction_velocity": 2.935717556670644,
+            "correction_acceleration": 71.56592923704707
+          },
+          "elapsed_seconds": 57.06663429999935,
+          "body_points": 1365,
+          "variables": 287,
+          "blade_choices": [
+            {
+              "pts": 455680,
+              "foot": 0,
+              "selected_candidate": "blade_left",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 455680,
+              "foot": 1,
+              "selected_candidate": "blade_right",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 461056,
+              "foot": 0,
+              "selected_candidate": "blade_left",
+              "source_side_confirmed": false
+            },
+            {
+              "pts": 461056,
+              "foot": 1,
+              "selected_candidate": "blade_left",
+              "source_side_confirmed": false
+            }
+          ],
+          "user_accepted": false,
+          "independent_3d_truth": false
+        }
+      },
+      {
+        "window": 4,
+        "seconds": [
+          37.4,
+          39.0
+        ],
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\full\\w4\\result.npz",
+        "sha256": "5c2063f893e86a1d0b8b422b0d6063e7875ebce5426b7145c9fe92c7ab2a85ae",
+        "config": {
+          "schema": "rinkspace.fullbody-window.v1",
+          "mode": "full",
+          "window_seconds": [
+            37.4,
+            39.0
+          ],
+          "source_pts": [
+            478720,
+            478976,
+            479232,
+            479488,
+            479744,
+            480000,
+            480256,
+            480512,
+            480768,
+            481024,
+            481280,
+            481536,
+            481792,
+            482048,
+            482304,
+            482560,
+            482816,
+            483072,
+            483328,
+            483584,
+            483840,
+            484096,
+            484352,
+            484608,
+            484864,
+            485120,
+            485376,
+            485632,
+            485888,
+            486144,
+            486400,
+            486656,
+            486912,
+            487168,
+            487424,
+            487680,
+            487936,
+            488192,
+            488448,
+            488704,
+            488960,
+            489216,
+            489472,
+            489728,
+            489984,
+            490240,
+            490496,
+            490752,
+            491008,
+            491264,
+            491520,
+            491776,
+            492032,
+            492288,
+            492544,
+            492800,
+            493056,
+            493312,
+            493568,
+            493824,
+            494080,
+            494336,
+            494592,
+            494848,
+            495104,
+            495360,
+            495616,
+            495872,
+            496128,
+            496384,
+            496640,
+            496896,
+            497152,
+            497408,
+            497664,
+            497920,
+            498176,
+            498432,
+            498688,
+            498944,
+            499200
+          ],
+          "time_base": [
+            1,
+            12800
+          ],
+          "active_state_columns": [
+            0,
+            1,
+            2,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            15,
+            18,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            3,
+            4,
+            5,
+            12,
+            13,
+            14,
+            21,
+            22,
+            23,
+            30,
+            31,
+            32,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62
+          ],
+          "state_layout": "P[0:3], right root Q[3:6], right local native1..21[6:69]",
+          "source_frames": 81,
+          "body_points": 1377,
+          "knots": [
+            15.279999999999998,
+            15.279999999999998,
+            15.279999999999998,
+            15.279999999999998,
+            15.679999999999998,
+            16.08,
+            16.479999999999997,
+            16.88,
+            16.88,
+            16.88,
+            16.88
+          ],
+          "taper_seconds": 0.2,
+          "boundary": "C2 quintic envelope returns to unchanged reference; outside window unchanged",
+          "frozen": [
+            "camera",
+            "scene",
+            "beta",
+            "body scale",
+            "bone lengths",
+            "shared equipment",
+            "boot installation",
+            "wrists",
+            "neck",
+            "collars"
+          ],
+          "wrist_orientation_observable": false,
+          "physical_contact_factor": false,
+          "reference_hashes": {
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\input.npz": "93a71022fc3c4d67a1ec4387f01a2e5513d96cdf50bc4728e0a290ca7590cc27",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\compact_smplx.npz": "f3655f86d42e9a5a1cda80eabfa98895b06e51d44f07e707b352618f0ca3c753",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\B5\\result.npz": "8b5fdb70f951ee692bb07e717ca31e620c718e6c3e689da5be9d5b73f408195d",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\result.npz": "5bcfc447b3acb33cbd1a88299d1ebdf571e963aea069290f1065f1b3111487b2"
+          },
+          "priors": "engineering reference/velocity/acceleration, no contact or gait assumptions",
+          "prior_scales": {
+            "root_displacement_m": 0.35,
+            "angular_displacement_deg": 25,
+            "root_velocity_m_s": 3,
+            "angular_velocity_deg_s": 400,
+            "root_acceleration_m_s2": 15,
+            "angular_acceleration_deg_s2": 800
+          },
+          "robust_body": "2D isotropic pseudo-Huber, c=2 after engineering sigma",
+          "equipment_sources": {
+            "review_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\source_review.json",
+            "review_sha256": "32f38cb8ce5f4657695d681df1aa23eac1991b6f01c5992e1d39187da895881a",
+            "admission_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\footwear_v2\\pose_transfer\\admission.json",
+            "admission_sha256": "42a9f82b1ac520fa88b11b43c650e8ab4c1c0abd309f527e0ad2695df899c451"
+          },
+          "backend": "scipy sparse TRF/LSMR; native camera with existing moving-body implicit-row chain",
+          "derivative": "analytic root P/Q; local physical rotation finite differences at exposure nodes; sparse spline chain",
+          "ftol": 1e-07,
+          "xtol": 1e-07,
+          "gtol": 0.0001,
+          "no_iteration_or_time_budget": true,
+          "initial_cost": 5246.647553048333,
+          "initial_parts": {
+            "body_pixels": 4953.546316881523,
+            "visible_boot_edges": 282.67469265600977,
+            "boot_direction_endpoints": 10.426543510799942,
+            "reference_deviation": 0.0,
+            "correction_velocity": 0.0,
+            "correction_acceleration": 0.0
+          }
+        },
+        "report": {
+          "mode": "full",
+          "window": [
+            37.4,
+            39.0
+          ],
+          "nfev": 75,
+          "njev": 75,
+          "accepted_iterations": 74,
+          "stopping_reason": "`ftol` termination condition is satisfied.",
+          "status": 2,
+          "optimality": 0.7122557841294641,
+          "numerically_converged": false,
+          "gradient_inf": 0.7122557841294641,
+          "initial_cost": 5246.647553048333,
+          "final_cost": 1086.6798929509275,
+          "initial_parts": {
+            "body_pixels": 4953.546316881523,
+            "visible_boot_edges": 282.67469265600977,
+            "boot_direction_endpoints": 10.426543510799942,
+            "reference_deviation": 0.0,
+            "correction_velocity": 0.0,
+            "correction_acceleration": 0.0
+          },
+          "final_parts": {
+            "body_pixels": 951.1515898688679,
+            "visible_boot_edges": 71.16823662102482,
+            "boot_direction_endpoints": 0.5660321309006346,
+            "reference_deviation": 20.46306668719203,
+            "correction_velocity": 1.8020409781233366,
+            "correction_acceleration": 41.528926664818954
+          },
+          "elapsed_seconds": 97.6174200000005,
+          "body_points": 1377,
+          "variables": 287,
+          "blade_choices": [],
+          "user_accepted": false,
+          "independent_3d_truth": false
+        }
+      },
+      {
+        "window": 5,
+        "seconds": [
+          40.0,
+          41.5
+        ],
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\full\\w5\\result.npz",
+        "sha256": "0bbfb4d784aef756304b934e6a1a178cad96333bee43a3c47969529f3c58870e",
+        "config": {
+          "schema": "rinkspace.fullbody-window.v1",
+          "mode": "full",
+          "window_seconds": [
+            40.0,
+            41.5
+          ],
+          "source_pts": [
+            512000,
+            512256,
+            512512,
+            512768,
+            513024,
+            513280,
+            513536,
+            513792,
+            514048,
+            514304,
+            514560,
+            514816,
+            515072,
+            515328,
+            515584,
+            515840,
+            516096,
+            516352,
+            516608,
+            516864,
+            517120,
+            517376,
+            517632,
+            517888,
+            518144,
+            518400,
+            518656,
+            518912,
+            519168,
+            519424,
+            519680,
+            519936,
+            520192,
+            520448,
+            520704,
+            520960,
+            521216,
+            521472,
+            521728,
+            521984,
+            522240,
+            522496,
+            522752,
+            523008,
+            523264,
+            523520,
+            523776,
+            524032,
+            524288,
+            524544,
+            524800,
+            525056,
+            525312,
+            525568,
+            525824,
+            526080,
+            526336,
+            526592,
+            526848,
+            527104,
+            527360,
+            527616,
+            527872,
+            528128,
+            528384,
+            528640,
+            528896,
+            529152,
+            529408,
+            529664,
+            529920,
+            530176,
+            530432,
+            530688,
+            530944,
+            531200
+          ],
+          "time_base": [
+            1,
+            12800
+          ],
+          "active_state_columns": [
+            0,
+            1,
+            2,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            15,
+            18,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            3,
+            4,
+            5,
+            12,
+            13,
+            14,
+            21,
+            22,
+            23,
+            30,
+            31,
+            32,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62
+          ],
+          "state_layout": "P[0:3], right root Q[3:6], right local native1..21[6:69]",
+          "source_frames": 76,
+          "body_points": 1292,
+          "knots": [
+            17.88,
+            17.88,
+            17.88,
+            17.88,
+            18.279999999999998,
+            18.679999999999996,
+            19.079999999999995,
+            19.38,
+            19.38,
+            19.38,
+            19.38
+          ],
+          "taper_seconds": 0.2,
+          "boundary": "C2 quintic envelope returns to unchanged reference; outside window unchanged",
+          "frozen": [
+            "camera",
+            "scene",
+            "beta",
+            "body scale",
+            "bone lengths",
+            "shared equipment",
+            "boot installation",
+            "wrists",
+            "neck",
+            "collars"
+          ],
+          "wrist_orientation_observable": false,
+          "physical_contact_factor": false,
+          "reference_hashes": {
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\input.npz": "93a71022fc3c4d67a1ec4387f01a2e5513d96cdf50bc4728e0a290ca7590cc27",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\compact_smplx.npz": "f3655f86d42e9a5a1cda80eabfa98895b06e51d44f07e707b352618f0ca3c753",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\B5\\result.npz": "8b5fdb70f951ee692bb07e717ca31e620c718e6c3e689da5be9d5b73f408195d",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\result.npz": "5bcfc447b3acb33cbd1a88299d1ebdf571e963aea069290f1065f1b3111487b2"
+          },
+          "priors": "engineering reference/velocity/acceleration, no contact or gait assumptions",
+          "prior_scales": {
+            "root_displacement_m": 0.35,
+            "angular_displacement_deg": 25,
+            "root_velocity_m_s": 3,
+            "angular_velocity_deg_s": 400,
+            "root_acceleration_m_s2": 15,
+            "angular_acceleration_deg_s2": 800
+          },
+          "robust_body": "2D isotropic pseudo-Huber, c=2 after engineering sigma",
+          "equipment_sources": {
+            "review_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\source_review.json",
+            "review_sha256": "32f38cb8ce5f4657695d681df1aa23eac1991b6f01c5992e1d39187da895881a",
+            "admission_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\footwear_v2\\pose_transfer\\admission.json",
+            "admission_sha256": "42a9f82b1ac520fa88b11b43c650e8ab4c1c0abd309f527e0ad2695df899c451"
+          },
+          "observation_array_sha256": "c7cb38e3acd8bf9a18796ec604048bc2fd35f76e66ce645ede34b6872545b2d4",
+          "backend": "scipy sparse TRF/LSMR; native camera with existing moving-body implicit-row chain",
+          "derivative": "analytic root P/Q; local physical rotation finite differences at exposure nodes; sparse spline chain",
+          "ftol": 1e-07,
+          "xtol": 1e-07,
+          "gtol": 0.0001,
+          "no_iteration_or_time_budget": true,
+          "initial_cost": 3384.6811264751805,
+          "initial_parts": {
+            "body_pixels": 3308.954799355825,
+            "visible_boot_edges": 75.72632711935448,
+            "reference_deviation": 0.0,
+            "correction_velocity": 0.0,
+            "correction_acceleration": 0.0
+          }
+        },
+        "report": {
+          "mode": "full",
+          "window": [
+            40.0,
+            41.5
+          ],
+          "nfev": 60,
+          "njev": 48,
+          "accepted_iterations": 47,
+          "stopping_reason": "`ftol` termination condition is satisfied.",
+          "status": 2,
+          "optimality": 2.1477152362234824,
+          "numerically_converged": false,
+          "gradient_inf": 2.1477152362234824,
+          "initial_cost": 3384.6811264751805,
+          "final_cost": 944.5033859684261,
+          "initial_parts": {
+            "body_pixels": 3308.954799355825,
+            "visible_boot_edges": 75.72632711935448,
+            "reference_deviation": 0.0,
+            "correction_velocity": 0.0,
+            "correction_acceleration": 0.0
+          },
+          "final_parts": {
+            "body_pixels": 812.225335589934,
+            "visible_boot_edges": 47.33705962093392,
+            "reference_deviation": 29.912574638771115,
+            "correction_velocity": 2.3642529669036545,
+            "correction_acceleration": 52.664163151883194
+          },
+          "elapsed_seconds": 56.66184959999919,
+          "body_points": 1292,
+          "variables": 287,
+          "blade_choices": [],
+          "user_accepted": false,
+          "independent_3d_truth": false
+        }
+      }
+    ]
+  },
+  "candidates": {
+    "reference": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\reference\\result.npz",
+      "sha256": "f3c4f91e13a044da8afd765a2078671822bcaee5f59f8bfcc85bc2d9f944fd37",
+      "export": {
+        "schema": "rinkspace.fullbody-export.v1",
+        "mode": "reference",
+        "frames": 1143,
+        "optimized_frames": 0,
+        "outside_window": "unchanged J1_s2 reference, not new fit",
+        "result_sha256": "f3c4f91e13a044da8afd765a2078671822bcaee5f59f8bfcc85bc2d9f944fd37",
+        "length_ratio": 0.9993616177797032,
+        "source_time_base": [
+          1,
+          12800
+        ],
+        "continuous_state": {
+          "reference_hashes": {
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\input.npz": "93a71022fc3c4d67a1ec4387f01a2e5513d96cdf50bc4728e0a290ca7590cc27",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\compact_smplx.npz": "f3655f86d42e9a5a1cda80eabfa98895b06e51d44f07e707b352618f0ca3c753",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\B5\\result.npz": "8b5fdb70f951ee692bb07e717ca31e620c718e6c3e689da5be9d5b73f408195d",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\result.npz": "5bcfc447b3acb33cbd1a88299d1ebdf571e963aea069290f1065f1b3111487b2"
+          },
+          "window_files": []
+        },
+        "common_midpoint_and_row_time_separate": true,
+        "reload_equal": true
+      }
+    },
+    "legacy": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\legacy\\result.npz",
+      "sha256": "04e5779226ee7a97815e318fb942a1ddc9569025a3a6ec159b3078b1dfa94559",
+      "export": {
+        "schema": "rinkspace.fullbody-export.v1",
+        "mode": "legacy",
+        "frames": 1143,
+        "optimized_frames": 445,
+        "outside_window": "unchanged J1_s2 reference, not new fit",
+        "result_sha256": "04e5779226ee7a97815e318fb942a1ddc9569025a3a6ec159b3078b1dfa94559",
+        "length_ratio": 0.9993616177797032,
+        "source_time_base": [
+          1,
+          12800
+        ],
+        "continuous_state": {
+          "reference_hashes": {
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\input.npz": "93a71022fc3c4d67a1ec4387f01a2e5513d96cdf50bc4728e0a290ca7590cc27",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\compact_smplx.npz": "f3655f86d42e9a5a1cda80eabfa98895b06e51d44f07e707b352618f0ca3c753",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\B5\\result.npz": "8b5fdb70f951ee692bb07e717ca31e620c718e6c3e689da5be9d5b73f408195d",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\result.npz": "5bcfc447b3acb33cbd1a88299d1ebdf571e963aea069290f1065f1b3111487b2"
+          },
+          "window_files": [
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\legacy\\w1\\result.npz",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\legacy\\w2\\result.npz",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\legacy\\w3\\result.npz",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\legacy\\w4\\result.npz",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\legacy\\w5\\result.npz"
+          ]
+        },
+        "common_midpoint_and_row_time_separate": true,
+        "reload_equal": true
+      }
+    },
+    "full": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\full\\result.npz",
+      "sha256": "103faec39fe78ad2735dd19baf85798a269db9e5049b2a673a79fa7b1a74de39",
+      "export": {
+        "schema": "rinkspace.fullbody-export.v1",
+        "mode": "full",
+        "frames": 1143,
+        "optimized_frames": 445,
+        "outside_window": "unchanged J1_s2 reference, not new fit",
+        "result_sha256": "103faec39fe78ad2735dd19baf85798a269db9e5049b2a673a79fa7b1a74de39",
+        "length_ratio": 0.9993616177797032,
+        "source_time_base": [
+          1,
+          12800
+        ],
+        "continuous_state": {
+          "reference_hashes": {
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\input.npz": "93a71022fc3c4d67a1ec4387f01a2e5513d96cdf50bc4728e0a290ca7590cc27",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\compact_smplx.npz": "f3655f86d42e9a5a1cda80eabfa98895b06e51d44f07e707b352618f0ca3c753",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\B5\\result.npz": "8b5fdb70f951ee692bb07e717ca31e620c718e6c3e689da5be9d5b73f408195d",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\result.npz": "5bcfc447b3acb33cbd1a88299d1ebdf571e963aea069290f1065f1b3111487b2"
+          },
+          "window_files": [
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\full\\w1\\result.npz",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\full\\w2\\result.npz",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\full\\w3\\result.npz",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\full\\w4\\result.npz",
+            "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\full\\w5\\result.npz"
+          ]
+        },
+        "common_midpoint_and_row_time_separate": true,
+        "reload_equal": true
+      }
+    }
+  },
+  "evidence": {
+    "metrics.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\metrics.json",
+      "sha256": "2ae07610bba93d46b9eef6dc56327a8a881cca64ca861f698b69aa37e18fbefe"
+    },
+    "results.txt": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\results.txt",
+      "sha256": "d817f08efdd9535a5ea2b209d48cd37705cae33b9f03ccfc154fc69e69e0c58c"
+    },
+    "state_checks.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\state_checks.json",
+      "sha256": "e05c05c08214b17659d885b15e27159df19e45c2c04740f4832711cb50499355"
+    },
+    "derivative_checks.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\derivative_checks.json",
+      "sha256": "a6252a9833e00f5bf9f53f9c88deb903c7a2a82cc3bda78ea7c8b6d498317654"
+    },
+    "visual_review.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\visual_review.json",
+      "sha256": "3e6f72c5605a9a89c6a9d52068a582addd648f36283deca046824c0fc8167e13"
+    },
+    "validation_summary.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\validation_summary.json",
+      "sha256": "37187cf71ee208f5368a729231432ecb4e98bb4509a9586941842394900a900c"
+    },
+    "player_check/checks.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\player_check\\checks.json",
+      "sha256": "7e248e7b9c6409266e23355500d397b52567d390284d6bd6ffe4850d2399043c"
+    }
+  },
+  "acceptance_assessment": {
+    "verdict": "not_ready_for_3d_accuracy_acceptance",
+    "verdict_zh": "当前结果不能验收为准确的三维人体动作与轨迹；已完成的是可运行工程与开发观测上的二维拟合改善。",
+    "engineering": "implementation and playback checked separately; does not validate physical accuracy",
+    "pixel_evidence": "improvement on development observations used for fitting and selection; not an independent final test",
+    "geometry": "saved blade geometry penetrates the frozen native ice plane",
+    "plane_penetration": [
+      {
+        "window": "w1",
+        "frames": 126,
+        "frames_with_any_blade_below_plane": 92,
+        "frames_with_any_blade_more_than_1cm_below": 89,
+        "lowest_saved_sample_m": -0.10865968667570305,
+        "worst_source_pts": 320512,
+        "worst_source_seconds": 25.04
+      },
+      {
+        "window": "w2",
+        "frames": 81,
+        "frames_with_any_blade_below_plane": 81,
+        "frames_with_any_blade_more_than_1cm_below": 81,
+        "lowest_saved_sample_m": -0.1792122718659783,
+        "worst_source_pts": 416000,
+        "worst_source_seconds": 32.5
+      },
+      {
+        "window": "w3",
+        "frames": 81,
+        "frames_with_any_blade_below_plane": 81,
+        "frames_with_any_blade_more_than_1cm_below": 81,
+        "lowest_saved_sample_m": -0.16264428711833534,
+        "worst_source_pts": 468992,
+        "worst_source_seconds": 36.64
+      },
+      {
+        "window": "w4",
+        "frames": 81,
+        "frames_with_any_blade_below_plane": 81,
+        "frames_with_any_blade_more_than_1cm_below": 81,
+        "lowest_saved_sample_m": -0.11036438080176994,
+        "worst_source_pts": 494592,
+        "worst_source_seconds": 38.64
+      },
+      {
+        "window": "w5",
+        "frames": 76,
+        "frames_with_any_blade_below_plane": 76,
+        "frames_with_any_blade_more_than_1cm_below": 76,
+        "lowest_saved_sample_m": -0.15877014622579594,
+        "worst_source_pts": 518400,
+        "worst_source_seconds": 40.5
+      },
+      {
+        "window": "all_windows",
+        "frames": 445,
+        "frames_with_any_blade_below_plane": 411,
+        "frames_with_any_blade_more_than_1cm_below": 408,
+        "lowest_saved_sample_m": -0.1792122718659783,
+        "worst_source_pts": 416000,
+        "worst_source_seconds": 32.5
+      }
+    ],
+    "plane_count_definition": "Z of saved lower-edge samples under current conditional scene scale; 1 micrometre avoids roundoff. 1 cm is an additional descriptive count, not a pass tolerance. No contact labels inferred.",
+    "between_fitted_models": {
+      "distance_m": {
+        "n": 445,
+        "finite_n": 445,
+        "missing_n": 0,
+        "median": 0.06053633112200026,
+        "p95": 0.20791447171401228,
+        "max": 0.2209915414420434
+      },
+      "meaning": "difference between two fitted models, NOT a measured error or confidence interval",
+      "along_camera_ray_absolute_m": {
+        "n": 445,
+        "finite_n": 445,
+        "missing_n": 0,
+        "median": 0.06045951586868745,
+        "p95": 0.20754364731763342,
+        "max": 0.22073811142130514
+      },
+      "perpendicular_to_ray_m": {
+        "n": 445,
+        "finite_n": 445,
+        "missing_n": 0,
+        "median": 0.005952733143098368,
+        "p95": 0.0151175535689957,
+        "max": 0.01846508536180427
+      }
+    },
+    "independent_3d_accuracy": "unknown: no independent 3D ground truth or frozen final validation set",
+    "visual_review_role": "source identity and visible anomalies only; user is not asked to judge invisible depth by eye"
+  },
+  "viewer_config": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\viewer3d_fullbody_1102.json",
+  "replay_entry": "D:\\OneDrive\\codex_projs\\RinkSpace\\scripts\\run_fullbody_round.py",
+  "limitations": [
+    "Five short development windows only; outside windows replay J1_s2.",
+    "Pixel error improvements do not establish depth, physical contact or 3D accuracy.",
+    "Assistant source review is not human acceptance; uncertainty and failures are preserved.",
+    "Stopping reasons and nonconverged gradients are retained per window."
+  ]
+}

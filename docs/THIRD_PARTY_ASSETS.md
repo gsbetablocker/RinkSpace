@@ -32,6 +32,13 @@ GVHMR 的 `geo_transform.py`、`preproc/__init__.py` 和 `wis3d_utils.py` 修改
 
 GVHMR 的 DPVO 子模块在历史盘点中为空，[固定安装说明](https://github.com/zju3dv/GVHMR/blob/6ec3ca39336c50492c0fae65fba2fb831fc7d866/docs/INSTALL.md)将其列为可选。RinkSpace 的对应人体路径使用自有相机输入，不据此认定 DPVO 已安装。
 
+<a id="boot-handoff"></a>
+### 开放鞋口参考实现的用户交接来源
+
+[open_boot_topology.py](../src/rinkspace/viewer3d/open_boot_topology.py) 来自用户提供的 `RinkSpace_Boot_Integration_20261102.zip`，对应成员 `RinkSpace_Boot_Integration_20261102/code/open_boot_topology.py`；交接成员与当前源码 SHA256 均为 `21e1d03bc1b2a189143c832b05003fe3bb00a6c2e3c7677cd66fb831664b4394`。原 ZIP 留 Data/handoff/1102，SHA256 为 `5d58a894e5ef9cf6d33007ff312a943f17b4ada71760338078ff74f6498d2285`。
+
+它针对项目现有 14 点鞋壳提供开放鞋口连接，交接包未附单独开源许可证、品牌 CAD、人体模型或预训练权重。来源登记不构成独立权利转让，不据研究文献链接认定复制了 FIND／SUPR 实现，也不为该文件推定 MIT 等许可；项目声明仍仅适用于作者实际享有权利的部分。
+
 ## 权重与小型数据
 
 | 资产 | 登记字节数 | 来源与限制 |
@@ -43,6 +50,8 @@ GVHMR 的 DPVO 子模块在历史盘点中为空，[固定安装说明](https://
 | `yolo11n-pose.pt` | 6255593 | 已登记文件 SHA，精确上游 release 与原下载记录仍未确定；[模型族说明](https://docs.ultralytics.com/models/yolo11/) |
 
 GVHMR／HMR2／ViTPose 的历史下载链固定 Hugging Face 镜像修订 `21b32d5389e2e59c0737d4c4095bbc0b8c23f66b`，按镜像 LFS SHA 核验下载字节，缺少官方 Drive 发布者散列，不能写成官方认证相同字节。人体映射、回归器、均值和顶点编号等小型数据也属于完整依赖；仅复制 Python 文件不足以恢复运行。
+
+SMPL-X 的研究引用为 Georgios Pavlakos 等，*Expressive Body Capture: 3D Hands, Face, and Body from a Single Image*，CVPR 2019；[官方项目与引用](https://smpl-x.is.tue.mpg.de/)提供作者及论文信息。
 
 ## 历史 GTSAM 构建资源
 

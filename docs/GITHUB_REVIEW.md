@@ -15,6 +15,8 @@
 
 公开前核对实际依赖，移出重复资产和可再生中间文件，并同步核对代码与测试引用。原始 UV、整数 PTS、统计 W、人工确认和失败证据保留在对应数值记录或归档中。原件 SHA 与[公开派生身份](../configs/privacy_derivatives.json)分别描述各自字节，不能互换。整理资产不授权提交、推送或改写历史。
 
+S01 全身、足鞋和开头修复的公开范围为实现源码、测试、播放器配置、三份小型控制参数及其来源／失败索引；详见[节目记录](../events/ankara_2026/programmes/okada_mei_sp/README.md)和[参数许可核查](LICENSING_REVIEW.md#body-parameters)。完整拟合输出、SMPL-X 紧凑模型与完整表面、原图及叠图仍位于 `Data/runs/body_s01_20261029/` 和 `Data/cache/results3d/`，不随这些参数包发布。绑定里的历史绝对路径记录当时运行身份，重放需使用本机 Data 配置及相符输入。
+
 ## 当前模型与数值来源
 
 当前开发工作区已接通共同 native 几何、时变相机、prepare／review 和连续 GPU LM。当前采用 `camera_solver_refined_1102` 暂定最终状态，覆盖 S01–S09 九镜头、三个物理机位，已执行真实联合拟合并导出完整回放；该状态未达到一阶数值收敛，独立物理标定和完整节目准确性验证仍未完成。精确输入、数值状态、原生库与视频见[当前结果绑定](../events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_solver_refined_1102.json)，人工确认范围见[节目入口](../events/ankara_2026/programmes/okada_mei_sp/README.md#有界结果与人工确认)，能力缺口见 [REBUILD](REBUILD.md)。

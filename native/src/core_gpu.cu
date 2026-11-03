@@ -744,7 +744,13 @@ RS_API int rs_g2_linearize(void* handle,int backend,double* summary,size_t ns,do
         }
         timings[0]=millis(start);timings[6]=double(l.device_bytes());
         if(summary[0]!=0||!finite_array(summary,4)){last_error="G2 invalid rows retained; no valid block system (failed="+std::to_string(summary[0])+")";
-            std::vector<int> statuses(p->host.n);cuda_check(cudaMemcpyAsync(statuses.data(),p->device_status,statuses.size()*sizeof(int),cudaMemcpyDeviceToHost,p->stream));cuda_check(cudaStreamSynchronize(p->stream));
+            std::vector<int> statuses;
+            if(backend==0)statuses=l.cpu_status;
+            else{
+                statuses.resize(p->host.n);
+                cuda_check(cudaMemcpyAsync(statuses.data(),p->device_status,statuses.size()*sizeof(int),cudaMemcpyDeviceToHost,p->stream));
+                cuda_check(cudaStreamSynchronize(p->stream));
+            }
             std::map<int,size_t> census;for(int code:statuses)++census[code];for(auto item:census)last_error+=" status_"+std::to_string(item.first)+"="+std::to_string(item.second);return 21;}
         return 0;
     }catch(const std::exception& e){last_error=e.what();return 20;}

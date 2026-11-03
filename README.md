@@ -6,7 +6,9 @@ RinkSpace 研究如何从花样滑冰转播中恢复冰场、连续围挡、广�
 
 当前原生核心支持 CPU／GPU 共用几何、完整时变相机、共享场景与曲线位置的联合连续 LM，可安全停止并在同一进程继续。冈田芽衣短节目已接入 S01–S09 九镜头、三个物理机位，完成真实联合拟合与完整回放；当前采用用户指定的 `camera_solver_refined_1102` 暂定最终状态。该状态未达到一阶数值收敛，局部投影运动、源特征覆盖与独立物理标定仍有限制，精确绑定和人工确认范围见[节目入口](events/ankara_2026/programmes/okada_mei_sp/README.md)。完整磁盘断点恢复和全节目自动取点尚未交付，能力与缺口见[实现状态](docs/REBUILD.md)。
 
-**冈田芽衣短节目的重构处理起点为原片 22.120 秒，PTS 283136，原生时基 1/12800。** 当前处理范围与历史物理镜头范围的差别见[范围文件](events/ankara_2026/programmes/okada_mei_sp/rebuild_scope.json)和[源时间说明](events/ankara_2026/programmes/okada_mei_sp/README.md#analysis-start)解释。起点前的原片与观测保留，不进入当前拟合。
+**冈田芽衣短节目的重构处理起点为原片 22.120 秒，PTS 283136，原生时基 1/12800。** 当前处理范围与历史物理镜头范围的差别见[范围文件](events/ankara_2026/programmes/okada_mei_sp/rebuild_scope.json)和[源时间说明](events/ankara_2026/programmes/okada_mei_sp/README.md#analysis-start)解释。起点前的原片与观测保留；19.960 秒准备画面另作开头人体姿势和位置辅助，不改变节目处理起点。
+
+S01 已接入可撤销观测关联、唯一全身状态、共享足鞋配准和开头裁切修复。[START_3D_COMPARISON.cmd](START_3D_COMPARISON.cmd)从原片 22.120 秒比较修复前后，[START_BOOT_INSPECTION.cmd](START_BOOT_INSPECTION.cmd)提供透明鞋与剖面检查。实际改善、穿冰／离冰残留和窗口范围见[节目记录](events/ankara_2026/programmes/okada_mei_sp/README.md)；这仍是局部研究结果，完整节目人体追踪尚未完成。
 
 ## 快速试用：合成数据
 

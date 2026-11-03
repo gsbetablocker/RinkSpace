@@ -146,8 +146,12 @@ RS_HD inline bool ice_actual_witness(const double* actual_x,const double* actual
             if(value<minimum)minimum=value;
             if(value>maximum)maximum=value;
         }
-        const double range=maximum-minimum;
-        if(!finite_scalar(range) || range>.02*pitch)return false;
+        // Subtracting two rounded legacy positions can exceed .02*pitch
+        // even when both came from the inclusive +/-epsilon forward map.
+        // Do not reject before choose_nominal/export_deviation can prove a
+        // legal witness. Their unchanged bounds and exact boundary-forward
+        // check still reject genuinely unrepresentable geometry.
+        if(!finite_scalar(maximum-minimum))return false;
         const double delta=epsilon*pitch;
         double low=maximum-delta,high=minimum+delta;
         if(low < -largest)low=-largest;

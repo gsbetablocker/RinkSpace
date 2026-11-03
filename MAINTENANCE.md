@@ -34,6 +34,8 @@ GPU Python 环境位于 Data 的 `runtime_tools/vision_cuda`、`runtime_tools/bo
 
 原生库、cuDSS 和历史 Ceres 运行副本分别位于 Data 的 `runtime_tools/native_core`、`runtime_tools/cudss` 和 `runtime_tools/ceres`。旧地址在共享映射中保留；源码、构建身份、补丁与许可仍在 OneDrive。历史 source_datasets 审阅页面按 `AssetStore.review_page()` 定位到 Data/results，旧页面精确路径也可通过同一映射查询。
 
+2026-11-03 补归档的12个 source-edge 链接中间文件（`.lib`／`.exp`）位于 `Data/runtime_tools/program_tracking_native`，旧路径仍由共享映射解析；迁移前后 SHA 和字节数保存在 `Data/maintenance/publication_20261103/native_artifact_moves.json`。对应旧构建脚本已显式指定导入库到各自 `RS_BIN`，避免链接器再次把中间文件留在源码目录。基础 `.venv` 继续由本机安装入口管理，Git 忽略该环境；公开树只保存依赖定义。
+
 `AssetStore.project_entry()` 定位到 `Data/workbench/START_HERE.html`；Web `/` 在该文件存在时显示面板，否则显示通用工作台。审阅页经 source_datasets → results 定位 Data 产物。旧根页面和历史快捷方式仅本机保留；刷新器可用旧页面首次初始化，无冻结绑定时无需生成面板。
 
 场景历史资产与导入／安装中间文件的旧路径、SHA、字节数和 Data 地址见[归档映射](events/ankara_2026/scene/archive.json)。`AssetStore(root).resolve(old_path, must_exist=True)` 查询原件；原件内部相对引用仍以原项目目录为基准，经同一 AssetStore 解析。共享 `legacy_paths` 与本机设置按键合并，本机同名项优先。当前场景求值、prepare/review 和公开测试不要求这些历史原件存在。

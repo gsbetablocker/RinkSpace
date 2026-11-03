@@ -19,6 +19,8 @@
 
 `INSTALL_LOCAL.cmd` 安装 dev／acquisition，不含 advanced。setuptools 只发现 `src` 下的包；`calibration` 中的历史模块需要完整源码 checkout，普通 wheel 不包含全部赛事运行依赖。
 
+S01 全身／足鞋／开头优化入口使用 SciPy 的 `least_squares(callback=...)` 保存已接受状态，该接口从 [SciPy 1.16.0](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.least_squares.html) 提供；`advanced` 下限已同步。现有 `.venv` 的实际版本为 1.17.1，见[观察清单](requirements-solver-observed.txt)。Data 中其他环境的历史锁不因此改写，报告绘制和播放器可继续使用各自现有环境；本次整理没有安装或升级运行包。
+
 ## 当前本机 GPU 与人体环境
 
 视觉解释器为 `<Data>/runtime_tools/vision_cuda/Scripts/python.exe`，人体解释器为 `<Data>/runtime_tools/body_cuda/Scripts/python.exe`，包版本分别管理。SAM2／YOLO 等通用权重位于 `<Data>/cache/pretrained`，GVHMR／PyTorch3D 与人体上游源码位于 `<Data>/runtime_tools/body`；ViTPose helper 的源码与默认加载入口为仓库内 [source_helpers/run_vitpose_h.py](../calibration/program_tracking/body_tracking/source_helpers/run_vitpose_h.py)。旧逻辑地址 `.venv-gpu`、`.venv-body`、`models/cache` 和 `environments/body` 由 AssetStore 解析到 Data，不在 OneDrive 留运行副本。Data 根使用现有存储配置，不另设环境专用盘符。

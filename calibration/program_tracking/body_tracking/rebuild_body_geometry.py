@@ -91,6 +91,27 @@ class CompactBody:
         if additional_rotations is not None:
             for j,correction in additional_rotations.items():
                 local[:,int(j)]=local[:,int(j)]@Rotation.from_rotvec(np.asarray(correction,float)).as_matrix()
+        return self._forward_local_rotations(local,with_frames=with_frames)
+
+    def forward_rotations(self,body_local_R,*,with_frames=False):
+        """Effective rotations of native joints 1..21; world root is external.
+
+        Frozen prior/B9/leg rotations must be composed by the state owner once.
+        Both entry points share the exact same FK and skinning implementation.
+        """
+        body_local_R=np.asarray(body_local_R,float)
+        if body_local_R.ndim!=4 or body_local_R.shape[1:]!=(21,3,3):
+            raise ValueError('Expected (N,21,3,3), excluding world root Q')
+        if not np.isfinite(body_local_R).all():
+            raise ValueError('Nonfinite body rotation')
+        n=len(body_local_R)
+        local=np.broadcast_to(np.eye(3),(n,55,3,3)).copy()
+        local[:,1:22]=body_local_R
+        local[:,22:]=self.default
+        return self._forward_local_rotations(local,with_frames=with_frames)
+
+    def _forward_local_rotations(self,local,*,with_frames=False):
+        n=len(local)
         rotation=local.copy();position=np.broadcast_to(self.J,(n,55,3)).copy()
         for j in range(1,55):
             parent=self.parents[j];rotation[:,j]=rotation[:,parent]@local[:,j]

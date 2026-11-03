@@ -1,0 +1,284 @@
+{
+  "schema": "rinkspace.opening-body-repair.v1",
+  "event": "ankara_2026",
+  "programme": "okada_mei_sp",
+  "source_seconds": [
+    22.12,
+    25.0
+  ],
+  "source_time_base": [
+    1,
+    12800
+  ],
+  "body_refined_frames": 145,
+  "near_static_condition_seconds": [
+    22.12,
+    24.44
+  ],
+  "lower_body_inferred_frames": 125,
+  "source_user_observation": "Opening nearly stationary turn; previous secondary view shows crossed legs near B2/F2-R2 intersection.",
+  "donor": {
+    "legacy_pts": 229175552,
+    "official_pts": 307456,
+    "seconds": 24.02,
+    "origin": "previously reviewed upright upper body; raw cached pose, no network rerun"
+  },
+  "parent": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\fitted\\result.npz",
+    "sha256": "bc2614e11b4bce2206132502cf97d3c6e051683edcf27f313e0619c98b9f4712"
+  },
+  "result": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_repair_1102\\fitted\\result.npz",
+    "sha256": "5e6e2ba596bfdc43d3588f51e8c54f5d9edfc9ba97944888e8191d3ea379d396"
+  },
+  "parameters": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\opening_repair_1102.npz",
+    "sha256": "7203dd54ddda9b9c0aebfe159c19c9c2533b53f47882a3e327331df88bce95cc"
+  },
+  "camera": {
+    "record": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\camera_solver_refined_1102.json",
+    "state_path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_solver_refined_1102.npz",
+    "state_sha256": "d6cfde1474a23d594a0395351ebbdb0ee15a6560ef77b27f069d239ee95bb3f3",
+    "native_library": "D:/CodexData/RinkSpace_Data/build/solver_continue_1102/rinkspace_core.dll",
+    "native_library_sha256": "606f94386d26a3c6683dcbf881ce75d64de08ab2cc27a9a4effbf2ea698ad080",
+    "shot": {
+      "camera_index": 0,
+      "control_begin": 0,
+      "control_stop": 1152,
+      "first_control_time": 1.96,
+      "first_pts": 283136,
+      "id": "s01",
+      "knot_stride": 10,
+      "last_pts": 575488,
+      "motion_reference_time": 2.1,
+      "reference_pts": 256256,
+      "row_begin": 0,
+      "row_stop": 279126,
+      "source_coverage": {
+        "expected_exposures": 1143,
+        "missing_exposures": 0,
+        "missing_ranges": [],
+        "observed_exposures": 1143,
+        "partial_source_coverage": false,
+        "synthetic_rows_added": 0
+      },
+      "stop_pts_exclusive": 575744,
+      "time_base_den": 12800,
+      "time_base_num": 1
+    },
+    "metres_per_scene_unit": 59.96169706678219,
+    "solver_metres_per_scene_unit": 60.0,
+    "length_export_ratio": 0.9993616177797032,
+    "camera_changed_during_fit": false,
+    "source_time_base": [
+      1,
+      12800
+    ],
+    "old_reference_reprojected_on_current_camera": true,
+    "prepared": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\physical_repair_1101\\prepared_shared_timing"
+  },
+  "priors": {
+    "velocity_scale_m_s": [
+      0.1,
+      0.1,
+      0.15
+    ],
+    "torso_horizontal_axis_scale": 0.2,
+    "root_horizontal_axis_scale": 0.25,
+    "root_neighbourhood_scale_m": 0.35,
+    "support_envelope_height_scale_m": 0.05,
+    "contact_point_identity": "unknown; coarse standing condition, not a source contact measurement"
+  },
+  "boundary": "First frame free; parent attachment at25s is C2; later body and footwear unchanged",
+  "active_local_joints": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    12,
+    15,
+    16,
+    17,
+    18,
+    19
+  ],
+  "preparation": {
+    "pose_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_repair_1102\\preparation_pose.npz",
+    "pose_sha256": "333414d1b0a6bbeb260a6ab43b5eebfa63de86f1c4fb10f8c5158c84ffa991d7",
+    "source_pts": 255488,
+    "seconds": 19.96,
+    "side_identity": "conditional; both side candidates retained",
+    "lower_pose_release_seconds": [
+      22.12,
+      24.44
+    ]
+  },
+  "state_ownership": "One continuous P/Q/local_R drives the complete body, registered lower boots, blades and local uppers at exposure nodes.",
+  "input_contract": {
+    "parent_result_sha256": "bc2614e11b4bce2206132502cf97d3c6e051683edcf27f313e0619c98b9f4712",
+    "reference_hashes": {
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\input.npz": "93a71022fc3c4d67a1ec4387f01a2e5513d96cdf50bc4728e0a290ca7590cc27",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\compact_smplx.npz": "f3655f86d42e9a5a1cda80eabfa98895b06e51d44f07e707b352618f0ca3c753",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\B5\\result.npz": "8b5fdb70f951ee692bb07e717ca31e620c718e6c3e689da5be9d5b73f408195d",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\result.npz": "5bcfc447b3acb33cbd1a88299d1ebdf571e963aea069290f1065f1b3111487b2"
+    },
+    "raw_cache_sha256": "eef70333e9d45257b1409bb21301ac5fec6e5db740b2ea2c8eb6e6552098fa2b",
+    "camera": {
+      "record": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\camera_solver_refined_1102.json",
+      "state_path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_solver_refined_1102.npz",
+      "state_sha256": "d6cfde1474a23d594a0395351ebbdb0ee15a6560ef77b27f069d239ee95bb3f3",
+      "native_library": "D:/CodexData/RinkSpace_Data/build/solver_continue_1102/rinkspace_core.dll",
+      "native_library_sha256": "606f94386d26a3c6683dcbf881ce75d64de08ab2cc27a9a4effbf2ea698ad080",
+      "shot": {
+        "camera_index": 0,
+        "control_begin": 0,
+        "control_stop": 1152,
+        "first_control_time": 1.96,
+        "first_pts": 283136,
+        "id": "s01",
+        "knot_stride": 10,
+        "last_pts": 575488,
+        "motion_reference_time": 2.1,
+        "reference_pts": 256256,
+        "row_begin": 0,
+        "row_stop": 279126,
+        "source_coverage": {
+          "expected_exposures": 1143,
+          "missing_exposures": 0,
+          "missing_ranges": [],
+          "observed_exposures": 1143,
+          "partial_source_coverage": false,
+          "synthetic_rows_added": 0
+        },
+        "stop_pts_exclusive": 575744,
+        "time_base_den": 12800,
+        "time_base_num": 1
+      },
+      "metres_per_scene_unit": 59.96169706678219,
+      "solver_metres_per_scene_unit": 60.0,
+      "length_export_ratio": 0.9993616177797032,
+      "camera_changed_during_fit": false,
+      "source_time_base": [
+        1,
+        12800
+      ],
+      "old_reference_reprojected_on_current_camera": true,
+      "prepared": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\physical_repair_1101\\prepared_shared_timing"
+    },
+    "observation_sha256": "071b266d1c689f70b7a2985c059cef0c6c6623bd18b94565180f13ba996ee973",
+    "donor_pts": 307456,
+    "source_seconds": [
+      22.12,
+      25.0
+    ],
+    "standing_until": 24.44,
+    "velocity_scale_m_s": [
+      0.1,
+      0.1,
+      0.15
+    ],
+    "torso_horizontal_scale": 0.2,
+    "standing_support_height_scale_m": 0.05,
+    "root_horizontal_scale": 0.25,
+    "root_neighbourhood_scale_m": 0.35,
+    "preparation_pose_sha256": "333414d1b0a6bbeb260a6ab43b5eebfa63de86f1c4fb10f8c5158c84ffa991d7",
+    "preparation_camera_sha256": "5c313e0b7bb87ca3c0ad4f1912275995b7e0d42d5330104b80df11908736f1db"
+  },
+  "observation_policy": "Original source UV/use unchanged; no fabricated off-screen lower body points",
+  "evidence": {
+    "inputs.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_repair_1102\\inputs.json",
+      "sha256": "0de838bd65a9dbe566bd87e73712bb0062f2eea4e8514c1d278ff09097c5d946"
+    },
+    "ledger.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_repair_1102\\ledger.json",
+      "sha256": "270ff500dde5ed378b59d04b8863b43ce6fda91891dffe99c9fded54a65b3d7b"
+    },
+    "fit/config.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_repair_1102\\fit\\config.json",
+      "sha256": "d594a613588f6b4ef39b8d0f85affe6812652ed90b3b0d69de40d8c54e271a27"
+    },
+    "fit/result.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_repair_1102\\fit\\result.json",
+      "sha256": "607ba6550b61fd64497ea2d48a498b0f9ef9b562295b27c49a58f9e9eeabf8e8"
+    },
+    "derivative_checks.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_repair_1102\\derivative_checks.json",
+      "sha256": "9c1a24bc97d7e8b1b05ecac210fac936bf8be57ec3424183b6035fa98b78e940"
+    },
+    "opening_report.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_repair_1102\\opening_report.json",
+      "sha256": "a9fd51ce7b55ede730e1c28e105c47d3fcecf185f4167f180ddc99a8614f11c5"
+    },
+    "results.txt": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_repair_1102\\results.txt",
+      "sha256": "5c687e8fc7807a082e88f5d352d95e2e3d3f8999010ec794d6464593087dc30a"
+    },
+    "source_opening.png": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_repair_1102\\source_opening.png",
+      "sha256": "ab7d9c48d7ddf64f642934875d0a2d5498aecca988e41ab34ef49bacc05a0fbf"
+    },
+    "source_opening.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_repair_1102\\source_opening.json",
+      "sha256": "93a8e9f62016acc8f64b89c3fbbeaaa65e0161c8a25d1c84862a8891ab5b4f29"
+    },
+    "player_check/checks.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_repair_1102\\player_check\\checks.json",
+      "sha256": "98cadea5e3b8253576a6ca997cc0f65a0dee66df5ff9d98c2164027c6a1fe9a5"
+    },
+    "top_check/checks.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_repair_1102\\top_check\\checks.json",
+      "sha256": "5605307f33ccdfe1e840b92859657f45a89f1d06a609d950f69e5e641418a1c3"
+    },
+    "verification.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_repair_1102\\verification.json",
+      "sha256": "bce0590ee943339ca320d4ec1eef6f4af5cdb78ef199ef703de4dd42f4a83123"
+    },
+    "preparation_camera.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_repair_1102\\preparation_camera.json",
+      "sha256": "403fcb06d80ca62662a45d0473db1947e4793b06b261d7b51d2c231c3ebf87b9"
+    },
+    "preparation_geometry_overlay.png": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_repair_1102\\preparation_geometry_overlay.png",
+      "sha256": "00142d4f870445ba98d4cf4d73c763d229b9542639fbdfd96de33fcfd1e9b75f"
+    },
+    "preparation_geometry_check.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_repair_1102\\preparation_geometry_check.json",
+      "sha256": "8909980ba8ae7e357e86b64a5e9812ad865b46616f2668425854de64fbf8729f"
+    },
+    "preparation_pose.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_repair_1102\\preparation_pose.json",
+      "sha256": "0eb5f8914f0947c2f3d76aa05a996f1828eddd1d34ae2dd35076aee195f21f16"
+    },
+    "preparation_pose_overlay.png": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_repair_1102\\preparation_pose_overlay.png",
+      "sha256": "70348acb4363b99dcaf8468f9311444003c0c3050537398d9b50bc03cb5ae8d9"
+    },
+    "metrics_plot.png": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_repair_1102\\metrics_plot.png",
+      "sha256": "97d4facebbd8ad29ba47280bb347f19c7cb30ba5dff8e297d2a3e150fb3b45bb"
+    },
+    "metrics_plot.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_repair_1102\\metrics_plot.json",
+      "sha256": "af9417240b1f8078480778f0ac17c823ccdb17204d021bf01569bc8affd48c8a"
+    },
+    "opening_visual_review.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\opening_repair_1102\\opening_visual_review.json",
+      "sha256": "6b7b876d17f2ba7675cdad9ee9b76a344074c551d24013924dd00ec23ef39353"
+    }
+  },
+  "implementation": {
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\opening_repair.py": "ad3dc67b696b72a9ad564f4e2b3c13aecdee2e1de70f9ea7bda664d1bf1701b6",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\opening_preparation.py": "3e3d0b746ef5e73ad58d853ea61e81ce1ae2355363054b13c8f29f67d3a8001e",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\opening_review.py": "b6c55a2f02596be1425620fbbd811705c4ce91f40e8e6461c113f6b758a14299",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\fullbody_fit.py": "17e8b1bc14a73b87148b4ed5c0ade3142ad8af54d3bad2c1311707ee3c715fee",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\scripts\\run_opening_repair.py": "e159a5bb9fc7384e2cb03d1c5c7e22b3cf10bc6ad2f185f24d70178f4987a79b"
+  },
+  "viewer_entry": "D:\\OneDrive\\codex_projs\\RinkSpace\\START_3D_COMPARISON.cmd",
+  "replay_entry": "D:\\OneDrive\\codex_projs\\RinkSpace\\scripts\\run_opening_repair.py"
+}

@@ -1,0 +1,1815 @@
+{
+  "schema": "rinkspace.programme-footwear-supplement.v1",
+  "event": "ankara_2026",
+  "programme": "okada_mei_sp",
+  "shot": "s01",
+  "available_source_seconds": [
+    22.12,
+    44.96
+  ],
+  "source_time_base": [
+    1,
+    12800
+  ],
+  "shared_binding_frames": 1143,
+  "body_refinement_frames": 157,
+  "body_refinement_seconds": [
+    [
+      35.2,
+      36.8
+    ],
+    [
+      40.0,
+      41.5
+    ]
+  ],
+  "parent_motion": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\body_fullbody_1102.json",
+    "sha256": "7df6c53fd7c36d8d3fbdeb72d32d99e670b56daa984f0bf5b88785872a8b5914"
+  },
+  "compact_parameters": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\boot_integration_1102.npz",
+    "sha256": "a18d176b0ffabbc0d5e57b72bc771e1882a44fe3d56f3244c95142818b0dac05"
+  },
+  "result": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\fitted\\result.npz",
+    "sha256": "bc2614e11b4bce2206132502cf97d3c6e051683edcf27f313e0619c98b9f4712"
+  },
+  "footwear_binding": {
+    "schema_version": "rinkspace.footwear-binding.v1",
+    "transform_convention": "column vectors: T_FB maps boot coordinates B into hindfoot F; T_WB=T_WF@T_FB; T_WL=T_WB@T_BL",
+    "body_model_hash": "376021446ddc86e99acacd795182bbef903e61d33b76b9d8b359c2b0865bd992",
+    "compact_model_hash": "f3655f86d42e9a5a1cda80eabfa98895b06e51d44f07e707b352618f0ca3c753",
+    "body_shape_hash": "69ab3da407213f73ffb28d79480ce419918d7fa2ce7869323ebd0d31dbd48157",
+    "reference_pose_hash": "eca3a0af57d87862ae7d107a44b4a8b974e9c6be746edcdfe5f3ead3a4b61116",
+    "body_scale": 0.9136808725841283,
+    "foot_frame_definition": {
+      "hindfoot": [
+        7,
+        8
+      ],
+      "shank": [
+        4,
+        5
+      ],
+      "distal_foot": [
+        10,
+        11
+      ],
+      "body_local_up": "Y"
+    },
+    "units": "current conditional metres",
+    "world_up": "Z",
+    "metric_binding": {
+      "record": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\camera_solver_refined_1102.json",
+      "state_path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_solver_refined_1102.npz",
+      "state_sha256": "d6cfde1474a23d594a0395351ebbdb0ee15a6560ef77b27f069d239ee95bb3f3",
+      "native_library": "D:/CodexData/RinkSpace_Data/build/solver_continue_1102/rinkspace_core.dll",
+      "native_library_sha256": "606f94386d26a3c6683dcbf881ce75d64de08ab2cc27a9a4effbf2ea698ad080",
+      "shot": {
+        "camera_index": 0,
+        "control_begin": 0,
+        "control_stop": 1152,
+        "first_control_time": 1.96,
+        "first_pts": 283136,
+        "id": "s01",
+        "knot_stride": 10,
+        "last_pts": 575488,
+        "motion_reference_time": 2.1,
+        "reference_pts": 256256,
+        "row_begin": 0,
+        "row_stop": 279126,
+        "source_coverage": {
+          "expected_exposures": 1143,
+          "missing_exposures": 0,
+          "missing_ranges": [],
+          "observed_exposures": 1143,
+          "partial_source_coverage": false,
+          "synthetic_rows_added": 0
+        },
+        "stop_pts_exclusive": 575744,
+        "time_base_den": 12800,
+        "time_base_num": 1
+      },
+      "metres_per_scene_unit": 59.96169706678219,
+      "solver_metres_per_scene_unit": 60.0,
+      "length_export_ratio": 0.9993616177797032,
+      "camera_changed_during_fit": false,
+      "source_time_base": [
+        1,
+        12800
+      ],
+      "old_reference_reprojected_on_current_camera": true,
+      "prepared": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\physical_repair_1101\\prepared_shared_timing"
+    },
+    "T_FB": [
+      [
+        [
+          0.9525119452395212,
+          -0.2645513863567451,
+          0.15077651724571442,
+          0.04188307772676309
+        ],
+        [
+          0.2583402326036009,
+          0.9642042577137963,
+          0.05975344027672776,
+          -0.07787594652611361
+        ],
+        [
+          -0.16118721535636876,
+          -0.017964225096320792,
+          0.9867603398102035,
+          0.08259903675312454
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      [
+        [
+          0.9901585687092878,
+          0.03648159664207369,
+          -0.13511144258729366,
+          -0.025512402163872044
+        ],
+        [
+          -0.031154935177657724,
+          0.9986596361691396,
+          0.041331599298811535,
+          -0.07461473765891719
+        ],
+        [
+          0.13643818683070538,
+          -0.03671544896861007,
+          0.9899679777555347,
+          0.07332733092513148
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    ],
+    "T_lower_boot_to_blade": [
+      [
+        0.9999999999999999,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.9741740105994791,
+        -0.22579857632971448,
+        -0.024464061979223954
+      ],
+      [
+        0.0,
+        0.22579857632971448,
+        0.9741740105994791,
+        0.0023401833250889484
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "inner_footbed": [
+      [
+        -0.04418020850521637,
+        0.02198595559115347,
+        -0.1340095446136926
+      ],
+      [
+        -0.04418020850521637,
+        0.02198595559115347,
+        -0.11602103549365794
+      ],
+      [
+        -0.04418020850521637,
+        0.0069955313244579225,
+        0.04824343606092934
+      ],
+      [
+        -0.04418020850521637,
+        0.009993616177797033,
+        0.13400954461369258
+      ],
+      [
+        0.04418020850521637,
+        0.02198595559115347,
+        -0.1340095446136926
+      ],
+      [
+        0.04418020850521637,
+        0.02198595559115347,
+        -0.11602103549365794
+      ],
+      [
+        0.04418020850521637,
+        0.0069955313244579225,
+        0.04824343606092934
+      ],
+      [
+        0.04418020850521637,
+        0.009993616177797033,
+        0.13400954461369258
+      ]
+    ],
+    "heel_pocket": [
+      0.0,
+      0.02198595559115347,
+      -0.11602103549365794
+    ],
+    "forefoot_support": [
+      0.0,
+      0.0069955313244579225,
+      0.04824343606092934
+    ],
+    "cavity_proxy": {
+      "vertices": [
+        [
+          -0.051976715888489844,
+          0.02198595559115347,
+          -0.1340095446136926
+        ],
+        [
+          -0.051976715888489844,
+          0.0069955313244579225,
+          0.04824343606092934
+        ],
+        [
+          -0.051976715888489844,
+          0.009993616177797033,
+          0.13400954461369258
+        ],
+        [
+          -0.051976715888489844,
+          0.04332773132821605,
+          0.13400954461369258
+        ],
+        [
+          -0.051976715888489844,
+          0.08367242588976545,
+          -0.03406770055507442
+        ],
+        [
+          -0.051976715888489844,
+          0.1918623628886137,
+          -0.08961254127914156
+        ],
+        [
+          -0.051976715888489844,
+          0.1918623628886137,
+          -0.13108324340082078
+        ],
+        [
+          -0.051976715888489844,
+          0.15494964262169234,
+          -0.1340095446136926
+        ],
+        [
+          0.051976715888489844,
+          0.02198595559115347,
+          -0.1340095446136926
+        ],
+        [
+          0.051976715888489844,
+          0.0069955313244579225,
+          0.04824343606092934
+        ],
+        [
+          0.051976715888489844,
+          0.009993616177797033,
+          0.13400954461369258
+        ],
+        [
+          0.051976715888489844,
+          0.04332773132821605,
+          0.13400954461369258
+        ],
+        [
+          0.051976715888489844,
+          0.08367242588976545,
+          -0.03406770055507442
+        ],
+        [
+          0.051976715888489844,
+          0.1918623628886137,
+          -0.08961254127914156
+        ],
+        [
+          0.051976715888489844,
+          0.1918623628886137,
+          -0.13108324340082078
+        ],
+        [
+          0.051976715888489844,
+          0.15494964262169234,
+          -0.1340095446136926
+        ]
+      ],
+      "faces": [
+        [
+          7,
+          0,
+          1
+        ],
+        [
+          1,
+          2,
+          3
+        ],
+        [
+          1,
+          3,
+          4
+        ],
+        [
+          7,
+          1,
+          4
+        ],
+        [
+          7,
+          4,
+          5
+        ],
+        [
+          5,
+          6,
+          7
+        ],
+        [
+          9,
+          8,
+          15
+        ],
+        [
+          11,
+          10,
+          9
+        ],
+        [
+          12,
+          11,
+          9
+        ],
+        [
+          12,
+          9,
+          15
+        ],
+        [
+          13,
+          12,
+          15
+        ],
+        [
+          15,
+          14,
+          13
+        ],
+        [
+          0,
+          1,
+          9
+        ],
+        [
+          0,
+          9,
+          8
+        ],
+        [
+          1,
+          2,
+          10
+        ],
+        [
+          1,
+          10,
+          9
+        ],
+        [
+          2,
+          3,
+          11
+        ],
+        [
+          2,
+          11,
+          10
+        ],
+        [
+          3,
+          4,
+          12
+        ],
+        [
+          3,
+          12,
+          11
+        ],
+        [
+          4,
+          5,
+          13
+        ],
+        [
+          4,
+          13,
+          12
+        ],
+        [
+          6,
+          7,
+          15
+        ],
+        [
+          6,
+          15,
+          14
+        ],
+        [
+          7,
+          0,
+          8
+        ],
+        [
+          7,
+          8,
+          15
+        ]
+      ]
+    },
+    "outer_shell_template": [
+      [
+        -0.04727832863797291,
+        0.0,
+        -0.1370076294670317
+      ],
+      [
+        -0.04837782465280948,
+        0.011348159559265547,
+        0.13700762946703168
+      ],
+      [
+        -0.04837782465280948,
+        0.046325816181555166,
+        0.13700762946703168
+      ],
+      [
+        -0.05497480074182896,
+        0.08667051074310456,
+        -0.03406770055507442
+      ],
+      [
+        -0.04727832863797291,
+        0.19486044774195282,
+        -0.08961254127914156
+      ],
+      [
+        -0.04727832863797291,
+        0.19486044774195282,
+        -0.13108324340082078
+      ],
+      [
+        -0.04727832863797291,
+        0.15794772747503147,
+        -0.1370076294670317
+      ],
+      [
+        0.04727832863797291,
+        0.0,
+        -0.1370076294670317
+      ],
+      [
+        0.04837782465280948,
+        0.011348159559265547,
+        0.13700762946703168
+      ],
+      [
+        0.04837782465280948,
+        0.046325816181555166,
+        0.13700762946703168
+      ],
+      [
+        0.05497480074182896,
+        0.08667051074310456,
+        -0.03406770055507442
+      ],
+      [
+        0.04727832863797291,
+        0.19486044774195282,
+        -0.08961254127914156
+      ],
+      [
+        0.04727832863797291,
+        0.19486044774195282,
+        -0.13108324340082078
+      ],
+      [
+        0.04727832863797291,
+        0.15794772747503147,
+        -0.1370076294670317
+      ]
+    ],
+    "shell_faces": [
+      [
+        0,
+        1,
+        2
+      ],
+      [
+        0,
+        2,
+        3
+      ],
+      [
+        6,
+        0,
+        3
+      ],
+      [
+        6,
+        3,
+        4
+      ],
+      [
+        4,
+        5,
+        6
+      ],
+      [
+        7,
+        9,
+        8
+      ],
+      [
+        7,
+        10,
+        9
+      ],
+      [
+        13,
+        10,
+        7
+      ],
+      [
+        13,
+        11,
+        10
+      ],
+      [
+        11,
+        13,
+        12
+      ],
+      [
+        0,
+        7,
+        8
+      ],
+      [
+        0,
+        8,
+        1
+      ],
+      [
+        1,
+        8,
+        9
+      ],
+      [
+        1,
+        9,
+        2
+      ],
+      [
+        2,
+        9,
+        10
+      ],
+      [
+        2,
+        10,
+        3
+      ],
+      [
+        3,
+        10,
+        11
+      ],
+      [
+        3,
+        11,
+        4
+      ],
+      [
+        5,
+        12,
+        13
+      ],
+      [
+        5,
+        13,
+        6
+      ],
+      [
+        6,
+        13,
+        7
+      ],
+      [
+        6,
+        7,
+        0
+      ]
+    ],
+    "region_ids": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      3,
+      3,
+      2,
+      2,
+      2,
+      2
+    ],
+    "region_labels": [
+      "side_0",
+      "side_1",
+      "bridge",
+      "front_upper_tongue_proxy"
+    ],
+    "collar_boundary": [
+      4,
+      5,
+      12,
+      11
+    ],
+    "upper_deformation_modes": {
+      "names": [
+        "front_tongue",
+        "rear_collar",
+        "collar_opening"
+      ],
+      "moving_vertex_ids": [
+        [
+          4,
+          11
+        ],
+        [
+          5,
+          12
+        ],
+        [
+          4,
+          5,
+          11,
+          12
+        ]
+      ],
+      "zero_weight_regions": "all other shell vertices, sole, heel support, blade and installation",
+      "driver": "finite shank axis/collar contact with clearance; positive gap gives exactly zero deformation"
+    },
+    "clearance_parameters": {
+      "shank_radius_m": 0.025983402062272284,
+      "clearance_m": 0.003997446471118813,
+      "lining_allowance_m": 0.0029980848533391097
+    },
+    "deformation_prior": {
+      "regularizer": [
+        0.35,
+        0.5,
+        0.8
+      ],
+      "maximum_mode_displacements_m": [
+        0.06995531324457924,
+        0.03997446471118813,
+        0.02498404044449258
+      ],
+      "material_stiffness_measured": false
+    },
+    "blade_edges": {
+      "vertices_L": [
+        [
+          -0.001998723235559406,
+          -0.05110698744071441,
+          -0.12108635905206826
+        ],
+        [
+          -0.001998723235559406,
+          -0.046562219862086994,
+          -0.10552324464443415
+        ],
+        [
+          -0.001998723235559406,
+          -0.0416487311131672,
+          -0.09004559414202515
+        ],
+        [
+          -0.001998723235559406,
+          -0.03636652119395503,
+          -0.07465340754484127
+        ],
+        [
+          -0.001998723235559406,
+          -0.0307155901044505,
+          -0.059346684852882504
+        ],
+        [
+          -0.001998723235559406,
+          -0.024695937844653574,
+          -0.04412542606614885
+        ],
+        [
+          -0.001998723235559406,
+          -0.018307564414564263,
+          -0.02898963118464032
+        ],
+        [
+          -0.001998723235559406,
+          -0.011550469814182606,
+          -0.013939300208356901
+        ],
+        [
+          -0.001998723235559406,
+          -0.004424654043508514,
+          0.0010255668627013929
+        ],
+        [
+          -0.001998723235559406,
+          0.003069882897457906,
+          0.015904970028534596
+        ],
+        [
+          -0.001998723235559406,
+          0.010933141008716729,
+          0.030698909289142665
+        ],
+        [
+          -0.001998723235559406,
+          0.01916512029026789,
+          0.04540738464452558
+        ],
+        [
+          -0.001998723235559406,
+          0.027765820742111445,
+          0.06003039609468343
+        ],
+        [
+          -0.001998723235559406,
+          0.036735242364247404,
+          0.07456794363961616
+        ],
+        [
+          -0.001998723235559406,
+          0.04607338515667572,
+          0.08902002727932379
+        ],
+        [
+          -0.001998723235559406,
+          0.0557802491193964,
+          0.10338664701380623
+        ],
+        [
+          -0.001998723235559406,
+          0.06585583425240948,
+          0.1176678028430636
+        ],
+        [
+          0.001998723235559406,
+          -0.05110698744071441,
+          -0.12108635905206826
+        ],
+        [
+          0.001998723235559406,
+          -0.046562219862086994,
+          -0.10552324464443415
+        ],
+        [
+          0.001998723235559406,
+          -0.0416487311131672,
+          -0.09004559414202515
+        ],
+        [
+          0.001998723235559406,
+          -0.03636652119395503,
+          -0.07465340754484127
+        ],
+        [
+          0.001998723235559406,
+          -0.0307155901044505,
+          -0.059346684852882504
+        ],
+        [
+          0.001998723235559406,
+          -0.024695937844653574,
+          -0.04412542606614885
+        ],
+        [
+          0.001998723235559406,
+          -0.018307564414564263,
+          -0.02898963118464032
+        ],
+        [
+          0.001998723235559406,
+          -0.011550469814182606,
+          -0.013939300208356901
+        ],
+        [
+          0.001998723235559406,
+          -0.004424654043508514,
+          0.0010255668627013929
+        ],
+        [
+          0.001998723235559406,
+          0.003069882897457906,
+          0.015904970028534596
+        ],
+        [
+          0.001998723235559406,
+          0.010933141008716729,
+          0.030698909289142665
+        ],
+        [
+          0.001998723235559406,
+          0.01916512029026789,
+          0.04540738464452558
+        ],
+        [
+          0.001998723235559406,
+          0.027765820742111445,
+          0.06003039609468343
+        ],
+        [
+          0.001998723235559406,
+          0.036735242364247404,
+          0.07456794363961616
+        ],
+        [
+          0.001998723235559406,
+          0.04607338515667572,
+          0.08902002727932379
+        ],
+        [
+          0.001998723235559406,
+          0.0557802491193964,
+          0.10338664701380623
+        ],
+        [
+          0.001998723235559406,
+          0.06585583425240948,
+          0.1176678028430636
+        ]
+      ],
+      "regions": [
+        "rocker_side_0",
+        "rocker_side_1"
+      ]
+    },
+    "toe_pick_candidates": [],
+    "toe_pick_status": "not observed/calibrated; rocker endpoint never relabelled as tooth",
+    "parameter_provenance": "geometry prior calibrated to shared-beta complete surface and cached external shoe observations",
+    "observability_status": {
+      "internal_fit": "prior-constrained, not directly imaged",
+      "upper_modes": "deterministic geometry prior; no independent frame parameters",
+      "foot_sliding": "disabled"
+    },
+    "legacy_migration": {
+      "c0_solver_m": [
+        0.0,
+        -0.13342442307652932,
+        0.09063023577547051
+      ],
+      "boot_align_folded_once": true,
+      "old_geometry_frozen": true
+    },
+    "fit_parameters_solver_unit": [
+      0.01766524606922355,
+      0.05888088941749263,
+      0.0007245435179898475,
+      -0.08232694122026445,
+      0.23447879398362964,
+      0.042065547817058076,
+      -0.0012841130822853289,
+      0.062144181512342044,
+      -0.008553084983084805,
+      -0.09270515774945283,
+      -0.20553610554826737,
+      0.18915328713117724,
+      0.1702777185431782,
+      0.22104559331656443
+    ],
+    "foot_surface_vertex_ids": [
+      [
+        5765,
+        5766,
+        5767,
+        5768,
+        5769,
+        5770,
+        5771,
+        5772,
+        5773,
+        5774,
+        5775,
+        5776,
+        5777,
+        5778,
+        5779,
+        5780,
+        5781,
+        5782,
+        5783,
+        5784,
+        5785,
+        5786,
+        5787,
+        5788,
+        5789,
+        5790,
+        5791,
+        5792,
+        5793,
+        5794,
+        5795,
+        5796,
+        5797,
+        5798,
+        5799,
+        5800,
+        5801,
+        5802,
+        5803,
+        5804,
+        5805,
+        5806,
+        5807,
+        5808,
+        5809,
+        5810,
+        5811,
+        5812,
+        5813,
+        5814,
+        5815,
+        5816,
+        5817,
+        5818,
+        5819,
+        5820,
+        5821,
+        5822,
+        5823,
+        5824,
+        5825,
+        5826,
+        5827,
+        5828,
+        5829,
+        5830,
+        5831,
+        5832,
+        5833,
+        5834,
+        5835,
+        5836,
+        5837,
+        5838,
+        5839,
+        5840,
+        5841,
+        5842,
+        5843,
+        5844,
+        5845,
+        5846,
+        5847,
+        5848,
+        5849,
+        5850,
+        5851,
+        5852,
+        5853,
+        5854,
+        5855,
+        5856,
+        5857,
+        5858,
+        5859,
+        5860,
+        5861,
+        5862,
+        5863,
+        5864,
+        5865,
+        5866,
+        5867,
+        5868,
+        5869,
+        5870,
+        5871,
+        5872,
+        5878,
+        5879,
+        5880,
+        5881,
+        5882,
+        5883,
+        5884,
+        5885,
+        5886,
+        5887,
+        5888,
+        5889,
+        5890,
+        5891,
+        5892,
+        5893,
+        5894,
+        5895,
+        5896,
+        5897,
+        5898,
+        5899,
+        5900,
+        5901,
+        5902,
+        5903,
+        5904,
+        5905,
+        5906,
+        5907,
+        5908,
+        5909,
+        5910,
+        5911,
+        5912,
+        5913,
+        5914,
+        5915,
+        5916,
+        5917,
+        5918,
+        5919,
+        5922,
+        5923,
+        5924,
+        5925,
+        5926,
+        5927,
+        5928,
+        5929,
+        5930,
+        5933,
+        8728,
+        8729,
+        8730,
+        8839,
+        8840,
+        8841,
+        8842,
+        8843,
+        8844,
+        8845,
+        8846,
+        8847,
+        8848,
+        8849,
+        8850,
+        8851,
+        8852,
+        8853,
+        8854,
+        8855,
+        8856,
+        8857,
+        8858,
+        8859,
+        8860,
+        8861,
+        8862,
+        8863,
+        8864,
+        8865,
+        8866,
+        8867,
+        8868,
+        8869,
+        8870,
+        8871,
+        8872,
+        8873,
+        8874,
+        8875,
+        8876,
+        8877,
+        8878,
+        8879,
+        8880,
+        8881,
+        8882,
+        8883,
+        8884,
+        8885,
+        8886,
+        8887,
+        8888,
+        8889,
+        8890,
+        8891,
+        8892,
+        8893,
+        8894,
+        8895,
+        8896,
+        8897,
+        8898,
+        8899,
+        8900,
+        8901,
+        8902,
+        8903,
+        8904,
+        8905,
+        8906,
+        8907,
+        8908,
+        8909,
+        8910,
+        8911,
+        8912,
+        8913,
+        8914,
+        8915,
+        8916,
+        8917,
+        8918,
+        8919,
+        8920,
+        8921,
+        8922,
+        8923,
+        8924,
+        8925,
+        8929,
+        8930,
+        8934,
+        8935
+      ],
+      [
+        8459,
+        8460,
+        8461,
+        8462,
+        8463,
+        8464,
+        8465,
+        8466,
+        8467,
+        8468,
+        8469,
+        8470,
+        8471,
+        8472,
+        8473,
+        8474,
+        8475,
+        8476,
+        8477,
+        8478,
+        8479,
+        8480,
+        8481,
+        8482,
+        8483,
+        8484,
+        8485,
+        8486,
+        8487,
+        8488,
+        8489,
+        8490,
+        8491,
+        8492,
+        8493,
+        8494,
+        8495,
+        8496,
+        8497,
+        8498,
+        8499,
+        8500,
+        8501,
+        8502,
+        8503,
+        8504,
+        8505,
+        8506,
+        8507,
+        8508,
+        8509,
+        8510,
+        8511,
+        8512,
+        8513,
+        8514,
+        8515,
+        8516,
+        8517,
+        8518,
+        8519,
+        8520,
+        8521,
+        8522,
+        8523,
+        8524,
+        8525,
+        8526,
+        8527,
+        8528,
+        8529,
+        8530,
+        8531,
+        8532,
+        8533,
+        8534,
+        8535,
+        8536,
+        8537,
+        8538,
+        8539,
+        8540,
+        8541,
+        8542,
+        8543,
+        8544,
+        8545,
+        8546,
+        8547,
+        8548,
+        8549,
+        8550,
+        8551,
+        8552,
+        8553,
+        8554,
+        8555,
+        8556,
+        8557,
+        8558,
+        8559,
+        8560,
+        8561,
+        8562,
+        8563,
+        8564,
+        8565,
+        8566,
+        8575,
+        8576,
+        8577,
+        8578,
+        8579,
+        8580,
+        8581,
+        8582,
+        8583,
+        8584,
+        8585,
+        8586,
+        8587,
+        8588,
+        8589,
+        8590,
+        8591,
+        8592,
+        8593,
+        8594,
+        8595,
+        8596,
+        8597,
+        8598,
+        8599,
+        8600,
+        8601,
+        8602,
+        8603,
+        8604,
+        8605,
+        8606,
+        8607,
+        8608,
+        8609,
+        8610,
+        8611,
+        8612,
+        8613,
+        8614,
+        8615,
+        8616,
+        8617,
+        8618,
+        8619,
+        8620,
+        8621,
+        8622,
+        8623,
+        8624,
+        8625,
+        8626,
+        8627,
+        8628,
+        8629,
+        8630,
+        8631,
+        8632,
+        8633,
+        8634,
+        8635,
+        8636,
+        8637,
+        8638,
+        8639,
+        8640,
+        8641,
+        8642,
+        8643,
+        8644,
+        8645,
+        8646,
+        8647,
+        8648,
+        8649,
+        8650,
+        8651,
+        8652,
+        8653,
+        8654,
+        8655,
+        8656,
+        8657,
+        8658,
+        8659,
+        8660,
+        8661,
+        8662,
+        8663,
+        8664,
+        8665,
+        8666,
+        8667,
+        8668,
+        8669,
+        8670,
+        8671,
+        8672,
+        8673,
+        8674,
+        8675,
+        8676,
+        8677,
+        8678,
+        8679,
+        8680,
+        8681,
+        8682,
+        8683,
+        8684,
+        8685,
+        8686,
+        8687,
+        8688,
+        8689,
+        8690,
+        8691,
+        8692,
+        8693,
+        8694,
+        8695,
+        8696,
+        8697,
+        8698,
+        8699,
+        8700,
+        8701,
+        8702,
+        8703,
+        8704,
+        8705,
+        8706,
+        8707,
+        8708,
+        8709,
+        8710,
+        8711,
+        8712,
+        8713,
+        8714,
+        8715,
+        8716,
+        8717
+      ]
+    ],
+    "heel_ball_patch_vertex_ids": [
+      [
+        [
+          8887,
+          8888,
+          8889,
+          8913,
+          8914,
+          8915,
+          8917,
+          8918,
+          8919,
+          8920,
+          8921,
+          8922,
+          8923,
+          8924,
+          8925,
+          8929,
+          8930,
+          8934
+        ],
+        [
+          5777,
+          5778,
+          5781,
+          5791,
+          5794,
+          5813,
+          5818,
+          5824,
+          5827,
+          5830,
+          5831,
+          5832,
+          5839,
+          5842,
+          5843,
+          5844,
+          5850,
+          5851,
+          5855,
+          5861,
+          5865
+        ]
+      ],
+      [
+        [
+          8675,
+          8676,
+          8677,
+          8701,
+          8702,
+          8703,
+          8705,
+          8706,
+          8707,
+          8708,
+          8709,
+          8710,
+          8711,
+          8712,
+          8713,
+          8714,
+          8715,
+          8716
+        ],
+        [
+          8471,
+          8472,
+          8475,
+          8485,
+          8488,
+          8507,
+          8508,
+          8512,
+          8518,
+          8521,
+          8524,
+          8525,
+          8526,
+          8533,
+          8536,
+          8537,
+          8544,
+          8545,
+          8549,
+          8555,
+          8559
+        ]
+      ]
+    ]
+  },
+  "input_contract": {
+    "schema": "rinkspace.footwear-inputs.v1",
+    "reference_hashes": {
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\input.npz": "93a71022fc3c4d67a1ec4387f01a2e5513d96cdf50bc4728e0a290ca7590cc27",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\compact_smplx.npz": "f3655f86d42e9a5a1cda80eabfa98895b06e51d44f07e707b352618f0ca3c753",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\B5\\result.npz": "8b5fdb70f951ee692bb07e717ca31e620c718e6c3e689da5be9d5b73f408195d",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\result.npz": "5bcfc447b3acb33cbd1a88299d1ebdf571e963aea069290f1065f1b3111487b2"
+    },
+    "parent_motion": {
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\full\\result.npz": "103faec39fe78ad2735dd19baf85798a269db9e5049b2a673a79fa7b1a74de39",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\ledger.json": "62f245c3dc070493ecea5471993d34b80525dd7173670e6eab66d4ca3b489f8e",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\observations.npz": "c7cb38e3acd8bf9a18796ec604048bc2fd35f76e66ce645ede34b6872545b2d4",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\full\\w1\\result.npz": "56713492fdb70a2e057143a529925609e3ada76d63b098ef55c238b48b86a31c",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\full\\w2\\result.npz": "880d1c010bf6838a776d292e93d47c32dada0f341f9dfb510ab18cc9ae8c72fc",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\full\\w3\\result.npz": "6bd7541f72317e84d467056ca87fe5579f4aa39c2c683594f67827f02c2ab820",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\full\\w4\\result.npz": "5c2063f893e86a1d0b8b422b0d6063e7875ebce5426b7145c9fe92c7ab2a85ae",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\full\\w5\\result.npz": "0bbfb4d784aef756304b934e6a1a178cad96333bee43a3c47969529f3c58870e"
+    },
+    "camera": {
+      "record": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\camera_solver_refined_1102.json",
+      "state_path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_solver_refined_1102.npz",
+      "state_sha256": "d6cfde1474a23d594a0395351ebbdb0ee15a6560ef77b27f069d239ee95bb3f3",
+      "native_library": "D:/CodexData/RinkSpace_Data/build/solver_continue_1102/rinkspace_core.dll",
+      "native_library_sha256": "606f94386d26a3c6683dcbf881ce75d64de08ab2cc27a9a4effbf2ea698ad080",
+      "shot": {
+        "camera_index": 0,
+        "control_begin": 0,
+        "control_stop": 1152,
+        "first_control_time": 1.96,
+        "first_pts": 283136,
+        "id": "s01",
+        "knot_stride": 10,
+        "last_pts": 575488,
+        "motion_reference_time": 2.1,
+        "reference_pts": 256256,
+        "row_begin": 0,
+        "row_stop": 279126,
+        "source_coverage": {
+          "expected_exposures": 1143,
+          "missing_exposures": 0,
+          "missing_ranges": [],
+          "observed_exposures": 1143,
+          "partial_source_coverage": false,
+          "synthetic_rows_added": 0
+        },
+        "stop_pts_exclusive": 575744,
+        "time_base_den": 12800,
+        "time_base_num": 1
+      },
+      "metres_per_scene_unit": 59.96169706678219,
+      "solver_metres_per_scene_unit": 60.0,
+      "length_export_ratio": 0.9993616177797032,
+      "camera_changed_during_fit": false,
+      "source_time_base": [
+        1,
+        12800
+      ],
+      "old_reference_reprojected_on_current_camera": true,
+      "prepared": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\physical_repair_1101\\prepared_shared_timing"
+    },
+    "body_model_hash": "376021446ddc86e99acacd795182bbef903e61d33b76b9d8b359c2b0865bd992",
+    "body_shape_hash": "69ab3da407213f73ffb28d79480ce419918d7fa2ce7869323ebd0d31dbd48157",
+    "equipment_sources": {
+      "review_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\next_round_20261029\\J1_s2\\source_review.json",
+      "review_sha256": "32f38cb8ce5f4657695d681df1aa23eac1991b6f01c5992e1d39187da895881a",
+      "admission_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\footwear_v2\\pose_transfer\\admission.json",
+      "admission_sha256": "42a9f82b1ac520fa88b11b43c650e8ab4c1c0abd309f527e0ad2695df899c451"
+    },
+    "geometry": [
+      -3.6888794348828395,
+      -1.5786154815691569,
+      -2.4281401937548592,
+      -2.014220080724789,
+      -2.7877348548190937,
+      -3.521085909818263,
+      -4.455899053861666,
+      -4.117005367918819,
+      -4.412930011101545,
+      -4.47806111549869,
+      0.06988900002407754,
+      -0.06448704354998597,
+      0.21975639724237883,
+      0.22776270551702998
+    ],
+    "engineering_priors": {
+      "lining": 0.003,
+      "heel_bed": 0.022,
+      "ball_bed": 0.007,
+      "shank_radius": 0.026,
+      "cuff_clearance": 0.004,
+      "maximum_modes": [
+        0.07,
+        0.04,
+        0.025
+      ],
+      "mode_regularizer": [
+        0.35,
+        0.5,
+        0.8
+      ],
+      "ankle_sigma_px": 24.0
+    },
+    "windows": [
+      [
+        35.2,
+        36.8
+      ],
+      [
+        40.0,
+        41.5
+      ]
+    ],
+    "state_definition": "shared 14-parameter binding; right-composed full-body refinements; contact-driven upper v1"
+  },
+  "solver": {
+    "initial_cost": 4320.197809736308,
+    "final_cost": 2996.482016738704,
+    "parts": {
+      "registration": {
+        "visible_boot_edges": 184.76587575454775,
+        "visible_blade_curves": 116.32629400506886,
+        "boot_direction_endpoints": 321.9819857550649,
+        "neutral_foot_fit": 5.632449513578976,
+        "dynamic_foot_fit": 6.9627967876259715,
+        "registration_prior": 1.8763192997849423
+      },
+      "window_1": {
+        "body_pixels": 1360.067595825025,
+        "visible_boot_edges": 62.59604907373045,
+        "visible_blade_curves": 5.220198751477169,
+        "boot_direction_endpoints": 8.24329298434826,
+        "reference_deviation": 17.185712275879748,
+        "correction_velocity": 0.9530462790730079,
+        "correction_acceleration": 21.792392057186632,
+        "foot_cavity_support": 53.16770981434733
+      },
+      "window_2": {
+        "body_pixels": 671.000321826519,
+        "visible_boot_edges": 66.7997456654035,
+        "reference_deviation": 11.844229100632097,
+        "correction_velocity": 0.6698735474448367,
+        "correction_acceleration": 18.020466202569995,
+        "foot_cavity_support": 61.375662219394904
+      }
+    },
+    "stopping_reason": "`ftol` termination condition is satisfied.",
+    "optimality": 88.95518859088845,
+    "nfev": 29,
+    "variables": 588,
+    "shared_registration_parameters": 14,
+    "per_frame_shoe_pose_parameters": 0,
+    "source_windows": [
+      [
+        35.2,
+        36.8
+      ],
+      [
+        40.0,
+        41.5
+      ]
+    ]
+  },
+  "observation_ledger": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\ledger.json",
+    "sha256": "1fa127e90aafe5b23c3433a8457ce7afda4acea70f4958b3a789e7704555a21d"
+  },
+  "candidates": [
+    {
+      "id": "boot_legacy",
+      "meaning": "original fitted motion and closed convex shell"
+    },
+    {
+      "id": "boot_open",
+      "meaning": "identical old vertices and motion with an open collar"
+    },
+    {
+      "id": "boot_fitted",
+      "meaning": "shared foot-boot registration, cavity and contact-driven upper with two refined body windows"
+    }
+  ],
+  "viewer_config": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\viewer3d_boot_1102.json",
+  "viewer_entry": "D:\\OneDrive\\codex_projs\\RinkSpace\\START_BOOT_INSPECTION.cmd",
+  "replay_entry": "D:\\OneDrive\\codex_projs\\RinkSpace\\scripts\\run_boot_integration.py",
+  "replay_source_hashes": {
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\boot_integration.py": "d7fc6d21538b27e7814e087e3b97e5c92d24c8bd08dd9ebeb12414b7975a0ab5",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\footwear_binding.py": "aa749bbf77580b73ce9dae7d0358fa555a733b614b7450cf3d63f5538aa21ed2",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\boot_delivery.py": "92e4fb036d16fc09a6eed86e32e18ae08e409a25008d5950b5239871f5d7e480",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\boot_review.py": "12db35de360f17cc125ee73c77425fe4a82afc022c34c08215213ea1b67b948c",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\footwear_observations.py": "fde695c3f615d5909d38135057be3036fc3c48bc58adcf98582bca18cbb0201f",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\footwear_pixel_factors.py": "f152914175728d516fe5a923c365cbb71a82e0a6c8f3b7e673af2256f5ec45e2",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\fullbody_state.py": "151c034ed7d16b30c23b1c988a93cff5aa637a499f853db080a412a2d8924cd1",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\fullbody_fit.py": "bf4916e3c3f1a44b2be23c24ff988643d392d13f657da2d5758c6b2aa02e89ee"
+  },
+  "evidence": {
+    "inputs.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\inputs.json",
+      "sha256": "a0c99153dc079073c67211d418c26a82130a4ac08c120d0294dcdcea599b4829"
+    },
+    "registration.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\registration.json",
+      "sha256": "c686efe5fa8758e16ae40c48e3dc9c6e803296e259487c2ce0f3883cc37378b6"
+    },
+    "joint_result.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\joint_result.json",
+      "sha256": "3e2854cecdb29d349c74d67d1dd22a040de961609461db3e29ff99133a1614a9"
+    },
+    "migration_check.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\migration_check.json",
+      "sha256": "530421cbf24c7bebb9e82e4667dfe2a872513350822fab1a6c2b0b154f31838d"
+    },
+    "derivative_checks.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\derivative_checks.json",
+      "sha256": "2ef766222fc40fd4a9e75aaa6261f3861b72285666ab96557e015c9def72bb9b"
+    },
+    "precision_check.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\precision_check.json",
+      "sha256": "365b1cba028457e86c47c5f079617535e59de5f9f08a8d875698945d163e5691"
+    },
+    "invariants.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\invariants.json",
+      "sha256": "77f1482add95d09bd2b711c2d2b39dc4481a6eb040fda25b3896e90641ef751f"
+    },
+    "invariants_final.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\invariants_final.json",
+      "sha256": "e451585ec0f0fde5a8945a795a7cd15625c9d5778c526ff4165ab7e2bd971f2f"
+    },
+    "observation_semantics.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\observation_semantics.json",
+      "sha256": "531a390a0c8d22e7ffcf2c75577871a2edd0328932b2c2cd1c8103437489e1d4"
+    },
+    "boot_report.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\boot_report.json",
+      "sha256": "d1d8dcc6a2f41dcc9606c6fc7eb735e1bf76d2224393be2fceedf82ddadc9c11"
+    },
+    "results.txt": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\results.txt",
+      "sha256": "8d3d280ec0e8789d54feaf414fda40f60ea07a6489d2b722b2fd68a72ce4c2ae"
+    },
+    "player_check/checks.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\player_check\\checks.json",
+      "sha256": "0540a6a0b0c528050c62c41dcccbea57430df0dcd7ac5af5df10129a8f174270"
+    },
+    "player_check/cache_contract.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\player_check\\cache_contract.json",
+      "sha256": "e6492e21202f85a5ba5fa544b8d60b0b3c3791846383f0f355200a80be523c60"
+    },
+    "section_check/checks.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\section_check\\checks.json",
+      "sha256": "a69fe7b06b25b7c226da7d5efedfb452a5dd06919f28197fe1561c42769cb144"
+    },
+    "section_check/normal_audit.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\section_check\\normal_audit.json",
+      "sha256": "84b7589b80ed3df9f82b6b67a3fa69e69b9105eab023f2192caf79a029eef635"
+    },
+    "clean_player_check/checks.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\clean_player_check\\checks.json",
+      "sha256": "6ca450157880bd17e127910dec0e1b34306ee0e10a0d4e3ca93e142bd0f87e20"
+    },
+    "clean_section_check/checks.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\clean_section_check\\checks.json",
+      "sha256": "00b29ab0dbb5366f0527a2f540bbefa11b3538115bd16ece54d251e5b473da03"
+    },
+    "source_shoes.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\source_shoes.json",
+      "sha256": "3d10ea5a0270a8f249a9c9302346cb997b406f999f3ec6908afede6d8226093a"
+    },
+    "source_shoes.png": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\source_shoes.png",
+      "sha256": "2f3f1f34130e92c66e294754fdb9b1d37faf181b0b8c840da245770c7c4df859"
+    },
+    "visual_review.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\visual_review.json",
+      "sha256": "23679aa1fed0f4bd3440562b0ff29d80fa140797cb625fba6d20de5882b2d0a2"
+    },
+    "verification.json": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\boot_integration_1102\\verification.json",
+      "sha256": "084bc6639e69e09fc879184157d7d6860697deaca53b4cc9b53f41a1984d2834"
+    }
+  },
+  "remaining_scope": [
+    "Existing complete articulated body state is S01 only.",
+    "Toe-pick geometry and an identified toe-pick contact observation are absent.",
+    "The cavity, footbed and upper regularizers are geometric fitting priors."
+  ]
+}

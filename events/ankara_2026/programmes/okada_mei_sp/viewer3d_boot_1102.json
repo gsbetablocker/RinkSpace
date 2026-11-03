@@ -1,0 +1,62 @@
+{
+  "schema": "rinkspace.result-viewer.v1",
+  "event": "ankara_2026",
+  "programme": "okada_mei_sp",
+  "shot": "s01",
+  "source_run": "runs/body_s01_20261029",
+  "scene_root": "runs/body_s01_20261029/fullbody_1102",
+  "scene_label": "camera_solver_refined_1102 冻结场景",
+  "metric_binding": "runs/body_s01_20261029/fullbody_1102/metric_binding.json",
+  "metric_binding_base": "data",
+  "model_asset": "environments/body/GVHMR/inputs/checkpoints/body_models/smplx/SMPLX_NEUTRAL.npz",
+  "default_variant": "opening1102",
+  "initial_source_pts": 461056,
+  "variants": [
+    {
+      "id": "boot_legacy",
+      "label": "对照：旧封闭刚性鞋壳",
+      "kind": "fullbody",
+      "result": "fullbody_1102/full/result.npz",
+      "shell_topology": "closed_hull",
+      "inherit_baseline": true
+    },
+    {
+      "id": "boot_open",
+      "label": "显示修复：22 面开放鞋口，顶点不变",
+      "kind": "fullbody",
+      "result": "fullbody_1102/full/result.npz",
+      "shell_topology": "open_collar",
+      "inherit_baseline": true
+    },
+    {
+      "id": "boot_fitted",
+      "label": "候选：共享穿合与有限上帮形变",
+      "kind": "fullbody",
+      "result": "boot_integration_1102/fitted/result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "fullbody1102"
+    },
+    {
+      "id": "opening1102",
+      "label": "候选：S01 开头完整人体修复＋继承鞋集成",
+      "kind": "fullbody",
+      "result": "opening_repair_1102/fitted/result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "boot_integration1102",
+      "body_refinement_intervals_seconds": [[22.12, 25.0]]
+    }
+  ],
+  "initial_wear_inspection": true,
+  "initial_view": "feet_oblique",
+  "footwear_scope_label": "鞋配准在全 S01 共享，绑定与有限上帮变化按本帧保存状态显示。",
+  "body_refinement_intervals_seconds": [
+    [
+      35.2,
+      36.8
+    ],
+    [
+      40.0,
+      41.5
+    ]
+  ]
+}

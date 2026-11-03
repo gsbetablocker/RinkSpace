@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param([string]$Variant='', [switch]$Fresh, [switch]$Wait)
+param([string]$Variant='', [switch]$Fresh, [switch]$Wait, [string]$Config='')
 $ErrorActionPreference='Stop'
 $projectRoot=$PSScriptRoot
 $env:PYTHONPATH=(Join-Path $projectRoot 'src')+';'+$projectRoot
@@ -24,6 +24,7 @@ try {
     $work=Join-Path $dataRoot 'workbench\results3d'
     [void][IO.Directory]::CreateDirectory($work)
     $values=@('-B','-X','utf8','-m','rinkspace.viewer3d.app','--project',$projectRoot,'--data-root',$dataRoot)
+    if ($Config) { $values+=@('--config',$Config) }
     if ($Variant) { $values+=@('--variant',$Variant) }
     if ($Fresh) { $values+='--fresh' }
     if ($Wait) {

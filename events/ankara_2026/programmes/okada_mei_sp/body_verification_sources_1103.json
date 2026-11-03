@@ -1,0 +1,93 @@
+{
+  "schema": "rinkspace.body-verification-source-preservation.v1",
+  "date": "2026-11-03",
+  "scope": "Preserved verification/plot producer code; original Data scripts and results retained",
+  "files": [
+    {
+      "data_source": "runs/body_s01_20261029/boot_integration_1102/check_invariants.py",
+      "original_sha256": "85d8a98505f88602f848c689be4128dc5121e250ab0cada376b352dd3247c20c",
+      "repository_source": "calibration/program_tracking/body_tracking/boot_invariants.py",
+      "repository_sha256": "ffc45733563a2016cb8e0e56b03ea70c986dcaa1dda931c8c6de7c317e4781ed",
+      "parameterization": "Explicit project/Data/root/output parameters; reports use a new explicit --report; same kinematic checks and tolerances.",
+      "verification_report": "maintenance/publication_20261103/boot_invariants_cli.json",
+      "verified": true
+    },
+    {
+      "data_source": "runs/body_s01_20261029/opening_repair_1102/make_opening_metrics_plot.py",
+      "original_sha256": "492382c9e85eec31425159572f7b91dfe54d50fee1cfc14f9bad52de7373e328",
+      "repository_source": "calibration/program_tracking/body_tracking/opening_metrics.py",
+      "repository_sha256": "1ff00853cb5a21818fbe5c8bb87ba9a3fce9d14642dc15296d72edb1a351690f",
+      "parameterization": "Explicit root/output/report-dir; same 117 original PTS samples and definitions, no smoothing or resampling.",
+      "verification_report": "maintenance/publication_20261103/opening_metrics_cli/metrics_plot.json",
+      "verified": true
+    },
+    {
+      "data_source": "runs/body_s01_20261029/opening_repair_1102/verify_saved.py",
+      "original_sha256": "8b2b0b7064c1cb847a773302c4d5a4557010d43536fa1b07dbbe10148c162324",
+      "repository_source": "calibration/program_tracking/body_tracking/opening_verification.py",
+      "repository_sha256": "356958c654ba38132f4d774db75e26ecf51edd05bf72dc16dc331109a94e8a05",
+      "parameterization": "Explicit project/root/output/parameter/binding/report arguments; expected hashes read from the existing binding, current exact input key preferred then unique slash-normalized historical body_s01_20261029/input.npz; original strict heading/FK comparisons retained.",
+      "verification_report": "maintenance/publication_20261103/opening_verification_cli.json",
+      "verified": true
+    }
+  ],
+  "verification": {
+    "summary": "maintenance/publication_20261103/body_code_validation.json",
+    "boot_checks": 41,
+    "compact_replay_frames": 1143,
+    "compact_replay_max_absolute": {
+      "P": 0.0,
+      "Q": 0.0,
+      "local_R": 0.0,
+      "native": 0.0,
+      "gear": 0.0
+    },
+    "plot_samples_per_trace": 117,
+    "plot_traces_and_original_pts_exact": true,
+    "protected_source_files": 25,
+    "protected_sha256_unchanged": true
+  },
+  "environment_facts": [
+    {
+      "environment": "runtime_tools/body_cuda",
+      "numpy": "1.26.4",
+      "scipy": "1.13.1",
+      "operation": "opening compact strict replay",
+      "result": "failed unchanged original assert_array_equal on heading",
+      "mismatched_elements": 27,
+      "total_elements": 504,
+      "maximum_absolute": 3.552713678800501e-15
+    },
+    {
+      "environment": ".venv",
+      "numpy": "2.4.6",
+      "scipy": "1.17.1",
+      "threads": {
+        "OPENBLAS_NUM_THREADS": 2,
+        "OMP_NUM_THREADS": 2,
+        "MKL_NUM_THREADS": 2
+      },
+      "operation": "boot_invariants and opening_verification CLI",
+      "result": "passed without tolerance changes"
+    },
+    {
+      "environment": ".venv and standalone runtime_tools/results3d",
+      "operation": "opening_metrics CLI",
+      "result": "ModuleNotFoundError: matplotlib; no installation attempted"
+    },
+    {
+      "environment": "runtime_tools/results3d after importing opening_verification",
+      "operation": "opening_metrics function",
+      "result": "passed; existing transitive imports appended vision_cuda/Lib/site-packages and matplotlib came from that directory"
+    },
+    {
+      "environment": "runtime_tools/vision_cuda",
+      "numpy": "2.4.6",
+      "operation": "independent opening_metrics CLI",
+      "result": "passed using existing matplotlib"
+    }
+  ],
+  "data_inventory_review": "maintenance/publication_20261103/data_code_review_summary.json",
+  "solver_started": false,
+  "accuracy_accepted": false
+}

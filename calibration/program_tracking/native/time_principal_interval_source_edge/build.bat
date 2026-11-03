@@ -31,7 +31,7 @@ cl /nologo /O2 /fp:strict /std:c++17 /EHsc /MD /bigobj /LD ^
   /I"%RS_VENDOR%\pybind11-global-3.0.3-pyhc8003f9_0\Library\include" ^
   /I"%RS_TBB%\include" ^
   native_source_edge_prod.cpp /Fo"%RS_BIN%\native_source_edge_time_principal_interval_prod.obj" ^
-  /link /OUT:"%RS_BIN%\native_source_edge_time_principal_interval_prod.pyd" ^
+  /link /OUT:"%RS_BIN%\native_source_edge_time_principal_interval_prod.pyd" /IMPLIB:"%RS_BIN%\native_source_edge_time_principal_interval_prod.lib" ^
   /LIBPATH:"%RS_ENV%\Library\lib" ^
   /LIBPATH:"%RS_ENV%\libs" ^
   /LIBPATH:"%RS_TBB%\lib" ^

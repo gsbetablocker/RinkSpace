@@ -23,6 +23,7 @@
 | 三维播放器使用的 AITViewer／Pyglet | 当前外部版本为 AITViewer 1.14.2（[MIT 原文](environments/third_party_licenses/AITVIEWER_LICENSE.txt)）及 Pyglet 2.1.19（[BSD 原文](environments/third_party_licenses/PYGLET_LICENSE.txt)）；项目连接代码与这些外部实现分别适用各自许可 |
 | Qt／PyQt6 外部依赖 | AITViewer 的安装锁包含 PyQt6 与 Qt。所选 PyQt6 发行物保留 [GPLv3 原文](environments/third_party_licenses/PYQT6_GPL3.txt)，Qt 包保留[自身许可](environments/third_party_licenses/PYQT6_QT6_LICENSE.txt)；默认播放器使用 Pyglet。依赖安装、实际加载和组合分发分别核对，见[播放器核查](docs/LICENSING_REVIEW.md#viewer3d) |
 | FootMR／CoTracker／RTMW | 作为 Data 中的外部人体／轨迹推理依赖登记，固定版本、文件身份及原许可见[第三方资产](docs/THIRD_PARTY_ASSETS.md)；实现与权重未随本次公开树分发 |
+| SMPL-X Python 包与模型 | 作为 Data 中的外部依赖使用，分别按取得版本的原始条款处理；模板、形变基、蒙皮权重、人体模型拓扑、紧凑模型导出与完整表面缓存不随公开树分发。节目控制参数的实际字段与先验来源见[许可核查](docs/LICENSING_REVIEW.md#body-parameters) |
 | 视频、截图、用户提供素材、标注及其他研究数据 | ISU 比赛视频、截图和叠加画面不随公开仓库分发；可提供官方频道 YouTube 地址及源时间戳供自行核对；原有测量记录保留；项目图、标注及数值观测按各自来源判断。软件许可证不自动覆盖其他第三方材料 |
 
 可选软件、模型和运行依赖也分别适用其原许可；项目自有接口或本声明不改变这些条件。分发组合程序时，还需满足实际适用的第三方条件。

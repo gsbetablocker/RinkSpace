@@ -1,0 +1,26 @@
+{
+  "schema": "rinkspace.result-viewer.v1",
+  "event": "ankara_2026",
+  "programme": "okada_mei_sp",
+  "shot": "s01",
+  "source_run": "runs/body_s01_20261029",
+  "scene_root": "runs/body_s01_20261029/fullbody_1102",
+  "scene_label": "camera_solver_refined_1102 冻结场景",
+  "metric_binding": "runs/body_s01_20261029/fullbody_1102/metric_binding.json",
+  "metric_binding_base": "data",
+  "model_asset": "environments/body/GVHMR/inputs/checkpoints/body_models/smplx/SMPLX_NEUTRAL.npz",
+  "default_variant": "opening1102",
+  "initial_source_pts": 283136,
+  "initial_view": "free",
+  "initial_wear_inspection": false,
+  "comparison_variants": ["boot_fitted", "opening1102"],
+  "variants": [
+    {"id":"ref1102","label":"对照：原 J1，同一最新场景","kind":"fullbody","result":"fullbody_1102/reference/result.npz"},
+    {"id":"obs1102","label":"新观测＋旧根/腿自由度（五短段）","kind":"fullbody","result":"fullbody_1102/legacy/result.npz"},
+    {"id":"full1102","label":"新观测＋全身与根朝向（五短段候选）","kind":"fullbody","result":"fullbody_1102/full/result.npz"},
+    {"id":"b5","label":"历史 B5 参考（同一场景尺度）","kind":"body","result":"next_round_20261029/B5/result.npz"},
+    {"id":"j2","label":"历史 J2 鞋形敏感性参考","kind":"joint","result":"next_round_20261029/J2_s2/result.npz","base":"next_round_20261029/B5/result.npz"},
+    {"id":"boot_fitted","label":"修复前：全身与冰鞋结果","kind":"fullbody","result":"boot_integration_1102/fitted/result.npz","shell_topology":"saved","body_reference_label":"fullbody1102","body_refinement_intervals_seconds":[[35.2,36.8],[40.0,41.5]]},
+    {"id":"opening1102","label":"修复后：开头站姿、位置与转身","kind":"fullbody","result":"opening_repair_1102/fitted/result.npz","shell_topology":"saved","body_reference_label":"boot_integration1102","body_refinement_intervals_seconds":[[22.12,25.0]]}
+  ]
+}
