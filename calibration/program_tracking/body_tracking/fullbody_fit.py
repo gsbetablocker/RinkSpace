@@ -107,10 +107,13 @@ class FullBodyProblem:
             B=csr_matrix(self.state.basis(reference.times[self.frames],order))
             # Integral quadrature at native cadence; 25 Hz-equivalent old scale.
             matrix=kron(B,csr_matrix(np.diag(1/scale)),format='csr')/np.sqrt(2)
-            if order==2 and getattr(self.state,'regularize_actual_root',False):
-                if np.any(active>=3):raise ValueError('Actual-root regularization requires translation-only controls')
-                name='actual_root_acceleration'
-                self.prior_offsets[name]=(reference.root_derivative(reference.times[self.frames],2)[:,active]/scale/np.sqrt(2)).ravel()
+            if order==2 and (getattr(self.state,'regularize_actual_root',False) or getattr(self.state,'regularize_actual_root_translation',False)):
+                mixed=getattr(self.state,'regularize_actual_root_translation',False)
+                if np.any(active>=3) and not mixed:raise ValueError('Actual-root regularization requires translation-only controls')
+                name='actual_root_and_correction_acceleration' if mixed else 'actual_root_acceleration'
+                offset=np.zeros((self.n,len(active)));linear=active<3
+                offset[:,linear]=reference.root_derivative(reference.times[self.frames],2)[:,active[linear]]
+                self.prior_offsets[name]=(offset/scale/np.sqrt(2)).ravel()
             self.prior_matrices.append((name,matrix))
         self.cache=None;self.cache_x=None
 

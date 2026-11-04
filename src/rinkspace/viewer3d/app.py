@@ -12,8 +12,9 @@ from aitviewer.renderables.lines import Lines
 from aitviewer.renderables.skeletons import Skeletons
 from aitviewer.renderables.spheres import Spheres
 from .data import ResultCatalog, CachedSequence, shell_triangles, ribbon_triangles, simplify_curve
-from .framing import fit_comparison_camera
+from .framing import fit_comparison_camera, comparison_panel_sizes
 from .imgui_buffers import install_dynamic_buffers
+from .source import SourceVideo, SupportObservations, region_outline, source_value, observation_used, load_world_regions
 
 
 class FrameObserver(Node):
@@ -32,7 +33,7 @@ class ResultsPlayer(Viewer):
             server_enabled=False, backface_culling=False, shadows_enabled=False,
             background_color=[.12, .15, .19, 1.], font_size=16,
             export_dir=str(catalog.session_root)))
-        super().__init__(title='RinkSpace 三维结果播放器 · S01', size=size)
+        super().__init__(title='RinkSpace 三维结果播放器 · '+catalog.config.get('shot',''), size=size)
         install_dynamic_buffers(self.imgui)
         # pyimgui retains filename bytes on this IO wrapper.
         self._imgui_io = imgui.get_io()
@@ -46,9 +47,13 @@ class ResultsPlayer(Viewer):
         self.zh_font = imgui.get_io().fonts.add_font_from_file_ttf(
             'C:/Windows/Fonts/msyh.ttc', 18 * self.window.pixel_ratio, glyph_ranges=self._zh_ranges)
         self.imgui.refresh_font_texture()
-        self.gui_controls = {'rinkspace': self.gui_rinkspace, 'exit': self.gui_exit,
+        # Viewer renders 3D before GUI callbacks. Read its source frame before
+        # controls can seek/switch the state intended for the next render.
+        self.gui_controls = {'source': self.gui_source, 'rinkspace': self.gui_rinkspace, 'exit': self.gui_exit,
                              'go_to_frame': self.gui_go_to_frame}
-        self.control_panel_width=425
+        panel_sizes=comparison_panel_sizes(self.window_size[0],bool(catalog.source_video))
+        self.control_panel_width=panel_sizes['control_width']
+        self.source_panel_width=panel_sizes['source_width']
         self.follow = True
         self.speed = 1.
         self.surface_alpha = .72
@@ -68,6 +73,14 @@ class ResultsPlayer(Viewer):
         self._last_status = None
         self.error = ''
         self.view_label = '自由视角'
+        self.view_mode = 'free'
+        self.source_reader = None
+        self.source_texture = None
+        self.source_texture_pts = None
+        self.source_error = ''
+        self.source_regions = (SupportObservations(catalog.support_observations,catalog.time_base,shot=catalog.config.get('source_shot'))
+                               if catalog.support_observations else None)
+        self.world_region_nodes = []
         self._build_rink()
         old = self._read_session() if restore else {}
         self.wear_inspection=bool(old.get('wear_inspection',False)) if restore else bool(catalog.config.get('initial_wear_inspection',False))
@@ -125,6 +138,14 @@ class ResultsPlayer(Viewer):
             if groups[group]:line_nodes.append(Lines(np.concatenate(groups[group]),mode='lines',r_base=radius,color=color,name='Frozen '+group+' lines',is_selectable=False))
         self.layers['rink_lines']=line_nodes
         self.scene.add(self.ice,boards,*line_nodes)
+        if self.catalog.support_world_regions:
+            for row in load_world_regions(self.catalog.support_world_regions):
+                points=np.asarray(row['world_polyline_m'],float)
+                if not np.array_equal(points[0],points[-1]):points=np.r_[points,points[:1]]
+                color=(1.,.64,.12,1.) if row['role']=='fit' else (.75,.4,1.,1.)
+                node=Lines(points,r_base=.0015,color=color,
+                    name='Source nominal-plane conditional range '+str(row.get('id','')),is_selectable=False)
+                self.world_region_nodes.append((row,node));self.scene.add(node,enabled=False)
 
     def load_variant(self, name):
         definition = self.catalog.variant(name)
@@ -256,7 +277,7 @@ class ResultsPlayer(Viewer):
                     axis_nodes.append(keep(Lines(points,mode='lines',r_base=.0025,color=color,name='Axis '+str(label),is_selectable=False)))
             layers.update(wear=[],footbed=footbed_nodes,cavity=cavity_nodes,axes=axis_nodes,collar=collar_nodes,
                           contact=contact_nodes,skate_reference=reference_nodes)
-            trajectory=keep(Lines(s['G'],r_base=.018,color=(1.,.75,.12,1),name='Whole S01 pelvis vertical projection',is_selectable=False))
+            trajectory=keep(Lines(s['G'],r_base=.018,color=(1.,.75,.12,1),name='Whole saved clip pelvis vertical projection',is_selectable=False))
             layers['trajectory']=[trajectory]
             vertical=keep(Lines(np.stack([s['P'],s['G']],axis=1),r_base=.007,color=(1.,.27,.67,1),name='P to G world vertical',is_selectable=False))
             pelvis=keep(Spheres(s['P'][:,None],radius=.032,color=(1.,.27,.67,1),name='P pelvis',is_selectable=False))
@@ -288,6 +309,8 @@ class ResultsPlayer(Viewer):
             # Clear the global normals LRU only after a successful switch.
             Meshes.compute_vertex_and_face_normals.cache_clear()
         self.error=''
+        if getattr(self,'view_mode','') in ('support_top','support_side'):
+            self.last_view_center=self.support_view_center()
 
     def apply_visibility(self):
         for key,nodes in self.layers.items():
@@ -314,11 +337,30 @@ class ResultsPlayer(Viewer):
 
     def frame_changed(self, frame):
         p=self.sequence.state['P'][frame]
-        if self.follow and self.last_p is not None:
+        if getattr(self,'view_mode','') in ('support_top','support_side'):
+            center=self.support_view_center()
+            if self.follow and getattr(self,'last_view_center',None) is not None:
+                displacement=center-self.last_view_center
+                cam=self.scene.camera
+                cam.position=cam.position+displacement;cam.target=cam.target+displacement
+            self.last_view_center=center
+        elif self.follow and self.last_p is not None:
             displacement=p-self.last_p
             cam=self.scene.camera
             cam.position=cam.position+displacement;cam.target=cam.target+displacement
         self.last_p=p.copy()
+        for row,node in getattr(self,'world_region_nodes',[]):
+            node.enabled=row['pts']==int(self.catalog.pts[frame])
+
+    def support_view_center(self):
+        """Only select the saved physical foot; never choose by minimum height."""
+        foot=int(self.catalog.config.get('support_foot',1))
+        if foot not in (0,1):raise ValueError('Invalid fixed support_foot')
+        if self.catalog.config.get('comparison_variants'):
+            points=np.concatenate([q.state['gear'][self.frame,foot].reshape(-1,3) for q in self.comparison_sequences().values()])
+            return (points.min(axis=0)+points.max(axis=0))*.5
+        s=self.sequence.state
+        return s.get('skate_lower',s['gear'])[self.frame,foot].mean(axis=0).copy()
 
     def seek(self, frame):
         self.toggle_animation(False)
@@ -349,7 +391,19 @@ class ResultsPlayer(Viewer):
     def set_view(self, view, *, fit_comparison=True):
         cam=self.scene.camera;p=self.sequence.state['P'][self.frame].copy();p[2]=.8
         cam.up=np.array([0.,0.,1.]);cam.is_ortho=False
-        if view=='top':
+        if view in ('support_top','support_side'):
+            p=self.support_view_center();self.last_view_center=p.copy()
+            cam.position=p+([0.,0.,1.4] if view=='support_top' else [0.,-1.4,.08]);cam.target=p
+            if view=='support_top':cam.up=np.array([0.,1.,0.])
+            cam.is_ortho=True;cam.ortho_size=.32
+            if getattr(self.catalog,'source_video',None):
+                width,height=self.window_size
+                left=min(getattr(self,'control_panel_width',425)+28,width-1);right=min(getattr(self,'source_panel_width',630)+20,width-left-1)
+                back=cam.position-cam.target;back/=np.linalg.norm(back)
+                horizontal=np.cross(cam.up,back);horizontal/=np.linalg.norm(horizontal)
+                shift=horizontal*((left-right)/height*cam.ortho_size)
+                cam.position-=shift;cam.target-=shift
+        elif view=='top':
             cam.position=p+[0,0,10];cam.target=p;cam.up=np.array([0.,1.,0.]);cam.is_ortho=True;cam.ortho_size=2.2
         elif view=='side':
             cam.position=p+[0,-8,0];cam.target=p;cam.is_ortho=True;cam.ortho_size=1.5
@@ -377,8 +431,15 @@ class ResultsPlayer(Viewer):
         self.comparison_framing=None
         if fit_comparison and view in ('free','top','side','end') and self.catalog.config.get('comparison_variants'):
             self.comparison_framing=fit_comparison_camera(self,self.comparison_sequences(),self.frame,
-                left_inset=min(getattr(self,'control_panel_width',425)+28,self.window_size[0]-1))
-        self.view_label={'top':'俯视','side':'侧视 XZ','end':'侧视 YZ','rink':'全冰场','free':'自由视角','feet':'足鞋近看','feet_oblique':'鞋口斜俯视','feet_side':'足鞋同侧剖切视角','feet_end':'足鞋正视'}[view]
+                left_inset=min(getattr(self,'control_panel_width',425)+28,self.window_size[0]-1),
+                right_inset=min(getattr(self,'source_panel_width',630)+20,max(0,self.window_size[0]-getattr(self,'control_panel_width',425)-29)) if getattr(self.catalog,'source_video',None) else 0.)
+        if fit_comparison and view in ('support_top','support_side') and self.catalog.config.get('comparison_variants'):
+            self.comparison_framing=fit_comparison_camera(self,self.comparison_sequences(),self.frame,
+                support_foot=int(self.catalog.config.get('support_foot',1)),
+                left_inset=min(self.control_panel_width+28,self.window_size[0]-1),
+                right_inset=min(self.source_panel_width+20,max(0,self.window_size[0]-self.control_panel_width-29)) if getattr(self.catalog,'source_video',None) else 0.)
+        self.view_mode=view
+        self.view_label={'top':'俯视','side':'侧视 XZ','end':'侧视 YZ','rink':'全冰场','free':'自由视角','feet':'足鞋近看','feet_oblique':'鞋口斜俯视','feet_side':'足鞋同侧剖切视角','feet_end':'足鞋正视','support_top':'支撑足俯视','support_side':'支撑足侧视'}[view]
         self.save_session()
 
     def save_session(self):
@@ -403,11 +464,83 @@ class ResultsPlayer(Viewer):
 
     def close(self):
         if hasattr(self,'variant'):self.save_session()
+        if self.source_reader is not None:self.source_reader.close()
+        self.release_source_texture()
         # Keep the context alive until Viewer.run finishes its last buffer swap.
         self.window.is_closing = True
 
     def center_view_on_selection(self):
         if hasattr(self,'sequence'):self.set_view('free')
+
+    def release_source_texture(self):
+        if self.source_texture is not None:
+            self.imgui.remove_texture(self.source_texture)
+            self.source_texture.release()
+            self.source_texture=None
+            self.source_texture_pts=None
+
+    def gui_source(self):
+        """The same selected integer PTS drives source pixels and saved 3D."""
+        if not self.catalog.source_video:return
+        imgui.set_next_window_position(self.window.size[0]-self.source_panel_width-20,14,condition=imgui.FIRST_USE_EVER)
+        imgui.set_next_window_size(self.source_panel_width,min(730,self.window.size[1]-28),condition=imgui.FIRST_USE_EVER)
+        with imgui.font(self.zh_font):
+            expanded,_=imgui.begin('同帧原片 / 原图支撑区域')
+            if expanded:
+                pts=int(self.catalog.pts[self.frame]);state=self.sequence.state
+                imgui.text('原片 PTS %d  |  time_base %d/%d'%(pts,*self.catalog.time_base))
+                imgui.text('当前保存版本：'+self.variant['id'])
+                mask=state.get('support_image_in_optimization')
+                used='unknown（未保存）' if mask is None else ('是' if np.any(mask) else '否')
+                imgui.text('此版本是否使用新增原图观测：'+used)
+                try:
+                    if self.source_reader is None:self.source_reader=SourceVideo(self.catalog.source_video,self.catalog.time_base)
+                    if self.source_texture_pts!=pts:
+                        image=self.source_reader.read(pts)
+                        height,width=image.shape[:2]
+                        if self.source_texture is None or self.source_texture.size!=(width,height):
+                            self.release_source_texture()
+                            self.source_texture=self.ctx.texture((width,height),3)
+                            self.imgui.register_texture(self.source_texture)
+                        self.source_texture.write(image.tobytes())
+                        self.source_texture_pts=pts;self.source_image_size=(width,height)
+                    self.source_error=''
+                except Exception as error:
+                    self.source_error=str(error)
+                if self.source_error:
+                    imgui.text_wrapped('当前原片帧不可用：'+self.source_error)
+                elif self.source_texture_pts==pts:
+                    rows=self.source_regions.at(pts) if self.source_regions else []
+                    width,height=self.source_image_size
+                    display_width=max(100.,imgui.get_content_region_available()[0])
+                    self.gui_source_image(rows,(0.,0.,float(width),float(height)),display_width)
+                    if rows:
+                        points=np.concatenate([region_outline(row) for row in rows])
+                        lower=np.maximum(points.min(0)-35,0);upper=np.minimum(points.max(0)+35,[width,height])
+                        imgui.text('当前源区域放大（fit 橙 / review 紫）')
+                        crop_width=min(display_width,240.*(upper[0]-lower[0])/max(upper[1]-lower[1],1.))
+                        self.gui_source_image(rows,(*lower,*upper),crop_width)
+                    else:imgui.text('本曝光无原图区域；不沿用相邻帧区域。')
+                    for row in rows:
+                        used=observation_used(state,row,self.frame)
+                        used_label='unknown' if used=='unknown' else ('是' if used else '否')
+                        imgui.text_wrapped('%s | foot=%s | %s | %s | 本PTS/foot新增观测入优化=%s'%
+                            (row.get('id',''),row.get('foot','unknown'),row['role'],row['kind'],used_label))
+                imgui.text_wrapped('区域来自原图；3D范围为同源名义平面条件诊断，不是第二份观测。')
+            imgui.end()
+
+    def gui_source_image(self,rows,crop,display_width):
+        """Draw native pixel ellipses over a source texture, without projection."""
+        left,top,right,bottom=crop;width,height=self.source_image_size
+        scale=display_width/max(right-left,1.);display_height=(bottom-top)*scale
+        x,y=imgui.get_cursor_screen_pos()
+        imgui.image(self.source_texture.glo,display_width,display_height,
+            uv0=(left/width,top/height),uv1=(right/width,bottom/height))
+        draw=imgui.get_window_draw_list()
+        for row in rows:
+            outline=region_outline(row);points=(outline-[left,top])*scale+[x,y]
+            color=imgui.get_color_u32_rgba(*((1.,.64,.12,1.) if row['role']=='fit' else (.75,.4,1.,1.)))
+            for a,b in zip(points[:-1],points[1:]):draw.add_line(*map(float,a),*map(float,b),color,2.)
 
     def gui_height_plot(self,label,series,band=None):
         """Plot saved millimetres against source time, leaving NaN gaps open."""
@@ -444,7 +577,7 @@ class ResultsPlayer(Viewer):
         imgui.set_next_window_size(self.control_panel_width,self.window.size[1]-28,condition=imgui.FIRST_USE_EVER)
         with imgui.font(self.zh_font):
             imgui.begin('RinkSpace 三维结果播放器')
-            imgui.text('S01  |  原片 22.120–44.960 秒  |  50 帧/秒')
+            imgui.text('%s | 原片 %.3f–%.3f 秒'%(self.catalog.config['shot'],self.catalog.seconds[0],self.catalog.seconds[-1]))
             imgui.text_wrapped('冰场：'+self.catalog.config.get('scene_label','本轮人体实验配套的冻结场景'))
             imgui.text_colored('当前人体结果：候选，尚未验收',1.,.78,.32)
             imgui.separator()
@@ -472,11 +605,21 @@ class ResultsPlayer(Viewer):
                 imgui.text_wrapped('整节目人体尚未完成；鞋内配合与接触仍未验收。')
             elif window is not None:
                 if bool(window[f]):imgui.text_colored('本帧：本轮窗口内优化候选，未核验',1.,.78,.32)
-                else:imgui.text_colored('本帧：段外旧 J1 参考，未参与本轮优化',1.,.7,.35)
-                imgui.text_wrapped('全 S01 时间轴用于对照；本轮只优化标记窗口，整节目人体尚未完成。')
+                else:imgui.text_colored('本帧：段外保存参考，未参与本轮优化',1.,.7,.35)
+                imgui.text_wrapped('保存时间轴用于对照；本轮只优化标记窗口，整节目人体尚未完成。')
             else:imgui.text('本帧：历史保存候选，未参与本轮全身优化')
             imgui.text('原片时间：%06.3f 秒  |  PTS %d'%(seconds,self.catalog.pts[f]))
-            imgui.text('S01 帧：%d / %d'%(f+1,len(self.catalog.pts)))
+            imgui.text('当前片段帧：%d / %d'%(f+1,len(self.catalog.pts)))
+            s=self.sequence.state
+            for foot in range(2):
+                phase=source_value(s,'source_action_phase',f,foot)
+                mode=source_value(s,'source_support_mode',f,foot)
+                confidence=source_value(s,'source_support_confidence',f,foot)
+                confidence_label='unknown' if confidence=='unknown' else '%.2f'%confidence
+                used=source_value(s,'support_image_in_optimization',f,foot)
+                used_label='unknown' if used=='unknown' else str(bool(used))
+                imgui.text_wrapped('足 %d | source_action_phase=%s | source_support_mode=%s | source_support_confidence=%s | support_image_in_optimization=%s'%
+                    (foot,phase,mode,confidence_label,used_label))
             if imgui.button('上一帧  ,'):self.seek(f-1)
             imgui.same_line()
             if imgui.button('暂停  空格' if self.run_animations else '播放  空格'):self.toggle_animation(not self.run_animations)
@@ -486,7 +629,7 @@ class ResultsPlayer(Viewer):
             changed,value=imgui.slider_int('##frame',f+1,1,len(self.catalog.pts),format='%d')
             if changed:self.seek(value-1)
             imgui.set_next_item_width(150)
-            changed,value=imgui.input_int('跳到 S01 帧',f+1)
+            changed,value=imgui.input_int('跳到片段帧',f+1)
             if changed:self.seek(value-1)
             imgui.set_next_item_width(150)
             changed,index=imgui.combo('播放速度',[.25,.5,1.,2.].index(self.speed),['0.25 倍','0.5 倍','1 倍','2 倍'])
@@ -496,6 +639,9 @@ class ResultsPlayer(Viewer):
             for i,(label,key) in enumerate([('自由 / 回到人体  X','free'),('侧视 XZ','side'),('侧视 YZ','end'),('俯视','top'),('全冰场','rink')]):
                 if i in (1,3,4):imgui.same_line()
                 if imgui.button(label):self.set_view(key)
+            if imgui.button('支撑足 %d 俯视'%self.catalog.config.get('support_foot',1)):self.set_view('support_top')
+            imgui.same_line()
+            if imgui.button('支撑足侧视'):self.set_view('support_side')
             imgui.text('左键拖动：旋转  |  右键拖动：平移')
             imgui.text('滚轮：缩放；暂停后也可自由观察')
             imgui.separator()

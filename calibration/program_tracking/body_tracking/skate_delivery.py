@@ -15,6 +15,7 @@ from .skate_binding import TEMPLATE_VERSION, BINDING_VERSION
 from .skate_template import profile_height
 from .skate_physics import fk_state, constraints, ALLOWANCE, SUPPORT_BAND
 from .skate_checkpoint import checkpoint_identity, validate_checkpoint_identity
+from .skate_diagnostics import ice_objective_mode, _legacy_ice_diagnostics
 
 
 def export_candidate(root, out, ref, camera, info, evidence):
@@ -136,6 +137,7 @@ def export_candidate(root, out, ref, camera, info, evidence):
         skate_dimensions_json=np.array(json.dumps(dimensions,sort_keys=True)),
         footwear_contact_evidence_json=np.array(json.dumps(evidence,sort_keys=True)),
         skate_contact_engineering_json=np.array(json.dumps(dict(allowed_entry_m=ALLOWANCE,support_band_m=SUPPORT_BAND,
+            support_band_legacy_only=True,support_band_is_current_delivery_gate=False,
             support_height='eligible minimum raw height, only evidence exposure; NaN unknown',
             clearance='minimum height plus semantic allowance',witness='moving lower-skate minimum, not a material-point velocity',
             engineering_tolerances_not_measured_ice=True),sort_keys=True)),
@@ -159,6 +161,8 @@ def export_candidate(root, out, ref, camera, info, evidence):
         solver_config_json=np.array(json.dumps(dict(export_only=True,body_state='ref.at(t)',shared_parameters=17,exposure_nodes=5))),
         active_blocks_json=np.array(json.dumps(dict(shared_binding=17,body_columns=[ws.active.tolist() for ws,_ in ref.new_refinements]))),
         stopping_reason_json=np.array(json.dumps('export of supplied state; optimizer status belongs to caller')),costs_json=np.array('{}'))
+    from .source_support_export import apply_source_support
+    apply_source_support(packet,evidence,shot_id=info.get('shot',{}).get('id'))
     destination=out/'fitted';destination.mkdir(parents=True,exist_ok=True)
     np.savez_compressed(destination/'result.npz',**packet)
     return packet
@@ -197,6 +201,23 @@ def _delivery_identity(programme,delivery_name,variant_id,pts):
         comparisons=['full1102','hand1103',variant_id] if historical else list(dict.fromkeys(['full1102','hand1103','skate1103',variant_id])))
 
 
+def _delivery_ice_status(report, saved=None):
+    """Separate historical hard-band numbers from finite-soft delivery status."""
+    mode=ice_objective_mode(saved,report)
+    legacy=dict(report.get('legacy_hard_ice_diagnostics',{}))
+    for name in ('dense_gate','core_dense_gate'):
+        if name in report:legacy.setdefault(name,report[name])
+    dense=legacy.get('dense_gate')
+    old_core=(bool(report.get('feasible',False) and dense.get('feasible',False))
+              if isinstance(dense,dict) else None)
+    legacy.update(candidate_core_feasible=old_core)
+    return dict(ice_mode=mode,ice_is_delivery_gate=mode!='finite_soft_objective',
+        candidate_core_feasible=old_core if mode!='finite_soft_objective' else None,
+        candidate_core_feasible_scope='legacy hard-ice objective only; unavailable for finite-soft ice',
+        legacy_hard_ice_diagnostics=_legacy_ice_diagnostics(**{
+            k:v for k,v in legacy.items() if k not in ('objective_version','legacy_only','used_for_current_quality')}))
+
+
 def deliver(project,root,out,ref,camera,info,evidence,problem,report,catalog=None,*,
             delivery_name='skate_contact_1103',variant_id='skate1103',make_default=True):
     """Persist replayable small parameters, full-S01 impact and player binding."""
@@ -216,10 +237,16 @@ def deliver(project,root,out,ref,camera,info,evidence,problem,report,catalog=Non
     _parameter_replay_checks(parameters,saved,binding.x)
     identity=_delivery_identity(programme,delivery_name,variant_id,ref.p['pts'])
     packet=export_candidate(root,out,ref,camera,info,evidence)
+    ice_status=_delivery_ice_status(report,saved)
+    packet.update(ice_mode=np.array(ice_status['ice_mode']),
+        ice_is_delivery_gate=np.array(ice_status['ice_is_delivery_gate']))
+    if 'ice_soft_policy_json' in saved:packet['ice_soft_policy_json']=saved['ice_soft_policy_json'].copy()
     fit_report='fit/candidate.json' if report.get('candidate_checkpoint') else 'fit/result.json'
     packet.update(stopping_reason_json=np.array(json.dumps(report.get('stop'))),
         solver_config_json=np.array(json.dumps(dict(solver=fit_report,inputs='inputs.json',
-            source_snapshot='fit/kernel_manifest.json',physical_feasibility='unweighted maximum, including source support bands and foot-cavity bounds'))),
+            source_snapshot='fit/kernel_manifest.json',
+            physical_feasibility=('foot_cavity_and_collar_only; finite-soft ice excluded'
+                if ice_status['ice_mode']=='finite_soft_objective' else 'legacy hard-ice objective thresholds only')))),
         costs_json=np.array(json.dumps(report.get('parts',{}))))
     np.savez_compressed(out/'fitted/result.npz',**packet)
     validation=review_candidate(root,out,ref,camera,info,packet,evidence)
@@ -227,7 +254,7 @@ def deliver(project,root,out,ref,camera,info,evidence,problem,report,catalog=Non
     validation['main_rocker_candidates']=compare_rockers(root,out,ref,camera,info,packet,evidence)
     from .skate_collar_review import review_collar_gap
     validation['collar_section']=review_collar_gap(root,out,ref,info,packet)
-    validation['acceptance_status']='pending human visual review; debugging bands are not calibrated'
+    validation['acceptance_status']='pending human visual review; legacy hard-ice bands do not decide finite-soft quality'
     source=load(root/'opening_timing_1103/hand_polish/fitted/result.npz')
     # Replay the actual saved parameters through the same state owner before
     # exposing a new viewer variant. No interpolation of exported poses occurs.
@@ -266,7 +293,7 @@ def deliver(project,root,out,ref,camera,info,evidence,problem,report,catalog=Non
     write_json(out/'parameter_replay.json',dict(onedrive_parameters=str(param_path),sha256=digest(param_path),
         **replay_checks,outside_body_maximum_error=checks,
         same_state_template_replay=validation['same_state_template_replay'],source_preservation=validation['source_preservation']))
-    core_feasible=bool(report.get('feasible',False) and report.get('dense_gate',{}).get('feasible',False))
+    core_feasible=ice_status['candidate_core_feasible']
     config_path=programme/'viewer3d_fullbody_1102.json'
     config=json.loads(config_path.read_text(encoding='utf8'))
     definition=dict(id=variant_id,label=identity['label'],
@@ -305,8 +332,8 @@ def deliver(project,root,out,ref,camera,info,evidence,problem,report,catalog=Non
             convention=('one continuous C2 curve over all available source/exposure support; no internal temporal freeze'
                         if continuous_all_source else 'saved body refinement intervals; parent body replay elsewhere')),
         engineering_allowance_m=ALLOWANCE,support_band_m=SUPPORT_BAND,
-        candidate_core_feasible=core_feasible,user_accepted=False,independent_3d_truth=False,
-        acceptance_status='uncalibrated debugging thresholds; pending human visual review',
+        **ice_status,user_accepted=False,independent_3d_truth=False,
+        acceptance_status='pending human visual review; legacy hard-ice thresholds are not finite-soft quality gates',
         parameter_provenance=binding.record()['parameter_provenance'],
         evidence={name:dict(path=str(out/name),sha256=digest(out/name)) for name in
             ('inputs.json','binding.json','validation.json',fit_report,'fit/kernel_manifest.json','source_evidence.json','parameter_replay.json','fitted/result.npz','collar_gap.json')},

@@ -1,0 +1,75 @@
+diff --git a/exmr/model/exmr.py b/exmr/model/exmr.py
+index bf68d03..fa7a5a2 100644
+--- a/exmr/model/exmr.py
++++ b/exmr/model/exmr.py
+@@ -86,6 +86,7 @@ class ExMR(nn.Module):
+         smooth_incam=False,
+         smooth_global=True,
+         fps=30.0,
++        camera_only=False,
+     ):
+         """
+         Args:
+@@ -110,15 +111,27 @@ class ExMR(nn.Module):
+             smooth_global: smooth the world-frame motion over time (Gaussian, SMOOTHING_SIGMA)
+             fps: frame rate of the video, for the time windows of snap_to_ground, of the
+                 static-camera drift correction and of the smoothing
++            camera_only: return before the world branch. Requires postprocess, snap_to_ground,
++                smooth_incam and smooth_global all False. Includes independent camera-frame
++                snapshots before FootMR and after FootMR (before HandMR).
+         Returns:
+             dict with
+               smplx_incam: SMPL-X parameters in the camera frame (each (B, L, D))
+               smplx_global: SMPL-X parameters in the gravity-aligned world frame (y up, ground
+                   at y=0 with postprocess or snap_to_ground; with postprocess, the motion starts
+                   at x=z=0 facing +z)
++              smplx_incam_prefoot, smplx_incam_postfoot: only with camera_only=True; cloned
++                  camera-frame SMPL-X parameters before FootMR and after FootMR, respectively.
++                  smplx_incam is the final camera-frame output after HandMR; no smplx_global
++                  is returned in camera-only mode.
+               static_conf_logits: (B, L, 6) logits of being static (not moving) for
+                   [L_ankle, L_foot, R_ankle, R_foot, L_wrist, R_wrist]
+         """
++        if camera_only and any([postprocess, snap_to_ground, smooth_incam, smooth_global]):
++            raise ValueError(
++                "camera_only=True requires postprocess=False, snap_to_ground=False, "
++                "smooth_incam=False and smooth_global=False"
++            )
+         B, L = kp2d.shape[:2]
+         if length is None:
+             length = torch.full((B,), L, device=kp2d.device)
+@@ -145,6 +158,9 @@ class ExMR(nn.Module):
+             "right_hand_pose": params["right_hand_pose"],
+             "transl": full_cam_transl(body_out["pred_cam"], bbx_xys, K_fullimg),
+         }
++        # FootMR and HandMR update body_pose in place; snapshots must own their tensors.
++        if camera_only:
++            smplx_incam_prefoot = {key: value.clone() for key, value in smplx_incam.items()}
+         body_pose = smplx_incam["body_pose"]  # refined in place below
+ 
+         # 2. FootMR: refine the global ankle rotations, then express them relative to the knee
+@@ -159,6 +175,9 @@ class ExMR(nn.Module):
+             -2
+         )
+ 
++        if camera_only:
++            smplx_incam_postfoot = {key: value.clone() for key, value in smplx_incam.items()}
++
+         # 3. HandMR: refine global elbows and wrists and the finger rotations
+         fk_rot = self.decoder.fk_rot(body_pose, smplx_incam["global_orient"])
+         hand_pose_r6d = self.decoder.denormalize(body_out["x"][..., HAND_POSE], HAND_POSE)
+@@ -180,6 +199,14 @@ class ExMR(nn.Module):
+         smplx_incam["left_hand_pose"] = finger_aa[:, :, :45]
+         smplx_incam["right_hand_pose"] = finger_aa[:, :, 45:]
+ 
++        if camera_only:
++            return {
++                "smplx_incam_prefoot": smplx_incam_prefoot,
++                "smplx_incam_postfoot": smplx_incam_postfoot,
++                "smplx_incam": smplx_incam,
++                "static_conf_logits": body_out["static_conf_logits"],
++            }
++
+         # 4. world frame: same articulation, rolled-out root trajectory
+         smplx_global = {
+             "body_pose": body_pose,

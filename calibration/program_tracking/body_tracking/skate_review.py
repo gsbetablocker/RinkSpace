@@ -13,6 +13,7 @@ from .footwear_observations import visible_shell_edges
 from .footwear_pixel_factors import nearest, nearest_segment
 from .fullbody_fit import footwear_rows
 from .rebuild_prepare import load, digest
+from .skate_diagnostics import ice_objective_mode, _legacy_ice_diagnostics
 from .skate_physics import (fk_state, constraints, ALLOWANCE, SUPPORT_BAND,
                             FEASIBILITY_TOLERANCE)
 
@@ -162,12 +163,15 @@ def _physics(ref, packet, pts, evidence):
         if len(found) != 1:
             source_rows.append(dict(id=row['id'], pts=row['pts'], status='missing_source_exposure'));continue
         i = int(found[0]);members = row.get('feet', [0, 1]);kind = row.get('mode', 'glide')
+        if kind in ('unknown','airborne'):
+            source_rows.append(dict(id=row['id'],pts=int(pts[i]),status=kind,source=row.get('source')));continue
         eligible = ref.binding.packet()['template']['support_feature_ids'][kind]
         candidates = [(float(height[i, f, j]), f, name) for f in members for j, name in enumerate(features['ids']) if name in eligible]
         h, foot, feature = min(candidates);gap_violation = max(SUPPORT_BAND[0]-h, h-SUPPORT_BAND[1], 0.)
         source_rows.append(dict(id=row['id'], pts=int(pts[i]), source_seconds=float(pts[i]/12800.),
             eligible_minimum_height_m=h, support_band_violation_m=gap_violation,
-            exceeds_numerical_tolerance=gap_violation > FEASIBILITY_TOLERANCE,
+            legacy_hard_ice_diagnostics=_legacy_ice_diagnostics(
+                exceeds_numerical_tolerance=gap_violation > FEASIBILITY_TOLERANCE),
             model_selected_candidate=dict(foot=foot, feature=feature),
             source_physical_side=row.get('physical_side', 'unknown'), source_edge=row.get('edge', 'unknown'),
             human_confirmed=row.get('human_confirmed', False), source=row.get('source'),
@@ -185,9 +189,15 @@ def _physics(ref, packet, pts, evidence):
         runner_statistic='reported statistics are depth=-minimum raw runner height; positive means below ice',
         lower_skate_raw_minimum_height_m=float(height.min()),
         source_reviewed_support=source_rows, inherited_contact_state_counts=counts,
-        physical_failure=bool(np.any(violation > FEASIBILITY_TOLERANCE) or any(r.get('exceeds_numerical_tolerance', True) for r in source_rows)),
+        ice_mode=ice_objective_mode(packet),current_ice_quality_verdict=None,
+        legacy_hard_ice_diagnostics=_legacy_ice_diagnostics(
+            physical_failure=bool(np.any(violation > FEASIBILITY_TOLERANCE) or any(
+                r.get('legacy_hard_ice_diagnostics',{}).get('exceeds_numerical_tolerance',True)
+                for r in source_rows if r.get('status') not in ('unknown','airborne'))),
+            support_band_m=SUPPORT_BAND,numerical_feasibility_tolerance_m=FEASIBILITY_TOLERANCE),
         semantic_allowance_m=ALLOWANCE, support_band_m=SUPPORT_BAND,
         numerical_feasibility_tolerance_m=FEASIBILITY_TOLERANCE,
+        numerical_threshold_scope='legacy_hard_ice_objective only; no current ice quality criterion',
         scope='source 50Hz only; caller solver owns 2.5ms dense checks; finite sampling is not continuous proof',
         unknown='unreviewed physical side/edge and inherited unknown labels stay unknown; a model minimum is only a candidate')
 
@@ -242,7 +252,7 @@ def review_candidate(root, out, ref, camera, info, packet, evidence):
     parent = variants['opening_hand_1103']
     outside = {key: _max_error(packet[key][~mask], parent[key][~mask]) for key in ('P_world_mid', 'Q_world_mid', 'local_R_mid')}
     report = dict(schema='rinkspace.same-source-skate-review.v1', user_accepted=False, independent_3d_truth=False,
-        diagnosis='Model/source-development diagnostics only. Physical failures and unknown contact states are retained.',
+        diagnosis='Model/source-development diagnostics only. Legacy hard-ice threshold results and unknown contact states are retained; no current ice quality verdict.',
         source_time_base=[1, 12800], source_seconds=[float(pts[0]/12800.), float(pts[-1]/12800.)],
         observation_sources=sources, common_denominator=dict(blade_curves=len(rows.blade_rows), blade_samples_per_curve=24,
             heel_toe_rows=len(rows.landmark_rows), contour_rows=len(rows.visible_rows),

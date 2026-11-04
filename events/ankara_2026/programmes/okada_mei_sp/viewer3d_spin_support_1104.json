@@ -1,0 +1,82 @@
+{
+  "schema": "rinkspace.result-viewer.v1",
+  "event": "ankara_2026",
+  "programme": "okada_mei_sp",
+  "shot": "spin_support_1104",
+  "source_run": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\player",
+  "scene_root": "runs/body_s01_20261029/fullbody_1102",
+  "scene_label": "camera_solver_refined_1102 冻结场景",
+  "metric_binding": "runs/body_s01_20261029/fullbody_1102/metric_binding.json",
+  "metric_binding_base": "data",
+  "model_asset": "environments/body/GVHMR/inputs/checkpoints/body_models/smplx/SMPLX_NEUTRAL.npz",
+  "default_variant": "support_new",
+  "initial_source_pts": 1126400,
+  "initial_view": "side",
+  "initial_wear_inspection": false,
+  "comparison_variants": [
+    "original_A",
+    "old_root",
+    "support_new"
+  ],
+  "variants": [
+    {
+      "id": "original_A",
+      "label": "原 A",
+      "kind": "fullbody",
+      "result": "original_A/result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "same_GVHMR_native_camera_and_shared_skate",
+      "body_refinement_intervals_seconds": []
+    },
+    {
+      "id": "old_root",
+      "label": "旧 root",
+      "kind": "fullbody",
+      "result": "old_root/result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "same_GVHMR_native_camera_and_shared_skate",
+      "body_refinement_intervals_seconds": []
+    },
+    {
+      "id": "support_stage1",
+      "label": "首轮保留2步",
+      "kind": "fullbody",
+      "result": "support_stage1/result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "same_GVHMR_native_camera_and_shared_skate",
+      "body_refinement_intervals_seconds": [
+        [
+          87.5,
+          92.5
+        ]
+      ]
+    },
+    {
+      "id": "support_new",
+      "label": "新联合候选（未验收）",
+      "kind": "fullbody",
+      "result": "support_new/result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "same_GVHMR_native_camera_and_shared_skate",
+      "body_refinement_intervals_seconds": [
+        [
+          87.5,
+          92.5
+        ]
+      ]
+    }
+  ],
+  "source_identity_field": "source_identity_suspect",
+  "review_status": "New candidate is unaccepted: review-region and world-height failures remain.",
+  "root_repair_status": "unaccepted candidate; reduced root drift; inspect image regression and remaining pose/contact failures",
+  "source_shot": "s05",
+  "source_video": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4",
+  "source_time_base": [
+    1,
+    12800
+  ],
+  "support_observations": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\support_spin_1104.json",
+  "support_foot": 1,
+  "support_world_regions": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\support_world_regions.json",
+  "body_window_scope": "87.5–92.5 context; 88–92 core. Full 76–95 and original S01 retained separately."
+}

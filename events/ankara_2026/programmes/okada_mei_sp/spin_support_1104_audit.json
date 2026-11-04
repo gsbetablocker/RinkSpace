@@ -1,0 +1,1155 @@
+{
+  "schema": "rinkspace.spin-support-1104-audit.v1",
+  "date": "2026-11-04",
+  "audit_baseline": "a5bb79c0474f63b9022155561486facd68b29a04",
+  "status": "Failed window localization; wiring repairs and bounded experiment delivered; no extension",
+  "input_package": {
+    "path": "Data/handoff/1104/RinkSpace_a5bb79c_Audit_Integration_20261104.zip",
+    "sha256": "a9e2e2c9636ee53243fef33ca2146c9fb4de0976df1a5edcf04cedcec850e523"
+  },
+  "code_fixes": {
+    "root_rigid_structural_stagnation": "Applied supplied patch; rigid global P/Q with fixed shared shape retains diagnostics without internal-geometry stagnation stop.",
+    "cross_stage_quality": "Immutable original_A, stage_seed, stage_best, delivery_candidate and grouped source metrics. Stage guard is not cross-stage accuracy acceptance.",
+    "source_support_export": "One shared export mapper; exact PTS, explicit source, single-foot mode/confidence. 4/4/3 restored in read-only memory checks, no old snapshot migration.",
+    "legacy_ice_reports": "Historical dense_gate/physical_failure scoped legacy-only; current finite ice diagnostics are not strict feasibility/delivery gates.",
+    "joint_pose_guard": "Mixed actual-root-acceleration prior is kept in objective but excluded from pose-quality percentage gate after diagnosed first run; first rejected state retained."
+  },
+  "source": {
+    "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+    "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+    "shot_id": "s05",
+    "time_base": [
+      1,
+      12800
+    ],
+    "source_pixel_domain": "native Brown 1920x1080",
+    "original_context_seconds": [
+      87.5,
+      92.5
+    ],
+    "original_core_seconds": [
+      88,
+      92
+    ],
+    "context_exposures": 251,
+    "core_exposures": 201,
+    "review_pts": [
+      1133568,
+      1159168,
+      1170944
+    ],
+    "coverage": {
+      "fit_boot_marker_region": {
+        "context_rows": 22,
+        "context_exposures": 8,
+        "core_rows": 13,
+        "core_exposures": 5,
+        "model_foot": 1
+      },
+      "fit_support_contact_region": {
+        "context_rows": 8,
+        "context_exposures": 8,
+        "core_rows": 5,
+        "core_exposures": 5,
+        "model_foot": 1
+      },
+      "review_boot_marker_region": {
+        "context_rows": 9,
+        "context_exposures": 3,
+        "core_rows": 9,
+        "core_exposures": 3,
+        "model_foot": 1
+      },
+      "review_support_contact_region": {
+        "context_rows": 3,
+        "context_exposures": 3,
+        "core_rows": 3,
+        "core_exposures": 3,
+        "model_foot": 1
+      }
+    },
+    "blade_fit_rows": 0,
+    "blade_unknown_reason": "All selected steel edges blend with shadow/reflection or are end-on; no precise blade curve admitted.",
+    "association": "Fixed support_track -> model foot1 using only fit-frame appearance/projections; anatomical right remains medium-confidence source inference."
+  },
+  "profile": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\profile.json",
+    "residual_jacobian_seconds": 6.188444299999901,
+    "total_profile_seconds": 12.506931399999758,
+    "directional_check": {
+      "relative_norm": 2.563315135495865e-09,
+      "support_relative_norm": 1.8229591064741735e-09,
+      "support_max_abs": 2.4611170879040856e-09,
+      "mixed_root_XYZ_SO3_support_hip_knee_ankle": true,
+      "support_nonzero_jacobian_nnz": 2520
+    },
+    "directional_block_effects": {
+      "world_X": {
+        "body_pixels": {
+          "jacobian_norm_per_solver_m": 167.27814583137368,
+          "cost_directional_derivative_per_solver_m": -140.11741644120076
+        },
+        "support_image": {
+          "jacobian_norm_per_solver_m": 8.459652753052696,
+          "cost_directional_derivative_per_solver_m": 7.129547435272699
+        },
+        "ice_soft": {
+          "jacobian_norm_per_solver_m": 0.0,
+          "cost_directional_derivative_per_solver_m": 0.0
+        }
+      },
+      "world_Y": {
+        "body_pixels": {
+          "jacobian_norm_per_solver_m": 845.0707343190571,
+          "cost_directional_derivative_per_solver_m": 649.1349874748815
+        },
+        "support_image": {
+          "jacobian_norm_per_solver_m": 40.913739019946284,
+          "cost_directional_derivative_per_solver_m": 30.03370046907751
+        },
+        "ice_soft": {
+          "jacobian_norm_per_solver_m": 0.0,
+          "cost_directional_derivative_per_solver_m": 0.0
+        }
+      },
+      "world_normal": {
+        "body_pixels": {
+          "jacobian_norm_per_solver_m": 877.6014261869517,
+          "cost_directional_derivative_per_solver_m": 5858.389661455228
+        },
+        "support_image": {
+          "jacobian_norm_per_solver_m": 64.67345132989905,
+          "cost_directional_derivative_per_solver_m": 187.469301224541
+        },
+        "ice_soft": {
+          "jacobian_norm_per_solver_m": 4.330944805941242,
+          "cost_directional_derivative_per_solver_m": 2.078853761160713
+        }
+      },
+      "camera_line_of_sight": {
+        "body_pixels": {
+          "jacobian_norm_per_solver_m": 18.709219609519096,
+          "cost_directional_derivative_per_solver_m": -154.5620271414484
+        },
+        "support_image": {
+          "jacobian_norm_per_solver_m": 2.8757361752551542,
+          "cost_directional_derivative_per_solver_m": 8.23143773763905
+        },
+        "ice_soft": {
+          "jacobian_norm_per_solver_m": 0.10516978404665499,
+          "cost_directional_derivative_per_solver_m": -0.05048150251786304
+        }
+      }
+    },
+    "preferred_seed": "original_A"
+  },
+  "runs": [
+    {
+      "name": "original_A_initializer",
+      "actual_accepted_steps": 3,
+      "retained_step": 2,
+      "stop": [
+        {
+          "code": "pose_cost_increase",
+          "category": "quality",
+          "message": "Raw pose cost degraded relative to the initial state.",
+          "baseline": 830.671337662144,
+          "latest": 1011.0698958409315,
+          "relative_increase": 0.21717200293259717,
+          "limit": 0.1
+        }
+      ],
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\original_A\\fitted\\result.npz"
+    },
+    {
+      "name": "stage1_retained_initializer",
+      "actual_accepted_steps": 10,
+      "retained_step": 10,
+      "stop": [
+        {
+          "code": "violation_stagnation",
+          "category": "stagnation",
+          "message": "Best physical violation did not improve enough over accepted steps.",
+          "accepted_window": 4,
+          "improvement_m": 2.757952557600656e-05,
+          "required_improvement_m": 0.0001,
+          "best_violation_m": 0.002051049469029241
+        }
+      ],
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\stage1_retained\\fitted\\result.npz"
+    }
+  ],
+  "budget": {
+    "max_wall_seconds": 600,
+    "max_initializations": 2,
+    "actual_initializations": 2,
+    "numerically_accepted_steps_total": 13,
+    "retained_update_steps_in_final_chain": 12,
+    "measured_profile_plus_solve_export_seconds": 136.11523009999974,
+    "conservative_wall_upper_seconds_including_between_run_gap": 386.9769250999998,
+    "no_automatic_retry": true
+  },
+  "grouped_image_comparison": {
+    "original_A": {
+      "body": {
+        "count": 3315,
+        "exposures": 196,
+        "median_px": 31.791817789018637,
+        "p95_px": 120.34925527171588,
+        "worst_px": 265.6341452334228,
+        "worst_pts": 1134592
+      },
+      "body_foot_0": {
+        "count": 588,
+        "exposures": 196,
+        "median_px": 52.32347604789745,
+        "p95_px": 181.7197346836298,
+        "worst_px": 252.94527941141524,
+        "worst_pts": 1135360
+      },
+      "body_foot_1": {
+        "count": 588,
+        "exposures": 196,
+        "median_px": 27.423971466489093,
+        "p95_px": 45.248654022896254,
+        "worst_px": 88.06253254707869,
+        "worst_pts": 1127936
+      },
+      "fit_boot_foot_0": {
+        "count": 0,
+        "median_px": null,
+        "p95_px": null,
+        "worst_px": null,
+        "worst_pts": null,
+        "centre_distance_px": {
+          "count": 0,
+          "median_px": null,
+          "p95_px": null,
+          "worst_px": null,
+          "worst_pts": null
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "fit_boot_foot_1": {
+        "count": 13,
+        "exposures": 5,
+        "median_px": 7.357896360073339,
+        "p95_px": 24.032440284334513,
+        "worst_px": 25.97279691602841,
+        "worst_pts": 1151744,
+        "centre_distance_px": {
+          "count": 13,
+          "exposures": 5,
+          "median_px": 37.476707810228774,
+          "p95_px": 50.57575544672234,
+          "worst_px": 55.31575833076316,
+          "worst_pts": 1151744
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "fit_support_region_foot_0": {
+        "count": 0,
+        "median_px": null,
+        "p95_px": null,
+        "worst_px": null,
+        "worst_pts": null,
+        "centre_distance_px": {
+          "count": 0,
+          "median_px": null,
+          "p95_px": null,
+          "worst_px": null,
+          "worst_pts": null
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "fit_support_region_foot_1": {
+        "count": 5,
+        "exposures": 5,
+        "median_px": 14.837080430222734,
+        "p95_px": 47.47910072502478,
+        "worst_px": 52.770981317281496,
+        "worst_pts": 1151744,
+        "centre_distance_px": {
+          "count": 5,
+          "exposures": 5,
+          "median_px": 28.50450403729963,
+          "p95_px": 61.32219700853412,
+          "worst_px": 66.95878317824709,
+          "worst_pts": 1151744
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "review_boot_foot_0": {
+        "count": 0,
+        "median_px": null,
+        "p95_px": null,
+        "worst_px": null,
+        "worst_pts": null,
+        "centre_distance_px": {
+          "count": 0,
+          "median_px": null,
+          "p95_px": null,
+          "worst_px": null,
+          "worst_pts": null
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "review_boot_foot_1": {
+        "count": 9,
+        "exposures": 3,
+        "median_px": 14.292176309660958,
+        "p95_px": 46.43079835353867,
+        "worst_px": 60.44104141417999,
+        "worst_pts": 1170944,
+        "centre_distance_px": {
+          "count": 9,
+          "exposures": 3,
+          "median_px": 42.1469291113344,
+          "p95_px": 72.28349195345628,
+          "worst_px": 81.65424484977642,
+          "worst_pts": 1170944
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "review_support_region_foot_0": {
+        "count": 0,
+        "median_px": null,
+        "p95_px": null,
+        "worst_px": null,
+        "worst_pts": null,
+        "centre_distance_px": {
+          "count": 0,
+          "median_px": null,
+          "p95_px": null,
+          "worst_px": null,
+          "worst_pts": null
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "review_support_region_foot_1": {
+        "count": 3,
+        "exposures": 3,
+        "median_px": 29.72789654635033,
+        "p95_px": 43.76174788269202,
+        "worst_px": 45.321064697841095,
+        "worst_pts": 1170944,
+        "centre_distance_px": {
+          "count": 3,
+          "exposures": 3,
+          "median_px": 42.82006069014035,
+          "p95_px": 59.66883851743249,
+          "worst_px": 61.54092494268718,
+          "worst_pts": 1170944
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "blade": {
+        "count": 0,
+        "reason": "All selected steel edges blend with shadow/reflection or are end-on; no precise blade curve admitted."
+      }
+    },
+    "old_root": {
+      "body": {
+        "count": 3315,
+        "exposures": 196,
+        "median_px": 49.022742202144016,
+        "p95_px": 142.01809568611017,
+        "worst_px": 262.62235321348356,
+        "worst_pts": 1126656
+      },
+      "body_foot_0": {
+        "count": 588,
+        "exposures": 196,
+        "median_px": 61.64763053020282,
+        "p95_px": 185.11349123538963,
+        "worst_px": 262.4934367311339,
+        "worst_pts": 1135360
+      },
+      "body_foot_1": {
+        "count": 588,
+        "exposures": 196,
+        "median_px": 15.939123875821577,
+        "p95_px": 35.21299495641379,
+        "worst_px": 58.66987018516707,
+        "worst_pts": 1127936
+      },
+      "fit_boot_foot_0": {
+        "count": 0,
+        "median_px": null,
+        "p95_px": null,
+        "worst_px": null,
+        "worst_pts": null,
+        "centre_distance_px": {
+          "count": 0,
+          "median_px": null,
+          "p95_px": null,
+          "worst_px": null,
+          "worst_pts": null
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "fit_boot_foot_1": {
+        "count": 13,
+        "exposures": 5,
+        "median_px": 12.750707621544771,
+        "p95_px": 41.6237419501708,
+        "worst_px": 43.469541899267796,
+        "worst_pts": 1146368,
+        "centre_distance_px": {
+          "count": 13,
+          "exposures": 5,
+          "median_px": 47.11274433210588,
+          "p95_px": 65.47857868938723,
+          "worst_px": 67.06735846663565,
+          "worst_pts": 1138432
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "fit_support_region_foot_0": {
+        "count": 0,
+        "median_px": null,
+        "p95_px": null,
+        "worst_px": null,
+        "worst_pts": null,
+        "centre_distance_px": {
+          "count": 0,
+          "median_px": null,
+          "p95_px": null,
+          "worst_px": null,
+          "worst_pts": null
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "fit_support_region_foot_1": {
+        "count": 5,
+        "exposures": 5,
+        "median_px": 38.16422814551453,
+        "p95_px": 46.68047510812724,
+        "worst_px": 48.04279812717233,
+        "worst_pts": 1151744,
+        "centre_distance_px": {
+          "count": 5,
+          "exposures": 5,
+          "median_px": 54.38578702455657,
+          "p95_px": 61.94579716942492,
+          "worst_px": 63.465583063860336,
+          "worst_pts": 1151744
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "review_boot_foot_0": {
+        "count": 0,
+        "median_px": null,
+        "p95_px": null,
+        "worst_px": null,
+        "worst_pts": null,
+        "centre_distance_px": {
+          "count": 0,
+          "median_px": null,
+          "p95_px": null,
+          "worst_px": null,
+          "worst_pts": null
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "review_boot_foot_1": {
+        "count": 9,
+        "exposures": 3,
+        "median_px": 10.242958679700044,
+        "p95_px": 46.49363266974415,
+        "worst_px": 49.16064349944515,
+        "worst_pts": 1170944,
+        "centre_distance_px": {
+          "count": 9,
+          "exposures": 3,
+          "median_px": 45.029718820992365,
+          "p95_px": 68.7632793357074,
+          "worst_px": 70.37384693504158,
+          "worst_pts": 1170944
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "review_support_region_foot_0": {
+        "count": 0,
+        "median_px": null,
+        "p95_px": null,
+        "worst_px": null,
+        "worst_pts": null,
+        "centre_distance_px": {
+          "count": 0,
+          "median_px": null,
+          "p95_px": null,
+          "worst_px": null,
+          "worst_pts": null
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "review_support_region_foot_1": {
+        "count": 3,
+        "exposures": 3,
+        "median_px": 43.235374121873406,
+        "p95_px": 43.761242310818794,
+        "worst_px": 43.819672109590506,
+        "worst_pts": 1133568,
+        "centre_distance_px": {
+          "count": 3,
+          "exposures": 3,
+          "median_px": 62.29154141892238,
+          "p95_px": 63.212574616202076,
+          "worst_px": 63.31491163812204,
+          "worst_pts": 1133568
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "blade": {
+        "count": 0,
+        "reason": "All selected steel edges blend with shadow/reflection or are end-on; no precise blade curve admitted."
+      }
+    },
+    "new": {
+      "body": {
+        "count": 3315,
+        "exposures": 196,
+        "median_px": 27.499642275017415,
+        "p95_px": 117.52155217824217,
+        "worst_px": 246.41020237267537,
+        "worst_pts": 1161984
+      },
+      "body_foot_0": {
+        "count": 588,
+        "exposures": 196,
+        "median_px": 53.86466900384862,
+        "p95_px": 179.33187455842108,
+        "worst_px": 245.14231503079802,
+        "worst_pts": 1152512
+      },
+      "body_foot_1": {
+        "count": 588,
+        "exposures": 196,
+        "median_px": 20.843511783744958,
+        "p95_px": 36.51640357744964,
+        "worst_px": 52.02219780227633,
+        "worst_pts": 1127936
+      },
+      "fit_boot_foot_0": {
+        "count": 0,
+        "median_px": null,
+        "p95_px": null,
+        "worst_px": null,
+        "worst_pts": null,
+        "centre_distance_px": {
+          "count": 0,
+          "median_px": null,
+          "p95_px": null,
+          "worst_px": null,
+          "worst_pts": null
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "fit_boot_foot_1": {
+        "count": 13,
+        "exposures": 5,
+        "median_px": 0.0,
+        "p95_px": 20.890372514578253,
+        "worst_px": 21.37053969888735,
+        "worst_pts": 1177344,
+        "centre_distance_px": {
+          "count": 13,
+          "exposures": 5,
+          "median_px": 22.172437686590715,
+          "p95_px": 43.154820034560835,
+          "worst_px": 43.77044443078711,
+          "worst_pts": 1177344
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "fit_support_region_foot_0": {
+        "count": 0,
+        "median_px": null,
+        "p95_px": null,
+        "worst_px": null,
+        "worst_pts": null,
+        "centre_distance_px": {
+          "count": 0,
+          "median_px": null,
+          "p95_px": null,
+          "worst_px": null,
+          "worst_pts": null
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "fit_support_region_foot_1": {
+        "count": 5,
+        "exposures": 5,
+        "median_px": 6.004498058121837,
+        "p95_px": 15.715271959766037,
+        "worst_px": 17.228371322815182,
+        "worst_pts": 1177344,
+        "centre_distance_px": {
+          "count": 5,
+          "exposures": 5,
+          "median_px": 33.20071428998084,
+          "p95_px": 51.259613493300165,
+          "worst_px": 54.479372678642235,
+          "worst_pts": 1177344
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "review_boot_foot_0": {
+        "count": 0,
+        "median_px": null,
+        "p95_px": null,
+        "worst_px": null,
+        "worst_pts": null,
+        "centre_distance_px": {
+          "count": 0,
+          "median_px": null,
+          "p95_px": null,
+          "worst_px": null,
+          "worst_pts": null
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "review_boot_foot_1": {
+        "count": 9,
+        "exposures": 3,
+        "median_px": 4.526243064191276,
+        "p95_px": 53.34885384032993,
+        "worst_px": 54.70034507818951,
+        "worst_pts": 1159168,
+        "centre_distance_px": {
+          "count": 9,
+          "exposures": 3,
+          "median_px": 45.289137400691374,
+          "p95_px": 74.34343706675651,
+          "worst_px": 75.54918149850285,
+          "worst_pts": 1159168
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "review_support_region_foot_0": {
+        "count": 0,
+        "median_px": null,
+        "p95_px": null,
+        "worst_px": null,
+        "worst_pts": null,
+        "centre_distance_px": {
+          "count": 0,
+          "median_px": null,
+          "p95_px": null,
+          "worst_px": null,
+          "worst_pts": null
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "review_support_region_foot_1": {
+        "count": 3,
+        "exposures": 3,
+        "median_px": 30.992982581806118,
+        "p95_px": 36.531198948993875,
+        "worst_px": 37.14655632312585,
+        "worst_pts": 1133568,
+        "centre_distance_px": {
+          "count": 3,
+          "exposures": 3,
+          "median_px": 46.47090388651599,
+          "p95_px": 51.53576564231853,
+          "worst_px": 52.09852805962992,
+          "worst_pts": 1133568
+        },
+        "measurement": "outside finite source region; centre is not an exact observed material point"
+      },
+      "blade": {
+        "count": 0,
+        "reason": "All selected steel edges blend with shadow/reflection or are end-on; no precise blade curve admitted."
+      }
+    }
+  },
+  "runner_comparison": {
+    "original_A": {
+      "core_exposures": 201,
+      "runner_XY_span_m": [
+        1.8907441910226659,
+        0.4545028036436136
+      ],
+      "runner_XY_path_m": 20.160283670343176,
+      "runner_raw_reference_Z_range_m": [
+        0.09739282380625879,
+        0.1609626553684443
+      ],
+      "interpretation": "Exact continuous model runner minimum, not a fixed material point or actual-contact truth"
+    },
+    "old_root": {
+      "core_exposures": 201,
+      "runner_XY_span_m": [
+        0.2953702986741886,
+        0.2250940813793436
+      ],
+      "runner_XY_path_m": 4.6794982354173555,
+      "runner_raw_reference_Z_range_m": [
+        0.0037825547565609463,
+        0.025287337998011927
+      ],
+      "interpretation": "Exact continuous model runner minimum, not a fixed material point or actual-contact truth"
+    },
+    "support_new": {
+      "core_exposures": 201,
+      "runner_XY_span_m": [
+        1.964008055742017,
+        0.7311955693406968
+      ],
+      "runner_XY_path_m": 21.369811665238622,
+      "runner_raw_reference_Z_range_m": [
+        0.042532652829844295,
+        0.19050650323486668
+      ],
+      "interpretation": "Exact continuous model runner minimum, not a fixed material point or actual-contact truth"
+    }
+  },
+  "current_ice": {
+    "policy": "ice_soft_1103.json unchanged",
+    "finite_objective": true,
+    "no_ice_AL": true,
+    "common_normalization_unchanged": true,
+    "raw_heights_not_actual_contact_truth": true,
+    "calibrated_in_complete_target": false
+  },
+  "parameters": [
+    {
+      "path": "events/ankara_2026/programmes/okada_mei_sp/spin_support_1104.npz",
+      "sha256": "c6f9ca9f9d6054d7f7552d6e28946a051457fd1383f229fc04743c4bb1c1531b",
+      "bytes": 43628,
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": []
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "float64",
+          "shape": [
+            2,
+            3,
+            3
+          ]
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "float64",
+          "shape": [
+            2,
+            3
+          ]
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": []
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": []
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": []
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": []
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1634",
+          "shape": []
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "int64",
+          "shape": []
+        },
+        {
+          "name": "base_layer_0_x",
+          "dtype": "float64",
+          "shape": [
+            3519
+          ]
+        },
+        {
+          "name": "base_layer_0_knots",
+          "dtype": "float64",
+          "shape": [
+            55
+          ]
+        },
+        {
+          "name": "base_layer_0_active",
+          "dtype": "int64",
+          "shape": [
+            69
+          ]
+        },
+        {
+          "name": "base_layer_0_seconds",
+          "dtype": "float64",
+          "shape": [
+            2
+          ]
+        },
+        {
+          "name": "base_layer_0_state_kind",
+          "dtype": "<U15",
+          "shape": []
+        },
+        {
+          "name": "x",
+          "dtype": "float64",
+          "shape": [
+            362
+          ]
+        },
+        {
+          "name": "knots",
+          "dtype": "float64",
+          "shape": [
+            27
+          ]
+        },
+        {
+          "name": "active",
+          "dtype": "int64",
+          "shape": [
+            15
+          ]
+        },
+        {
+          "name": "seconds",
+          "dtype": "float64",
+          "shape": [
+            2
+          ]
+        },
+        {
+          "name": "physics_times",
+          "dtype": "float64",
+          "shape": [
+            1505
+          ]
+        },
+        {
+          "name": "multiplier",
+          "dtype": "float64",
+          "shape": [
+            1008
+          ]
+        },
+        {
+          "name": "penalty",
+          "dtype": "float64",
+          "shape": []
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U22",
+          "shape": []
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "bool",
+          "shape": []
+        },
+        {
+          "name": "ice_mode",
+          "dtype": "<U21",
+          "shape": []
+        },
+        {
+          "name": "ice_is_delivery_gate",
+          "dtype": "bool",
+          "shape": []
+        },
+        {
+          "name": "al_row_scope",
+          "dtype": "<U27",
+          "shape": []
+        },
+        {
+          "name": "ice_soft_policy_json",
+          "dtype": "<U172",
+          "shape": []
+        },
+        {
+          "name": "source_region_sha256",
+          "dtype": "<U64",
+          "shape": []
+        },
+        {
+          "name": "initial_reference_kind",
+          "dtype": "<U10",
+          "shape": []
+        },
+        {
+          "name": "source_region_file",
+          "dtype": "<U65",
+          "shape": []
+        }
+      ]
+    },
+    {
+      "path": "events/ankara_2026/programmes/okada_mei_sp/spin_support_joint_1104.npz",
+      "sha256": "52a35437f75b756bd89ce132d729fedb753471d197177efa676d5f084b2d2d2e",
+      "bytes": 47536,
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": []
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "float64",
+          "shape": [
+            2,
+            3,
+            3
+          ]
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "float64",
+          "shape": [
+            2,
+            3
+          ]
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": []
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": []
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": []
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": []
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1634",
+          "shape": []
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "int64",
+          "shape": []
+        },
+        {
+          "name": "base_layer_0_x",
+          "dtype": "float64",
+          "shape": [
+            3519
+          ]
+        },
+        {
+          "name": "base_layer_0_knots",
+          "dtype": "float64",
+          "shape": [
+            55
+          ]
+        },
+        {
+          "name": "base_layer_0_active",
+          "dtype": "int64",
+          "shape": [
+            69
+          ]
+        },
+        {
+          "name": "base_layer_0_seconds",
+          "dtype": "float64",
+          "shape": [
+            2
+          ]
+        },
+        {
+          "name": "base_layer_0_state_kind",
+          "dtype": "<U15",
+          "shape": []
+        },
+        {
+          "name": "base_layer_1_x",
+          "dtype": "float64",
+          "shape": [
+            345
+          ]
+        },
+        {
+          "name": "base_layer_1_knots",
+          "dtype": "float64",
+          "shape": [
+            27
+          ]
+        },
+        {
+          "name": "base_layer_1_active",
+          "dtype": "int64",
+          "shape": [
+            15
+          ]
+        },
+        {
+          "name": "base_layer_1_seconds",
+          "dtype": "float64",
+          "shape": [
+            2
+          ]
+        },
+        {
+          "name": "base_layer_1_state_kind",
+          "dtype": "<U22",
+          "shape": []
+        },
+        {
+          "name": "x",
+          "dtype": "float64",
+          "shape": [
+            362
+          ]
+        },
+        {
+          "name": "knots",
+          "dtype": "float64",
+          "shape": [
+            27
+          ]
+        },
+        {
+          "name": "active",
+          "dtype": "int64",
+          "shape": [
+            15
+          ]
+        },
+        {
+          "name": "seconds",
+          "dtype": "float64",
+          "shape": [
+            2
+          ]
+        },
+        {
+          "name": "physics_times",
+          "dtype": "float64",
+          "shape": [
+            1505
+          ]
+        },
+        {
+          "name": "multiplier",
+          "dtype": "float64",
+          "shape": [
+            1008
+          ]
+        },
+        {
+          "name": "penalty",
+          "dtype": "float64",
+          "shape": []
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U22",
+          "shape": []
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "bool",
+          "shape": []
+        },
+        {
+          "name": "ice_mode",
+          "dtype": "<U21",
+          "shape": []
+        },
+        {
+          "name": "ice_is_delivery_gate",
+          "dtype": "bool",
+          "shape": []
+        },
+        {
+          "name": "al_row_scope",
+          "dtype": "<U27",
+          "shape": []
+        },
+        {
+          "name": "ice_soft_policy_json",
+          "dtype": "<U172",
+          "shape": []
+        },
+        {
+          "name": "source_region_sha256",
+          "dtype": "<U64",
+          "shape": []
+        },
+        {
+          "name": "initial_reference_kind",
+          "dtype": "<U15",
+          "shape": []
+        },
+        {
+          "name": "source_region_file",
+          "dtype": "<U65",
+          "shape": []
+        }
+      ]
+    }
+  ],
+  "code_and_pts_replay": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\parameter_replay_1104.json",
+  "player_headless_checks": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\player_checks.json",
+  "visualization": {
+    "config": "viewer3d_spin_support_1104.json",
+    "launch": "START_3D_SUPPORT.cmd",
+    "source_comparison_video": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_A_root_new_88_92.mp4",
+    "video_source_seconds": [
+      88,
+      92
+    ],
+    "runner_figure": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\runner_source_comparison.svg",
+    "gui_opened": false,
+    "actual_OpenGL_continuous_playback_verified": false
+  },
+  "preserved": {
+    "immutable_baseline_files": 15,
+    "baseline_hashes_unchanged": true,
+    "outside_context": {
+      "P_world_mid": 0.0,
+      "Q_world_mid": 0.0,
+      "local_R_mid": 0.0
+    },
+    "all_old_candidates_retained": true,
+    "main_S01_default_changed": false
+  },
+  "unresolved": [
+    "World runner XY range/path did not improve; image-region training gains are not localization acceptance.",
+    "Review support-region median worsened; review boot P95 worsened.",
+    "Model raw reference heights remain high/variable; no actual-contact truth claim.",
+    "Source contact regions are weak and sparse, precise blade curves unavailable; foot0 shoe observations absent.",
+    "Known GVHMR orientation anomalies outside the core remain unchanged.",
+    "No full-spin/jump/step extension or multi-model inference.",
+    "No actual GUI/OpenGL playback certification."
+  ],
+  "no_commit_or_push": true
+}

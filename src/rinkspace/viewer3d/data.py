@@ -48,6 +48,24 @@ def _text_scalar(value,label):
     return value
 
 
+def source_support_state(saved,n):
+    """Copy distinct saved source labels/masks, without deriving contact."""
+    out={}
+    for target in ('source_action_phase','source_support_mode','source_support_confidence','support_image_in_optimization'):
+        key=target+'_mid' if target+'_mid' in saved else target
+        if key not in saved:continue
+        values=np.asarray(saved[key])
+        shapes=((n,),(n,2)) if target in ('source_action_phase','support_image_in_optimization') else ((n,2),)
+        if values.shape not in shapes:raise ValueError('Invalid '+key)
+        if target=='support_image_in_optimization':
+            if values.dtype.kind!='b':raise ValueError('Invalid '+key)
+        elif target=='source_support_confidence':
+            if values.dtype.kind not in 'fiu' or not np.isfinite(values).all() or np.any((values<0)|(values>1)):raise ValueError('Invalid '+key)
+        elif values.dtype.kind!='U':raise ValueError('Invalid '+key)
+        out[target]=values.copy()
+    return out
+
+
 def skate_state(saved,n,ratio):
     """Read the versioned, already attached skate without another transform.
 
@@ -172,7 +190,13 @@ class ResultCatalog:
         self.packet=load_npz(self.root/'input.npz')
         self.pts=self.packet['pts'].astype(np.int64)
         if len(self.pts)<2 or np.any(np.diff(self.pts)<=0):raise ValueError('Source exposures must be ordered and unique')
-        self.time_base=(1,12800);self.seconds=self.pts/12800.
+        tb=np.asarray(self.packet.get('time_base',[1,12800]))
+        if tb.shape!=(2,) or tb.dtype.kind not in 'iu' or np.any(tb<=0):raise ValueError('Invalid native source time base')
+        self.time_base=tuple(map(int,tb));self.seconds=self.pts*(self.time_base[0]/self.time_base[1])
+        for name in ('source_video','support_observations','support_world_regions'):
+            value=self.config.get(name)
+            path=Path(value) if value else None
+            setattr(self,name,((self.project/path).resolve() if not path.is_absolute() else path) if path else None)
         self.variants=self.config['variants']
         # The source pose packet and a comparison scene can use different units.
         # scene_root is relative to Data; metric_binding uses its declared base.
@@ -217,7 +241,7 @@ class ResultCatalog:
         from io import BytesIO
         # Generic action clips bind their warning array to the same explicit
         # input PTS. Preserve the supplied warning flags without certifying identity.
-        if self.config.get('source_identity_field'):
+        if getattr(self,'config',{}).get('source_identity_field'):
             key=self.config['source_identity_field']
             if key not in self.packet:raise ValueError('Configured source identity field is absent')
             flags=np.asarray(self.packet[key])

@@ -4,6 +4,31 @@
 
 第一次默认停在原片 **36.020 秒**，以后记住退出时的帧、结果版本和观察角度。窗口左边的下拉框可切换已保存的 S01 人体结果，切换时保持帧号和视角。
 
+## 2026-11-04 GVHMR／ExMR旋转对照
+
+双击 [START_3D_SPIN_MODELS.cmd](../START_3D_SPIN_MODELS.cmd)。完整源76–95秒，951个曝光；四项为固定GVHMR共同初值、GVHMR联合1步、ExMR足细化前未优化初值、足细化后结构unknown初值。默认选足细化前，不代表已验收。具体指标和失败见[审核索引](../events/ankara_2026/programmes/okada_mei_sp/spin_models_1104_audit.json)。
+
+比较使用同一观察相机，不逐模型重对齐或平移。原片按PTS读取，自由3D与脚下俯视／侧视保留同帧；脚视区包含所有被比较版本的选定足，避免因裁切漏掉漂移。修复了原片纹理注册与窄窗口启动问题；真实NVIDIA无桌面窗口检查验证原片、切换、PTS和共同脚视区，未替用户打开窗口，也不认证姿态准确性。
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\START_3D_SPIN_MODELS.ps1 -Check
+```
+
+本地视频 `Data/runs/body_s01_20261029/exmr_spin_compare_1104/native_protocol/source_GVHMR_ExMR_76_95.mp4` 为原片76–95秒、951个50Hz曝光，供PotPlayer；只画人体点投影，不能替代鞋刀与接冰验收。模型、显示缓存及原片像素均留Data。
+
+## 2026-11-04 源支撑旋转小窗对照
+
+双击 [START_3D_SUPPORT.cmd](../START_3D_SUPPORT.cmd)，进入原片87.5–92.5秒上下文，核心为88–92秒。四项是原A、旧root、首轮保留2步、最终联合候选；当前结果仍失败，不能据图像局部改善认定世界轨迹正确。分项与失败见[本轮索引](../events/ankara_2026/programmes/okada_mei_sp/spin_support_1104_audit.json)。
+
+播放器右侧按整数PTS精确读取本地原片、显示当前fit/review区域及放大；左侧源phase/source support/unknown与是否实际入优化独立显示。原片区域只在真实观测PTS出现，未密集传播。自由3D、脚下俯视／侧视和版本切换都保留当前PTS；P/G、双鞋、精确runner和同源条件世界区域分别显示。区域的Z=0足迹以冻结相机/名义平面为条件，不作额外因子或真值，不修改保存状态。
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\START_3D_SUPPORT.ps1 -Fresh
+powershell -NoProfile -ExecutionPolicy Bypass -File .\START_3D_SUPPORT.ps1 -Check
+```
+
+本机视频 `Data/runs/body_s01_20261029/support_spin_1104/source_A_root_new_88_92.mp4` 按原片88.00–92.00秒201个50Hz曝光比较三项，供PotPlayer。4份251帧缓存、逐帧源时间、版本／脚视图切换与源标签完成无窗口核对；未替用户打开GUI，实际OpenGL连续播放未认证。原S01和旧旋转入口仍各自保留。
+
 ## 2026-11-04 三段动作与根轨迹失败对照
 
 双击 [START_3D_INTEGRATION.cmd](../START_3D_INTEGRATION.cmd)，选择 S01、跳跃（原片44.98–52.00秒）、步法（25.00–35.00秒）或旋转（76.00–95.00秒）。S01保持 `skate_s01_1103` 为默认；三段默认显示 `A_root`，保留 `A`、`B`、`A_root`、`B_root` 四项，同源PTS切换。旋转 `B_root` 明确复用与B数值等价的A根修正，没有独立B根拟合。

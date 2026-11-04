@@ -12,6 +12,10 @@ S01 已接入可撤销观测关联、唯一全身状态、共享足鞋配准和�
 
 新的人体整合、三段 A/B 与根轨迹修正已保存供审阅，均未通过准确性验收；根轨迹仍异常，部分图像误差变差。[节目记录](events/ankara_2026/programmes/okada_mei_sp/README.md#人体整合与根轨迹对照2026-11-04未验收)与[机器可读索引](events/ankara_2026/programmes/okada_mei_sp/body_integration_1104.json)区分代码、实际结果和缺项。[START_3D_INTEGRATION.cmd](START_3D_INTEGRATION.cmd)选择 S01、跳跃、步法或旋转，保留现有 S01 默认对照。
 
+最新源支撑接线已在旋转88–92秒进行真实联合试验；局部图像改善，但世界runner漂移和review仍失败，未扩展。[独立播放器入口](START_3D_SUPPORT.cmd)提供原片同帧、原A／旧root／新候选、自由3D及脚下视角；[真实结果索引](events/ankara_2026/programmes/okada_mei_sp/spin_support_1104_audit.json)保留完整限制。
+
+最新 GVHMR／ExMR 对照覆盖旋转完整76–95秒；ExMR部分二维人体指标改善，但足细化后有12个鞋口截面unknown，全部候选仍有明显根漂移，未验收或替换S01。[审核索引](events/ankara_2026/programmes/okada_mei_sp/spin_models_1104_audit.json)保留来源、参数、支持间隙和失败；[播放器入口](START_3D_SPIN_MODELS.cmd)使用共同观察相机和同帧原片。
+
 ## 快速试用：合成数据
 
 使用 Python 3.11 或更新环境，在仓库根目录运行：

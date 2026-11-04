@@ -164,3 +164,29 @@ def test_dense_skate_inspection_camera_uses_saved_template_frame_and_never_moves
     np.testing.assert_allclose(player.scene.camera.target,center)
     np.testing.assert_allclose(player.scene.camera.position,center+R[:,axis]*.95+[0.,0.,.16])
     np.testing.assert_array_equal(state['skate_lower'],lower)
+
+
+@pytest.mark.parametrize('width',[640,720,960,1280,1600])
+def test_source_and_control_panels_leave_a_useful_body_viewport(width):
+    sizes=FRAMING.comparison_panel_sizes(width,True)
+    assert width-sizes['left_inset']-sizes['right_inset']>=min(320,.4*width)-1e-9
+    assert sizes['control_width']>0 and sizes['source_width']>0
+    if width==1600:
+        assert sizes['control_width']==425 and sizes['source_width']==630
+    seq=sequence([0,0,0]);camera=Camera([0,-8,0],[0,0,1])
+    player=SimpleNamespace(scene=SimpleNamespace(camera=camera),window_size=(width,720))
+    FRAMING.fit_comparison_camera(player,{'model':seq},0,left_inset=sizes['left_inset'],right_inset=sizes['right_inset'])
+    assert FRAMING.comparison_frustum_bounds(player,seq,0,left_inset=sizes['left_inset'],right_inset=sizes['right_inset'])['all_body_and_gear_in_view_region']
+
+
+def test_support_comparison_keeps_separated_feet_visible_without_realigning_them():
+    sequences={'old':sequence([0,0,0]),'new':sequence([1.4,.25,.08])}
+    camera=Camera([0,-1.4,.08],[0,0,1]);player=SimpleNamespace(scene=SimpleNamespace(camera=camera),window_size=(960,720))
+    sizes=FRAMING.comparison_panel_sizes(960,True)
+    before={k:s.state['gear'].copy() for k,s in sequences.items()}
+    meta=FRAMING.fit_comparison_camera(player,sequences,0,support_foot=1,left_inset=sizes['left_inset'],right_inset=sizes['right_inset'])
+    assert meta['support_foot']==1
+    for name,seq in sequences.items():
+        bounds=FRAMING.comparison_frustum_bounds(player,seq,0,support_foot=1,left_inset=sizes['left_inset'],right_inset=sizes['right_inset'])
+        assert bounds['all_body_and_gear_in_view_region']
+        np.testing.assert_array_equal(before[name],seq.state['gear'])

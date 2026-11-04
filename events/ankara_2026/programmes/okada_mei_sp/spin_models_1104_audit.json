@@ -1,0 +1,1553 @@
+{
+  "schema": "rinkspace.spin-models-1104-audit.v1",
+  "date": "2026-11-04",
+  "audit_baseline": "a5bb79c0474f63b9022155561486facd68b29a04",
+  "status_zh": "保留满意S01；旋转世界轨迹仍失败。此索引公开已实现代码、真实结果和unknown，不作为准确性验收。",
+  "source": {
+    "video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+    "time_base": [
+      1,
+      12800
+    ],
+    "continuous_seconds": [
+      76,
+      95
+    ],
+    "diagnostic_core_seconds": [
+      88,
+      92
+    ],
+    "network_frames": 476,
+    "network_hz": 25,
+    "native_exposures": 951,
+    "native_hz": 50,
+    "first_last_pts": [
+      972800,
+      1216000
+    ],
+    "network_pts_step": 512,
+    "native_pts_step": 256
+  },
+  "comparison_protocol": {
+    "fixed_gvhmr_prior_sha256": "62168375ae4d3da0a274bbee96eaf959aac7b12a246d435621777dcdfc09c11d",
+    "exmr_commit": "eac72e47339b404c0443f5fb323412e2ce432410",
+    "inference": {
+      "exmr_commit": "eac72e47339b404c0443f5fb323412e2ce432410",
+      "checkpoint_sha256": "8d3947310c30444ec59dae4662574d7a32bf83af30320eeac87146529ff2fda5",
+      "smplx_sha256": "376021446ddc86e99acacd795182bbef903e61d33b76b9d8b359c2b0865bd992",
+      "frames": 476,
+      "source_pts": [
+        972800,
+        1216000
+      ],
+      "source_time_base": [
+        1,
+        12800
+      ],
+      "fps": 25,
+      "one_continuous_model_call_per_input": true,
+      "input_controls": [
+        "native23",
+        "shared17"
+      ],
+      "temporal_compatibility": "25Hz explicit real source sequence; model trained frame-index cadence is not recalibrated",
+      "world_branch_executed": false,
+      "postprocess": false,
+      "snap_to_ground": false,
+      "smooth_incam": false,
+      "smooth_global": false,
+      "orientation_normalization": false,
+      "primary_body_input": "released ExMR RTMW COCO23 with >5.5 binary visibility",
+      "control_body_input": "original GVHMR COCO17, extra6 RTMW anatomical foot points with binary visibility",
+      "extra6": "RTMW anatomical foot landmarks, not skate contacts",
+      "stage_checks": {
+        "native23": {
+          "root_translation_shape_unchanged_by_refiners": true,
+          "foot_refiner_changed_only_ankles": true,
+          "hand_refiner_changed_only_elbows_wrists_and_fingers": true,
+          "maximum_ankle_axis_angle_change_rad": 1.4529303312301636
+        },
+        "shared17": {
+          "root_translation_shape_unchanged_by_refiners": true,
+          "foot_refiner_changed_only_ankles": true,
+          "hand_refiner_changed_only_elbows_wrists_and_fingers": true,
+          "maximum_ankle_axis_angle_change_rad": 1.5149694681167603
+        }
+      },
+      "network_static_logits_contact_truth": false,
+      "peak_cuda_bytes": 435576320
+    },
+    "crop": "Same known source frames/person/camera. SAM uses raw detector bbox with native 1.25 padding; ExMR uses 192:256 aspect with native 1.2 padding. Earlier repeated-expanded GVHMR-bbox protocol retained as a failed input control.",
+    "projection": "Raw camera diagnostics use native Brown mid-exposure; common state uses the existing native exposure/rolling projection.",
+    "sam3db_body_native": "Retained MHR body-only decoder tensors and SAM features in Data; not represented as SMPL-X.",
+    "world_state": "Each network supplies its own P/Q/local reference. One continuous 76-95s body curve; fixed shared S01 shape, scale, shoe and camera. No inherited GVHMR body correction layer or per-model trajectory alignment.",
+    "ice": "Finite soft ice residual remains in the objective; no ice augmented-Lagrangian or millimetre delivery gate.",
+    "contact": "Only source-supported observations; network anatomical feet, external boot regions, steel material points and static logits retain distinct semantics.",
+    "cadence_caution": "existing SO(3)/continuous-state interpolation; not 50Hz neural inference"
+  },
+  "raw_camera_comparison": {
+    "scope": "raw camera-coordinate SMPL-X at the original 25Hz exposures, before any world solve",
+    "projection": "native Brown at midpoint; no rolling/exposure compensation in this diagnostic",
+    "source_time_base": [
+      1,
+      12800
+    ],
+    "comparators": {
+      "gvhmr": {
+        "prior": "Data\\runs\\body_s01_20261029\\action_integration_1103\\spin_s05\\prior\\camera_prior.npz",
+        "prior_sha256": "62168375ae4d3da0a274bbee96eaf959aac7b12a246d435621777dcdfc09c11d",
+        "core_body_groups": {
+          "body": {
+            "count": 1700,
+            "exposures": 100,
+            "median_px": 37.53588058180839,
+            "p95_px": 156.0718700090151,
+            "worst_px": 269.78084368540567,
+            "worst_pts": 1134592
+          },
+          "body_foot_0": {
+            "count": 300,
+            "exposures": 100,
+            "median_px": 47.6045005162532,
+            "p95_px": 203.84413994692164,
+            "worst_px": 244.25130393109075,
+            "worst_pts": 1135104
+          },
+          "body_foot_1": {
+            "count": 300,
+            "exposures": 100,
+            "median_px": 31.27566762582969,
+            "p95_px": 49.531836821378235,
+            "worst_px": 80.7878481588656,
+            "worst_pts": 1127936
+          }
+        },
+        "full_root_angle_step_max_deg": 165.27018563074864,
+        "core_root_angle_step_max_deg": 117.53229789134645,
+        "root_jump_source_seconds": [
+          78.12,
+          81.36,
+          81.4,
+          86.92,
+          88.08
+        ],
+        "raw_core_pelvis_xy_span_m": [
+          2.9277899882530747,
+          0.6876414680074276
+        ],
+        "raw_core_pelvis_xy_path_m": 52.02806361397446,
+        "model_native_shape": true,
+        "shared_shape_replacement": false,
+        "foot_or_shoe_contact_truth": false
+      },
+      "exmr_prefoot": {
+        "prior": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\exmr_prefoot.npz",
+        "prior_sha256": "6cc17ac82bc2f2ae7a34d384fbbbdb973c9795d554b4cba6c3e9136c62adb6f1",
+        "core_body_groups": {
+          "body": {
+            "count": 1700,
+            "exposures": 100,
+            "median_px": 29.62067962810476,
+            "p95_px": 104.26002494837537,
+            "worst_px": 266.33345120357455,
+            "worst_pts": 1135616
+          },
+          "body_foot_0": {
+            "count": 300,
+            "exposures": 100,
+            "median_px": 33.735527746268154,
+            "p95_px": 145.91435087131117,
+            "worst_px": 192.1410826999192,
+            "worst_pts": 1131008
+          },
+          "body_foot_1": {
+            "count": 300,
+            "exposures": 100,
+            "median_px": 21.68494620810261,
+            "p95_px": 36.33799237267071,
+            "worst_px": 45.58573020669584,
+            "worst_pts": 1166336
+          }
+        },
+        "full_root_angle_step_max_deg": 144.35331705913242,
+        "core_root_angle_step_max_deg": 55.44899909646385,
+        "root_jump_source_seconds": [
+          77.88,
+          78.0,
+          78.12
+        ],
+        "raw_core_pelvis_xy_span_m": [
+          3.58078892690461,
+          0.7400367057185413
+        ],
+        "raw_core_pelvis_xy_path_m": 56.77352846406869,
+        "model_native_shape": true,
+        "shared_shape_replacement": false,
+        "foot_or_shoe_contact_truth": false
+      },
+      "exmr_final": {
+        "prior": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\exmr_final.npz",
+        "prior_sha256": "3caafeea261d2c4e74b067769db426c885163935d620114868a4303fc6dfa000",
+        "core_body_groups": {
+          "body": {
+            "count": 1700,
+            "exposures": 100,
+            "median_px": 29.224432987645052,
+            "p95_px": 104.26002494837537,
+            "worst_px": 262.0166451248432,
+            "worst_pts": 1135616
+          },
+          "body_foot_0": {
+            "count": 300,
+            "exposures": 100,
+            "median_px": 33.735527746268154,
+            "p95_px": 145.91435087131117,
+            "worst_px": 192.1410826999192,
+            "worst_pts": 1131008
+          },
+          "body_foot_1": {
+            "count": 300,
+            "exposures": 100,
+            "median_px": 21.68494620810261,
+            "p95_px": 36.33799237267071,
+            "worst_px": 45.58573020669584,
+            "worst_pts": 1166336
+          }
+        },
+        "full_root_angle_step_max_deg": 144.35331705913242,
+        "core_root_angle_step_max_deg": 55.44899909646385,
+        "root_jump_source_seconds": [
+          77.88,
+          78.0,
+          78.12
+        ],
+        "raw_core_pelvis_xy_span_m": [
+          3.58078892690461,
+          0.7400367057185413
+        ],
+        "raw_core_pelvis_xy_path_m": 56.77352846406869,
+        "model_native_shape": true,
+        "shared_shape_replacement": false,
+        "foot_or_shoe_contact_truth": false
+      },
+      "exmr_shared17_final": {
+        "prior": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\exmr_shared17_final.npz",
+        "prior_sha256": "a13cc5d96c4e10ee073eb2b03d2bf73317c8d298cfc2ec14cd53f2e004bab4e7",
+        "core_body_groups": {
+          "body": {
+            "count": 1700,
+            "exposures": 100,
+            "median_px": 29.06264360046577,
+            "p95_px": 93.83688653653208,
+            "worst_px": 250.159207894082,
+            "worst_pts": 1135616
+          },
+          "body_foot_0": {
+            "count": 300,
+            "exposures": 100,
+            "median_px": 33.06695772678712,
+            "p95_px": 146.8926121597283,
+            "worst_px": 189.91014490172208,
+            "worst_pts": 1147904
+          },
+          "body_foot_1": {
+            "count": 300,
+            "exposures": 100,
+            "median_px": 22.02839835483517,
+            "p95_px": 36.09680204183504,
+            "worst_px": 46.52146791417584,
+            "worst_pts": 1135104
+          }
+        },
+        "full_root_angle_step_max_deg": 119.88001770264958,
+        "core_root_angle_step_max_deg": 57.36785150210177,
+        "root_jump_source_seconds": [
+          78.0
+        ],
+        "raw_core_pelvis_xy_span_m": [
+          3.517087297265938,
+          0.7270915305476429
+        ],
+        "raw_core_pelvis_xy_path_m": 57.05466038956361,
+        "model_native_shape": true,
+        "shared_shape_replacement": false,
+        "foot_or_shoe_contact_truth": false
+      }
+    },
+    "raw_network_is_truth": false
+  },
+  "common_state_comparison": {
+    "schema": "rinkspace.spin-model-delivery.v1",
+    "source_time_base": [
+      1,
+      12800
+    ],
+    "whole_continuous_seconds": [
+      76,
+      95
+    ],
+    "diagnostic_core_seconds": [
+      88,
+      92
+    ],
+    "cases": {
+      "gvhmr_fixed": {
+        "result": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\common\\gvhmr\\initial\\fitted\\result.npz",
+        "result_sha256": "33c794fee80c5f9ff47b85a12b8ded9f06f809460c27e7f85fb1590922141bc6",
+        "stage": "fixed_common_initial",
+        "source_frames": 951,
+        "source_first_last_pts": [
+          972800,
+          1216000
+        ],
+        "accepted_steps": 0,
+        "retained_step": null,
+        "core_body_groups": {
+          "body": {
+            "count": 3315,
+            "exposures": 196,
+            "median_px": 33.8976403026516,
+            "p95_px": 140.42510006566508,
+            "worst_px": 276.6406663399788,
+            "worst_pts": 1134592
+          },
+          "body_foot_0": {
+            "count": 588,
+            "exposures": 196,
+            "median_px": 56.11073074916025,
+            "p95_px": 209.33345279607104,
+            "worst_px": 273.5278148057491,
+            "worst_pts": 1135360
+          },
+          "body_foot_1": {
+            "count": 588,
+            "exposures": 196,
+            "median_px": 29.01766893847709,
+            "p95_px": 45.9905192067193,
+            "worst_px": 96.50849429097994,
+            "worst_pts": 1127936
+          }
+        },
+        "core_pelvis_projection_G_equals_Pxy": {
+          "xy_span_m": [
+            1.7473117575965738,
+            0.46620652477170754
+          ],
+          "xy_path_m": 18.4050966178223
+        },
+        "core_fixed_steel_material_reference_xy": {
+          "xy_span_m": [
+            1.7073547084474274,
+            0.5474702585941547
+          ],
+          "xy_path_m": 18.551686825167767
+        },
+        "raw_nominal_plane_penetration_depth_max_m": 0.3758017287805877,
+        "model_foot_cavity_breach_max_m": 0.0032917128759148142,
+        "structural_constraint_max_m": null,
+        "source_supported_raw_gaps": [
+          {
+            "source_pts": 977920,
+            "source_seconds": 76.4,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.0044132723436403135,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1029120,
+            "source_seconds": 80.4,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.07127035560205813,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1080320,
+            "source_seconds": 84.4,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.034136683313155634,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1121792,
+            "source_seconds": 87.64,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.16973210066910316,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1125888,
+            "source_seconds": 87.96,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.11490129929176558,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1138432,
+            "source_seconds": 88.94,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.1565062835843591,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1146368,
+            "source_seconds": 89.56,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.1504272870239062,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1151744,
+            "source_seconds": 89.98,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.10637219009483274,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1164544,
+            "source_seconds": 90.98,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.15422488368198145,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1177344,
+            "source_seconds": 91.98,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.10033566400797604,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1183488,
+            "source_seconds": 92.46,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.07576215376339378,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          }
+        ],
+        "unknown_contact_foot_frames": 1891,
+        "ice_is_delivery_gate": false,
+        "user_accepted": false
+      },
+      "exmr_prefoot": {
+        "result": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\common\\exmr_prefoot\\initial\\fitted\\result.npz",
+        "result_sha256": "5996e72df97ddaf30c04005ab57529675faf7ac46387744de1bde80706330c32",
+        "stage": "diagnostic_unoptimized",
+        "source_frames": 951,
+        "source_first_last_pts": [
+          972800,
+          1216000
+        ],
+        "accepted_steps": 0,
+        "retained_step": null,
+        "core_body_groups": {
+          "body": {
+            "count": 3315,
+            "exposures": 196,
+            "median_px": 26.063625597094294,
+            "p95_px": 91.835440806584,
+            "worst_px": 244.7744278464238,
+            "worst_pts": 1161472
+          },
+          "body_foot_0": {
+            "count": 588,
+            "exposures": 196,
+            "median_px": 36.48290676045797,
+            "p95_px": 151.17799904381417,
+            "worst_px": 189.911865703646,
+            "worst_pts": 1147904
+          },
+          "body_foot_1": {
+            "count": 588,
+            "exposures": 196,
+            "median_px": 19.572561687879613,
+            "p95_px": 39.79896301316006,
+            "worst_px": 57.6700747259411,
+            "worst_pts": 1148416
+          }
+        },
+        "core_pelvis_projection_G_equals_Pxy": {
+          "xy_span_m": [
+            1.4109451229479877,
+            0.3188105355184545
+          ],
+          "xy_path_m": 12.763235162066923
+        },
+        "core_fixed_steel_material_reference_xy": {
+          "xy_span_m": [
+            1.4688918616187845,
+            0.5522464012711792
+          ],
+          "xy_path_m": 14.522085994494278
+        },
+        "raw_nominal_plane_penetration_depth_max_m": 0.24620624815905334,
+        "model_foot_cavity_breach_max_m": 0.005440236892985775,
+        "structural_constraint_max_m": null,
+        "source_supported_raw_gaps": [
+          {
+            "source_pts": 977920,
+            "source_seconds": 76.4,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": -0.028404041979597828,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1029120,
+            "source_seconds": 80.4,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.024895261899225172,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1080320,
+            "source_seconds": 84.4,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.07629307180527611,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1121792,
+            "source_seconds": 87.64,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.02357594566711165,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1125888,
+            "source_seconds": 87.96,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.04681332375667068,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1138432,
+            "source_seconds": 88.94,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.005453024878030711,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1146368,
+            "source_seconds": 89.56,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.01742904668244707,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1151744,
+            "source_seconds": 89.98,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.05321950236321831,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1164544,
+            "source_seconds": 90.98,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.03185024515408531,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1177344,
+            "source_seconds": 91.98,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.030675621021500673,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1183488,
+            "source_seconds": 92.46,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.03539993066667021,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          }
+        ],
+        "unknown_contact_foot_frames": 1891,
+        "ice_is_delivery_gate": false,
+        "user_accepted": false
+      },
+      "exmr_final": {
+        "result": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\common\\exmr_final\\initial\\fitted\\result.npz",
+        "result_sha256": "2ddfb710559f7278afafd1fb725bf4f92cd2b41e48bba9e9d626b9ef2dd5e812",
+        "stage": "attempt_rejected_unknown",
+        "source_frames": 951,
+        "source_first_last_pts": [
+          972800,
+          1216000
+        ],
+        "accepted_steps": 0,
+        "retained_step": null,
+        "core_body_groups": {
+          "body": {
+            "count": 3315,
+            "exposures": 196,
+            "median_px": 25.77539997695105,
+            "p95_px": 91.00414768989671,
+            "worst_px": 242.14463620235296,
+            "worst_pts": 1161472
+          },
+          "body_foot_0": {
+            "count": 588,
+            "exposures": 196,
+            "median_px": 36.02683842387467,
+            "p95_px": 150.81054924525426,
+            "worst_px": 189.18782723402148,
+            "worst_pts": 1147904
+          },
+          "body_foot_1": {
+            "count": 588,
+            "exposures": 196,
+            "median_px": 19.553701754915522,
+            "p95_px": 39.63469298049647,
+            "worst_px": 57.46966450923495,
+            "worst_pts": 1148416
+          }
+        },
+        "core_pelvis_projection_G_equals_Pxy": {
+          "xy_span_m": [
+            1.5044428879405398,
+            0.3309619431933486
+          ],
+          "xy_path_m": 13.451388321498818
+        },
+        "core_fixed_steel_material_reference_xy": {
+          "xy_span_m": [
+            1.5980255146596836,
+            0.5180793138372612
+          ],
+          "xy_path_m": 15.484302435656332
+        },
+        "raw_nominal_plane_penetration_depth_max_m": 0.1947790398749037,
+        "model_foot_cavity_breach_max_m": 0.005522095699656706,
+        "structural_constraint_max_m": null,
+        "source_supported_raw_gaps": [
+          {
+            "source_pts": 977920,
+            "source_seconds": 76.4,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.05154031640519904,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1029120,
+            "source_seconds": 80.4,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.0333460998382607,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1080320,
+            "source_seconds": 84.4,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.09696273064301533,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1121792,
+            "source_seconds": 87.64,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.02104500784084524,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1125888,
+            "source_seconds": 87.96,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.031195178364908187,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1138432,
+            "source_seconds": 88.94,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": -0.015749582920789398,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1146368,
+            "source_seconds": 89.56,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": -0.002796183016727166,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1151744,
+            "source_seconds": 89.98,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.029199816402844605,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1164544,
+            "source_seconds": 90.98,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.00957500496830831,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1177344,
+            "source_seconds": 91.98,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.05326249277821148,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1183488,
+            "source_seconds": 92.46,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.027493869188562576,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          }
+        ],
+        "unknown_contact_foot_frames": 1891,
+        "ice_is_delivery_gate": false,
+        "user_accepted": false
+      },
+      "gvhmr_joint1": {
+        "result": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\common\\gvhmr\\fitted\\result.npz",
+        "result_sha256": "0c96ea4aad15be072efa2529869126de793797691bc2af0c87743cd2ed3d7d82",
+        "stage": "joint_fit_1_step",
+        "source_frames": 951,
+        "source_first_last_pts": [
+          972800,
+          1216000
+        ],
+        "accepted_steps": 1,
+        "retained_step": 1,
+        "core_body_groups": {
+          "body": {
+            "count": 3315,
+            "exposures": 196,
+            "median_px": 31.787781467856128,
+            "p95_px": 120.29474117473997,
+            "worst_px": 265.6299464385852,
+            "worst_pts": 1134592
+          },
+          "body_foot_0": {
+            "count": 588,
+            "exposures": 196,
+            "median_px": 52.31808235269179,
+            "p95_px": 181.68308928340488,
+            "worst_px": 252.87188674936596,
+            "worst_pts": 1135360
+          },
+          "body_foot_1": {
+            "count": 588,
+            "exposures": 196,
+            "median_px": 27.4453539390234,
+            "p95_px": 45.434762580670366,
+            "worst_px": 88.93530215520228,
+            "worst_pts": 1127936
+          }
+        },
+        "core_pelvis_projection_G_equals_Pxy": {
+          "xy_span_m": [
+            1.747342508589016,
+            0.4661977907904049
+          ],
+          "xy_path_m": 18.405118943065304
+        },
+        "core_fixed_steel_material_reference_xy": {
+          "xy_span_m": [
+            1.7383604204094585,
+            0.5239317576534361
+          ],
+          "xy_path_m": 18.732932700520674
+        },
+        "raw_nominal_plane_penetration_depth_max_m": 0.36981856493039256,
+        "model_foot_cavity_breach_max_m": 0.0031996456991210264,
+        "structural_constraint_max_m": 0.023315226515818445,
+        "source_supported_raw_gaps": [
+          {
+            "source_pts": 977920,
+            "source_seconds": 76.4,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.01284271990919926,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1029120,
+            "source_seconds": 80.4,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.07219959517033725,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1080320,
+            "source_seconds": 84.4,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.030327619466201376,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1121792,
+            "source_seconds": 87.64,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.1697007323343755,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1125888,
+            "source_seconds": 87.96,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.11562255813831392,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1138432,
+            "source_seconds": 88.94,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.15899290394129037,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1146368,
+            "source_seconds": 89.56,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.15221349366445214,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1151744,
+            "source_seconds": 89.98,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.10925358865803396,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1164544,
+            "source_seconds": 90.98,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.1562761444848746,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1177344,
+            "source_seconds": 91.98,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.10016872247640024,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          },
+          {
+            "source_pts": 1183488,
+            "source_seconds": 92.46,
+            "source_support_candidate_feet": [
+              1
+            ],
+            "raw_reference_gap_m": 0.07381577707702304,
+            "interpretation": "minimum over admitted source support candidate feet; not one invented anatomical-foot measurement"
+          }
+        ],
+        "unknown_contact_foot_frames": 1891,
+        "ice_is_delivery_gate": false,
+        "user_accepted": false
+      }
+    },
+    "interpretations": {
+      "G": "vertical projection of model pelvis P; not CoM or a measured support point",
+      "steel_reference": "same attached material point on steel web; not contact minimum",
+      "heights": "raw model/reference-plane diagnostics, not independent physical ice truth",
+      "support": "only source-admitted exposures; network static probabilities never admitted",
+      "image_error": "source anatomical body-keypoint residual; not shoe/blade or contact acceptance"
+    },
+    "no_trajectory_alignment": true,
+    "no_more_optimization": true,
+    "collar_diagnostic": "See collar_sections and SHA-identified Data/collar_diagnostic.json; undefined-section penalties must not be read as valid measured maxima."
+  },
+  "collar_sections": {
+    "gvhmr_fixed": {
+      "unknown_sections": 0,
+      "unknown_exposures": 0,
+      "unknown_rows": [],
+      "valid_collar_breach_max_m": 0.029110069467799912,
+      "unknown_is_not_measured_penetration": true,
+      "world_root_cannot_change_this_body_local_test": true
+    },
+    "gvhmr_joint1": {
+      "unknown_sections": 0,
+      "unknown_exposures": 0,
+      "unknown_rows": [],
+      "valid_collar_breach_max_m": 0.023315226515818056,
+      "unknown_is_not_measured_penetration": true,
+      "world_root_cannot_change_this_body_local_test": true
+    },
+    "exmr_prefoot": {
+      "unknown_sections": 0,
+      "unknown_exposures": 0,
+      "unknown_rows": [],
+      "valid_collar_breach_max_m": 0.01742708742413926,
+      "unknown_is_not_measured_penetration": true,
+      "world_root_cannot_change_this_body_local_test": true
+    },
+    "exmr_postfoot": {
+      "unknown_sections": 12,
+      "unknown_exposures": 12,
+      "unknown_rows": [
+        {
+          "source_pts": 1096192,
+          "source_seconds": 85.64,
+          "foot": 0,
+          "reason": "body:open_or_branched_section",
+          "sample_count": 145
+        },
+        {
+          "source_pts": 1096704,
+          "source_seconds": 85.68,
+          "foot": 0,
+          "reason": "body:multiple_section_loops",
+          "sample_count": 188
+        },
+        {
+          "source_pts": 1157376,
+          "source_seconds": 90.42,
+          "foot": 0,
+          "reason": "body:open_or_branched_section",
+          "sample_count": 147
+        },
+        {
+          "source_pts": 1157632,
+          "source_seconds": 90.44,
+          "foot": 0,
+          "reason": "body:open_or_branched_section",
+          "sample_count": 129
+        },
+        {
+          "source_pts": 1157888,
+          "source_seconds": 90.46,
+          "foot": 0,
+          "reason": "body:open_or_branched_section",
+          "sample_count": 145
+        },
+        {
+          "source_pts": 1176576,
+          "source_seconds": 91.92,
+          "foot": 0,
+          "reason": "body:open_or_branched_section",
+          "sample_count": 137
+        },
+        {
+          "source_pts": 1176832,
+          "source_seconds": 91.94,
+          "foot": 0,
+          "reason": "body:open_or_branched_section",
+          "sample_count": 133
+        },
+        {
+          "source_pts": 1177088,
+          "source_seconds": 91.96,
+          "foot": 0,
+          "reason": "body:open_or_branched_section",
+          "sample_count": 151
+        },
+        {
+          "source_pts": 1199104,
+          "source_seconds": 93.68,
+          "foot": 1,
+          "reason": "body:open_or_branched_section",
+          "sample_count": 152
+        },
+        {
+          "source_pts": 1199360,
+          "source_seconds": 93.7,
+          "foot": 1,
+          "reason": "body:multiple_section_loops",
+          "sample_count": 168
+        },
+        {
+          "source_pts": 1199616,
+          "source_seconds": 93.72,
+          "foot": 1,
+          "reason": "body:open_or_branched_section",
+          "sample_count": 152
+        },
+        {
+          "source_pts": 1199872,
+          "source_seconds": 93.74,
+          "foot": 1,
+          "reason": "body:open_or_branched_section",
+          "sample_count": 109
+        }
+      ],
+      "unknown_is_not_measured_penetration": true,
+      "world_root_cannot_change_this_body_local_test": true,
+      "legacy_named_max_includes_unknown_domain_penalty_m": 0.3474685621143387,
+      "valid_collar_breach_max_m": null,
+      "physical_maximum_status": "not_certified: historical field includes finite domain penalties for undefined sections"
+    },
+    "exmr_final": {
+      "unknown_sections": 12,
+      "unknown_exposures": 12,
+      "unknown_rows": [
+        {
+          "source_pts": 1096192,
+          "source_seconds": 85.64,
+          "foot": 0,
+          "reason": "body:open_or_branched_section",
+          "sample_count": 145
+        },
+        {
+          "source_pts": 1096704,
+          "source_seconds": 85.68,
+          "foot": 0,
+          "reason": "body:multiple_section_loops",
+          "sample_count": 188
+        },
+        {
+          "source_pts": 1157376,
+          "source_seconds": 90.42,
+          "foot": 0,
+          "reason": "body:open_or_branched_section",
+          "sample_count": 147
+        },
+        {
+          "source_pts": 1157632,
+          "source_seconds": 90.44,
+          "foot": 0,
+          "reason": "body:open_or_branched_section",
+          "sample_count": 129
+        },
+        {
+          "source_pts": 1157888,
+          "source_seconds": 90.46,
+          "foot": 0,
+          "reason": "body:open_or_branched_section",
+          "sample_count": 145
+        },
+        {
+          "source_pts": 1176576,
+          "source_seconds": 91.92,
+          "foot": 0,
+          "reason": "body:open_or_branched_section",
+          "sample_count": 137
+        },
+        {
+          "source_pts": 1176832,
+          "source_seconds": 91.94,
+          "foot": 0,
+          "reason": "body:open_or_branched_section",
+          "sample_count": 131
+        },
+        {
+          "source_pts": 1177088,
+          "source_seconds": 91.96,
+          "foot": 0,
+          "reason": "body:open_or_branched_section",
+          "sample_count": 151
+        },
+        {
+          "source_pts": 1199104,
+          "source_seconds": 93.68,
+          "foot": 1,
+          "reason": "body:open_or_branched_section",
+          "sample_count": 152
+        },
+        {
+          "source_pts": 1199360,
+          "source_seconds": 93.7,
+          "foot": 1,
+          "reason": "body:multiple_section_loops",
+          "sample_count": 168
+        },
+        {
+          "source_pts": 1199616,
+          "source_seconds": 93.72,
+          "foot": 1,
+          "reason": "body:open_or_branched_section",
+          "sample_count": 152
+        },
+        {
+          "source_pts": 1199872,
+          "source_seconds": 93.74,
+          "foot": 1,
+          "reason": "body:open_or_branched_section",
+          "sample_count": 109
+        }
+      ],
+      "unknown_is_not_measured_penetration": true,
+      "world_root_cannot_change_this_body_local_test": true,
+      "legacy_named_max_includes_unknown_domain_penalty_m": 0.3472048696889339,
+      "valid_collar_breach_max_m": null,
+      "physical_maximum_status": "not_certified: historical field includes finite domain penalties for undefined sections"
+    }
+  },
+  "results": {
+    "gvhmr": "One accepted and retained joint step; own-reference replay exact. Still unaccepted world trajectory.",
+    "exmr_final": "Zero accepted steps; no quality-valid fitted result; initial_attempt and last_attempt preserved. Rejection is not a millimetre ice gate.",
+    "exmr_prefoot": "Read-only unoptimized common-state diagnosis; no fitting or optimized-result claim.",
+    "decision": "No replacement of satisfied S01, no full-program extension or further tuning. Prefoot is only an initial-state review candidate.",
+    "limitations": [
+      "Model pelvis G=Pxy is not CoM or actual measured displacement. All candidates retain abnormal large root drift.",
+      "Boot-region zero residual means inside an uncertainty region, not exact zero-pixel blade/material alignment. No precise steel curve is admitted.",
+      "Eleven source-supported exposures across 19 seconds; other contact-foot frames remain unknown.",
+      "Undefined collar sections are not measured penetration. The legacy named maximum can include a finite domain penalty; see explicit unknown rows.",
+      "ExMR 45D finger poses stay in raw Data outputs; the current common solver/player does not optimize fingers."
+    ]
+  },
+  "parameters": [
+    {
+      "path": "spin_support_1104.npz",
+      "bytes": 43628,
+      "sha256": "c6f9ca9f9d6054d7f7552d6e28946a051457fd1383f229fc04743c4bb1c1531b"
+    },
+    {
+      "path": "spin_support_joint_1104.npz",
+      "bytes": 47536,
+      "sha256": "52a35437f75b756bd89ce132d729fedb753471d197177efa676d5f084b2d2d2e"
+    },
+    {
+      "path": "spin_models_gvhmr_initial_1104.npz",
+      "bytes": 1462155,
+      "sha256": "82b150663179658ca32b20e874ea282c8a824344701fce6f80d24646ece5cc33"
+    },
+    {
+      "path": "spin_models_gvhmr_1104.npz",
+      "bytes": 55525,
+      "sha256": "58f690e7819eb2be88f2a43f8ed3d1602a765f508d9197e6d55be53466d542f5"
+    }
+  ],
+  "player": {
+    "launcher": "START_3D_SPIN_MODELS.cmd",
+    "config": "viewer3d_spin_models_1104.json",
+    "variants": [
+      "gvhmr_fixed",
+      "gvhmr_joint1",
+      "exmr_prefoot",
+      "exmr_final"
+    ],
+    "default": "exmr_prefoot",
+    "shared_observation_camera": true,
+    "source_pts_preserved": true,
+    "checks": {
+      "player_verify_fixed": true,
+      "player_support_top_shared": true,
+      "player_support_side_shared": true,
+      "movie_pts": true,
+      "old_baselines": true,
+      "real_parameter_replay": true,
+      "all": true
+    },
+    "no_visible_desktop_window_opened": true
+  },
+  "protected_baselines": {
+    "passed": true,
+    "files": {
+      "Project/events/ankara_2026/programmes/okada_mei_sp/skate_s01_1103.npz": {
+        "expected": "3b58dac5f7363dfc5e051fc75ef8602dd3810a0ebc370c57a24542745bc5090c",
+        "actual": "3b58dac5f7363dfc5e051fc75ef8602dd3810a0ebc370c57a24542745bc5090c"
+      },
+      "Project/events/ankara_2026/programmes/okada_mei_sp/skate_s01_1103.json": {
+        "expected": "a4f6ec8a195415f77e834c7e7d89498f89092feba3ab6b3d616c686d75bab25a",
+        "actual": "a4f6ec8a195415f77e834c7e7d89498f89092feba3ab6b3d616c686d75bab25a"
+      },
+      "Project/events/ankara_2026/programmes/okada_mei_sp/viewer3d_fullbody_1102.json": {
+        "expected": "647d6faa699edf6df53fb09d1e61efa3ed25ba1f324eb47eb9f6a142e77fd005",
+        "actual": "647d6faa699edf6df53fb09d1e61efa3ed25ba1f324eb47eb9f6a142e77fd005"
+      },
+      "Project/events/ankara_2026/programmes/okada_mei_sp/viewer3d_action_spin_s05_1103.json": {
+        "expected": "8c095d842ecb6d7f22b5d42e2d3a420625110cc84c139330ee5e8a0818349527",
+        "actual": "8c095d842ecb6d7f22b5d42e2d3a420625110cc84c139330ee5e8a0818349527"
+      },
+      "Data/runs/body_s01_20261029/skate_s01_1103/fit/candidate.npz": {
+        "expected": "371798108c8258e2065c2d2e6e301cd9deaff193f7e8eac3b79079bf222b05a4",
+        "actual": "371798108c8258e2065c2d2e6e301cd9deaff193f7e8eac3b79079bf222b05a4"
+      },
+      "Data/runs/body_s01_20261029/skate_s01_1103/fit/last_accepted.npz": {
+        "expected": "d50ec4198aebe5d5a4e1d469b4a368a71508fde80079eb1374a09f419bc0c31d",
+        "actual": "d50ec4198aebe5d5a4e1d469b4a368a71508fde80079eb1374a09f419bc0c31d"
+      },
+      "Data/runs/body_s01_20261029/skate_s01_1103/fitted/result.npz": {
+        "expected": "5a1d67d535359259a3bcba57fd115d52b02cca631724bc7ea5ad8743af7d6bb9",
+        "actual": "5a1d67d535359259a3bcba57fd115d52b02cca631724bc7ea5ad8743af7d6bb9"
+      },
+      "Data/runs/body_s01_20261029/action_integration_1103/spin_s05/input.npz": {
+        "expected": "8cbd767c324a4ef1e734d53c18880e744d4c91a9a8cdfdf279a6b6f8e46e2b3a",
+        "actual": "8cbd767c324a4ef1e734d53c18880e744d4c91a9a8cdfdf279a6b6f8e46e2b3a"
+      },
+      "Data/runs/body_s01_20261029/action_integration_1103/spin_s05/initial.npz": {
+        "expected": "82b150663179658ca32b20e874ea282c8a824344701fce6f80d24646ece5cc33",
+        "actual": "82b150663179658ca32b20e874ea282c8a824344701fce6f80d24646ece5cc33"
+      },
+      "Data/runs/body_s01_20261029/action_integration_1103/spin_s05/observations.npz": {
+        "expected": "e934232dfff4afa5f9f62ed6d1cd98997391ce50cb849fb0a290608c1d02ed55",
+        "actual": "e934232dfff4afa5f9f62ed6d1cd98997391ce50cb849fb0a290608c1d02ed55"
+      },
+      "Data/runs/body_s01_20261029/action_integration_1103/spin_s05/A/fitted/result.npz": {
+        "expected": "674bbb186bbb6c3d239e0917f4dcf895ed1a7b0e4e2e282aae7da7404cc11101",
+        "actual": "674bbb186bbb6c3d239e0917f4dcf895ed1a7b0e4e2e282aae7da7404cc11101"
+      },
+      "Data/runs/body_s01_20261029/action_integration_1103/spin_s05/A/fit/candidate.npz": {
+        "expected": "548f82a5e77a07ec3b1abe4ee0f41d1de2958fbd4a2846b5fdd3d963633581f1",
+        "actual": "548f82a5e77a07ec3b1abe4ee0f41d1de2958fbd4a2846b5fdd3d963633581f1"
+      },
+      "Data/runs/body_s01_20261029/action_integration_1103/spin_s05/B/fitted/result.npz": {
+        "expected": "ca7f9530ff71c3752d793b388760278af18ace423bd71f747d1a3a9b07498400",
+        "actual": "ca7f9530ff71c3752d793b388760278af18ace423bd71f747d1a3a9b07498400"
+      },
+      "Data/runs/body_s01_20261029/action_integration_1103/spin_s05/root_repair/A/fitted/result.npz": {
+        "expected": "056d79a232accce2e216c5fae93f29a11a6e6709d587f96f96d3def4341eaeb7",
+        "actual": "056d79a232accce2e216c5fae93f29a11a6e6709d587f96f96d3def4341eaeb7"
+      },
+      "Data/runs/body_s01_20261029/action_integration_1103/spin_s05/root_repair/A_pose/fitted/result.npz": {
+        "expected": "374ea93888f844e026866896d5b80c1833b447d5dade40443f1e291e7fac734c",
+        "actual": "374ea93888f844e026866896d5b80c1833b447d5dade40443f1e291e7fac734c"
+      },
+      "Data/runs/body_s01_20261029/action_integration_1103/spin_s05/prior/camera_prior.npz": {
+        "expected": "62168375ae4d3da0a274bbee96eaf959aac7b12a246d435621777dcdfc09c11d",
+        "actual": "62168375ae4d3da0a274bbee96eaf959aac7b12a246d435621777dcdfc09c11d"
+      },
+      "gvhmr_prepared": {
+        "expected": "c4002cb82821397704f0ae637ee21d8032764d038a7343b7b37d7dc7992f01da",
+        "actual": "c4002cb82821397704f0ae637ee21d8032764d038a7343b7b37d7dc7992f01da"
+      }
+    }
+  },
+  "evidence": [
+    {
+      "path": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\EXMR_COMPARISON_ZH.txt",
+      "sha256": "59fe9022d2e9f1c53a97b59aa4ead0f438d1a7f1cb995033d2827fcaecad7b63",
+      "bytes": 7784
+    },
+    {
+      "path": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\delivery_comparison.json",
+      "sha256": "1eb04f6c4ae9bd105ae69fbfb85ed2937de7276090d8640ed3e997fba504ae0e",
+      "bytes": 31215
+    },
+    {
+      "path": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\camera_comparison.json",
+      "sha256": "699c69755127d662e7ff5fe726922d6dbee48a19cab790aff63aacfab2125fd7",
+      "bytes": 6417
+    },
+    {
+      "path": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\collar_diagnostic.json",
+      "sha256": "a4a480c70d1648adc9a91b602a1ee3253821134f01319e4ebcbf38fe77ae263a",
+      "bytes": 6454
+    },
+    {
+      "path": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\execution_provenance.json",
+      "sha256": "175337a76cea5127aacc31f6ddd7c6867cf62ff8251e2e4fec48dde7c2d1a33a",
+      "bytes": 8231
+    },
+    {
+      "path": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\delivery_checks.json",
+      "sha256": "a6a14c3b2129cdf35eb5d9f0b474d05c70bb09473f0a8e811375e92b430f7ff2",
+      "bytes": 210
+    },
+    {
+      "path": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\immutable_baselines_verified.json",
+      "sha256": "6f6faaf641da550b85f3fbee1e2097b6f7193a92fc5be792a3351689496328c3",
+      "bytes": 5011
+    },
+    {
+      "path": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\movie_verified.json",
+      "sha256": "ca68e1ef9777e233366eab6eb7d64d7c077f01d72d47f26a326acfbe40d37b91",
+      "bytes": 297
+    },
+    {
+      "path": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\source_movie_clock.json",
+      "sha256": "b20f3de8def85757ea246f494e74a1db29072bf4acf18df0e9fc509bbb33526d",
+      "bytes": 14005
+    },
+    {
+      "path": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\source_visual_review.json",
+      "sha256": "6e96913e1b3e3a7d05d62c96ea9bbd89a6afd1e0c2bb311232ffb72df58c20df",
+      "bytes": 1133
+    },
+    {
+      "path": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\common\\gvhmr\\profile.json",
+      "sha256": "180f550af6fa73c7158699b45273fbcf964a310c1f918f6396bfc5908469a022",
+      "bytes": 28308
+    },
+    {
+      "path": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\common\\gvhmr\\run_summary.json",
+      "sha256": "9bb73703834ff00a52aaacb186662b20868b1e38f2f6c54fe2a6ac3d4dc21078",
+      "bytes": 211051
+    },
+    {
+      "path": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\common\\exmr_final\\profile.json",
+      "sha256": "be9ba5b75f2e26cf98f6aa3ddce2c6a714f2160ebaaa1a51590455314def8d41",
+      "bytes": 28074
+    },
+    {
+      "path": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\common\\exmr_final\\attempt_summary.json",
+      "sha256": "780173ea19e24cfe3817f7a729bfefb1c97294a75e98d938d6da60842f237b23",
+      "bytes": 497
+    },
+    {
+      "path": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\common\\exmr_prefoot\\diagnostic.json",
+      "sha256": "4abbf747735cf699eaea28a50a72a595efd9de3a2181747a7e8771902dd61bd7",
+      "bytes": 22908
+    },
+    {
+      "path": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\player_verify_fixed\\checks.json",
+      "sha256": "fa61a5e90d4635a8af40da67e6de83bd7a4697c325ac6c744a96544fe0f9e3bb",
+      "bytes": 71808
+    },
+    {
+      "path": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\player_support_top_shared\\checks.json",
+      "sha256": "6affece680e33a21a73ac66c7c2f3083033c35d88c94aab3998f01b9204066db",
+      "bytes": 34293
+    },
+    {
+      "path": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\player_support_side_shared\\checks.json",
+      "sha256": "e34fe268c5dae46bb99e4a414f6b59e8518f896e61d350e937d21a41fa65fb7e",
+      "bytes": 34375
+    },
+    {
+      "path": "Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\common\\gvhmr\\replay_58f690e7819e\\replay.json",
+      "sha256": "78e1dd7cddaed1b17f60488c65c51792afe87103633a1082f92181563b8d3cf9",
+      "bytes": 3683
+    }
+  ],
+  "dependencies": {
+    "exmr_commit": "eac72e47339b404c0443f5fb323412e2ce432410",
+    "upstream_download_table_sha256": "af1d5c02a044e8c909c4463f9a254ef8ee7eb85725936dab18336c26cbb9a03e",
+    "files": [
+      {
+        "component": "exmr",
+        "repo_id": "twehrbein/ExMR",
+        "revision": "8debd2e34262fcc63384f7e04d39ca784b0aec21",
+        "repo_type": "model",
+        "filename": "exmr.safetensors",
+        "relative_path": "exmr/exmr.safetensors",
+        "expected_sha256": [
+          "8d3947310c30444ec59dae4662574d7a32bf83af30320eeac87146529ff2fda5"
+        ],
+        "status": "verified",
+        "sha256": "8d3947310c30444ec59dae4662574d7a32bf83af30320eeac87146529ff2fda5",
+        "bytes": 235766520
+      },
+      {
+        "component": "exmr",
+        "repo_id": "twehrbein/ExMR",
+        "revision": "8debd2e34262fcc63384f7e04d39ca784b0aec21",
+        "repo_type": "model",
+        "filename": "config.json",
+        "relative_path": "exmr/config.json",
+        "expected_sha256": [
+          "b29ad86d7916a7f54154c1a20fb07d3bc9d794da4d671c88ba0cf75a5cec8c43"
+        ],
+        "status": "verified",
+        "sha256": "b29ad86d7916a7f54154c1a20fb07d3bc9d794da4d671c88ba0cf75a5cec8c43",
+        "bytes": 180
+      },
+      {
+        "component": "sam-3d-body-dinov3",
+        "repo_id": "facebook/sam-3d-body-dinov3",
+        "revision": "11aaa346c7204874a1cbafe3d39a979080b2c55a",
+        "repo_type": "model",
+        "filename": "model.ckpt",
+        "relative_path": "sam-3d-body-dinov3/model.ckpt",
+        "expected_sha256": [
+          "b5a2f9d305dd02626b967aa2e86021fba07065df66ce7a7e00ffb9664f150abf"
+        ],
+        "status": "verified",
+        "sha256": "b5a2f9d305dd02626b967aa2e86021fba07065df66ce7a7e00ffb9664f150abf",
+        "bytes": 2109129346
+      },
+      {
+        "component": "sam-3d-body-dinov3",
+        "repo_id": "facebook/sam-3d-body-dinov3",
+        "revision": "11aaa346c7204874a1cbafe3d39a979080b2c55a",
+        "repo_type": "model",
+        "filename": "model_config.yaml",
+        "relative_path": "sam-3d-body-dinov3/model_config.yaml",
+        "expected_sha256": [
+          "1012fc3f39cb5e90e3f8fbadf7bded31604bfafdce0321d17a7c1a2d3f08b88d"
+        ],
+        "status": "verified",
+        "sha256": "1012fc3f39cb5e90e3f8fbadf7bded31604bfafdce0321d17a7c1a2d3f08b88d",
+        "bytes": 1488
+      },
+      {
+        "component": "sam-3d-body-dinov3",
+        "repo_id": "facebook/sam-3d-body-dinov3",
+        "revision": "11aaa346c7204874a1cbafe3d39a979080b2c55a",
+        "repo_type": "model",
+        "filename": "assets/mhr_model.pt",
+        "relative_path": "sam-3d-body-dinov3/assets/mhr_model.pt",
+        "expected_sha256": [
+          "352e271a6c42729c68554ceaea0c955e866970160c31e35506d782dc0f7377bc"
+        ],
+        "status": "verified",
+        "sha256": "352e271a6c42729c68554ceaea0c955e866970160c31e35506d782dc0f7377bc",
+        "bytes": 696110248
+      },
+      {
+        "component": "hamer",
+        "repo_id": "geopavlakos/HaMeR",
+        "revision": "aabc78ee4fd1f1ccf1a55fdd4225bf84df0e680a",
+        "repo_type": "space",
+        "filename": "_DATA/hamer_ckpts/checkpoints/hamer.ckpt",
+        "relative_path": "hamer/hamer_ckpts/checkpoints/hamer.ckpt",
+        "expected_sha256": [
+          "e5cc06f294d88a92dee24e603480aab04de532b49f0e08200804ee7d90e16f53"
+        ],
+        "status": "verified",
+        "sha256": "e5cc06f294d88a92dee24e603480aab04de532b49f0e08200804ee7d90e16f53",
+        "bytes": 2689536166
+      },
+      {
+        "component": "hamer",
+        "repo_id": "geopavlakos/HaMeR",
+        "revision": "aabc78ee4fd1f1ccf1a55fdd4225bf84df0e680a",
+        "repo_type": "space",
+        "filename": "_DATA/hamer_ckpts/model_config.yaml",
+        "relative_path": "hamer/hamer_ckpts/model_config.yaml",
+        "expected_sha256": [
+          "0e5eeb82752e47dfd01db8e13ccc4c5eba9bf83f53da8285523b8d3e87247aa3",
+          "2217f6bcf27ae4c074e2a33a3409d822bbfd02931373deedb9f71287adeabe16"
+        ],
+        "status": "verified",
+        "sha256": "2217f6bcf27ae4c074e2a33a3409d822bbfd02931373deedb9f71287adeabe16",
+        "bytes": 2084
+      },
+      {
+        "component": "hamer",
+        "repo_id": "geopavlakos/HaMeR",
+        "revision": "aabc78ee4fd1f1ccf1a55fdd4225bf84df0e680a",
+        "repo_type": "space",
+        "filename": "_DATA/hamer_ckpts/dataset_config.yaml",
+        "relative_path": "hamer/hamer_ckpts/dataset_config.yaml",
+        "expected_sha256": [
+          "392d10aece296152769328f14bb1c0137d6ea2f50f7e69f716ee00e9ad6ac343"
+        ],
+        "status": "verified",
+        "sha256": "392d10aece296152769328f14bb1c0137d6ea2f50f7e69f716ee00e9ad6ac343",
+        "bytes": 1369
+      },
+      {
+        "component": "hamer",
+        "repo_id": "geopavlakos/HaMeR",
+        "revision": "aabc78ee4fd1f1ccf1a55fdd4225bf84df0e680a",
+        "repo_type": "space",
+        "filename": "_DATA/data/mano_mean_params.npz",
+        "relative_path": "hamer/data/mano_mean_params.npz",
+        "expected_sha256": [
+          "efc0ec58e4a5cef78f3abfb4e8f91623b8950be9eff8b8e0dbb0d036ebc63988"
+        ],
+        "status": "verified",
+        "sha256": "efc0ec58e4a5cef78f3abfb4e8f91623b8950be9eff8b8e0dbb0d036ebc63988",
+        "bytes": 1178
+      },
+      {
+        "component": "rtmw",
+        "repo_id": "twehrbein/ExMR",
+        "revision": "8debd2e34262fcc63384f7e04d39ca784b0aec21",
+        "repo_type": "model",
+        "filename": "rtmw-x_384x288_fp16.onnx",
+        "relative_path": "rtmw/rtmw-x_384x288_fp16.onnx",
+        "expected_sha256": [
+          "957ddb5ed34576593a918b3e514003ab9cc85d037309b9a23d9e0209530e98ed"
+        ],
+        "status": "verified",
+        "sha256": "957ddb5ed34576593a918b3e514003ab9cc85d037309b9a23d9e0209530e98ed",
+        "bytes": 184493423
+      }
+    ],
+    "dinov3": {
+      "component": "dinov3_code",
+      "commit": "6876159a11b4df116f30f667f8c9888617df0751",
+      "expected_tree_sha256": "0389aafef4614add2090f2907f210698df48f16d3f2b845b6002c4ebb6aea0f8",
+      "status": "verified",
+      "actual_tree_sha256": "0389aafef4614add2090f2907f210698df48f16d3f2b845b6002c4ebb6aea0f8"
+    },
+    "license_notice": "environments/third_party_licenses/EXMR_LICENSE.txt",
+    "license_sha256": "cac6e2293c310f1e38c05b83a6428f0176555608e1a63232f925433fe200aece",
+    "model_and_runtime_distribution": "External Data only; repository contains no credentials, runtime environments or downloaded model payloads."
+  },
+  "publication_storage": {
+    "audit": "Data\\maintenance\\publication_body_20261104\\storage_code_audit.json",
+    "audit_sha256": "2f83760df6e3ba93c705224fac8d0e90d23a1ae3859ed0a6a2f5b019f0194ed4",
+    "onedrive_archive_candidates": 0,
+    "missing_production_source": 0,
+    "runtime_snapshot_matches": 109,
+    "historical_superseded_snapshots": 3,
+    "shared_caches_left_in_place": 46,
+    "source_snapshot_identity_note": "Current review sources, including subsequent display-only fixes and line-ending normalization; exact solver-run files remain in the per-case fit/source_snapshot and kernel_manifest.json."
+  }
+}

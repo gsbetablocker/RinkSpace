@@ -17,6 +17,8 @@
 
 人体、足鞋和开头修复的公开范围为实现源码、测试、播放器配置、三份 1102 与五份原有 1103 小型控制参数；2026-11-04另核对25份动作初值／根参考／修正控制和历史S01整合参数，共7,491,223字节，并公开其来源／失败索引；详见[节目记录](../events/ankara_2026/programmes/okada_mei_sp/README.md)、[新增参数字段索引](../events/ankara_2026/programmes/okada_mei_sp/body_parameters_1103_fields.json)和[参数许可核查](LICENSING_REVIEW.md#body-parameters)。完整拟合输出、SMPL-X 紧凑模型与完整表面、原图及叠图仍位于 `Data/runs/body_s01_20261029/` 和 `Data/cache/results3d/`，不随这些参数包发布。绑定里的历史绝对路径记录当时运行身份，重放需使用本机 Data 配置及相符输入。`skate_s01_1103` 保留预算停止、接冰未通过、鞋刀图像尾部误差变差及开头姿态回退的结论；公开参数不表示候选通过准确性验收。新增 [人体整合索引](../events/ankara_2026/programmes/okada_mei_sp/body_integration_1104.json)保留三段A/B及根修正的图像退化、接触未知和实际预算超时；完整结果与模型仍不公开。
 
+2026-11-04另公开源支撑旋转候选及GVHMR自身初值／联合控制四份小型参数，共1,608,844字节；字段清单沿用上述索引。[源支撑审核](../events/ankara_2026/programmes/okada_mei_sp/spin_support_1104_audit.json)和[GVHMR／ExMR审核](../events/ankara_2026/programmes/okada_mei_sp/spin_models_1104_audit.json)保留实际接受步、图像分组、根漂移、支持间隙及截面unknown。SAM/ExMR原始网络输出、失败输入、完整人体和播放器缓存留Data。现有满意S01不替换；这些公开材料均未通过人体／轨迹准确性验收。
+
 ## 当前模型与数值来源
 
 当前开发工作区已接通共同 native 几何、时变相机、prepare／review 和连续 GPU LM。当前采用 `camera_solver_refined_1102` 暂定最终状态，覆盖 S01–S09 九镜头、三个物理机位，已执行真实联合拟合并导出完整回放；该状态未达到一阶数值收敛，独立物理标定和完整节目准确性验证仍未完成。精确输入、数值状态、原生库与视频见[当前结果绑定](../events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_solver_refined_1102.json)，人工确认范围见[节目入口](../events/ankara_2026/programmes/okada_mei_sp/README.md#有界结果与人工确认)，能力缺口见 [REBUILD](REBUILD.md)。

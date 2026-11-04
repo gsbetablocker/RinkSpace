@@ -159,9 +159,28 @@ class ContinuousPoseWindow(ContinuousShotWindow):
         self.active=np.arange(3,69,dtype=int);self.d=66;self.size=self.m*self.d
 
 
+class SupportJointWindow(WindowState):
+    """One C2 correction: world P/Q and the associated support-leg chain."""
+    regularize_actual_root_translation=True
+    # A mixed root-acceleration/correction regularizer is not source pose
+    # quality. Keep it in the objective; compare actual source groups instead.
+    use_pose_cost_guard=False
+
+    def __init__(self,reference,seconds,mode='full',*,foot=1):
+        super().__init__(reference,seconds,mode,spacing=.25,taper=.50)
+        if foot not in (0,1):raise ValueError('Explicit associated foot required')
+        self.foot=int(foot)
+        joints=(1,4,7) if foot==0 else (2,5,8)
+        self.active=np.array(list(range(6))+[6+3*(j-1)+a for j in joints for a in range(3)])
+        self.d=len(self.active);self.size=self.m*self.d
+        self.state_kind='support_joint_left_v1' if foot==0 else 'support_joint_right_v1'
+
+
 def window_factory(kind):
     return {'halo_1103':HaloWindow,'continuous_shot':ContinuousShotWindow,
-        'continuous_root':ContinuousRootWindow,'continuous_pose':ContinuousPoseWindow}[kind]
+        'continuous_root':ContinuousRootWindow,'continuous_pose':ContinuousPoseWindow,
+        'support_joint_left_v1':lambda r,s,m:SupportJointWindow(r,s,m,foot=0),
+        'support_joint_right_v1':lambda r,s,m:SupportJointWindow(r,s,m,foot=1)}[kind]
 
 
 def checkpoint_state_kind(saved):
@@ -185,7 +204,7 @@ def base_layer_packet(reference):
         prefix=f'base_layer_{i}_'
         packet.update({prefix+'x':np.asarray(controls).copy(),prefix+'knots':state.knots.copy(),
             prefix+'active':state.active.copy(),prefix+'seconds':np.asarray(state.seconds),
-            prefix+'state_kind':np.array('continuous_pose' if isinstance(state,ContinuousPoseWindow) else 'continuous_root' if isinstance(state,ContinuousRootWindow) else 'continuous_shot' if isinstance(state,ContinuousShotWindow) else 'halo_1103')})
+            prefix+'state_kind':np.array(getattr(state,'state_kind','continuous_pose' if isinstance(state,ContinuousPoseWindow) else 'continuous_root' if isinstance(state,ContinuousRootWindow) else 'continuous_shot' if isinstance(state,ContinuousShotWindow) else 'halo_1103'))})
     return packet
 
 
@@ -381,6 +400,11 @@ class JointContactProblem:
         if jacobian:
             motion_J=hstack((csr_matrix((len(motion['residual']),17)),motion['jac']),format='csr')
             Jdata=vstack((Jdata,motion_J,extra['jac']),format='csr')
+        support=getattr(self,'support_image',None)
+        support_value=support.evaluate(x[17:],jacobian) if support is not None else None
+        if support_value is not None:
+            rdata=np.r_[rdata,support_value['residual']]
+            if jacobian:Jdata=vstack((Jdata,support_value['jac']),format='csr')
         ral,Jal=self.al.residual_and_jacobian(e['g'],Jg,row_weights=e['weights'])
         r=np.r_[rdata,ral];J=vstack((Jdata,Jal),format='csr') if jacobian else None
         gate=physical_feasibility(e['margin_m'],tolerance_m=FEASIBILITY_TOLERANCE,row_labels=e['labels'])
@@ -391,12 +415,17 @@ class JointContactProblem:
         parts=dict(**ice['parts'],data=float(data@data/2),neutral_fit=float(neutral@neutral/2),shared_prior=float(prior@prior/2),contact_AL=float(ral@ral/2),
             source_motion=float(motion['residual']@motion['residual']/2),action=float(extra['residual']@extra['residual']/2))
         image_names=('body_pixels','visible_boot_edges','visible_blade_curves','boot_direction_endpoints')
-        pose_names=('reference_deviation','correction_velocity','correction_acceleration')
+        pose_names=('reference_deviation','correction_velocity','correction_acceleration','actual_root_and_correction_acceleration')
         v=dict(residual=r,jac=J,parts=parts,contact=e,raw_ice=raw_ice,ice=ice,gate=gate,
-            image_cost=sum(base['parts'].get(name,0.) for name in image_names),
+            image_cost=(1. if support_value is None else .02)*sum(base['parts'].get(name,0.) for name in image_names)+(0. if support_value is None else support_value['cost']),
             pose_cost=sum(base['parts'].get(name,0.) for name in pose_names),
             source_motion_metrics=motion['metrics'],action_metrics=extra['metrics'],
             raw_data_parts={**base['parts'],**motion['parts'],**extra['parts']})
+        if support_value is not None:
+            v['support_image_metrics']=support_value['metrics']
+            v['parts']['support_image']=support_value['cost']
+            v['raw_data_parts'].update(support_value['parts'])
+            v['block_slices']={'support_image':slice(len(rdata)-len(support_value['residual']),len(rdata))}
         self.cache_x=x.copy();self.cache=v
         self.log.write(json.dumps(dict(event='joint_evaluation',outer=self.outer,with_jacobian=jacobian,
             seconds=time.perf_counter()-self.start,evaluation_seconds=time.perf_counter()-tick,cost=float(r@r/2),
@@ -427,7 +456,7 @@ class JointContactProblem:
             ice_soft_policy_json=np.array(json.dumps(vars(self.ice_policy),sort_keys=True)))
 
     def solve(self,initial=None,run_policy=None):
-        from .skate_run_policy import RunPolicy,Monitor,CandidateRetention
+        from .skate_run_policy import RunPolicy,Monitor,CandidateRetention,structural_progress_is_observable
         self.output.mkdir(parents=True,exist_ok=True)
         prior=self.output/'last_accepted.npz'
         if prior.exists():
@@ -438,7 +467,13 @@ class JointContactProblem:
             if (self.output/'source_snapshot').exists():
                 dst=archive/'source_snapshot';dst.mkdir(exist_ok=True)
                 for path in (self.output/'source_snapshot').glob('*.py'):(dst/path.name).write_bytes(path.read_bytes())
-        monitor=Monitor(run_policy or RunPolicy(),now=time.perf_counter())
+        # World-root motion leaves foot-cavity/collar geometry unchanged.
+        # Keep those diagnostics, but do not stop a root-only solve because
+        # an internal-shoe quantity outside its active variables is constant.
+        structural_progress=structural_progress_is_observable(self.body.state.active,
+            optimize_shared=bool(getattr(self,'optimize_shared',True)))
+        monitor=Monitor(run_policy or RunPolicy(),now=time.perf_counter(),
+            violation_stagnation_enabled=structural_progress)
         write_json(self.output/'run_policy.json',monitor.record())
         x=np.r_[self.binding.x,np.zeros(self.body.size)] if initial is None else initial.copy()
         # No root-height restoration: flight/unknown must not be glued to ice.
@@ -463,7 +498,8 @@ class JointContactProblem:
                      'fullbody_state.py','boot_integration.py','body_execution.py','footwear_pixel_factors.py','skate_run_policy.py',
                       'skate_collar_factors.py','skate_checkpoint.py','opening_live.py',
                       'opening_motion.py','opening_timing.py','skating_action_factors.py',
-                      'ice_soft.py','action_live.py','action_integration.py','root_trajectory.py','root_repair.py'):
+                      'ice_soft.py','action_live.py','action_integration.py','root_trajectory.py','root_repair.py',
+                      'support_anchor_factors.py','support_image.py','stage_quality.py','source_support_export.py'):
             path=Path(__file__).with_name(name);implementation[name]=digest(path)
             (source_dir/name).write_bytes(path.read_bytes())
         write_json(self.output/'kernel_manifest.json',implementation)
@@ -479,7 +515,8 @@ class JointContactProblem:
                 message='Collar section unavailable; finite domain residual is not a penetration measurement.')] if unknown else []
             status=monitor.observe(now=time.perf_counter(),accepted=accepted,
                 violation_m=value['gate']['max_violation_m'],image_cost=value['image_cost'],
-                pose_cost=value['pose_cost'],quality_metrics=metrics,quality_failures=failures)
+                pose_cost=value['pose_cost'] if getattr(self.body.state,'use_pose_cost_guard',True) else None,
+                quality_metrics=metrics,quality_failures=failures)
             retention.observe(z,value,step=self.accepted,decision=status,metrics=monitor.latest)
             self.binding.x=z[:17].copy()
             np.savez_compressed(self.output/'attempt.pending.npz',**self.checkpoint_fields(z))
@@ -492,6 +529,8 @@ class JointContactProblem:
             write_json(self.output/'candidate_selection.json',retention.record())
             return status
         initial_value=self.evaluate(x,False)
+        if getattr(self,'stage_quality',None) is not None:
+            self.stage_quality.begin(x,initial_value)
         observe_candidate(x,initial_value)
         def save_candidate(reason):
             selected=retention.selected
@@ -512,6 +551,12 @@ class JointContactProblem:
                 raw_data_parts=last_value['raw_data_parts'],numerical_convergence=False,user_accepted=False,
                 acceptance_calibrated=False,run_policy=monitor.record(),state_kind=self.state_kind,
                 selection=retention.record(),source_motion_metrics=last_value.get('source_motion_metrics',{}))
+            record['stage_update']='updated' if self.accepted else 'no_update'
+            record['quality_baseline_scope']='stage-local monitor; cross-stage comparison is separately recorded'
+            record['pose_guard_scope']='source groups, not the mixed motion regularizer' if not getattr(self.body.state,'use_pose_cost_guard',True) else 'legacy stage-local pose-cost guard'
+            if getattr(self,'stage_quality',None) is not None:
+                self.stage_quality.finish(last_x,last_value,accepted_steps=self.accepted)
+                record['cross_stage_quality']=self.stage_quality.record()
             self.log.write(json.dumps(record)+'\n');write_json(self.output/'candidate.json',record)
             return last_x,record
         jacobian_seconds=float(getattr(self,'jacobian_seconds_hint',0.))

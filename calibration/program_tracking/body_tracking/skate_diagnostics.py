@@ -8,6 +8,27 @@ from .contact_feasibility import physical_feasibility
 from .skate_physics import FEASIBILITY_TOLERANCE,SUPPORT_BAND
 
 
+LEGACY_ICE_OBJECTIVE = 'legacy_hard_ice_objective'
+
+
+def ice_objective_mode(*records):
+    """Resolve saved objective semantics; an explicit finite-soft marker wins."""
+    for record in records:
+        if record is None:continue
+        if str(np.asarray(record.get('ice_mode', '')).item()) == 'finite_soft_objective':
+            return 'finite_soft_objective'
+        if 'ice_soft_policy_json' in record or 'ice_soft_policy' in record:
+            return 'finite_soft_objective'
+        if 'ice_is_delivery_gate' in record and not bool(np.asarray(record['ice_is_delivery_gate']).item()):
+            return 'finite_soft_objective'
+    return LEGACY_ICE_OBJECTIVE
+
+
+def _legacy_ice_diagnostics(**values):
+    return dict(objective_version=LEGACY_ICE_OBJECTIVE, legacy_only=True,
+                used_for_current_quality=False, **values)
+
+
 def source_support_shift_intervals(packet,evidence):
     """Instantaneous metric root-Z intervals; never modify the candidate.
 
@@ -34,6 +55,7 @@ def source_support_shift_intervals(packet,evidence):
             interval_nonempty=bool(lower<=upper),
             empty_interval_gap_m=max(0.,lower-upper)))
     return dict(schema='rinkspace.source-support-vertical-diagnostic.v1',applied=False,
+        objective_version=LEGACY_ICE_OBJECTIVE,legacy_only=True,used_for_current_quality=False,
         units='conditional scene metres',support_band_m=list(SUPPORT_BAND),bands_calibrated=False,
         scope='reviewed source exposure midpoints; same frozen pose, static attachment and shared template',
         limitations='No optimization. Neither an image-quality test nor a neighboring-time or global feasibility proof.',rows=rows)
@@ -41,12 +63,21 @@ def source_support_shift_intervals(packet,evidence):
 
 def inspect_checkpoint(problem,saved,path,out):
     """No minimization, parameter updates or tolerance calibration occurs here."""
-    out=Path(out);x=saved['x'].copy()
+    out=Path(out);out.mkdir(parents=True,exist_ok=True);x=saved['x'].copy()
     snapshot=out/'candidate.npz';prior_report={}
     # Publication must retain the actual budget/quality stop from the solve.
     # Only reuse a report already attached to these exact checkpoint bytes.
     if snapshot.exists() and (out/'candidate.json').exists() and snapshot.read_bytes()==Path(path).read_bytes():
         prior_report=json.loads((out/'candidate.json').read_text(encoding='utf8'))
+    # Keep the original reports byte-for-byte before publishing new semantics.
+    if snapshot.exists():
+        report_path=out/'candidate.json'
+        suffix='_'+digest(report_path)[:12] if report_path.exists() else ''
+        archive=out/'history'/(digest(snapshot)[:12]+suffix)
+        archive.mkdir(parents=True,exist_ok=True)
+        for name in ('candidate.npz','candidate.json','start_3520_diagnosis.json'):
+            previous=out/name
+            if previous.exists():(archive/name).write_bytes(previous.read_bytes())
     if 'physics_times' in saved:problem.set_physics_times(saved['physics_times'])
     if 'multiplier' in saved:
         if len(saved['multiplier'])!=len(problem.al.multiplier):raise ValueError('Saved physical row layout differs')
@@ -60,6 +91,29 @@ def inspect_checkpoint(problem,saved,path,out):
     core=np.array([35.2e9-1<=row[0]<=36.8e9+1 for row in check['labels']])
     core_gate=physical_feasibility(check['margin_m'][core],tolerance_m=FEASIBILITY_TOLERANCE,
         row_labels=[row for row,used in zip(check['labels'],core) if used])
+    mode=ice_objective_mode(saved,value['gate'],prior_report)
+    legacy=_legacy_ice_diagnostics(dense_gate=gate,core_dense_gate=core_gate,
+        support_band_m=list(SUPPORT_BAND),feasibility_tolerance_m=FEASIBILITY_TOLERANCE,
+        scope='old nonpenetration/support-band thresholds; diagnostic comparison only')
+    if mode=='finite_soft_objective':
+        # The old 35.20s hard-band counterfactual has no role in this objective.
+        # In particular, do not evaluate it outside a new clip's source interval.
+        snapshot.write_bytes(Path(path).read_bytes())
+        report=dict(prior_report,event='candidate_saved',
+            stop=prior_report.get('stop','caller stopped for diagnosis and human visual review'),
+            candidate_checkpoint=str(snapshot),source_checkpoint_sha256=digest(path),
+            source_seconds=list(problem.body.state.seconds),parts=value['parts'],**value['gate'],
+            raw_data_parts=value.get('raw_data_parts',{}),ice_mode=mode,
+            legacy_hard_ice_diagnostics=legacy,
+            temporal_check_step_s=.0025,finite_sampling_is_not_continuous_proof=True,
+            numerical_convergence=False,user_accepted=False,acceptance_calibrated=False,
+            no_optimization=True,initial_penalty=float(problem.al.penalty),
+            automatic_penalty_increase_stopped=True)
+        report['ice_is_delivery_gate']=False
+        for name in ('dense_gate','core_dense_gate','dense_gate_scope','physical_failure','support_parameters_status'):
+            report.pop(name,None)
+        write_json(out/'candidate.json',report)
+        return report
     t=np.array([35.20-problem.origin]);contact=problem.contact(x,times=t)
     features=contact['features'];heights=features['height'][0]
     eligible=[i for i,n in enumerate(features['ids']) if n in
@@ -81,17 +135,16 @@ def inspect_checkpoint(problem,saved,path,out):
         row_labels=[row for row,used in zip(trial_contact['labels'],core) if used])
     trial_value=problem.evaluate(trial,False)
     counterfactual=dict(applied_to_candidate=False,optimization_performed=False,
+        objective_version=LEGACY_ICE_OBJECTIVE,legacy_only=True,used_for_current_quality=False,
         construction='minimum-norm root-Z coefficients for the one 35.20s support upper bound; other coordinates unchanged',
         desired_vertical_shift_m=upper,core_physical_gate_before=core_gate,core_physical_gate_after=trial_gate,
         raw_image_cost_before=value.get('image_cost'),raw_image_cost_after=trial_value.get('image_cost'),
         raw_pose_cost_before=value.get('pose_cost'),raw_pose_cost_after=trial_value.get('pose_cost'))
     problem.binding.x=x[:17].copy()
     content=Path(path).read_bytes()
-    if snapshot.exists() and snapshot.read_bytes()!=content:
-        archive=out/'history'/digest(snapshot)[:12];archive.mkdir(parents=True,exist_ok=True)
-        (archive/'candidate.npz').write_bytes(snapshot.read_bytes())
     snapshot.write_bytes(content)
     diagnosis=dict(source_checkpoint=str(path),sha256=digest(path),no_optimization=True,
+        objective_version=LEGACY_ICE_OBJECTIVE,legacy_only=True,used_for_current_quality=False,
         at_source_seconds=35.20,actual_body_interval=list(state.seconds),
         outer_basis_sum=float(basis.sum()),nonzero_basis_indices=np.flatnonzero(basis).tolist(),
         state_columns=state.active.tolist(),
@@ -108,12 +161,14 @@ def inspect_checkpoint(problem,saved,path,out):
     write_json(out/'start_3520_diagnosis.json',diagnosis)
     report=dict(prior_report,event='candidate_saved',stop=prior_report.get('stop','caller stopped for diagnosis and human visual review'),
         candidate_checkpoint=str(snapshot),source_checkpoint_sha256=digest(path),
-        source_seconds=list(state.seconds),parts=value['parts'],**value['gate'],dense_gate=gate,core_dense_gate=core_gate,
+        source_seconds=list(state.seconds),parts=value['parts'],**value['gate'],
+        ice_mode=mode,legacy_hard_ice_diagnostics=legacy,
         raw_data_parts=value.get('raw_data_parts',{}),
         temporal_check_step_s=.0025,finite_sampling_is_not_continuous_proof=True,
-        dense_gate_scope='skate nonpenetration and explicitly supported source exposure; foot/collar tested at every source midpoint and neutral pose',
         numerical_convergence=False,user_accepted=False,acceptance_calibrated=False,
         support_parameters_status='debug only; 3 mm upper and 1 mm slack remain uncalibrated',
         initial_penalty=float(problem.al.penalty),automatic_penalty_increase_stopped=True)
+    for name in ('dense_gate','core_dense_gate','dense_gate_scope','physical_failure'):
+        report.pop(name,None)
     write_json(out/'candidate.json',report)
     return report

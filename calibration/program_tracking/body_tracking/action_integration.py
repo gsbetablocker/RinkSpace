@@ -13,6 +13,7 @@ from .skate_run_policy import RunPolicy
 from .skate_delivery import export_candidate
 from .skating_action_factors import validate_source_timeline,root_so3_diagnostics
 from .fullbody_round import write_json
+from .source_support_export import apply_source_support
 
 
 def _native(data,*names):
@@ -55,8 +56,8 @@ class ClipReference(SkateReference):
         return result
 
 
-def initialize_clip(project,base_root,output,native_path,prior_path,shot_id,*,heldout_pts=()):
-    """Use real pixels for root initialization, and the SAME GVHMR pose for A/B."""
+def initialize_clip(project,base_root,output,native_path,prior_path,shot_id,*,heldout_pts=(),prior_label='GVHMR'):
+    """Use real pixels and an explicit camera-frame prior; shared S01 supplies shape only."""
     project,base_root,output=map(Path,(project,base_root,output));output.mkdir(parents=True,exist_ok=True)
     native=load(native_path);prior=load(prior_path)
     pts=_native(native,'pts','source_pts').astype(np.int64)
@@ -152,12 +153,12 @@ def initialize_clip(project,base_root,output,native_path,prior_path,shot_id,*,he
         shared_geometry=ref.geometry,user_accepted=np.array(False))
     write_json(output/'initialization.json',dict(source_pts=[int(pts[0]),int(pts[-1])],source_exposures=n,
         camera=info,hashes=ref.hashes,shared_shape_and_attachment_fixed=True,
-        body_pose_origin='real uniform-25Hz GVHMR incam; world rotation through this frozen camera',
+        body_pose_origin=f'real uniform-25Hz {prior_label} incam; world rotation through this frozen camera',
         root_origin='weighted native source body rays and fixed shared body size; network translation unused',
         interpolation='SO(3) RotationSpline of actual root/local rotations; cubic root position least-squares, 0.2s knots',
         inferred_root_pts=pts[~valid].tolist(),mapping_missing_pts=pts[missing].tolist(),
         heldout_pts=pts[heldout].tolist(),heldout_protection_pts=pts[hold].tolist(),
-        prior_pose_anchor='current clip GVHMR only; no historical opening or S01 body-pose layers'))
+        prior_pose_anchor=f'current clip {prior_label} only; no historical opening or S01 body-pose layers'))
     return ref,camera,info
 
 
@@ -222,12 +223,7 @@ def run_arm(project,base_root,root,native,prior,clip_id,evidence,arm,budget=300)
         if foot in (0,1):
             mask=(packet['pts']>=interval['start_pts'])&(packet['pts']<=interval['end_pts'])
             phases[mask,foot]=interval['phase']
-    for support in supports:
-        rows=np.flatnonzero(packet['pts']==support['pts'])
-        if len(support['feet'])==1:
-            foot=support['feet'][0]
-            packet['skate_contact_mode_mid'][rows,foot]=support['mode']
-            packet['skate_contact_confidence_mid'][rows,foot]=support['confidence']
+    apply_source_support(packet,supports,shot_id=evidence['shot_id'])
     packet['source_action_phase_mid']=phases
     packet['ice_soft_policy_json']=np.array(json.dumps(vars(problem.ice_policy),sort_keys=True))
     packet['ice_is_delivery_gate']=np.array(False)

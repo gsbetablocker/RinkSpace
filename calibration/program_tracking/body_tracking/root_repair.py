@@ -10,6 +10,8 @@ from .root_trajectory import proxy_root_samples, smooth_root_samples, image_heig
 from .rebuild_prepare import load, digest
 from .fullbody_round import write_json
 from .skate_delivery import export_candidate
+from .source_support_export import apply_source_support
+from .stage_quality import attach_saved_A_comparison
 
 PROGRAMME=Path('events/ankara_2026/programmes/okada_mei_sp')
 
@@ -88,6 +90,8 @@ def run_arm(project,base_root,run,clip,arm,budget=120.):
             'continuous_root',optimize_shared=False)
         from .action_live import GlideActionFactors
         problem.action_factors=GlideActionFactors(problem,evidence,sigma_mps=evidence['glide_sigma_mps'],enabled=arm=='B')
+        attach_saved_A_comparison(problem,root,dict(source_id=evidence['source_id'],shot_id=evidence['shot_id'],
+            pts=reference.p['pts'].tolist(),camera_identity=info,body_observations_sha256=digest(root/'observations.npz')))
         initial=np.r_[reference.binding.x,np.zeros(problem.body.size)]
         # A directional check on the actual live residual, before spending the fit budget.
         rng=np.random.default_rng(110304);direction=np.r_[np.zeros(17),rng.normal(size=problem.body.size)]
@@ -104,6 +108,7 @@ def run_arm(project,base_root,run,clip,arm,budget=120.):
     np.testing.assert_allclose(reference.at(ref.times)['Q'],pose['Q'],rtol=0,atol=2e-14)
     np.testing.assert_allclose(reference.at(ref.times)['local_R'],pose['local_R'],rtol=0,atol=2e-14)
     packet=export_candidate(root,out,reference,camera,info,supports)
+    apply_source_support(packet,supports,shot_id=evidence['shot_id'])
     old=load(root/arm/'fitted/result.npz')
     for name in ('source_action_phase_mid','action_evidence_json'):
         if name in old:packet[name]=old[name].copy()
@@ -156,6 +161,8 @@ def run_pose(project,base_root,run,clip,arm,total_budget=120.):
             (float(first-padding),float(last+padding)),supports,out/'fit',log,'continuous_pose',optimize_shared=False)
         from .action_live import GlideActionFactors
         problem.action_factors=GlideActionFactors(problem,evidence,sigma_mps=evidence['glide_sigma_mps'],enabled=arm=='B')
+        attach_saved_A_comparison(problem,root,dict(source_id=evidence['source_id'],shot_id=evidence['shot_id'],
+            pts=reference.p['pts'].tolist(),camera_identity=info,body_observations_sha256=digest(root/'observations.npz')))
         # Use only completed real evaluations to avoid starting a Jacobian
         # that demonstrably cannot fit the remaining aggregate budget.
         rates=[]
@@ -172,6 +179,7 @@ def run_pose(project,base_root,run,clip,arm,total_budget=120.):
     reference.binding.x=x[:17].copy();reference.new_refinements.append((problem.body.state,x[17:].copy()))
     np.testing.assert_array_equal(x[:17],initial[:17]);np.testing.assert_array_equal(reference.at(reference.times)['P'],fixed_root)
     packet=export_candidate(root,out,reference,camera,info,supports)
+    apply_source_support(packet,supports,shot_id=evidence['shot_id'])
     old=load(previous/'fitted/result.npz')
     for name in ('source_action_phase_mid','action_evidence_json','root_initialization_sha256','root_phase_override_json'):
         if name in old:packet[name]=old[name].copy()

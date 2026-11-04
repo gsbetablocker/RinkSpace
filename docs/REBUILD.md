@@ -63,6 +63,8 @@ S01 既有全身、共享鞋体与开头分支已接入相同目标的紧凑 FK/
 人体动作短段另有 `scripts/repair_action_root.py`：复用已保存的 GVHMR A/B 姿态与固定共享鞋刀，先修整段根平移，再在剩余预算内调姿态；两阶段共用同一身体、鞋刀和原生相机投影。`continuous_root` 对实际根加速度求残差，`continuous_pose` 保持已修根曲线。源阶段与条件初始化配置归节目 `root_trajectory_1103.json`，不产生新的支持观测，不固定旋转中心。预算监视可根据已测单次 Jacobian 耗时预留退出。2026-11-03 的三段实际结果减少了根往返漂移，但人体/鞋刀图像误差仍有退化且保留 SO(3) 跳变；它们是播放器中的未验收候选，不能视为人体定位或接冰已完成。
 
 
+源支撑区域已通过 `support_image.py` 接入同一身体／鞋刀状态、五曝光节点native Brown及隐式行时间Jacobian；连续runner图像导数包含最低点沿rocker移动。`support_refinement.py` 可在局部C2窗联合开放root XYZ/SO(3)与明确支撑腿，`stage_quality.py`保留原A/seed/best/delivery分组对照；公共导出保留源标签，legacy硬冰面报告不参与当前软冰面交付门。2026-11-04真实88–92秒小窗做了两轮有界更新，图像训练区域局部改善，但review与世界runner轨迹仍失败，未扩完整事件。实际参数、预算与限制见[本轮索引](../events/ankara_2026/programmes/okada_mei_sp/spin_support_1104_audit.json)。
+
 ## 工程检查
 
 基础 Python 检查见 [README](../README.md)，CPU／CUDA 构建与原生检查见 [native](../native/README.md)，运行依赖见[环境说明](../environments/README.md)。测试按所用接口选择，不要求基础安装具备全部本机历史后端。
@@ -78,3 +80,6 @@ S01 既有全身、共享鞋体与开头分支已接入相同目标的紧凑 FK/
 - 真实人体位置、垂直投影及冰刀接触的独立验证。
 
 这些缺口不阻止使用已经实现的 prepare、review、原生几何和连续 LM 接口；调用范围由上述接口与实际运行绑定确定。
+
+
+2026-11-04 ExMR 相机坐标对照：spin_s05 完整 76–95 秒的固定 GVHMR 原始相机输出已核验，ExMR 固定提交的本机 camera-only 推理已实际完成，SAM 原生输出与足细化前后参数均保留。原生裁切纠正的首轮失败对照也保留。所有显示状态复用同一固定 S01 鞋刀、native 投影和现有播放器；GVHMR 一步候选可精确重放，ExMR 足细化后因鞋口截面 unknown 未接受优化，足细化前为未优化诊断。实际审阅入口 [START_3D_SPIN_MODELS.cmd](../START_3D_SPIN_MODELS.cmd)，[审核索引](../events/ankara_2026/programmes/okada_mei_sp/spin_models_1104_audit.json)登记来源、实际步数、失败和参数。运行证据位于 Data/runs/body_s01_20261029/exmr_spin_compare_1104/native_protocol。模型骨盆投影仍明显漂移，尚未验收或扩全节目。

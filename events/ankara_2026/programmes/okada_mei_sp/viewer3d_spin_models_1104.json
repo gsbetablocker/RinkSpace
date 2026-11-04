@@ -1,0 +1,78 @@
+{
+  "schema": "rinkspace.result-viewer.v1",
+  "event": "ankara_2026",
+  "programme": "okada_mei_sp",
+  "shot": "spin_models_1104",
+  "source_run": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\player",
+  "scene_root": "runs/body_s01_20261029/fullbody_1102",
+  "scene_label": "camera_solver_refined_1102 冻结场景",
+  "metric_binding": "runs/body_s01_20261029/fullbody_1102/metric_binding.json",
+  "metric_binding_base": "data",
+  "model_asset": "environments/body/GVHMR/inputs/checkpoints/body_models/smplx/SMPLX_NEUTRAL.npz",
+  "default_variant": "exmr_prefoot",
+  "initial_source_pts": 1127936,
+  "initial_view": "side",
+  "initial_wear_inspection": false,
+  "comparison_variants": [
+    "gvhmr_fixed",
+    "exmr_prefoot",
+    "exmr_final"
+  ],
+  "variants": [
+    {
+      "id": "gvhmr_fixed",
+      "label": "GVHMR 固定基线（共同初值）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\common\\gvhmr\\initial\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "own_camera_gvhmr_fixed_shared_S01_shape_and_skate",
+      "body_refinement_intervals_seconds": []
+    },
+    {
+      "id": "gvhmr_joint1",
+      "label": "GVHMR 联合1步（未验收）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\common\\gvhmr\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "own_camera_gvhmr_joint1_shared_S01_shape_and_skate",
+      "body_refinement_intervals_seconds": [
+        [
+          76.0,
+          95.0
+        ]
+      ]
+    },
+    {
+      "id": "exmr_prefoot",
+      "label": "ExMR 足细化前（共同初值，未优化）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\common\\exmr_prefoot\\initial\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "own_camera_exmr_prefoot_shared_S01_shape_and_skate",
+      "body_refinement_intervals_seconds": []
+    },
+    {
+      "id": "exmr_final",
+      "label": "ExMR 足细化后（结构unknown，未优化）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\common\\exmr_final\\initial\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "own_camera_exmr_final_shared_S01_shape_and_skate",
+      "body_refinement_intervals_seconds": []
+    }
+  ],
+  "source_identity_field": "source_identity_suspect",
+  "review_status": "Same full 76-95 second source clock. Network/body/skate candidates require source review; none accepted as truth.",
+  "root_repair_status": "Own network articulation; common source-ray world initialization; finite soft ice; no automatic network-static contact labels.",
+  "source_shot": "s05",
+  "source_video": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4",
+  "source_time_base": [
+    1,
+    12800
+  ],
+  "support_observations": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\support_spin_1104.json",
+  "support_foot": 1,
+  "support_world_regions": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\support_world_regions.json",
+  "body_window_scope": "Complete continuous 76.00-95.00 second spin; no internal frame-window freezing.",
+  "camera_comparison": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\camera_comparison.json"
+}

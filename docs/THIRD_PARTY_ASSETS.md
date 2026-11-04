@@ -75,3 +75,8 @@ SMPL-X 的研究引用为 Georgios Pavlakos 等，*Expressive Body Capture: 3D H
 ## 已知缺口
 
 项目内资源迁移和隔离检查已有记录，空白机器的完整 Windows 人体构建／推理仍未验证。部分上游定义包含 Linux wheel，不能直接当作本机环境锁。各模型、人体组件和嵌入数据的许可闭合程度分别判断；来源登记不授予额外再分发或商业权利。
+
+
+ExMR局部camera-only补丁的[上游完整许可及署名](../environments/third_party_licenses/EXMR_LICENSE.txt)按固定提交原字节保留，包含Leibniz University Hannover与GVHMR原作者通知；衍生修改沿用其教育／研究／非营利和非商业条件。资产revision、SHA及实际执行范围见[审核索引](../events/ankara_2026/programmes/okada_mei_sp/spin_models_1104_audit.json)。
+
+ExMR camera-only 本机比较固定 [官方 ExMR](https://github.com/twehrbein/ExMR) 提交 eac72e47339b404c0443f5fb323412e2ce432410，权重来源为作者固定 Hugging Face revision；依其非商业研究许可使用。SAM 3D Body/DINOv3 及 HaMeR 分别按各自官方许可使用，模型字节和完整第三方源码均留 Data，不随本项目公开。固定来源、SHA 与许可网址在 environments/prepare_exmr_assets.py 读取的官方清单及 Data 运行 assets_manifest.json 中；OneDrive 只保存接线、依赖和局部补丁。当前 HaMeR 仅抽取原网络 token，没有加载或分发 MANO 手模型。

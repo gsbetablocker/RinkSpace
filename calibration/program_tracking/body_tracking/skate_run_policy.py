@@ -108,6 +108,25 @@ def _metric(value):
     return value if math.isfinite(value) and value >= 0 else None
 
 
+def structural_progress_is_observable(active_state_columns, *, optimize_shared):
+    """Return false for a proved rigid-body-only stage with fixed footwear.
+
+    The 69-column body layout uses 0:3 for world translation, 3:6 for global
+    orientation, and 6:69 for local joint rotations. Foot-cavity and collar
+    rows are expressed in body/foot coordinates, so a common world rigid
+    motion cannot change them. Local-pose or shared-shape stages retain the
+    existing stop. This is deliberately conservative; it does not claim
+    that every local joint can change every structural row.
+    """
+    if not isinstance(optimize_shared, bool):
+        raise ValueError('optimize_shared must be bool')
+    columns = tuple(active_state_columns)
+    for column in columns:
+        if isinstance(column, bool) or not isinstance(column, Integral) or not 0 <= column < 69:
+            raise ValueError('active body columns must be integers in [0, 69)')
+    return optimize_shared or any(column >= 6 for column in columns)
+
+
 class Monitor:
     """Monitor coherent initial/accepted-state measurements, never trial fits.
 
@@ -119,8 +138,11 @@ class Monitor:
     measurements are diagnostic unless the caller supplies an explicit maximum
     and matching unit in quality_limits. No default action threshold is implied.
     """
-    def __init__(self, policy=None, *, now, quality_limits=None):
+    def __init__(self, policy=None, *, now, quality_limits=None, violation_stagnation_enabled=True):
         self.policy = RunPolicy() if policy is None else policy
+        if not isinstance(violation_stagnation_enabled, bool):
+            raise ValueError('violation_stagnation_enabled must be bool')
+        self.violation_stagnation_enabled = violation_stagnation_enabled
         self.start_now = float(now)
         if not math.isfinite(self.start_now):raise ValueError('now must be finite monotonic seconds')
         self.last_now = self.start_now
@@ -197,7 +219,7 @@ class Monitor:
         if self.outer_completed >= p.max_outer:
             stop('outer_budget', 'Completed outer-solve budget reached.', outer_completed=self.outer_completed, limit=p.max_outer)
         history = self._violation_history
-        if accepted and len(history) == p.stagnation_window+1 and all(v is not None for _, v in history):
+        if self.violation_stagnation_enabled and accepted and len(history) == p.stagnation_window+1 and all(v is not None for _, v in history):
             if history[-1][0]-history[0][0] == p.stagnation_window:
                 improvement = history[0][1]-history[-1][1]
                 if improvement < p.min_violation_improvement_m:
@@ -248,6 +270,7 @@ class Monitor:
             checks=self.checks, accepted=self.accepted, outer_completed=self.outer_completed,
             baseline=deepcopy(self.baseline), latest=deepcopy(self.latest),
             best_violation_m=self.best_violation_m, best_at_accepted=self.best_at_accepted,
+            violation_stagnation_enabled=self.violation_stagnation_enabled,
             comparable_violation_history=[dict(accepted=n, best_violation_m=v) for n, v in self._violation_history],
             stopped_by_policy=bool(self.stop_reasons), first_stop_now=self.first_stop_now,
             reasons=deepcopy(self.stop_reasons), quality_failed=bool(self.quality_reasons),

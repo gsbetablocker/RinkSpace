@@ -18,3 +18,7 @@ models/*.pth filter=lfs diff=lfs merge=lfs -text
 
 # Compact technical review archives stay below the ordinary GitHub file limit.
 events/*/programmes/*/review/*.zip binary
+
+# Retain the exact upstream ExMR notice and unified-diff context.
+environments/third_party_licenses/EXMR_LICENSE.txt whitespace=-blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+environments/exmr_camera.patch whitespace=-blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

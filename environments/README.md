@@ -42,6 +42,18 @@ python -B environments/prepare_body_sources.py --data-root <外部Data绝对路�
 
 三维播放器的固定依赖和许可证据见 [viewer3d-provenance.json](viewer3d-provenance.json)。默认窗口使用 Pyglet；锁文件仍保留 AITViewer 声明的 Qt 依赖，实际条件见[许可核查](../docs/LICENSING_REVIEW.md#viewer3d)。环境与完整人体缓存均留 Data。
 
+## ExMR 相机坐标短段对照
+
+当前固定 ExMR `eac72e47339b404c0443f5fb323412e2ce432410`，外部源码、模型和附加包位于 Data；已有 body_cuda 不升级。附加依赖见 [requirements-exmr-extra.txt](requirements-exmr-extra.txt)。[prepare_exmr_assets.py](prepare_exmr_assets.py) 默认核验，`--fetch` 才下载固定资产；使用本机登录文件但不输出凭据。HaMeR token 路径仅实例化原版 backbone/head，不需要实例化 MANO 网格或渲染器。
+
+ExMR局部补丁保留[上游完整许可和署名](third_party_licenses/EXMR_LICENSE.txt)，适用教育／研究／非营利用途及衍生修改非商业条件；不是项目通用许可。下载资产的固定revision/SHA见[本次审核索引](../events/ankara_2026/programmes/okada_mei_sp/spin_models_1104_audit.json)，模型字节与第三方完整实现不分发。
+
+[apply_exmr_camera_patch.py](apply_exmr_camera_patch.py) 核验固定提交及文件内容，`--apply` 应用 [camera-only 补丁](exmr_camera.patch)。返回出口位于 world 分支之前，保留足细化前／后和最终相机 SMPL-X，禁止同时开启世界后处理、贴地或平滑。[exmr_prior.py](../calibration/program_tracking/body_tracking/exmr_prior.py) 的 prepare/keypoints/sam/hands/infer 分阶段复用已知人物、原始 PTS 和相机；SAM 原生 MHR 输出与特征一并保存。原始人物框分别按 SAM/ExMR 原生规则处理，不复用 GVHMR 已扩大的方框作为原始检测框。
+
+2026-11-04 本机实际对照为 spin_s05 的完整 76–95 秒：两网络各一段 476 帧真实 25Hz 输入，现有唯一状态在 951 个原生 50Hz 曝光上消费；原生节奏适配未标定。新入口 [run_exmr_comparison.py](../scripts/run_exmr_comparison.py) 通过同一性能包装器 profile/compare/replay，共享满意 S01 体型和鞋刀，自己的网络姿态不继承另一网络身体层。`replay` 实际读取自身初值及 case 身份，旧快照不自动补身份。
+
+当前结果在 Data/runs/body_s01_20261029/exmr_spin_compare_1104/native_protocol。GVHMR 实际保留 1 步；ExMR 足细化后的鞋口截面出现 unknown，未接受优化步，足细化前仅作未优化对照。新 [START_3D_SPIN_MODELS.cmd](../START_3D_SPIN_MODELS.cmd) 使用现有播放器；这不是全节目接入或轨迹验收。Windows/Python3.11/Torch2.7.1 的已运行范围仅为这里的 camera-only 子链，不宣称官方完整 demo 已在此环境重建。
+
 ## 人体求解执行优化
 
 [性能启动入口](../scripts/run_body_performance.py)给现有 Python 求解命令设置子进程环境，原参数原样传递。切换原生库时使用独立候选目录和已有参数作 warm-start，使旧目录的输入记录保持原样。例如将当前时序入口及其已有参数接在后面：
