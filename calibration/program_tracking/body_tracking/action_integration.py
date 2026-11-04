@@ -31,11 +31,25 @@ class ClipReference(SkateReference):
         self.binding=copy.copy(shared.binding);self.binding.x=shared.binding.x.copy()
         self.q_curve=RotationSpline(self.times,Rotation.from_matrix(initial['Q']))
         self.local_curves=[RotationSpline(self.times,Rotation.from_matrix(initial['local_R'][:,j]))for j in range(21)]
-        a,b=self.times[[0,-1]];knots=np.r_[[a]*4,np.arange(a+.2,b-1e-8,.2),[b]*4]
-        B=BSpline.design_matrix(self.times,knots,3).toarray()
-        controls=np.linalg.lstsq(B,initial['P'],rcond=None)[0]
-        self.p_curve=BSpline(knots,controls,3,extrapolate=True)
+        if 'root_curve_schema' in initial:
+            if str(initial['root_curve_schema'])!='rinkspace.source-clock-root-bspline.v1':raise ValueError('Unsupported archived root curve schema')
+            knots=np.asarray(initial['root_curve_knots'],float);controls=np.asarray(initial['root_curve_controls'],float);degree=int(initial['root_curve_degree'])
+            if degree!=3 or knots.ndim!=1 or controls.shape!=(len(knots)-degree-1,3) or np.any(np.diff(knots)<0) or not np.isfinite(knots).all() or not np.isfinite(controls).all():raise ValueError('Invalid archived source-clock root curve')
+            self.p_curve=BSpline(knots,controls,degree,extrapolate=True)
+            np.testing.assert_allclose(self.p_curve(self.times),initial['P'],rtol=0,atol=1e-10,err_msg='Archived root curve does not reproduce its source exposures')
+        else:
+            a,b=self.times[[0,-1]];knots=np.r_[[a]*4,np.arange(a+.2,b-1e-8,.2),[b]*4]
+            B=BSpline.design_matrix(self.times,knots,3).toarray()
+            controls=np.linalg.lstsq(B,initial['P'],rcond=None)[0]
+            self.p_curve=BSpline(knots,controls,3,extrapolate=True)
         self.export_source_path=self.root/'export_source.npz'
+        from .hand_state import hand_curves,META
+        self.hand_metadata={k:initial[k] for k in META if k in initial}
+        self.hand_curves=None
+        if 'hand_local_R' in initial:
+            ht=(initial['hand_prior_pts']-p['pts'][0])/12800. if 'hand_prior_pts' in initial else self.times
+            self.hand_curves=hand_curves(ht,initial.get('hand_prior_local_R',initial['hand_local_R']))
+        elif self.hand_metadata:raise ValueError('Hand schema present without archived hand state')
 
     def root_derivative(self,t,order):
         t=np.atleast_1d(t).astype(float);value=self.p_curve(t,order)
@@ -49,6 +63,9 @@ class ClipReference(SkateReference):
         t=np.atleast_1d(t).astype(float)
         result=dict(P=self.p_curve(t),Q=self.q_curve(t).as_matrix(),
             local_R=np.stack([c(t).as_matrix()for c in self.local_curves],axis=1))
+        if self.hand_curves is not None:
+            from .hand_state import evaluate_hands
+            result['hand_local_R']=evaluate_hands(self.hand_curves,t)
         for ws,x in self.new_refinements:
             d=ws.increments(x,t);result['P']+=d[:,:3]
             result['Q']=result['Q']@matrices(d[:,3:6])
@@ -87,7 +104,9 @@ def initialize_clip(project,base_root,output,native_path,prior_path,shot_id,*,he
     local=np.stack([RotationSpline(prior_times,Rotation.from_matrix(raw_local[:,j]))(p['fit_time_seconds']).as_matrix()for j in range(21)],axis=1)
     raw_world=prior['R_w2c'].transpose(0,2,1)@Rotation.from_rotvec(prior['global_orient']).as_matrix()
     Q=RotationSpline(prior_times,Rotation.from_matrix(raw_world))(p['fit_time_seconds']).as_matrix()
-    coco=shared.body.forward_rotations(local)[0]
+    from .hand_state import prior_hand_fields
+    hand_fields=prior_hand_fields(prior,p['fit_time_seconds'],pts[0],prior_label,digest(prior_path))
+    coco=shared.body.forward_rotations(local,**({} if not hand_fields else {'hand_local_R':hand_fields['hand_local_R']}))[0]
     rel=np.einsum('nij,nkj->nki',pose['rotation']@Q,coco)
     # Brown ray unprojection uses the same explicit camera25 implementation
     # as preparation; the helper records its native-camera closure check.
@@ -116,13 +135,13 @@ def initialize_clip(project,base_root,output,native_path,prior_path,shot_id,*,he
     if initial_path.exists():
         previous=load(initial_path)
         np.testing.assert_array_equal(previous['pts'],pts)
-        for name,value in dict(P=P,Q=Q,local_R=local).items():
+        for name,value in dict(P=P,Q=Q,local_R=local,**{k:v for k,v in hand_fields.items() if k not in ('hand_pose_schema_version','hand_mean_convention','hand_pose_origin','hand_prior_sha256')}).items():
             np.testing.assert_allclose(previous[name],value,rtol=0,atol=1e-12)
         # Reuse the saved arrays exactly across A/B; tiny BLAS roundoff is
         # verified above, not written as a distinct initialization.
         P,Q,local=(previous[k] for k in ('P','Q','local_R'))
-    else:np.savez_compressed(initial_path,pts=pts,P=P,Q=Q,local_R=local)
-    ref=ClipReference(shared,output,p,dict(P=P,Q=Q,local_R=local))
+    else:np.savez_compressed(initial_path,pts=pts,P=P,Q=Q,local_R=local,**hand_fields)
+    ref=ClipReference(shared,output,p,dict(P=P,Q=Q,local_R=local,**hand_fields))
     ref.hashes=dict(native_input_sha256=digest(native_path),camera_prior_sha256=digest(prior_path),
         shared_s01_parameters_sha256=digest(project/'events/ankara_2026/programmes/okada_mei_sp/skate_s01_1103.npz'))
     ref.fixed_checkpoint_identity=checkpoint_identity(ref.binding,project,info)

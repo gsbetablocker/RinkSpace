@@ -56,14 +56,15 @@ S01／S04 等轴焦距、六镜头 Lane 与历史九镜头 joint_mount_flex 基�
 
 ## 人体局部拟合执行层
 
-S01 既有全身、共享鞋体与开头分支已接入相同目标的紧凑 FK/LBS 优化、脚部采样缓存、局部导数 CPU 并行、同状态前向复用和共享鞋参的身体重放。独立 CPU 原生库新增完整运动相机的 XYZ 解析导数及可选 OpenMP，保持 ABI2；旧库继续走原导数入口。可选 CUDA 仅负责 FP64 紧凑人体前向，鞋体因子、相机、CSR 装配和 SciPy TRF/LSMR 仍在 CPU。
+S01 全身、共享鞋体与开头分支复用同一身体／鞋刀目标，支持紧凑 FK/LBS、脚部采样缓存、局部导数 CPU 并行、同状态前向复用和共享鞋参的身体重放。独立 CPU 原生库提供完整运动相机的 XYZ 解析导数及可选 OpenMP，保持 ABI2；旧库继续使用原导数入口。`hybrid` 在单窗口、冻结共享鞋参条件下，将 native55 FK、选中皮肤与足腔／鞋口兼容性精确扰动留在 GPU；身体解析导数、相机、CSR 装配和 SciPy TRF/LSMR 仍在 CPU。配置与同状态测量见[环境说明](../environments/README.md#人体求解执行优化)；GPU 常驻身体 Jacobian、相机和线性求解尚未实现。
 
-执行配置、启动包装和同状态评估命令见[环境说明](../environments/README.md#人体求解执行优化)。当前新动作／时序派生问题无需更改调用签名即可使用公共层；它们自己的附加物理残差求导仍沿用原实现。Data 中 body_perf_1103 记录本机数值与单次评估对照；未启动整轮性能对照拟合，也未实现 GPU 常驻身体 Jacobian／相机／线性求解，不能据此宣称整轮提速或人体位置与接触准确性已验收。
+[scripts/repair_action_root.py](../scripts/repair_action_root.py)复用已保存姿态和固定鞋刀，先优化根平移，再在剩余预算内调整姿态。`continuous_root` 对实际根加速度求残差，`continuous_pose` 保持已修根曲线；源阶段和条件初值由节目 `root_trajectory_1103.json` 登记。预算监视可按测得的 Jacobian 耗时预留出口，真实运行的停止原因以对应结果绑定为准。
 
-人体动作短段另有 `scripts/repair_action_root.py`：复用已保存的 GVHMR A/B 姿态与固定共享鞋刀，先修整段根平移，再在剩余预算内调姿态；两阶段共用同一身体、鞋刀和原生相机投影。`continuous_root` 对实际根加速度求残差，`continuous_pose` 保持已修根曲线。源阶段与条件初始化配置归节目 `root_trajectory_1103.json`，不产生新的支持观测，不固定旋转中心。预算监视可根据已测单次 Jacobian 耗时预留退出。2026-11-03 的三段实际结果减少了根往返漂移，但人体/鞋刀图像误差仍有退化且保留 SO(3) 跳变；它们是播放器中的未验收候选，不能视为人体定位或接冰已完成。
+`support_image.py` 将源支撑区域接入同一身体／鞋刀状态、五曝光节点 native Brown 投影和隐式行时间 Jacobian，runner 导数包含最低点沿 rocker 的移动。`support_refinement.py` 可在局部 C2 窗联合开放根 XYZ／SO(3)与指定支撑腿；`stage_quality.py`比较原 A、初值、最佳保留状态和交付状态。冰面有限软项与 legacy 硬冰面报告分别解释，源标签和未知状态随结果导出。
 
+GVHMR／ExMR 相机坐标对照复用同一固定鞋刀、native 投影和现有播放器。ExMR camera-only 入口保留足细化前后输出，关闭世界后处理、贴地、平滑和朝向归一化；其本机接入范围见[环境说明](../environments/README.md#exmr-相机坐标短段对照)。真实人体候选仍有根漂移、图像或接触失败，当前范围与精确绑定集中见[节目结果导航](../events/ankara_2026/programmes/okada_mei_sp/README.md#人体与足鞋结果)。
 
-源支撑区域已通过 `support_image.py` 接入同一身体／鞋刀状态、五曝光节点native Brown及隐式行时间Jacobian；连续runner图像导数包含最低点沿rocker移动。`support_refinement.py` 可在局部C2窗联合开放root XYZ/SO(3)与明确支撑腿，`stage_quality.py`保留原A/seed/best/delivery分组对照；公共导出保留源标签，legacy硬冰面报告不参与当前软冰面交付门。2026-11-04真实88–92秒小窗做了两轮有界更新，图像训练区域局部改善，但review与世界runner轨迹仍失败，未扩完整事件。实际参数、预算与限制见[本轮索引](../events/ankara_2026/programmes/okada_mei_sp/spin_support_1104_audit.json)。
+`ballistic_com_factors.py` 从同一身体／鞋刀状态计算分段体积质量近似质心，在有原片支持的腾空内部对质心加速度减去重力形成有限残差；不把骨盆或网络静止概率当质心／接冰真值。`spin_entry_motion.py` 保留整段连续状态、旧质量基线和失败候选；该次实际结果及剩余回投误差见[入旋记录](../events/ankara_2026/programmes/okada_mei_sp/spin_entry_1104_audit.json)。
 
 ## 工程检查
 
@@ -80,6 +81,3 @@ S01 既有全身、共享鞋体与开头分支已接入相同目标的紧凑 FK/
 - 真实人体位置、垂直投影及冰刀接触的独立验证。
 
 这些缺口不阻止使用已经实现的 prepare、review、原生几何和连续 LM 接口；调用范围由上述接口与实际运行绑定确定。
-
-
-2026-11-04 ExMR 相机坐标对照：spin_s05 完整 76–95 秒的固定 GVHMR 原始相机输出已核验，ExMR 固定提交的本机 camera-only 推理已实际完成，SAM 原生输出与足细化前后参数均保留。原生裁切纠正的首轮失败对照也保留。所有显示状态复用同一固定 S01 鞋刀、native 投影和现有播放器；GVHMR 一步候选可精确重放，ExMR 足细化后因鞋口截面 unknown 未接受优化，足细化前为未优化诊断。实际审阅入口 [START_3D_SPIN_MODELS.cmd](../START_3D_SPIN_MODELS.cmd)，[审核索引](../events/ankara_2026/programmes/okada_mei_sp/spin_models_1104_audit.json)登记来源、实际步数、失败和参数。运行证据位于 Data/runs/body_s01_20261029/exmr_spin_compare_1104/native_protocol。模型骨盆投影仍明显漂移，尚未验收或扩全节目。

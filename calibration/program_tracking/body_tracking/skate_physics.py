@@ -5,7 +5,7 @@ rows are (physical time id, foot nonpenetration or source support group),
 irrespective of which exact arc/solid supplies the active witness.
 """
 import numpy as np
-from scipy.sparse import coo_matrix
+from scipy.sparse import coo_matrix,csr_matrix
 from .fullbody_state import matrices
 from .fullbody_fit import right_jacobian
 from .skate_contact import trapezoid_time_weights
@@ -49,7 +49,7 @@ def fk_state(reference,ref,delta):
     native=(pos-body.J[0])*body.scale
     R,O=reference.binding.transforms(P,Q,native,rot)
     nativeW=P[:,None]+np.einsum('nij,nkj->nki',Q,native)
-    return dict(P=P,Q=Q,local_R=local,frames=rot,native=native,native_world=nativeW,R=R,O=O)
+    return dict(P=P,Q=Q,local_R=local,frames=rot,native=native,native_world=nativeW,R=R,O=O,**({} if 'hand_local_R' not in ref else {'hand_local_R':ref['hand_local_R']}))
 
 
 def batch_features(binding,R,O,state=None):
@@ -129,46 +129,65 @@ def constraints(binding,state,times,source_origin,evidence):
 
 
 def body_constraint_jacobian(reference,state,delta,active,B,evaluation):
-    """Envelope theorem at each active witness, followed by sparse spline chain."""
-    n=len(delta);d=len(active);local=np.zeros((len(evaluation['rows']),d))
-    root_axes=state['Q']@right_jacobian(delta[:,3:6]);ratio=reference.binding.ratio
-    joint_axes={}
-    for j in (1,2,4,5,7,8):
-        joint_axes[j]=state['Q']@state['frames'][:,j]@right_jacobian(delta[:,6+(j-1)*3:6+j*3])
-    ancestors=({1,4,7},{2,5,8})
-    upper_partials={}
-    if any(i>=0 for i in evaluation.get('row_upper_vertex',[])):
+    """Envelope theorem at each active witness, followed by sparse spline chain.
+
+    All rows keep their current witness, sign and active-column ordering.  The
+    scalar cross products are evaluated in arrays, rather than a Python loop
+    over every constraint/column pair.  In particular the optional upper-row
+    default is allocated once, never once per matrix element.
+    """
+    active=np.asarray(active,dtype=int);d=len(active);rows=evaluation['rows']
+    count=len(rows);local=np.zeros((count,d));ratio=reference.binding.ratio
+    if not count or not d:return csr_matrix((count,B.shape[1]*d))
+    fr=np.fromiter((r[0] for r in rows),dtype=int,count=count)
+    foot=np.fromiter((r[1] for r in rows),dtype=int,count=count)
+    q=np.asarray([r[2] for r in rows]);sign=np.fromiter((r[3] for r in rows),dtype=float,count=count)
+    upper_vertex=np.asarray(evaluation.get('row_upper_vertex',np.full(count,-1)),dtype=int)
+    rotation=state['R'][fr,foot]
+    point=state['O'][fr,foot]+np.einsum('nij,nj->ni',rotation,q)
+    local[:,active==2]=1.
+    root_columns=np.flatnonzero((active>=3)&(active<6))
+    if len(root_columns):
+        axes=(state['Q']@right_jacobian(delta[:,3:6]))[fr]
+        arm=point-state['P'][fr]
+        cross_z=axes[:,0,:]*arm[:,1,None]-axes[:,1,:]*arm[:,0,None]
+        local[:,root_columns]=cross_z[:,active[root_columns]-3]
+    for j,f in ((1,0),(4,0),(7,0),(2,1),(5,1),(8,1)):
+        columns=np.flatnonzero((active>=6+(j-1)*3)&(active<6+j*3))
+        selected=np.flatnonzero(foot==f)
+        if not len(columns) or not len(selected):continue
+        frames=fr[selected]
+        axes=(state['Q']@state['frames'][:,j]@
+            right_jacobian(delta[:,6+(j-1)*3:6+j*3]))[frames]
+        arm=point[selected]-state['native_world'][frames,j]
+        cross_z=axes[:,0,:]*arm[:,1,None]-axes[:,1,:]*arm[:,0,None]
+        local[np.ix_(selected,columns)]=cross_z[:,active[columns]-(6+(j-1)*3)]
+    selected=np.flatnonzero(upper_vertex>=0)
+    if len(selected):
         # Upper-cuff deformation depends only on each ankle relative to its
         # shank. Six local driver columns are checked directly; rigid lower
         # contacts and the rest of the body keep the analytic FK chain.
-        h=1e-5
+        h=1e-5;ref=reference.at(evaluation['times'])
         for joint in (7,8):
             for axis in range(3):
                 a=6+(joint-1)*3+axis
                 if a not in active:continue
                 plus=delta.copy();minus=delta.copy();plus[:,a]+=h;minus[:,a]-=h
-                sp=fk_state(reference,reference.at(evaluation['times']),plus)
-                sm=fk_state(reference,reference.at(evaluation['times']),minus)
+                sp=fk_state(reference,ref,plus)
+                sm=fk_state(reference,ref,minus)
                 vp=reference.binding.deform(reference.binding.packet()['upper'],reference.binding.deformation(sp['native'],sp['frames']))
                 vm=reference.binding.deform(reference.binding.packet()['upper'],reference.binding.deformation(sm['native'],sm['frames']))
-                upper_partials[a]=(vp-vm)/(2*h)
-    for r,(i,f,q,sign) in enumerate(evaluation['rows']):
-        point=state['O'][i,f]+state['R'][i,f]@q
-        for c,a in enumerate(active):
-            if a<3:derivative=float(a==2)
-            elif a<6:derivative=np.cross(root_axes[i,:,a-3],point-state['P'][i])[2]
-            else:
-                j=(a-6)//3+1;axis=(a-6)%3
-                derivative=(np.cross(joint_axes[j][i,:,axis],point-state['native_world'][i,j])[2]
-                    if j in ancestors[f] else 0.)
-            upper_vertex=evaluation.get('row_upper_vertex',[-1]*len(evaluation['rows']))[r]
-            if upper_vertex>=0 and a in upper_partials:
-                derivative+=state['R'][i,f,2]@upper_partials[a][i,f,upper_vertex]
-            local[r,c]=sign*ratio*derivative/NORMALIZATION
-    fr=np.array([r[0] for r in evaluation['rows']]);rr=[];cc=[];vv=[]
-    for row in range(len(fr)):
-        knots=np.flatnonzero(B[fr[row]])
-        for k in knots:
-            rr.extend([row]*d);cc.extend(k*d+np.arange(d));vv.extend(B[fr[row],k]*local[row])
-    J=coo_matrix((vv,(rr,cc)),shape=(len(fr),B.shape[1]*d)).tocsr();J.eliminate_zeros()
+                pick=(fr[selected],foot[selected],upper_vertex[selected])
+                partial=(vp[pick]-vm[pick])/(2*h)
+                value=np.einsum('nj,nj->n',rotation[selected,2],partial)
+                local[np.ix_(selected,np.flatnonzero(active==a))]+=value[:,None]
+    local*=sign[:,None]*ratio/NORMALIZATION
+    # Select the original sparse spline support for each physical row. Only
+    # values that are nonzero enter COO; large explicit zero blocks never
+    # reach the downstream sparse products/LSMR.
+    support=csr_matrix(B)[fr].tocoo();support.eliminate_zeros()
+    values=local[support.row]*support.data[:,None];keep=values!=0
+    rr=np.broadcast_to(support.row[:,None],values.shape)[keep]
+    cc=(support.col[:,None]*d+np.arange(d))[keep]
+    J=coo_matrix((values[keep],(rr,cc)),shape=(count,B.shape[1]*d)).tocsr();J.eliminate_zeros()
     return J

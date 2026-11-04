@@ -1,0 +1,133 @@
+{
+  "schema": "rinkspace.spin-grasp-geometry.v1",
+  "model_sha256": "376021446ddc86e99acacd795182bbef903e61d33b76b9d8b359c2b0865bd992",
+  "model_vertices": 10475,
+  "hand_mean": "network flat_hand_mean=True; default used for semantic selection only",
+  "palm_patches": {
+    "left": {
+      "vertex_ids": [
+        4621,
+        4690,
+        4622,
+        4765,
+        4620,
+        4899,
+        4619,
+        4664,
+        4763,
+        4851,
+        4689,
+        4794
+      ],
+      "weights": [
+        0.08333333333333333,
+        0.08333333333333333,
+        0.08333333333333333,
+        0.08333333333333333,
+        0.08333333333333333,
+        0.08333333333333333,
+        0.08333333333333333,
+        0.08333333333333333,
+        0.08333333333333333,
+        0.08333333333333333,
+        0.08333333333333333,
+        0.08333333333333333
+      ],
+      "wrist_native_joint": 20,
+      "finger_root_native_joints": [
+        25,
+        28,
+        34
+      ],
+      "rest_centre_model_m": [
+        0.6883809597793271,
+        0.026221941486218626,
+        -0.05845610048717888
+      ],
+      "palmar_normal_model": [
+        -0.09860348593522077,
+        -0.9948488116246362,
+        0.023520088657818884
+      ],
+      "rest_patch_extent_m": [
+        0.021857917308807373,
+        0.003704788163304329,
+        0.0214000903069973
+      ],
+      "provenance": "SMPL-X55 joint names/parents and >0.8 hand skin weights; central wrist-to-finger-root region; palmar side selected from default finger flexion, not nearest to shoe"
+    },
+    "right": {
+      "vertex_ids": [
+        7357,
+        7426,
+        7501,
+        7358,
+        7356,
+        7635,
+        7355,
+        7400,
+        7499,
+        7587,
+        7425,
+        7397
+      ],
+      "weights": [
+        0.08333333333333333,
+        0.08333333333333333,
+        0.08333333333333333,
+        0.08333333333333333,
+        0.08333333333333333,
+        0.08333333333333333,
+        0.08333333333333333,
+        0.08333333333333333,
+        0.08333333333333333,
+        0.08333333333333333,
+        0.08333333333333333,
+        0.08333333333333333
+      ],
+      "wrist_native_joint": 21,
+      "finger_root_native_joints": [
+        40,
+        43,
+        49
+      ],
+      "rest_centre_model_m": [
+        -0.6893271132063947,
+        0.027584850043691454,
+        -0.05881178358734728
+      ],
+      "palmar_normal_model": [
+        0.13310084327314126,
+        -0.9907362464242833,
+        0.02694170635094271
+      ],
+      "rest_patch_extent_m": [
+        0.024638712406158447,
+        0.0020636245608329773,
+        0.01561623066663742
+      ],
+      "provenance": "SMPL-X55 joint names/parents and >0.8 hand skin weights; central wrist-to-finger-root region; palmar side selected from default finger flexion, not nearest to shoe"
+    }
+  },
+  "grip_foot": 0,
+  "grip_hand": "left",
+  "grip_region_id": "left_rear_sole_blade_web_finite_segment",
+  "segment_local_solver": [
+    [
+      0.005214148281736442,
+      0.0,
+      0.014307452396514143
+    ],
+    [
+      0.06256977938083731,
+      0.0,
+      0.012415203235546058
+    ]
+  ],
+  "length_export_ratio": 0.9993616177797032,
+  "region_provenance": "source 86.8/87.64/89.56/91.98/92.46 supports a finite rear-heel/under-sole region, exact material ambiguous; template rear steel web is its declared positional proxy",
+  "limitations": [
+    "palmar-side semantic selection needs visual inspection",
+    "position only: not palm orientation, finger wrapping, forces or certified nonintersection"
+  ]
+}

@@ -114,6 +114,8 @@ class BootWindowProblem(FullBodyProblem):
         self.binding=reference.binding;self.mid_times=reference.times[self.frames]
         self.mid_ref=reference.at(self.mid_times);self.binding_key=None
         self.camera_centres=camera_centres(camera,self.frames)
+        prepare=getattr(self.execution,'prepare_compatibility',None)
+        self.resident_compatibility=None if prepare is None else prepare(self.reference,self.mid_ref,self.binding)
 
     def visible_boot_edges(self,world):
         return edges_for(world,self.frames,self.projector,self.binding,centres=self.camera_centres)
@@ -165,21 +167,49 @@ class BootWindowProblem(FullBodyProblem):
 
     def compatibility_from_state(self,s):
         j=np.einsum('nji,nkj->nki',s['Q'],s['native']-s['P'][:,None])
-        return self.binding.compatibility_rows(j,s['frames'])/np.sqrt(2)
+        return self.binding.compatibility_rows(j,s['frames'],**({} if 'hand_local_R' not in s else {'hand_local_R':s['hand_local_R']}))/np.sqrt(2)
 
     def evaluate(self,x,jacobian=False):
         key=self.binding.x.tobytes()
         if self.binding_key!=key:self.cache=None;self.cache_x=None;self.binding_key=key
         base=super().evaluate(x,jacobian)
         if base.get('foot_compatibility_added'):return base
-        d=self.state.increments(x,self.mid_times);extra=self.compatibility(d);rows=extra.size;blocks=[]
+        forward_start=time.perf_counter()
+        d=self.state.increments(x,self.mid_times)
+        resident=getattr(self,'resident_compatibility',None)
+        if resident is not None:
+            if type(self).compatibility_from_state is not BootWindowProblem.compatibility_from_state:
+                raise TypeError('Resident compatibility requires the audited original consumer')
+            if not resident.matches(self.binding):
+                raise ValueError('Resident compatibility shared geometry changed; create a new prepared owner')
+            extra,resident_values=resident.evaluate(d,self.state.active[self.state.active>=6] if jacobian else None)
+        else:extra=self.compatibility(d)
+        rows=extra.size;blocks=[]
+        elapsed=time.perf_counter()-forward_start
+        base['phases']['compatibility_forward_seconds']=elapsed if resident is None or not jacobian else 0.
+        if resident is not None:
+            base['phases']['compatibility_resident_'+('linearize' if jacobian else 'trial')+'_seconds']=elapsed
         if jacobian:
             start=time.perf_counter();columns=self.state.active[self.state.active>=6]
-            values=self.execution.state_differences(self.reference,self.mid_ref,d,columns,
-                self.compatibility_from_state,step=1e-5)
+            values=resident_values if resident is not None else None
+            replay=getattr(self.execution,'native_state_differences',None)
+            # This consumer needs only native22 FK and full-surface skin.
+            # Keep all 63 pose-blend dependencies; only the discarded compact
+            # COCO/equipment forward is removed. Custom consumers retain the
+            # original world callback until their own chain is implemented.
+            if values is None and replay is not None and type(self).compatibility_from_state is BootWindowProblem.compatibility_from_state:
+                values=replay(self.reference,self.mid_ref,d,columns,
+                    lambda native,frames,samples=None:self.binding.compatibility_rows(native,frames,samples,**({} if 'hand_local_R' not in self.mid_ref else {'hand_local_R':self.mid_ref['hand_local_R']}))/np.sqrt(2),
+                    step=1e-5,surface=getattr(self.binding,'surface',None),vertex_ids=getattr(self.binding,'sample_ids',None))
+            base['compatibility_execution']=('cuda_resident_native55_selected_skin' if resident is not None else
+                'exact_native_fk_replay' if values is not None else 'world_finite_difference')
+            if values is None:
+                values=self.execution.state_differences(self.reference,self.mid_ref,d,columns,
+                    self.compatibility_from_state,step=1e-5)
             physical=dict(zip(map(int,columns),values))
             derivatives=[np.zeros_like(extra) if active<6 else physical[int(active)] for active in self.state.active]
-            base['phases']['compatibility_derivatives_seconds']=time.perf_counter()-start
+            base['phases']['compatibility_derivatives_seconds']=(elapsed if resident is not None else time.perf_counter()-start)
+            sparse_start=time.perf_counter()
             local=np.stack(derivatives,-1);B=self.state.basis(self.mid_times)
             rr=[];cc=[];vv=[];fr,kn=np.nonzero(B)
             val=local[fr]*B[fr,kn,None,None]
@@ -187,6 +217,7 @@ class BootWindowProblem(FullBodyProblem):
             cc=np.broadcast_to(kn[:,None,None]*self.state.d+np.arange(self.state.d),val.shape).ravel()
             J=coo_matrix((val.ravel(),(rr,cc)),shape=(rows,self.size)).tocsr();J.eliminate_zeros()
             base['jac']=vstack((base['jac'],J),format='csr')
+            base['phases']['compatibility_sparse_seconds']=time.perf_counter()-sparse_start
         first=len(base['residual'])
         base['compatibility_residual']=extra.ravel()
         base['compatibility_jacobian']=J if jacobian else None

@@ -302,6 +302,7 @@ class ResultsPlayer(Viewer):
             raise
 
         old_nodes = self.variant_nodes
+        previous_variant=getattr(self,'variant',{}).get('id')
         self.sequence=sequence;self.variant=definition
         self.layers=layers;self.variant_nodes=nodes;self.last_p=last_p
         if old_nodes:
@@ -309,6 +310,12 @@ class ResultsPlayer(Viewer):
             # Clear the global normals LRU only after a successful switch.
             Meshes.compute_vertex_and_face_normals.cache_clear()
         self.error=''
+        if getattr(self,'view_mode','')=='grasp':
+            compared=self.catalog.config.get('comparison_variants',[])
+            # Shared comparison bounds already include these candidates.
+            # Refitting from float32 camera coordinates would drift on switches.
+            if previous_variant not in compared or definition['id'] not in compared:
+                self.fit_grasp_view()
         if getattr(self,'view_mode','') in ('support_top','support_side'):
             self.last_view_center=self.support_view_center()
 
@@ -337,7 +344,9 @@ class ResultsPlayer(Viewer):
 
     def frame_changed(self, frame):
         p=self.sequence.state['P'][frame]
-        if getattr(self,'view_mode','') in ('support_top','support_side'):
+        if getattr(self,'view_mode','')=='grasp':
+            if self.follow:self.fit_grasp_view(frame)
+        elif getattr(self,'view_mode','') in ('support_top','support_side'):
             center=self.support_view_center()
             if self.follow and getattr(self,'last_view_center',None) is not None:
                 displacement=center-self.last_view_center
@@ -361,6 +370,17 @@ class ResultsPlayer(Viewer):
             return (points.min(axis=0)+points.max(axis=0))*.5
         s=self.sequence.state
         return s.get('skate_lower',s['gear'])[self.frame,foot].mean(axis=0).copy()
+
+    def fit_grasp_view(self,frame=None):
+        """Use one world-space view for all saved candidates at this source PTS."""
+        frame=self.frame if frame is None else int(frame)
+        sequences=dict(self.comparison_sequences()) if self.catalog.config.get('comparison_variants') else {}
+        sequences[self.variant['id']]=self.sequence
+        self.comparison_framing=fit_comparison_camera(self,sequences,frame,
+            grasp_hand=self.catalog.config.get('grasp_hand','left'),free_foot=self.catalog.config.get('free_foot',0),
+            left_inset=min(getattr(self,'control_panel_width',425)+28,self.window_size[0]-1),
+            right_inset=min(getattr(self,'source_panel_width',630)+20,max(0,self.window_size[0]-getattr(self,'control_panel_width',425)-29)) if getattr(self.catalog,'source_video',None) else 0.)
+        return self.comparison_framing
 
     def seek(self, frame):
         self.toggle_animation(False)
@@ -403,6 +423,8 @@ class ResultsPlayer(Viewer):
                 horizontal=np.cross(cam.up,back);horizontal/=np.linalg.norm(horizontal)
                 shift=horizontal*((left-right)/height*cam.ortho_size)
                 cam.position-=shift;cam.target-=shift
+        elif view=='grasp':
+            cam.position=p+[.65,-1.1,.45];cam.target=p;cam.is_ortho=True;cam.ortho_size=.35
         elif view=='top':
             cam.position=p+[0,0,10];cam.target=p;cam.up=np.array([0.,1.,0.]);cam.is_ortho=True;cam.ortho_size=2.2
         elif view=='side':
@@ -438,8 +460,9 @@ class ResultsPlayer(Viewer):
                 support_foot=int(self.catalog.config.get('support_foot',1)),
                 left_inset=min(self.control_panel_width+28,self.window_size[0]-1),
                 right_inset=min(self.source_panel_width+20,max(0,self.window_size[0]-self.control_panel_width-29)) if getattr(self.catalog,'source_video',None) else 0.)
+        if fit_comparison and view=='grasp':self.fit_grasp_view()
         self.view_mode=view
-        self.view_label={'top':'俯视','side':'侧视 XZ','end':'侧视 YZ','rink':'全冰场','free':'自由视角','feet':'足鞋近看','feet_oblique':'鞋口斜俯视','feet_side':'足鞋同侧剖切视角','feet_end':'足鞋正视','support_top':'支撑足俯视','support_side':'支撑足侧视'}[view]
+        self.view_label={'top':'俯视','side':'侧视 XZ','end':'侧视 YZ','rink':'全冰场','free':'自由视角','feet':'足鞋近看','feet_oblique':'鞋口斜俯视','feet_side':'足鞋同侧剖切视角','feet_end':'足鞋正视','support_top':'支撑足俯视','support_side':'支撑足侧视','grasp':'抓握／自由鞋特写'}[view]
         self.save_session()
 
     def save_session(self):
@@ -642,6 +665,7 @@ class ResultsPlayer(Viewer):
             if imgui.button('支撑足 %d 俯视'%self.catalog.config.get('support_foot',1)):self.set_view('support_top')
             imgui.same_line()
             if imgui.button('支撑足侧视'):self.set_view('support_side')
+            if imgui.button('抓握／自由鞋特写'):self.set_view('grasp')
             imgui.text('左键拖动：旋转  |  右键拖动：平移')
             imgui.text('滚轮：缩放；暂停后也可自由观察')
             imgui.separator()

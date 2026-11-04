@@ -19,7 +19,7 @@
 
 `INSTALL_LOCAL.cmd` 安装 dev／acquisition，不含 advanced。setuptools 只发现 `src` 下的包；`calibration` 中的历史模块需要完整源码 checkout，普通 wheel 不包含全部赛事运行依赖。
 
-S01 全身／足鞋／开头优化入口使用 SciPy 的 `least_squares(callback=...)` 保存已接受状态，该接口从 [SciPy 1.16.0](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.least_squares.html) 提供；`advanced` 下限已同步。现有 `.venv` 的实际版本为 1.17.1，见[观察清单](requirements-solver-observed.txt)。Data 中其他环境的历史锁不因此改写，报告绘制和播放器可继续使用各自现有环境；本次整理没有安装或升级运行包。
+S01 全身／足鞋／开头优化入口使用 SciPy 的 `least_squares(callback=...)` 保存已接受状态，该接口从 [SciPy 1.16.0](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.least_squares.html) 提供；`advanced` 下限已同步。现有 `.venv` 的实际版本为 1.17.1，见[观察清单](requirements-solver-observed.txt)。Data 中其他环境的历史锁不因此改写，报告绘制和播放器可继续使用各自现有环境。
 
 ## 当前本机 GPU 与人体环境
 
@@ -46,13 +46,11 @@ python -B environments/prepare_body_sources.py --data-root <外部Data绝对路�
 
 当前固定 ExMR `eac72e47339b404c0443f5fb323412e2ce432410`，外部源码、模型和附加包位于 Data；已有 body_cuda 不升级。附加依赖见 [requirements-exmr-extra.txt](requirements-exmr-extra.txt)。[prepare_exmr_assets.py](prepare_exmr_assets.py) 默认核验，`--fetch` 才下载固定资产；使用本机登录文件但不输出凭据。HaMeR token 路径仅实例化原版 backbone/head，不需要实例化 MANO 网格或渲染器。
 
-ExMR局部补丁保留[上游完整许可和署名](third_party_licenses/EXMR_LICENSE.txt)，适用教育／研究／非营利用途及衍生修改非商业条件；不是项目通用许可。下载资产的固定revision/SHA见[本次审核索引](../events/ankara_2026/programmes/okada_mei_sp/spin_models_1104_audit.json)，模型字节与第三方完整实现不分发。
+ExMR局部补丁保留[上游完整许可和署名](third_party_licenses/EXMR_LICENSE.txt)，适用教育／研究／非营利用途及衍生修改非商业条件；不是项目通用许可。下载资产的固定revision/SHA见[固定依赖索引](../events/ankara_2026/programmes/okada_mei_sp/spin_models_1104_audit.json)，模型字节与第三方完整实现不分发。
 
 [apply_exmr_camera_patch.py](apply_exmr_camera_patch.py) 核验固定提交及文件内容，`--apply` 应用 [camera-only 补丁](exmr_camera.patch)。返回出口位于 world 分支之前，保留足细化前／后和最终相机 SMPL-X，禁止同时开启世界后处理、贴地或平滑。[exmr_prior.py](../calibration/program_tracking/body_tracking/exmr_prior.py) 的 prepare/keypoints/sam/hands/infer 分阶段复用已知人物、原始 PTS 和相机；SAM 原生 MHR 输出与特征一并保存。原始人物框分别按 SAM/ExMR 原生规则处理，不复用 GVHMR 已扩大的方框作为原始检测框。
 
-2026-11-04 本机实际对照为 spin_s05 的完整 76–95 秒：两网络各一段 476 帧真实 25Hz 输入，现有唯一状态在 951 个原生 50Hz 曝光上消费；原生节奏适配未标定。新入口 [run_exmr_comparison.py](../scripts/run_exmr_comparison.py) 通过同一性能包装器 profile/compare/replay，共享满意 S01 体型和鞋刀，自己的网络姿态不继承另一网络身体层。`replay` 实际读取自身初值及 case 身份，旧快照不自动补身份。
-
-当前结果在 Data/runs/body_s01_20261029/exmr_spin_compare_1104/native_protocol。GVHMR 实际保留 1 步；ExMR 足细化后的鞋口截面出现 unknown，未接受优化步，足细化前仅作未优化对照。新 [START_3D_SPIN_MODELS.cmd](../START_3D_SPIN_MODELS.cmd) 使用现有播放器；这不是全节目接入或轨迹验收。Windows/Python3.11/Torch2.7.1 的已运行范围仅为这里的 camera-only 子链，不宣称官方完整 demo 已在此环境重建。
+对照入口 [run_exmr_comparison.py](../scripts/run_exmr_comparison.py)通过同一性能包装器执行 profile／compare／replay，共享 S01 体型和鞋刀；每个网络使用自身姿态初值，重放读取对应 case 身份和初值。25Hz 输入与原生 50Hz 显示曝光按整数 PTS 对应，节奏适配未标定。[播放器入口](../START_3D_SPIN_MODELS.cmd)及[节目结果绑定](../events/ankara_2026/programmes/okada_mei_sp/spin_models_1104_audit.json)给出已保存对照的范围与限制。本机 Windows／Python 3.11／Torch 2.7.1 的运行范围为 camera-only 子链，官方完整 demo 的空白环境重建仍未验证。
 
 ## 人体求解执行优化
 
@@ -62,11 +60,35 @@ ExMR局部补丁保留[上游完整许可和署名](third_party_licenses/EXMR_LI
 python -B scripts/run_body_performance.py scripts/run_opening_timing.py --root <Data>/runs/body_s01_20261029 --output <独立候选目录> --stage fit --warm-start <已有参数.npz>
 ~~~
 
-[本机配置](body-performance-local.json)从 AssetStore 的 Data 根解析独立 CPU 投影库，默认 CPU 身体 workers=4、native_threads=4、BLAS=1。先加 `--show-command` 可只打印命令；`--backend cuda`使用已有 vision_cuda（SciPy 支持 callback）和一个 FP64 身体 owner。原 body_cuda 的 SciPy 1.13.1 不支持当前拟合 callback，因此未选作 CUDA 求解解释器。轻量附加依赖见 [requirements-body-performance.txt](requirements-body-performance.txt)。
+[本机配置](body-performance-local.json)从 AssetStore 的 Data 根解析独立 CPU 投影库，CPU 身体 workers=12、native_threads=4、BLAS=1。未给 `--backend` 时读取所选 profile 的 `default_backend`，旧 profile 缺该字段时使用 CPU；通用本机配置保留 `default_backend=cpu`，用于共享鞋参或多窗口问题。当前 case 可另用 Data 中的性能 profile 设置 `default_backend=hybrid`，再通过 `--profile` 选择。`--show-command` 只打印命令和子进程设置，不启动目标；目标参数始终原样传递。
+
+`--backend hybrid` 使用已有 vision_cuda、12 个 CPU 身体 workers、4 个 native 投影线程及 BLAS=1，实际设置为 `RINKSPACE_BODY_BACKEND=cpu`、`RINKSPACE_BODY_LOCAL_DERIVATIVES=analytic`、`RINKSPACE_BODY_COMPATIBILITY_BACKEND=cuda_resident`。GPU 仅驻留执行 native55 FK、选中皮肤及所有活动列的精确正负扰动兼容性消费者，覆盖足腔和鞋口；身体解析导数、相机、CSR、TRF／LSMR 仍在 CPU。该模式当前要求单窗口和冻结的17个共享鞋参，运行守卫拒绝不支持的布局。CPU 模式显式选择 CPU 兼容块，避免继承父进程的 GPU 设置。
+
+原 `--backend cuda` 保留一个 FP64 compact FK／LBS CUDA adapter，兼容块仍使用 CPU；它与 hybrid 的执行范围不同。两者使用现有 vision_cuda（SciPy 支持 callback），不选用 SciPy 1.13.1 尚不支持当前拟合 callback 的 body_cuda。轻量附加依赖见 [requirements-body-performance.txt](requirements-body-performance.txt)。
 
 该入口复用全身、鞋体、开头及其派生问题，不改相机记录、观测、损失、参数布局和停止条件。移除启动包装即可回到原执行配置；环境只作用于新子进程，已有运行不会切换。新库可用 `python -B scripts/build_core.py --out <Data内构建目录> --generator Ninja --openmp`重建，CPU／GPU 场地库仍分别保存。
 
-同状态测量入口为 [profile_body_solver.py](../scripts/profile_body_solver.py)，`--kind`支持 fullbody、boot、opening、motion、timing；`--state`可指定正在求解的检查点的只读副本。测量只评估残差／Jacobian，不启动拟合。当前本机结果位于 `<Data>/runs/body_perf_1103`。数值对照和实际测量范围见其中的 integration_summary.json；算子与单次评估加速不代表整轮拟合或画面质量已验收。
+完整当前 Joint 测量入口为 [profile_contact_solver.py](../scripts/profile_contact_solver.py)，覆盖身体、足鞋／鞋口兼容性、冰面、支撑图像及当前抓握因子，`--kind current_spin` 直接消费现有初值、观测与检查点。默认只测一次 fresh 完整 Jacobian。探针自身的执行 CLI 会覆盖环境，所以 hybrid 测量须显式给 `--backend cpu --workers 12 --native-threads 4 --blas-threads 1 --local-derivatives analytic --compatibility-backend cuda_resident`。本机已有的 Data 入口已绑定完整 common 输入与这些参数，可只复查评估：
+
+~~~powershell
+& 'D:\CodexData\RinkSpace_Data\runs\body_pf1104\run_probe.ps1' -Mode gpu -Operation evaluate
+~~~
+
+该 Data 脚本的 `gpu` 标签指上述混合执行范围；它默认评估，使用新输出目录，不重建观测、不运行网络或生成视频。完整 solve 另须显式政策、固定原 GVHMR 质量基准和来自实测的 Jacobian 耗时 hint。
+
+2026-11-04 在 265KF／5070 Ti 上，同一 current_spin 输入、63 个身体活动列和数学目标的实测如下。该 case 保存951个曝光，实际求解窗口为82–94.8秒的641个曝光；表中完整 Jacobian 包含全部 Joint 因子，solve 为相同政策下各完成2个接受步：
+
+| 实际路径 | fresh 完整 Jacobian | 同2步完整 solve |
+|---|---:|---:|
+| 原 CPU4 差分 | 73.66秒 | 178.51秒 |
+| CPU12 解析／精确重放 | 36.29秒 | 108.37秒 |
+| CPU12＋驻留GPU兼容块 | 9.20–14.72秒 | 50.76–56.68秒 |
+
+完整测量、CPU 核秒、峰值内存、GPU 传输／计算、数值等价及剩余阶段见[公开性能记录](../events/ankara_2026/programmes/okada_mei_sp/body_performance_1104_audit.json)；原始日志与输入留 Data。
+
+两步是此次性能验证的固定工作量，不表示数值收敛或人体／轨迹准确性通过；原候选与来源保持原绑定。混合 solve 中最大的剩余阶段为 CPU LSMR，累计20.99秒、两次分别771和417次迭代；细节与质量范围见 Data 的 `runs/body_pf1104` 实测记录。
+
+旧 [profile_body_solver.py](../scripts/profile_body_solver.py) 的 `--kind` 支持 fullbody、boot、opening、motion、timing；`--state` 可指定检查点只读副本，其局部问题评估不代表当前完整 Joint。旧本机范围保存在 `<Data>/runs/body_perf_1103/integration_summary.json`。
 
 ## 基础检查与完整回归
 

@@ -1,0 +1,1175 @@
+{
+  "schema": "rinkspace.spin-entry-public-review.v1",
+  "date": "2026-11-04",
+  "baseline_commit": "3d6f51fee68a07706c1456c5e99d28c1d0438908",
+  "accuracy_accepted": false,
+  "preserved_s01": {
+    "parameter": "skate_s01_1103.npz",
+    "sha256": "3b58dac5f7363dfc5e051fc75ef8602dd3810a0ebc370c57a24542745bc5090c",
+    "identical_to_HEAD": true
+  },
+  "model": "ExMR BodyNet + HandMR, FootMR disabled; same shared S01 shape/equipment; no forced GVHMR pose anchor",
+  "source": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4",
+    "sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+    "native_size_wh": [
+      1920,
+      1080
+    ],
+    "time_base": [
+      1,
+      12800
+    ],
+    "pts_range": [
+      972800,
+      1216000
+    ]
+  },
+  "source_frames": 951,
+  "source_time_base": [
+    1,
+    12800
+  ],
+  "same_native_camera_and_world_no_alignment": true,
+  "support_foot_stage": {
+    "parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_support_foot_1104.npz",
+    "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_support_foot_1104\\common\\exmr_hand_nofoot\\fitted\\result.npz",
+    "accepted": 8,
+    "retained_step": 8,
+    "budget_seconds": 600.0,
+    "wall_seconds": 170.91109249999863,
+    "source_context_seconds": [
+      76,
+      95
+    ],
+    "accuracy_accepted": false,
+    "placement": {
+      "method": "current attached blade midpoint -> same-source native Brown/RS ray at midpoint-minus-runner height; root controls only",
+      "fit_anchor_count": 42,
+      "source_fit_pts": [
+        1054720,
+        1056000,
+        1057280,
+        1058560,
+        1064960,
+        1066240,
+        1067520,
+        1080320,
+        1082880,
+        1090560,
+        1091840,
+        1093120,
+        1094400,
+        1095680,
+        1096960,
+        1098240,
+        1099520,
+        1109248,
+        1110528,
+        1111040,
+        1119488,
+        1121792,
+        1122048,
+        1123328,
+        1124608,
+        1125888,
+        1138432,
+        1143296,
+        1144576,
+        1146368,
+        1147136,
+        1148416,
+        1149696,
+        1150976,
+        1151744,
+        1164544,
+        1177344,
+        1178112,
+        1180672,
+        1181952,
+        1183232,
+        1183488
+      ],
+      "support_foot": 1,
+      "source_window_seconds": [
+        82.4,
+        92.46
+      ],
+      "nominal_ice_only": true,
+      "extra_residuals_added": false,
+      "fixed_world_centre": false,
+      "root_shift_median_m": 0.13274818958945694,
+      "root_shift_max_m": 0.5949016064599857,
+      "control_fit_rms_m": 0.025144573385861572,
+      "root_control_basis_unchanged": true,
+      "articulation_and_hands_unchanged": true
+    },
+    "stop": {
+      "policy": {
+        "wall_seconds": 582.8125431000008,
+        "max_accepted": 8,
+        "max_outer": 1,
+        "stagnation_window": 4,
+        "min_violation_improvement_m": 0.0001,
+        "min_joint_relative_improvement": 1e-07,
+        "max_image_cost_increase": 0.05,
+        "max_pose_cost_increase": 0.1,
+        "allow_penalty_growth": false
+      },
+      "start_now": 40904.1233073,
+      "last_now": 41050.5179968,
+      "checks": 27,
+      "accepted": 8,
+      "outer_completed": 0,
+      "baseline": {
+        "now": 40904.441407,
+        "elapsed_seconds": 0.3180997000017669,
+        "accepted": 0,
+        "outer_completed": 0,
+        "violation_m": 0.004485798335500793,
+        "image_cost": 7791.264862942336,
+        "pose_cost": null,
+        "joint_cost": 8135.759440297956,
+        "quality_metrics": {}
+      },
+      "latest": {
+        "now": 41050.5179968,
+        "elapsed_seconds": 146.39468950000446,
+        "accepted": 8,
+        "outer_completed": 0,
+        "violation_m": 0.007960532397775305,
+        "image_cost": 2559.3570543780997,
+        "pose_cost": null,
+        "joint_cost": 2959.4933395326057,
+        "quality_metrics": {}
+      },
+      "best_violation_m": 0.004292503318944246,
+      "best_at_accepted": 6,
+      "violation_stagnation_enabled": true,
+      "comparable_violation_history": [
+        {
+          "accepted": 4,
+          "best_violation_m": 0.004485798335500793
+        },
+        {
+          "accepted": 5,
+          "best_violation_m": 0.004485798335500793
+        },
+        {
+          "accepted": 6,
+          "best_violation_m": 0.004292503318944246
+        },
+        {
+          "accepted": 7,
+          "best_violation_m": 0.004292503318944246
+        },
+        {
+          "accepted": 8,
+          "best_violation_m": 0.004292503318944246
+        }
+      ],
+      "comparable_joint_history": [
+        {
+          "accepted": 4,
+          "joint_cost": 3166.513382581086
+        },
+        {
+          "accepted": 5,
+          "joint_cost": 3085.8200529366964
+        },
+        {
+          "accepted": 6,
+          "joint_cost": 3039.092302505161
+        },
+        {
+          "accepted": 7,
+          "joint_cost": 2989.2345215371074
+        },
+        {
+          "accepted": 8,
+          "joint_cost": 2959.4933395326057
+        }
+      ],
+      "progress_diagnostics": [],
+      "stopped_by_policy": true,
+      "first_stop_now": 41050.5179968,
+      "reasons": [
+        {
+          "code": "accepted_budget",
+          "category": "budget",
+          "message": "Accepted-step budget reached.",
+          "accepted": 8,
+          "limit": 8
+        }
+      ],
+      "quality_failed": false,
+      "quality_reasons": [],
+      "quality_limits": {},
+      "quality_diagnostics": [
+        {
+          "code": "relative_quality_unavailable",
+          "metric": "pose_cost",
+          "reason": "missing_initial_cost",
+          "baseline": null,
+          "latest": null
+        }
+      ],
+      "convergence_claim": false,
+      "meaning": "Quality/domain failure rejects the attempted candidate; budget/stagnation alone does not. Neither establishes convergence nor source acceptance."
+    },
+    "phase_comparison": [
+      {
+        "phase": "entry",
+        "source_seconds": [
+          84,
+          86
+        ],
+        "old4": {
+          "body_error_median_px": 16.595722196280168,
+          "body_error_p95_px": 76.48128512832061,
+          "pelvis_xy_span_m": [
+            3.9014434539836795,
+            0.8248377816651491
+          ],
+          "support_runner_xy_span_m": [
+            3.9033170402691857,
+            0.8443400938963448
+          ],
+          "support_runner_raw_height_median_m": 0.026033282219972118,
+          "palm_segment_median_m": 0.9036238276408182,
+          "exposures": 101
+        },
+        "new8": {
+          "body_error_median_px": 11.147870595671979,
+          "body_error_p95_px": 64.84170375282866,
+          "pelvis_xy_span_m": [
+            1.1922154266676461,
+            0.47021881479303396
+          ],
+          "support_runner_xy_span_m": [
+            1.0942291553128598,
+            0.5955431215906701
+          ],
+          "support_runner_raw_height_median_m": 0.01613784573464931,
+          "palm_segment_median_m": 0.933995193844922,
+          "exposures": 101
+        }
+      },
+      {
+        "phase": "held",
+        "source_seconds": [
+          88,
+          92
+        ],
+        "old4": {
+          "body_error_median_px": 17.827417919943414,
+          "body_error_p95_px": 59.62999060387684,
+          "pelvis_xy_span_m": [
+            1.5025072566988555,
+            0.33170879621595084
+          ],
+          "support_runner_xy_span_m": [
+            1.3690698386701605,
+            0.24747313472462906
+          ],
+          "support_runner_raw_height_median_m": 0.0346469594965034,
+          "palm_segment_median_m": 0.2335382381637213,
+          "exposures": 201
+        },
+        "new8": {
+          "body_error_median_px": 13.35240329582675,
+          "body_error_p95_px": 45.741513409952134,
+          "pelvis_xy_span_m": [
+            1.012589777459059,
+            0.20633051437541017
+          ],
+          "support_runner_xy_span_m": [
+            0.6702412526969752,
+            0.36551297825420725
+          ],
+          "support_runner_raw_height_median_m": 0.02143967971443828,
+          "palm_segment_median_m": 0.0420769716284705,
+          "exposures": 201
+        }
+      },
+      {
+        "phase": "release",
+        "source_seconds": [
+          92.46,
+          94.8
+        ],
+        "old4": {
+          "body_error_median_px": 7.778187009525822,
+          "body_error_p95_px": 25.436662844850346,
+          "pelvis_xy_span_m": [
+            2.843665903370878,
+            4.977004138164067
+          ],
+          "support_runner_xy_span_m": [
+            3.0698828415681314,
+            5.460935706251076
+          ],
+          "support_runner_raw_height_median_m": -0.042551077563510425,
+          "palm_segment_median_m": 1.029550485762734,
+          "exposures": 118
+        },
+        "new8": {
+          "body_error_median_px": 5.90209479739066,
+          "body_error_p95_px": 22.004447494752796,
+          "pelvis_xy_span_m": [
+            2.5376283225646157,
+            4.894658741347431
+          ],
+          "support_runner_xy_span_m": [
+            2.745337181430454,
+            5.461836533747806
+          ],
+          "support_runner_raw_height_median_m": -0.014886755833873975,
+          "palm_segment_median_m": 1.0175497122915025,
+          "exposures": 118
+        }
+      }
+    ],
+    "metric_scope": "same source PTS, same current observation mask; geometric spans/distances/reference heights are model diagnostics, not measured 3D truth or calibrated contact acceptance",
+    "remaining": "head alignment, blade/shoe direction, release pose and wrapping/intersection remain for source/3D review",
+    "player": "D:/OneDrive/codex_projs/RinkSpace/START_3D_SPIN_SUPPORT_FOOT.cmd",
+    "native_stills": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_support_foot_1104\\support_foot_native_stills",
+    "strict_replay_checkpoint": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_support_foot_1104\\replay_checkpoint.npz",
+    "performance_summary": "D:/CodexData/RinkSpace_Data/runs/body_pf1104/integration_summary.json",
+    "reproduce_command": "D:/CodexData/RinkSpace_Data/runtime_tools/vision_cuda/Scripts/python.exe -B -X utf8 -m calibration.program_tracking.body_tracking.spin_support_continuation --project D:/OneDrive/codex_projs/RinkSpace --base-root D:/CodexData/RinkSpace_Data/runs/body_s01_20261029 --previous-output D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/spin_grasp_1104/support_joint_v2 --checkpoint D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/spin_grasp_1104/support_joint_v2/continuation/seed.npz --output <new Data output> --parameter <new OneDrive NPZ> --budget 600 --max-steps 8",
+    "player_cache_prepared": true
+  },
+  "position_residual_stage_retained_as_intermediate": {
+    "parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_entry_motion_1104.npz",
+    "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_entry_motion_1104\\common\\exmr_hand_nofoot\\fitted\\result.npz",
+    "accepted": 8,
+    "retained_step": 8,
+    "wall_seconds": 211.2058978999994,
+    "budget_seconds": 600.0,
+    "source_context_seconds": [
+      76,
+      95
+    ],
+    "source_frames": 951,
+    "whole_shot_adjustable": true,
+    "accuracy_accepted": false,
+    "parent_parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_support_foot_1104.npz",
+    "initialization": {
+      "method": "monotone XY reference bridge across the diagnosed 81.3--81.8 depth branch; native cubic root curve",
+      "bridge_source_seconds": [
+        80.4,
+        82.8
+      ],
+      "full_weight_source_seconds": [
+        80.8,
+        82.4
+      ],
+      "surrounding_model_anchor_seconds": [
+        80.0,
+        80.4,
+        80.8,
+        82.4,
+        82.8,
+        83.2
+      ],
+      "native_samples": 951,
+      "root_z_unchanged": true,
+      "Q_body_hands_unchanged": true,
+      "old_refinement_layers_retained": true,
+      "initialization_not_3d_truth": true,
+      "parent_parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_support_foot_1104.npz",
+      "parent_parameter_sha256": "4da0bbc0a36ed42dbae2131a792688711e5de7ddeb49083a4d88aecfc4e97229",
+      "max_reference_shift_m": 4.211133726186904
+    },
+    "stop": {
+      "policy": {
+        "wall_seconds": 581.4777315999963,
+        "max_accepted": 8,
+        "max_outer": 1,
+        "stagnation_window": 4,
+        "min_violation_improvement_m": 0.0001,
+        "min_joint_relative_improvement": 1e-07,
+        "max_image_cost_increase": 0.05,
+        "max_pose_cost_increase": 0.1,
+        "allow_penalty_growth": false
+      },
+      "start_now": 45901.6697115,
+      "last_now": 46086.3974914,
+      "checks": 27,
+      "accepted": 8,
+      "outer_completed": 0,
+      "baseline": {
+        "now": 45901.7267995,
+        "elapsed_seconds": 0.05708800000138581,
+        "accepted": 0,
+        "outer_completed": 0,
+        "violation_m": 0.007960532397775007,
+        "image_cost": 5787.0930057704045,
+        "pose_cost": null,
+        "joint_cost": 6069.7673522377445,
+        "quality_metrics": {}
+      },
+      "latest": {
+        "now": 46086.3974914,
+        "elapsed_seconds": 184.72777990000031,
+        "accepted": 8,
+        "outer_completed": 0,
+        "violation_m": 0.006674221350034891,
+        "image_cost": 3328.148332865424,
+        "pose_cost": null,
+        "joint_cost": 3627.7343974958194,
+        "quality_metrics": {}
+      },
+      "best_violation_m": 0.0049873205132187435,
+      "best_at_accepted": 4,
+      "violation_stagnation_enabled": true,
+      "comparable_violation_history": [
+        {
+          "accepted": 4,
+          "best_violation_m": 0.0049873205132187435
+        },
+        {
+          "accepted": 5,
+          "best_violation_m": 0.0049873205132187435
+        },
+        {
+          "accepted": 6,
+          "best_violation_m": 0.0049873205132187435
+        },
+        {
+          "accepted": 7,
+          "best_violation_m": 0.0049873205132187435
+        },
+        {
+          "accepted": 8,
+          "best_violation_m": 0.0049873205132187435
+        }
+      ],
+      "comparable_joint_history": [
+        {
+          "accepted": 4,
+          "joint_cost": 4598.964014562694
+        },
+        {
+          "accepted": 5,
+          "joint_cost": 3831.8246673324375
+        },
+        {
+          "accepted": 6,
+          "joint_cost": 3684.511698440155
+        },
+        {
+          "accepted": 7,
+          "joint_cost": 3640.63410682747
+        },
+        {
+          "accepted": 8,
+          "joint_cost": 3627.7343974958194
+        }
+      ],
+      "progress_diagnostics": [
+        {
+          "code": "structural_plateau_with_joint_progress",
+          "accepted_window": 4,
+          "joint_relative_improvement": 0.21118443501437714,
+          "meaning": "A structural component plateau is not stagnation of the fitted joint objective."
+        }
+      ],
+      "stopped_by_policy": true,
+      "first_stop_now": 46086.3974914,
+      "reasons": [
+        {
+          "code": "accepted_budget",
+          "category": "budget",
+          "message": "Accepted-step budget reached.",
+          "accepted": 8,
+          "limit": 8
+        }
+      ],
+      "quality_failed": false,
+      "quality_reasons": [],
+      "quality_limits": {},
+      "quality_diagnostics": [
+        {
+          "code": "relative_quality_unavailable",
+          "metric": "pose_cost",
+          "reason": "missing_initial_cost",
+          "baseline": null,
+          "latest": null
+        }
+      ],
+      "convergence_claim": false,
+      "meaning": "Quality/domain failure rejects the attempted candidate; budget/stagnation alone does not. Neither establishes convergence nor source acceptance."
+    }
+  },
+  "gravity_acceleration_stage": {
+    "parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_entry_gravity_1104.npz",
+    "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_entry_gravity_1104\\common\\exmr_hand_nofoot\\fitted\\result.npz",
+    "accepted": 6,
+    "retained_step": 6,
+    "wall_seconds": 150.4499175000019,
+    "budget_seconds": 380.0,
+    "source_context_seconds": [
+      76,
+      95
+    ],
+    "source_frames": 951,
+    "whole_shot_adjustable": true,
+    "accuracy_accepted": false,
+    "parent_parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_entry_motion_1104.npz",
+    "initialization": {
+      "Q_body_hands_unchanged": true,
+      "bridge_source_seconds": [
+        81.2,
+        81.6
+      ],
+      "full_weight_source_seconds": [
+        81.36,
+        81.44
+      ],
+      "initialization_not_3d_truth": true,
+      "max_reference_shift_m": 0.0268955311864507,
+      "method": "current mass-proxy CoM projected to known-gravity trajectory as initial reference, then full joint acceleration-constrained solve",
+      "native_samples": 951,
+      "old_refinement_layers_retained": true,
+      "parent_parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_entry_motion_1104.npz",
+      "parent_parameter_sha256": "4489531ac8707a16e754504ef52b7930c8b1c131ea6d82f232b396033a50a437",
+      "root_z_unchanged": false,
+      "surrounding_model_anchor_seconds": []
+    },
+    "stop": {
+      "policy": {
+        "wall_seconds": 362.32604569999967,
+        "max_accepted": 6,
+        "max_outer": 1,
+        "stagnation_window": 4,
+        "min_violation_improvement_m": 0.0001,
+        "min_joint_relative_improvement": 1e-07,
+        "max_image_cost_increase": 0.05,
+        "max_pose_cost_increase": 0.1,
+        "allow_penalty_growth": false
+      },
+      "start_now": 46642.7480574,
+      "last_now": 46767.5195089,
+      "checks": 23,
+      "accepted": 6,
+      "outer_completed": 0,
+      "baseline": {
+        "now": 46642.8110502,
+        "elapsed_seconds": 0.0629927999980282,
+        "accepted": 0,
+        "outer_completed": 0,
+        "violation_m": 0.006674221350034779,
+        "image_cost": 3334.1414652292424,
+        "pose_cost": null,
+        "joint_cost": 3610.3424926440607,
+        "quality_metrics": {}
+      },
+      "latest": {
+        "now": 46767.5195089,
+        "elapsed_seconds": 124.77145149999706,
+        "accepted": 6,
+        "outer_completed": 0,
+        "violation_m": 0.00440799305053056,
+        "image_cost": 3194.8609016382925,
+        "pose_cost": null,
+        "joint_cost": 3468.4620535165773,
+        "quality_metrics": {}
+      },
+      "best_violation_m": 0.00440799305053056,
+      "best_at_accepted": 6,
+      "violation_stagnation_enabled": true,
+      "comparable_violation_history": [
+        {
+          "accepted": 2,
+          "best_violation_m": 0.004680520010098297
+        },
+        {
+          "accepted": 3,
+          "best_violation_m": 0.0045649604455340175
+        },
+        {
+          "accepted": 4,
+          "best_violation_m": 0.004509374116137417
+        },
+        {
+          "accepted": 5,
+          "best_violation_m": 0.004409964191573969
+        },
+        {
+          "accepted": 6,
+          "best_violation_m": 0.00440799305053056
+        }
+      ],
+      "comparable_joint_history": [
+        {
+          "accepted": 2,
+          "joint_cost": 3537.925059602739
+        },
+        {
+          "accepted": 3,
+          "joint_cost": 3523.580517129999
+        },
+        {
+          "accepted": 4,
+          "joint_cost": 3495.138901663095
+        },
+        {
+          "accepted": 5,
+          "joint_cost": 3470.298095732095
+        },
+        {
+          "accepted": 6,
+          "joint_cost": 3468.4620535165773
+        }
+      ],
+      "progress_diagnostics": [],
+      "stopped_by_policy": true,
+      "first_stop_now": 46767.5195089,
+      "reasons": [
+        {
+          "code": "accepted_budget",
+          "category": "budget",
+          "message": "Accepted-step budget reached.",
+          "accepted": 6,
+          "limit": 6
+        }
+      ],
+      "quality_failed": false,
+      "quality_reasons": [],
+      "quality_limits": {},
+      "quality_diagnostics": [
+        {
+          "code": "relative_quality_unavailable",
+          "metric": "pose_cost",
+          "reason": "missing_initial_cost",
+          "baseline": null,
+          "latest": null
+        }
+      ],
+      "convergence_claim": false,
+      "meaning": "Quality/domain failure rejects the attempted candidate; budget/stagnation alone does not. Neither establishes convergence nor source acceptance."
+    },
+    "previous_stage_wall_seconds": 211.2058978999994,
+    "total_two_stage_wall_seconds": 361.6558154000013,
+    "root_jump_source_interval_seconds": [
+      81.3,
+      81.8
+    ],
+    "before_entry_max_pelvis_xy_speed_m_s": 23.332642724445247,
+    "after_entry_max_pelvis_xy_speed_m_s": 2.6691108161250985,
+    "com_model_is_proxy_not_measured_anthropometry": true,
+    "com_flight_after_acceleration_m_s2": [
+      [
+        -0.1469519177987877,
+        -0.5176287005093094,
+        -9.083484247613404
+      ],
+      [
+        -0.7042480402263852,
+        1.2086123448340538,
+        -6.990286577866489
+      ],
+      [
+        0.972359134334666,
+        0.262868079439188,
+        -8.458951332055433
+      ]
+    ],
+    "gravity_target_m_s2": [
+      0,
+      0,
+      -9.81
+    ],
+    "flight_confirmed_interior_source_seconds": [
+      81.36,
+      81.44
+    ],
+    "flight_boundary_uncertainty_retained": true,
+    "metadata_label_corrected_without_state_change": true,
+    "delivery": {
+      "launcher": "D:\\OneDrive\\codex_projs\\RinkSpace\\START_3D_SPIN_ENTRY.cmd",
+      "registration": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_entry_gravity_1104\\entry_motion_player_registration.json",
+      "trajectory": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_entry_gravity_1104\\entry_motion_saved_pelvis_xy.png",
+      "native_stills": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_entry_gravity_1104\\entry_motion_native_stills",
+      "no_gui_opened": true
+    },
+    "visual_review": {
+      "trajectory_reviewed": true,
+      "native_still_pts_reviewed": [
+        1041920
+      ],
+      "source_seconds_reviewed": [
+        81.4
+      ],
+      "trajectory_finding": "Previously saved lateral out-and-back branch is absent from the new saved pelvis XY; all 951 source exposures remain plotted without alignment or point deletion.",
+      "native_projection_finding": "Arm, leg and shoe mismatches remain visible at source 81.40 s. This is not source-accuracy acceptance.",
+      "limitations": [
+        "Mass-weighted COM is a uniform-density segment-volume proxy, not measured athlete anthropometry.",
+        "Flight interior 81.36--81.44 s is source-supported; exact takeoff/landing boundaries remain uncertain.",
+        "The finite gravity residual reduces acceleration error but does not establish exact ballistic equality.",
+        "Original and intermediate candidates remain retained; no further fitting started after the stated step budget."
+      ]
+    }
+  },
+  "com_diagnostics": {
+    "before": {
+      "metrics": {
+        "residual_form": "acceleration",
+        "source_pts": [
+          1041408,
+          1041664,
+          1041920,
+          1042176,
+          1042432
+        ],
+        "source_interval_seconds": [
+          81.36,
+          81.44
+        ],
+        "com_world_m": [
+          [
+            -10.982114115934568,
+            -7.5530577566655746,
+            1.0397140523142439
+          ],
+          [
+            -11.348599898155454,
+            -7.604819723919395,
+            1.0744316046552922
+          ],
+          [
+            -11.695607326929798,
+            -7.651224127370466,
+            1.0932353603665468
+          ],
+          [
+            -12.018052485341943,
+            -7.689686380903475,
+            1.092522218868519
+          ],
+          [
+            -12.307008286125077,
+            -7.726040144217187,
+            1.0963236448340838
+          ]
+        ],
+        "gravity_world_mps2": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "acceleration_diagnostics": {
+          "elapsed_s": [
+            0.02,
+            0.04,
+            0.06
+          ],
+          "stencil_pts": [
+            [
+              1041408,
+              1041664,
+              1041920
+            ],
+            [
+              1041664,
+              1041920,
+              1042176
+            ],
+            [
+              1041920,
+              1042176,
+              1042432
+            ]
+          ],
+          "com_acceleration_world_mps2": [
+            [
+              48.69588361635646,
+              13.39390950687136,
+              -39.784491574484385
+            ],
+            [
+              61.40567590549467,
+              19.85537479515686,
+              -48.792243023205735
+            ],
+            [
+              83.72339407253051,
+              5.271225548242364,
+              11.286418658981166
+            ]
+          ],
+          "acceleration_minus_gravity_world_mps2": [
+            [
+              48.69588361635646,
+              13.39390950687136,
+              -29.974491574484382
+            ],
+            [
+              61.40567590549467,
+              19.85537479515686,
+              -38.98224302320573
+            ],
+            [
+              83.72339407253051,
+              5.271225548242364,
+              21.096418658981165
+            ]
+          ],
+          "stencil_confidence": [
+            0.8,
+            0.8,
+            0.8
+          ]
+        },
+        "mass_model_id": "shape-segment-convex-volume.uniform-density.v1;rigid-skate-relative-mass-assumption",
+        "segment_names": [
+          "pelvis",
+          "left_hip",
+          "right_hip",
+          "spine1",
+          "left_knee",
+          "right_knee",
+          "spine2",
+          "left_ankle",
+          "right_ankle",
+          "spine3",
+          "left_foot",
+          "right_foot",
+          "neck",
+          "left_collar",
+          "right_collar",
+          "head",
+          "left_shoulder",
+          "right_shoulder",
+          "left_elbow",
+          "right_elbow",
+          "left_wrist",
+          "right_wrist",
+          "left_skate_proxy",
+          "right_skate_proxy"
+        ],
+        "normalized_model_masses": [
+          0.20828498339408824,
+          0.10708321377369218,
+          0.10038615006057655,
+          0.045550947766026105,
+          0.04834334272614982,
+          0.05260035923084912,
+          0.05715641401184565,
+          0.009760582215764304,
+          0.009761001333271895,
+          0.16361336870967408,
+          0.0022677622441152167,
+          0.0022678308965450094,
+          0.008690601139346365,
+          0.012577575723405093,
+          0.014881938337701657,
+          0.0665853086556941,
+          0.023574616688678614,
+          0.024127639949331113,
+          0.012610494653928118,
+          0.012702564996972227,
+          0.008672402831290588,
+          0.008500900661053837,
+          0.02,
+          0.02
+        ],
+        "mass_is_measured": false,
+        "skate_mass_is_assumed": true,
+        "distribution_sensitivity": [
+          {
+            "lower_body_mass_multiplier": 0.8,
+            "relative_mass_per_skate": 0.0,
+            "maximum_com_change_m": 0.04337827151208081
+          },
+          {
+            "lower_body_mass_multiplier": 1.2,
+            "relative_mass_per_skate": 0.03,
+            "maximum_com_change_m": 0.028012283753612664
+          }
+        ],
+        "pelvis_used_as_com": false,
+        "source_boundaries_excluded": true,
+        "finite_soft_factor": true,
+        "model_limitations": "uniform-density segment convex-volume/rigid-segment and unmeasured skate-mass proxy; no exact athlete anthropometry claim"
+      },
+      "maximum_ballistic_position_error_m": 0.02808710334047459,
+      "mean_com_acceleration_mps2": [
+        64.60831786479388,
+        12.840169950090193,
+        -25.76343864623632
+      ]
+    },
+    "after": {
+      "metrics": {
+        "residual_form": "acceleration",
+        "source_pts": [
+          1041408,
+          1041664,
+          1041920,
+          1042176,
+          1042432
+        ],
+        "source_interval_seconds": [
+          81.36,
+          81.44
+        ],
+        "com_world_m": [
+          [
+            -9.422453345886574,
+            -7.299851938604399,
+            1.0158010243026774
+          ],
+          [
+            -9.394547884251041,
+            -7.281107247600356,
+            1.0268442676356684
+          ],
+          [
+            -9.366701203382629,
+            -7.262569608076516,
+            1.034254117269614
+          ],
+          [
+            -9.339136221730307,
+            -7.243548523614743,
+            1.038867852272413
+          ],
+          [
+            -9.311182296424251,
+            -7.2244222919211945,
+            1.04009800674239
+          ]
+        ],
+        "gravity_world_mps2": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "acceleration_diagnostics": {
+          "elapsed_s": [
+            0.02,
+            0.04,
+            0.06
+          ],
+          "stencil_pts": [
+            [
+              1041408,
+              1041664,
+              1041920
+            ],
+            [
+              1041664,
+              1041920,
+              1042176
+            ],
+            [
+              1041920,
+              1042176,
+              1042432
+            ]
+          ],
+          "com_acceleration_world_mps2": [
+            [
+              -0.1469519177987877,
+              -0.5176287005093094,
+              -9.083484247613404
+            ],
+            [
+              -0.7042480402263852,
+              1.2086123448340538,
+              -6.990286577866489
+            ],
+            [
+              0.972359134334666,
+              0.262868079439188,
+              -8.458951332055433
+            ]
+          ],
+          "acceleration_minus_gravity_world_mps2": [
+            [
+              -0.1469519177987877,
+              -0.5176287005093094,
+              0.7265157523865966
+            ],
+            [
+              -0.7042480402263852,
+              1.2086123448340538,
+              2.8197134221335114
+            ],
+            [
+              0.972359134334666,
+              0.262868079439188,
+              1.3510486679445677
+            ]
+          ],
+          "stencil_confidence": [
+            0.8,
+            0.8,
+            0.8
+          ]
+        },
+        "mass_model_id": "shape-segment-convex-volume.uniform-density.v1;rigid-skate-relative-mass-assumption",
+        "segment_names": [
+          "pelvis",
+          "left_hip",
+          "right_hip",
+          "spine1",
+          "left_knee",
+          "right_knee",
+          "spine2",
+          "left_ankle",
+          "right_ankle",
+          "spine3",
+          "left_foot",
+          "right_foot",
+          "neck",
+          "left_collar",
+          "right_collar",
+          "head",
+          "left_shoulder",
+          "right_shoulder",
+          "left_elbow",
+          "right_elbow",
+          "left_wrist",
+          "right_wrist",
+          "left_skate_proxy",
+          "right_skate_proxy"
+        ],
+        "normalized_model_masses": [
+          0.20828498339408824,
+          0.10708321377369218,
+          0.10038615006057655,
+          0.045550947766026105,
+          0.04834334272614982,
+          0.05260035923084912,
+          0.05715641401184565,
+          0.009760582215764304,
+          0.009761001333271895,
+          0.16361336870967408,
+          0.0022677622441152167,
+          0.0022678308965450094,
+          0.008690601139346365,
+          0.012577575723405093,
+          0.014881938337701657,
+          0.0665853086556941,
+          0.023574616688678614,
+          0.024127639949331113,
+          0.012610494653928118,
+          0.012702564996972227,
+          0.008672402831290588,
+          0.008500900661053837,
+          0.02,
+          0.02
+        ],
+        "mass_is_measured": false,
+        "skate_mass_is_assumed": true,
+        "distribution_sensitivity": [
+          {
+            "lower_body_mass_multiplier": 0.8,
+            "relative_mass_per_skate": 0.0,
+            "maximum_com_change_m": 0.0434906624883216
+          },
+          {
+            "lower_body_mass_multiplier": 1.2,
+            "relative_mass_per_skate": 0.03,
+            "maximum_com_change_m": 0.02800207730579036
+          }
+        ],
+        "pelvis_used_as_com": false,
+        "source_boundaries_excluded": true,
+        "finite_soft_factor": true,
+        "model_limitations": "uniform-density segment convex-volume/rigid-segment and unmeasured skate-mass proxy; no exact athlete anthropometry claim"
+      },
+      "maximum_ballistic_position_error_m": 0.0008909986779619126,
+      "mean_com_acceleration_mps2": [
+        0.04038639210316438,
+        0.31795057458797743,
+        -8.177574052511774
+      ]
+    }
+  },
+  "player": {
+    "config": "viewer3d_spin_entry_motion_1104.json",
+    "launcher": "START_3D_SPIN_ENTRY.cmd",
+    "default_variant": "entry_motion",
+    "old_variants_preserved": [
+      "gvhmr_fixed",
+      "exmr_prefoot_old",
+      "hand_nofoot_initial",
+      "grasp_candidate",
+      "grasp_stage1",
+      "support_located",
+      "support_midpoint",
+      "old_root",
+      "support_foot"
+    ],
+    "cache_is_offline": true
+  },
+  "offline_evidence": {
+    "base": "data",
+    "run": "runs/body_s01_20261029/spin_entry_gravity_1104",
+    "native_projection": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_entry_gravity_1104\\entry_motion_native_stills\\projection_and_clock.json",
+      "sha256": "1fe949852ef1a2ac01138131c69282defa888b0057cd722713b6a39f637f51dd",
+      "bytes": 18062
+    },
+    "trajectory": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_entry_gravity_1104\\entry_motion_saved_pelvis_xy.png",
+      "sha256": "954e08f7e82f543d251d3eae6eee0f60f523e4ad8428fc5544bec4f5772afe8b",
+      "bytes": 115781
+    },
+    "source_snapshot": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_entry_gravity_1104\\entry_source_manifest.json",
+      "sha256": "045d5b6ac1895e9cb10d1ca48dffc7f8919dfce1e90cdd11eabfb662a985ed7c",
+      "bytes": 491
+    },
+    "stills": [
+      {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_entry_gravity_1104\\entry_motion_native_stills\\compare_1034240.png",
+        "sha256": "5be2876d93210c0379bd7644832aabba228a1ec6591732717ce1d5a8a1cdc600",
+        "bytes": 820268
+      },
+      {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_entry_gravity_1104\\entry_motion_native_stills\\compare_1040640.png",
+        "sha256": "0857be05b0e285965819e69d2146fe7bfee9a084a192f938fa83eba649c9fcd9",
+        "bytes": 865311
+      },
+      {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_entry_gravity_1104\\entry_motion_native_stills\\compare_1041920.png",
+        "sha256": "fcae1edbfa5094f430a05b01c41cdc3b3155372d6ebba0e731ae522ccab2c2c7",
+        "bytes": 858048
+      },
+      {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_entry_gravity_1104\\entry_motion_native_stills\\compare_1043200.png",
+        "sha256": "e6d068a02e7c47d59a42f1d13da7e4ea86b9306df847776c37e09d160bb9966e",
+        "bytes": 873873
+      },
+      {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_entry_gravity_1104\\entry_motion_native_stills\\compare_1045760.png",
+        "sha256": "21a4cd462b674292c96b481ed7a050e2385654b59428460c3122baaf893919bb",
+        "bytes": 890681
+      },
+      {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_entry_gravity_1104\\entry_motion_native_stills\\compare_1052160.png",
+        "sha256": "3cf527cd1b76d19c951730e07b034fc7ee6e91a15545a1c6b7dccf6285429f14",
+        "bytes": 924069
+      },
+      {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_entry_gravity_1104\\entry_motion_native_stills\\compare_1146368.png",
+        "sha256": "54957ff8cd608e898b36ef503ed8eb01709cdf8cc17b04ed2046268bc6e54f8c",
+        "bytes": 951013
+      }
+    ]
+  },
+  "failures_and_unknown": [
+    "Parent optimization started at 82 s and inherited the false 81.3--81.8 s lateral out-and-back branch unchanged.",
+    "New full 76--95 s shot exposes all 951 source times to the continuous state; no point deletion or display alignment.",
+    "Position-only COM residual first-stage candidate is retained: lower pelvis speed did not ensure gravity-consistent COM acceleration.",
+    "Final gravity residual is finite, uses a uniform-density segment-volume mass proxy with assumed skate mass; it is not measured athlete anthropometry or an exact-equality acceptance.",
+    "Source 81.36--81.44 s is confirmed airborne interior; exact takeoff/landing boundaries remain unknown; source 81.60 s is visibly landed.",
+    "Native source 81.40 s still shows arm, leg and shoe mismatches. Numerical improvement and accepted steps do not establish visual or contact accuracy.",
+    "No full-programme expansion, new network inference, video generation or millimetre feasibility reruns were performed."
+  ]
+}

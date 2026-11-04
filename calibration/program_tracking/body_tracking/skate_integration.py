@@ -176,8 +176,29 @@ class SupportJointWindow(WindowState):
         self.state_kind='support_joint_left_v1' if foot==0 else 'support_joint_right_v1'
 
 
+class SpinGraspWindow(WindowState):
+    """One C2 correction over the action with both legs, trunk and both arms."""
+    use_pose_cost_guard=False
+    regularize_actual_root_translation=True
+    def __init__(self,reference,seconds,mode='full'):
+        super().__init__(reference,seconds,mode,spacing=.25,taper=.5)
+        joints=(1,2,3,4,5,6,7,8,9,13,14,16,17,18,19,20,21)
+        self.active=np.array(list(range(6))+[6+3*(j-1)+a for j in joints for a in range(3)])
+        self.d=len(self.active);self.size=self.m*self.d;self.state_kind='spin_grasp_v1'
+
+
+
+class SpinSupportWindow(SpinGraspWindow):
+    """One continuous joint curve including both native toe joints."""
+    def __init__(self,reference,seconds,mode='full'):
+        super().__init__(reference,seconds,mode)
+        joints=(1,2,3,4,5,6,7,8,9,10,11,13,14,16,17,18,19,20,21)
+        self.active=np.array(list(range(6))+[6+3*(j-1)+a for j in joints for a in range(3)])
+        self.d=len(self.active);self.size=self.m*self.d;self.state_kind='spin_support_v2'
+
+
 def window_factory(kind):
-    return {'halo_1103':HaloWindow,'continuous_shot':ContinuousShotWindow,
+    return {'spin_support_v2':SpinSupportWindow,'spin_grasp_v1':SpinGraspWindow,'halo_1103':HaloWindow,'continuous_shot':ContinuousShotWindow,
         'continuous_root':ContinuousRootWindow,'continuous_pose':ContinuousPoseWindow,
         'support_joint_left_v1':lambda r,s,m:SupportJointWindow(r,s,m,foot=0),
         'support_joint_right_v1':lambda r,s,m:SupportJointWindow(r,s,m,foot=1)}[kind]
@@ -228,6 +249,8 @@ class ContactBodyProblem(BootWindowProblem):
         self.binding=reference.binding;self.mid_times=reference.times[self.frames]
         self.mid_ref=reference.at(self.mid_times);self.binding_key=None
         self.camera_centres=camera_centres(camera,self.frames)
+        prepare=getattr(self.execution,'prepare_compatibility',None)
+        self.resident_compatibility=None if prepare is None else prepare(self.reference,self.mid_ref,self.binding)
 
     def visible_boot_edges(self,world):
         from .footwear_observations import visible_shell_edges
@@ -237,11 +260,12 @@ class ContactBodyProblem(BootWindowProblem):
 
 
 class JointContactProblem:
-    def __init__(self,reference,camera,ledger,seconds,evidence,output,log,state_kind='halo_1103',*,optimize_shared=True,ice_policy=None):
+    def __init__(self,reference,camera,ledger,seconds,evidence,output,log,state_kind='halo_1103',*,optimize_shared=True,ice_policy=None,record_acceptance_before_jacobian=False):
         self.reference=reference;self.binding=reference.binding;self.camera=camera
         self.output=Path(output);self.log=log;self.start=time.perf_counter();self.outer=0;self.accepted=0
         self.state_kind=state_kind
         self.optimize_shared=bool(optimize_shared)
+        self.record_acceptance_before_jacobian=bool(record_acceptance_before_jacobian)
         if ice_policy is None:
             config=Path(__file__).resolve().parents[3]/'events/ankara_2026/programmes/okada_mei_sp/ice_soft_1103.json'
             ice_policy=IceSoftPolicy(**json.loads(config.read_text(encoding='utf-8'))['policy'])
@@ -344,16 +368,19 @@ class JointContactProblem:
 
     def evaluate(self,x,jacobian=False):
         if self.cache_x is not None and np.array_equal(x,self.cache_x) and (not jacobian or self.cache['jac'] is not None):return self.cache
-        tick=time.perf_counter();self.binding.x=x[:17].copy()
+        tick=time.perf_counter();self.binding.x=x[:17].copy();phases={};phase_start=tick
         base=self.body.evaluate(x[17:],jacobian)
+        phases['body_with_compatibility_seconds']=time.perf_counter()-phase_start;phase_start=time.perf_counter()
         # Existing 50Hz image/reference blocks become duration integrals by a
         # common constant. Physics uses its own positive trapezoidal weights.
         data=np.sqrt(.02)*base['residual']
         neutral=self.binding.compatibility_rows(self.binding.neutral_native,self.binding.neutral_frames,self.binding.neutral_samples).ravel()
         prior=shared_prior(x[:17]);rdata=np.r_[data,neutral,prior]
+        phases['neutral_and_prior_seconds']=time.perf_counter()-phase_start;phase_start=time.perf_counter()
         raw_ice=self.contact(x,jacobian)
         ice=ice_soft_rows(raw_ice,self.ice_policy)
         rdata=np.r_[rdata,ice['residual']]
+        phases['ice_geometry_and_jacobian_seconds']=time.perf_counter()-phase_start;phase_start=time.perf_counter()
         e=dict(raw_ice)
         neutral_margin,neutral_which=self.cavity_margins(neutral)
         dynamic_rows=base['compatibility_residual']*np.sqrt(2)
@@ -368,11 +395,12 @@ class JointContactProblem:
         collar_unknown=0
         if jacobian or self.binding.collar_constraints_enabled:
             s=base['world'];local=np.einsum('nji,nkj->nki',s['Q'],s['native']-s['P'][:,None]);mid=np.arange(self.body.n)*5+2
-            self._replay_samples=self.binding.surface.sample_vertices(local[mid],s['frames'][mid],self.binding.sample_ids,double_precision=True)
+            self._replay_samples=self.binding.surface.sample_vertices(local[mid],s['frames'][mid],self.binding.sample_ids,double_precision=True,**({} if 'hand_local_R' not in s else {'hand_local_R':s['hand_local_R'][mid]}))
             if self.binding.collar_constraints_enabled:
                 collar_unknown=int(self.binding.collar_metrics(local[mid],s['frames'][mid],self._replay_samples)['unknown'].sum())
                 collar_unknown+=int(self.binding.collar_metrics(self.binding.neutral_native,self.binding.neutral_frames,
                     self.binding.neutral_samples)['unknown'].sum())
+        phases['cavity_and_collar_gate_seconds']=time.perf_counter()-phase_start;phase_start=time.perf_counter()
         if jacobian:
             if getattr(self,'optimize_shared',True):
                 columns=self.body.execution.map_columns(lambda c:self.shared_column(c,x,base),range(17))
@@ -393,18 +421,23 @@ class JointContactProblem:
                 compatibility_J[select]*(-.003*np.sqrt(2)/NORMALIZATION)),format='csr')
             Jg=hstack((shared_g,foot_body_J),format='csr')
         else:Jdata=Jg=None
+        phases['shared_columns_and_sparse_seconds']=time.perf_counter()-phase_start;phase_start=time.perf_counter()
         motion=self.source_motion.evaluate(x[17:],jacobian)
+        phases['source_motion_seconds']=time.perf_counter()-phase_start;phase_start=time.perf_counter()
         action=getattr(self,'action_factors',None)
         extra=action.evaluate(x[17:],jacobian) if action is not None else dict(residual=np.empty(0),jac=csr_matrix((0,self.size)),parts={},metrics={})
+        phases['action_seconds']=time.perf_counter()-phase_start;phase_start=time.perf_counter()
         rdata=np.r_[rdata,motion['residual'],extra['residual']]
         if jacobian:
             motion_J=hstack((csr_matrix((len(motion['residual']),17)),motion['jac']),format='csr')
             Jdata=vstack((Jdata,motion_J,extra['jac']),format='csr')
+        phases['motion_action_assembly_seconds']=time.perf_counter()-phase_start;phase_start=time.perf_counter()
         support=getattr(self,'support_image',None)
         support_value=support.evaluate(x[17:],jacobian) if support is not None else None
         if support_value is not None:
             rdata=np.r_[rdata,support_value['residual']]
             if jacobian:Jdata=vstack((Jdata,support_value['jac']),format='csr')
+        phases['support_image_seconds']=time.perf_counter()-phase_start;phase_start=time.perf_counter()
         ral,Jal=self.al.residual_and_jacobian(e['g'],Jg,row_weights=e['weights'])
         r=np.r_[rdata,ral];J=vstack((Jdata,Jal),format='csr') if jacobian else None
         gate=physical_feasibility(e['margin_m'],tolerance_m=FEASIBILITY_TOLERANCE,row_labels=e['labels'])
@@ -417,7 +450,7 @@ class JointContactProblem:
         image_names=('body_pixels','visible_boot_edges','visible_blade_curves','boot_direction_endpoints')
         pose_names=('reference_deviation','correction_velocity','correction_acceleration','actual_root_and_correction_acceleration')
         v=dict(residual=r,jac=J,parts=parts,contact=e,raw_ice=raw_ice,ice=ice,gate=gate,
-            image_cost=(1. if support_value is None else .02)*sum(base['parts'].get(name,0.) for name in image_names)+(0. if support_value is None else support_value['cost']),
+            image_cost=(1. if support_value is None else .02)*sum(base['parts'].get(name,0.) for name in image_names)+(0. if support_value is None else support_value['cost'])+extra.get('image_cost',0.),
             pose_cost=sum(base['parts'].get(name,0.) for name in pose_names),
             source_motion_metrics=motion['metrics'],action_metrics=extra['metrics'],
             raw_data_parts={**base['parts'],**motion['parts'],**extra['parts']})
@@ -426,11 +459,17 @@ class JointContactProblem:
             v['parts']['support_image']=support_value['cost']
             v['raw_data_parts'].update(support_value['parts'])
             v['block_slices']={'support_image':slice(len(rdata)-len(support_value['residual']),len(rdata))}
+        phases['AL_and_final_assembly_seconds']=time.perf_counter()-phase_start
+        v['evaluation_phases']=phases
+        v['body_derivative_phases']=dict(base.get('phases',{}))
+        v['compatibility_execution']=base.get('compatibility_execution')
         self.cache_x=x.copy();self.cache=v
         self.log.write(json.dumps(dict(event='joint_evaluation',outer=self.outer,with_jacobian=jacobian,
             seconds=time.perf_counter()-self.start,evaluation_seconds=time.perf_counter()-tick,cost=float(r@r/2),
             parts=parts,physics_times=len(self.physics_times),constraints=len(e['g']),variables=self.size,
-            jacobian_nnz=None if J is None else J.nnz,**gate))+'\n')
+            evaluation_phases=phases,body_derivative_phases=v['body_derivative_phases'],
+            compatibility_execution=v['compatibility_execution'],
+            jacobian_nnz=None if J is None else J.nnz,body_execution_phases=dict(base.get('phases',{})),**gate))+'\n')
         return v
 
     def restoration_seed(self,x):
@@ -446,7 +485,7 @@ class JointContactProblem:
         return out
 
     def checkpoint_fields(self,x):
-        return dict(self.reference.fixed_checkpoint_identity,**self.saved_base_layers,
+        return dict(self.reference.fixed_checkpoint_identity,**self.saved_base_layers,**getattr(self,'checkpoint_extra',{}),
             x=np.asarray(x).copy(),knots=self.body.state.knots,
             active=self.body.state.active,seconds=self.body.state.seconds,physics_times=self.physics_times,
             multiplier=self.al.multiplier,penalty=np.array(self.al.penalty),state_kind=np.array(self.state_kind),
@@ -485,24 +524,32 @@ class JointContactProblem:
         selection=np.arange(0 if getattr(self,'optimize_shared',True) else 17,self.size)
         self.parameter_selection=selection
         frozen_initial=x.copy()
+        record_before_jacobian=bool(getattr(self,'record_acceptance_before_jacobian',False))
+        last_linearization=None;last_recorded=x[selection].copy()
         def expand(z):
             full=frozen_initial.copy();full[selection]=z;return full
         write_json(self.output/'parameter_selection.json',dict(full_layout=self.size,active_variables=len(selection),
             active_state_columns=self.body.state.active.tolist(),state_kind=self.state_kind,
             body_support_seconds=list(self.body.state.seconds),selection=selection.tolist(),one_body_state=True,
-            internal_temporal_freezes=False))
+            internal_temporal_freezes=False,record_acceptance_before_jacobian=record_before_jacobian))
         implementation={}
         source_dir=self.output/'source_snapshot';source_dir.mkdir(exist_ok=True)
         for name in ('skate_integration.py','skate_binding.py','skate_physics.py','skate_template.py',
                      'skate_contact.py','contact_feasibility.py','footwear_layout.py','fullbody_fit.py',
-                     'fullbody_state.py','boot_integration.py','body_execution.py','footwear_pixel_factors.py','skate_run_policy.py',
+                     'fullbody_state.py','boot_integration.py','body_execution.py',
+                     'compact_body_derivatives.py','selected_surface_linearization.py',
+                     'body_resident_torch.py','torch_foot_compatibility.py','body_foot_cuda_bridge.py','body_foot_cuda.cu',
+                     'footwear_pixel_factors.py','skate_run_policy.py',
                       'skate_collar_factors.py','skate_checkpoint.py','opening_live.py',
                       'opening_motion.py','opening_timing.py','skating_action_factors.py',
                       'ice_soft.py','action_live.py','action_integration.py','root_trajectory.py','root_repair.py',
-                      'support_anchor_factors.py','support_image.py','stage_quality.py','source_support_export.py'):
+                      'support_anchor_factors.py','support_image.py','stage_quality.py','source_support_export.py',
+                      'hand_state.py','rebuild_body_geometry.py','compact_body_torch.py','spin_grasp_factors.py',
+                      'grasp_temporal_factors.py','spin_grasp_refinement.py'):
             path=Path(__file__).with_name(name);implementation[name]=digest(path)
             (source_dir/name).write_bytes(path.read_bytes())
         write_json(self.output/'kernel_manifest.json',implementation)
+        write_json(self.output/'execution_policy.json',self.body.execution.record())
         write_json(self.output/'ice_soft_policy.json',dict(policy=vars(self.ice_policy),
             role='finite objective only; no multiplier, feasibility threshold or continuation'))
         class StopFit(Exception):pass
@@ -515,6 +562,7 @@ class JointContactProblem:
                 message='Collar section unavailable; finite domain residual is not a penetration measurement.')] if unknown else []
             status=monitor.observe(now=time.perf_counter(),accepted=accepted,
                 violation_m=value['gate']['max_violation_m'],image_cost=value['image_cost'],
+                joint_cost=float(value['residual']@value['residual']/2),
                 pose_cost=value['pose_cost'] if getattr(self.body.state,'use_pose_cost_guard',True) else None,
                 quality_metrics=metrics,quality_failures=failures)
             retention.observe(z,value,step=self.accepted,decision=status,metrics=monitor.latest)
@@ -527,6 +575,9 @@ class JointContactProblem:
                 np.savez_compressed(self.output/'accepted.pending.npz',**self.checkpoint_fields(z))
                 (self.output/'accepted.pending.npz').replace(self.output/'last_accepted.npz')
             write_json(self.output/'candidate_selection.json',retention.record())
+            # Initial-domain failure and solver-return observations must also
+            # persist the actual policy state, not an empty pre-solve record.
+            write_json(self.output/'run_policy.json',monitor.record())
             return status
         initial_value=self.evaluate(x,False)
         if getattr(self,'stage_quality',None) is not None:
@@ -544,6 +595,7 @@ class JointContactProblem:
             self.body.cache=self.body.cache_x=None
             self.body.binding_key=None
             last_value=self.evaluate(last_x,False)
+            write_json(self.output/'execution_policy.json',self.body.execution.record())
             np.savez_compressed(self.output/'candidate.pending.npz',**self.checkpoint_fields(last_x))
             (self.output/'candidate.pending.npz').replace(self.output/'candidate.npz')
             record=dict(event='candidate_saved',stop=reason,candidate_checkpoint=str(self.output/'candidate.npz'),
@@ -561,21 +613,36 @@ class JointContactProblem:
             return last_x,record
         jacobian_seconds=float(getattr(self,'jacobian_seconds_hint',0.))
         def guarded(z,jacobian=False):
-            nonlocal jacobian_seconds
+            nonlocal jacobian_seconds,last_linearization
+            # SciPy TRF requests a new Jacobian only after accepting its cached
+            # fun state. Record it before spending a J that a budget may discard.
+            if jacobian and record_before_jacobian and last_linearization is not None and not np.array_equal(z,last_linearization):
+                full=expand(z)
+                if self.cache_x is not None and np.array_equal(full,self.cache_x) and self.cache is not None:
+                    accepted(z)
             now=time.perf_counter()
             if monitor.reserve_evaluation(now=now,estimated_seconds=jacobian_seconds if jacobian else 0.)['stop']:raise StopFit()
             value=self.evaluate(expand(z),jacobian)
-            if jacobian:jacobian_seconds=max(jacobian_seconds,time.perf_counter()-now)
+            if jacobian:
+                jacobian_seconds=max(jacobian_seconds,time.perf_counter()-now)
+                last_linearization=np.array(z,copy=True)
             return value
         while True:
-            self.cache=None;self.cache_x=None;self.outer+=1
+            # A supplied same-state seed J is still exact before the first
+            # inner solve. Later AL/association phases must invalidate it.
+            if not (self.record_acceptance_before_jacobian and self.outer==0):
+                self.cache=None;self.cache_x=None
+            self.outer+=1
             def accepted(reduced):
+                nonlocal last_recorded
+                if record_before_jacobian:
+                    if np.array_equal(reduced,last_recorded):return
+                    last_recorded=np.array(reduced,copy=True)
                 z=expand(reduced)
                 self.accepted+=1;v=self.evaluate(z,False)
                 self.log.write(json.dumps(dict(event='accepted',outer=self.outer,iteration=self.accepted,
                     cost=float(v['residual']@v['residual']/2),parts=v['parts'],**v['gate']))+'\n')
                 status=observe_candidate(z,v,accepted=True)
-                write_json(self.output/'run_policy.json',monitor.record())
                 if status['stop']:raise StopFit()
             try:
                 fit=least_squares(lambda z:guarded(z)['residual'],x[selection],jac=lambda z:guarded(z,True)['jac'][:,selection],
@@ -595,7 +662,7 @@ class JointContactProblem:
             # an AL update, a denser feasibility gate, or prevent delivery.
             record.update(ice_is_delivery_gate=False,ice_mode='finite_soft_objective',
                 source_seconds=self.body.state.seconds,accepted_iterations=self.accepted,
-                numerical_convergence=fit.optimality<=1e-4)
+                numerical_convergence=bool(fit.optimality<=1e-4))
             write_json(self.output/'result.json',record)
             return save_candidate(dict(reason='inner_solver_return',message=str(fit.message),
                 ice_is_delivery_gate=False))

@@ -16,8 +16,18 @@ def positive_int(value):
     return value
 
 
+def select_backend(profile, backend=None):
+    backend = profile.get('default_backend', 'cpu') if backend is None else backend
+    if backend not in ('cpu', 'cuda', 'hybrid'):
+        raise ValueError('backend must be cpu, cuda or hybrid')
+    if backend not in profile:
+        raise ValueError('performance profile has no '+backend+' settings')
+    return backend
+
+
 def command_environment(project, data_root, profile, backend, script, script_args,
                         *, workers=None, native_threads=None, python=None):
+    backend = select_backend(profile, backend)
     selected = profile[backend]
     workers = selected['workers'] if workers is None else workers
     native_threads = selected['native_threads'] if native_threads is None else native_threads
@@ -25,6 +35,8 @@ def command_environment(project, data_root, profile, backend, script, script_arg
         raise ValueError('worker counts must be positive')
     if backend == 'cuda' and workers != 1:
         raise ValueError('CUDA uses one body owner; --workers must be 1')
+    if selected['python_base'] not in ('project', 'data'):
+        raise ValueError('python_base must be project or data')
     base = project if selected['python_base'] == 'project' else data_root
     executable = Path(python) if python else base / selected['python']
     library = data_root / profile['native_library']
@@ -36,7 +48,10 @@ def command_environment(project, data_root, profile, backend, script, script_arg
             raise FileNotFoundError(f'{label}: {candidate}')
     env = os.environ.copy()
     env.update(RINKSPACE_DATA_ROOT=str(data_root), PYTHONDONTWRITEBYTECODE='1',
-        RINKSPACE_BODY_BACKEND=backend, RINKSPACE_BODY_WORKERS=str(workers),
+        RINKSPACE_BODY_BACKEND='cuda' if backend == 'cuda' else 'cpu',
+        RINKSPACE_BODY_COMPATIBILITY_BACKEND='cuda_resident' if backend == 'hybrid' else 'cpu',
+        RINKSPACE_BODY_LOCAL_DERIVATIVES='finite_difference' if backend == 'cuda' else 'analytic',
+        RINKSPACE_BODY_WORKERS=str(workers),
         RINKSPACE_BODY_BLAS_THREADS='1', RINKSPACE_BODY_NATIVE_THREADS=str(native_threads),
         RINKSPACE_BODY_NATIVE_LIBRARY=str(library),
         RINKSPACE_BODY_GPU_BATCH_SIZE=str(selected.get('gpu_batch_size', 512)),
@@ -56,7 +71,8 @@ def command_environment(project, data_root, profile, backend, script, script_arg
 def main(argv=None):
     project = Path(__file__).resolve().parents[1]
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--backend', choices=('cpu', 'cuda'), default='cpu')
+    parser.add_argument('--backend', choices=('cpu', 'cuda', 'hybrid'),
+        help='Default: profile.default_backend, or cpu for older profiles; hybrid uses CPU body derivatives and resident CUDA foot/collar compatibility')
     parser.add_argument('--workers', type=positive_int)
     parser.add_argument('--native-threads', type=positive_int)
     parser.add_argument('--python', type=Path)
@@ -70,12 +86,15 @@ def main(argv=None):
     data_root = Path(AssetStore(project).data)
     profile = json.loads(args.profile.read_text(encoding='utf8'))
     try:
-        command, env = command_environment(project, data_root, profile, args.backend, args.script,
+        backend = select_backend(profile, args.backend)
+        command, env = command_environment(project, data_root, profile, backend, args.script,
             args.script_args, workers=args.workers, native_threads=args.native_threads, python=args.python)
     except (ValueError, FileNotFoundError) as error:
         parser.error(str(error))
-    record = dict(event='body_performance_launcher', command=command, backend=args.backend,
+    record = dict(event='body_performance_launcher', command=command, backend=backend,
         settings={k: v for k, v in env.items() if k.startswith('RINKSPACE_BODY_')},
+        execution_scope='CPU body/camera/CSR/TRF with resident CUDA foot/collar compatibility only' if backend == 'hybrid' else
+            ('legacy compact FK/LBS CUDA adapter; compatibility/camera/CSR/TRF stay CPU' if backend == 'cuda' else 'CPU body and compatibility'),
         environment_scope='child process only', started=not args.show_command)
     print(json.dumps(record, ensure_ascii=False), flush=True)
     if args.show_command:

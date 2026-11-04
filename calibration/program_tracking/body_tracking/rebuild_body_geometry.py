@@ -105,7 +105,7 @@ class CompactBody:
         fixed_tail=additional_rotations is None or all(0<=int(j)<22 for j in additional_rotations)
         return self._forward_local_rotations(local,with_frames=with_frames,fixed_tail=fixed_tail)
 
-    def forward_rotations(self,body_local_R,*,with_frames=False):
+    def forward_rotations(self,body_local_R,*,hand_local_R=None,with_frames=False):
         """Effective rotations of native joints 1..21; world root is external.
 
         Frozen prior/B9/leg rotations must be composed by the state owner once.
@@ -120,7 +120,10 @@ class CompactBody:
         local=np.broadcast_to(np.eye(3),(n,55,3,3)).copy()
         local[:,1:22]=body_local_R
         local[:,22:]=self.default
-        return self._forward_local_rotations(local,with_frames=with_frames,fixed_tail=True)
+        if hand_local_R is not None:
+            from .hand_state import validate_hand
+            hand=validate_hand(hand_local_R,n);local[:,25:40]=hand[:,0];local[:,40:55]=hand[:,1]
+        return self._forward_local_rotations(local,with_frames=with_frames,fixed_tail=hand_local_R is None)
 
     def _forward_local_rotations(self,local,*,with_frames=False,fixed_tail=False):
         n=len(local)

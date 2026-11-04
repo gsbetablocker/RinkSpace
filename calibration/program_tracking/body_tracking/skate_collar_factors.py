@@ -178,7 +178,7 @@ def _sampled_signed_gap(points,polygon):
     return np.where(inside,distance,-distance)
 
 
-def evaluate(binding,joints,frames,samples=None):
+def evaluate(binding,joints,frames,samples=None,*,hand_local_R=None):
     """Return nonnegative ``breach_solver[n,2]`` and explicit ``unknown``.
 
     samples, if supplied, must be full-surface vertices at prepare().sample_ids
@@ -198,7 +198,9 @@ def evaluate(binding,joints,frames,samples=None):
                 unknown=unknown,unknown_reason=reason,sample_count=count,
                 minimum_sample_gap_solver=minimum)
     if n==0 or spec.inner_unknown_reason:return result
-    if samples is None:samples=binding.surface.sample_vertices(joints,frames,spec.sample_ids,double_precision=True)
+    if samples is None:
+        kwargs={} if hand_local_R is None else dict(hand_local_R=hand_local_R)
+        samples=binding.surface.sample_vertices(joints,frames,spec.sample_ids,double_precision=True,**kwargs)
     samples=np.asarray(samples)
     if samples.shape!=(n,len(spec.sample_ids),3) or not np.isfinite(samples).all():raise ValueError('Invalid collar full-surface samples')
     R_FB,t_FB,_=binding.parameters()

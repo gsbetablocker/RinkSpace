@@ -8,13 +8,7 @@ RinkSpace 研究如何从花样滑冰转播中恢复冰场、连续围挡、广�
 
 **冈田芽衣短节目的重构处理起点为原片 22.120 秒，PTS 283136，原生时基 1/12800。** 当前处理范围与历史物理镜头范围的差别见[范围文件](events/ankara_2026/programmes/okada_mei_sp/rebuild_scope.json)和[源时间说明](events/ankara_2026/programmes/okada_mei_sp/README.md#analysis-start)解释。起点前的原片与观测保留；19.960 秒准备画面另作开头人体姿势和位置辅助，不改变节目处理起点。
 
-S01 已接入可撤销观测关联、唯一全身状态、共享足鞋配准和开头时序修复。[START_3D_COMPARISON.cmd](START_3D_COMPARISON.cmd)从原片22.120秒比较旧结果与“22.90秒后下探、扶腰后展开”候选，[START_BOOT_INSPECTION.cmd](START_BOOT_INSPECTION.cmd)提供透明鞋与剖面检查。实际改善、穿冰／离冰残留和窗口范围见[节目记录](events/ankara_2026/programmes/okada_mei_sp/README.md)；这仍是局部研究结果，完整节目人体追踪尚未完成。
-
-新的人体整合、三段 A/B 与根轨迹修正已保存供审阅，均未通过准确性验收；根轨迹仍异常，部分图像误差变差。[节目记录](events/ankara_2026/programmes/okada_mei_sp/README.md#人体整合与根轨迹对照2026-11-04未验收)与[机器可读索引](events/ankara_2026/programmes/okada_mei_sp/body_integration_1104.json)区分代码、实际结果和缺项。[START_3D_INTEGRATION.cmd](START_3D_INTEGRATION.cmd)选择 S01、跳跃、步法或旋转，保留现有 S01 默认对照。
-
-最新源支撑接线已在旋转88–92秒进行真实联合试验；局部图像改善，但世界runner漂移和review仍失败，未扩展。[独立播放器入口](START_3D_SUPPORT.cmd)提供原片同帧、原A／旧root／新候选、自由3D及脚下视角；[真实结果索引](events/ankara_2026/programmes/okada_mei_sp/spin_support_1104_audit.json)保留完整限制。
-
-最新 GVHMR／ExMR 对照覆盖旋转完整76–95秒；ExMR部分二维人体指标改善，但足细化后有12个鞋口截面unknown，全部候选仍有明显根漂移，未验收或替换S01。[审核索引](events/ankara_2026/programmes/okada_mei_sp/spin_models_1104_audit.json)保留来源、参数、支持间隙和失败；[播放器入口](START_3D_SPIN_MODELS.cmd)使用共同观察相机和同帧原片。
+S01 人体与共享足鞋已有可回放候选；[主比较入口](START_3D_COMPARISON.cmd)默认从原片 22.120 秒加载 `skate_s01_1103`。三段动作、源支撑和 GVHMR／ExMR 旋转对照仍有根轨迹、图像或接触失败，完整节目人体追踪尚未完成。当前版本、范围和限制集中见[节目结果导航](events/ankara_2026/programmes/okada_mei_sp/README.md#人体与足鞋结果)，操作与默认配置见[播放器说明](docs/RESULTS_3D_PLAYER_ZH.md)。
 
 ## 快速试用：合成数据
 

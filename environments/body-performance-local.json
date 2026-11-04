@@ -6,8 +6,9 @@
   "cpu": {
     "python_base": "project",
     "python": ".venv/Scripts/python.exe",
-    "workers": 4,
-    "native_threads": 4
+    "workers": 12,
+    "native_threads": 4,
+    "performance_evidence": "runs/body_pf1104/spin_new12/profile.json"
   },
   "cuda": {
     "python_base": "data",
@@ -17,6 +18,14 @@
     "gpu_batch_size": 512,
     "perturbation_batch": 4,
     "max_batch_samples": 4096
+  },
+  "hybrid": {
+    "python_base": "data",
+    "python": "runtime_tools/vision_cuda/Scripts/python.exe",
+    "workers": 12,
+    "native_threads": 4,
+    "performance_evidence": "runs/body_pf1104/spin_gpu_final/profile.json",
+    "scope": "CPU analytic body/FK, native camera, CSR and TRF/LSMR; resident CUDA native55 FK, selected skin and foot/collar compatibility; single window and frozen shared footwear only"
   },
   "evidence": "runs/body_perf_1103/integration_summary.json",
   "scope": "execution only; existing entry point owns observations, objective, state, bounds, checkpoints and stopping conditions"

@@ -171,7 +171,7 @@ class TorchCompactBody:
                     local[:, j] = local[:, j] @ Rotation.from_rotvec(correction).as_matrix()
         return self._forward_local_rotations(local, with_frames=with_frames)
 
-    def forward_rotations(self, body_local_R, *, with_frames=False):
+    def forward_rotations(self, body_local_R, *, hand_local_R=None, with_frames=False):
         body_local_R = np.asarray(body_local_R, dtype=np.float64)
         if body_local_R.ndim != 4 or body_local_R.shape[1:] != (21, 3, 3):
             raise ValueError("Expected (N,21,3,3), excluding world root Q")
@@ -180,6 +180,9 @@ class TorchCompactBody:
         local = np.broadcast_to(np.eye(3), (len(body_local_R), 55, 3, 3)).copy()
         local[:, 1:22] = body_local_R
         local[:, 22:] = self.source.default
+        if hand_local_R is not None:
+            from .hand_state import validate_hand
+            hand=validate_hand(hand_local_R,len(local));local[:,25:40]=hand[:,0];local[:,40:55]=hand[:,1]
         return self._forward_local_rotations(local, with_frames=with_frames)
 
     def _forward_local_rotations(self, local, *, with_frames=False):

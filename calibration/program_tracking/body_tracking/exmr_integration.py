@@ -19,7 +19,7 @@ from .skate_delivery import export_candidate
 from .source_support_export import apply_source_support
 
 PROGRAMME=Path('events/ankara_2026/programmes/okada_mei_sp')
-LABELS={'gvhmr':'fixed_original_GVHMR','exmr_prefoot':'ExMR_camera_before_FootMR','exmr_final':'ExMR_camera_after_FootMR_HandMR'}
+LABELS={'gvhmr':'fixed_original_GVHMR','exmr_prefoot':'ExMR_camera_before_FootMR','exmr_final':'ExMR_camera_after_FootMR_HandMR','exmr_hand_nofoot':'ExMR_BodyNet_HandMR_FootMR_off'}
 
 
 CASE_FIELD='comparison_case_identity_json'
@@ -34,16 +34,16 @@ CASE_FIELDS={'schema','label','prior_label','native_input_sha256','camera_prior_
 def case_paths(project,base,output,label):
     return dict(case=output/'common'/label,
         native=base/'action_integration_1103/source_cache/spin_s05.native50.npz',
-        prior=base/'action_integration_1103/spin_s05/prior/camera_prior.npz' if label=='gvhmr' else output/(label+'.npz'),
+        prior=base/'action_integration_1103/spin_s05/prior/camera_prior.npz' if label=='gvhmr' else output/('exmr_body_hand_nofoot.npz' if label=='exmr_hand_nofoot' else label+'.npz'),
         shared=project/PROGRAMME/'skate_s01_1103.npz',
-        support=project/PROGRAMME/'support_spin_1104.json',
+        support=output/'support_and_free_shoe_regions.json' if label=='exmr_hand_nofoot' else project/PROGRAMME/'support_spin_1104.json',
         evidence=project/PROGRAMME/'action_evidence_1103.json')
 
 
 def case_identity(project,base,output,label,info,*,initial=None,prior_sha256=None):
     paths=case_paths(project,base,output,label);case=paths['case']
     pts=np.asarray(load(case/'input.npz')['pts'],dtype='<i8')
-    return dict(schema=CASE_SCHEMA,label=label,prior_label=LABELS[label],
+    identity=dict(schema=CASE_SCHEMA,label=label,prior_label=LABELS[label],
         native_input_sha256=digest(paths['native']),
         camera_prior_sha256=prior_sha256 or digest(paths['prior']),
         initial_reference_sha256=digest(initial or case/'initial.npz'),
@@ -53,6 +53,12 @@ def case_identity(project,base,output,label,info,*,initial=None,prior_sha256=Non
         action_evidence_sha256=digest(paths['evidence']),source_pts_sha256=hashlib.sha256(pts.tobytes()).hexdigest(),
         source_frames=len(pts),source_time_base=[1,12800],
         camera={k:v for k,v in info.items() if k not in CAMERA_LOCATION_FIELDS})
+    if label=='exmr_hand_nofoot':
+        from .hand_state import SCHEMA,MEAN
+        identity.update(schema='rinkspace.network-comparison-case.v2',hand_pose_schema_version=SCHEMA,
+            hand_mean_convention=MEAN,relation_document_sha256=digest(output/'grasp_relations.json'),
+            geometry_semantics_sha256=digest(output/'palm_grip_geometry.json'))
+    return identity
 
 
 def read_case_identity(saved):
@@ -62,7 +68,10 @@ def read_case_identity(saved):
         if value.shape!=():raise ValueError('Expected scalar case identity')
         result=json.loads(str(value))
     except (TypeError,ValueError) as exc:raise ValueError('Invalid comparison case identity') from exc
-    if not isinstance(result,dict) or set(result)!=CASE_FIELDS or result.get('schema')!=CASE_SCHEMA:
+    extra={'hand_pose_schema_version','hand_mean_convention','relation_document_sha256','geometry_semantics_sha256'}
+    schema=result.get('schema') if isinstance(result,dict) else None
+    expected_fields=CASE_FIELDS|extra if schema=='rinkspace.network-comparison-case.v2' else CASE_FIELDS
+    if not isinstance(result,dict) or set(result)!=expected_fields or schema not in (CASE_SCHEMA,'rinkspace.network-comparison-case.v2'):
         raise ValueError('Incomplete comparison case identity')
     return result
 
@@ -100,6 +109,14 @@ def replay_errors(actual,saved):
             raise ValueError('Invalid replay comparison field: '+field)
         errors[field]=float(np.max(np.abs(a-b),initial=0.))
         passed &= errors[field] <= (1e-6 if field.endswith('_uv') else 2e-10)
+    if 'hand_local_R_mid' in actual or 'hand_local_R_mid' in saved:
+        if 'hand_local_R_mid' not in actual or 'hand_local_R_mid' not in saved:raise ValueError('Replay hand channel missing')
+        errors['hand_local_R_mid']=float(np.max(np.abs(actual['hand_local_R_mid']-saved['hand_local_R_mid'])))
+        passed &= errors['hand_local_R_mid']<=2e-10
+    for field in ('grasp_palm_world_mid','grasp_segment_world_mid','palm_to_segment_m_mid'):
+        if field in actual or field in saved:
+            if field not in actual or field not in saved:raise ValueError('Replay grasp channel missing: '+field)
+            errors[field]=float(np.max(np.abs(actual[field]-saved[field])));passed &= errors[field]<=2e-10
     for name,part in [('shoe',slice(0,14)),('blade',slice(14,None))]:
         errors[name+'_native_uv']=float(np.max(np.abs(actual['equipment_uv'][:,:,part]-saved['equipment_uv'][:,:,part]),initial=0.))
     return dict(passed=bool(passed),source_pts_equal=True,source_frames=len(actual['pts']),
@@ -109,8 +126,8 @@ def replay_errors(actual,saved):
 
 def make_case(project,base,output,label,log=None):
     case=output/'common'/label
-    prior=base/'action_integration_1103/spin_s05/prior/camera_prior.npz' if label=='gvhmr' else output/(label+'.npz')
-    document=json.loads((project/PROGRAMME/'support_spin_1104.json').read_text(encoding='utf8'))
+    paths=case_paths(project,base,output,label);prior=paths['prior']
+    document=json.loads(paths['support'].read_text(encoding='utf8'))
     evidence=json.loads((project/PROGRAMME/'action_evidence_1103.json').read_text(encoding='utf8'))['clips']['spin_s05']
     ref,camera,info=initialize_clip(project,base,case,
         base/'action_integration_1103/source_cache/spin_s05.native50.npz',prior,'s05',
@@ -144,7 +161,7 @@ def save_packet(problem,info,supports,document,out,*,status,report=None):
     observed=np.zeros((len(packet['pts']),2),bool)
     if status in ('joint_fit','parameter_replay'):
         for row in document['observations']:
-            if row['role']=='fit':observed[packet['pts']==row['pts'],row['foot']]=True
+            if row['role']=='fit' and row.get('optimization_enabled',True):observed[packet['pts']==row['pts'],row['foot']]=True
     packet.update(support_image_observations_json=np.array(json.dumps(document,sort_keys=True)),
         support_image_in_optimization=observed,ice_mode=np.array('finite_soft_objective'),
         ice_soft_policy_json=np.array(json.dumps(vars(problem.ice_policy),sort_keys=True)),
@@ -286,6 +303,9 @@ def replay(project,base,output,label,checkpoint=None,replay_output=None):
         raise ValueError('Replay shared S01 parameters changed')
     p=camera.p;p['camera_rotation']=pose['rotation'];p['camera_centre']=pose['centre'];p['camera_values']=pose['values']
     ref=ClipReference(shared,case,p,initial)
+    if label=='exmr_hand_nofoot':
+        ref.grasp_geometry=json.loads((output/'palm_grip_geometry.json').read_text(encoding='utf8'))
+        ref.grasp_relations=json.loads((output/'grasp_relations.json').read_text(encoding='utf8'))
     ref.fixed_checkpoint_identity=checkpoint_identity(ref.binding,project,info)
     ref.fixed_checkpoint_identity[CASE_FIELD]=np.array(json.dumps(expected,sort_keys=True))
     validate_checkpoint_identity(saved,ref.fixed_checkpoint_identity)
@@ -303,6 +323,10 @@ def replay(project,base,output,label,checkpoint=None,replay_output=None):
     problem=SimpleNamespace(reference=ref,camera=camera,ice_policy=SimpleNamespace(**ice))
     actual=save_packet(problem,info,supports,document,target,status='parameter_replay')
     original=case/'fitted/result.npz'
+    if 'result_reference' in saved:
+        relative=Path(str(saved['result_reference']));original=(case/relative).resolve()
+        if relative.is_absolute() or not original.is_relative_to(case.resolve()):raise ValueError('Result reference escapes the identified case')
+        if 'result_reference_sha256' not in saved or not original.is_file() or digest(original)!=str(saved['result_reference_sha256']):raise ValueError('Result reference SHA256 mismatch')
     result=load(original);validate_case_identity(result,expected)
     report=replay_errors(actual,result)
     report.update(checkpoint_sha256=digest(checkpoint),initial_reference_sha256=digest(initial_path),

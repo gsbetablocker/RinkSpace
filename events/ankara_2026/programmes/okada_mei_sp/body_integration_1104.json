@@ -7,13 +7,6 @@
   "accepted_baseline": {
     "parameters": "skate_s01_1103.npz",
     "sha256": "3b58dac5f7363dfc5e051fc75ef8602dd3810a0ebc370c57a24542745bc5090c",
-    "unchanged_five_protected_files": {
-      "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\skate_s01_1103.npz": true,
-      "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\skate_s01_1103.json": true,
-      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_s01_1103\\fit\\candidate.npz": true,
-      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_s01_1103\\fit\\last_accepted.npz": true,
-      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\skate_s01_1103\\fitted\\result.npz": true
-    },
     "player_default": "skate_s01_1103",
     "user_visual_preference_does_not_establish_3d_accuracy": true
   },
@@ -48,21 +41,6 @@
     "network_static_probability_used_as_contact_truth": false,
     "flight_COM": "Not run on real clips; no admitted segment mass/COM model. Pure kernels do not establish a real COM or substitute pelvis for COM.",
     "spin_policy": "No fixed centre or uniform yaw; stable-glide factor disabled in spin. B reuses A within floating-point equivalence."
-  },
-  "quality_and_budget": {
-    "image_guard_baseline": "Each optimization stage starts its image guard at that stage input; a corrected initialization can already be worse than previous A/B. The public comparison flags that regression and does not accept it.",
-    "configured_combined_wall_seconds_per_candidate": 120,
-    "configured_combined_accepted_steps": 8,
-    "actual_overrun": "Initial solves only checked time at safe evaluation boundaries; an expensive Jacobian exceeded configured wall time. Actual seconds are retained per run.",
-    "evaluation_reservation": "Code added from measured Jacobian times and unit tested; no further real fit was started to validate the new early-reservation exit.",
-    "remaining": [
-      "Original A/B and root candidates still rejected by user",
-      "Root/image fit tradeoff unresolved",
-      "Inherited root SO(3) jumps remain",
-      "Support/flight ambiguity and sparse source evidence remain",
-      "Model witness heights are not actual-contact truth"
-    ],
-    "current_computation": "stopped; no automatic retries or penalty increases"
   },
   "clips": {
     "jump_s02": {
@@ -358,66 +336,6 @@
           "image_median_change_fraction": 0.618311548204292,
           "image_regression_vs_previous_AB": true,
           "reused_A": false,
-          "root_run": {
-            "configured": {
-              "wall_seconds": 120.0,
-              "max_accepted": 8,
-              "max_outer": 1,
-              "stagnation_window": 4,
-              "min_violation_improvement_m": 0.0001,
-              "max_image_cost_increase": 0.05,
-              "max_pose_cost_increase": 0.1,
-              "allow_penalty_growth": false
-            },
-            "actual_seconds": 16.23519299999316,
-            "accepted_steps": 4,
-            "stop": [
-              {
-                "code": "violation_stagnation",
-                "category": "stagnation",
-                "message": "Best physical violation did not improve enough over accepted steps.",
-                "accepted_window": 4,
-                "improvement_m": 5.898059818321144e-17,
-                "required_improvement_m": 0.0001,
-                "best_violation_m": 0.005373401403231451
-              }
-            ]
-          },
-          "pose_run": {
-            "configured": {
-              "wall_seconds": 103.76480700000684,
-              "max_accepted": 4,
-              "max_outer": 1,
-              "stagnation_window": 4,
-              "min_violation_improvement_m": 0.0001,
-              "max_image_cost_increase": 0.05,
-              "max_pose_cost_increase": 0.1,
-              "allow_penalty_growth": false
-            },
-            "actual_seconds": 122.34903499999928,
-            "accepted_steps": 2,
-            "stop": [
-              {
-                "code": "wall_budget",
-                "category": "budget",
-                "message": "Wall-time budget reached.",
-                "elapsed_seconds": 122.34903499999928,
-                "limit_seconds": 103.76480700000684
-              }
-            ]
-          },
-          "code_and_cache_replay": {
-            "parameter_fixed_identity_valid": true,
-            "initial_reference_sha256_valid": true,
-            "replay_maximum_error": {
-              "P_m": 0.0,
-              "Q": 0.0,
-              "local_R": 0.0
-            },
-            "cache": "D:\\CodexData\\RinkSpace_Data\\cache\\results3d\\action_jump_s02\\A_root_ce1a7a228310151854ee",
-            "cache_state_and_pts_match": true,
-            "common_body_shoe_P_G_coco_match": true
-          },
           "numerically_converged": false,
           "user_accepted": false,
           "physical_accuracy_accepted": false
@@ -529,66 +447,6 @@
           "image_median_change_fraction": 0.6175656896080823,
           "image_regression_vs_previous_AB": true,
           "reused_A": false,
-          "root_run": {
-            "configured": {
-              "wall_seconds": 120.0,
-              "max_accepted": 8,
-              "max_outer": 1,
-              "stagnation_window": 4,
-              "min_violation_improvement_m": 0.0001,
-              "max_image_cost_increase": 0.05,
-              "max_pose_cost_increase": 0.1,
-              "allow_penalty_growth": false
-            },
-            "actual_seconds": 16.664323799996055,
-            "accepted_steps": 4,
-            "stop": [
-              {
-                "code": "violation_stagnation",
-                "category": "stagnation",
-                "message": "Best physical violation did not improve enough over accepted steps.",
-                "accepted_window": 4,
-                "improvement_m": 0.0,
-                "required_improvement_m": 0.0001,
-                "best_violation_m": 0.005383642789680628
-              }
-            ]
-          },
-          "pose_run": {
-            "configured": {
-              "wall_seconds": 103.33567620000395,
-              "max_accepted": 4,
-              "max_outer": 1,
-              "stagnation_window": 4,
-              "min_violation_improvement_m": 0.0001,
-              "max_image_cost_increase": 0.05,
-              "max_pose_cost_increase": 0.1,
-              "allow_penalty_growth": false
-            },
-            "actual_seconds": 123.26507820000552,
-            "accepted_steps": 2,
-            "stop": [
-              {
-                "code": "wall_budget",
-                "category": "budget",
-                "message": "Wall-time budget reached.",
-                "elapsed_seconds": 123.26507820000552,
-                "limit_seconds": 103.33567620000395
-              }
-            ]
-          },
-          "code_and_cache_replay": {
-            "parameter_fixed_identity_valid": true,
-            "initial_reference_sha256_valid": true,
-            "replay_maximum_error": {
-              "P_m": 0.0,
-              "Q": 0.0,
-              "local_R": 0.0
-            },
-            "cache": "D:\\CodexData\\RinkSpace_Data\\cache\\results3d\\action_jump_s02\\B_root_1c9a1f73f215f9c7e08c",
-            "cache_state_and_pts_match": true,
-            "common_body_shoe_P_G_coco_match": true
-          },
           "numerically_converged": false,
           "user_accepted": false,
           "physical_accuracy_accepted": false
@@ -1002,66 +860,6 @@
           "image_median_change_fraction": 0.32805050156434556,
           "image_regression_vs_previous_AB": true,
           "reused_A": false,
-          "root_run": {
-            "configured": {
-              "wall_seconds": 120.0,
-              "max_accepted": 8,
-              "max_outer": 1,
-              "stagnation_window": 4,
-              "min_violation_improvement_m": 0.0001,
-              "max_image_cost_increase": 0.05,
-              "max_pose_cost_increase": 0.1,
-              "allow_penalty_growth": false
-            },
-            "actual_seconds": 24.88986499999737,
-            "accepted_steps": 4,
-            "stop": [
-              {
-                "code": "violation_stagnation",
-                "category": "stagnation",
-                "message": "Best physical violation did not improve enough over accepted steps.",
-                "accepted_window": 4,
-                "improvement_m": 0.0,
-                "required_improvement_m": 0.0001,
-                "best_violation_m": 0.0038021867018425376
-              }
-            ]
-          },
-          "pose_run": {
-            "configured": {
-              "wall_seconds": 95.11013500000263,
-              "max_accepted": 4,
-              "max_outer": 1,
-              "stagnation_window": 4,
-              "min_violation_improvement_m": 0.0001,
-              "max_image_cost_increase": 0.05,
-              "max_pose_cost_increase": 0.1,
-              "allow_penalty_growth": false
-            },
-            "actual_seconds": 115.85185629999614,
-            "accepted_steps": 1,
-            "stop": [
-              {
-                "code": "wall_budget",
-                "category": "budget",
-                "message": "Wall-time budget reached.",
-                "elapsed_seconds": 115.85185629999614,
-                "limit_seconds": 95.11013500000263
-              }
-            ]
-          },
-          "code_and_cache_replay": {
-            "parameter_fixed_identity_valid": true,
-            "initial_reference_sha256_valid": true,
-            "replay_maximum_error": {
-              "P_m": 0.0,
-              "Q": 0.0,
-              "local_R": 0.0
-            },
-            "cache": "D:\\CodexData\\RinkSpace_Data\\cache\\results3d\\action_step_s01\\A_root_17b9a0bf907577e7e1e2",
-            "cache_state_and_pts_match": true,
-            "common_body_shoe_P_G_coco_match": true
-          },
           "numerically_converged": false,
           "user_accepted": false,
           "physical_accuracy_accepted": false
@@ -1159,66 +957,6 @@
           "image_median_change_fraction": 0.32813282210369743,
           "image_regression_vs_previous_AB": true,
           "reused_A": false,
-          "root_run": {
-            "configured": {
-              "wall_seconds": 120.0,
-              "max_accepted": 8,
-              "max_outer": 1,
-              "stagnation_window": 4,
-              "min_violation_improvement_m": 0.0001,
-              "max_image_cost_increase": 0.05,
-              "max_pose_cost_increase": 0.1,
-              "allow_penalty_growth": false
-            },
-            "actual_seconds": 26.60956299999816,
-            "accepted_steps": 4,
-            "stop": [
-              {
-                "code": "violation_stagnation",
-                "category": "stagnation",
-                "message": "Best physical violation did not improve enough over accepted steps.",
-                "accepted_window": 4,
-                "improvement_m": 6.201636426617085e-17,
-                "required_improvement_m": 0.0001,
-                "best_violation_m": 0.003799242232583519
-              }
-            ]
-          },
-          "pose_run": {
-            "configured": {
-              "wall_seconds": 93.39043700000184,
-              "max_accepted": 4,
-              "max_outer": 1,
-              "stagnation_window": 4,
-              "min_violation_improvement_m": 0.0001,
-              "max_image_cost_increase": 0.05,
-              "max_pose_cost_increase": 0.1,
-              "allow_penalty_growth": false
-            },
-            "actual_seconds": 119.9371558999992,
-            "accepted_steps": 1,
-            "stop": [
-              {
-                "code": "wall_budget",
-                "category": "budget",
-                "message": "Wall-time budget reached.",
-                "elapsed_seconds": 119.9371558999992,
-                "limit_seconds": 93.39043700000184
-              }
-            ]
-          },
-          "code_and_cache_replay": {
-            "parameter_fixed_identity_valid": true,
-            "initial_reference_sha256_valid": true,
-            "replay_maximum_error": {
-              "P_m": 0.0,
-              "Q": 0.0,
-              "local_R": 0.0
-            },
-            "cache": "D:\\CodexData\\RinkSpace_Data\\cache\\results3d\\action_step_s01\\B_root_c6a19c07ccb2d4b55afa",
-            "cache_state_and_pts_match": true,
-            "common_body_shoe_P_G_coco_match": true
-          },
           "numerically_converged": false,
           "user_accepted": false,
           "physical_accuracy_accepted": false
@@ -1595,66 +1333,6 @@
           "image_median_change_fraction": 0.6082844073384484,
           "image_regression_vs_previous_AB": true,
           "reused_A": false,
-          "root_run": {
-            "configured": {
-              "wall_seconds": 120.0,
-              "max_accepted": 8,
-              "max_outer": 1,
-              "stagnation_window": 4,
-              "min_violation_improvement_m": 0.0001,
-              "max_image_cost_increase": 0.05,
-              "max_pose_cost_increase": 0.1,
-              "allow_penalty_growth": false
-            },
-            "actual_seconds": 39.29163020000124,
-            "accepted_steps": 4,
-            "stop": [
-              {
-                "code": "violation_stagnation",
-                "category": "stagnation",
-                "message": "Best physical violation did not improve enough over accepted steps.",
-                "accepted_window": 4,
-                "improvement_m": 0.0,
-                "required_improvement_m": 0.0001,
-                "best_violation_m": 0.023319084072951135
-              }
-            ]
-          },
-          "pose_run": {
-            "configured": {
-              "wall_seconds": 80.70836979999876,
-              "max_accepted": 4,
-              "max_outer": 1,
-              "stagnation_window": 4,
-              "min_violation_improvement_m": 0.0001,
-              "max_image_cost_increase": 0.05,
-              "max_pose_cost_increase": 0.1,
-              "allow_penalty_growth": false
-            },
-            "actual_seconds": 112.19731639999372,
-            "accepted_steps": 0,
-            "stop": [
-              {
-                "code": "wall_budget",
-                "category": "budget",
-                "message": "Wall-time budget reached.",
-                "elapsed_seconds": 112.19731639999372,
-                "limit_seconds": 80.70836979999876
-              }
-            ]
-          },
-          "code_and_cache_replay": {
-            "parameter_fixed_identity_valid": true,
-            "initial_reference_sha256_valid": true,
-            "replay_maximum_error": {
-              "P_m": 0.0,
-              "Q": 0.0,
-              "local_R": 0.0
-            },
-            "cache": "D:\\CodexData\\RinkSpace_Data\\cache\\results3d\\action_spin_s05\\A_root_b9ed0ee39c109fc4bd7a",
-            "cache_state_and_pts_match": true,
-            "common_body_shoe_P_G_coco_match": true
-          },
           "numerically_converged": false,
           "user_accepted": false,
           "physical_accuracy_accepted": false
@@ -1754,44 +1432,6 @@
           "image_median_change_fraction": 0.6082844073384484,
           "image_regression_vs_previous_AB": true,
           "reused_A": true,
-          "root_run": {
-            "configured": {
-              "wall_seconds": 120.0,
-              "max_accepted": 8,
-              "max_outer": 1,
-              "stagnation_window": 4,
-              "min_violation_improvement_m": 0.0001,
-              "max_image_cost_increase": 0.05,
-              "max_pose_cost_increase": 0.1,
-              "allow_penalty_growth": false
-            },
-            "actual_seconds": 39.29163020000124,
-            "accepted_steps": 4,
-            "stop": [
-              {
-                "code": "violation_stagnation",
-                "category": "stagnation",
-                "message": "Best physical violation did not improve enough over accepted steps.",
-                "accepted_window": 4,
-                "improvement_m": 0.0,
-                "required_improvement_m": 0.0001,
-                "best_violation_m": 0.023319084072951135
-              }
-            ]
-          },
-          "pose_run": null,
-          "code_and_cache_replay": {
-            "parameter_fixed_identity_valid": true,
-            "initial_reference_sha256_valid": true,
-            "replay_maximum_error": {
-              "P_m": 0.0,
-              "Q": 0.0,
-              "local_R": 0.0
-            },
-            "cache": "D:\\CodexData\\RinkSpace_Data\\cache\\results3d\\action_spin_s05\\B_root_b9ed0ee39c109fc4bd7a",
-            "cache_state_and_pts_match": true,
-            "common_body_shoe_P_G_coco_match": true
-          },
           "numerically_converged": false,
           "user_accepted": false,
           "physical_accuracy_accepted": false
@@ -1914,5 +1554,20 @@
     "models_and_weights": "runtime_tools/body and cache/pretrained; obtain upstream models under their own terms",
     "full_results_and_display_geometry": "runs/body_s01_20261029 and cache/results3d; not included in public parameters"
   },
-  "independent_3d_truth": false
+  "independent_3d_truth": false,
+  "limitations": [
+    "Original A/B and root candidates still rejected by user",
+    "Root/image fit tradeoff unresolved",
+    "Inherited root SO(3) jumps remain",
+    "Support/flight ambiguity and sparse source evidence remain",
+    "Model witness heights are not actual-contact truth",
+    "Initial solves only checked time at safe evaluation boundaries; an expensive Jacobian exceeded configured wall time. Actual seconds are retained per run.",
+    "Code added from measured Jacobian times and unit tested; no further real fit was started to validate the new early-reservation exit."
+  ],
+  "history_archive": {
+    "base": "data",
+    "path": "maintenance/agents_audit_20261025/documentation_sources.zip",
+    "member": "20261104/events/ankara_2026/programmes/okada_mei_sp/body_integration_1104.json",
+    "sha256": "e9a2241c12fcc163230c9976274758bdb8a2c3f7a4e2a2b9f51896d3b3af6f3f"
+  }
 }

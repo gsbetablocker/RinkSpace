@@ -13,7 +13,7 @@
 | SAM2 基础权重 | `facebook/sam2.1-hiera-tiny`，固定修订 `de431c4043854a71d8101e17995dfe596bf101a5`；下载收据、本地 SHA 与[固定提交 LFS](https://huggingface.co/facebook/sam2.1-hiera-tiny/commit/de431c4043854a71d8101e17995dfe596bf101a5)一致，模型卡标 Apache-2.0 |
 | rink_vision.pt | SHA256 `26e792f2381a9bd66c484b8cfa38b13993f5c6cf11b52ef84ee22da65041f208`，对应训练 step 9200；162 个编码器张量／108876544 字节与基础权重一致，208 个存储均为模型状态，未发现额外原图缓冲区；[来源与训练记录](../models/rink_vision.provenance.json)、[SAM2 许可](../models/SAM2_LICENSE.txt)保留 |
 | GVHMR 补丁 | 固定上游提交 `6ec3ca39336c50492c0fae65fba2fb831fc7d866`；[原许可](../environments/third_party_patches/GVHMR_LICENSE.txt)、补丁和研究引用见[资产说明](THIRD_PARTY_ASSETS.md)，保留上游教育／研究／非营利及衍生修改非商业条件 |
-| ExMR camera-only补丁 | 固定提交 `eac72e47339b404c0443f5fb323412e2ce432410`；[完整上游许可与署名](../environments/third_party_licenses/EXMR_LICENSE.txt)原字节保留，教育／研究／非营利及衍生修改非商业条件继续适用；完整源码、SAM/HaMeR/RTMW权重及网络原始输出留Data，固定资产身份见[审核索引](../events/ankara_2026/programmes/okada_mei_sp/spin_models_1104_audit.json) |
+| ExMR camera-only补丁 | 固定提交 `eac72e47339b404c0443f5fb323412e2ce432410`；[完整上游许可与署名](../environments/third_party_licenses/EXMR_LICENSE.txt)原字节保留，教育／研究／非营利及衍生修改非商业条件继续适用；完整源码、SAM/HaMeR/RTMW权重及网络原始输出留Data，固定资产身份见[依赖索引](../events/ankara_2026/programmes/okada_mei_sp/spin_models_1104_audit.json) |
 | Ceres／Abseil、SciPy、oneTBB | 原许可证和署名保留；分别适用 BSD、嵌入组件的 Apache 等原条件，项目声明不缩减第三方授权 |
 | 项目辅助代码 | ViTPose helper 与 calibration companion 按项目分项声明处理；[helper 来源](../calibration/program_tracking/body_tracking/source_helpers/run_vitpose_h.provenance.json)、[companion 来源](../src/rinkspace/calibration_companion/provenance.json)保留，实际运行依赖仍适用原许可 |
 | 外部模型与框架 | GVHMR、HMR2、ViTPose、SMPL-X、YOLO、RAFT 及 RTMW 运行实现／权重留在 Data；[FootMR 与 CoTracker 的当前源码接线、固定提交和权重身份](../environments/body-runtime-sources.json)已实际接入，不能再将 CoTracker 描述成仅有参考链接。PIDNet／SMP 仍按原核查范围解释 |
@@ -32,17 +32,18 @@
 <a id="body-parameters"></a>
 ## S01 人体、足鞋与开头参数
 
-2026-11-03 逐字段核对 [body_fullbody_1102.npz](../events/ankara_2026/programmes/okada_mei_sp/body_fullbody_1102.npz)、[boot_integration_1102.npz](../events/ankara_2026/programmes/okada_mei_sp/boot_integration_1102.npz) 与 [opening_repair_1102.npz](../events/ankara_2026/programmes/okada_mei_sp/opening_repair_1102.npz)：公开内容为节目控制量、源时间、尺度、绑定和来源身份。足鞋绑定还含项目简化鞋壳／内腔拓扑及按本机模型筛选的足部顶点索引；开头参数含既有缓存姿态先验转换的局部旋转，以及本次拟合的初始值和修正量。
+| 参数组 | 内容与身份记录 |
+|---|---|
+| `body_fullbody_1102`、`boot_integration_1102`、`opening_repair_1102` | 节目控制量、源时间、尺度、绑定与来源身份；足鞋参数另含项目简化鞋壳／内腔拓扑和足部顶点索引，开头参数包含缓存姿态转换的局部旋转、初值与修正量 |
+| 开头时序／右臂、鞋刀、动作 A/B 与根修正、历史 S01 整合 | 控制向量、P/Q、局部旋转与先验、连续修正层及结点、共享鞋形、源 PTS 和算法／绑定身份 |
+| 提刀、支撑脚参照、连续入旋／质心重力初值及控制 | 小型控制层、P/Q／局部手姿态、共享鞋参数、源身份和初始化记录；分段体积质量近似仅保存小型分组质心、正归一化体积分数与假设，不含完整 SMPL-X 表面或模型字节 |
+| 源支撑旋转与 GVHMR 自身初值／联合控制 | 连续控制层、源 PTS、固定身份和重放初值；原始 ExMR／SAM 网络输出保留在 Data |
 
-同日补核 `opening_motion_1103`、`opening_timing_1103`、`opening_hand_1103`、`skate_contact_1103` 与 `skate_s01_1103` 五份 NPZ。[逐字段索引](../events/ankara_2026/programmes/okada_mei_sp/body_parameters_1103_fields.json)保留文件 SHA、字节数、字段名、dtype 和 shape；前三份包含控制向量、局部旋转与姿态先验、源 PTS／身份及少量顶点索引，后两份包含共享鞋形控制、连续修正层、结点、约束算法状态与绑定身份。
+具体文件 SHA、字节数、字段名、dtype 和 shape 见[字段索引](../events/ankara_2026/programmes/okada_mei_sp/body_parameters_1103_fields.json)，较早三份参数的完整身份由[节目绑定](../events/ankara_2026/programmes/okada_mei_sp/README.md#历史人体候选导航)定位。
 
-这八份参数不含 SMPL-X 模板、形变基、蒙皮权重、人体面表、完整人体表面或广播像素缓冲区；`compact_smplx`、模型文件和完整表面缓存继续留在 Data。需要按原许可取得相应模型与本地输入才能重放，参数文件不替代这些依赖。[SMPL-X 官方模型条款](https://smpl-x.is.tue.mpg.de/modellicense.html)与代码包许可分别核对；当前网页不替代已安装版本附带的许可原文。该字段检查不认证第三方先验或所有数值输出可自由再分发、商用，也不将独立优化的控制值直接等同于上游附带的模型动画。
+这些参数不含 SMPL-X 模板、形变基、蒙皮权重、人体面表、完整人体表面或广播像素缓冲区；紧凑模型、模型文件和表面缓存继续留在 Data。重放需要相符模型与本地输入。[SMPL-X 官方模型条款](https://smpl-x.is.tue.mpg.de/modellicense.html)与代码包许可分别核对，当前网页不替代已安装版本附带的许可原文。字段清单不认证第三方先验或数值输出可自由再分发、商用，也不将独立优化控制值直接等同于上游附带的模型动画。
 
-2026-11-04按同一边界另逐字段核对25份 `action_*_1103.npz`／`skate_s01_integrated_1103.npz`，总计7,491,223字节，SHA、dtype、shape见上述索引。内容为源时间、P/Q、局部旋转、根参考、连续控制层、共享鞋形和身份／算法参数；未发现 SMPL-X 模板、形变基、蒙皮权重、人体面表、完整人体表面或广播像素缓冲区。它们保留失败初值和未验收候选，不替代上游模型／先验许可，也不认证其可自由再分发或商用。
-
-同日补核四份 `spin_support_1104`、`spin_support_joint_1104`、`spin_models_gvhmr_initial_1104`、`spin_models_gvhmr_1104` NPZ，共1,608,844字节。字段索引记录姿态P/Q/local_R、连续控制层、源PTS、数值算法状态和固定身份；没有模型模板／形变基／蒙皮权重、完整人体表面或广播像素。GVHMR自身初值用于精确重放；原始ExMR/SAM网络输出留Data，不因文件小而自动公开。原许可和既有数值分发范围继续适用，失败状态保留。
-
-开放鞋口与通用下鞋／冰刀参考实现的用户交接来源见[第三方资产记录](THIRD_PARTY_ASSETS.md#boot-handoff)及[鞋刀交接记录](THIRD_PARTY_ASSETS.md#skate-handoff)。此次补充来源和分发边界，项目分项许可与第三方原条款保持不变。
+公开参数保留失败初值和未验收候选，不能作为人体、轨迹或接触准确性的证明。开放鞋口与通用下鞋／冰刀参考实现的用户交接来源见[第三方资产记录](THIRD_PARTY_ASSETS.md#boot-handoff)及[鞋刀交接记录](THIRD_PARTY_ASSETS.md#skate-handoff)；项目分项许可与第三方原条款保持不变。
 
 ## 比赛素材与数值观测
 

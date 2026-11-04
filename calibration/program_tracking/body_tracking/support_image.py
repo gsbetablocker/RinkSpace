@@ -23,6 +23,7 @@ class SupportImageFactors:
             o=NativeRegionObservation(**{k:row[k] for k in NativeRegionObservation.__dataclass_fields__})
             enabled=(o.role=='fit' or include_review) and o.foot in (0,1) and o.visibility=='visible' and o.reliability>0
             enabled &= o.kind!='support_contact_region' or o.contact_state=='supported'
+            enabled &= include_review or row.get('optimization_enabled',True)
             if enabled:
                 if o.pts not in lookup:raise ValueError('Observation outside source timeline')
                 self.rows.append((row,o,lookup[o.pts]))
@@ -52,6 +53,16 @@ class SupportImageFactors:
                     w=lowest_runner_witness([self.arcs[self.arc_ids[row['id']]]],R,O,plane_normal_world=[0,0,1])
                     point=w['world_point'];J=w['jacobian_right_rotation']
                     if w['differentiability_warning']:warnings.append((row['id'],l))
+                elif o.kind in ('blade_midpoint_region','blade_endpoint_region'):
+                    from .skate_template import profile_height
+                    p=self.binding.packet()['parameters'];xx=.5*(-p.runner_rear_extension_m+p.sole_length_m-p.runner_front_inset_m)
+                    if o.kind=='blade_endpoint_region':
+                        endpoint=row.get('blade_endpoint')
+                        if endpoint not in ('front','rear'):raise ValueError('Explicit blade endpoint identity required')
+                        xx=p.sole_length_m-p.runner_front_inset_m if endpoint=='front' else -p.runner_rear_extension_m
+                    q=np.array([xx,0.,float(profile_height(xx,p))]);point=O+R@q
+                    from .fullbody_fit import skew
+                    J=-R@skew(q)
                 else:
                     ids=row.get('adapter_point_ids',list(range(14)))
                     q=adapter[np.asarray(ids,int)].mean(0)

@@ -1,0 +1,117 @@
+{
+  "schema": "rinkspace.result-viewer.v1",
+  "event": "ankara_2026",
+  "programme": "okada_mei_sp",
+  "shot": "spin_grasp_1104",
+  "source_run": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\player",
+  "scene_root": "runs/body_s01_20261029/fullbody_1102",
+  "scene_label": "camera_solver_refined_1102 冻结场景",
+  "metric_binding": "runs/body_s01_20261029/fullbody_1102/metric_binding.json",
+  "metric_binding_base": "data",
+  "model_asset": "environments/body/GVHMR/inputs/checkpoints/body_models/smplx/SMPLX_NEUTRAL.npz",
+  "default_variant": "support_midpoint",
+  "initial_source_pts": 1090560,
+  "initial_view": "side",
+  "initial_wear_inspection": false,
+  "comparison_variants": [
+    "grasp_candidate",
+    "support_midpoint"
+  ],
+  "variants": [
+    {
+      "id": "gvhmr_fixed",
+      "label": "原GVHMR固定初值（旧默认手）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\common\\gvhmr\\initial\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "preserved_original",
+      "body_refinement_intervals_seconds": []
+    },
+    {
+      "id": "exmr_prefoot_old",
+      "label": "原ExMR细化前（旧默认手）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\common\\exmr_prefoot\\initial\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "preserved_original",
+      "body_refinement_intervals_seconds": []
+    },
+    {
+      "id": "hand_nofoot_initial",
+      "label": "HandMR开／FootMR关初值（真实手通道）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\common\\exmr_hand_nofoot\\initial_current_objective\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "exmr_hand_nofoot",
+      "body_refinement_intervals_seconds": []
+    },
+    {
+      "id": "grasp_candidate",
+      "label": "新全链候选（4步，待源图审核）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\common\\exmr_hand_nofoot\\finished\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "exmr_hand_nofoot",
+      "body_refinement_intervals_seconds": [
+        [
+          82.0,
+          94.8
+        ]
+      ]
+    },
+    {
+      "id": "grasp_stage1",
+      "label": "第一阶段3步（保留对照）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\common\\exmr_hand_nofoot\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "preserved_original",
+      "body_refinement_intervals_seconds": []
+    },
+    {
+      "id": "support_located",
+      "label": "最低点误作中点（失败保留）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\support_located\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "exmr_hand_nofoot",
+      "body_refinement_intervals_seconds": []
+    },
+    {
+      "id": "support_midpoint",
+      "label": "支撑刀中点定位（姿态待审核）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\support_midpoint\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "exmr_hand_nofoot",
+      "body_refinement_intervals_seconds": []
+    },
+    {
+      "id": "old_root",
+      "label": "旧根修正（失败对照）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\spin_s05\\root_repair\\A_pose\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "preserved_original",
+      "body_refinement_intervals_seconds": []
+    }
+  ],
+  "source_identity_field": "source_identity_suspect",
+  "review_status": "Image/pose failures remain; midpoint placement is a conditional review candidate, not an accepted fit",
+  "root_repair_status": "Source-supported conditional blade/ice placement is a separate candidate; articulation unchanged; not independent 3D truth",
+  "source_shot": "s05",
+  "source_video": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4",
+  "source_time_base": [
+    1,
+    12800
+  ],
+  "support_observations": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\support_and_free_shoe_regions.json",
+  "support_foot": 1,
+  "support_world_regions": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\support_world_regions.json",
+  "body_window_scope": "Single continuous 76-95s state, C2 correction 82-94.8s",
+  "camera_comparison": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\camera_comparison.json",
+  "grasp_hand": "left",
+  "free_foot": 0,
+  "relation_document": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\grasp_relations.json",
+  "support_location_document": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_support_midpoint_anchors_1104.json"
+}

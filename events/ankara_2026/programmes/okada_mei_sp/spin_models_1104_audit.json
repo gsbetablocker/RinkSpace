@@ -60,22 +60,7 @@
       "primary_body_input": "released ExMR RTMW COCO23 with >5.5 binary visibility",
       "control_body_input": "original GVHMR COCO17, extra6 RTMW anatomical foot points with binary visibility",
       "extra6": "RTMW anatomical foot landmarks, not skate contacts",
-      "stage_checks": {
-        "native23": {
-          "root_translation_shape_unchanged_by_refiners": true,
-          "foot_refiner_changed_only_ankles": true,
-          "hand_refiner_changed_only_elbows_wrists_and_fingers": true,
-          "maximum_ankle_axis_angle_change_rad": 1.4529303312301636
-        },
-        "shared17": {
-          "root_translation_shape_unchanged_by_refiners": true,
-          "foot_refiner_changed_only_ankles": true,
-          "hand_refiner_changed_only_elbows_wrists_and_fingers": true,
-          "maximum_ankle_axis_angle_change_rad": 1.5149694681167603
-        }
-      },
-      "network_static_logits_contact_truth": false,
-      "peak_cuda_bytes": 435576320
+      "network_static_logits_contact_truth": false
     },
     "crop": "Same known source frames/person/camera. SAM uses raw detector bbox with native 1.25 padding; ExMR uses 192:256 aspect with native 1.2 padding. Earlier repeated-expanded GVHMR-bbox protocol retained as a failed input control.",
     "projection": "Raw camera diagnostics use native Brown mid-exposure; common state uses the existing native exposure/rolling projection.",
@@ -1201,90 +1186,7 @@
     ],
     "default": "exmr_prefoot",
     "shared_observation_camera": true,
-    "source_pts_preserved": true,
-    "checks": {
-      "player_verify_fixed": true,
-      "player_support_top_shared": true,
-      "player_support_side_shared": true,
-      "movie_pts": true,
-      "old_baselines": true,
-      "real_parameter_replay": true,
-      "all": true
-    },
-    "no_visible_desktop_window_opened": true
-  },
-  "protected_baselines": {
-    "passed": true,
-    "files": {
-      "Project/events/ankara_2026/programmes/okada_mei_sp/skate_s01_1103.npz": {
-        "expected": "3b58dac5f7363dfc5e051fc75ef8602dd3810a0ebc370c57a24542745bc5090c",
-        "actual": "3b58dac5f7363dfc5e051fc75ef8602dd3810a0ebc370c57a24542745bc5090c"
-      },
-      "Project/events/ankara_2026/programmes/okada_mei_sp/skate_s01_1103.json": {
-        "expected": "a4f6ec8a195415f77e834c7e7d89498f89092feba3ab6b3d616c686d75bab25a",
-        "actual": "a4f6ec8a195415f77e834c7e7d89498f89092feba3ab6b3d616c686d75bab25a"
-      },
-      "Project/events/ankara_2026/programmes/okada_mei_sp/viewer3d_fullbody_1102.json": {
-        "expected": "647d6faa699edf6df53fb09d1e61efa3ed25ba1f324eb47eb9f6a142e77fd005",
-        "actual": "647d6faa699edf6df53fb09d1e61efa3ed25ba1f324eb47eb9f6a142e77fd005"
-      },
-      "Project/events/ankara_2026/programmes/okada_mei_sp/viewer3d_action_spin_s05_1103.json": {
-        "expected": "8c095d842ecb6d7f22b5d42e2d3a420625110cc84c139330ee5e8a0818349527",
-        "actual": "8c095d842ecb6d7f22b5d42e2d3a420625110cc84c139330ee5e8a0818349527"
-      },
-      "Data/runs/body_s01_20261029/skate_s01_1103/fit/candidate.npz": {
-        "expected": "371798108c8258e2065c2d2e6e301cd9deaff193f7e8eac3b79079bf222b05a4",
-        "actual": "371798108c8258e2065c2d2e6e301cd9deaff193f7e8eac3b79079bf222b05a4"
-      },
-      "Data/runs/body_s01_20261029/skate_s01_1103/fit/last_accepted.npz": {
-        "expected": "d50ec4198aebe5d5a4e1d469b4a368a71508fde80079eb1374a09f419bc0c31d",
-        "actual": "d50ec4198aebe5d5a4e1d469b4a368a71508fde80079eb1374a09f419bc0c31d"
-      },
-      "Data/runs/body_s01_20261029/skate_s01_1103/fitted/result.npz": {
-        "expected": "5a1d67d535359259a3bcba57fd115d52b02cca631724bc7ea5ad8743af7d6bb9",
-        "actual": "5a1d67d535359259a3bcba57fd115d52b02cca631724bc7ea5ad8743af7d6bb9"
-      },
-      "Data/runs/body_s01_20261029/action_integration_1103/spin_s05/input.npz": {
-        "expected": "8cbd767c324a4ef1e734d53c18880e744d4c91a9a8cdfdf279a6b6f8e46e2b3a",
-        "actual": "8cbd767c324a4ef1e734d53c18880e744d4c91a9a8cdfdf279a6b6f8e46e2b3a"
-      },
-      "Data/runs/body_s01_20261029/action_integration_1103/spin_s05/initial.npz": {
-        "expected": "82b150663179658ca32b20e874ea282c8a824344701fce6f80d24646ece5cc33",
-        "actual": "82b150663179658ca32b20e874ea282c8a824344701fce6f80d24646ece5cc33"
-      },
-      "Data/runs/body_s01_20261029/action_integration_1103/spin_s05/observations.npz": {
-        "expected": "e934232dfff4afa5f9f62ed6d1cd98997391ce50cb849fb0a290608c1d02ed55",
-        "actual": "e934232dfff4afa5f9f62ed6d1cd98997391ce50cb849fb0a290608c1d02ed55"
-      },
-      "Data/runs/body_s01_20261029/action_integration_1103/spin_s05/A/fitted/result.npz": {
-        "expected": "674bbb186bbb6c3d239e0917f4dcf895ed1a7b0e4e2e282aae7da7404cc11101",
-        "actual": "674bbb186bbb6c3d239e0917f4dcf895ed1a7b0e4e2e282aae7da7404cc11101"
-      },
-      "Data/runs/body_s01_20261029/action_integration_1103/spin_s05/A/fit/candidate.npz": {
-        "expected": "548f82a5e77a07ec3b1abe4ee0f41d1de2958fbd4a2846b5fdd3d963633581f1",
-        "actual": "548f82a5e77a07ec3b1abe4ee0f41d1de2958fbd4a2846b5fdd3d963633581f1"
-      },
-      "Data/runs/body_s01_20261029/action_integration_1103/spin_s05/B/fitted/result.npz": {
-        "expected": "ca7f9530ff71c3752d793b388760278af18ace423bd71f747d1a3a9b07498400",
-        "actual": "ca7f9530ff71c3752d793b388760278af18ace423bd71f747d1a3a9b07498400"
-      },
-      "Data/runs/body_s01_20261029/action_integration_1103/spin_s05/root_repair/A/fitted/result.npz": {
-        "expected": "056d79a232accce2e216c5fae93f29a11a6e6709d587f96f96d3def4341eaeb7",
-        "actual": "056d79a232accce2e216c5fae93f29a11a6e6709d587f96f96d3def4341eaeb7"
-      },
-      "Data/runs/body_s01_20261029/action_integration_1103/spin_s05/root_repair/A_pose/fitted/result.npz": {
-        "expected": "374ea93888f844e026866896d5b80c1833b447d5dade40443f1e291e7fac734c",
-        "actual": "374ea93888f844e026866896d5b80c1833b447d5dade40443f1e291e7fac734c"
-      },
-      "Data/runs/body_s01_20261029/action_integration_1103/spin_s05/prior/camera_prior.npz": {
-        "expected": "62168375ae4d3da0a274bbee96eaf959aac7b12a246d435621777dcdfc09c11d",
-        "actual": "62168375ae4d3da0a274bbee96eaf959aac7b12a246d435621777dcdfc09c11d"
-      },
-      "gvhmr_prepared": {
-        "expected": "c4002cb82821397704f0ae637ee21d8032764d038a7343b7b37d7dc7992f01da",
-        "actual": "c4002cb82821397704f0ae637ee21d8032764d038a7343b7b37d7dc7992f01da"
-      }
-    }
+    "source_pts_preserved": true
   },
   "evidence": [
     {
@@ -1540,14 +1442,10 @@
     "license_sha256": "cac6e2293c310f1e38c05b83a6428f0176555608e1a63232f925433fe200aece",
     "model_and_runtime_distribution": "External Data only; repository contains no credentials, runtime environments or downloaded model payloads."
   },
-  "publication_storage": {
-    "audit": "Data\\maintenance\\publication_body_20261104\\storage_code_audit.json",
-    "audit_sha256": "2f83760df6e3ba93c705224fac8d0e90d23a1ae3859ed0a6a2f5b019f0194ed4",
-    "onedrive_archive_candidates": 0,
-    "missing_production_source": 0,
-    "runtime_snapshot_matches": 109,
-    "historical_superseded_snapshots": 3,
-    "shared_caches_left_in_place": 46,
-    "source_snapshot_identity_note": "Current review sources, including subsequent display-only fixes and line-ending normalization; exact solver-run files remain in the per-case fit/source_snapshot and kernel_manifest.json."
+  "history_archive": {
+    "base": "data",
+    "path": "maintenance/agents_audit_20261025/documentation_sources.zip",
+    "member": "20261104/events/ankara_2026/programmes/okada_mei_sp/spin_models_1104_audit.json",
+    "sha256": "ad35e890dcfd832255cf0146e372dc81f9c488e29b64e5b8b4ee7e83c85f5948"
   }
 }

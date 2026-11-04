@@ -564,3 +564,49 @@ def test_default_skinning_branch_remains_the_same_as_explicit_false():
     surface=synthetic_skinning_surface();frames=np.tile(np.eye(3),(1,22,1,1))
     joints=np.broadcast_to((surface.body.J[:22]-surface.body.J[0])*surface.body.scale,(1,22,3)).copy()
     np.testing.assert_array_equal(surface.sample_vertices(joints,frames),surface.sample_vertices(joints,frames,double_precision=False))
+
+
+def test_dynamic_hand_channel_reaches_surface_and_cached_state(tmp_path):
+    from scipy.spatial.transform import Rotation
+    c=fullbody_catalog(tmp_path);result=c.root/'result.npz'
+    hands=np.broadcast_to(np.eye(3),(3,2,15,3,3)).copy()
+    hands[:,0,0]=Rotation.from_rotvec([.3,0.,0.]).as_matrix()
+    replace_npz(result,hand_local_R_mid=hands,
+                hand_pose_schema_version=np.array(DATA.HAND_POSE_SCHEMA),
+                hand_mean_convention=np.array(DATA.HAND_MEAN_CONVENTION),
+                hand_pose_origin=np.array('exmr_hand_nofoot'),hand_prior_sha256=np.array('a'*64))
+    class HandSurface(MatrixSurface):
+        def forward_rotations(self,local_R,*,hand_local_R):
+            self.hands=hand_local_R.copy()
+            return super().forward_rotations(local_R)
+    surface=HandSurface();path=PREPARE.prepare_variant(c,'fixture',surface)
+    seq=DATA.CachedSequence(path)
+    np.testing.assert_array_equal(surface.hands,hands)
+    np.testing.assert_array_equal(seq.state['hand_local_R_mid'],hands)
+    assert seq.state['hand_pose_origin']=='exmr_hand_nofoot'
+    assert seq.meta['schema']==DATA.MESH_CACHE_SCHEMA
+    assert seq.meta['identity']['hand_pose']['hand_pose_schema_version']==DATA.HAND_POSE_SCHEMA
+    assert PREPARE.prepare_variant(c,'fixture',MatrixSurface())==path
+    changed=hands.copy();changed[:,1,2]=Rotation.from_rotvec([0.,.2,0.]).as_matrix()
+    replace_npz(result,hand_local_R_mid=changed)
+    assert c.cache_path('fixture')[0]!=path
+    saved=DATA.load_npz(result);del saved['hand_local_R_mid'];write_npz(result,**saved)
+    with pytest.raises(ValueError,match='missing hand_local_R_mid'):c.parameters('fixture')
+    replace_npz(result,hand_local_R_mid=np.zeros((3,2,15,3,3)))
+    with pytest.raises(ValueError,match='proper rotation'):c.parameters('fixture')
+    # The selected FP64 cache stores raw shape/features, never a hand pose.
+    skin=synthetic_skinning_surface();n=1;ids=np.array([3,0,3])
+    skin.body.default[3:]=Rotation.from_rotvec([0.,0.,.4]).as_matrix()
+    skin.weights[:]=0.;skin.weights[:,0]=1.
+    frames=np.broadcast_to(np.eye(3),(n,22,3,3)).copy()
+    joints=np.broadcast_to((skin.body.J[:22]-skin.body.J[0])*skin.body.scale,(n,22,3)).copy()
+    actual=skin.sample_vertices(joints,frames,ids,hand_local_R=hands[:n],double_precision=True)
+    cached=skin._sample_double_cache
+    local=np.broadcast_to(np.eye(3),(n,55,3,3)).copy()
+    local[:,22:]=skin.body.default;local[:,25:]=hands[:n].reshape(n,30,3,3)
+    feature=(local[:,1:]-np.eye(3)).reshape(n,486)
+    expected=(skin.shaped.astype(float)+(feature@skin.posedirs.astype(float)).reshape(n,-1,3)-skin.body.J[0])*skin.body.scale
+    np.testing.assert_allclose(actual,expected[:,ids],rtol=0,atol=1e-14)
+    skin.sample_vertices(joints,frames,ids,hand_local_R=changed[:n],double_precision=True)
+    assert skin._sample_double_cache is cached
+    np.testing.assert_array_equal(cached[1][0],skin.shaped[ids])

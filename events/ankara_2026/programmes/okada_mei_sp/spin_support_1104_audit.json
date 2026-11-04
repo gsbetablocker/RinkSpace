@@ -7,13 +7,6 @@
     "path": "Data/handoff/1104/RinkSpace_a5bb79c_Audit_Integration_20261104.zip",
     "sha256": "a9e2e2c9636ee53243fef33ca2146c9fb4de0976df1a5edcf04cedcec850e523"
   },
-  "code_fixes": {
-    "root_rigid_structural_stagnation": "Applied supplied patch; rigid global P/Q with fixed shared shape retains diagnostics without internal-geometry stagnation stop.",
-    "cross_stage_quality": "Immutable original_A, stage_seed, stage_best, delivery_candidate and grouped source metrics. Stage guard is not cross-stage accuracy acceptance.",
-    "source_support_export": "One shared export mapper; exact PTS, explicit source, single-foot mode/confidence. 4/4/3 restored in read-only memory checks, no old snapshot migration.",
-    "legacy_ice_reports": "Historical dense_gate/physical_failure scoped legacy-only; current finite ice diagnostics are not strict feasibility/delivery gates.",
-    "joint_pose_guard": "Mixed actual-root-acceleration prior is kept in objective but excluded from pose-quality percentage gate after diagnosed first run; first rejected state retained."
-  },
   "source": {
     "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
     "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
@@ -73,75 +66,7 @@
     "association": "Fixed support_track -> model foot1 using only fit-frame appearance/projections; anatomical right remains medium-confidence source inference."
   },
   "profile": {
-    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\profile.json",
-    "residual_jacobian_seconds": 6.188444299999901,
-    "total_profile_seconds": 12.506931399999758,
-    "directional_check": {
-      "relative_norm": 2.563315135495865e-09,
-      "support_relative_norm": 1.8229591064741735e-09,
-      "support_max_abs": 2.4611170879040856e-09,
-      "mixed_root_XYZ_SO3_support_hip_knee_ankle": true,
-      "support_nonzero_jacobian_nnz": 2520
-    },
-    "directional_block_effects": {
-      "world_X": {
-        "body_pixels": {
-          "jacobian_norm_per_solver_m": 167.27814583137368,
-          "cost_directional_derivative_per_solver_m": -140.11741644120076
-        },
-        "support_image": {
-          "jacobian_norm_per_solver_m": 8.459652753052696,
-          "cost_directional_derivative_per_solver_m": 7.129547435272699
-        },
-        "ice_soft": {
-          "jacobian_norm_per_solver_m": 0.0,
-          "cost_directional_derivative_per_solver_m": 0.0
-        }
-      },
-      "world_Y": {
-        "body_pixels": {
-          "jacobian_norm_per_solver_m": 845.0707343190571,
-          "cost_directional_derivative_per_solver_m": 649.1349874748815
-        },
-        "support_image": {
-          "jacobian_norm_per_solver_m": 40.913739019946284,
-          "cost_directional_derivative_per_solver_m": 30.03370046907751
-        },
-        "ice_soft": {
-          "jacobian_norm_per_solver_m": 0.0,
-          "cost_directional_derivative_per_solver_m": 0.0
-        }
-      },
-      "world_normal": {
-        "body_pixels": {
-          "jacobian_norm_per_solver_m": 877.6014261869517,
-          "cost_directional_derivative_per_solver_m": 5858.389661455228
-        },
-        "support_image": {
-          "jacobian_norm_per_solver_m": 64.67345132989905,
-          "cost_directional_derivative_per_solver_m": 187.469301224541
-        },
-        "ice_soft": {
-          "jacobian_norm_per_solver_m": 4.330944805941242,
-          "cost_directional_derivative_per_solver_m": 2.078853761160713
-        }
-      },
-      "camera_line_of_sight": {
-        "body_pixels": {
-          "jacobian_norm_per_solver_m": 18.709219609519096,
-          "cost_directional_derivative_per_solver_m": -154.5620271414484
-        },
-        "support_image": {
-          "jacobian_norm_per_solver_m": 2.8757361752551542,
-          "cost_directional_derivative_per_solver_m": 8.23143773763905
-        },
-        "ice_soft": {
-          "jacobian_norm_per_solver_m": 0.10516978404665499,
-          "cost_directional_derivative_per_solver_m": -0.05048150251786304
-        }
-      }
-    },
-    "preferred_seed": "original_A"
+    "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\profile.json"
   },
   "runs": [
     {
@@ -179,16 +104,6 @@
       "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\stage1_retained\\fitted\\result.npz"
     }
   ],
-  "budget": {
-    "max_wall_seconds": 600,
-    "max_initializations": 2,
-    "actual_initializations": 2,
-    "numerically_accepted_steps_total": 13,
-    "retained_update_steps_in_final_chain": 12,
-    "measured_profile_plus_solve_export_seconds": 136.11523009999974,
-    "conservative_wall_upper_seconds_including_between_run_gap": 386.9769250999998,
-    "no_automatic_retry": true
-  },
   "grouped_image_comparison": {
     "original_A": {
       "body": {
@@ -1128,19 +1043,7 @@
       92
     ],
     "runner_figure": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\runner_source_comparison.svg",
-    "gui_opened": false,
     "actual_OpenGL_continuous_playback_verified": false
-  },
-  "preserved": {
-    "immutable_baseline_files": 15,
-    "baseline_hashes_unchanged": true,
-    "outside_context": {
-      "P_world_mid": 0.0,
-      "Q_world_mid": 0.0,
-      "local_R_mid": 0.0
-    },
-    "all_old_candidates_retained": true,
-    "main_S01_default_changed": false
   },
   "unresolved": [
     "World runner XY range/path did not improve; image-region training gains are not localization acceptance.",
@@ -1151,5 +1054,10 @@
     "No full-spin/jump/step extension or multi-model inference.",
     "No actual GUI/OpenGL playback certification."
   ],
-  "no_commit_or_push": true
+  "history_archive": {
+    "base": "data",
+    "path": "maintenance/agents_audit_20261025/documentation_sources.zip",
+    "member": "20261104/events/ankara_2026/programmes/okada_mei_sp/spin_support_1104_audit.json",
+    "sha256": "023a2c00b6d7d81ed60fac0bf7be2d7776248e1ec655a6b947d103b02463f740"
+  }
 }

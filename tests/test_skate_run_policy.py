@@ -17,7 +17,7 @@ def loose(**changes):
 
 def test_default_user_budget_is_explicit_and_penalty_growth_is_disabled():
     assert asdict(RunPolicy()) == dict(wall_seconds=900, max_accepted=8, max_outer=1,
-        stagnation_window=4, min_violation_improvement_m=.0001,
+        stagnation_window=4, min_violation_improvement_m=.0001, min_joint_relative_improvement=1e-7,
         max_image_cost_increase=.05, max_pose_cost_increase=.10, allow_penalty_growth=False)
 
 

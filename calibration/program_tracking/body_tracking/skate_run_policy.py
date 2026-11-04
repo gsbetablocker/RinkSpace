@@ -87,12 +87,15 @@ class RunPolicy:
     max_outer: int = 1
     stagnation_window: int = 4
     min_violation_improvement_m: float = .0001
+    # Numerical joint-objective progress, matching solve() ftol; not a
+    # body/ice accuracy threshold. Legacy callers may omit joint_cost.
+    min_joint_relative_improvement: float = 1e-7
     max_image_cost_increase: float = .05
     max_pose_cost_increase: float = .10
     allow_penalty_growth: bool = False
 
     def __post_init__(self):
-        for name in ('wall_seconds', 'min_violation_improvement_m',
+        for name in ('wall_seconds', 'min_violation_improvement_m', 'min_joint_relative_improvement',
                      'max_image_cost_increase', 'max_pose_cost_increase'):
             value = getattr(self, name)
             if not math.isfinite(value) or value < 0:raise ValueError(name+' must be finite and nonnegative')
@@ -149,7 +152,8 @@ class Monitor:
         self.baseline = None;self.latest = None
         self.checks = 0;self.accepted = 0;self.outer_completed = 0
         self.best_violation_m = None;self.best_at_accepted = None
-        self._violation_history = []
+        self._violation_history = [];self._joint_history = []
+        self.progress_diagnostics = []
         self.stop_reasons = [];self.first_stop_now = None
         self.quality_reasons = [];self.quality_diagnostics = []
         self.quality_limits = {}
@@ -174,7 +178,7 @@ class Monitor:
             status=self.observe(now=now)
         return status
 
-    def observe(self, *, now, violation_m=None, image_cost=None, pose_cost=None,
+    def observe(self, *, now, violation_m=None, image_cost=None, pose_cost=None, joint_cost=None,
                 accepted=False, outer_completed=None, penalty_growth_requested=False,
                 quality_metrics=None, quality_failures=None):
         now = float(now)
@@ -187,7 +191,8 @@ class Monitor:
         if accepted:self.accepted += 1
         sample = dict(now=now, elapsed_seconds=now-self.start_now,
             accepted=self.accepted, outer_completed=self.outer_completed,
-            violation_m=_metric(violation_m), image_cost=_metric(image_cost), pose_cost=_metric(pose_cost))
+            violation_m=_metric(violation_m), image_cost=_metric(image_cost), pose_cost=_metric(pose_cost),
+            joint_cost=_metric(joint_cost))
         measured = quality_metrics is not None or accepted or any(sample[k] is not None for k in ('violation_m', 'image_cost', 'pose_cost'))
         live = {}
         for name, metric in (quality_metrics or {}).items():
@@ -207,10 +212,12 @@ class Monitor:
             # A missing accepted measurement breaks the comparable window.
             self._violation_history.append((self.accepted, self.best_violation_m if value is not None else None))
             self._violation_history = self._violation_history[-(self.policy.stagnation_window+1):]
+            self._joint_history.append((self.accepted,sample['joint_cost']))
+            self._joint_history = self._joint_history[-(self.policy.stagnation_window+1):]
         reasons = []
         def stop(code, message, **details):
             reasons.append(dict(code=code, category=_REASON_CATEGORIES[code], message=message, **details))
-        self.quality_diagnostics = []
+        self.quality_diagnostics = [];self.progress_diagnostics = []
         p = self.policy
         if sample['elapsed_seconds'] >= p.wall_seconds:
             stop('wall_budget', 'Wall-time budget reached.', elapsed_seconds=sample['elapsed_seconds'], limit_seconds=p.wall_seconds)
@@ -223,9 +230,23 @@ class Monitor:
             if history[-1][0]-history[0][0] == p.stagnation_window:
                 improvement = history[0][1]-history[-1][1]
                 if improvement < p.min_violation_improvement_m:
-                    stop('violation_stagnation', 'Best physical violation did not improve enough over accepted steps.',
-                        accepted_window=p.stagnation_window, improvement_m=improvement,
-                        required_improvement_m=p.min_violation_improvement_m, best_violation_m=self.best_violation_m)
+                    joint=self._joint_history
+                    comparable=(len(joint)==len(history) and
+                        [i for i,_ in joint]==[i for i,_ in history] and
+                        all(value is not None for _,value in joint))
+                    relative=((joint[0][1]-joint[-1][1])/max(joint[0][1],1e-30)) if comparable else None
+                    if relative is not None and relative > p.min_joint_relative_improvement:
+                        self.progress_diagnostics.append(dict(
+                            code='structural_plateau_with_joint_progress',
+                            accepted_window=p.stagnation_window,
+                            joint_relative_improvement=relative,
+                            meaning='A structural component plateau is not stagnation of the fitted joint objective.'))
+                    else:
+                        stop('violation_stagnation', 'Structural violation plateau with no comparable joint-objective progress.',
+                            accepted_window=p.stagnation_window, improvement_m=improvement,
+                            required_improvement_m=p.min_violation_improvement_m,
+                            best_violation_m=self.best_violation_m,
+                            joint_relative_improvement=relative)
         if self.baseline is not None:
             for kind, limit in (('image', p.max_image_cost_increase), ('pose', p.max_pose_cost_increase)):
                 base = self.baseline[kind+'_cost'];value = sample[kind+'_cost']
@@ -272,6 +293,8 @@ class Monitor:
             best_violation_m=self.best_violation_m, best_at_accepted=self.best_at_accepted,
             violation_stagnation_enabled=self.violation_stagnation_enabled,
             comparable_violation_history=[dict(accepted=n, best_violation_m=v) for n, v in self._violation_history],
+            comparable_joint_history=[dict(accepted=n,joint_cost=v) for n,v in self._joint_history],
+            progress_diagnostics=deepcopy(self.progress_diagnostics),
             stopped_by_policy=bool(self.stop_reasons), first_stop_now=self.first_stop_now,
             reasons=deepcopy(self.stop_reasons), quality_failed=bool(self.quality_reasons),
             quality_reasons=deepcopy(self.quality_reasons), quality_limits=deepcopy(self.quality_limits),

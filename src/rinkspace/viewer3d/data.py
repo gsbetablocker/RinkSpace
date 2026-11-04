@@ -9,6 +9,11 @@ from rinkspace.metric_scale import estimate_uniform_scale
 from .open_boot_topology import shell_triangles as open_shell_triangles
 
 
+MESH_CACHE_SCHEMA='rinkspace.viewer-mesh-cache.v4'
+HAND_POSE_SCHEMA='rinkspace.hand-local-R.v1'
+HAND_MEAN_CONVENTION='flat_hand_mean=True; actual local rotations; no additive mean'
+
+
 def load_npz(path):
     with np.load(path,allow_pickle=False) as z:return {k:z[k].copy() for k in z.files}
 
@@ -46,6 +51,24 @@ def _text_scalar(value,label):
     value=np.asarray(value)
     if value.shape!=() or value.dtype.kind!='U' or not str(value):raise ValueError('Invalid '+label)
     return value
+
+
+def hand_state(saved,n,variant):
+    """Read actual local hand rotations; legacy results keep their default tail."""
+    fields=('hand_pose_schema_version','hand_pose_origin','hand_mean_convention','hand_prior_sha256')
+    metadata={key:str(_text_scalar(saved[key],key)) for key in fields if key in saved}
+    schema=metadata.get('hand_pose_schema_version')
+    if schema is not None and schema!=HAND_POSE_SCHEMA:raise ValueError('Unsupported hand pose schema: '+schema)
+    if 'hand_mean_convention' in metadata and metadata['hand_mean_convention']!=HAND_MEAN_CONVENTION:
+        raise ValueError('Unsupported hand mean convention')
+    requires_hand=schema is not None or any('exmr_hand_nofoot' in str(variant.get(key,'')) for key in ('id','label','prior_label','result'))
+    if 'hand_local_R_mid' not in saved:
+        if requires_hand:raise ValueError('Explicit hand-schema/ExMR candidate is missing hand_local_R_mid')
+        return None,dict(available=False,origin='legacy default tail; no estimated hand channel')
+    if schema is not None and any(key not in metadata for key in fields):
+        raise ValueError('Declared hand schema requires hand origin, mean convention and prior SHA256')
+    hands=_rotations(saved['hand_local_R_mid'],(n,2,15,3,3),'hand_local_R_mid')
+    return hands,dict(available=True,**metadata)
 
 
 def source_support_state(saved,n):
@@ -229,7 +252,7 @@ class ResultCatalog:
             paths=[self.root/'input.npz',self.root/'compact_smplx.npz',self.model_path,Path(__file__),Path(__file__).with_name('prepare.py'),self.project/'calibration/program_tracking/body_tracking/rebuild_body_geometry.py',self.project/'calibration/program_tracking/body_tracking/footwear_geometry.py']
             if hasattr(self,'scene_root'):paths.extend([self.scene_root/'review_scene.npz',self.scene_root/'review_scene.json',self.camera_path])
             if getattr(self,'metric_path',None):paths.append(self.metric_path)
-            self._common_fingerprint=dict(files={str(p):digest(p) for p in paths},display_metres_per_scene_unit=self.scale,time_semantics='common source mid-exposure',schema='rinkspace.viewer-mesh-cache.v3')
+            self._common_fingerprint=dict(files={str(p):digest(p) for p in paths},display_metres_per_scene_unit=self.scale,time_semantics='common source mid-exposure',schema=MESH_CACHE_SCHEMA)
         return self._common_fingerprint
 
     def source_identity(self):
@@ -265,6 +288,7 @@ class ResultCatalog:
         # saved render/contact array are content-bound by the result SHA. The
         # viewer never evaluates an external template or binding dependency.
         with np.load(self.result_path(v),allow_pickle=False) as saved:
+            _,identity['hand_pose']=hand_state(saved,len(self.pts),v)
             if 'template_version' in saved:
                 identity['skate_versions']={key:str(_text_scalar(saved[key],key)) for key in ('template_version','binding_version')}
         if 'metres_per_scene_unit' in v:identity['candidate_metres_per_scene_unit']=v['metres_per_scene_unit']
@@ -284,7 +308,8 @@ class ResultCatalog:
         candidate_scale=_positive_scalar(v.get('metres_per_scene_unit',z.get('metres_per_scene_unit',self.legacy_scale)),'candidate scale')
         if 'metres_per_scene_unit' in v and 'metres_per_scene_unit' in z:
             np.testing.assert_allclose(candidate_scale,z['metres_per_scene_unit'],rtol=1e-12)
-        common=dict(P=p,Q=q,saved=z,variant=v,metres_per_scene_unit=candidate_scale,unit_ratio=self.scale/candidate_scale,length_ratio=1.)
+        hands,hand_identity=hand_state(z,n,v)
+        common=dict(P=p,Q=q,saved=z,variant=v,metres_per_scene_unit=candidate_scale,unit_ratio=self.scale/candidate_scale,length_ratio=1.,hand_local_R=hands,hand_pose_identity=hand_identity)
         if v['kind']=='fullbody':
             local=_rotations(z['local_R_mid'],(n,21,3,3),'effective local rotations')
             solver_scale=_positive_scalar(z['solver_metres_per_scene_unit'],'solver scale')

@@ -209,9 +209,11 @@ class SkateBinding(FootwearBinding):
             upper_local=self.deform(packet['upper'],alpha,x),
             inner_local=self.deform(packet['inner'],alpha,x))
 
-    def foot_metrics(self,joints,frames,samples=None,x=None):
+    def foot_metrics(self,joints,frames,samples=None,x=None,*,hand_local_R=None):
         R,t,_=self.parameters(x);p=self.packet(x)
-        if samples is None:samples=self.surface.sample_vertices(joints,frames,self.sample_ids,double_precision=True)
+        if samples is None:
+            kwargs={} if hand_local_R is None else dict(hand_local_R=hand_local_R)
+            samples=self.surface.sample_vertices(joints,frames,self.sample_ids,double_precision=True,**kwargs)
         feet=[];anchors=[];violations=[];support=[];alpha=self.deformation(joints,frames,x)
         # Inner walls/footbed are generated from the legal outer section; no
         # maximum-width shortcut and no smaller substitute human foot.
@@ -259,21 +261,27 @@ class SkateBinding(FootwearBinding):
             self.sample_ids,double_precision=True)
         self.collar_constraints_enabled=True
 
-    def collar_metrics(self,joints,frames,samples=None,x=None):
+    def collar_metrics(self,joints,frames,samples=None,x=None,*,hand_local_R=None):
         from .skate_collar_factors import evaluate
         binding=self
         if x is not None:
             binding=copy.copy(self);binding.x=np.asarray(x).copy()
         chosen=None if samples is None else samples[:,self.collar_sample_positions]
-        return evaluate(binding,joints,frames,chosen)
+        kwargs={} if hand_local_R is None else dict(hand_local_R=hand_local_R)
+        return evaluate(binding,joints,frames,chosen,**kwargs)
 
-    def compatibility_rows(self,joints,frames,samples=None,x=None):
-        m=self.foot_metrics(joints,frames,samples,x);n=len(joints)
+    def compatibility_rows(self,joints,frames,samples=None,x=None,*,hand_local_R=None):
+        kwargs={} if hand_local_R is None else dict(hand_local_R=hand_local_R)
+        # The exact foot/shank union is skinned once, with the actual hands.
+        # Caller-owned samples and live shape/registration remain unchanged.
+        if samples is None and getattr(self,'collar_constraints_enabled',False):
+            samples=self.surface.sample_vertices(joints,frames,self.sample_ids,double_precision=True,**kwargs)
+        m=self.foot_metrics(joints,frames,samples,x,**kwargs);n=len(joints)
         anchor=(m['anchors']-m['targets'][None,None])/(.012/self.ratio)
         outside=np.stack([np.max(v,axis=1) for v in m['violations']],1)/(.003/self.ratio)
         rows=np.concatenate((anchor.reshape(n,-1),outside.reshape(n,-1),m['support'].reshape(n,-1)/(.005/self.ratio)),axis=1)
         if getattr(self,'collar_constraints_enabled',False):
-            collar=self.collar_metrics(joints,frames,samples,x)
+            collar=self.collar_metrics(joints,frames,samples,x,**kwargs)
             rows=np.c_[rows,collar.get('residual_breach_solver',collar['breach_solver'])/(.003/self.ratio)]
         return rows
 

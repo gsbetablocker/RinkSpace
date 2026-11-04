@@ -37,7 +37,9 @@ def export_candidate(root, out, ref, camera, info, evidence):
     if not np.isfinite(ratio) or ratio<=0:raise ValueError('Invalid export length ratio')
     np.testing.assert_allclose(ratio,binding.ratio,rtol=0,atol=1e-12)
     np.testing.assert_allclose(ratio,float(info['metres_per_scene_unit'])/float(info['solver_metres_per_scene_unit']),rtol=1e-12)
-    packet=dict(source);arrays={}
+    packet=dict(source);packet.update(getattr(ref,'hand_metadata',{}));arrays={}
+    if getattr(ref,'grasp_geometry',None) is not None:
+        packet.update(grasp_geometry_json=np.array(json.dumps(ref.grasp_geometry,sort_keys=True)),grasp_relations_json=np.array(json.dumps(ref.grasp_relations,sort_keys=True)))
     def append(key,value):arrays.setdefault(key,[]).append(np.asarray(value))
     template_packet=binding.packet();template=template_packet['template']
     # A fixed material point on the steel web's top surface, not a contact
@@ -56,6 +58,10 @@ def export_candidate(root, out, ref, camera, info, evidence):
         for target,key in [('P_world_mid','P'),('native22_world_mid','native'),('COCO_world_mid','coco'),('gear_world_mid','gear')]:
             append(target,mid[key]*ratio)
         append('Q_world_mid',mid['Q']);append('local_R_mid',mid['local_R'])
+        if 'hand_local_R' in mid:append('hand_local_R_mid',mid['hand_local_R'])
+        if getattr(ref,'grasp_geometry',None) is not None:
+            from .spin_grasp_factors import export_grasp
+            for key,value in export_grasp(ref,mid).items():append(key,value)
         append('COCO_uv',uv[:,layout.body_landmarks])
         append('equipment_uv',uv[:,:layout.equipment_count].reshape(count,2,layout.per_foot,2))
         append('P_uv_dynamic',moving_projection(camera,nodes['P'].reshape(count,5,1,3),frames)['uv'][:,0])
@@ -89,7 +95,7 @@ def export_candidate(root, out, ref, camera, info, evidence):
         append('skate_support_gap_m_mid',contact['support_height'])
 
         local=np.einsum('nji,nkj->nki',mid['Q'],mid['native']-mid['P'][:,None])
-        metrics=binding.foot_metrics(local,mid['frames'])
+        metrics=binding.foot_metrics(local,mid['frames'],**({} if 'hand_local_R' not in mid else {'hand_local_R':mid['hand_local_R']}))
         violation=np.stack([np.max(value,axis=(1,2)) for value in metrics['violations']],axis=1)*ratio
         append('foot_cavity_max_violation_m_mid',violation)
         append('cavity_penetration_mid',violation)

@@ -1,0 +1,4420 @@
+{
+  "schema": "rinkspace.source-support-regions.v1",
+  "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "shot_id": "s05",
+  "time_base": [
+    1,
+    12800
+  ],
+  "pixel_domain": "native Brown 1920x1080",
+  "context_seconds": [
+    87.5,
+    92.5
+  ],
+  "core_seconds": [
+    88.0,
+    92.0
+  ],
+  "robust_delta": 2.0,
+  "support_foot": 1,
+  "objective_weight_note": "Separate finite image-region weight 1 per sparse admitted observation; existing body sqrt(.02), ice policy and common normalization unchanged. Engineering weighting, not accuracy calibration.",
+  "association_fit_median_px": {
+    "original_A": {
+      "foot_0": 694.0693977407329,
+      "foot_1": 40.287471341905274
+    },
+    "old_root": {
+      "foot_0": 634.2972941097128,
+      "foot_1": 46.583163062836675
+    }
+  },
+  "observations": [
+    {
+      "id": "spin_1121792_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1121792,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1146,
+        791
+      ],
+      "region_shape_px2": [
+        [
+          4418.0,
+          0.0
+        ],
+        [
+          0.0,
+          4418.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1121792.png",
+        "source_frame_sha256": "87a564b59c9d4f3cfe39ceb9f8b51e64a09d405236b96edee4b72603ea6bc738",
+        "region_rectangle_half_extent_uv": [
+          47,
+          47
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "shoe_body",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ]
+    },
+    {
+      "id": "spin_1121792_toe",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1121792,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1118,
+        825
+      ],
+      "region_shape_px2": [
+        [
+          722.0,
+          0.0
+        ],
+        [
+          0.0,
+          338.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1121792.png",
+        "source_frame_sha256": "87a564b59c9d4f3cfe39ceb9f8b51e64a09d405236b96edee4b72603ea6bc738",
+        "region_rectangle_half_extent_uv": [
+          19,
+          13
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "toe",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        1,
+        8
+      ]
+    },
+    {
+      "id": "spin_1121792_heel",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1121792,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1180,
+        816
+      ],
+      "region_shape_px2": [
+        [
+          392.0,
+          0.0
+        ],
+        [
+          0.0,
+          450.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1121792.png",
+        "source_frame_sha256": "87a564b59c9d4f3cfe39ceb9f8b51e64a09d405236b96edee4b72603ea6bc738",
+        "region_rectangle_half_extent_uv": [
+          14,
+          15
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "heel",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        7
+      ]
+    },
+    {
+      "id": "spin_1121792_contact_candidate",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1121792,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "support_contact_region",
+      "centre_uv": [
+        1137,
+        852
+      ],
+      "region_shape_px2": [
+        [
+          2888.0,
+          0.0
+        ],
+        [
+          0.0,
+          98.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "supported",
+      "role": "fit",
+      "reliability": 0.35,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1121792.png",
+        "source_frame_sha256": "87a564b59c9d4f3cfe39ceb9f8b51e64a09d405236b96edee4b72603ea6bc738",
+        "region_rectangle_half_extent_uv": [
+          38,
+          7
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "contact_candidate",
+      "source_uncertainty": "低刃和冰面阴影相接但边界模糊，无法确定具体受力点",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1125888_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1125888,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1007,
+        797
+      ],
+      "region_shape_px2": [
+        [
+          3698.0,
+          0.0
+        ],
+        [
+          0.0,
+          3872.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1125888.png",
+        "source_frame_sha256": "3795b0e33fa52af337d551783cf611081e9f02c7c669c9c083aed0f4a36ac47c",
+        "region_rectangle_half_extent_uv": [
+          43,
+          44
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "shoe_body",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ]
+    },
+    {
+      "id": "spin_1125888_toe",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1125888,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1035,
+        829
+      ],
+      "region_shape_px2": [
+        [
+          578.0,
+          0.0
+        ],
+        [
+          0.0,
+          288.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1125888.png",
+        "source_frame_sha256": "3795b0e33fa52af337d551783cf611081e9f02c7c669c9c083aed0f4a36ac47c",
+        "region_rectangle_half_extent_uv": [
+          17,
+          12
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "toe",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        1,
+        8
+      ]
+    },
+    {
+      "id": "spin_1125888_heel",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1125888,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        974,
+        820
+      ],
+      "region_shape_px2": [
+        [
+          338.0,
+          0.0
+        ],
+        [
+          0.0,
+          450.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1125888.png",
+        "source_frame_sha256": "3795b0e33fa52af337d551783cf611081e9f02c7c669c9c083aed0f4a36ac47c",
+        "region_rectangle_half_extent_uv": [
+          13,
+          15
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "heel",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        7
+      ]
+    },
+    {
+      "id": "spin_1125888_contact_candidate",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1125888,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "support_contact_region",
+      "centre_uv": [
+        1001,
+        853
+      ],
+      "region_shape_px2": [
+        [
+          3528.0,
+          0.0
+        ],
+        [
+          0.0,
+          98.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "supported",
+      "role": "fit",
+      "reliability": 0.35,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1125888.png",
+        "source_frame_sha256": "3795b0e33fa52af337d551783cf611081e9f02c7c669c9c083aed0f4a36ac47c",
+        "region_rectangle_half_extent_uv": [
+          42,
+          7
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "contact_candidate",
+      "source_uncertainty": "侧面刃底投影与阴影相连，精确切点不可分辨",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1133568_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1133568,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        997,
+        828
+      ],
+      "region_shape_px2": [
+        [
+          4608.0,
+          0.0
+        ],
+        [
+          0.0,
+          4050.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "review",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1133568.png",
+        "source_frame_sha256": "1aa20288fb449d0881d14940cb546aadd665d9adca122634dd2d27b25a9fbad5",
+        "region_rectangle_half_extent_uv": [
+          48,
+          45
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "shoe_body",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ]
+    },
+    {
+      "id": "spin_1133568_toe",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1133568,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1027,
+        859
+      ],
+      "region_shape_px2": [
+        [
+          648.0,
+          0.0
+        ],
+        [
+          0.0,
+          392.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "review",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1133568.png",
+        "source_frame_sha256": "1aa20288fb449d0881d14940cb546aadd665d9adca122634dd2d27b25a9fbad5",
+        "region_rectangle_half_extent_uv": [
+          18,
+          14
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "toe",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        1,
+        8
+      ]
+    },
+    {
+      "id": "spin_1133568_heel",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1133568,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        964,
+        851
+      ],
+      "region_shape_px2": [
+        [
+          392.0,
+          0.0
+        ],
+        [
+          0.0,
+          512.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "review",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1133568.png",
+        "source_frame_sha256": "1aa20288fb449d0881d14940cb546aadd665d9adca122634dd2d27b25a9fbad5",
+        "region_rectangle_half_extent_uv": [
+          14,
+          16
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "heel",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        7
+      ]
+    },
+    {
+      "id": "spin_1133568_contact_candidate",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1133568,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "support_contact_region",
+      "centre_uv": [
+        995,
+        885
+      ],
+      "region_shape_px2": [
+        [
+          4050.0,
+          0.0
+        ],
+        [
+          0.0,
+          98.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "supported",
+      "role": "review",
+      "reliability": 0.35,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1133568.png",
+        "source_frame_sha256": "1aa20288fb449d0881d14940cb546aadd665d9adca122634dd2d27b25a9fbad5",
+        "region_rectangle_half_extent_uv": [
+          45,
+          7
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "contact_candidate",
+      "source_uncertainty": "刀刃底部与阴影相连，不能锁定切点",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1138432_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1138432,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1087,
+        829
+      ],
+      "region_shape_px2": [
+        [
+          1352.0,
+          0.0
+        ],
+        [
+          0.0,
+          4608.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1138432.png",
+        "source_frame_sha256": "ee928d27cba0b6806deb0cdb61c472c39fb56c7580d71a35cceae199f2687858",
+        "region_rectangle_half_extent_uv": [
+          26,
+          48
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "shoe_body",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ]
+    },
+    {
+      "id": "spin_1138432_toe",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1138432,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1086,
+        862
+      ],
+      "region_shape_px2": [
+        [
+          968.0,
+          0.0
+        ],
+        [
+          0.0,
+          392.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1138432.png",
+        "source_frame_sha256": "ee928d27cba0b6806deb0cdb61c472c39fb56c7580d71a35cceae199f2687858",
+        "region_rectangle_half_extent_uv": [
+          22,
+          14
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "toe",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        1,
+        8
+      ]
+    },
+    {
+      "id": "spin_1138432_contact_candidate",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1138432,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "support_contact_region",
+      "centre_uv": [
+        1085,
+        892
+      ],
+      "region_shape_px2": [
+        [
+          242.0,
+          0.0
+        ],
+        [
+          0.0,
+          98.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "supported",
+      "role": "fit",
+      "reliability": 0.35,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1138432.png",
+        "source_frame_sha256": "ee928d27cba0b6806deb0cdb61c472c39fb56c7580d71a35cceae199f2687858",
+        "region_rectangle_half_extent_uv": [
+          11,
+          7
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "contact_candidate",
+      "source_uncertainty": "原图见鞋下近端刀刃小灰斑；刃与冰真实切点分辨率不足",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1146368_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1146368,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1052,
+        835
+      ],
+      "region_shape_px2": [
+        [
+          2592.0,
+          0.0
+        ],
+        [
+          0.0,
+          4802.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1146368.png",
+        "source_frame_sha256": "e5ae07aea6e13dfa45eb7a3490011b45156c0a196cb61f8de9db4b02a2059c41",
+        "region_rectangle_half_extent_uv": [
+          36,
+          49
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "shoe_body",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ]
+    },
+    {
+      "id": "spin_1146368_toe",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1146368,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1030,
+        870
+      ],
+      "region_shape_px2": [
+        [
+          450.0,
+          0.0
+        ],
+        [
+          0.0,
+          392.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1146368.png",
+        "source_frame_sha256": "e5ae07aea6e13dfa45eb7a3490011b45156c0a196cb61f8de9db4b02a2059c41",
+        "region_rectangle_half_extent_uv": [
+          15,
+          14
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "toe",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        1,
+        8
+      ]
+    },
+    {
+      "id": "spin_1146368_heel",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1146368,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1078,
+        862
+      ],
+      "region_shape_px2": [
+        [
+          338.0,
+          0.0
+        ],
+        [
+          0.0,
+          450.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1146368.png",
+        "source_frame_sha256": "e5ae07aea6e13dfa45eb7a3490011b45156c0a196cb61f8de9db4b02a2059c41",
+        "region_rectangle_half_extent_uv": [
+          13,
+          15
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "heel",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        7
+      ]
+    },
+    {
+      "id": "spin_1146368_contact_candidate",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1146368,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "support_contact_region",
+      "centre_uv": [
+        1045,
+        896
+      ],
+      "region_shape_px2": [
+        [
+          1568.0,
+          0.0
+        ],
+        [
+          0.0,
+          98.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "supported",
+      "role": "fit",
+      "reliability": 0.35,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1146368.png",
+        "source_frame_sha256": "e5ae07aea6e13dfa45eb7a3490011b45156c0a196cb61f8de9db4b02a2059c41",
+        "region_rectangle_half_extent_uv": [
+          28,
+          7
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "contact_candidate",
+      "source_uncertainty": "可见短轴倾斜刀架，底部切点被阴影和小尺寸限制",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1151744_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1151744,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        960,
+        842
+      ],
+      "region_shape_px2": [
+        [
+          1352.0,
+          0.0
+        ],
+        [
+          0.0,
+          4050.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1151744.png",
+        "source_frame_sha256": "3abea75d9e913d2501c52344f0308f3a76f1e4ecb93959db1e9e8029aab5b682",
+        "region_rectangle_half_extent_uv": [
+          26,
+          45
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "shoe_body",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ]
+    },
+    {
+      "id": "spin_1151744_heel",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1151744,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        960,
+        872
+      ],
+      "region_shape_px2": [
+        [
+          1058.0,
+          0.0
+        ],
+        [
+          0.0,
+          450.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1151744.png",
+        "source_frame_sha256": "3abea75d9e913d2501c52344f0308f3a76f1e4ecb93959db1e9e8029aab5b682",
+        "region_rectangle_half_extent_uv": [
+          23,
+          15
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "heel",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        7
+      ]
+    },
+    {
+      "id": "spin_1151744_contact_candidate",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1151744,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "support_contact_region",
+      "centre_uv": [
+        956,
+        903
+      ],
+      "region_shape_px2": [
+        [
+          338.0,
+          0.0
+        ],
+        [
+          0.0,
+          128.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "supported",
+      "role": "fit",
+      "reliability": 0.35,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1151744.png",
+        "source_frame_sha256": "3abea75d9e913d2501c52344f0308f3a76f1e4ecb93959db1e9e8029aab5b682",
+        "region_rectangle_half_extent_uv": [
+          13,
+          8
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "contact_candidate",
+      "source_uncertainty": "鞋下只剩狭窄模糊刃投影，真实接触点不可辨",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1159168_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1159168,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        964,
+        845
+      ],
+      "region_shape_px2": [
+        [
+          5618.0,
+          0.0
+        ],
+        [
+          0.0,
+          4232.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "review",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1159168.png",
+        "source_frame_sha256": "b26d823563b5661844c1887d0b28ec59323d57f790c8d4e51add9fc1c4c75f3e",
+        "region_rectangle_half_extent_uv": [
+          53,
+          46
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "shoe_body",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ]
+    },
+    {
+      "id": "spin_1159168_toe",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1159168,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1001,
+        878
+      ],
+      "region_shape_px2": [
+        [
+          578.0,
+          0.0
+        ],
+        [
+          0.0,
+          392.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "review",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1159168.png",
+        "source_frame_sha256": "b26d823563b5661844c1887d0b28ec59323d57f790c8d4e51add9fc1c4c75f3e",
+        "region_rectangle_half_extent_uv": [
+          17,
+          14
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "toe",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        1,
+        8
+      ]
+    },
+    {
+      "id": "spin_1159168_heel",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1159168,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        923,
+        866
+      ],
+      "region_shape_px2": [
+        [
+          450.0,
+          0.0
+        ],
+        [
+          0.0,
+          512.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "review",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1159168.png",
+        "source_frame_sha256": "b26d823563b5661844c1887d0b28ec59323d57f790c8d4e51add9fc1c4c75f3e",
+        "region_rectangle_half_extent_uv": [
+          15,
+          16
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "heel",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        7
+      ]
+    },
+    {
+      "id": "spin_1159168_contact_candidate",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1159168,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "support_contact_region",
+      "centre_uv": [
+        958,
+        902
+      ],
+      "region_shape_px2": [
+        [
+          5202.0,
+          0.0
+        ],
+        [
+          0.0,
+          98.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "supported",
+      "role": "review",
+      "reliability": 0.35,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1159168.png",
+        "source_frame_sha256": "b26d823563b5661844c1887d0b28ec59323d57f790c8d4e51add9fc1c4c75f3e",
+        "region_rectangle_half_extent_uv": [
+          51,
+          7
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "contact_candidate",
+      "source_uncertainty": "刃底有大片阴影，接触点沿可见低缘无法分辨",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1164544_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1164544,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1068,
+        846
+      ],
+      "region_shape_px2": [
+        [
+          3200.0,
+          0.0
+        ],
+        [
+          0.0,
+          5000.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1164544.png",
+        "source_frame_sha256": "51ed0f2a35c3f985172842f3083aac15ca893f054b3869b70259baff2b60f00b",
+        "region_rectangle_half_extent_uv": [
+          40,
+          50
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "shoe_body",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ]
+    },
+    {
+      "id": "spin_1164544_toe",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1164544,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1042,
+        885
+      ],
+      "region_shape_px2": [
+        [
+          450.0,
+          0.0
+        ],
+        [
+          0.0,
+          338.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1164544.png",
+        "source_frame_sha256": "51ed0f2a35c3f985172842f3083aac15ca893f054b3869b70259baff2b60f00b",
+        "region_rectangle_half_extent_uv": [
+          15,
+          13
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "toe",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        1,
+        8
+      ]
+    },
+    {
+      "id": "spin_1164544_heel",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1164544,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1096,
+        875
+      ],
+      "region_shape_px2": [
+        [
+          338.0,
+          0.0
+        ],
+        [
+          0.0,
+          450.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1164544.png",
+        "source_frame_sha256": "51ed0f2a35c3f985172842f3083aac15ca893f054b3869b70259baff2b60f00b",
+        "region_rectangle_half_extent_uv": [
+          13,
+          15
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "heel",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        7
+      ]
+    },
+    {
+      "id": "spin_1164544_contact_candidate",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1164544,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "support_contact_region",
+      "centre_uv": [
+        1056,
+        910
+      ],
+      "region_shape_px2": [
+        [
+          1800.0,
+          0.0
+        ],
+        [
+          0.0,
+          98.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "supported",
+      "role": "fit",
+      "reliability": 0.35,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1164544.png",
+        "source_frame_sha256": "51ed0f2a35c3f985172842f3083aac15ca893f054b3869b70259baff2b60f00b",
+        "region_rectangle_half_extent_uv": [
+          30,
+          7
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "contact_candidate",
+      "source_uncertainty": "短轴刀刃轮廓和阴影相连，无法明确受力区域",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1170944_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1170944,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        996,
+        853
+      ],
+      "region_shape_px2": [
+        [
+          2450.0,
+          0.0
+        ],
+        [
+          0.0,
+          4050.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "review",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1170944.png",
+        "source_frame_sha256": "096921e414ee128a09ae6b5ce69561fe538dfbaace3cfb6c69f7fe6875522e6d",
+        "region_rectangle_half_extent_uv": [
+          35,
+          45
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "shoe_body",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ]
+    },
+    {
+      "id": "spin_1170944_toe",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1170944,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        974,
+        885
+      ],
+      "region_shape_px2": [
+        [
+          450.0,
+          0.0
+        ],
+        [
+          0.0,
+          450.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "review",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1170944.png",
+        "source_frame_sha256": "096921e414ee128a09ae6b5ce69561fe538dfbaace3cfb6c69f7fe6875522e6d",
+        "region_rectangle_half_extent_uv": [
+          15,
+          15
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "toe",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        1,
+        8
+      ]
+    },
+    {
+      "id": "spin_1170944_heel",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1170944,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1011,
+        881
+      ],
+      "region_shape_px2": [
+        [
+          578.0,
+          0.0
+        ],
+        [
+          0.0,
+          450.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "review",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1170944.png",
+        "source_frame_sha256": "096921e414ee128a09ae6b5ce69561fe538dfbaace3cfb6c69f7fe6875522e6d",
+        "region_rectangle_half_extent_uv": [
+          17,
+          15
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "heel",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        7
+      ]
+    },
+    {
+      "id": "spin_1170944_contact_candidate",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1170944,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "support_contact_region",
+      "centre_uv": [
+        995,
+        916
+      ],
+      "region_shape_px2": [
+        [
+          1682.0,
+          0.0
+        ],
+        [
+          0.0,
+          128.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "supported",
+      "role": "review",
+      "reliability": 0.35,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1170944.png",
+        "source_frame_sha256": "096921e414ee128a09ae6b5ce69561fe538dfbaace3cfb6c69f7fe6875522e6d",
+        "region_rectangle_half_extent_uv": [
+          29,
+          8
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "contact_candidate",
+      "source_uncertainty": "模糊刀架与反光、灰影接近；不能确认接触细节",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1177344_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1177344,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1035,
+        852
+      ],
+      "region_shape_px2": [
+        [
+          6498.0,
+          0.0
+        ],
+        [
+          0.0,
+          4608.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1177344.png",
+        "source_frame_sha256": "e3aa9585dda0fa768d12e9c88787152f7725cb35d29e4dcf96001b0732cdf802",
+        "region_rectangle_half_extent_uv": [
+          57,
+          48
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "shoe_body",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ]
+    },
+    {
+      "id": "spin_1177344_toe",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1177344,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1077,
+        887
+      ],
+      "region_shape_px2": [
+        [
+          512.0,
+          0.0
+        ],
+        [
+          0.0,
+          392.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1177344.png",
+        "source_frame_sha256": "e3aa9585dda0fa768d12e9c88787152f7725cb35d29e4dcf96001b0732cdf802",
+        "region_rectangle_half_extent_uv": [
+          16,
+          14
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "toe",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        1,
+        8
+      ]
+    },
+    {
+      "id": "spin_1177344_heel",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1177344,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        989,
+        878
+      ],
+      "region_shape_px2": [
+        [
+          392.0,
+          0.0
+        ],
+        [
+          0.0,
+          512.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1177344.png",
+        "source_frame_sha256": "e3aa9585dda0fa768d12e9c88787152f7725cb35d29e4dcf96001b0732cdf802",
+        "region_rectangle_half_extent_uv": [
+          14,
+          16
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "heel",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        7
+      ]
+    },
+    {
+      "id": "spin_1177344_contact_candidate",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1177344,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "support_contact_region",
+      "centre_uv": [
+        1034,
+        915
+      ],
+      "region_shape_px2": [
+        [
+          6050.0,
+          0.0
+        ],
+        [
+          0.0,
+          98.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "supported",
+      "role": "fit",
+      "reliability": 0.35,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1177344.png",
+        "source_frame_sha256": "e3aa9585dda0fa768d12e9c88787152f7725cb35d29e4dcf96001b0732cdf802",
+        "region_rectangle_half_extent_uv": [
+          55,
+          7
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "contact_candidate",
+      "source_uncertainty": "侧向刀刃底部靠近冰面，长条暗影阻碍判定具体切点",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1183488_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1183488,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1089,
+        853
+      ],
+      "region_shape_px2": [
+        [
+          5832.0,
+          0.0
+        ],
+        [
+          0.0,
+          4608.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1183488.png",
+        "source_frame_sha256": "25e946afbce53fd7edfa946814466fe228d5e2252b84851e8d949a8372528df0",
+        "region_rectangle_half_extent_uv": [
+          54,
+          48
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "shoe_body",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ]
+    },
+    {
+      "id": "spin_1183488_toe",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1183488,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1048,
+        888
+      ],
+      "region_shape_px2": [
+        [
+          450.0,
+          0.0
+        ],
+        [
+          0.0,
+          392.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1183488.png",
+        "source_frame_sha256": "25e946afbce53fd7edfa946814466fe228d5e2252b84851e8d949a8372528df0",
+        "region_rectangle_half_extent_uv": [
+          15,
+          14
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "toe",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        1,
+        8
+      ]
+    },
+    {
+      "id": "spin_1183488_heel",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1183488,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1132,
+        881
+      ],
+      "region_shape_px2": [
+        [
+          392.0,
+          0.0
+        ],
+        [
+          0.0,
+          512.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1183488.png",
+        "source_frame_sha256": "25e946afbce53fd7edfa946814466fe228d5e2252b84851e8d949a8372528df0",
+        "region_rectangle_half_extent_uv": [
+          14,
+          16
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "heel",
+      "source_uncertainty": "finite shoe region; no exact material-point claim",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        7
+      ]
+    },
+    {
+      "id": "spin_1183488_contact_candidate",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1183488,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "support_contact_region",
+      "centre_uv": [
+        1076,
+        916
+      ],
+      "region_shape_px2": [
+        [
+          3362.0,
+          0.0
+        ],
+        [
+          0.0,
+          128.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "supported",
+      "role": "fit",
+      "reliability": 0.35,
+      "objective_weight": 1.0,
+      "provenance": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1183488.png",
+        "source_frame_sha256": "25e946afbce53fd7edfa946814466fe228d5e2252b84851e8d949a8372528df0",
+        "region_rectangle_half_extent_uv": [
+          41,
+          8
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "contact_candidate",
+      "source_uncertainty": "刃下较低的一段与冰面相接，具体切点仍受灰影及像素尺寸限制",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1121792_free_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1121792,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 0,
+      "foot_track": "free_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1252.0,
+        85.0
+      ],
+      "region_shape_px2": [
+        [
+          4050.0,
+          0.0
+        ],
+        [
+          0.0,
+          7200.0
+        ]
+      ],
+      "visibility": "visible",
+      "source_feature_visibility": "partially_visible",
+      "contact_state": "airborne",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "existing source-reviewed free shoe; 跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1121792.png",
+        "source_frame_sha256": "87a564b59c9d4f3cfe39ceb9f8b51e64a09d405236b96edee4b72603ea6bc738",
+        "region_rectangle_half_extent_uv": [
+          45.0,
+          60.0
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "shoe_body",
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "source_uncertainty": "coarse/partially visible source shoe region; no exact material point",
+      "association": "跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1121792_free_toe",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1121792,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 0,
+      "foot_track": "free_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1277.0,
+        48.0
+      ],
+      "region_shape_px2": [
+        [
+          722.0,
+          0.0
+        ],
+        [
+          0.0,
+          1352.0
+        ]
+      ],
+      "visibility": "visible",
+      "source_feature_visibility": "coarse",
+      "contact_state": "airborne",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "existing source-reviewed free shoe; 跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1121792.png",
+        "source_frame_sha256": "87a564b59c9d4f3cfe39ceb9f8b51e64a09d405236b96edee4b72603ea6bc738",
+        "region_rectangle_half_extent_uv": [
+          19.0,
+          26.0
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "toe",
+      "adapter_point_ids": [
+        1,
+        8
+      ],
+      "source_uncertainty": "coarse/partially visible source shoe region; no exact material point",
+      "association": "跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1125888_free_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1125888,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 0,
+      "foot_track": "free_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        872.0,
+        98.0
+      ],
+      "region_shape_px2": [
+        [
+          3698.0,
+          0.0
+        ],
+        [
+          0.0,
+          7938.0
+        ]
+      ],
+      "visibility": "visible",
+      "source_feature_visibility": "partially_visible",
+      "contact_state": "airborne",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "existing source-reviewed free shoe; 跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1125888.png",
+        "source_frame_sha256": "3795b0e33fa52af337d551783cf611081e9f02c7c669c9c083aed0f4a36ac47c",
+        "region_rectangle_half_extent_uv": [
+          43.0,
+          63.0
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "shoe_body",
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "source_uncertainty": "coarse/partially visible source shoe region; no exact material point",
+      "association": "跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1125888_free_toe",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1125888,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 0,
+      "foot_track": "free_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        841.0,
+        63.0
+      ],
+      "region_shape_px2": [
+        [
+          722.0,
+          0.0
+        ],
+        [
+          0.0,
+          1352.0
+        ]
+      ],
+      "visibility": "visible",
+      "source_feature_visibility": "coarse",
+      "contact_state": "airborne",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "existing source-reviewed free shoe; 跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1125888.png",
+        "source_frame_sha256": "3795b0e33fa52af337d551783cf611081e9f02c7c669c9c083aed0f4a36ac47c",
+        "region_rectangle_half_extent_uv": [
+          19.0,
+          26.0
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "toe",
+      "adapter_point_ids": [
+        1,
+        8
+      ],
+      "source_uncertainty": "coarse/partially visible source shoe region; no exact material point",
+      "association": "跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1133568_free_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1133568,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 0,
+      "foot_track": "free_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        856.0,
+        120.0
+      ],
+      "region_shape_px2": [
+        [
+          3698.0,
+          0.0
+        ],
+        [
+          0.0,
+          8450.0
+        ]
+      ],
+      "visibility": "visible",
+      "source_feature_visibility": "partially_visible",
+      "contact_state": "airborne",
+      "role": "review",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "existing source-reviewed free shoe; 跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1133568.png",
+        "source_frame_sha256": "1aa20288fb449d0881d14940cb546aadd665d9adca122634dd2d27b25a9fbad5",
+        "region_rectangle_half_extent_uv": [
+          43.0,
+          65.0
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "shoe_body",
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "source_uncertainty": "coarse/partially visible source shoe region; no exact material point",
+      "association": "跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1133568_free_toe",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1133568,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 0,
+      "foot_track": "free_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        827.0,
+        83.0
+      ],
+      "region_shape_px2": [
+        [
+          722.0,
+          0.0
+        ],
+        [
+          0.0,
+          1458.0
+        ]
+      ],
+      "visibility": "visible",
+      "source_feature_visibility": "coarse",
+      "contact_state": "airborne",
+      "role": "review",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "existing source-reviewed free shoe; 跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1133568.png",
+        "source_frame_sha256": "1aa20288fb449d0881d14940cb546aadd665d9adca122634dd2d27b25a9fbad5",
+        "region_rectangle_half_extent_uv": [
+          19.0,
+          27.0
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "toe",
+      "adapter_point_ids": [
+        1,
+        8
+      ],
+      "source_uncertainty": "coarse/partially visible source shoe region; no exact material point",
+      "association": "跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1138432_free_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1138432,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 0,
+      "foot_track": "free_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1184.0,
+        119.0
+      ],
+      "region_shape_px2": [
+        [
+          3698.0,
+          0.0
+        ],
+        [
+          0.0,
+          7688.0
+        ]
+      ],
+      "visibility": "visible",
+      "source_feature_visibility": "partially_visible",
+      "contact_state": "airborne",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "existing source-reviewed free shoe; 跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1138432.png",
+        "source_frame_sha256": "ee928d27cba0b6806deb0cdb61c472c39fb56c7580d71a35cceae199f2687858",
+        "region_rectangle_half_extent_uv": [
+          43.0,
+          62.0
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "shoe_body",
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "source_uncertainty": "coarse/partially visible source shoe region; no exact material point",
+      "association": "跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1138432_free_toe",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1138432,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 0,
+      "foot_track": "free_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1200.0,
+        84.0
+      ],
+      "region_shape_px2": [
+        [
+          968.0,
+          0.0
+        ],
+        [
+          0.0,
+          1682.0
+        ]
+      ],
+      "visibility": "visible",
+      "source_feature_visibility": "coarse",
+      "contact_state": "airborne",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "existing source-reviewed free shoe; 跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1138432.png",
+        "source_frame_sha256": "ee928d27cba0b6806deb0cdb61c472c39fb56c7580d71a35cceae199f2687858",
+        "region_rectangle_half_extent_uv": [
+          22.0,
+          29.0
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "toe",
+      "adapter_point_ids": [
+        1,
+        8
+      ],
+      "source_uncertainty": "coarse/partially visible source shoe region; no exact material point",
+      "association": "跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1146368_free_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1146368,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 0,
+      "foot_track": "free_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1204.0,
+        121.0
+      ],
+      "region_shape_px2": [
+        [
+          3872.0,
+          0.0
+        ],
+        [
+          0.0,
+          7442.0
+        ]
+      ],
+      "visibility": "visible",
+      "source_feature_visibility": "partially_visible",
+      "contact_state": "airborne",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "existing source-reviewed free shoe; 跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1146368.png",
+        "source_frame_sha256": "e5ae07aea6e13dfa45eb7a3490011b45156c0a196cb61f8de9db4b02a2059c41",
+        "region_rectangle_half_extent_uv": [
+          44.0,
+          61.0
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "shoe_body",
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "source_uncertainty": "coarse/partially visible source shoe region; no exact material point",
+      "association": "跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1146368_free_toe",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1146368,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 0,
+      "foot_track": "free_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1228.0,
+        85.0
+      ],
+      "region_shape_px2": [
+        [
+          800.0,
+          0.0
+        ],
+        [
+          0.0,
+          1458.0
+        ]
+      ],
+      "visibility": "visible",
+      "source_feature_visibility": "coarse",
+      "contact_state": "airborne",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "existing source-reviewed free shoe; 跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1146368.png",
+        "source_frame_sha256": "e5ae07aea6e13dfa45eb7a3490011b45156c0a196cb61f8de9db4b02a2059c41",
+        "region_rectangle_half_extent_uv": [
+          20.0,
+          27.0
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "toe",
+      "adapter_point_ids": [
+        1,
+        8
+      ],
+      "source_uncertainty": "coarse/partially visible source shoe region; no exact material point",
+      "association": "跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1151744_free_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1151744,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 0,
+      "foot_track": "free_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        905.0,
+        120.0
+      ],
+      "region_shape_px2": [
+        [
+          5832.0,
+          0.0
+        ],
+        [
+          0.0,
+          8978.0
+        ]
+      ],
+      "visibility": "visible",
+      "source_feature_visibility": "visible_blurred",
+      "contact_state": "airborne",
+      "role": "fit",
+      "reliability": 0.4,
+      "objective_weight": 1.0,
+      "provenance": "existing source-reviewed free shoe; 跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1151744.png",
+        "source_frame_sha256": "3abea75d9e913d2501c52344f0308f3a76f1e4ecb93959db1e9e8029aab5b682",
+        "region_rectangle_half_extent_uv": [
+          54.0,
+          67.0
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "shoe_body",
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "source_uncertainty": "coarse/partially visible source shoe region; no exact material point",
+      "association": "跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1159168_free_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1159168,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 0,
+      "foot_track": "free_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        818.0,
+        118.0
+      ],
+      "region_shape_px2": [
+        [
+          3872.0,
+          0.0
+        ],
+        [
+          0.0,
+          9522.0
+        ]
+      ],
+      "visibility": "visible",
+      "source_feature_visibility": "partially_visible",
+      "contact_state": "airborne",
+      "role": "review",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "existing source-reviewed free shoe; 跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1159168.png",
+        "source_frame_sha256": "b26d823563b5661844c1887d0b28ec59323d57f790c8d4e51add9fc1c4c75f3e",
+        "region_rectangle_half_extent_uv": [
+          44.0,
+          69.0
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "shoe_body",
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "source_uncertainty": "coarse/partially visible source shoe region; no exact material point",
+      "association": "跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1159168_free_toe",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1159168,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 0,
+      "foot_track": "free_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        788.0,
+        78.0
+      ],
+      "region_shape_px2": [
+        [
+          722.0,
+          0.0
+        ],
+        [
+          0.0,
+          1458.0
+        ]
+      ],
+      "visibility": "visible",
+      "source_feature_visibility": "coarse",
+      "contact_state": "airborne",
+      "role": "review",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "existing source-reviewed free shoe; 跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1159168.png",
+        "source_frame_sha256": "b26d823563b5661844c1887d0b28ec59323d57f790c8d4e51add9fc1c4c75f3e",
+        "region_rectangle_half_extent_uv": [
+          19.0,
+          27.0
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "toe",
+      "adapter_point_ids": [
+        1,
+        8
+      ],
+      "source_uncertainty": "coarse/partially visible source shoe region; no exact material point",
+      "association": "跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1164544_free_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1164544,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 0,
+      "foot_track": "free_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1220.0,
+        119.0
+      ],
+      "region_shape_px2": [
+        [
+          4050.0,
+          0.0
+        ],
+        [
+          0.0,
+          8192.0
+        ]
+      ],
+      "visibility": "visible",
+      "source_feature_visibility": "partially_visible",
+      "contact_state": "airborne",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "existing source-reviewed free shoe; 跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1164544.png",
+        "source_frame_sha256": "51ed0f2a35c3f985172842f3083aac15ca893f054b3869b70259baff2b60f00b",
+        "region_rectangle_half_extent_uv": [
+          45.0,
+          64.0
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "shoe_body",
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "source_uncertainty": "coarse/partially visible source shoe region; no exact material point",
+      "association": "跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1164544_free_toe",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1164544,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 0,
+      "foot_track": "free_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1245.0,
+        83.0
+      ],
+      "region_shape_px2": [
+        [
+          800.0,
+          0.0
+        ],
+        [
+          0.0,
+          1458.0
+        ]
+      ],
+      "visibility": "visible",
+      "source_feature_visibility": "coarse",
+      "contact_state": "airborne",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "existing source-reviewed free shoe; 跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1164544.png",
+        "source_frame_sha256": "51ed0f2a35c3f985172842f3083aac15ca893f054b3869b70259baff2b60f00b",
+        "region_rectangle_half_extent_uv": [
+          20.0,
+          27.0
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "toe",
+      "adapter_point_ids": [
+        1,
+        8
+      ],
+      "source_uncertainty": "coarse/partially visible source shoe region; no exact material point",
+      "association": "跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1170944_free_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1170944,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 0,
+      "foot_track": "free_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        973.0,
+        117.0
+      ],
+      "region_shape_px2": [
+        [
+          5408.0,
+          0.0
+        ],
+        [
+          0.0,
+          9248.0
+        ]
+      ],
+      "visibility": "visible",
+      "source_feature_visibility": "visible_blurred",
+      "contact_state": "airborne",
+      "role": "review",
+      "reliability": 0.4,
+      "objective_weight": 1.0,
+      "provenance": "existing source-reviewed free shoe; 跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1170944.png",
+        "source_frame_sha256": "096921e414ee128a09ae6b5ce69561fe538dfbaace3cfb6c69f7fe6875522e6d",
+        "region_rectangle_half_extent_uv": [
+          52.0,
+          68.0
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "shoe_body",
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "source_uncertainty": "coarse/partially visible source shoe region; no exact material point",
+      "association": "跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1177344_free_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1177344,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 0,
+      "foot_track": "free_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        921.0,
+        144.0
+      ],
+      "region_shape_px2": [
+        [
+          4608.0,
+          0.0
+        ],
+        [
+          0.0,
+          8450.0
+        ]
+      ],
+      "visibility": "visible",
+      "source_feature_visibility": "visible_blurred",
+      "contact_state": "airborne",
+      "role": "fit",
+      "reliability": 0.4,
+      "objective_weight": 1.0,
+      "provenance": "existing source-reviewed free shoe; 跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1177344.png",
+        "source_frame_sha256": "e3aa9585dda0fa768d12e9c88787152f7725cb35d29e4dcf96001b0732cdf802",
+        "region_rectangle_half_extent_uv": [
+          48.0,
+          65.0
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "shoe_body",
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "source_uncertainty": "coarse/partially visible source shoe region; no exact material point",
+      "association": "跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "human_confirmed": false
+    },
+    {
+      "id": "spin_1183488_free_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1183488,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 0,
+      "foot_track": "free_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1245.0,
+        166.0
+      ],
+      "region_shape_px2": [
+        [
+          6050.0,
+          0.0
+        ],
+        [
+          0.0,
+          7688.0
+        ]
+      ],
+      "visibility": "visible",
+      "source_feature_visibility": "visible_blurred",
+      "contact_state": "airborne",
+      "role": "fit",
+      "reliability": 0.4,
+      "objective_weight": 1.0,
+      "provenance": "existing source-reviewed free shoe; 跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1183488.png",
+        "source_frame_sha256": "25e946afbce53fd7edfa946814466fe228d5e2252b84851e8d949a8372528df0",
+        "region_rectangle_half_extent_uv": [
+          55.0,
+          62.0
+        ],
+        "native_dimensions": [
+          1920,
+          1080
+        ]
+      },
+      "feature": "shoe_body",
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "source_uncertainty": "coarse/partially visible source shoe region; no exact material point",
+      "association": "跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+      "human_confirmed": false
+    },
+    {
+      "id": "grasp_1080320_1_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1080320,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        930,
+        768
+      ],
+      "region_shape_px2": [
+        [
+          6050.0,
+          0.0
+        ],
+        [
+          0.0,
+          4608.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "native source review source_findings.json; fixed episode anatomical hypothesis, medium confidence",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\source_review\\1080320.png",
+        "source_frame_sha256": "a6ae4e3c8ce81314cf4e050d866a361ee4705807f429cf1512d38bf6cf5ee1cf",
+        "native_dimensions": [
+          1920,
+          1080
+        ],
+        "region_rectangle_half_extent_uv": [
+          55.0,
+          48.0
+        ]
+      },
+      "feature": "shoe_body",
+      "source_uncertainty": "wide finite shoe-body region, not blade/contact/ankle point",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "source_visibility": "visible"
+    },
+    {
+      "id": "grasp_1080320_0_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1080320,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 0,
+      "foot_track": "free_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1173,
+        378
+      ],
+      "region_shape_px2": [
+        [
+          11250.0,
+          0.0
+        ],
+        [
+          0.0,
+          2048.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.4,
+      "objective_weight": 1.0,
+      "provenance": "native source review source_findings.json; fixed episode anatomical hypothesis, medium confidence",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\source_review\\1080320.png",
+        "source_frame_sha256": "a6ae4e3c8ce81314cf4e050d866a361ee4705807f429cf1512d38bf6cf5ee1cf",
+        "native_dimensions": [
+          1920,
+          1080
+        ],
+        "region_rectangle_half_extent_uv": [
+          75.0,
+          32.0
+        ]
+      },
+      "feature": "shoe_body",
+      "source_uncertainty": "wide finite shoe-body region, not blade/contact/ankle point",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "source_visibility": "visible_blurred"
+    },
+    {
+      "id": "grasp_1090560_1_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1090560,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        906,
+        769
+      ],
+      "region_shape_px2": [
+        [
+          6050.0,
+          0.0
+        ],
+        [
+          0.0,
+          4608.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "native source review source_findings.json; fixed episode anatomical hypothesis, medium confidence",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\source_review\\1090560.png",
+        "source_frame_sha256": "c13a8847b094a8901573c2679892df8569f454975468762f9433bc7cf6c7eb30",
+        "native_dimensions": [
+          1920,
+          1080
+        ],
+        "region_rectangle_half_extent_uv": [
+          55.0,
+          48.0
+        ]
+      },
+      "feature": "shoe_body",
+      "source_uncertainty": "wide finite shoe-body region, not blade/contact/ankle point",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "source_visibility": "visible"
+    },
+    {
+      "id": "grasp_1090560_0_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1090560,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 0,
+      "foot_track": "free_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1110,
+        477
+      ],
+      "region_shape_px2": [
+        [
+          6050.0,
+          0.0
+        ],
+        [
+          0.0,
+          5000.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.4,
+      "objective_weight": 1.0,
+      "provenance": "native source review source_findings.json; fixed episode anatomical hypothesis, medium confidence",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\source_review\\1090560.png",
+        "source_frame_sha256": "c13a8847b094a8901573c2679892df8569f454975468762f9433bc7cf6c7eb30",
+        "native_dimensions": [
+          1920,
+          1080
+        ],
+        "region_rectangle_half_extent_uv": [
+          55.0,
+          50.0
+        ]
+      },
+      "feature": "shoe_body",
+      "source_uncertainty": "wide finite shoe-body region, not blade/contact/ankle point",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "source_visibility": "partially_visible_blurred"
+    },
+    {
+      "id": "grasp_1100800_1_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1100800,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        894,
+        778
+      ],
+      "region_shape_px2": [
+        [
+          1800.0,
+          0.0
+        ],
+        [
+          0.0,
+          4802.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "review",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "native source review source_findings.json; fixed episode anatomical hypothesis, medium confidence",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\source_review\\1100800.png",
+        "source_frame_sha256": "0fb94cdf8754e68421c23ae83ff9160c687cc9eeb83e3b1a21ac4048b6136080",
+        "native_dimensions": [
+          1920,
+          1080
+        ],
+        "region_rectangle_half_extent_uv": [
+          30.0,
+          49.0
+        ]
+      },
+      "feature": "shoe_body",
+      "source_uncertainty": "wide finite shoe-body region, not blade/contact/ankle point",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "source_visibility": "visible_end_on"
+    },
+    {
+      "id": "grasp_1111040_1_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1111040,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        934,
+        793
+      ],
+      "region_shape_px2": [
+        [
+          5832.0,
+          0.0
+        ],
+        [
+          0.0,
+          5000.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "native source review source_findings.json; fixed episode anatomical hypothesis, medium confidence",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\source_review\\1111040.png",
+        "source_frame_sha256": "267dacbcb17b6a8b967f9d69bedf7109286a50838c87456d69240a95ad171f71",
+        "native_dimensions": [
+          1920,
+          1080
+        ],
+        "region_rectangle_half_extent_uv": [
+          54.0,
+          50.0
+        ]
+      },
+      "feature": "shoe_body",
+      "source_uncertainty": "wide finite shoe-body region, not blade/contact/ankle point",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "source_visibility": "visible"
+    },
+    {
+      "id": "grasp_1111040_0_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1111040,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 0,
+      "foot_track": "free_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        823,
+        87
+      ],
+      "region_shape_px2": [
+        [
+          4608.0,
+          0.0
+        ],
+        [
+          0.0,
+          9800.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.65,
+      "objective_weight": 1.0,
+      "provenance": "native source review source_findings.json; fixed episode anatomical hypothesis, medium confidence",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\source_review\\1111040.png",
+        "source_frame_sha256": "267dacbcb17b6a8b967f9d69bedf7109286a50838c87456d69240a95ad171f71",
+        "native_dimensions": [
+          1920,
+          1080
+        ],
+        "region_rectangle_half_extent_uv": [
+          48.0,
+          70.0
+        ]
+      },
+      "feature": "shoe_body",
+      "source_uncertainty": "wide finite shoe-body region, not blade/contact/ankle point",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "source_visibility": "partially_visible"
+    },
+    {
+      "id": "grasp_1187840_1_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1187840,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 1,
+      "foot_track": "support_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        1164,
+        851
+      ],
+      "region_shape_px2": [
+        [
+          7200.0,
+          0.0
+        ],
+        [
+          0.0,
+          5000.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.4,
+      "objective_weight": 1.0,
+      "provenance": "native source review source_findings.json; fixed episode anatomical hypothesis, medium confidence",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\source_review\\1187840.png",
+        "source_frame_sha256": "d51866e7ae7320990bec7fdafe6b1f4f3d0d0bace61079ba34371843565a8820",
+        "native_dimensions": [
+          1920,
+          1080
+        ],
+        "region_rectangle_half_extent_uv": [
+          60.0,
+          50.0
+        ]
+      },
+      "feature": "shoe_body",
+      "source_uncertainty": "wide finite shoe-body region, not blade/contact/ankle point",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "source_visibility": "visible_blurred"
+    },
+    {
+      "id": "grasp_1187840_0_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1187840,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 0,
+      "foot_track": "free_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        914,
+        810
+      ],
+      "region_shape_px2": [
+        [
+          2450.0,
+          0.0
+        ],
+        [
+          0.0,
+          4608.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "fit",
+      "reliability": 0.4,
+      "objective_weight": 1.0,
+      "provenance": "native source review source_findings.json; fixed episode anatomical hypothesis, medium confidence",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\source_review\\1187840.png",
+        "source_frame_sha256": "d51866e7ae7320990bec7fdafe6b1f4f3d0d0bace61079ba34371843565a8820",
+        "native_dimensions": [
+          1920,
+          1080
+        ],
+        "region_rectangle_half_extent_uv": [
+          35.0,
+          48.0
+        ]
+      },
+      "feature": "shoe_body",
+      "source_uncertainty": "wide finite shoe-body region, not blade/contact/ankle point",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "source_visibility": "visible_blurred"
+    },
+    {
+      "id": "grasp_1192960_0_shoe_body",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "pts": 1192960,
+      "time_base": [
+        1,
+        12800
+      ],
+      "foot": 0,
+      "foot_track": "free_track",
+      "kind": "boot_marker_region",
+      "centre_uv": [
+        945,
+        838
+      ],
+      "region_shape_px2": [
+        [
+          4050.0,
+          0.0
+        ],
+        [
+          0.0,
+          4608.0
+        ]
+      ],
+      "visibility": "visible",
+      "contact_state": "unknown",
+      "role": "review",
+      "reliability": 0.4,
+      "objective_weight": 1.0,
+      "provenance": "native source review source_findings.json; fixed episode anatomical hypothesis, medium confidence",
+      "image_footprint": {
+        "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\source_review\\1192960.png",
+        "source_frame_sha256": "a6ac38378d2edeb2c4045d2b03e5cb76ab4ba073debd9ea231e5c0148b42277a",
+        "native_dimensions": [
+          1920,
+          1080
+        ],
+        "region_rectangle_half_extent_uv": [
+          45.0,
+          48.0
+        ]
+      },
+      "feature": "shoe_body",
+      "source_uncertainty": "wide finite shoe-body region, not blade/contact/ankle point",
+      "association": "fixed model foot 1 / support_track, compared against foot 0 using fit frames only",
+      "human_confirmed": false,
+      "adapter_point_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "source_visibility": "visible_blurred"
+    }
+  ],
+  "supports": [
+    {
+      "id": "spin_1121792_contact_candidate",
+      "pts": 1121792,
+      "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1121792.png",
+      "source": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "source_time_base": [
+        1,
+        12800
+      ],
+      "confidence": 0.35,
+      "mode": "glide",
+      "feet": [
+        1
+      ],
+      "physical_side": "source support_track; anatomical right is a medium-confidence inference",
+      "edge": "unknown",
+      "source_support_weight_s": 0.02,
+      "source_support_weight_basis": "one discrete native exposure; not duration/propagated contact",
+      "human_confirmed": false,
+      "note": "低刃和冰面阴影相接但边界模糊，无法确定具体受力点"
+    },
+    {
+      "id": "spin_1125888_contact_candidate",
+      "pts": 1125888,
+      "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1125888.png",
+      "source": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "source_time_base": [
+        1,
+        12800
+      ],
+      "confidence": 0.35,
+      "mode": "glide",
+      "feet": [
+        1
+      ],
+      "physical_side": "source support_track; anatomical right is a medium-confidence inference",
+      "edge": "unknown",
+      "source_support_weight_s": 0.02,
+      "source_support_weight_basis": "one discrete native exposure; not duration/propagated contact",
+      "human_confirmed": false,
+      "note": "侧面刃底投影与阴影相连，精确切点不可分辨"
+    },
+    {
+      "id": "spin_1138432_contact_candidate",
+      "pts": 1138432,
+      "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1138432.png",
+      "source": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "source_time_base": [
+        1,
+        12800
+      ],
+      "confidence": 0.35,
+      "mode": "glide",
+      "feet": [
+        1
+      ],
+      "physical_side": "source support_track; anatomical right is a medium-confidence inference",
+      "edge": "unknown",
+      "source_support_weight_s": 0.02,
+      "source_support_weight_basis": "one discrete native exposure; not duration/propagated contact",
+      "human_confirmed": false,
+      "note": "原图见鞋下近端刀刃小灰斑；刃与冰真实切点分辨率不足"
+    },
+    {
+      "id": "spin_1146368_contact_candidate",
+      "pts": 1146368,
+      "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1146368.png",
+      "source": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "source_time_base": [
+        1,
+        12800
+      ],
+      "confidence": 0.35,
+      "mode": "glide",
+      "feet": [
+        1
+      ],
+      "physical_side": "source support_track; anatomical right is a medium-confidence inference",
+      "edge": "unknown",
+      "source_support_weight_s": 0.02,
+      "source_support_weight_basis": "one discrete native exposure; not duration/propagated contact",
+      "human_confirmed": false,
+      "note": "可见短轴倾斜刀架，底部切点被阴影和小尺寸限制"
+    },
+    {
+      "id": "spin_1151744_contact_candidate",
+      "pts": 1151744,
+      "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1151744.png",
+      "source": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "source_time_base": [
+        1,
+        12800
+      ],
+      "confidence": 0.35,
+      "mode": "glide",
+      "feet": [
+        1
+      ],
+      "physical_side": "source support_track; anatomical right is a medium-confidence inference",
+      "edge": "unknown",
+      "source_support_weight_s": 0.02,
+      "source_support_weight_basis": "one discrete native exposure; not duration/propagated contact",
+      "human_confirmed": false,
+      "note": "鞋下只剩狭窄模糊刃投影，真实接触点不可辨"
+    },
+    {
+      "id": "spin_1164544_contact_candidate",
+      "pts": 1164544,
+      "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1164544.png",
+      "source": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "source_time_base": [
+        1,
+        12800
+      ],
+      "confidence": 0.35,
+      "mode": "glide",
+      "feet": [
+        1
+      ],
+      "physical_side": "source support_track; anatomical right is a medium-confidence inference",
+      "edge": "unknown",
+      "source_support_weight_s": 0.02,
+      "source_support_weight_basis": "one discrete native exposure; not duration/propagated contact",
+      "human_confirmed": false,
+      "note": "短轴刀刃轮廓和阴影相连，无法明确受力区域"
+    },
+    {
+      "id": "spin_1177344_contact_candidate",
+      "pts": 1177344,
+      "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1177344.png",
+      "source": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "source_time_base": [
+        1,
+        12800
+      ],
+      "confidence": 0.35,
+      "mode": "glide",
+      "feet": [
+        1
+      ],
+      "physical_side": "source support_track; anatomical right is a medium-confidence inference",
+      "edge": "unknown",
+      "source_support_weight_s": 0.02,
+      "source_support_weight_basis": "one discrete native exposure; not duration/propagated contact",
+      "human_confirmed": false,
+      "note": "侧向刀刃底部靠近冰面，长条暗影阻碍判定具体切点"
+    },
+    {
+      "id": "spin_1183488_contact_candidate",
+      "pts": 1183488,
+      "source_frame": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\1183488.png",
+      "source": "assistant direct source-image development review; D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "source_time_base": [
+        1,
+        12800
+      ],
+      "confidence": 0.35,
+      "mode": "glide",
+      "feet": [
+        1
+      ],
+      "physical_side": "source support_track; anatomical right is a medium-confidence inference",
+      "edge": "unknown",
+      "source_support_weight_s": 0.02,
+      "source_support_weight_basis": "one discrete native exposure; not duration/propagated contact",
+      "human_confirmed": false,
+      "note": "刃下较低的一段与冰面相接，具体切点仍受灰影及像素尺寸限制"
+    }
+  ],
+  "blade_curves": [],
+  "blade_unknown_reason": "All selected steel edges blend with shadow/reflection or are end-on; no precise blade curve admitted.",
+  "review_exclusion": "Review shoe/contact labels are absent from fit factors, seed selection, and height evidence; prior networks saw the images.",
+  "free_shoe_admission": {
+    "added_rows": 18,
+    "added_ids": [
+      "spin_1121792_free_shoe_body",
+      "spin_1121792_free_toe",
+      "spin_1125888_free_shoe_body",
+      "spin_1125888_free_toe",
+      "spin_1133568_free_shoe_body",
+      "spin_1133568_free_toe",
+      "spin_1138432_free_shoe_body",
+      "spin_1138432_free_toe",
+      "spin_1146368_free_shoe_body",
+      "spin_1146368_free_toe",
+      "spin_1151744_free_shoe_body",
+      "spin_1159168_free_shoe_body",
+      "spin_1159168_free_toe",
+      "spin_1164544_free_shoe_body",
+      "spin_1164544_free_toe",
+      "spin_1170944_free_shoe_body",
+      "spin_1177344_free_shoe_body",
+      "spin_1183488_free_shoe_body"
+    ],
+    "free_foot": 0,
+    "association_provenance": "跨源帧视觉审阅支持的解剖左侧中等置信 episode 假设；整段固定右足 foot1 支撑、左足 foot0 为自由脚，不逐帧换身份；该映射不是人工逐帧真值，亦不签发抓握真值。",
+    "skipped": [],
+    "role_preserved": true,
+    "new_ice_support_rows": 0,
+    "new_grip_truth_rows": 0,
+    "original_support_count": 8,
+    "original_observation_count": 42,
+    "note": "Free-shoe pixels are distinct from a held hand/shoe relation; no contact point or interval is inferred here.",
+    "input_sha256": {
+      "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\support_spin_1104.json": "c339e84324da68a41f8d49be9a1c67bd0ab660845165c0ea48ddbec25a070ae4",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\source_review\\source_region_review.json": "75cff944dcd3fb9aafaa9d426ea4691ec6fb2629fe37757bd31018a05e1f5f54"
+    }
+  },
+  "early_and_release_regions": {
+    "source_findings_sha256": "6f817640e20fec54bf2259058db6b11c9ee7d7e7d910d26f1d600998f079fe3d",
+    "old_observations_unchanged": true,
+    "no_new_discrete_support": true
+  }
+}

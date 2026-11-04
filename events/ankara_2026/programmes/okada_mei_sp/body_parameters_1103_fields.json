@@ -1,7 +1,7 @@
 {
   "schema": "rinkspace.body-control-field-audit.v1",
   "audit_date": "2026-11-04",
-  "scope": "Five previous compact S01 packages plus 25 subsequent S01/event initialization, control and root-reference packages; complete field metadata, no model/template/image payload. Four 2026-11-04 source-support and own-initial-reference spin comparison parameter archives; no raw ExMR animation/model/surface/image payload.",
+  "scope": "Five previous compact S01 packages plus 25 subsequent S01/event initialization, control and root-reference packages; complete field metadata, no model/template/image payload. Four 2026-11-04 source-support and own-initial-reference spin comparison parameter archives; no raw ExMR animation/model/surface/image payload. Added 2026-11-04 grasp, support-foot, continuous entry and mass-weighted gravity initial/control parameters; original failed candidates remain retained.",
   "files": [
     {
       "path": "opening_motion_1103.npz",
@@ -5429,6 +5429,1898 @@
           "array_bytes": 1
         }
       ]
+    },
+    {
+      "path": "spin_entry_gravity_1104.npz",
+      "bytes": 140070,
+      "sha256": "b971706729981fa416229c502b2314585a4fb2ceb9992b3c4541fddd22b9b73f",
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1634",
+          "shape": [],
+          "array_bytes": 6536
+        },
+        {
+          "name": "comparison_case_identity_json",
+          "dtype": "<U2505",
+          "shape": [],
+          "array_bytes": 10020
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "base_layer_0_x",
+          "dtype": "<f8",
+          "shape": [
+            3465
+          ],
+          "array_bytes": 27720
+        },
+        {
+          "name": "base_layer_0_knots",
+          "dtype": "<f8",
+          "shape": [
+            59
+          ],
+          "array_bytes": 472
+        },
+        {
+          "name": "base_layer_0_active",
+          "dtype": "<i8",
+          "shape": [
+            63
+          ],
+          "array_bytes": 504
+        },
+        {
+          "name": "base_layer_0_seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "base_layer_0_state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "base_layer_1_x",
+          "dtype": "<f8",
+          "shape": [
+            5229
+          ],
+          "array_bytes": 41832
+        },
+        {
+          "name": "base_layer_1_knots",
+          "dtype": "<f8",
+          "shape": [
+            87
+          ],
+          "array_bytes": 696
+        },
+        {
+          "name": "base_layer_1_active",
+          "dtype": "<i8",
+          "shape": [
+            63
+          ],
+          "array_bytes": 504
+        },
+        {
+          "name": "base_layer_1_seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "base_layer_1_state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "hand_pose_schema_version",
+          "dtype": "<U25",
+          "shape": [],
+          "array_bytes": 100
+        },
+        {
+          "name": "grasp_relations_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "grasp_geometry_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "source_support_track_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "initialization_provenance_json",
+          "dtype": "<U702",
+          "shape": [],
+          "array_bytes": 2808
+        },
+        {
+          "name": "entry_motion_config_json",
+          "dtype": "<U307",
+          "shape": [],
+          "array_bytes": 1228
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            5246
+          ],
+          "array_bytes": 41968
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            87
+          ],
+          "array_bytes": 696
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            63
+          ],
+          "array_bytes": 504
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            5705
+          ],
+          "array_bytes": 45640
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            3808
+          ],
+          "array_bytes": 30464
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "ice_mode",
+          "dtype": "<U21",
+          "shape": [],
+          "array_bytes": 84
+        },
+        {
+          "name": "ice_is_delivery_gate",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "al_row_scope",
+          "dtype": "<U27",
+          "shape": [],
+          "array_bytes": 108
+        },
+        {
+          "name": "ice_soft_policy_json",
+          "dtype": "<U172",
+          "shape": [],
+          "array_bytes": 688
+        },
+        {
+          "name": "initial_reference",
+          "dtype": "<U78",
+          "shape": [],
+          "array_bytes": 312
+        },
+        {
+          "name": "initial_reference_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "original_gvhmr_pose_anchor",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "whole_source_state_adjustable",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "mass_model_reference",
+          "dtype": "<U74",
+          "shape": [],
+          "array_bytes": 296
+        },
+        {
+          "name": "mass_model_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "motion_relations_reference",
+          "dtype": "<U81",
+          "shape": [],
+          "array_bytes": 324
+        },
+        {
+          "name": "motion_relations_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        }
+      ],
+      "review": "Small control/initial-reference state and provenance only; no full body model, network feature/output archive, weights, surface cache or source pixels. Unaccepted candidate/initial state retained."
+    },
+    {
+      "path": "spin_entry_gravity_initial_1104.npz",
+      "bytes": 4426349,
+      "sha256": "66b88c82cd938fbb2380f687ebc3d0b72a6f5c221762e198bd0e1ed67ed4cd17",
+      "fields": [
+        {
+          "name": "pts",
+          "dtype": "<i8",
+          "shape": [
+            951
+          ],
+          "array_bytes": 7608
+        },
+        {
+          "name": "P",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            3
+          ],
+          "array_bytes": 22824
+        },
+        {
+          "name": "Q",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            3,
+            3
+          ],
+          "array_bytes": 68472
+        },
+        {
+          "name": "local_R",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            21,
+            3,
+            3
+          ],
+          "array_bytes": 1437912
+        },
+        {
+          "name": "hand_local_R",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            2,
+            15,
+            3,
+            3
+          ],
+          "array_bytes": 2054160
+        },
+        {
+          "name": "hand_prior_pts",
+          "dtype": "<i8",
+          "shape": [
+            476
+          ],
+          "array_bytes": 3808
+        },
+        {
+          "name": "hand_prior_local_R",
+          "dtype": "<f8",
+          "shape": [
+            476,
+            2,
+            15,
+            3,
+            3
+          ],
+          "array_bytes": 1028160
+        },
+        {
+          "name": "hand_pose_schema_version",
+          "dtype": "<U25",
+          "shape": [],
+          "array_bytes": 100
+        },
+        {
+          "name": "hand_mean_convention",
+          "dtype": "<U61",
+          "shape": [],
+          "array_bytes": 244
+        },
+        {
+          "name": "hand_pose_origin",
+          "dtype": "<U30",
+          "shape": [],
+          "array_bytes": 120
+        },
+        {
+          "name": "hand_prior_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "root_curve_schema",
+          "dtype": "<U38",
+          "shape": [],
+          "array_bytes": 152
+        },
+        {
+          "name": "root_curve_knots",
+          "dtype": "<f8",
+          "shape": [
+            955
+          ],
+          "array_bytes": 7640
+        },
+        {
+          "name": "root_curve_controls",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            3
+          ],
+          "array_bytes": 22824
+        },
+        {
+          "name": "root_curve_degree",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "root_curve_origin",
+          "dtype": "<U94",
+          "shape": [],
+          "array_bytes": 376
+        }
+      ],
+      "review": "Small control/initial-reference state and provenance only; no full body model, network feature/output archive, weights, surface cache or source pixels. Unaccepted candidate/initial state retained."
+    },
+    {
+      "path": "spin_entry_motion_1104.npz",
+      "bytes": 98236,
+      "sha256": "4489531ac8707a16e754504ef52b7930c8b1c131ea6d82f232b396033a50a437",
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1634",
+          "shape": [],
+          "array_bytes": 6536
+        },
+        {
+          "name": "comparison_case_identity_json",
+          "dtype": "<U2505",
+          "shape": [],
+          "array_bytes": 10020
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "base_layer_0_x",
+          "dtype": "<f8",
+          "shape": [
+            3465
+          ],
+          "array_bytes": 27720
+        },
+        {
+          "name": "base_layer_0_knots",
+          "dtype": "<f8",
+          "shape": [
+            59
+          ],
+          "array_bytes": 472
+        },
+        {
+          "name": "base_layer_0_active",
+          "dtype": "<i8",
+          "shape": [
+            63
+          ],
+          "array_bytes": 504
+        },
+        {
+          "name": "base_layer_0_seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "base_layer_0_state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "hand_pose_schema_version",
+          "dtype": "<U25",
+          "shape": [],
+          "array_bytes": 100
+        },
+        {
+          "name": "grasp_relations_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "grasp_geometry_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "source_support_track_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "initialization_provenance_json",
+          "dtype": "<U701",
+          "shape": [],
+          "array_bytes": 2804
+        },
+        {
+          "name": "entry_motion_config_json",
+          "dtype": "<U307",
+          "shape": [],
+          "array_bytes": 1228
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            5246
+          ],
+          "array_bytes": 41968
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            87
+          ],
+          "array_bytes": 696
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            63
+          ],
+          "array_bytes": 504
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            5705
+          ],
+          "array_bytes": 45640
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            3808
+          ],
+          "array_bytes": 30464
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "ice_mode",
+          "dtype": "<U21",
+          "shape": [],
+          "array_bytes": 84
+        },
+        {
+          "name": "ice_is_delivery_gate",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "al_row_scope",
+          "dtype": "<U27",
+          "shape": [],
+          "array_bytes": 108
+        },
+        {
+          "name": "ice_soft_policy_json",
+          "dtype": "<U172",
+          "shape": [],
+          "array_bytes": 688
+        },
+        {
+          "name": "initial_reference",
+          "dtype": "<U77",
+          "shape": [],
+          "array_bytes": 308
+        },
+        {
+          "name": "initial_reference_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "original_gvhmr_pose_anchor",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "whole_source_state_adjustable",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        }
+      ],
+      "review": "Small control/initial-reference state and provenance only; no full body model, network feature/output archive, weights, surface cache or source pixels. Unaccepted candidate/initial state retained."
+    },
+    {
+      "path": "spin_entry_motion_initial_1104.npz",
+      "bytes": 4426340,
+      "sha256": "196f41b247399f1f8632b965e10117bc802392417121e2dcd8d04bbe0d8a481f",
+      "fields": [
+        {
+          "name": "pts",
+          "dtype": "<i8",
+          "shape": [
+            951
+          ],
+          "array_bytes": 7608
+        },
+        {
+          "name": "P",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            3
+          ],
+          "array_bytes": 22824
+        },
+        {
+          "name": "Q",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            3,
+            3
+          ],
+          "array_bytes": 68472
+        },
+        {
+          "name": "local_R",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            21,
+            3,
+            3
+          ],
+          "array_bytes": 1437912
+        },
+        {
+          "name": "hand_local_R",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            2,
+            15,
+            3,
+            3
+          ],
+          "array_bytes": 2054160
+        },
+        {
+          "name": "hand_prior_pts",
+          "dtype": "<i8",
+          "shape": [
+            476
+          ],
+          "array_bytes": 3808
+        },
+        {
+          "name": "hand_prior_local_R",
+          "dtype": "<f8",
+          "shape": [
+            476,
+            2,
+            15,
+            3,
+            3
+          ],
+          "array_bytes": 1028160
+        },
+        {
+          "name": "hand_pose_schema_version",
+          "dtype": "<U25",
+          "shape": [],
+          "array_bytes": 100
+        },
+        {
+          "name": "hand_mean_convention",
+          "dtype": "<U61",
+          "shape": [],
+          "array_bytes": 244
+        },
+        {
+          "name": "hand_pose_origin",
+          "dtype": "<U30",
+          "shape": [],
+          "array_bytes": 120
+        },
+        {
+          "name": "hand_prior_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "root_curve_schema",
+          "dtype": "<U38",
+          "shape": [],
+          "array_bytes": 152
+        },
+        {
+          "name": "root_curve_knots",
+          "dtype": "<f8",
+          "shape": [
+            955
+          ],
+          "array_bytes": 7640
+        },
+        {
+          "name": "root_curve_controls",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            3
+          ],
+          "array_bytes": 22824
+        },
+        {
+          "name": "root_curve_degree",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "root_curve_origin",
+          "dtype": "<U94",
+          "shape": [],
+          "array_bytes": 376
+        }
+      ],
+      "review": "Small control/initial-reference state and provenance only; no full body model, network feature/output archive, weights, surface cache or source pixels. Unaccepted candidate/initial state retained."
+    },
+    {
+      "path": "spin_grasp_1104.npz",
+      "bytes": 46724,
+      "sha256": "7d4ee52b9df5863a410447e5048a50388031228b6009fe9ddc796ad60710bd67",
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1634",
+          "shape": [],
+          "array_bytes": 6536
+        },
+        {
+          "name": "comparison_case_identity_json",
+          "dtype": "<U2505",
+          "shape": [],
+          "array_bytes": 10020
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "hand_pose_schema_version",
+          "dtype": "<U25",
+          "shape": [],
+          "array_bytes": 100
+        },
+        {
+          "name": "grasp_relations_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "grasp_geometry_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "grasp_arc_ids_json",
+          "dtype": "<U464",
+          "shape": [],
+          "array_bytes": 1856
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            3152
+          ],
+          "array_bytes": 25216
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            59
+          ],
+          "array_bytes": 472
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            57
+          ],
+          "array_bytes": 456
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            3845
+          ],
+          "array_bytes": 30760
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            2568
+          ],
+          "array_bytes": 20544
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U13",
+          "shape": [],
+          "array_bytes": 52
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "ice_mode",
+          "dtype": "<U21",
+          "shape": [],
+          "array_bytes": 84
+        },
+        {
+          "name": "ice_is_delivery_gate",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "al_row_scope",
+          "dtype": "<U27",
+          "shape": [],
+          "array_bytes": 108
+        },
+        {
+          "name": "ice_soft_policy_json",
+          "dtype": "<U172",
+          "shape": [],
+          "array_bytes": 688
+        },
+        {
+          "name": "initial_reference",
+          "dtype": "<U70",
+          "shape": [],
+          "array_bytes": 280
+        },
+        {
+          "name": "initial_reference_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_prior_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "original_gvhmr_pose_anchor",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        }
+      ],
+      "review": "Small control/initial-reference state and provenance only; no full body model, network feature/output archive, weights, surface cache or source pixels. Unaccepted candidate/initial state retained."
+    },
+    {
+      "path": "spin_grasp_finished_1104.npz",
+      "bytes": 47305,
+      "sha256": "2ac829a34fd0305a770e320af8e0b1620de004d05c3a5b35563ef686ae59d699",
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1743",
+          "shape": [],
+          "array_bytes": 6972
+        },
+        {
+          "name": "comparison_case_identity_json",
+          "dtype": "<U2505",
+          "shape": [],
+          "array_bytes": 10020
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "hand_pose_schema_version",
+          "dtype": "<U25",
+          "shape": [],
+          "array_bytes": 100
+        },
+        {
+          "name": "grasp_relations_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "grasp_geometry_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "grasp_arc_ids_json",
+          "dtype": "<U464",
+          "shape": [],
+          "array_bytes": 1856
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            3152
+          ],
+          "array_bytes": 25216
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            59
+          ],
+          "array_bytes": 472
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            57
+          ],
+          "array_bytes": 456
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            3845
+          ],
+          "array_bytes": 30760
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            2568
+          ],
+          "array_bytes": 20544
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U13",
+          "shape": [],
+          "array_bytes": 52
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "ice_mode",
+          "dtype": "<U21",
+          "shape": [],
+          "array_bytes": 84
+        },
+        {
+          "name": "ice_is_delivery_gate",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "al_row_scope",
+          "dtype": "<U27",
+          "shape": [],
+          "array_bytes": 108
+        },
+        {
+          "name": "ice_soft_policy_json",
+          "dtype": "<U172",
+          "shape": [],
+          "array_bytes": 688
+        },
+        {
+          "name": "initial_reference",
+          "dtype": "<U70",
+          "shape": [],
+          "array_bytes": 280
+        },
+        {
+          "name": "initial_reference_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_prior_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "original_gvhmr_pose_anchor",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "result_reference",
+          "dtype": "<U26",
+          "shape": [],
+          "array_bytes": 104
+        },
+        {
+          "name": "result_reference_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        }
+      ],
+      "review": "Small control/initial-reference state and provenance only; no full body model, network feature/output archive, weights, surface cache or source pixels. Unaccepted candidate/initial state retained."
+    },
+    {
+      "path": "spin_grasp_initial_1104.npz",
+      "bytes": 4410193,
+      "sha256": "dda2d73c00c58516042c5807b794076439f028cd0461e9da2e93841d09dd9275",
+      "fields": [
+        {
+          "name": "pts",
+          "dtype": "<i8",
+          "shape": [
+            951
+          ],
+          "array_bytes": 7608
+        },
+        {
+          "name": "P",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            3
+          ],
+          "array_bytes": 22824
+        },
+        {
+          "name": "Q",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            3,
+            3
+          ],
+          "array_bytes": 68472
+        },
+        {
+          "name": "local_R",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            21,
+            3,
+            3
+          ],
+          "array_bytes": 1437912
+        },
+        {
+          "name": "hand_local_R",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            2,
+            15,
+            3,
+            3
+          ],
+          "array_bytes": 2054160
+        },
+        {
+          "name": "hand_prior_pts",
+          "dtype": "<i8",
+          "shape": [
+            476
+          ],
+          "array_bytes": 3808
+        },
+        {
+          "name": "hand_prior_local_R",
+          "dtype": "<f8",
+          "shape": [
+            476,
+            2,
+            15,
+            3,
+            3
+          ],
+          "array_bytes": 1028160
+        },
+        {
+          "name": "hand_pose_schema_version",
+          "dtype": "<U25",
+          "shape": [],
+          "array_bytes": 100
+        },
+        {
+          "name": "hand_mean_convention",
+          "dtype": "<U61",
+          "shape": [],
+          "array_bytes": 244
+        },
+        {
+          "name": "hand_pose_origin",
+          "dtype": "<U30",
+          "shape": [],
+          "array_bytes": 120
+        },
+        {
+          "name": "hand_prior_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        }
+      ],
+      "review": "Small control/initial-reference state and provenance only; no full body model, network feature/output archive, weights, surface cache or source pixels. Unaccepted candidate/initial state retained."
+    },
+    {
+      "path": "spin_support_foot_1104.npz",
+      "bytes": 50888,
+      "sha256": "4da0bbc0a36ed42dbae2131a792688711e5de7ddeb49083a4d88aecfc4e97229",
+      "fields": [
+        {
+          "name": "base_skate_parameters_json",
+          "dtype": "<U532",
+          "shape": [],
+          "array_bytes": 2128
+        },
+        {
+          "name": "R_FB_initial",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 144
+        },
+        {
+          "name": "t_FB_initial_solver",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "template_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "binding_version",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "parent_hand_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_timing_parameters_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "camera_binding_json",
+          "dtype": "<U1634",
+          "shape": [],
+          "array_bytes": 6536
+        },
+        {
+          "name": "comparison_case_identity_json",
+          "dtype": "<U2505",
+          "shape": [],
+          "array_bytes": 10020
+        },
+        {
+          "name": "base_layer_count",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "hand_pose_schema_version",
+          "dtype": "<U25",
+          "shape": [],
+          "array_bytes": 100
+        },
+        {
+          "name": "grasp_relations_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "grasp_geometry_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "source_support_track_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "initialization_provenance_json",
+          "dtype": "<U835",
+          "shape": [],
+          "array_bytes": 3340
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            3482
+          ],
+          "array_bytes": 27856
+        },
+        {
+          "name": "knots",
+          "dtype": "<f8",
+          "shape": [
+            59
+          ],
+          "array_bytes": 472
+        },
+        {
+          "name": "active",
+          "dtype": "<i8",
+          "shape": [
+            63
+          ],
+          "array_bytes": 504
+        },
+        {
+          "name": "seconds",
+          "dtype": "<f8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "physics_times",
+          "dtype": "<f8",
+          "shape": [
+            3845
+          ],
+          "array_bytes": 30760
+        },
+        {
+          "name": "multiplier",
+          "dtype": "<f8",
+          "shape": [
+            2568
+          ],
+          "array_bytes": 20544
+        },
+        {
+          "name": "penalty",
+          "dtype": "<f8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "state_kind",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "collar_constraints_enabled",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "ice_mode",
+          "dtype": "<U21",
+          "shape": [],
+          "array_bytes": 84
+        },
+        {
+          "name": "ice_is_delivery_gate",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "al_row_scope",
+          "dtype": "<U27",
+          "shape": [],
+          "array_bytes": 108
+        },
+        {
+          "name": "ice_soft_policy_json",
+          "dtype": "<U172",
+          "shape": [],
+          "array_bytes": 688
+        },
+        {
+          "name": "initial_reference",
+          "dtype": "<U77",
+          "shape": [],
+          "array_bytes": 308
+        },
+        {
+          "name": "initial_reference_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "original_gvhmr_pose_anchor",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "support_position_initialization_json",
+          "dtype": "<U907",
+          "shape": [],
+          "array_bytes": 3628
+        }
+      ],
+      "review": "Small control/initial-reference state and provenance only; no full body model, network feature/output archive, weights, surface cache or source pixels. Unaccepted candidate/initial state retained."
+    },
+    {
+      "path": "spin_support_foot_initial_1104.npz",
+      "bytes": 4426311,
+      "sha256": "509566cbffe95959c4023a58bf978dfe61c61d240976ccaa4d653a773b697a9c",
+      "fields": [
+        {
+          "name": "pts",
+          "dtype": "<i8",
+          "shape": [
+            951
+          ],
+          "array_bytes": 7608
+        },
+        {
+          "name": "P",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            3
+          ],
+          "array_bytes": 22824
+        },
+        {
+          "name": "Q",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            3,
+            3
+          ],
+          "array_bytes": 68472
+        },
+        {
+          "name": "local_R",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            21,
+            3,
+            3
+          ],
+          "array_bytes": 1437912
+        },
+        {
+          "name": "hand_local_R",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            2,
+            15,
+            3,
+            3
+          ],
+          "array_bytes": 2054160
+        },
+        {
+          "name": "hand_prior_pts",
+          "dtype": "<i8",
+          "shape": [
+            476
+          ],
+          "array_bytes": 3808
+        },
+        {
+          "name": "hand_prior_local_R",
+          "dtype": "<f8",
+          "shape": [
+            476,
+            2,
+            15,
+            3,
+            3
+          ],
+          "array_bytes": 1028160
+        },
+        {
+          "name": "hand_pose_schema_version",
+          "dtype": "<U25",
+          "shape": [],
+          "array_bytes": 100
+        },
+        {
+          "name": "hand_mean_convention",
+          "dtype": "<U61",
+          "shape": [],
+          "array_bytes": 244
+        },
+        {
+          "name": "hand_pose_origin",
+          "dtype": "<U30",
+          "shape": [],
+          "array_bytes": 120
+        },
+        {
+          "name": "hand_prior_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "root_curve_schema",
+          "dtype": "<U38",
+          "shape": [],
+          "array_bytes": 152
+        },
+        {
+          "name": "root_curve_knots",
+          "dtype": "<f8",
+          "shape": [
+            955
+          ],
+          "array_bytes": 7640
+        },
+        {
+          "name": "root_curve_controls",
+          "dtype": "<f8",
+          "shape": [
+            951,
+            3
+          ],
+          "array_bytes": 22824
+        },
+        {
+          "name": "root_curve_degree",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "root_curve_origin",
+          "dtype": "<U63",
+          "shape": [],
+          "array_bytes": 252
+        }
+      ],
+      "review": "Small control/initial-reference state and provenance only; no full body model, network feature/output archive, weights, surface cache or source pixels. Unaccepted candidate/initial state retained."
+    },
+    {
+      "path": "spin_support_located_1104.npz",
+      "bytes": 6080,
+      "sha256": "a4ffa7eacec734dbe992fd0435c814e0f9ab14516a7fd190707f1dd2caa41543",
+      "fields": [
+        {
+          "name": "schema",
+          "dtype": "<U44",
+          "shape": [],
+          "array_bytes": 176
+        },
+        {
+          "name": "document_json",
+          "dtype": "<U12874",
+          "shape": [],
+          "array_bytes": 51496
+        },
+        {
+          "name": "parent_parameter",
+          "dtype": "<U71",
+          "shape": [],
+          "array_bytes": 284
+        },
+        {
+          "name": "parent_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_result_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "anchor_pts",
+          "dtype": "<i8",
+          "shape": [
+            15
+          ],
+          "array_bytes": 120
+        },
+        {
+          "name": "anchor_world_m",
+          "dtype": "<f8",
+          "shape": [
+            15,
+            3
+          ],
+          "array_bytes": 360
+        },
+        {
+          "name": "result_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "implementation_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        }
+      ],
+      "review": "Small control/initial-reference state and provenance only; no full body model, network feature/output archive, weights, surface cache or source pixels. Unaccepted candidate/initial state retained."
+    },
+    {
+      "path": "spin_support_midpoint_1104.npz",
+      "bytes": 6455,
+      "sha256": "2f3739f3d012113ed5bc70720f4faf36da0e9bb5a5bcb57c80dd5ea2ba93cd61",
+      "fields": [
+        {
+          "name": "schema",
+          "dtype": "<U44",
+          "shape": [],
+          "array_bytes": 176
+        },
+        {
+          "name": "document_json",
+          "dtype": "<U13399",
+          "shape": [],
+          "array_bytes": 53596
+        },
+        {
+          "name": "parent_parameter",
+          "dtype": "<U71",
+          "shape": [],
+          "array_bytes": 284
+        },
+        {
+          "name": "parent_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "parent_result_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "anchor_pts",
+          "dtype": "<i8",
+          "shape": [
+            15
+          ],
+          "array_bytes": 120
+        },
+        {
+          "name": "anchor_world_m",
+          "dtype": "<f8",
+          "shape": [
+            15,
+            3
+          ],
+          "array_bytes": 360
+        },
+        {
+          "name": "result_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "implementation_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        }
+      ],
+      "review": "Small control/initial-reference state and provenance only; no full body model, network feature/output archive, weights, surface cache or source pixels. Unaccepted candidate/initial state retained."
     }
   ],
   "observed_contents": [

@@ -15,9 +15,9 @@
 
 公开前核对实际依赖，移出重复资产和可再生中间文件，并同步核对代码与测试引用。原始 UV、整数 PTS、统计 W、人工确认和失败证据保留在对应数值记录或归档中。原件 SHA 与[公开派生身份](../configs/privacy_derivatives.json)分别描述各自字节，不能互换。整理资产不授权提交、推送或改写历史。
 
-人体、足鞋和开头修复的公开范围为实现源码、测试、播放器配置、三份 1102 与五份原有 1103 小型控制参数；2026-11-04另核对25份动作初值／根参考／修正控制和历史S01整合参数，共7,491,223字节，并公开其来源／失败索引；详见[节目记录](../events/ankara_2026/programmes/okada_mei_sp/README.md)、[新增参数字段索引](../events/ankara_2026/programmes/okada_mei_sp/body_parameters_1103_fields.json)和[参数许可核查](LICENSING_REVIEW.md#body-parameters)。完整拟合输出、SMPL-X 紧凑模型与完整表面、原图及叠图仍位于 `Data/runs/body_s01_20261029/` 和 `Data/cache/results3d/`，不随这些参数包发布。绑定里的历史绝对路径记录当时运行身份，重放需使用本机 Data 配置及相符输入。`skate_s01_1103` 保留预算停止、接冰未通过、鞋刀图像尾部误差变差及开头姿态回退的结论；公开参数不表示候选通过准确性验收。新增 [人体整合索引](../events/ankara_2026/programmes/okada_mei_sp/body_integration_1104.json)保留三段A/B及根修正的图像退化、接触未知和实际预算超时；完整结果与模型仍不公开。
+人体公开内容包括实现源码、测试、播放器配置、小型控制参数与来源索引。参数范围涵盖全身、足鞋、开头、动作初值、根参考和旋转对照，具体字段、SHA、dtype 与 shape 见[参数索引](../events/ankara_2026/programmes/okada_mei_sp/body_parameters_1103_fields.json)及[许可核查](LICENSING_REVIEW.md#body-parameters)。当前候选、失败与人工反馈由[节目结果导航](../events/ankara_2026/programmes/okada_mei_sp/README.md#人体与足鞋结果)维护；公开参数不表示准确性验收通过。
 
-2026-11-04另公开源支撑旋转候选及GVHMR自身初值／联合控制四份小型参数，共1,608,844字节；字段清单沿用上述索引。[源支撑审核](../events/ankara_2026/programmes/okada_mei_sp/spin_support_1104_audit.json)和[GVHMR／ExMR审核](../events/ankara_2026/programmes/okada_mei_sp/spin_models_1104_audit.json)保留实际接受步、图像分组、根漂移、支持间隙及截面unknown。SAM/ExMR原始网络输出、失败输入、完整人体和播放器缓存留Data。现有满意S01不替换；这些公开材料均未通过人体／轨迹准确性验收。
+完整拟合输出、SMPL-X 模型与完整表面、网络原始输出、原图、叠图和播放器缓存保留在本机 Data。历史绝对路径登记当时的运行身份；重放需要配置 Data 根并取得相符模型和输入。运行日志、调试报告及文档原文按已有运行目录与归档追查。
 
 ## 当前模型与数值来源
 

@@ -4,10 +4,12 @@ The CUDA-mode cases exercise perturbation batching/slicing with a fake world
 function. They do not exercise Torch, CUDA kernels, a device, or GPU speed.
 """
 import importlib.util
+import os
 from pathlib import Path
 import sys
 import threading
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 
@@ -54,6 +56,28 @@ def consume(state):
 
 
 class BodyExecutionTests(unittest.TestCase):
+    def test_explicit_resident_compatibility_config_keeps_cpu_body_and_validates_environment(self):
+        with patch.dict(os.environ, {}, clear=True):
+            ordinary=BodyExecution(BodyExecutionConfig.from_environment())
+            self.assertEqual(ordinary.record()['compatibility_backend'],'cpu')
+            self.assertIsNone(ordinary.prepare_compatibility(None,None,None))
+        with patch.dict(os.environ, dict(RINKSPACE_BODY_BACKEND='CPU',
+                RINKSPACE_BODY_WORKERS='4',RINKSPACE_BODY_LOCAL_DERIVATIVES='ANALYTIC',
+                RINKSPACE_BODY_COMPATIBILITY_BACKEND='CUDA_RESIDENT'), clear=True):
+            config=BodyExecutionConfig.from_environment()
+            self.assertEqual((config.backend,config.workers,config.local_derivatives,
+                              config.compatibility_backend),('cpu',4,'analytic','cuda_resident'))
+            # Configuration and reporting must not initialize CUDA on their own.
+            execution=BodyExecution(config)
+            self.assertIsNone(execution._body_backend)
+            self.assertIsNone(execution._compatibility_backend)
+            self.assertEqual(execution.record()['compatibility_backend'],'cuda_resident')
+        for settings in (dict(compatibility_backend='auto'),
+                         dict(compatibility_backend='cuda_resident',local_derivatives='finite_difference'),
+                         dict(compatibility_backend='cuda_resident',backend='cuda')):
+            with self.subTest(settings=settings),self.assertRaises(ValueError):
+                BodyExecutionConfig(**settings)
+
     def test_all_69_columns_batch_vs_serial_with_partial_and_capped_groups(self):
         reference,delta=inputs();original_delta=delta.copy();original={k:v.copy() for k,v in reference.items()}
         columns=list(range(68,-1,-1))+[6,68]

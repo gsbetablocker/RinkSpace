@@ -34,9 +34,9 @@ GPU Python 环境位于 Data 的 `runtime_tools/vision_cuda`、`runtime_tools/bo
 
 原生库、cuDSS 和历史 Ceres 运行副本分别位于 Data 的 `runtime_tools/native_core`、`runtime_tools/cudss` 和 `runtime_tools/ceres`。旧地址在共享映射中保留；源码、构建身份、补丁与许可仍在 OneDrive。历史 source_datasets 审阅页面按 `AssetStore.review_page()` 定位到 Data/results，旧页面精确路径也可通过同一映射查询。
 
-2026-11-03 补归档的12个 source-edge 链接中间文件（`.lib`／`.exp`）位于 `Data/runtime_tools/program_tracking_native`，旧路径仍由共享映射解析；迁移前后 SHA 和字节数保存在 `Data/maintenance/publication_20261103/native_artifact_moves.json`。对应旧构建脚本已显式指定导入库到各自 `RS_BIN`，避免链接器再次把中间文件留在源码目录。基础 `.venv` 继续由本机安装入口管理，Git 忽略该环境；公开树只保存依赖定义。
+source-edge 的运行库与链接中间文件位于 `Data/runtime_tools/program_tracking_native`，历史路径由共享映射解析；构建脚本通过各自 `RS_BIN` 指定导入库位置。基础 `.venv` 由本机安装入口管理并受 Git 忽略，公开树保存依赖定义。
 
-2026-11-04公开整理将53个可再生 Python 字节码缓存及3个历史私有交接打包工具按原字节归档至 `Data/maintenance/publication_20261104/onedrive_archived/`；56项共2,336,466字节的原路径、Data路径、大小和SHA见该目录上级的 `onedrive_archive_moves.json`。它们不参与当前求解或播放器启动。Data另有两份本轮关键交付／导数核对源码，已原字节回收至人体模块 `source_helpers/`，来源与副作用登记在[人体执行来源索引](events/ankara_2026/programmes/okada_mei_sp/body_verification_sources_1103.json)；这些历史脚本在顶层执行固定本机路径操作，不能当作只读模块导入，本次未执行。
+历史文件迁移由 Data 中 `maintenance/publication_20261103/native_artifact_moves.json` 和 `maintenance/publication_20261104/onedrive_archive_moves.json` 定位。人体复核源码与原件身份见[来源索引](events/ankara_2026/programmes/okada_mei_sp/body_verification_sources_1103.json)；其中 `source_helpers/` 的历史脚本带有固定路径和顶层写入操作，按索引说明显式运行。
 
 `AssetStore.project_entry()` 定位到 `Data/workbench/START_HERE.html`；Web `/` 在该文件存在时显示面板，否则显示通用工作台。审阅页经 source_datasets → results 定位 Data 产物。旧根页面和历史快捷方式仅本机保留；刷新器可用旧页面首次初始化，无冻结绑定时无需生成面板。
 

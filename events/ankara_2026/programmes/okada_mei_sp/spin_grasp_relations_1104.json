@@ -1,0 +1,499 @@
+{
+  "schema": "rinkspace.spin-grasp-relations.v1",
+  "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "shot_id": "s05",
+  "time_base": [
+    1,
+    12800
+  ],
+  "episode_identity": {
+    "support_foot": 1,
+    "free_foot": 0,
+    "grip_hand": "left",
+    "confidence": "medium, fixed whole-episode anatomical hypothesis"
+  },
+  "grip_interval": {
+    "start_pts": 1111040,
+    "end_pts": 1183488,
+    "hand": "left",
+    "foot": 0,
+    "state": "held",
+    "role": "fit",
+    "evidence_pts": [
+      1111040,
+      1121792,
+      1146368,
+      1177344,
+      1183488
+    ],
+    "grip_region_id": "left_rear_sole_blade_web_finite_segment",
+    "provenance": "source-backed sustained relation between sparse frames, not per-frame manual truth"
+  },
+  "grip_unknown_intervals": [
+    [
+      1080320,
+      1111040
+    ],
+    [
+      1183488,
+      1187840
+    ]
+  ],
+  "released_from_pts": 1187840,
+  "support_intervals": [
+    {
+      "start_pts": 1080320,
+      "end_pts": 1183488,
+      "foot": 1,
+      "weight": 1.0,
+      "source_evidence_pts": [
+        1080320,
+        1090560,
+        1111040,
+        1121792,
+        1146368,
+        1177344,
+        1183488
+      ],
+      "provenance": "sparse source-backed continuous right-foot support hypothesis; no fixed world point"
+    },
+    {
+      "start_pts": 1183488,
+      "end_pts": 1187840,
+      "foot": 1,
+      "weight": 0.25,
+      "provenance": "release/downward transition, weaker inferred support; not extended into kneeling"
+    }
+  ],
+  "phase_boundaries_seconds": [
+    82.0,
+    84.4,
+    86.0,
+    86.8,
+    92.46,
+    92.8,
+    94.8
+  ],
+  "body_regions": [
+    {
+      "id": "grasp_1111040_left_wrist",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "time_base": [
+        1,
+        12800
+      ],
+      "pts": 1111040,
+      "native_joint": 20,
+      "coco_joint": 9,
+      "anatomical_part": "left_wrist",
+      "role": "fit",
+      "visibility": "partially_visible",
+      "centre_uv": [
+        895,
+        108
+      ],
+      "region_shape_px2": [
+        [
+          1250.0,
+          0.0
+        ],
+        [
+          0.0,
+          1058.0
+        ]
+      ],
+      "reliability": 0.65,
+      "objective_weight": 4.0,
+      "source_frame_sha256": "267dacbcb17b6a8b967f9d69bedf7109286a50838c87456d69240a95ad171f71",
+      "provenance": "direct native frame development review; wide joint/cuff region, not precise skin/material point"
+    },
+    {
+      "id": "grasp_1111040_left_shoulder",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "time_base": [
+        1,
+        12800
+      ],
+      "pts": 1111040,
+      "native_joint": 16,
+      "coco_joint": 5,
+      "anatomical_part": "left_shoulder",
+      "role": "fit",
+      "visibility": "partially_visible",
+      "centre_uv": [
+        1060,
+        270
+      ],
+      "region_shape_px2": [
+        [
+          3200.0,
+          0.0
+        ],
+        [
+          0.0,
+          2450.0
+        ]
+      ],
+      "reliability": 0.65,
+      "objective_weight": 4.0,
+      "source_frame_sha256": "267dacbcb17b6a8b967f9d69bedf7109286a50838c87456d69240a95ad171f71",
+      "provenance": "direct native frame development review; wide joint/cuff region, not precise skin/material point"
+    },
+    {
+      "id": "grasp_1187840_left_shoulder",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "time_base": [
+        1,
+        12800
+      ],
+      "pts": 1187840,
+      "native_joint": 16,
+      "coco_joint": 5,
+      "anatomical_part": "left_shoulder",
+      "role": "fit",
+      "visibility": "partially_visible",
+      "centre_uv": [
+        820,
+        364
+      ],
+      "region_shape_px2": [
+        [
+          2450.0,
+          0.0
+        ],
+        [
+          0.0,
+          1800.0
+        ]
+      ],
+      "reliability": 0.65,
+      "objective_weight": 4.0,
+      "source_frame_sha256": "d51866e7ae7320990bec7fdafe6b1f4f3d0d0bace61079ba34371843565a8820",
+      "provenance": "direct native frame development review; wide joint/cuff region, not precise skin/material point"
+    },
+    {
+      "id": "grasp_1192960_left_wrist",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "time_base": [
+        1,
+        12800
+      ],
+      "pts": 1192960,
+      "native_joint": 20,
+      "coco_joint": 9,
+      "anatomical_part": "left_wrist",
+      "role": "review",
+      "visibility": "partially_visible",
+      "centre_uv": [
+        975,
+        520
+      ],
+      "region_shape_px2": [
+        [
+          2048.0,
+          0.0
+        ],
+        [
+          0.0,
+          1250.0
+        ]
+      ],
+      "reliability": 0.4,
+      "objective_weight": 4.0,
+      "source_frame_sha256": "a6ac38378d2edeb2c4045d2b03e5cb76ab4ba073debd9ea231e5c0148b42277a",
+      "provenance": "direct native frame development review; wide joint/cuff region, not precise skin/material point"
+    },
+    {
+      "id": "grasp_1192960_left_shoulder",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "time_base": [
+        1,
+        12800
+      ],
+      "pts": 1192960,
+      "native_joint": 16,
+      "coco_joint": 5,
+      "anatomical_part": "left_shoulder",
+      "role": "review",
+      "visibility": "partially_visible",
+      "centre_uv": [
+        803,
+        604
+      ],
+      "region_shape_px2": [
+        [
+          2450.0,
+          0.0
+        ],
+        [
+          0.0,
+          1800.0
+        ]
+      ],
+      "reliability": 0.65,
+      "objective_weight": 4.0,
+      "source_frame_sha256": "a6ac38378d2edeb2c4045d2b03e5cb76ab4ba073debd9ea231e5c0148b42277a",
+      "provenance": "direct native frame development review; wide joint/cuff region, not precise skin/material point"
+    },
+    {
+      "id": "grasp_1203200_left_shoulder",
+      "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+      "shot_id": "s05",
+      "time_base": [
+        1,
+        12800
+      ],
+      "pts": 1203200,
+      "native_joint": 16,
+      "coco_joint": 5,
+      "anatomical_part": "left_shoulder",
+      "role": "fit",
+      "visibility": "partially_visible",
+      "centre_uv": [
+        837,
+        453
+      ],
+      "region_shape_px2": [
+        [
+          2048.0,
+          0.0
+        ],
+        [
+          0.0,
+          1568.0
+        ]
+      ],
+      "reliability": 0.65,
+      "objective_weight": 4.0,
+      "source_frame_sha256": "a4ed8a193e7cacdbd2867b56519f65800d8acbbae4b288914722165bfb6d9a2a",
+      "provenance": "direct native frame development review; wide joint/cuff region, not precise skin/material point"
+    }
+  ],
+  "visibility": [
+    {
+      "pts": 1080320,
+      "part": "left_wrist",
+      "coco_joint": 9,
+      "visibility": "uncertain",
+      "role": "fit",
+      "source_frame_sha256": "a6ae4e3c8ce81314cf4e050d866a361ee4705807f429cf1512d38bf6cf5ee1cf",
+      "source_reason": "侧身及转动下抓握侧身份不能在本帧可靠单独辨认"
+    },
+    {
+      "pts": 1080320,
+      "part": "left_elbow",
+      "coco_joint": 7,
+      "visibility": "uncertain",
+      "role": "fit",
+      "source_frame_sha256": "a6ae4e3c8ce81314cf4e050d866a361ee4705807f429cf1512d38bf6cf5ee1cf",
+      "source_reason": "袖与躯干混叠且侧别不明"
+    },
+    {
+      "pts": 1080320,
+      "part": "left_shoulder",
+      "coco_joint": 5,
+      "visibility": "uncertain",
+      "role": "fit",
+      "source_frame_sha256": "a6ae4e3c8ce81314cf4e050d866a361ee4705807f429cf1512d38bf6cf5ee1cf",
+      "source_reason": "肩部和侧别轮廓不清"
+    },
+    {
+      "pts": 1090560,
+      "part": "left_wrist",
+      "coco_joint": 9,
+      "visibility": "uncertain",
+      "role": "fit",
+      "source_frame_sha256": "c13a8847b094a8901573c2679892df8569f454975468762f9433bc7cf6c7eb30",
+      "source_reason": "后侧手臂靠近自由鞋，但手腕和鞋、腿间混叠，不能可靠确定腕点及是否已接触"
+    },
+    {
+      "pts": 1090560,
+      "part": "left_elbow",
+      "coco_joint": 7,
+      "visibility": "self_occluded",
+      "role": "fit",
+      "source_frame_sha256": "c13a8847b094a8901573c2679892df8569f454975468762f9433bc7cf6c7eb30",
+      "source_reason": "后侧臂被躯干及腿遮挡"
+    },
+    {
+      "pts": 1090560,
+      "part": "left_shoulder",
+      "coco_joint": 5,
+      "visibility": "uncertain",
+      "role": "fit",
+      "source_frame_sha256": "c13a8847b094a8901573c2679892df8569f454975468762f9433bc7cf6c7eb30",
+      "source_reason": "体侧重叠，肩臂归属不能单帧锁定"
+    },
+    {
+      "pts": 1100800,
+      "part": "left_wrist",
+      "coco_joint": 9,
+      "visibility": "self_occluded",
+      "role": "review",
+      "source_frame_sha256": "0fb94cdf8754e68421c23ae83ff9160c687cc9eeb83e3b1a21ac4048b6136080",
+      "source_reason": "手鞋重叠区域无法分离"
+    },
+    {
+      "pts": 1100800,
+      "part": "left_elbow",
+      "coco_joint": 7,
+      "visibility": "self_occluded",
+      "role": "review",
+      "source_frame_sha256": "0fb94cdf8754e68421c23ae83ff9160c687cc9eeb83e3b1a21ac4048b6136080",
+      "source_reason": "躯干和臂重叠"
+    },
+    {
+      "pts": 1100800,
+      "part": "left_shoulder",
+      "coco_joint": 5,
+      "visibility": "uncertain",
+      "role": "review",
+      "source_frame_sha256": "0fb94cdf8754e68421c23ae83ff9160c687cc9eeb83e3b1a21ac4048b6136080",
+      "source_reason": "面向变化和衣服遮挡"
+    },
+    {
+      "pts": 1111040,
+      "part": "left_wrist",
+      "coco_joint": 9,
+      "visibility": "partially_visible",
+      "role": "fit",
+      "source_frame_sha256": "267dacbcb17b6a8b967f9d69bedf7109286a50838c87456d69240a95ad171f71",
+      "source_reason": "袖口到手的粗区域，手遮挡鞋底侧；不是精确关节点"
+    },
+    {
+      "pts": 1111040,
+      "part": "left_elbow",
+      "coco_joint": 7,
+      "visibility": "uncertain",
+      "role": "fit",
+      "source_frame_sha256": "267dacbcb17b6a8b967f9d69bedf7109286a50838c87456d69240a95ad171f71",
+      "source_reason": "伸直黑袖中看不见可靠肘部轮廓"
+    },
+    {
+      "pts": 1111040,
+      "part": "left_shoulder",
+      "coco_joint": 5,
+      "visibility": "partially_visible",
+      "role": "fit",
+      "source_frame_sha256": "267dacbcb17b6a8b967f9d69bedf7109286a50838c87456d69240a95ad171f71",
+      "source_reason": "背面肩臂连接处宽区域，衣物覆盖实际关节"
+    },
+    {
+      "pts": 1187840,
+      "part": "left_wrist",
+      "coco_joint": 9,
+      "visibility": "uncertain",
+      "role": "fit",
+      "source_frame_sha256": "d51866e7ae7320990bec7fdafe6b1f4f3d0d0bace61079ba34371843565a8820",
+      "source_reason": "左伸臂与背景图案及运动模糊混合，腕部不能可靠定位"
+    },
+    {
+      "pts": 1187840,
+      "part": "left_elbow",
+      "coco_joint": 7,
+      "visibility": "uncertain",
+      "role": "fit",
+      "source_frame_sha256": "d51866e7ae7320990bec7fdafe6b1f4f3d0d0bace61079ba34371843565a8820",
+      "source_reason": "伸臂与背景及模糊混合"
+    },
+    {
+      "pts": 1187840,
+      "part": "left_shoulder",
+      "coco_joint": 5,
+      "visibility": "partially_visible",
+      "role": "fit",
+      "source_frame_sha256": "d51866e7ae7320990bec7fdafe6b1f4f3d0d0bace61079ba34371843565a8820",
+      "source_reason": "背面左肩臂连接处宽区域"
+    },
+    {
+      "pts": 1192960,
+      "part": "left_wrist",
+      "coco_joint": 9,
+      "visibility": "partially_visible",
+      "role": "review",
+      "source_frame_sha256": "a6ac38378d2edeb2c4045d2b03e5cb76ab4ba073debd9ea231e5c0148b42277a",
+      "source_reason": "左臂伸展末端的袖口/腕部粗区；手、腕模糊且不应作精确点"
+    },
+    {
+      "pts": 1192960,
+      "part": "left_elbow",
+      "coco_joint": 7,
+      "visibility": "uncertain",
+      "role": "review",
+      "source_frame_sha256": "a6ac38378d2edeb2c4045d2b03e5cb76ab4ba073debd9ea231e5c0148b42277a",
+      "source_reason": "伸直袖子中不可分辨实际肘点"
+    },
+    {
+      "pts": 1192960,
+      "part": "left_shoulder",
+      "coco_joint": 5,
+      "visibility": "partially_visible",
+      "role": "review",
+      "source_frame_sha256": "a6ac38378d2edeb2c4045d2b03e5cb76ab4ba073debd9ea231e5c0148b42277a",
+      "source_reason": "面朝前左肩与臂连接处，衣物和姿态产生歧义"
+    },
+    {
+      "pts": 1203200,
+      "part": "left_wrist",
+      "coco_joint": 9,
+      "visibility": "uncertain",
+      "role": "fit",
+      "source_frame_sha256": "a4ed8a193e7cacdbd2867b56519f65800d8acbbae4b288914722165bfb6d9a2a",
+      "source_reason": "双臂在胸前交叉、手和袖互相遮挡"
+    },
+    {
+      "pts": 1203200,
+      "part": "left_elbow",
+      "coco_joint": 7,
+      "visibility": "uncertain",
+      "role": "fit",
+      "source_frame_sha256": "a4ed8a193e7cacdbd2867b56519f65800d8acbbae4b288914722165bfb6d9a2a",
+      "source_reason": "两臂交叠且动模糊"
+    },
+    {
+      "pts": 1203200,
+      "part": "left_shoulder",
+      "coco_joint": 5,
+      "visibility": "partially_visible",
+      "role": "fit",
+      "source_frame_sha256": "a4ed8a193e7cacdbd2867b56519f65800d8acbbae4b288914722165bfb6d9a2a",
+      "source_reason": "近正面姿态的左肩臂连接宽区，肩关节位置未直视"
+    }
+  ],
+  "source_findings_sha256": "6f817640e20fec54bf2259058db6b11c9ee7d7e7d910d26f1d600998f079fe3d",
+  "factor_parameters": {
+    "shoe_region_weight_multiplier": 160.0,
+    "grip": {
+      "contact_radius_m": 0.035,
+      "residual_scale_m": 0.06,
+      "objective_weight": 8.0,
+      "robust_delta": 2.0
+    },
+    "local_motion": {
+      "scale_m_s2": 20.0,
+      "weight": 0.8,
+      "robust_delta": 3.0
+    },
+    "continuous_support": {
+      "deadzone_m": 0.025,
+      "scale_m": 0.08,
+      "weight": 20.0
+    }
+  },
+  "parameter_meaning": "finite first-integration engineering scales/weights, not calibrated probabilities or acceptance thresholds; 35mm tube covers finite central palm patch and uncertain rear equipment material",
+  "not_grip_truth": true,
+  "not_per_frame_manual_contact": true,
+  "weight_selection": "one finite source-region block change after measured normal/LOS derivatives; source rectangles/reliabilities/roles and all ice/grip scales unchanged"
+}

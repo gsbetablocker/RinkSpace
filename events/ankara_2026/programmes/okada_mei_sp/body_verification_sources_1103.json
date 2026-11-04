@@ -39,7 +39,6 @@
       "role": "Historical original A/B 69-column delivery and cache identity check; can prepare viewer caches.",
       "verification_report": "runs/body_s01_20261029/action_integration_1103/final_delivery_checks.json",
       "verified": true,
-      "executed_during_publication": false,
       "side_effects": "May rewrite preparation inputs or construct/reuse viewer caches; never auto-run during publication, tests, startup or normal fitting."
     },
     {
@@ -51,69 +50,15 @@
       "role": "Historical actual 69-column action/ice derivative check; initialize_clip can rewrite preparation records.",
       "verification_report": "runs/body_s01_20261029/action_integration_1103/live_derivative_check.json",
       "verified": true,
-      "executed_during_publication": false,
       "side_effects": "May rewrite preparation inputs or construct/reuse viewer caches; never auto-run during publication, tests, startup or normal fitting."
     }
   ],
-  "verification": {
-    "summary": "maintenance/publication_20261103/body_code_validation.json",
-    "boot_checks": 41,
-    "compact_replay_frames": 1143,
-    "compact_replay_max_absolute": {
-      "P": 0.0,
-      "Q": 0.0,
-      "local_R": 0.0,
-      "native": 0.0,
-      "gear": 0.0
-    },
-    "plot_samples_per_trace": 117,
-    "plot_traces_and_original_pts_exact": true,
-    "protected_source_files": 25,
-    "protected_sha256_unchanged": true
-  },
-  "environment_facts": [
-    {
-      "environment": "runtime_tools/body_cuda",
-      "numpy": "1.26.4",
-      "scipy": "1.13.1",
-      "operation": "opening compact strict replay",
-      "result": "failed unchanged original assert_array_equal on heading",
-      "mismatched_elements": 27,
-      "total_elements": 504,
-      "maximum_absolute": 3.552713678800501e-15
-    },
-    {
-      "environment": ".venv",
-      "numpy": "2.4.6",
-      "scipy": "1.17.1",
-      "threads": {
-        "OPENBLAS_NUM_THREADS": 2,
-        "OMP_NUM_THREADS": 2,
-        "MKL_NUM_THREADS": 2
-      },
-      "operation": "boot_invariants and opening_verification CLI",
-      "result": "passed without tolerance changes"
-    },
-    {
-      "environment": ".venv and standalone runtime_tools/results3d",
-      "operation": "opening_metrics CLI",
-      "result": "ModuleNotFoundError: matplotlib; no installation attempted"
-    },
-    {
-      "environment": "runtime_tools/results3d after importing opening_verification",
-      "operation": "opening_metrics function",
-      "result": "passed; existing transitive imports appended vision_cuda/Lib/site-packages and matplotlib came from that directory"
-    },
-    {
-      "environment": "runtime_tools/vision_cuda",
-      "numpy": "2.4.6",
-      "operation": "independent opening_metrics CLI",
-      "result": "passed using existing matplotlib"
-    }
-  ],
-  "data_inventory_review": "maintenance/publication_20261103/data_code_review_summary.json",
-  "solver_started": false,
   "accuracy_accepted": false,
   "updated_date": "2026-11-04",
-  "data_inventory_review_1104": "maintenance/publication_20261104/data_code_audit.json"
+  "history_archive": {
+    "base": "data",
+    "path": "maintenance/agents_audit_20261025/documentation_sources.zip",
+    "member": "20261104/events/ankara_2026/programmes/okada_mei_sp/body_verification_sources_1103.json",
+    "sha256": "d7971e72d1f27f22f617815438afb951ccc2ee9486f414ed9f550ee73c4c50ba"
+  }
 }

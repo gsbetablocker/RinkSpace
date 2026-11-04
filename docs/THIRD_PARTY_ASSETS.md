@@ -15,7 +15,7 @@
 | PyTorch3D | 上游提交 `75ebeeaea0908c5527e7b1e305fbc7681382db47`，观察版本 0.7.8，[固定许可](https://raw.githubusercontent.com/facebookresearch/pytorch3d/75ebeeaea0908c5527e7b1e305fbc7681382db47/LICENSE) | BSD 三条款及 LICENSE-3RD-PARTY；根许可不代替全部嵌入组件核查 |
 | FootMR | 提交 `530da95641f906b42ba6792df8e55c1dd667f98d`；[固定来源与文件 SHA](../environments/body-runtime-sources.json)、[固定许可](https://raw.githubusercontent.com/twehrbein/FootMR/530da95641f906b42ba6792df8e55c1dd667f98d/LICENSE) | 上游文件保留在 Data；自定义研究／非营利及 GVHMR 衍生条件。本地 namespace 接线单独记录 |
 | CoTracker | 提交 `82e02e8029753ad4ef13cf06be7f4fc5facdda4d`；[固定来源与文件 SHA](../environments/body-runtime-sources.json)、[固定许可](https://raw.githubusercontent.com/facebookresearch/co-tracker/82e02e8029753ad4ef13cf06be7f4fc5facdda4d/LICENSE.md) | 上游源码与权重留 Data；所选源码许可为 CC BY-NC 4.0，不额外授予商业或分发权利 |
-| RTMW／RTMLib | [现有权重来源、归档与 ONNX SHA](../environments/body-runtime-sources.json) | 外部推理依赖；源码、模型及环境不随本次公开树分发，分别适用上游条款 |
+| RTMW／RTMLib | [现有权重来源、归档与 ONNX SHA](../environments/body-runtime-sources.json) | 外部推理依赖；源码、模型及环境不随公开树分发，分别适用上游条款 |
 | AITViewer／Pyglet | 指定安装版本 1.14.2／2.1.19，分别附 [MIT](../environments/third_party_licenses/AITVIEWER_LICENSE.txt)／[BSD](../environments/third_party_licenses/PYGLET_LICENSE.txt)；[安装身份](../environments/viewer3d-provenance.json) | 外部实现留 Data；项目播放器显式使用 Pyglet 窗口后端 |
 | PyQt6／Qt | 安装锁中的 6.12.0 发行物；PyQt6 附 GPLv3，Qt 包元数据标 LGPL v3，证据见[播放器核查](LICENSING_REVIEW.md#viewer3d) | 不随公开树附带运行库；使用 Qt 后端或组合分发须另核适用条件，不能把 PyQt6 标为 LGPL |
 | HMR2／ViTPose／人体工具 | 由 GVHMR 树使用，具体来源见机器清单 | 独立上游修订与全部许可尚有缺口，不自动继承 GVHMR 根许可 |
@@ -46,6 +46,8 @@ GVHMR 的 DPVO 子模块在历史盘点中为空，[固定安装说明](https://
 
 该参考模板是通用工程初值，不是品牌扫描、选手鞋的实测模型或已经标定的接冰阈值。交接包未附单独开源许可证；来源登记不额外授予第三方权利，也不为交接实现推定 MIT 等许可。拟合参数与失败状态的公开范围见[参数核查](LICENSING_REVIEW.md#body-parameters)。
 
+ExMR camera-only 比较固定[官方 ExMR](https://github.com/twehrbein/ExMR)提交 `eac72e47339b404c0443f5fb323412e2ce432410`。局部补丁保留[完整上游许可及署名](../environments/third_party_licenses/EXMR_LICENSE.txt)，包括 Leibniz University Hannover 与 GVHMR 原作者通知，衍生修改沿用原教育／研究／非营利和非商业条件。SAM 3D Body／DINOv3 与 HaMeR 分别按各自许可处理；固定资产 revision、SHA 和许可来源见[结果依赖索引](../events/ankara_2026/programmes/okada_mei_sp/spin_models_1104_audit.json)。模型字节、完整第三方实现和运行环境留 Data，仓库保存接线、依赖和局部补丁。当前 HaMeR 只抽取原网络 token，没有加载或分发 MANO 手模型。
+
 ## 权重与小型数据
 
 | 资产 | 登记字节数 | 来源与限制 |
@@ -75,8 +77,3 @@ SMPL-X 的研究引用为 Georgios Pavlakos 等，*Expressive Body Capture: 3D H
 ## 已知缺口
 
 项目内资源迁移和隔离检查已有记录，空白机器的完整 Windows 人体构建／推理仍未验证。部分上游定义包含 Linux wheel，不能直接当作本机环境锁。各模型、人体组件和嵌入数据的许可闭合程度分别判断；来源登记不授予额外再分发或商业权利。
-
-
-ExMR局部camera-only补丁的[上游完整许可及署名](../environments/third_party_licenses/EXMR_LICENSE.txt)按固定提交原字节保留，包含Leibniz University Hannover与GVHMR原作者通知；衍生修改沿用其教育／研究／非营利和非商业条件。资产revision、SHA及实际执行范围见[审核索引](../events/ankara_2026/programmes/okada_mei_sp/spin_models_1104_audit.json)。
-
-ExMR camera-only 本机比较固定 [官方 ExMR](https://github.com/twehrbein/ExMR) 提交 eac72e47339b404c0443f5fb323412e2ce432410，权重来源为作者固定 Hugging Face revision；依其非商业研究许可使用。SAM 3D Body/DINOv3 及 HaMeR 分别按各自官方许可使用，模型字节和完整第三方源码均留 Data，不随本项目公开。固定来源、SHA 与许可网址在 environments/prepare_exmr_assets.py 读取的官方清单及 Data 运行 assets_manifest.json 中；OneDrive 只保存接线、依赖和局部补丁。当前 HaMeR 仅抽取原网络 token，没有加载或分发 MANO 手模型。

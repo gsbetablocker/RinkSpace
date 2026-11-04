@@ -1,0 +1,2794 @@
+{
+  "schema": "rinkspace.body-performance-public-review.v1",
+  "date": "2026-11-04",
+  "baseline_commit": "3d6f51fee68a07706c1456c5e99d28c1d0438908",
+  "meaning": "Recorded complete-Joint measurements; fixed two-step performance work does not establish numerical convergence or body/source accuracy. Original logs, inputs, source snapshots and environments remain offline.",
+  "offline_original": {
+    "base": "data",
+    "path": "runs/body_pf1104/integration_summary.json",
+    "sha256": "a1e21a2cdcecd0c1fb36cbe1f3df3de91bb3bf9029ac99a8db3b3dd117acd464"
+  },
+  "measurement": {
+    "schema": "rinkspace.body-performance-integration.20261104.v1",
+    "head": "3d6f51fee68a07706c1456c5e99d28c1d0438908",
+    "baseline": "complete pre-integration user working tree; not a reset to public HEAD",
+    "before_snapshot": "D:/CodexData/RinkSpace_Data/audit/bpf_before",
+    "apply_precheck": {
+      "head": "3d6f51fee68a07706c1456c5e99d28c1d0438908",
+      "check_returncode": 2,
+      "before_snapshot": "D:\\CodexData\\RinkSpace_Data\\audit\\bpf_before",
+      "backup": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\source_backup",
+      "new_ready_files_installed": [
+        "calibration/program_tracking/body_tracking/compact_body_derivatives.py",
+        "calibration/program_tracking/body_tracking/selected_surface_linearization.py",
+        "scripts/benchmark_compact_body_derivatives.py",
+        "scripts/benchmark_contact_jacobian.py",
+        "scripts/benchmark_selected_surface.py",
+        "scripts/profile_contact_solver.py",
+        "tests/test_body_compatibility_performance.py",
+        "tests/test_body_derivative_integration.py",
+        "tests/test_compact_body_derivatives.py",
+        "tests/test_profile_contact_solver.py",
+        "tests/test_selected_surface_linearization.py",
+        "tests/test_skate_physics_performance.py"
+      ],
+      "semantic_merge_required": [
+        "calibration/program_tracking/body_tracking/body_execution.py",
+        "calibration/program_tracking/body_tracking/boot_integration.py",
+        "calibration/program_tracking/body_tracking/skate_binding.py",
+        "calibration/program_tracking/body_tracking/skate_integration.py",
+        "calibration/program_tracking/body_tracking/skate_physics.py"
+      ]
+    },
+    "source": {
+      "body_execution.py": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\body_execution.py",
+        "sha256": "8e74a873abe43dfde49aaa88f396fd532732368858676dcb6f51f93ab0bb2bad"
+      },
+      "boot_integration.py": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\boot_integration.py",
+        "sha256": "48ce6be380178a7564c2e348457e475b5d2600de3a544978b9f663c19063fc69"
+      },
+      "skate_integration.py": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\skate_integration.py",
+        "sha256": "0e3e5c8e136919e44e411f791f00bcabdf4483bacf40a03b344137f47095ccd0"
+      },
+      "skate_binding.py": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\skate_binding.py",
+        "sha256": "cadc2d472bf0574db7596e510ee086608a6633e9aa18333b20d00343a4aeb7fe"
+      },
+      "skate_physics.py": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\skate_physics.py",
+        "sha256": "e4bc5acca61861629dfd307898ff885116ffe2f29c2e1ae33bdd77d6d92fb60f"
+      },
+      "compact_body_derivatives.py": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\compact_body_derivatives.py",
+        "sha256": "36bf8c30941eb57323fb3cbe1a54a77e43b15e97394f00aacffa8ab361649348"
+      },
+      "selected_surface_linearization.py": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\selected_surface_linearization.py",
+        "sha256": "f0d871f4d5a376447d488ec5c741363838495be87de6cbb017c7cffae97b0e24"
+      },
+      "body_resident_torch.py": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\body_resident_torch.py",
+        "sha256": "c90e95093ff76d11bda611c9b63d628fd04fe739844a8ebcc447a33521142d80"
+      },
+      "torch_foot_compatibility.py": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\torch_foot_compatibility.py",
+        "sha256": "c72cb1db5bfebde5c4bd6c9e46baec4f222a200020545ccac7481ee5f018e254"
+      },
+      "body_foot_cuda_bridge.py": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\body_foot_cuda_bridge.py",
+        "sha256": "8f87f9a7bd6605c11ac41b26b0ceea7eb210582a15cc4c0bf1eb87bedd63ddb0"
+      },
+      "body_foot_cuda.cu": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\calibration\\program_tracking\\body_tracking\\body_foot_cuda.cu",
+        "sha256": "355d564edb6c43b17bc684de721b5d3a350dcea1a8cf9fe8da66d9b3a348a121"
+      }
+    },
+    "native_cuda_library": {
+      "path": "D:/CodexData/RinkSpace_Data/build/body_foot_gpu/body_foot_cuda.dll",
+      "sha256": "046c72b4137d45100b5cb5db4f55f31758a5dfb3b6bb34caab8d53bc6b05ef35"
+    },
+    "case": {
+      "prepared_source_exposures": 951,
+      "active_exposures": 641,
+      "window_seconds": [
+        82.0,
+        94.8
+      ],
+      "source_clock": "integer PTS; 1/12800 s; native50",
+      "physics_times": 3845,
+      "active_state_columns": 63,
+      "active_controls": 3465,
+      "shared_parameters_fixed": 17,
+      "selected_skin_union_vertices": 1083,
+      "network_inference_rerun": false
+    },
+    "inputs_unchanged": {
+      "camera_record": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\audit\\bpf_before\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\camera_solver_refined_1102.json",
+        "sha256": "9290062c2f8b7ef1e8f54908896e1c0249bf3ec731f51b97c1fbc6406704682e",
+        "unchanged": true
+      },
+      "camera_state_path": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\camera_solver_refined_1102.npz",
+        "sha256": "d6cfde1474a23d594a0395351ebbdb0ee15a6560ef77b27f069d239ee95bb3f3",
+        "unchanged": true
+      },
+      "case_compact": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\support_joint_v2\\common\\exmr_hand_nofoot\\compact_smplx.npz",
+        "sha256": "f3655f86d42e9a5a1cda80eabfa98895b06e51d44f07e707b352618f0ca3c753",
+        "unchanged": true
+      },
+      "case_export_source": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\support_joint_v2\\common\\exmr_hand_nofoot\\export_source.npz",
+        "sha256": "54c21f19d1259f3b5cdade886c90fe20670ec832789cad18927a70c91fa77eaf",
+        "unchanged": true
+      },
+      "case_input": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\support_joint_v2\\common\\exmr_hand_nofoot\\input.npz",
+        "sha256": "dfb5122f7358d25e66aca78b3d578452cb664bad3911b6c367a5f45c66624674",
+        "unchanged": true
+      },
+      "catalog_config_path": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\audit\\bpf_before\\events\\ankara_2026\\programmes\\okada_mei_sp\\viewer3d_boot_1102.json",
+        "sha256": "ac7a12f81a861f472fb1d93ce03d4089be499492a50e93658505691eb442bbe1",
+        "unchanged": true
+      },
+      "catalog_model_path": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runtime_tools\\body\\GVHMR\\inputs\\checkpoints\\body_models\\smplx\\SMPLX_NEUTRAL.npz",
+        "sha256": "376021446ddc86e99acacd795182bbef903e61d33b76b9d8b359c2b0865bd992",
+        "unchanged": true
+      },
+      "evidence": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\action_evidence_1103.json",
+        "sha256": "09535a7e189230f64869f5c804856d7e362df9b24af303a240bce44eac736c79",
+        "unchanged": true
+      },
+      "grasp_geometry": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\support_joint_v2\\palm_grip_geometry.json",
+        "sha256": "5a5887f42a18defeb24dc8bd1b228b3a1141875cbf41fcbda425e9da26e74b97",
+        "unchanged": true
+      },
+      "grasp_relations": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\support_joint_v2\\grasp_relations.json",
+        "sha256": "a0b9c069bb6c9b110ef81f04bb6a104be111355ea20979f0bec3ddc0a6207faa",
+        "unchanged": true
+      },
+      "initial": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\support_joint_v2\\common\\exmr_hand_nofoot\\initial.npz",
+        "sha256": "509566cbffe95959c4023a58bf978dfe61c61d240976ccaa4d653a773b697a9c",
+        "unchanged": true
+      },
+      "observation": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\support_joint_v2\\common\\exmr_hand_nofoot\\observations.npz",
+        "sha256": "237836e208b3fe7e2e7c66b11015057e20367d62451ccdd466d4d8a78aff9021",
+        "unchanged": true
+      },
+      "shared_compact": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\compact_smplx.npz",
+        "sha256": "f3655f86d42e9a5a1cda80eabfa98895b06e51d44f07e707b352618f0ca3c753",
+        "unchanged": true
+      },
+      "shared_input": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\input.npz",
+        "sha256": "93a71022fc3c4d67a1ec4387f01a2e5513d96cdf50bc4728e0a290ca7590cc27",
+        "unchanged": true
+      },
+      "shared_s01": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\audit\\bpf_before\\events\\ankara_2026\\programmes\\okada_mei_sp\\skate_s01_1103.npz",
+        "sha256": "3b58dac5f7363dfc5e051fc75ef8602dd3810a0ebc370c57a24542745bc5090c",
+        "unchanged": true
+      },
+      "state": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\support_joint_v2\\continuation\\seed.npz",
+        "sha256": "98177f150332cb51c3a8c57195bbf172264f20cc18a56f3bc3957bb72defce87",
+        "unchanged": true
+      },
+      "support": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\support_joint_v2\\support_and_free_shoe_regions.json",
+        "sha256": "6944c632b3aecdb361b3b4bfbd5652f92e0883b4bb790d8c13c5d47a8725fbc9",
+        "unchanged": true
+      }
+    },
+    "preexisting_implementation_preserved": [
+      {
+        "path": "AGENTS.md",
+        "sha256": "8a6ba94baf158dc3fe5fde8c4132ea3659ce7cbf8ca136d269ecd29e6c5e8314"
+      },
+      {
+        "path": "calibration/program_tracking/body_tracking/hand_state.py",
+        "sha256": "7ca128454f75c32e24cfd417e43fe457360b852dd1714304c25fe80df8a26237"
+      },
+      {
+        "path": "calibration/program_tracking/body_tracking/root_trajectory.py",
+        "sha256": "3098d1b0961b0ba639d4f49318e3b8fd4a475167b6b6b9188dac4b4e8040ab05"
+      },
+      {
+        "path": "calibration/program_tracking/body_tracking/spin_grasp_factors.py",
+        "sha256": "d8a25db5f9e44f1b31bcaa43f8c76f89d08c0164ea81570e1827951d16f9e529"
+      },
+      {
+        "path": "calibration/program_tracking/body_tracking/spin_support_joint.py",
+        "sha256": "69a03e5a110aa74290afb3584a246c41c8915a261820562e80c37e61ac20ecf4"
+      },
+      {
+        "path": "events/ankara_2026/programmes/okada_mei_sp/skate_s01_1103.npz",
+        "sha256": "3b58dac5f7363dfc5e051fc75ef8602dd3810a0ebc370c57a24542745bc5090c"
+      }
+    ],
+    "line_endings": [
+      {
+        "path": "environments/README.md",
+        "measured_crlf_sha256": "eddabf770a54ae4ac5b194fa0279129ea79e9267433cfdf01808d0742730051f",
+        "current_original_lf_sha256": "c7f8c7f74e2c951702c1bb8ce2ab66a853e3c87b4293b4988ea98cb0e33c4a53",
+        "change": "line endings only; original LF restored; measured snapshots retained verbatim"
+      },
+      {
+        "path": "calibration/program_tracking/body_tracking/body_execution.py",
+        "measured_crlf_sha256": "d1578c5409d3bd0ea80b751268b1c2bc0dda70f3c57177b24717308ea087e295",
+        "current_original_lf_sha256": "8e74a873abe43dfde49aaa88f396fd532732368858676dcb6f51f93ab0bb2bad",
+        "change": "line endings only; original LF restored; measured snapshots retained verbatim"
+      },
+      {
+        "path": "calibration/program_tracking/body_tracking/skate_binding.py",
+        "measured_crlf_sha256": "b893994ac786e67494110b3c4f5dba541a46d8f03c76c5ddefb16020d9926020",
+        "current_original_lf_sha256": "cadc2d472bf0574db7596e510ee086608a6633e9aa18333b20d00343a4aeb7fe",
+        "change": "line endings only; original LF restored; measured snapshots retained verbatim"
+      },
+      {
+        "path": "calibration/program_tracking/body_tracking/skate_physics.py",
+        "measured_crlf_sha256": "6a08602bd23316c062720ad0fe7a8ced914dec8054af3622792a07aac605d17e",
+        "current_original_lf_sha256": "e4bc5acca61861629dfd307898ff885116ffe2f29c2e1ae33bdd77d6d92fb60f",
+        "change": "line endings only; original LF restored; measured snapshots retained verbatim"
+      }
+    ],
+    "cpu_worker_comparison": {
+      "spin_base4": {
+        "profile": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\spin_base4\\profile.json",
+        "wall_seconds": 73.65877799999726,
+        "cpu_core_seconds": 235.671875,
+        "average_cpu_cores": 3.199508346445943,
+        "peak_process_rss_bytes": 2880172032,
+        "setup_seconds": 4.040616300000693,
+        "launcher_wall_seconds": 80.19267559999571,
+        "shape": [
+          187558,
+          3482
+        ],
+        "nnz": 9606855,
+        "derivative_usage": {},
+        "gpu": null,
+        "comparison": null
+      },
+      "spin_new4": {
+        "profile": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\spin_new4\\profile.json",
+        "wall_seconds": 54.54768850000255,
+        "cpu_core_seconds": 176.328125,
+        "average_cpu_cores": 3.232549899891574,
+        "peak_process_rss_bytes": 2880663552,
+        "setup_seconds": 3.3458666000005906,
+        "launcher_wall_seconds": 61.781484799998,
+        "shape": [
+          187558,
+          3482
+        ],
+        "nnz": 9606855,
+        "derivative_usage": {
+          "analytic_world_linearizations": 1,
+          "fk_replay_linearizations": 1,
+          "surface_replay_linearizations": 1,
+          "finite_difference_world_linearizations": 0
+        },
+        "gpu": null,
+        "comparison": {
+          "baseline_snapshot": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\spin_base4\\snapshot.npz",
+          "automatic_backend_selection": false,
+          "residual_max_abs": 0.0,
+          "residual_relative_l2": 0.0,
+          "residual_violation_count": 0,
+          "jacobian_max_abs": 1.0383951410536385e-08,
+          "jacobian_relative_frobenius": 8.754886140460458e-11,
+          "jacobian_entry_violation_count": 0,
+          "jacobian_worst_entry": {
+            "row": 187000,
+            "column": 2606,
+            "baseline": -0.01585023089366139,
+            "current": -0.015850241277612802,
+            "absolute_error": 1.0383951410536385e-08,
+            "allowed_error": 5.3170048255522565e-05,
+            "normalized_error": 0.00019529700933566192
+          },
+          "jacobian_max_normalized_error": 0.00019529700933566192,
+          "residual_within_tolerance": true,
+          "jacobian_within_tolerance": true,
+          "thresholds": {
+            "residual_atol": 1e-08,
+            "residual_rtol": 1e-10,
+            "jacobian_entry_atol": 5e-05,
+            "jacobian_entry_rtol": 0.0002,
+            "equation": "abs(new-old) <= atol + rtol*max(abs(old),abs(new)); every sparse union entry",
+            "frobenius_is_summary_only": true
+          }
+        }
+      },
+      "spin_new8": {
+        "profile": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\spin_new8\\profile.json",
+        "wall_seconds": 39.66259789999458,
+        "cpu_core_seconds": 206.59375,
+        "average_cpu_cores": 5.208780083465693,
+        "peak_process_rss_bytes": 2883833856,
+        "setup_seconds": 3.16190149999602,
+        "launcher_wall_seconds": 46.66865610000241,
+        "shape": [
+          187558,
+          3482
+        ],
+        "nnz": 9606855,
+        "derivative_usage": {
+          "analytic_world_linearizations": 1,
+          "fk_replay_linearizations": 1,
+          "surface_replay_linearizations": 1,
+          "finite_difference_world_linearizations": 0
+        },
+        "gpu": null,
+        "comparison": {
+          "baseline_snapshot": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\spin_base4\\snapshot.npz",
+          "automatic_backend_selection": false,
+          "residual_max_abs": 0.0,
+          "residual_relative_l2": 0.0,
+          "residual_violation_count": 0,
+          "jacobian_max_abs": 1.0383951410536385e-08,
+          "jacobian_relative_frobenius": 8.754886140460458e-11,
+          "jacobian_entry_violation_count": 0,
+          "jacobian_worst_entry": {
+            "row": 187000,
+            "column": 2606,
+            "baseline": -0.01585023089366139,
+            "current": -0.015850241277612802,
+            "absolute_error": 1.0383951410536385e-08,
+            "allowed_error": 5.3170048255522565e-05,
+            "normalized_error": 0.00019529700933566192
+          },
+          "jacobian_max_normalized_error": 0.00019529700933566192,
+          "residual_within_tolerance": true,
+          "jacobian_within_tolerance": true,
+          "thresholds": {
+            "residual_atol": 1e-08,
+            "residual_rtol": 1e-10,
+            "jacobian_entry_atol": 5e-05,
+            "jacobian_entry_rtol": 0.0002,
+            "equation": "abs(new-old) <= atol + rtol*max(abs(old),abs(new)); every sparse union entry",
+            "frobenius_is_summary_only": true
+          }
+        }
+      },
+      "spin_new12": {
+        "profile": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\spin_new12\\profile.json",
+        "wall_seconds": 36.288286300004984,
+        "cpu_core_seconds": 241.578125,
+        "average_cpu_cores": 6.657192985163557,
+        "peak_process_rss_bytes": 3427205120,
+        "setup_seconds": 3.263561599997047,
+        "launcher_wall_seconds": 43.38744299999962,
+        "shape": [
+          187558,
+          3482
+        ],
+        "nnz": 9606855,
+        "derivative_usage": {
+          "analytic_world_linearizations": 1,
+          "fk_replay_linearizations": 1,
+          "surface_replay_linearizations": 1,
+          "finite_difference_world_linearizations": 0
+        },
+        "gpu": null,
+        "comparison": {
+          "baseline_snapshot": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\spin_base4\\snapshot.npz",
+          "automatic_backend_selection": false,
+          "residual_max_abs": 0.0,
+          "residual_relative_l2": 0.0,
+          "residual_violation_count": 0,
+          "jacobian_max_abs": 1.0383951410536385e-08,
+          "jacobian_relative_frobenius": 8.754886140460458e-11,
+          "jacobian_entry_violation_count": 0,
+          "jacobian_worst_entry": {
+            "row": 187000,
+            "column": 2606,
+            "baseline": -0.01585023089366139,
+            "current": -0.015850241277612802,
+            "absolute_error": 1.0383951410536385e-08,
+            "allowed_error": 5.3170048255522565e-05,
+            "normalized_error": 0.00019529700933566192
+          },
+          "jacobian_max_normalized_error": 0.00019529700933566192,
+          "residual_within_tolerance": true,
+          "jacobian_within_tolerance": true,
+          "thresholds": {
+            "residual_atol": 1e-08,
+            "residual_rtol": 1e-10,
+            "jacobian_entry_atol": 5e-05,
+            "jacobian_entry_rtol": 0.0002,
+            "equation": "abs(new-old) <= atol + rtol*max(abs(old),abs(new)); every sparse union entry",
+            "frobenius_is_summary_only": true
+          }
+        }
+      },
+      "spin_gpu_final": {
+        "profile": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\spin_gpu_final\\profile.json",
+        "wall_seconds": 9.202979499998037,
+        "cpu_core_seconds": 26.65625,
+        "average_cpu_cores": 2.8964804278881298,
+        "peak_process_rss_bytes": 3631443968,
+        "setup_seconds": 5.558491199997661,
+        "launcher_wall_seconds": 29.060472199998912,
+        "shape": [
+          187558,
+          3482
+        ],
+        "nnz": 9606855,
+        "derivative_usage": {
+          "analytic_world_linearizations": 2,
+          "fk_replay_linearizations": 0,
+          "surface_replay_linearizations": 0,
+          "finite_difference_world_linearizations": 0
+        },
+        "gpu": {
+          "implementation_scope": "foot/collar compatibility only",
+          "measurement_supported": true,
+          "implementation": {
+            "kind": "cuda_resident_native55_selected_skin_foot",
+            "device": "cuda:0",
+            "device_info": {
+              "name": "NVIDIA GeForce RTX 5070 Ti",
+              "compute_capability": [
+                12,
+                0
+              ],
+              "total_memory": 17094475776,
+              "torch": "2.7.1+cu128",
+              "cuda": "12.8"
+            },
+            "scope": "native55 FK, full486 pose blend, selected union skin, exact +/- replay and live cavity/collar consumers; CPU analytic body images/native camera/CSR/TRF unchanged",
+            "selected_vertices": 1083,
+            "samples": 641,
+            "prepare_seconds": 0.215387299998838,
+            "prepare_uploaded_bytes": 18098568,
+            "precision": "float64",
+            "shared_parameters": "fixed; changing shared geometry requires a new prepared owner",
+            "transfer_boundary": "one changed N x 69 increment upload; one packed residual/local-Jacobian download per call; no per-column download"
+          },
+          "measurement": {
+            "calls": 1,
+            "linearize_calls": 1,
+            "trial_calls": 0,
+            "h2d_bytes": 353832,
+            "d2h_bytes": 10112416,
+            "h2d_calls": 1,
+            "d2h_calls": 1,
+            "h2d_seconds_cuda_events": 0.0002163520008325577,
+            "compute_seconds_cuda_events": 2.94006640625,
+            "d2h_seconds_cuda_events": 0.0013384640216827393,
+            "timing_scope": "CUDA events inside complete host-wall measurement; includes cache reuse, excludes static preparation"
+          }
+        },
+        "comparison": {
+          "baseline_snapshot": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\spin_base4\\snapshot.npz",
+          "automatic_backend_selection": false,
+          "residual_max_abs": 1.9925727734459997e-13,
+          "residual_relative_l2": 1.1008638566318272e-14,
+          "residual_violation_count": 0,
+          "jacobian_max_abs": 1.0006884435670438e-08,
+          "jacobian_relative_frobenius": 8.870354030673351e-11,
+          "jacobian_entry_violation_count": 0,
+          "jacobian_worst_entry": {
+            "row": 187000,
+            "column": 2606,
+            "baseline": -0.01585023089366139,
+            "current": -0.015850240900545827,
+            "absolute_error": 1.0006884435670438e-08,
+            "allowed_error": 5.317004818010917e-05,
+            "normalized_error": 0.00018820529185478523
+          },
+          "jacobian_max_normalized_error": 0.00018820529185478523,
+          "residual_within_tolerance": true,
+          "jacobian_within_tolerance": true,
+          "thresholds": {
+            "residual_atol": 1e-08,
+            "residual_rtol": 1e-10,
+            "jacobian_entry_atol": 5e-05,
+            "jacobian_entry_rtol": 0.0002,
+            "equation": "abs(new-old) <= atol + rtol*max(abs(old),abs(new)); every sparse union entry",
+            "frobenius_is_summary_only": true
+          }
+        }
+      },
+      "spin_gpu_checked": {
+        "profile": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\spin_gpu_checked\\profile.json",
+        "wall_seconds": 14.719924400000309,
+        "cpu_core_seconds": 26.515625,
+        "average_cpu_cores": 1.8013424715686341,
+        "peak_process_rss_bytes": 3629707264,
+        "setup_seconds": 5.812578600001871,
+        "launcher_wall_seconds": 39.77336959999957,
+        "shape": [
+          187558,
+          3482
+        ],
+        "nnz": 9606855,
+        "derivative_usage": {
+          "analytic_world_linearizations": 2,
+          "fk_replay_linearizations": 0,
+          "surface_replay_linearizations": 0,
+          "finite_difference_world_linearizations": 0
+        },
+        "gpu": {
+          "implementation_scope": "foot/collar compatibility only",
+          "measurement_supported": true,
+          "implementation": {
+            "kind": "cuda_resident_native55_selected_skin_foot",
+            "device": "cuda:0",
+            "device_info": {
+              "name": "NVIDIA GeForce RTX 5070 Ti",
+              "compute_capability": [
+                12,
+                0
+              ],
+              "total_memory": 17094475776,
+              "torch": "2.7.1+cu128",
+              "cuda": "12.8"
+            },
+            "scope": "native55 FK, full486 pose blend, selected union skin, exact +/- replay and live cavity/collar consumers; CPU analytic body images/native camera/CSR/TRF unchanged",
+            "selected_vertices": 1083,
+            "samples": 641,
+            "prepare_seconds": 0.460395599999174,
+            "prepare_uploaded_bytes": 18098568,
+            "precision": "float64",
+            "shared_parameters": "fixed; changing shared geometry requires a new prepared owner",
+            "transfer_boundary": "one changed N x 69 increment upload; one packed residual/local-Jacobian download per call; no per-column download"
+          },
+          "measurement": {
+            "calls": 1,
+            "linearize_calls": 1,
+            "trial_calls": 0,
+            "h2d_bytes": 353832,
+            "d2h_bytes": 10112416,
+            "h2d_calls": 1,
+            "d2h_calls": 1,
+            "native55_fk_prepares": 1,
+            "selected_surface_prepares": 1,
+            "exact_fk_replay_pairs": 57,
+            "selected_skin_replay_pairs": 57,
+            "consumer_calls": 58,
+            "h2d_host_seconds": 0.0003125000002910383,
+            "d2h_host_blocking_seconds": 0.2564200999986497,
+            "compute_host_enqueue_seconds": 8.19022430000041,
+            "h2d_seconds_cuda_events": 0.00014271999895572662,
+            "compute_seconds_cuda_events": 8.445310546875,
+            "d2h_seconds_cuda_events": 0.0013391040563583375,
+            "timing_scope": "CUDA stream event intervals (include host submission gaps, not summed pure kernel time); complete wall separately includes host waits. Static preparation excluded."
+          }
+        },
+        "comparison": {
+          "baseline_snapshot": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\spin_base4\\snapshot.npz",
+          "automatic_backend_selection": false,
+          "residual_max_abs": 1.9925727734459997e-13,
+          "residual_relative_l2": 1.1008638566318272e-14,
+          "residual_violation_count": 0,
+          "jacobian_max_abs": 1.0006884435670438e-08,
+          "jacobian_relative_frobenius": 8.870354030673351e-11,
+          "jacobian_entry_violation_count": 0,
+          "jacobian_worst_entry": {
+            "row": 187000,
+            "column": 2606,
+            "baseline": -0.01585023089366139,
+            "current": -0.015850240900545827,
+            "absolute_error": 1.0006884435670438e-08,
+            "allowed_error": 5.317004818010917e-05,
+            "normalized_error": 0.00018820529185478523
+          },
+          "jacobian_max_normalized_error": 0.00018820529185478523,
+          "residual_within_tolerance": true,
+          "jacobian_within_tolerance": true,
+          "thresholds": {
+            "residual_atol": 1e-08,
+            "residual_rtol": 1e-10,
+            "jacobian_entry_atol": 5e-05,
+            "jacobian_entry_rtol": 0.0002,
+            "equation": "abs(new-old) <= atol + rtol*max(abs(old),abs(new)); every sparse union entry",
+            "frobenius_is_summary_only": true
+          }
+        }
+      }
+    },
+    "jacobians": {
+      "spin_base4": {
+        "profile": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\spin_base4\\profile.json",
+        "wall_seconds": 73.65877799999726,
+        "cpu_core_seconds": 235.671875,
+        "average_cpu_cores": 3.199508346445943,
+        "peak_process_rss_bytes": 2880172032,
+        "setup_seconds": 4.040616300000693,
+        "launcher_wall_seconds": 80.19267559999571,
+        "shape": [
+          187558,
+          3482
+        ],
+        "nnz": 9606855,
+        "derivative_usage": {},
+        "gpu": null,
+        "comparison": null
+      },
+      "spin_new4": {
+        "profile": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\spin_new4\\profile.json",
+        "wall_seconds": 54.54768850000255,
+        "cpu_core_seconds": 176.328125,
+        "average_cpu_cores": 3.232549899891574,
+        "peak_process_rss_bytes": 2880663552,
+        "setup_seconds": 3.3458666000005906,
+        "launcher_wall_seconds": 61.781484799998,
+        "shape": [
+          187558,
+          3482
+        ],
+        "nnz": 9606855,
+        "derivative_usage": {
+          "analytic_world_linearizations": 1,
+          "fk_replay_linearizations": 1,
+          "surface_replay_linearizations": 1,
+          "finite_difference_world_linearizations": 0
+        },
+        "gpu": null,
+        "comparison": {
+          "baseline_snapshot": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\spin_base4\\snapshot.npz",
+          "automatic_backend_selection": false,
+          "residual_max_abs": 0.0,
+          "residual_relative_l2": 0.0,
+          "residual_violation_count": 0,
+          "jacobian_max_abs": 1.0383951410536385e-08,
+          "jacobian_relative_frobenius": 8.754886140460458e-11,
+          "jacobian_entry_violation_count": 0,
+          "jacobian_worst_entry": {
+            "row": 187000,
+            "column": 2606,
+            "baseline": -0.01585023089366139,
+            "current": -0.015850241277612802,
+            "absolute_error": 1.0383951410536385e-08,
+            "allowed_error": 5.3170048255522565e-05,
+            "normalized_error": 0.00019529700933566192
+          },
+          "jacobian_max_normalized_error": 0.00019529700933566192,
+          "residual_within_tolerance": true,
+          "jacobian_within_tolerance": true,
+          "thresholds": {
+            "residual_atol": 1e-08,
+            "residual_rtol": 1e-10,
+            "jacobian_entry_atol": 5e-05,
+            "jacobian_entry_rtol": 0.0002,
+            "equation": "abs(new-old) <= atol + rtol*max(abs(old),abs(new)); every sparse union entry",
+            "frobenius_is_summary_only": true
+          }
+        }
+      },
+      "spin_new8": {
+        "profile": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\spin_new8\\profile.json",
+        "wall_seconds": 39.66259789999458,
+        "cpu_core_seconds": 206.59375,
+        "average_cpu_cores": 5.208780083465693,
+        "peak_process_rss_bytes": 2883833856,
+        "setup_seconds": 3.16190149999602,
+        "launcher_wall_seconds": 46.66865610000241,
+        "shape": [
+          187558,
+          3482
+        ],
+        "nnz": 9606855,
+        "derivative_usage": {
+          "analytic_world_linearizations": 1,
+          "fk_replay_linearizations": 1,
+          "surface_replay_linearizations": 1,
+          "finite_difference_world_linearizations": 0
+        },
+        "gpu": null,
+        "comparison": {
+          "baseline_snapshot": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\spin_base4\\snapshot.npz",
+          "automatic_backend_selection": false,
+          "residual_max_abs": 0.0,
+          "residual_relative_l2": 0.0,
+          "residual_violation_count": 0,
+          "jacobian_max_abs": 1.0383951410536385e-08,
+          "jacobian_relative_frobenius": 8.754886140460458e-11,
+          "jacobian_entry_violation_count": 0,
+          "jacobian_worst_entry": {
+            "row": 187000,
+            "column": 2606,
+            "baseline": -0.01585023089366139,
+            "current": -0.015850241277612802,
+            "absolute_error": 1.0383951410536385e-08,
+            "allowed_error": 5.3170048255522565e-05,
+            "normalized_error": 0.00019529700933566192
+          },
+          "jacobian_max_normalized_error": 0.00019529700933566192,
+          "residual_within_tolerance": true,
+          "jacobian_within_tolerance": true,
+          "thresholds": {
+            "residual_atol": 1e-08,
+            "residual_rtol": 1e-10,
+            "jacobian_entry_atol": 5e-05,
+            "jacobian_entry_rtol": 0.0002,
+            "equation": "abs(new-old) <= atol + rtol*max(abs(old),abs(new)); every sparse union entry",
+            "frobenius_is_summary_only": true
+          }
+        }
+      },
+      "spin_new12": {
+        "profile": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\spin_new12\\profile.json",
+        "wall_seconds": 36.288286300004984,
+        "cpu_core_seconds": 241.578125,
+        "average_cpu_cores": 6.657192985163557,
+        "peak_process_rss_bytes": 3427205120,
+        "setup_seconds": 3.263561599997047,
+        "launcher_wall_seconds": 43.38744299999962,
+        "shape": [
+          187558,
+          3482
+        ],
+        "nnz": 9606855,
+        "derivative_usage": {
+          "analytic_world_linearizations": 1,
+          "fk_replay_linearizations": 1,
+          "surface_replay_linearizations": 1,
+          "finite_difference_world_linearizations": 0
+        },
+        "gpu": null,
+        "comparison": {
+          "baseline_snapshot": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\spin_base4\\snapshot.npz",
+          "automatic_backend_selection": false,
+          "residual_max_abs": 0.0,
+          "residual_relative_l2": 0.0,
+          "residual_violation_count": 0,
+          "jacobian_max_abs": 1.0383951410536385e-08,
+          "jacobian_relative_frobenius": 8.754886140460458e-11,
+          "jacobian_entry_violation_count": 0,
+          "jacobian_worst_entry": {
+            "row": 187000,
+            "column": 2606,
+            "baseline": -0.01585023089366139,
+            "current": -0.015850241277612802,
+            "absolute_error": 1.0383951410536385e-08,
+            "allowed_error": 5.3170048255522565e-05,
+            "normalized_error": 0.00019529700933566192
+          },
+          "jacobian_max_normalized_error": 0.00019529700933566192,
+          "residual_within_tolerance": true,
+          "jacobian_within_tolerance": true,
+          "thresholds": {
+            "residual_atol": 1e-08,
+            "residual_rtol": 1e-10,
+            "jacobian_entry_atol": 5e-05,
+            "jacobian_entry_rtol": 0.0002,
+            "equation": "abs(new-old) <= atol + rtol*max(abs(old),abs(new)); every sparse union entry",
+            "frobenius_is_summary_only": true
+          }
+        }
+      },
+      "spin_gpu_final": {
+        "profile": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\spin_gpu_final\\profile.json",
+        "wall_seconds": 9.202979499998037,
+        "cpu_core_seconds": 26.65625,
+        "average_cpu_cores": 2.8964804278881298,
+        "peak_process_rss_bytes": 3631443968,
+        "setup_seconds": 5.558491199997661,
+        "launcher_wall_seconds": 29.060472199998912,
+        "shape": [
+          187558,
+          3482
+        ],
+        "nnz": 9606855,
+        "derivative_usage": {
+          "analytic_world_linearizations": 2,
+          "fk_replay_linearizations": 0,
+          "surface_replay_linearizations": 0,
+          "finite_difference_world_linearizations": 0
+        },
+        "gpu": {
+          "implementation_scope": "foot/collar compatibility only",
+          "measurement_supported": true,
+          "implementation": {
+            "kind": "cuda_resident_native55_selected_skin_foot",
+            "device": "cuda:0",
+            "device_info": {
+              "name": "NVIDIA GeForce RTX 5070 Ti",
+              "compute_capability": [
+                12,
+                0
+              ],
+              "total_memory": 17094475776,
+              "torch": "2.7.1+cu128",
+              "cuda": "12.8"
+            },
+            "scope": "native55 FK, full486 pose blend, selected union skin, exact +/- replay and live cavity/collar consumers; CPU analytic body images/native camera/CSR/TRF unchanged",
+            "selected_vertices": 1083,
+            "samples": 641,
+            "prepare_seconds": 0.215387299998838,
+            "prepare_uploaded_bytes": 18098568,
+            "precision": "float64",
+            "shared_parameters": "fixed; changing shared geometry requires a new prepared owner",
+            "transfer_boundary": "one changed N x 69 increment upload; one packed residual/local-Jacobian download per call; no per-column download"
+          },
+          "measurement": {
+            "calls": 1,
+            "linearize_calls": 1,
+            "trial_calls": 0,
+            "h2d_bytes": 353832,
+            "d2h_bytes": 10112416,
+            "h2d_calls": 1,
+            "d2h_calls": 1,
+            "h2d_seconds_cuda_events": 0.0002163520008325577,
+            "compute_seconds_cuda_events": 2.94006640625,
+            "d2h_seconds_cuda_events": 0.0013384640216827393,
+            "timing_scope": "CUDA events inside complete host-wall measurement; includes cache reuse, excludes static preparation"
+          }
+        },
+        "comparison": {
+          "baseline_snapshot": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\spin_base4\\snapshot.npz",
+          "automatic_backend_selection": false,
+          "residual_max_abs": 1.9925727734459997e-13,
+          "residual_relative_l2": 1.1008638566318272e-14,
+          "residual_violation_count": 0,
+          "jacobian_max_abs": 1.0006884435670438e-08,
+          "jacobian_relative_frobenius": 8.870354030673351e-11,
+          "jacobian_entry_violation_count": 0,
+          "jacobian_worst_entry": {
+            "row": 187000,
+            "column": 2606,
+            "baseline": -0.01585023089366139,
+            "current": -0.015850240900545827,
+            "absolute_error": 1.0006884435670438e-08,
+            "allowed_error": 5.317004818010917e-05,
+            "normalized_error": 0.00018820529185478523
+          },
+          "jacobian_max_normalized_error": 0.00018820529185478523,
+          "residual_within_tolerance": true,
+          "jacobian_within_tolerance": true,
+          "thresholds": {
+            "residual_atol": 1e-08,
+            "residual_rtol": 1e-10,
+            "jacobian_entry_atol": 5e-05,
+            "jacobian_entry_rtol": 0.0002,
+            "equation": "abs(new-old) <= atol + rtol*max(abs(old),abs(new)); every sparse union entry",
+            "frobenius_is_summary_only": true
+          }
+        }
+      },
+      "spin_gpu_checked": {
+        "profile": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\spin_gpu_checked\\profile.json",
+        "wall_seconds": 14.719924400000309,
+        "cpu_core_seconds": 26.515625,
+        "average_cpu_cores": 1.8013424715686341,
+        "peak_process_rss_bytes": 3629707264,
+        "setup_seconds": 5.812578600001871,
+        "launcher_wall_seconds": 39.77336959999957,
+        "shape": [
+          187558,
+          3482
+        ],
+        "nnz": 9606855,
+        "derivative_usage": {
+          "analytic_world_linearizations": 2,
+          "fk_replay_linearizations": 0,
+          "surface_replay_linearizations": 0,
+          "finite_difference_world_linearizations": 0
+        },
+        "gpu": {
+          "implementation_scope": "foot/collar compatibility only",
+          "measurement_supported": true,
+          "implementation": {
+            "kind": "cuda_resident_native55_selected_skin_foot",
+            "device": "cuda:0",
+            "device_info": {
+              "name": "NVIDIA GeForce RTX 5070 Ti",
+              "compute_capability": [
+                12,
+                0
+              ],
+              "total_memory": 17094475776,
+              "torch": "2.7.1+cu128",
+              "cuda": "12.8"
+            },
+            "scope": "native55 FK, full486 pose blend, selected union skin, exact +/- replay and live cavity/collar consumers; CPU analytic body images/native camera/CSR/TRF unchanged",
+            "selected_vertices": 1083,
+            "samples": 641,
+            "prepare_seconds": 0.460395599999174,
+            "prepare_uploaded_bytes": 18098568,
+            "precision": "float64",
+            "shared_parameters": "fixed; changing shared geometry requires a new prepared owner",
+            "transfer_boundary": "one changed N x 69 increment upload; one packed residual/local-Jacobian download per call; no per-column download"
+          },
+          "measurement": {
+            "calls": 1,
+            "linearize_calls": 1,
+            "trial_calls": 0,
+            "h2d_bytes": 353832,
+            "d2h_bytes": 10112416,
+            "h2d_calls": 1,
+            "d2h_calls": 1,
+            "native55_fk_prepares": 1,
+            "selected_surface_prepares": 1,
+            "exact_fk_replay_pairs": 57,
+            "selected_skin_replay_pairs": 57,
+            "consumer_calls": 58,
+            "h2d_host_seconds": 0.0003125000002910383,
+            "d2h_host_blocking_seconds": 0.2564200999986497,
+            "compute_host_enqueue_seconds": 8.19022430000041,
+            "h2d_seconds_cuda_events": 0.00014271999895572662,
+            "compute_seconds_cuda_events": 8.445310546875,
+            "d2h_seconds_cuda_events": 0.0013391040563583375,
+            "timing_scope": "CUDA stream event intervals (include host submission gaps, not summed pure kernel time); complete wall separately includes host waits. Static preparation excluded."
+          }
+        },
+        "comparison": {
+          "baseline_snapshot": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\spin_base4\\snapshot.npz",
+          "automatic_backend_selection": false,
+          "residual_max_abs": 1.9925727734459997e-13,
+          "residual_relative_l2": 1.1008638566318272e-14,
+          "residual_violation_count": 0,
+          "jacobian_max_abs": 1.0006884435670438e-08,
+          "jacobian_relative_frobenius": 8.870354030673351e-11,
+          "jacobian_entry_violation_count": 0,
+          "jacobian_worst_entry": {
+            "row": 187000,
+            "column": 2606,
+            "baseline": -0.01585023089366139,
+            "current": -0.015850240900545827,
+            "absolute_error": 1.0006884435670438e-08,
+            "allowed_error": 5.317004818010917e-05,
+            "normalized_error": 0.00018820529185478523
+          },
+          "jacobian_max_normalized_error": 0.00018820529185478523,
+          "residual_within_tolerance": true,
+          "jacobian_within_tolerance": true,
+          "thresholds": {
+            "residual_atol": 1e-08,
+            "residual_rtol": 1e-10,
+            "jacobian_entry_atol": 5e-05,
+            "jacobian_entry_rtol": 0.0002,
+            "equation": "abs(new-old) <= atol + rtol*max(abs(old),abs(new)); every sparse union entry",
+            "frobenius_is_summary_only": true
+          }
+        }
+      }
+    },
+    "solves": {
+      "baseline": {
+        "profile": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\solve_base2\\profile.json",
+        "wall_seconds": 178.5070044000022,
+        "cpu_core_seconds": 500.734375,
+        "average_cpu_cores": 2.8051245198084445,
+        "peak_process_rss_bytes": 3310059520,
+        "gpu_memory": null,
+        "gpu": null,
+        "setup_seconds": 3.3684807999961777,
+        "launcher_wall_seconds": 182.30477470000187,
+        "accepted_steps": 2,
+        "rejected_trial_steps": 1,
+        "trial_costs": [
+          3824.033305240741,
+          4093.2703025273054,
+          3434.99898939127
+        ],
+        "trial_count_scope": "noncached joint trial evaluations before final accepted callback; excludes initial outer=0 and post-stop saved-candidate re-evaluation",
+        "accepted_costs": [
+          3824.033305240741,
+          3434.99898939127
+        ],
+        "stop_reasons": [
+          {
+            "code": "accepted_budget",
+            "category": "budget",
+            "message": "Accepted-step budget reached.",
+            "accepted": 2,
+            "limit": 2
+          }
+        ],
+        "jacobian_hint": 73.6587779999973,
+        "initial_fun_then_jac_seconds_from_run_log": 75.36255399999936,
+        "initial_fun_then_jac_scope": "sum of first cold Joint fun and same-x J inside solve; other begin/checkpoint work remains in complete solve wall",
+        "final_cost": 3434.99898939127,
+        "final_gradient_inf": 5589.300889874379,
+        "final_gradient_evidence": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\final_gradient_baseline\\profile.json",
+        "gradient_scope": "read-only current complete FP64 evaluator after solve, all 3465 active controls; outside timed solve",
+        "gradient_evaluation_seconds": 9.015885300002992,
+        "lsmr": [
+          {
+            "wall_seconds": 11.576431100002083,
+            "istop": 2,
+            "iterations": 771,
+            "normr": 83.72134716236981,
+            "normar": 0.01122459187593699,
+            "norma": 1348.97566357818,
+            "conda": 30.855225623465444,
+            "normx": 50.93301275415312
+          },
+          {
+            "wall_seconds": 5.614091299998108,
+            "istop": 2,
+            "iterations": 417,
+            "normr": 80.88917371778702,
+            "normar": 0.0070606095562737855,
+            "norma": 878.3395651836837,
+            "conda": 11.215263703516642,
+            "normx": 18.63077025459798
+          }
+        ],
+        "lsmr_total_seconds": 17.19052240000019,
+        "phase_timings": {
+          "solve_json_write": {
+            "calls": 11,
+            "failures": 0,
+            "inclusive_call_seconds": 0.04179849999491125,
+            "exclusive_call_seconds": 0.04179849999491125,
+            "main_thread_inclusive_seconds": 0.04179849999491125,
+            "worker_call_seconds_sum": 0.0
+          },
+          "compact_forward_rotations": {
+            "calls": 468,
+            "failures": 0,
+            "inclusive_call_seconds": 62.29227830002492,
+            "exclusive_call_seconds": 62.29227830002492,
+            "main_thread_inclusive_seconds": 0.7796749000044656,
+            "worker_call_seconds_sum": 61.51260340002045
+          },
+          "native_projection": {
+            "calls": 163,
+            "failures": 0,
+            "inclusive_call_seconds": 0.3533915000516572,
+            "exclusive_call_seconds": 0.3533915000516572,
+            "main_thread_inclusive_seconds": 0.3533915000516572,
+            "worker_call_seconds_sum": 0.0
+          },
+          "fullbody_base": {
+            "calls": 9,
+            "failures": 0,
+            "inclusive_call_seconds": 22.58749969999917,
+            "exclusive_call_seconds": 21.628774199984036,
+            "main_thread_inclusive_seconds": 22.58749969999917,
+            "worker_call_seconds_sum": 0.0
+          },
+          "surface_sample": {
+            "calls": 712,
+            "failures": 0,
+            "inclusive_call_seconds": 70.17868699986138,
+            "exclusive_call_seconds": 70.17868699986138,
+            "main_thread_inclusive_seconds": 3.8603548999599298,
+            "worker_call_seconds_sum": 66.31833209990145
+          },
+          "foot_metrics": {
+            "calls": 242,
+            "failures": 0,
+            "inclusive_call_seconds": 138.61447310005315,
+            "exclusive_call_seconds": 104.4503578001968,
+            "main_thread_inclusive_seconds": 3.5306560000099125,
+            "worker_call_seconds_sum": 135.08381710004323
+          },
+          "collar_metrics": {
+            "calls": 256,
+            "failures": 0,
+            "inclusive_call_seconds": 276.6262770000176,
+            "exclusive_call_seconds": 242.6782279999752,
+            "main_thread_inclusive_seconds": 11.582289199985098,
+            "worker_call_seconds_sum": 265.0439878000325
+          },
+          "compatibility_rows": {
+            "calls": 242,
+            "failures": 0,
+            "inclusive_call_seconds": 411.4805739999938,
+            "exclusive_call_seconds": 1.618479899916565,
+            "main_thread_inclusive_seconds": 9.770845200007898,
+            "worker_call_seconds_sum": 401.7097287999859
+          },
+          "compatibility_forward": {
+            "calls": 7,
+            "failures": 0,
+            "inclusive_call_seconds": 10.022035200003302,
+            "exclusive_call_seconds": 0.10118259999580914,
+            "main_thread_inclusive_seconds": 10.022035200003302,
+            "worker_call_seconds_sum": 0.0
+          },
+          "body_with_compatibility": {
+            "calls": 9,
+            "failures": 0,
+            "inclusive_call_seconds": 140.8672843000095,
+            "exclusive_call_seconds": 108.25774940000701,
+            "main_thread_inclusive_seconds": 140.8672843000095,
+            "worker_call_seconds_sum": 0.0
+          },
+          "physics_fk": {
+            "calls": 7,
+            "failures": 0,
+            "inclusive_call_seconds": 0.17824679999466753,
+            "exclusive_call_seconds": 0.17824679999466753,
+            "main_thread_inclusive_seconds": 0.17824679999466753,
+            "worker_call_seconds_sum": 0.0
+          },
+          "physics_constraints": {
+            "calls": 7,
+            "failures": 0,
+            "inclusive_call_seconds": 0.32013079999160254,
+            "exclusive_call_seconds": 0.32013079999160254,
+            "main_thread_inclusive_seconds": 0.32013079999160254,
+            "worker_call_seconds_sum": 0.0
+          },
+          "source_motion": {
+            "calls": 7,
+            "failures": 0,
+            "inclusive_call_seconds": 0.00010959999781334773,
+            "exclusive_call_seconds": 0.00010959999781334773,
+            "main_thread_inclusive_seconds": 0.00010959999781334773,
+            "worker_call_seconds_sum": 0.0
+          },
+          "spin_fk": {
+            "calls": 501,
+            "failures": 0,
+            "inclusive_call_seconds": 0.4916485999710858,
+            "exclusive_call_seconds": 0.4916485999710858,
+            "main_thread_inclusive_seconds": 0.4916485999710858,
+            "worker_call_seconds_sum": 0.0
+          },
+          "spin_palm_skin": {
+            "calls": 235,
+            "failures": 0,
+            "inclusive_call_seconds": 1.1812766000584816,
+            "exclusive_call_seconds": 0.004678200086345896,
+            "main_thread_inclusive_seconds": 1.1812766000584816,
+            "worker_call_seconds_sum": 0.0
+          },
+          "spin_grasp_geometry": {
+            "calls": 235,
+            "failures": 0,
+            "inclusive_call_seconds": 1.6177381000306923,
+            "exclusive_call_seconds": 0.017400900018401444,
+            "main_thread_inclusive_seconds": 1.6177381000306923,
+            "worker_call_seconds_sum": 0.0
+          },
+          "spin_continuous_support": {
+            "calls": 7,
+            "failures": 0,
+            "inclusive_call_seconds": 0.13152959999570157,
+            "exclusive_call_seconds": 0.019317899997986387,
+            "main_thread_inclusive_seconds": 0.13152959999570157,
+            "worker_call_seconds_sum": 0.0
+          },
+          "spin_source_image": {
+            "calls": 7,
+            "failures": 0,
+            "inclusive_call_seconds": 0.07120780000695959,
+            "exclusive_call_seconds": 0.006888499992783181,
+            "main_thread_inclusive_seconds": 0.07120780000695959,
+            "worker_call_seconds_sum": 0.0
+          },
+          "action_factors": {
+            "calls": 7,
+            "failures": 0,
+            "inclusive_call_seconds": 2.336411299998872,
+            "exclusive_call_seconds": 0.5159357999655185,
+            "main_thread_inclusive_seconds": 2.336411299998872,
+            "worker_call_seconds_sum": 0.0
+          },
+          "support_image": {
+            "calls": 9,
+            "failures": 0,
+            "inclusive_call_seconds": 1.2026074000095832,
+            "exclusive_call_seconds": 1.1941961999764317,
+            "main_thread_inclusive_seconds": 1.2026074000095832,
+            "worker_call_seconds_sum": 0.0
+          },
+          "joint_complete": {
+            "calls": 12,
+            "failures": 0,
+            "inclusive_call_seconds": 160.37293049999425,
+            "exclusive_call_seconds": 0.7435174999991432,
+            "main_thread_inclusive_seconds": 160.37293049999425,
+            "worker_call_seconds_sum": 0.0
+          },
+          "stage_quality_begin": {
+            "calls": 1,
+            "failures": 0,
+            "inclusive_call_seconds": 0.2992812000011327,
+            "exclusive_call_seconds": 0.27206750000914326,
+            "main_thread_inclusive_seconds": 0.2992812000011327,
+            "worker_call_seconds_sum": 0.0
+          },
+          "checkpoint_npz_write": {
+            "calls": 10,
+            "failures": 0,
+            "inclusive_call_seconds": 0.04428229998302413,
+            "exclusive_call_seconds": 0.04428229998302413,
+            "main_thread_inclusive_seconds": 0.04428229998302413,
+            "worker_call_seconds_sum": 0.0
+          },
+          "native_xyz_jacobian": {
+            "calls": 6,
+            "failures": 0,
+            "inclusive_call_seconds": 0.010294899992004503,
+            "exclusive_call_seconds": 0.010294899992004503,
+            "main_thread_inclusive_seconds": 0.010294899992004503,
+            "worker_call_seconds_sum": 0.0
+          },
+          "physics_jacobian": {
+            "calls": 2,
+            "failures": 0,
+            "inclusive_call_seconds": 8.487082600004214,
+            "exclusive_call_seconds": 8.487082600004214,
+            "main_thread_inclusive_seconds": 8.487082600004214,
+            "worker_call_seconds_sum": 0.0
+          },
+          "spin_support_jacobian": {
+            "calls": 2,
+            "failures": 0,
+            "inclusive_call_seconds": 0.10141930000099819,
+            "exclusive_call_seconds": 0.10141930000099819,
+            "main_thread_inclusive_seconds": 0.10141930000099819,
+            "worker_call_seconds_sum": 0.0
+          },
+          "lsmr": {
+            "calls": 2,
+            "failures": 0,
+            "inclusive_call_seconds": 17.19052240000019,
+            "exclusive_call_seconds": 17.19052240000019,
+            "main_thread_inclusive_seconds": 17.19052240000019,
+            "worker_call_seconds_sum": 0.0
+          },
+          "scipy_trf_complete": {
+            "calls": 1,
+            "failures": 1,
+            "inclusive_call_seconds": 172.4708352000016,
+            "exclusive_call_seconds": 0.43735850001394283,
+            "main_thread_inclusive_seconds": 172.4708352000016,
+            "worker_call_seconds_sum": 0.0
+          },
+          "stage_quality_finish": {
+            "calls": 1,
+            "failures": 0,
+            "inclusive_call_seconds": 0.049850099996547215,
+            "exclusive_call_seconds": 0.02231329998903675,
+            "main_thread_inclusive_seconds": 0.049850099996547215,
+            "worker_call_seconds_sum": 0.0
+          }
+        },
+        "parts": {
+          "ice_penetration": 0.5366001736045731,
+          "ice_support_hover": 0.0,
+          "data": 3275.183236964755,
+          "neutral_fit": 0.8797784393673409,
+          "shared_prior": 2.740368884492997,
+          "contact_AL": 9.067398928965536,
+          "source_motion": 0.0,
+          "action": 32.123103220453416,
+          "support_image": 114.46850277963031
+        },
+        "raw_data_parts": {
+          "body_pixels": 151469.19075667998,
+          "reference_deviation": 973.36043415775,
+          "correction_velocity": 48.7394595407267,
+          "actual_root_and_correction_acceleration": 10988.071986493916,
+          "foot_cavity_support": 279.79921136556607,
+          "grip": 18.615700653067936,
+          "actual_local_acceleration": 13.349489749546024,
+          "continuous_support": 0.15791281783945132,
+          "body_source_regions": 0.0,
+          "support_image": 114.46850277963031
+        },
+        "quality_groups": {
+          "body": {
+            "count": 3213,
+            "exposures": 190,
+            "median_px": 17.82286554696849,
+            "p95_px": 52.40738596103779,
+            "worst_px": 226.91288362836005,
+            "worst_pts": 1161472
+          },
+          "body_foot_0": {
+            "count": 570,
+            "exposures": 190,
+            "median_px": 25.63167682766478,
+            "p95_px": 55.13645396286485,
+            "worst_px": 119.14775847613008,
+            "worst_pts": 1176576
+          },
+          "body_foot_1": {
+            "count": 570,
+            "exposures": 190,
+            "median_px": 9.278813303453306,
+            "p95_px": 26.134924994883434,
+            "worst_px": 38.4129372598498,
+            "worst_pts": 1142528
+          },
+          "fit_boot_foot_0": {
+            "count": 8,
+            "exposures": 5,
+            "median_px": 0.0,
+            "p95_px": 0.0,
+            "worst_px": 0.0,
+            "worst_pts": 1138432,
+            "centre_distance_px": {
+              "count": 8,
+              "exposures": 5,
+              "median_px": 32.404110572313435,
+              "p95_px": 43.81402427015914,
+              "worst_px": 44.39216618031047,
+              "worst_pts": 1151744
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "fit_boot_foot_1": {
+            "count": 13,
+            "exposures": 5,
+            "median_px": 0.0,
+            "p95_px": 5.604155675475328,
+            "worst_px": 7.253567524009572,
+            "worst_pts": 1138432,
+            "centre_distance_px": {
+              "count": 13,
+              "exposures": 5,
+              "median_px": 19.114357794054325,
+              "p95_px": 28.939044495754054,
+              "worst_px": 34.231647842464426,
+              "worst_pts": 1138432
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "fit_support_region_foot_0": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null,
+            "centre_distance_px": {
+              "count": 0,
+              "median_px": null,
+              "p95_px": null,
+              "worst_px": null,
+              "worst_pts": null
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "fit_support_region_foot_1": {
+            "count": 5,
+            "exposures": 5,
+            "median_px": 0.0,
+            "p95_px": 3.115982336224363,
+            "worst_px": 3.8949779202804544,
+            "worst_pts": 1177344,
+            "centre_distance_px": {
+              "count": 5,
+              "exposures": 5,
+              "median_px": 9.46817996398179,
+              "p95_px": 22.21030781594919,
+              "worst_px": 24.797265930008013,
+              "worst_pts": 1177344
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "review_boot_foot_0": {
+            "count": 5,
+            "exposures": 3,
+            "median_px": 0.0,
+            "p95_px": 36.968060712377486,
+            "worst_px": 41.17528627745201,
+            "worst_pts": 1159168,
+            "centre_distance_px": {
+              "count": 5,
+              "exposures": 3,
+              "median_px": 47.197773408168736,
+              "p95_px": 66.31875407256766,
+              "worst_px": 68.04881997943409,
+              "worst_pts": 1159168
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "review_boot_foot_1": {
+            "count": 9,
+            "exposures": 3,
+            "median_px": 1.7689154254135735,
+            "p95_px": 16.768498570411463,
+            "worst_px": 20.911600746210727,
+            "worst_pts": 1133568,
+            "centre_distance_px": {
+              "count": 9,
+              "exposures": 3,
+              "median_px": 29.051657397325712,
+              "p95_px": 41.630314188715246,
+              "worst_px": 46.331678775242224,
+              "worst_pts": 1133568
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "review_support_region_foot_0": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null,
+            "centre_distance_px": {
+              "count": 0,
+              "median_px": null,
+              "p95_px": null,
+              "worst_px": null,
+              "worst_pts": null
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "review_support_region_foot_1": {
+            "count": 3,
+            "exposures": 3,
+            "median_px": 0.0,
+            "p95_px": 0.0,
+            "worst_px": 0.0,
+            "worst_pts": 1133568,
+            "centre_distance_px": {
+              "count": 3,
+              "exposures": 3,
+              "median_px": 36.83401198186985,
+              "p95_px": 38.52566484199736,
+              "worst_px": 38.71362627090042,
+              "worst_pts": 1159168
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "blade": {
+            "count": 0,
+            "reason": "All selected steel edges blend with shadow/reflection or are end-on; no precise blade curve admitted."
+          }
+        },
+        "quality_status": "requires_visual_review",
+        "accuracy_accepted": false,
+        "unknown_sections": 0,
+        "max_structural_violation_m": 0.007298647483644377,
+        "numerical_convergence": false,
+        "quality_failed": false,
+        "candidate": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\solve_base2\\solve\\candidate.npz",
+        "input_fingerprint": "80ae623590db314821a0612d5e8a4f30b2797c894806b82a317febdb640a17f8",
+        "initial_x_sha256": "0bc41b1ec22ba1dcc5d41fc9d9710f45e9dd3d00cb291e5d097c700257998b3a"
+      },
+      "cpu12": {
+        "profile": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\solve_cpu12_2\\profile.json",
+        "wall_seconds": 108.36621970000124,
+        "cpu_core_seconds": 529.609375,
+        "average_cpu_cores": 4.8872183275024215,
+        "peak_process_rss_bytes": 3918794752,
+        "gpu_memory": null,
+        "gpu": null,
+        "setup_seconds": 3.4209071999939624,
+        "launcher_wall_seconds": 112.26106609999988,
+        "accepted_steps": 2,
+        "rejected_trial_steps": 1,
+        "trial_costs": [
+          3824.0265515867873,
+          4093.2709996466615,
+          3434.997194912238
+        ],
+        "trial_count_scope": "noncached joint trial evaluations before final accepted callback; excludes initial outer=0 and post-stop saved-candidate re-evaluation",
+        "accepted_costs": [
+          3824.0265515867873,
+          3434.997194912238
+        ],
+        "stop_reasons": [
+          {
+            "code": "accepted_budget",
+            "category": "budget",
+            "message": "Accepted-step budget reached.",
+            "accepted": 2,
+            "limit": 2
+          }
+        ],
+        "jacobian_hint": 36.2883,
+        "initial_fun_then_jac_seconds_from_run_log": 39.33688969999639,
+        "initial_fun_then_jac_scope": "sum of first cold Joint fun and same-x J inside solve; other begin/checkpoint work remains in complete solve wall",
+        "final_cost": 3434.997194912238,
+        "final_gradient_inf": 5589.220189728396,
+        "final_gradient_evidence": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\final_gradient_cpu12\\profile.json",
+        "gradient_scope": "read-only current complete FP64 evaluator after solve, all 3465 active controls; outside timed solve",
+        "gradient_evaluation_seconds": 9.122294000000693,
+        "lsmr": [
+          {
+            "wall_seconds": 13.590225600004487,
+            "istop": 2,
+            "iterations": 769,
+            "normr": 83.72134702859957,
+            "normar": 0.011153514476760397,
+            "norma": 1342.9308900894064,
+            "conda": 33.00301513141249,
+            "normx": 50.933092588121205
+          },
+          {
+            "wall_seconds": 7.332208100000571,
+            "istop": 2,
+            "iterations": 417,
+            "normr": 80.8891632448739,
+            "normar": 0.00703920306450114,
+            "norma": 877.6236392294991,
+            "conda": 13.171528361682519,
+            "normx": 18.630878666128865
+          }
+        ],
+        "lsmr_total_seconds": 20.922433700005058,
+        "phase_timings": {
+          "solve_json_write": {
+            "calls": 13,
+            "failures": 0,
+            "inclusive_call_seconds": 0.0508124999832944,
+            "exclusive_call_seconds": 0.0508124999832944,
+            "main_thread_inclusive_seconds": 0.0508124999832944,
+            "worker_call_seconds_sum": 0.0
+          },
+          "compact_forward_rotations": {
+            "calls": 12,
+            "failures": 0,
+            "inclusive_call_seconds": 0.8009889000022667,
+            "exclusive_call_seconds": 0.8009889000022667,
+            "main_thread_inclusive_seconds": 0.8009889000022667,
+            "worker_call_seconds_sum": 0.0
+          },
+          "native_projection": {
+            "calls": 163,
+            "failures": 0,
+            "inclusive_call_seconds": 0.3562190000011469,
+            "exclusive_call_seconds": 0.3562190000011469,
+            "main_thread_inclusive_seconds": 0.3562190000011469,
+            "worker_call_seconds_sum": 0.0
+          },
+          "fullbody_base": {
+            "calls": 9,
+            "failures": 0,
+            "inclusive_call_seconds": 5.6222819999893545,
+            "exclusive_call_seconds": 4.3546431999857305,
+            "main_thread_inclusive_seconds": 5.6222819999893545,
+            "worker_call_seconds_sum": 0.0
+          },
+          "foot_metrics": {
+            "calls": 242,
+            "failures": 0,
+            "inclusive_call_seconds": 172.099384499983,
+            "exclusive_call_seconds": 172.099384499983,
+            "main_thread_inclusive_seconds": 2.656019299996842,
+            "worker_call_seconds_sum": 169.44336519998615
+          },
+          "collar_metrics": {
+            "calls": 256,
+            "failures": 0,
+            "inclusive_call_seconds": 457.81855200001155,
+            "exclusive_call_seconds": 457.81855200001155,
+            "main_thread_inclusive_seconds": 10.818949400010752,
+            "worker_call_seconds_sum": 446.9996026000008
+          },
+          "compatibility_rows": {
+            "calls": 242,
+            "failures": 0,
+            "inclusive_call_seconds": 628.6917809000661,
+            "exclusive_call_seconds": 4.177875100096571,
+            "main_thread_inclusive_seconds": 9.011634599992249,
+            "worker_call_seconds_sum": 619.6801463000738
+          },
+          "compatibility_forward": {
+            "calls": 7,
+            "failures": 0,
+            "inclusive_call_seconds": 9.263888999994379,
+            "exclusive_call_seconds": 0.09954669999569887,
+            "main_thread_inclusive_seconds": 9.263888999994379,
+            "worker_call_seconds_sum": 0.0
+          },
+          "body_with_compatibility": {
+            "calls": 9,
+            "failures": 0,
+            "inclusive_call_seconds": 73.31119050000416,
+            "exclusive_call_seconds": 58.085026000015205,
+            "main_thread_inclusive_seconds": 73.31119050000416,
+            "worker_call_seconds_sum": 0.0
+          },
+          "physics_fk": {
+            "calls": 7,
+            "failures": 0,
+            "inclusive_call_seconds": 0.17530429999897024,
+            "exclusive_call_seconds": 0.17530429999897024,
+            "main_thread_inclusive_seconds": 0.17530429999897024,
+            "worker_call_seconds_sum": 0.0
+          },
+          "physics_constraints": {
+            "calls": 7,
+            "failures": 0,
+            "inclusive_call_seconds": 0.3220762999917497,
+            "exclusive_call_seconds": 0.3220762999917497,
+            "main_thread_inclusive_seconds": 0.3220762999917497,
+            "worker_call_seconds_sum": 0.0
+          },
+          "source_motion": {
+            "calls": 7,
+            "failures": 0,
+            "inclusive_call_seconds": 6.0800004575867206e-05,
+            "exclusive_call_seconds": 6.0800004575867206e-05,
+            "main_thread_inclusive_seconds": 6.0800004575867206e-05,
+            "worker_call_seconds_sum": 0.0
+          },
+          "spin_fk": {
+            "calls": 501,
+            "failures": 0,
+            "inclusive_call_seconds": 0.5086301999908756,
+            "exclusive_call_seconds": 0.5086301999908756,
+            "main_thread_inclusive_seconds": 0.5086301999908756,
+            "worker_call_seconds_sum": 0.0
+          },
+          "spin_palm_skin": {
+            "calls": 235,
+            "failures": 0,
+            "inclusive_call_seconds": 1.2244248999777483,
+            "exclusive_call_seconds": 1.2244248999777483,
+            "main_thread_inclusive_seconds": 1.2244248999777483,
+            "worker_call_seconds_sum": 0.0
+          },
+          "spin_grasp_geometry": {
+            "calls": 235,
+            "failures": 0,
+            "inclusive_call_seconds": 1.6798877999608521,
+            "exclusive_call_seconds": 0.019871700016665272,
+            "main_thread_inclusive_seconds": 1.6798877999608521,
+            "worker_call_seconds_sum": 0.0
+          },
+          "spin_continuous_support": {
+            "calls": 7,
+            "failures": 0,
+            "inclusive_call_seconds": 0.032001799991121516,
+            "exclusive_call_seconds": 0.01848969999991823,
+            "main_thread_inclusive_seconds": 0.032001799991121516,
+            "worker_call_seconds_sum": 0.0
+          },
+          "spin_source_image": {
+            "calls": 7,
+            "failures": 0,
+            "inclusive_call_seconds": 0.07164790000388166,
+            "exclusive_call_seconds": 0.006912199954967946,
+            "main_thread_inclusive_seconds": 0.07164790000388166,
+            "worker_call_seconds_sum": 0.0
+          },
+          "action_factors": {
+            "calls": 7,
+            "failures": 0,
+            "inclusive_call_seconds": 2.319267700004275,
+            "exclusive_call_seconds": 0.5357302000484196,
+            "main_thread_inclusive_seconds": 2.319267700004275,
+            "worker_call_seconds_sum": 0.0
+          },
+          "support_image": {
+            "calls": 9,
+            "failures": 0,
+            "inclusive_call_seconds": 2.250359400008165,
+            "exclusive_call_seconds": 2.241849000027287,
+            "main_thread_inclusive_seconds": 2.250359400008165,
+            "worker_call_seconds_sum": 0.0
+          },
+          "joint_complete": {
+            "calls": 12,
+            "failures": 0,
+            "inclusive_call_seconds": 86.48055210000166,
+            "exclusive_call_seconds": 1.5850639999844134,
+            "main_thread_inclusive_seconds": 86.48055210000166,
+            "worker_call_seconds_sum": 0.0
+          },
+          "stage_quality_begin": {
+            "calls": 1,
+            "failures": 0,
+            "inclusive_call_seconds": 0.31209349999699043,
+            "exclusive_call_seconds": 0.2829581999903894,
+            "main_thread_inclusive_seconds": 0.31209349999699043,
+            "worker_call_seconds_sum": 0.0
+          },
+          "checkpoint_npz_write": {
+            "calls": 10,
+            "failures": 0,
+            "inclusive_call_seconds": 0.042553499988571275,
+            "exclusive_call_seconds": 0.042553499988571275,
+            "main_thread_inclusive_seconds": 0.042553499988571275,
+            "worker_call_seconds_sum": 0.0
+          },
+          "native_xyz_jacobian": {
+            "calls": 6,
+            "failures": 0,
+            "inclusive_call_seconds": 0.010585499992885161,
+            "exclusive_call_seconds": 0.010585499992885161,
+            "main_thread_inclusive_seconds": 0.010585499992885161,
+            "worker_call_seconds_sum": 0.0
+          },
+          "compact_linearization_prepare": {
+            "calls": 4,
+            "failures": 0,
+            "inclusive_call_seconds": 0.31297300000005635,
+            "exclusive_call_seconds": 0.31297300000005635,
+            "main_thread_inclusive_seconds": 0.31297300000005635,
+            "worker_call_seconds_sum": 0.0
+          },
+          "compact_analytic_derivative": {
+            "calls": 114,
+            "failures": 0,
+            "inclusive_call_seconds": 13.098593700007768,
+            "exclusive_call_seconds": 13.098593700007768,
+            "main_thread_inclusive_seconds": 0.0,
+            "worker_call_seconds_sum": 13.098593700007768
+          },
+          "compact_fk_pair": {
+            "calls": 150,
+            "failures": 0,
+            "inclusive_call_seconds": 7.3707269000587985,
+            "exclusive_call_seconds": 7.3707269000587985,
+            "main_thread_inclusive_seconds": 0.0,
+            "worker_call_seconds_sum": 7.3707269000587985
+          },
+          "selected_surface_prepare": {
+            "calls": 2,
+            "failures": 0,
+            "inclusive_call_seconds": 0.314600400008203,
+            "exclusive_call_seconds": 0.314600400008203,
+            "main_thread_inclusive_seconds": 0.314600400008203,
+            "worker_call_seconds_sum": 0.0
+          },
+          "selected_surface_pair": {
+            "calls": 114,
+            "failures": 0,
+            "inclusive_call_seconds": 37.33747269997548,
+            "exclusive_call_seconds": 37.33747269997548,
+            "main_thread_inclusive_seconds": 0.0,
+            "worker_call_seconds_sum": 37.33747269997548
+          },
+          "physics_jacobian": {
+            "calls": 2,
+            "failures": 0,
+            "inclusive_call_seconds": 1.146013799996581,
+            "exclusive_call_seconds": 1.146013799996581,
+            "main_thread_inclusive_seconds": 1.146013799996581,
+            "worker_call_seconds_sum": 0.0
+          },
+          "spin_support_jacobian": {
+            "calls": 2,
+            "failures": 0,
+            "inclusive_call_seconds": 0.0022147999989101663,
+            "exclusive_call_seconds": 0.0022147999989101663,
+            "main_thread_inclusive_seconds": 0.0022147999989101663,
+            "worker_call_seconds_sum": 0.0
+          },
+          "lsmr": {
+            "calls": 2,
+            "failures": 0,
+            "inclusive_call_seconds": 20.922433700005058,
+            "exclusive_call_seconds": 20.922433700005058,
+            "main_thread_inclusive_seconds": 20.922433700005058,
+            "worker_call_seconds_sum": 0.0
+          },
+          "scipy_trf_complete": {
+            "calls": 1,
+            "failures": 1,
+            "inclusive_call_seconds": 102.59806920000119,
+            "exclusive_call_seconds": 0.46529739999823505,
+            "main_thread_inclusive_seconds": 102.59806920000119,
+            "worker_call_seconds_sum": 0.0
+          },
+          "stage_quality_finish": {
+            "calls": 1,
+            "failures": 0,
+            "inclusive_call_seconds": 0.04582479999953648,
+            "exclusive_call_seconds": 0.01860570000280859,
+            "main_thread_inclusive_seconds": 0.04582479999953648,
+            "worker_call_seconds_sum": 0.0
+          }
+        },
+        "parts": {
+          "ice_penetration": 0.5365997255424759,
+          "ice_support_hover": 0.0,
+          "data": 3275.1834652656075,
+          "neutral_fit": 0.8797784393673409,
+          "shared_prior": 2.740368884492997,
+          "contact_AL": 9.06740121547518,
+          "source_motion": 0.0,
+          "action": 32.12313268102222,
+          "support_image": 114.46644870072788
+        },
+        "raw_data_parts": {
+          "body_pixels": 151469.20398695703,
+          "reference_deviation": 973.3596380302646,
+          "correction_velocity": 48.73938912765409,
+          "actual_root_and_correction_acceleration": 10988.071106238269,
+          "foot_cavity_support": 279.7991429272121,
+          "grip": 18.615730421489474,
+          "actual_local_acceleration": 13.349489062518698,
+          "continuous_support": 0.15791319701403547,
+          "body_source_regions": 0.0,
+          "support_image": 114.46644870072788
+        },
+        "quality_groups": {
+          "body": {
+            "count": 3213,
+            "exposures": 190,
+            "median_px": 17.82290307072294,
+            "p95_px": 52.40737941468289,
+            "worst_px": 226.91287351418822,
+            "worst_pts": 1161472
+          },
+          "body_foot_0": {
+            "count": 570,
+            "exposures": 190,
+            "median_px": 25.631673441643255,
+            "p95_px": 55.13645666277617,
+            "worst_px": 119.14774051032998,
+            "worst_pts": 1176576
+          },
+          "body_foot_1": {
+            "count": 570,
+            "exposures": 190,
+            "median_px": 9.278834069503898,
+            "p95_px": 26.134898992940116,
+            "worst_px": 38.41293800011662,
+            "worst_pts": 1142528
+          },
+          "fit_boot_foot_0": {
+            "count": 8,
+            "exposures": 5,
+            "median_px": 0.0,
+            "p95_px": 0.0,
+            "worst_px": 0.0,
+            "worst_pts": 1138432,
+            "centre_distance_px": {
+              "count": 8,
+              "exposures": 5,
+              "median_px": 32.4040993527575,
+              "p95_px": 43.814024944130395,
+              "worst_px": 44.392169650957754,
+              "worst_pts": 1151744
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "fit_boot_foot_1": {
+            "count": 13,
+            "exposures": 5,
+            "median_px": 0.0,
+            "p95_px": 5.604184699501367,
+            "worst_px": 7.25363531650601,
+            "worst_pts": 1138432,
+            "centre_distance_px": {
+              "count": 13,
+              "exposures": 5,
+              "median_px": 19.114334504567292,
+              "p95_px": 28.939059094869755,
+              "worst_px": 34.23168015713453,
+              "worst_pts": 1138432
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "fit_support_region_foot_0": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null,
+            "centre_distance_px": {
+              "count": 0,
+              "median_px": null,
+              "p95_px": null,
+              "worst_px": null,
+              "worst_pts": null
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "fit_support_region_foot_1": {
+            "count": 5,
+            "exposures": 5,
+            "median_px": 0.0,
+            "p95_px": 3.1158641442821766,
+            "worst_px": 3.8948301803527214,
+            "worst_pts": 1177344,
+            "centre_distance_px": {
+              "count": 5,
+              "exposures": 5,
+              "median_px": 9.468193711788137,
+              "p95_px": 22.21029733998889,
+              "worst_px": 24.79725560944556,
+              "worst_pts": 1177344
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "review_boot_foot_0": {
+            "count": 5,
+            "exposures": 3,
+            "median_px": 0.0,
+            "p95_px": 36.96817567009754,
+            "worst_px": 41.17541494452618,
+            "worst_pts": 1159168,
+            "centre_distance_px": {
+              "count": 5,
+              "exposures": 3,
+              "median_px": 47.19783293028822,
+              "p95_px": 66.31885170906162,
+              "worst_px": 68.04894911222463,
+              "worst_pts": 1159168
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "review_boot_foot_1": {
+            "count": 9,
+            "exposures": 3,
+            "median_px": 1.7689840169894164,
+            "p95_px": 16.768561211381954,
+            "worst_px": 20.91170311734997,
+            "worst_pts": 1133568,
+            "centre_distance_px": {
+              "count": 9,
+              "exposures": 3,
+              "median_px": 29.051670831607442,
+              "p95_px": 41.63037724410823,
+              "worst_px": 46.33178401119201,
+              "worst_pts": 1133568
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "review_support_region_foot_0": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null,
+            "centre_distance_px": {
+              "count": 0,
+              "median_px": null,
+              "p95_px": null,
+              "worst_px": null,
+              "worst_pts": null
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "review_support_region_foot_1": {
+            "count": 3,
+            "exposures": 3,
+            "median_px": 0.0,
+            "p95_px": 0.0,
+            "worst_px": 0.0,
+            "worst_pts": 1133568,
+            "centre_distance_px": {
+              "count": 3,
+              "exposures": 3,
+              "median_px": 36.834159407843416,
+              "p95_px": 38.52575822597069,
+              "worst_px": 38.713713650207055,
+              "worst_pts": 1159168
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "blade": {
+            "count": 0,
+            "reason": "All selected steel edges blend with shadow/reflection or are end-on; no precise blade curve admitted."
+          }
+        },
+        "quality_status": "requires_visual_review",
+        "accuracy_accepted": false,
+        "unknown_sections": 0,
+        "max_structural_violation_m": 0.0072986567844850496,
+        "numerical_convergence": false,
+        "quality_failed": false,
+        "candidate": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\solve_cpu12_2\\solve\\candidate.npz",
+        "input_fingerprint": "80ae623590db314821a0612d5e8a4f30b2797c894806b82a317febdb640a17f8",
+        "initial_x_sha256": "0bc41b1ec22ba1dcc5d41fc9d9710f45e9dd3d00cb291e5d097c700257998b3a"
+      },
+      "hybrid": {
+        "profile": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\solve_gpu_checked\\profile.json",
+        "wall_seconds": 50.75776770000084,
+        "cpu_core_seconds": 78.265625,
+        "average_cpu_cores": 1.5419437959246325,
+        "peak_process_rss_bytes": 4536131584,
+        "gpu_memory": {
+          "devices": [
+            {
+              "device": "cuda:0",
+              "implementation_scopes": [
+                "compatibility"
+              ],
+              "peak_allocated": 643333120,
+              "peak_reserved": 813694976
+            }
+          ],
+          "peak_allocated": 643333120,
+          "peak_reserved": 813694976,
+          "scope": "PyTorch allocator only, per unique CUDA device; includes all listed implementation scopes, not ownership-attributed memory"
+        },
+        "gpu": {
+          "implementation_scope": "foot/collar compatibility only",
+          "measurement_supported": true,
+          "implementation": {
+            "kind": "cuda_resident_native55_selected_skin_foot",
+            "device": "cuda:0",
+            "device_info": {
+              "name": "NVIDIA GeForce RTX 5070 Ti",
+              "compute_capability": [
+                12,
+                0
+              ],
+              "total_memory": 17094475776,
+              "torch": "2.7.1+cu128",
+              "cuda": "12.8"
+            },
+            "scope": "native55 FK, full486 pose blend, selected union skin, exact +/- replay and live cavity/collar consumers; CPU analytic body images/native camera/CSR/TRF unchanged",
+            "selected_vertices": 1083,
+            "samples": 641,
+            "prepare_seconds": 0.4714728999970248,
+            "prepare_uploaded_bytes": 18098568,
+            "precision": "float64",
+            "shared_parameters": "fixed; changing shared geometry requires a new prepared owner",
+            "transfer_boundary": "one changed N x 69 increment upload; one packed residual/local-Jacobian download per call; no per-column download"
+          },
+          "measurement": {
+            "calls": 7,
+            "linearize_calls": 2,
+            "trial_calls": 5,
+            "h2d_bytes": 1415328,
+            "d2h_bytes": 21096592,
+            "h2d_calls": 4,
+            "d2h_calls": 7,
+            "native55_fk_prepares": 4,
+            "selected_surface_prepares": 4,
+            "exact_fk_replay_pairs": 114,
+            "selected_skin_replay_pairs": 114,
+            "consumer_calls": 121,
+            "h2d_host_seconds": 0.001266400002350565,
+            "d2h_host_blocking_seconds": 0.5471840999962296,
+            "compute_host_enqueue_seconds": 11.240325400001893,
+            "h2d_seconds_cuda_events": 0.0008353279978036881,
+            "compute_seconds_cuda_events": 11.78175237083435,
+            "d2h_seconds_cuda_events": 0.005384959980845451,
+            "timing_scope": "CUDA stream event intervals (include host submission gaps, not summed pure kernel time); complete wall separately includes host waits. Static preparation excluded."
+          }
+        },
+        "setup_seconds": 5.947366599997622,
+        "launcher_wall_seconds": 57.251208900001075,
+        "accepted_steps": 2,
+        "rejected_trial_steps": 1,
+        "trial_costs": [
+          3824.0309531928706,
+          4093.27020440612,
+          3434.9983505704704
+        ],
+        "trial_count_scope": "noncached joint trial evaluations before final accepted callback; excludes initial outer=0 and post-stop saved-candidate re-evaluation",
+        "accepted_costs": [
+          3824.0309531928706,
+          3434.9983505704704
+        ],
+        "stop_reasons": [
+          {
+            "code": "accepted_budget",
+            "category": "budget",
+            "message": "Accepted-step budget reached.",
+            "accepted": 2,
+            "limit": 2
+          }
+        ],
+        "jacobian_hint": 14.7199244000003,
+        "initial_fun_then_jac_seconds_from_run_log": 15.26004579999426,
+        "initial_fun_then_jac_scope": "sum of first cold Joint fun and same-x J inside solve; other begin/checkpoint work remains in complete solve wall",
+        "final_cost": 3434.9983505704704,
+        "final_gradient_inf": 5589.277126943005,
+        "final_gradient_evidence": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\final_gradient_hybrid\\profile.json",
+        "gradient_scope": "read-only current complete FP64 evaluator after solve, all 3465 active controls; outside timed solve",
+        "gradient_evaluation_seconds": 9.048899399997026,
+        "lsmr": [
+          {
+            "wall_seconds": 13.492792400000326,
+            "istop": 2,
+            "iterations": 771,
+            "normr": 83.72134711872083,
+            "normar": 0.011201610414138414,
+            "norma": 1345.330535410758,
+            "conda": 14.62547842360651,
+            "normx": 50.93303864234268
+          },
+          {
+            "wall_seconds": 5.679610899998806,
+            "istop": 2,
+            "iterations": 417,
+            "normr": 80.88916994089173,
+            "normar": 0.007005321263307224,
+            "norma": 878.7066457473331,
+            "conda": 20.800896165501882,
+            "normx": 18.630816383781774
+          }
+        ],
+        "lsmr_total_seconds": 19.172403299999132,
+        "phase_timings": {
+          "solve_json_write": {
+            "calls": 13,
+            "failures": 0,
+            "inclusive_call_seconds": 0.051170099999581,
+            "exclusive_call_seconds": 0.051170099999581,
+            "main_thread_inclusive_seconds": 0.051170099999581,
+            "worker_call_seconds_sum": 0.0
+          },
+          "compact_forward_rotations": {
+            "calls": 5,
+            "failures": 0,
+            "inclusive_call_seconds": 0.6180313000004389,
+            "exclusive_call_seconds": 0.6180313000004389,
+            "main_thread_inclusive_seconds": 0.6180313000004389,
+            "worker_call_seconds_sum": 0.0
+          },
+          "native_projection": {
+            "calls": 163,
+            "failures": 0,
+            "inclusive_call_seconds": 0.3511487000141642,
+            "exclusive_call_seconds": 0.3511487000141642,
+            "main_thread_inclusive_seconds": 0.3511487000141642,
+            "worker_call_seconds_sum": 0.0
+          },
+          "fullbody_base": {
+            "calls": 9,
+            "failures": 0,
+            "inclusive_call_seconds": 5.5820868000082555,
+            "exclusive_call_seconds": 4.31948860000557,
+            "main_thread_inclusive_seconds": 5.5820868000082555,
+            "worker_call_seconds_sum": 0.0
+          },
+          "body_with_compatibility": {
+            "calls": 9,
+            "failures": 0,
+            "inclusive_call_seconds": 17.632355499998084,
+            "exclusive_call_seconds": 12.050268699989829,
+            "main_thread_inclusive_seconds": 17.632355499998084,
+            "worker_call_seconds_sum": 0.0
+          },
+          "foot_metrics": {
+            "calls": 7,
+            "failures": 0,
+            "inclusive_call_seconds": 0.007980100002896506,
+            "exclusive_call_seconds": 0.007980100002896506,
+            "main_thread_inclusive_seconds": 0.007980100002896506,
+            "worker_call_seconds_sum": 0.0
+          },
+          "collar_metrics": {
+            "calls": 21,
+            "failures": 0,
+            "inclusive_call_seconds": 5.39491480000288,
+            "exclusive_call_seconds": 5.39491480000288,
+            "main_thread_inclusive_seconds": 5.39491480000288,
+            "worker_call_seconds_sum": 0.0
+          },
+          "compatibility_rows": {
+            "calls": 7,
+            "failures": 0,
+            "inclusive_call_seconds": 0.025575799991202075,
+            "exclusive_call_seconds": 0.00035779998142970726,
+            "main_thread_inclusive_seconds": 0.025575799991202075,
+            "worker_call_seconds_sum": 0.0
+          },
+          "physics_fk": {
+            "calls": 7,
+            "failures": 0,
+            "inclusive_call_seconds": 0.18234099999972386,
+            "exclusive_call_seconds": 0.18234099999972386,
+            "main_thread_inclusive_seconds": 0.18234099999972386,
+            "worker_call_seconds_sum": 0.0
+          },
+          "physics_constraints": {
+            "calls": 7,
+            "failures": 0,
+            "inclusive_call_seconds": 0.32283420000749175,
+            "exclusive_call_seconds": 0.32283420000749175,
+            "main_thread_inclusive_seconds": 0.32283420000749175,
+            "worker_call_seconds_sum": 0.0
+          },
+          "source_motion": {
+            "calls": 7,
+            "failures": 0,
+            "inclusive_call_seconds": 6.75999908708036e-05,
+            "exclusive_call_seconds": 6.75999908708036e-05,
+            "main_thread_inclusive_seconds": 6.75999908708036e-05,
+            "worker_call_seconds_sum": 0.0
+          },
+          "spin_fk": {
+            "calls": 501,
+            "failures": 0,
+            "inclusive_call_seconds": 0.5280022000733879,
+            "exclusive_call_seconds": 0.5280022000733879,
+            "main_thread_inclusive_seconds": 0.5280022000733879,
+            "worker_call_seconds_sum": 0.0
+          },
+          "spin_palm_skin": {
+            "calls": 235,
+            "failures": 0,
+            "inclusive_call_seconds": 1.2228954000311205,
+            "exclusive_call_seconds": 1.2228954000311205,
+            "main_thread_inclusive_seconds": 1.2228954000311205,
+            "worker_call_seconds_sum": 0.0
+          },
+          "spin_grasp_geometry": {
+            "calls": 235,
+            "failures": 0,
+            "inclusive_call_seconds": 1.694018199967104,
+            "exclusive_call_seconds": 0.01713359992572805,
+            "main_thread_inclusive_seconds": 1.694018199967104,
+            "worker_call_seconds_sum": 0.0
+          },
+          "spin_continuous_support": {
+            "calls": 7,
+            "failures": 0,
+            "inclusive_call_seconds": 0.031439500002306886,
+            "exclusive_call_seconds": 0.017911899980390444,
+            "main_thread_inclusive_seconds": 0.031439500002306886,
+            "worker_call_seconds_sum": 0.0
+          },
+          "spin_source_image": {
+            "calls": 7,
+            "failures": 0,
+            "inclusive_call_seconds": 0.07192829999985406,
+            "exclusive_call_seconds": 0.006705799933115486,
+            "main_thread_inclusive_seconds": 0.07192829999985406,
+            "worker_call_seconds_sum": 0.0
+          },
+          "action_factors": {
+            "calls": 7,
+            "failures": 0,
+            "inclusive_call_seconds": 2.3115324000027613,
+            "exclusive_call_seconds": 0.5141464000334963,
+            "main_thread_inclusive_seconds": 2.3115324000027613,
+            "worker_call_seconds_sum": 0.0
+          },
+          "support_image": {
+            "calls": 9,
+            "failures": 0,
+            "inclusive_call_seconds": 2.0762226000006194,
+            "exclusive_call_seconds": 2.0673918000102276,
+            "main_thread_inclusive_seconds": 2.0762226000006194,
+            "worker_call_seconds_sum": 0.0
+          },
+          "joint_complete": {
+            "calls": 12,
+            "failures": 0,
+            "inclusive_call_seconds": 30.656133999989834,
+            "exclusive_call_seconds": 1.638569600014307,
+            "main_thread_inclusive_seconds": 30.656133999989834,
+            "worker_call_seconds_sum": 0.0
+          },
+          "stage_quality_begin": {
+            "calls": 1,
+            "failures": 0,
+            "inclusive_call_seconds": 0.30419009999604896,
+            "exclusive_call_seconds": 0.27794319999520667,
+            "main_thread_inclusive_seconds": 0.30419009999604896,
+            "worker_call_seconds_sum": 0.0
+          },
+          "checkpoint_npz_write": {
+            "calls": 10,
+            "failures": 0,
+            "inclusive_call_seconds": 0.04476710000017192,
+            "exclusive_call_seconds": 0.04476710000017192,
+            "main_thread_inclusive_seconds": 0.04476710000017192,
+            "worker_call_seconds_sum": 0.0
+          },
+          "native_xyz_jacobian": {
+            "calls": 6,
+            "failures": 0,
+            "inclusive_call_seconds": 0.010881899994274136,
+            "exclusive_call_seconds": 0.010881899994274136,
+            "main_thread_inclusive_seconds": 0.010881899994274136,
+            "worker_call_seconds_sum": 0.0
+          },
+          "compact_linearization_prepare": {
+            "calls": 2,
+            "failures": 0,
+            "inclusive_call_seconds": 0.29390910000074655,
+            "exclusive_call_seconds": 0.29390910000074655,
+            "main_thread_inclusive_seconds": 0.29390910000074655,
+            "worker_call_seconds_sum": 0.0
+          },
+          "compact_analytic_derivative": {
+            "calls": 114,
+            "failures": 0,
+            "inclusive_call_seconds": 11.92512330005411,
+            "exclusive_call_seconds": 11.92512330005411,
+            "main_thread_inclusive_seconds": 0.0,
+            "worker_call_seconds_sum": 11.92512330005411
+          },
+          "compact_fk_pair": {
+            "calls": 36,
+            "failures": 0,
+            "inclusive_call_seconds": 3.8294196000060765,
+            "exclusive_call_seconds": 3.8294196000060765,
+            "main_thread_inclusive_seconds": 0.0,
+            "worker_call_seconds_sum": 3.8294196000060765
+          },
+          "physics_jacobian": {
+            "calls": 2,
+            "failures": 0,
+            "inclusive_call_seconds": 1.1436202999975649,
+            "exclusive_call_seconds": 1.1436202999975649,
+            "main_thread_inclusive_seconds": 1.1436202999975649,
+            "worker_call_seconds_sum": 0.0
+          },
+          "spin_support_jacobian": {
+            "calls": 2,
+            "failures": 0,
+            "inclusive_call_seconds": 0.0021951000089757144,
+            "exclusive_call_seconds": 0.0021951000089757144,
+            "main_thread_inclusive_seconds": 0.0021951000089757144,
+            "worker_call_seconds_sum": 0.0
+          },
+          "lsmr": {
+            "calls": 2,
+            "failures": 0,
+            "inclusive_call_seconds": 19.172403299999132,
+            "exclusive_call_seconds": 19.172403299999132,
+            "main_thread_inclusive_seconds": 19.172403299999132,
+            "worker_call_seconds_sum": 0.0
+          },
+          "scipy_trf_complete": {
+            "calls": 1,
+            "failures": 1,
+            "inclusive_call_seconds": 47.09288820000074,
+            "exclusive_call_seconds": 0.4426524000155041,
+            "main_thread_inclusive_seconds": 47.09288820000074,
+            "worker_call_seconds_sum": 0.0
+          },
+          "stage_quality_finish": {
+            "calls": 1,
+            "failures": 0,
+            "inclusive_call_seconds": 0.046389800001634285,
+            "exclusive_call_seconds": 0.017958199998247437,
+            "main_thread_inclusive_seconds": 0.046389800001634285,
+            "worker_call_seconds_sum": 0.0
+          }
+        },
+        "parts": {
+          "ice_penetration": 0.5365999486165408,
+          "ice_support_hover": 0.0,
+          "data": 3275.1832779515507,
+          "neutral_fit": 0.8797784393673409,
+          "shared_prior": 2.740368884492997,
+          "contact_AL": 9.067397756705935,
+          "source_motion": 0.0,
+          "action": 32.123115584171806,
+          "support_image": 114.467812005565
+        },
+        "raw_data_parts": {
+          "body_pixels": 151469.1931949953,
+          "reference_deviation": 973.3603086551493,
+          "correction_velocity": 48.739441282614806,
+          "actual_root_and_correction_acceleration": 10988.071775244225,
+          "foot_cavity_support": 279.7991774002873,
+          "grip": 18.615713146194718,
+          "actual_local_acceleration": 13.349489665091394,
+          "continuous_support": 0.15791277288569713,
+          "body_source_regions": 0.0,
+          "support_image": 114.467812005565
+        },
+        "quality_groups": {
+          "body": {
+            "count": 3213,
+            "exposures": 190,
+            "median_px": 17.82287585135125,
+            "p95_px": 52.40737956912648,
+            "worst_px": 226.912882427617,
+            "worst_pts": 1161472
+          },
+          "body_foot_0": {
+            "count": 570,
+            "exposures": 190,
+            "median_px": 25.631668183806156,
+            "p95_px": 55.136459784527894,
+            "worst_px": 119.14775264530175,
+            "worst_pts": 1176576
+          },
+          "body_foot_1": {
+            "count": 570,
+            "exposures": 190,
+            "median_px": 9.278817922358932,
+            "p95_px": 26.134921384452028,
+            "worst_px": 38.412931921637544,
+            "worst_pts": 1142528
+          },
+          "fit_boot_foot_0": {
+            "count": 8,
+            "exposures": 5,
+            "median_px": 0.0,
+            "p95_px": 0.0,
+            "worst_px": 0.0,
+            "worst_pts": 1138432,
+            "centre_distance_px": {
+              "count": 8,
+              "exposures": 5,
+              "median_px": 32.40410376649309,
+              "p95_px": 43.81402585128038,
+              "worst_px": 44.39216894568434,
+              "worst_pts": 1151744
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "fit_boot_foot_1": {
+            "count": 13,
+            "exposures": 5,
+            "median_px": 0.0,
+            "p95_px": 5.60417060819343,
+            "worst_px": 7.25360310225846,
+            "worst_pts": 1138432,
+            "centre_distance_px": {
+              "count": 13,
+              "exposures": 5,
+              "median_px": 19.114353543262997,
+              "p95_px": 28.939052135324445,
+              "worst_px": 34.23166532890813,
+              "worst_pts": 1138432
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "fit_support_region_foot_0": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null,
+            "centre_distance_px": {
+              "count": 0,
+              "median_px": null,
+              "p95_px": null,
+              "worst_px": null,
+              "worst_pts": null
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "fit_support_region_foot_1": {
+            "count": 5,
+            "exposures": 5,
+            "median_px": 0.0,
+            "p95_px": 3.1159460381437447,
+            "worst_px": 3.894932547679682,
+            "worst_pts": 1177344,
+            "centre_distance_px": {
+              "count": 5,
+              "exposures": 5,
+              "median_px": 9.468187573526665,
+              "p95_px": 22.21030348740252,
+              "worst_px": 24.797260932812723,
+              "worst_pts": 1177344
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "review_boot_foot_0": {
+            "count": 5,
+            "exposures": 3,
+            "median_px": 0.0,
+            "p95_px": 36.9681038328793,
+            "worst_px": 41.175337203702234,
+            "worst_pts": 1159168,
+            "centre_distance_px": {
+              "count": 5,
+              "exposures": 3,
+              "median_px": 47.19778514057584,
+              "p95_px": 66.31879136029944,
+              "worst_px": 68.04887104454454,
+              "worst_pts": 1159168
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "review_boot_foot_1": {
+            "count": 9,
+            "exposures": 3,
+            "median_px": 1.768926731128526,
+            "p95_px": 16.768544310071817,
+            "worst_px": 20.911649037398984,
+            "worst_pts": 1133568,
+            "centre_distance_px": {
+              "count": 9,
+              "exposures": 3,
+              "median_px": 29.051660395380623,
+              "p95_px": 41.63036031561236,
+              "worst_px": 46.33172844107632,
+              "worst_pts": 1133568
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "review_support_region_foot_0": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null,
+            "centre_distance_px": {
+              "count": 0,
+              "median_px": null,
+              "p95_px": null,
+              "worst_px": null,
+              "worst_pts": null
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "review_support_region_foot_1": {
+            "count": 3,
+            "exposures": 3,
+            "median_px": 0.0,
+            "p95_px": 0.0,
+            "worst_px": 0.0,
+            "worst_pts": 1133568,
+            "centre_distance_px": {
+              "count": 3,
+              "exposures": 3,
+              "median_px": 36.83408221018576,
+              "p95_px": 38.525719852247086,
+              "worst_px": 38.7136795902539,
+              "worst_pts": 1159168
+            },
+            "measurement": "outside finite source region; centre is not an exact observed material point"
+          },
+          "blade": {
+            "count": 0,
+            "reason": "All selected steel edges blend with shadow/reflection or are end-on; no precise blade curve admitted."
+          }
+        },
+        "quality_status": "requires_visual_review",
+        "accuracy_accepted": false,
+        "unknown_sections": 0,
+        "max_structural_violation_m": 0.0072986498609014325,
+        "numerical_convergence": false,
+        "quality_failed": false,
+        "candidate": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\solve_gpu_checked\\solve\\candidate.npz",
+        "input_fingerprint": "80ae623590db314821a0612d5e8a4f30b2797c894806b82a317febdb640a17f8",
+        "initial_x_sha256": "0bc41b1ec22ba1dcc5d41fc9d9710f45e9dd3d00cb291e5d097c700257998b3a"
+      }
+    },
+    "quality_difference_from_baseline": {
+      "cpu12": {
+        "changes_px": {
+          "body.median_px": 3.75237544503193e-05,
+          "body.p95_px": -6.5463548963862195e-06,
+          "body.worst_px": -1.0114171828945473e-05,
+          "body_foot_0.median_px": -3.3860215253866954e-06,
+          "body_foot_0.p95_px": 2.6999113202919034e-06,
+          "body_foot_0.worst_px": -1.796580009738591e-05,
+          "body_foot_1.median_px": 2.0766050591092267e-05,
+          "body_foot_1.p95_px": -2.6001943318476606e-05,
+          "body_foot_1.worst_px": 7.40266820287161e-07,
+          "fit_boot_foot_0.median_px": 0.0,
+          "fit_boot_foot_0.p95_px": 0.0,
+          "fit_boot_foot_0.worst_px": 0.0,
+          "fit_boot_foot_1.median_px": 0.0,
+          "fit_boot_foot_1.p95_px": 2.902402603943699e-05,
+          "fit_boot_foot_1.worst_px": 6.779249643784624e-05,
+          "fit_support_region_foot_1.median_px": 0.0,
+          "fit_support_region_foot_1.p95_px": -0.00011819194218620765,
+          "fit_support_region_foot_1.worst_px": -0.0001477399277329816,
+          "review_boot_foot_0.median_px": 0.0,
+          "review_boot_foot_0.p95_px": 0.00011495772005076788,
+          "review_boot_foot_0.worst_px": 0.0001286670741720286,
+          "review_boot_foot_1.median_px": 6.859157584293563e-05,
+          "review_boot_foot_1.p95_px": 6.26409704906905e-05,
+          "review_boot_foot_1.worst_px": 0.00010237113924205232,
+          "review_support_region_foot_1.median_px": 0.0,
+          "review_support_region_foot_1.p95_px": 0.0,
+          "review_support_region_foot_1.worst_px": 0.0
+        },
+        "max_abs_group_metric_difference_px": 0.0001477399277329816
+      },
+      "hybrid": {
+        "changes_px": {
+          "body.median_px": 1.0304382758619113e-05,
+          "body.p95_px": -6.391911306025122e-06,
+          "body.worst_px": -1.200743042772956e-06,
+          "body_foot_0.median_px": -8.643858624424183e-06,
+          "body_foot_0.p95_px": 5.8216630449692275e-06,
+          "body_foot_0.worst_px": -5.83082832861237e-06,
+          "body_foot_1.median_px": 4.6189056259748895e-06,
+          "body_foot_1.p95_px": -3.610431406286807e-06,
+          "body_foot_1.worst_px": -5.3382122544576305e-06,
+          "fit_boot_foot_0.median_px": 0.0,
+          "fit_boot_foot_0.p95_px": 0.0,
+          "fit_boot_foot_0.worst_px": 0.0,
+          "fit_boot_foot_1.median_px": 0.0,
+          "fit_boot_foot_1.p95_px": 1.4932718102045328e-05,
+          "fit_boot_foot_1.worst_px": 3.557824888833494e-05,
+          "fit_support_region_foot_1.median_px": 0.0,
+          "fit_support_region_foot_1.p95_px": -3.629808061811346e-05,
+          "fit_support_region_foot_1.worst_px": -4.53726007725308e-05,
+          "review_boot_foot_0.median_px": 0.0,
+          "review_boot_foot_0.p95_px": 4.312050181454197e-05,
+          "review_boot_foot_0.worst_px": 5.0926250224847536e-05,
+          "review_boot_foot_1.median_px": 1.1305714952447588e-05,
+          "review_boot_foot_1.p95_px": 4.573966035437138e-05,
+          "review_boot_foot_1.worst_px": 4.829118825711021e-05,
+          "review_support_region_foot_1.median_px": 0.0,
+          "review_support_region_foot_1.p95_px": 0.0,
+          "review_support_region_foot_1.worst_px": 0.0
+        },
+        "max_abs_group_metric_difference_px": 5.0926250224847536e-05
+      }
+    },
+    "fresh_fun_jac": {
+      "fun_seconds": 1.527597300002526,
+      "jac_after_fun_seconds": 13.505908500002988,
+      "total_seconds": 15.033505800005514,
+      "complete_residual_csr_comparison": {
+        "residual_max_abs": 0.0,
+        "residual_relative_l2": 0.0,
+        "residual_violation_count": 0,
+        "jacobian_max_abs": 0.0,
+        "jacobian_relative_frobenius": 0.0,
+        "jacobian_entry_violation_count": 0,
+        "jacobian_worst_entry": null,
+        "jacobian_max_normalized_error": 0.0,
+        "residual_within_tolerance": true,
+        "jacobian_within_tolerance": true,
+        "thresholds": {
+          "residual_atol": 1e-08,
+          "residual_rtol": 1e-10,
+          "jacobian_entry_atol": 5e-05,
+          "jacobian_entry_rtol": 0.0002,
+          "equation": "abs(new-old) <= atol + rtol*max(abs(old),abs(new)); every sparse union entry",
+          "frobenius_is_summary_only": true
+        }
+      },
+      "x_cache_cleared": true,
+      "immutable_gpu_model_kept": true
+    },
+    "speedup": {
+      "fresh_jac_vs_original": 5.004018770639591,
+      "solve_vs_original": 3.5168411159263657,
+      "solve_vs_cpu12": 2.1349681952226485
+    },
+    "measurement_costs": [
+      {
+        "name": "final_gradient_baseline",
+        "operation": "evaluate",
+        "launcher_wall_seconds": 16.81474309999612,
+        "setup_seconds": 5.350139800000761,
+        "evaluation_wall_seconds": 9.015885300002992,
+        "solve_wall_seconds": 0.0
+      },
+      {
+        "name": "final_gradient_cpu12",
+        "operation": "evaluate",
+        "launcher_wall_seconds": 17.059931800002232,
+        "setup_seconds": 5.463993400000618,
+        "evaluation_wall_seconds": 9.122294000000693,
+        "solve_wall_seconds": 0.0
+      },
+      {
+        "name": "final_gradient_hybrid",
+        "operation": "evaluate",
+        "launcher_wall_seconds": 16.923607599994284,
+        "setup_seconds": 5.411649500005296,
+        "evaluation_wall_seconds": 9.048899399997026,
+        "solve_wall_seconds": 0.0
+      },
+      {
+        "name": "solve_base2",
+        "operation": "solve",
+        "launcher_wall_seconds": 182.30477470000187,
+        "setup_seconds": 3.3684807999961777,
+        "evaluation_wall_seconds": 0,
+        "solve_wall_seconds": 178.5070044000022
+      },
+      {
+        "name": "solve_cpu12_2",
+        "operation": "solve",
+        "launcher_wall_seconds": 112.26106609999988,
+        "setup_seconds": 3.4209071999939624,
+        "evaluation_wall_seconds": 0,
+        "solve_wall_seconds": 108.36621970000124
+      },
+      {
+        "name": "solve_gpu2",
+        "operation": "solve",
+        "launcher_wall_seconds": 62.791769000003114,
+        "setup_seconds": 5.593153900001198,
+        "evaluation_wall_seconds": 0,
+        "solve_wall_seconds": 56.6795484999966
+      },
+      {
+        "name": "solve_gpu_checked",
+        "operation": "solve",
+        "launcher_wall_seconds": 57.251208900001075,
+        "setup_seconds": 5.947366599997622,
+        "evaluation_wall_seconds": 0,
+        "solve_wall_seconds": 50.75776770000084
+      },
+      {
+        "name": "spin_base4",
+        "operation": "evaluate",
+        "launcher_wall_seconds": 80.19267559999571,
+        "setup_seconds": 4.040616300000693,
+        "evaluation_wall_seconds": 73.65877799999726,
+        "solve_wall_seconds": 0.0
+      },
+      {
+        "name": "spin_gpu12_v4",
+        "operation": "evaluate",
+        "launcher_wall_seconds": 19.28689260000101,
+        "setup_seconds": 5.647605500002101,
+        "evaluation_wall_seconds": 9.63025010000274,
+        "solve_wall_seconds": 0.0
+      },
+      {
+        "name": "spin_gpu_checked",
+        "operation": "evaluate",
+        "launcher_wall_seconds": 39.77336959999957,
+        "setup_seconds": 5.812578600001871,
+        "evaluation_wall_seconds": 29.753430200005823,
+        "solve_wall_seconds": 0.0
+      },
+      {
+        "name": "spin_gpu_final",
+        "operation": "evaluate",
+        "launcher_wall_seconds": 29.060472199998912,
+        "setup_seconds": 5.558491199997661,
+        "evaluation_wall_seconds": 19.448632600004203,
+        "solve_wall_seconds": 0.0
+      },
+      {
+        "name": "spin_new12",
+        "operation": "evaluate",
+        "launcher_wall_seconds": 43.38744299999962,
+        "setup_seconds": 3.263561599997047,
+        "evaluation_wall_seconds": 36.288286300004984,
+        "solve_wall_seconds": 0.0
+      },
+      {
+        "name": "spin_new4",
+        "operation": "evaluate",
+        "launcher_wall_seconds": 61.781484799998,
+        "setup_seconds": 3.3458666000005906,
+        "evaluation_wall_seconds": 54.54768850000255,
+        "solve_wall_seconds": 0.0
+      },
+      {
+        "name": "spin_new8",
+        "operation": "evaluate",
+        "launcher_wall_seconds": 46.66865610000241,
+        "setup_seconds": 3.16190149999602,
+        "evaluation_wall_seconds": 39.66259789999458,
+        "solve_wall_seconds": 0.0
+      }
+    ],
+    "cost_accounting": "All profiles and final-gradient measurements listed. Timed solve includes initial objective, trial/J, native camera, TRF/LSMR, quality and checkpoints. CPU seconds are process CPU time. Process RSS is lifetime high-water including setup. CUDA workspace uses Torch allocator. GPU stream event intervals include host submission gaps, not pure kernel sums.",
+    "capability": {
+      "cpu_local_analytic": true,
+      "cpu_native_fk_replay": true,
+      "cpu_selected_skin_replay": true,
+      "gpu_native55_fk_and_selected_skin": true,
+      "gpu_live_cavity_and_collar": true,
+      "gpu_body_image_derivatives": false,
+      "gpu_native_camera": false,
+      "gpu_sparse_scatter": false,
+      "gpu_trf_lsmr": false
+    },
+    "remaining": {
+      "largest_solve_stage": "CPU sparse LSMR",
+      "lsmr_seconds": 19.172403299999132,
+      "lsmr_iterations": [
+        771,
+        417
+      ],
+      "resident_loop": "57 active local columns, with all 63 possible local columns in analytic/skin tests; no per-column CPU world download"
+    },
+    "tests": {
+      "unified_passed": 105,
+      "skipped_local_fixture": 7,
+      "subtests": 420,
+      "followup_launcher_passed": 6,
+      "followup_profiler_passed": 27,
+      "counts_overlap": true,
+      "record": "D:\\CodexData\\RinkSpace_Data\\runs\\body_pf1104\\tests.txt"
+    },
+    "limitations": [
+      "Two accepted steps measure equal work; gradients remain large; no convergence or accuracy acceptance.",
+      "Approved S01 and existing failed/drifting/unknown evidence retained.",
+      "Hybrid supports one continuous window and fixed shared footwear parameters; generic CPU12 retained.",
+      "Fresh GPU timings varied 9.20 to 14.72 seconds; final instrumented 14.72 s used conservatively.",
+      "Exact-on-plane synthetic consumer may change unknown-row sample_count by CPU/GPU roundoff; unknown/reason/domain residual agree; Data/build/body_foot_gpu/verification.json retains details.",
+      "Measured source snapshots keep exact runtime bytes; four checkout files restored original LF only, with byte mapping recorded."
+    ],
+    "no_commit_or_push": true,
+    "no_video_generation": true,
+    "body_task_left_paused": false,
+    "user_requested_body_resume": true,
+    "body_continuation_summary": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/spin_support_foot_1104/run_summary.json"
+  }
+}

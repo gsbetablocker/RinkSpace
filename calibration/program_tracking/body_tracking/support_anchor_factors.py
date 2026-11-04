@@ -65,7 +65,7 @@ class NativeRegionObservation:
             raise ValueError("time_base must be a positive integer rational")
         if self.foot is not None and (_integer(self.foot, "foot") not in (0, 1)):
             raise ValueError("foot must be anatomical track 0/1 or unknown (None)")
-        if self.kind not in ("support_contact_region", "boot_marker_region"):
+        if self.kind not in ("support_contact_region", "boot_marker_region", "blade_midpoint_region", "blade_endpoint_region"):
             raise ValueError("An ankle or boot centroid is not a contact-region observation")
         if self.visibility not in ("visible", "occluded", "unknown"):
             raise ValueError("Unknown visibility category")

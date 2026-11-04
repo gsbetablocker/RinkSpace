@@ -183,7 +183,7 @@ def verify(config,output,project=None,data_root=None,variants=('ref1102','obs110
                 state=player.sequence.state
                 entries[-1]['wear_diagnostics']={key:state[key][frame].tolist() for key in ('cavity_penetration','heel_drift','forefoot_error','blade_tilt_rad','upper_deformation','effective_ankle_relative_rotation') if key in state}
                 if fit_comparison_bounds or (framing is not None and name in configured_comparison):
-                    bounds=comparison_frustum_bounds(player,player.sequence,frame,left_inset=framing.get('left_inset_pixels',0.),right_inset=framing.get('right_inset_pixels',0.),support_foot=framing.get('support_foot'))
+                    bounds=comparison_frustum_bounds(player,player.sequence,frame,left_inset=framing.get('left_inset_pixels',0.),right_inset=framing.get('right_inset_pixels',0.),support_foot=framing.get('support_foot'),grasp_hand=framing.get('grasp_hand'),free_foot=framing.get('free_foot',0))
                     check('common camera contains full body and gear',bounds['all_body_and_gear_inside'],variant=name,source_pts=int(catalog.pts[frame]),**bounds)
                     check('common camera keeps full body and gear in unobscured view region',bounds['all_body_and_gear_in_view_region'],variant=name)
                     entries[-1]['framing']=bounds
@@ -285,7 +285,7 @@ def main():
     parser.add_argument('--variants',nargs='+',default=['ref1102','obs1102','full1102'])
     parser.add_argument('--seconds',nargs='+',type=float,default=[36.02,26.26])
     parser.add_argument('--wear-inspection',action='store_true')
-    parser.add_argument('--view',choices=['free','feet','feet_oblique','feet_side','feet_end','support_top','support_side','side','end','top','rink'],default='free')
+    parser.add_argument('--view',choices=['free','feet','feet_oblique','feet_side','feet_end','support_top','support_side','grasp','side','end','top','rink'],default='free')
     parser.add_argument('--boot-section',type=int,choices=[0,1,2,3],default=0,help='0: full shell, 1/2: remove fixed side, 3: remove side facing observing camera')
     parser.add_argument('--inspection-layers',nargs='*',choices=['footbed','cavity','axes'],default=[],help='Independent optional diagnostic overlays; default is a clean physical comparison')
     parser.add_argument('--fit-comparison-bounds',action='store_true',help='Diagnostic orthographic camera fitting all selected candidates at the same source PTS; keeps the requested view direction')

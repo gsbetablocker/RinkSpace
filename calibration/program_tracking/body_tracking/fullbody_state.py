@@ -57,11 +57,13 @@ class FrozenReference:
         P=reference['P']+delta[:,:3]
         Q=reference['Q']@matrices(delta[:,3:6])
         local=reference['local_R']@matrices(delta[:,6:].reshape(n,21,3))
-        coco,native,_,frames=self.body.forward_rotations(local,with_frames=True)
+        hand=reference.get('hand_local_R')
+        kwargs={} if hand is None else {'hand_local_R':hand}
+        coco,native,_,frames=self.body.forward_rotations(local,with_frames=True,**kwargs)
         gear,_,boot_R,boot_O=equipment_world(P,Q,native,frames,self.geometry)
         coco_world=P[:,None]+np.einsum('nij,nkj->nki',Q,coco)
         native_world=P[:,None]+np.einsum('nij,nkj->nki',Q,native)
-        return dict(P=P,Q=Q,local_R=local,native=native_world,coco=coco_world,
+        return dict(P=P,Q=Q,local_R=local,**({} if hand is None else {'hand_local_R':hand}),native=native_world,coco=coco_world,
                     gear=gear,boot_R=boot_R,boot_O=boot_O,frames=frames,
                     world=np.concatenate((gear.reshape(n,96,3),coco_world),axis=1))
 
