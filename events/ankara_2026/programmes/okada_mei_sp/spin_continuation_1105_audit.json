@@ -1,0 +1,1152 @@
+{
+  "schema": "rinkspace.spin-continuation-audit.v1",
+  "baseline_head": "036990c80398441b4c825055e7dd2c8a2670ec32",
+  "scope": {
+    "source_seconds": [
+      76,
+      95
+    ],
+    "source_frames": 951,
+    "control_count": 293,
+    "adjustable_body_variables": 20217,
+    "internal_temporal_freezes": false,
+    "shared_shape_footwear_camera_frozen": true,
+    "network": "ExMR BodyNet+HandMR; FootMR disabled; no new inference"
+  },
+  "preserved": {
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\skate_s01_1103.npz": "3b58dac5f7363dfc5e051fc75ef8602dd3810a0ebc370c57a24542745bc5090c",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_continuous_source_1105.npz": "d4aa68bbdb0d08b8224600b66578c0ee52f329acc641edd6c9f5788072eb60ce",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_continuous_flight_1105.npz": "a9e0ad5b8cd4374da21f2dfb399050aae4936d5b3f1f5a89cbd414134b9ed4e9",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\camera_solver_refined_1102.npz": "d6cfde1474a23d594a0395351ebbdb0ee15a6560ef77b27f069d239ee95bb3f3"
+  },
+  "runs": [
+    {
+      "run": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuation_1105\\fit1",
+      "accepted_steps": 8,
+      "chart_trial_rejections": 0,
+      "whole_source_seconds": [
+        76,
+        95
+      ],
+      "attempt": {
+        "status": "attempt_only",
+        "error": "Ambiguous adjacent SO(3) branch: subdivide using the source sequence",
+        "wall_seconds": 235.33712390000073,
+        "warm_start": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_continuous_source_1105.npz",
+        "existing_inputs_preserved": true,
+        "accuracy_accepted": false
+      },
+      "last_good": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuation_1105\\fit1\\continuous_stage\\solve\\last_good.npz"
+    },
+    {
+      "run": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuation_1105\\fit2",
+      "accepted_steps": 22,
+      "chart_trial_rejections": 8,
+      "whole_source_seconds": [
+        76,
+        95
+      ],
+      "parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_continued_1105.npz",
+      "parameter_sha256": "7e6723ccd6bdd023013ae66d3d653fe12a13863680c3e87c74cd080f500bda3c",
+      "wall_seconds": 534.1476843,
+      "stop": {
+        "ice_is_delivery_gate": false,
+        "message": "`ftol` termination condition is satisfied.",
+        "reason": "inner_solver_return"
+      },
+      "schema": "rinkspace.absolute_motion_v1",
+      "retained_step": 22
+    },
+    {
+      "run": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuation_1105\\fit3",
+      "accepted_steps": 25,
+      "chart_trial_rejections": 8,
+      "whole_source_seconds": [
+        76,
+        95
+      ],
+      "parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_support_refined_1105.npz",
+      "parameter_sha256": "387d03c30685f743186820d8e4dccb51fe363538a3964c139cbd18ff59a9aa78",
+      "wall_seconds": 620.7184775000023,
+      "stop": {
+        "reason": "inner_solver_return",
+        "message": "`ftol` termination condition is satisfied.",
+        "ice_is_delivery_gate": false
+      },
+      "schema": "rinkspace.absolute_motion_v1",
+      "retained_step": 25
+    },
+    {
+      "run": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuation_1105\\fit4",
+      "accepted_steps": 14,
+      "chart_trial_rejections": 6,
+      "whole_source_seconds": [
+        76,
+        95
+      ],
+      "parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_support_position_1105.npz",
+      "parameter_sha256": "831fbdf29a0d3d8692a10e393651387926a126816ebc7f543b16e3c159de6e8e",
+      "wall_seconds": 372.55800980000276,
+      "stop": {
+        "reason": "inner_solver_return",
+        "message": "Both `ftol` and `xtol` termination conditions are satisfied.",
+        "ice_is_delivery_gate": false
+      },
+      "schema": "rinkspace.absolute_motion_v1",
+      "retained_step": 14
+    },
+    {
+      "run": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuation_1105\\fit5",
+      "accepted_steps": 16,
+      "chart_trial_rejections": 8,
+      "whole_source_seconds": [
+        76,
+        95
+      ],
+      "parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_support_physical_1105.npz",
+      "parameter_sha256": "ecbcb3e714a7e103f76b51a2d54096773c29b714ab2f955d44eec59e58e06c43",
+      "wall_seconds": 420.94362049999836,
+      "stop": {
+        "reason": "inner_solver_return",
+        "message": "Both `ftol` and `xtol` termination conditions are satisfied.",
+        "ice_is_delivery_gate": false
+      },
+      "schema": "rinkspace.absolute_motion_v1",
+      "retained_step": 16
+    },
+    {
+      "run": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuation_1105\\fit6",
+      "accepted_steps": 46,
+      "chart_trial_rejections": 0,
+      "whole_source_seconds": [
+        76,
+        95
+      ],
+      "parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_support_continuous_1105.npz",
+      "parameter_sha256": "83a40a1061b71634e2a93f030509f8b788f22bbce235edc3e2e717ba596954ad",
+      "wall_seconds": 1048.4378313000016,
+      "stop": {
+        "reason": "inner_solver_return",
+        "message": "`ftol` termination condition is satisfied.",
+        "ice_is_delivery_gate": false
+      },
+      "schema": "rinkspace.absolute_motion_v2",
+      "retained_step": 46
+    }
+  ],
+  "total_accepted_steps": 131,
+  "total_run_wall_seconds": 3232.142747300006,
+  "final_parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_support_continuous_1105.npz",
+  "final_parameter_sha256": "83a40a1061b71634e2a93f030509f8b788f22bbce235edc3e2e717ba596954ad",
+  "final_result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuation_1105\\fit6\\continuous_stage\\common\\exmr_hand_nofoot\\fitted\\result.npz",
+  "final_result_sha256": "763b15261a1986d27e31ee786876228dd73d0297d2a31e1a693ce63cf61a3ec2",
+  "same_revised_ledger_comparison": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuation_1105\\review_final\\same_evidence_comparison.json",
+  "metrics": {
+    "A": {
+      "body_whole": {
+        "count": 15694,
+        "exposures": 933,
+        "median_px": 3.355031839844564,
+        "p95_px": 22.03972040421535,
+        "worst_px": 360.09849450286447,
+        "worst_pts": 1069312
+      },
+      "body_held": {
+        "count": 3204,
+        "exposures": 190,
+        "median_px": 4.576945743016187,
+        "p95_px": 23.799714497349367,
+        "worst_px": 207.32192183354798,
+        "worst_pts": 1143552
+      },
+      "shoe_groups": {
+        "fit_boot_marker_region_foot0": {
+          "outside_region_px": {
+            "count": 22,
+            "exposures": 15,
+            "median_px": 0.0,
+            "p95_px": 0.08518423241456195,
+            "worst_px": 0.1271192945366549,
+            "worst_pts": 1138432
+          },
+          "centre_distance_px": {
+            "count": 22,
+            "exposures": 15,
+            "median_px": 38.57893615813667,
+            "p95_px": 54.05306301102641,
+            "worst_px": 54.698500417316666,
+            "worst_pts": 1187840
+          },
+          "source_rows": 22,
+          "prediction_geometries": [
+            "actual_current_geometry"
+          ],
+          "actual_geometry_outside_region_px": {
+            "count": 22,
+            "exposures": 15,
+            "median_px": 0.0,
+            "p95_px": 0.08518423241456195,
+            "worst_px": 0.1271192945366549,
+            "worst_pts": 1138432
+          },
+          "actual_geometry_centre_distance_px": {
+            "count": 22,
+            "exposures": 15,
+            "median_px": 38.57893615813667,
+            "p95_px": 54.05306301102641,
+            "worst_px": 54.698500417316666,
+            "worst_pts": 1187840
+          }
+        },
+        "fit_boot_marker_region_foot1": {
+          "outside_region_px": {
+            "count": 36,
+            "exposures": 16,
+            "median_px": 0.0,
+            "p95_px": 14.537417804709271,
+            "worst_px": 27.340087330362696,
+            "worst_pts": 1170944
+          },
+          "centre_distance_px": {
+            "count": 36,
+            "exposures": 16,
+            "median_px": 21.625362562043513,
+            "p95_px": 39.66620751761074,
+            "worst_px": 48.553290765959126,
+            "worst_pts": 1170944
+          },
+          "source_rows": 36,
+          "prediction_geometries": [
+            "actual_current_geometry"
+          ],
+          "actual_geometry_outside_region_px": {
+            "count": 36,
+            "exposures": 16,
+            "median_px": 0.0,
+            "p95_px": 14.537417804709271,
+            "worst_px": 27.340087330362696,
+            "worst_pts": 1170944
+          },
+          "actual_geometry_centre_distance_px": {
+            "count": 36,
+            "exposures": 16,
+            "median_px": 21.625362562043513,
+            "p95_px": 39.66620751761074,
+            "worst_px": 48.553290765959126,
+            "worst_pts": 1170944
+          }
+        },
+        "fit_blade_midpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 3.6600629934585758,
+            "p95_px": 5.143541396250367,
+            "worst_px": 5.3902658250128255,
+            "worst_pts": 1177344
+          },
+          "centre_distance_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 11.447162591264894,
+            "p95_px": 13.603210778547577,
+            "worst_px": 13.875547199251395,
+            "worst_pts": 1177344
+          },
+          "source_rows": 4,
+          "prediction_geometries": [
+            "actual_current_geometry"
+          ],
+          "actual_geometry_outside_region_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 3.6600629934585758,
+            "p95_px": 5.143541396250367,
+            "worst_px": 5.3902658250128255,
+            "worst_pts": 1177344
+          },
+          "actual_geometry_centre_distance_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 11.447162591264894,
+            "p95_px": 13.603210778547577,
+            "worst_px": 13.875547199251395,
+            "worst_pts": 1177344
+          }
+        },
+        "fit_blade_endpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 49,
+            "exposures": 31,
+            "median_px": 0.04895061146879815,
+            "p95_px": 7.93204791277866,
+            "worst_px": 9.65547241817515,
+            "worst_pts": 1070080
+          },
+          "centre_distance_px": {
+            "count": 49,
+            "exposures": 31,
+            "median_px": 18.033326797173668,
+            "p95_px": 25.083059589125448,
+            "worst_px": 26.80368097330723,
+            "worst_pts": 1070080
+          },
+          "source_rows": 49,
+          "prediction_geometries": [
+            "actual_current_geometry"
+          ],
+          "actual_geometry_outside_region_px": {
+            "count": 49,
+            "exposures": 31,
+            "median_px": 0.04895061146879815,
+            "p95_px": 7.93204791277866,
+            "worst_px": 9.65547241817515,
+            "worst_pts": 1070080
+          },
+          "actual_geometry_centre_distance_px": {
+            "count": 49,
+            "exposures": 31,
+            "median_px": 18.033326797173668,
+            "p95_px": 25.083059589125448,
+            "worst_px": 26.80368097330723,
+            "worst_pts": 1070080
+          }
+        },
+        "fit_support_contact_region_foot1": {
+          "outside_region_px": {
+            "count": 11,
+            "exposures": 11,
+            "median_px": 0.0,
+            "p95_px": 3.0194684260666946,
+            "worst_px": 3.993035936434756,
+            "worst_pts": 1121792
+          },
+          "centre_distance_px": {
+            "count": 11,
+            "exposures": 11,
+            "median_px": 18.84746280561367,
+            "p95_px": 38.887096069369235,
+            "worst_px": 42.41268215478181,
+            "worst_pts": 1177344
+          },
+          "source_rows": 11,
+          "prediction_geometries": [
+            "nominal_ice_projection_of_current_lowest_runner"
+          ],
+          "actual_geometry_outside_region_px": {
+            "count": 11,
+            "exposures": 11,
+            "median_px": 2.0662757684176056,
+            "p95_px": 10.604421895899776,
+            "worst_px": 11.843252426353958,
+            "worst_pts": 1125888
+          },
+          "actual_geometry_centre_distance_px": {
+            "count": 11,
+            "exposures": 11,
+            "median_px": 19.86294798252077,
+            "p95_px": 40.536663532779244,
+            "worst_px": 43.65109568826462,
+            "worst_pts": 1177344
+          }
+        }
+      },
+      "held_support_geometric_xy_extent_m": [
+        0.7386896263698013,
+        0.33484930671773316
+      ],
+      "held_support_material_mid_xy_extent_m": [
+        0.9080386896691355,
+        0.401897880949857
+      ],
+      "entry_max_pelvis_horizontal_20ms_m": 0.10274070062876357,
+      "entry_max_com_horizontal_20ms_m": 0.09602179644183814,
+      "non_grip_right_wrist_40ms_deg": 6.9206365959494915,
+      "support_shoe_world_omega_85_56_to_85_58_rad_s": [
+        -1.5290473902387502,
+        -0.5713370056547045,
+        7.896551306818942
+      ]
+    },
+    "B": {
+      "body_whole": {
+        "count": 15694,
+        "exposures": 933,
+        "median_px": 3.1956063695075816,
+        "p95_px": 21.359736676242722,
+        "worst_px": 360.13721347134435,
+        "worst_pts": 1069312
+      },
+      "body_held": {
+        "count": 3204,
+        "exposures": 190,
+        "median_px": 4.409108450959677,
+        "p95_px": 23.47464235426107,
+        "worst_px": 205.45536493996275,
+        "worst_pts": 1143552
+      },
+      "shoe_groups": {
+        "fit_boot_marker_region_foot0": {
+          "outside_region_px": {
+            "count": 22,
+            "exposures": 15,
+            "median_px": 0.0,
+            "p95_px": 3.0469294809404786,
+            "worst_px": 4.016831580344156,
+            "worst_pts": 1146368
+          },
+          "centre_distance_px": {
+            "count": 22,
+            "exposures": 15,
+            "median_px": 39.020935719166175,
+            "p95_px": 55.10330885420058,
+            "worst_px": 55.44291702774952,
+            "worst_pts": 1170944
+          },
+          "source_rows": 22,
+          "prediction_geometries": [
+            "actual_current_geometry"
+          ],
+          "actual_geometry_outside_region_px": {
+            "count": 22,
+            "exposures": 15,
+            "median_px": 0.0,
+            "p95_px": 3.0469294809404786,
+            "worst_px": 4.016831580344156,
+            "worst_pts": 1146368
+          },
+          "actual_geometry_centre_distance_px": {
+            "count": 22,
+            "exposures": 15,
+            "median_px": 39.020935719166175,
+            "p95_px": 55.10330885420058,
+            "worst_px": 55.44291702774952,
+            "worst_pts": 1170944
+          }
+        },
+        "fit_boot_marker_region_foot1": {
+          "outside_region_px": {
+            "count": 36,
+            "exposures": 16,
+            "median_px": 0.0,
+            "p95_px": 21.771908571307435,
+            "worst_px": 47.35177337230431,
+            "worst_pts": 1170944
+          },
+          "centre_distance_px": {
+            "count": 36,
+            "exposures": 16,
+            "median_px": 22.029738277664457,
+            "p95_px": 43.63836928795476,
+            "worst_px": 68.56497680790073,
+            "worst_pts": 1170944
+          },
+          "source_rows": 36,
+          "prediction_geometries": [
+            "actual_current_geometry"
+          ],
+          "actual_geometry_outside_region_px": {
+            "count": 36,
+            "exposures": 16,
+            "median_px": 0.0,
+            "p95_px": 21.771908571307435,
+            "worst_px": 47.35177337230431,
+            "worst_pts": 1170944
+          },
+          "actual_geometry_centre_distance_px": {
+            "count": 36,
+            "exposures": 16,
+            "median_px": 22.029738277664457,
+            "p95_px": 43.63836928795476,
+            "worst_px": 68.56497680790073,
+            "worst_pts": 1170944
+          }
+        },
+        "fit_blade_midpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 3.1465522887454833,
+            "p95_px": 4.434905790892712,
+            "worst_px": 4.585450970120634,
+            "worst_pts": 1177344
+          },
+          "centre_distance_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 10.806294646913779,
+            "p95_px": 12.752824089180343,
+            "worst_px": 13.070732344359202,
+            "worst_pts": 1177344
+          },
+          "source_rows": 4,
+          "prediction_geometries": [
+            "actual_current_geometry"
+          ],
+          "actual_geometry_outside_region_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 3.1465522887454833,
+            "p95_px": 4.434905790892712,
+            "worst_px": 4.585450970120634,
+            "worst_pts": 1177344
+          },
+          "actual_geometry_centre_distance_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 10.806294646913779,
+            "p95_px": 12.752824089180343,
+            "worst_px": 13.070732344359202,
+            "worst_pts": 1177344
+          }
+        },
+        "fit_blade_endpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 49,
+            "exposures": 31,
+            "median_px": 0.5823677638996247,
+            "p95_px": 6.2626563721637805,
+            "worst_px": 8.286592857330163,
+            "worst_pts": 1070080
+          },
+          "centre_distance_px": {
+            "count": 49,
+            "exposures": 31,
+            "median_px": 18.488284915846894,
+            "p95_px": 23.43919807138382,
+            "worst_px": 25.431153676922623,
+            "worst_pts": 1070080
+          },
+          "source_rows": 49,
+          "prediction_geometries": [
+            "actual_current_geometry"
+          ],
+          "actual_geometry_outside_region_px": {
+            "count": 49,
+            "exposures": 31,
+            "median_px": 0.5823677638996247,
+            "p95_px": 6.2626563721637805,
+            "worst_px": 8.286592857330163,
+            "worst_pts": 1070080
+          },
+          "actual_geometry_centre_distance_px": {
+            "count": 49,
+            "exposures": 31,
+            "median_px": 18.488284915846894,
+            "p95_px": 23.43919807138382,
+            "worst_px": 25.431153676922623,
+            "worst_pts": 1070080
+          }
+        },
+        "fit_support_contact_region_foot1": {
+          "outside_region_px": {
+            "count": 11,
+            "exposures": 11,
+            "median_px": 9.150881610836889,
+            "p95_px": 17.668879975717758,
+            "worst_px": 19.75261122783112,
+            "worst_pts": 1125888
+          },
+          "centre_distance_px": {
+            "count": 11,
+            "exposures": 11,
+            "median_px": 26.652759609556163,
+            "p95_px": 47.970858737613895,
+            "worst_px": 50.714399705997295,
+            "worst_pts": 1125888
+          },
+          "source_rows": 11,
+          "prediction_geometries": [
+            "nominal_ice_projection_of_current_lowest_runner"
+          ],
+          "actual_geometry_outside_region_px": {
+            "count": 11,
+            "exposures": 11,
+            "median_px": 0.0,
+            "p95_px": 10.349986489024081,
+            "worst_px": 11.266596745104062,
+            "worst_pts": 1159168
+          },
+          "actual_geometry_centre_distance_px": {
+            "count": 11,
+            "exposures": 11,
+            "median_px": 22.651184824183947,
+            "p95_px": 47.37214759727577,
+            "worst_px": 49.35951023419612,
+            "worst_pts": 1125888
+          }
+        }
+      },
+      "held_support_geometric_xy_extent_m": [
+        0.7000441693921058,
+        0.3474922687184465
+      ],
+      "held_support_material_mid_xy_extent_m": [
+        0.8358491508869008,
+        0.424249914243954
+      ],
+      "entry_max_pelvis_horizontal_20ms_m": 0.07019095119980102,
+      "entry_max_com_horizontal_20ms_m": 0.09680983898836218,
+      "non_grip_right_wrist_40ms_deg": 6.386814579183857,
+      "support_shoe_world_omega_85_56_to_85_58_rad_s": [
+        -1.513078567759436,
+        -1.5616962379622616,
+        6.645669523818482
+      ]
+    },
+    "previous_continuation": {
+      "body_whole": {
+        "count": 15694,
+        "exposures": 933,
+        "median_px": 3.002342148059504,
+        "p95_px": 20.103620009094055,
+        "worst_px": 359.6400218081291,
+        "worst_pts": 1069312
+      },
+      "body_held": {
+        "count": 3204,
+        "exposures": 190,
+        "median_px": 4.13116099134986,
+        "p95_px": 22.947254106145465,
+        "worst_px": 202.19360793936937,
+        "worst_pts": 1143552
+      },
+      "shoe_groups": {
+        "fit_boot_marker_region_foot0": {
+          "outside_region_px": {
+            "count": 22,
+            "exposures": 15,
+            "median_px": 0.0,
+            "p95_px": 0.1588222927657948,
+            "worst_px": 0.2767262220325552,
+            "worst_pts": 1164544
+          },
+          "centre_distance_px": {
+            "count": 22,
+            "exposures": 15,
+            "median_px": 39.215361167039795,
+            "p95_px": 55.80448349478699,
+            "worst_px": 56.19152716106386,
+            "worst_pts": 1187840
+          },
+          "source_rows": 22,
+          "prediction_geometries": [
+            "actual_current_geometry"
+          ],
+          "actual_geometry_outside_region_px": {
+            "count": 22,
+            "exposures": 15,
+            "median_px": 0.0,
+            "p95_px": 0.1588222927657948,
+            "worst_px": 0.2767262220325552,
+            "worst_pts": 1164544
+          },
+          "actual_geometry_centre_distance_px": {
+            "count": 22,
+            "exposures": 15,
+            "median_px": 39.215361167039795,
+            "p95_px": 55.80448349478699,
+            "worst_px": 56.19152716106386,
+            "worst_pts": 1187840
+          }
+        },
+        "fit_boot_marker_region_foot1": {
+          "outside_region_px": {
+            "count": 36,
+            "exposures": 16,
+            "median_px": 0.0,
+            "p95_px": 0.3853370452150855,
+            "worst_px": 0.45191483593256976,
+            "worst_pts": 1170944
+          },
+          "centre_distance_px": {
+            "count": 36,
+            "exposures": 16,
+            "median_px": 20.670459418631754,
+            "p95_px": 27.471099678977442,
+            "worst_px": 41.65618005237604,
+            "worst_pts": 1151744
+          },
+          "source_rows": 36,
+          "prediction_geometries": [
+            "actual_current_geometry"
+          ],
+          "actual_geometry_outside_region_px": {
+            "count": 36,
+            "exposures": 16,
+            "median_px": 0.0,
+            "p95_px": 0.3853370452150855,
+            "worst_px": 0.45191483593256976,
+            "worst_pts": 1170944
+          },
+          "actual_geometry_centre_distance_px": {
+            "count": 36,
+            "exposures": 16,
+            "median_px": 20.670459418631754,
+            "p95_px": 27.471099678977442,
+            "worst_px": 41.65618005237604,
+            "worst_pts": 1151744
+          }
+        },
+        "fit_blade_midpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 3.409251721118034,
+            "p95_px": 5.07879067681855,
+            "worst_px": 5.084718567216509,
+            "worst_pts": 1177344
+          },
+          "centre_distance_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 11.544328792190045,
+            "p95_px": 13.564072051057119,
+            "worst_px": 13.569999941455077,
+            "worst_pts": 1177344
+          },
+          "source_rows": 4,
+          "prediction_geometries": [
+            "actual_current_geometry"
+          ],
+          "actual_geometry_outside_region_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 3.409251721118034,
+            "p95_px": 5.07879067681855,
+            "worst_px": 5.084718567216509,
+            "worst_pts": 1177344
+          },
+          "actual_geometry_centre_distance_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 11.544328792190045,
+            "p95_px": 13.564072051057119,
+            "worst_px": 13.569999941455077,
+            "worst_pts": 1177344
+          }
+        },
+        "fit_blade_endpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 49,
+            "exposures": 31,
+            "median_px": 0.5637416791144765,
+            "p95_px": 4.041161270512959,
+            "worst_px": 4.952101755157401,
+            "worst_pts": 1098240
+          },
+          "centre_distance_px": {
+            "count": 49,
+            "exposures": 31,
+            "median_px": 18.29683183352368,
+            "p95_px": 21.746661476000373,
+            "worst_px": 22.113290568274465,
+            "worst_pts": 1098240
+          },
+          "source_rows": 49,
+          "prediction_geometries": [
+            "actual_current_geometry"
+          ],
+          "actual_geometry_outside_region_px": {
+            "count": 49,
+            "exposures": 31,
+            "median_px": 0.5637416791144765,
+            "p95_px": 4.041161270512959,
+            "worst_px": 4.952101755157401,
+            "worst_pts": 1098240
+          },
+          "actual_geometry_centre_distance_px": {
+            "count": 49,
+            "exposures": 31,
+            "median_px": 18.29683183352368,
+            "p95_px": 21.746661476000373,
+            "worst_px": 22.113290568274465,
+            "worst_pts": 1098240
+          }
+        },
+        "fit_support_contact_region_foot1": {
+          "outside_region_px": {
+            "count": 11,
+            "exposures": 11,
+            "median_px": 0.3756575505866387,
+            "p95_px": 1.003218506914741,
+            "worst_px": 1.127814920957132,
+            "worst_pts": 1121792
+          },
+          "centre_distance_px": {
+            "count": 11,
+            "exposures": 11,
+            "median_px": 13.283911087672365,
+            "p95_px": 28.9038134178816,
+            "worst_px": 35.68861176601356,
+            "worst_pts": 1177344
+          },
+          "source_rows": 11,
+          "prediction_geometries": [
+            "nominal_ice_projection_of_current_lowest_runner"
+          ],
+          "actual_geometry_outside_region_px": {
+            "count": 11,
+            "exposures": 11,
+            "median_px": 0.7997418408818752,
+            "p95_px": 8.480092063608614,
+            "worst_px": 8.981364868182656,
+            "worst_pts": 1151744
+          },
+          "actual_geometry_centre_distance_px": {
+            "count": 11,
+            "exposures": 11,
+            "median_px": 18.78867687476176,
+            "p95_px": 29.313035581095498,
+            "worst_px": 36.32056272709338,
+            "worst_pts": 1177344
+          }
+        }
+      },
+      "held_support_geometric_xy_extent_m": [
+        0.6381978349450073,
+        0.36495849946030745
+      ],
+      "held_support_material_mid_xy_extent_m": [
+        0.7521698427595638,
+        0.4021223749582301
+      ],
+      "entry_max_pelvis_horizontal_20ms_m": 0.09950260449892863,
+      "entry_max_com_horizontal_20ms_m": 0.08698001461479957,
+      "non_grip_right_wrist_40ms_deg": 5.9270060500198385,
+      "support_shoe_world_omega_85_56_to_85_58_rad_s": [
+        -0.17153822353004913,
+        -1.0622745321603104,
+        6.611814275787577
+      ]
+    },
+    "new": {
+      "body_whole": {
+        "count": 15694,
+        "exposures": 933,
+        "median_px": 2.9426030850967986,
+        "p95_px": 19.919209871735546,
+        "worst_px": 359.7832967314174,
+        "worst_pts": 1069312
+      },
+      "body_held": {
+        "count": 3204,
+        "exposures": 190,
+        "median_px": 4.107714856226311,
+        "p95_px": 23.284307050494043,
+        "worst_px": 201.67284478470054,
+        "worst_pts": 1143552
+      },
+      "shoe_groups": {
+        "fit_boot_marker_region_foot0": {
+          "outside_region_px": {
+            "count": 22,
+            "exposures": 15,
+            "median_px": 0.0,
+            "p95_px": 0.08649363655294262,
+            "worst_px": 0.1598372675716448,
+            "worst_pts": 1138432
+          },
+          "centre_distance_px": {
+            "count": 22,
+            "exposures": 15,
+            "median_px": 39.29468987550497,
+            "p95_px": 56.16657117704181,
+            "worst_px": 57.58474811564723,
+            "worst_pts": 1170944
+          },
+          "source_rows": 22,
+          "prediction_geometries": [
+            "actual_current_geometry"
+          ],
+          "actual_geometry_outside_region_px": {
+            "count": 22,
+            "exposures": 15,
+            "median_px": 0.0,
+            "p95_px": 0.08649363655294262,
+            "worst_px": 0.1598372675716448,
+            "worst_pts": 1138432
+          },
+          "actual_geometry_centre_distance_px": {
+            "count": 22,
+            "exposures": 15,
+            "median_px": 39.29468987550497,
+            "p95_px": 56.16657117704181,
+            "worst_px": 57.58474811564723,
+            "worst_pts": 1170944
+          }
+        },
+        "fit_boot_marker_region_foot1": {
+          "outside_region_px": {
+            "count": 36,
+            "exposures": 16,
+            "median_px": 0.0,
+            "p95_px": 0.22417557168566993,
+            "worst_px": 0.3089191923225892,
+            "worst_pts": 1125888
+          },
+          "centre_distance_px": {
+            "count": 36,
+            "exposures": 16,
+            "median_px": 20.798063015634277,
+            "p95_px": 27.508911411252356,
+            "worst_px": 43.86421885976308,
+            "worst_pts": 1151744
+          },
+          "source_rows": 36,
+          "prediction_geometries": [
+            "actual_current_geometry"
+          ],
+          "actual_geometry_outside_region_px": {
+            "count": 36,
+            "exposures": 16,
+            "median_px": 0.0,
+            "p95_px": 0.22417557168566993,
+            "worst_px": 0.3089191923225892,
+            "worst_pts": 1125888
+          },
+          "actual_geometry_centre_distance_px": {
+            "count": 36,
+            "exposures": 16,
+            "median_px": 20.798063015634277,
+            "p95_px": 27.508911411252356,
+            "worst_px": 43.86421885976308,
+            "worst_pts": 1151744
+          }
+        },
+        "fit_blade_midpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 2.875321133040929,
+            "p95_px": 4.977261682436094,
+            "worst_px": 5.073630513880995,
+            "worst_pts": 1177344
+          },
+          "centre_distance_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 11.011060986677759,
+            "p95_px": 13.462543056674663,
+            "worst_px": 13.558911888119564,
+            "worst_pts": 1177344
+          },
+          "source_rows": 4,
+          "prediction_geometries": [
+            "actual_current_geometry"
+          ],
+          "actual_geometry_outside_region_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 2.875321133040929,
+            "p95_px": 4.977261682436094,
+            "worst_px": 5.073630513880995,
+            "worst_pts": 1177344
+          },
+          "actual_geometry_centre_distance_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 11.011060986677759,
+            "p95_px": 13.462543056674663,
+            "worst_px": 13.558911888119564,
+            "worst_pts": 1177344
+          }
+        },
+        "fit_blade_endpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 49,
+            "exposures": 31,
+            "median_px": 0.21687784372550573,
+            "p95_px": 3.899953290585046,
+            "worst_px": 4.231313583015824,
+            "worst_pts": 1098240
+          },
+          "centre_distance_px": {
+            "count": 49,
+            "exposures": 31,
+            "median_px": 18.094777748398005,
+            "p95_px": 21.134617589359582,
+            "worst_px": 21.942389385130674,
+            "worst_pts": 1178112
+          },
+          "source_rows": 49,
+          "prediction_geometries": [
+            "actual_current_geometry"
+          ],
+          "actual_geometry_outside_region_px": {
+            "count": 49,
+            "exposures": 31,
+            "median_px": 0.21687784372550573,
+            "p95_px": 3.899953290585046,
+            "worst_px": 4.231313583015824,
+            "worst_pts": 1098240
+          },
+          "actual_geometry_centre_distance_px": {
+            "count": 49,
+            "exposures": 31,
+            "median_px": 18.094777748398005,
+            "p95_px": 21.134617589359582,
+            "worst_px": 21.942389385130674,
+            "worst_pts": 1178112
+          }
+        },
+        "fit_support_contact_region_foot1": {
+          "outside_region_px": {
+            "count": 11,
+            "exposures": 11,
+            "median_px": 0.32066755588434936,
+            "p95_px": 0.8873486357062761,
+            "worst_px": 0.9500118255946423,
+            "worst_pts": 1177344
+          },
+          "centre_distance_px": {
+            "count": 11,
+            "exposures": 11,
+            "median_px": 13.691544426506866,
+            "p95_px": 26.907247482761825,
+            "worst_px": 34.344686033326646,
+            "worst_pts": 1177344
+          },
+          "source_rows": 11,
+          "prediction_geometries": [
+            "nominal_ice_projection_of_current_lowest_runner"
+          ],
+          "actual_geometry_outside_region_px": {
+            "count": 11,
+            "exposures": 11,
+            "median_px": 1.7211923611200834,
+            "p95_px": 10.241120101848972,
+            "worst_px": 11.112002404949633,
+            "worst_pts": 1164544
+          },
+          "actual_geometry_centre_distance_px": {
+            "count": 11,
+            "exposures": 11,
+            "median_px": 19.200040356756848,
+            "p95_px": 29.68124827612558,
+            "worst_px": 34.98471543197178,
+            "worst_pts": 1177344
+          }
+        }
+      },
+      "held_support_geometric_xy_extent_m": [
+        0.6600180498386337,
+        0.37686187378296143
+      ],
+      "held_support_material_mid_xy_extent_m": [
+        0.7962281994891427,
+        0.40543214480535106
+      ],
+      "entry_max_pelvis_horizontal_20ms_m": 0.07087489562056716,
+      "entry_max_com_horizontal_20ms_m": 0.08333713745697507,
+      "non_grip_right_wrist_40ms_deg": 5.74607050879114,
+      "support_shoe_world_omega_85_56_to_85_58_rad_s": [
+        -0.012641655738498285,
+        -1.2813073717271628,
+        6.432469150791167
+      ]
+    }
+  },
+  "source_revisions": {
+    "body_association": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuation_1105\\body_observation_revision_v2.json",
+    "additional_duplicates": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuation_1105\\body_observation_revision_v3.json",
+    "contact_review": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuation_1105\\contact_revision_v3.json",
+    "conditional_planar_position": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuation_1105\\source_evidence_v4.json",
+    "admitted_body_points": 15694,
+    "no_new_uv_or_sigma": true,
+    "all_revisions_are_development_evidence": true,
+    "unknown_observations_preserved": true
+  },
+  "actual_checks": {
+    "math_tests_passed": 13,
+    "warm_replay": {
+      "absolute_position_controls": 0.0,
+      "absolute_rotation_controls": 0.0,
+      "exposure_P": 0.0,
+      "exposure_Q": 6.661338147750939e-16,
+      "exposure_local_R": 9.992007221626409e-16
+    },
+    "native_chain": {
+      "full_native_residual_rows": 229610,
+      "relative_directional_error": 5.6016491245113644e-08,
+      "max_absolute_error": 8.737445007511724e-07,
+      "root_and_head_controls": true,
+      "source_control_seconds": [
+        93.2,
+        93.8
+      ],
+      "first_full_J_reused": true
+    },
+    "support_geometry": {
+      "new_source_support_regions": 11,
+      "specific_new_geometry_check": true,
+      "relative_directional_error": 2.8877115116926164e-07,
+      "max_absolute_error": 4.5962149937406327e-07,
+      "differentiability_warnings": []
+    },
+    "entry_curvature": {
+      "new_horizontal_entry_curvature": true,
+      "relative_directional_error": 2.9105740094234788e-09,
+      "max_absolute_error": 1.2031908136478364e-08,
+      "full_source_frames": 951,
+      "unchanged_finite_scale": 12.0,
+      "not_a_COM_or_contact_measurement": true
+    },
+    "full_saved_951_midpoints_replay_equal": true,
+    "all_three_player_caches_951_pts_and_actual_hands_equal": true,
+    "viewer_runtime_module_import_without_window": true
+  },
+  "final_solve": {
+    "accepted_steps": 46,
+    "retained_step": 46,
+    "wall_seconds": 1048.4378313000016,
+    "budget_seconds": 7200,
+    "stop": {
+      "reason": "inner_solver_return",
+      "message": "`ftol` termination condition is satisfied.",
+      "ice_is_delivery_gate": false
+    },
+    "optimality": 906.2813099482817,
+    "numerical_convergence": false
+  },
+  "structural_diagnostics": {
+    "maximum_cavity_collar_violation_m": 0.003109112087069307,
+    "unknown_collar_sections": 0,
+    "scope": "cavity/collar only; original reference tolerance is not an ice acceptance gate"
+  },
+  "raw_nominal_ice_geometry": {
+    "midpoint_minimum_nominal_clearance_m": -0.027440839875916858,
+    "held_support_witness_nominal_height_range_m": [
+      -0.012972331250341276,
+      0.07796688944945684
+    ],
+    "not_direct_physical_contact_or_flight_truth": true
+  },
+  "ice_policy": {
+    "unchanged": true,
+    "finite_soft_objective": true,
+    "no_multiplier_growth": true,
+    "no_millimetre_delivery_gate": true
+  },
+  "remaining_issues_zh": [
+    "88–92秒支撑几何点X跨度0.739→0.660m，但Y跨度0.335→0.377m；漂移未全面解决。几何最低点会迁移，不是被跟踪的材料点。",
+    "条件性冰面位置参照残差改善；实际鞋刀几何见证点的原片区域p95仍约10.24px，不能拿条件性参照代替真实接触验收。",
+    "释放段93.2–93.5秒鞋刀朝向及小腿配置仍有明显偏差，93.50秒最终回投已目视复核。",
+    "最优性906.28，因ftol退出；未达到数值收敛、准确性或真实接冰验收。",
+    "15694个准入人体点中仍有约360px的极端偏差，不能证明所有关联有效。",
+    "有限腾空内部只覆盖81.36–81.46秒；最终质心弹道位置最大偏差约2.93cm，短时加速度仍明显偏离重力，物理一致性未通过。"
+  ],
+  "delivery": {
+    "launcher": "D:\\OneDrive\\codex_projs\\RinkSpace\\launchers\\START_3D_SPIN_REFINED.cmd",
+    "command": "\"D:\\OneDrive\\codex_projs\\RinkSpace\\launchers\\START_3D_SPIN_REFINED.cmd\" -Variant continuous_refined",
+    "config": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\viewer3d_spin_support_continuous_1105.json",
+    "cache_preparation": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuation_1105\\fit6\\player_preparation.json",
+    "native_stills": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuation_1105\\fit6\\native_stills\\projection_and_clock.json",
+    "motion_comparison": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuation_1105\\review_final\\motion_comparison.png",
+    "gui_opened": false,
+    "no_new_video": true
+  },
+  "accuracy_accepted": false,
+  "user_accepted": false,
+  "no_commit_or_push": true
+}

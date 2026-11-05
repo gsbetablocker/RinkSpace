@@ -198,6 +198,9 @@ class SpinSupportWindow(SpinGraspWindow):
 
 
 def window_factory(kind):
+    if kind=='absolute_motion_v1':
+        from .absolute_motion_state import AbsoluteMotionState
+        return AbsoluteMotionState
     return {'spin_support_v2':SpinSupportWindow,'spin_grasp_v1':SpinGraspWindow,'halo_1103':HaloWindow,'continuous_shot':ContinuousShotWindow,
         'continuous_root':ContinuousRootWindow,'continuous_pose':ContinuousPoseWindow,
         'support_joint_left_v1':lambda r,s,m:SupportJointWindow(r,s,m,foot=0),
@@ -211,6 +214,10 @@ def checkpoint_state_kind(saved):
 def state_from_packet(reference,saved,prefix=''):
     """Reconstruct the actual control basis, without fitting another spline."""
     kind=str(saved.get(prefix+'state_kind',np.array('halo_1103')))
+    if kind=='absolute_motion_v1':
+        from .absolute_motion_state import AbsoluteMotionState,curve_from_packet
+        reference.absolute_curve=curve_from_packet(saved,seed=True)
+        return AbsoluteMotionState(reference,tuple(saved['seconds']))
     factory=window_factory(kind)
     state=factory(reference,tuple(map(float,saved[prefix+'seconds'])),'full')
     np.testing.assert_array_equal(state.knots,saved[prefix+'knots'])
@@ -231,6 +238,8 @@ def base_layer_packet(reference):
 
 def restore_checkpoint_layers(reference,saved,include_primary=False):
     """Replay saved candidate layers exactly; there is still one body state."""
+    if str(saved.get('state_kind',''))=='absolute_motion_v1':
+        raise ValueError('Absolute state requires spin_continuous_refit.restore_absolute; cannot append it as a correction layer')
     for i in range(int(saved.get('base_layer_count',0))):
         prefix=f'base_layer_{i}_';state=state_from_packet(reference,saved,prefix)
         controls=np.asarray(saved[prefix+'x']).copy()
@@ -519,9 +528,15 @@ class JointContactProblem:
         lo,hi=shared_bounds(self.binding)
         angular=np.tile(self.body.state.active>=3,self.body.state.m)
         lower=np.r_[lo,np.where(angular,-np.pi,-np.inf)];upper=np.r_[hi,np.where(angular,np.pi,np.inf)]
-        # All coefficients of the one body curve participate. Cubic knots
-        # describe a continuous curve; they do not define independent clips.
-        selection=np.arange(0 if getattr(self,'optimize_shared',True) else 17,self.size)
+        # Local repairs may activate a subset of this same global curve.
+        # Every other parameter is expanded from the saved immutable state.
+        selection=np.asarray(getattr(self,'active_parameter_indices',
+            np.arange(0 if getattr(self,'optimize_shared',True) else 17,self.size)))
+        if (selection.ndim!=1 or selection.dtype.kind not in 'iu' or not len(selection)
+                or np.any(selection<0) or np.any(selection>=self.size)
+                or np.any(np.diff(selection)<=0)
+                or (not self.optimize_shared and np.any(selection<17))):
+            raise ValueError('Invalid explicit active parameter selection')
         self.parameter_selection=selection
         frozen_initial=x.copy()
         record_before_jacobian=bool(getattr(self,'record_acceptance_before_jacobian',False))
@@ -531,7 +546,9 @@ class JointContactProblem:
         write_json(self.output/'parameter_selection.json',dict(full_layout=self.size,active_variables=len(selection),
             active_state_columns=self.body.state.active.tolist(),state_kind=self.state_kind,
             body_support_seconds=list(self.body.state.seconds),selection=selection.tolist(),one_body_state=True,
-            internal_temporal_freezes=False,record_acceptance_before_jacobian=record_before_jacobian))
+            internal_temporal_freezes=hasattr(self,'active_parameter_indices'),
+            local_control_seconds=getattr(self,'local_control_seconds',None),
+            record_acceptance_before_jacobian=record_before_jacobian))
         implementation={}
         source_dir=self.output/'source_snapshot';source_dir.mkdir(exist_ok=True)
         for name in ('skate_integration.py','skate_binding.py','skate_physics.py','skate_template.py',
@@ -622,7 +639,16 @@ class JointContactProblem:
                     accepted(z)
             now=time.perf_counter()
             if monitor.reserve_evaluation(now=now,estimated_seconds=jacobian_seconds if jacobian else 0.)['stop']:raise StopFit()
-            value=self.evaluate(expand(z),jacobian)
+            from .absolute_motion_curve import RotationChartDomainError
+            try:
+                value=self.evaluate(expand(z),jacobian)
+            except RotationChartDomainError as error:
+                if jacobian:raise
+                # SciPy TRF treats nonfinite trial residuals as rejected and
+                # contracts its trust radius. Never accept/project/rewrite a
+                # branch-invalid pose or replace the last accepted candidate.
+                self.log.write(json.dumps(dict(event='trial_domain_rejected',domain='absolute_so3_log_chart',message=str(error),accepted=self.accepted))+'\n')
+                return dict(residual=np.full_like(initial_value['residual'],np.inf))
             if jacobian:
                 jacobian_seconds=max(jacobian_seconds,time.perf_counter()-now)
                 last_linearization=np.array(z,copy=True)
@@ -645,9 +671,11 @@ class JointContactProblem:
                 status=observe_candidate(z,v,accepted=True)
                 if status['stop']:raise StopFit()
             try:
-                fit=least_squares(lambda z:guarded(z)['residual'],x[selection],jac=lambda z:guarded(z,True)['jac'][:,selection],
-                    bounds=(lower[selection],upper[selection]),method='trf',tr_solver='lsmr',x_scale='jac',ftol=1e-7,xtol=1e-7,gtol=1e-4,
-                    callback=accepted,tr_options=dict(atol=1e-7,btol=1e-7))
+                from .body_linear_solver import sparse_direct_trf
+                with sparse_direct_trf(self):
+                    fit=least_squares(lambda z:guarded(z)['residual'],x[selection],jac=lambda z:guarded(z,True)['jac'][:,selection],
+                        bounds=(lower[selection],upper[selection]),method='trf',tr_solver='lsmr',x_scale='jac',ftol=1e-7,xtol=1e-7,gtol=1e-4,
+                        callback=accepted,tr_options=dict(atol=1e-7,btol=1e-7))
             except StopFit:
                 return save_candidate(monitor.record())
             x=expand(fit.x);value=self.evaluate(x,False)

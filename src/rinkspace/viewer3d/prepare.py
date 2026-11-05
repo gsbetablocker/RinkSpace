@@ -192,6 +192,7 @@ def prepare_variant(catalog,variant,surface=None):
         lower=state['saved']['source_lower_body_inferred'] if fullbody else catalog.packet['lower_body_inferred']
         cache_state=dict(pts=catalog.pts,P=P,G=G,Q=state['Q'],joints=joints,coco=cocos,gear=gear,parents=surface.body.parents[:22],source_lower_body_inferred=lower,source_identity_suspect=source_flags)
         cache_state.update(source_support_state(state['saved'],n))
+        cache_state.update(state['motion_diagnostics'])
         for key,shape in (('grasp_palm_world_mid',(n,3)),('grasp_segment_world_mid',(n,2,3)),('palm_to_segment_m_mid',(n,))):
             if key in state['saved']:
                 values=np.asarray(state['saved'][key])
@@ -215,6 +216,11 @@ def prepare_variant(catalog,variant,surface=None):
         equipment_description='saved fixed-topology boot surface with local dynamic upper; rigid lower-boot and blade attachment' if dynamic_surface else ('saved rigid 14-vertex shell and lower-edge strip' if fullbody or state['geometry'] is not None else 'original five-point blade proxy; no fitted boot shell in this old variant')
         if versioned_skate:equipment_description='saved connected lower-skate solids, fixed-topology articulated upper and cavity, exact dual edges and contact witnesses; legacy landmarks are observation adapters only'
         metadata=dict(schema=MESH_CACHE_SCHEMA,identity=identity,variant=v,frames=n,vertices_per_frame=len(surface.shaped),source_time_base=list(getattr(catalog,'time_base',(1,12800))),source_first_last_pts=[int(catalog.pts[0]),int(catalog.pts[-1])],world_up='Z',display_unit='metre',display_metres_per_scene_unit=catalog.scale,old_result_metres_per_scene_unit=catalog.legacy_scale,candidate_metres_per_scene_unit=state['metres_per_scene_unit'],body_length_ratio=state['length_ratio'],uniform_unit_reexpression_ratio=ratio,time_semantics='all body vertices, native joints and equipment evaluated at common source mid-exposure; rolling-shutter row samples are not mixed into a 3D pose',surface='full 10475-vertex SMPL-X model with effective local_R_mid' if fullbody else 'full 10475-vertex SMPL-X model with existing shared beta and pose corrections',equipment=equipment_description,source_result=str(catalog.result_path(v).resolve()),saved_coco_mid_maximum_reconstruction_error_m=max_saved_error,saved_native22_mid_maximum_reconstruction_error_m=max_native_error,full_vs_compact_coco_maximum_error_m=max_surface_error,saved_nominal_blade_minimum_maximum_error_m=max_blade_error,no_new_pose_or_root_fit=True,no_neural_inference=True,no_foot_lock_or_ground_snapping=True,accuracy_accepted=False,seconds=time.perf_counter()-start)
+        metadata['motion_diagnostics']=dict(saved_fields=list(state['motion_diagnostics']),
+            com='saved conditional-metric mass-model approximation; not measured true centre of mass',
+            blade_material_order=['rear','middle','front'],foot_order='existing saved foot 0/1; anatomical identity not inferred',
+            witness='saved moving minimum/contact candidate; not verified ice contact',
+            estimated_by_viewer=False)
         if fullbody:
             footwear=state['footwear']
             if 'body_refinement_window_mask' in footwear:

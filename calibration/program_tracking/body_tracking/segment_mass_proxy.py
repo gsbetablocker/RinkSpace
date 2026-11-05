@@ -16,8 +16,11 @@ class _DegenerateSegment(ValueError):
     pass
 
 
-def tetraVolumeCentroid(points):
-    """Return convex volume and volume centroid in the input coordinate units.
+def tetraVolumeProperties(points):
+    """Return convex volume, COM and own-COM unit-mass inertia in input units.
+
+    Length is the input unit, volume its cube, and inertia its square. The
+    inertia axes are the unchanged input axes, translated to this own COM.
 
     Triangulate the closed convex hull and join every face to the mean of all
     input points, which lies inside the hull. No Qhull joggling or invented
@@ -46,7 +49,22 @@ def tetraVolumeCentroid(points):
     centroid = interior + np.sum(volumes[:, None] * triangles.sum(axis=1) / 4., axis=0) / volume
     if not np.isfinite(centroid).all():
         raise ValueError('Nonfinite segment volume centroid')
-    return volume, centroid
+    # Uniform tetrahedron second moment: (sum(v v.T) + sum(v) sum(v).T)/20.
+    # Work around the interior point to avoid a distant origin cancellation.
+    tetra = np.concatenate((np.zeros((len(triangles), 1, 3)), triangles), axis=1)
+    summed = tetra.sum(axis=1)
+    centre_local = np.sum(volumes[:, None] * summed / 4., axis=0) / volume
+    second = (np.einsum('nvi,nvj->nij', tetra, tetra)
+              + np.einsum('ni,nj->nij', summed, summed)) / 20.
+    covariance = np.einsum('n,nij->ij', volumes / volume, second) - np.outer(centre_local, centre_local)
+    inertia = np.trace(covariance) * np.eye(3) - covariance
+    return volume, centroid, (inertia + inertia.T) / 2.
+
+
+def tetraVolumeCentroid(points):
+    """Compatibility interface returning only volume and COM in input units."""
+    volume, centre, _ = tetraVolumeProperties(points)
+    return volume, centre
 
 
 def prepare_segment_mass_proxy(surface):
@@ -83,7 +101,7 @@ def prepare_segment_mass_proxy(surface):
             empty.append(joint)
             continue
         try:
-            parts[joint] = (*tetraVolumeCentroid(points[indices]), len(indices))
+            parts[joint] = (*tetraVolumeProperties(points[indices]), len(indices))
         except _DegenerateSegment as error:
             if joint == 0:
                 raise ValueError('Root shape group is degenerate and has no parent to merge into') from error
@@ -96,14 +114,29 @@ def prepare_segment_mass_proxy(surface):
     ids = np.array(sorted(parts), dtype=int)
     volumes = np.array([parts[j][0] for j in ids])
     centres = np.stack([parts[j][1] for j in ids])
+    inertia = np.stack([parts[j][2] for j in ids])
     fractions = volumes / volumes.sum()
     if not np.isfinite(fractions).all() or np.any(fractions <= 0):
         raise ValueError('Invalid normalized positive shape-volume fractions')
+    # Trace each originally assigned group through the unchanged merge chain.
+    merged_parent = {row['native_joint_id']: row['parent_native_joint_id'] for row in merged}
+    retained = np.full(22, -1, dtype=int)
+    for joint in range(22):
+        if initial_counts[joint]:
+            target = joint
+            while target in merged_parent:
+                target = merged_parent[target]
+            retained[joint] = target
     return dict(
         id='shape-segment-convex-volume.uniform-density.v1',
         native_joint_ids=ids, centres_rest=centres, mass_fractions=fractions,
         names=[NATIVE22_NAMES[j] for j in ids], volumes_rest=volumes,
-        vertex_counts=np.array([parts[j][2] for j in ids], int),
+        vertex_counts=np.array([parts[j][3] for j in ids], int),
+        unit_mass_inertia_rest=inertia,
+        inertia_units='square of the unscaled model coordinate unit of surface.shaped',
+        inertia_reference='about each segment own COM, in unchanged shaped-model rest axes',
+        metric_scaling='COM offsets multiply metres_per_model_unit; unit-mass inertia multiplies its square once',
+        initial_native_joint_to_retained_native_joint=retained,
         initial_vertex_counts=initial_counts, merged_groups=merged,
         empty_native_joint_ids=sorted(empty),
         assumptions=['uniform-density', 'rigid-segment', 'convex-cap'],
@@ -114,3 +147,81 @@ def prepare_segment_mass_proxy(surface):
         left_finger_weights_merged_into_wrist=20,
         right_finger_weights_merged_into_wrist=21,
         surface_render_mesh_unchanged=True)
+
+
+def prepare_body_skate_mass_proxy(body_proxy, joint_centres_rest, skate_template_points, *,
+                                  metres_per_model_unit, metres_per_skate_unit,
+                                  relative_mass_per_skate, mass_variant_id):
+    """Attach two rigid template skate proxies to an existing body mass model.
+
+    ``joint_centres_rest`` is (22,3), in the SAME unscaled shaped-model axes as
+    body_proxy centres_rest. Output body COM offsets are relative to those
+    native joints; the caller supplies their current world positions and R.
+    Body local axes remain the shaped-model rest axes (not a bone-aligned frame).
+    ``skate_template_points`` is either one shared (V,3) template or a pair of
+    left/right templates, in the local frame mapped by each current shoe R/O.
+    For SkateBinding.packet() these can be template vertices + upper, with
+    metres_per_skate_unit=binding.ratio. No FK or shoe deformation is done here.
+
+    Each skate mass is relative to total BODY mass=1, never to already combined
+    body+equipment mass. Body fractions are validated, not re-normalized. The
+    single final division includes the equipment once. The hull combines shell,
+    holder and steel into one unmeasured rigid uniform-volume proxy; it is not
+    the flexible boot-cuff model or a measured material density distribution.
+    """
+    body_scale = float(metres_per_model_unit)
+    skate_scale = float(metres_per_skate_unit)
+    per_skate = np.asarray(relative_mass_per_skate, float)
+    if per_skate.ndim == 0:
+        per_skate = np.repeat(per_skate, 2)
+    if (not np.isfinite([body_scale, skate_scale]).all() or min(body_scale, skate_scale) <= 0
+            or per_skate.shape != (2,) or not np.isfinite(per_skate).all() or np.any(per_skate <= 0)):
+        raise ValueError('Require positive finite metric scales and two positive assumed skate masses')
+    if not isinstance(mass_variant_id, str) or not mass_variant_id.strip():
+        raise ValueError('Declare a nonempty mass_variant_id for the mass/inertia assumption')
+    joints = np.asarray(joint_centres_rest, float)
+    ids = np.asarray(body_proxy['native_joint_ids'], int)
+    centres = np.asarray(body_proxy['centres_rest'], float)
+    inertia = np.asarray(body_proxy['unit_mass_inertia_rest'], float)
+    masses = np.asarray(body_proxy['mass_fractions'], float)
+    S = len(ids)
+    if (joints.shape != (22, 3) or ids.ndim != 1 or np.any((ids < 0) | (ids >= 22))
+            or centres.shape != (S, 3) or inertia.shape != (S, 3, 3)
+            or masses.shape != (S,) or not all(np.isfinite(a).all() for a in (joints, centres, inertia, masses))
+            or np.any(masses <= 0) or not np.isclose(masses.sum(), 1., rtol=1e-12, atol=1e-12)):
+        raise ValueError('Require the normalized prepared body proxy and matching unscaled rest joints')
+    try:
+        shared = np.asarray(skate_template_points, float)
+    except ValueError:
+        shared = None
+    templates = ([shared, shared] if shared is not None and shared.ndim == 2
+                 else list(skate_template_points))
+    if len(templates) != 2:
+        raise ValueError('Supply one shared or two local skate templates')
+    skate = [tetraVolumeProperties(points) for points in templates]
+    relative_masses = np.r_[masses, per_skate]
+    total = float(relative_masses.sum())
+    if not np.isfinite(total):
+        raise ValueError('Combined relative masses must have a finite positive sum')
+    fractions = relative_masses / total
+    return dict(
+        id=body_proxy['id']+';rigid-attached-skate-convex-volume.v1',
+        mass_variant_id=mass_variant_id,
+        segment_names=list(body_proxy['names'])+['left_skate_proxy', 'right_skate_proxy'],
+        segment_native_joint_ids=np.r_[ids, -1, -1],
+        segment_mass_fractions=fractions,
+        segment_com_rest_local_m=np.r_[(centres-joints[ids])*body_scale,
+                                       np.stack([part[1] for part in skate])*skate_scale],
+        segment_unit_mass_inertia_local_m2=np.r_[inertia*body_scale**2,
+                                                np.stack([part[2] for part in skate])*skate_scale**2],
+        body_segment_count=S,
+        relative_mass_per_skate=per_skate.copy(),
+        metres_per_model_unit=body_scale, metres_per_skate_unit=skate_scale,
+        body_mass_proxy_id=body_proxy['id'],
+        merged_groups=[dict(row) for row in body_proxy['merged_groups']],
+        initial_native_joint_to_retained_native_joint=np.asarray(
+            body_proxy['initial_native_joint_to_retained_native_joint']).copy(),
+        rest_frame='body: shaped-model axes at native joint; skate: supplied template axes at shoe origin',
+        inertia_reference='each segment own COM, per unit segment mass; never multiply segment mass twice',
+        skate_mass_model='one rigid uniform convex proxy combining shell/holder/steel; unmeasured relative mass',
+        absolute_mass_inferred=False, physical_accuracy_certified=False)

@@ -1,0 +1,306 @@
+{
+  "schema": "rinkspace.spin-local-leg-repair-audit.v1",
+  "request": "Fix observed leg-identity jump near player frames281/282",
+  "ui_to_source": {
+    "frame_281": {
+      "pts": 1044480,
+      "source_seconds": 81.6
+    },
+    "frame_282": {
+      "pts": 1044736,
+      "source_seconds": 81.62
+    }
+  },
+  "cause_zh": "81.58–81.64秒原检测台账的膝/踝侧别相对相邻稳定物理腿轨道短暂反转；81.58/81.60双踝还重复落在同一低处脚。源图没有换腿。",
+  "implemented": {
+    "simultaneous_source_row_rebinding": true,
+    "rebound_rows": 14,
+    "new_admissions": 15640,
+    "previous_admissions": 15694,
+    "new_source_uv_or_sigma": false,
+    "unknowns_preserved": true,
+    "one_global_absolute_motion_v2": true,
+    "local_parameter_selection": {
+      "requested_seconds": [
+        81.2,
+        82.0
+      ],
+      "effective_support_seconds": [
+        81.22926829268293,
+        81.97073170731707
+      ],
+      "control_indices": [
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73
+      ],
+      "active_variables": 1104,
+      "full_body_variables": 20217,
+      "one_global_curve": true,
+      "no_independent_clip_or_display_smoothing": true
+    },
+    "shared_shape_camera_footwear_unchanged": true,
+    "no_post_export_pose_smoothing": true,
+    "ice_policy_residual_families_and_weights_unchanged": true
+  },
+  "result": {
+    "parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_281_repaired_1105.npz",
+    "parameter_sha256": "f4865b62f3223b8d32473d057e12255f7334cb1af6f3aeb8eab93cf71fe68a14",
+    "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_local_280_1105\\fit1\\continuous_stage\\common\\exmr_hand_nofoot\\fitted\\result.npz",
+    "result_sha256": "c125819195584bea6f323a54b7bfdd6973767869911dab09c6076b1761cc6d40",
+    "source_frames": 951,
+    "accepted_steps": 29,
+    "retained_step": 29,
+    "wall_seconds": 560.4659936999997,
+    "stop": {
+      "reason": "inner_solver_return",
+      "message": "`ftol` termination condition is satisfied.",
+      "ice_is_delivery_gate": false
+    },
+    "optimality": 2.0332825935009,
+    "numerical_convergence": false
+  },
+  "comparison": {
+    "source_frames": 951,
+    "source_time_base": [
+      1,
+      12800
+    ],
+    "ui_frame_281": {
+      "pts": 1044480,
+      "source_seconds": 81.6
+    },
+    "ui_frame_282": {
+      "pts": 1044736,
+      "source_seconds": 81.62
+    },
+    "metrics": {
+      "before": {
+        "ui_frames": [
+          278,
+          279,
+          280,
+          281,
+          282,
+          283,
+          284,
+          285
+        ],
+        "source_seconds": [
+          81.54,
+          81.56,
+          81.58,
+          81.6,
+          81.62,
+          81.64,
+          81.66,
+          81.68
+        ],
+        "geometrically_lower_model_foot": [
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          1,
+          1
+        ],
+        "lower_model_foot_changes": 2,
+        "root_max_single20ms_rotation_deg": 44.42857673301633,
+        "corrected_14_source_observation_error_px": {
+          "median": 245.6794736188198,
+          "p95": 477.5278525221116,
+          "maximum": 490.03492755147494
+        },
+        "shoe_nominal_clearance_m": [
+          [
+            1.0173001582083974,
+            0.11907174607197202
+          ],
+          [
+            0.8154532164734929,
+            0.10334363318687269
+          ],
+          [
+            0.3198175710996781,
+            0.25421106900501284
+          ],
+          [
+            0.040725028281885754,
+            0.7422606955451924
+          ],
+          [
+            0.060772914548022555,
+            0.8428160960806793
+          ],
+          [
+            0.2335505534031255,
+            0.25872346503461163
+          ],
+          [
+            0.8494989344203323,
+            0.046637568246328295
+          ],
+          [
+            0.8672280715031393,
+            0.04460957769965664
+          ]
+        ]
+      },
+      "after": {
+        "ui_frames": [
+          278,
+          279,
+          280,
+          281,
+          282,
+          283,
+          284,
+          285
+        ],
+        "source_seconds": [
+          81.54,
+          81.56,
+          81.58,
+          81.6,
+          81.62,
+          81.64,
+          81.66,
+          81.68
+        ],
+        "geometrically_lower_model_foot": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "lower_model_foot_changes": 0,
+        "root_max_single20ms_rotation_deg": 13.015347608505433,
+        "corrected_14_source_observation_error_px": {
+          "median": 2.314982615666818,
+          "p95": 14.092216442758518,
+          "maximum": 29.205496732214314
+        },
+        "shoe_nominal_clearance_m": [
+          [
+            0.8163177526473028,
+            0.15667724944505024
+          ],
+          [
+            0.8326243615891928,
+            0.0822645691640188
+          ],
+          [
+            0.8330710986309277,
+            0.035501476662542664
+          ],
+          [
+            0.8415863806811579,
+            0.029585102760337774
+          ],
+          [
+            0.849429554897431,
+            0.05273889841323955
+          ],
+          [
+            0.8372530796841611,
+            0.045607067190955725
+          ],
+          [
+            0.8100745214561165,
+            0.042413576701001196
+          ],
+          [
+            0.7793163886147093,
+            0.05201443274991173
+          ]
+        ]
+      }
+    },
+    "unchanged_outside_81_2_to_82_0": {
+      "P_world_mid": 0.0,
+      "Q_world_mid": 0.0,
+      "local_R_mid": 0.0,
+      "native22_world_mid": 0.0,
+      "skate_R_world_mid": 0.0,
+      "skate_origin_world_mid": 0.0,
+      "COCO_uv_max_abs_floating_roundoff_px": 1.1368683772161603e-12
+    },
+    "frozen_parameter_coordinates_exact": true,
+    "actual_hands_unchanged": true,
+    "ice_height_not_contact_truth": true,
+    "accepted_steps": 29,
+    "wall_seconds": 560.4659936999997,
+    "stop": {
+      "reason": "inner_solver_return",
+      "message": "`ftol` termination condition is satisfied.",
+      "ice_is_delivery_gate": false
+    },
+    "review": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_local_280_1105\\source_review\\leg_association_review.json",
+    "new_parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_281_repaired_1105.npz",
+    "new_result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_local_280_1105\\fit1\\continuous_stage\\common\\exmr_hand_nofoot\\fitted\\result.npz"
+  },
+  "preserved": {
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_support_continuous_1105.npz": "83a40a1061b71634e2a93f030509f8b788f22bbce235edc3e2e717ba596954ad",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\skate_s01_1103.npz": "3b58dac5f7363dfc5e051fc75ef8602dd3810a0ebc370c57a24542745bc5090c",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_continuous_source_1105.npz": "d4aa68bbdb0d08b8224600b66578c0ee52f329acc641edd6c9f5788072eb60ce",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_continuous_flight_1105.npz": "a9e0ad5b8cd4374da21f2dfb399050aae4936d5b3f1f5a89cbd414134b9ed4e9",
+    "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\camera_solver_refined_1102.npz": "d6cfde1474a23d594a0395351ebbdb0ee15a6560ef77b27f069d239ee95bb3f3"
+  },
+  "regression": {
+    "local_support_output_test": "tests/test_absolute_motion_local_selection.py:1 passed",
+    "all_inactive_parameter_coordinates_bit_exact": true,
+    "outside_81_2_to_82_0_P_Q_local_R_native_joints_and_shoe_state_bit_exact": true,
+    "outside_derived_pixel_roundoff_px": 1.1368683772161603e-12,
+    "both_player_caches_951_source_pts_and_actual_hands_equal": true,
+    "ten_native_camera_comparison_frames": true
+  },
+  "evidence": {
+    "source_review": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_local_280_1105\\source_review\\leg_association_review.json",
+    "source_review_sha256": "b12d7ca60d60db3e1052fa02a175631239d908da9a5d489010375d34fc83e647",
+    "observation_revision": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_local_280_1105\\observation_revision.json",
+    "local_comparison": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_local_280_1105\\local_comparison.json",
+    "identity_sheet": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_local_280_1105\\leg_identity_before_after.png",
+    "identity_sheet_sha256": "d82a180e66866b4cd0b4bce66ab420909df104673ce464a4bca2f748cbe86f2d",
+    "native_stills": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_local_280_1105\\fit1\\native_stills\\projection_and_clock.json"
+  },
+  "delivery": {
+    "launcher": "D:\\OneDrive\\codex_projs\\RinkSpace\\launchers\\START_3D_SPIN_REFINED.cmd",
+    "config": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\viewer3d_spin_281_repaired_1105.json",
+    "default_variant": "local_281",
+    "initial_source_pts": 1044224,
+    "retained_previous_variant": "continuous_refined",
+    "all_A_B_retained": true,
+    "launcher_before": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_local_280_1105\\fit1\\launcher_before.json",
+    "cache_preparation": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_local_280_1105\\fit1\\player_preparation.json",
+    "gui_opened": false,
+    "no_video": true
+  },
+  "scope_limits_zh": [
+    "修复同一物理腿轨道的短暂关联反转；不宣称独立认证了全段解剖左右。",
+    "模型足1持续为低处腿不等同于真实接冰真值；精确落冰时刻/接触点仍未证实。",
+    "鞋刀朝向、人体轮廓及原有旋转漂移仍有偏差；本次只处理局部换腿跳变。",
+    "源图审阅用于修复，属于开发材料，不作为独立准确性验收。"
+  ],
+  "accuracy_accepted": false,
+  "user_accepted": false,
+  "no_commit_or_push": true
+}

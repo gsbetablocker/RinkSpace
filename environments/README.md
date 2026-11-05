@@ -17,7 +17,7 @@
 | 历史 Ceres 后端 | [rinkfit](../calibration/rinkfit/README.md)、[solve2](../calibration/solve2/native/README.md)、[原生 recipe](native-build-recipes-observed.json) | 与当前 native LM 的构建和状态合同分别解释 |
 | 历史 GTSAM | [独立候选配置](gtsam-reconstruction-candidate.yml) | NumPy 1.26／GTSAM 4.2.2 栈，与主 NumPy 2.x 分开，候选未验收 |
 
-`INSTALL_LOCAL.cmd` 安装 dev／acquisition，不含 advanced。setuptools 只发现 `src` 下的包；`calibration` 中的历史模块需要完整源码 checkout，普通 wheel 不包含全部赛事运行依赖。
+`launchers/INSTALL_LOCAL.cmd` 安装 dev／acquisition，不含 advanced。setuptools 只发现 `src` 下的包；`calibration` 中的历史模块需要完整源码 checkout，普通 wheel 不包含全部赛事运行依赖。
 
 S01 全身／足鞋／开头优化入口使用 SciPy 的 `least_squares(callback=...)` 保存已接受状态，该接口从 [SciPy 1.16.0](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.least_squares.html) 提供；`advanced` 下限已同步。现有 `.venv` 的实际版本为 1.17.1，见[观察清单](requirements-solver-observed.txt)。Data 中其他环境的历史锁不因此改写，报告绘制和播放器可继续使用各自现有环境。
 
@@ -50,9 +50,13 @@ ExMR局部补丁保留[上游完整许可和署名](third_party_licenses/EXMR_LI
 
 [apply_exmr_camera_patch.py](apply_exmr_camera_patch.py) 核验固定提交及文件内容，`--apply` 应用 [camera-only 补丁](exmr_camera.patch)。返回出口位于 world 分支之前，保留足细化前／后和最终相机 SMPL-X，禁止同时开启世界后处理、贴地或平滑。[exmr_prior.py](../calibration/program_tracking/body_tracking/exmr_prior.py) 的 prepare/keypoints/sam/hands/infer 分阶段复用已知人物、原始 PTS 和相机；SAM 原生 MHR 输出与特征一并保存。原始人物框分别按 SAM/ExMR 原生规则处理，不复用 GVHMR 已扩大的方框作为原始检测框。
 
-对照入口 [run_exmr_comparison.py](../scripts/run_exmr_comparison.py)通过同一性能包装器执行 profile／compare／replay，共享 S01 体型和鞋刀；每个网络使用自身姿态初值，重放读取对应 case 身份和初值。25Hz 输入与原生 50Hz 显示曝光按整数 PTS 对应，节奏适配未标定。[播放器入口](../START_3D_SPIN_MODELS.cmd)及[节目结果绑定](../events/ankara_2026/programmes/okada_mei_sp/spin_models_1104_audit.json)给出已保存对照的范围与限制。本机 Windows／Python 3.11／Torch 2.7.1 的运行范围为 camera-only 子链，官方完整 demo 的空白环境重建仍未验证。
+对照入口 [run_exmr_comparison.py](../scripts/run_exmr_comparison.py)通过同一性能包装器执行 profile／compare／replay，共享 S01 体型和鞋刀；每个网络使用自身姿态初值，重放读取对应 case 身份和初值。25Hz 输入与原生 50Hz 显示曝光按整数 PTS 对应，节奏适配未标定。[播放器入口](../launchers/START_3D_SPIN_MODELS.cmd)及[节目结果绑定](../events/ankara_2026/programmes/okada_mei_sp/spin_models_1104_audit.json)给出已保存对照的范围与限制。本机 Windows／Python 3.11／Torch 2.7.1 的运行范围为 camera-only 子链，官方完整 demo 的空白环境重建仍未验证。
 
 ## 人体求解执行优化
+
+当前 `absolute_motion_v1` 连续人体入口已接入同关节三轴 GPU 扰动批处理、曲线/固定参考值复用、按需导数、旋转小块及五曝光节点 CSR 装配。只有人体图像观测的块仅生成被消费的 COCO 导数；独立鞋刀图像、内腔、鞋口、抓握和软冰面因子保留。
+
+`ContinuousJoint` 默认使用 [body_linear_solver.py](../calibration/program_tracking/body_tracking/body_linear_solver.py)的稀疏直接 GN 方向，保留 SciPy TRF 的缩放、边界、正则化及接受规则；正规系统残差检查失败或算子不支持时回退 LSMR。其他问题默认仍为 LSMR；程序化设置 `problem.linear_solver_backend='lsmr'` 可选原路径。当前 951 帧、同起点两个接受步的旧求解 Monitor 区间为205.70秒，新完整 solve 调用35.14秒；首次完整 J 单独为19.48→17.33秒。该近收敛 S05 短段倍率不推广到其他求解阶段。[实际记录](../events/ankara_2026/programmes/okada_mei_sp/body_performance_1105_audit.json)保留原始计时边界、逐项 CSR 差异、CPU/GPU计数及原版报告缺项；现有 A/B 参数不因代码更新而重新拟合。
 
 [性能启动入口](../scripts/run_body_performance.py)给现有 Python 求解命令设置子进程环境，原参数原样传递。切换原生库时使用独立候选目录和已有参数作 warm-start，使旧目录的输入记录保持原样。例如将当前时序入口及其已有参数接在后面：
 
@@ -62,7 +66,7 @@ python -B scripts/run_body_performance.py scripts/run_opening_timing.py --root <
 
 [本机配置](body-performance-local.json)从 AssetStore 的 Data 根解析独立 CPU 投影库，CPU 身体 workers=12、native_threads=4、BLAS=1。未给 `--backend` 时读取所选 profile 的 `default_backend`，旧 profile 缺该字段时使用 CPU；通用本机配置保留 `default_backend=cpu`，用于共享鞋参或多窗口问题。当前 case 可另用 Data 中的性能 profile 设置 `default_backend=hybrid`，再通过 `--profile` 选择。`--show-command` 只打印命令和子进程设置，不启动目标；目标参数始终原样传递。
 
-`--backend hybrid` 使用已有 vision_cuda、12 个 CPU 身体 workers、4 个 native 投影线程及 BLAS=1，实际设置为 `RINKSPACE_BODY_BACKEND=cpu`、`RINKSPACE_BODY_LOCAL_DERIVATIVES=analytic`、`RINKSPACE_BODY_COMPATIBILITY_BACKEND=cuda_resident`。GPU 仅驻留执行 native55 FK、选中皮肤及所有活动列的精确正负扰动兼容性消费者，覆盖足腔和鞋口；身体解析导数、相机、CSR、TRF／LSMR 仍在 CPU。该模式当前要求单窗口和冻结的17个共享鞋参，运行守卫拒绝不支持的布局。CPU 模式显式选择 CPU 兼容块，避免继承父进程的 GPU 设置。
+`--backend hybrid` 使用已有 vision_cuda、12 个 CPU 身体 workers、4 个 native 投影线程及 BLAS=1，实际设置为 `RINKSPACE_BODY_BACKEND=cpu`、`RINKSPACE_BODY_LOCAL_DERIVATIVES=analytic`、`RINKSPACE_BODY_COMPATIBILITY_BACKEND=cuda_resident`。GPU 仅驻留执行 native55 FK、选中皮肤及所有活动列的精确正负扰动兼容性消费者，覆盖足腔和鞋口；身体解析导数、相机、CSR 与 TRF 仍在 CPU；默认内层 LSMR，连续绝对状态可选择下述稀疏直接解法。该模式当前要求单窗口和冻结的17个共享鞋参，运行守卫拒绝不支持的布局。CPU 模式显式选择 CPU 兼容块，避免继承父进程的 GPU 设置。
 
 原 `--backend cuda` 保留一个 FP64 compact FK／LBS CUDA adapter，兼容块仍使用 CPU；它与 hybrid 的执行范围不同。两者使用现有 vision_cuda（SciPy 支持 callback），不选用 SciPy 1.13.1 尚不支持当前拟合 callback 的 body_cuda。轻量附加依赖见 [requirements-body-performance.txt](requirements-body-performance.txt)。
 

@@ -139,7 +139,7 @@ def register(project, base, old, output, *, previous=None, spec=None):
     spec = spec or DeliverySpec()
     saved = _saved(project, base, old, output, previous, spec)
     project, base, old, output, previous, paths, packets, before, pts, evidence = saved
-    target = project / PROGRAMME / spec.config_name; launcher = project / spec.launcher_name
+    target = project / PROGRAMME / spec.config_name; launcher = project / 'launchers' / spec.launcher_name
     report_path = output / (spec.variant + '_player_registration.json')
     for path in (target, launcher, report_path):
         _guard(path, project)
@@ -184,7 +184,7 @@ def register(project, base, old, output, *, previous=None, spec=None):
     state = _load(cache / 'state.npz'); _clock(state, pts, 'player cache')
     np.testing.assert_array_equal(state['hand_local_R_mid'], packets['result']['hand_local_R_mid'])
     lines = ['@echo off',
-             'powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0START_3D_RESULTS.ps1" -Config "%~dp0' +
+             'powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0START_3D_RESULTS.ps1" -Config "%~dp0..\\' +
              (PROGRAMME / spec.config_name).as_posix().replace('/', '\\') + '" %*',
              'exit /b %ERRORLEVEL%']
     _new_bytes(launcher, ('\r\n'.join(lines) + '\r\n').encode('ascii'), project)

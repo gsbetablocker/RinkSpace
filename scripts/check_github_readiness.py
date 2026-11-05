@@ -51,7 +51,7 @@ QUICKSTART_FILES = ("src/rinkspace/cli.py", "src/rinkspace/demo.py", "tests/test
 def local_publication_path(path: str) -> bool:
     path = path.replace("\\", "/")
     value = PurePosixPath(path)
-    return (path in LOCAL_ONLY or bool(re.fullmatch(r"START_SHOT[2-9]_REVIEW\.cmd", path))
+    return (path in LOCAL_ONLY or bool(re.fullmatch(r"(?:launchers/)?START_SHOT[2-9]_REVIEW\.cmd", path))
             or ("source_datasets" in value.parts and value.name in {"review.html", "whole_first_shot_review.html"}))
 
 

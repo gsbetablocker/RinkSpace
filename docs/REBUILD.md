@@ -56,7 +56,7 @@ S01／S04 等轴焦距、六镜头 Lane 与历史九镜头 joint_mount_flex 基�
 
 ## 人体局部拟合执行层
 
-S01 全身、共享鞋体与开头分支复用同一身体／鞋刀目标，支持紧凑 FK/LBS、脚部采样缓存、局部导数 CPU 并行、同状态前向复用和共享鞋参的身体重放。独立 CPU 原生库提供完整运动相机的 XYZ 解析导数及可选 OpenMP，保持 ABI2；旧库继续使用原导数入口。`hybrid` 在单窗口、冻结共享鞋参条件下，将 native55 FK、选中皮肤与足腔／鞋口兼容性精确扰动留在 GPU；身体解析导数、相机、CSR 装配和 SciPy TRF/LSMR 仍在 CPU。配置与同状态测量见[环境说明](../environments/README.md#人体求解执行优化)；GPU 常驻身体 Jacobian、相机和线性求解尚未实现。
+S01 全身、共享鞋体与开头分支复用同一身体／鞋刀目标，支持紧凑 FK/LBS、脚部采样缓存、局部导数 CPU 并行、同状态前向复用和共享鞋参的身体重放。独立 CPU 原生库提供完整运动相机的 XYZ 解析导数及可选 OpenMP，保持 ABI2；旧库继续使用原导数入口。`hybrid` 在单窗口、冻结共享鞋参条件下，将 native55 FK、选中皮肤与足腔／鞋口兼容性精确扰动留在 GPU；身体解析导数、相机、CSR 装配和 SciPy TRF 仍在 CPU；连续绝对状态默认用稀疏直接 GN 方向，其他状态及数值回退保留 LSMR。配置与同状态测量见[环境说明](../environments/README.md#人体求解执行优化)；GPU 常驻身体 Jacobian、相机和线性求解尚未实现。
 
 [scripts/repair_action_root.py](../scripts/repair_action_root.py)复用已保存姿态和固定鞋刀，先优化根平移，再在剩余预算内调整姿态。`continuous_root` 对实际根加速度求残差，`continuous_pose` 保持已修根曲线；源阶段和条件初值由节目 `root_trajectory_1103.json` 登记。预算监视可按测得的 Jacobian 耗时预留出口，真实运行的停止原因以对应结果绑定为准。
 

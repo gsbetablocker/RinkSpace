@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param([string]$Variant='', [switch]$Fresh, [switch]$Wait, [string]$Config='')
 $ErrorActionPreference='Stop'
-$projectRoot=$PSScriptRoot
+$projectRoot=Split-Path -Parent $PSScriptRoot
 $env:PYTHONPATH=(Join-Path $projectRoot 'src')+';'+$projectRoot
 $env:PYTHONDONTWRITEBYTECODE='1'
 $env:PYTHONIOENCODING='utf-8'

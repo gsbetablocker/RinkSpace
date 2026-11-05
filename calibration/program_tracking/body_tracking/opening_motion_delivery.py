@@ -158,8 +158,9 @@ def run(project, root, output, *, builder=build, problem_type=MotionProblem,
                     else ['opening1102', 'motion1103', variant_id] if variant_id == 'timing1103'
                     else ['opening1102', variant_id]))
     write_json(config_path, config)
-    entry = guard_project_write(project/'START_3D_COMPARISON.cmd')
-    entry.write_text('@echo off\ncall "%~dp0START_3D_RESULTS.cmd" -Config "%~dp0events\\ankara_2026\\programmes\\okada_mei_sp\\viewer3d_fullbody_1102.json" -Variant '+variant_id+' -Fresh %*\n', encoding='utf8')
+    entry = guard_project_write(project / 'launchers' / 'START_3D_COMPARISON.cmd')
+    entry.parent.mkdir(parents=True,exist_ok=True)
+    entry.write_text('@echo off\ncall "%~dp0START_3D_RESULTS.cmd" -Config "%~dp0..\\events\\ankara_2026\\programmes\\okada_mei_sp\\viewer3d_fullbody_1102.json" -Variant '+variant_id+' -Fresh %*\n', encoding='utf8')
     catalog = ResultCatalog(project=project, data_root=root.parents[1], config=config_path)
     cache = prepare_variant(catalog, catalog.variant(variant_id), reference.binding.surface)
     evidence = {}

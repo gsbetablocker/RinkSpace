@@ -81,10 +81,10 @@ def register(project,base,output,label,packets):
         print(json.dumps(dict(event='grasp_player_cache',variant=variant['id'])),flush=True);cache=prepare_variant(catalog,variant);caches.append(dict(variant=variant['id'],path=str(cache)))
     write_json(output/'player_registration.json',dict(config=str(target),caches=caches,source_frames=len(catalog.pts),views=['free','support_top','support_side','grasp'],same_pts_and_world=True,no_visible_gui_opened=True))
     launcher_name='START_3D_GRASP' if legacy else 'START_3D_'+stem.upper()
-    command=project/(launcher_name+'.ps1');text="""[CmdletBinding()]
+    command=project/'launchers'/(launcher_name+'.ps1');command.parent.mkdir(parents=True,exist_ok=True);text="""[CmdletBinding()]
 param([string]$Variant='grasp_candidate',[switch]$Fresh,[switch]$Wait,[switch]$Check)
 $ErrorActionPreference='Stop'
-$configPath=Join-Path $PSScriptRoot 'events/ankara_2026/programmes/okada_mei_sp/viewer3d_spin_grasp_1104.json'
+$configPath=Join-Path (Split-Path -Parent $PSScriptRoot) 'events/ankara_2026/programmes/okada_mei_sp/viewer3d_spin_grasp_1104.json'
 if ($Check) {
  $config=Get-Content -LiteralPath $configPath -Raw -Encoding UTF8 | ConvertFrom-Json
  if (-not (Test-Path -LiteralPath $config.source_video)) { throw 'Source video missing' }
@@ -98,7 +98,7 @@ exit $LASTEXITCODE
     text=text.replace("$Variant='grasp_candidate'","$Variant='"+config['default_variant']+"'")
     command.write_text(text,encoding='utf-8-sig')
     cmd_lines=['@echo off','powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0'+launcher_name+'.ps1" %*','set "rinkspace_exit=%ERRORLEVEL%"','if not "%rinkspace_exit%"=="0" (','  echo.','  echo RinkSpace 3D failed. Review the error above.','  pause',')','exit /b %rinkspace_exit%']
-    (project/(launcher_name+'.cmd')).write_bytes((chr(13)+chr(10)).join(cmd_lines).encode('ascii')+bytes([13,10]))
+    (project/'launchers'/(launcher_name+'.cmd')).write_bytes((chr(13)+chr(10)).join(cmd_lines).encode('ascii')+bytes([13,10]))
     return target
 
 

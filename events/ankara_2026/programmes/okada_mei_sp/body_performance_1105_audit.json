@@ -1,0 +1,294 @@
+{
+  "schema": "rinkspace.body-performance-continuous.v1",
+  "baseline_commit": "036990c80398441b4c825055e7dd2c8a2670ec32",
+  "source_context_seconds": [
+    76,
+    95
+  ],
+  "source_frames": 951,
+  "active_body_variables": 20217,
+  "full_residual_rows": 229618,
+  "same_saved_start_state_and_observations": true,
+  "input_hashes": {
+    "source_state_sha256": "d4aa68bbdb0d08b8224600b66578c0ee52f329acc641edd6c9f5788072eb60ce",
+    "observations_sha256": "a53bfb81a77ca405647ff977b13b2afc4a5e11bc2c764b4e5cb8de5bc93f9df6",
+    "source_evidence_sha256": "0e68c934b25e10ef91425118d4fcae2c15a350a702b8bf9d1de700f499e605a7"
+  },
+  "implemented": [
+    "同关节三个局部轴的正负扰动在GPU批处理，保留63个方向、全部486 pose-blend依赖及实时鞋腔/鞋口分支；每次线性化消费者调用64→22。",
+    "绝对曲线控制值和固定参考值复用；trial不提前构建SO(3) Jacobian。",
+    "实际姿态连续性使用关节3x3小块直接CSR装配；五节点投影先合并共享控制贡献再装配一次CSR。通用足腔/物理块保留较省内存的分支持装配。",
+    "只有人体图像点的块只生成被消费的COCO导数；鞋图像、支撑区域、内腔和鞋口消费者保留完整几何及导数。",
+    "连续绝对状态采用稀疏正规系统直接解GN方向；保留原TRF缩放、边界、正则化和接受规则。独立数值检查失败或不支持的算子回退LSMR。其他状态默认LSMR。"
+  ],
+  "before": {
+    "complete_jacobian_wall_seconds": 19.479695300000458,
+    "complete_jacobian_time_source": "captured stdout of before_run",
+    "accepted_steps": 2,
+    "retained_step": 2,
+    "solve_monitor_seconds": 205.70266340000126,
+    "whole_solve_wall_seconds": null,
+    "CPU_core_seconds": null,
+    "peak_memory_bytes": null,
+    "final_cost": 1481.584314798169,
+    "measurement_limit": "真实求解及final.npz已完成；末尾可选psutil缺失导致result.json未写入。保留原目录/原始日志，用实际Monitor区间作明确下界，不补造全调用墙钟、CPU或内存，也未重跑该基线。"
+  },
+  "after": {
+    "complete_jacobian": {
+      "seconds": 17.327523199999632,
+      "cpu_core_seconds": 34.171875,
+      "rows": 229618,
+      "nnz": 17085280,
+      "parts": {
+        "ice_penetration": 0.25022058676712033,
+        "ice_support_hover": 0.0037571090701958593,
+        "data": 1313.4839848238532,
+        "neutral_fit": 0.8797784393673409,
+        "shared_prior": 2.740368884492997,
+        "contact_AL": 8.260084130845097,
+        "source_motion": 0.0,
+        "action": 187.54718763993043,
+        "support_image": 3.515229823077842
+      },
+      "phases": {
+        "body_with_compatibility_seconds": 9.521516699998756,
+        "neutral_and_prior_seconds": 0.003485299999738345,
+        "ice_geometry_and_jacobian_seconds": 2.4938130999998975,
+        "cavity_and_collar_gate_seconds": 1.305641300001298,
+        "shared_columns_and_sparse_seconds": 0.23531910000019707,
+        "source_motion_seconds": 5.239999882178381e-05,
+        "action_seconds": 2.313358400000652,
+        "motion_action_assembly_seconds": 0.06920520000130637,
+        "support_image_seconds": 1.3043481999993674,
+        "AL_and_final_assembly_seconds": 0.06602080000084243
+      },
+      "gpu": {
+        "calls": 1,
+        "linearize_calls": 1,
+        "trial_calls": 0,
+        "h2d_bytes": 524952,
+        "d2h_bytes": 16555008,
+        "h2d_calls": 1,
+        "d2h_calls": 1,
+        "native55_fk_prepares": 1,
+        "selected_surface_prepares": 1,
+        "exact_fk_replay_pairs": 63,
+        "selected_skin_replay_pairs": 63,
+        "consumer_calls": 22,
+        "h2d_host_seconds": 0.0007509999995818362,
+        "d2h_host_blocking_seconds": 0.19954499999948894,
+        "compute_host_enqueue_seconds": 4.52619649999906,
+        "h2d_seconds_cuda_events": 0.0005703679919242859,
+        "compute_seconds_cuda_events": 4.7231650390625,
+        "d2h_seconds_cuda_events": 0.002571135997772217,
+        "timing_scope": "CUDA stream event intervals (include host submission gaps, not summed pure kernel time); complete wall separately includes host waits. Static preparation excluded."
+      }
+    },
+    "solve_wall_seconds": 35.141696599999705,
+    "solve_CPU_core_seconds_including_final_cached_eval_and_npz_write": 50.859375,
+    "accepted_steps": 2,
+    "retained_step": 2,
+    "final_cost": 1479.8536085208098,
+    "actual_inner_linear_backend": "sparse_direct",
+    "linear_solves": [
+      {
+        "backend": "sparse_direct",
+        "columns": 20217,
+        "rows": 229618,
+        "assembly_seconds": 3.0261509000010847,
+        "factor_seconds": 0.4652069000003394,
+        "solve_seconds": 0.02428460000010091,
+        "normal_nnz": 13126757,
+        "factor_nnz": 13215842,
+        "relative_normal_residual": 6.866711029902196e-14,
+        "total_seconds": 3.555659800000285,
+        "fallback": false
+      },
+      {
+        "backend": "sparse_direct",
+        "columns": 20217,
+        "rows": 229618,
+        "assembly_seconds": 3.0394684999992023,
+        "factor_seconds": 0.4699184000000969,
+        "solve_seconds": 0.02283960000022489,
+        "normal_nnz": 13126761,
+        "factor_nnz": 13215846,
+        "relative_normal_residual": 3.642733880831217e-15,
+        "total_seconds": 3.5725149999998393,
+        "fallback": false
+      }
+    ],
+    "peak_rss_bytes": 3995930624,
+    "GPU_peak_allocated_bytes": 2471975424,
+    "GPU_peak_reserved_bytes": 3087007744,
+    "solve_GPU_measurement": {
+      "calls": 5,
+      "linearize_calls": 1,
+      "trial_calls": 4,
+      "h2d_bytes": 1574856,
+      "d2h_bytes": 17589696,
+      "h2d_calls": 3,
+      "d2h_calls": 5,
+      "native55_fk_prepares": 3,
+      "selected_surface_prepares": 3,
+      "exact_fk_replay_pairs": 63,
+      "selected_skin_replay_pairs": 63,
+      "consumer_calls": 26,
+      "h2d_host_seconds": 0.0009465999992244178,
+      "d2h_host_blocking_seconds": 0.3383825999972032,
+      "compute_host_enqueue_seconds": 4.315878500003237,
+      "h2d_seconds_cuda_events": 0.0006688320040702819,
+      "compute_seconds_cuda_events": 4.649463998794555,
+      "d2h_seconds_cuda_events": 0.004578080013394356,
+      "timing_scope": "CUDA stream event intervals (include host submission gaps, not summed pure kernel time); complete wall separately includes host waits. Static preparation excluded."
+    },
+    "execution": {
+      "backend": "cpu",
+      "workers": 12,
+      "blas_threads": 1,
+      "perturbation_batch": 4,
+      "gpu_batch_size": 512,
+      "max_batch_samples": 4096,
+      "local_derivatives": "analytic",
+      "compatibility_backend": "cuda_resident",
+      "derivative": "audited CPU compact FK/pose-blend/LBS analytic chain; exact +/- FK/surface replay for shoe/skin consumers; unsupported/custom consumers retain central differences",
+      "linear_solver": "scipy CPU sparse TRF/LSMR",
+      "cpu_parallel_axis": "independent local parameter perturbations",
+      "cuda_scope": "resident native55 FK/selected skin/compatibility only; CPU camera, body-image analytic derivatives, CSR and TRF remain",
+      "derivative_usage": {
+        "analytic_world_linearizations": 2,
+        "fk_replay_linearizations": 0,
+        "surface_replay_linearizations": 0,
+        "finite_difference_world_linearizations": 0
+      },
+      "last_world_derivative_mode": "cpu_analytic_coco_observed_points_only",
+      "last_surface_replay": null,
+      "compatibility_device": {
+        "kind": "cuda_resident_native55_selected_skin_foot",
+        "device": "cuda:0",
+        "device_info": {
+          "name": "NVIDIA GeForce RTX 5070 Ti",
+          "compute_capability": [
+            12,
+            0
+          ],
+          "total_memory": 17094475776,
+          "torch": "2.7.1+cu128",
+          "cuda": "12.8"
+        },
+        "scope": "native55 FK, full486 pose blend, selected union skin, exact +/- replay and live cavity/collar consumers; CPU analytic body images/native camera/CSR/TRF unchanged",
+        "selected_vertices": 1083,
+        "samples": 951,
+        "prepare_seconds": 0.2457233000004635,
+        "direction_batch_size": 3,
+        "prepare_uploaded_bytes": 20003208,
+        "precision": "float64",
+        "shared_parameters": "fixed; changing shared geometry requires a new prepared owner",
+        "transfer_boundary": "one changed N x 69 increment upload; one packed residual/local-Jacobian download per call; no per-column download"
+      }
+    }
+  },
+  "same_step_solve_speedup_lower_bound": 5.853521124532246,
+  "timing_scope": "旧Monitor区间是原solve墙钟的下界；新为完整solve调用，含TRF/线性系统/质量检查/保存。首次完整J单独列示，不能将此近收敛S05两步倍率推广到所有阶段。",
+  "complete_numerical_comparison": {
+    "residual_max_abs": 0.0,
+    "residual_relative_l2": 0.0,
+    "residual_violation_count": 0,
+    "jacobian_max_abs": 1.0304686780954198e-08,
+    "jacobian_relative_frobenius": 2.5503081663996416e-11,
+    "jacobian_entry_violation_count": 0,
+    "jacobian_worst_entry": {
+      "row": 228220,
+      "column": 12513,
+      "baseline": 0.018110991767694182,
+      "current": 0.0181109814630074,
+      "absolute_error": 1.0304686780954198e-08,
+      "allowed_error": 5.362219835353884e-05,
+      "normalized_error": 0.00019217203131087466
+    },
+    "jacobian_max_normalized_error": 0.00019217203131087466,
+    "residual_within_tolerance": true,
+    "jacobian_within_tolerance": true,
+    "thresholds": {
+      "residual_atol": 1e-08,
+      "residual_rtol": 1e-10,
+      "jacobian_entry_atol": 5e-05,
+      "jacobian_entry_rtol": 0.0002,
+      "equation": "abs(new-old) <= atol + rtol*max(abs(old),abs(new)); every sparse union entry",
+      "frobenius_is_summary_only": true
+    }
+  },
+  "solver_path_equivalence": "目标和全部Jacobian行等价；直接GN方向比迭代LSMR更准确，接受轨迹并非逐位相同。两步cost旧1481.584314798169、新1479.8536085208098，不作为人体准确性结论。",
+  "tests": {
+    "passed": 29,
+    "subtests_passed": 75,
+    "report": "Data/runs/body_perf_1105/continuous_opt/final_tests.xml"
+  },
+  "preserved_parameter_sha256": {
+    "skate_s01_1103.npz": "3b58dac5f7363dfc5e051fc75ef8602dd3810a0ebc370c57a24542745bc5090c",
+    "spin_continuous_source_1105.npz": "d4aa68bbdb0d08b8224600b66578c0ee52f329acc641edd6c9f5788072eb60ce",
+    "spin_continuous_flight_1105.npz": "a9e0ad5b8cd4374da21f2dfb399050aae4936d5b3f1f5a89cbd414134b9ed4e9"
+  },
+  "no_ice_threshold_or_objective_change": true,
+  "no_user_candidate_replaced": true,
+  "no_inference_or_video_or_GUI": true,
+  "committed_or_pushed": false,
+  "remaining_cost": {
+    "complete_jacobian_seconds": 17.327523199999632,
+    "complete_jacobian_phases": {
+      "body_with_compatibility_seconds": 9.521516699998756,
+      "neutral_and_prior_seconds": 0.003485299999738345,
+      "ice_geometry_and_jacobian_seconds": 2.4938130999998975,
+      "cavity_and_collar_gate_seconds": 1.305641300001298,
+      "shared_columns_and_sparse_seconds": 0.23531910000019707,
+      "source_motion_seconds": 5.239999882178381e-05,
+      "action_seconds": 2.313358400000652,
+      "motion_action_assembly_seconds": 0.06920520000130637,
+      "support_image_seconds": 1.3043481999993674,
+      "AL_and_final_assembly_seconds": 0.06602080000084243
+    },
+    "largest_remaining": "身体/足鞋线性化、物理/源因子的Jacobian，以及每次正规系统装配；直接因子分解约0.4–0.5秒。"
+  },
+  "sources": [
+    {
+      "path": "calibration/program_tracking/body_tracking/body_resident_torch.py",
+      "sha256": "d1f2a8ff5fde5c0fef9b1741239f1fdeb56cf80bff6e40f898f22f0a3883dfc1"
+    },
+    {
+      "path": "calibration/program_tracking/body_tracking/body_execution.py",
+      "sha256": "bb783de828089a3b5b7f8ff007c13f8cda4eb2521a4a9e99ddae1476dfea4e39"
+    },
+    {
+      "path": "calibration/program_tracking/body_tracking/fullbody_fit.py",
+      "sha256": "2a67c5ef4bfac6ac5ebe2c47aea9ce8e53cabf2d0d331769834691b8e4a02a4f"
+    },
+    {
+      "path": "calibration/program_tracking/body_tracking/absolute_motion_state.py",
+      "sha256": "be3d3dcda7202957346ec3b0ad4f2148e49e62aa7d9750e999a705c2631a84d1"
+    },
+    {
+      "path": "calibration/program_tracking/body_tracking/continuous_motion_factors.py",
+      "sha256": "6520c3fd092114d2ae31a33e7a28303c712faacc17cfa3d315476603d700c42f"
+    },
+    {
+      "path": "calibration/program_tracking/body_tracking/body_linear_solver.py",
+      "sha256": "fa19f63810d29fd2ae95705f5617b812e6352a9475766b846ad6989abe0a4397"
+    },
+    {
+      "path": "calibration/program_tracking/body_tracking/skate_integration.py",
+      "sha256": "901f4a9376d0a56f813098fa066a321ccf866a6fa0e45604f60fb43972bd9aa3"
+    },
+    {
+      "path": "calibration/program_tracking/body_tracking/spin_continuous_refit.py",
+      "sha256": "bd22c1c6b0132fbcc9b8154ef09c7038adebe1ba4018d81c06a57d64dcdb2e27"
+    },
+    {
+      "path": "calibration/program_tracking/body_tracking/continuous_execution_check.py",
+      "sha256": "452eca6af252bd8fcde0e5e0862d9dfcf3ff67b679f2db915d161a9e78c953a0"
+    }
+  ],
+  "offline_root": "Data/runs/body_perf_1105/continuous_opt",
+  "actual_run": "Data/runs/body_perf_1105/continuous_opt/accepted_fast_path/result.json",
+  "failure_preserved": "Data/runs/body_perf_1105/continuous_opt/before_run",
+  "accuracy_accepted": false
+}

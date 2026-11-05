@@ -259,7 +259,7 @@ def refresh():
         sections = content(json.loads(data.group(1)), current.group())
         body = ('<body><main><header><a href="#/">RinkSpace</a><nav id="entry-breadcrumb" aria-label="当前位置">RinkSpace</nav></header>'
                 +sections
-                +'<footer>唯一入口：START_HERE.html · <a href="README.md">项目说明</a> · <a href="calibration/solver_runtime/README.md">求解接口</a> · <a href="CHECK_PATHS.cmd">OneDrive 路径检查</a></footer>'
+                +'<footer>唯一入口：START_HERE.html · <a href="README.md">项目说明</a> · <a href="calibration/solver_runtime/README.md">求解接口</a> · <a href="launchers/CHECK_PATHS.cmd">OneDrive 路径检查</a></footer>'
                 +'<script type="application/json" id="entry-data">'+data.group(1)+'</script>'+JS.replace('__PROJECT_URI__', json.dumps(ROOT.as_uri())).replace('__DATA_URI__', json.dumps(AssetStore(ROOT).data.as_uri()))+'</main></body></html>')
         output = (head+body).encode("utf-8")
         with tempfile.NamedTemporaryFile(dir=temp_root, suffix=".entry.html", delete=False) as handle:

@@ -208,7 +208,7 @@ def deliver(project,root,out,ref,problem,x,info):
         evidence=evidence,implementation={str(f):digest(f) for f in (
             Path(__file__),Path(__file__).with_name('opening_preparation.py'),Path(__file__).with_name('opening_review.py'),
             Path(__file__).with_name('fullbody_fit.py'),project/'scripts/run_opening_repair.py')},
-        viewer_entry=str(project/'START_3D_COMPARISON.cmd'),
+        viewer_entry=str(project / 'launchers' / 'START_3D_COMPARISON.cmd'),
         replay_entry=str(project/'scripts/run_opening_repair.py'))
     write_json(record_path,record)
     return dict(binding=str(record_path),parameters=str(parameters))

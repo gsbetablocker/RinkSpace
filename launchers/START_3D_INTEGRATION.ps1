@@ -4,7 +4,7 @@ param(
     [string]$Variant='', [switch]$Fresh, [switch]$Wait, [switch]$Check
 )
 $ErrorActionPreference='Stop'
-$programme=Join-Path $PSScriptRoot 'events\ankara_2026\programmes\okada_mei_sp'
+$programme=Join-Path (Split-Path -Parent $PSScriptRoot) 'events\ankara_2026\programmes\okada_mei_sp'
 $configs=@{
     s01='viewer3d_fullbody_1102.json'
     jump='viewer3d_action_jump_s02_1103.json'

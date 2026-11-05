@@ -6,12 +6,12 @@
 
 | 入口 | 默认结果与起点 | 适用范围 |
 |---|---|---|
-| [START_3D_RESULTS.cmd](../START_3D_RESULTS.cmd) | 原配置默认 `j1`（J1_s2），首次停在原片 36.020 秒；后续恢复保存的帧、版本和视角 | 历史 S01 人体与鞋刀参考 |
-| [START_3D_COMPARISON.cmd](../START_3D_COMPARISON.cmd) | `skate_s01_1103`，Fresh 从原片 22.120 秒、side 全身视角开始 | 处理 S01：22.120–44.960 秒，1143 个曝光；保留较早全身、开头和鞋刀候选 |
-| [START_BOOT_INSPECTION.cmd](../START_BOOT_INSPECTION.cmd) | `opening1102`，Fresh 停在原片 36.020 秒 | 四项足鞋／开头历史对照；默认项是旧开头候选 |
-| [START_3D_INTEGRATION.cmd](../START_3D_INTEGRATION.cmd) | 先选择片段，回车选 S01；S01 默认 `skate_s01_1103`，其他三段默认 `A_root` | 跳跃 44.980–52.000 秒、步法 25.000–35.000 秒、旋转 76.000–95.000 秒 |
-| [START_3D_SUPPORT.cmd](../START_3D_SUPPORT.cmd) | `support_new`，默认原片 88.000 秒 | 87.500–92.500 秒上下文，核心为 88.000–92.000 秒 |
-| [START_3D_SPIN_MODELS.cmd](../START_3D_SPIN_MODELS.cmd) | `exmr_prefoot`，默认原片 88.120 秒 | 76.000–95.000 秒 GVHMR／ExMR 对照，951 个曝光 |
+| [START_3D_RESULTS.cmd](../launchers/START_3D_RESULTS.cmd) | 原配置默认 `j1`（J1_s2），首次停在原片 36.020 秒；后续恢复保存的帧、版本和视角 | 历史 S01 人体与鞋刀参考 |
+| [START_3D_COMPARISON.cmd](../launchers/START_3D_COMPARISON.cmd) | `skate_s01_1103`，Fresh 从原片 22.120 秒、side 全身视角开始 | 处理 S01：22.120–44.960 秒，1143 个曝光；保留较早全身、开头和鞋刀候选 |
+| [START_BOOT_INSPECTION.cmd](../launchers/START_BOOT_INSPECTION.cmd) | `opening1102`，Fresh 停在原片 36.020 秒 | 四项足鞋／开头历史对照；默认项是旧开头候选 |
+| [START_3D_INTEGRATION.cmd](../launchers/START_3D_INTEGRATION.cmd) | 先选择片段，回车选 S01；S01 默认 `skate_s01_1103`，其他三段默认 `A_root` | 跳跃 44.980–52.000 秒、步法 25.000–35.000 秒、旋转 76.000–95.000 秒 |
+| [START_3D_SUPPORT.cmd](../launchers/START_3D_SUPPORT.cmd) | `support_new`，默认原片 88.000 秒 | 87.500–92.500 秒上下文，核心为 88.000–92.000 秒 |
+| [START_3D_SPIN_MODELS.cmd](../launchers/START_3D_SPIN_MODELS.cmd) | `exmr_prefoot`，默认原片 88.120 秒 | 76.000–95.000 秒 GVHMR／ExMR 对照，951 个曝光 |
 
 版本切换保持原片 PTS 和观察角度。`Fresh` 按配置重新选择起点；普通入口会恢复保存的窗口状态。
 
@@ -62,10 +62,10 @@
 从项目根目录选择片段或核对配置，可使用：
 
 ~~~powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\START_3D_INTEGRATION.ps1 -Clip jump -Variant A_root -Fresh
-powershell -NoProfile -ExecutionPolicy Bypass -File .\START_3D_INTEGRATION.ps1 -Check
-powershell -NoProfile -ExecutionPolicy Bypass -File .\START_3D_SUPPORT.ps1 -Check
-powershell -NoProfile -ExecutionPolicy Bypass -File .\START_3D_SPIN_MODELS.ps1 -Check
+powershell -NoProfile -ExecutionPolicy Bypass -File .\launchers\START_3D_INTEGRATION.ps1 -Clip jump -Variant A_root -Fresh
+powershell -NoProfile -ExecutionPolicy Bypass -File .\launchers\START_3D_INTEGRATION.ps1 -Check
+powershell -NoProfile -ExecutionPolicy Bypass -File .\launchers\START_3D_SUPPORT.ps1 -Check
+powershell -NoProfile -ExecutionPolicy Bypass -File .\launchers\START_3D_SPIN_MODELS.ps1 -Check
 ~~~
 
 `-Check` 核对配置和对应文件，不证明人体、轨迹或接触准确。求解与证据生成接口见[实现状态](REBUILD.md#人体局部拟合执行层)及[复核源码索引](../events/ankara_2026/programmes/okada_mei_sp/body_verification_sources_1103.json)。
@@ -79,4 +79,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\START_3D_SPIN_MODELS.ps1 -
 
 视频、源图、完整拟合与逐轮诊断保留在 Data，由[节目结果绑定](../events/ankara_2026/programmes/okada_mei_sp/README.md#人体与足鞋结果)定位；界面操作和播放检查不能代替这些结果的准确性验收。
 
-入旋后续对照使用 [START_3D_SPIN_ENTRY.cmd](../START_3D_SPIN_ENTRY.cmd)，默认 `entry_motion`，保留全部旧候选；同一原片 76–95 秒、951 个 PTS 与共同世界坐标，提供自由视角、支撑足俯视／侧视与抓握特写。[结果绑定](../events/ankara_2026/programmes/okada_mei_sp/spin_entry_1104_audit.json)明确记录重力残差与回投失败；该候选不替换满意 S01。
+入旋后续对照使用 [START_3D_SPIN_ENTRY.cmd](../launchers/START_3D_SPIN_ENTRY.cmd)，默认 `entry_motion`，保留全部旧候选；同一原片 76–95 秒、951 个 PTS 与共同世界坐标，提供自由视角、支撑足俯视／侧视与抓握特写。[结果绑定](../events/ankara_2026/programmes/okada_mei_sp/spin_entry_1104_audit.json)明确记录重力残差与回投失败；该候选不替换满意 S01。

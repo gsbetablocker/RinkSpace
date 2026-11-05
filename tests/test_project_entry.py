@@ -16,7 +16,7 @@ def build_panel(project, data):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(value), encoding="utf-8")
     write("configs/storage.json", dict(schema_version="rinkspace.storage.v1", data_root=str(data),
-          public_project_paths=["README.md", "events", "calibration", "CHECK_PATHS.cmd"]))
+          public_project_paths=["README.md", "events", "calibration", "launchers/CHECK_PATHS.cmd"]))
     write("configs/project.example.json", {"sources": {}})
     scene = "events/ankara_2026/models/synthetic/scene.json"
     write(scene, dict(ice_boundary=dict(points_xyz=[[0, 0, 0], [1, 0, 0], [1, 1, 0]]),

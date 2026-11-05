@@ -90,15 +90,15 @@ class FullBodyProblem:
         # This scatter structure depends only on the frozen window and basis.
         # Assemble values each linearization, never rediscover support in it.
         self.spline_scatter=[]
-        for node in range(5):
+        for node in ([] if getattr(self.state,"is_absolute",False) else range(5)):
             obs,knot=np.nonzero(self.B[self.fi,node])
             shape=(len(obs),2,self.state.d)
             rr=np.broadcast_to(self.uv_rows[obs,:,None],shape).ravel().copy()
             cc=np.broadcast_to(knot[:,None,None]*self.state.d+np.arange(self.state.d),shape).ravel().copy()
             weight=self.B[self.fi[obs],node,knot,None,None]
             self.spline_scatter.append((obs,rr,cc,weight))
-        self.spline_rows=np.concatenate([v[1] for v in self.spline_scatter])
-        self.spline_cols=np.concatenate([v[2] for v in self.spline_scatter])
+        self.spline_rows=np.concatenate([v[1] for v in self.spline_scatter]) if self.spline_scatter else np.empty(0,int)
+        self.spline_cols=np.concatenate([v[2] for v in self.spline_scatter]) if self.spline_scatter else np.empty(0,int)
         # Sample actual delta/velocity/acceleration, with the taper included.
         self.prior_matrices=[];self.prior_offsets={}
         active=self.state.active;angular=active>=3
@@ -115,6 +115,7 @@ class FullBodyProblem:
                 offset[:,linear]=reference.root_derivative(reference.times[self.frames],2)[:,active[linear]]
                 self.prior_offsets[name]=(offset/scale/np.sqrt(2)).ravel()
             self.prior_matrices.append((name,matrix))
+        if getattr(self.state,"is_absolute",False):self.prior_matrices=[]
         self.cache=None;self.cache_x=None
 
     def prior_rows(self,x):
@@ -145,7 +146,8 @@ class FullBodyProblem:
             phase.update(world_seconds=0.,projection_seconds=time.perf_counter()-start,factors_seconds=0.)
         else:
             start=time.perf_counter();delta=np.zeros((len(self.times),69))
-            delta[:,self.state.active]=self.eval_basis@np.asarray(x).reshape(self.state.m,self.state.d)
+            if getattr(self.state,"is_absolute",False):delta=self.state.increments(x,self.times)
+            else:delta[:,self.state.active]=self.eval_basis@np.asarray(x).reshape(self.state.m,self.state.d)
             s=self.reference.world(self.ref,delta);W=s['world'].reshape(self.n,5,self.layout.point_count,3)
             nodes=W[self.fi,:,self.pi][:,:,None];phase['world_seconds']=time.perf_counter()-start
             start=time.perf_counter()
@@ -163,27 +165,41 @@ class FullBodyProblem:
         if jacobian:
             start=time.perf_counter();jp=proj['pixel_jac_nodes'][:,0];derivatives=[]
             Jr=right_jacobian(delta[:,3:6]);rot_axes=s['Q']@Jr
-            radial=s['world']-s['P'][:,None]
+            radial=(s['world']-s['P'][:,None]).reshape(W.shape)[self.fi,:,self.pi]
+            observed_axes=rot_axes.reshape(self.n,5,3,3)[self.fi]
             columns=self.state.active[self.state.active>=6]
-            physical=dict(self.execution.world_derivatives(self.reference,self.ref,delta,columns,step=1e-5))
+            only_coco=bool(np.all(self.pi>=self.layout.equipment_count) and hasattr(self.execution,'world_coco_derivatives'))
+            if only_coco:
+                physical=dict(self.execution.world_coco_derivatives(self.reference,self.ref,delta,columns,step=1e-5))
+                points=self.pi-self.layout.equipment_count;point_count=17
+            else:
+                physical=dict(self.execution.world_derivatives(self.reference,self.ref,delta,columns,step=1e-5))
+                points=self.pi;point_count=self.layout.point_count
             for active in self.state.active:
                 if active<3:
-                    derivative=np.zeros_like(W);derivative[...,active]=1
+                    derivative=np.zeros_like(radial);derivative[...,active]=1
                 elif active<6:
-                    derivative=np.cross(rot_axes[:,:,active-3][:,None],radial).reshape(self.n,5,self.layout.point_count,3)
+                    derivative=np.cross(observed_axes[:,:,:,active-3],radial)
                 else:
-                    derivative=physical[int(active)].reshape(self.n,5,self.layout.point_count,3)
-                derivatives.append(np.einsum('mplc,mlc->mpl',jp,derivative[self.fi,:,self.pi]))
+                    derivative=physical[int(active)].reshape(self.n,5,point_count,3)[self.fi,:,points]
+                derivatives.append(np.einsum('mplc,mlc->mpl',jp,derivative))
             local=np.stack(derivatives,axis=-1)
             phase['local_derivatives_seconds']=time.perf_counter()-start
             start=time.perf_counter()
-            # Only nonzero exposure-node basis supports are assembled.
-            vv=[]
-            for node in range(5):
-                obs,_,_,weight=self.spline_scatter[node]
-                values=local[obs,:,node,:]*weight
-                vv.append(values.ravel())
-            U=coo_matrix((np.concatenate(vv),(self.spline_rows,self.spline_cols)),shape=(uv.size,self.size)).tocsr()
+            if hasattr(delta,'chain'):
+                from .absolute_motion_state import chain_exposure
+                indices=self.fi[:,None]*5+np.arange(5)
+                observed=chain_exposure(local,delta,sample_indices=indices)
+                scatter=coo_matrix((np.ones(self.uv_rows.size),(self.uv_rows.ravel(),np.arange(self.uv_rows.size))),shape=(uv.size,self.uv_rows.size)).tocsr()
+                U=scatter@observed
+            else:
+                # Only nonzero exposure-node basis supports are assembled.
+                vv=[]
+                for node in range(5):
+                    obs,_,_,weight=self.spline_scatter[node]
+                    values=local[obs,:,node,:]*weight
+                    vv.append(values.ravel())
+                U=coo_matrix((np.concatenate(vv),(self.spline_rows,self.spline_cols)),shape=(uv.size,self.size)).tocsr()
             U.eliminate_zeros();matrices=[BA@U,GA@U]
             phase['sparse_chain_seconds']=time.perf_counter()-start
         prior_values=dict(self.prior_rows(x))

@@ -8,7 +8,7 @@ RinkSpace 研究如何从花样滑冰转播中恢复冰场、连续围挡、广�
 
 **冈田芽衣短节目的重构处理起点为原片 22.120 秒，PTS 283136，原生时基 1/12800。** 当前处理范围与历史物理镜头范围的差别见[范围文件](events/ankara_2026/programmes/okada_mei_sp/rebuild_scope.json)和[源时间说明](events/ankara_2026/programmes/okada_mei_sp/README.md#analysis-start)解释。起点前的原片与观测保留；19.960 秒准备画面另作开头人体姿势和位置辅助，不改变节目处理起点。
 
-S01 人体与共享足鞋已有可回放候选；[主比较入口](START_3D_COMPARISON.cmd)默认从原片 22.120 秒加载 `skate_s01_1103`。三段动作、源支撑和 GVHMR／ExMR 旋转对照仍有根轨迹、图像或接触失败，完整节目人体追踪尚未完成。当前版本、范围和限制集中见[节目结果导航](events/ankara_2026/programmes/okada_mei_sp/README.md#人体与足鞋结果)，操作与默认配置见[播放器说明](docs/RESULTS_3D_PLAYER_ZH.md)。
+S01 人体与共享足鞋已有可回放候选；[主比较入口](launchers/START_3D_COMPARISON.cmd)默认从原片 22.120 秒加载 `skate_s01_1103`。三段动作、源支撑和 GVHMR／ExMR 旋转对照仍有根轨迹、图像或接触失败，完整节目人体追踪尚未完成。当前版本、范围和限制集中见[节目结果导航](events/ankara_2026/programmes/okada_mei_sp/README.md#人体与足鞋结果)，操作与默认配置见[播放器说明](docs/RESULTS_3D_PLAYER_ZH.md)。
 
 ## 快速试用：合成数据
 
@@ -34,7 +34,7 @@ python -m pytest tests/test_geometry.py tests/test_motion.py tests/test_mosaic.p
 
 | 内容 | 入口 |
 |---|---|
-| 三维检查 S01 人体结果 | 双击根目录 START_3D_RESULTS.cmd；[操作说明](docs/RESULTS_3D_PLAYER_ZH.md) |
+| 三维检查 S01 人体结果 | 双击 [launchers/START_3D_RESULTS.cmd](launchers/START_3D_RESULTS.cmd)；[操作说明](docs/RESULTS_3D_PLAYER_ZH.md) |
 | 代码结构、算法与接口 | [架构](docs/ARCHITECTURE.md)、[求解方法](docs/SOLVER.md)、[接口合同](docs/INTERFACES.md) |
 | 已实现能力与缺口 | [实现状态](docs/REBUILD.md)、[原生核心](native/README.md) |
 | 当前赛事模型与节目输入 | [安卡拉场景](events/ankara_2026/scene/README.md)、[冈田芽衣短节目](events/ankara_2026/programmes/okada_mei_sp/README.md) |

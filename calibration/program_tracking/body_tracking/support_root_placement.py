@@ -29,6 +29,9 @@ SCHEMA='rinkspace.source-supported-root-placement.v1'
 
 def restore_parent(project,base,output,target,parent_path):
     case=output/'common/exmr_hand_nofoot';saved=load(parent_path)
+    if str(saved.get('state_kind',''))=='absolute_motion_v1':
+        from .spin_continuous_refit import restore_absolute
+        return restore_absolute(project,base,target,parent_path)
     initial_path=resolve_initial_reference(project,saved);identity=read_case_identity(saved)
     p=load(case/'input.npz');camera,info,_,pose=camera_binding(project,SimpleNamespace(p=p),shot_id='s05')
     expected=case_identity(project,base,output,'exmr_hand_nofoot',info,initial=initial_path,

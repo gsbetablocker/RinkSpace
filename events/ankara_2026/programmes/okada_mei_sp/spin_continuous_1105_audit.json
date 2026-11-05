@@ -1,0 +1,2764 @@
+{
+  "schema": "rinkspace.spin-continuous-delivery.v1",
+  "audit_base_commit": "036990c80398441b4c825055e7dd2c8a2670ec32",
+  "accuracy_accepted": false,
+  "numerical_convergence": false,
+  "scope": {
+    "shot": "S05",
+    "source_seconds": [
+      76,
+      95
+    ],
+    "native_exposures": 951,
+    "source_pts": [
+      972800,
+      1216000
+    ],
+    "time_base": [
+      1,
+      12800
+    ],
+    "one_continuous_state": true,
+    "camera_scene_body_shape_equipment_frozen": true,
+    "S01_unchanged": true
+  },
+  "implementation": {
+    "schema": "rinkspace.absolute_motion_v1",
+    "body_control_points": 293,
+    "body_variables": 20217,
+    "state_definition": "根平移、根 SO(3) 与21局部 SO(3) 由可变绝对控制点直接定义最终曲线；HandMR 手指保留，不把旧高频姿态叠加回最终状态。",
+    "native_projection": "所有因子、五节点曝光投影、鞋掌几何、导出与播放器使用同一状态；播放器不另滤波或贴冰。",
+    "actual_motion": "最终根与全部局部 SO(3) 角加速度有限项，持姿/转换相位不同权重；右腕参与；不将自转速度压为零。",
+    "physics": "同状态分段体积质量/自身 COM 惯量，完整轨道项+自身转动项 H；仅源确认81.36–81.46秒使用有限固定重力积分位置与H项，冰上力/角冲量仅诊断；有限软冰面保留。",
+    "cli": "python -B -X utf8 -m calibration.program_tracking.body_tracking.spin_continuous_refit --project <project> --base-root <Data>/runs/body_s01_20261029 --output <new-isolated-output> --source-budget 900 --flight-budget 360"
+  },
+  "initialization": {
+    "parent_parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_entry_gravity_1104.npz",
+    "parent_parameter_sha256": "b971706729981fa416229c502b2314585a4fb2ceb9992b3c4541fddd22b9b73f",
+    "camera": {
+      "record": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\camera_solver_refined_1102.json",
+      "state_path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_solver_refined_1102.npz",
+      "state_sha256": "d6cfde1474a23d594a0395351ebbdb0ee15a6560ef77b27f069d239ee95bb3f3",
+      "native_library": "D:\\CodexData\\RinkSpace_Data\\runs\\body_perf_1103\\native_cpu\\rinkspace_core.dll",
+      "native_library_sha256": "d228146cee739fe255d2b12c0ba9cb00647d5e6a2dffadcf0f2f53354a3bb71f",
+      "shot": {
+        "camera_index": 2,
+        "control_begin": 2695,
+        "control_stop": 4096,
+        "first_control_time": -0.4,
+        "first_pts": 948992,
+        "id": "s05",
+        "knot_stride": 5,
+        "last_pts": 1300992,
+        "motion_reference_time": 0,
+        "reference_pts": 948992,
+        "row_begin": 653412,
+        "row_stop": 1137114,
+        "source_coverage": {
+          "expected_exposures": 1376,
+          "missing_exposures": 0,
+          "missing_ranges": [],
+          "observed_exposures": 1376,
+          "partial_source_coverage": false,
+          "synthetic_rows_added": 0
+        },
+        "stop_pts_exclusive": 1301248,
+        "time_base_den": 12800,
+        "time_base_num": 1
+      },
+      "metres_per_scene_unit": 59.96169706678219,
+      "solver_metres_per_scene_unit": 60.0,
+      "length_export_ratio": 0.9993616177797032,
+      "camera_changed_during_fit": false,
+      "source_time_base": [
+        1,
+        12800
+      ],
+      "old_reference_reprojected_on_current_camera": true,
+      "prepared": "D:\\CodexData\\RinkSpace_Data\\runs\\native_programme_20261031\\feature_refinement_1101\\focus_repair_1pct\\physical_repair_1101\\prepared_shared_timing",
+      "recorded_native_library": "D:/CodexData/RinkSpace_Data/build/solver_continue_1102/rinkspace_core.dll",
+      "native_library_override": true
+    },
+    "rotation_difference_degrees_p95": 9.471148417348193,
+    "position_error_solver_max": 0.07647913443871858,
+    "attribution": "旧 gravity6→绝对初值本身已改变曲线；跨阶段质量保留原绝对初值基线。A未收敛，B继续源目标下降的改善不能全部归功于腾空物理。"
+  },
+  "evidence": {
+    "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+    "observations_sha256": "a53bfb81a77ca405647ff977b13b2afc4a5e11bc2c764b4e5cb8de5bc93f9df6",
+    "document_sha256": "0e68c934b25e10ef91425118d4fcae2c15a350a702b8bf9d1de700f499e605a7",
+    "actual_body_points": 15723,
+    "unknown_body_associations": {
+      "source_seconds": 81.4,
+      "pts": 1041920,
+      "coco17_indices": [
+        9,
+        10,
+        13,
+        14,
+        15,
+        16
+      ],
+      "action": "仅将这些左右关联标 unknown/use=false，保留原UV、sigma和标签，不交换或伪造读点。"
+    },
+    "legacy_seed_policy": "13个旧seed仅4个已有直接复核中点；另9个保留粗区域/阴影/接触候选语义，不自动升级材料中点。",
+    "actual_new_blade_factors": {
+      "finite_endpoint_regions": 50,
+      "finite_midpoint_regions": 4,
+      "time_weight_per_direct_exposure_s": 0.02,
+      "regions_are_not_probability_covariance": true
+    },
+    "flow_coverage_audit": {
+      "valid_exposures": 185,
+      "selected_exposures": 52,
+      "valid_exposure_seconds": 3.7,
+      "assigned_seconds": 3.7,
+      "unrepresented_valid_pts": []
+    },
+    "flow_fixed_material_admission": 0,
+    "flow_note": "185个有效flow曝光/3.70秒由52代表覆盖；无每帧仿射/几何不确定性，未将其冒充185个材料点。直接刀端观测独立入优化。",
+    "longest_unknown_flow_gap_seconds": [
+      83.5,
+      84.14
+    ],
+    "gap_review": "83.60与83.98直接源区域入优化，其余未知曝光不填造或扩权。",
+    "dense_endpoint_unknown_rows_preserved": 57
+  },
+  "stages": {
+    "source_stage": {
+      "parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_continuous_source_1105.npz",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuous_1105\\source_stage\\common\\exmr_hand_nofoot\\fitted\\result.npz",
+      "accepted": 23,
+      "retained_step": 23,
+      "wall_seconds": 897.6875376999997,
+      "budget_seconds": 900.0,
+      "finite_flight": false,
+      "accuracy_accepted": false,
+      "numerical_convergence": false,
+      "stop_reasons": [
+        {
+          "code": "evaluation_budget_reserve",
+          "category": "budget",
+          "message": "Estimated evaluation cannot finish within remaining solve budget.",
+          "estimated_seconds": 23.334437500000604,
+          "remaining_seconds": 13.114989799999421
+        }
+      ],
+      "stop_is_not_convergence": true,
+      "integrity": {
+        "all_951_parameter_to_export_max_absolute_error": {
+          "P": 0.0,
+          "Q": 0.0,
+          "local_R": 0.0
+        },
+        "ledger_uv_sigma_admission_objective_equal": true,
+        "objective_body_points": 15723,
+        "observations_sha256": "a53bfb81a77ca405647ff977b13b2afc4a5e11bc2c764b4e5cb8de5bc93f9df6",
+        "source_evidence_sha256": "0e68c934b25e10ef91425118d4fcae2c15a350a702b8bf9d1de700f499e605a7",
+        "parameter_sha256": "d4aa68bbdb0d08b8224600b66578c0ee52f329acc641edd6c9f5788072eb60ce",
+        "result_sha256": "765c4d8705f09ff5805992b91b2ba8529f9193555beb520e57e77b54f1f7f26f",
+        "physics_sha256": "e5c650a00c9051b7cfd5e1b089e8a9153dfa3f89c0f6e1b493c18c1dea243b9b",
+        "mass_fraction_sum": 0.9999999999999999,
+        "positive_own_com_inertia": true
+      },
+      "jacobian_directional_checks": {
+        "first_jacobian_seconds": 17.024213099999542,
+        "checks": [
+          {
+            "block": "root",
+            "relative_norm": 5.3907718487511306e-08,
+            "max_absolute": 4.754226494152469e-07
+          },
+          {
+            "block": "legs",
+            "relative_norm": 2.3015029104875468e-08,
+            "max_absolute": 6.681849417863872e-08
+          },
+          {
+            "block": "non_grip_right_wrist",
+            "relative_norm": 1.9512692245131626e-07,
+            "max_absolute": 5.276568240154822e-08
+          }
+        ]
+      },
+      "flight_diagnostics": [
+        {
+          "source_indices": [
+            268,
+            269,
+            270,
+            271,
+            272,
+            273
+          ],
+          "source_elapsed_range_s": [
+            5.36,
+            5.46
+          ],
+          "source_sample_count": 6,
+          "status": "diagnostic_only",
+          "flight": {
+            "initial_com_world_m": [
+              -9.452566734024714,
+              -7.259326559757157,
+              0.9889605666764456
+            ],
+            "initial_velocity_world_mps": [
+              2.4107994198637623,
+              0.42172748103924407,
+              0.7430658905541395
+            ],
+            "fitted_com_world_m": [
+              [
+                -9.452566734024714,
+                -7.259326559757157,
+                0.9889605666764456
+              ],
+              [
+                -9.40435074562744,
+                -7.250892010136372,
+                1.0018598844875282
+              ],
+              [
+                -9.356134757230164,
+                -7.242457460515587,
+                1.0108352022986111
+              ],
+              [
+                -9.30791876883289,
+                -7.234022910894803,
+                1.015886520109694
+              ],
+              [
+                -9.259702780435612,
+                -7.225588361274017,
+                1.0170138379207767
+              ],
+              [
+                -9.211486792038338,
+                -7.217153811653232,
+                1.0142171557318598
+              ]
+            ],
+            "position_residual_m": [
+              [
+                -0.03536016337007908,
+                -0.0047127135540394605,
+                0.011801572180230036
+              ],
+              [
+                0.011430621523473405,
+                0.0007774781434051192,
+                -0.0023429196594609847
+              ],
+              [
+                0.02831442533154238,
+                0.003873433253309244,
+                -0.009988494751797194
+              ],
+              [
+                0.020976421949006507,
+                0.003714943544230742,
+                -0.009841146472535423
+              ],
+              [
+                0.00418221086391668,
+                0.0014034683482231358,
+                1.1594937152192841e-05
+              ],
+              [
+                -0.029543516297842132,
+                -0.005056609735119011,
+                0.01035939376640993
+              ]
+            ],
+            "position_error_max_m": 0.03757429877624184,
+            "position_error_rms_m": 0.025951514616671303,
+            "acceleration_world_mps2": [
+              [
+                -74.7674527137106,
+                -5.985591468854814,
+                6.437291868387968
+              ],
+              [
+                -60.55451797651242,
+                -8.136112047457432,
+                9.672308428995011
+              ],
+              [
+                -23.640519256380333,
+                -5.382463717321142,
+                14.453482826062903
+              ],
+              [
+                -42.328790191676156,
+                -10.371507218335973,
+                -8.572356451072865
+              ]
+            ],
+            "acceleration_minus_gravity_mps2": [
+              [
+                -74.7674527137106,
+                -5.985591468854814,
+                16.24729186838797
+              ],
+              [
+                -60.55451797651242,
+                -8.136112047457432,
+                19.48230842899501
+              ],
+              [
+                -23.640519256380333,
+                -5.382463717321142,
+                24.263482826062905
+              ],
+              [
+                -42.328790191676156,
+                -10.371507218335973,
+                1.2376435489271351
+              ]
+            ],
+            "acceleration_stencil_indices": [
+              [
+                0,
+                1,
+                2
+              ],
+              [
+                1,
+                2,
+                3
+              ],
+              [
+                2,
+                3,
+                4
+              ],
+              [
+                3,
+                4,
+                5
+              ]
+            ],
+            "duration_s": 0.09999999999999964,
+            "gravity_departure_from_endpoint_chord_m": 0.012262499999999914,
+            "gravity_curvature_after_affine_removal_m": [
+              [
+                0.0,
+                0.0,
+                -0.006539999999999933
+              ],
+              [
+                0.0,
+                0.0,
+                0.001307999999999909
+              ],
+              [
+                0.0,
+                0.0,
+                0.005232000000000006
+              ],
+              [
+                0.0,
+                0.0,
+                0.0052320000000000075
+              ],
+              [
+                0.0,
+                0.0,
+                0.0013079999999999134
+              ],
+              [
+                0.0,
+                0.0,
+                -0.006539999999999928
+              ]
+            ],
+            "independent_position_noise_to_acceleration_gain_per_s2": [
+              6123.724356957934,
+              6123.724356957934,
+              6123.724356957934,
+              6123.724356957934
+            ],
+            "whitened_residual": null,
+            "temporal_covariance_supplied": false,
+            "likelihood_calibrated_by_this_module": false,
+            "acceptance_gate": false
+          },
+          "angular_momentum_valid_source_indices": [
+            269,
+            270,
+            271,
+            272
+          ],
+          "specific_H_range_world_m2ps": [
+            0.09949004435037577,
+            0.34579686916139346,
+            0.9486913899217178
+          ],
+          "specific_angular_impulse_source_pairs": [
+            [
+              269,
+              270
+            ],
+            [
+              270,
+              271
+            ],
+            [
+              271,
+              272
+            ]
+          ],
+          "specific_angular_impulse_world_m2ps": [
+            [
+              -0.05860812075452414,
+              -0.046647273072198354,
+              0.028244596993431237
+            ],
+            [
+              -0.04088192359585163,
+              0.19517907894250952,
+              0.475935725736066
+            ],
+            [
+              0.05565317061590007,
+              0.15061779021888397,
+              0.44451106719222055
+            ]
+          ]
+        }
+      ],
+      "mass_sensitivity": {
+        "variants": [
+          {
+            "variant": "leg_low_skate_low",
+            "lower_mass_multiplier": 0.8,
+            "relative_skate_mass": 0.01,
+            "max_COM_change_m": 0.04327648263458546,
+            "max_specific_H_change_m2ps": 0.41668638338544634,
+            "max_external_force_per_mass_change_m_s2": 25.442731931918434,
+            "max_adjacent_angular_impulse_change_m2ps": 0.16876962479039018
+          },
+          {
+            "variant": "leg_high_skate_high",
+            "lower_mass_multiplier": 1.2,
+            "relative_skate_mass": 0.03,
+            "max_COM_change_m": 0.03829726580206355,
+            "max_specific_H_change_m2ps": 0.3773526779774768,
+            "max_external_force_per_mass_change_m_s2": 22.93789263395388,
+            "max_adjacent_angular_impulse_change_m2ps": 0.15263097673913018
+          }
+        ],
+        "assumptions_unmeasured": true,
+        "source_support_episode_inferred_not_per_frame_ground_truth": true,
+        "raw_reference_plane_height_not_actual_contact_truth": true
+      },
+      "physics_arrays": "Data/runs/body_s01_20261029/spin_continuous_1105/source_stage/centroidal_physics.npz"
+    },
+    "flight_stage": {
+      "parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_continuous_flight_1105.npz",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuous_1105\\flight_stage\\common\\exmr_hand_nofoot\\fitted\\result.npz",
+      "accepted": 3,
+      "retained_step": 3,
+      "wall_seconds": 373.33462320000035,
+      "budget_seconds": 360.0,
+      "finite_flight": true,
+      "accuracy_accepted": false,
+      "numerical_convergence": false,
+      "stop_reasons": [
+        {
+          "code": "wall_budget",
+          "category": "budget",
+          "message": "Wall-time budget reached.",
+          "elapsed_seconds": 302.52577700000074,
+          "limit_seconds": 300.16908799999965
+        }
+      ],
+      "stop_is_not_convergence": true,
+      "integrity": {
+        "all_951_parameter_to_export_max_absolute_error": {
+          "P": 0.0,
+          "Q": 0.0,
+          "local_R": 0.0
+        },
+        "ledger_uv_sigma_admission_objective_equal": true,
+        "objective_body_points": 15723,
+        "observations_sha256": "a53bfb81a77ca405647ff977b13b2afc4a5e11bc2c764b4e5cb8de5bc93f9df6",
+        "source_evidence_sha256": "0e68c934b25e10ef91425118d4fcae2c15a350a702b8bf9d1de700f499e605a7",
+        "parameter_sha256": "a9e0ad5b8cd4374da21f2dfb399050aae4936d5b3f1f5a89cbd414134b9ed4e9",
+        "result_sha256": "caa1c1402722ff862bfeefd25457acec6221abf81a8f9ae7d30dfad6ed1cfb79",
+        "physics_sha256": "1be86c8e9adeb8d102b378347843f56c608257da41d4c6e32cb1e98b4fd0fa01",
+        "mass_fraction_sum": 0.9999999999999999,
+        "positive_own_com_inertia": true
+      },
+      "jacobian_directional_checks": {
+        "first_jacobian_seconds": 22.11731400000008,
+        "checks": [
+          {
+            "block": "root",
+            "relative_norm": 5.227443757305186e-08,
+            "max_absolute": 4.4368097706914966e-07
+          },
+          {
+            "block": "legs",
+            "relative_norm": 2.509062390770107e-08,
+            "max_absolute": 7.759495519336695e-08
+          },
+          {
+            "block": "non_grip_right_wrist",
+            "relative_norm": 2.750773969637187e-07,
+            "max_absolute": 7.635862197532747e-08
+          }
+        ]
+      },
+      "flight_diagnostics": [
+        {
+          "source_indices": [
+            268,
+            269,
+            270,
+            271,
+            272,
+            273
+          ],
+          "source_elapsed_range_s": [
+            5.36,
+            5.46
+          ],
+          "source_sample_count": 6,
+          "status": "diagnostic_only",
+          "flight": {
+            "initial_com_world_m": [
+              -9.525680862268384,
+              -7.275141615347076,
+              0.9913965114721971
+            ],
+            "initial_velocity_world_mps": [
+              2.04534764191943,
+              0.37212118081726636,
+              0.7489443319802804
+            ],
+            "fitted_com_world_m": [
+              [
+                -9.525680862268384,
+                -7.275141615347076,
+                0.9913965114721971
+              ],
+              [
+                -9.484773909429997,
+                -7.267699191730731,
+                1.0044133981118024
+              ],
+              [
+                -9.443866956591608,
+                -7.2602567681143855,
+                1.0135062847514082
+              ],
+              [
+                -9.402960003753218,
+                -7.252814344498041,
+                1.0186751713910138
+              ],
+              [
+                -9.36205305091483,
+                -7.245371920881695,
+                1.0199200580306196
+              ],
+              [
+                -9.321146098076442,
+                -7.237929497265349,
+                1.0172409446702253
+              ]
+            ],
+            "position_residual_m": [
+              [
+                -0.01454383138613835,
+                -0.0010584469530119378,
+                0.009857183507030354
+              ],
+              [
+                0.005438289788617823,
+                -0.0008215209238660037,
+                -0.0023059026342318045
+              ],
+              [
+                0.0111755074324833,
+                0.0016340317068781474,
+                -0.007989029924672097
+              ],
+              [
+                0.008237425214577598,
+                0.0019176711595356721,
+                -0.007922636483670864
+              ],
+              [
+                0.000964625049684642,
+                -0.00015911897915810158,
+                -0.0002499442568701937
+              ],
+              [
+                -0.011272016099205473,
+                -0.0015126160103715591,
+                0.008610329792413829
+              ]
+            ],
+            "position_error_max_m": 0.017601346767563964,
+            "position_error_rms_m": 0.012080041004382187,
+            "acceleration_world_mps2": [
+              [
+                -35.6122588272266,
+                5.546566503996178,
+                6.389897127055775
+              ],
+              [
+                -21.68824965442077,
+                -5.429782945216515,
+                4.563801828603935
+              ],
+              [
+                -10.83679486747192,
+                -5.901073978374251,
+                9.205746964498275
+              ],
+              [
+                -12.409602459994828,
+                1.8082327687005786,
+                -6.841045443791092
+              ]
+            ],
+            "acceleration_minus_gravity_mps2": [
+              [
+                -35.6122588272266,
+                5.546566503996178,
+                16.199897127055777
+              ],
+              [
+                -21.68824965442077,
+                -5.429782945216515,
+                14.373801828603934
+              ],
+              [
+                -10.83679486747192,
+                -5.901073978374251,
+                19.015746964498277
+              ],
+              [
+                -12.409602459994828,
+                1.8082327687005786,
+                2.9689545562089084
+              ]
+            ],
+            "acceleration_stencil_indices": [
+              [
+                0,
+                1,
+                2
+              ],
+              [
+                1,
+                2,
+                3
+              ],
+              [
+                2,
+                3,
+                4
+              ],
+              [
+                3,
+                4,
+                5
+              ]
+            ],
+            "duration_s": 0.09999999999999964,
+            "gravity_departure_from_endpoint_chord_m": 0.012262499999999914,
+            "gravity_curvature_after_affine_removal_m": [
+              [
+                0.0,
+                0.0,
+                -0.006539999999999933
+              ],
+              [
+                0.0,
+                0.0,
+                0.001307999999999909
+              ],
+              [
+                0.0,
+                0.0,
+                0.005232000000000006
+              ],
+              [
+                0.0,
+                0.0,
+                0.0052320000000000075
+              ],
+              [
+                0.0,
+                0.0,
+                0.0013079999999999134
+              ],
+              [
+                0.0,
+                0.0,
+                -0.006539999999999928
+              ]
+            ],
+            "independent_position_noise_to_acceleration_gain_per_s2": [
+              6123.724356957934,
+              6123.724356957934,
+              6123.724356957934,
+              6123.724356957934
+            ],
+            "whitened_residual": null,
+            "temporal_covariance_supplied": false,
+            "likelihood_calibrated_by_this_module": false,
+            "acceptance_gate": false
+          },
+          "angular_momentum_valid_source_indices": [
+            269,
+            270,
+            271,
+            272
+          ],
+          "specific_H_range_world_m2ps": [
+            0.08812200957193833,
+            0.23721628019105592,
+            0.5183773268957677
+          ],
+          "specific_angular_impulse_source_pairs": [
+            [
+              269,
+              270
+            ],
+            [
+              270,
+              271
+            ],
+            [
+              271,
+              272
+            ]
+          ],
+          "specific_angular_impulse_world_m2ps": [
+            [
+              -0.051162157572183536,
+              -0.006342257605319885,
+              0.05308345080901011
+            ],
+            [
+              0.017642999716749708,
+              0.12064002347901118,
+              0.2803810820380078
+            ],
+            [
+              0.07047900985518862,
+              0.11657625671204475,
+              0.18491279404874972
+            ]
+          ]
+        }
+      ],
+      "mass_sensitivity": {
+        "variants": [
+          {
+            "variant": "leg_low_skate_low",
+            "lower_mass_multiplier": 0.8,
+            "relative_skate_mass": 0.01,
+            "max_COM_change_m": 0.043216365440641294,
+            "max_specific_H_change_m2ps": 0.4247785123372242,
+            "max_external_force_per_mass_change_m_s2": 26.091032469017076,
+            "max_adjacent_angular_impulse_change_m2ps": 0.16994609663521526
+          },
+          {
+            "variant": "leg_high_skate_high",
+            "lower_mass_multiplier": 1.2,
+            "relative_skate_mass": 0.03,
+            "max_COM_change_m": 0.038244253722284335,
+            "max_specific_H_change_m2ps": 0.3845865625177816,
+            "max_external_force_per_mass_change_m_s2": 23.632951617212985,
+            "max_adjacent_angular_impulse_change_m2ps": 0.15373233090716054
+          }
+        ],
+        "assumptions_unmeasured": true,
+        "source_support_episode_inferred_not_per_frame_ground_truth": true,
+        "raw_reference_plane_height_not_actual_contact_truth": true
+      },
+      "physics_arrays": "Data/runs/body_s01_20261029/spin_continuous_1105/flight_stage/centroidal_physics.npz"
+    }
+  },
+  "same_evidence_metrics": {
+    "gravity6": {
+      "body_and_actual_motion": {
+        "whole": {
+          "body": {
+            "count": 15723,
+            "exposures": 933,
+            "median_px": 8.437044948787179,
+            "p95_px": 42.205736153632884,
+            "worst_px": 474.9939265015192,
+            "worst_pts": 1077760
+          },
+          "left_lower_body": {
+            "count": 2732,
+            "exposures": 933,
+            "median_px": 11.917050705335932,
+            "p95_px": 48.76244635085743,
+            "worst_px": 474.9939265015192,
+            "worst_pts": 1077760
+          },
+          "right_lower_body": {
+            "count": 2791,
+            "exposures": 933,
+            "median_px": 7.146461622030262,
+            "p95_px": 25.44163697042263,
+            "worst_px": 455.3037279814141,
+            "worst_pts": 1044736
+          }
+        },
+        "entry": {
+          "body": {
+            "count": 1350,
+            "exposures": 81,
+            "median_px": 12.482259523885336,
+            "p95_px": 63.66779419030245,
+            "worst_px": 472.5567187932344,
+            "worst_pts": 1042176
+          },
+          "left_lower_body": {
+            "count": 232,
+            "exposures": 81,
+            "median_px": 19.19231357567122,
+            "p95_px": 170.50785967930972,
+            "worst_px": 464.9243185518738,
+            "worst_pts": 1044992
+          },
+          "right_lower_body": {
+            "count": 236,
+            "exposures": 81,
+            "median_px": 13.979426389079086,
+            "p95_px": 76.90245003875796,
+            "worst_px": 455.3037279814141,
+            "worst_pts": 1044736
+          }
+        },
+        "support_reversal": {
+          "body": {
+            "count": 1649,
+            "exposures": 99,
+            "median_px": 10.691405226715641,
+            "p95_px": 61.692432977835644,
+            "worst_px": 474.9939265015192,
+            "worst_pts": 1077760
+          },
+          "left_lower_body": {
+            "count": 279,
+            "exposures": 99,
+            "median_px": 15.437160476441528,
+            "p95_px": 88.08907301043536,
+            "worst_px": 474.9939265015192,
+            "worst_pts": 1077760
+          },
+          "right_lower_body": {
+            "count": 297,
+            "exposures": 99,
+            "median_px": 7.746571911636515,
+            "p95_px": 36.43663682282939,
+            "worst_px": 347.26343983087776,
+            "worst_pts": 1086720
+          }
+        },
+        "held": {
+          "body": {
+            "count": 3213,
+            "exposures": 190,
+            "median_px": 12.62322147089087,
+            "p95_px": 43.87451910324334,
+            "worst_px": 233.9414725710353,
+            "worst_pts": 1161472
+          },
+          "left_lower_body": {
+            "count": 570,
+            "exposures": 190,
+            "median_px": 18.311399420356352,
+            "p95_px": 48.103824222422695,
+            "worst_px": 124.77030802310797,
+            "worst_pts": 1176576
+          },
+          "right_lower_body": {
+            "count": 570,
+            "exposures": 190,
+            "median_px": 8.297911907610565,
+            "p95_px": 23.404927128926506,
+            "worst_px": 31.94816178085599,
+            "worst_pts": 1127424
+          }
+        },
+        "release": {
+          "body": {
+            "count": 661,
+            "exposures": 39,
+            "median_px": 6.087388094392055,
+            "p95_px": 22.63496663049392,
+            "worst_px": 231.96646740173276,
+            "worst_pts": 1187072
+          },
+          "left_lower_body": {
+            "count": 117,
+            "exposures": 39,
+            "median_px": 9.401268879837568,
+            "p95_px": 25.734168512064976,
+            "worst_px": 31.63515315331013,
+            "worst_pts": 1187840
+          },
+          "right_lower_body": {
+            "count": 117,
+            "exposures": 39,
+            "median_px": 7.240732154261365,
+            "p95_px": 18.681518835948165,
+            "worst_px": 24.126014506856077,
+            "worst_pts": 1192192
+          }
+        },
+        "non_grip_right_wrist_40ms_degrees": 105.33918136771976,
+        "support_shoe_85_56_to_85_58_world_omega_rad_s": [
+          -1.5815386497910409,
+          2.2618812050357087,
+          -8.670453991782932
+        ],
+        "held_root_world_omega_change_rms_rad_s2": 102.63659412589072
+      },
+      "source_regions": {
+        "fit_boot_marker_region_foot0": {
+          "outside_region_px": {
+            "count": 17,
+            "exposures": 12,
+            "median_px": 0.0,
+            "p95_px": 0.019797753093382064,
+            "worst_px": 0.09898876546691067,
+            "worst_pts": 1138432
+          },
+          "centre_distance_px": {
+            "count": 17,
+            "exposures": 12,
+            "median_px": 31.415382189969357,
+            "p95_px": 52.12901259562254,
+            "worst_px": 54.591007947256344,
+            "worst_pts": 1080320
+          },
+          "source_rows": 17
+        },
+        "fit_blade_midpoint_region_foot0": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        },
+        "fit_blade_endpoint_region_foot0": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        },
+        "fit_boot_marker_region_foot1": {
+          "outside_region_px": {
+            "count": 26,
+            "exposures": 12,
+            "median_px": 0.0,
+            "p95_px": 0.8513080958047472,
+            "worst_px": 0.9750988057614607,
+            "worst_pts": 1151744
+          },
+          "centre_distance_px": {
+            "count": 26,
+            "exposures": 12,
+            "median_px": 20.051639622371155,
+            "p95_px": 23.36368238855759,
+            "worst_px": 27.387807581863168,
+            "worst_pts": 1121792
+          },
+          "source_rows": 26
+        },
+        "fit_blade_midpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 0.0,
+            "p95_px": 0.0,
+            "worst_px": 0.0,
+            "worst_pts": 1080320
+          },
+          "centre_distance_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 6.413560939406102,
+            "p95_px": 7.618463481512301,
+            "worst_px": 7.772793982286793,
+            "worst_pts": 1146368
+          },
+          "source_rows": 4
+        },
+        "fit_blade_endpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 50,
+            "exposures": 32,
+            "median_px": 0.6385685464375419,
+            "p95_px": 65.76122253814688,
+            "worst_px": 123.75196419804922,
+            "worst_pts": 1098240
+          },
+          "centre_distance_px": {
+            "count": 50,
+            "exposures": 32,
+            "median_px": 18.21020055696672,
+            "p95_px": 83.34476740403997,
+            "worst_px": 142.99440717694299,
+            "worst_pts": 1098240
+          },
+          "source_rows": 50
+        },
+        "review_boot_marker_region_foot0": {
+          "outside_region_px": {
+            "count": 6,
+            "exposures": 4,
+            "median_px": 0.0,
+            "p95_px": 0.0,
+            "worst_px": 0.0,
+            "worst_pts": 1133568
+          },
+          "centre_distance_px": {
+            "count": 6,
+            "exposures": 4,
+            "median_px": 27.532118193358404,
+            "p95_px": 53.221407979551955,
+            "worst_px": 60.19116873511139,
+            "worst_pts": 1170944
+          },
+          "source_rows": 6
+        },
+        "review_blade_midpoint_region_foot0": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        },
+        "review_blade_endpoint_region_foot0": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        },
+        "review_boot_marker_region_foot1": {
+          "outside_region_px": {
+            "count": 10,
+            "exposures": 4,
+            "median_px": 0.499443395527631,
+            "p95_px": 17.908694434125117,
+            "worst_px": 19.83833168806619,
+            "worst_pts": 1133568
+          },
+          "centre_distance_px": {
+            "count": 10,
+            "exposures": 4,
+            "median_px": 31.673075867768652,
+            "p95_px": 43.15273245477141,
+            "worst_px": 45.26793833150376,
+            "worst_pts": 1133568
+          },
+          "source_rows": 10
+        },
+        "review_blade_midpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        },
+        "review_blade_endpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        }
+      }
+    },
+    "support8": {
+      "body_and_actual_motion": {
+        "whole": {
+          "body": {
+            "count": 15723,
+            "exposures": 933,
+            "median_px": 10.338887443876432,
+            "p95_px": 46.96532640929801,
+            "worst_px": 542.1888661318849,
+            "worst_pts": 1044224
+          },
+          "left_lower_body": {
+            "count": 2732,
+            "exposures": 933,
+            "median_px": 14.004015474292238,
+            "p95_px": 52.35758135905949,
+            "worst_px": 542.1888661318849,
+            "worst_pts": 1044224
+          },
+          "right_lower_body": {
+            "count": 2791,
+            "exposures": 933,
+            "median_px": 8.434901614531015,
+            "p95_px": 28.93567092086535,
+            "worst_px": 504.35823322509543,
+            "worst_pts": 1044736
+          }
+        },
+        "entry": {
+          "body": {
+            "count": 1350,
+            "exposures": 81,
+            "median_px": 17.053423757543,
+            "p95_px": 89.18172193733291,
+            "worst_px": 542.1888661318849,
+            "worst_pts": 1044224
+          },
+          "left_lower_body": {
+            "count": 232,
+            "exposures": 81,
+            "median_px": 22.501855237520886,
+            "p95_px": 178.12414936670268,
+            "worst_px": 542.1888661318849,
+            "worst_pts": 1044224
+          },
+          "right_lower_body": {
+            "count": 236,
+            "exposures": 81,
+            "median_px": 17.240804937605063,
+            "p95_px": 92.24042571160822,
+            "worst_px": 504.35823322509543,
+            "worst_pts": 1044736
+          }
+        },
+        "support_reversal": {
+          "body": {
+            "count": 1649,
+            "exposures": 99,
+            "median_px": 11.147870595671979,
+            "p95_px": 64.84170375282866,
+            "worst_px": 474.3329180393324,
+            "worst_pts": 1077760
+          },
+          "left_lower_body": {
+            "count": 279,
+            "exposures": 99,
+            "median_px": 16.20967689507493,
+            "p95_px": 87.91358683023209,
+            "worst_px": 474.3329180393324,
+            "worst_pts": 1077760
+          },
+          "right_lower_body": {
+            "count": 297,
+            "exposures": 99,
+            "median_px": 8.263087702603773,
+            "p95_px": 37.49706703516726,
+            "worst_px": 347.5547201433017,
+            "worst_pts": 1086720
+          }
+        },
+        "held": {
+          "body": {
+            "count": 3213,
+            "exposures": 190,
+            "median_px": 13.35240329582675,
+            "p95_px": 45.741513409952134,
+            "worst_px": 230.74032701876084,
+            "worst_pts": 1161472
+          },
+          "left_lower_body": {
+            "count": 570,
+            "exposures": 190,
+            "median_px": 19.559298937083916,
+            "p95_px": 49.49300218093119,
+            "worst_px": 123.48072019303882,
+            "worst_pts": 1176576
+          },
+          "right_lower_body": {
+            "count": 570,
+            "exposures": 190,
+            "median_px": 7.980027444293523,
+            "p95_px": 23.870149131419943,
+            "worst_px": 33.245566200445204,
+            "worst_pts": 1152000
+          }
+        },
+        "release": {
+          "body": {
+            "count": 661,
+            "exposures": 39,
+            "median_px": 6.521632096953346,
+            "p95_px": 23.23315995040183,
+            "worst_px": 228.09064627640063,
+            "worst_pts": 1187072
+          },
+          "left_lower_body": {
+            "count": 117,
+            "exposures": 39,
+            "median_px": 9.224992388408399,
+            "p95_px": 27.731565855758173,
+            "worst_px": 31.123126940507003,
+            "worst_pts": 1187840
+          },
+          "right_lower_body": {
+            "count": 117,
+            "exposures": 39,
+            "median_px": 6.880103189070826,
+            "p95_px": 19.235622765249136,
+            "worst_px": 24.186204712728035,
+            "worst_pts": 1192192
+          }
+        },
+        "non_grip_right_wrist_40ms_degrees": 105.49309779456239,
+        "support_shoe_85_56_to_85_58_world_omega_rad_s": [
+          -2.890058551043647,
+          2.9591044581218084,
+          -9.050742958316732
+        ],
+        "held_root_world_omega_change_rms_rad_s2": 102.50372508259787
+      },
+      "source_regions": {
+        "fit_boot_marker_region_foot0": {
+          "outside_region_px": {
+            "count": 17,
+            "exposures": 12,
+            "median_px": 0.0,
+            "p95_px": 0.0,
+            "worst_px": 0.0,
+            "worst_pts": 1121792
+          },
+          "centre_distance_px": {
+            "count": 17,
+            "exposures": 12,
+            "median_px": 27.408321263036346,
+            "p95_px": 48.98854970881363,
+            "worst_px": 51.933613415929365,
+            "worst_pts": 1080320
+          },
+          "source_rows": 17
+        },
+        "fit_blade_midpoint_region_foot0": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        },
+        "fit_blade_endpoint_region_foot0": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        },
+        "fit_boot_marker_region_foot1": {
+          "outside_region_px": {
+            "count": 26,
+            "exposures": 12,
+            "median_px": 0.0,
+            "p95_px": 3.1127441560544966,
+            "worst_px": 8.360165503270306,
+            "worst_pts": 1125888
+          },
+          "centre_distance_px": {
+            "count": 26,
+            "exposures": 12,
+            "median_px": 21.46664408828168,
+            "p95_px": 26.956666113807128,
+            "worst_px": 32.266291617406786,
+            "worst_pts": 1125888
+          },
+          "source_rows": 26
+        },
+        "fit_blade_midpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 0.0,
+            "p95_px": 0.0,
+            "worst_px": 0.0,
+            "worst_pts": 1080320
+          },
+          "centre_distance_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 7.121102909873871,
+            "p95_px": 8.02404146727932,
+            "worst_px": 8.067039619493146,
+            "worst_pts": 1146368
+          },
+          "source_rows": 4
+        },
+        "fit_blade_endpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 50,
+            "exposures": 32,
+            "median_px": 1.3716389439920236,
+            "p95_px": 54.525492327665404,
+            "worst_px": 121.14362780754514,
+            "worst_pts": 1098240
+          },
+          "centre_distance_px": {
+            "count": 50,
+            "exposures": 32,
+            "median_px": 18.624752338903015,
+            "p95_px": 72.04737584982419,
+            "worst_px": 140.34072760149326,
+            "worst_pts": 1098240
+          },
+          "source_rows": 50
+        },
+        "review_boot_marker_region_foot0": {
+          "outside_region_px": {
+            "count": 6,
+            "exposures": 4,
+            "median_px": 0.0,
+            "p95_px": 9.762316373686865,
+            "worst_px": 10.190363889396464,
+            "worst_pts": 1133568
+          },
+          "centre_distance_px": {
+            "count": 6,
+            "exposures": 4,
+            "median_px": 33.05900165778644,
+            "p95_px": 55.11020991662321,
+            "worst_px": 61.06235368921116,
+            "worst_pts": 1170944
+          },
+          "source_rows": 6
+        },
+        "review_blade_midpoint_region_foot0": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        },
+        "review_blade_endpoint_region_foot0": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        },
+        "review_boot_marker_region_foot1": {
+          "outside_region_px": {
+            "count": 10,
+            "exposures": 4,
+            "median_px": 1.3158122762106967,
+            "p95_px": 18.07009635386973,
+            "worst_px": 23.587414921749684,
+            "worst_pts": 1133568
+          },
+          "centre_distance_px": {
+            "count": 10,
+            "exposures": 4,
+            "median_px": 31.038262775866432,
+            "p95_px": 44.69430870047109,
+            "worst_px": 48.92718176963659,
+            "worst_pts": 1133568
+          },
+          "source_rows": 10
+        },
+        "review_blade_midpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        },
+        "review_blade_endpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        }
+      }
+    },
+    "continuous_source": {
+      "body_and_actual_motion": {
+        "whole": {
+          "body": {
+            "count": 15723,
+            "exposures": 933,
+            "median_px": 3.3658040572899273,
+            "p95_px": 22.423621578243793,
+            "worst_px": 447.94222659014764,
+            "worst_pts": 1077760
+          },
+          "left_lower_body": {
+            "count": 2732,
+            "exposures": 933,
+            "median_px": 4.24909005202276,
+            "p95_px": 26.64646372412113,
+            "worst_px": 447.94222659014764,
+            "worst_pts": 1077760
+          },
+          "right_lower_body": {
+            "count": 2791,
+            "exposures": 933,
+            "median_px": 3.2686523215301024,
+            "p95_px": 15.124982347962373,
+            "worst_px": 368.31712188173753,
+            "worst_pts": 1042176
+          }
+        },
+        "entry": {
+          "body": {
+            "count": 1350,
+            "exposures": 81,
+            "median_px": 3.033878002361466,
+            "p95_px": 35.085639574002805,
+            "worst_px": 368.31712188173753,
+            "worst_pts": 1042176
+          },
+          "left_lower_body": {
+            "count": 232,
+            "exposures": 81,
+            "median_px": 3.082438203989038,
+            "p95_px": 54.85663043531897,
+            "worst_px": 342.40336272155304,
+            "worst_pts": 1042176
+          },
+          "right_lower_body": {
+            "count": 236,
+            "exposures": 81,
+            "median_px": 3.0924805787350644,
+            "p95_px": 23.295383872284162,
+            "worst_px": 368.31712188173753,
+            "worst_pts": 1042176
+          }
+        },
+        "support_reversal": {
+          "body": {
+            "count": 1649,
+            "exposures": 99,
+            "median_px": 3.582546631933507,
+            "p95_px": 39.24817598046036,
+            "worst_px": 447.94222659014764,
+            "worst_pts": 1077760
+          },
+          "left_lower_body": {
+            "count": 279,
+            "exposures": 99,
+            "median_px": 4.703712684093651,
+            "p95_px": 56.81414137153423,
+            "worst_px": 447.94222659014764,
+            "worst_pts": 1077760
+          },
+          "right_lower_body": {
+            "count": 297,
+            "exposures": 99,
+            "median_px": 2.9768161241516577,
+            "p95_px": 29.43871835991985,
+            "worst_px": 246.46209791925858,
+            "worst_pts": 1086720
+          }
+        },
+        "held": {
+          "body": {
+            "count": 3213,
+            "exposures": 190,
+            "median_px": 4.590124542043039,
+            "p95_px": 24.444416093739395,
+            "worst_px": 218.20661932364433,
+            "worst_pts": 1135360
+          },
+          "left_lower_body": {
+            "count": 570,
+            "exposures": 190,
+            "median_px": 7.357159517439602,
+            "p95_px": 28.60270837867948,
+            "worst_px": 141.7376013246981,
+            "worst_pts": 1176576
+          },
+          "right_lower_body": {
+            "count": 570,
+            "exposures": 190,
+            "median_px": 4.421034577456984,
+            "p95_px": 15.45716444722623,
+            "worst_px": 24.919715811478184,
+            "worst_pts": 1143552
+          }
+        },
+        "release": {
+          "body": {
+            "count": 661,
+            "exposures": 39,
+            "median_px": 2.3849752158274695,
+            "p95_px": 11.41876911041692,
+            "worst_px": 129.8679348764203,
+            "worst_pts": 1187072
+          },
+          "left_lower_body": {
+            "count": 117,
+            "exposures": 39,
+            "median_px": 2.7609462242136082,
+            "p95_px": 9.709166752693484,
+            "worst_px": 28.63213352961524,
+            "worst_pts": 1185536
+          },
+          "right_lower_body": {
+            "count": 117,
+            "exposures": 39,
+            "median_px": 2.8088900589692143,
+            "p95_px": 11.28079781216913,
+            "worst_px": 19.591895165136936,
+            "worst_pts": 1187072
+          }
+        },
+        "non_grip_right_wrist_40ms_degrees": 6.9206365959494915,
+        "support_shoe_85_56_to_85_58_world_omega_rad_s": [
+          -1.5290473902387502,
+          -0.5713370056547045,
+          7.896551306818942
+        ],
+        "held_root_world_omega_change_rms_rad_s2": 35.62018456299929
+      },
+      "source_regions": {
+        "fit_boot_marker_region_foot0": {
+          "outside_region_px": {
+            "count": 17,
+            "exposures": 12,
+            "median_px": 0.0,
+            "p95_px": 0.09379332088888269,
+            "worst_px": 0.1271192945366549,
+            "worst_pts": 1138432
+          },
+          "centre_distance_px": {
+            "count": 17,
+            "exposures": 12,
+            "median_px": 38.50302853162868,
+            "p95_px": 48.814861812055966,
+            "worst_px": 54.698500417316666,
+            "worst_pts": 1187840
+          },
+          "source_rows": 17
+        },
+        "fit_blade_midpoint_region_foot0": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        },
+        "fit_blade_endpoint_region_foot0": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        },
+        "fit_boot_marker_region_foot1": {
+          "outside_region_px": {
+            "count": 26,
+            "exposures": 12,
+            "median_px": 0.0,
+            "p95_px": 0.35528711449769956,
+            "worst_px": 0.6070257269137375,
+            "worst_pts": 1177344
+          },
+          "centre_distance_px": {
+            "count": 26,
+            "exposures": 12,
+            "median_px": 21.311503831688746,
+            "p95_px": 26.267102829944328,
+            "worst_px": 39.58856012790997,
+            "worst_pts": 1151744
+          },
+          "source_rows": 26
+        },
+        "fit_blade_midpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 3.6600629934585758,
+            "p95_px": 5.143541396250367,
+            "worst_px": 5.3902658250128255,
+            "worst_pts": 1177344
+          },
+          "centre_distance_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 11.447162591264894,
+            "p95_px": 13.603210778547577,
+            "worst_px": 13.875547199251395,
+            "worst_pts": 1177344
+          },
+          "source_rows": 4
+        },
+        "fit_blade_endpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 50,
+            "exposures": 32,
+            "median_px": 0.06475007193268159,
+            "p95_px": 7.9302121692879926,
+            "worst_px": 9.65547241817515,
+            "worst_pts": 1070080
+          },
+          "centre_distance_px": {
+            "count": 50,
+            "exposures": 32,
+            "median_px": 18.010337719761246,
+            "p95_px": 25.07911449987056,
+            "worst_px": 26.80368097330723,
+            "worst_pts": 1070080
+          },
+          "source_rows": 50
+        },
+        "review_boot_marker_region_foot0": {
+          "outside_region_px": {
+            "count": 6,
+            "exposures": 4,
+            "median_px": 0.0,
+            "p95_px": 0.0,
+            "worst_px": 0.0,
+            "worst_pts": 1133568
+          },
+          "centre_distance_px": {
+            "count": 6,
+            "exposures": 4,
+            "median_px": 35.218738400615294,
+            "p95_px": 52.66935831693304,
+            "worst_px": 54.39898918454976,
+            "worst_pts": 1170944
+          },
+          "source_rows": 6
+        },
+        "review_blade_midpoint_region_foot0": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        },
+        "review_blade_endpoint_region_foot0": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        },
+        "review_boot_marker_region_foot1": {
+          "outside_region_px": {
+            "count": 10,
+            "exposures": 4,
+            "median_px": 4.446932844740342,
+            "p95_px": 23.385145119261402,
+            "worst_px": 27.340087330362696,
+            "worst_pts": 1170944
+          },
+          "centre_distance_px": {
+            "count": 10,
+            "exposures": 4,
+            "median_px": 32.6222749069325,
+            "p95_px": 44.65892728029837,
+            "worst_px": 48.553290765959126,
+            "worst_pts": 1170944
+          },
+          "source_rows": 10
+        },
+        "review_blade_midpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        },
+        "review_blade_endpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        }
+      }
+    },
+    "continuous_flight": {
+      "body_and_actual_motion": {
+        "whole": {
+          "body": {
+            "count": 15723,
+            "exposures": 933,
+            "median_px": 3.2009109524131123,
+            "p95_px": 21.73055864155053,
+            "worst_px": 447.7130290281647,
+            "worst_pts": 1077760
+          },
+          "left_lower_body": {
+            "count": 2732,
+            "exposures": 933,
+            "median_px": 3.8353980354124526,
+            "p95_px": 26.163272256859756,
+            "worst_px": 447.7130290281647,
+            "worst_pts": 1077760
+          },
+          "right_lower_body": {
+            "count": 2791,
+            "exposures": 933,
+            "median_px": 2.9998437872183628,
+            "p95_px": 14.06803624192742,
+            "worst_px": 358.65971734805026,
+            "worst_pts": 1042176
+          }
+        },
+        "entry": {
+          "body": {
+            "count": 1350,
+            "exposures": 81,
+            "median_px": 2.9156657914802526,
+            "p95_px": 33.6364897736181,
+            "worst_px": 358.65971734805026,
+            "worst_pts": 1042176
+          },
+          "left_lower_body": {
+            "count": 232,
+            "exposures": 81,
+            "median_px": 2.9380340238287603,
+            "p95_px": 58.51003994965925,
+            "worst_px": 333.8608190670774,
+            "worst_pts": 1051392
+          },
+          "right_lower_body": {
+            "count": 236,
+            "exposures": 81,
+            "median_px": 2.7392416268486617,
+            "p95_px": 22.642943965669275,
+            "worst_px": 358.65971734805026,
+            "worst_pts": 1042176
+          }
+        },
+        "support_reversal": {
+          "body": {
+            "count": 1649,
+            "exposures": 99,
+            "median_px": 3.4488901800198306,
+            "p95_px": 38.81897123000744,
+            "worst_px": 447.7130290281647,
+            "worst_pts": 1077760
+          },
+          "left_lower_body": {
+            "count": 279,
+            "exposures": 99,
+            "median_px": 4.413843030126797,
+            "p95_px": 56.36001763768046,
+            "worst_px": 447.7130290281647,
+            "worst_pts": 1077760
+          },
+          "right_lower_body": {
+            "count": 297,
+            "exposures": 99,
+            "median_px": 2.674013222837619,
+            "p95_px": 27.247237294905332,
+            "worst_px": 249.95561779359213,
+            "worst_pts": 1086720
+          }
+        },
+        "held": {
+          "body": {
+            "count": 3213,
+            "exposures": 190,
+            "median_px": 4.416720821963988,
+            "p95_px": 24.523642627294745,
+            "worst_px": 218.65496800392916,
+            "worst_pts": 1135360
+          },
+          "left_lower_body": {
+            "count": 570,
+            "exposures": 190,
+            "median_px": 6.888110108515746,
+            "p95_px": 28.87506056811667,
+            "worst_px": 141.80459603245524,
+            "worst_pts": 1176576
+          },
+          "right_lower_body": {
+            "count": 570,
+            "exposures": 190,
+            "median_px": 3.8248567317086657,
+            "p95_px": 14.055905971132725,
+            "worst_px": 24.513593355587687,
+            "worst_pts": 1143552
+          }
+        },
+        "release": {
+          "body": {
+            "count": 661,
+            "exposures": 39,
+            "median_px": 2.370976656800492,
+            "p95_px": 11.052182423503849,
+            "worst_px": 123.52709497565759,
+            "worst_pts": 1187072
+          },
+          "left_lower_body": {
+            "count": 117,
+            "exposures": 39,
+            "median_px": 2.5841784544056727,
+            "p95_px": 8.807683820634614,
+            "worst_px": 29.328265349519565,
+            "worst_pts": 1185536
+          },
+          "right_lower_body": {
+            "count": 117,
+            "exposures": 39,
+            "median_px": 2.724634393493121,
+            "p95_px": 10.644396319757428,
+            "worst_px": 18.80345507238497,
+            "worst_pts": 1187072
+          }
+        },
+        "non_grip_right_wrist_40ms_degrees": 6.386814579183857,
+        "support_shoe_85_56_to_85_58_world_omega_rad_s": [
+          -1.513078567759436,
+          -1.5616962379622616,
+          6.645669523818482
+        ],
+        "held_root_world_omega_change_rms_rad_s2": 33.24977367126379
+      },
+      "source_regions": {
+        "fit_boot_marker_region_foot0": {
+          "outside_region_px": {
+            "count": 17,
+            "exposures": 12,
+            "median_px": 0.0,
+            "p95_px": 3.3692016684397617,
+            "worst_px": 4.016831580344156,
+            "worst_pts": 1146368
+          },
+          "centre_distance_px": {
+            "count": 17,
+            "exposures": 12,
+            "median_px": 38.549093427795704,
+            "p95_px": 49.44004570772231,
+            "worst_px": 55.43229768533065,
+            "worst_pts": 1187840
+          },
+          "source_rows": 17
+        },
+        "fit_blade_midpoint_region_foot0": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        },
+        "fit_blade_endpoint_region_foot0": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        },
+        "fit_boot_marker_region_foot1": {
+          "outside_region_px": {
+            "count": 26,
+            "exposures": 12,
+            "median_px": 0.0,
+            "p95_px": 1.6826387874303035,
+            "worst_px": 3.6342136688857307,
+            "worst_pts": 1121792
+          },
+          "centre_distance_px": {
+            "count": 26,
+            "exposures": 12,
+            "median_px": 21.77922637366092,
+            "p95_px": 29.152040481338148,
+            "worst_px": 39.303291646205984,
+            "worst_pts": 1151744
+          },
+          "source_rows": 26
+        },
+        "fit_blade_midpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 3.1465522887454833,
+            "p95_px": 4.434905790892712,
+            "worst_px": 4.585450970120634,
+            "worst_pts": 1177344
+          },
+          "centre_distance_px": {
+            "count": 4,
+            "exposures": 4,
+            "median_px": 10.806294646913779,
+            "p95_px": 12.752824089180343,
+            "worst_px": 13.070732344359202,
+            "worst_pts": 1177344
+          },
+          "source_rows": 4
+        },
+        "fit_blade_endpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 50,
+            "exposures": 32,
+            "median_px": 0.5651609354052374,
+            "p95_px": 6.229917805118355,
+            "worst_px": 8.286592857330163,
+            "worst_pts": 1070080
+          },
+          "centre_distance_px": {
+            "count": 50,
+            "exposures": 32,
+            "median_px": 18.453679073092175,
+            "p95_px": 23.410436294131696,
+            "worst_px": 25.431153676922623,
+            "worst_pts": 1070080
+          },
+          "source_rows": 50
+        },
+        "review_boot_marker_region_foot0": {
+          "outside_region_px": {
+            "count": 6,
+            "exposures": 4,
+            "median_px": 0.0,
+            "p95_px": 0.0,
+            "worst_px": 0.0,
+            "worst_pts": 1133568
+          },
+          "centre_distance_px": {
+            "count": 6,
+            "exposures": 4,
+            "median_px": 37.29272644676352,
+            "p95_px": 53.795318036494464,
+            "worst_px": 55.44291702774952,
+            "worst_pts": 1170944
+          },
+          "source_rows": 6
+        },
+        "review_blade_midpoint_region_foot0": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        },
+        "review_blade_endpoint_region_foot0": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        },
+        "review_boot_marker_region_foot1": {
+          "outside_region_px": {
+            "count": 10,
+            "exposures": 4,
+            "median_px": 5.326652030098694,
+            "p95_px": 35.931667741371086,
+            "worst_px": 47.35177337230431,
+            "worst_pts": 1170944
+          },
+          "centre_distance_px": {
+            "count": 10,
+            "exposures": 4,
+            "median_px": 35.8561768425035,
+            "p95_px": 57.40078823969689,
+            "worst_px": 68.56497680790073,
+            "worst_pts": 1170944
+          },
+          "source_rows": 10
+        },
+        "review_blade_midpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        },
+        "review_blade_endpoint_region_foot1": {
+          "outside_region_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "centre_distance_px": {
+            "count": 0,
+            "median_px": null,
+            "p95_px": null,
+            "worst_px": null,
+            "worst_pts": null
+          },
+          "source_rows": 0
+        }
+      }
+    },
+    "gvhmr_fixed": {
+      "body_and_actual_motion": {
+        "whole": {
+          "body": {
+            "count": 15723,
+            "exposures": 933,
+            "median_px": 19.735249887461638,
+            "p95_px": 95.08005921568197,
+            "worst_px": 521.9498066000388,
+            "worst_pts": 1077760
+          },
+          "left_lower_body": {
+            "count": 2732,
+            "exposures": 933,
+            "median_px": 24.003722067144718,
+            "p95_px": 171.41031151831268,
+            "worst_px": 521.9498066000388,
+            "worst_pts": 1077760
+          },
+          "right_lower_body": {
+            "count": 2791,
+            "exposures": 933,
+            "median_px": 19.348173397760043,
+            "p95_px": 48.95067738770027,
+            "worst_px": 469.84521782110875,
+            "worst_pts": 1044736
+          }
+        },
+        "entry": {
+          "body": {
+            "count": 1350,
+            "exposures": 81,
+            "median_px": 20.664614748272005,
+            "p95_px": 105.81318176720507,
+            "worst_px": 469.84521782110875,
+            "worst_pts": 1044736
+          },
+          "left_lower_body": {
+            "count": 232,
+            "exposures": 81,
+            "median_px": 24.991793427887693,
+            "p95_px": 159.2503957075087,
+            "worst_px": 406.6106807204694,
+            "worst_pts": 1051392
+          },
+          "right_lower_body": {
+            "count": 236,
+            "exposures": 81,
+            "median_px": 20.096489431749646,
+            "p95_px": 78.970342166245,
+            "worst_px": 469.84521782110875,
+            "worst_pts": 1044736
+          }
+        },
+        "support_reversal": {
+          "body": {
+            "count": 1649,
+            "exposures": 99,
+            "median_px": 25.120783428176733,
+            "p95_px": 103.54441227798357,
+            "worst_px": 521.9498066000388,
+            "worst_pts": 1077760
+          },
+          "left_lower_body": {
+            "count": 279,
+            "exposures": 99,
+            "median_px": 32.461445448144396,
+            "p95_px": 150.64971045089484,
+            "worst_px": 521.9498066000388,
+            "worst_pts": 1077760
+          },
+          "right_lower_body": {
+            "count": 297,
+            "exposures": 99,
+            "median_px": 18.37734937676924,
+            "p95_px": 51.16083955016178,
+            "worst_px": 325.6562409416739,
+            "worst_pts": 1086720
+          }
+        },
+        "held": {
+          "body": {
+            "count": 3213,
+            "exposures": 190,
+            "median_px": 34.15449309880466,
+            "p95_px": 140.54483271571692,
+            "worst_px": 276.6406663399788,
+            "worst_pts": 1134592
+          },
+          "left_lower_body": {
+            "count": 570,
+            "exposures": 190,
+            "median_px": 56.68173827958057,
+            "p95_px": 210.58818096905836,
+            "worst_px": 273.5278148057491,
+            "worst_pts": 1135360
+          },
+          "right_lower_body": {
+            "count": 570,
+            "exposures": 190,
+            "median_px": 29.06733466609336,
+            "p95_px": 46.11506434761625,
+            "worst_px": 96.50849429097994,
+            "worst_pts": 1127936
+          }
+        },
+        "release": {
+          "body": {
+            "count": 661,
+            "exposures": 39,
+            "median_px": 14.798903238631203,
+            "p95_px": 44.61557234045766,
+            "worst_px": 229.41299862926306,
+            "worst_pts": 1187072
+          },
+          "left_lower_body": {
+            "count": 117,
+            "exposures": 39,
+            "median_px": 19.597142305065475,
+            "p95_px": 90.75364421256221,
+            "worst_px": 140.87636345527736,
+            "worst_pts": 1182720
+          },
+          "right_lower_body": {
+            "count": 117,
+            "exposures": 39,
+            "median_px": 16.48216846986235,
+            "p95_px": 33.26919157776181,
+            "worst_px": 45.31022440882204,
+            "worst_pts": 1191168
+          }
+        },
+        "non_grip_right_wrist_40ms_degrees": 5.164072548695179,
+        "support_shoe_85_56_to_85_58_world_omega_rad_s": [
+          0.9501948237997206,
+          -0.6747780635347103,
+          7.910741322657916
+        ],
+        "held_root_world_omega_change_rms_rad_s2": 173.57768478439252
+      }
+    },
+    "exmr_prefoot_old": {
+      "body_and_actual_motion": {
+        "whole": {
+          "body": {
+            "count": 15723,
+            "exposures": 933,
+            "median_px": 15.824772685124678,
+            "p95_px": 72.99687746928663,
+            "worst_px": 547.4284848970688,
+            "worst_pts": 1044480
+          },
+          "left_lower_body": {
+            "count": 2732,
+            "exposures": 933,
+            "median_px": 17.80299633874792,
+            "p95_px": 111.793711514599,
+            "worst_px": 547.4284848970688,
+            "worst_pts": 1044480
+          },
+          "right_lower_body": {
+            "count": 2791,
+            "exposures": 933,
+            "median_px": 14.569619997737375,
+            "p95_px": 40.40830809025772,
+            "worst_px": 513.545935894855,
+            "worst_pts": 1044736
+          }
+        },
+        "entry": {
+          "body": {
+            "count": 1350,
+            "exposures": 81,
+            "median_px": 19.1305000130715,
+            "p95_px": 79.70801455329077,
+            "worst_px": 547.4284848970688,
+            "worst_pts": 1044480
+          },
+          "left_lower_body": {
+            "count": 232,
+            "exposures": 81,
+            "median_px": 22.089561343061945,
+            "p95_px": 167.72417496443154,
+            "worst_px": 547.4284848970688,
+            "worst_pts": 1044480
+          },
+          "right_lower_body": {
+            "count": 236,
+            "exposures": 81,
+            "median_px": 17.835063394850152,
+            "p95_px": 79.2133753028194,
+            "worst_px": 513.545935894855,
+            "worst_pts": 1044736
+          }
+        },
+        "support_reversal": {
+          "body": {
+            "count": 1649,
+            "exposures": 99,
+            "median_px": 22.10157501421625,
+            "p95_px": 93.68647100291008,
+            "worst_px": 468.5725253777458,
+            "worst_pts": 1077760
+          },
+          "left_lower_body": {
+            "count": 279,
+            "exposures": 99,
+            "median_px": 26.368146273682164,
+            "p95_px": 116.38413617333727,
+            "worst_px": 468.5725253777458,
+            "worst_pts": 1077760
+          },
+          "right_lower_body": {
+            "count": 297,
+            "exposures": 99,
+            "median_px": 18.204616081942625,
+            "p95_px": 51.88382636708705,
+            "worst_px": 376.19749984341325,
+            "worst_pts": 1086720
+          }
+        },
+        "held": {
+          "body": {
+            "count": 3213,
+            "exposures": 190,
+            "median_px": 26.57097637789541,
+            "p95_px": 93.93045156856276,
+            "worst_px": 244.7744278464238,
+            "worst_pts": 1161472
+          },
+          "left_lower_body": {
+            "count": 570,
+            "exposures": 190,
+            "median_px": 36.5846430189778,
+            "p95_px": 153.57919718117662,
+            "worst_px": 189.911865703646,
+            "worst_pts": 1147904
+          },
+          "right_lower_body": {
+            "count": 570,
+            "exposures": 190,
+            "median_px": 19.622023475592307,
+            "p95_px": 39.92070970861999,
+            "worst_px": 57.6700747259411,
+            "worst_pts": 1148416
+          }
+        },
+        "release": {
+          "body": {
+            "count": 661,
+            "exposures": 39,
+            "median_px": 12.523491964331184,
+            "p95_px": 33.23985770163676,
+            "worst_px": 218.80511874870598,
+            "worst_pts": 1187072
+          },
+          "left_lower_body": {
+            "count": 117,
+            "exposures": 39,
+            "median_px": 17.753365554243004,
+            "p95_px": 44.58862596412285,
+            "worst_px": 90.59709690555715,
+            "worst_pts": 1183744
+          },
+          "right_lower_body": {
+            "count": 117,
+            "exposures": 39,
+            "median_px": 15.724615831083963,
+            "p95_px": 31.776056174581846,
+            "worst_px": 34.04213443435068,
+            "worst_pts": 1184768
+          }
+        },
+        "non_grip_right_wrist_40ms_degrees": 4.782397380615624,
+        "support_shoe_85_56_to_85_58_world_omega_rad_s": [
+          0.8286321970277826,
+          1.0508186107246578,
+          0.9397077710140112
+        ],
+        "held_root_world_omega_change_rms_rad_s2": 102.11655542360614
+      }
+    },
+    "hand_nofoot_initial": {
+      "body_and_actual_motion": {
+        "whole": {
+          "body": {
+            "count": 15723,
+            "exposures": 933,
+            "median_px": 15.991462887656171,
+            "p95_px": 73.69437981867519,
+            "worst_px": 542.188866131884,
+            "worst_pts": 1044224
+          },
+          "left_lower_body": {
+            "count": 2732,
+            "exposures": 933,
+            "median_px": 18.145879448514002,
+            "p95_px": 112.52904960885144,
+            "worst_px": 542.188866131884,
+            "worst_pts": 1044224
+          },
+          "right_lower_body": {
+            "count": 2791,
+            "exposures": 933,
+            "median_px": 14.681838314358783,
+            "p95_px": 41.148721990648426,
+            "worst_px": 504.3582332250961,
+            "worst_pts": 1044736
+          }
+        },
+        "entry": {
+          "body": {
+            "count": 1350,
+            "exposures": 81,
+            "median_px": 20.46403078073985,
+            "p95_px": 88.98213281998723,
+            "worst_px": 542.188866131884,
+            "worst_pts": 1044224
+          },
+          "left_lower_body": {
+            "count": 232,
+            "exposures": 81,
+            "median_px": 24.085842836609725,
+            "p95_px": 183.81846857881914,
+            "worst_px": 542.188866131884,
+            "worst_pts": 1044224
+          },
+          "right_lower_body": {
+            "count": 236,
+            "exposures": 81,
+            "median_px": 19.704208348896557,
+            "p95_px": 92.24042571160828,
+            "worst_px": 504.3582332250961,
+            "worst_pts": 1044736
+          }
+        },
+        "support_reversal": {
+          "body": {
+            "count": 1649,
+            "exposures": 99,
+            "median_px": 22.340869911091687,
+            "p95_px": 92.90784483210253,
+            "worst_px": 471.07621750752065,
+            "worst_pts": 1077760
+          },
+          "left_lower_body": {
+            "count": 279,
+            "exposures": 99,
+            "median_px": 26.655468885575036,
+            "p95_px": 115.37988021727338,
+            "worst_px": 471.07621750752065,
+            "worst_pts": 1077760
+          },
+          "right_lower_body": {
+            "count": 297,
+            "exposures": 99,
+            "median_px": 18.642244036509645,
+            "p95_px": 52.30782807653324,
+            "worst_px": 377.71012855744044,
+            "worst_pts": 1086720
+          }
+        },
+        "held": {
+          "body": {
+            "count": 3213,
+            "exposures": 190,
+            "median_px": 26.14062013864665,
+            "p95_px": 93.63013458008844,
+            "worst_px": 242.15606257280007,
+            "worst_pts": 1161472
+          },
+          "left_lower_body": {
+            "count": 570,
+            "exposures": 190,
+            "median_px": 36.52427404766035,
+            "p95_px": 154.41674494132027,
+            "worst_px": 189.90472601532133,
+            "worst_pts": 1147904
+          },
+          "right_lower_body": {
+            "count": 570,
+            "exposures": 190,
+            "median_px": 19.827814289293737,
+            "p95_px": 40.00491947929435,
+            "worst_px": 57.44350209933131,
+            "worst_pts": 1148416
+          }
+        },
+        "release": {
+          "body": {
+            "count": 661,
+            "exposures": 39,
+            "median_px": 12.317813474882936,
+            "p95_px": 33.0745954929979,
+            "worst_px": 213.18488809678087,
+            "worst_pts": 1187072
+          },
+          "left_lower_body": {
+            "count": 117,
+            "exposures": 39,
+            "median_px": 18.150190196874977,
+            "p95_px": 44.13590053339569,
+            "worst_px": 90.70519648587195,
+            "worst_pts": 1183744
+          },
+          "right_lower_body": {
+            "count": 117,
+            "exposures": 39,
+            "median_px": 15.405150343430508,
+            "p95_px": 32.29474585927693,
+            "worst_px": 34.56978004504501,
+            "worst_pts": 1184768
+          }
+        },
+        "non_grip_right_wrist_40ms_degrees": 105.44609027556722,
+        "support_shoe_85_56_to_85_58_world_omega_rad_s": [
+          0.828632197027785,
+          1.0508186107246609,
+          0.9397077710140068
+        ],
+        "held_root_world_omega_change_rms_rad_s2": 102.11655542360614
+      }
+    }
+  },
+  "selection": {
+    "recommended_default_variant": "continuous_source",
+    "physical_variant": "continuous_flight",
+    "accuracy_accepted": false,
+    "reason": "Prioritize visible source/shoe quality. B improves fit blade endpoint tail and the short flight residual, but source review support-shoe p95 outside-region error worsens from A23.39px to B35.93px. Preserve both; do not present B as an accuracy upgrade.",
+    "source_stage": "23 accepted; source/kinematics",
+    "flight_stage": "3 accepted; finite flight plus continued source optimization",
+    "not_all_B_improvements_attributable_to_physics": true
+  },
+  "priority_findings": [
+    {
+      "source_seconds": [
+        81.4,
+        81.4
+      ],
+      "status": "partial_improvement",
+      "finding": "原模型一条腿近水平的错误明显减轻；同源回投中新候选双腿下斜更接近原片。手臂/鞋位置仍有偏差；81.42等曝光仍有大尾误差，未完成关联逐点复核。",
+      "image": "Data/runs/body_s01_20261029/spin_continuous_1105/native_comparison/compare_1041920.png"
+    },
+    {
+      "source_seconds": [
+        85.56,
+        85.58
+      ],
+      "status": "local_reversal_removed",
+      "finding": "支撑鞋世界omega_z：gravity6 -8.67045，A +7.89655，B +6.64567 rad/s；该处反转减轻。仍有转速波动，不能据此判整段运动正确。"
+    },
+    {
+      "source_seconds": [
+        89.32,
+        89.36
+      ],
+      "status": "outlier_reduced",
+      "finding": "非提刀右腕40ms旋转：gravity6 105.339°，A 6.921°，B 6.387°；绝对初始化本身也减小离群，不能全部归因于物理。"
+    },
+    {
+      "source_seconds": [
+        92.4,
+        93.2
+      ],
+      "status": "partial_improvement",
+      "finding": "同台账释放段人体median/p95由6.087/22.635px降至A 2.385/11.419、B 2.371/11.052px；92.80回投仍见头/鞋轮廓偏移，释放段未验收。",
+      "image": "Data/runs/body_s01_20261029/spin_continuous_1105/native_comparison/compare_1187840.png"
+    }
+  ],
+  "remaining_failures": [
+    "新增fit刀端p95有限区域外距离从65.76px降至A7.93/B6.23px，但旧4中点p95区域外误差从0增加到A5.14/B4.43px。",
+    "复核支撑鞋区域p95区域外误差gravity6 17.91px、A23.39px、B35.93px，均未通过；所以默认A，B仅保留物理对照。fit与review统计分开，review不是独立人工真值。",
+    "短腾空COM位置残差RMS A0.02595m→B0.01208m，但B加速度仍明显偏离固定重力，H也未恒定；质量/密度和条件尺度尚未独立标定，不能宣称物理正确。",
+    "旋转根角速度变化RMS降低，但仍有周期性波动、支撑鞋图像退化及未知关联；下一阻塞是证据/遮挡深度/足鞋朝向之间的冲突，不是毫米接冰余量。",
+    "A、B分别因预算预留/墙钟预算停止；B总墙钟373.33s含最终保存超过360s设置。未收敛，保留候选，不继续加权续跑。"
+  ],
+  "verification": {
+    "tests": {
+      "integration_tests.xml": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "253",
+          "time": "3.586"
+        }
+      ],
+      "delivery_tests.xml": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "96",
+          "time": "6.049"
+        }
+      ]
+    },
+    "mixed_jacobian_max_relative_error": 2.750773969637187e-07,
+    "all_951_saved_states_exact": true,
+    "actual_ledger_pts_uv_sigma_masks_exact": true,
+    "numerical_checks_are_not_trajectory_acceptance": true,
+    "native_stills": "Data/runs/body_s01_20261029/spin_continuous_1105/native_comparison/projection_and_clock.json"
+  },
+  "player": {
+    "launcher": "launchers/START_3D_SPIN_CONTINUOUS.cmd",
+    "config": "events/ankara_2026/programmes/okada_mei_sp/viewer3d_spin_continuous_1105.json",
+    "default_variant": "continuous_source",
+    "comparison_variants": [
+      "continuous_source",
+      "continuous_flight",
+      "entry_motion",
+      "support_foot"
+    ],
+    "four_comparison_caches_prepared": true,
+    "channels": "COM、固定刀身后/中/前材料点、移动接触候选独立显示；自由视角、逐帧、脚下近景及俯视。",
+    "GUI_opened": false
+  },
+  "offline_root": "Data/runs/body_s01_20261029/spin_continuous_1105",
+  "preserved_failures": [
+    "source_stage_setup_failure_1",
+    "flight_stage_setup_failure_1",
+    "native_source_stage_setup_failure_1"
+  ],
+  "executed_sources": [
+    "continuous_source_snapshot/",
+    "flight_execution_source_snapshot/"
+  ],
+  "post_run_changes": [
+    "播放器默认改A、当前绘图隐藏历史disabled观测（原文保留）",
+    "NoOpening空metrics修正元数据：原日志中历史开头因子说明布尔值被通用监视器标m，不影响目标；原日志未改写"
+  ],
+  "no_new_inference": true,
+  "no_video_generated": true,
+  "auto_commit_or_push": false
+}

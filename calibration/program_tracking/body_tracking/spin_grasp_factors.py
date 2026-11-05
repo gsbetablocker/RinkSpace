@@ -143,7 +143,10 @@ class SpinGraspFactors:
                 dX=((sa['native_world'][pick,ids]-sb['native_world'][pick,ids])/(2*h)).reshape(-1,5,3)
                 locals.append(np.einsum('nplc,nlc->npl',pr['pixel_jac_nodes'][:,0],dX))
             local=np.stack(locals,-1);local=np.einsum('nab,nbld->nald',np.asarray(Ds),local)
-            J=csr_matrix(np.einsum('nald,nlm->namd',local,self.image_B).reshape(len(r),self.body.size))
+            if hasattr(d,'chain'):
+                from .absolute_motion_state import chain_exposure
+                J=chain_exposure(local,d)
+            else:J=csr_matrix(np.einsum('nald,nlm->namd',local,self.image_B).reshape(len(r),self.body.size))
             J=hstack((csr_matrix((len(r),17)),J),format='csr')
         return r,J,metrics
 
@@ -178,8 +181,9 @@ class SpinGraspFactors:
                 values=[]
                 for i,v in zip(np.flatnonzero(self.held),grip):values.append(v['jacobian_palm_world']@((Ha[i]-Hb[i])/(2*hstep))+v['jacobian_shoe_origin']@((Oa[i]-Ob[i])/(2*hstep))+v['jacobian_shoe_right_rotation']@eta[i])
                 dg.append(np.asarray(values))
-            Jg=spline_chain(np.stack(dg,-1),self.B[self.held])
-            pointJ=spline_chain(np.stack(dx,-1).reshape(len(X),-1,self.body.state.d),self.B)
+            Jg=d.chain(np.stack(dg,-1),sample_indices=np.flatnonzero(self.held)) if hasattr(d,'chain') else spline_chain(np.stack(dg,-1),self.B[self.held])
+            local=np.stack(dx,-1).reshape(len(X),-1,self.body.state.d)
+            pointJ=d.chain(local) if hasattr(d,'chain') else spline_chain(local,self.B)
             D2=csr_matrix(temporal['second_difference_operator']);A=block_diag(list(temporal['jacobian_per_acceleration'].reshape(-1,3,3)),format='csr')
             Jt=diags(scale)@A@kron(D2,eye(X.shape[1]*3),format='csr')@pointJ
             Jg=hstack((csr_matrix((len(rg),17)),Jg),format='csr');Jt=hstack((csr_matrix((len(rt),17)),Jt),format='csr')

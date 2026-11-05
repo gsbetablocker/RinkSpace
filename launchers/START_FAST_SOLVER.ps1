@@ -6,7 +6,7 @@ param(
     [switch]$VerifyBackendsOnly
 )
 $ErrorActionPreference = 'Stop'
-$taskProjectRoot = $PSScriptRoot
+$taskProjectRoot = Split-Path -Parent $PSScriptRoot
 $taskPython = Join-Path $taskProjectRoot '.venv/Scripts/python.exe'
 if (-not $InputConfig) { $InputConfig = Join-Path $taskProjectRoot 'configs/solver_runtime/okada_named66.json' }
 $taskConfig = Get-Content -LiteralPath $InputConfig -Raw -Encoding utf8 | ConvertFrom-Json

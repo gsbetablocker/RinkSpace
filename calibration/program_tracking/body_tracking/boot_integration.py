@@ -211,11 +211,14 @@ class BootWindowProblem(FullBodyProblem):
             base['phases']['compatibility_derivatives_seconds']=(elapsed if resident is not None else time.perf_counter()-start)
             sparse_start=time.perf_counter()
             local=np.stack(derivatives,-1);B=self.state.basis(self.mid_times)
-            rr=[];cc=[];vv=[];fr,kn=np.nonzero(B)
-            val=local[fr]*B[fr,kn,None,None]
-            rr=np.broadcast_to(fr[:,None,None]*extra.shape[1]+np.arange(extra.shape[1])[None,:,None],val.shape).ravel()
-            cc=np.broadcast_to(kn[:,None,None]*self.state.d+np.arange(self.state.d),val.shape).ravel()
-            J=coo_matrix((val.ravel(),(rr,cc)),shape=(rows,self.size)).tocsr();J.eliminate_zeros()
+            if hasattr(d,'chain'):
+                J=d.chain(local)
+            else:
+                rr=[];cc=[];vv=[];fr,kn=np.nonzero(B)
+                val=local[fr]*B[fr,kn,None,None]
+                rr=np.broadcast_to(fr[:,None,None]*extra.shape[1]+np.arange(extra.shape[1])[None,:,None],val.shape).ravel()
+                cc=np.broadcast_to(kn[:,None,None]*self.state.d+np.arange(self.state.d),val.shape).ravel()
+                J=coo_matrix((val.ravel(),(rr,cc)),shape=(rows,self.size)).tocsr();J.eliminate_zeros()
             base['jac']=vstack((base['jac'],J),format='csr')
             base['phases']['compatibility_sparse_seconds']=time.perf_counter()-sparse_start
         first=len(base['residual'])

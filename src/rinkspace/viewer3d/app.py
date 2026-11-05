@@ -64,7 +64,9 @@ class ResultsPlayer(Viewer):
         self.visible = dict(surface=True, skeleton=True, shoes=True, trajectory=True, pelvis=True,
                             rink_lines=True, boards=True, ice=True, wear=False,
                             footbed=False, cavity=False, axes=False, collar=False,
-                            contact=True, skate_reference=False)
+                            contact=True, skate_reference=False, com=True, blade_material=True)
+        for key,value in catalog.config.get('initial_visible',{}).items():
+            if key in self.visible:self.visible[key]=bool(value)
         self.layers = {}
         self.variant_nodes = []
         self.last_p = None
@@ -234,11 +236,23 @@ class ResultsPlayer(Viewer):
                 else:equipment.append(keep(Lines(gear,r_base=.004,color=color,name='Old blade proxy '+str(foot+1),is_selectable=False)))
             layers['shoes']=equipment
             footbed_nodes=[];cavity_nodes=[];axis_nodes=[];collar_nodes=[]
-            contact_nodes=[];reference_nodes=[]
+            contact_nodes=[];reference_nodes=[];com_nodes=[];material_nodes=[]
+            if 'com_world_mid' in s:
+                cross=np.eye(3)[:,None,:]*np.array([-1.,1.])[None,:,None]
+                points=s['com_world_mid'][:,None,:]+cross.reshape(1,6,3)*.035
+                com_nodes.append(keep(Lines(points,mode='lines',r_base=.0035,
+                    color=(.45,1.,.22,1.),name='Saved approximate mass-model COM cross; not measured COM',is_selectable=False)))
+            if 'blade_material_world_mid' in s:
+                for index,(label,color) in enumerate((('rear',(.3,.45,1.,1.)),('middle',(1.,.86,.15,1.)),('front',(.94,.98,1.,1.)))):
+                    material_nodes.append(keep(Spheres(s['blade_material_world_mid'][:,:,index],radius=.005,
+                        color=color,name='Saved fixed blade material station '+label,is_selectable=False)))
             if versioned_skate:
                 for foot in range(2):
-                    contact_nodes.append(keep(Spheres(s['skate_witness'][:,foot,None],radius=.004,
-                        color=(1.,.2,.35,1.),name='Nonpenetration witness '+str(foot+1),is_selectable=False)))
+                    diamond=np.array([[0,0,1],[1,0,0],[0,1,0],[-1,0,0],[0,-1,0],[0,0,-1]],float)
+                    edges=np.array([(pole,side) for pole in (0,5) for side in range(1,5)]+[(1,2),(2,3),(3,4),(4,1)])
+                    marker=s['skate_witness'][:,foot,None,:]+diamond[edges].reshape(1,-1,3)*.008
+                    contact_nodes.append(keep(Lines(marker,mode='lines',r_base=.0015,
+                        color=(1.,.2,.6,1.),name='Nonpenetration witness '+str(foot+1),is_selectable=False)))
                     reference_nodes.append(keep(Lines(s['skate_reference'][:,foot],r_base=.002,
                         color=(.35,1.,.55,1.) if foot==0 else (.4,.65,1.,1.),
                         name='Fixed blade material reference trajectory '+str(foot+1),is_selectable=False)))
@@ -276,14 +290,14 @@ class ResultsPlayer(Viewer):
                     color=[(.95,.25,.25,1),(.3,.95,.3,1),(.3,.6,1.,1)][index%3]
                     axis_nodes.append(keep(Lines(points,mode='lines',r_base=.0025,color=color,name='Axis '+str(label),is_selectable=False)))
             layers.update(wear=[],footbed=footbed_nodes,cavity=cavity_nodes,axes=axis_nodes,collar=collar_nodes,
-                          contact=contact_nodes,skate_reference=reference_nodes)
+                          contact=contact_nodes,skate_reference=reference_nodes,com=com_nodes,blade_material=material_nodes)
             trajectory=keep(Lines(s['G'],r_base=.018,color=(1.,.75,.12,1),name='Whole saved clip pelvis vertical projection',is_selectable=False))
             layers['trajectory']=[trajectory]
             vertical=keep(Lines(np.stack([s['P'],s['G']],axis=1),r_base=.007,color=(1.,.27,.67,1),name='P to G world vertical',is_selectable=False))
             pelvis=keep(Spheres(s['P'][:,None],radius=.032,color=(1.,.27,.67,1),name='P pelvis',is_selectable=False))
             ground=keep(Spheres(s['G'][:,None],radius=.04,color=(1.,.78,.12,1),name='G pelvis projection',is_selectable=False))
             layers['pelvis']=[vertical,pelvis,ground]
-            for key in ('surface','skeleton','shoes','trajectory','pelvis','wear','footbed','cavity','axes','collar','contact','skate_reference'):
+            for key in ('surface','skeleton','shoes','trajectory','pelvis','wear','footbed','cavity','axes','collar','contact','skate_reference','com','blade_material'):
                 for node in layers[key]:
                     node.current_frame_id=frame
                     node.enabled=self.visible.get(key,False)
@@ -658,6 +672,7 @@ class ResultsPlayer(Viewer):
             changed,index=imgui.combo('播放速度',[.25,.5,1.,2.].index(self.speed),['0.25 倍','0.5 倍','1 倍','2 倍'])
             if changed:self.speed=[.25,.5,1.,2.][index];self.playback_fps=50*self.speed
             _,self.follow=imgui.checkbox('播放时跟随运动员（保留观察角度）',self.follow)
+            imgui.text('取消跟随后，当前观察位置固定；拖动仍可自由旋转／平移。')
             imgui.separator()
             for i,(label,key) in enumerate([('自由 / 回到人体  X','free'),('侧视 XZ','side'),('侧视 YZ','end'),('俯视','top'),('全冰场','rink')]):
                 if i in (1,3,4):imgui.same_line()
@@ -721,10 +736,20 @@ class ResultsPlayer(Viewer):
                 imgui.text_wrapped('内腔/间隙为工程先验；有效转角不等同解剖背屈/内翻，形变系数不代表材料刚度。')
             imgui.text('粉色 P：骨盆；黄色 G：骨盆竖直投影')
             imgui.text('橙 / 青：两只鞋刀，左右身份尚未确认')
+            if 'com_world_mid' in s:
+                changed,self.visible['com']=imgui.checkbox('质量近似 COM ×（绿，非真实质心）',self.visible['com'])
+                if changed:self.apply_visibility()
+                imgui.text_wrapped('COM 只读取保存的条件米制质量近似；显示程序不从骨盆或表面重新推算。')
+            else:imgui.text('本候选未保存质量近似 COM，无法显示。')
+            if 'blade_material_world_mid' in s:
+                changed,self.visible['blade_material']=imgui.checkbox('刀材料点 ●（后蓝／中黄／前白）',self.visible['blade_material'])
+                if changed:self.apply_visibility()
+                imgui.text_wrapped('每只刀三个固定材料点，按后／中／前区分；它们不是接冰点。')
+            else:imgui.text('本候选未保存三刀材料点，无法显示。')
             if 'template_version' in s:
                 imgui.text_wrapped('鞋刀模板：'+str(s['template_version'])+'；绑定：'+str(s['binding_version']))
                 imgui.text('鞋刀：保存的完整下鞋实体、上鞋与精确双刃')
-                for label,key in [('最低非穿透 witness 点（粉红）','contact'),('刀上固定参考点与整段轨迹','skate_reference')]:
+                for label,key in [('witness 接触候选 ◇（洋红，非真接冰）','contact'),('刀上固定参考点与整段轨迹','skate_reference')]:
                     changed,self.visible[key]=imgui.checkbox(label,self.visible[key])
                     if changed:self.apply_visibility()
                 for foot in range(2):

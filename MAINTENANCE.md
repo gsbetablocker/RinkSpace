@@ -20,13 +20,15 @@
 
 ## 本机工具与存储解析
 
+启动脚本统一存放在 [launchers/](launchers/)。当前 S05 续算候选使用 [START_3D_SPIN_REFINED.cmd](launchers/START_3D_SPIN_REFINED.cmd)，原 A/B 入口 [START_3D_SPIN_CONTINUOUS.cmd](launchers/START_3D_SPIN_CONTINUOUS.cmd) 保留；满意的 S01 使用 [START_3D_COMPARISON.cmd](launchers/START_3D_COMPARISON.cmd)；旧版本及逐镜头入口同目录保留。
+
 | 工具 | 用途与边界 |
 |---|---|
 | [scripts/build_core.py](scripts/build_core.py)、[构建说明](native/README.md#构建与检查) | 原生 CPU／CUDA 构建；`--check-toolchain` 先检查原生子进程访问及现有工具，记录实际工具路径与版本 |
-| [INSTALL_LOCAL.cmd](INSTALL_LOCAL.cmd)、[START_LOCAL.cmd](START_LOCAL.cmd) | 基础安装与本地服务；安装器选择 dev/acquisition，不含 advanced |
-| [START_POINT_EDITOR.cmd](START_POINT_EDITOR.cmd)、[参数](START_POINT_EDITOR.ps1) | 指定 Dataset、Media、SourceMedia、Model、Port，编辑有源身份的观测 |
+| [INSTALL_LOCAL.cmd](launchers/INSTALL_LOCAL.cmd)、[START_LOCAL.cmd](launchers/START_LOCAL.cmd) | 基础安装与本地服务；安装器选择 dev/acquisition，不含 advanced |
+| [START_POINT_EDITOR.cmd](launchers/START_POINT_EDITOR.cmd)、[参数](launchers/START_POINT_EDITOR.ps1) | 指定 Dataset、Media、SourceMedia、Model、Port，编辑有源身份的观测 |
 | [refresh_project_entry.py](scripts/refresh_project_entry.py) | 刷新 Data 中的结果面板，保留 CURRENT_TASK 与冻结绑定 |
-| [START_FAST_SOLVER.ps1](START_FAST_SOLVER.ps1)、[solver_runtime](calibration/solver_runtime/README.md)、[rinkfit](calibration/rinkfit/README.md) | 历史后端／样本入口；只能按相符的输入、完整状态和 profile 使用，不代表新引擎已支持 solve/resume |
+| [START_FAST_SOLVER.ps1](launchers/START_FAST_SOLVER.ps1)、[solver_runtime](calibration/solver_runtime/README.md)、[rinkfit](calibration/rinkfit/README.md) | 历史后端／样本入口；只能按相符的输入、完整状态和 profile 使用，不代表新引擎已支持 solve/resume |
 
 共享映射为 [storage.defaults.json](configs/storage.defaults.json)。新机器可复制 [storage.example.json](configs/storage.example.json) 为受忽略的 `configs/storage.json`，填入绝对 Data 根，或设置 `RINKSPACE_DATA_ROOT`。显式 `AssetStore(root, data_root=...)` 优先于环境变量和本机文件；未配置 Data 时，通用工作台使用受忽略的 outputs，pytest 缓存使用系统临时目录。
 

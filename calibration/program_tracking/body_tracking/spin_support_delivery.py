@@ -256,7 +256,7 @@ def register(project, base, old, output, *, make_default=False):
                   same_pts_and_world=True, native_camera_unchanged=True,
                   previous_default=before['default_variant'], default_variant=config['default_variant'],
                   made_default=bool(make_default), old_variants_preserved=old_ids,
-                  launch_commands={v['id']: f'"{project / "START_3D_GRASP.cmd"}" -Variant {v["id"]}' for v in added},
+                  launch_commands={v['id']: f'"{project / "launchers" / "START_3D_GRASP.cmd"}" -Variant {v["id"]}' for v in added},
                   no_visible_gui_opened=True, accuracy_accepted=False)
     _write_new_json(target, report, project)
     return report

@@ -23,13 +23,17 @@ class SupportImageFactors:
             o=NativeRegionObservation(**{k:row[k] for k in NativeRegionObservation.__dataclass_fields__})
             enabled=(o.role=='fit' or include_review) and o.foot in (0,1) and o.visibility=='visible' and o.reliability>0
             enabled &= o.kind!='support_contact_region' or o.contact_state=='supported'
-            enabled &= include_review or row.get('optimization_enabled',True)
+            enabled &= row.get('optimization_enabled',True) or (include_review and o.role=='review' and not row.get('replaced_in_optimization_by'))
             if enabled:
                 if o.pts not in lookup:raise ValueError('Observation outside source timeline')
                 self.rows.append((row,o,lookup[o.pts]))
         if not self.rows:raise ValueError('No admitted support/shoe image rows')
         self.frames=np.array([r[2] for r in self.rows],int)
         self.feet=np.array([r[1].foot for r in self.rows],int)
+        self.planar_rows=np.array([r[0].get('prediction_geometry')=='nominal_ice_projection_of_current_lowest_runner' for r in self.rows],bool)
+        for selected,(_,o,_) in zip(self.planar_rows,self.rows):
+            if selected and (o.kind!='support_contact_region' or o.contact_state!='supported'):
+                raise ValueError('Nominal-ice position reference requires an explicit source-supported contact region')
         self.times=(self.reference.times[self.frames,None]+np.linspace(-.5,.5,5)*self.body.tau).ravel()
         self.ref=self.reference.at(self.times);self.B=self.body.state.basis(self.times).reshape(-1,5,self.body.state.m)
         arcs=self.binding.packet()['template']['contact_arcs']
@@ -44,13 +48,16 @@ class SupportImageFactors:
         self.last=None
 
     def geometry(self,state):
-        count=len(self.rows);points=np.empty((count,5,1,3));rotation_j=np.empty((count,5,3,3));warnings=[]
+        count=len(self.rows);points=np.empty((count,5,1,3));rotation_j=np.empty((count,5,3,3));warnings=[];selected_arcs={}
+        actual_points=np.empty_like(points)
         adapter=self.binding.packet()['adapter']
         for i,(row,o,_) in enumerate(self.rows):
             for l in range(5):
                 R=state['R'][i*5+l,o.foot];O=state['O'][i*5+l,o.foot]
                 if o.kind=='support_contact_region':
-                    w=lowest_runner_witness([self.arcs[self.arc_ids[row['id']]]],R,O,plane_normal_world=[0,0,1])
+                    arcs=list(self.arcs.values()) if row.get('arc_selection')=='current_geometric_lowest_runner' else [self.arcs[self.arc_ids[row['id']]]]
+                    w=lowest_runner_witness(arcs,R,O,plane_normal_world=[0,0,1])
+                    selected_arcs.setdefault(row['id'],[]).append(w['arc_id'])
                     point=w['world_point'];J=w['jacobian_right_rotation']
                     if w['differentiability_warning']:warnings.append((row['id'],l))
                 elif o.kind in ('blade_midpoint_region','blade_endpoint_region'):
@@ -69,13 +76,22 @@ class SupportImageFactors:
                     point=O+R@q
                     from .fullbody_fit import skew
                     J=-R@skew(q)
+                actual_points[i,l,0]=point
+                if self.planar_rows[i]:
+                    # A conditional ice-footprint observation constrains XY;
+                    # it does not move the body, shoe or actual contact geometry.
+                    point=point.copy();point[2]=0.
                 points[i,l,0]=point;rotation_j[i,l]=J
+        self.selected_geometry_arcs=selected_arcs
+        self.actual_geometry_points=actual_points
         return points,rotation_j,warnings
 
     def evaluate(self,x,jacobian=False):
         state=self.body.state;delta=state.increments(x,self.times)
         s=fk_state(self.reference,self.ref,delta);nodes,Jrotation,warnings=self.geometry(s)
         projection=moving_projection(self.problem.camera,nodes,self.frames,jacobian=jacobian)
+        actual_projection=(moving_projection(self.problem.camera,self.actual_geometry_points,self.frames)['uv'][:,0]
+                           if self.planar_rows.any() else projection['uv'][:,0])
         residual=[];D=[];metrics=[]
         for i,(row,o,_) in enumerate(self.rows):
             measured=replace(o,role='fit') if self.include_review else o
@@ -83,7 +99,9 @@ class SupportImageFactors:
             if not r['enabled']:raise ValueError('An inner source row unexpectedly disabled')
             residual.append(r['residual']);D.append(r['jacobian_native_uv'])
             offset=np.asarray(r['native_pixel_offset']);radius=r['source_ellipse_radius']
-            metrics.append(dict(id=row['id'],pts=o.pts,foot=o.foot,kind=o.kind,role=o.role,uv=projection['uv'][i,0].tolist(),centre_error_px=float(np.linalg.norm(offset)),outside_region_px=float(np.linalg.norm(offset)*max(0.,1.-1./max(radius,1e-30))),ellipse_radius=radius))
+            actual=pixel_region_factor(actual_projection[i],measured,source_id=self.source,shot_id=self.shot,pts=o.pts,time_base=self.tb,predicted_foot=o.foot,predicted_kind=o.kind,robust_delta=self.document['robust_delta'])
+            actual_offset=np.asarray(actual['native_pixel_offset']);actual_radius=actual['source_ellipse_radius']
+            metrics.append(dict(id=row['id'],pts=o.pts,foot=o.foot,kind=o.kind,role=o.role,uv=projection['uv'][i,0].tolist(),centre_error_px=float(np.linalg.norm(offset)),outside_region_px=float(np.linalg.norm(offset)*max(0.,1.-1./max(radius,1e-30))),ellipse_radius=radius,optimization_enabled=(o.role=='fit' and row.get('optimization_enabled',True)),source_visibility=row.get('source_visibility',o.visibility),source_semantic=row.get('source_semantic',o.kind),source_uncertainty=row.get('source_uncertainty','unspecified'),region_shape_px2=row['region_shape_px2'],prediction_geometry=row.get('prediction_geometry','actual_current_geometry'),actual_geometry_uv=actual_projection[i].tolist(),actual_geometry_centre_distance_px=float(np.linalg.norm(actual_offset)),actual_geometry_outside_region_px=float(np.linalg.norm(actual_offset)*max(0.,1.-1./max(actual_radius,1e-30)))))
         r=np.asarray(residual).ravel();J=None
         if jacobian:
             n=len(self.rows);pick=np.arange(n*5);foot=np.repeat(self.feet,5)
@@ -94,13 +112,19 @@ class SupportImageFactors:
                 dO=(a['O'][pick,foot]-b['O'][pick,foot])/(2*h)
                 dR=(a['R'][pick,foot]-b['R'][pick,foot])/(2*h)
                 eta=_vee(R.transpose(0,2,1)@dR).reshape(n,5,3)
-                return dO.reshape(n,5,3)+np.einsum('nlij,nlj->nli',Jrotation,eta)
+                derivative=dO.reshape(n,5,3)+np.einsum('nlij,nlj->nli',Jrotation,eta)
+                derivative[self.planar_rows,:,2]=0.
+                return derivative
             for dX in self.body.execution.map_columns(column,state.active):
                 drows.append(np.einsum('nplc,nlc->npl',projection['pixel_jac_nodes'][:,0],dX))
             local=np.stack(drows,-1)
             local=np.einsum('nab,nbld->nald',np.asarray(D),local)
-            body_J=csr_matrix(np.einsum('nald,nlm->namd',local,self.B).reshape(len(r),state.size))
+            if hasattr(delta,'chain'):
+                from .absolute_motion_state import chain_exposure
+                body_J=chain_exposure(local,delta)
+            else:
+                body_J=csr_matrix(np.einsum('nald,nlm->namd',local,self.B).reshape(len(r),state.size))
             J=hstack((csr_matrix((len(r),17)),body_J),format='csr')
         cost=float(r@r/2)
-        self.last=dict(residual=r,jac=J,cost=cost,parts={'support_image':cost},metrics=dict(observations=metrics,enabled_rows=len(metrics),fixed_arc_ids=self.arc_ids,differentiability_warnings=warnings,five_node_native_projection=True))
+        self.last=dict(residual=r,jac=J,cost=cost,parts={'support_image':cost},metrics=dict(observations=metrics,enabled_rows=len(metrics),fixed_arc_ids={key:value for key,value in self.arc_ids.items() if not any(row[0]['id']==key and row[0].get('arc_selection')=='current_geometric_lowest_runner' for row in self.rows)},current_geometry_arc_ids=self.selected_geometry_arcs,differentiability_warnings=warnings,five_node_native_projection=True))
         return self.last

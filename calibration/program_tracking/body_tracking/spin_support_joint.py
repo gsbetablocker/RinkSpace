@@ -101,25 +101,15 @@ def prepare(project,base,old,output):
         np.savez_compressed(initial_path,**original)
         np.savez_compressed(output/'source_root_initialization.npz',pts=parent.p['pts'],support_pixel_curve=all_uv,conditional_support_anchor_world_m=anchors*parent.binding.ratio,attachment_weight=weight,source_yaw_pts=yaw_pts,source_yaw_corrections_rad=corrections)
         write_json(output/'initialization.json',dict(parent_parameter=active['parameter'],parent_sha256=digest(Path(active['parameter'])),pose_origin='actual retained four-step HandMR/noFootMR pose; support ankle/toe initialized from source blade direction and nominal plane only',root_origin='source-image support middle, per-exposure native Brown inverse; no original network root LS inside support interval',not_new_inference=True,unverified_flat_boot_initialization=True,support_interval=[82.4,92.46],unknown_entry_and_release=True,source_track=str(output/'source_support_track.json'),yaw_seed_pts=yaw_pts))
-    # Replace only the semantically incorrect geometric-minimum pixel rows.
-    # They remain present for reporting, and all historical review roles persist.
-    for row in source_doc['observations']:
-        if row['kind']=='support_contact_region':row.update(optimization_enabled=False,replaced_in_optimization_by='source-image blade-midpoint rows; minimum height is separate finite ice geometry')
-    known={r['id']for r in source_doc['observations']};selected=np.flatnonzero(track['optimization_use']);pt=track['pts'][selected];dt=np.r_[np.diff(pt/12800.)[0]/2,(pt[2:]-pt[:-2])/25600.,np.diff(pt/12800.)[-1]/2]
-    for k,i in enumerate(selected):
-        key='derived_support_middle_'+str(int(track['pts'][i]));quality=float(track['confidence'][i]);half=np.array([12.,10.])+(1-quality)*np.array([20.,15.])
-        if key in known:continue
-        source_doc['observations'].append(dict(id=key,source_id=source_doc['source_id'],source_sha256=source_doc['source_sha256'],shot_id='s05',pts=int(track['pts'][i]),time_base=[1,12800],foot=1,foot_track='support_track',kind='blade_midpoint_region',centre_uv=track['uv'][i].tolist(),region_shape_px2=np.diag(half**2).tolist(),visibility='visible',contact_state='supported',role='fit',reliability=quality,objective_weight=float(dt[k]),provenance='source_support_track.json: derived source pixels from admitted native blade-middle seeds; 10Hz sampling with time quadrature, not repeated manual truth',source_visibility='derived source-image flow; confidence is not calibrated',source_uncertainty='finite native-pixel region, not a universal metric support band'))
-    direct=json.loads((old/'source_review/support_direct_check_v2.json').read_text(encoding='utf8'))
-    protected={r['pts']for r in source_doc['observations']if r['role']=='review'}
-    known={r['id']for r in source_doc['observations']}
-    for row in direct['frames']:
-        if row['native_pts']in protected or row['blade_midpoint_px']is None:continue
-        for endpoint,key in [('front','toe_region_xyxy_px'),('rear','tail_region_xyxy_px')]:
-            rid='direct_blade_'+str(row['native_pts'])+'_'+endpoint
-            if rid in known:continue
-            box=np.array(row[key],float).reshape(2,2);half=np.maximum((box[1]-box[0])/2,6.)
-            source_doc['observations'].append(dict(id=rid,source_id=source_doc['source_id'],source_sha256=source_doc['source_sha256'],shot_id='s05',pts=row['native_pts'],time_base=[1,12800],foot=1,foot_track='support_track',kind='blade_endpoint_region',blade_endpoint=endpoint,centre_uv=box.mean(0).tolist(),region_shape_px2=np.diag(half**2).tolist(),visibility='visible',contact_state='supported',role='fit',reliability=.65,objective_weight=1.,provenance='source_review/support_direct_check_v2.json: directly viewed native steel endpoint tolerance region, not anatomical toe or boot centroid; finite geometric end proxy, material location blurred'))
+    # New factor rows require per-seed source review. Saved flow confidence is
+    # neither a material identity nor an uncertainty ellipse.
+    from .source_track_evidence import build_track_region_document
+    anchor_document=json.loads((project/PROGRAMME/'spin_support_midpoint_anchors_1104.json').read_text(encoding='utf8'))
+    review_path=output/'source_seed_review_overrides.json'
+    review_overrides=json.loads(review_path.read_text(encoding='utf8')) if review_path.exists() else None
+    source_doc,track_evidence=build_track_region_document(source_doc,track,
+        [r for r in anchor_document['anchors'] if track['pts'][0]<=r['pts']<=track['pts'][-1]],
+        review_overrides=review_overrides,native_step_pts=256)
     write_json(output/'support_and_free_shoe_regions.json',source_doc)
     relations=copy.deepcopy(relations);relations['factor_parameters']['grip']['objective_weight']=80.
     relations['factor_parameter_change_reason']='Retained held-phase palm/rear-shoe gap 0.239m and native 89.56s visible unclosed grip. One explicit finite positional-grip reweight; no ice reweight or threshold continuation.'

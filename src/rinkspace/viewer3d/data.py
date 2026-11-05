@@ -9,7 +9,7 @@ from rinkspace.metric_scale import estimate_uniform_scale
 from .open_boot_topology import shell_triangles as open_shell_triangles
 
 
-MESH_CACHE_SCHEMA='rinkspace.viewer-mesh-cache.v4'
+MESH_CACHE_SCHEMA='rinkspace.viewer-mesh-cache.v5'
 HAND_POSE_SCHEMA='rinkspace.hand-local-R.v1'
 HAND_MEAN_CONVENTION='flat_hand_mean=True; actual local rotations; no additive mean'
 
@@ -87,6 +87,24 @@ def source_support_state(saved,n):
         elif values.dtype.kind!='U':raise ValueError('Invalid '+key)
         out[target]=values.copy()
     return out
+
+
+def motion_diagnostics_state(saved,n,ratio,required=()):
+    """Read saved diagnostics once; never estimate COM or material points.
+
+    The three blade stations are fixed material identities, ordered rear,
+    middle, front on each existing foot 0/1. A moving witness is a separate
+    contact candidate and cannot substitute for a material station.
+    """
+    fields={'com_world_mid':((n,3),'com_world_mid'),
+            'blade_material_world_mid':((n,2,3,3),'blade_material_world_mid'),
+            'skate_witness_world_mid':((n,2,3),'skate_witness')}
+    if not isinstance(required,(list,tuple)) or any(key not in fields for key in required):
+        raise ValueError('Invalid required_saved_diagnostics')
+    for key in required:
+        if key not in saved:raise ValueError('Required saved motion diagnostic is absent: '+key)
+    return {target:_array(saved[key],shape,key)*ratio
+            for key,(shape,target) in fields.items() if key in saved}
 
 
 def skate_state(saved,n,ratio):
@@ -237,7 +255,13 @@ class ResultCatalog:
         self.unit_ratio=self.scale/self.legacy_scale
         self.model_path=self.assets.resolve(self.project/self.config['model_asset'],must_exist=True)
         self.cache_root=self.data_root/'cache/results3d'/self.config['shot']
-        self.session_root=self.data_root/'workbench/results3d';self.session_root.mkdir(parents=True,exist_ok=True)
+        self.session_root=self.data_root/'workbench/results3d'
+        session=self.config.get('session_id')
+        if session is not None:
+            if not isinstance(session,str) or not session or any(c not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-' for c in session):
+                raise ValueError('Invalid viewer session_id')
+            self.session_root/=session
+        self.session_root.mkdir(parents=True,exist_ok=True)
         self._common_fingerprint=None
 
     def variant(self,name):return next(q for q in self.variants if q['id']==name)
@@ -289,6 +313,7 @@ class ResultCatalog:
         # viewer never evaluates an external template or binding dependency.
         with np.load(self.result_path(v),allow_pickle=False) as saved:
             _,identity['hand_pose']=hand_state(saved,len(self.pts),v)
+            motion_diagnostics_state(saved,len(self.pts),1.,v.get('required_saved_diagnostics',()))
             if 'template_version' in saved:
                 identity['skate_versions']={key:str(_text_scalar(saved[key],key)) for key in ('template_version','binding_version')}
         if 'metres_per_scene_unit' in v:identity['candidate_metres_per_scene_unit']=v['metres_per_scene_unit']
@@ -310,6 +335,7 @@ class ResultCatalog:
             np.testing.assert_allclose(candidate_scale,z['metres_per_scene_unit'],rtol=1e-12)
         hands,hand_identity=hand_state(z,n,v)
         common=dict(P=p,Q=q,saved=z,variant=v,metres_per_scene_unit=candidate_scale,unit_ratio=self.scale/candidate_scale,length_ratio=1.,hand_local_R=hands,hand_pose_identity=hand_identity)
+        common['motion_diagnostics']=motion_diagnostics_state(z,n,common['unit_ratio'],v.get('required_saved_diagnostics',()))
         if v['kind']=='fullbody':
             local=_rotations(z['local_R_mid'],(n,21,3,3),'effective local rotations')
             solver_scale=_positive_scalar(z['solver_metres_per_scene_unit'],'solver scale')

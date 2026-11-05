@@ -1,6 +1,6 @@
 @echo off
 set PYTHONDONTWRITEBYTECODE=1
-cd /d "%~dp0"
+cd /d "%~dp0.."
 if exist ".venv\Scripts\python.exe" (
   ".venv\Scripts\python.exe" -B "scripts\check_onedrive_paths.py"
 ) else (

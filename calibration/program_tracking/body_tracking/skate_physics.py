@@ -182,6 +182,7 @@ def body_constraint_jacobian(reference,state,delta,active,B,evaluation):
                 value=np.einsum('nj,nj->n',rotation[selected,2],partial)
                 local[np.ix_(selected,np.flatnonzero(active==a))]+=value[:,None]
     local*=sign[:,None]*ratio/NORMALIZATION
+    if hasattr(delta,'chain'):return delta.chain(local[:,None,:],sample_indices=fr)
     # Select the original sparse spline support for each physical row. Only
     # values that are nonzero enter COO; large explicit zero blocks never
     # reach the downstream sparse products/LSMR.

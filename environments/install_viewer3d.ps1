@@ -24,4 +24,4 @@ if ($LASTEXITCODE -ne 0) { throw 'Viewer dependency installation failed.' }
 $env:OPENBLAS_NUM_THREADS='2';$env:OMP_NUM_THREADS='2';$env:CUDA_VISIBLE_DEVICES=''
 & $python -B -m rinkspace.viewer3d.prepare --project $projectRoot --data-root $dataRoot --all
 if ($LASTEXITCODE -ne 0) { throw 'Saved-pose display preparation failed. Original results have not been modified.' }
-Write-Output 'Ready. Double-click START_3D_RESULTS.cmd in the project directory.'
+Write-Output 'Ready. Double-click launchers\START_3D_RESULTS.cmd in the project directory.'

@@ -328,7 +328,10 @@ class BodyExecution:
             self._derivative_usage['surface_replay_linearizations'] += 1
         return values
 
-    def world_derivatives(self, reference, ref, delta, columns, *, step=1e-5):
+    def world_coco_derivatives(self,reference,ref,delta,columns,*,step=1e-5):
+        return self.world_derivatives(reference,ref,delta,columns,step=step,include_equipment=False)
+
+    def world_derivatives(self, reference, ref, delta, columns, *, step=1e-5, include_equipment=True):
         columns = list(map(int, columns))
         owner = self._analytic_reference(reference)
         if owner is None or any(c < 6 or c >= 69 for c in columns):
@@ -336,7 +339,7 @@ class BodyExecution:
                 'explicit_finite_difference' if self.config.local_derivatives == 'finite_difference' else
                 'unsupported_reference_or_columns_central_difference')
             values = self.state_differences(reference, ref, delta, columns,
-                                            lambda state: state['world'], step=step)
+                                            lambda state: state['world'] if include_equipment else state['world'][:,-17:], step=step)
             self._derivative_usage['finite_difference_world_linearizations'] += 1
             return zip(columns, values)
         delta = self._validate_local_inputs(ref, delta, columns, step)
@@ -358,6 +361,7 @@ class BodyExecution:
                 # joint that is outside both leg ancestor trees.
                 coco = np.einsum('nij,nkj->nki', Q,
                     linearization.derivative(column, kinematics=False)['coco'])
+                if not include_equipment:return coco
                 if not linearization.affects_joints(column, (4, 5, 7, 8)):
                     gear = np.zeros((len(delta), count, 3), dtype=np.float64)
                 else:
@@ -381,7 +385,7 @@ class BodyExecution:
 
             values = self.map_columns(derivative, columns)
         self._derivative_usage['analytic_world_linearizations'] += 1
-        self._last_world_derivative_mode = 'cpu_analytic_coco_exact_fk_gear_difference'
+        self._last_world_derivative_mode = ('cpu_analytic_coco_exact_fk_gear_difference' if include_equipment else 'cpu_analytic_coco_observed_points_only')
         return zip(columns, values)
 
 

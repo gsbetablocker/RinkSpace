@@ -39,7 +39,8 @@ def case(root):
         p={'pts': np.array([283136, 283392])}, times=np.array([0., .02]), new_refinements=[])
     for name in ('skate_contact_1103.npz', 'viewer3d_fullbody_1102.json'):
         (programme/name).write_bytes(b'existing accepted asset')
-    (project/'START_3D_COMPARISON.cmd').write_bytes(b'existing launcher')
+    (project/'launchers').mkdir()
+    (project/'launchers/START_3D_COMPARISON.cmd').write_bytes(b'existing launcher')
     (out/'source_evidence.json').write_text('[]', encoding='utf8')
     (out/'binding.json').write_bytes(b'existing binding')
     return SimpleNamespace(project=project, data=data, out=out, checkpoint=checkpoint,

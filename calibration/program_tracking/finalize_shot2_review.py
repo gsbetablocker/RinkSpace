@@ -210,9 +210,9 @@ def run():
         raise ValueError('Selected manifest does not match the requested shot')
     label = {1:'第一镜头',2:'第二镜头',3:'第三镜头'}.get(shot,f'第{shot}镜头')
     marker_name = f'SHOT{shot}_SELECTED_REVIEW_20261014'
-    restart = ROOT / f'START_SHOT{shot}_REVIEW.cmd'
+    restart = ROOT / 'launchers' / f'START_SHOT{shot}_REVIEW.cmd'
     restart_html = (f'<a href="{restart.as_uri()}">重启{label}审阅后端</a> · ' if restart.is_file() else
-        f'<a href="{(ROOT / "START_POINT_EDITOR.ps1").as_uri()}">通用点位编辑器（指定 Dataset、Media、Model）</a> · ')
+        f'<a href="{(ROOT / "launchers/START_POINT_EDITOR.ps1").as_uri()}">通用点位编辑器（指定 Dataset、Media、Model）</a> · ')
     entry_label = label + ('返修版' if '_r2_' in OUT.name else '')
     selected_pts = [r['source']['native_pts'] for r in manifest['frames']]
     intervals = np.diff(selected_pts) / 12800

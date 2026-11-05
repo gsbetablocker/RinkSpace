@@ -64,6 +64,8 @@ class SupportObservations:
             raise ValueError('Support observation shot differs from player source')
         self.by_pts = {}
         for row in self.document['observations']:
+            # Historical disabled rows remain archived, but are not current source observations.
+            if row.get('optimization_enabled') is False:continue
             pts = native_pts(row['pts'])
             for key in ('source_id','shot_id'):
                 if row.get(key,self.document.get(key)) != self.document.get(key):
@@ -100,7 +102,7 @@ def source_value(state, key, frame, foot=None):
 
 
 def observation_used(state, row, frame):
-    if row['role'] == 'review':
+    if row['role'] == 'review' or row.get('optimization_enabled') is False:
         return False
     if row.get('foot') not in (0, 1):
         return 'unknown'

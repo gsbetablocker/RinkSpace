@@ -8,11 +8,13 @@ from .rebuild_prepare import digest
 from .fullbody_round import write_json
 
 
-def _flow_track(images,start,stop,centre):
+def _flow_track(images,start,stop,centre,*,source_pts=None,native_step_pts=256):
     n=len(images);out=np.full((n,2),np.nan);quality=np.zeros(n);out[start]=centre;quality[start]=1
     step=1 if stop>start else -1;current=np.array(centre,float)
     for i in range(start,stop,step):
-        j=i+step;mask=np.zeros(images[i].shape,np.uint8);x,y=np.rint(current).astype(int)
+        j=i+step
+        if source_pts is not None and abs(int(source_pts[j])-int(source_pts[i]))!=native_step_pts:break
+        mask=np.zeros(images[i].shape,np.uint8);x,y=np.rint(current).astype(int)
         cv2.rectangle(mask,(x-74,y-95),(x+74,y-5),255,-1)
         pts=cv2.goodFeaturesToTrack(images[i],maxCorners=80,qualityLevel=.015,minDistance=3,mask=mask,blockSize=5)
         if pts is None or len(pts)<6:break
@@ -32,13 +34,9 @@ def build_track(project,base,old_output,output):
         with np.load(cache,allow_pickle=False)as z:return {k:z[k]for k in z.files}
     programme=project/'events/ankara_2026/programmes/okada_mei_sp'
     anchors=json.loads((programme/'spin_support_midpoint_anchors_1104.json').read_text(encoding='utf8'))
-    check=json.loads((old_output/'source_review/support_direct_check_v2.json').read_text(encoding='utf8'))
-    updates={r['native_pts']:r for r in check['frames'] if r['blade_midpoint_px']is not None}
     rows=[dict(r)for r in anchors['anchors']if 82.4*12800<=r['pts']<=92.46*12800]
-    for row in rows:
-        if row['pts']in updates:
-            row['centre_uv']=updates[row['pts']]['blade_midpoint_px'];row['region_half_extent_uv']=[8,7]
-        row['feature_semantics']='visible support blade middle region; not ankle, not moving geometric minimum'
+    # Preserve original source rectangles and semantics. Old direct-check names
+    # do not establish midpoint identity or justify shrinking every region.
     original=json.loads((old_output/'support_and_free_shoe_regions.json').read_text(encoding='utf8'))
     review={int(r['pts'])for r in original['observations']if r['role']=='review'}
     excluded={p+d for p in review for d in (-256,0,256)}
@@ -56,7 +54,7 @@ def build_track(project,base,old_output,output):
     lookup={int(p):i for i,p in enumerate(pts)}
     for a,b in zip(rows[:-1],rows[1:]):
         ia,ib=lookup[a['pts']],lookup[b['pts']];pa=np.array(a['centre_uv'])-origin;pb=np.array(b['centre_uv'])-origin
-        forward,qf=_flow_track(images,ia,ib,pa);back,qb=_flow_track(images,ib,ia,pb)
+        forward,qf=_flow_track(images,ia,ib,pa,source_pts=pts);back,qb=_flow_track(images,ib,ia,pb,source_pts=pts)
         idx=np.arange(ia,ib+1);u=(pts[idx]-pts[ia])/(pts[ib]-pts[ia]);goodf=np.isfinite(forward[idx]).all(1);goodb=np.isfinite(back[idx]).all(1)
         # Blend source-material flow in each direction; no image-derived
         # coordinate is supplied by the frozen review frames or their neighbours.
@@ -70,13 +68,18 @@ def build_track(project,base,old_output,output):
         uv[ia]=a['centre_uv'];uv[ib]=b['centre_uv'];confidence[[ia,ib]]=1
         bidirectional.append(dict(start_pts=a['pts'],end_pts=b['pts'],valid_frames=int(use.sum()),total_frames=len(idx),median_forward_backward_disagreement_px=float(np.nanmedian(disagreement))if both.any()else None))
     native=pts.copy();valid=np.isfinite(uv).all(1);assert np.all(np.diff(pts)>0)
-    # Source pixels at 10 Hz plus the admitted seed frames enter optimization.
-    # Native-50Hz flow remains available for initialization and independent plots.
-    chosen=valid&((np.arange(len(pts))%5)==0);chosen|=np.isin(pts,[r['pts']for r in rows])
-    np.savez_compressed(cache,pts=pts,uv=uv,confidence=confidence,valid=valid,optimization_use=chosen,native_crop_xyxy=crop,time_base=np.array([1,12800]))
+    # Retain 10 Hz samples plus seed exposures as integration representatives.
+    # Image-factor admission still requires independently reviewed semantics.
+    chosen=valid&((np.arange(len(pts))%5)==0);chosen|=valid&np.isin(pts,[r['pts']for r in rows])
+    from .source_track_evidence import prepare_track_evidence
+    evidence=prepare_track_evidence(dict(pts=pts,uv=uv,valid=valid,optimization_use=chosen),
+        excluded_review_pts=excluded,native_step_pts=256,time_base=(1,12800))
+    chosen=evidence['optimization_use']
+    np.savez_compressed(cache,pts=pts,uv=uv,confidence=confidence,valid=valid,optimization_use=chosen,exposure_weight_seconds=evidence['exposure_weight_seconds'],native_crop_xyxy=crop,time_base=np.array([1,12800]))
     document=dict(schema='rinkspace.source-support-derived-track.v1',source_sha256=anchors['source_sha256'],shot_id='s05',time_base=[1,12800],pixel_domain='native Brown 1920x1080',support_foot=1,source_path=source,
       source_anchor_rows=rows,excluded_review_pts=sorted(excluded),intervals=bidirectional,frames=len(pts),valid_flow_frames=int(valid.sum()),optimization_exposures=int(chosen.sum()),
-      provenance='adjacent source-image KLT forward/backward + robust local affine propagation from admitted blade-middle development regions; no body/network predictions used as blade observations',
+      provenance='adjacent source-image KLT forward/backward + robust local affine propagation from historical coarse steel/shadow seed regions; no body/network predictions used as blade observations',
+      source_exposure_quadrature=evidence['source_exposure_audit'],source_semantic='historical coarse steel/shadow; not automatically a fixed material midpoint',
       not_per_frame_manual_truth=True,no_review_pixels_consumed=True,unknown_pts=pts[~valid].tolist(),
       uncertainties=['flow follows nearby boot/steel material features; longitudinal blade midpoint changes appearance under rotation','partial visibility and source blur','confidence is an engineering reliability score, not calibrated probability'],
       input_anchor_document_sha256=digest(programme/'spin_support_midpoint_anchors_1104.json'),track_npz_sha256=digest(cache))

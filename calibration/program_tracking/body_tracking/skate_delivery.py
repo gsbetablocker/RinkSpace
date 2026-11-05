@@ -314,11 +314,12 @@ def deliver(project,root,out,ref,camera,info,evidence,problem,report,catalog=Non
     else:
         config['comparison_variants']=list(dict.fromkeys(config.get('comparison_variants',[])+[variant_id]))
     write_json(config_path,config)
-    command=project/('START_3D_COMPARISON.cmd' if make_default else 'START_3D_INTEGRATION.cmd')
+    command=project/'launchers'/('START_3D_COMPARISON.cmd' if make_default else 'START_3D_INTEGRATION.cmd')
     for path in (command,param_path,record_path):
         if len(str(path.resolve()).encode('utf-16-le'))//2>=260 or len(path.name.encode('utf-16-le'))//2>255:
             raise ValueError('OneDrive output path exceeds the Windows path contract')
-    command.write_text('@echo off\ncall "%~dp0START_3D_RESULTS.cmd" -Config "%~dp0events\\ankara_2026\\programmes\\okada_mei_sp\\viewer3d_fullbody_1102.json" -Variant '+variant_id+' -Fresh %*\n',encoding='utf8')
+    command.parent.mkdir(parents=True,exist_ok=True)
+    command.write_text('@echo off\ncall "%~dp0START_3D_RESULTS.cmd" -Config "%~dp0..\\events\\ankara_2026\\programmes\\okada_mei_sp\\viewer3d_fullbody_1102.json" -Variant '+variant_id+' -Fresh %*\n',encoding='utf8')
     source_seconds=[float(seconds[0]),float(seconds[-1])]
     continuous_mask=np.zeros(len(seconds),bool)
     for ws,_ in ref.new_refinements:

@@ -1,0 +1,235 @@
+{
+  "schema": "rinkspace.result-viewer.v1",
+  "event": "ankara_2026",
+  "programme": "okada_mei_sp",
+  "shot": "spin_281_repaired_1105",
+  "source_run": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_local_280_1105\\fit1\\continuous_stage\\common\\exmr_hand_nofoot",
+  "scene_root": "runs/body_s01_20261029/fullbody_1102",
+  "scene_label": "camera_solver_refined_1102 冻结场景",
+  "metric_binding": "runs/body_s01_20261029/fullbody_1102/metric_binding.json",
+  "metric_binding_base": "data",
+  "model_asset": "environments/body/GVHMR/inputs/checkpoints/body_models/smplx/SMPLX_NEUTRAL.npz",
+  "default_variant": "local_281",
+  "initial_source_pts": 1044224,
+  "initial_view": "side",
+  "initial_wear_inspection": false,
+  "comparison_variants": [
+    "continuous_refined",
+    "local_281"
+  ],
+  "variants": [
+    {
+      "id": "gvhmr_fixed",
+      "label": "原GVHMR固定初值（旧默认手）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\common\\gvhmr\\initial\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "preserved_original",
+      "body_refinement_intervals_seconds": []
+    },
+    {
+      "id": "exmr_prefoot_old",
+      "label": "原ExMR细化前（旧默认手）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\common\\exmr_prefoot\\initial\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "preserved_original",
+      "body_refinement_intervals_seconds": []
+    },
+    {
+      "id": "hand_nofoot_initial",
+      "label": "HandMR开／FootMR关初值（真实手通道）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\common\\exmr_hand_nofoot\\initial_current_objective\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "exmr_hand_nofoot",
+      "body_refinement_intervals_seconds": []
+    },
+    {
+      "id": "grasp_candidate",
+      "label": "新全链候选（4步，待源图审核）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\common\\exmr_hand_nofoot\\finished\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "exmr_hand_nofoot",
+      "body_refinement_intervals_seconds": [
+        [
+          82.0,
+          94.8
+        ]
+      ]
+    },
+    {
+      "id": "grasp_stage1",
+      "label": "第一阶段3步（保留对照）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\common\\exmr_hand_nofoot\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "preserved_original",
+      "body_refinement_intervals_seconds": []
+    },
+    {
+      "id": "support_located",
+      "label": "最低点误作中点（失败保留）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\support_located\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "exmr_hand_nofoot",
+      "body_refinement_intervals_seconds": []
+    },
+    {
+      "id": "support_midpoint",
+      "label": "支撑刀中点定位（姿态待审核）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_grasp_1104\\support_midpoint\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "exmr_hand_nofoot",
+      "body_refinement_intervals_seconds": []
+    },
+    {
+      "id": "old_root",
+      "label": "旧根修正（失败对照）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\action_integration_1103\\spin_s05\\root_repair\\A_pose\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "preserved_original",
+      "body_refinement_intervals_seconds": []
+    },
+    {
+      "id": "support_foot",
+      "label": "支撑脚位置续算（8步，待原片审核）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_support_foot_1104\\common\\exmr_hand_nofoot\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "exmr_hand_nofoot",
+      "body_refinement_intervals_seconds": [
+        [
+          82.0,
+          94.8
+        ]
+      ]
+    },
+    {
+      "id": "entry_motion",
+      "label": "整段入旋可动候选（6步，待原片审核）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_entry_gravity_1104\\common\\exmr_hand_nofoot\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "exmr_hand_nofoot",
+      "body_refinement_intervals_seconds": [
+        [
+          76.0,
+          95.0
+        ]
+      ]
+    },
+    {
+      "id": "continuous_source",
+      "label": "A 原图连续运动候选（23步，待原片审核）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuous_1105\\source_stage\\common\\exmr_hand_nofoot\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "exmr_hand_nofoot",
+      "body_refinement_intervals_seconds": [
+        [
+          76.0,
+          95.0
+        ]
+      ],
+      "required_saved_diagnostics": [
+        "com_world_mid",
+        "blade_material_world_mid",
+        "skate_witness_world_mid"
+      ]
+    },
+    {
+      "id": "continuous_flight",
+      "label": "B 连续运动＋腾空物理候选（3步，待原片审核）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuous_1105\\flight_stage\\common\\exmr_hand_nofoot\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "exmr_hand_nofoot",
+      "body_refinement_intervals_seconds": [
+        [
+          76.0,
+          95.0
+        ]
+      ],
+      "required_saved_diagnostics": [
+        "com_world_mid",
+        "blade_material_world_mid",
+        "skate_witness_world_mid"
+      ]
+    },
+    {
+      "id": "continuous_refined",
+      "label": "整段优化后续算（46步，待原片审核）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuation_1105\\fit6\\continuous_stage\\common\\exmr_hand_nofoot\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "exmr_hand_nofoot",
+      "body_refinement_intervals_seconds": [
+        [
+          76.0,
+          95.0
+        ]
+      ],
+      "required_saved_diagnostics": [
+        "com_world_mid",
+        "blade_material_world_mid",
+        "skate_witness_world_mid"
+      ]
+    },
+    {
+      "id": "local_281",
+      "label": "281帧附近左右腿关联修复，待审核",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_local_280_1105\\fit1\\continuous_stage\\common\\exmr_hand_nofoot\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "exmr_hand_nofoot",
+      "required_saved_diagnostics": [
+        "com_world_mid",
+        "blade_material_world_mid",
+        "skate_witness_world_mid"
+      ],
+      "body_refinement_intervals_seconds": [
+        [
+          81.2,
+          82.0
+        ]
+      ]
+    }
+  ],
+  "source_identity_field": "source_identity_suspect",
+  "review_status": "Completed local leg-association repair; source/3D accuracy not accepted",
+  "root_repair_status": "Source-supported conditional blade/ice placement is a separate candidate; articulation unchanged; not independent 3D truth",
+  "source_shot": "s05",
+  "source_video": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4",
+  "source_time_base": [
+    1,
+    12800
+  ],
+  "support_observations": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_local_280_1105\\fit1\\continuous_stage\\support_and_free_shoe_regions.json",
+  "support_foot": 1,
+  "support_world_regions": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\support_world_regions.json",
+  "body_window_scope": "One absolute 76-95s body curve; all 951 original source exposures",
+  "camera_comparison": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\camera_comparison.json",
+  "grasp_hand": "left",
+  "free_foot": 0,
+  "relation_document": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_local_280_1105\\fit1\\continuous_stage\\grasp_relations.json",
+  "support_location_document": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_support_midpoint_anchors_1104.json",
+  "session_id": "spin_281_repaired_1105",
+  "initial_visible": {
+    "com": true,
+    "blade_material": true,
+    "contact": true,
+    "trajectory": false,
+    "pelvis": false
+  },
+  "diagnostic_semantics": {
+    "com": "条件米制质量近似，非真实质心",
+    "blade_material": "每只刀固定材料点：后／中／前；不是接冰点",
+    "witness": "移动最低点／接触候选，非真实接冰"
+  },
+  "quality_selection": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuous_1105\\quality_selection.json"
+}

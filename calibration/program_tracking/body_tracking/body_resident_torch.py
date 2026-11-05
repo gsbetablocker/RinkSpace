@@ -14,13 +14,15 @@ from .torch_foot_compatibility import TorchFootCompatibility
 
 
 class ResidentFootLinearization:
-    def __init__(self,reference,ref,binding,*,device='cuda'):
+    def __init__(self,reference,ref,binding,*,device='cuda',direction_batch_size=3):
         from .compact_body_derivatives import resolve_reference
         from .selected_surface_linearization import supports_surface
         owner=resolve_reference(reference)
         if owner is None or not supports_surface(binding.surface):
             raise TypeError('Resident foot path requires audited original body, world and FullSurface')
         self.torch=torch
+        if direction_batch_size not in (1,2,3):raise ValueError('Direction batch must fit one joint (1..3)')
+        self.direction_batch_size=direction_batch_size
         self.device=torch.device(device)
         if self.device.index is None:self.device=torch.device('cuda',torch.cuda.current_device())
         self.dtype=torch.float64
@@ -76,6 +78,7 @@ class ResidentFootLinearization:
         return dict(kind='cuda_resident_native55_selected_skin_foot',device=str(self.device),device_info=self.device_info,
             scope='native55 FK, full486 pose blend, selected union skin, exact +/- replay and live cavity/collar consumers; CPU analytic body images/native camera/CSR/TRF unchanged',
             selected_vertices=self.vertices,samples=self.n,prepare_seconds=self.prepare_seconds,
+            direction_batch_size=self.direction_batch_size,
             prepare_uploaded_bytes=self._prepare_bytes,precision='float64',
             shared_parameters='fixed; changing shared geometry requires a new prepared owner',
             transfer_boundary='one changed N x 69 increment upload; one packed residual/local-Jacobian download per call; no per-column download')
@@ -180,6 +183,46 @@ class ResidentFootLinearization:
         both=self.consumer.evaluate(torch.cat(natives),torch.cat(frames_all),torch.cat(outputs))
         return (both[:self.n]-both[self.n:])/(2*step)
 
+    def _pairs(self,pose,columns,step,subtree):
+        """Replay all axes of one joint in one device consumer invocation.
+
+        Direction/sign/frame axes stay explicit until the consumer boundary.
+        Each +/- state retains its own live max, wall and collar choices.
+        No perturbation, skin dependency or nonsmooth branch is discarded.
+        """
+        k=len(columns);n=self.n;joint=(columns[0]-6)//3+1
+        if any((column-6)//3+1!=joint for column in columns):
+            raise ValueError('A replay batch must share its joint subtree')
+        parent=int(self.parents[joint]);indices,subR,relative=subtree
+        axes=torch.as_tensor([(column-6)%3 for column in columns],device=self.device)
+        directions=self.eye[axes]
+        signs=torch.tensor([1.,-1.],dtype=self.dtype,device=self.device)
+        value=(pose['delta'][:,6:].reshape(n,21,3)[:,joint-1][None,None]
+            +step*signs[None,:,None,None]*directions[:,None,None])
+        changed=self.refLocal[:,joint-1][None,None]@self._rot(value)
+        current=pose['frames'][:,parent][None,None]@changed
+        turn=current@pose['frames'][:,joint].transpose(-1,-2)[None,None]
+        pos=pose['position'][:,:22][None,None].expand(k,2,n,22,3).clone()
+        frames=pose['frames'][None,None].expand(k,2,n,22,3,3).clone()
+        pivot=pose['position'][:,joint,None]
+        pos[:,:,:,indices]=pivot[None,None]+torch.einsum('bsnij,nkj->bsnki',turn,pose['position'][:,indices]-pivot)
+        frames[:,:,:,indices]=turn[:,:,:,None]@pose['frames'][:,indices][None,None]
+        pos[:,:,:,joint]=pose['position'][:,joint][None,None]
+        frames[:,:,:,joint]=current
+        world=pose['P'][None,None,:,None]+torch.einsum('nij,bsnkj->bsnki',pose['Q'],(pos-self.J[0])*self.scale)
+        native=torch.einsum('nji,bsnkj->bsnki',pose['Q'],world-pose['P'][None,None,:,None])
+        local=frames[:,:,:,parent].transpose(-1,-2)@frames[:,:,:,joint]
+        dposed=((local-pose['recovered_local'][:,joint-1][None,None]).reshape(k,2,n,9)
+            @self.posedirs[(joint-1)*9:joint*9]).reshape(k,2,n,self.vertices,3)
+        effect=torch.einsum('nvij,bsnvj->bsnvi',pose['blendR'],dposed)
+        shifted=relative[None,None]+torch.einsum('nvij,bsnvj->bsnvi',subR,dposed)
+        surface_turn=frames[:,:,:,joint]@pose['frames'][:,joint].transpose(-1,-2)[None,None]-self.eye
+        effect+=torch.einsum('bsnij,bsnvj->bsnvi',surface_turn,shifted)
+        samples=pose['samples'][None,None]+effect*self.scale
+        residual=self.consumer.evaluate(native.reshape(k*2*n,22,3),frames.reshape(k*2*n,22,3,3),samples.reshape(k*2*n,self.vertices,3))
+        residual=residual.reshape(k,2,n,self.consumer.compatibility_width)
+        return (residual[:,0]-residual[:,1])/(2*step)
+
     @torch.no_grad()
     def evaluate(self,delta,columns=None,*,step=1e-5):
         values=np.asarray(delta,dtype=np.float64)
@@ -205,11 +248,17 @@ class ResidentFootLinearization:
         residual=self.consumer.evaluate(pose['base_native'],pose['frames'],pose['samples'])
         self._counts['consumer_calls']+=1
         derivatives=[];last_joint=None;subtree=None
-        for column in ([] if columns is None else columns):
-            joint=(column-6)//3+1
+        offset=0;columns=[] if columns is None else columns
+        while offset<len(columns):
+            column=columns[offset];joint=(column-6)//3+1
             if last_joint!=joint:subtree=self._subtree(pose,joint);last_joint=joint
-            derivatives.append(self._pair(pose,column,step,subtree))
-            self._counts['exact_fk_replay_pairs']+=1;self._counts['selected_skin_replay_pairs']+=1;self._counts['consumer_calls']+=1
+            stop=offset+1
+            while stop<len(columns) and stop-offset<self.direction_batch_size and (columns[stop]-6)//3+1==joint:stop+=1
+            batch=columns[offset:stop]
+            if len(batch)==1:derivatives.append(self._pair(pose,column,step,subtree))
+            else:derivatives.extend(self._pairs(pose,batch,step,subtree).unbind(0))
+            self._counts['exact_fk_replay_pairs']+=len(batch);self._counts['selected_skin_replay_pairs']+=len(batch);self._counts['consumer_calls']+=1
+            offset=stop
         packed=torch.cat([residual.reshape(-1)]+[value.reshape(-1) for value in derivatives])
         compute_end.record()
         self._counts['compute_host_enqueue_seconds']+=time.perf_counter()-host

@@ -125,7 +125,7 @@ def measure(problem,report_factor,x,value):
         obs['uv'][frames][core],obs['use'][frames][core],clock[core]),objective_image_cost=value['image_cost'])
     details=report_factor.evaluate(x[17:],False)['metrics']['observations']
     for role in ['fit','review']:
-        for kind,label in [('boot_marker_region','boot'),('support_contact_region','support_region')]:
+        for kind,label in [('boot_marker_region','boot'),('support_contact_region','support_region'),('blade_midpoint_region','blade_midpoint'),('blade_endpoint_region','blade_endpoint')]:
             rows=[r for r in details if r['role']==role and r['kind']==kind and 88*12800<=r['pts']<=92*12800]
             for foot in [0,1]:
                 part=[r for r in rows if r['foot']==foot];pts=np.array([r['pts']for r in part])
@@ -133,7 +133,13 @@ def measure(problem,report_factor,x,value):
                 summary['centre_distance_px']=error_summary(np.array([r['centre_error_px']for r in part]),pts)
                 summary['measurement']='outside finite source region; centre is not an exact observed material point'
                 result['groups'][f'{role}_{label}_foot_{foot}']=summary
-    result['groups']['blade']={'count':0,'reason':problem.support_image.document['blade_unknown_reason']}
+    from .source_track_evidence import summarize_source_regions
+    result['source_regions_all']=summarize_source_regions(details)
+    blade_rows=[r for r in details if r['kind'] in ('blade_midpoint_region','blade_endpoint_region')]
+    result['groups']['blade']=dict(count=len(blade_rows),unique_exposures=len({r['pts'] for r in blade_rows}),
+        fit_count=sum(r['role']=='fit' for r in blade_rows),review_count=sum(r['role']=='review' for r in blade_rows),
+        objective_enabled_count=sum(r.get('optimization_enabled',False) for r in blade_rows),
+        meaning='all reported midpoint/end-kind rows including disabled history; finite source regions, not independent 3D blade truth')
     result['regions']=details
     result['ice_soft']=dict(value['ice']['parts'])
     result['structural_diagnostics']=dict(problem.evaluate(x,False)['gate'])

@@ -157,11 +157,12 @@ def make_case(project,base,output,label,log=None):
 
 def save_packet(problem,info,supports,document,out,*,status,report=None):
     packet=export_candidate(problem.reference.root,out,problem.reference,problem.camera,info,supports)
+    from .actual_observation_ledger import update_actual_observation_ledger,admitted_support_image_mask
+    update_actual_observation_ledger(packet,problem.body)
     apply_source_support(packet,supports,shot_id='s05')
     observed=np.zeros((len(packet['pts']),2),bool)
     if status in ('joint_fit','parameter_replay'):
-        for row in document['observations']:
-            if row['role']=='fit' and row.get('optimization_enabled',True):observed[packet['pts']==row['pts'],row['foot']]=True
+        observed=admitted_support_image_mask(packet['pts'],problem.support_image)
     packet.update(support_image_observations_json=np.array(json.dumps(document,sort_keys=True)),
         support_image_in_optimization=observed,ice_mode=np.array('finite_soft_objective'),
         ice_soft_policy_json=np.array(json.dumps(vars(problem.ice_policy),sort_keys=True)),

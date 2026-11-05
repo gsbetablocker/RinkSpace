@@ -4,7 +4,7 @@
 
 ## 样本入口
 
-在项目根运行 `START_FAST_SOLVER.ps1`，默认配置为 [okada_named66.json](../../configs/solver_runtime/okada_named66.json)。它描述对应历史样本，不是当前四镜头实验入口。源码与配置在项目，源包、完整状态及匹配 DLL 在 Data。
+在项目根运行 `./launchers/START_FAST_SOLVER.ps1`，默认配置为 [okada_named66.json](../../configs/solver_runtime/okada_named66.json)。它描述对应历史样本，不是当前四镜头实验入口。源码与配置在项目，源包、完整状态及匹配 DLL 在 Data。
 
 | PowerShell 参数 | 用途 |
 |---|---|

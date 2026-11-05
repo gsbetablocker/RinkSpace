@@ -101,7 +101,7 @@ def deliver(project, output):
                     dict(id='boot_open', meaning='identical old vertices and motion with an open collar'),
                     dict(id='boot_fitted', meaning='shared foot-boot registration, cavity and contact-driven upper with two refined body windows')],
         viewer_config=str(programme/'viewer3d_boot_1102.json'),
-        viewer_entry=str(project/'START_BOOT_INSPECTION.cmd'),
+        viewer_entry=str(project / 'launchers' / 'START_BOOT_INSPECTION.cmd'),
         replay_entry=str(project/'scripts/run_boot_integration.py'),
         replay_source_hashes=source_hashes, evidence=evidence,
         remaining_scope=['Existing complete articulated body state is S01 only.',

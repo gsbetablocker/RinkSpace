@@ -22,7 +22,8 @@ def prepare(project, data, monkeypatch):
     for name, value in (("feature_registry.json", {"model_id": "synthetic"}),
                         ("scene.json", {}), ("ad2_material_template.json", {}), ("model.json", {})):
         write(model / name, value)
-    (project / "START_POINT_EDITOR.ps1").write_text("# synthetic launcher", encoding="utf-8")
+    (project / "launchers").mkdir()
+    (project / "launchers/START_POINT_EDITOR.ps1").write_text("# synthetic launcher", encoding="utf-8")
     frame = np.zeros((1080, 1920, 3), np.uint8)
     mask = np.zeros((1080, 1920), np.uint8)
     records = []

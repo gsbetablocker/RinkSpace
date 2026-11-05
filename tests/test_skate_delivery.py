@@ -148,5 +148,5 @@ def test_delivery_retains_old_candidate_and_uses_actual_source_scope(tmp_path, m
     assert record['body_scope']['state_kinds'] == ['HaloWindow', 'ContinuousShotWindow']
     assert record['body_scope']['optimized_source_exposures'] == 3
     assert prepared == [variant_id]
-    assert '-Variant '+variant_id in (project/'START_3D_COMPARISON.cmd').read_text(encoding='utf8')
+    assert '-Variant '+variant_id in (project/'launchers/START_3D_COMPARISON.cmd').read_text(encoding='utf8')
     assert json.loads(capsys.readouterr().out)['source_seconds'] == [22.12, 44.96]

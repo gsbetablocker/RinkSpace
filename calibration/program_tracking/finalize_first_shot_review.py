@@ -331,7 +331,7 @@ def publish(validation):
  relative=OUT.relative_to(ROOT).as_posix()
  block=f'''{begin}<section class="surface"><h3>冈田芽衣：第一个镜头取点完成</h3>
 <p>官方50fps：第1–1248帧，源时间00:20.020–00:44.960。已验收1–200帧保持原样；新增201–1248帧共1048帧，等待审核，每帧{min(counts)}–{max(counts)}点，硬上限500。</p>
-<p><a href="{EDITOR_URL}">打开可加点、删点的逐帧页面</a> · <a href="START_POINT_EDITOR.cmd">启动编辑器</a> · <a href="{AssetStore(ROOT).review_page(OUT, 'whole_first_shot_review.html').as_uri()}">完整第一镜头交付快照（1–1248帧）</a> · <a href="{relative}/batch_manifest.json">新增批次记录</a> · <a href="{SOURCE_OUT.relative_to(ROOT).as_posix()}/historical_manual_annotation_inventory.json">人工标注来源</a></p>
+<p><a href="{EDITOR_URL}">打开可加点、删点的逐帧页面</a> · <a href="launchers/START_POINT_EDITOR.cmd">启动编辑器</a> · <a href="{AssetStore(ROOT).review_page(OUT, 'whole_first_shot_review.html').as_uri()}">完整第一镜头交付快照（1–1248帧）</a> · <a href="{relative}/batch_manifest.json">新增批次记录</a> · <a href="{SOURCE_OUT.relative_to(ROOT).as_posix()}/historical_manual_annotation_inventory.json">人工标注来源</a></p>
 <p class="small">B1/B2/C等宽直线取宽度中线；靶圈取指定材料轮廓。广告沿围挡展开面建模。尚未重新求解相机，新增取点尚未由用户验收。</p></section>{end}'''
  require(text.count(begin)==1 and text.count(end)==1,'Review entry markers not unique')
  entry.write_text(re.sub(re.escape(begin)+r'[\s\S]*?'+re.escape(end),lambda _:block,text,count=1),encoding='utf8')

@@ -101,6 +101,35 @@ def test_empty_explicit_ids_append_without_deleting_existing_same_group_points(p
                for change in merged['changes'])
 
 
+def test_independent_append_packets_share_curve_exposure_without_losing_fragments(parent_packet):
+    _,old,state,manifest,mapping,packet_mapping,_=parent_packet
+    for group in packet_mapping['source_replacement']['groups']:group['parent_observation_ids']=[]
+    first=authenticate(parent_packet)
+    second=copy.deepcopy(first)
+    second['points']['observation_ids']=np.array(['new-far-0','new-far-1'],dtype='U96')
+    second['points']['source_rows']+=100
+    second['points']['uv'][:,1]-=600
+    merged=update.replace_source_groups(old,state,manifest,mapping,[first,second])
+    assert len(merged['points']['pts'])==9 and not len(merged['removed'])
+    assert_parent_exact(merged,old,state,range(5))
+    for packet_index,packet in enumerate([first,second]):
+        indices=np.flatnonzero(merged['packet_indices']==packet_index)
+        for name in old:np.testing.assert_array_equal(merged['points'][name][indices],packet['points'][name])
+    assert all(change['packet_indices']==[0,1] for change in merged['changes'])
+
+
+@pytest.mark.parametrize('retiring_packet',[0,1])
+def test_actual_replacement_authority_cannot_share_a_group_with_append(parent_packet,retiring_packet):
+    _,old,state,manifest,mapping,packet_mapping,_=parent_packet
+    retiring=authenticate(parent_packet)
+    for group in packet_mapping['source_replacement']['groups']:group['parent_observation_ids']=[]
+    appending=authenticate(parent_packet)
+    packets=[appending,appending]
+    packets[retiring_packet]=retiring
+    with pytest.raises(ValueError,match='Multiple packets claim'):
+        update.replace_source_groups(old,state,manifest,mapping,packets)
+
+
 @pytest.mark.parametrize('invalid,message',[
     ('bad_sha','parent point input SHA256'),('unknown_id','exactly one current parent'),
     ('foreign_shot','another shot'),('foreign_pts','PTS/path'),('foreign_path','PTS/path'),

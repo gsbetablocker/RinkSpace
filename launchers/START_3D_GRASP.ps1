@@ -1,7 +1,7 @@
 ﻿[CmdletBinding()]
 param([string]$Variant='support_midpoint',[switch]$Fresh,[switch]$Wait,[switch]$Check)
 $ErrorActionPreference='Stop'
-$configPath=Join-Path $PSScriptRoot 'events/ankara_2026/programmes/okada_mei_sp/viewer3d_spin_grasp_1104.json'
+$configPath=Join-Path (Split-Path -Parent $PSScriptRoot) 'events/ankara_2026/programmes/okada_mei_sp/viewer3d_spin_grasp_1104.json'
 if ($Check) {
  $config=Get-Content -LiteralPath $configPath -Raw -Encoding UTF8 | ConvertFrom-Json
  if (-not (Test-Path -LiteralPath $config.source_video)) { throw 'Source video missing' }

@@ -25,7 +25,7 @@ class SourceReviewTests(unittest.TestCase):
         files = {'README.md': '# Test project', 'pyproject.toml': '[project]\nname="fixture"',
                  'LICENSE.md': '# Fixture licence', 'MAINTENANCE.md': '# Maintenance',
                  'environments/README.md': '# Environment', 'calibration/example.py': 'value = 1',
-                 'START_LOCAL.cmd': '@echo off', 'INSTALL_LOCAL.cmd': '@echo off',
+                 'launchers/START_LOCAL.cmd': '@echo off', 'launchers/INSTALL_LOCAL.cmd': '@echo off',
                  'src/fixture.py': 'value = 1\n', 'tests/test_fixture.py': 'assert True\n',
                  'docs/ARCHITECTURE.md': '# Public architecture', 'docs/PRIVACY_REVIEW.md': 'LOCAL_WORK_RECORD',
                  'configs/project.example.json': '{"sources":{}}', 'configs/holdout_lock.json': '{}',
