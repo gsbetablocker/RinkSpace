@@ -1,0 +1,53 @@
+{
+  "schema": "rinkspace.runner-support-mode.v1",
+  "source_id": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "shot_id": "s05",
+  "time_base": [
+    1,
+    12800
+  ],
+  "objective_weight": 20.0,
+  "weight_provenance": "Same finite 20 coefficient as existing continuous-support block, not an escalation or contact acceptance threshold",
+  "quadrature_stride": 2,
+  "intervals": [
+    {
+      "id": "s05_supported_spin_runner_mode",
+      "foot": 1,
+      "start_pts": 1111040,
+      "end_pts": 1183488,
+      "state": "supported",
+      "role": "fit",
+      "optimization_enabled": true,
+      "mode": "runner_interior",
+      "source_evidence_pts": [
+        1090560,
+        1121792,
+        1146368,
+        1177344,
+        1183488
+      ],
+      "foot_identity": "existing conditional foot1/right support episode, unchanged",
+      "provenance": "User 2026-11-05 reports supported spinning on runner instead of heel/toe-pick walking; consistent with existing supported/grip phase and five source-image development reviews. Finite mechanical phase hypothesis, not per-frame truth."
+    }
+  ],
+  "source_review": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\blade_support_profile_1105\\source_profile_review.json",
+  "source_review_sha256": "b45c45daea2c8d8ee8d1dfaee038edf34cff4ca85b11210b5ee7cc1c8299d34d",
+  "longitudinal_contact_location": "unknown",
+  "exact_material_contact": "unknown",
+  "source_steel_pixel_observations_added": 0,
+  "normalization": {
+    "normal_fan": "half norm of fixed runner front-minus-rear unit tangent",
+    "pick_gap": "fixed template blade_web_height_m; normalization only, no acceptance band"
+  },
+  "preserved": {
+    "finite_ice_policy": true,
+    "curved_blade": true,
+    "bank_roll": true,
+    "foot_episode": true,
+    "camera": true,
+    "template_dimensions": true,
+    "units": true
+  },
+  "not_a_force_or_exact_height_measurement": true,
+  "independent_final_validation": false
+}

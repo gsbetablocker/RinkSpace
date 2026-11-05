@@ -92,19 +92,25 @@ def region_terms(uv,row,delta=2.):
     return w*k*e,w*(k*np.eye(2)+2*dk*np.outer(e,e))@De,float(np.linalg.norm(uv-row['centre_uv'])*max(0.,1-1/max(r,1e-30)))
 
 
+def source_sample_indices(pts,seconds,phase_boundaries_seconds):
+    """Keep native source samples and phase boundaries inside this context."""
+    pts=np.asarray(pts);source=pts/12800.
+    selected=(source>=seconds[0])&(source<=seconds[1])
+    boundaries=[round(v*12800) for v in phase_boundaries_seconds]
+    return np.unique(np.r_[np.flatnonzero(selected)[::2],
+        np.flatnonzero(selected&np.isin(pts,boundaries))])
+
+
 class SpinGraspFactors:
     def __init__(self,problem,relations):
         self.problem=problem;self.body=problem.body;self.ref=problem.reference;self.binding=problem.binding
         self.relations=relations;self.geometry=self.ref.grasp_geometry;self.config=relations['factor_parameters']
-        pts=self.ref.p['pts'];origin=pts[0]/12800.;source=pts/12800.
-        selected=(source>=self.body.state.seconds[0])&(source<=self.body.state.seconds[1])
-        chosen=np.flatnonzero(selected)[::2]
-        boundaries=[round(v*12800) for v in relations['phase_boundaries_seconds']]
-        chosen=np.unique(np.r_[chosen,np.flatnonzero(np.isin(pts,boundaries))]);self.pts=pts[chosen]
+        pts=self.ref.p['pts']
+        chosen=source_sample_indices(pts,self.body.state.seconds,relations['phase_boundaries_seconds']);self.pts=pts[chosen]
         self.times=(self.pts-pts[0])/12800.;self.base=self.ref.at(self.times);self.B=self.body.state.basis(self.times)
         held=relations['grip_interval'];interval=GripInterval(source_id=relations['source_id'],shot_id=relations['shot_id'],time_base=tuple(relations['time_base']),**{k:tuple(v) if k=='evidence_pts' else v for k,v in held.items() if k in ('start_pts','end_pts','hand','foot','state','role','evidence_pts','provenance')})
         self.held=interval.admitted_pts(self.pts,source_id=relations['source_id'],shot_id=relations['shot_id'],time_base=relations['time_base'])
-        self.grip_weights=trapezoid_time_weights(self.times[self.held],singleton_duration_s=.04)
+        self.grip_weights=trapezoid_time_weights(self.times[self.held],singleton_duration_s=.04) if self.held.any() else np.empty(0)
         self.joints=np.array([1,2,4,5,7,8,16,17,18,19,20,21]);self.last=None
         self.support_mask=np.zeros(len(self.pts),bool);self.support_phase_weight=np.zeros(len(self.pts))
         for interval in relations['support_intervals']:
@@ -167,7 +173,7 @@ class SpinGraspFactors:
     def evaluate(self,x,jacobian=False):
         d=self.body.state.increments(x,self.times);X,H,R,O=self.geometry_at(d);cfg=self.config['grip'];seg=np.asarray(self.geometry['segment_local_solver'])*self.binding.ratio
         grip=[grip_to_segment_factor(H[i],R[i],O[i],seg[0],seg[1],quadrature_seconds=float(w),**cfg) for i,w in zip(np.flatnonzero(self.held),self.grip_weights)]
-        rg=np.concatenate([v['residual'] for v in grip]);motion=self.config['local_motion']
+        rg=np.concatenate([v['residual'] for v in grip]) if grip else np.empty(0);motion=self.config['local_motion']
         temporal=actual_local_acceleration_factor(X,self.times,scale_m_s2=motion['scale_m_s2'],objective_weight=motion['weight'],fixed_point_weights=np.r_[np.ones(len(self.joints)),.2],robust_delta=motion['robust_delta'])
         sec=self.pts[1:-1]/12800.;phase=np.where((sec>=86.8)&(sec<=92.46),1.,.18);scale=np.repeat(np.sqrt(phase),X.shape[1]*3)
         rt=temporal['residual']*scale;Jg=Jt=None
@@ -180,8 +186,8 @@ class SpinGraspFactors:
                 dx.append((Xa-Xb)/(2*hstep));eta=vee(R.swapaxes(1,2)@((Ra-Rb)/(2*hstep)))
                 values=[]
                 for i,v in zip(np.flatnonzero(self.held),grip):values.append(v['jacobian_palm_world']@((Ha[i]-Hb[i])/(2*hstep))+v['jacobian_shoe_origin']@((Oa[i]-Ob[i])/(2*hstep))+v['jacobian_shoe_right_rotation']@eta[i])
-                dg.append(np.asarray(values))
-            Jg=d.chain(np.stack(dg,-1),sample_indices=np.flatnonzero(self.held)) if hasattr(d,'chain') else spline_chain(np.stack(dg,-1),self.B[self.held])
+                dg.append(np.asarray(values).reshape(-1,3))
+            Jg=(d.chain(np.stack(dg,-1),sample_indices=np.flatnonzero(self.held)) if hasattr(d,'chain') else spline_chain(np.stack(dg,-1),self.B[self.held])) if grip else csr_matrix((0,self.body.size))
             local=np.stack(dx,-1).reshape(len(X),-1,self.body.state.d)
             pointJ=d.chain(local) if hasattr(d,'chain') else spline_chain(local,self.B)
             D2=csr_matrix(temporal['second_difference_operator']);A=block_diag(list(temporal['jacobian_per_acceleration'].reshape(-1,3,3)),format='csr')

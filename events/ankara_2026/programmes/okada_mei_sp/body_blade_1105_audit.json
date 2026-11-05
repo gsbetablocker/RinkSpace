@@ -1,0 +1,387 @@
+{
+  "schema": "rinkspace.s05-blade-review-public-audit.v1",
+  "baseline": "0078c8db0e50e36993b67cb29aed61b2fca3e7fc",
+  "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "source_time_base": [
+    1,
+    12800
+  ],
+  "scope_pts": [
+    972800,
+    1216000
+  ],
+  "native_exposures": 951,
+  "network_initialization": "existing ExMR camera-space hand/nofoot current body; no inference rerun",
+  "implemented": [
+    "current-only saved absolute body reference and native five-node blade projection",
+    "finite boot heel/toe regions and 180-degree symmetric boot-axis factors on existing ankle controls",
+    "clip grasp phase samples to source context and handle empty grip rows/Jacobian",
+    "finite source-gated runner normal-fan/pick support-mode prior on existing body state",
+    "saved exactPTS source/model overlays and pitch/roll/runner profile diagnostics"
+  ],
+  "state_invariants": {
+    "camera_frozen": true,
+    "template_frozen": true,
+    "static_footwear_binding_frozen": true,
+    "scale_and_time_frozen": true,
+    "no_per_frame_shoe_DOF": true,
+    "finite_ice_policy_unchanged": true,
+    "no_ice_AL_or_penalty_escalation": true,
+    "original_candidates_preserved": true,
+    "default_variant": "local_281"
+  },
+  "candidates": [
+    {
+      "id": "boot_axis_entry",
+      "parameter": "spin_boot_axis_entry_1105.npz",
+      "parameter_sha256": "1906c74efc55dcf00617f2d42599be25ff3e8f86a7c96ba2556226691401590e",
+      "result_data_relative": "runs/body_s01_20261029/blade_orientation_1105/entry_81_2_82_0/common/exmr_hand_nofoot/fitted/result.npz",
+      "result_sha256": "3d16a2de92b78a4dcfbbf370a15a2cb9cf84b3a904e9ff032851cd5dfb4a5aeb",
+      "summary_data_relative": "runs/body_s01_20261029/blade_orientation_1105/entry_81_2_82_0/run_summary.json",
+      "summary_sha256": "c6857959efc390b65658b97d142dbceeb3f199fee470c97d91e9df072154d993",
+      "core_seconds": [
+        81.2,
+        82.0
+      ],
+      "context_seconds": [
+        80.8,
+        82.4
+      ],
+      "accepted_steps": 8,
+      "retained_step": 8,
+      "wall_seconds": 48.94668900000397,
+      "stop_codes": [
+        "accepted_budget"
+      ],
+      "converged": false,
+      "source_accuracy_accepted": false,
+      "user_accepted": false,
+      "default": false
+    },
+    {
+      "id": "boot_axis_support",
+      "parameter": "spin_boot_axis_support_1105.npz",
+      "parameter_sha256": "34ecf77f623836a0decaf977b4d21964a8fb07e15848d240004da20d56f412ae",
+      "result_data_relative": "runs/body_s01_20261029/blade_orientation_1105/support_87_6_90_0/common/exmr_hand_nofoot/fitted/result.npz",
+      "result_sha256": "56903158dbe88c96d756fd11d4ea224133d93271e5bef252b164a8898872cc7b",
+      "summary_data_relative": "runs/body_s01_20261029/blade_orientation_1105/support_87_6_90_0/run_summary.json",
+      "summary_sha256": "5a31a0cbaf43b2477f5fe544fa7a0483f95fce513186620e3ee83b42cee51fff",
+      "core_seconds": [
+        87.6,
+        90.0
+      ],
+      "context_seconds": [
+        87.2,
+        90.4
+      ],
+      "accepted_steps": 8,
+      "retained_step": 8,
+      "wall_seconds": 66.19109049999679,
+      "stop_codes": [
+        "accepted_budget"
+      ],
+      "converged": false,
+      "source_accuracy_accepted": false,
+      "user_accepted": false,
+      "default": false
+    },
+    {
+      "id": "runner_support",
+      "parameter": "spin_runner_support_1105.npz",
+      "parameter_sha256": "72446e763fa0da2a1c2cac7752bc21d32a70eeb1b4569168eb33a4fc85e90562",
+      "result_data_relative": "runs/body_s01_20261029/blade_support_profile_1105/runner_support_run/common/exmr_hand_nofoot/fitted/result.npz",
+      "result_sha256": "c1069c27a853e7c2c49244a23d343a0525ad5081b56d897c45cbdbcb1b8558cb",
+      "summary_data_relative": "runs/body_s01_20261029/blade_support_profile_1105/runner_support_run/run_summary.json",
+      "summary_sha256": "1caf345130551f9d3c08682278dab10f2a8c9c3558b008be4a3ab879906d743f",
+      "core_seconds": [
+        86.8,
+        92.46
+      ],
+      "context_seconds": [
+        86.4,
+        92.86
+      ],
+      "accepted_steps": 8,
+      "retained_step": 8,
+      "wall_seconds": 91.22399210000003,
+      "stop_codes": [
+        "accepted_budget"
+      ],
+      "converged": false,
+      "source_accuracy_accepted": false,
+      "user_accepted": false,
+      "default": false
+    }
+  ],
+  "runner_actual_new_objective": {
+    "conditional_prior_samples": 143,
+    "residual_scalar_rows": 429,
+    "new_source_pixel_observations": 0,
+    "normalization": "fixed runner tangent fan / fixed template blade web; not accuracy thresholds",
+    "objective_mode_costs": {
+      "before": {
+        "total": 121.00080424130073,
+        "normal_fan": 120.5261815094633,
+        "runner_pick": 0.47462273183741555
+      },
+      "after": {
+        "total": 1.788532544723453,
+        "normal_fan": 1.7877219822886599,
+        "runner_pick": 0.0008105624347931217
+      }
+    },
+    "directional_relative_error": 4.140694906109502e-09,
+    "source_material_contact": "unknown"
+  },
+  "runner_geometry_diagnostics": {
+    "boot_axis_entry": {
+      "frames": 951,
+      "support_seconds": [
+        86.8,
+        92.46
+      ],
+      "support_foot": 1,
+      "support_exposures": 284,
+      "pitch_degrees_min_q25_median_q75_max": [
+        -42.75910417917875,
+        -31.146108323488647,
+        -25.464777411406978,
+        -15.929063349540353,
+        19.256561579641904
+      ],
+      "roll_degrees_min_median_max": [
+        2.9807796167942993,
+        16.49503833251479,
+        35.225793451136774
+      ],
+      "whole_runner_rear_endpoint_frames": 5,
+      "whole_runner_front_endpoint_frames": 226,
+      "runner_interior_frames": 53,
+      "raw_toe_pick_lowest_frames": 178,
+      "runner_min_height_m_min_median_max": [
+        -0.011759664689287888,
+        0.02625959914930607,
+        0.07796688944945684
+      ],
+      "runner_minus_pick_m_min_median_max": [
+        -0.09762546481337314,
+        0.00043672083353547136,
+        0.003884665866064254
+      ],
+      "station_height_m_min_median_max": [
+        [
+          0.05617760937433943,
+          0.04606861706612176,
+          -0.011352516565283296
+        ],
+        [
+          0.13207775798439875,
+          0.07123824799868637,
+          0.026765594710023193
+        ],
+        [
+          0.19242644956943653,
+          0.10795662703244226,
+          0.16399850346534628
+        ]
+      ],
+      "station_lower_edge_height_m_min_median_max": [
+        [
+          0.05587928329196813,
+          0.04580532857449172,
+          -0.01175966468928797
+        ],
+        [
+          0.13156107176669274,
+          0.07077429227879814,
+          0.026259599149305975
+        ],
+        [
+          0.1916623704722907,
+          0.10760113361224245,
+          0.16364301004514648
+        ]
+      ],
+      "source_pts_equal": true,
+      "geometry_matches_saved": true
+    },
+    "runner_support": {
+      "frames": 951,
+      "support_seconds": [
+        86.8,
+        92.46
+      ],
+      "support_foot": 1,
+      "support_exposures": 284,
+      "pitch_degrees_min_q25_median_q75_max": [
+        -27.235687774275466,
+        -15.634522811145143,
+        -15.14208154467087,
+        -13.751397058035149,
+        8.768060036696808
+      ],
+      "roll_degrees_min_median_max": [
+        1.1033904873203115,
+        11.08335821681186,
+        23.076005321646402
+      ],
+      "whole_runner_rear_endpoint_frames": 4,
+      "whole_runner_front_endpoint_frames": 196,
+      "runner_interior_frames": 84,
+      "raw_toe_pick_lowest_frames": 3,
+      "runner_min_height_m_min_median_max": [
+        0.02966125539818213,
+        0.04527512636752486,
+        0.07518532554986403
+      ],
+      "runner_minus_pick_m_min_median_max": [
+        -0.05008739741698502,
+        -5.551115123125783e-17,
+        0.0005460421812505598
+      ],
+      "station_height_m_min_median_max": [
+        [
+          0.05522306364580201,
+          0.044882375493592926,
+          0.03038791563975686
+        ],
+        [
+          0.10539700244009917,
+          0.06792818669699782,
+          0.04638442417940945
+        ],
+        [
+          0.15221920994831947,
+          0.09284318971106278,
+          0.11958605290869381
+        ]
+      ],
+      "station_lower_edge_height_m_min_median_max": [
+        [
+          0.05492440316577518,
+          0.04458996136954461,
+          0.030080535656665762
+        ],
+        [
+          0.10486197012628798,
+          0.06748887250230762,
+          0.04596625994938218
+        ],
+        [
+          0.15206012780870776,
+          0.092587344861132,
+          0.11926103945240553
+        ]
+      ],
+      "source_pts_equal": true,
+      "geometry_matches_saved": true
+    }
+  },
+  "source_association_warning": "Legacy finite endpoint correspondences and support episode remain conditional. Visible steel subsegments are not certified whole-blade endpoints, and model lowest features are not measured contact/force.",
+  "remaining_failures": [
+    "runner front endpoint minimum still 196/284 supported-spin native exposures; heel 4/284",
+    "91.68s native projection still visibly differs from the source steel under the boot",
+    "median raw nominal reference runner height increases 2.626cm to4.528cm; not measured actual ice clearance",
+    "77.92-77.94s blade-axis pulse unresolved; 85/93s reviewed samples lack safe identities/full-axis evidence",
+    "static footwear registration and ankle pose are not uniquely identifiable with sparse monocular evidence",
+    "first two boot-axis runs did not capture the exact pre-run driver snapshot; no missing snapshot synthesized",
+    "pose_cost relative guard unavailable for runner run; null is not a quality pass"
+  ],
+  "accuracy_accepted": false,
+  "task_all_complete": false,
+  "user_accepted": false,
+  "source_helpers_index": "../../../../calibration/program_tracking/body_tracking/source_helpers/blade_1105/source_index.json",
+  "offline_records": [
+    {
+      "data_relative_path": "runs/body_s01_20261029/blade_observability_1105/blade_observability_audit.json",
+      "sha256": "3bf874d9c7a2a04cab098f28f81abca15fc39bc3b9156c9ca112c00a04e56b98",
+      "bytes": 5984508
+    },
+    {
+      "data_relative_path": "runs/body_s01_20261029/blade_observability_1105/factor_assembly_audit.json",
+      "sha256": "4d1b0bd256fce0d5a863c4a565e10764f7b1778cf4ba7d8eef6f06b4ddba6d7d",
+      "bytes": 3850964
+    },
+    {
+      "data_relative_path": "runs/body_s01_20261029/blade_observability_1105/dual_source_manifest.json",
+      "sha256": "18693f31ce90fc99c0889449c792f171f560811184e2aec99962648115e52cd0",
+      "bytes": 378352
+    },
+    {
+      "data_relative_path": "runs/body_s01_20261029/blade_orientation_1105/blade_boot_integration_audit.json",
+      "sha256": "01d44171d00f6817d294490f3a32c3a6afe777f7dc67940931d2fbf5af199f56",
+      "bytes": 17958
+    },
+    {
+      "data_relative_path": "runs/body_s01_20261029/blade_orientation_1105/blade_axis_projection_comparison.csv",
+      "sha256": "037e772bc3e66915e6c697834f54ca0a24e9a36fd19ccc21aefae63d39eece8a",
+      "bytes": 379117
+    },
+    {
+      "data_relative_path": "runs/body_s01_20261029/blade_orientation_1105/blade_orientation_anomaly_report.json",
+      "sha256": "731e1977dfd38ec2a69051c93b950152d31312f6565d9159798d10a82cdaf106",
+      "bytes": 2081913
+    },
+    {
+      "data_relative_path": "runs/body_s01_20261029/blade_orientation_1105/counterfactual_projection_study.json",
+      "sha256": "90fbf121bea9c2604dcbe41579a45da4684fa8be82b5a7d1dac1779117ad97e4",
+      "bytes": 60232
+    },
+    {
+      "data_relative_path": "runs/body_s01_20261029/blade_orientation_1105/source_axis_geometry_review.json",
+      "sha256": "c1eb537915a29b814adf4ab19ad8de8141526a8fac5f1aaed9ca8c0bd08c8d17",
+      "bytes": 22228
+    },
+    {
+      "data_relative_path": "runs/body_s01_20261029/blade_orientation_1105/BLADE_FIX_REPORT_ZH.md",
+      "sha256": "223a74a445eb3132209c6ce3ba31f5417adc53eaf3200c1f3a05aa8c581fc17b",
+      "bytes": 3745
+    },
+    {
+      "data_relative_path": "runs/body_s01_20261029/blade_support_profile_1105/phase_clip_before_after.json",
+      "sha256": "fbb60801cc9e5566ed2d57e1ec15c86dc83ee23aee14c2879d882d689d58a3c0",
+      "bytes": 246670
+    },
+    {
+      "data_relative_path": "runs/body_s01_20261029/blade_support_profile_1105/constraint_mechanism.json",
+      "sha256": "5fded684c5b39238d9bade7130964f91fd6e9a235719f4b2bc02762901fa59c9",
+      "bytes": 136839
+    },
+    {
+      "data_relative_path": "runs/body_s01_20261029/blade_support_profile_1105/source_profile_review.json",
+      "sha256": "b45c45daea2c8d8ee8d1dfaee038edf34cff4ca85b11210b5ee7cc1c8299d34d",
+      "bytes": 22879
+    },
+    {
+      "data_relative_path": "runs/body_s01_20261029/blade_support_profile_1105/candidate_visual_review.json",
+      "sha256": "b1dea94438b42add39e4d0aee56780a3f68a17290ed71e6b6b4014088139935e",
+      "bytes": 6449
+    },
+    {
+      "data_relative_path": "runs/body_s01_20261029/blade_support_profile_1105/runner_support_outcome.json",
+      "sha256": "bcc735e501d527788c80d3c609c4ef87ddc18b7b28714ba429a6bd4941ce5c12",
+      "bytes": 4970
+    },
+    {
+      "data_relative_path": "runs/body_s01_20261029/blade_support_profile_1105/source_region_change_groups.json",
+      "sha256": "ccce689e7914a9971339aa1604b4c132d2c2a299253ad8d69087e6d2076889a7",
+      "bytes": 5757
+    },
+    {
+      "data_relative_path": "runs/body_s01_20261029/blade_support_profile_1105/same_frame_comparison_manifest.json",
+      "sha256": "f5f67c655ce1af0b0c82f317a20ac997425d452d5222f9a5819590c42522e4fd",
+      "bytes": 3857
+    },
+    {
+      "data_relative_path": "runs/body_s01_20261029/blade_support_profile_1105/RUNNER_SUPPORT_REPORT_ZH.md",
+      "sha256": "e3a9348728aa387e6637b44e4eba045c1ab39c8f8c4052af5a013c8e8ca5cd1f",
+      "bytes": 5878
+    },
+    {
+      "data_relative_path": "runs/body_s01_20261029/blade_support_profile_1105/task_completion_status.json",
+      "sha256": "1b5fcb92d83407f032c654bad1d5c53ad4f546feae5e89d48db878ea5465bd78",
+      "bytes": 1782
+    }
+  ],
+  "public_review_boundary": "Only own code, compact controls/numerical source observations and factual indices. No broadcast pixels, SMPL-X model/template/weights/full surface, full fitted output, environments or viewer cache."
+}

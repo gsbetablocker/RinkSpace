@@ -15,6 +15,7 @@ from .data import ResultCatalog, CachedSequence, shell_triangles, ribbon_triangl
 from .framing import fit_comparison_camera, comparison_panel_sizes
 from .imgui_buffers import install_dynamic_buffers
 from .source import SourceVideo, SupportObservations, region_outline, source_value, observation_used, load_world_regions
+from .blade_review import BladeReview, overlay_primitives, diagnostic_lines
 
 
 class FrameObserver(Node):
@@ -82,6 +83,10 @@ class ResultsPlayer(Viewer):
         self.source_error = ''
         self.source_regions = (SupportObservations(catalog.support_observations,catalog.time_base,shot=catalog.config.get('source_shot'))
                                if catalog.support_observations else None)
+        review_asset=catalog.config.get('blade_review_asset')
+        self.blade_review=(BladeReview(catalog.assets.resolve(review_asset,must_exist=True),
+                                      assets=catalog.assets,time_base=catalog.time_base) if review_asset else None)
+        self.show_blade_review=True
         self.world_region_nodes = []
         self._build_rink()
         old = self._read_session() if restore else {}
@@ -246,6 +251,9 @@ class ResultsPlayer(Viewer):
                 for index,(label,color) in enumerate((('rear',(.3,.45,1.,1.)),('middle',(1.,.86,.15,1.)),('front',(.94,.98,1.,1.)))):
                     material_nodes.append(keep(Spheres(s['blade_material_world_mid'][:,:,index],radius=.005,
                         color=color,name='Saved fixed blade material station '+label,is_selectable=False)))
+                for foot in range(2):
+                    material_nodes.append(keep(Lines(s['blade_material_world_mid'][:,foot][:,[0,2]],r_base=.0015,
+                        color=(.3,.45,1.,1.),name='Saved fixed blade rear-to-front axis '+str(foot),is_selectable=False)))
             if versioned_skate:
                 for foot in range(2):
                     diamond=np.array([[0,0,1],[1,0,0],[0,1,0],[-1,0,0],[0,-1,0],[0,0,-1]],float)
@@ -527,6 +535,9 @@ class ResultsPlayer(Viewer):
                 pts=int(self.catalog.pts[self.frame]);state=self.sequence.state
                 imgui.text('原片 PTS %d  |  time_base %d/%d'%(pts,*self.catalog.time_base))
                 imgui.text('当前保存版本：'+self.variant['id'])
+                if self.blade_review is not None:
+                    _,self.show_blade_review=imgui.checkbox('原片叠加：鞋轴、刀材料轴和源区域',self.show_blade_review)
+                    imgui.text_wrapped('模型鞋轴橙；刀后蓝／中黄／前白；源观测绿。可见钢子段不是整刀轴或材料前后端。')
                 mask=state.get('support_image_in_optimization')
                 used='unknown（未保存）' if mask is None else ('是' if np.any(mask) else '否')
                 imgui.text('此版本是否使用新增原图观测：'+used)
@@ -547,37 +558,62 @@ class ResultsPlayer(Viewer):
                 if self.source_error:
                     imgui.text_wrapped('当前原片帧不可用：'+self.source_error)
                 elif self.source_texture_pts==pts:
-                    rows=self.source_regions.at(pts) if self.source_regions else []
+                    review=self.blade_review.at(self.variant['id'],pts) if self.blade_review is not None else None
+                    if review is not None:
+                        rows=review['source_regions'] if self.show_blade_review else []
+                    else:rows=self.source_regions.at(pts) if self.source_regions else []
+                    primitives=overlay_primitives(review) if review is not None and self.show_blade_review else []
                     width,height=self.source_image_size
                     display_width=max(100.,imgui.get_content_region_available()[0])
-                    self.gui_source_image(rows,(0.,0.,float(width),float(height)),display_width)
-                    if rows:
-                        points=np.concatenate([region_outline(row) for row in rows])
+                    self.gui_source_image(rows,(0.,0.,float(width),float(height)),display_width,primitives)
+                    bounds=[primitive['points'] for primitive in primitives if primitive['kind']!='text']
+                    if review is None:bounds=[region_outline(row) for row in rows]
+                    if bounds:
+                        points=np.concatenate(bounds)
                         lower=np.maximum(points.min(0)-35,0);upper=np.minimum(points.max(0)+35,[width,height])
-                        imgui.text('当前源区域放大（fit 橙 / review 紫）')
-                        crop_width=min(display_width,240.*(upper[0]-lower[0])/max(upper[1]-lower[1],1.))
-                        self.gui_source_image(rows,(*lower,*upper),crop_width)
-                    else:imgui.text('本曝光无原图区域；不沿用相邻帧区域。')
+                        if np.all(upper>lower):
+                            imgui.text('当前鞋／刀轴与源区域放大（源绿）' if review is not None else '当前源区域放大（fit 橙 / review 紫）')
+                            crop_width=min(display_width,240.*(upper[0]-lower[0])/max(upper[1]-lower[1],1.))
+                            self.gui_source_image(rows,(*lower,*upper),crop_width,primitives)
+                    elif self.show_blade_review or review is None:imgui.text('本曝光无原图区域；不沿用相邻帧区域。')
                     for row in rows:
                         used=observation_used(state,row,self.frame)
                         used_label='unknown' if used=='unknown' else ('是' if used else '否')
                         imgui.text_wrapped('%s | foot=%s | %s | %s | 本PTS/foot新增观测入优化=%s'%
                             (row.get('id',''),row.get('foot','unknown'),row['role'],row['kind'],used_label))
+                    if review is not None and self.show_blade_review:
+                        for row in review['source_boot_axes']:
+                            imgui.text_wrapped('源鞋轴 foot=%d | %s | 不确定性：%s'%
+                                (row['foot'],row.get('role','unknown'),row.get('source_uncertainty','unknown')))
+                        for row in review['source_steel_segments']:
+                            imgui.text_wrapped('原片可见钢子段 foot=%d（非刀前后端）| %s'%
+                                (row['foot'],row.get('uncertainty','unknown')))
                 imgui.text_wrapped('区域来自原图；3D范围为同源名义平面条件诊断，不是第二份观测。')
             imgui.end()
 
-    def gui_source_image(self,rows,crop,display_width):
-        """Draw native pixel ellipses over a source texture, without projection."""
+    def gui_source_image(self,rows,crop,display_width,primitives=()):
+        """Draw saved native pixels/projections; no geometry is inferred here."""
         left,top,right,bottom=crop;width,height=self.source_image_size
         scale=display_width/max(right-left,1.);display_height=(bottom-top)*scale
         x,y=imgui.get_cursor_screen_pos()
         imgui.image(self.source_texture.glo,display_width,display_height,
             uv0=(left/width,top/height),uv1=(right/width,bottom/height))
         draw=imgui.get_window_draw_list()
-        for row in rows:
-            outline=region_outline(row);points=(outline-[left,top])*scale+[x,y]
-            color=imgui.get_color_u32_rgba(*((1.,.64,.12,1.) if row['role']=='fit' else (.75,.4,1.,1.)))
-            for a,b in zip(points[:-1],points[1:]):draw.add_line(*map(float,a),*map(float,b),color,2.)
+        draw.push_clip_rect(x,y,x+display_width,y+display_height,True)
+        try:
+            if self.blade_review is None:
+                for row in rows:
+                    outline=region_outline(row);points=(outline-[left,top])*scale+[x,y]
+                    color=imgui.get_color_u32_rgba(*((1.,.64,.12,1.) if row['role']=='fit' else (.75,.4,1.,1.)))
+                    for a,b in zip(points[:-1],points[1:]):draw.add_line(*map(float,a),*map(float,b),color,2.)
+            for primitive in primitives:
+                points=(primitive['points']-[left,top])*scale+[x,y]
+                color=imgui.get_color_u32_rgba(*primitive['color'])
+                if primitive['kind']=='line':
+                    for a,b in zip(points[:-1],points[1:]):draw.add_line(*map(float,a),*map(float,b),color,primitive['width'])
+                elif primitive['kind']=='point':draw.add_circle_filled(*map(float,points[0]),3.,color)
+                else:draw.add_text(float(points[0,0]+4),float(points[0,1]+3),color,primitive['text'])
+        finally:draw.pop_clip_rect()
 
     def gui_height_plot(self,label,series,band=None):
         """Plot saved millimetres against source time, leaving NaN gaps open."""
@@ -648,6 +684,10 @@ class ResultsPlayer(Viewer):
             imgui.text('原片时间：%06.3f 秒  |  PTS %d'%(seconds,self.catalog.pts[f]))
             imgui.text('当前片段帧：%d / %d'%(f+1,len(self.catalog.pts)))
             s=self.sequence.state
+            if self.blade_review is not None:
+                for line in diagnostic_lines(self.blade_review.at(self.variant['id'],int(self.catalog.pts[f]))):
+                    imgui.text_wrapped(line)
+                imgui.text_wrapped('方向速率只显示保存的模型20ms变化，不作原片准确性验收阈值；刀轴角差只在可辨源证据处显示；模板端点对应仍为条件假设。')
             for foot in range(2):
                 phase=source_value(s,'source_action_phase',f,foot)
                 mode=source_value(s,'source_support_mode',f,foot)
@@ -742,7 +782,7 @@ class ResultsPlayer(Viewer):
                 imgui.text_wrapped('COM 只读取保存的条件米制质量近似；显示程序不从骨盆或表面重新推算。')
             else:imgui.text('本候选未保存质量近似 COM，无法显示。')
             if 'blade_material_world_mid' in s:
-                changed,self.visible['blade_material']=imgui.checkbox('刀材料点 ●（后蓝／中黄／前白）',self.visible['blade_material'])
+                changed,self.visible['blade_material']=imgui.checkbox('刀材料点／轴（后蓝／中黄／前白）',self.visible['blade_material'])
                 if changed:self.apply_visibility()
                 imgui.text_wrapped('每只刀三个固定材料点，按后／中／前区分；它们不是接冰点。')
             else:imgui.text('本候选未保存三刀材料点，无法显示。')
