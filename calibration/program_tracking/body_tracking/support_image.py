@@ -124,6 +124,9 @@ class SupportImageFactors:
                 body_J=chain_exposure(local,delta)
             else:
                 body_J=csr_matrix(np.einsum('nald,nlm->namd',local,self.B).reshape(len(r),state.size))
+            if callable(getattr(getattr(delta,'owner',None),'shoe_chain',None)):
+                from .sequence_shoe_factors import image_shoe_chain
+                body_J=body_J+image_shoe_chain(self,delta,s,projection,Jrotation,D=np.asarray(D))
             J=hstack((csr_matrix((len(r),17)),body_J),format='csr')
         cost=float(r@r/2)
         self.last=dict(residual=r,jac=J,cost=cost,parts={'support_image':cost},metrics=dict(observations=metrics,enabled_rows=len(metrics),fixed_arc_ids={key:value for key,value in self.arc_ids.items() if not any(row[0]['id']==key and row[0].get('arc_selection')=='current_geometric_lowest_runner' for row in self.rows)},current_geometry_arc_ids=self.selected_geometry_arcs,differentiability_warnings=warnings,five_node_native_projection=True))

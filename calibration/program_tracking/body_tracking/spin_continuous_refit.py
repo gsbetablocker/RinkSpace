@@ -302,6 +302,9 @@ def run(project,base,root,source_budget=900.,flight_budget=360.,check_only=False
 
 def restore_absolute(project,base,root,parameter):
     saved=load(parameter)
+    if 'relative_skate_schema' in saved:
+        from .blade_current_reference import restore_current_reference
+        return restore_current_reference(project,Path(str(saved['absolute_case_root'])),parameter,seed=False)
     curve=curve_from_packet(saved)
     native=base.parent/'body_perf_1103/native_cpu/rinkspace_core.dll';os.environ['RINKSPACE_BODY_NATIVE_LIBRARY']=str(native)
     parent,camera,info,_=restore_parent(project,base,Path(str(saved['absolute_parent_case_root'])),root/'absolute_replay_geometry',project/PROGRAMME/'spin_entry_gravity_1104.npz')

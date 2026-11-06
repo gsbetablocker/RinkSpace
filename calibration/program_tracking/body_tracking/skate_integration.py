@@ -41,7 +41,10 @@ class SkateReference(FrozenReference):
         s=FrozenReference.world(self,reference,delta)
         if self.binding is None:return s
         local=np.einsum('nji,nkj->nki',s['Q'],s['native']-s['P'][:,None])
-        g=self.binding.evaluate(s['P'],s['Q'],local,s['frames'])
+        from .sequence_skate_state import relative_rotation
+        relative=relative_rotation(self,reference,delta)
+        g=self.binding.evaluate(s['P'],s['Q'],local,s['frames'],skate_relative_R=relative)
+        s['skate_relative_R']=relative
         s.update(gear=g['gear'],boot_R=g['boot_R'],boot_O=g['boot_O'],footwear=g)
         s['world']=np.concatenate((s['gear'].reshape(len(local),self.layout.equipment_count,3),s['coco']),1)
         return s
@@ -198,6 +201,9 @@ class SpinSupportWindow(SpinGraspWindow):
 
 
 def window_factory(kind):
+    if kind=='sequence_skates_v1':
+        from .sequence_skate_state import SequenceState
+        return SequenceState
     if kind=='absolute_motion_v1':
         from .absolute_motion_state import AbsoluteMotionState
         return AbsoluteMotionState
@@ -208,15 +214,20 @@ def window_factory(kind):
 
 
 def checkpoint_state_kind(saved):
+    if 'relative_skate_schema' in saved:return 'sequence_skates_v1'
     return str(saved.get('state_kind',np.array('halo_1103')))
 
 
 def state_from_packet(reference,saved,prefix=''):
     """Reconstruct the actual control basis, without fitting another spline."""
     kind=str(saved.get(prefix+'state_kind',np.array('halo_1103')))
-    if kind=='absolute_motion_v1':
+    if kind in ('absolute_motion_v1','sequence_skates_v1'):
         from .absolute_motion_state import AbsoluteMotionState,curve_from_packet
         reference.absolute_curve=curve_from_packet(saved,seed=True)
+        if 'relative_skate_schema' in saved:
+            from .sequence_skate_state import SequenceState,shoe_curve_from_packet
+            reference.relative_skate_curve=shoe_curve_from_packet(saved,seed=True)
+            return SequenceState(reference,tuple(saved['seconds']))
         return AbsoluteMotionState(reference,tuple(saved['seconds']))
     factory=window_factory(kind)
     state=factory(reference,tuple(map(float,saved[prefix+'seconds'])),'full')
@@ -406,7 +417,7 @@ class JointContactProblem:
             s=base['world'];local=np.einsum('nji,nkj->nki',s['Q'],s['native']-s['P'][:,None]);mid=np.arange(self.body.n)*5+2
             self._replay_samples=self.binding.surface.sample_vertices(local[mid],s['frames'][mid],self.binding.sample_ids,double_precision=True,**({} if 'hand_local_R' not in s else {'hand_local_R':s['hand_local_R'][mid]}))
             if self.binding.collar_constraints_enabled:
-                collar_unknown=int(self.binding.collar_metrics(local[mid],s['frames'][mid],self._replay_samples)['unknown'].sum())
+                collar_unknown=int(self.binding.collar_metrics(local[mid],s['frames'][mid],self._replay_samples,skate_relative_R=(None if s.get('skate_relative_R') is None else s['skate_relative_R'][mid]))['unknown'].sum())
                 collar_unknown+=int(self.binding.collar_metrics(self.binding.neutral_native,self.binding.neutral_frames,
                     self.binding.neutral_samples)['unknown'].sum())
         phases['cavity_and_collar_gate_seconds']=time.perf_counter()-phase_start;phase_start=time.perf_counter()
@@ -489,7 +500,7 @@ class JointContactProblem:
         # equipment poses are absent. End attachment remains unchanged.
         smooth=self.body.state.basis(self.physics_times,2)
         controls=np.linalg.lstsq(np.r_[B,.003*smooth],np.r_[target,np.zeros(len(target))],rcond=None)[0]
-        out=x.copy();view=out[17:].reshape(self.body.state.m,self.body.state.d)
+        out=x.copy();view=out[17:17+getattr(self.body.state,'body_size',self.body.size)].reshape(self.body.state.m,self.body.state.d)
         view[:,np.flatnonzero(self.body.state.active==2)[0]]+=controls
         return out
 
@@ -504,7 +515,7 @@ class JointContactProblem:
             ice_soft_policy_json=np.array(json.dumps(vars(self.ice_policy),sort_keys=True)))
 
     def solve(self,initial=None,run_policy=None):
-        from .skate_run_policy import RunPolicy,Monitor,CandidateRetention,structural_progress_is_observable
+        from .skate_run_policy import RunPolicy,Monitor,CandidateRetention,structural_progress_is_observable,image_trial_quality
         self.output.mkdir(parents=True,exist_ok=True)
         prior=self.output/'last_accepted.npz'
         if prior.exists():
@@ -527,6 +538,7 @@ class JointContactProblem:
         # No root-height restoration: flight/unknown must not be glued to ice.
         lo,hi=shared_bounds(self.binding)
         angular=np.tile(self.body.state.active>=3,self.body.state.m)
+        if hasattr(self.body.state,'shoe_size'):angular=np.r_[angular,np.ones(self.body.state.shoe_size,bool)]
         lower=np.r_[lo,np.where(angular,-np.pi,-np.inf)];upper=np.r_[hi,np.where(angular,np.pi,np.inf)]
         # Local repairs may activate a subset of this same global curve.
         # Every other parameter is expanded from the saved immutable state.
@@ -649,6 +661,22 @@ class JointContactProblem:
                 # branch-invalid pose or replace the last accepted candidate.
                 self.log.write(json.dumps(dict(event='trial_domain_rejected',domain='absolute_so3_log_chart',message=str(error),accepted=self.accepted))+'\n')
                 return dict(residual=np.full_like(initial_value['residual'],np.inf))
+            if not jacobian and getattr(self,'image_safe_trials',False):
+                image_trial=image_trial_quality(None if monitor.baseline is None else monitor.baseline.get('image_cost'),
+                    value.get('image_cost'),monitor.policy.max_image_cost_increase)
+                if image_trial['rejected']:
+                    # Keep the real evaluate/cache value. Only TRF's trial return
+                    # is nonfinite, so it contracts without accepting this state.
+                    self.log.write(json.dumps(dict(event='trial_image_quality_rejected',accepted=self.accepted,
+                        seconds=time.perf_counter()-self.start,**image_trial))+'\n')
+                    return dict(residual=np.full_like(initial_value['residual'],np.inf))
+            extra_guard=getattr(self,'additional_trial_quality',None)
+            if not jacobian and getattr(self,'image_safe_trials',False) and extra_guard is not None:
+                groups=extra_guard(value,monitor.policy.max_image_cost_increase)
+                if any(g['rejected'] for g in groups.values()):
+                    self.log.write(json.dumps(dict(event='trial_source_group_quality_rejected',accepted=self.accepted,
+                        seconds=time.perf_counter()-self.start,groups=groups))+'\n')
+                    return dict(residual=np.full_like(initial_value['residual'],np.inf))
             if jacobian:
                 jacobian_seconds=max(jacobian_seconds,time.perf_counter()-now)
                 last_linearization=np.array(z,copy=True)

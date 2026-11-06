@@ -85,6 +85,8 @@ class SavedBladeProjection:
                                  hand_metadata={key: initial[key] for key in META if key in initial},
                                  layout=OBSERVATION_LAYOUT, root=case)
         self.reference = absolute_reference(shared, self.curve, root=case)
+        from .sequence_skate_state import shoe_curve_from_packet
+        self.reference.relative_skate_curve=shoe_curve_from_packet(saved)
         native = os.environ.get('RINKSPACE_BODY_NATIVE_LIBRARY') or saved_camera['native_library']
         self.camera, self.camera_info, _, _ = camera_binding(
             self.project, self.reference, record_path=saved_camera['record'],

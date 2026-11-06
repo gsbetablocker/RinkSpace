@@ -178,7 +178,7 @@ def _sampled_signed_gap(points,polygon):
     return np.where(inside,distance,-distance)
 
 
-def evaluate(binding,joints,frames,samples=None,*,hand_local_R=None):
+def evaluate(binding,joints,frames,samples=None,*,hand_local_R=None,skate_relative_R=None):
     """Return nonnegative ``breach_solver[n,2]`` and explicit ``unknown``.
 
     samples, if supplied, must be full-surface vertices at prepare().sample_ids
@@ -204,15 +204,23 @@ def evaluate(binding,joints,frames,samples=None,*,hand_local_R=None):
     samples=np.asarray(samples)
     if samples.shape!=(n,len(spec.sample_ids),3) or not np.isfinite(samples).all():raise ValueError('Invalid collar full-surface samples')
     R_FB,t_FB,_=binding.parameters()
-    alpha=binding.deformation(joints,frames)
+    if skate_relative_R is not None:
+        R_FB,t_FB=binding.relative_parameters(skate_relative_R)
+        if len(R_FB)!=n:raise ValueError('skate_relative_R sample count differs')
+    relative_kwargs={} if skate_relative_R is None else dict(skate_relative_R=skate_relative_R)
+    alpha=binding.deformation(joints,frames,**relative_kwargs)
     inner=binding.deform(spec.inner_vertices,alpha)
     # Batch the distance tensors rather than allocating points*walls for an
     # entire programme or all exposure nodes at once.
     for first in range(0,n,128):
         last=min(first+128,n)
         for foot,ankle in enumerate((7,8)):
-            rotation=frames[first:last,ankle]@R_FB[foot]
-            origin=joints[first:last,ankle]+np.einsum('nij,j->ni',frames[first:last,ankle],t_FB[foot])
+            if skate_relative_R is None:
+                rotation=frames[first:last,ankle]@R_FB[foot]
+                origin=joints[first:last,ankle]+np.einsum('nij,j->ni',frames[first:last,ankle],t_FB[foot])
+            else:
+                rotation=frames[first:last,ankle]@R_FB[first:last,foot]
+                origin=joints[first:last,ankle]+np.einsum('nij,nj->ni',frames[first:last,ankle],t_FB[first:last,foot])
             body=np.einsum('nji,nvj->nvi',rotation,samples[first:last]-origin[:,None])
             points,mask,why,counts=_section_samples(body,spec.body[foot],spec.height_solver,spec.tolerance_solver)
             vertices=inner[first:last,foot];ends=spec.inner_edge_vertices;fraction=spec.inner_edge_fraction

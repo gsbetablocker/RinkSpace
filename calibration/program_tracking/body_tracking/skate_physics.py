@@ -47,9 +47,11 @@ def fk_state(reference,ref,delta):
         a=body.parents[j];rot[:,j]=rot[:,a]@local[:,j-1]
         pos[:,j]=pos[:,a]+np.einsum('nij,j->ni',rot[:,a],body.J[j]-body.J[a])
     native=(pos-body.J[0])*body.scale
-    R,O=reference.binding.transforms(P,Q,native,rot)
+    from .sequence_skate_state import relative_rotation
+    relative=relative_rotation(reference,ref,delta)
+    R,O=reference.binding.transforms(P,Q,native,rot,skate_relative_R=relative)
     nativeW=P[:,None]+np.einsum('nij,nkj->nki',Q,native)
-    return dict(P=P,Q=Q,local_R=local,frames=rot,native=native,native_world=nativeW,R=R,O=O,**({} if 'hand_local_R' not in ref else {'hand_local_R':ref['hand_local_R']}))
+    return dict(skate_relative_R=relative,P=P,Q=Q,local_R=local,frames=rot,native=native,native_world=nativeW,R=R,O=O,**({} if 'hand_local_R' not in ref else {'hand_local_R':ref['hand_local_R']}))
 
 
 def batch_features(binding,R,O,state=None):
@@ -75,7 +77,7 @@ def batch_features(binding,R,O,state=None):
         ids.append(group['id']);semantics.append(group['semantic']);eligible.append(group.get('support_eligible',False))
     upper_index=None
     if state is not None and 'native' in state:
-        alpha=binding.deformation(state['native'],state['frames'])
+        alpha=binding.deformation(state['native'],state['frames'],skate_relative_R=state.get('skate_relative_R'))
         upper=binding.deform(p['upper'],alpha)
         z=np.einsum('nfj,nfvj->nfv',normals,upper)
         upper_index=np.argmin(z,axis=-1)
@@ -175,14 +177,36 @@ def body_constraint_jacobian(reference,state,delta,active,B,evaluation):
                 plus=delta.copy();minus=delta.copy();plus[:,a]+=h;minus[:,a]-=h
                 sp=fk_state(reference,ref,plus)
                 sm=fk_state(reference,ref,minus)
-                vp=reference.binding.deform(reference.binding.packet()['upper'],reference.binding.deformation(sp['native'],sp['frames']))
-                vm=reference.binding.deform(reference.binding.packet()['upper'],reference.binding.deformation(sm['native'],sm['frames']))
+                vp=reference.binding.deform(reference.binding.packet()['upper'],reference.binding.deformation(sp['native'],sp['frames'],skate_relative_R=sp.get('skate_relative_R')))
+                vm=reference.binding.deform(reference.binding.packet()['upper'],reference.binding.deformation(sm['native'],sm['frames'],skate_relative_R=sm.get('skate_relative_R')))
                 pick=(fr[selected],foot[selected],upper_vertex[selected])
                 partial=(vp[pick]-vm[pick])/(2*h)
                 value=np.einsum('nj,nj->n',rotation[selected,2],partial)
                 local[np.ix_(selected,np.flatnonzero(active==a))]+=value[:,None]
     local*=sign[:,None]*ratio/NORMALIZATION
-    if hasattr(delta,'chain'):return delta.chain(local[:,None,:],sample_indices=fr)
+    if hasattr(delta,'chain'):
+        J=delta.chain(local[:,None,:],sample_indices=fr)
+        if hasattr(delta.owner,'shoe_chain'):
+            RFB,tFB,_=reference.binding.parameters();ankle=-np.einsum('fi,fij->fj',tFB,RFB)
+            tangent=np.cross(q-ankle[foot],rotation[:,2,:])
+            shoe=np.zeros((count,1,6))
+            for f in (0,1):
+                keep=foot==f;shoe[keep,0,f*3:f*3+3]=tangent[keep]
+            if len(selected):
+                from .sequence_skate_state import perturb_relative
+                packet=reference.binding.packet()
+                for f in (0,1):
+                    for axis in range(3):
+                        h=1e-5
+                        a=fk_state(reference,reference.at(evaluation['times']),perturb_relative(delta,f,axis,h))
+                        b=fk_state(reference,reference.at(evaluation['times']),perturb_relative(delta,f,axis,-h))
+                        ap=reference.binding.deform(packet['upper'],reference.binding.deformation(a['native'],a['frames'],skate_relative_R=a['skate_relative_R']))
+                        bp=reference.binding.deform(packet['upper'],reference.binding.deformation(b['native'],b['frames'],skate_relative_R=b['skate_relative_R']))
+                        pick=(fr[selected],foot[selected],upper_vertex[selected])
+                        shoe[selected,0,f*3+axis]+=np.einsum('nj,nj->n',rotation[selected,2],(ap[pick]-bp[pick])/(2*h))
+            shoe*=sign[:,None,None]*ratio/NORMALIZATION
+            J+=delta.owner.shoe_chain(shoe,delta.parameters,delta.sample_times,sample_indices=fr)
+        return J
     # Select the original sparse spline support for each physical row. Only
     # values that are nonzero enter COO; large explicit zero blocks never
     # reach the downstream sparse products/LSMR.

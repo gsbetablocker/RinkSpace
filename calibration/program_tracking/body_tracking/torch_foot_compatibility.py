@@ -42,6 +42,9 @@ class TorchFootCompatibility:
         self.collar_height=float(p['floor'][station]+p['rise'][station])
         self.collar_width=float(p['width'][station])
         self.ankle=-(self.t[:,None,:]@self.R).squeeze(1)
+        # Resident replay may flatten direction/sign/sample axes. Keep the
+        # sample block intact and repeat it in that same order on device.
+        self.skate_relative_R=None
         self.maximum=upload(np.array([.020,.015,.012])/self.ratio)
         self.foot_indices=[upload(ids,torch.int64) for ids in binding.foot_indices]
         self.patch_indices=[[upload(ids,torch.int64) for ids in patches] for patches in binding.patch_indices]
@@ -74,10 +77,24 @@ class TorchFootCompatibility:
         fraction=((query-grid[index])/(grid[index+1]-grid[index])).clamp(0,1)
         return values[index]*(1-fraction)+values[index+1]*fraction
 
-    def _alpha(self,native,frames):
+    def _relative_parameters(self,relative_R,n):
+        if relative_R is None:relative_R=getattr(self,'skate_relative_R',None)
+        if relative_R is None:return self.R,self.t
+        if (not isinstance(relative_R,torch.Tensor) or relative_R.device!=self.device or relative_R.dtype!=self.dtype
+                or relative_R.ndim!=4 or tuple(relative_R.shape[1:])!=(2,3,3)):
+            raise ValueError(f'skate_relative_R must be FP64 on {self.device} with shape (N,2,3,3)')
+        count=len(relative_R)
+        if count==0 or n%count:raise ValueError('Consumer batch must be an integer multiple of the shoe sample count')
+        if count!=n:relative_R=relative_R.repeat(n//count,1,1,1)
+        rotation=self.R[None]@relative_R
+        origin=-torch.einsum('nfij,fj->nfi',rotation,self.ankle)
+        return rotation,origin
+
+    def _alpha(self,native,frames,skate_relative_R=None,*,parameters=None):
+        R,_=self._relative_parameters(skate_relative_R,len(native)) if parameters is None else parameters
         values=[]
         for foot,(knee,ankle) in enumerate(((4,7),(5,8))):
-            rotation=frames[:,ankle]@self.R[foot]
+            rotation=frames[:,ankle]@(R[foot] if R.ndim==3 else R[:,foot])
             direction=torch.einsum('nji,nj->ni',rotation,native[:,knee]-native[:,ankle])
             fraction=((self.collar_height-self.ankle[foot,2])/direction[:,2].clamp_min(1e-6)).clamp(0,1)
             centre=self.ankle[foot]+fraction[:,None]*direction
@@ -116,19 +133,24 @@ class TorchFootCompatibility:
         return self.last_collar_metrics['residual_breach_solver']
 
     @torch.no_grad()
-    def evaluate(self,native,frames,samples):
+    def evaluate(self,native,frames,samples,skate_relative_R=None):
         n=len(native)
         for name,tensor,shape in (('native',native,(n,22,3)),('frames',frames,(n,22,3,3)),
                                   ('samples',samples,(n,len(self.sample_ids),3))):
             if tensor.device!=self.device or tensor.dtype!=self.dtype or tuple(tensor.shape)!=shape:
                 raise ValueError(f'{name} must be FP64 on {self.device} with shape {shape}')
-        alpha=self._alpha(native,frames)
+        R,t=self._relative_parameters(skate_relative_R,n)
+        alpha=self._alpha(native,frames,parameters=(R,t))
         deformed=self._deform(alpha)
         sections=deformed[:,:,:self.section_count*6].reshape(n,2,self.section_count,6,3)
         anchors=[];outside=[];support=[];locals_=[]
         for foot,ankle in enumerate((7,8)):
-            rotation=frames[:,ankle]@self.R[foot]
-            origin=native[:,ankle]+torch.einsum('nij,j->ni',frames[:,ankle],self.t[foot])
+            if R.ndim==3:
+                rotation=frames[:,ankle]@R[foot]
+                origin=native[:,ankle]+torch.einsum('nij,j->ni',frames[:,ankle],t[foot])
+            else:
+                rotation=frames[:,ankle]@R[:,foot]
+                origin=native[:,ankle]+torch.einsum('nij,nj->ni',frames[:,ankle],t[:,foot])
             local=torch.einsum('nji,nkj->nki',rotation,samples-origin[:,None])
             locals_.append(local)
             skin=local[:,self.foot_indices[foot]]

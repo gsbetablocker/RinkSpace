@@ -69,6 +69,7 @@ class ResidentFootLinearization:
         torch.cuda.synchronize(self.device)
         self.prepare_seconds=time.perf_counter()-started
         self._last_delta=None;self._pose=None
+        self._last_skate_relative_R=None;self._device_skate_relative_R=None
         self.reset_measurement()
 
     def matches(self,binding):
@@ -81,16 +82,19 @@ class ResidentFootLinearization:
             direction_batch_size=self.direction_batch_size,
             prepare_uploaded_bytes=self._prepare_bytes,precision='float64',
             shared_parameters='fixed; changing shared geometry requires a new prepared owner',
-            transfer_boundary='one changed N x 69 increment upload; one packed residual/local-Jacobian download per call; no per-column download')
+            transfer_boundary='changed N x 69 body and optional N x 2 x 3 x 3 shoe arrays uploaded once; one packed residual/local-Jacobian download per call; no per-column download')
 
     def reset_measurement(self):
         self._events=[]
         self._counts=dict(calls=0,linearize_calls=0,trial_calls=0,h2d_bytes=0,d2h_bytes=0,h2d_calls=0,d2h_calls=0,
             native55_fk_prepares=0,selected_surface_prepares=0,exact_fk_replay_pairs=0,selected_skin_replay_pairs=0,
+            shoe_linearize_calls=0,shoe_replay_pairs=0,
             consumer_calls=0,h2d_host_seconds=0.,d2h_host_blocking_seconds=0.,compute_host_enqueue_seconds=0.)
 
     def clear_result_cache(self):
         self._last_delta=None;self._pose=None
+        self._last_skate_relative_R=None;self._device_skate_relative_R=None
+        self.consumer.skate_relative_R=None
 
     def measurement(self):
         # Caller synchronizes the owner before reading event intervals.
@@ -223,28 +227,48 @@ class ResidentFootLinearization:
         residual=residual.reshape(k,2,n,self.consumer.compatibility_width)
         return (residual[:,0]-residual[:,1])/(2*step)
 
-    @torch.no_grad()
-    def evaluate(self,delta,columns=None,*,step=1e-5):
+    def _upload_state(self,delta,skate_relative_R):
+        """Cache body and shoe uploads independently; shoes never invalidate FK."""
         values=np.asarray(delta,dtype=np.float64)
         if values.shape!=(self.n,69) or not np.isfinite(values).all():raise ValueError('Changed resident state layout or nonfinite delta')
+        relative=None if skate_relative_R is None else np.asarray(skate_relative_R,dtype=np.float64)
+        if relative is not None and (relative.shape!=(self.n,2,3,3) or not np.isfinite(relative).all()):
+            raise ValueError('skate_relative_R must be finite with shape (N,2,3,3)')
+        changed=self._last_delta is None or not np.array_equal(values,self._last_delta)
+        shoe_changed=relative is not None and (self._last_skate_relative_R is None or not np.array_equal(relative,self._last_skate_relative_R))
+        device_delta=None
+        if changed or shoe_changed:
+            host=time.perf_counter();end=self._event('h2d')
+            if changed:
+                device_delta=torch.as_tensor(np.array(values,copy=True),dtype=self.dtype,device=self.device)
+                self._counts['h2d_calls']+=1;self._counts['h2d_bytes']+=device_delta.numel()*8
+            if shoe_changed:
+                self._device_skate_relative_R=torch.as_tensor(np.array(relative,copy=True),dtype=self.dtype,device=self.device)
+                self._last_skate_relative_R=relative.copy()
+                self._counts['h2d_calls']+=1;self._counts['h2d_bytes']+=self._device_skate_relative_R.numel()*8
+            end.record();self._counts['h2d_host_seconds']+=time.perf_counter()-host
+        if relative is None:
+            self._last_skate_relative_R=None;self._device_skate_relative_R=None
+        self.consumer.skate_relative_R=self._device_skate_relative_R
+        return values,changed,device_delta
+
+    def _current_pose(self,values,changed,device_delta):
+        if changed:
+            self._pose=self._prepare_pose(device_delta);self._last_delta=values.copy()
+            self._counts['native55_fk_prepares']+=1;self._counts['selected_surface_prepares']+=1
+        return self._pose
+
+    @torch.no_grad()
+    def evaluate(self,delta,columns=None,*,step=1e-5,skate_relative_R=None):
         columns=None if columns is None else list(map(int,columns))
         if columns is not None and any(c<6 or c>=69 for c in columns):raise ValueError('Resident derivative column outside body21')
         if not np.isfinite(step) or step<=0:raise ValueError('Invalid difference step')
         self._counts['calls']+=1
         self._counts['trial_calls' if columns is None else 'linearize_calls']+=1
-        changed=self._last_delta is None or not np.array_equal(values,self._last_delta)
-        if changed:
-            host=time.perf_counter()
-            end=self._event('h2d')
-            device_delta=torch.as_tensor(np.array(values,copy=True),dtype=self.dtype,device=self.device)
-            end.record();self._counts['h2d_host_seconds']+=time.perf_counter()-host
-            self._counts['h2d_calls']+=1;self._counts['h2d_bytes']+=device_delta.numel()*8
+        values,changed,device_delta=self._upload_state(delta,skate_relative_R)
         host=time.perf_counter()
         compute_end=self._event('compute')
-        if changed:
-            self._pose=self._prepare_pose(device_delta);self._last_delta=values.copy()
-            self._counts['native55_fk_prepares']+=1;self._counts['selected_surface_prepares']+=1
-        pose=self._pose
+        pose=self._current_pose(values,changed,device_delta)
         residual=self.consumer.evaluate(pose['base_native'],pose['frames'],pose['samples'])
         self._counts['consumer_calls']+=1
         derivatives=[];last_joint=None;subtree=None
@@ -271,3 +295,38 @@ class ResidentFootLinearization:
         baseline=array[:width].reshape(self.n,self.consumer.compatibility_width)
         result=[array[(i+1)*width:(i+2)*width].reshape(baseline.shape) for i in range(len(derivatives))]
         return baseline,result
+
+    @torch.no_grad()
+    def shoe_derivatives(self,delta,skate_relative_R,*,step=1e-5):
+        """Return compatibility and six per-sample right shoe SO(3) columns.
+
+        Columns are left xyz then right xyz, with each Rrel perturbed by
+        Rrel @ Exp(+/- step*axis). Frames never mix across replay blocks.
+        """
+        if skate_relative_R is None:raise ValueError('shoe_derivatives requires skate_relative_R')
+        if not np.isfinite(step) or step<=0:raise ValueError('Invalid difference step')
+        values,changed,device_delta=self._upload_state(delta,skate_relative_R)
+        self._counts['calls']+=1;self._counts['linearize_calls']+=1;self._counts['shoe_linearize_calls']+=1
+        host=time.perf_counter();compute_end=self._event('compute')
+        pose=self._current_pose(values,changed,device_delta)
+        baseline=self.consumer.evaluate(pose['base_native'],pose['frames'],pose['samples'])
+        directions=torch.zeros((6,2,3),dtype=self.dtype,device=self.device)
+        for column in range(6):directions[column,column//3,column%3]=step
+        signs=torch.tensor([1.,-1.],dtype=self.dtype,device=self.device)
+        turn=self._rot(directions[:,None]*signs[None,:,None,None])
+        relative=self._device_skate_relative_R[None,None]@turn[:,:,None]
+        # Flatten direction/sign/sample, exactly as the body replay does.
+        n=self.n
+        residual=self.consumer.evaluate(pose['base_native'].repeat(12,1,1),
+            pose['frames'].repeat(12,1,1,1),pose['samples'].repeat(12,1,1),
+            skate_relative_R=relative.reshape(12*n,2,3,3)).reshape(6,2,n,self.consumer.compatibility_width)
+        jacobian=((residual[:,0]-residual[:,1])/(2*step)).permute(1,2,0)
+        self._counts['consumer_calls']+=2;self._counts['shoe_replay_pairs']+=6
+        packed=torch.cat((baseline.reshape(-1),jacobian.reshape(-1)))
+        compute_end.record();self._counts['compute_host_enqueue_seconds']+=time.perf_counter()-host
+        host=time.perf_counter();end=self._event('d2h')
+        array=packed.cpu().numpy();end.record()
+        self._counts['d2h_host_blocking_seconds']+=time.perf_counter()-host
+        self._counts['d2h_calls']+=1;self._counts['d2h_bytes']+=array.nbytes
+        width=n*self.consumer.compatibility_width
+        return array[:width].reshape(n,self.consumer.compatibility_width),array[width:].reshape(n,self.consumer.compatibility_width,6)

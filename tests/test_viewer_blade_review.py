@@ -4,7 +4,7 @@ import json
 import numpy as np
 import pytest
 
-from rinkspace.viewer3d.blade_review import BladeReview,diagnostic_lines,overlay_primitives
+from rinkspace.viewer3d.blade_review import BladeReview,diagnostic_lines,overlay_primitives,skate_axis_primitives
 
 
 def review_asset(tmp_path, **extra):
@@ -52,7 +52,8 @@ def test_optional_model_arrays_keep_exact_pts_and_source_unknown(tmp_path):
     assert source['contact_state']==source['material_state']=='unknown'
     lines=diagnostic_lines(current)
     text='\n'.join(lines)
-    assert '刀纵倾 3.00°' in text and '刀侧倾 7.00°' in text
+    assert '旧pitch诊断 3.00°' in text and '旧roll诊断 7.00°' in text
+    assert '非钢片角度测量' in text
     assert 'runner最低点 0.300（0后1前）' in text
     assert 'rear/mid/front 7.00/8.00/9.00 cm' in text
     assert 'runner-pick相对高度 -3.00 cm' in text
@@ -73,7 +74,7 @@ def test_optional_model_arrays_keep_exact_pts_and_source_unknown(tmp_path):
 def test_optional_arrays_are_independent(tmp_path):
     review=review_asset(tmp_path,test_roll_degrees=np.full((2,2),12.))
     text='\n'.join(diagnostic_lines(review.at('candidate',1256)))
-    assert '刀侧倾 12.00°' in text
+    assert '旧roll诊断 12.00°' in text
     assert '刀纵倾' not in text and '原始参考面高度' not in text
 
 
@@ -87,3 +88,68 @@ def test_bad_optional_shape_is_rejected(tmp_path,key):
 def test_nonfinite_optional_model_diagnostic_is_rejected(tmp_path,value):
     with pytest.raises(ValueError,match='test_pitch_degrees'):
         review_asset(tmp_path,test_pitch_degrees=np.full((2,2),value))
+
+
+def mode_diagnostics():
+    result = {('test_' + name):np.broadcast_to(np.eye(3)[axis],(2,2,3)).copy()
+              for axis,name in enumerate(('forward_world','lateral_world','up_world'))}
+    result['test_ice_normal_world']=result['test_up_world'].copy()
+    for name in ('fore_aft_pitch_degrees','edge_bank_degrees','total_lean_degrees','plane_normal_to_ice_normal_degrees'):
+        result['test_'+name]=np.array([[1.,2.],[3.,4.]])
+    result.update(test_runner_u=np.array([[.1,.9],[.25,.75]]),
+                  test_edge_mode=np.full((2,2),'flat_or_unknown'),
+                  test_contact_mode=np.full((2,2),'runner_interior'),
+                  test_mode_conflict=np.array([[False,False],[True,False]],dtype=bool))
+    return result
+
+
+def test_saved_axes_modes_keep_exact_pts_and_distinguish_source_unknown(tmp_path):
+    values=mode_diagnostics();review=review_asset(tmp_path,**values)
+    current=review.at('candidate',1256)
+    for key,value in values.items():
+        np.testing.assert_array_equal(current['model'][key.removeprefix('test_')],value[1])
+    assert review.at('candidate',1255)['model'] is None
+    assert review.model_array('candidate','ice_normal_world',[1000,1255]) is None
+    np.testing.assert_array_equal(review.model_array('candidate','forward_world',[1256,1000]),values['test_forward_world'][[1,0]])
+    text='\n'.join(diagnostic_lines(current))
+    assert '模型世界向量（非源测量）' in text and 'F [1.000,0.000,0.000]' in text
+    assert 'fore-aft pitch 3.00°' in text and 'edge bank 3.00°' in text
+    assert 'total lean 3.00°' in text and 'plane-normal / ice-normal 3.00°' in text
+    assert 'runner_u 0.250000' in text and 'mode_conflict true' in text
+    assert 'edge_mode flat_or_unknown' in text and 'contact_mode runner_interior' in text
+    assert '源edge/contact：unknown/unknown' in text
+
+
+@pytest.mark.parametrize('key',mode_diagnostics())
+def test_new_optional_shapes_are_strict(tmp_path,key):
+    with pytest.raises(ValueError,match=key):review_asset(tmp_path,**{key:np.zeros((2,))})
+
+
+@pytest.mark.parametrize('key,value',[
+    ('test_forward_world',np.full((2,2,3),'1')),
+    ('test_runner_u',np.zeros((2,2),dtype=bool)),
+    ('test_edge_mode',np.full((2,2),'unknown',dtype='S8')),
+    ('test_contact_mode',np.full((2,2),'')),
+    ('test_mode_conflict',np.zeros((2,2),dtype=np.int64)),
+    ('test_total_lean_degrees',np.full((2,2),np.nan)),
+    ('test_ice_normal_world',np.full((2,2,3),np.inf)),
+])
+def test_new_optional_dtype_and_finite_validation(tmp_path,key,value):
+    with pytest.raises(ValueError,match=key):review_asset(tmp_path,**{key:value})
+
+
+def test_axis_glyphs_use_saved_transform_and_existing_axis_scale_without_mutation():
+    R=np.array([[0.,-1.,0.],[1.,0.,0.],[0.,0.,1.]])
+    state=dict(skate_R=np.broadcast_to(R,(2,2,3,3)).copy(),skate_origin=np.arange(12.).reshape(2,2,3))
+    state['axes']=np.stack((state['skate_origin'][:,:,None,:],state['skate_origin'][:,:,None,:]+[.2,0.,0.]),axis=-2)
+    before={key:value.copy() for key,value in state.items()}
+    normal=np.broadcast_to([0.,0.,1.],(2,2,3))
+    arrows=skate_axis_primitives(state,unit_ratio=.5,ice_normal_world=normal)
+    assert len(arrows)==8
+    for arrow in arrows:
+        foot=arrow['foot'];direction={'F':R[:,0],'L':R[:,1],'U':R[:,2],'iceN':normal[0,foot]}[arrow['label']]
+        np.testing.assert_allclose(arrow['points'][:,0],state['skate_origin'][:,foot])
+        np.testing.assert_allclose(arrow['points'][:,1],state['skate_origin'][:,foot]+.2*direction)
+        assert 'foot %d'%foot in arrow['name'] and 'not source contact' in arrow['name']
+    assert len(skate_axis_primitives(state))==6
+    for key in state:np.testing.assert_array_equal(state[key],before[key])

@@ -165,4 +165,6 @@ def restore_current_reference(project, stage, parameter, *, seed=False):
         reference.binding = copy.copy(binding)
         reference.binding.reference = reference
         reference.current_restore_info = dict(reference.current_restore_info, pose_seed='saved_archived_seed')
+        from .sequence_skate_state import shoe_curve_from_packet
+        reference.relative_skate_curve=shoe_curve_from_packet(saved,seed=True)
     return reference, query.camera, query.camera_info, saved

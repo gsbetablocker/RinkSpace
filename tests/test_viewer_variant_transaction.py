@@ -359,6 +359,26 @@ class VariantTransactionTests(unittest.TestCase):
         f.player.visible.update(contact=True,skate_reference=True)
         return f
 
+    def test_versioned_skate_axis_layer_reads_exact_saved_normal_without_gui(self):
+        from rinkspace.viewer3d.blade_review import skate_axis_primitives
+        f=self.versioned_fixture()
+        f.sequence.state['skate_origin']=np.arange(18.).reshape(3,2,3)
+        f.sequence.meta={'uniform_unit_reexpression_ratio':2.}
+        normal=np.broadcast_to([0.,0.,1.],(3,2,3)).copy()
+        f.player.blade_review=SimpleNamespace(model_array=Mock(return_value=normal))
+        f.player.visible['blade_axes']=True
+        f.namespace['skate_axis_primitives']=skate_axis_primitives
+        before={key:value.copy() for key,value in f.sequence.state.items()}
+        f.switch(f.player,'new')
+        f.player.blade_review.model_array.assert_called_once_with('new','ice_normal_world',f.pts)
+        arrows=f.player.layers['blade_axes']
+        self.assertEqual(len(arrows),8)
+        for foot in range(2):
+            for label in ('F','L','U','iceN'):
+                self.assertTrue(any(node.name=='Model skate %s foot %d; not source contact'%(label,foot) for node in arrows))
+        self.assertTrue(all(node.enabled and node.current_frame_id==1 for node in arrows))
+        for key,value in before.items():np.testing.assert_array_equal(f.sequence.state[key],value)
+
     def test_versioned_skate_renders_full_saved_parts_edges_and_witness_without_old_adapter_shell(self):
         f=self.versioned_fixture();before={key:value.copy() for key,value in f.sequence.state.items()}
         f.switch(f.player,'new')

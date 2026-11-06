@@ -84,6 +84,7 @@ def export_candidate(root, out, ref, camera, info, evidence):
         edge=template_packet['edges']
         append('skate_edge_world_mid',np.stack([transform(R,O,edge[k])*ratio for k in range(2)],axis=2))
         append('skate_R_world_mid',R);append('skate_origin_world_mid',O*ratio)
+        if 'skate_relative_R' in mid:append('skate_relative_R_mid',mid['skate_relative_R'])
         append('skate_reference_world_mid',transform(R,O,reference_B)[:,:,0]*ratio)
 
         physics=fk_state(ref,mid_reference,np.zeros((count,69)))
@@ -95,7 +96,7 @@ def export_candidate(root, out, ref, camera, info, evidence):
         append('skate_support_gap_m_mid',contact['support_height'])
 
         local=np.einsum('nji,nkj->nki',mid['Q'],mid['native']-mid['P'][:,None])
-        metrics=binding.foot_metrics(local,mid['frames'],**({} if 'hand_local_R' not in mid else {'hand_local_R':mid['hand_local_R']}))
+        metrics=binding.foot_metrics(local,mid['frames'],skate_relative_R=mid.get('skate_relative_R'),**({} if 'hand_local_R' not in mid else {'hand_local_R':mid['hand_local_R']}))
         violation=np.stack([np.max(value,axis=(1,2)) for value in metrics['violations']],axis=1)*ratio
         append('foot_cavity_max_violation_m_mid',violation)
         append('cavity_penetration_mid',violation)

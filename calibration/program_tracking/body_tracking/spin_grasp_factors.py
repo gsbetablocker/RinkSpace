@@ -188,6 +188,18 @@ class SpinGraspFactors:
                 for i,v in zip(np.flatnonzero(self.held),grip):values.append(v['jacobian_palm_world']@((Ha[i]-Hb[i])/(2*hstep))+v['jacobian_shoe_origin']@((Oa[i]-Ob[i])/(2*hstep))+v['jacobian_shoe_right_rotation']@eta[i])
                 dg.append(np.asarray(values).reshape(-1,3))
             Jg=(d.chain(np.stack(dg,-1),sample_indices=np.flatnonzero(self.held)) if hasattr(d,'chain') else spline_chain(np.stack(dg,-1),self.B[self.held])) if grip else csr_matrix((0,self.body.size))
+            if grip and callable(getattr(getattr(d,'owner',None),'shoe_chain',None)):
+                from .sequence_skate_state import perturb_relative
+                shoe_columns=[]
+                for foot in range(2):
+                    for axis in range(3):
+                        a=perturb_relative(d,foot,axis,hstep);b=perturb_relative(d,foot,axis,-hstep)
+                        _,Ha,Ra,Oa=self.geometry_at(a);_,Hb,Rb,Ob=self.geometry_at(b)
+                        eta=vee(R.swapaxes(1,2)@((Ra-Rb)/(2*hstep)));values=[]
+                        for i,v in zip(np.flatnonzero(self.held),grip):
+                            values.append(v['jacobian_palm_world']@((Ha[i]-Hb[i])/(2*hstep))+v['jacobian_shoe_origin']@((Oa[i]-Ob[i])/(2*hstep))+v['jacobian_shoe_right_rotation']@eta[i])
+                        shoe_columns.append(np.asarray(values).reshape(-1,3))
+                Jg=Jg+d.owner.shoe_chain(np.stack(shoe_columns,-1),d.parameters,d.sample_times,sample_indices=np.flatnonzero(self.held))
             local=np.stack(dx,-1).reshape(len(X),-1,self.body.state.d)
             pointJ=d.chain(local) if hasattr(d,'chain') else spline_chain(local,self.B)
             D2=csr_matrix(temporal['second_difference_operator']);A=block_diag(list(temporal['jacobian_per_acceleration'].reshape(-1,3,3)),format='csr')

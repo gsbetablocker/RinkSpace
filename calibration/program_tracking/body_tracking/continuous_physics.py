@@ -50,12 +50,30 @@ class ConfirmedFlightFactors:
                     mask=np.arange(N)%3==color;CA=C.copy();CB=C.copy();RA=R.copy();RB=R.copy()
                     CA[mask]=Cp[mask];CB[mask]=Cm[mask];RA[mask]=Rp[mask];RB[mask]=Rm[mask]
                     dH[color].append((self.mass.H(self.times,CA,RA)[0]-self.mass.H(self.times,CB,RB)[0])/(2*h))
-            Jcom=d.chain(np.stack(dc,-1));Jp=kron(csr_matrix(self.operator['operator']/self.position_scale),eye(3),format='csr')@Jcom
+            Jcom=d.chain(np.stack(dc,-1));shoe_colorvals=None
+            if callable(getattr(getattr(d,'owner',None),'shoe_chain',None)):
+                from .sequence_skate_state import perturb_relative
+                shoe_dc=[];shoe_dH=[[],[],[]]
+                for foot in range(2):
+                    for axis in range(3):
+                        plus=perturb_relative(d,foot,axis,h);minus=perturb_relative(d,foot,axis,-h)
+                        Cp,Rp=self.mass.evaluate(self.base,plus);Cm,Rm=self.mass.evaluate(self.base,minus)
+                        shoe_dc.append((self.mass.com(Cp)-self.mass.com(Cm))/(2*h))
+                        for color in range(3):
+                            mask=np.arange(N)%3==color;CA=C.copy();CB=C.copy();RA=R.copy();RB=R.copy()
+                            CA[mask]=Cp[mask];CB[mask]=Cm[mask];RA[mask]=Rp[mask];RB[mask]=Rm[mask]
+                            shoe_dH[color].append((self.mass.H(self.times,CA,RA)[0]-self.mass.H(self.times,CB,RB)[0])/(2*h))
+                Jcom=Jcom+d.owner.shoe_chain(np.stack(shoe_dc,-1),d.parameters,d.sample_times)
+                shoe_colorvals=[np.stack(values,-1) for values in shoe_dH]
+            Jp=kron(csr_matrix(self.operator['operator']/self.position_scale),eye(3),format='csr')@Jcom
             Jh=csr_matrix((H.size,self.body.size));i=np.arange(1,N-1)
             colorvals=[np.stack(values,-1) for values in dH]
             for offset in [-1,0,1]:
                 samples=i+offset;local=np.stack([colorvals[int(c)][k] for k,c in enumerate(samples%3)])
                 Jh=Jh+d.chain(local,sample_indices=samples)
+                if shoe_colorvals is not None:
+                    shoe_local=np.stack([shoe_colorvals[int(c)][k] for k,c in enumerate(samples%3)])
+                    Jh=Jh+d.owner.shoe_chain(shoe_local,d.parameters,d.sample_times,sample_indices=samples)
             D=np.zeros((len(H)-1,len(H)));rows=np.arange(len(H)-1);D[rows,rows]=-1;D[rows,rows+1]=1
             Jh=kron(csr_matrix(D/self.impulse_scale),eye(3),format='csr')@Jh
             J=hstack((csr_matrix((len(rp)+len(rh),17)),vstack((Jp,Jh),format='csr')),format='csr')

@@ -86,6 +86,9 @@ class BootAxisFactors:
                 from .absolute_motion_state import chain_exposure
                 raw=chain_exposure(local,delta)
             else:raw=csr_matrix(np.einsum('nald,nlm->namd',local,helper.B).reshape(2*n,self.body.size))
+            if callable(getattr(getattr(delta,'owner',None),'shoe_chain',None)):
+                from .sequence_shoe_factors import image_shoe_chain
+                raw=raw+image_shoe_chain(helper,delta,s,projection,Jrotation)
             count=len(self.axes);rr=np.repeat(np.arange(count),4);cc=np.arange(count*4)
             operator=coo_matrix((np.asarray(D).ravel(),(rr,cc)),shape=(count,2*n)).tocsr()
             J=hstack((csr_matrix((count,17)),operator@raw),format='csr')

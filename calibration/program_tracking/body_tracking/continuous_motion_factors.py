@@ -78,6 +78,7 @@ class ActualMotionFactors:
             A=csr_matrix(self.body.state.basis(self.times,2))
             K=kron(A,csr_matrix(np.c_[np.eye(3),np.zeros((3,66))]),format='csr')
             J=diags(w.ravel())@K
+            if J.shape[1]<self.body.size:J=hstack((J,csr_matrix((J.shape[0],self.body.size-J.shape[1]))),format='csr')
         add('actual_root_translation_acceleration',r,J)
         residual=np.concatenate(rows);J=vstack(mats,format='csr') if jacobian else None
         self.last=dict(residual=residual,jac=hstack((csr_matrix((len(residual),17)),J),format='csr') if jacobian else None,parts=parts,

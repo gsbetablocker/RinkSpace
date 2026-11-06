@@ -54,7 +54,7 @@ S01／S04 等轴焦距、六镜头 Lane 与历史九镜头 joint_mount_flex 基�
 
 来源读取模块可结合既有源库和视觉模块，从原片 RGB 读取边界、材料与拓扑并生成候选。配置 `enable_candidate_admission: true` 才允许候选进入相应准入流程，默认关闭；候选生成、原片回读、身份确认和完整节目验证是不同状态。已有局部真实检查和合成闭环不能证明全节目自动读取已交付。
 
-## 人体局部拟合执行层
+## 人体与鞋刀拟合执行层
 
 S01 全身、共享鞋体与开头分支复用同一身体／鞋刀目标，支持紧凑 FK/LBS、脚部采样缓存、局部导数 CPU 并行、同状态前向复用和共享鞋参的身体重放。独立 CPU 原生库提供完整运动相机的 XYZ 解析导数及可选 OpenMP，保持 ABI2；旧库继续使用原导数入口。`hybrid` 在单窗口、冻结共享鞋参条件下，将 native55 FK、选中皮肤与足腔／鞋口兼容性精确扰动留在 GPU；身体解析导数、相机、CSR 装配和 SciPy TRF 仍在 CPU；连续绝对状态默认用稀疏直接 GN 方向，其他状态及数值回退保留 LSMR。配置与同状态测量见[环境说明](../environments/README.md#人体求解执行优化)；GPU 常驻身体 Jacobian、相机和线性求解尚未实现。
 
@@ -65,6 +65,10 @@ S01 全身、共享鞋体与开头分支复用同一身体／鞋刀目标，支�
 GVHMR／ExMR 相机坐标对照复用同一固定鞋刀、native 投影和现有播放器。ExMR camera-only 入口保留足细化前后输出，关闭世界后处理、贴地、平滑和朝向归一化；其本机接入范围见[环境说明](../environments/README.md#exmr-相机坐标短段对照)。真实人体候选仍有根漂移、图像或接触失败，当前范围与精确绑定集中见[节目结果导航](../events/ankara_2026/programmes/okada_mei_sp/README.md#人体与足鞋结果)。
 
 `ballistic_com_factors.py` 从同一身体／鞋刀状态计算分段体积质量近似质心，在有原片支持的腾空内部对质心加速度减去重力形成有限残差；不把骨盆或网络静止概率当质心／接冰真值。`spin_entry_motion.py` 保留整段连续状态、旧质量基线和失败候选；该次实际结果及剩余回投误差见[入旋记录](../events/ankara_2026/programmes/okada_mei_sp/spin_entry_1104_audit.json)。
+
+`sequence_skate_state.py`／`sequence_refit.py` 在一个完整 S05 状态中联合调整人体和踝枢轴相对鞋 SO(3) 曲线，无独立小窗拼接或逐帧自由鞋位姿。`source_skate_structure_factors.py` 将实际钢刃、刀齿区域、刀尾及刀架的原生源轮廓接入同一投影链；`complete_runner_extent.py` 对明确完整可见的下缘补反向覆盖，并与正向项分摊原预算。`source_support_locations.py` 使用同源、相机／冰面条件化的有限支撑 XY 范围，范围内不吸引到中点，Z 仍由原有有限软项处理；未分左右的可见鞋刀保留集合匹配和身份未知。
+
+当前实际覆盖76–95秒951曝光；源观测为36曝光40条轮廓、32条支撑位置，其余为连续估计。`source_structure_trajectory.py` 导出双脚完整曲线、原生 UV、固定材料点及移动几何见证，并核对真实结果与 PTS；`sequence_delivery.py --family source_structure` 复用现有播放器及旧缓存。新的来源装配、候选和反向覆盖均已真实运行，源码检查与几何闭合不代替准确性验收；刀尾、支撑位置及转出身份仍有[明确失败](../events/ankara_2026/programmes/okada_mei_sp/spin_source_structure_1106_audit.json)。
 
 ## 工程检查
 

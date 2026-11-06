@@ -2,7 +2,8 @@
 
 All internal lengths use the historical solver unit. The template's metric
 parameters are converted once by the frozen scene ratio; export reverses it.
-No blade pitch, independent shoe state or foot-size change is introduced.
+Optional shoe-local rotations keep the registered ankle fixed; neither blade
+pitch nor foot size is changed by that rotation.
 """
 from dataclasses import asdict, replace
 import copy
@@ -166,17 +167,40 @@ class SkateBinding(FootwearBinding):
         t=self.t0+x[:12].reshape(2,6)[:,:3]
         return R,t,self.packet(x)['adapter']
 
-    def transforms(self,P,Q,joints,frames,x=None):
+    def relative_parameters(self,relative_R,x=None):
+        """Apply per-sample shoe-local rotations about the registered ankle."""
+        R,t,_=self.parameters(x)
+        if relative_R is None:return R,t
+        relative_R=np.asarray(relative_R,dtype=float)
+        if relative_R.ndim!=4 or relative_R.shape[1:]!=(2,3,3) or not np.isfinite(relative_R).all():
+            raise ValueError('skate_relative_R must be finite with shape (N,2,3,3)')
+        ankle=-np.einsum('fi,fij->fj',t,R)
+        rotation=R[None]@relative_R
+        origin=-np.einsum('nfij,fj->nfi',rotation,ankle)
+        return rotation,origin
+
+    def transforms(self,P,Q,joints,frames,x=None,*,skate_relative_R=None):
+        if skate_relative_R is not None:
+            R,t=self.relative_parameters(skate_relative_R,x)
+            if len(R)!=len(P):raise ValueError('skate_relative_R sample count differs')
+            RW=np.stack([Q@frames[:,a]@R[:,f] for f,a in enumerate((7,8))],1)
+            OW=np.stack([P+np.einsum('nij,nj->ni',Q,joints[:,a]+np.einsum('nij,nj->ni',frames[:,a],t[:,f])) for f,a in enumerate((7,8))],1)
+            return RW,OW
         R,t,_=self.parameters(x)
         RW=np.stack([Q@frames[:,a]@R[f] for f,a in enumerate((7,8))],1)
         OW=np.stack([P+np.einsum('nij,nj->ni',Q,joints[:,a]+np.einsum('nij,j->ni',frames[:,a],t[f])) for f,a in enumerate((7,8))],1)
         return RW,OW
 
-    def deformation(self,joints,frames,x=None):
+    def deformation(self,joints,frames,x=None,*,skate_relative_R=None):
         R,t,_=self.parameters(x);p=self.packet(x);out=[]
+        dynamic=None
+        if skate_relative_R is not None:
+            dynamic,_=self.relative_parameters(skate_relative_R,x)
+            if len(dynamic)!=len(joints):raise ValueError('skate_relative_R sample count differs')
         for f,(k,a) in enumerate(((4,7),(5,8))):
             ankle=-t[f]@R[f]
-            direction=np.einsum('nji,nj->ni',frames[:,a]@R[f],joints[:,k]-joints[:,a])
+            rotation=R[f] if dynamic is None else dynamic[:,f]
+            direction=np.einsum('nji,nj->ni',frames[:,a]@rotation,joints[:,k]-joints[:,a])
             collar_station=int(np.argmin(abs(p['xs']/p['parameters'].sole_length_m-.28)))
             height=p['floor'][collar_station]+p['rise'][collar_station]
             lam=np.clip((height-ankle[2])/np.maximum(direction[:,2],1e-6),0,1)
@@ -198,9 +222,9 @@ class SkateBinding(FootwearBinding):
         v[...,1]+=alpha[:,:,2,None]*cuff*np.sign(vertices[:,1])
         return v
 
-    def evaluate(self,P,Q,joints,frames,x=None,deformation=None):
-        packet=self.packet(x);R,O=self.transforms(P,Q,joints,frames,x)
-        alpha=self.deformation(joints,frames,x)
+    def evaluate(self,P,Q,joints,frames,x=None,deformation=None,*,skate_relative_R=None):
+        packet=self.packet(x);R,O=self.transforms(P,Q,joints,frames,x,skate_relative_R=skate_relative_R)
+        alpha=self.deformation(joints,frames,x,skate_relative_R=skate_relative_R)
         if deformation is False:alpha*=0
         adapter=np.broadcast_to(packet['adapter'],(len(P),2,self.layout.per_foot,3)).copy()
         adapter[:,:,:self.layout.shell_count]=self.deform(packet['adapter'][:self.layout.shell_count],alpha,x)
@@ -209,18 +233,24 @@ class SkateBinding(FootwearBinding):
             upper_local=self.deform(packet['upper'],alpha,x),
             inner_local=self.deform(packet['inner'],alpha,x))
 
-    def foot_metrics(self,joints,frames,samples=None,x=None,*,hand_local_R=None):
+    def foot_metrics(self,joints,frames,samples=None,x=None,*,hand_local_R=None,skate_relative_R=None):
         R,t,_=self.parameters(x);p=self.packet(x)
+        if skate_relative_R is not None:
+            R,t=self.relative_parameters(skate_relative_R,x)
+            if len(R)!=len(joints):raise ValueError('skate_relative_R sample count differs')
         if samples is None:
             kwargs={} if hand_local_R is None else dict(hand_local_R=hand_local_R)
             samples=self.surface.sample_vertices(joints,frames,self.sample_ids,double_precision=True,**kwargs)
-        feet=[];anchors=[];violations=[];support=[];alpha=self.deformation(joints,frames,x)
+        feet=[];anchors=[];violations=[];support=[];alpha=self.deformation(joints,frames,x,skate_relative_R=skate_relative_R)
         # Inner walls/footbed are generated from the legal outer section; no
         # maximum-width shortcut and no smaller substitute human foot.
         count=len(p['xs'])
         inner=self.deform(p['inner'],alpha,x)[:,:,:count*6].reshape(len(joints),2,count,6,3)
         for f,a in enumerate((7,8)):
-            RB=frames[:,a]@R[f];O=joints[:,a]+np.einsum('nij,j->ni',frames[:,a],t[f])
+            if skate_relative_R is None:
+                RB=frames[:,a]@R[f];O=joints[:,a]+np.einsum('nij,j->ni',frames[:,a],t[f])
+            else:
+                RB=frames[:,a]@R[:,f];O=joints[:,a]+np.einsum('nij,nj->ni',frames[:,a],t[:,f])
             local=np.einsum('nji,nkj->nki',RB,samples-O[:,None]);foot=local[:,self.foot_indices[f]]
             feet.append(foot);anchors.append(np.stack([local[:,ids].mean(1) for ids in self.patch_indices[f]],1))
             # Batched equivalent of six per-frame np.interp calls. This
@@ -261,27 +291,27 @@ class SkateBinding(FootwearBinding):
             self.sample_ids,double_precision=True)
         self.collar_constraints_enabled=True
 
-    def collar_metrics(self,joints,frames,samples=None,x=None,*,hand_local_R=None):
+    def collar_metrics(self,joints,frames,samples=None,x=None,*,hand_local_R=None,skate_relative_R=None):
         from .skate_collar_factors import evaluate
         binding=self
         if x is not None:
             binding=copy.copy(self);binding.x=np.asarray(x).copy()
         chosen=None if samples is None else samples[:,self.collar_sample_positions]
         kwargs={} if hand_local_R is None else dict(hand_local_R=hand_local_R)
-        return evaluate(binding,joints,frames,chosen,**kwargs)
+        return evaluate(binding,joints,frames,chosen,skate_relative_R=skate_relative_R,**kwargs)
 
-    def compatibility_rows(self,joints,frames,samples=None,x=None,*,hand_local_R=None):
+    def compatibility_rows(self,joints,frames,samples=None,x=None,*,hand_local_R=None,skate_relative_R=None):
         kwargs={} if hand_local_R is None else dict(hand_local_R=hand_local_R)
         # The exact foot/shank union is skinned once, with the actual hands.
         # Caller-owned samples and live shape/registration remain unchanged.
         if samples is None and getattr(self,'collar_constraints_enabled',False):
             samples=self.surface.sample_vertices(joints,frames,self.sample_ids,double_precision=True,**kwargs)
-        m=self.foot_metrics(joints,frames,samples,x,**kwargs);n=len(joints)
+        m=self.foot_metrics(joints,frames,samples,x,skate_relative_R=skate_relative_R,**kwargs);n=len(joints)
         anchor=(m['anchors']-m['targets'][None,None])/(.012/self.ratio)
         outside=np.stack([np.max(v,axis=1) for v in m['violations']],1)/(.003/self.ratio)
         rows=np.concatenate((anchor.reshape(n,-1),outside.reshape(n,-1),m['support'].reshape(n,-1)/(.005/self.ratio)),axis=1)
         if getattr(self,'collar_constraints_enabled',False):
-            collar=self.collar_metrics(joints,frames,samples,x,**kwargs)
+            collar=self.collar_metrics(joints,frames,samples,x,skate_relative_R=skate_relative_R,**kwargs)
             rows=np.c_[rows,collar.get('residual_breach_solver',collar['breach_solver'])/(.003/self.ratio)]
         return rows
 

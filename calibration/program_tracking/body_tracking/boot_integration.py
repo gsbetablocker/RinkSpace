@@ -167,7 +167,7 @@ class BootWindowProblem(FullBodyProblem):
 
     def compatibility_from_state(self,s):
         j=np.einsum('nji,nkj->nki',s['Q'],s['native']-s['P'][:,None])
-        return self.binding.compatibility_rows(j,s['frames'],**({} if 'hand_local_R' not in s else {'hand_local_R':s['hand_local_R']}))/np.sqrt(2)
+        return self.binding.compatibility_rows(j,s['frames'],skate_relative_R=s.get('skate_relative_R'),**({} if 'hand_local_R' not in s else {'hand_local_R':s['hand_local_R']}))/np.sqrt(2)
 
     def evaluate(self,x,jacobian=False):
         key=self.binding.x.tobytes()
@@ -182,7 +182,7 @@ class BootWindowProblem(FullBodyProblem):
                 raise TypeError('Resident compatibility requires the audited original consumer')
             if not resident.matches(self.binding):
                 raise ValueError('Resident compatibility shared geometry changed; create a new prepared owner')
-            extra,resident_values=resident.evaluate(d,self.state.active[self.state.active>=6] if jacobian else None)
+            extra,resident_values=resident.evaluate(d,self.state.active[self.state.active>=6] if jacobian else None,skate_relative_R=getattr(d,'skate_relative_R',None))
         else:extra=self.compatibility(d)
         rows=extra.size;blocks=[]
         elapsed=time.perf_counter()-forward_start
@@ -199,7 +199,7 @@ class BootWindowProblem(FullBodyProblem):
             # original world callback until their own chain is implemented.
             if values is None and replay is not None and type(self).compatibility_from_state is BootWindowProblem.compatibility_from_state:
                 values=replay(self.reference,self.mid_ref,d,columns,
-                    lambda native,frames,samples=None:self.binding.compatibility_rows(native,frames,samples,**({} if 'hand_local_R' not in self.mid_ref else {'hand_local_R':self.mid_ref['hand_local_R']}))/np.sqrt(2),
+                    lambda native,frames,samples=None:self.binding.compatibility_rows(native,frames,samples,skate_relative_R=getattr(d,'skate_relative_R',None),**({} if 'hand_local_R' not in self.mid_ref else {'hand_local_R':self.mid_ref['hand_local_R']}))/np.sqrt(2),
                     step=1e-5,surface=getattr(self.binding,'surface',None),vertex_ids=getattr(self.binding,'sample_ids',None))
             base['compatibility_execution']=('cuda_resident_native55_selected_skin' if resident is not None else
                 'exact_native_fk_replay' if values is not None else 'world_finite_difference')
@@ -213,6 +213,13 @@ class BootWindowProblem(FullBodyProblem):
             local=np.stack(derivatives,-1);B=self.state.basis(self.mid_times)
             if hasattr(d,'chain'):
                 J=d.chain(local)
+                if hasattr(d.owner,'shoe_chain'):
+                    if resident is not None:
+                        _,shoe_local=resident.shoe_derivatives(d,d.skate_relative_R,step=1e-8)
+                    else:
+                        from .sequence_skate_state import perturb_relative
+                        shoe_local=np.stack([(self.compatibility(perturb_relative(d,f,a,1e-5))-self.compatibility(perturb_relative(d,f,a,-1e-5)))/(2e-5) for f in (0,1) for a in range(3)],-1)
+                    J+=d.owner.shoe_chain(shoe_local,d.parameters,d.sample_times)
             else:
                 rr=[];cc=[];vv=[];fr,kn=np.nonzero(B)
                 val=local[fr]*B[fr,kn,None,None]

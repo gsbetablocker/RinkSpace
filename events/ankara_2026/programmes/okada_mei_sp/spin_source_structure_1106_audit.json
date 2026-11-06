@@ -1,0 +1,561 @@
+{
+  "schema": "rinkspace.source-structure-integration-audit.v1",
+  "source_seconds": [
+    76.0,
+    95.0
+  ],
+  "source_pts": [
+    972800,
+    1216000
+  ],
+  "time_base": [
+    1,
+    12800
+  ],
+  "frames": 951,
+  "feet": 2,
+  "source_exposures": 36,
+  "source_skate_contours": 40,
+  "associated_source_foot_exposures": 35,
+  "unassigned_source_contours": 5,
+  "source_support_locations": 32,
+  "forward_feature_rows": 278,
+  "complete_runner_reverse_exposures": 22,
+  "accepted_steps": {
+    "first_one_way": 30,
+    "corrected_bidirectional": 35,
+    "total": 65
+  },
+  "stop": {
+    "policy": {
+      "wall_seconds": 1168.0840172999997,
+      "max_accepted": 160,
+      "max_outer": 1,
+      "stagnation_window": 12,
+      "min_violation_improvement_m": 0.0001,
+      "min_joint_relative_improvement": 1e-07,
+      "max_image_cost_increase": 0.05,
+      "max_pose_cost_increase": 0.1,
+      "allow_penalty_growth": false
+    },
+    "start_now": 18046.5169727,
+    "last_now": 19216.9018692,
+    "checks": 111,
+    "accepted": 35,
+    "outer_completed": 0,
+    "baseline": {
+      "now": 18046.5448569,
+      "elapsed_seconds": 0.02788420000069891,
+      "accepted": 0,
+      "outer_completed": 0,
+      "violation_m": 0.0019284619489642525,
+      "image_cost": 1141.8813257389777,
+      "pose_cost": null,
+      "joint_cost": 1357.1934899717417,
+      "quality_metrics": {}
+    },
+    "latest": {
+      "now": 19216.9018692,
+      "elapsed_seconds": 1170.3848964999997,
+      "accepted": 35,
+      "outer_completed": 0,
+      "violation_m": 0.0013883741947927739,
+      "image_cost": 1136.8315525993041,
+      "pose_cost": null,
+      "joint_cost": 1352.433353902568,
+      "quality_metrics": {}
+    },
+    "best_violation_m": 0.0013883741947927739,
+    "best_at_accepted": 35,
+    "violation_stagnation_enabled": true,
+    "comparable_violation_history": [
+      {
+        "accepted": 23,
+        "best_violation_m": 0.0013982751647855526
+      },
+      {
+        "accepted": 24,
+        "best_violation_m": 0.001395247759168215
+      },
+      {
+        "accepted": 25,
+        "best_violation_m": 0.001395247759168215
+      },
+      {
+        "accepted": 26,
+        "best_violation_m": 0.0013902906436306392
+      },
+      {
+        "accepted": 27,
+        "best_violation_m": 0.0013902906436306392
+      },
+      {
+        "accepted": 28,
+        "best_violation_m": 0.0013902906436306392
+      },
+      {
+        "accepted": 29,
+        "best_violation_m": 0.0013902906436306392
+      },
+      {
+        "accepted": 30,
+        "best_violation_m": 0.0013902906436306392
+      },
+      {
+        "accepted": 31,
+        "best_violation_m": 0.0013902906436306392
+      },
+      {
+        "accepted": 32,
+        "best_violation_m": 0.0013902906436306392
+      },
+      {
+        "accepted": 33,
+        "best_violation_m": 0.0013902906436306392
+      },
+      {
+        "accepted": 34,
+        "best_violation_m": 0.0013902906436306392
+      },
+      {
+        "accepted": 35,
+        "best_violation_m": 0.0013883741947927739
+      }
+    ],
+    "comparable_joint_history": [
+      {
+        "accepted": 23,
+        "joint_cost": 1352.543790577216
+      },
+      {
+        "accepted": 24,
+        "joint_cost": 1352.5324902064622
+      },
+      {
+        "accepted": 25,
+        "joint_cost": 1352.5241593314126
+      },
+      {
+        "accepted": 26,
+        "joint_cost": 1352.5133554382385
+      },
+      {
+        "accepted": 27,
+        "joint_cost": 1352.501791049685
+      },
+      {
+        "accepted": 28,
+        "joint_cost": 1352.4932724604469
+      },
+      {
+        "accepted": 29,
+        "joint_cost": 1352.484117361672
+      },
+      {
+        "accepted": 30,
+        "joint_cost": 1352.4737163173118
+      },
+      {
+        "accepted": 31,
+        "joint_cost": 1352.4683862556924
+      },
+      {
+        "accepted": 32,
+        "joint_cost": 1352.4612756762149
+      },
+      {
+        "accepted": 33,
+        "joint_cost": 1352.4530804433232
+      },
+      {
+        "accepted": 34,
+        "joint_cost": 1352.43828141131
+      },
+      {
+        "accepted": 35,
+        "joint_cost": 1352.433353902568
+      }
+    ],
+    "progress_diagnostics": [
+      {
+        "code": "structural_plateau_with_joint_progress",
+        "accepted_window": 12,
+        "joint_relative_improvement": 8.165108990738764e-05,
+        "meaning": "A structural component plateau is not stagnation of the fitted joint objective."
+      }
+    ],
+    "stopped_by_policy": true,
+    "first_stop_now": 19216.9018692,
+    "reasons": [
+      {
+        "code": "wall_budget",
+        "category": "budget",
+        "message": "Wall-time budget reached.",
+        "elapsed_seconds": 1170.3848964999997,
+        "limit_seconds": 1168.0840172999997
+      }
+    ],
+    "quality_failed": false,
+    "quality_reasons": [],
+    "quality_limits": {},
+    "quality_diagnostics": [
+      {
+        "code": "relative_quality_unavailable",
+        "metric": "pose_cost",
+        "reason": "missing_initial_cost",
+        "baseline": null,
+        "latest": null
+      }
+    ],
+    "convergence_claim": false,
+    "meaning": "Quality/domain failure rejects the attempted candidate; budget/stagnation alone does not. Neither establishes convergence nor source acceptance."
+  },
+  "fixed_original_body_pixel_baseline": {
+    "body_pixel_scaled_cost": 1097.7815585399935,
+    "source_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\full_source_fit_1106\\start_quality.json",
+    "source_sha256": "32abc20ff8e83bbcc24a2b8edf4b6db81fc4ccff3a9d47f5c3ca60505e372424",
+    "meaning": "same original source-body pixel guard across the diagnosed objective correction; new contour objective not used to reset source quality"
+  },
+  "body_pixel_cost_change_from_original_parent_fraction": 0.003552973750547972,
+  "metrics": {
+    "parent": {
+      "runner_lower_edge": {
+        "median_px": 12.531192687360889,
+        "p95_px": 31.805967773309806,
+        "max_px": 61.889256016120704
+      },
+      "runner_upper_edge": {
+        "median_px": 12.207230792255551,
+        "p95_px": 28.755520298541164,
+        "max_px": 58.60322119389561
+      },
+      "toe_pick": {
+        "median_px": 7.002032052473738,
+        "p95_px": 27.660396485577557,
+        "max_px": 65.62867173953562
+      },
+      "rear_extension": {
+        "median_px": 15.277582467862096,
+        "p95_px": 29.14905427946579,
+        "max_px": 40.21073064573125
+      },
+      "outside_source_support_range_m": {
+        "median": 0.15024027134718954,
+        "p95": 0.5740445695842187,
+        "maximum": 0.8089291515455092
+      },
+      "raw_nominal_ice_height_m": {
+        "minimum": -0.01994422189814914,
+        "median": 0.03099400743296313,
+        "maximum": 0.06919659196222455
+      }
+    },
+    "current": {
+      "runner_lower_edge": {
+        "median_px": 8.085997443833895,
+        "p95_px": 13.445626294596286,
+        "max_px": 21.877029455824555
+      },
+      "runner_upper_edge": {
+        "median_px": 8.866918800094783,
+        "p95_px": 14.312027760777555,
+        "max_px": 19.432750565755196
+      },
+      "toe_pick": {
+        "median_px": 3.641168185561628,
+        "p95_px": 10.27601970811665,
+        "max_px": 16.1646700522441
+      },
+      "rear_extension": {
+        "median_px": 8.509051215851501,
+        "p95_px": 14.608236153544997,
+        "max_px": 19.524692133816878
+      },
+      "outside_source_support_range_m": {
+        "median": 0.0747925819998326,
+        "p95": 0.3843057310331969,
+        "maximum": 0.5267833775576315
+      },
+      "raw_nominal_ice_height_m": {
+        "minimum": -0.013257610843396954,
+        "median": 0.035282472821954194,
+        "maximum": 0.061380917283186565
+      }
+    }
+  },
+  "trajectory_statistics": {
+    "parent": {
+      "origin_maximum_20ms_jump": {
+        "available": true,
+        "max_displacement_conditional_m": 0.3232246045021038,
+        "from_pts": 1037056,
+        "to_pts": 1037312,
+        "from_source_seconds": 81.02,
+        "to_source_seconds": 81.04,
+        "delta_seconds": 0.02,
+        "item_indices": [
+          1
+        ],
+        "delta_xyz_conditional_m": [
+          0.04278709795232061,
+          0.3203629903539973,
+          -0.003311135123271136
+        ],
+        "intervals_compared": 950,
+        "interpretation": "model displacement, not source-measured speed or accuracy"
+      },
+      "COM_proxy_maximum_20ms_jump": {
+        "available": true,
+        "max_displacement_conditional_m": 0.13399637344078802,
+        "from_pts": 976128,
+        "to_pts": 976384,
+        "from_source_seconds": 76.26,
+        "to_source_seconds": 76.28,
+        "delta_seconds": 0.02,
+        "item_indices": [],
+        "delta_xyz_conditional_m": [
+          -0.08946449174776205,
+          -0.09947793572057673,
+          -0.0074345891864001645
+        ],
+        "intervals_compared": 950,
+        "interpretation": "model displacement, not source-measured speed or accuracy"
+      },
+      "fixed_material_maximum_20ms_jump": {
+        "available": true,
+        "max_displacement_conditional_m": 0.359822578520844,
+        "from_pts": 1037056,
+        "to_pts": 1037312,
+        "from_source_seconds": 81.02,
+        "to_source_seconds": 81.04,
+        "delta_seconds": 0.02,
+        "item_indices": [
+          1,
+          2
+        ],
+        "delta_xyz_conditional_m": [
+          -0.013295985020240764,
+          0.3583787575198416,
+          0.029328671198420087
+        ],
+        "intervals_compared": 950,
+        "interpretation": "model displacement, not source-measured speed or accuracy"
+      },
+      "moving_runner_witness_XY_span_88_92": [
+        {
+          "model_foot": 0,
+          "source_seconds": [
+            88.0,
+            92.0
+          ],
+          "samples": 201,
+          "xy_min_conditional_m": [
+            -9.567336927125565,
+            -7.243947297725567
+          ],
+          "xy_max_conditional_m": [
+            -8.542984372062076,
+            -6.660227122568198
+          ],
+          "xy_axis_span_conditional_m": [
+            1.0243525550634889,
+            0.5837201751573691
+          ],
+          "maximum_pairwise_xy_distance_conditional_m": 1.0779326981871946,
+          "witness": "moving exact minimum on finite steel arcs; not a fixed material/contact point"
+        },
+        {
+          "model_foot": 1,
+          "source_seconds": [
+            88.0,
+            92.0
+          ],
+          "samples": 201,
+          "xy_min_conditional_m": [
+            -9.327757949415588,
+            -7.1463755462089695
+          ],
+          "xy_max_conditional_m": [
+            -8.674137683701922,
+            -6.764322817010374
+          ],
+          "xy_axis_span_conditional_m": [
+            0.6536202657136663,
+            0.38205272919859556
+          ],
+          "maximum_pairwise_xy_distance_conditional_m": 0.658824916364366,
+          "witness": "moving exact minimum on finite steel arcs; not a fixed material/contact point"
+        }
+      ]
+    },
+    "current": {
+      "origin_maximum_20ms_jump": {
+        "available": true,
+        "max_displacement_conditional_m": 0.32303242025598167,
+        "from_pts": 1037056,
+        "to_pts": 1037312,
+        "from_source_seconds": 81.02,
+        "to_source_seconds": 81.04,
+        "delta_seconds": 0.02,
+        "item_indices": [
+          1
+        ],
+        "delta_xyz_conditional_m": [
+          0.04221142345180695,
+          0.32025211041369506,
+          -0.0025934614290318847
+        ],
+        "intervals_compared": 950,
+        "interpretation": "model displacement, not source-measured speed or accuracy"
+      },
+      "COM_proxy_maximum_20ms_jump": {
+        "available": true,
+        "max_displacement_conditional_m": 0.13411330310404979,
+        "from_pts": 976128,
+        "to_pts": 976384,
+        "from_source_seconds": 76.26,
+        "to_source_seconds": 76.28,
+        "delta_seconds": 0.02,
+        "item_indices": [],
+        "delta_xyz_conditional_m": [
+          -0.08951243910184736,
+          -0.0995879763635496,
+          -0.007492414786294144
+        ],
+        "intervals_compared": 950,
+        "interpretation": "model displacement, not source-measured speed or accuracy"
+      },
+      "fixed_material_maximum_20ms_jump": {
+        "available": true,
+        "max_displacement_conditional_m": 0.3588379776636794,
+        "from_pts": 1037056,
+        "to_pts": 1037312,
+        "from_source_seconds": 81.02,
+        "to_source_seconds": 81.04,
+        "delta_seconds": 0.02,
+        "item_indices": [
+          1,
+          2
+        ],
+        "delta_xyz_conditional_m": [
+          -0.013489873597185564,
+          0.3575296201038656,
+          0.027482508482247148
+        ],
+        "intervals_compared": 950,
+        "interpretation": "model displacement, not source-measured speed or accuracy"
+      },
+      "moving_runner_witness_XY_span_88_92": [
+        {
+          "model_foot": 0,
+          "source_seconds": [
+            88.0,
+            92.0
+          ],
+          "samples": 201,
+          "xy_min_conditional_m": [
+            -9.564591403615532,
+            -7.24354933638277
+          ],
+          "xy_max_conditional_m": [
+            -8.550995910562996,
+            -6.658934205486238
+          ],
+          "xy_axis_span_conditional_m": [
+            1.0135954930525362,
+            0.5846151308965322
+          ],
+          "maximum_pairwise_xy_distance_conditional_m": 1.0754458754244829,
+          "witness": "moving exact minimum on finite steel arcs; not a fixed material/contact point"
+        },
+        {
+          "model_foot": 1,
+          "source_seconds": [
+            88.0,
+            92.0
+          ],
+          "samples": 201,
+          "xy_min_conditional_m": [
+            -9.159737520190314,
+            -7.104959554500176
+          ],
+          "xy_max_conditional_m": [
+            -8.6661807011076,
+            -6.752307143383039
+          ],
+          "xy_axis_span_conditional_m": [
+            0.4935568190827144,
+            0.35265241111713674
+          ],
+          "maximum_pairwise_xy_distance_conditional_m": 0.4967404378257928,
+          "witness": "moving exact minimum on finite steel arcs; not a fixed material/contact point"
+        }
+      ]
+    }
+  },
+  "result_closure_checks": {
+    "parent": {
+      "P_world_mid": 8.881784197001252e-16,
+      "Q_world_mid": 0.0,
+      "local_R_mid": 0.0,
+      "native22_world_mid": 1.7763568394002505e-15,
+      "skate_R_world_mid": 0.0,
+      "skate_origin_world_mid": 3.552713678800501e-15,
+      "com_world_mid": 1.7763568394002505e-15,
+      "skate_edge_world_mid": 7.105427357601002e-15,
+      "maximum_COCO_native_pixel_difference": 3.8619418774032965e-10,
+      "native_projected_exposures": 951
+    },
+    "current": {
+      "P_world_mid": 1.7763568394002505e-15,
+      "Q_world_mid": 0.0,
+      "local_R_mid": 0.0,
+      "native22_world_mid": 1.7763568394002505e-15,
+      "skate_R_world_mid": 0.0,
+      "skate_origin_world_mid": 3.552713678800501e-15,
+      "com_world_mid": 3.552713678800501e-15,
+      "runner_edges_world_mid": 1.7763568394002505e-15,
+      "skate_edge_world_mid": 7.105427357601002e-15,
+      "maximum_COCO_native_pixel_difference": 4.1461589717073366e-10,
+      "native_projected_exposures": 951
+    }
+  },
+  "parameter": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_sequence_source_structure_1106.npz",
+    "sha256": "2507709856fc631746a8cd2b58875772b8f9dd412129fb43cc1d4a4c086d4375"
+  },
+  "original_one_way_candidate": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_sequence_source_structure_pass1_1106.npz",
+    "sha256": "9dd9086e36c5cd027d3e3e9123609886972ccc587a840cb31c46912584a69aa3",
+    "failure": "source-to-model only does not cover unsupported full model extent; retained"
+  },
+  "documents": {
+    "structures": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_source_skate_structures_1106.json",
+    "integration": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\full_structure_1106_inputs\\integration_fit_v2_extent.json",
+    "trajectory": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\trajectory_source_1106\\trajectory.npz",
+    "trajectory_csv": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\trajectory_source_1106\\trajectory.csv",
+    "gallery": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\source_review_1106\\index.html",
+    "comparisons": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\source_final_cards_1106\\comparison.json",
+    "player_config": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\viewer3d_sequence_source_structure_1106.json",
+    "player_readiness": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\source_review_1106\\player_readiness.json"
+  },
+  "source_metric_scope": "same-source fit diagnostics, not independent held-out verification; original full22 used by explicit new task admission",
+  "ice": "Inherited finite soft policy, extra source support uses same policy; no millimetre failure gate or penalty continuation",
+  "unresolved": [
+    "87.64s runner tail still too high in native source overlay",
+    "92.8s model support witness remains about0.527 conditional metres outside source pixel-range hull",
+    "94.4-95.0s five source contours retain unassigned anatomical identity; optimizer set association is not source truth",
+    "Middle exposures are estimates of one continuous state, not manually observed blade labels",
+    "Whole-objective FD relative error about0.00104; inherited dynamic compatibility/cavity blocks about0.00675/0.00935 at2e-7 step, new source factors below3.6e-6",
+    "Nominal ice heights and moving lowest witness are geometry diagnostics, not measured forces/contact materials"
+  ],
+  "tests": {
+    "passed": 52,
+    "subtests": 40,
+    "all951_native_world_and_pts_closure": true
+  },
+  "network_inference_run": false,
+  "GUI_opened": false,
+  "accuracy_accepted": false,
+  "user_accepted": false
+}

@@ -15,7 +15,7 @@ from .data import ResultCatalog, CachedSequence, shell_triangles, ribbon_triangl
 from .framing import fit_comparison_camera, comparison_panel_sizes
 from .imgui_buffers import install_dynamic_buffers
 from .source import SourceVideo, SupportObservations, region_outline, source_value, observation_used, load_world_regions
-from .blade_review import BladeReview, overlay_primitives, diagnostic_lines
+from .blade_review import BladeReview, overlay_primitives, diagnostic_lines, skate_axis_primitives
 
 
 class FrameObserver(Node):
@@ -64,7 +64,7 @@ class ResultsPlayer(Viewer):
         self.ice_alpha = .48
         self.visible = dict(surface=True, skeleton=True, shoes=True, trajectory=True, pelvis=True,
                             rink_lines=True, boards=True, ice=True, wear=False,
-                            footbed=False, cavity=False, axes=False, collar=False,
+                            footbed=False, cavity=False, axes=False, blade_axes=False, collar=False,
                             contact=True, skate_reference=False, com=True, blade_material=True)
         for key,value in catalog.config.get('initial_visible',{}).items():
             if key in self.visible:self.visible[key]=bool(value)
@@ -87,6 +87,11 @@ class ResultsPlayer(Viewer):
         self.blade_review=(BladeReview(catalog.assets.resolve(review_asset,must_exist=True),
                                       assets=catalog.assets,time_base=catalog.time_base) if review_asset else None)
         self.show_blade_review=True
+        has_source_structures=bool(self.blade_review and self.blade_review.rows.get('source_structures'))
+        self.show_model_reference=not has_source_structures
+        self.show_model_runner=bool(catalog.config.get('source_review_model_runner_default',False))
+        self.show_legacy_source=not has_source_structures
+        self.show_source_ice_grid=False
         self.world_region_nodes = []
         self._build_rink()
         old = self._read_session() if restore else {}
@@ -240,7 +245,7 @@ class ResultsPlayer(Viewer):
                     for offset in (14,31):equipment.append(keep(Lines(gear[:,offset:offset+17],r_base=.003,color=color,name='Blade edge '+str(foot+1),is_selectable=False)))
                 else:equipment.append(keep(Lines(gear,r_base=.004,color=color,name='Old blade proxy '+str(foot+1),is_selectable=False)))
             layers['shoes']=equipment
-            footbed_nodes=[];cavity_nodes=[];axis_nodes=[];collar_nodes=[]
+            footbed_nodes=[];cavity_nodes=[];axis_nodes=[];blade_axis_nodes=[];collar_nodes=[]
             contact_nodes=[];reference_nodes=[];com_nodes=[];material_nodes=[]
             if 'com_world_mid' in s:
                 cross=np.eye(3)[:,None,:]*np.array([-1.,1.])[None,:,None]
@@ -297,15 +302,22 @@ class ResultsPlayer(Viewer):
                     points=s['axes'][:,:,index].reshape(len(self.catalog.pts),-1,3)
                     color=[(.95,.25,.25,1),(.3,.95,.3,1),(.3,.6,1.,1)][index%3]
                     axis_nodes.append(keep(Lines(points,mode='lines',r_base=.0025,color=color,name='Axis '+str(label),is_selectable=False)))
+            if versioned_skate and 'skate_R' in s and 'skate_origin' in s:
+                review=getattr(self,'blade_review',None)
+                ice_normal=(review.model_array(definition['id'],'ice_normal_world',self.catalog.pts)
+                            if review is not None else None)
+                for arrow in skate_axis_primitives(s,unit_ratio=sequence.meta['uniform_unit_reexpression_ratio'],ice_normal_world=ice_normal):
+                    blade_axis_nodes.append(keep(Lines(arrow['points'],mode='lines',r_base=.0015,
+                        color=arrow['color'],name=arrow['name'],is_selectable=False)))
             layers.update(wear=[],footbed=footbed_nodes,cavity=cavity_nodes,axes=axis_nodes,collar=collar_nodes,
-                          contact=contact_nodes,skate_reference=reference_nodes,com=com_nodes,blade_material=material_nodes)
+                          blade_axes=blade_axis_nodes,contact=contact_nodes,skate_reference=reference_nodes,com=com_nodes,blade_material=material_nodes)
             trajectory=keep(Lines(s['G'],r_base=.018,color=(1.,.75,.12,1),name='Whole saved clip pelvis vertical projection',is_selectable=False))
             layers['trajectory']=[trajectory]
             vertical=keep(Lines(np.stack([s['P'],s['G']],axis=1),r_base=.007,color=(1.,.27,.67,1),name='P to G world vertical',is_selectable=False))
             pelvis=keep(Spheres(s['P'][:,None],radius=.032,color=(1.,.27,.67,1),name='P pelvis',is_selectable=False))
             ground=keep(Spheres(s['G'][:,None],radius=.04,color=(1.,.78,.12,1),name='G pelvis projection',is_selectable=False))
             layers['pelvis']=[vertical,pelvis,ground]
-            for key in ('surface','skeleton','shoes','trajectory','pelvis','wear','footbed','cavity','axes','collar','contact','skate_reference','com','blade_material'):
+            for key in ('surface','skeleton','shoes','trajectory','pelvis','wear','footbed','cavity','axes','blade_axes','collar','contact','skate_reference','com','blade_material'):
                 for node in layers[key]:
                     node.current_frame_id=frame
                     node.enabled=self.visible.get(key,False)
@@ -355,11 +367,13 @@ class ResultsPlayer(Viewer):
             self.visible.update(surface=True,shoes=True,skeleton=False,trajectory=False,pelvis=False,
                                 rink_lines=False,boards=False,ice=False,wear=True,collar=True,
                                 footbed='footbed' in diagnostic_layers,cavity='cavity' in diagnostic_layers,axes='axes' in diagnostic_layers)
+            if 'blade_axes' in self.visible:self.visible['blade_axes']='blade_axes' in diagnostic_layers
         else:
             if hasattr(self,'_pre_wear_visibility'):
                 self.visible.update(self._pre_wear_visibility);del self._pre_wear_visibility
                 self.boot_alpha=self._pre_wear_boot_alpha;del self._pre_wear_boot_alpha
             self.visible.update(wear=False,collar=False,footbed=False,cavity=False,axes=False)
+            if 'blade_axes' in self.visible:self.visible['blade_axes']=False
         self.apply_visibility()
         for node in self.layers.get('shoes',[]):
             if node.name.startswith('Boot candidate'):node.color=(*node.color[:3],self.boot_alpha)
@@ -494,7 +508,7 @@ class ResultsPlayer(Viewer):
             local_frame=frame,source_pts=int(self.catalog.pts[frame]),source_seconds=float(self.catalog.seconds[frame]),
             playing=bool(self.run_animations),follow=self.follow,visible=self.visible,
             wear_inspection=self.wear_inspection,boot_section=self.boot_section,
-            inspection_layers=[key for key in ('footbed','cavity','axes') if self.visible.get(key,False)],
+            inspection_layers=[key for key in ('footbed','cavity','axes','blade_axes') if self.visible.get(key,False)],
             camera=dict(position=cam.position.tolist(),target=cam.target.tolist(),up=cam.up.tolist(),
                         is_ortho=bool(cam.is_ortho),ortho_size=float(cam.ortho_size)),
             geometry_cache=str(self.sequence.path),accuracy_accepted=False)
@@ -536,11 +550,33 @@ class ResultsPlayer(Viewer):
                 imgui.text('原片 PTS %d  |  time_base %d/%d'%(pts,*self.catalog.time_base))
                 imgui.text('当前保存版本：'+self.variant['id'])
                 if self.blade_review is not None:
-                    _,self.show_blade_review=imgui.checkbox('原片叠加：鞋轴、刀材料轴和源区域',self.show_blade_review)
-                    imgui.text_wrapped('模型鞋轴橙；刀后蓝／中黄／前白；源观测绿。可见钢子段不是整刀轴或材料前后端。')
+                    _,self.show_blade_review=imgui.checkbox('原片源结构描线（非模型）',self.show_blade_review)
+                    _,self.show_model_runner=imgui.checkbox('模型钢刃回投（深粉下缘／浅粉上缘）',self.show_model_runner)
+                    _,self.show_model_reference=imgui.checkbox('模型参考轴（蓝／橙；不是轮廓）',self.show_model_reference)
+                    _,self.show_legacy_source=imgui.checkbox('旧源区域与短线段',self.show_legacy_source)
+                    _,self.show_source_ice_grid=imgui.checkbox('冰面坐标辅助网格（相机回投）',self.show_source_ice_grid)
+                    source_pts=sorted(self.blade_review.rows.get('source_structures',{}))
+                    if source_pts:
+                        if imgui.button('上一个源标注'):
+                            previous=[p for p in source_pts if p<pts];self.seek(int(np.searchsorted(self.catalog.pts,previous[-1] if previous else source_pts[-1])))
+                        imgui.same_line()
+                        if imgui.button('下一个源标注'):
+                            following=[p for p in source_pts if p>pts];self.seek(int(np.searchsorted(self.catalog.pts,following[0] if following else source_pts[0])))
+                        pts=int(self.catalog.pts[self.frame])
+                        current_sources=self.blade_review.rows['source_structures'].get(pts,[])
+                        imgui.text('完整鞋刀源描线：%d / %d曝光；当前帧：%s'%(len(source_pts),len(self.catalog.pts),'有' if current_sources else '尚未标注'))
+                        imgui.text_wrapped('源描线：青鞋体，橙鞋底/鞋跟，紫刀架，绿钢刃，红刀齿区域，蓝刀尾；虚线为局部分界/推断。')
+                        fit_binding=self.blade_review.document.get('source_structure_fit_variants',{}).get(self.variant['id'])
+                        if fit_binding:
+                            imgui.text_wrapped(fit_binding['description_zh'])
+                            count=sum(1 for row in fit_binding.get('feature_rows',[])if row['pts']==pts)
+                            support_count=sum(1 for row in fit_binding.get('support_rows',[])if row['pts']==pts)
+                            unassigned_count=sum(row.get('feature_rows_count',0)for row in fit_binding.get('unassigned_source_sets',[])if row['pts']==pts)
+                            imgui.text('当前曝光直接入拟合：%d条结构 / %d条未分左右结构 / %d条支撑位置'%(count,unassigned_count,support_count))
+                        else:imgui.text_wrapped('此旧候选未使用本轮完整描线；源图层用于同帧比较。')
                 mask=state.get('support_image_in_optimization')
                 used='unknown（未保存）' if mask is None else ('是' if np.any(mask) else '否')
-                imgui.text('此版本是否使用新增原图观测：'+used)
+                if self.show_legacy_source:imgui.text('保存状态中旧源区域的整体入优化标记：'+used)
                 try:
                     if self.source_reader is None:self.source_reader=SourceVideo(self.catalog.source_video,self.catalog.time_base)
                     if self.source_texture_pts!=pts:
@@ -560,28 +596,46 @@ class ResultsPlayer(Viewer):
                 elif self.source_texture_pts==pts:
                     review=self.blade_review.at(self.variant['id'],pts) if self.blade_review is not None else None
                     if review is not None:
-                        rows=review['source_regions'] if self.show_blade_review else []
+                        rows=review['source_regions'] if self.show_legacy_source else []
                     else:rows=self.source_regions.at(pts) if self.source_regions else []
-                    primitives=overlay_primitives(review) if review is not None and self.show_blade_review else []
+                    primitives=(overlay_primitives(review,include_model_reference=self.show_model_reference,
+                        include_model_contours=self.show_model_runner,include_source_structures=self.show_blade_review,
+                        include_source_legacy=self.show_legacy_source,include_ice_grid=self.show_source_ice_grid) if review is not None else [])
                     width,height=self.source_image_size
                     display_width=max(100.,imgui.get_content_region_available()[0])
                     self.gui_source_image(rows,(0.,0.,float(width),float(height)),display_width,primitives)
-                    bounds=[primitive['points'] for primitive in primitives if primitive['kind']!='text']
-                    if review is None:bounds=[region_outline(row) for row in rows]
-                    if bounds:
-                        points=np.concatenate(bounds)
+                    crops=[]
+                    for source_row in ([] if review is None else review.get('source_structures',[])):
+                        source_points=[np.asarray(f.get('points_uv',[]),float)for f in source_row['features'].values()if len(f.get('points_uv',[]))]
+                        if source_points:crops.append((source_row.get('foot'),source_row.get('source_track_id'),np.concatenate(source_points)))
+                    if not crops:
+                        bounds=[primitive['points'] for primitive in primitives if primitive['kind']!='text']
+                        if review is None:bounds=[region_outline(row)for row in rows]
+                        if bounds:crops=[(None,None,np.concatenate(bounds))]
+                    for source_foot,source_track,points in crops:
                         lower=np.maximum(points.min(0)-35,0);upper=np.minimum(points.max(0)+35,[width,height])
                         if np.all(upper>lower):
-                            imgui.text('当前鞋／刀轴与源区域放大（源绿）' if review is not None else '当前源区域放大（fit 橙 / review 紫）')
-                            crop_width=min(display_width,240.*(upper[0]-lower[0])/max(upper[1]-lower[1],1.))
+                            imgui.text('源鞋刀放大 | foot=%s%s'%(str(source_foot),''if source_track is None else' | '+source_track))
+                            crop_width=min(display_width,420.*(upper[0]-lower[0])/max(upper[1]-lower[1],1.))
                             self.gui_source_image(rows,(*lower,*upper),crop_width,primitives)
-                    elif self.show_blade_review or review is None:imgui.text('本曝光无原图区域；不沿用相邻帧区域。')
+                    if not crops and(self.show_blade_review or review is None):imgui.text('本曝光没有完整源结构描线；不以模型线冒充源图结果。')
                     for row in rows:
                         used=observation_used(state,row,self.frame)
                         used_label='unknown' if used=='unknown' else ('是' if used else '否')
                         imgui.text_wrapped('%s | foot=%s | %s | %s | 本PTS/foot新增观测入优化=%s'%
                             (row.get('id',''),row.get('foot','unknown'),row['role'],row['kind'],used_label))
-                    if review is not None and self.show_blade_review:
+                    if review is not None:
+                        for location in review.get('source_plane_locations',[]):
+                            xy=location['xy_conditional_m'];radius=location.get('pixel_radius_max_offset_m')
+                            imgui.text_wrapped('源交界代表位置：X %.3f m / Y %.3f m（当前场地尺度；拟合使用整段有限范围）'%(xy[0],xy[1]))
+                            if radius is not None:imgui.text_wrapped('像素定位范围约 %.1f cm；未含相机/场地标定误差。'%(radius*100))
+                            imgui.text_wrapped('已按连续动作识别为支撑脚；坐标按源交界位于冰面计算，未据此判定逐点接触和内外刃。')
+                            fit_binding=self.blade_review.document.get('source_structure_fit_variants',{}).get(self.variant['id'],{})
+                            measured=next((r for r in fit_binding.get('support_diagnostics',[])if r['pts']==pts and r['foot']==location['foot']),None)
+                            if measured is not None:
+                                outside=float(np.linalg.norm(measured['outside_source_range_xy_conditional_m']))
+                                imgui.text_wrapped('模型钢刃见证点XY离源范围 %.1f cm；参考面高度 %.1f cm（几何诊断）'%(outside*100,measured['predicted_runner_height_conditional_m']*100))
+                    if review is not None and self.show_legacy_source:
                         for row in review['source_boot_axes']:
                             imgui.text_wrapped('源鞋轴 foot=%d | %s | 不确定性：%s'%
                                 (row['foot'],row.get('role','unknown'),row.get('source_uncertainty','unknown')))
@@ -749,9 +803,15 @@ class ResultsPlayer(Viewer):
             if changed:
                 for node in self.layers['shoes']:
                     if node.name.startswith('Boot candidate'):node.color=(*node.color[:3],self.boot_alpha)
-            for label,key in [('足床与锚点','footbed'),('内腔线框','cavity'),('小腿/下鞋/刀具坐标轴','axes'),('标色鞋口边界','collar')]:
+            for label,key in [('足床与锚点','footbed'),('内腔线框','cavity'),('小腿/下鞋/刀具坐标轴','axes'),('模型鞋刀 F/L/U 与冰面法向（非源接触）','blade_axes'),('标色鞋口边界','collar')]:
                 changed,self.visible[key]=imgui.checkbox(label,self.visible[key])
                 if changed:self.apply_visibility()
+            if self.visible['blade_axes']:
+                if 'skate_R' in s and 'skate_origin' in s:
+                    for foot in range(2):imgui.text_wrapped('足 %d | F 红（前向）/ L 绿（横向）/ U 蓝（向上）；保存模型轴，非源接触。'%foot)
+                    saved_normal=any(node.name.startswith('Model skate iceN ') for node in self.layers.get('blade_axes',[]))
+                    imgui.text_wrapped('iceN 黄：保存的冰面法向。' if saved_normal else 'iceN 未保存或精确 PTS 不齐；不补造法向箭线。')
+                else:imgui.text_wrapped('本候选未保存版本鞋刀旋转与原点，F/L/U 未知。')
             imgui.set_next_item_width(175)
             changed,section=imgui.combo('鞋壳剖面',self.boot_section,['不隐藏','隐藏侧面 0','隐藏侧面 1','隐藏朝向相机侧面'])
             if changed:

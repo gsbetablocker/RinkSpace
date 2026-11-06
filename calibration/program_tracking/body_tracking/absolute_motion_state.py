@@ -86,6 +86,7 @@ class MotionDelta(np.ndarray):
     def __array_finalize__(self,parent):
         if parent is not None:
             self.owner=getattr(parent,'owner',None);self.parameters=getattr(parent,'parameters',None);self.sample_times=getattr(parent,'sample_times',None)
+            self.skate_relative_R=getattr(parent,'skate_relative_R',None)
     def chain(self,local,sample_indices=None):
         return self.owner.chain(local,self.parameters,self.sample_times,sample_indices=sample_indices)
     def rotation_chain(self,blocks,sample_indices=None):
@@ -205,6 +206,8 @@ def absolute_reference(shared,curve,*,root=None):
         def at(self,t):
             t=np.atleast_1d(t).astype(float);s=evaluate_curve(self.absolute_curve,t)
             result={k:s[k] for k in ('P','Q','local_R')}
+            shoe=getattr(self,'relative_skate_curve',None)
+            if shoe is not None:result['skate_relative_R']=evaluate_curve(shoe,t)['rotations']
             if self.hand_curves is not None:
                 from .hand_state import evaluate_hands
                 result['hand_local_R']=evaluate_hands(self.hand_curves,t)

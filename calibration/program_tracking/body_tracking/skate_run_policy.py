@@ -111,6 +111,29 @@ def _metric(value):
     return value if math.isfinite(value) and value >= 0 else None
 
 
+def image_trial_quality(baseline, current_cost, relative_limit):
+    """Pure trial check against the existing initial-image relative limit.
+
+    Missing/zero baselines cannot establish a relative guard. This helper does
+    not observe a candidate, update a monitor or replace the actual objective.
+    """
+    def finite(value):
+        if value is None or isinstance(value, bool):return None
+        try:value = float(value)
+        except (TypeError, ValueError, OverflowError):return None
+        return value if math.isfinite(value) else None
+    baseline, current_cost, relative_limit = map(finite, (baseline, current_cost, relative_limit))
+    available = (baseline is not None and baseline > 0 and current_cost is not None and current_cost >= 0
+                 and relative_limit is not None and relative_limit >= 0)
+    maximum = baseline*(1+relative_limit) if available else None
+    available = available and math.isfinite(maximum)
+    rejected = bool(available and current_cost > maximum)
+    return dict(status=('rejected' if rejected else 'allowed') if available else 'unavailable',
+                available=bool(available), rejected=rejected, baseline=baseline, image_cost=current_cost,
+                relative_limit=relative_limit, maximum_image_cost=maximum if available else None,
+                relative_increase=(current_cost-baseline)/baseline if available else None)
+
+
 def structural_progress_is_observable(active_state_columns, *, optimize_shared):
     """Return false for a proved rigid-body-only stage with fixed footwear.
 
