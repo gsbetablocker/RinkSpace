@@ -1,6 +1,27 @@
 """Exact longitudinal rocker coordinate with finite endpoint restoration."""
 import numpy as np
-from .skate_template import _profile
+from .skate_template import _profile,profile_height
+
+
+class RunnerCoordinateDomainError(ValueError):pass
+
+
+def canonical_runner_witness(normal,parameters,witness):
+    """Resolve floating-point height ties at the C1 main/secondary join.
+
+    Positive nz makes the longitudinal rocker strictly convex. Its analytic
+    stationary coordinate is unambiguous even when two arc heights round to
+    the same float. This uses machine precision, not a contact tolerance.
+    """
+    normal=np.asarray(normal,float);witness=np.asarray(witness,float)
+    coordinate=runner_longitudinal_coordinate(normal,parameters)
+    _,_,(rear,_,_,front)=_profile(parameters)
+    point=witness.copy();point[:,0]=rear+(front-rear)*coordinate['actual_u'];point[:,2]=profile_height(point[:,0],parameters)
+    old=np.sum(normal*witness,axis=1);new=np.sum(normal*point,axis=1)
+    tolerance=64*np.finfo(float).eps*np.maximum(1.,np.linalg.norm(normal,axis=1)*np.maximum(np.linalg.norm(witness,axis=1),np.linalg.norm(point,axis=1)))
+    bad=np.abs(old-new)>tolerance
+    if bad.any():raise RunnerCoordinateDomainError('Runner stationary minimum disagrees beyond float height precision: '+str(dict(normal=normal[bad][:3].tolist(),old_x=witness[bad,0][:3].tolist(),canonical_x=point[bad,0][:3].tolist(),height_difference=(old-new)[bad][:3].tolist())))
+    return point,coordinate
 
 
 def runner_interior_band(parameters, config=None):

@@ -167,7 +167,9 @@ class BootWindowProblem(FullBodyProblem):
 
     def compatibility_from_state(self,s):
         j=np.einsum('nji,nkj->nki',s['Q'],s['native']-s['P'][:,None])
-        return self.binding.compatibility_rows(j,s['frames'],skate_relative_R=s.get('skate_relative_R'),**({} if 'hand_local_R' not in s else {'hand_local_R':s['hand_local_R']}))/np.sqrt(2)
+        kwargs={}if s.get('skate_relative_R')is None else dict(skate_relative_R=s['skate_relative_R'])
+        if 'hand_local_R'in s:kwargs['hand_local_R']=s['hand_local_R']
+        return self.binding.compatibility_rows(j,s['frames'],**kwargs)/np.sqrt(2)
 
     def evaluate(self,x,jacobian=False):
         key=self.binding.x.tobytes()
@@ -177,12 +179,13 @@ class BootWindowProblem(FullBodyProblem):
         forward_start=time.perf_counter()
         d=self.state.increments(x,self.mid_times)
         resident=getattr(self,'resident_compatibility',None)
+        difference_step=float(getattr(self,'compatibility_difference_step',1e-5))
         if resident is not None:
             if type(self).compatibility_from_state is not BootWindowProblem.compatibility_from_state:
                 raise TypeError('Resident compatibility requires the audited original consumer')
             if not resident.matches(self.binding):
                 raise ValueError('Resident compatibility shared geometry changed; create a new prepared owner')
-            extra,resident_values=resident.evaluate(d,self.state.active[self.state.active>=6] if jacobian else None,skate_relative_R=getattr(d,'skate_relative_R',None))
+            extra,resident_values=resident.evaluate(d,self.state.active[self.state.active>=6] if jacobian else None,step=difference_step,skate_relative_R=getattr(d,'skate_relative_R',None))
         else:extra=self.compatibility(d)
         rows=extra.size;blocks=[]
         elapsed=time.perf_counter()-forward_start
@@ -200,12 +203,12 @@ class BootWindowProblem(FullBodyProblem):
             if values is None and replay is not None and type(self).compatibility_from_state is BootWindowProblem.compatibility_from_state:
                 values=replay(self.reference,self.mid_ref,d,columns,
                     lambda native,frames,samples=None:self.binding.compatibility_rows(native,frames,samples,skate_relative_R=getattr(d,'skate_relative_R',None),**({} if 'hand_local_R' not in self.mid_ref else {'hand_local_R':self.mid_ref['hand_local_R']}))/np.sqrt(2),
-                    step=1e-5,surface=getattr(self.binding,'surface',None),vertex_ids=getattr(self.binding,'sample_ids',None))
+                    step=difference_step,surface=getattr(self.binding,'surface',None),vertex_ids=getattr(self.binding,'sample_ids',None))
             base['compatibility_execution']=('cuda_resident_native55_selected_skin' if resident is not None else
                 'exact_native_fk_replay' if values is not None else 'world_finite_difference')
             if values is None:
                 values=self.execution.state_differences(self.reference,self.mid_ref,d,columns,
-                    self.compatibility_from_state,step=1e-5)
+                    self.compatibility_from_state,step=difference_step)
             physical=dict(zip(map(int,columns),values))
             derivatives=[np.zeros_like(extra) if active<6 else physical[int(active)] for active in self.state.active]
             base['phases']['compatibility_derivatives_seconds']=(elapsed if resident is not None else time.perf_counter()-start)
@@ -231,6 +234,11 @@ class BootWindowProblem(FullBodyProblem):
         first=len(base['residual'])
         base['compatibility_residual']=extra.ravel()
         base['compatibility_jacobian']=J if jacobian else None
+        from .weighted_blocks import block
+        if 'weighted_blocks'not in base:base['weighted_blocks']=[block('body_combined',base['residual'],None if not jacobian else base['jac'][:first])]
+        provenance=dict(width=extra.shape[1])
+        if hasattr(self.reference,'p')and hasattr(self,'frames'):provenance['source_pts']=self.reference.p['pts'][self.frames]
+        base['weighted_blocks'].append(block('dynamic_foot_compatibility',extra.ravel(),J if jacobian else None,provenance))
         base.setdefault('block_slices',{})['foot_compatibility']=slice(first,first+rows)
         base['residual']=np.r_[base['residual'],extra.ravel()]
         base['parts']['foot_cavity_support']=float(np.sum(extra**2)/2);base['foot_compatibility_added']=True

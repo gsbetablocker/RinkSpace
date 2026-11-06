@@ -27,12 +27,23 @@ class ActualMotionFactors:
             transition_weight=.16,stable_weight=1.,right_wrist_outlier_prior_weight=.035,
             horizontal_entry_curvature='finite existing-scale prior; not a COM or contact measurement',
             vertical_entry_prior_relaxation_seconds=[81.30,81.62])
+        policy=getattr(self.ref,'source_document',{}).get('root_prior_policy',{})
+        confidence=float(policy.get('camera_ray_depth_confidence',1.))
+        if not np.isfinite(confidence)or not 0<confidence<=1:raise ValueError('Finite camera-ray depth confidence required')
+        self.root_transform=np.broadcast_to(np.eye(3),(len(self.times),3,3)).copy()
+        if confidence!=1.:
+            centres=np.asarray(self.body.camera_centres)
+            ray=self.parent['P']-centres;ray/=np.maximum(np.linalg.norm(ray,axis=1),1e-12)[:,None]
+            self.root_transform+=(np.sqrt(confidence)-1)*ray[:,:,None]*ray[:,None,:]
+        self.config['camera_ray_depth_confidence']=confidence
     def evaluate(self,x,jacobian=False):
         d=self.body.state.increments(x,self.times);s=self.ref.world(self.base,d)
-        R=np.concatenate((s['Q'][:,None],s['local_R']),axis=1);n=len(R);rows=[];mats=[];parts={}
+        R=np.concatenate((s['Q'][:,None],s['local_R']),axis=1);n=len(R);rows=[];mats=[];parts={};named=[]
         def add(name,r,J):
             r=np.asarray(r).ravel();rows.append(r);parts[name]=float(r@r/2)
             if jacobian:mats.append(J)
+            from .weighted_blocks import block,full_columns
+            named.append(full_columns(block(name,r,J,dict(source_pts=self.ref.p['pts']))))
         weight=np.ones((n,22))*np.sqrt(self.weights[:,None]*self.config['pose_prior_weight'])/.6
         weight[((self.source>=89.24)&(self.source<=89.44)),21]*=np.sqrt(.035)
         error=_log(self.prior_R.swapaxes(-1,-2)@R);z=error*weight[...,None];r,D=robust_vector(z,delta=2.)
@@ -41,9 +52,9 @@ class ActualMotionFactors:
             blocks=D@((weight[...,None,None]*inverse_right_jacobian(error))@right_jacobian(np.asarray(d)[:,3:].reshape(n,22,3)))
             J=d.rotation_chain(blocks)
         add('finite_network_pose_prior',r,J)
-        w=np.sqrt(self.weights*.2)/.75;rp=(s['P']-self.parent['P'])*w[:,None]
+        w=np.sqrt(self.weights*.2)/.75;rp=np.einsum('nij,nj->ni',self.root_transform,s['P']-self.parent['P'])*w[:,None]
         if jacobian:
-            local=np.zeros((n,3,69));local[:,:,:3]=w[:,None,None]*np.eye(3);J=d.chain(local)
+            local=np.zeros((n,3,69));local[:,:,:3]=w[:,None,None]*self.root_transform;J=d.chain(local)
         add('finite_parent_root_prior',rp,J)
         # SO(3) interval velocities are expressed in the same world/parent axes.
         h=np.diff(self.times);rel=R[1:]@R[:-1].swapaxes(-1,-2);phi=_log(rel);omega=phi/h[:,None,None]
@@ -81,7 +92,7 @@ class ActualMotionFactors:
             if J.shape[1]<self.body.size:J=hstack((J,csr_matrix((J.shape[0],self.body.size-J.shape[1]))),format='csr')
         add('actual_root_translation_acceleration',r,J)
         residual=np.concatenate(rows);J=vstack(mats,format='csr') if jacobian else None
-        self.last=dict(residual=residual,jac=hstack((csr_matrix((len(residual),17)),J),format='csr') if jacobian else None,parts=parts,
+        self.last=dict(residual=residual,jac=hstack((csr_matrix((len(residual),17)),J),format='csr') if jacobian else None,parts=parts,weighted_blocks=named,
             metrics=dict(actual_root_omega_world_rad_s=omega[:,0].tolist(),actual_right_wrist_interval_degrees=np.rad2deg(np.linalg.norm(phi[:,21],axis=1)).tolist(),
                 all_terminal_joint_orientations_regularized=True,finite_prior_config=self.config,no_zero_angular_velocity_target=True))
         return self.last

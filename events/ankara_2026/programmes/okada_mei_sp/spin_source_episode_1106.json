@@ -1,0 +1,1133 @@
+{
+  "schema": "rinkspace.source-episode-review.v1",
+  "purpose": "开发源证据ledger；作为外层阶段关联输入而非人体或接触真值",
+  "time_base": [
+    1,
+    12800
+  ],
+  "source_video": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4",
+    "sha256_from_sequence": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+    "shot_id": "s05",
+    "source_frame_count": 951,
+    "scope_pts": [
+      972800,
+      1216000
+    ]
+  },
+  "review": {
+    "whole_sequence": "76–95源像素联系表（约0.2秒采样；91–95按联系表实际标注时间），非逐帧连续目视；不声称全951曝光逐帧审阅",
+    "native_dense": "80.92–81.10, 81.26–81.66, 84.90–86.38, 92.24–95.00用SourceVideo实际PTS逐曝光读取，部分区间拼接端点见图清单；源裁剪仅作导航，无模型投影",
+    "sheets": [
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\source_contract_review_1106\\review_sheets.json",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\source_contract_review_1106\\review_sheets_extra.json"
+    ],
+    "coarse_sheets": [
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\sequence_76_81.png",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\sequence_81_86.png",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\sequence_86_91.png",
+      "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\sequence_91_95.png"
+    ],
+    "direct_pixels_are_not_contact_force": "刀刃/影子和前后端可见性不产生真实接触点或材料身份真值"
+  },
+  "inputs": {
+    "integration_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\full_structure_1106_inputs\\integration_fit_v2_extent.json",
+    "integration_sha256": "7dff722d9a795319b58fd125158ed6e90ea2ca8352ad4f2351e0318731ce6649",
+    "structure_path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_source_skate_structures_1106.json",
+    "structure_sha256": "7eda94aba03de41fb4b642a34b4c6d1044083f0aa969590467e872d7eed86460",
+    "source_support_count": 32,
+    "support_copy_semantics": "原始32条完整复制，字段语义和context保持不变；需要按同一source/foot/PTS去重，勿将一份证据当额外独立证据",
+    "unassigned_observation_count": 5
+  },
+  "source_support_evidence_original": [
+    {
+      "pts": 983040,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        981760,
+        982016,
+        982272,
+        982528,
+        982784,
+        983040,
+        983296,
+        983552,
+        983808,
+        984064,
+        984320
+      ],
+      "support_identity_evidence": "76.70–76.90秒逐曝光连续可见左画面近冰刀支撑身体、另一刀抬起；面向镜头时对应右脚，记作foot1，身体转向及交叉使左右关联为源序列判断而非人工确认。影子使具体接触材料点与刃侧未知。"
+    },
+    {
+      "pts": 1003520,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1002240,
+        1002496,
+        1002752,
+        1003008,
+        1003264,
+        1003520,
+        1003776,
+        1004032,
+        1004288,
+        1004544,
+        1004800
+      ],
+      "support_identity_evidence": "78.30–78.50秒逐曝光可见同一近冰鞋承载下蹲及滑出，另一鞋前后摆动；接78.60–78.80秒朝镜头的单足姿态将支撑腿关联为右脚foot1。接触点与内外刃不由影子确定。"
+    },
+    {
+      "pts": 1029120,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1027840,
+        1028096,
+        1028352,
+        1028608,
+        1028864,
+        1029120,
+        1029376,
+        1029632,
+        1029888,
+        1030144,
+        1030400
+      ],
+      "support_identity_evidence": "80.30–80.50秒逐曝光同一近冰刀持续滑行并承载身体；79.84–80.40秒每0.04秒看转身，支撑腿在身体前方从画面左侧移至右侧，自由腿摆到左后方。追踪至正面姿态，支撑为右脚foot1，非按画面位置换脚；冰影不确定实际接触点。"
+    },
+    {
+      "pts": 1044736,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1044480,
+        1044736,
+        1044992
+      ],
+      "support_identity_evidence": "既有22帧完整源图及前后原生曝光：右脚在落冰后连续支撑旋转，钢刃/冰面交界另保留有限像素范围。"
+    },
+    {
+      "pts": 1052416,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1052160,
+        1052416,
+        1052672
+      ],
+      "support_identity_evidence": "既有22帧完整源图及前后原生曝光：右脚在落冰后连续支撑旋转，钢刃/冰面交界另保留有限像素范围。"
+    },
+    {
+      "pts": 1060096,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1059840,
+        1060096,
+        1060352
+      ],
+      "support_identity_evidence": "既有22帧完整源图及前后原生曝光：右脚在落冰后连续支撑旋转，钢刃/冰面交界另保留有限像素范围。"
+    },
+    {
+      "pts": 1065216,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1064960,
+        1065216,
+        1065472
+      ],
+      "support_identity_evidence": "既有22帧完整源图及前后原生曝光：右脚在落冰后连续支撑旋转，钢刃/冰面交界另保留有限像素范围。"
+    },
+    {
+      "pts": 1070336,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1070080,
+        1070336,
+        1070592
+      ],
+      "support_identity_evidence": "既有22帧完整源图及前后原生曝光：右脚在落冰后连续支撑旋转，钢刃/冰面交界另保留有限像素范围。"
+    },
+    {
+      "pts": 1075456,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1075200,
+        1075456,
+        1075712
+      ],
+      "support_identity_evidence": "既有22帧完整源图及前后原生曝光：右脚在落冰后连续支撑旋转，钢刃/冰面交界另保留有限像素范围。"
+    },
+    {
+      "pts": 1080576,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1080320,
+        1080576,
+        1080832
+      ],
+      "support_identity_evidence": "既有22帧完整源图及前后原生曝光：右脚在落冰后连续支撑旋转，钢刃/冰面交界另保留有限像素范围。"
+    },
+    {
+      "pts": 1090816,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1090560,
+        1090816,
+        1091072
+      ],
+      "support_identity_evidence": "既有22帧完整源图及前后原生曝光：右脚在落冰后连续支撑旋转，钢刃/冰面交界另保留有限像素范围。"
+    },
+    {
+      "pts": 1098496,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1098240,
+        1098496,
+        1098752
+      ],
+      "support_identity_evidence": "既有22帧完整源图及前后原生曝光：右脚在落冰后连续支撑旋转，钢刃/冰面交界另保留有限像素范围。"
+    },
+    {
+      "pts": 1103616,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1103360,
+        1103616,
+        1103872
+      ],
+      "support_identity_evidence": "既有22帧完整源图及前后原生曝光：右脚在落冰后连续支撑旋转，钢刃/冰面交界另保留有限像素范围。"
+    },
+    {
+      "pts": 1105920,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1103360,
+        1105920,
+        1108480
+      ],
+      "support_identity_evidence": "86.2–86.6 s 源画面显示持续单脚旋转，该下方鞋承载身体，另一鞋高抬；身份是该段 foot1，非左右解剖判断。"
+    },
+    {
+      "pts": 1111040,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1108480,
+        1111040,
+        1113600
+      ],
+      "support_identity_evidence": "86.6–87.0 s 画面显示同一低位鞋持续支撑旋转，另一鞋被手抓持高举；钢冰阴影边界位置仍不确定。"
+    },
+    {
+      "pts": 1116160,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1113600,
+        1116160,
+        1118720
+      ],
+      "support_identity_evidence": "87.0–87.4 s 连续画面中该低位鞋持续单脚旋转支撑，另一鞋高举被手握住。"
+    },
+    {
+      "pts": 1121792,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1121536,
+        1121792,
+        1122048
+      ],
+      "support_identity_evidence": "既有22帧完整源图及前后原生曝光：右脚在落冰后连续支撑旋转，钢刃/冰面交界另保留有限像素范围。"
+    },
+    {
+      "pts": 1128960,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1128704,
+        1128960,
+        1129216
+      ],
+      "support_identity_evidence": "既有22帧完整源图及前后原生曝光：右脚在落冰后连续支撑旋转，钢刃/冰面交界另保留有限像素范围。"
+    },
+    {
+      "pts": 1136640,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1136384,
+        1136640,
+        1136896
+      ],
+      "support_identity_evidence": "既有22帧完整源图及前后原生曝光：右脚在落冰后连续支撑旋转，钢刃/冰面交界另保留有限像素范围。"
+    },
+    {
+      "pts": 1141760,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1140480,
+        1141760,
+        1143040
+      ],
+      "support_identity_evidence": "89.1–89.3 s 源序列中低位鞋保持旋转支撑，另一鞋被抓持高举；钢冰边界模糊。"
+    },
+    {
+      "pts": 1144320,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1144064,
+        1144320,
+        1144576
+      ],
+      "support_identity_evidence": "既有22帧完整源图及前后原生曝光：右脚在落冰后连续支撑旋转，钢刃/冰面交界另保留有限像素范围。"
+    },
+    {
+      "pts": 1146880,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1145600,
+        1146880,
+        1148160
+      ],
+      "support_identity_evidence": "89.5–89.7 s 低位鞋持续单脚旋转支撑；该帧接近端视，接冰区的定位仍不明确。"
+    },
+    {
+      "pts": 1149440,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1149184,
+        1149440,
+        1149696
+      ],
+      "support_identity_evidence": "既有22帧完整源图及前后原生曝光：右脚在落冰后连续支撑旋转，钢刃/冰面交界另保留有限像素范围。"
+    },
+    {
+      "pts": 1154560,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1154304,
+        1154560,
+        1154816
+      ],
+      "support_identity_evidence": "既有22帧完整源图及前后原生曝光：右脚在落冰后连续支撑旋转，钢刃/冰面交界另保留有限像素范围。"
+    },
+    {
+      "pts": 1157120,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1154560,
+        1157120,
+        1159680
+      ],
+      "support_identity_evidence": "90.2–90.6 s 连续画面仍为同一低位鞋单脚旋转支撑，另一鞋高举。"
+    },
+    {
+      "pts": 1162240,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1161984,
+        1162240,
+        1162496
+      ],
+      "support_identity_evidence": "既有22帧完整源图及前后原生曝光：右脚在落冰后连续支撑旋转，钢刃/冰面交界另保留有限像素范围。"
+    },
+    {
+      "pts": 1167360,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1167104,
+        1167360,
+        1167616
+      ],
+      "support_identity_evidence": "既有22帧完整源图及前后原生曝光：右脚在落冰后连续支撑旋转，钢刃/冰面交界另保留有限像素范围。"
+    },
+    {
+      "pts": 1172480,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1172224,
+        1172480,
+        1172736
+      ],
+      "support_identity_evidence": "既有22帧完整源图及前后原生曝光：右脚在落冰后连续支撑旋转，钢刃/冰面交界另保留有限像素范围。"
+    },
+    {
+      "pts": 1177600,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1177344,
+        1177600,
+        1177856
+      ],
+      "support_identity_evidence": "既有22帧完整源图及前后原生曝光：右脚在落冰后连续支撑旋转，钢刃/冰面交界另保留有限像素范围。"
+    },
+    {
+      "pts": 1182720,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1182464,
+        1182720,
+        1182976
+      ],
+      "support_identity_evidence": "既有22帧完整源图及前后原生曝光：右脚在落冰后连续支撑旋转，钢刃/冰面交界另保留有限像素范围。"
+    },
+    {
+      "pts": 1183232,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1182976,
+        1183232,
+        1183488
+      ],
+      "support_identity_evidence": "既有22帧完整源图及前后原生曝光：右脚在落冰后连续支撑旋转，钢刃/冰面交界另保留有限像素范围。"
+    },
+    {
+      "pts": 1187840,
+      "foot": 1,
+      "role": "fit",
+      "optimization_enabled": true,
+      "phase": "source_supported",
+      "context_source_pts": [
+        1186560,
+        1187840,
+        1189120
+      ],
+      "support_identity_evidence": "92.7–92.9 s 源序列显示原单脚旋转支撑鞋转入低位滑行，另一鞋从高处下摆；本帧钢冰阴影模糊。"
+    }
+  ],
+  "unassigned_observations_original_identity_fields": [
+    {
+      "pts": 1216000,
+      "source_seconds": 95.0,
+      "source_track_id": "s05_release_right_95",
+      "foot": null,
+      "foot_proposal": 0,
+      "foot_candidates": [
+        0,
+        1
+      ],
+      "identity_note_zh": "以当前画面左右分离的鞋作为源图轨迹标签；跪地及并鞋遮挡后尚未核实与旋转期 foot0/1 的对应，不能把 proposal 自动当作身份。",
+      "role": "development_review",
+      "source_support": {
+        "supported": true,
+        "evidence_status": "source_sequence_review",
+        "context_source_pts": [
+          1214720,
+          1216000,
+          1217280,
+          1218560
+        ],
+        "description_zh": "94.9–95.2 s 画面显示右侧鞋近冰并过渡到该侧弯膝承重滑行；当前灰带与冰、影边界模糊。该源轨迹的 foot0/1 尚待跨跪地遮挡关联。"
+      },
+      "source_crop_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\full_structure_1106_inputs\\native\\1216000_f0.png",
+      "source_frame_rgb_sha256": "901fe1b9a1ef836b14a6327daf30d197c3441f77ac305190badb627a7322a2fd"
+    },
+    {
+      "pts": 1216000,
+      "source_seconds": 95.0,
+      "source_track_id": "s05_release_left_95",
+      "foot": null,
+      "foot_proposal": 1,
+      "foot_candidates": [
+        0,
+        1
+      ],
+      "identity_note_zh": "以当前画面左右分离的鞋作为源图轨迹标签；跪地及并鞋遮挡后尚未核实与旋转期 foot0/1 的对应，不能把 proposal 自动当作身份。",
+      "role": "development_review",
+      "source_support": {
+        "supported": null,
+        "evidence_status": "source_sequence_review",
+        "context_source_pts": [
+          1214720,
+          1216000,
+          1217280,
+          1218560
+        ],
+        "description_zh": "94.9–95.2 s 左侧鞋由并鞋分开并随伸腿向外滑；足底很靠近冰，但当前模糊和阴影不能判定其受力支撑。"
+      },
+      "source_crop_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\full_structure_1106_inputs\\native\\1216000_f1.png",
+      "source_frame_rgb_sha256": "901fe1b9a1ef836b14a6327daf30d197c3441f77ac305190badb627a7322a2fd"
+    },
+    {
+      "pts": 1213440,
+      "source_seconds": 94.8,
+      "source_track_id": "s05_94_8_screen_left",
+      "foot": null,
+      "foot_proposal": 0,
+      "foot_candidates": [
+        0,
+        1
+      ],
+      "identity_note_zh": "仅以本曝光可见的鞋轮廓区分候选轨迹；两鞋相叠，尚未跨跪地遮挡关联到旋转期 foot0/1。",
+      "role": "development_review",
+      "source_support": {
+        "supported": null,
+        "evidence_status": "source_sequence_review",
+        "context_source_pts": [
+          1212160,
+          1213440,
+          1214720
+        ],
+        "description_zh": "94.7 s 仍在转身腾空，94.8 s 两刀接近冰面并互相重叠；不能从本曝光确定该鞋受力。"
+      },
+      "source_crop_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\full_structure_1106_inputs\\native\\1213440_f0.png",
+      "source_frame_rgb_sha256": "3aae73399d8b9735f95cb5d3be006f6cb6e2b4daec4d4334e41cb695cd1ce6f9"
+    },
+    {
+      "pts": 1213440,
+      "source_seconds": 94.8,
+      "source_track_id": "s05_94_8_screen_right",
+      "foot": null,
+      "foot_proposal": 1,
+      "foot_candidates": [
+        0,
+        1
+      ],
+      "identity_note_zh": "仅以本曝光可见的鞋轮廓区分候选轨迹；两鞋相叠，尚未跨跪地遮挡关联到旋转期 foot0/1。",
+      "role": "development_review",
+      "source_support": {
+        "supported": null,
+        "evidence_status": "source_sequence_review",
+        "context_source_pts": [
+          1212160,
+          1213440,
+          1214720
+        ],
+        "description_zh": "94.7–94.9 s 两鞋靠拢并进入滑行；当前叠影和冰影不允许确定该鞋实际承重。"
+      },
+      "source_crop_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\full_structure_1106_inputs\\native\\1213440_f1.png",
+      "source_frame_rgb_sha256": "3aae73399d8b9735f95cb5d3be006f6cb6e2b4daec4d4334e41cb695cd1ce6f9"
+    },
+    {
+      "pts": 1208320,
+      "source_seconds": 94.4,
+      "source_track_id": "s05_94_4_foreground",
+      "foot": null,
+      "foot_proposal": 0,
+      "foot_candidates": [
+        0,
+        1
+      ],
+      "identity_note_zh": "前景轮廓在当前曝光可见；两鞋交叉重叠，尚不能确定相对旋转期 foot0/1 的身份。",
+      "role": "development_review",
+      "source_support": {
+        "supported": null,
+        "evidence_status": "source_sequence_review",
+        "context_source_pts": [
+          1207040,
+          1208320,
+          1209600
+        ],
+        "description_zh": "94.3–94.5 s 两鞋从分开转为并鞋，94.4 s 重叠且正处于落冰过渡，单鞋受力不能由源图可靠确定。"
+      },
+      "source_crop_path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\full_structure_1106_inputs\\native\\1208320_f0.png",
+      "source_frame_rgb_sha256": "92a18b1bdc13a15e5cae9475d9cce8a9f77c8e2ed42d87be76f899424db30ffc"
+    }
+  ],
+  "episodes": [
+    {
+      "episode_id": "support_76_8",
+      "start_pts": 981760,
+      "end_pts_inclusive": 984320,
+      "kind": "support_candidate",
+      "foot": 1,
+      "evidence_pts": [
+        981760,
+        983040,
+        984320
+      ],
+      "status": "source_derived_episode_candidate",
+      "description_zh": "新增来源记录明确报告相邻逐曝光支撑上下文；本次整段源图0.2秒采样见76.8低位鞋与抬起鞋。只在所给上下文使用，不外推相邻阶段。",
+      "identity": "historical_source_sequence_foot1_candidate",
+      "source_sequence_context": "imported_review"
+    },
+    {
+      "episode_id": "support_78_4",
+      "start_pts": 1002240,
+      "end_pts_inclusive": 1004800,
+      "kind": "support_candidate",
+      "foot": 1,
+      "evidence_pts": [
+        1002240,
+        1003520,
+        1004800
+      ],
+      "status": "source_derived_episode_candidate",
+      "description_zh": "新增来源记录的相邻逐曝光上下文及78.4源图支持低位鞋承载、另一鞋摆动；足身份为既有序列关联候选。",
+      "identity": "historical_source_sequence_foot1_candidate",
+      "source_sequence_context": "imported_review"
+    },
+    {
+      "episode_id": "support_80_4",
+      "start_pts": 1027840,
+      "end_pts_inclusive": 1030400,
+      "kind": "support_candidate",
+      "foot": 1,
+      "evidence_pts": [
+        1027840,
+        1029120,
+        1030400
+      ],
+      "status": "source_derived_episode_candidate",
+      "description_zh": "新增来源记录报告相邻逐曝光及79.84–80.40旋转追踪；80.4源图有一近冰鞋与一抬起鞋。不能按屏幕左右改变物理足。",
+      "identity": "historical_source_sequence_foot1_candidate",
+      "source_sequence_context": "imported_review"
+    },
+    {
+      "episode_id": "entry_lunge",
+      "start_pts": 1035776,
+      "end_pts_inclusive": 1038080,
+      "kind": "single_near_ice_lunge",
+      "foot": null,
+      "evidence_pts": [
+        1035776,
+        1036800,
+        1037056,
+        1037312,
+        1038080
+      ],
+      "status": "source_derived_episode_candidate",
+      "description_zh": "深弓步，前方一鞋临近冰面，另一腿向后摆且转过身前后时模糊/裁切；81.02–81.04不可判为双足腾空。",
+      "shoe_support_role": "near_ice_candidate",
+      "other_shoe": "free_or_occluded",
+      "exact_contact": "unknown",
+      "physical_foot": "unknown"
+    },
+    {
+      "episode_id": "entry_flight_core",
+      "start_pts": 1041408,
+      "end_pts_inclusive": 1042944,
+      "kind": "flight_visible_candidate",
+      "foot": null,
+      "evidence_pts": [
+        1040640,
+        1040896,
+        1041152,
+        1041408,
+        1041920,
+        1042688,
+        1042944,
+        1043200,
+        1043456
+      ],
+      "status": "source_derived_episode_candidate",
+      "description_zh": "跳入旋转，两鞋在81.36–81.48明显抬离；81.30–81.34起跳及81.50–81.56落冰界面模糊，不能给精确离冰/落冰帧。",
+      "applies_to_both_feet": true,
+      "boundary_before_pts": [
+        1040640,
+        1041152
+      ],
+      "boundary_after_pts": [
+        1043200,
+        1043968
+      ],
+      "contact": "unknown_at_boundaries",
+      "allow_mode": "flight_candidate_no_contact"
+    },
+    {
+      "episode_id": "landing_transition",
+      "start_pts": 1043200,
+      "end_pts_inclusive": 1044480,
+      "kind": "transition_unknown",
+      "foot": null,
+      "evidence_pts": [
+        1043200,
+        1043456,
+        1043712,
+        1043968,
+        1044224,
+        1044480
+      ],
+      "status": "source_derived_episode_candidate",
+      "description_zh": "81.50–81.56低位鞋接近冰面且运动模糊；81.58–81.60进入单足旋转外观。真实触冰时刻、具体受力点均未知。",
+      "left_boundary": "flight",
+      "right_boundary": "spin_support_candidate",
+      "physical_contact": "unknown"
+    },
+    {
+      "episode_id": "spin_support",
+      "start_pts": 1044736,
+      "end_pts_inclusive": 1186816,
+      "kind": "support_candidate",
+      "foot": 1,
+      "evidence_pts": [
+        1044736,
+        1052416,
+        1065216,
+        1075456,
+        1090816,
+        1103616,
+        1121792,
+        1136640,
+        1146880,
+        1162240,
+        1167360,
+        1177600,
+        1182720,
+        1183232,
+        1185280,
+        1186816
+      ],
+      "status": "source_derived_episode_candidate",
+      "description_zh": "入旋后同一低位鞋持续支撑外观，另一腿离冰并举起。0.2秒整段采样及两端逐曝光支持这一整段动作候选；区间内某些刀/冰交界被运动模糊与阴影遮挡，连续身份为推断，非逐帧接触测量。foot1为既有源关联候选，不是独立人工解剖真值。",
+      "identity": "historical_source_sequence_foot1_candidate",
+      "inferred_through_occlusion": true,
+      "contact_material": "unknown",
+      "blade_side": "unknown"
+    },
+    {
+      "episode_id": "spin_free",
+      "start_pts": 1044736,
+      "end_pts_inclusive": 1186816,
+      "kind": "free_foot_off_ice_candidate",
+      "foot": 0,
+      "evidence_pts": [
+        1044736,
+        1049600,
+        1062400,
+        1075200,
+        1088000,
+        1103360,
+        1116160,
+        1141760,
+        1167360,
+        1182720,
+        1185280,
+        1186816
+      ],
+      "status": "source_derived_episode_candidate",
+      "description_zh": "旋转中另一腿由水平伸出、弯膝到高举，来源连续动作支持抬离冰面的自由足；遮挡/运动模糊下为传播推断。",
+      "identity": "complement_of_historical_foot1_candidate",
+      "inferred_through_occlusion": true
+    },
+    {
+      "episode_id": "grasp_core",
+      "start_pts": 1102592,
+      "end_pts_inclusive": 1183744,
+      "kind": "hand_to_raised_shoe_grasp_candidate",
+      "foot": 0,
+      "evidence_pts": [
+        1102592,
+        1103360,
+        1104384,
+        1111040,
+        1121280,
+        1134080,
+        1146880,
+        1159680,
+        1172480,
+        1180672,
+        1182720,
+        1183744
+      ],
+      "status": "source_derived_episode_candidate",
+      "description_zh": "手与高举鞋/刀区域相连的抓持姿态在源图可见，转动和模糊时以动作连续性推断；手部、鞋上具体材料点及力量未知。",
+      "hand_identity": "legacy_left_candidate_not_independently_confirmed",
+      "held_foot_identity": "legacy_foot0_candidate",
+      "intermittent_occlusion": "inferred"
+    },
+    {
+      "episode_id": "grasp_onset_uncertain",
+      "start_pts": 1086720,
+      "end_pts_inclusive": 1102336,
+      "kind": "grasp_onset_unknown",
+      "foot": 0,
+      "evidence_pts": [
+        1086720,
+        1089280,
+        1090560,
+        1093120,
+        1095680,
+        1097216,
+        1100800,
+        1102336
+      ],
+      "status": "source_derived_episode_candidate",
+      "description_zh": "自由腿弯曲、手臂和鞋交汇/遮挡并且运动模糊；可见动作进入抓持但首个可靠握住曝光无法判定。",
+      "hand_shoe_contact": "unknown",
+      "hard_grasp": false
+    },
+    {
+      "episode_id": "grasp_release_transition",
+      "start_pts": 1184000,
+      "end_pts_inclusive": 1185024,
+      "kind": "grasp_release_transition",
+      "foot": 0,
+      "evidence_pts": [
+        1183744,
+        1184000,
+        1184256,
+        1184512,
+        1184768,
+        1185024,
+        1185280
+      ],
+      "status": "source_derived_episode_candidate",
+      "description_zh": "高举鞋与手渐分离后向下摆，92.50–92.58为有限释放窗口，不应把旧92.46当精确松手时刻。",
+      "hand_shoe_contact": "ambiguous_in_window",
+      "release_confirmed_after_pts": 1185280
+    },
+    {
+      "episode_id": "support_release_context",
+      "start_pts": 1187072,
+      "end_pts_inclusive": 1187840,
+      "kind": "support_candidate",
+      "foot": 1,
+      "evidence_pts": [
+        1187072,
+        1187328,
+        1187584,
+        1187840
+      ],
+      "status": "source_derived_episode_candidate",
+      "description_zh": "原旋转低位鞋继续近冰滑行，自由鞋下摆；92.8为32条新增来源中的独立曝光记录，不把自由鞋也强判为支撑。",
+      "identity": "historical_source_sequence_foot1_candidate",
+      "contact_material": "unknown",
+      "end_boundary": "subsequent_weight_transfer_unknown"
+    },
+    {
+      "episode_id": "kneel_overlap",
+      "start_pts": 1191936,
+      "end_pts_inclusive": 1203968,
+      "kind": "occlusion_kneel_transition",
+      "foot": null,
+      "evidence_pts": [
+        1191936,
+        1192960,
+        1194752,
+        1196800,
+        1199616,
+        1201152,
+        1202944,
+        1203968
+      ],
+      "status": "source_derived_episode_candidate",
+      "description_zh": "低蹲转为膝、手近冰，鞋受身体、裙摆、冰影和运动模糊遮挡；沿遮挡可维持轨迹候选但不能测出足部承重、受力点或解剖足身份。",
+      "foot_states": {
+        "0": "unknown",
+        "1": "unknown"
+      },
+      "support_nonfoot_possible": true,
+      "inferred_pose_only": true
+    },
+    {
+      "episode_id": "two_shoe_crossing",
+      "start_pts": 1207552,
+      "end_pts_inclusive": 1214720,
+      "kind": "occlusion_and_separation",
+      "foot": null,
+      "evidence_pts": [
+        1207552,
+        1208320,
+        1209344,
+        1210368,
+        1211392,
+        1212160,
+        1213440,
+        1214208,
+        1214720
+      ],
+      "status": "source_derived_episode_candidate",
+      "description_zh": "94.4两鞋叠合；94.5后分离并转身，94.8左右鞋可按曝光区分，94.84–94.90又合并。屏幕位置随旋转改变，允许整个episode的跨遮挡对应候选。",
+      "source_track_identity": "ambiguous",
+      "physical_feet": "unknown",
+      "support": "unknown"
+    },
+    {
+      "episode_id": "late_air_possible_a",
+      "start_pts": 1204224,
+      "end_pts_inclusive": 1206272,
+      "kind": "possible_flight_unresolved",
+      "foot": null,
+      "evidence_pts": [
+        1204224,
+        1204736,
+        1205248,
+        1205760,
+        1206272
+      ],
+      "status": "source_derived_episode_candidate",
+      "description_zh": "起身后两鞋在图像上同时抬起的外观，冰影和模糊妨碍精确落离冰判定；只作为待核查候选，不能当确定腾空物理约束。",
+      "applies_to_both_feet": true,
+      "hard_flight": false
+    },
+    {
+      "episode_id": "late_air_possible_b",
+      "start_pts": 1211648,
+      "end_pts_inclusive": 1212928,
+      "kind": "possible_flight_unresolved",
+      "foot": null,
+      "evidence_pts": [
+        1211648,
+        1211904,
+        1212160,
+        1212416,
+        1212672,
+        1212928
+      ],
+      "status": "source_derived_episode_candidate",
+      "description_zh": "转身期间两鞋抬起外观，但阴影和视角无法严谨判定冰面间隙；只作为候选，不能确定腾空或确切触冰帧。",
+      "applies_to_both_feet": true,
+      "hard_flight": false
+    }
+  ],
+  "late_identity_episode": {
+    "start_pts": 1207552,
+    "end_pts_inclusive": 1216000,
+    "anchor_pts": 1213440,
+    "anchor_track_definitions": {
+      "track_A": "94.8 source observation s05_94_8_screen_left",
+      "track_B": "94.8 source observation s05_94_8_screen_right"
+    },
+    "evidence_pts": [
+      1207296,
+      1208320,
+      1210112,
+      1211648,
+      1212160,
+      1213440,
+      1213952,
+      1214720,
+      1216000
+    ],
+    "source_derived_observation": "94.4鞋交叠，94.5后分离、94.8屏幕左右可在该曝光区分，94.84–94.90重新交汇，95再分离。遮挡前后身份映射不唯一。",
+    "hypothesis_method": "八个episode级双足候选：94.4前景可接A/B；94.8 A/B与95屏幕左/右允许两种一对一重关联；A/B与既有foot0/1允许两种固定映射。各候选全局保持双足身份，保留缺失轨迹，禁止逐曝光贪心标签。",
+    "candidate_count": 8,
+    "candidates": [
+      {
+        "candidate_id": "episode_01",
+        "association_by_observation": {
+          "s05_94_4_foreground": "track_A",
+          "s05_94_8_screen_left": "track_A",
+          "s05_94_8_screen_right": "track_B",
+          "s05_release_left_95": "track_A",
+          "s05_release_right_95": "track_B"
+        },
+        "fixed_body_foot_by_track": {
+          "track_A": 0,
+          "track_B": 1
+        },
+        "source_cost": null,
+        "source_cost_status": "not_computed; no model projection was used to establish source identity"
+      },
+      {
+        "candidate_id": "episode_02",
+        "association_by_observation": {
+          "s05_94_4_foreground": "track_A",
+          "s05_94_8_screen_left": "track_A",
+          "s05_94_8_screen_right": "track_B",
+          "s05_release_left_95": "track_A",
+          "s05_release_right_95": "track_B"
+        },
+        "fixed_body_foot_by_track": {
+          "track_A": 1,
+          "track_B": 0
+        },
+        "source_cost": null,
+        "source_cost_status": "not_computed; no model projection was used to establish source identity"
+      },
+      {
+        "candidate_id": "episode_03",
+        "association_by_observation": {
+          "s05_94_4_foreground": "track_A",
+          "s05_94_8_screen_left": "track_A",
+          "s05_94_8_screen_right": "track_B",
+          "s05_release_left_95": "track_B",
+          "s05_release_right_95": "track_A"
+        },
+        "fixed_body_foot_by_track": {
+          "track_A": 0,
+          "track_B": 1
+        },
+        "source_cost": null,
+        "source_cost_status": "not_computed; no model projection was used to establish source identity"
+      },
+      {
+        "candidate_id": "episode_04",
+        "association_by_observation": {
+          "s05_94_4_foreground": "track_A",
+          "s05_94_8_screen_left": "track_A",
+          "s05_94_8_screen_right": "track_B",
+          "s05_release_left_95": "track_B",
+          "s05_release_right_95": "track_A"
+        },
+        "fixed_body_foot_by_track": {
+          "track_A": 1,
+          "track_B": 0
+        },
+        "source_cost": null,
+        "source_cost_status": "not_computed; no model projection was used to establish source identity"
+      },
+      {
+        "candidate_id": "episode_05",
+        "association_by_observation": {
+          "s05_94_4_foreground": "track_B",
+          "s05_94_8_screen_left": "track_A",
+          "s05_94_8_screen_right": "track_B",
+          "s05_release_left_95": "track_A",
+          "s05_release_right_95": "track_B"
+        },
+        "fixed_body_foot_by_track": {
+          "track_A": 0,
+          "track_B": 1
+        },
+        "source_cost": null,
+        "source_cost_status": "not_computed; no model projection was used to establish source identity"
+      },
+      {
+        "candidate_id": "episode_06",
+        "association_by_observation": {
+          "s05_94_4_foreground": "track_B",
+          "s05_94_8_screen_left": "track_A",
+          "s05_94_8_screen_right": "track_B",
+          "s05_release_left_95": "track_A",
+          "s05_release_right_95": "track_B"
+        },
+        "fixed_body_foot_by_track": {
+          "track_A": 1,
+          "track_B": 0
+        },
+        "source_cost": null,
+        "source_cost_status": "not_computed; no model projection was used to establish source identity"
+      },
+      {
+        "candidate_id": "episode_07",
+        "association_by_observation": {
+          "s05_94_4_foreground": "track_B",
+          "s05_94_8_screen_left": "track_A",
+          "s05_94_8_screen_right": "track_B",
+          "s05_release_left_95": "track_B",
+          "s05_release_right_95": "track_A"
+        },
+        "fixed_body_foot_by_track": {
+          "track_A": 0,
+          "track_B": 1
+        },
+        "source_cost": null,
+        "source_cost_status": "not_computed; no model projection was used to establish source identity"
+      },
+      {
+        "candidate_id": "episode_08",
+        "association_by_observation": {
+          "s05_94_4_foreground": "track_B",
+          "s05_94_8_screen_left": "track_A",
+          "s05_94_8_screen_right": "track_B",
+          "s05_release_left_95": "track_B",
+          "s05_release_right_95": "track_A"
+        },
+        "fixed_body_foot_by_track": {
+          "track_A": 1,
+          "track_B": 0
+        },
+        "source_cost": null,
+        "source_cost_status": "not_computed; no model projection was used to establish source identity"
+      }
+    ],
+    "preference": "none established from source; no per-frame geometry proposal or fitted geometry treated as source label",
+    "directly_confirmed_anatomical_identity": false,
+    "support_state": "95秒画面右侧鞋原记录supported=true，屏幕左侧unknown，均不改变其物理足身份未知。"
+  },
+  "integration_guidance": {
+    "association_stage": "outer episode association only; keep alternatives and costs; re-evaluate all candidates under same objective after reassociation and invalidate dependent caches/multipliers",
+    "uncovered_pts": "unknown; do not infer support merely because an isolated support row exists",
+    "source_track_constraint": "one-to-one per exposure; physical foot identity is fixed over an episode, source observation may be hidden or ambiguous",
+    "new_support_rows": "all32 imported by exact native PTS; use only stated temporal context and credible episode continuity; preserve role/optimization_enabled and avoid double counting source pixels/XY",
+    "mode_details": "source does not establish toe_pick, heel, runner interior/front/rear, inside/outside edge, force/contact material. Existing toe_pick/heel/off_ice labels do not establish completed physical mode implementation. No hard thresholds supplied."
+  },
+  "remaining_unknowns": [
+    "76–95整体只按约0.2秒源图采样，不能声称全部951曝光逐帧审阅。",
+    "旋转期foot1对应右脚、foot0对应左脚沿用既有源关联，未经独立人工解剖确认。",
+    "81.30–81.34离冰及81.50–81.60落冰具体曝光未知。",
+    "84.90–86.12抓握起点、92.50–92.58松手精确曝光、左右手及材料点未知。",
+    "刀/冰接触点、力量、内外刃和runner前中后实际物理模式未知；阴影和运动模糊遮挡。",
+    "93.12–95.00跨跪地/两鞋交叠的物理足对应仍不唯一，5条轮廓原foot=null不改；95秒屏幕左鞋承重未知。",
+    "94.08–94.24及94.66–94.76可能腾空，缺少明确鞋刀与冰的分离和起落界面，不能作为确定flight。"
+  ],
+  "acceptance": "development source review; not independent physical or visual acceptance"
+}

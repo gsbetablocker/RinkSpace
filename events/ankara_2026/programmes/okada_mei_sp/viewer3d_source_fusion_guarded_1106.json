@@ -1,0 +1,253 @@
+{
+  "schema": "rinkspace.result-viewer.v1",
+  "event": "ankara_2026",
+  "programme": "okada_mei_sp",
+  "shot": "spin_281_repaired_1105",
+  "source_run": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_local_280_1105\\fit1\\continuous_stage\\common\\exmr_hand_nofoot",
+  "scene_root": "runs/body_s01_20261029/fullbody_1102",
+  "scene_label": "camera_solver_refined_1102 冻结场景",
+  "metric_binding": "runs/body_s01_20261029/fullbody_1102/metric_binding.json",
+  "metric_binding_base": "data",
+  "model_asset": "environments/body/GVHMR/inputs/checkpoints/body_models/smplx/SMPLX_NEUTRAL.npz",
+  "default_variant": "sequence_source_structure",
+  "initial_source_pts": 1121792,
+  "initial_view": "side",
+  "initial_wear_inspection": false,
+  "comparison_variants": [
+    "sequence_source_structure",
+    "source_guided",
+    "joint_source_guarded"
+  ],
+  "variants": [
+    {
+      "id": "continuous_source",
+      "label": "A 原图连续运动候选（23步，待原片审核）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuous_1105\\source_stage\\common\\exmr_hand_nofoot\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "exmr_hand_nofoot",
+      "required_saved_diagnostics": [
+        "com_world_mid",
+        "blade_material_world_mid",
+        "skate_witness_world_mid"
+      ],
+      "body_refinement_intervals_seconds": [
+        [
+          76.0,
+          95.0
+        ]
+      ]
+    },
+    {
+      "id": "sequence_blade_image",
+      "label": "原14步钢片源轮廓整段候选（未验收）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\delivery_blade_image\\sequence_blade_image_display_result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "exmr_hand_nofoot",
+      "required_saved_diagnostics": [
+        "com_world_mid",
+        "blade_material_world_mid",
+        "skate_witness_world_mid"
+      ],
+      "body_refinement_intervals_seconds": [
+        [
+          76.0,
+          95.0
+        ]
+      ]
+    },
+    {
+      "id": "sequence_source_structure",
+      "label": "完整源轮廓＋条件支撑XY整段候选（76–95秒，未验收）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\delivery_source_structure_1106\\sequence_source_structure_display_result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "exmr_hand_nofoot",
+      "required_saved_diagnostics": [
+        "com_world_mid",
+        "blade_material_world_mid",
+        "skate_witness_world_mid"
+      ],
+      "body_refinement_intervals_seconds": [
+        [
+          76.0,
+          95.0
+        ]
+      ]
+    },
+    {
+      "id": "sequence_global",
+      "label": "39步全序列诊断基线（未视觉通过）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\delivery\\sequence_global_display_result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "exmr_hand_nofoot",
+      "required_saved_diagnostics": [
+        "com_world_mid",
+        "blade_material_world_mid",
+        "skate_witness_world_mid"
+      ],
+      "body_refinement_intervals_seconds": [
+        [
+          76.0,
+          95.0
+        ]
+      ]
+    },
+    {
+      "id": "source_guided",
+      "label": "源引导检查点：15接受步（数值中断状态已精确恢复，未验收）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\source_guided_1106\\source_guided_seeded_v2\\common\\exmr_hand_nofoot\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "exmr_hand_nofoot",
+      "required_saved_diagnostics": [
+        "com_world_mid",
+        "blade_material_world_mid",
+        "skate_witness_world_mid"
+      ],
+      "body_refinement_intervals_seconds": [
+        [
+          76.0,
+          95.0
+        ]
+      ]
+    },
+    {
+      "id": "joint_evidence",
+      "label": "旧人体证据再融合：14接受步（完整76–95秒，未验收）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\source_guided_1106\\joint_evidence_v2\\common\\exmr_hand_nofoot\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "exmr_hand_nofoot",
+      "required_saved_diagnostics": [
+        "com_world_mid",
+        "blade_material_world_mid",
+        "skate_witness_world_mid"
+      ],
+      "body_refinement_intervals_seconds": [
+        [
+          76.0,
+          95.0
+        ]
+      ]
+    },
+    {
+      "id": "joint_physics",
+      "label": "旧全量先验融合：9接受步（清晰刀尾回拉失败对照）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\source_guided_1106\\joint_physics\\common\\exmr_hand_nofoot\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "exmr_hand_nofoot",
+      "required_saved_diagnostics": [
+        "com_world_mid",
+        "blade_material_world_mid",
+        "skate_witness_world_mid"
+      ],
+      "body_refinement_intervals_seconds": [
+        [
+          76.0,
+          95.0
+        ]
+      ]
+    },
+    {
+      "id": "joint_source_guarded",
+      "label": "源端部保持／有限物理融合：12接受步（完整76–95秒，未验收）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\source_guided_1106\\joint_source_guarded\\common\\exmr_hand_nofoot\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "exmr_hand_nofoot",
+      "required_saved_diagnostics": [
+        "com_world_mid",
+        "blade_material_world_mid",
+        "skate_witness_world_mid"
+      ],
+      "body_refinement_intervals_seconds": [
+        [
+          76.0,
+          95.0
+        ]
+      ]
+    }
+  ],
+  "source_identity_field": "source_identity_suspect",
+  "review_status": "整段源引导与证据/物理融合候选；所有失败与unknown保留，待用户视觉验收",
+  "root_repair_status": "Source-supported conditional blade/ice placement is a separate candidate; articulation unchanged; not independent 3D truth",
+  "source_shot": "s05",
+  "source_video": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4",
+  "source_time_base": [
+    1,
+    12800
+  ],
+  "support_observations": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\blade_orientation_1105\\source_boot_axis_document.json",
+  "support_foot": 1,
+  "support_world_regions": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\support_spin_1104\\support_world_regions.json",
+  "body_window_scope": "One unified76-95s state, all951 native exposures, no independent window fitting",
+  "camera_comparison": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\exmr_spin_compare_1104\\native_protocol\\camera_comparison.json",
+  "grasp_hand": "left",
+  "free_foot": 0,
+  "relation_document": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_local_280_1105\\fit1\\continuous_stage\\grasp_relations.json",
+  "support_location_document": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\spin_support_midpoint_anchors_1104.json",
+  "session_id": "source_fusion_guarded_1106",
+  "initial_visible": {
+    "com": true,
+    "blade_material": true,
+    "contact": true,
+    "trajectory": false,
+    "pelvis": false
+  },
+  "diagnostic_semantics": {
+    "com": "条件米制质量近似，非真实质心",
+    "blade_material": "每只刀固定材料点：后／中／前；不是接冰点",
+    "witness": "移动最低点／接触候选，非真实接冰"
+  },
+  "quality_selection": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\spin_continuous_1105\\quality_selection.json",
+  "blade_review_asset": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\source_guided_1106\\delivery_guarded\\sequence_blade_review.json",
+  "source_sequence_ledger": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\source_sequence.json",
+  "temporal_inferred_regions": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\temporal_regions.json",
+  "retained_legacy_configuration": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\viewer3d_sequence_blade_1105.json",
+  "source_structure_review_asset": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\source_guided_1106\\delivery_guarded\\sequence_blade_review.json",
+  "source_structure_review_frames": [
+    977920,
+    983040,
+    1003520,
+    1029120,
+    1044736,
+    1052416,
+    1060096,
+    1065216,
+    1070336,
+    1075456,
+    1080576,
+    1090816,
+    1098496,
+    1103616,
+    1105920,
+    1111040,
+    1116160,
+    1121792,
+    1128960,
+    1136640,
+    1141760,
+    1144320,
+    1146880,
+    1149440,
+    1154560,
+    1157120,
+    1162240,
+    1167360,
+    1172480,
+    1177600,
+    1182720,
+    1183232,
+    1187840,
+    1208320,
+    1213440,
+    1216000
+  ],
+  "upstream_source_structure_review_asset": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\body_sequence_1105\\source_review_1106\\player_source_review.json",
+  "source_review_model_runner_default": true,
+  "source_episode_ledger": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\source_guided_1106\\inputs\\source_episode_review.json"
+}

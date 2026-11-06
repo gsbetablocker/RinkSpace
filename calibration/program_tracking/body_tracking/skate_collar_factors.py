@@ -119,7 +119,7 @@ def _simple_loops(points,counts,tolerance):
     return good&~np.any(use&intersects,axis=1)
 
 
-def _section_samples(vertices,topology,height,tolerance):
+def _section_samples(vertices,topology,height,tolerance,*,return_association=False):
     """Batched triangle cuts, graph traversal and endpoint/midpoint packing."""
     n=len(vertices);edges=topology.edges;tri=topology.triangle_edges
     a,b=vertices[:,edges[:,0]],vertices[:,edges[:,1]]
@@ -160,22 +160,27 @@ def _section_samples(vertices,topology,height,tolerance):
     counts=mask.sum(axis=1);width=int(counts.max(initial=0))
     packed=np.zeros((n,width,2));position=np.cumsum(mask,axis=1)-1
     r,c=np.nonzero(mask);packed[r,position[r,c]]=values[r,c]
-    return packed,np.arange(width)[None]<counts[:,None],reason,counts
+    out=(packed,np.arange(width)[None]<counts[:,None],reason,counts)
+    return out+(np.packbits(mask,axis=1),)if return_association else out
 
 
-def _sampled_signed_gap(points,polygon):
+def _sampled_signed_gap(points,polygon,*,return_association=False):
     a=polygon;b=np.roll(polygon,-1,axis=1);vector=b-a
     denominator=np.sum(vector*vector,axis=-1)
     difference=points[:,:,None]-a[:,None]
     fraction=np.divide(np.einsum('npei,nei->npe',difference,vector),denominator[:,None],
         out=np.zeros(difference.shape[:-1]),where=denominator[:,None]>0)
     fraction=np.clip(fraction,0,1)
-    distance=np.linalg.norm(difference-fraction[:,:,:,None]*vector[:,None],axis=-1).min(axis=2)
+    distances=np.linalg.norm(difference-fraction[:,:,:,None]*vector[:,None],axis=-1);nearest=np.argmin(distances,axis=2)
+    distance=np.take_along_axis(distances,nearest[:,:,None],axis=2)[:,:,0]
     selected=(a[:,None,:,1]>points[:,:,None,1])!=(b[:,None,:,1]>points[:,:,None,1])
     dy=b[:,:,1]-a[:,:,1];safe=np.where(dy==0,1.,dy)
     crossing=(b[:,:,0]-a[:,:,0])[:,None]*(points[:,:,None,1]-a[:,None,:,1])/safe[:,None]+a[:,None,:,0]
     inside=(np.count_nonzero(selected&(points[:,:,None,0]<crossing),axis=2)%2)==1
-    return np.where(inside,distance,-distance)
+    gap=np.where(inside,distance,-distance)
+    if not return_association:return gap
+    selected_fraction=np.take_along_axis(fraction,nearest[:,:,None],axis=2)[:,:,0]
+    return gap,nearest,(selected_fraction>0)&(selected_fraction<1),inside
 
 
 def evaluate(binding,joints,frames,samples=None,*,hand_local_R=None,skate_relative_R=None):
@@ -193,7 +198,7 @@ def evaluate(binding,joints,frames,samples=None,*,hand_local_R=None,skate_relati
     # A geometry-sized domain penalty prevents a lost section reducing the
     # objective. It is not a measured penetration or a new contact tolerance.
     domain_size=max(float(np.linalg.norm(np.ptp(spec.inner_vertices,axis=0))),np.finfo(float).eps)
-    residual_breach=np.full((n,2),domain_size)
+    residual_breach=np.full((n,2),domain_size);branches=[]
     result=dict(breach_solver=breach,residual_breach_solver=residual_breach,
                 unknown=unknown,unknown_reason=reason,sample_count=count,
                 minimum_sample_gap_solver=minimum)
@@ -222,7 +227,7 @@ def evaluate(binding,joints,frames,samples=None,*,hand_local_R=None,skate_relati
                 rotation=frames[first:last,ankle]@R_FB[first:last,foot]
                 origin=joints[first:last,ankle]+np.einsum('nij,nj->ni',frames[first:last,ankle],t_FB[first:last,foot])
             body=np.einsum('nji,nvj->nvi',rotation,samples[first:last]-origin[:,None])
-            points,mask,why,counts=_section_samples(body,spec.body[foot],spec.height_solver,spec.tolerance_solver)
+            points,mask,why,counts,section_branch=_section_samples(body,spec.body[foot],spec.height_solver,spec.tolerance_solver,return_association=True)
             vertices=inner[first:last,foot];ends=spec.inner_edge_vertices;fraction=spec.inner_edge_fraction
             polygon=vertices[:,ends[:,0],:2]*(1-fraction[None,:,None])+vertices[:,ends[:,1],:2]*fraction[None,:,None]
             simple=_simple_loops(polygon,np.full(last-first,len(ends)),spec.tolerance_solver)
@@ -231,9 +236,13 @@ def evaluate(binding,joints,frames,samples=None,*,hand_local_R=None,skate_relati
             why[(why=='')&z_changed]='inner:section_height_changed'
             good=why=='';reason[first:last,foot]=why;unknown[first:last,foot]=~good;count[first:last,foot]=counts
             if points.shape[1]:
-                gap=_sampled_signed_gap(points,polygon)
+                gap,nearest,interior,inside=_sampled_signed_gap(points,polygon,return_association=True)
                 values=np.where(mask,gap,np.inf).min(axis=1)
+                k=np.argmin(np.where(mask,gap,np.inf),axis=1);ii=np.arange(len(k))
+                branches.extend([section_branch,k,nearest[ii,k],interior[ii,k],inside[ii,k],values<0])
                 minimum[first:last,foot]=np.where(good,values,np.nan)
                 breach[first:last,foot]=np.where(good,np.maximum(-values,0.),0.)
                 residual_breach[first:last,foot]=np.where(good,breach[first:last,foot],domain_size)
+    from .weighted_blocks import signature
+    result['association_signature']=signature(*branches)
     return result

@@ -43,6 +43,7 @@ class CompleteRunnerExtentFactors:
         self.times=(self.ref.times[self.frames,None]+np.linspace(-.5,.5,5)*self.body.tau).ravel()
         self.base=self.ref.at(self.times) if self.rows else None
         self.source=[]; self.factor_rows=[]
+        self.association_policy=document.get('association_policy',{});self.visible_mask=None
         keys=set()
         for row in self.rows:
             key=(int(row['pts']),row['foot'])
@@ -64,7 +65,7 @@ class CompleteRunnerExtentFactors:
             self.source.append(uv)
             self.factor_rows.extend([dict(region_shape_px2=np.eye(2)*radius**2,
                 objective_weight=budget*fraction/self.count,
-                reliability=float(row.get('reliability',1.)))]*self.count)
+                reliability=float(row.get('reliability',1.)))for _ in range(self.count)])
         self.last=None
 
     def evaluate(self,x,jacobian=False):
@@ -82,6 +83,18 @@ class CompleteRunnerExtentFactors:
         R=s['R'][pick,feet].reshape(n,5,3,3);O=s['O'][pick,feet].reshape(n,5,3)
         nodes=O[:,:,None]+np.einsum('nlij,kj->nlki',R,self.q)
         projection=moving_projection(self.problem.camera,nodes,self.frames,jacobian=jacobian)
+        if self.association_policy.get('model_visibility')=='near_visible_runner_branch'and self.visible_mask is None:
+            from .source_visible_model import camera_centres
+            centres=camera_centres(self.problem.camera,self.frames,[np.median(v[:,1])for v in self.source])
+            local_camera=np.einsum('nji,nj->ni',R[:,2],centres-O[:,2]);sides=(local_camera[:,1]>=0).astype(int)
+            self.visible_mask=np.zeros((n,self.count),bool)
+            from .source_contour_contract import polyline_measure_weights
+            for i,side in enumerate(sides):
+                ids=side*81+np.arange(81);self.visible_mask[i,ids]=True
+                measure=polyline_measure_weights(self.curves[side][:,[0,2]])
+                budget=self.rows[i]['contour_frame_budget']*self.rows[i]['feature_budget_fraction']
+                for k in range(self.count):self.factor_rows[i*self.count+k]['objective_weight']=float(budget*measure[k%81])if self.visible_mask[i,k]else 0.
+            self.visibility_record=dict(model_side=sides.tolist(),semantics='camera-near visible lower branch; no anatomical edge identity',fixed_inner=True)
         uv=projection['uv'];closest=[];projectors=[];segments=[];alphas=[]
         for i,source in enumerate(self.source):
             A=source[:-1];V=np.diff(source,axis=0);length2=np.sum(V*V,axis=1)
@@ -100,6 +113,9 @@ class CompleteRunnerExtentFactors:
         terms=[region_terms(point,dict(row,centre_uv=centre))
             for point,centre,row in zip(flat,centres,self.factor_rows)]
         residual=np.concatenate([v[0]for v in terms]);D=np.stack([v[1]for v in terms])
+        from .weighted_blocks import signature
+        aa=np.asarray(alphas)
+        self.association_signature=signature(np.asarray(segments),(aa>0)&(aa<1),np.linalg.norm(flat-centres,axis=-1)>np.repeat([r['pixel_uncertainty_radius_px']for r in self.rows],self.count))
         J=None
         if jacobian:
             def derivative(sa,sb,h):
@@ -109,12 +125,13 @@ class CompleteRunnerExtentFactors:
                 world=do[:,:,None]+np.einsum('nlij,kj->nlki',dr,self.q)
                 pixel=np.einsum('nkplc,nlkc->nkpl',projection['pixel_jac_nodes'],world).reshape(-1,2,5)
                 return np.einsum('nij,njk,nkl->nil',D,normal_projector,pixel)
-            h=1e-6;values=[]
-            for axis in self.body.state.active:
+            h=1e-6;values=[];axes=np.asarray(getattr(self.problem,'factor_derivative_columns',self.body.state.active))
+            for axis in axes:
                 plus=d.copy();minus=d.copy();plus[:,axis]+=h;minus[:,axis]-=h
                 values.append(derivative(fk_state(self.ref,self.base,plus),fk_state(self.ref,self.base,minus),h))
             sample=np.repeat(np.arange(n*5).reshape(n,5),self.count,axis=0)
-            BJ=chain_exposure(np.stack(values,-1),d,sample_indices=sample)
+            compact=np.stack(values,-1);local=np.zeros(compact.shape[:-1]+(69,));local[...,axes]=compact
+            BJ=chain_exposure(local,d,sample_indices=sample)
             shoe=[]
             for foot in (0,1):
                 for axis in range(3):
@@ -141,4 +158,7 @@ class CompleteRunnerExtentFactors:
                 complete_runner_extent_model_samples=n*self.count,
                 complete_runner_extent_budget='Caller-provided share of existing forward lower-edge budget, normalized by 162 actual model samples; no added frame weight',
                 complete_runner_extent_scope='Only explicitly complete visible source lower runners; never apply to partial/occluded outlines'))
+        if self.visible_mask is not None:
+            self.last['metrics']['complete_runner_visible_branch']=self.visibility_record
+            for i,row in enumerate(metrics):row['model_visible_mask']=self.visible_mask[i].reshape(2,81).tolist()
         return self.last

@@ -2701,35 +2701,6 @@
     "旋转根角速度变化RMS降低，但仍有周期性波动、支撑鞋图像退化及未知关联；下一阻塞是证据/遮挡深度/足鞋朝向之间的冲突，不是毫米接冰余量。",
     "A、B分别因预算预留/墙钟预算停止；B总墙钟373.33s含最终保存超过360s设置。未收敛，保留候选，不继续加权续跑。"
   ],
-  "verification": {
-    "tests": {
-      "integration_tests.xml": [
-        {
-          "name": "pytest",
-          "errors": "0",
-          "failures": "0",
-          "skipped": "0",
-          "tests": "253",
-          "time": "3.586"
-        }
-      ],
-      "delivery_tests.xml": [
-        {
-          "name": "pytest",
-          "errors": "0",
-          "failures": "0",
-          "skipped": "0",
-          "tests": "96",
-          "time": "6.049"
-        }
-      ]
-    },
-    "mixed_jacobian_max_relative_error": 2.750773969637187e-07,
-    "all_951_saved_states_exact": true,
-    "actual_ledger_pts_uv_sigma_masks_exact": true,
-    "numerical_checks_are_not_trajectory_acceptance": true,
-    "native_stills": "Data/runs/body_s01_20261029/spin_continuous_1105/native_comparison/projection_and_clock.json"
-  },
   "player": {
     "launcher": "launchers/START_3D_SPIN_CONTINUOUS.cmd",
     "config": "events/ankara_2026/programmes/okada_mei_sp/viewer3d_spin_continuous_1105.json",
@@ -2741,8 +2712,7 @@
       "support_foot"
     ],
     "four_comparison_caches_prepared": true,
-    "channels": "COM、固定刀身后/中/前材料点、移动接触候选独立显示；自由视角、逐帧、脚下近景及俯视。",
-    "GUI_opened": false
+    "channels": "COM、固定刀身后/中/前材料点、移动接触候选独立显示；自由视角、逐帧、脚下近景及俯视。"
   },
   "offline_root": "Data/runs/body_s01_20261029/spin_continuous_1105",
   "preserved_failures": [
@@ -2754,11 +2724,10 @@
     "continuous_source_snapshot/",
     "flight_execution_source_snapshot/"
   ],
-  "post_run_changes": [
-    "播放器默认改A、当前绘图隐藏历史disabled观测（原文保留）",
-    "NoOpening空metrics修正元数据：原日志中历史开头因子说明布尔值被通用监视器标m，不影响目标；原日志未改写"
-  ],
-  "no_new_inference": true,
-  "no_video_generated": true,
-  "auto_commit_or_push": false
+  "history_archive": {
+    "base": "data",
+    "path": "maintenance/agents_audit_20261025/documentation_sources.zip",
+    "member": "20261106/events/ankara_2026/programmes/okada_mei_sp/spin_continuous_1105_audit.json",
+    "sha256": "ec57231bab4492f1e4a621c39c0c149ddd742da5c6afce9b776b2f78960871ed"
+  }
 }

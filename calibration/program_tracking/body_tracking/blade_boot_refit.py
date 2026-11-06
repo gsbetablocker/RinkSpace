@@ -229,6 +229,8 @@ class ExistingActionsWithBootAxes:
         result=dict(residual=np.concatenate([v['residual'] for v in outputs]),jac=vstack([v['jac'] for v in outputs],format='csr') if jacobian else None,parts={},metrics={})
         for v in outputs:result['parts'].update(v['parts']);result['metrics'].update(v['metrics'])
         result['factor_row_counts']=[(type(f).__name__,len(v['residual'])) for f,v in zip(factors,outputs)]
+        from .weighted_blocks import block
+        result['weighted_blocks']=[b for f,v in zip(factors,outputs)for b in v.get('weighted_blocks',[block(type(f).__name__,v['residual'],v['jac'])])]
         self.last=result
         return result
 

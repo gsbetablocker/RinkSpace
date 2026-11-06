@@ -412,14 +412,18 @@ class JointContactProblem:
             np.r_[.01,np.full(self.body.n-2,.02),.01] if self.body.n>1 else [.02],self.cavity_rows_per_frame)]
         e['labels']=self.foot_row_labels.copy()
         if e['labels']!=self.row_labels:raise ValueError('Contact row identities changed inside inner solve')
-        collar_unknown=0
+        collar_unknown=0;compatibility_branch='';collar_branch=''
         if jacobian or self.binding.collar_constraints_enabled:
             s=base['world'];local=np.einsum('nji,nkj->nki',s['Q'],s['native']-s['P'][:,None]);mid=np.arange(self.body.n)*5+2
             self._replay_samples=self.binding.surface.sample_vertices(local[mid],s['frames'][mid],self.binding.sample_ids,double_precision=True,**({} if 'hand_local_R' not in s else {'hand_local_R':s['hand_local_R'][mid]}))
             if self.binding.collar_constraints_enabled:
-                collar_unknown=int(self.binding.collar_metrics(local[mid],s['frames'][mid],self._replay_samples,skate_relative_R=(None if s.get('skate_relative_R') is None else s['skate_relative_R'][mid]))['unknown'].sum())
+                collar_value=self.binding.collar_metrics(local[mid],s['frames'][mid],self._replay_samples,skate_relative_R=(None if s.get('skate_relative_R') is None else s['skate_relative_R'][mid]))
+                collar_unknown=int(collar_value['unknown'].sum());collar_branch=collar_value.get('association_signature','')
                 collar_unknown+=int(self.binding.collar_metrics(self.binding.neutral_native,self.binding.neutral_frames,
                     self.binding.neutral_samples)['unknown'].sum())
+            if getattr(self,'record_compatibility_association',False):
+                foot_value=self.binding.foot_metrics(local[mid],s['frames'][mid],self._replay_samples,skate_relative_R=(None if s.get('skate_relative_R') is None else s['skate_relative_R'][mid]))
+                compatibility_branch=foot_value['association_signature']
         phases['cavity_and_collar_gate_seconds']=time.perf_counter()-phase_start;phase_start=time.perf_counter()
         if jacobian:
             if getattr(self,'optimize_shared',True):
@@ -460,6 +464,20 @@ class JointContactProblem:
         phases['support_image_seconds']=time.perf_counter()-phase_start;phase_start=time.perf_counter()
         ral,Jal=self.al.residual_and_jacobian(e['g'],Jg,row_weights=e['weights'])
         r=np.r_[rdata,ral];J=vstack((Jdata,Jal),format='csr') if jacobian else None
+        from .weighted_blocks import block,full_columns,signature
+        named=[full_columns(b,scale=np.sqrt(.02))for b in base.get('weighted_blocks',[block('body_combined',base['residual'],base['jac'])])]
+        for b in named:
+            if b.name=='dynamic_foot_compatibility':b.association=signature(compatibility_branch,collar_branch)
+        if jacobian:
+            offset=len(data);neutralJ=Jdata[offset:offset+len(neutral)];offset+=len(neutral);priorJ=Jdata[offset:offset+len(prior)]
+            offset+=len(prior);iceJ=Jdata[offset:offset+len(ice['residual'])]
+        else:neutralJ=priorJ=iceJ=None
+        named.extend([block('neutral_foot_compatibility',neutral,neutralJ),block('shared_static_prior',prior,priorJ),
+            block('finite_ice',ice['residual'],iceJ,dict(policy=vars(self.ice_policy)),signature(ice['indices'],raw_ice.get('labels'))),
+            full_columns(block('source_motion',motion['residual'],motion['jac']))])
+        named.extend(extra.get('weighted_blocks',[block('action',extra['residual'],extra['jac'])]))
+        if support_value is not None:named.append(block('old_shoe_support_regions',support_value['residual'],support_value['jac'],dict(rows=support.rows)))
+        named.append(block('cavity_AL',ral,Jal,dict(labels=e['labels'],dynamic_selected_rows=dynamic_which,neutral_selected_rows=neutral_which),signature(dynamic_which,neutral_which,collar_unknown,np.asarray(ral)>0,compatibility_branch,collar_branch)))
         gate=physical_feasibility(e['margin_m'],tolerance_m=FEASIBILITY_TOLERANCE,row_labels=e['labels'])
         gate['scope']='foot_cavity_and_collar_only; ice excluded from feasibility'
         gate['collar_unknown_sections']=collar_unknown
@@ -481,6 +499,21 @@ class JointContactProblem:
             v['block_slices']={'support_image':slice(len(rdata)-len(support_value['residual']),len(rdata))}
         phases['AL_and_final_assembly_seconds']=time.perf_counter()-phase_start
         v['evaluation_phases']=phases
+        v['weighted_blocks']=named
+        if getattr(self,'objective_block_weights',None):
+            from .weighted_blocks import assemble
+            scaled=[]
+            for b in named:
+                w=np.broadcast_to(np.asarray(self.objective_block_weights.get(b.name,1.),float),b.residual.shape)
+                if not np.isfinite(w).all()or np.any(w<=0):raise ValueError('Objective curriculum requires finite positive declared weights')
+                factor=np.sqrt(w)
+                scaled.append(block(b.name,b.residual*factor,None if b.jacobian is None else diags(factor)@b.jacobian,b.provenance,b.association))
+            r,J=assemble(scaled,jacobian)
+            v['residual']=r;v['jac']=J;v['weighted_blocks']=scaled
+            v['weighted_parts']={b.name:float(b.residual@b.residual/2)for b in scaled}
+            v['legacy_image_cost']=v['image_cost']
+            image_blocks=('body_pixels','old_gear_pixels','full_source_skate_structure','source_pixel_edge_profile','complete_runner_extent','complete_visible_structure_extent','source_support_location_xy','native_source_support_contact','unassigned_source_skate_sets','old_shoe_support_regions','body_source_regions')
+            v['image_cost']=sum(v['weighted_parts'].get(name,0.)for name in image_blocks)
         v['body_derivative_phases']=dict(base.get('phases',{}))
         v['compatibility_execution']=base.get('compatibility_execution')
         self.cache_x=x.copy();self.cache=v
@@ -640,9 +673,11 @@ class JointContactProblem:
                 record['cross_stage_quality']=self.stage_quality.record()
             self.log.write(json.dumps(record)+'\n');write_json(self.output/'candidate.json',record)
             return last_x,record
-        jacobian_seconds=float(getattr(self,'jacobian_seconds_hint',0.))
+        jacobian_seconds=float(getattr(self,'jacobian_seconds_hint',0.));requested_stop=False
         def guarded(z,jacobian=False):
-            nonlocal jacobian_seconds,last_linearization
+            nonlocal jacobian_seconds,last_linearization,requested_stop
+            if (self.output/'STOP_AFTER_ACCEPTED').is_file():
+                requested_stop=True;raise StopFit()
             # SciPy TRF requests a new Jacobian only after accepting its cached
             # fun state. Record it before spending a J that a budget may discard.
             if jacobian and record_before_jacobian and last_linearization is not None and not np.array_equal(z,last_linearization):
@@ -652,14 +687,15 @@ class JointContactProblem:
             now=time.perf_counter()
             if monitor.reserve_evaluation(now=now,estimated_seconds=jacobian_seconds if jacobian else 0.)['stop']:raise StopFit()
             from .absolute_motion_curve import RotationChartDomainError
+            from .runner_interior import RunnerCoordinateDomainError
             try:
                 value=self.evaluate(expand(z),jacobian)
-            except RotationChartDomainError as error:
+            except (RotationChartDomainError,RunnerCoordinateDomainError) as error:
                 if jacobian:raise
                 # SciPy TRF treats nonfinite trial residuals as rejected and
                 # contracts its trust radius. Never accept/project/rewrite a
                 # branch-invalid pose or replace the last accepted candidate.
-                self.log.write(json.dumps(dict(event='trial_domain_rejected',domain='absolute_so3_log_chart',message=str(error),accepted=self.accepted))+'\n')
+                self.log.write(json.dumps(dict(event='trial_domain_rejected',domain=type(error).__name__,message=str(error),accepted=self.accepted))+'\n')
                 return dict(residual=np.full_like(initial_value['residual'],np.inf))
             if not jacobian and getattr(self,'image_safe_trials',False):
                 image_trial=image_trial_quality(None if monitor.baseline is None else monitor.baseline.get('image_cost'),
@@ -705,7 +741,9 @@ class JointContactProblem:
                         bounds=(lower[selection],upper[selection]),method='trf',tr_solver='lsmr',x_scale='jac',ftol=1e-7,xtol=1e-7,gtol=1e-4,
                         callback=accepted,tr_options=dict(atol=1e-7,btol=1e-7))
             except StopFit:
-                return save_candidate(monitor.record())
+                reason=monitor.record()
+                if requested_stop:reason=dict(reason,explicit_checkpoint_stop=True,reason='STOP_AFTER_ACCEPTED file; last accepted retained')
+                return save_candidate(reason)
             x=expand(fit.x);value=self.evaluate(x,False)
             status=observe_candidate(x,value)
             if status['stop']:return save_candidate(status)

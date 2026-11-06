@@ -20,7 +20,7 @@
 
 ## 本机工具与存储解析
 
-启动脚本统一存放在 [launchers/](launchers/)。当前 S05 完整源鞋刀与支撑位置联合候选使用 [START_3D_SEQUENCE_BLADE.cmd](launchers/START_3D_SEQUENCE_BLADE.cmd)，旧续算 [START_3D_SPIN_REFINED.cmd](launchers/START_3D_SPIN_REFINED.cmd) 与原 A/B 入口 [START_3D_SPIN_CONTINUOUS.cmd](launchers/START_3D_SPIN_CONTINUOUS.cmd) 保留；满意的 S01 使用 [START_3D_COMPARISON.cmd](launchers/START_3D_COMPARISON.cmd)；旧版本及逐镜头入口同目录保留。当前候选的失败和未知项见[节目审计](events/ankara_2026/programmes/okada_mei_sp/spin_source_structure_1106_audit.json)。
+启动脚本统一存放在 [launchers/](launchers/)。播放器入口、默认版本与操作见[使用说明](docs/RESULTS_3D_PLAYER_ZH.md)，当前结果与范围见所属节目入口。
 
 | 工具 | 用途与边界 |
 |---|---|

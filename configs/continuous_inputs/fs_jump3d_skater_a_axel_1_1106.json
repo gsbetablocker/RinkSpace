@@ -1,0 +1,658 @@
+{
+  "schema": "rinkspace.real_fs_trial_experiment.v1",
+  "dataset": "FS-Jump3D",
+  "trial_id": "Skater_A/Axel/Axel_1",
+  "source_manifest": "D:\\CodexData\\RinkSpace_Data\\runs\\fs_jump3d_1106\\fs_jump3d_trial_v1.json",
+  "source_manifest_sha256": "17872f9c15b1f3d50ea64827e88072f40bc1e316ae5bec98e64dac621fa66d88",
+  "reference": {
+    "frames": 300,
+    "original_point_names": 142,
+    "unit": "mm",
+    "original_frame_range": [
+      1,
+      300
+    ],
+    "missing_slots": 793,
+    "world_transform": "identity"
+  },
+  "video": {
+    "actual_size": [
+      1920,
+      1088
+    ],
+    "source_time_base": [
+      1,
+      15360
+    ],
+    "source_pts": [
+      0,
+      76544
+    ],
+    "PTS_increment": 256,
+    "views": 12,
+    "source_frames_per_view": 300,
+    "downloaded_trial_bytes": 30238873
+  },
+  "input_camera": 7,
+  "input_choice": "source acquisition coverage before neural inference; cam1 had many out-of-frame exposures; no model quality selection",
+  "other_cameras": "evaluation only; not passed to ExMR or weight/parameter selection",
+  "camera_original_source_sha256": "7a7b3f165d6d61cda6da9a851d9fc13e9c3036ff0290ffb2e6e4a23b59e5fbae",
+  "camera_convention": "diag(1,-1,-1) @ released R, C=xyz/1000, cvBrown coefficients=original[0,1,3,4,2]",
+  "adopted_original_calibration": {
+    "fs_camera_1": {
+      "affine_intrinsics_matrix": [
+        [
+          1673.4740901110035,
+          0.0,
+          907.7626843174098
+        ],
+        [
+          0.0,
+          1672.7806808087491,
+          601.1517707035085
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "distortion": [
+        -0.044943,
+        0.135546,
+        0.0,
+        0.000297,
+        -0.000415
+      ],
+      "extrinsic_matrix": [
+        [
+          0.785144,
+          -0.618962,
+          0.020859
+        ],
+        [
+          -0.019147,
+          0.009404,
+          0.999772
+        ],
+        [
+          -0.619017,
+          -0.785365,
+          -0.004468
+        ]
+      ],
+      "xyz": [
+        -4897.890625,
+        -7161.513184,
+        1548.84314
+      ]
+    },
+    "fs_camera_2": {
+      "affine_intrinsics_matrix": [
+        [
+          1678.1208764058547,
+          0.0,
+          919.1087318925773
+        ],
+        [
+          0.0,
+          1677.5379693491407,
+          541.6897496861169
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "distortion": [
+        -0.043816,
+        0.130488,
+        0.0,
+        -0.00029,
+        -0.000221
+      ],
+      "extrinsic_matrix": [
+        [
+          0.286919,
+          -0.957716,
+          0.021405
+        ],
+        [
+          0.056684,
+          0.039278,
+          0.997619
+        ],
+        [
+          -0.956276,
+          -0.285023,
+          0.065557
+        ]
+      ],
+      "xyz": [
+        -9218.864258,
+        -3783.529297,
+        1536.206665
+      ]
+    },
+    "fs_camera_3": {
+      "affine_intrinsics_matrix": [
+        [
+          1675.4751388355862,
+          0.0,
+          951.0269903829052
+        ],
+        [
+          0.0,
+          1674.8155811976708,
+          500.1432672767877
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "distortion": [
+        -0.047594,
+        0.13465,
+        0.0,
+        0.000639,
+        -0.001008
+      ],
+      "extrinsic_matrix": [
+        [
+          -0.542315,
+          -0.838346,
+          0.055413
+        ],
+        [
+          0.038286,
+          0.041226,
+          0.998416
+        ],
+        [
+          -0.839303,
+          0.543577,
+          0.00974
+        ]
+      ],
+      "xyz": [
+        -7981.368164,
+        3933.534912,
+        1412.778442
+      ]
+    },
+    "fs_camera_4": {
+      "affine_intrinsics_matrix": [
+        [
+          1674.3413210353276,
+          0.0,
+          965.3028095014446
+        ],
+        [
+          0.0,
+          1673.7531888039236,
+          524.2216208775114
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "distortion": [
+        -0.047803,
+        0.137115,
+        0.0,
+        0.000814,
+        -0.000519
+      ],
+      "extrinsic_matrix": [
+        [
+          -0.135001,
+          -0.990818,
+          0.007367
+        ],
+        [
+          0.005601,
+          0.006672,
+          0.999962
+        ],
+        [
+          -0.99083,
+          0.135037,
+          0.004649
+        ]
+      ],
+      "xyz": [
+        -7876.623047,
+        4096.902832,
+        1407.950562
+      ]
+    },
+    "fs_camera_5": {
+      "affine_intrinsics_matrix": [
+        [
+          1681.1065274882446,
+          0.0,
+          964.1728349484941
+        ],
+        [
+          0.0,
+          1680.6568490204652,
+          522.7243195979952
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "distortion": [
+        -0.046542,
+        0.129375,
+        0.0,
+        0.000312,
+        0.000596
+      ],
+      "extrinsic_matrix": [
+        [
+          -0.825621,
+          -0.56162,
+          0.054153
+        ],
+        [
+          0.038228,
+          0.040077,
+          0.998465
+        ],
+        [
+          -0.562928,
+          0.826424,
+          -0.011619
+        ]
+      ],
+      "xyz": [
+        -5346.917969,
+        7647.055664,
+        1457.241577
+      ]
+    },
+    "fs_camera_6": {
+      "affine_intrinsics_matrix": [
+        [
+          1674.7428484730672,
+          0.0,
+          920.555865551681
+        ],
+        [
+          0.0,
+          1673.9772290718215,
+          509.0099935283854
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "distortion": [
+        -0.046697,
+        0.133037,
+        0.0,
+        0.000701,
+        -0.000251
+      ],
+      "extrinsic_matrix": [
+        [
+          -0.69474,
+          -0.718893,
+          0.022995
+        ],
+        [
+          0.015026,
+          0.017458,
+          0.999735
+        ],
+        [
+          -0.719104,
+          0.694902,
+          -0.001327
+        ]
+      ],
+      "xyz": [
+        -4878.602539,
+        8643.151367,
+        1541.955811
+      ]
+    },
+    "fs_camera_7": {
+      "affine_intrinsics_matrix": [
+        [
+          1673.2422754294876,
+          0.0,
+          964.2049839884927
+        ],
+        [
+          0.0,
+          1672.6359144544099,
+          507.1582463717023
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "distortion": [
+        -0.044757,
+        0.127975,
+        0.0,
+        -3.2e-05,
+        -0.000395
+      ],
+      "extrinsic_matrix": [
+        [
+          -0.852712,
+          0.517127,
+          0.073901
+        ],
+        [
+          0.070892,
+          -0.025603,
+          0.997155
+        ],
+        [
+          0.517548,
+          0.855526,
+          -0.014828
+        ]
+      ],
+      "xyz": [
+        3947.765137,
+        9723.418945,
+        1342.460938
+      ]
+    },
+    "fs_camera_8": {
+      "affine_intrinsics_matrix": [
+        [
+          1685.606416495268,
+          0.0,
+          945.9276164204218
+        ],
+        [
+          0.0,
+          1685.108384166449,
+          524.3035169321137
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "distortion": [
+        -0.047678,
+        0.138365,
+        0.0,
+        0.000656,
+        0.000104
+      ],
+      "extrinsic_matrix": [
+        [
+          -0.528432,
+          0.848786,
+          0.01796
+        ],
+        [
+          -0.045773,
+          -0.049608,
+          0.997719
+        ],
+        [
+          0.847741,
+          0.526405,
+          0.065066
+        ]
+      ],
+      "xyz": [
+        6330.378906,
+        6516.788574,
+        1362.209351
+      ]
+    },
+    "fs_camera_9": {
+      "affine_intrinsics_matrix": [
+        [
+          1678.230317344884,
+          0.0,
+          957.4035412171975
+        ],
+        [
+          0.0,
+          1677.3464923579297,
+          496.3321738883113
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "distortion": [
+        -0.045633,
+        0.131926,
+        0.0,
+        -1.3e-05,
+        3.8e-05
+      ],
+      "extrinsic_matrix": [
+        [
+          -0.721468,
+          0.691784,
+          0.030311
+        ],
+        [
+          -0.028325,
+          -0.073221,
+          0.996913
+        ],
+        [
+          0.691868,
+          0.718382,
+          0.072421
+        ]
+      ],
+      "xyz": [
+        7051.42627,
+        5524.668457,
+        1427.932129
+      ]
+    },
+    "fs_camera_10": {
+      "affine_intrinsics_matrix": [
+        [
+          1676.389464758193,
+          0.0,
+          963.3395221723079
+        ],
+        [
+          0.0,
+          1675.8184571763152,
+          495.90693031224606
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "distortion": [
+        -0.045657,
+        0.129011,
+        0.0,
+        -0.000162,
+        -0.000183
+      ],
+      "extrinsic_matrix": [
+        [
+          0.076853,
+          0.996578,
+          0.030432
+        ],
+        [
+          -0.00407,
+          -0.030209,
+          0.999535
+        ],
+        [
+          0.997034,
+          -0.076941,
+          0.001735
+        ]
+      ],
+      "xyz": [
+        10564.422852,
+        -777.105774,
+        1432.60437
+      ]
+    },
+    "fs_camera_11": {
+      "affine_intrinsics_matrix": [
+        [
+          1677.8912578634267,
+          0.0,
+          953.3312893171332
+        ],
+        [
+          0.0,
+          1677.2809999015383,
+          503.57872427486325
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "distortion": [
+        -0.048416,
+        0.134156,
+        0.0,
+        0.000323,
+        0.000239
+      ],
+      "extrinsic_matrix": [
+        [
+          0.439537,
+          0.898198,
+          -0.006896
+        ],
+        [
+          0.007293,
+          0.004109,
+          0.999965
+        ],
+        [
+          0.898195,
+          -0.439572,
+          -0.004745
+        ]
+      ],
+      "xyz": [
+        8620.392578,
+        -4133.473633,
+        1491.508789
+      ]
+    },
+    "fs_camera_12": {
+      "affine_intrinsics_matrix": [
+        [
+          1682.1317584269893,
+          0.0,
+          919.0254006227672
+        ],
+        [
+          0.0,
+          1681.70448429372,
+          520.9619385280121
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "distortion": [
+        -0.04673,
+        0.13052,
+        0.0,
+        1.6e-05,
+        -0.000328
+      ],
+      "extrinsic_matrix": [
+        [
+          0.832122,
+          0.553989,
+          -0.025872
+        ],
+        [
+          -0.023856,
+          0.082362,
+          0.996317
+        ],
+        [
+          0.55408,
+          -0.82844,
+          0.081751
+        ]
+      ],
+      "xyz": [
+        5193.651855,
+        -8846.013672,
+        1598.137207
+      ]
+    }
+  },
+  "ExMR": {
+    "model": "ExMR",
+    "commit": "eac72e47339b404c0443f5fb323412e2ce432410",
+    "checkpoint_sha256": "8d3947310c30444ec59dae4662574d7a32bf83af30320eeac87146529ff2fda5",
+    "SMPLX_sha256": "376021446ddc86e99acacd795182bbef903e61d33b76b9d8b359c2b0865bd992",
+    "frames": 300,
+    "fps": 60.0,
+    "source_time_base": [
+      1,
+      15360
+    ],
+    "one_continuous_model_call": true,
+    "camera_only": true,
+    "world_branch": false,
+    "postprocess": false,
+    "snap_to_ground": false,
+    "smooth_incam": false,
+    "smooth_global": false,
+    "orientation_normalization": false,
+    "trained": false,
+    "reference_or_holdout_used": false,
+    "network_static_probabilities_are_contact_truth": false,
+    "candidates": [
+      "prefoot",
+      "postfoot",
+      "final",
+      "hand_nofoot"
+    ],
+    "temporal_limit": "60Hz actual source cadence; no sports fine-tuning or cadence adapter",
+    "peak_cuda_bytes": 467232768
+  },
+  "metrics_path": "D:\\CodexData\\RinkSpace_Data\\runs\\fs_jump3d_1106\\evaluation\\metrics.json",
+  "clock_check_path": "D:\\CodexData\\RinkSpace_Data\\runs\\fs_jump3d_1106\\source_checks\\image_clock_audit.json",
+  "actual_result_path": "D:\\CodexData\\RinkSpace_Data\\runs\\fs_jump3d_1106\\evaluation\\world_predictions_and_errors.npz",
+  "report_path": "D:\\CodexData\\RinkSpace_Data\\runs\\fs_jump3d_1106\\RESULT_ZH.md",
+  "S05_preserved": true,
+  "training": false,
+  "accuracy_pass_declared": false,
+  "training_set_FS_AP_overlap_of_fixed_checkpoint": "not independently audited; only this experiment input/holdout consumption is isolated"
+}

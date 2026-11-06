@@ -156,7 +156,7 @@ def blade_assets(loc,pts,defs,before):
         i=int(np.searchsorted(pts,frame['pts']))
         for row in frame['regions']:
             if row['role']=='fit':source_status[i,row['foot'],0 if row['feature']=='heel' else 1]=row['status']
-    for vid in (PARENT,CURRENT):
+    for vid in loc.get('asset_variants',(PARENT,CURRENT)):
         v=defs[vid];z=v['saved'];query=SavedBladeProjection(loc['project'],v['stage'],v['parameter']);v['query']=query
         np.testing.assert_array_equal(query.pts,pts)
         packet=query.binding.packet();p=packet['parameters'];R=z['skate_R_world_mid'];O=z['skate_origin_world_mid']
@@ -164,10 +164,10 @@ def blade_assets(loc,pts,defs,before):
         np.testing.assert_allclose(evaluated['R'],R,rtol=0,atol=2e-9);np.testing.assert_allclose(evaluated['O']*query.ratio,O,rtol=0,atol=2e-9)
         representative=np.asarray([round(t*12800) for t in KEY_SECONDS],dtype=np.int64)
         source_indices=np.searchsorted(pts,representative)
-        projected_body=query.project_points(representative,0,np.zeros((1,3)),include_body=True)['COCO_uv']
-        np.testing.assert_allclose(projected_body,z['COCO_uv'][source_indices],rtol=0,atol=2e-6)
-        v['projection_verification']=dict(source_pts=representative.tolist(),R_O_all951_match_saved=True,
-            maximum_COCO_native_pixel_difference=float(np.max(np.abs(projected_body-z['COCO_uv'][source_indices]))),
+        projected_body=query.project_points(pts,0,np.zeros((1,3)),include_body=True)['COCO_uv']
+        np.testing.assert_allclose(projected_body,z['COCO_uv'],rtol=0,atol=2e-6)
+        v['projection_verification']=dict(source_pts=pts.tolist(),R_O_all951_match_saved=True,COCO_all951_match_saved=True,
+            maximum_COCO_native_pixel_difference=float(np.max(np.abs(projected_body-z['COCO_uv']))),
             coordinates='actual native Brown five-node rolling-shutter projection')
         f=batch_features(query.binding,R,O/query.ratio);h=f['height'];q=f['local_point'];ii=np.arange(len(pts))[:,None];ff=np.arange(2)[None]
         eligible=np.asarray([i for i,k in enumerate(f['ids']) if k in packet['template']['support_feature_ids']['glide']],int)
@@ -397,8 +397,8 @@ def contour_geometry_match(curves,source):
         material_correspondence='latent nearest projected segment; not observed fixed material',contact_truth='unmeasured')
 
 
-def static_frames(loc):
-    pts,defs,before=checked(loc);config=read(configuration(loc));asset_path=Path(config['blade_review_asset']);asset=read(asset_path);projection=load(asset_path.parent/asset['projection_npz'])
+def static_frames(loc,*,prepared=None):
+    pts,defs,before=checked(loc)if prepared is None else prepared;config=read(configuration(loc));asset_path=Path(config['blade_review_asset']);asset=read(asset_path);projection=load(asset_path.parent/asset['projection_npz'])
     from PIL import Image,ImageDraw,ImageFont
     from rinkspace.viewer3d.source import SourceVideo
     from calibration.program_tracking.body_tracking.blade_projection import SavedBladeProjection
@@ -419,10 +419,11 @@ def static_frames(loc):
         observed=[row for row in contour_rows if int(row['pts'])==pt]
         titles=([('source structures / status retained',None),('14-step blade baseline / unaccepted',PARENT),('full source + conditional XY / unaccepted',CURRENT)] if loc['family']=='source_structure' else
             [('source steel observed',None),('39-step baseline / pose inferred',PARENT),('steel-source candidate / pose inferred',CURRENT)] if loc['family']=='blade_image' else [('clean source',None),('parent spin_safe',PARENT),('new unified whole sequence',CURRENT)])
+        titles=loc.get('comparison_titles',titles)
         matches=[]
         for column,(title,vid) in enumerate(titles):
             panel=im.copy();d=ImageDraw.Draw(panel,'RGBA')
-            if loc['family']=='source_structure':
+            if loc['family']=='source_structure'and not(column==0 and loc.get('clean_source_column')):
                 from rinkspace.viewer3d.blade_review import overlay_primitives
                 current=dict(model=None,source_structures=[r for r in asset.get('source_structures',[])if int(r['pts'])==pt])
                 for primitive in overlay_primitives(current,include_model_reference=False,include_model_contours=False,include_source_structures=True,include_source_legacy=False):

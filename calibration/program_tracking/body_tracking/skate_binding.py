@@ -241,7 +241,7 @@ class SkateBinding(FootwearBinding):
         if samples is None:
             kwargs={} if hand_local_R is None else dict(hand_local_R=hand_local_R)
             samples=self.surface.sample_vertices(joints,frames,self.sample_ids,double_precision=True,**kwargs)
-        feet=[];anchors=[];violations=[];support=[];alpha=self.deformation(joints,frames,x,skate_relative_R=skate_relative_R)
+        feet=[];anchors=[];violations=[];support=[];branches=[];alpha=self.deformation(joints,frames,x,skate_relative_R=skate_relative_R)
         # Inner walls/footbed are generated from the legal outer section; no
         # maximum-width shortcut and no smaller substitute human foot.
         count=len(p['xs'])
@@ -256,12 +256,13 @@ class SkateBinding(FootwearBinding):
             # Batched equivalent of six per-frame np.interp calls. This
             # changes execution only; each frame retains its own co-deformed
             # inner-wall sections and its full original foot vertex set.
-            walls=[];fr=np.arange(len(joints))[:,None];query=foot[...,0]
+            walls=[];cells=[];cell_interior=[];fr=np.arange(len(joints))[:,None];query=foot[...,0]
             for j in range(6):
                 grid=inner[:,f,:,j,0]
                 index=np.clip(np.sum(query[...,None]>=grid[:,None,:],axis=-1)-1,0,count-2)
                 left=grid[fr,index];right=grid[fr,index+1]
                 fraction=np.clip((query-left)/(right-left),0,1)
+                cells.append(index);cell_interior.append((fraction>0)&(fraction<1))
                 yz=inner[:,f,:,j,1:]
                 walls.append(yz[fr,index]*(1-fraction[...,None])+yz[fr,index+1]*fraction[...,None])
             walls=np.stack(walls,axis=2);edge=np.roll(walls,-1,axis=2)-walls
@@ -271,9 +272,13 @@ class SkateBinding(FootwearBinding):
             violations.append(np.concatenate((np.maximum(-margins,0),
                 np.maximum(lining-query,0)[...,None],
                 np.maximum(query-(p['parameters'].sole_length_m-lining),0)[...,None]),axis=2))
+            selected=np.argmax(violations[-1],axis=1);ii=np.arange(len(joints))[:,None]
+            ci=np.stack(cells,axis=-1);inside=np.stack(cell_interior,axis=-1)
+            branches.extend([selected,np.max(violations[-1],axis=1)>0,ci[ii,selected[:,:6],np.arange(6)[None]],inside[ii,selected[:,:6],np.arange(6)[None]],np.searchsorted(p['xs'],anchors[-1][...,0])])
             support.append(anchors[-1][...,2]-np.interp(anchors[-1][...,0],p['xs'],p['floor']+.003/self.ratio))
+        from .weighted_blocks import signature
         return dict(feet=feet,anchors=np.stack(anchors,1),violations=violations,
-            support=np.stack(support,1),targets=p['targets'],alpha=alpha)
+            support=np.stack(support,1),targets=p['targets'],alpha=alpha,association_signature=signature(*branches,alpha>0,alpha<np.array([.020,.015,.012])/self.ratio))
 
     @property
     def compatibility_width(self):

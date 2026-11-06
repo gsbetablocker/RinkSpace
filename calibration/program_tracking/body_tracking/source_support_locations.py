@@ -336,6 +336,8 @@ class SourceSupportLocationFactors:
                 support_location_frame_weight=self.weight, reserved_complete_2d_curve_weight=self.curve_frame_weight))
         residual = np.asarray(residual).ravel()
         cost = float(residual @ residual/2)
+        from .weighted_blocks import signature
+        self.association_signature=signature(witness['feature_index'],witness['interior'],str([r['source_boundary_projection']for r in metrics]))
         self.last = dict(residual=residual,
             jac=self._local_jacobians(delta, state, witness, rotation, np.asarray(derivatives)) if jacobian else None,
             parts={'source_support_location_xy': cost}, image_cost=cost,

@@ -207,10 +207,14 @@ class FullBodyProblem:
             r=prior_values[name];residual.append(r);parts[name]=float(r@r/2)
             if jacobian:matrices.append(matrix)
         r=np.concatenate(residual);J=vstack(matrices,format='csr') if jacobian else None
+        from .weighted_blocks import block
+        named=[block('body_pixels',br,None if not jacobian else matrices[0],dict(frame_indices=self.of,joint_indices=self.oj)),
+               block('old_gear_pixels',gr,None if not jacobian else matrices[1],dict(choices=choices))]
+        for i,(name,matrix)in enumerate(self.prior_matrices):named.append(block('body_'+name,prior_values[name],None if not jacobian else matrices[2+i]))
         self.cache_x=np.array(x,copy=True);self.evaluations+=1
         self.cache=dict(residual=r,jac=J,parts=parts,uv=uv,world=s,data_rows=data_rows,choices=choices,
                         eval_seconds=time.perf_counter()-tick,normalized_body_error=errors,
-                        phases=phase,forward_reused=bool(reuse),_forward=forward)
+                        phases=phase,forward_reused=bool(reuse),_forward=forward,weighted_blocks=named)
         if self.log:
             self.log.write(json.dumps(dict(event='evaluation',mode=self.state.mode,window=self.state.seconds,
                 evaluation=self.evaluations,cost=float(r@r/2),parts=parts,with_jacobian=jacobian,

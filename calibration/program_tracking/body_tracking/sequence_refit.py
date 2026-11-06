@@ -36,22 +36,37 @@ class SequenceActions:
         self.source_locations=None
         if 'source_support_locations' in document:
             from .source_support_locations import SourceSupportLocationFactors
-            self.source_locations=SourceSupportLocationFactors(problem,document['source_support_locations'],support_evidence=document['source_support_evidence'],**document['source_structure_budget'])
+            cls=SourceSupportLocationFactors
+            if document.get('support_location_policy',{}).get('mode')=='native_image_candidate':
+                from .source_contact_image import NativeSupportContactFactors
+                cls=NativeSupportContactFactors
+            self.source_locations=cls(problem,document['source_support_locations'],support_evidence=document['source_support_evidence'],**document['source_structure_budget'])
+        self.structure_extent=None
+        if document.get('complete_visible_structure_extent',{}).get('rows'):
+            from .source_structure_extent import CompleteStructureExtentFactors
+            self.structure_extent=CompleteStructureExtentFactors(problem,document['complete_visible_structure_extent'])
         self.unassigned=None
         if document.get('unassigned_source_skate_sets'):
             from .source_skate_structure_factors import UnassignedSkateSetFactors
-            self.unassigned=UnassignedSkateSetFactors(problem,document['unassigned_source_skate_sets'])
+            self.unassigned=UnassignedSkateSetFactors(problem,document['unassigned_source_skate_sets'],episode=document.get('source_episode_review',{}).get('late_identity_episode'))
     def evaluate(self,x,jacobian=False):
         outputs=[self.existing.evaluate(x,jacobian),self.shoe.evaluate(x,jacobian),self.modes.evaluate(x,jacobian)]
         if self.contour is not None:outputs.append(self.contour.evaluate(x,jacobian))
         if self.extent is not None:outputs.append(self.extent.evaluate(x,jacobian))
         if self.source_locations is not None:outputs.append(self.source_locations.evaluate(x,jacobian))
+        if self.structure_extent is not None:outputs.append(self.structure_extent.evaluate(x,jacobian))
         if self.unassigned is not None:outputs.append(self.unassigned.evaluate(x,jacobian))
         out=dict(residual=np.concatenate([v['residual'] for v in outputs]),jac=vstack([v['jac'] for v in outputs],format='csr') if jacobian else None,parts={},metrics={})
         for v in outputs:out['parts'].update(v['parts']);out['metrics'].update(v['metrics'])
         out['image_cost']=self.existing.grasp.last.get('image_cost',0.)+sum(v.get('image_cost',0.) for v in outputs[1:])
-        factors=[self.shoe,self.modes]+([] if self.contour is None else [self.contour])+([] if self.extent is None else [self.extent])+([] if self.source_locations is None else [self.source_locations])+([] if self.unassigned is None else [self.unassigned])
+        factors=[self.shoe,self.modes]+([] if self.contour is None else [self.contour])+([] if self.extent is None else [self.extent])+([] if self.source_locations is None else [self.source_locations])+([] if self.structure_extent is None else [self.structure_extent])+([] if self.unassigned is None else [self.unassigned])
         out['factor_row_counts']=outputs[0]['factor_row_counts']+[(type(f).__name__,len(v['residual'])) for f,v in zip(factors,outputs[1:])]
+        from .weighted_blocks import block,signature
+        out['weighted_blocks']=[]
+        for factor,value in zip([self.existing]+factors,outputs):
+            name=next(iter(value['parts']),type(factor).__name__)
+            association=getattr(factor,'association_signature','')
+            out['weighted_blocks'].extend(value.get('weighted_blocks',[block(name,value['residual'],value['jac'],dict(factor=type(factor).__name__),association)]))
         self.last=out;return out
 
 

@@ -56,7 +56,7 @@ ExMR局部补丁保留[上游完整许可和署名](third_party_licenses/EXMR_LI
 
 当前 `absolute_motion_v1` 连续人体入口已接入同关节三轴 GPU 扰动批处理、曲线/固定参考值复用、按需导数、旋转小块及五曝光节点 CSR 装配。只有人体图像观测的块仅生成被消费的 COCO 导数；独立鞋刀图像、内腔、鞋口、抓握和软冰面因子保留。
 
-`ContinuousJoint` 默认使用 [body_linear_solver.py](../calibration/program_tracking/body_tracking/body_linear_solver.py)的稀疏直接 GN 方向，保留 SciPy TRF 的缩放、边界、正则化及接受规则；正规系统残差检查失败或算子不支持时回退 LSMR。其他问题默认仍为 LSMR；程序化设置 `problem.linear_solver_backend='lsmr'` 可选原路径。当前 951 帧、同起点两个接受步的旧求解 Monitor 区间为205.70秒，新完整 solve 调用35.14秒；首次完整 J 单独为19.48→17.33秒。该近收敛 S05 短段倍率不推广到其他求解阶段。[实际记录](../events/ankara_2026/programmes/okada_mei_sp/body_performance_1105_audit.json)保留原始计时边界、逐项 CSR 差异、CPU/GPU计数及原版报告缺项；现有 A/B 参数不因代码更新而重新拟合。
+`ContinuousJoint` 默认使用 [body_linear_solver.py](../calibration/program_tracking/body_tracking/body_linear_solver.py)的稀疏直接 GN 方向，保留 SciPy TRF 的缩放、边界、正则化及接受规则；正规系统残差检查失败或算子不支持时回退 LSMR。其他问题默认仍为 LSMR；程序化设置 `problem.linear_solver_backend='lsmr'` 可选原路径。测量按固定输入与接受步数限定比较范围，不推广到其他求解阶段。[实际记录](../events/ankara_2026/programmes/okada_mei_sp/body_performance_1105_audit.json)保留原始计时边界、逐项 CSR 差异、CPU/GPU计数及原版报告缺项；现有 A/B 参数不因代码更新而重新拟合。
 
 [性能启动入口](../scripts/run_body_performance.py)给现有 Python 求解命令设置子进程环境，原参数原样传递。切换原生库时使用独立候选目录和已有参数作 warm-start，使旧目录的输入记录保持原样。例如将当前时序入口及其已有参数接在后面：
 
@@ -72,25 +72,19 @@ python -B scripts/run_body_performance.py scripts/run_opening_timing.py --root <
 
 该入口复用全身、鞋体、开头及其派生问题，不改相机记录、观测、损失、参数布局和停止条件。移除启动包装即可回到原执行配置；环境只作用于新子进程，已有运行不会切换。新库可用 `python -B scripts/build_core.py --out <Data内构建目录> --generator Ninja --openmp`重建，CPU／GPU 场地库仍分别保存。
 
-完整当前 Joint 测量入口为 [profile_contact_solver.py](../scripts/profile_contact_solver.py)，覆盖身体、足鞋／鞋口兼容性、冰面、支撑图像及当前抓握因子，`--kind current_spin` 直接消费现有初值、观测与检查点。默认只测一次 fresh 完整 Jacobian。探针自身的执行 CLI 会覆盖环境，所以 hybrid 测量须显式给 `--backend cpu --workers 12 --native-threads 4 --blas-threads 1 --local-derivatives analytic --compatibility-backend cuda_resident`。本机已有的 Data 入口已绑定完整 common 输入与这些参数，可只复查评估：
+完整 Joint 测量入口为 [profile_contact_solver.py](../scripts/profile_contact_solver.py)，覆盖身体、足鞋／鞋口兼容性、冰面、支撑图像和当前抓握因子。`--kind current_spin`读取已有初值、观测与检查点，默认 `--operation evaluate` 只测一次 fresh 完整 Jacobian。
 
-~~~powershell
-& 'D:\CodexData\RinkSpace_Data\runs\body_pf1104\run_probe.ps1' -Mode gpu -Operation evaluate
-~~~
+| 参数 | 对应已有输入 |
+|---|---|
+| `--base-root`、`--case-root` | S01 共享模型根与已准备的片段目录 |
+| `--state`、`--initial` | 固定身份一致的当前参数及初始参考 |
+| `--support`、`--grasp-relations`、`--grasp-geometry` | 原有支撑与抓握证据，不在测量时重建 |
+| `--output` | 新的 Data 输出目录 |
+| `--backend cpu --workers 12 --native-threads 4 --blas-threads 1 --local-derivatives analytic --compatibility-backend cuda_resident` | 明确选择当前混合测量路径；探针自身 CLI 设置优先于外层包装 |
 
-该 Data 脚本的 `gpu` 标签指上述混合执行范围；它默认评估，使用新输出目录，不重建观测、不运行网络或生成视频。完整 solve 另须显式政策、固定原 GVHMR 质量基准和来自实测的 Jacobian 耗时 hint。
+完整求解须显式使用 `--operation solve`，并提供既有 `--run-policy`、固定原 GVHMR 的 `--quality-baseline` 及实测 `--jacobian-seconds-hint`；`current_spin` 要求冻结共享鞋参。参数的完整定义见该脚本 `--help`。
 
-2026-11-04 在 265KF／5070 Ti 上，同一 current_spin 输入、63 个身体活动列和数学目标的实测如下。该 case 保存951个曝光，实际求解窗口为82–94.8秒的641个曝光；表中完整 Jacobian 包含全部 Joint 因子，solve 为相同政策下各完成2个接受步：
-
-| 实际路径 | fresh 完整 Jacobian | 同2步完整 solve |
-|---|---:|---:|
-| 原 CPU4 差分 | 73.66秒 | 178.51秒 |
-| CPU12 解析／精确重放 | 36.29秒 | 108.37秒 |
-| CPU12＋驻留GPU兼容块 | 9.20–14.72秒 | 50.76–56.68秒 |
-
-完整测量、CPU 核秒、峰值内存、GPU 传输／计算、数值等价及剩余阶段见[公开性能记录](../events/ankara_2026/programmes/okada_mei_sp/body_performance_1104_audit.json)；原始日志与输入留 Data。
-
-两步是此次性能验证的固定工作量，不表示数值收敛或人体／轨迹准确性通过；原候选与来源保持原绑定。混合 solve 中最大的剩余阶段为 CPU LSMR，累计20.99秒、两次分别771和417次迭代；细节与质量范围见 Data 的 `runs/body_pf1104` 实测记录。
+已保存的同输入性能数据见[完整 Joint 测量](../events/ankara_2026/programmes/okada_mei_sp/body_performance_1104_audit.json)和[连续状态测量](../events/ankara_2026/programmes/okada_mei_sp/body_performance_1105_audit.json)。数值按各自硬件、输入、活动列与计时边界解释，单次 Jacobian、固定步数求解和完整拟合耗时分别比较；这些测量不构成人体或轨迹准确性验收。原始输入、日志及生产源码快照保留在对应 Data 运行目录。
 
 旧 [profile_body_solver.py](../scripts/profile_body_solver.py) 的 `--kind` 支持 fullbody、boot、opening、motion、timing；`--state` 可指定检查点只读副本，其局部问题评估不代表当前完整 Joint。旧本机范围保存在 `<Data>/runs/body_perf_1103/integration_summary.json`。
 

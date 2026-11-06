@@ -75,8 +75,10 @@ class SequenceShoeDynamics:
                 ids=(np.arange(len(a))[:,None]*6+np.arange(6)[None]+offset*6).ravel()
                 J+=blocks@JR[ids]
             mats.append(J)
+        from .weighted_blocks import block,full_columns
+        named=[full_columns(block(name,value,mats[i]if jacobian else None,dict(source_pts=self.ref.p['pts'])))for i,(name,value)in enumerate(zip(parts,rows))]
         r=np.concatenate(rows)
-        return dict(residual=r,jac=_full(vstack(mats,format='csr')) if jacobian else None,parts=parts,
+        return dict(residual=r,jac=_full(vstack(mats,format='csr')) if jacobian else None,parts=parts,weighted_blocks=named,
             metrics=dict(relative_skate_degrees=np.rad2deg(np.linalg.norm(error,axis=-1)).tolist(),config=self.config))
 
 
@@ -120,17 +122,29 @@ class TemporalContactFactors:
         raw_u=(qr[:,:,0].ravel()-x0)/(x1-x0)
         co=dict(effective_u=raw_u.copy(),actual_u=raw_u.copy(),derivative_normal=np.zeros_like(flat))
         if valid.any():
-            good=runner_longitudinal_coordinate(flat[valid],self.p,qr[:,:,0].ravel()[valid])
+            from .runner_interior import canonical_runner_witness
+            canonical,good=canonical_runner_witness(flat[valid],self.p,qr.reshape(-1,3)[valid])
+            qr=qr.copy();qr.reshape(-1,3)[valid]=canonical
             for key in co:co[key][valid]=good[key]
         co['stationary_valid']=valid
         u=co['effective_u'].reshape(-1,2);gap=hh[ix,feet,rb]-hh[ix,feet,pb]
-        return d,s,f,qr,qp,n,co,u,gap,hh[ix,feet,rb],hh[ix,feet,pb]
+        runner_height=(s['O'][:,:,2]+np.sum(n*qr,axis=-1))*self.binding.ratio
+        gap=runner_height-hh[ix,feet,pb]
+        return d,s,f,qr,qp,n,co,u,gap,runner_height,hh[ix,feet,pb]
     def associate(self,x):
         values=self.geometry(x);u=values[7];gap=values[8];rh=values[9];ph=values[10];t=self.pts/12800.;N=len(t)
         modes=np.full((N,2),6,int);status=np.full((N,2),'unknown',dtype='<U16');costs=np.zeros((N,2,7))
         for foot in (0,1):
             cost=np.zeros((N,7));supported=(t>=81.62)&(t<=92.46)&(foot==1)
             lifted=((t>=86.2)&(t<=92.4)&(foot==0))|((t>=81.36)&(t<=81.46))
+            ledger=getattr(self.ref,'source_document',{}).get('source_episode_review')
+            if ledger:
+                supported=np.zeros(N,bool);lifted=np.zeros(N,bool)
+                for episode in ledger['episodes']:
+                    mask=(self.pts>=episode['start_pts'])&(self.pts<=episode['end_pts_inclusive'])
+                    if episode['kind']=='support_candidate'and episode.get('foot')==foot:supported|=mask
+                    if(episode['kind']=='free_foot_off_ice_candidate'and episode.get('foot')==foot)or episode['kind']=='flight_visible_candidate':lifted|=mask
+                if np.any(supported&lifted):raise ValueError('Conflicting source support/flight episode')
             cost[supported,6]=6.;cost[supported,5]=5.
             cost[supported,:5]=np.c_[np.maximum(self.band[0]-u[supported,foot],0)**2+np.maximum(u[supported,foot]-self.band[1],0)**2,
                 .7+np.maximum(.75-u[supported,foot],0)**2,
@@ -147,6 +161,9 @@ class TemporalContactFactors:
             source_phase_from='source temporal review; right support and left held foot',
             emission='source phase plus finite current runner/pick geometry; no argmin-as-contact-truth',
             observed_contact_material='unknown',inference_is_not_new_source_observation=True)
+        if ledger:self.record.update(source_phase_from='explicit source_episode_review ledger',source_episode_ids=[e['episode_id']for e in ledger['episodes']],toe_pick_heel_office_physics='phase association only; no new toe/heel contact residual')
+        from .weighted_blocks import signature
+        self.association_signature=signature(self.modes,self.status)
     def evaluate(self,x,jacobian=False):
         d,s,f,qr,qp,n,co,u,gap,rh,ph=self.geometry(x);N=len(d);feet=np.arange(2)[None]
         # Mode association is fixed during this continuous solve. It may be

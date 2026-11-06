@@ -1,6 +1,6 @@
 # RinkSpace 三维结果播放器
 
-双击项目根目录的启动文件，打开独立三维窗口。结果需要对应的本机 Data、模型和显示环境；公开仓库不附比赛视频、完整人体模型或显示缓存。当前人体结果均未通过独立三维准确性或接冰验收，候选状态见[节目入口](../events/ankara_2026/programmes/okada_mei_sp/README.md#人体与足鞋结果)。
+双击 [launchers/](../launchers/) 中的相应启动文件，打开独立三维窗口。结果需要对应的本机 Data、模型和显示环境；公开仓库不附比赛视频、完整人体模型或显示缓存。当前人体结果均未通过独立三维准确性或接冰验收，候选状态见[节目入口](../events/ankara_2026/programmes/okada_mei_sp/README.md#人体与足鞋结果)。
 
 ## 选择入口与结果
 
@@ -8,16 +8,24 @@
 |---|---|---|
 | [START_3D_RESULTS.cmd](../launchers/START_3D_RESULTS.cmd) | 原配置默认 `j1`（J1_s2），首次停在原片 36.020 秒；后续恢复保存的帧、版本和视角 | 历史 S01 人体与鞋刀参考 |
 | [START_3D_COMPARISON.cmd](../launchers/START_3D_COMPARISON.cmd) | `skate_s01_1103`，Fresh 从原片 22.120 秒、side 全身视角开始 | 处理 S01：22.120–44.960 秒，1143 个曝光；保留较早全身、开头和鞋刀候选 |
+| [START_3D_SEQUENCE_BLADE.cmd](../launchers/START_3D_SEQUENCE_BLADE.cmd) | `sequence_source_structure`，无参数启动使用 Fresh，原片 87.640 秒 | 当前 S05 完整源结构与条件支撑位置候选，76.000–95.000 秒；保留旧 14 步、39 步及原 A 对照 |
 | [START_BOOT_INSPECTION.cmd](../launchers/START_BOOT_INSPECTION.cmd) | `opening1102`，Fresh 停在原片 36.020 秒 | 四项足鞋／开头历史对照；默认项是旧开头候选 |
 | [START_3D_INTEGRATION.cmd](../launchers/START_3D_INTEGRATION.cmd) | 先选择片段，回车选 S01；S01 默认 `skate_s01_1103`，其他三段默认 `A_root` | 跳跃 44.980–52.000 秒、步法 25.000–35.000 秒、旋转 76.000–95.000 秒 |
 | [START_3D_SUPPORT.cmd](../launchers/START_3D_SUPPORT.cmd) | `support_new`，默认原片 88.000 秒 | 87.500–92.500 秒上下文，核心为 88.000–92.000 秒 |
 | [START_3D_SPIN_MODELS.cmd](../launchers/START_3D_SPIN_MODELS.cmd) | `exmr_prefoot`，默认原片 88.120 秒 | 76.000–95.000 秒 GVHMR／ExMR 对照，951 个曝光 |
+| [START_3D_SPIN_REFINED.cmd](../launchers/START_3D_SPIN_REFINED.cmd) | `local_281`，首次原片 81.580 秒 | 历史局部关联修复；整段续算 `continuous_refined` 在同一配置中保留 |
+| [START_3D_SPIN_CONTINUOUS.cmd](../launchers/START_3D_SPIN_CONTINUOUS.cmd) | `continuous_source`，首次原片 81.300 秒 | 历史绝对连续 A/B，76.000–95.000 秒 |
+| [START_3D_SPIN_ENTRY.cmd](../launchers/START_3D_SPIN_ENTRY.cmd) | `entry_motion`，首次原片 81.300 秒 | 历史入旋／质心重力候选，76.000–95.000 秒 |
 
-版本切换保持原片 PTS 和观察角度。`Fresh` 按配置重新选择起点；普通入口会恢复保存的窗口状态。
+版本切换保持原片 PTS 和观察角度。表中列出配置初始值；Fresh 不恢复上次会话。S01 比较、足鞋检查和无参数的 S05 源结构入口按配置重新定位；普通入口可恢复保存的帧、结果和视角。使用 -Variant 选择保留版本，使用 -Fresh 从配置起点检查。
 
 足鞋入口的四项为“旧封闭刚性鞋壳”“相同顶点的开放鞋口”“共享穿合与有限上帮形变”及 `opening1102`。最后一项保留固定姿态／近静止条件的失败历史。鞋壳显示连接改变和实际拟合改变分别解释，未观察到的刀齿或接点不会补造。
 
 动作入口的三段保留 `A`、`B`、`A_root`、`B_root`；旋转的 `B_root` 复用与 B 数值等价的 A 根修正。源支撑入口比较原 A、旧 root、首轮保留状态和最终候选。模型入口比较固定 GVHMR 初值、GVHMR 一步候选、ExMR 足细化前／后初值；足细化后存在结构 unknown，没有合格最终拟合。具体失败与结果身份由[节目结果导航](../events/ankara_2026/programmes/okada_mei_sp/README.md#人体与足鞋结果)定位。
+
+S05 源结构入口可逐帧查看完整源轮廓，用“上一／下一源标注”定位实际描线曝光；未标注帧不继承邻帧描线。配置中保留的旧结果按版本单独解释，源像素范围与条件冰面位置均不代表真实接触已验收。
+
+本轮完整76–95秒、951曝光的新旧比较使用 [START_3D_SOURCE_FUSION_SUPPORT.cmd](../launchers/START_3D_SOURCE_FUSION_SUPPORT.cmd)，显式选择 `support_grounded`，保留旧版本并预备完整缓存。此候选仅有有限改善，91.20秒刀具俯仰及局部鞋刀退化仍未解决，界面标记未通过视觉验收；[结果身份](../events/ankara_2026/programmes/okada_mei_sp/spin_support_correction_1106_audit.json)不将工程加载通过解释为画面准确。
 
 ## 怎么操作
 
@@ -68,7 +76,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\launchers\START_3D_SUPPORT
 powershell -NoProfile -ExecutionPolicy Bypass -File .\launchers\START_3D_SPIN_MODELS.ps1 -Check
 ~~~
 
-`-Check` 核对配置和对应文件，不证明人体、轨迹或接触准确。求解与证据生成接口见[实现状态](REBUILD.md#人体局部拟合执行层)及[复核源码索引](../events/ankara_2026/programmes/okada_mei_sp/body_verification_sources_1103.json)。
+`-Check` 核对配置和对应文件，不证明人体、轨迹或接触准确。求解与证据生成接口见[实现状态](REBUILD.md#人体与鞋刀拟合执行层)及[复核源码索引](../events/ankara_2026/programmes/okada_mei_sp/body_verification_sources_1103.json)。
 
 ## 本地视频
 
@@ -78,5 +86,3 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\launchers\START_3D_SPIN_MO
 | `runs/body_s01_20261029/exmr_spin_compare_1104/native_protocol/source_GVHMR_ExMR_76_95.mp4` | 76.000–95.000 秒 |
 
 视频、源图、完整拟合与逐轮诊断保留在 Data，由[节目结果绑定](../events/ankara_2026/programmes/okada_mei_sp/README.md#人体与足鞋结果)定位；界面操作和播放检查不能代替这些结果的准确性验收。
-
-入旋后续对照使用 [START_3D_SPIN_ENTRY.cmd](../launchers/START_3D_SPIN_ENTRY.cmd)，默认 `entry_motion`，保留全部旧候选；同一原片 76–95 秒、951 个 PTS 与共同世界坐标，提供自由视角、支撑足俯视／侧视与抓握特写。[结果绑定](../events/ankara_2026/programmes/okada_mei_sp/spin_entry_1104_audit.json)明确记录重力残差与回投失败；该候选不替换满意 S01。

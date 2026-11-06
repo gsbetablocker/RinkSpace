@@ -91,6 +91,15 @@ def region_terms(uv,row,delta=2.):
     u=np.sqrt(1+(e@e)/delta**2);k=np.sqrt(2/(u+1));dk=-k/(4*delta**2*u*(u+1));w=np.sqrt(row['objective_weight']*row['reliability'])
     return w*k*e,w*(k*np.eye(2)+2*dk*np.outer(e,e))@De,float(np.linalg.norm(uv-row['centre_uv'])*max(0.,1-1/max(r,1e-30)))
 
+def tolerant_support_response(height,tolerance):
+    """Gentle signed contact expectation; tolerance is curvature, never a gate.
+
+    Cubic near the reference plane, asymptotically linear for large gaps.
+    Existing penetration/hover terms and all finite engineering scales remain.
+    """
+    height=np.asarray(height);z=height/float(tolerance);decay=np.exp(-.5*z*z)
+    return height*(-np.expm1(-.5*z*z)),1-decay+z*z*decay
+
 
 def source_sample_indices(pts,seconds,phase_boundaries_seconds):
     """Keep native source samples and phase boundaries inside this context."""
@@ -163,12 +172,15 @@ class SpinGraspFactors:
         candidates=[j for j,k in enumerate(features['ids']) if k in eligible];h=features['height'][:,f,candidates]
         best=np.asarray(candidates)[np.argmin(h,axis=1)];ix=np.arange(len(h));height=features['height'][ix,f,best];q=features['local_point'][ix,f,best]
         cfg=self.config['continuous_support'];w=np.sqrt(cfg['weight']*self.support_dt*self.support_phase_weight[self.support_mask])/cfg['scale_m']
-        excess=np.maximum(height-cfg['deadzone_m'],0);r=w*excess;J=None
+        if cfg.get('response')=='tolerant_signed_expectation':
+            excess,slope=tolerant_support_response(height,cfg['deadzone_m'])
+        else:excess=np.maximum(height-cfg['deadzone_m'],0);slope=(excess>0).astype(float)
+        r=w*excess;J=None
         if jacobian:
             e=dict(rows=[(i,f,q[i],-1.) for i in ix],row_upper_vertex=[-1]*len(ix),times=self.support_times)
             derivative=-NORMALIZATION*body_constraint_jacobian(self.ref,s,d,self.body.state.active,self.support_B,e)
-            J=hstack((csr_matrix((len(r),17)),diags(w*(excess>0))@derivative),format='csr')
-        return r,J,dict(source_inferred_interval_samples=len(r),raw_height_m=height.tolist(),pts=self.pts[self.support_mask].tolist(),feature_ids=[features['ids'][j] for j in best])
+            J=hstack((csr_matrix((len(r),17)),diags(w*slope)@derivative),format='csr')
+        return r,J,dict(source_inferred_interval_samples=len(r),raw_height_m=height.tolist(),pts=self.pts[self.support_mask].tolist(),feature_ids=[features['ids'][j] for j in best],response=cfg.get('response','legacy_hover_hinge'),not_a_feasibility_or_accuracy_gate=True)
 
     def evaluate(self,x,jacobian=False):
         d=self.body.state.increments(x,self.times);X,H,R,O=self.geometry_at(d);cfg=self.config['grip'];seg=np.asarray(self.geometry['segment_local_solver'])*self.binding.ratio
@@ -210,5 +222,6 @@ class SpinGraspFactors:
         residual=np.concatenate([r for _,r,_ in groups]);J=vstack([j for _,_,j in groups],format='csr') if jacobian else None
         offset=0;slices={}
         for name,r,j in groups:slices[name]=slice(offset,offset+len(r));offset+=len(r)
-        self.last=dict(residual=residual,jac=J,parts={k:float(r@r/2) for k,r,_ in groups},block_slices=slices,image_cost=float(ri@ri/2),metrics=dict(grip_samples=len(grip),grip_pts=self.pts[self.held].tolist(),palm_to_segment_m=[v['palm_to_segment_m'] for v in grip],temporal_samples=len(X),support=support,body_regions=im,root_columns_of_relative_factors_exactly_zero=True))
+        from .weighted_blocks import block
+        self.last=dict(residual=residual,jac=J,parts={k:float(r@r/2) for k,r,_ in groups},weighted_blocks=[block(name,r,j,dict(source_pts=self.pts))for name,r,j in groups],block_slices=slices,image_cost=float(ri@ri/2),metrics=dict(grip_samples=len(grip),grip_pts=self.pts[self.held].tolist(),palm_to_segment_m=[v['palm_to_segment_m'] for v in grip],temporal_samples=len(X),support=support,body_regions=im,root_columns_of_relative_factors_exactly_zero=True))
         return self.last

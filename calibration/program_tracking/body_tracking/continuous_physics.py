@@ -27,11 +27,18 @@ class ContinuousMassGeometry:
 class ConfirmedFlightFactors:
     def __init__(self,problem,mass_geometry):
         self.problem=problem;self.body=problem.body;self.ref=problem.reference;self.mass=mass_geometry
-        source=self.ref.p['pts']/12800.;self.frames=np.flatnonzero((source>=81.36-1e-9)&(source<=81.46+1e-9));self.times=self.ref.times[self.frames];self.base=self.ref.at(self.times)
+        source=self.ref.p['pts']/12800.;ledger=getattr(self.ref,'source_document',{}).get('source_episode_review')
+        if ledger:
+            intervals=[e for e in ledger['episodes']if e['kind']=='flight_visible_candidate'];mask=np.zeros(len(source),bool)
+            if len(intervals)!=1:raise ValueError('Current flight factor requires one explicitly reviewed flight core')
+            episode=intervals[0];mask=(self.ref.p['pts']>=episode['start_pts'])&(self.ref.p['pts']<=episode['end_pts_inclusive'])
+            interval=[episode['start_pts']/12800.,episode['end_pts_inclusive']/12800.]
+        else:mask=(source>=81.36-1e-9)&(source<=81.46+1e-9);interval=[81.36,81.46]
+        self.frames=np.flatnonzero(mask);self.times=self.ref.times[self.frames];self.base=self.ref.at(self.times)
         # One source-supported interior: exact onset and landing are excluded.
         self.gravity=np.array([0.,0.,-9.81]);self.operator=flight_position_operator(self.times,self.gravity)
         self.position_scale=.03;self.impulse_scale=.2
-        self.config=dict(confirmed_source_interval_seconds=[81.36,81.46],source_boundary_unknown=True,position_scale_m=self.position_scale,specific_impulse_scale_m2_s=self.impulse_scale,finite_weight=1.,physics_model_is_proxy=True)
+        self.config=dict(confirmed_source_interval_seconds=interval,source_boundary_unknown=True,position_scale_m=self.position_scale,specific_impulse_scale_m2_s=self.impulse_scale,finite_weight=1.,physics_model_is_proxy=True,source_episode_ledger_used=bool(ledger))
     def values(self,C,R):
         H,_,_=self.mass.H(self.times,C,R);com=self.mass.com(C)
         op=self.operator['operator'];r=(op@(com-self.operator['gravity_position_m']))/self.position_scale
@@ -77,4 +84,6 @@ class ConfirmedFlightFactors:
             D=np.zeros((len(H)-1,len(H)));rows=np.arange(len(H)-1);D[rows,rows]=-1;D[rows,rows+1]=1
             Jh=kron(csr_matrix(D/self.impulse_scale),eye(3),format='csr')@Jh
             J=hstack((csr_matrix((len(rp)+len(rh),17)),vstack((Jp,Jh),format='csr')),format='csr')
-        r=np.r_[rp,rh];return dict(residual=r,jac=J,parts={'flight_integrated_com':float(rp@rp/2),'flight_specific_angular_impulse':float(rh@rh/2)},metrics=dict(self.config,com_world_m=com.tolist(),specific_H_world_m2ps=H.tolist(),full_orbital_and_intrinsic=True,local_FK_derivatives_only=True))
+        from .weighted_blocks import block
+        named=[block('flight_integrated_com',rp,None if not jacobian else J[:len(rp)]),block('flight_specific_angular_impulse',rh,None if not jacobian else J[len(rp):])]
+        r=np.r_[rp,rh];return dict(residual=r,jac=J,parts={'flight_integrated_com':float(rp@rp/2),'flight_specific_angular_impulse':float(rh@rh/2)},weighted_blocks=named,metrics=dict(self.config,com_world_m=com.tolist(),specific_H_world_m2ps=H.tolist(),full_orbital_and_intrinsic=True,local_FK_derivatives_only=True))

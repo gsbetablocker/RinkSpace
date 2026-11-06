@@ -219,11 +219,6 @@
     }
   },
   "solver_path_equivalence": "目标和全部Jacobian行等价；直接GN方向比迭代LSMR更准确，接受轨迹并非逐位相同。两步cost旧1481.584314798169、新1479.8536085208098，不作为人体准确性结论。",
-  "tests": {
-    "passed": 29,
-    "subtests_passed": 75,
-    "report": "Data/runs/body_perf_1105/continuous_opt/final_tests.xml"
-  },
   "preserved_parameter_sha256": {
     "skate_s01_1103.npz": "3b58dac5f7363dfc5e051fc75ef8602dd3810a0ebc370c57a24542745bc5090c",
     "spin_continuous_source_1105.npz": "d4aa68bbdb0d08b8224600b66578c0ee52f329acc641edd6c9f5788072eb60ce",
@@ -231,8 +226,6 @@
   },
   "no_ice_threshold_or_objective_change": true,
   "no_user_candidate_replaced": true,
-  "no_inference_or_video_or_GUI": true,
-  "committed_or_pushed": false,
   "remaining_cost": {
     "complete_jacobian_seconds": 17.327523199999632,
     "complete_jacobian_phases": {
@@ -290,5 +283,11 @@
   "offline_root": "Data/runs/body_perf_1105/continuous_opt",
   "actual_run": "Data/runs/body_perf_1105/continuous_opt/accepted_fast_path/result.json",
   "failure_preserved": "Data/runs/body_perf_1105/continuous_opt/before_run",
-  "accuracy_accepted": false
+  "accuracy_accepted": false,
+  "history_archive": {
+    "base": "data",
+    "path": "maintenance/agents_audit_20261025/documentation_sources.zip",
+    "member": "20261106/events/ankara_2026/programmes/okada_mei_sp/body_performance_1105_audit.json",
+    "sha256": "afa1ba627de9855c6614f4fd9d27b8b4dff69ec77be535bc2cc656c106656bce"
+  }
 }
