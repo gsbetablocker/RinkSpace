@@ -46,7 +46,13 @@ class ProgrammeCamera:
         return out
     def with_jacobian(self,points,frames):
         points=np.asarray(points);uv=np.empty((*points.shape[:-1],2));J=np.empty((*points.shape[:-1],2,3))
-        for ix,camera,local in self._groups(frames):uv[ix],J[ix]=camera.with_jacobian(points[ix],local)
+        for ix,camera,local in self._groups(frames):
+            # FullBodyProblem configures this dispatcher's execution policy.
+            # Every real shot projector must consume it, not only the S05
+            # representative exposed as self.core.
+            camera.core.motion_projection_threads=self.core.motion_projection_threads
+            if hasattr(self,'body_execution'):camera.body_execution=self.body_execution
+            uv[ix],J[ix]=camera.with_jacobian(points[ix],local)
         return uv,J
 
 class StaticCropCamera:

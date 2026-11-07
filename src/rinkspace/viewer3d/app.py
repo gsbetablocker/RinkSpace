@@ -83,6 +83,8 @@ class ResultsPlayer(Viewer):
         self.source_error = ''
         self.source_navigation = catalog.navigation_points()
         self.source_navigation_index = 0
+        self.action_navigation = catalog.navigation_points('events')
+        self.action_navigation_index = 0
         self.source_regions = (SupportObservations(catalog.support_observations,catalog.time_base,shot=catalog.config.get('source_shot'))
                                if catalog.support_observations else None)
         review_asset=catalog.config.get('blade_review_asset')
@@ -754,6 +756,17 @@ class ResultsPlayer(Viewer):
                 imgui.same_line()
                 if imgui.button('切后一曝光'):self.seek(cut['frame'])
                 imgui.text('精确 PTS %d → %d'%(cut['previous_pts'],cut['pts']))
+            if self.action_navigation:
+                labels=[row['label'] for row in self.action_navigation]
+                changed,selected=imgui.combo('完整动作',self.action_navigation_index,labels)
+                if changed:
+                    self.action_navigation_index=selected
+                    self.seek(self.action_navigation[selected]['start_frame'])
+                episode=self.action_navigation[self.action_navigation_index]
+                if imgui.button('动作起点'):self.seek(episode['start_frame'])
+                imgui.same_line()
+                if imgui.button('动作终点'):self.seek(episode['end_frame'])
+                imgui.text('动作原片区间 %.2f–%.2f 秒'%(self.catalog.seconds[episode['start_frame']],self.catalog.seconds[episode['end_frame']]))
             s=self.sequence.state
             if self.blade_review is not None:
                 for line in diagnostic_lines(self.blade_review.at(self.variant['id'],int(self.catalog.pts[f]))):

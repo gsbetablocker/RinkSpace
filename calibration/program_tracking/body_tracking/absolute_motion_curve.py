@@ -94,9 +94,24 @@ class AbsoluteMotionCurve:
                     or np.max(abs(np.linalg.norm(q,axis=-1)-1.))>1e-7):
                 raise ValueError('Invalid archived SU(2) edge chart reference')
             self.edge_reference_quaternion=q.copy()
+        self.rotation_controls.setflags(write=False)
+        if self.edge_reference_quaternion is not None:
+            self.edge_reference_quaternion.setflags(write=False)
+        self._log_chart_cache=None
         self._check_log_chart()
 
     def _check_log_chart(self):
+        cached=self._log_chart_cache
+        rotation,chart=self.rotation_controls,self.edge_reference_quaternion
+        if cached is not None and cached[0] is rotation and cached[1] is chart:
+            return cached[2]
+        steps=self._validate_log_chart()
+        if not rotation.flags.writeable and (chart is None or not chart.flags.writeable):
+            steps.setflags(write=False)
+            self._log_chart_cache=(rotation,chart,steps)
+        return steps
+
+    def _validate_log_chart(self):
         relative=self.rotation_controls[:-1].swapaxes(-1,-2)@self.rotation_controls[1:]
         if self.edge_reference_quaternion is None:
             steps=_log(relative)

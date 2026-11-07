@@ -62,19 +62,29 @@ def _slice_state(value, start, stop, total):
     # Metadata (e.g. lower_boot_vertices) is not sample-aligned. Only known
     # dynamic fields are needed by callers; leave all other fields untouched.
     sample_keys = {'P', 'Q', 'local_R', 'hand_local_R', 'native', 'coco', 'gear', 'boot_R', 'boot_O',
-                   'frames', 'world', 'upper_deformation',
+                   'frames', 'world', 'upper_deformation', 'skate_relative_R', 'upper_local', 'inner_local',
                    'effective_ankle_relative_rotation', 'blade_R', 'blade_O', 'shank_world'}
     out = {}
     for key, item in value.items():
         if isinstance(item, dict):
             out[key] = _slice_state(item, start, stop, total)
-        elif key in sample_keys:
+        elif key in sample_keys and item is not None:
             if not isinstance(item, np.ndarray) or item.shape[0] != total:
                 raise ValueError('Unexpected batched body state layout: '+key)
             out[key] = item[start:stop]
         else:
             out[key] = item
     return out
+
+
+def _current_skate_reference(ref, delta):
+    """Keep the selected shoe state when a numeric perturbation drops ndarray metadata.
+
+    Body columns hold relative-shoe controls fixed at their CURRENT value, not
+    the seed stored in ref. Copy the dictionary only; no input is modified.
+    """
+    relative = getattr(delta, 'skate_relative_R', None)
+    return ref if relative is None else dict(ref, skate_relative_R=relative)
 
 
 class BodyExecution:
@@ -187,6 +197,7 @@ class BodyExecution:
         The batch cap limits the number of columns, not an individual window;
         TorchCompactBody additionally chunks every device operation.
         """
+        ref = _current_skate_reference(ref, delta)
         delta = np.asarray(delta, dtype=np.float64)
         columns = list(map(int, columns))
         if delta.ndim != 2 or delta.shape[1] != 69 or not np.isfinite(delta).all():
@@ -223,8 +234,8 @@ class BodyExecution:
                     trial[(2*j)*n:(2*j+1)*n, column] += step
                     trial[(2*j+1)*n:(2*j+2)*n, column] -= step
                 batched_ref = {}
-                for key in ('P', 'Q', 'local_R', 'hand_local_R', 'times'):
-                    if key in ref:
+                for key in ('P', 'Q', 'local_R', 'hand_local_R', 'skate_relative_R', 'times'):
+                    if key in ref and ref[key] is not None:
                         value = np.asarray(ref[key])
                         if value.shape[0] != n:
                             raise ValueError('Reference sample layout differs: '+key)
@@ -334,6 +345,7 @@ class BodyExecution:
         return self.world_derivatives(reference,ref,delta,columns,step=step,include_equipment=False)
 
     def world_derivatives(self, reference, ref, delta, columns, *, step=1e-5, include_equipment=True):
+        ref = _current_skate_reference(ref, delta)
         columns = list(map(int, columns))
         owner = self._analytic_reference(reference)
         if owner is None or any(c < 6 or c >= 69 for c in columns):
@@ -381,7 +393,9 @@ class BodyExecution:
                         for state in pair:
                             world = P[:, None] + np.einsum('nij,nkj->nki', Q, state['native'])
                             native = np.einsum('nji,nkj->nki', Q, world - P[:, None])
-                            trial.append(local_binding.evaluate(P, Q, native, state['frames'])['gear'])
+                            relative = ref.get('skate_relative_R')
+                            options = {} if relative is None else dict(skate_relative_R=relative)
+                            trial.append(local_binding.evaluate(P, Q, native, state['frames'], **options)['gear'])
                     gear = ((trial[0] - trial[1]) / (2 * step)).reshape(len(delta), count, 3)
                 return np.concatenate((gear, coco), axis=1)
 

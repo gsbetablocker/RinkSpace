@@ -20,6 +20,8 @@ from .exmr_integration import PROGRAMME,CASE_FIELD,case_identity,save_packet
 
 class SequenceActions:
     def __init__(self,problem,prior,mass,document,x,*,base_factors=None):
+        self.split_jacobian_only=getattr(problem,'bounded_memory',False)
+        self.prechecked_contour=None
         self.existing=ExistingActionsWithBootAxes(problem,prior,mass,document)if base_factors is None else base_factors
         self.shoe=SequenceShoeDynamics(problem);self.modes=TemporalContactFactors(problem,x);self.last=None
         self.contour=None
@@ -53,9 +55,24 @@ class SequenceActions:
         for entry in document.get('additional_unassigned_source_episodes',[]):
             from .source_skate_structure_factors import UnassignedSkateSetFactors
             self.extra_unassigned_episodes.append((entry['id'],UnassignedSkateSetFactors(problem,entry['groups'],episode=entry['episode'])))
+    def source_trial_rows(self,x):
+        value=self.contour.evaluate(x,False)
+        self.prechecked_contour=(np.array(x,copy=True),value)
+        return value['metrics']['visible_runner_contours']
+
     def evaluate(self,x,jacobian=False):
-        outputs=[self.existing.evaluate(x,jacobian),self.shoe.evaluate(x,jacobian),self.modes.evaluate(x,jacobian)]
-        if self.contour is not None:outputs.append(self.contour.evaluate(x,jacobian))
+        from .skate_physics import fk_state
+        d=self.shoe.body.state.increments(x,self.shoe.times)
+        native=(d,fk_state(self.shoe.ref,self.shoe.base,d))
+        outputs=[self.existing.evaluate(x,jacobian),self.shoe.evaluate(x,jacobian,native_state=native),
+                 self.modes.evaluate(x,jacobian,native_state=native)]
+        if self.contour is not None:
+            cached=self.prechecked_contour
+            self.prechecked_contour=None
+            if not jacobian and cached is not None and np.array_equal(cached[0],x):
+                outputs.append(cached[1])
+            else:
+                outputs.append(self.contour.evaluate(x,jacobian))
         if self.extent is not None:outputs.append(self.extent.evaluate(x,jacobian))
         if self.source_locations is not None:outputs.append(self.source_locations.evaluate(x,jacobian))
         if self.structure_extent is not None:outputs.append(self.structure_extent.evaluate(x,jacobian))
@@ -64,7 +81,8 @@ class SequenceActions:
             value=factor.evaluate(x,jacobian).copy()
             value['parts']={'additional_unassigned_source_'+episode_id:value['image_cost']}
             outputs.append(value)
-        out=dict(residual=np.concatenate([v['residual'] for v in outputs]),jac=vstack([v['jac'] for v in outputs],format='csr') if jacobian else None,parts={},metrics={})
+        matrix=vstack([v['jac'] for v in outputs],format='csr') if jacobian and not self.split_jacobian_only else None
+        out=dict(residual=np.concatenate([v['residual'] for v in outputs]),jac=matrix,parts={},metrics={})
         for v in outputs:
             out['parts'].update(v['parts'])
             for key,item in v['metrics'].items():
@@ -82,7 +100,10 @@ class SequenceActions:
         for factor,value in zip([self.existing]+factors,outputs):
             name=next(iter(value['parts']),type(factor).__name__)
             association=getattr(factor,'association_signature','')
-            out['weighted_blocks'].extend(value.get('weighted_blocks',[block(name,value['residual'],value['jac'],dict(factor=type(factor).__name__),association)]))
+            blocks=value.get('weighted_blocks')
+            if blocks is None:
+                blocks=[block(name,value['residual'],value['jac'],dict(factor=type(factor).__name__),association)]
+            out['weighted_blocks'].extend(blocks)
         self.last=out;return out
 
 

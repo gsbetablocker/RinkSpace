@@ -30,20 +30,35 @@ def world_batches(reference,base,delta,*,samples):
     return {key:np.concatenate(value,axis=0) for key,value in arrays.items()}
 
 
-def contact_batches(problem,x,times,jacobian,*,samples=512):
+def contact_batches(problem,x,times,jacobian,*,samples=512,soft_policy=None):
     """Exact global quadrature and witnesses; temporary FK/J scratch is tiled."""
-    from scipy.sparse import vstack
+    from scipy.sparse import csr_matrix,vstack
     from .skate_contact import trapezoid_time_weights
-    from .body_clock import sample_period
-    from .skate_physics import fk_state,constraints,body_constraint_jacobian
+    from .body_clock import sample_period,time_base
+    from .skate_physics import fk_state,constraints,body_constraint_jacobian,source_support_schedule
     ref=problem.reference;weights=trapezoid_time_weights(times,singleton_duration_s=sample_period(ref.p));pieces=[];matrices=[]
+    schedule=source_support_schedule(times,problem.origin,problem.evidence,time_base(ref.p))
     for first in range(0,len(times),samples):
         from .memory_guard import check_memory_budget
         check_memory_budget()
         last=min(first+samples,len(times));ts=times[first:last]
         base=ref.at(ts);delta=problem.body.state.increments(x[17:],ts);state=fk_state(ref,base,delta)
-        part=constraints(problem.binding,state,ts,problem.origin,problem.evidence,time_weights=weights[first:last])
-        if jacobian:matrices.append(body_constraint_jacobian(ref,state,delta,problem.body.state.active,problem.body.state.basis(ts),part))
+        part=constraints(problem.binding,state,ts,problem.origin,problem.evidence,
+                         time_weights=weights[first:last],support_schedule=schedule[first:last])
+        if jacobian:
+            if soft_policy is None:
+                matrices.append(body_constraint_jacobian(ref,state,delta,problem.body.state.active,problem.body.state.basis(ts),part))
+            else:
+                labels=part['labels']
+                penetration=np.fromiter((name in ('left_nonpenetration','right_nonpenetration') for _,name in labels),bool,count=len(labels))
+                support=np.fromiter((name.endswith(':upper') for _,name in labels),bool,count=len(labels))
+                active=np.flatnonzero((penetration & (-part['margin_m']>soft_policy.penetration_deadzone_m))
+                                    | (support & (part['values']>soft_policy.support_hover_deadzone_m)))
+                selected=dict(rows=[part['rows'][i] for i in active],times=ts,
+                              row_upper_vertex=np.asarray(part['row_upper_vertex'])[active])
+                J=body_constraint_jacobian(ref,state,delta,problem.body.state.active,problem.body.state.basis(ts),selected)
+                scatter=csr_matrix((np.ones(len(active)),(active,np.arange(len(active)))),shape=(len(labels),len(active)))
+                matrices.append(scatter@J)
         part['rows']=[(row+first,foot,q,sign)for row,foot,q,sign in part['rows']]
         for row in part['support_groups']:row['frame_index']+=first
         pieces.append(part)

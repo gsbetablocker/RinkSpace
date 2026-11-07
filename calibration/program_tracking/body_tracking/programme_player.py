@@ -366,13 +366,24 @@ def register(loc):
             raise FileExistsError('Existing compact model has a different identity')
     else:
         os.link(source_compact, compact)
-    write(loc['navigation'], navigation_document(read(loc['scope'])))
+    navigation = navigation_document(read(loc['scope']))
+    if (loc['prepared']/'action_input_identity.json').is_file():
+        doc=read(loc['prepared']/'source_evidence.json')
+        contexts=doc['source_episode_review']['whole_programme_coverage_intervals']
+        labels={'first_combination':'3F+3T 连跳','axel':'2A','flying_camel':'FCSp 跳入与抓握',
+                'lutz':'3Lz','step_sequence':'步法段','layback':'LSp 左足旋',
+                'change_foot_spin':'CCoSp 换足旋'}
+        navigation['events']=[dict(label=labels[e['episode_id']],start_pts=e['start_pts'],
+            end_pts=e['end_pts_inclusive']) for e in contexts if e['episode_id'] in labels]
+    write(loc['navigation'], navigation)
     write(loc['config'], config)
     from rinkspace.viewer3d.data import ResultCatalog
     catalog = ResultCatalog(project=loc['project'], data_root=loc['store'].data, config=loc['config'])
     for variant in variant_ids(loc, diagnostics):
         catalog.parameters(variant)
     catalog.navigation_points()
+    if navigation.get('events'):
+        catalog.navigation_points('events')
     report = dict(schema='rinkspace.programme-player-registration.v1', frames=len(packet['pts']),
         shots={str(s): int(np.count_nonzero(shots == s)) for s in dict.fromkeys(shots.tolist())},
         first_last_pts=packet['pts'][[0, -1]].tolist(), time_base=[1, 12800],

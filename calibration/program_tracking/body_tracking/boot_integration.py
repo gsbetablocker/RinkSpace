@@ -181,12 +181,22 @@ class BootWindowProblem(FullBodyProblem):
         d=self.state.increments(x,self.mid_times)
         resident=getattr(self,'resident_compatibility',None)
         difference_step=float(getattr(self,'compatibility_difference_step',1e-5))
+        shoe_local=None
         if resident is not None:
             if type(self).compatibility_from_state is not BootWindowProblem.compatibility_from_state:
                 raise TypeError('Resident compatibility requires the audited original consumer')
             if not resident.matches(self.binding):
                 raise ValueError('Resident compatibility shared geometry changed; create a new prepared owner')
-            extra,resident_values=resident.evaluate(d,self.state.active[self.state.active>=6] if jacobian else None,step=difference_step,skate_relative_R=getattr(d,'skate_relative_R',None))
+            columns=self.state.active[self.state.active>=6] if jacobian else None
+            relative=getattr(d,'skate_relative_R',None)
+            fused=getattr(resident,'linearize_body_and_shoes',None)
+            if jacobian and relative is not None and fused is not None:
+                resident.reset_measurement()
+                extra,resident_values,shoe_local=fused(d,columns,body_step=difference_step,
+                    shoe_step=1e-8,skate_relative_R=relative)
+                base['fused_compatibility_timing']=resident.measurement()
+            else:
+                extra,resident_values=resident.evaluate(d,columns,step=difference_step,skate_relative_R=relative)
         else:extra=self.compatibility(d)
         rows=extra.size;blocks=[]
         elapsed=time.perf_counter()-forward_start
@@ -218,11 +228,12 @@ class BootWindowProblem(FullBodyProblem):
             if hasattr(d,'chain'):
                 J=d.chain(local)
                 if hasattr(d.owner,'shoe_chain'):
-                    if resident is not None:
-                        _,shoe_local=resident.shoe_derivatives(d,d.skate_relative_R,step=1e-8)
-                    else:
-                        from .sequence_skate_state import perturb_relative
-                        shoe_local=np.stack([(self.compatibility(perturb_relative(d,f,a,1e-5))-self.compatibility(perturb_relative(d,f,a,-1e-5)))/(2e-5) for f in (0,1) for a in range(3)],-1)
+                    if shoe_local is None:
+                        if resident is not None:
+                            _,shoe_local=resident.shoe_derivatives(d,d.skate_relative_R,step=1e-8)
+                        else:
+                            from .sequence_skate_state import perturb_relative
+                            shoe_local=np.stack([(self.compatibility(perturb_relative(d,f,a,1e-5))-self.compatibility(perturb_relative(d,f,a,-1e-5)))/(2e-5) for f in (0,1) for a in range(3)],-1)
                     J+=d.owner.shoe_chain(shoe_local,d.parameters,d.sample_times)
             else:
                 rr=[];cc=[];vv=[];fr,kn=np.nonzero(B)

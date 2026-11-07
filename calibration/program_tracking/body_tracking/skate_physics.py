@@ -88,7 +88,23 @@ def batch_features(binding,R,O,state=None):
         ids=ids,semantics=semantics,eligible=eligible,upper_index=upper_index)
 
 
-def constraints(binding,state,times,source_origin,evidence,*,time_weights=None):
+def source_support_schedule(times,source_origin,evidence,tb):
+    seconds=np.asarray(times)+source_origin
+    result=[[] for _ in seconds]
+    ordered=np.all(np.diff(seconds)>=0.)
+    for row in evidence:
+        at=row['pts']*tb[0]/tb[1]
+        if ordered:
+            lo,hi=np.searchsorted(seconds,[at-1e-8,at+1e-8],side='left')
+            candidates=np.arange(lo,hi)
+        else:
+            candidates=np.arange(len(seconds))
+        for index in candidates[np.abs(seconds[candidates]-at)<1e-8]:
+            result[index].append(row)
+    return result
+
+
+def constraints(binding,state,times,source_origin,evidence,*,time_weights=None,support_schedule=None):
     features=batch_features(binding,state['R'],state['O'],state);h=features['height']
     allow=np.array([ALLOWANCE[s] for s in features['semantics']]);clear=h+allow
     k=np.argmin(clear,axis=-1);n=len(times);ni=np.arange(n)[:,None];feet=np.arange(2)[None]
@@ -101,6 +117,8 @@ def constraints(binding,state,times,source_origin,evidence,*,time_weights=None):
     tw=trapezoid_time_weights(times,singleton_duration_s=sample_period(binding.reference.p)) if time_weights is None else np.asarray(time_weights)
     if tw.shape!=(len(times),)or not np.isfinite(tw).all()or np.any(tw<=0):raise ValueError('Positive weights on the full physical clock required')
     plane_known=getattr(binding.reference,'ice_plane_known',True)
+    if plane_known and support_schedule is None:
+        support_schedule=source_support_schedule(times,source_origin,evidence,tb)
     for i,t in enumerate(times):
         if not plane_known:continue  # no invented absolute ice plane for a new scene
         time_id=int(round((t+source_origin)*1e9))
@@ -110,8 +128,7 @@ def constraints(binding,state,times,source_origin,evidence,*,time_weights=None):
             labels.append((time_id,('left','right')[f]+'_nonpenetration'));weights.append(tw[i]);values.append(clearance[i,f])
         # A source image constrains only its own exposure midpoint, not a
         # fabricated dense run of contact labels between reviewed images.
-        matches=[r for r in evidence if abs(t+source_origin-r['pts']*tb[0]/tb[1])<1e-8]
-        for r in matches:
+        for r in support_schedule[i]:
             members=r.get('feet',[0,1]);kind=r.get('mode','glide')
             # Known flight and unknown contact receive only the universal
             # nonpenetration rows above. They are not support observations.

@@ -27,7 +27,7 @@ def image_cost(parts):
         'source_support_location_xy','native_source_support_contact','unassigned_source_skate_sets',
         'old_shoe_support_regions','body_source_regions'}
     return sum(float(value) for name,value in parts.items()
-        if name in names or name.startswith('additional_unassigned_source_'))
+        if name.rsplit('/',1)[-1] in names or name.startswith('additional_unassigned_source_'))
 
 
 def block(name,r,J=None,provenance=None,association=''):

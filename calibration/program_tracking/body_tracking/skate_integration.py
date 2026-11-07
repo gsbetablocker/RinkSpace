@@ -263,9 +263,11 @@ def restore_checkpoint_layers(reference,saved,include_primary=False):
 
 
 class ContactBodyProblem(BootWindowProblem):
-    def __init__(self,reference,camera,ledger,seconds,log=None,state_kind='halo_1103'):
+    def __init__(self,reference,camera,ledger,seconds,log=None,state_kind='halo_1103',*,
+                 source_frames=None,execution=None):
         factory=window_factory(state_kind)
-        FullBodyProblem.__init__(self,reference,camera,ledger,seconds,'full',log,state_factory=factory)
+        FullBodyProblem.__init__(self,reference,camera,ledger,seconds,'full',log,
+            state_factory=factory,source_frames=source_frames,execution=execution)
         self.binding=reference.binding;self.mid_times=reference.times[self.frames]
         self.mid_ref=reference.at(self.mid_times);self.binding_key=None
         self.camera_centres=camera_centres(camera,self.frames)
@@ -341,12 +343,12 @@ class JointContactProblem:
         if self.binding.collar_constraints_enabled:margin=np.c_[margin,-rows[:,32:34]*.003]
         return margin.ravel(),which
 
-    def contact(self,x,jacobian=False,times=None):
+    def contact(self,x,jacobian=False,times=None,*,soft_only=False):
         self.binding.x=x[:17].copy()
         ts=self.physics_times if times is None else np.asarray(times)
         if self.bounded_memory:
             from .memory_bounded import contact_batches
-            return contact_batches(self,x,ts,jacobian)
+            return contact_batches(self,x,ts,jacobian,soft_policy=self.ice_policy if soft_only else None)
         ref=self.physics_ref if times is None else self.reference.at(ts)
         B=self.physics_B if times is None else self.body.state.basis(ts)
         delta=self.body.state.increments(x[17:],ts)
@@ -361,7 +363,9 @@ class JointContactProblem:
         b=self.binding if binding is None else binding
         b.x=shared.copy();s=packet['world']
         local=np.einsum('nji,nkj->nki',s['Q'],s['native']-s['P'][:,None])
-        g=b.evaluate(s['P'],s['Q'],local,s['frames'])
+        relative = s.get('skate_relative_R')
+        gear_options = {} if relative is None else dict(skate_relative_R=relative)
+        g = b.evaluate(s['P'], s['Q'], local, s['frames'], **gear_options)
         layout=b.layout
         W=np.concatenate((g['gear'].reshape(-1,layout.equipment_count,3),s['coco']),1).reshape(self.body.n,5,layout.point_count,3)
         nodes=W[self.body.fi,:,self.body.pi][:,:,None]
@@ -372,7 +376,13 @@ class JointContactProblem:
             boot_edges=self.body.visible_boot_edges(W[:,2]))
         mid=np.arange(self.body.n)*5+2
         samples=self._replay_samples
-        compat=b.compatibility_rows(local[mid],s['frames'][mid],samples)/np.sqrt(2)
+        compatibility_options = {}
+        if relative is not None:
+            compatibility_options['skate_relative_R'] = relative[mid]
+        hand = s.get('hand_local_R')
+        if hand is not None:
+            compatibility_options['hand_local_R'] = hand[mid]
+        compat = b.compatibility_rows(local[mid], s['frames'][mid], samples, **compatibility_options) / np.sqrt(2)
         return dict(residual=np.r_[br,gr,*[r for _,r in self.body.prior_rows(body_x)],compat.ravel()],
             compatibility_residual=compat.ravel())
 
@@ -410,8 +420,8 @@ class JointContactProblem:
         neutral=self.binding.compatibility_rows(self.binding.neutral_native,self.binding.neutral_frames,self.binding.neutral_samples).ravel()
         prior=shared_prior(x[:17]);rdata=np.r_[data,neutral,prior]
         phases['neutral_and_prior_seconds']=time.perf_counter()-phase_start;phase_start=time.perf_counter()
-        raw_ice=self.contact(x,jacobian)
-        ice=ice_soft_rows(raw_ice,self.ice_policy)
+        raw_ice=self.contact(x,jacobian,soft_only=True) if self.bounded_memory else self.contact(x,jacobian)
+        ice=ice_soft_rows(raw_ice,self.ice_policy,diagnostics=not self.bounded_memory)
         rdata=np.r_[rdata,ice['residual']]
         phases['ice_geometry_and_jacobian_seconds']=time.perf_counter()-phase_start;phase_start=time.perf_counter()
         e=dict(raw_ice)
@@ -526,6 +536,7 @@ class JointContactProblem:
             v['raw_data_parts'].update(support_value['parts'])
             v['block_slices']={'support_image':slice(len(rdata)-len(support_value['residual']),len(rdata))}
         phases['AL_and_final_assembly_seconds']=time.perf_counter()-phase_start
+        phase_start=time.perf_counter()
         v['evaluation_phases']=phases
         v['weighted_blocks']=named
         if self.bounded_memory:
@@ -560,14 +571,19 @@ class JointContactProblem:
             v['legacy_image_cost']=v['image_cost']
             from .weighted_blocks import image_cost
             v['image_cost']=image_cost(v['weighted_parts'])
+        phases['weighted_pack_seconds']=time.perf_counter()-phase_start
         v['body_derivative_phases']=dict(base.get('phases',{}))
         v['compatibility_execution']=base.get('compatibility_execution')
+        v['fused_compatibility_timing']=base.get('fused_compatibility_timing')
         self.cache_x=x.copy();self.cache=v
         self.log.write(json.dumps(dict(event='joint_evaluation',outer=self.outer,with_jacobian=jacobian,
             seconds=time.perf_counter()-self.start,evaluation_seconds=time.perf_counter()-tick,cost=float(r@r/2),
             parts=parts,physics_times=len(self.physics_times),constraints=len(e['g']),variables=self.size,
             evaluation_phases=phases,body_derivative_phases=v['body_derivative_phases'],
             compatibility_execution=v['compatibility_execution'],
+            fused_compatibility_timing=v['fused_compatibility_timing'],
+            residual_rows=len(r),jacobian_shape=None if J is None else list(J.shape),
+            jacobian_storage_bytes=None if J is None else int(J.data.nbytes+J.indices.nbytes+J.indptr.nbytes),
             jacobian_nnz=None if J is None else J.nnz,body_execution_phases=dict(base.get('phases',{})),**gate))+'\n')
         return v
 
@@ -594,6 +610,18 @@ class JointContactProblem:
             ice_soft_policy_json=np.array(json.dumps(vars(self.ice_policy),sort_keys=True)))
 
     def solve(self,initial=None,run_policy=None):
+        if getattr(self,'linear_solver_backend','')!='cuda_resident':
+            return self._solve(initial,run_policy)
+        from .body_gpu_linear import CuDSSSession,DeviceCSRLayout
+        with CuDSSSession(getattr(self,'linear_runtime',None)) as session:
+            self._linear_session=session
+            self._linear_layout=DeviceCSRLayout()
+            try:
+                return self._solve(initial,run_policy)
+            finally:
+                self._linear_layout=self._linear_session=None
+
+    def _solve(self,initial,run_policy):
         from .skate_run_policy import RunPolicy,Monitor,CandidateRetention,structural_progress_is_observable,image_trial_quality
         self.output.mkdir(parents=True,exist_ok=True)
         prior=self.output/'last_accepted.npz'
@@ -659,7 +687,9 @@ class JointContactProblem:
                       'sequence_refit.py','sequence_dynamics.py','continuous_motion_factors.py','continuous_physics.py',
                       'memory_bounded.py','memory_guard.py','body_gpu_linear.py','body_linear_solver.py',
                       'trajectory_backend.py','trajectory_root_init.py','trajectory_probe.py',
-                      'programme_camera.py','body_clock.py','weighted_blocks.py'):
+                      'programme_camera.py','body_clock.py','weighted_blocks.py',
+                      'phase_ledger.py','episode_factor_adapter.py','event_physics.py',
+                      'programme_action_factors.py','programme_anatomy.py','programme_source_step.py','source_contact_image.py'):
             path=Path(__file__).with_name(name);implementation[name]=digest(path)
             (source_dir/name).write_bytes(path.read_bytes())
         write_json(self.output/'kernel_manifest.json',implementation)
@@ -677,6 +707,7 @@ class JointContactProblem:
         class StopFit(Exception):pass
         retention=CandidateRetention()
         def observe_candidate(z,value,*,accepted=False):
+            started_checkpoint=time.perf_counter()
             metrics={name:dict(unit='deg' if name.endswith('_deg') else 'm',value=v)
                 for name,v in value.get('source_motion_metrics',{}).items()}
             unknown=value['gate'].get('collar_unknown_sections',0)
@@ -692,14 +723,17 @@ class JointContactProblem:
             np.savez_compressed(self.output/'attempt.pending.npz',**self.checkpoint_fields(z))
             (self.output/'attempt.pending.npz').replace(self.output/'last_attempt.npz')
             if not status['quality_failed']:
-                np.savez_compressed(self.output/'good.pending.npz',**self.checkpoint_fields(z))
-                (self.output/'good.pending.npz').replace(self.output/'last_good.npz')
-                np.savez_compressed(self.output/'accepted.pending.npz',**self.checkpoint_fields(z))
-                (self.output/'accepted.pending.npz').replace(self.output/'last_accepted.npz')
+                from shutil import copyfile
+                for role in ('good','accepted'):
+                    temporary=self.output/(role+'.pending.npz')
+                    copyfile(self.output/'last_attempt.npz',temporary)
+                    temporary.replace(self.output/('last_'+role+'.npz'))
             write_json(self.output/'candidate_selection.json',retention.record())
             # Initial-domain failure and solver-return observations must also
             # persist the actual policy state, not an empty pre-solve record.
             write_json(self.output/'run_policy.json',monitor.record())
+            self.log.write(json.dumps(dict(event='checkpoint_written',accepted=self.accepted,
+                seconds=time.perf_counter()-started_checkpoint,one_compression=True))+'\n')
             return status
         initial_value=self.evaluate(x,False)
         if getattr(self,'stage_quality',None) is not None:
@@ -752,7 +786,20 @@ class JointContactProblem:
             from .absolute_motion_curve import RotationChartDomainError
             from .runner_interior import RunnerCoordinateDomainError
             try:
-                value=self.evaluate(expand(z),jacobian)
+                full=expand(z)
+                precheck=getattr(self,'early_source_trial_quality',None)
+                if (not jacobian and getattr(self,'image_safe_trials',False) and precheck is not None
+                        and (self.cache_x is None or not np.array_equal(self.cache_x,full))):
+                    precheck_start=time.perf_counter()
+                    groups=precheck(full)
+                    rejected={name:info for name,info in groups.items() if info['rejected']}
+                    if rejected:
+                        self.log.write(json.dumps(dict(event='trial_source_group_quality_rejected',
+                            accepted=self.accepted,seconds=time.perf_counter()-self.start,
+                            before_full_residual=True,precheck_seconds=time.perf_counter()-precheck_start,
+                            groups=rejected))+'\n')
+                        return dict(residual=np.full_like(initial_value['residual'],np.inf))
+                value=self.evaluate(full,jacobian)
             except (RotationChartDomainError,RunnerCoordinateDomainError) as error:
                 if jacobian:raise
                 # SciPy TRF treats nonfinite trial residuals as rejected and
@@ -805,12 +852,14 @@ class JointContactProblem:
                         if value.get('_gpu_jacobian') is None:
                             from .body_gpu_linear import GPUJacobian
                             if np.array_equal(selection,np.arange(17,self.size)):
-                                value['_gpu_jacobian']=GPUJacobian(value['jac'],shared_prefix=17)
+                                value['_gpu_jacobian']=GPUJacobian(value['jac'],shared_prefix=17,
+                                    session=self._linear_session,layout=self._linear_layout)
                             else:
                                 # A declared profile freezes P in expand(), not
                                 # just in its Jacobian. Select only real active
                                 # columns; the residual still uses the same FK.
-                                value['_gpu_jacobian']=GPUJacobian(value['jac'][:,selection].tocsr())
+                                value['_gpu_jacobian']=GPUJacobian(value['jac'][:,selection].tocsr(),
+                                    session=self._linear_session,layout=self._linear_layout)
                             value['jac']=None
                             for b in value['weighted_blocks']:b.jacobian=None
                         return value['_gpu_jacobian']
@@ -821,10 +870,40 @@ class JointContactProblem:
                         reduced.data=full.data;reduced.indices=full.indices-17;reduced.indptr=full.indptr
                         return reduced
                     return full[:,selection]
+                source_margins=getattr(self,'source_conditioned_margins',None)
+                if source_margins is not None and self.outer==1:
+                    from .programme_source_step import source_conditioned_direction
+                    reduced=x[selection]
+                    value=guarded(reduced,True)
+                    margins=source_margins(value)
+                    if margins is not None:
+                        op=selected_jacobian(reduced)
+                        try:
+                            move,receipt=source_conditioned_direction(op,value,
+                                (lower[selection]-reduced,upper[selection]-reduced),margins,selection)
+                        finally:
+                            op.release()
+                        self.log.write(json.dumps(dict(event='source_conditioned_direction',**receipt))+'\n')
+                        baseline_cost=float(value['residual']@value['residual']/2)
+                        from scipy.optimize._lsq.common import make_strictly_feasible
+                        for fraction in (1.,.5,.25,.125):
+                            trial=make_strictly_feasible(reduced+fraction*move,lower[selection],upper[selection],rstep=0.)
+                            trial_value=guarded(trial,False)
+                            residual=trial_value['residual']
+                            trial_cost=float(residual@residual/2) if np.isfinite(residual).all() else None
+                            keep=trial_cost is not None and trial_cost<baseline_cost
+                            self.log.write(json.dumps(dict(event='source_conditioned_trial',fraction=fraction,
+                                cost=trial_cost,baseline_cost=baseline_cost,quality_valid=trial_cost is not None,accepted=keep))+'\n')
+                            if keep:
+                                x=expand(trial)
+                                accepted(trial)
+                                break
                 with sparse_direct_trf(self):
                     if getattr(self,'linear_solver_backend','')=='cuda_resident':
                         from .body_gpu_linear import gpu_trf
-                        fit=gpu_trf(lambda z:guarded(z)['residual'],selected_jacobian,x[selection],lower[selection],upper[selection],callback=accepted,options=dict(atol=1e-7,btol=1e-7))
+                        fit=gpu_trf(lambda z:guarded(z)['residual'],selected_jacobian,x[selection],lower[selection],upper[selection],callback=accepted,options=dict(atol=1e-7,btol=1e-7),
+                            log=self.log,
+                            warm_relative=bool(getattr(self,'action_warm_relative_trf',False)))
                     else:
                         fit=least_squares(lambda z:guarded(z)['residual'],x[selection],jac=selected_jacobian,
                             bounds=(lower[selection],upper[selection]),method='trf',tr_solver='lsmr',x_scale='jac',ftol=1e-7,xtol=1e-7,gtol=1e-4,

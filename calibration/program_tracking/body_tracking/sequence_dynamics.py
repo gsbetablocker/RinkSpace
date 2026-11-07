@@ -1,6 +1,6 @@
 """Finite sequence priors on the actual shoes, with duration-aware inferred modes."""
 import numpy as np
-from scipy.sparse import csr_matrix,hstack,vstack,kron,eye,block_diag
+from scipy.sparse import bsr_matrix,csr_matrix,hstack,vstack,kron,eye
 from .absolute_motion_curve import _log
 from .absolute_motion_state import inverse_right_jacobian
 from .fullbody_fit import right_jacobian
@@ -28,6 +28,24 @@ def rotation_chain(delta,state,reference):
     return J+delta.owner.shoe_chain(identity,delta.parameters,delta.sample_times)
 
 
+def mode_rotation_jacobian(d,state,frames,feet,gradients,normals):
+    """Scatter only active mode derivatives to the common shoe/body curve."""
+    count=len(frames)
+    if not count:
+        return csr_matrix((0,d.owner.size+17))
+    time_rows,lookup=np.unique(frames,return_inverse=True)
+    sub=d.owner.increments(d.parameters,d.sample_times[time_rows])
+    substate={name:state[name][time_rows] for name in ('R','Q','frames')}
+    chain=rotation_chain(sub,substate,None)
+    # dn = n cross right tangent; derivative against that tangent is g cross n.
+    local=np.cross(gradients,normals[:,None,:])
+    columns=np.broadcast_to((lookup*6+feet*3)[:,None,None]+np.arange(3),(count,5,3))
+    rows=np.broadcast_to(np.arange(5*count).reshape(count,5,1),columns.shape)
+    sparse=csr_matrix((local.ravel(),(rows.ravel(),columns.ravel())),shape=(5*count,chain.shape[0]))
+    sparse.eliminate_zeros()
+    return _full(sparse@chain)
+
+
 class SequenceShoeDynamics:
     def __init__(self,problem):
         self.problem=problem;self.body=problem.body;self.ref=problem.reference
@@ -36,8 +54,12 @@ class SequenceShoeDynamics:
         self.config=dict(relative_rotation_sigma_rad=.25,relative_angular_velocity_scale_rad_s=1.5,
             actual_shoe_angular_acceleration_scale_rad_s2=60.,world_rotation_no_zero_velocity_target=True,
             ankle_pivot_no_translation=True,shoe_knot_spacing_target_s=.5)
-    def evaluate(self,x,jacobian=False):
-        d=self.body.state.increments(x,self.times);s=fk_state(self.ref,self.base,d)
+    def evaluate(self,x,jacobian=False,*,native_state=None):
+        if native_state is None:
+            d=self.body.state.increments(x,self.times)
+            s=fk_state(self.ref,self.base,d)
+        else:
+            d,s=native_state
         rel=d.skate_relative_R;error=_log(rel);w=np.sqrt(self.weights)/self.config['relative_rotation_sigma_rad']
         rp=error*w[:,None,None];rows=[rp.ravel()];mats=[];parts={'finite_relative_skate_wear_prior':float(np.sum(rp*rp)/2)}
         if jacobian:
@@ -75,14 +97,17 @@ class SequenceShoeDynamics:
                  a[:,None,None,None]*K[1:]/h[1:,None,None,None]]
             J=csr_matrix((ra.size,self.body.size))
             for offset,C in enumerate(coeff):
-                C=D@(weight[:,None,None,None]*C);blocks=block_diag(list(C.reshape(-1,3,3)),format='csr')
+                C=D@(weight[:,None,None,None]*C)
+                blocks=bsr_matrix((C.reshape(-1,3,3),np.arange(2*len(a)),np.arange(2*len(a)+1)),
+                                  shape=(6*len(a),6*len(a))).tocsr()
                 ids=(np.arange(len(a))[:,None]*6+np.arange(6)[None]+offset*6).ravel()
                 J+=blocks@JR[ids]
             mats.append(J)
         from .weighted_blocks import block,full_columns
         named=[full_columns(block(name,value,mats[i]if jacobian else None,dict(source_pts=self.ref.p['pts'])))for i,(name,value)in enumerate(zip(parts,rows))]
         r=np.concatenate(rows)
-        return dict(residual=r,jac=_full(vstack(mats,format='csr')) if jacobian else None,parts=parts,weighted_blocks=named,
+        total=_full(vstack(mats,format='csr')) if jacobian and not getattr(self.problem,'bounded_memory',False) else None
+        return dict(residual=r,jac=total,parts=parts,weighted_blocks=named,
             metrics=dict(relative_skate_degrees=np.rad2deg(np.linalg.norm(error,axis=-1)).tolist(),config=self.config))
 
 
@@ -114,9 +139,14 @@ class TemporalContactFactors:
         self.weights=trapezoid_time_weights(self.times)*20.
         self.p=self.binding.packet()['parameters'];self.band,self.uscale=runner_interior_band(self.p)
         self.rear,self.front,self.nscale=runner_tangent_limits(self.p);self.gscale=self.p.blade_web_height_m*self.binding.ratio
+        self.action_revision=bool(getattr(self.ref,'source_document',{}).get('programme_action_physics'))
         self.associate(x)
-    def geometry(self,x):
-        d=self.body.state.increments(x,self.times);s=fk_state(self.ref,self.base,d)
+    def geometry(self,x,*,native_state=None):
+        if native_state is None:
+            d=self.body.state.increments(x,self.times)
+            s=fk_state(self.ref,self.base,d)
+        else:
+            d,s=native_state
         f=batch_features(self.binding,s['R'],s['O']);hh=f['height'];q=f['local_point'];ix=np.arange(len(d))[:,None];feet=np.arange(2)[None]
         runner=np.array([i for i,v in enumerate(f['semantics']) if v=='runner']);pick=np.array([i for i,v in enumerate(f['semantics']) if v=='toe_pick'])
         rb=runner[np.argmin(hh[:,:,runner],axis=-1)];pb=pick[np.argmin(hh[:,:,pick],axis=-1)]
@@ -143,11 +173,15 @@ class TemporalContactFactors:
             cost=np.zeros((N,7));supported=(t>=81.62)&(t<=92.46)&(foot==1)
             lifted=((t>=86.2)&(t<=92.4)&(foot==0))|((t>=81.36)&(t<=81.46))
             ledger=getattr(self.ref,'source_document',{}).get('source_episode_review')
+            hint=np.full(N,'unknown',dtype='<U20')
             if ledger:
                 supported=np.zeros(N,bool);lifted=np.zeros(N,bool)
                 for episode in ledger['episodes']:
                     mask=(self.pts>=episode['start_pts'])&(self.pts<=episode['end_pts_inclusive'])
-                    if episode['kind']=='support_candidate'and episode.get('foot')==foot:supported|=mask
+                    if episode['kind']=='support_candidate' and episode.get('foot')==foot:
+                        supported |= mask
+                        if self.action_revision:
+                            hint[mask]=episode.get('contact_mode','normal_runner')
                     if(episode['kind']=='free_foot_off_ice_candidate'and episode.get('foot')==foot)or episode['kind']=='flight_visible_candidate':lifted|=mask
                 if np.any(supported&lifted):raise ValueError('Conflicting source support/flight episode')
             cost[supported,6]=6.;cost[supported,5]=5.
@@ -157,9 +191,27 @@ class TemporalContactFactors:
                 2.+np.maximum(-gap[supported,foot]/self.gscale,0)**2,
                 2.+np.maximum(u[supported,foot]-.15,0)**2]
             cost[supported,:3]+=np.maximum(gap[supported,foot,None]/self.gscale,0)**2
+            if self.action_revision:
+                # Stable source support admits all interior rocker locations.
+                # A curved endpoint can still be valid in a source transfer
+                # or in an explicitly observed point-contact episode.
+                normal = hint=='normal_runner'
+                cost[normal,0]=np.minimum(cost[normal,0], 2.)
+                cost[normal,1:5]+=4.
+                for label, mode in (('toe_pick',3),('heel',4)):
+                    selected=hint==label
+                    cost[selected,:5]+=5.
+                    cost[selected,mode]=np.minimum(cost[selected,mode]-5.,2.)
             cost[lifted,:5]+=8.;cost[lifted,6]+=2.
             free=~(supported|lifted);cost[free,:6]+=.25
             path=duration_path(cost)
+            if self.action_revision:
+                # A temporal switch can never overrule explicitly airborne
+                # source evidence, or silently turn support into no factor.
+                path[lifted]=5
+                path[~(supported|lifted)]=6
+                fallback=supported & (path>=5)
+                path[fallback]=np.argmin(cost[fallback,:5],axis=1)
             modes[:,foot]=path;status[supported|lifted,foot]='inferred';costs[:,foot]=cost
         self.modes=modes;self.status=status;self.association_costs=costs
         self.record=dict(method='duration-expanded Viterbi',mode_names=MODE_NAMES.tolist(),switch_cost=1.5,minimum_duration_samples=4,
@@ -167,10 +219,14 @@ class TemporalContactFactors:
             emission='source phase plus finite current runner/pick geometry; no argmin-as-contact-truth',
             observed_contact_material='unknown',inference_is_not_new_source_observation=True)
         if ledger:self.record.update(source_phase_from='explicit source_episode_review ledger',source_episode_ids=[e['episode_id']for e in ledger['episodes']],toe_pick_heel_office_physics='phase association only; no new toe/heel contact residual')
+        if self.action_revision:
+            self.record.update(toe_pick_heel_office_physics='finite runner-vs-point separation and per-mode height; airborne suppresses support, finite ice remains',
+                supported_samples=int(np.count_nonzero(modes<5)), source_labels_do_not_come_from_height=True)
         from .weighted_blocks import signature
         self.association_signature=signature(self.modes,self.status)
-    def evaluate(self,x,jacobian=False):
-        d,s,f,qr,qp,n,co,u,gap,rh,ph=self.geometry(x);N=len(d);feet=np.arange(2)[None]
+    def evaluate(self,x,jacobian=False,*,native_state=None):
+        geometry=self.geometry(x) if native_state is None else self.geometry(x,native_state=native_state)
+        d,s,f,qr,qp,n,co,u,gap,rh,ph=geometry;N=len(d)
         # Mode association is fixed during this continuous solve. It may be
         # recomputed at an explicit whole-sequence stage boundary.
         interior=self.modes==0;front=self.modes==1;rear=self.modes==2;runner=interior|front|rear
@@ -180,28 +236,86 @@ class TemporalContactFactors:
         derivative_u=np.sqrt(wr)/self.uscale*((u<low)*-1.+(u>high))
         ur=np.sqrt(wr)/self.uscale*(np.maximum(low-u,0)+np.maximum(u-high,0))
         er=np.zeros((N,2));r=np.concatenate((legacy.reshape(N,2,3),ur[:,:,None],er[:,:,None]),axis=-1)
+        if self.action_revision:
+            return self.evaluate_programme_modes(x,jacobian,d,s,f,r,D,co,derivative_u,u,gap,qr,qp,n)
         J=None
         if jacobian:
-            from .sequence_skate_state import perturb_relative
-            def terms(sa,sb,h):
-                dn=(sa['R'][:,:,2,:]-sb['R'][:,:,2,:])/(2*h)
-                dr=np.stack((dn@self.rear,-dn@self.front,self.binding.ratio*np.sum(dn*(qr-qp),axis=-1)),axis=-1)
-                du=np.sum(co['derivative_normal'].reshape(N,2,3)*dn,axis=-1)
-                return np.concatenate((D.reshape(N,2,3)*dr,(derivative_u*du)[:,:,None],np.zeros((N,2,1))),axis=-1).reshape(N,10)
-            body=[];h=1e-6
-            for a in self.body.state.active:
-                # These factors depend only on rigid skate direction. Other
-                # joints and translations have exactly zero derivatives;
-                # retain their zero columns without replaying whole-body FK.
-                influencing={3,4,5}|{6+3*(j-1)+axis for j in(1,2,4,5,7,8)for axis in range(3)}
-                if a not in influencing:
-                    body.append(np.zeros((N,10)));continue
-                plus=d.copy();minus=d.copy();plus[:,a]+=h;minus[:,a]-=h
-                body.append(terms(fk_state(self.ref,self.base,plus),fk_state(self.ref,self.base,minus),h))
-            local=np.stack(body,-1);BJ=d.chain(local)
-            shoe=[]
-            for foot in (0,1):
-                for a in range(3):shoe.append(terms(fk_state(self.ref,self.base,perturb_relative(d,foot,a,h)),fk_state(self.ref,self.base,perturb_relative(d,foot,a,-h)),h))
-            BJ+=d.owner.shoe_chain(np.stack(shoe,-1),d.parameters,d.sample_times);J=_full(BJ)
+            frames,feet=np.nonzero(runner)
+            response=D.reshape(N,2,3)[frames,feet]
+            gradients=np.zeros((len(frames),5,3))
+            gradients[:,0]=response[:,0,None]*self.rear
+            gradients[:,1]=-response[:,1,None]*self.front
+            gradients[:,2]=response[:,2,None]*self.binding.ratio*(qr-qp)[frames,feet]
+            gradients[:,3]=derivative_u[frames,feet,None]*co['derivative_normal'].reshape(N,2,3)[frames,feet]
+            active=mode_rotation_jacobian(d,s,frames,feet,gradients,n[frames,feet])
+            target=(5*(2*frames+feet)[:,None]+np.arange(5)).ravel()
+            scatter=csr_matrix((np.ones(len(target)),(target,np.arange(len(target)))),shape=(10*N,len(target)))
+            J=scatter@active
         r=r.ravel()
         return dict(residual=r,jac=J,parts={'temporal_contact_mode':float(r@r/2)},metrics=dict(sequence_contact_modes=MODE_NAMES[self.modes].tolist(),sequence_contact_status=self.status.tolist(),mode_association=self.record,stationary_effective_u=u.tolist(),geometric_minimum_is_diagnostic=True))
+
+    def evaluate_programme_modes(self,x,jacobian,d,s,f,r,D,co,du,u,gap,qr,qp,n):
+        """Compact native rows and analytic orientation tangents for action runs."""
+        from .weighted_blocks import block, signature
+        from .blade_contact_modes import blade_axes_diagnostics, inner_edge_y_sign
+        frames, feet = np.nonzero(self.modes < 5)
+        mode = self.modes[frames,feet]
+        n_selected = n[frames,feet]
+        runner_ids = [i for i, value in enumerate(f['semantics']) if value == 'runner']
+        heights = f['height'][frames, feet]
+        current_runner = np.asarray(runner_ids)[np.argmin(heights[:,runner_ids],axis=1)]
+        # The actual feature used for a normal mode is still an arc minimum.
+        # A selected point mode has its own direction/separation residual.
+        pick = mode==3
+        rear = mode==4
+        N = len(mode)
+        rows = r[frames,feet].copy()
+        grads = np.zeros((N,5,3))
+        D = D.reshape(-1,2,3)[frames,feet]
+        scale = self.binding.ratio
+        separation = scale*(qr-qp)[frames,feet]
+        grads[:,0]=D[:,0,None]*self.rear
+        grads[:,1]=-D[:,1,None]*self.front
+        grads[:,2]=D[:,2,None]*separation
+        grads[:,3]=du[frames,feet,None]*co['derivative_normal'].reshape(-1,2,3)[frames,feet]
+        # Favor pick over the curved runner only in point-contact phases.
+        weight = np.sqrt(self.weights[frames])/self.gscale
+        raw = -gap[frames,feet]
+        rows[pick,4] = (weight*np.maximum(raw,0.))[pick]
+        grads[pick,4] = -(weight*(raw>0.))[:,None][pick]*separation[pick]
+        # The heel can contact at a rear runner endpoint. Do not add a second
+        # rigid floor. A finite upper bound on stationary u keeps the rest of
+        # the runner from being lower than that declared rear contact.
+        rear_shift = np.maximum(u[frames,feet]-.25,0.)
+        rows[rear,4] = (np.sqrt(self.weights[frames])*rear_shift/self.uscale)[rear]
+        grads[rear,4] = (np.sqrt(self.weights[frames])*(rear_shift>0.)/self.uscale)[:,None][rear]*co['derivative_normal'].reshape(-1,2,3)[frames[rear],feet[rear]]
+        # The extended stationary coordinate can grow at nearly vertical
+        # blade pitch. Preserve its restoring direction but bound the influence
+        # on P/G and image evidence with a smooth finite shaping function.
+        robust_scale = 1.5*np.sqrt(self.weights[frames])[:,None]
+        normalized = rows/robust_scale
+        rows = robust_scale*np.arcsinh(normalized)
+        grads *= (1./np.hypot(1.,normalized))[:,:,None]
+        J = None
+        if jacobian:
+            J=mode_rotation_jacobian(d,s,frames,feet,grads,n_selected)
+        ids = [f['ids'][v] for v in current_runner]
+        side = np.array([1 if k.startswith('y_positive') else -1 for k in ids])
+        inside = inner_edge_y_sign(self.ref,self.binding)[feet]
+        axes = blade_axes_diagnostics(s['R'][frames,feet])
+        values = rows.ravel()
+        return dict(residual=values,jac=J,parts={'temporal_contact_mode':float(values@values/2)},
+            weighted_blocks=[block('temporal_contact_mode',values,J,
+                dict(source_pts=self.pts[frames],samples=N,unit='scaled angle and metres'),
+                self.association_signature)],
+            metrics=dict(sequence_contact_modes=MODE_NAMES[self.modes].tolist(),
+                sequence_contact_status=self.status.tolist(),mode_association=self.record,
+                runner_support_diagnostics=dict(source_pts=self.pts[frames].tolist(),foot=feet.tolist(),
+                    mode=MODE_NAMES[mode].tolist(),current_arc=ids,
+                    inferred_edge_side=np.where(inside==0,'unknown',np.where(inside==side,'inside_geometry','outside_geometry')).tolist(),
+                    source_edge='unknown unless separately observed',geometric_minimum_is_diagnostic=True,
+                    influence_scale_dimensionless=1.5,actual_u=co['actual_u'].reshape(-1,2)[frames,feet].tolist(),
+                    stationary_effective_u=u[frames,feet].tolist(),
+                    runner_height_m=heights[np.arange(N),current_runner].tolist(),
+                    runner_minus_pick_m=gap[frames,feet].tolist(),
+                    **{name: np.asarray(value).tolist() for name,value in axes.items()})))

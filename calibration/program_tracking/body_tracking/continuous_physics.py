@@ -25,7 +25,7 @@ class ContinuousMassGeometry:
         return out['specific_angular_momentum_world_m2ps'],rates,out
 
 class ConfirmedFlightFactors:
-    def __init__(self,problem,mass_geometry,*,episode=None):
+    def __init__(self,problem,mass_geometry,*,episode=None,event_average=False):
         self.problem=problem;self.body=problem.body;self.ref=problem.reference;self.mass=mass_geometry
         from .body_clock import source_seconds,time_base
         source=source_seconds(self.ref.p);ledger=getattr(self.ref,'source_document',{}).get('source_episode_review')
@@ -39,12 +39,45 @@ class ConfirmedFlightFactors:
         # One source-supported interior: exact onset and landing are excluded.
         self.gravity=np.array([0.,0.,-9.81]);self.operator=flight_position_operator(self.times,self.gravity)
         self.position_scale=.03;self.impulse_scale=.2
-        self.config=dict(confirmed_source_interval_seconds=interval,source_boundary_unknown=True,position_scale_m=self.position_scale,specific_impulse_scale_m2_s=self.impulse_scale,finite_weight=1.,physics_model_is_proxy=True,source_episode_ledger_used=bool(ledger))
+        self.momentum_scale=.2
+        self.event_average=event_average
+        if event_average:
+            from .event_physics import ballistic_position_operator, flight_momentum_residual
+            position, offset = ballistic_position_operator(self.times, self.gravity, self.position_scale)
+            h_times = self.times[1:-1]
+            momentum = flight_momentum_residual(np.zeros((len(h_times), 3)), h_times,
+                                               sigma_specific_H=self.momentum_scale, phase='flight')
+            self.position_operator, self.position_offset = position, offset
+            self.momentum_operator = momentum['operator']
+        self.momentum_name = 'flight_specific_momentum' if event_average else 'flight_specific_angular_impulse'
+        self.config=dict(confirmed_source_interval_seconds=interval,source_boundary_unknown=True,position_scale_m=self.position_scale,specific_impulse_scale_m2_s=self.impulse_scale,finite_weight=1.,physics_model_is_proxy=True,source_episode_ledger_used=bool(ledger),event_average=event_average,momentum_scale_specific_m2ps=self.momentum_scale)
     def values(self,C,R):
         H,_,_=self.mass.H(self.times,C,R);com=self.mass.com(C)
+        if self.event_average:
+            return com, H, (self.position_operator @ com + self.position_offset).ravel(), (self.momentum_operator @ H).ravel()
         op=self.operator['operator'];r=(op@(com-self.operator['gravity_position_m']))/self.position_scale
         dh=np.diff(H,axis=0)/self.impulse_scale
         return com,H,r.ravel(),dh.ravel()
+    def mass_sensitivity(self, centres, rotations, com, momentum):
+        # Reweight the same segment kinematics without aligning world states.
+        original = self.mass.mass
+        records = []
+        for scale in (0.5, 1.5):
+            adjusted = original.copy()
+            adjusted[-2:] *= scale
+            adjusted /= adjusted.sum()
+            rates = discrete_segment_rates(self.times, centres, rotations,
+                phase_ids=np.zeros(len(centres), int), confirmed_phase=np.ones(len(centres), bool))
+            ix = rates['source_indices']
+            alternate = centroidal_momentum(centres_world_m=centres[ix],
+                velocity_world_mps=rates['segment_velocity_world_mps'],rotation_world_from_segment=rotations[ix],
+                omega_world_radps=rates['segment_omega_world_radps'],segment_mass_fractions=adjusted,
+                unit_mass_inertia_segment_m2=self.mass.inertia)['specific_angular_momentum_world_m2ps']
+            records.append(dict(skate_proxy_mass_multiplier=scale,
+                max_com_shift_m=float(np.max(np.linalg.norm(np.einsum('s,nsc->nc',adjusted,centres) - com, axis=-1))),
+                max_specific_H_shift_m2ps=float(np.max(np.linalg.norm(alternate-momentum, axis=-1)))))
+        return records
+
     def evaluate(self,x,jacobian=False):
         d=self.body.state.increments(x,self.times);C,R=self.mass.evaluate(self.base,d);com,H,rp,rh=self.values(C,R);J=None
         if jacobian:
@@ -73,7 +106,8 @@ class ConfirmedFlightFactors:
                             shoe_dH[color].append((self.mass.H(self.times,CA,RA)[0]-self.mass.H(self.times,CB,RB)[0])/(2*h))
                 Jcom=Jcom+d.owner.shoe_chain(np.stack(shoe_dc,-1),d.parameters,d.sample_times)
                 shoe_colorvals=[np.stack(values,-1) for values in shoe_dH]
-            Jp=kron(csr_matrix(self.operator['operator']/self.position_scale),eye(3),format='csr')@Jcom
+            A = self.position_operator if self.event_average else self.operator['operator']/self.position_scale
+            Jp=kron(csr_matrix(A),eye(3),format='csr')@Jcom
             Jh=csr_matrix((H.size,self.body.size));i=np.arange(1,N-1)
             colorvals=[np.stack(values,-1) for values in dH]
             for offset in [-1,0,1]:
@@ -83,8 +117,14 @@ class ConfirmedFlightFactors:
                     shoe_local=np.stack([shoe_colorvals[int(c)][k] for k,c in enumerate(samples%3)])
                     Jh=Jh+d.owner.shoe_chain(shoe_local,d.parameters,d.sample_times,sample_indices=samples)
             D=np.zeros((len(H)-1,len(H)));rows=np.arange(len(H)-1);D[rows,rows]=-1;D[rows,rows+1]=1
-            Jh=kron(csr_matrix(D/self.impulse_scale),eye(3),format='csr')@Jh
+            L = self.momentum_operator if self.event_average else D/self.impulse_scale
+            Jh=kron(csr_matrix(L),eye(3),format='csr')@Jh
             J=hstack((csr_matrix((len(rp)+len(rh),17)),vstack((Jp,Jh),format='csr')),format='csr')
         from .weighted_blocks import block
-        named=[block('flight_integrated_com',rp,None if not jacobian else J[:len(rp)]),block('flight_specific_angular_impulse',rh,None if not jacobian else J[len(rp):])]
-        r=np.r_[rp,rh];return dict(residual=r,jac=J,parts={'flight_integrated_com':float(rp@rp/2),'flight_specific_angular_impulse':float(rh@rh/2)},weighted_blocks=named,metrics=dict(self.config,com_world_m=com.tolist(),specific_H_world_m2ps=H.tolist(),full_orbital_and_intrinsic=True,local_FK_derivatives_only=True))
+        named=[block('flight_integrated_com',rp,None if not jacobian else J[:len(rp)]),block(self.momentum_name,rh,None if not jacobian else J[len(rp):])]
+        r=np.r_[rp,rh];return dict(residual=r,jac=J,parts={'flight_integrated_com':float(rp@rp/2),self.momentum_name:float(rh@rh/2)},weighted_blocks=named,metrics=dict(self.config,com_world_m=com.tolist(),specific_H_world_m2ps=H.tolist(),full_orbital_and_intrinsic=True,local_FK_derivatives_only=True,
+            source_pts=self.ref.p['pts'][self.frames].tolist(),
+            momentum_pts=self.ref.p['pts'][self.frames[1:-1]].tolist(),
+            com_residual_marginal_norm=np.linalg.norm(rp.reshape(-1,3),axis=1).tolist(),
+            momentum_residual_norm=np.linalg.norm(rh.reshape(-1,3),axis=1).tolist(),
+            mass_proxy_sensitivity=self.mass_sensitivity(C,R,com,H) if self.event_average else []))

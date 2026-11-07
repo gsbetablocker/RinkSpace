@@ -38,7 +38,13 @@ class ActualMotionFactors:
             self.root_transform+=(np.sqrt(confidence)-1)*ray[:,:,None]*ray[:,None,:]
         self.config['camera_ray_depth_confidence']=confidence
     def evaluate(self,x,jacobian=False):
-        d=self.body.state.increments(x,self.times);s=self.ref.world(self.base,d)
+        from .fullbody_state import matrices
+        d=self.body.state.increments(x,self.times)
+        pose=np.asarray(d)
+        # These priors consume the pose before FK and selected skinning.
+        s=dict(P=self.base['P']+pose[:,:3],
+               Q=self.base['Q']@matrices(pose[:,3:6]),
+               local_R=self.base['local_R']@matrices(pose[:,6:].reshape(-1,21,3)))
         R=np.concatenate((s['Q'][:,None],s['local_R']),axis=1);n=len(R);rows=[];mats=[];parts={};named=[]
         def add(name,r,J):
             r=np.asarray(r).ravel();rows.append(r);parts[name]=float(r@r/2)

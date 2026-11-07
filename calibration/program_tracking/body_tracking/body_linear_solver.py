@@ -76,7 +76,14 @@ def sparse_direct_trf(problem):
                 if getattr(problem,'log',None) is not None:
                     import json;problem.log.write(json.dumps(dict(event='GPU_linear_failure',**row))+'\n');problem.log.flush()
                 raise ArithmeticError('GPU linear solve failed without an unbounded LSMR retry: '+fallback)
-            return old_lsmr(op,rhs,**options)
+            fallback_started=time.perf_counter()
+            try:
+                return old_lsmr(op,rhs,**options)
+            finally:
+                row['fallback_seconds']=time.perf_counter()-fallback_started
+                row['total_seconds']=time.perf_counter()-start
+                if getattr(problem,'log',None) is not None:
+                    import json;problem.log.write(json.dumps(dict(event='CPU_linear_fallback',**row))+'\n')
         trf.right_multiplied_operator=right;trf.regularized_lsq_operator=regularized;trf.lsmr=direction
         try:yield
         finally:trf.right_multiplied_operator=old_right;trf.regularized_lsq_operator=old_regularized;trf.lsmr=old_lsmr

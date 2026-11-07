@@ -1,0 +1,42 @@
+--- a/complete_actions_v2.py
++++ b/s09_runner_stage.py
+@@ -35,6 +35,5 @@
+-PARENT=ROOT/'solve_v1'
+-OUT=ROOT/'solve_v2'
+-RANGES=((47.56,50.64),(97.40,98.36),(104.08,105.12),(116.90,118.22),
+-        (143.76,151.80),(155.38,166.38),(171.04,185.30))
+-MAX_SECONDS=315.
+-MAX_ACCEPTED=3
++PARENT=ROOT/'collision_v3'
++OUT=ROOT/'s09_v4'
++RANGES=((155.38,166.38),(171.04,185.30))
++MAX_SECONDS=230.
++MAX_ACCEPTED=2
+@@ -170,0 +170,4 @@
++            # Prioritize corrections of the exact existing rocker and finite
++            # contact rows in the proposal. Full acceptance uses saved weights.
++            if b.name=='temporal_contact_mode':w*=1.65
++            if b.name.endswith('/episode_support'):w*=2.5
+@@ -216 +219,11 @@
+-    return dict(cost=float(val['residual']@val['residual']/2),parts=val['weighted_parts'],
++    g=b['runner_support_diagnostics']
++    stamp=np.asarray(g['source_pts'])
++    feet=np.asarray(g['foot'])
++    foot=(stamp>=2294528)&(stamp<=2361856)&(feet==1)
++    pitch=np.abs(np.asarray(g['fore_aft_pitch_degrees'])[foot])
++    u=np.asarray(g['actual_u'])[foot]
++    height=np.asarray(g['runner_height_m'])[foot]
++    right=dict(abs_pitch_p95=float(np.percentile(pitch,95)),samples=int(foot.sum()),
++        runner_endpoints=int(np.sum((u<.01)|(u>.99))),median_runner_z=float(np.median(height)),
++        finite_hover_excess=float(np.mean(np.maximum(height-problem.ice_policy.support_hover_deadzone_m,0.))))
++    return dict(cost=float(val['residual']@val['residual']/2),parts=val['weighted_parts'],right=right,
+@@ -399,0 +413,3 @@
++                        gate['right_runner_and_hover']=(
++                            m['right']['abs_pitch_p95']<selected['right']['abs_pitch_p95']
++                            and m['right']['finite_hover_excess']<selected['right']['finite_hover_excess'])
+@@ -404 +420 @@
+-                            bands=m['band_median_px'],collision=m['parts']['self_collision'])
++                            bands=m['band_median_px'],collision=m['parts']['self_collision'],right=m['right'])
+@@ -432 +448 @@
+-    memory=ProcessMemoryGuard(ROOT/'solve_v2_resources',22.)
++    memory=ProcessMemoryGuard(ROOT/'s09_v4_resources',22.)

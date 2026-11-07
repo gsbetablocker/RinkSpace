@@ -35,43 +35,103 @@ from .skate_delivery import export_candidate
 from .programme_camera import ProgrammeCamera,StaticCropCamera
 from .trajectory_probe import GROUPS,body_groups
 from .weighted_blocks import block,verify
+from .programme_action_factors import (action_policy, SourceTurnPath, ProgrammeRootTrust,
+    choose_source_path_hypothesis, record_action_factors, action_direction_check,
+    turn_episode_image_metrics, turn_episode_image_checks)
 
 class GripOnly(SpinGraspFactors):
     def continuous_support(self,x,jacobian):return np.empty(0),csr_matrix((0,self.problem.size))if jacobian else None,[]
 
 class EpisodeSupport:
     """Finite source-gated support; either foot, multiple episodes, no locking."""
-    def __init__(self,problem,document):
+    def __init__(self,problem,document,*,episode=None):
+        self.episode=episode
+        self.mode='normal_runner' if episode is None else episode.get('contact_mode','normal_runner')
+        self.confidence=1. if episode is None else float(episode.get('factor_reliability',1.))
         self.p=problem;self.ref=problem.reference;pts=self.ref.p['pts'];rows={}
         if self.ref.ice_plane_known:
-            for e in document.get('source_episode_review',{}).get('episodes',[]):
+            episodes = document.get('source_episode_review',{}).get('episodes',[]) if episode is None else [episode]
+            for e in episodes:
                 if e['kind']!='support_candidate'or e.get('foot')not in (0,1):continue
                 ids=np.flatnonzero((pts>=e['start_pts'])&(pts<=e['end_pts_inclusive']))[::2]
                 for i,w in zip(ids,trapezoid_time_weights(self.ref.times[ids],singleton_duration_s=.04)if len(ids)else[]):rows[i,e['foot']]=max(rows.get((i,e['foot']),0.),w)
         keys=sorted(rows);self.indices=np.array([k[0]for k in keys],int);self.feet=np.array([k[1]for k in keys],int);self.dt=np.array([rows[k]for k in keys]);self.times=self.ref.times[self.indices];self.base=self.ref.at(self.times);self.B=problem.body.state.basis(self.times)
     def evaluate(self,x,jacobian=False):
         if not len(self.times):return dict(residual=np.empty(0),jac=csr_matrix((0,self.p.size))if jacobian else None,parts={'episode_support':0.},metrics={})
-        d=self.p.body.state.increments(x,self.times);s=fk_state(self.ref,self.base,d);f=batch_features(self.p.binding,s['R'],s['O'],s);eligible=self.p.binding.packet()['template']['support_feature_ids']['glide'];ids=np.array([i for i,k in enumerate(f['ids'])if k in eligible]);ii=np.arange(len(self.times));h=f['height'][ii[:,None],self.feet[:,None],ids[None]];best=ids[np.argmin(h,axis=1)];height=f['height'][ii,self.feet,best];q=f['local_point'][ii,self.feet,best]
-        cfg=getattr(self.ref,'grasp_relations',None);cfg={}if not cfg else cfg['factor_parameters']['continuous_support'];scale=float(cfg.get('scale_m',.08));weight=float(cfg.get('weight',20.));tolerance=float(cfg.get('deadzone_m',.025));response,slope=tolerant_support_response(height,tolerance);w=np.sqrt(self.dt*weight)/scale;r=w*response;J=None
+        d=self.p.body.state.increments(x,self.times);s=fk_state(self.ref,self.base,d);f=batch_features(self.p.binding,s['R'],s['O'],s);eligible=self.p.binding.packet()['template']['support_feature_ids']['glide'];ids=np.array([i for i,k in enumerate(f['ids'])if k in eligible]);ii=np.arange(len(self.times))
+        if self.mode=='toe_pick':
+            ids=np.array([i for i,k in enumerate(f['semantics']) if k=='toe_pick'])
+        if self.mode=='heel':
+            rear=np.array([edge[np.argmin(edge[:,0])] for edge in self.p.binding.packet()['edges']])
+            normals=s['R'][ii,self.feet,2]
+            local_h=normals@rear.T
+            which=np.argmin(local_h,axis=1)
+            q=rear[which]
+            height=self.p.binding.ratio*(s['O'][ii,self.feet,2]+local_h[ii,which])
+        else:
+            h=f['height'][ii[:,None],self.feet[:,None],ids[None]]
+            best=ids[np.argmin(h,axis=1)]
+            height=f['height'][ii,self.feet,best]
+            q=f['local_point'][ii,self.feet,best]
+        cfg=getattr(self.ref,'grasp_relations',None);cfg={}if not cfg else cfg['factor_parameters']['continuous_support'];scale=float(cfg.get('scale_m',.08));weight=self.confidence*float(cfg.get('weight',20.));tolerance=float(cfg.get('deadzone_m',.025));response,slope=tolerant_support_response(height,tolerance);w=np.sqrt(self.dt*weight)/scale;r=w*response;J=None
         if jacobian:
             e=dict(rows=[(i,int(self.feet[i]),q[i],-1.)for i in ii],row_upper_vertex=[-1]*len(ii),times=self.times);D=-NORMALIZATION*body_constraint_jacobian(self.ref,s,d,self.p.body.state.active,self.B,e);J=hstack((csr_matrix((len(r),17)),diags(w*slope)@D),format='csr')
-        return dict(residual=r,jac=J,parts={'episode_support':float(r@r/2)},weighted_blocks=[block('episode_support',r,J)],metrics=dict(episode_support=dict(samples=len(r),feet=self.feet.tolist(),source_pts=self.ref.p['pts'][self.indices].tolist(),raw_height_m=height.tolist(),finite_weight=weight,scale_m=scale,tolerance_is_not_accuracy_gate=True)))
+        return dict(residual=r,jac=J,parts={'episode_support':float(r@r/2)},weighted_blocks=[block('episode_support',r,J,dict(
+            source_pts=self.ref.p['pts'][self.indices],unit='m',scale=scale,finite_weight=weight))],metrics=dict(episode_support=dict(samples=len(r),feet=self.feet.tolist(),source_pts=self.ref.p['pts'][self.indices].tolist(),raw_height_m=height.tolist(),finite_weight=weight,scale_m=scale,contact_mode=self.mode,tolerance_is_not_accuracy_gate=True)))
 
 class PrimaryActions:
-    def __init__(self,problem,parent,mass,document):
-        self.motion=ActualMotionFactors(problem,parent);self.support=EpisodeSupport(problem,document);self.grasp=SimpleNamespace(last={'image_cost':0.});self.factors=[self.motion,self.support]
+    def __init__(self,problem,parent,mass,document,warm=None):
+        from .episode_factor_adapter import EpisodeScopedFactor,validate_unique_episode_ids
+        self.split_jacobian_only=getattr(problem,'bounded_memory',False)
+        self.motion=ActualMotionFactors(problem,parent)
+        self.grasp=SimpleNamespace(last={'image_cost':0.})
+        self.factors=[self.motion]
+        self.turn_factors=[]
+        policy=action_policy(document)
+        episodes=document.get('source_episode_review',{}).get('episodes',[])
+        if policy:
+            validate_unique_episode_ids(episodes)
+            by_id={e['episode_id']:e for e in episodes}
+            self.factors.append(ProgrammeRootTrust(problem,warm))
+            for e in episodes:
+                if e['kind']=='support_candidate' and e.get('foot') in (0,1) and problem.reference.ice_plane_known:
+                    self.factors.append(EpisodeScopedFactor(EpisodeSupport(problem,document,episode=e),e['episode_id']))
+                if e.get('turn_direction_sign') in (-1,0,1):
+                    turn=SourceTurnPath(problem,e,warm)
+                    self.turn_factors.append(turn)
+                    self.factors.append(EpisodeScopedFactor(turn,e['episode_id']))
+                if e['kind']=='step_relation' and e.get('optimization_enabled',False):
+                    from .step_relations import StepRelationFactors
+                    self.factors.append(EpisodeScopedFactor(StepRelationFactors(problem,e,by_id),e['episode_id']))
+            from .source_contact_image import NativeSupportContactFactors
+            for e in episodes:
+                bands=e.get('native_support_bands',[])
+                if bands and problem.reference.ice_plane_known:
+                    support=NativeSupportContactFactors(problem,native_bands=bands)
+                    self.factors.append(EpisodeScopedFactor(support,e['episode_id']+'_source_band'))
+            if policy.get('structure_enabled'):
+                from .programme_anatomy import ProgrammeAnatomy
+                self.factors.append(ProgrammeAnatomy(problem,document))
+        else:
+            self.factors.append(EpisodeSupport(problem,document))
         relations=getattr(problem.reference,'grasp_relations',None)
         if relations and relations.get('grip_interval'):
             relations=copy.deepcopy(relations);relations['support_intervals']=[];held=relations['grip_interval'];tb=time_base(problem.reference.p);relations['context_source_seconds']=[held['start_pts']*tb[0]/tb[1]-.04,held['end_pts']*tb[0]/tb[1]+.04];self.grasp=GripOnly(problem,relations);self.factors.append(self.grasp)
-        for e in document.get('source_episode_review',{}).get('episodes',[]):
-            if e['kind']=='flight_visible_candidate':self.factors.append(ConfirmedFlightFactors(problem,mass,episode=e))
+        flights=[e for e in episodes if e['kind']=='flight_visible_candidate']
+        validate_unique_episode_ids(flights)
+        if not policy or policy.get('flight_dynamics_enabled',True):
+            for e in flights:
+                self.factors.append(EpisodeScopedFactor(ConfirmedFlightFactors(
+                    problem,mass,episode=e,event_average=bool(policy)),e['episode_id']))
     def evaluate(self,x,jacobian=False):
         out=dict(residual=[],jac=[],parts={},metrics={},weighted_blocks=[],factor_row_counts=[])
         for factor in self.factors:
             v=factor.evaluate(x,jacobian);out['residual'].append(v['residual'])
-            if jacobian:out['jac'].append(v['jac'])
+            if jacobian and not self.split_jacobian_only:out['jac'].append(v['jac'])
             out['parts'].update(v['parts']);out['metrics'].update(v['metrics']);out['weighted_blocks'].extend(v.get('weighted_blocks',[]));out['factor_row_counts'].append((type(factor).__name__,len(v['residual'])))
-        out['residual']=np.concatenate(out['residual']);out['jac']=vstack(out['jac'],format='csr')if jacobian else None;return out
+        out['residual']=np.concatenate(out['residual'])
+        out['jac']=vstack(out['jac'],format='csr') if jacobian and not self.split_jacobian_only else None
+        return out
 
 def seed_reference(shared,initial,document,camera):
     initial=dict(initial)
@@ -164,24 +224,32 @@ def primary_policy(problem):
     problem.trajectory_primary_mode=True;problem.image_safe_trials=True;problem.source_group_baseline={}
     return dict(schema='rinkspace.trajectory-primary-policy.v1',priority=['P/G with reliable torso and source support','both attached skates and finite physics','decoration'],body_confidences=dict(face=.025,torso=.35,lower=.45,upper=.07,boot_occluded_ankle=.045),source_budget_multipliers={k:v for k,v in problem.objective_block_weights.items()if'source'in k or'extent'in k},raw_UV_sigma_use_unchanged=True,finite_ice_and_footwear_objective_retained=True,internal_mm_structure_not_delivery_gate=True,FS_reference_or_holdout_used_for_policy=False)
 
-def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_linear=False,device_batch=1024,quality_baseline=None,freeze_root=False,diagnostic_profile=False,protected_source_evidence=None,source_episode_choices=None):
+def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_linear=False,device_batch=1024,quality_baseline=None,freeze_root=False,diagnostic_profile=False,protected_source_evidence=None,source_episode_choices=None,warm_start=None,save_linear_cache=False,source_conditioned_step=False):
     project,prepared,output=map(Path,(project,prepared,output))
     if output.exists():raise FileExistsError(output)
     output.mkdir(parents=True);log_path=output/'progress.jsonl';print(json.dumps(dict(main_log=str(log_path.resolve()),whole_prepared_state=True)),flush=True);started=time.perf_counter()
     ref,camera,info,document,seed=load_reference(project,prepared);write_json(output/'seed_report.json',seed)
-    saved=None;parent_steps=0
-    if resume is not None:
+    saved=None;parent_steps=0;start_packet=None
+    if resume is not None and warm_start is not None:raise ValueError('Choose resume or a revised-objective warm start')
+    if resume is not None or warm_start is not None:
         from .skate_checkpoint import validate_checkpoint_identity
         from .absolute_motion_state import curve_from_packet
         from .sequence_skate_state import shoe_curve_from_packet
-        saved=load(resume);validate_checkpoint_identity(saved,ref.fixed_checkpoint_identity)
+        start_parameter=Path(resume if resume is not None else warm_start)
+        start_packet=load(start_parameter)
+        validate_checkpoint_identity(start_packet,ref.fixed_checkpoint_identity)
+        saved=start_packet if resume is not None else None
         for field,name in(('prepared_input_sha256','input.npz'),('prepared_observations_sha256','observations.npz')):
-            if str(saved[field])!=digest(prepared/name):raise ValueError('Resume changed prepared identity: '+field)
-        ref.absolute_curve=curve_from_packet(saved,seed=True);ref.relative_skate_curve=shoe_curve_from_packet(saved,seed=True)
-        old_stage=Path(resume).parent.parent
+            if str(start_packet[field])!=digest(prepared/name):raise ValueError('Start changed immutable prepared identity: '+field)
+        ref.absolute_curve=curve_from_packet(start_packet,seed=True)
+        ref.relative_skate_curve=shoe_curve_from_packet(start_packet,seed=True)
+        old_stage=start_parameter.parent.parent
         selection=json.loads((old_stage/'solve/candidate_selection.json').read_text(encoding='utf-8'))
-        parent_steps=int(selection['retained_step'])+int(saved.get('parent_accepted_steps',0))
-        write_json(output/'resume.json',dict(parameter=str(resume),parameter_sha256=digest(resume),parent_accepted_steps=parent_steps,original_seed_and_objective_retained=True,baseline=str(old_stage/'primary_quality_baseline.json')))
+        parent_steps=int(selection['retained_step'])+int(start_packet.get('parent_accepted_steps',0))
+        receipt='resume.json' if saved is not None else 'warm_start.json'
+        write_json(output/receipt,dict(parameter=str(start_parameter),parameter_sha256=digest(start_parameter),
+            parent_accepted_steps=parent_steps,original_seed_retained=True,
+            original_objective_retained=saved is not None,baseline=str(old_stage/'primary_quality_baseline.json')))
     from .ice_soft import IceSoftPolicy
     if saved is not None:
         policy=IceSoftPolicy(**json.loads(str(saved['ice_soft_policy_json'])))
@@ -191,11 +259,32 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         policy=IceSoftPolicy(**json.loads(policy_path.read_text(encoding='utf-8'))['policy'])
     execution=BodyExecution(BodyExecutionConfig(workers=12,blas_threads=1,gpu_batch_size=device_batch,local_derivatives='analytic',compatibility_backend='cuda_resident'));execution.attach(ref)
     with log_path.open('a',encoding='utf-8',buffering=1)as log,execution.limits():
+        # Bind the GPU DLL before large host CSR and device Gram allocations.
+        # The local object keeps the loader mapping valid throughout this run.
+        linear_runtime=None
+        if gpu_linear:
+            import torch
+            from .body_gpu_linear import CuDSS
+            linear_runtime=CuDSS()
+            log.write(json.dumps(dict(event='cuda_linear_runtime_preloaded',
+                library=linear_runtime.path,cuda=torch.version.cuda))+'\n')
         sec=source_seconds(ref.p);problem=SequenceJoint(ref,camera,prepared/'observations.npz',tuple(sec[[0,-1]]),document.get('supports',[]),output/'solve',log,'sequence_skates_v1',optimize_shared=False,ice_policy=policy,record_acceptance_before_jacobian=True)
-        problem.body.compatibility_difference_step=1e-8;x=np.r_[ref.binding.x,np.zeros(problem.body.size)];mass=ContinuousMassGeometry(ref);base=PrimaryActions(problem,ref,mass,document);problem.action_factors=SequenceActions(problem,ref,mass,document,x[17:],base_factors=base)
-        if saved is not None:
-            if saved['x'].shape!=x.shape:raise ValueError('Resume control layout changed')
-            np.testing.assert_array_equal(problem.body.state.knots,saved['absolute_knots']);x=saved['x'].copy()
+        problem.body.compatibility_difference_step=1e-8
+        x=np.r_[ref.binding.x,np.zeros(problem.body.size)]
+        if start_packet is not None:
+            if start_packet['x'].shape!=x.shape:raise ValueError('Start control layout changed')
+            np.testing.assert_array_equal(problem.body.state.knots,start_packet['absolute_knots'])
+            x=start_packet['x'].copy()
+        action=action_policy(document)
+        problem.action_warm_relative_trf=bool(action.get('structure_enabled'))
+        if problem.action_warm_relative_trf:
+            log.write(json.dumps(dict(event='trust_region_origin',coordinate='increment from warm programme state'))+'\n')
+        mass=ContinuousMassGeometry(ref)
+        base=PrimaryActions(problem,ref,mass,document,warm=x[17:])
+        # Legacy resumes historically associate against the prior and restore
+        # stored assignments below. A new source objective uses the warm state.
+        association_x=x[17:] if action else np.zeros(problem.body.size)
+        problem.action_factors=SequenceActions(problem,ref,mass,document,association_x,base_factors=base)
         root_columns=17+(np.arange(problem.body.state.m)[:,None]*69+np.arange(3)[None]).ravel()
         profile_root=x[root_columns].copy()
         if freeze_root:
@@ -219,11 +308,38 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
             problem.local_control_seconds='global source-protected initialization; existing source-chain controls held, all other global controls free; later full joint release required'
             write_json(output/'source_control_protection.json',dict(source=str(protected_source_evidence),source_sha256=digest(protected_source_evidence),
                 source_pts=stamps,columns=protected_columns.tolist(),new_source_not_frozen=True,no_separate_window_or_XYZ_stitching=True,not_final_joint_freeze=True))
+        if action.get('primary_controls_only') and not freeze_root and not len(protected_columns):
+            # Global control selection, never fit or stitch separate clips.
+            body_columns=np.arange(17,17+problem.body.state.body_size)
+            local=(body_columns-17)%69
+            joints=np.where(local>=6,1+(local-6)//3,0)
+            retained=body_columns[(local<6) | np.isin(joints,[1,2,3,4,5,6,7,8,9,10,11,12])]
+            problem.active_parameter_indices=np.r_[retained,np.arange(17+problem.body.state.body_size,problem.size)]
+            problem.local_control_seconds='whole programme P/Q, torso, legs and attached relative shoes'
         protected_values=x[protected_columns].copy()
         problem.linear_solver_backend='cuda_resident' if gpu_linear else 'sparse_direct'
+        problem.linear_runtime=linear_runtime
         problem.checkpoint_extra=dict(programme_context_json=np.array(json.dumps(document.get('programme_scope',document['scene_contract']),sort_keys=True)),prepared_input_sha256=np.array(digest(prepared/'input.npz')),prepared_observations_sha256=np.array(digest(prepared/'observations.npz')))
-        weights=primary_policy(problem);write_json(output/'objective_policy.json',weights);np.savez_compressed(output/'objective_block_weights.npz',**problem.objective_block_weights)
-        problem.checkpoint_extra.update(objective_phase=np.array('trajectory_primary'),objective_policy_sha256=np.array(digest(output/'objective_policy.json')),objective_block_weights_sha256=np.array(digest(output/'objective_block_weights.npz')))
+        weights=primary_policy(problem)
+        if action:
+            family_weights=dict(episode_support=1., rotation_direction_path=12.,source_facing_cone=2.,rotation_path_impulse=1.4,
+                flight_integrated_com=1.,flight_specific_momentum=.8,native_source_support_contact=2.,
+                programme_parent_root_trust=.24,self_collision=.75,signed_joint_relation=.65,
+                step_runner_lateral=1.,step_runner_travel=.5)
+            declared=base.evaluate(x[17:],False)['weighted_blocks']
+            for entry in declared:
+                family=entry.name.rsplit('/',1)[-1]
+                if family in family_weights:
+                    problem.objective_block_weights[entry.name]=family_weights[family]
+                elif entry.name.startswith('episode/'):
+                    raise ValueError('No declared weight for '+entry.name)
+            problem.objective_block_weights['temporal_contact_mode']=.55
+            weights.update(action_revision=action,episode_family_weights=family_weights,
+                robust_runner_mode_weight=.55,
+                exact_episode_weight_keys=[b.name for b in declared if b.name.startswith('episode/')])
+        write_json(output/'objective_policy.json',weights)
+        np.savez_compressed(output/'objective_block_weights.npz',**problem.objective_block_weights)
+        problem.checkpoint_extra.update(objective_phase=np.array(action.get('stage','trajectory_primary')),objective_policy_sha256=np.array(digest(output/'objective_policy.json')),objective_block_weights_sha256=np.array(digest(output/'objective_block_weights.npz')))
         problem.checkpoint_extra['parent_accepted_steps']=np.array(parent_steps)
         if saved is not None:
             previous=load(old_stage/'objective_block_weights.npz')
@@ -234,6 +350,11 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         # associations from the same archived global seed, then record them.
         extra_associations={};source_episode_choices=dict(source_episode_choices or {})
         known_episodes={name for name,_ in problem.action_factors.extra_unassigned_episodes}
+        if warm_start is not None:
+            for name in known_episodes:
+                key='source_association_extra_'+name+'_choice'
+                if key in start_packet:
+                    source_episode_choices.setdefault(name,int(start_packet[key]))
         if set(source_episode_choices)-known_episodes:raise ValueError('Unknown explicit source association hypothesis')
         hypothesis_records=[]
         for episode_id,factor in problem.action_factors.extra_unassigned_episodes:
@@ -293,7 +414,7 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         frozen_baseline=None
         if saved is not None:frozen_baseline=old_stage/'primary_quality_baseline.json'
         elif quality_baseline is not None:frozen_baseline=Path(quality_baseline)
-        if frozen_baseline is not None and not diagnostic_profile:
+        if frozen_baseline is not None and not diagnostic_profile and not action:
             source_limits=json.loads(frozen_baseline.read_text(encoding='utf-8'))['source'];repairs=[];original_x=x.copy()
             for fraction in(1.,.75,.5,.25,0.):
                 candidate=original_x.copy();candidate[17:]*=fraction
@@ -306,11 +427,24 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
                 if not bad:x=candidate;break
             else:raise ValueError('Archived seed fails its own frozen source baseline')
             write_json(output/'source_initialization_guard.json',dict(original_baseline=str(frozen_baseline),trials=repairs,selected_fraction=fraction,one_global_control_state=True,no_per_frame_or_per_shot_repositioning=True))
-        tick=time.perf_counter();first=problem.evaluate(x,True);first_J=time.perf_counter()-tick
-        if gpu_linear:
+        if saved is None and (action.get('propose_rotation_path') or action.get('structure_enabled')) and base.turn_factors:
+            x=choose_source_path_hypothesis(problem,x,base.turn_factors,output,frozen_baseline)
+        elif saved is not None and action and base.turn_factors:
+            write_json(output/'source_path_hypotheses.json',dict(seed_selected=False,
+                exact_resume_state_preserved=True,parameter_sha256=digest(start_parameter)))
+        tick=time.perf_counter()
+        log.write(json.dumps(dict(event='initial_linearization_start',setup_seconds=tick-started))+'\n')
+        first=problem.evaluate(x,True);first_J=time.perf_counter()-tick
+        if action:
+            record_action_factors(problem,first,output/'initial_action_factors.json',jacobian=True)
+            if saved is None or save_linear_cache:
+                action_direction_check(problem,x,first,output/'weighted_direction_check.json')
+        if save_linear_cache:
+            snapshot_start=time.perf_counter()
             cache=output/'linear_cache';cache.mkdir()
             for name,a in(('data',first['jac'].data),('indices',first['jac'].indices),('indptr',first['jac'].indptr),('residual',first['residual']),('x',x)):np.save(cache/(name+'.npy'),a)
             write_json(cache/'identity.json',dict(shape=list(first['jac'].shape),prepared_input_sha256=digest(prepared/'input.npz'),prepared_observations_sha256=digest(prepared/'observations.npz'),objective_policy_sha256=digest(output/'objective_policy.json'),actual_weighted_CSR=True))
+            log.write(json.dumps(dict(event='first_J_snapshot',seconds=time.perf_counter()-snapshot_start))+'\n')
         write_json(output/'weighted_registry.json',verify(first['weighted_blocks'],first['residual'],first['jac']))
         write_json(output/'initial_metrics.json',dict(groups=body_groups(problem,first),weighted_parts={b.name:float(b.residual@b.residual/2)for b in first['weighted_blocks']},structure=first['gate']))
         # A fixed per-source baseline survives every primary stage. Decoration
@@ -329,15 +463,30 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
             guard_observations=old_observations['use']
             if np.any(guard_observations & ~problem.body.obs['use']):raise ValueError('An old body evidence row disappeared')
             for key in('uv','sigma_px'):np.testing.assert_array_equal(old_observations[key][guard_observations],problem.body.obs[key][guard_observations])
-        def guard(value,relative_limit):
+        turn_before=turn_episode_image_metrics(problem,base.turn_factors,guard_observations)
+        turn_before.update(original.get('turn_episodes',{}))
+        def source_checks(rows):
             checks={}
-            for row in value['action_metrics'].get('visible_runner_contours',[])+value['action_metrics'].get('visible_unassigned_skate_contours',[]):
+            for row in rows:
                 old,radius=baseline[row['id']];now=float(np.percentile(row['outside_visible_band_px'],95));checks[row['id']]=dict(rejected=now>old+.25*radius,before=old,after=now,original_radius_px=radius)
+            return checks
+        def guard(value,relative_limit):
+            checks=source_checks(value['action_metrics'].get('visible_runner_contours',[])+value['action_metrics'].get('visible_unassigned_skate_contours',[]))
             torso=body_groups(problem,value,observation_mask=guard_observations)['torso'];checks['torso']=dict(rejected=torso['pixel_p95']>torso_before['pixel_p95']+max(2.,.1*torso_before['pixel_p95']),before=torso_before['pixel_p95'],after=torso['pixel_p95'],meaning='same source population across stages; finite engineering source guard, not 3D truth')
+            checks.update(turn_episode_image_checks(turn_before,
+                turn_episode_image_metrics(problem,base.turn_factors,guard_observations)))
             return checks
         problem.additional_trial_quality=guard
+        if problem.action_factors.contour is not None:
+            problem.early_source_trial_quality=lambda z: source_checks(problem.action_factors.source_trial_rows(z[17:]))
+        if source_conditioned_step:
+            if not gpu_linear or not action.get('structure_enabled') or problem.action_factors.contour is None:
+                raise ValueError('Source-conditioned step requires the full programme physics and GPU objective')
+            from .programme_source_step import contour_margins
+            problem.source_conditioned_margins=lambda value: contour_margins(value,problem.action_factors.contour,
+                baseline,problem.objective_block_weights['full_source_skate_structure'])
         if diagnostic_profile:problem.image_safe_trials=False
-        quality=dict(source=baseline,torso=torso_before,stage_reset_allowed=False)
+        quality=dict(source=baseline,torso=torso_before,turn_episodes=turn_before,stage_reset_allowed=False)
         if population is not None:quality['body_observation_reference']=population
         write_json(output/'primary_quality_baseline.json',quality);problem.jacobian_seconds_hint=first_J
         del first
@@ -346,9 +495,22 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         result,report=problem.solve(x,RunPolicy(wall_seconds=remaining,max_accepted=max_accepted,max_outer=1,allow_penalty_growth=False,stagnation_window=12))
         if freeze_root:np.testing.assert_array_equal(result[root_columns],profile_root)
         if len(protected_columns):np.testing.assert_array_equal(result[protected_columns],protected_values)
-        final=problem.evaluate(result,False);write_json(output/'final_metrics.json',dict(groups=body_groups(problem,final),weighted_parts={b.name:float(b.residual@b.residual/2)for b in final['weighted_blocks']},structure=final['gate'],primary_guards=guard(final,.05)))
+        final=problem.evaluate(result,False)
+        write_json(output/'final_metrics.json',dict(groups=body_groups(problem,final),
+            weighted_parts={b.name:float(b.residual@b.residual/2)for b in final['weighted_blocks']},
+            structure=final['gate'],primary_guards=guard(final,.05)))
+        if action:record_action_factors(problem,final,output/'final_action_factors.json',jacobian=False)
+        export_started=time.perf_counter()
         candidate=absolute_reference(ref,problem.body.state.current_curve(result[17:]),root=prepared);candidate.relative_skate_curve=problem.body.state.shoe_current_curve(result[17:]);candidate.binding=copy.copy(ref.binding);candidate.binding.reference=candidate
-        packet=export_candidate(prepared,output,candidate,camera,info,document.get('supports',[]));C,Rot=mass.evaluate(candidate.at(candidate.times),np.zeros((len(candidate.times),69)));packet['com_world_mid']=mass.com(C)
+        packet=export_candidate(prepared,output,candidate,camera,info,document.get('supports',[]))
+        native_state=candidate.at(candidate.times)
+        C,Rot=mass.evaluate(native_state,np.zeros((len(candidate.times),69)))
+        packet['com_world_mid']=mass.com(C)
+        if action:
+            body_fk=fk_state(candidate,native_state,np.zeros((len(candidate.times),69)))
+            packet['native_body_local_R_mid']=body_fk['local_R']
+            packet['native_body_FK_world_R_mid']=body_fk['Q'][:,None]@body_fk['frames']
+            packet['source_action_ledger_sha256']=np.array(digest(prepared/'source_evidence.json'))
         packet.update(P_velocity_world_mps=candidate.root_derivative(candidate.times,1)*candidate.binding.ratio,source_shot_ids=ref.p.get('shot_ids',np.full(len(ref.times),'FS_cam7')),trajectory_evidence_status=np.where(np.asarray(problem.body.obs['use']).sum(1)>=4,'source_constrained_estimate','temporal_inference'),position_uncertainty_status=np.full(len(ref.times),'conditional_scale_and_depth; no independent accuracy acceptance'),ice_plane_known=np.array(ref.ice_plane_known),sequence_contact_modes=problem.action_factors.modes.modes,sequence_contact_status=problem.action_factors.modes.status,
             shared_betas=np.asarray(ref.p['shared_betas']).copy(),shared_body_scale=np.asarray(ref.p['body_scale']).copy())
         from .fullbody_fit import body_joint_assignment
@@ -356,6 +518,7 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         if'body_joint_assignment_provenance_json'in problem.body.obs:
             packet['body_joint_assignment_provenance_json']=problem.body.obs['body_joint_assignment_provenance_json'].copy()
         np.savez_compressed(output/'fitted/result.npz',**packet)
+        log.write(json.dumps(dict(event='result_export',seconds=time.perf_counter()-export_started))+'\n')
         summary=dict(parameter=str(output/'solve/candidate.npz'),result=str(output/'fitted/result.npz'),source_frames=len(ref.times),whole_seconds=sec[[0,-1]].tolist(),accepted_steps=parent_steps+problem.accepted,additional_accepted_steps=problem.accepted,retained_step=parent_steps+report['selection']['retained_step'],stop=report['stop'],first_full_J_seconds=first_J,wall_seconds=time.perf_counter()-started,engineering_ready=True,trajectory_candidate=True,external_validation_status='not_evaluated_here',source_visual_review='pending',accuracy_accepted=False,ice_plane_known=ref.ice_plane_known,primary_guard_baseline=str(output/'primary_quality_baseline.json'),no_per_shot_alignment=True)
         summary.update(root_profile_fixed=freeze_root,diagnostic_profile=diagnostic_profile,
             source_protected_initialization=protected_source_evidence is not None,
@@ -369,9 +532,13 @@ def main():
     for name in ('project','prepared','output'):ap.add_argument('--'+name,type=Path,required=True)
     ap.add_argument('--wall-seconds',type=float,required=True);ap.add_argument('--max-accepted',type=int,required=True)
     ap.add_argument('--memory-gib',type=float,default=12.)
-    ap.add_argument('--resume',type=Path);ap.add_argument('--gpu-linear',action='store_true');ap.add_argument('--device-batch',type=int,default=1024);ap.add_argument('--quality-baseline',type=Path)
+    ap.add_argument('--warm-start',type=Path,help='Same immutable input and prior, explicitly revised objective');ap.add_argument('--resume',type=Path);ap.add_argument('--gpu-linear',action='store_true');ap.add_argument('--device-batch',type=int,default=1024);ap.add_argument('--quality-baseline',type=Path)
     ap.add_argument('--freeze-root',action='store_true');ap.add_argument('--diagnostic-profile',action='store_true')
     ap.add_argument('--protected-source-evidence',type=Path)
+    ap.add_argument('--save-linear-cache',action='store_true',
+        help='Save the first actual weighted CSR for trajectory_root_init or an explicit equivalence check')
+    ap.add_argument('--source-conditioned-step',action='store_true',
+        help='Try one guarded whole-state step accounting for near-limit source evidence before TRF')
     ap.add_argument('--source-episode-choice',action='append',default=[],metavar='EPISODE=INDEX',help='Explicit conditional source association; preserves source identity unknown')
     a=ap.parse_args()
     choices={}
@@ -382,7 +549,7 @@ def main():
     if a.output.exists():raise FileExistsError(a.output)
     from .memory_guard import ProcessMemoryGuard
     memory=ProcessMemoryGuard(a.output.parent/(a.output.name+'_resources'),a.memory_gib)
-    try:run(a.project,a.prepared,a.output,wall_seconds=a.wall_seconds,max_accepted=a.max_accepted,resume=a.resume,gpu_linear=a.gpu_linear,device_batch=a.device_batch,quality_baseline=a.quality_baseline,freeze_root=a.freeze_root,diagnostic_profile=a.diagnostic_profile,protected_source_evidence=a.protected_source_evidence,source_episode_choices=choices)
+    try:run(a.project,a.prepared,a.output,wall_seconds=a.wall_seconds,max_accepted=a.max_accepted,resume=a.resume,gpu_linear=a.gpu_linear,device_batch=a.device_batch,quality_baseline=a.quality_baseline,freeze_root=a.freeze_root,diagnostic_profile=a.diagnostic_profile,protected_source_evidence=a.protected_source_evidence,source_episode_choices=choices,warm_start=a.warm_start,save_linear_cache=a.save_linear_cache,source_conditioned_step=a.source_conditioned_step)
     except MemoryError:
         write_json(a.output/'MEMORY_LIMIT.json',dict(status='stopped_at_process_memory_ceiling',no_auto_restart=True,**memory.snapshot()));raise
     finally:memory.close()

@@ -1,0 +1,137 @@
+{
+  "schema": "rinkspace.result-viewer.v1",
+  "event": "ankara_2026",
+  "programme": "okada_mei_sp",
+  "scene_root": "runs/body_s01_20261029/fullbody_1102",
+  "scene_label": "camera_solver_refined_1102 冻结场景",
+  "metric_binding": "runs/body_s01_20261029/fullbody_1102/metric_binding.json",
+  "metric_binding_base": "data",
+  "model_asset": "environments/body/GVHMR/inputs/checkpoints/body_models/smplx/SMPLX_NEUTRAL.npz",
+  "source_video": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4",
+  "source_time_base": [
+    1,
+    12800
+  ],
+  "diagnostic_semantics": {
+    "com": "条件米制质量近似，非真实质心",
+    "blade_material": "每只刀固定材料点：后／中／前；不是接冰点",
+    "witness": "移动最低点／接触候选，非真实接冰"
+  },
+  "shot": "programme_action_1107",
+  "source_run": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\trajectory_action_1107\\action_player",
+  "session_id": "programme_action_1107",
+  "default_variant": "programme_action_physics_1107",
+  "initial_source_pts": 283136,
+  "initial_view": "side",
+  "initial_wear_inspection": false,
+  "source_identity_field": "source_identity_suspect",
+  "source_navigation": "programme_action_finish_1107_navigation.json",
+  "source_programme_scope": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\rebuild_scope.json",
+  "source_review_model_body_default": true,
+  "body_window_scope": "九镜头8329曝光的统一连续开发候选；身体、鞋刀与接触准确性未验收。",
+  "body_scope_label": "全节目九镜头连续开发候选；本帧是否参与本轮优化按保存mask显示。",
+  "footwear_scope_label": "装备按本轮保存数组显示；已保存的unknown不由显示端补造。",
+  "display_outside_window_label": "保存的全节目初状态；本帧未参与本轮优化。",
+  "display_footwear_binding_scope": "全节目保存的装备应用mask",
+  "review_status": "全节目开发候选；不表示独立三维、接触或逐曝光视觉准确性通过。",
+  "initial_visible": {
+    "surface": true,
+    "skeleton": true,
+    "shoes": true,
+    "trajectory": true,
+    "pelvis": true,
+    "com": false,
+    "blade_material": true,
+    "contact": true
+  },
+  "variants": [
+    {
+      "id": "programme_action_physics_1107",
+      "label": "九镜头连续轨迹与全身开发候选（未验收）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\trajectory_action_1107\\physics_guarded\\final\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "programme_initial",
+      "body_refinement_intervals_seconds": [
+        [
+          22.12,
+          188.68
+        ]
+      ]
+    },
+    {
+      "id": "programme_trajectory_1107",
+      "label": "旧全节目候选（原保存状态；本候选独立保存的钢刃诊断）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\trajectory_continue_1107\\temporal_joint_cached\\final\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "programme_initial",
+      "source_projection_origin": "own saved COCO_uv/equipment_uv",
+      "blade_review_available": true
+    },
+    {
+      "id": "programme_action_source_1107",
+      "label": "诊断对照 programme_action_source_1107（未验收；本候选独立保存的钢刃诊断）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\trajectory_action_1107\\source_path_v3\\final\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "programme_initial",
+      "conditional_diagnostic": true,
+      "user_accepted": false,
+      "accuracy_accepted": false,
+      "blade_review_available": true,
+      "source_projection_origin": "own saved COCO_uv/equipment_uv",
+      "diagnostic_record": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\programme_action_source_1107.json",
+      "diagnostic_record_sha256": "8c0f2d8707172158ad32f5f42753ab43b0aa553374a869d6d07bf995e94b4939",
+      "parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\programme_action_source_1107.npz",
+      "parameter_sha256": "f1b60ccf23c54b2d262f71e12b3e2257368f73f1c0e384b2bd734f000583d870"
+    },
+    {
+      "id": "programme_action_root_1107",
+      "label": "诊断对照 programme_action_root_1107（未验收；本候选独立保存的钢刃诊断）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\trajectory_action_1107\\root_tangent_v2\\final\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "programme_initial",
+      "conditional_diagnostic": true,
+      "user_accepted": false,
+      "accuracy_accepted": false,
+      "blade_review_available": true,
+      "source_projection_origin": "own saved COCO_uv/equipment_uv",
+      "diagnostic_record": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\programme_action_root_1107.json",
+      "diagnostic_record_sha256": "0727ba103a2897d7c82af26fa27c5f41797b8488c3cdeff06395ee1c830dd308",
+      "parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\programme_action_root_1107.npz",
+      "parameter_sha256": "f7d6e8003a667811f999e9750100e9575b98291b77360859c61ec40f323e9d73"
+    },
+    {
+      "id": "programme_action_axel_1107",
+      "label": "2A 轴修正版（单视角候选）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\trajectory_action_1107\\axel_axis_joint_1107\\final\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "programme_initial",
+      "body_refinement_intervals_seconds": [
+        [
+          22.12,
+          188.68
+        ]
+      ]
+    },
+    {
+      "id": "programme_action_finish_1107",
+      "label": "全节目动作修正版（S09／步法／结构候选）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\trajectory_action_1107\\action_completion_1107\\s09_v4\\final\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "programme_initial",
+      "body_refinement_intervals_seconds": [
+        [
+          22.12,
+          188.68
+        ]
+      ]
+    }
+  ],
+  "blade_review_asset": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\trajectory_action_1107\\action_completion_1107\\s09_v4\\blade_review\\programme_blade_review.json",
+  "source_review_model_runner_default": true
+}

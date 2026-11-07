@@ -39,6 +39,15 @@
 
 [完整节目播放器](../../../../launchers/START_3D_PROGRAMME_TRAJECTORY_1107.cmd)提供新旧、[足部关联失败](programme_association1_failure_1107.json)、[尺度 ×0.97](programme_scale097_1107.json)／[×1.03](programme_scale103_1107.json)及[沿视线 +0.10 m](programme_depthplus_1107.json)／[−0.10 m](programme_depthminus_1107.json)共 7 版，均已实际计算并生成完整缓存。主候选使用相同冻结相机与绑定，补上 175 个缺失曝光的 2877 个身体观测，并为 140.84–140.94 秒的 6 帧保存显式源标签→模型关节关联；原 UV/use/sigma 保留，裙摆下髋部对应仍是传播假设。新增三帧只读到局部鞋底，未将其升级为完整钢刃、人体左右或接冰真值。
 
+<a id="whole-programme-actions"></a>
+### 全节目动作与结构修正（2026-11-07）
+
+[动作对照播放器](../../../../launchers/START_3D_PROGRAMME_ACTION_1107.cmd)提供同一 8329 曝光的[原全节目候选](programme_trajectory_1107.json)、[源方向候选](programme_action_source_1107.json)、[物理候选](programme_action_physics_1107.json)、[根轨迹对照](programme_action_root_1107.json)、[2A 轴修正版](programme_action_axel_1107.json)和[全节目动作修正版](programme_action_finish_1107.json)。该入口保留物理候选为默认。源动作、S09 鞋刀与步法的实际观测及不确定性分别见[初版台账](programme_action_ledger_1107.json)和[修订台账](programme_action_ledger_finish_travel_1107.json)。完整模型与缓存由 Data 提供。
+
+全节目动作修正版保留 8 个接受步。S09 两段旋转的源支持带超差中位数分别为 3.17 和 1.14 px，换右足后仍有 221／264 个曝光的模型最低点靠近刀端。同一组 39 项网格精查由 28 项相交降至 25 项。步法观测支持右脚后滑转为左脚前滑，具体用刃、真实接冰与世界轨迹仍待验收。满意的 S01 和 2A 修正版用于逐曝光一致性核查。
+
+265KF 与 RTX 5070 Ti 的同输入、同质量全节目测量中，到达同等接受步的墙钟由 1574.4 秒缩至 995.2 秒。实际加权残差、CSR 对照及有界结构修正的[复核源码](../../../../calibration/program_tracking/body_tracking/source_helpers/action_1107/README.md)保留了对应运行入口和数据身份。
+
 101.66、140.92 秒的同源投影有明确改善，但准确性未通过：175.584621 秒插值样本的刀具相对参考冰面高度仍低至约 −0.1165 m，旋转残余运动与自由鞋匹配仍待修；模型高度不直接等同于真实穿冰。四个尺度／深度分支均为有限且不同实际工作量的敏感性试验，清晰源区域保护仍失败，不构成置信区间或已排除的尺度范围。FS 完整试次也已接入实际共同后端并运行三个尺度分支，未改善无世界配准的绝对定位，不能据此断言网络先验为唯一原因。真实运行、接受步、图像与物理失败、内存和未确认项由各结果记录连接 Data；没有以总目标下降代替世界轨迹验收。
 
 人体、骨架和鞋刀由同一状态求值，场景和相机冻结于 `camera_solver_refined_1102`；这些对照使用 59.96169706678219 米／场景单位的条件尺度，未完成独立米制标定。普通历史 S01 播放器的另一套尺度按[操作说明](../../../../docs/RESULTS_3D_PLAYER_ZH.md#画面含义与尺度)单独解释。

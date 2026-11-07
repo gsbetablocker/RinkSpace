@@ -67,7 +67,7 @@ def _raw_witness_height(contact, index):
     return float(np.asarray(features['height'])[frame, foot, matches[0]]), 'exact_feature_witness'
 
 
-def ice_soft_rows(contact, policy):
+def ice_soft_rows(contact, policy, *, diagnostics=True):
     """Adapt constraints() ice rows to finite least-squares residuals.
 
     Nonpenetration margin_m is raw height + semantic allowance. Its residual
@@ -91,6 +91,29 @@ def ice_soft_rows(contact, policy):
     labels = contact['labels']
     if len(labels) != len(margins) or np.any(weights <= 0):
         raise ValueError('labels and positive weights must match margin_m')
+    if not diagnostics:
+        # The fit keeps the exact geometry packet; only residuals and slopes
+        # are needed at each trial. Per-witness text is rendered on request.
+        def row_kind(label):
+            if not isinstance(label,(tuple,list)) or len(label)!=2 or not isinstance(label[1],str):
+                raise ValueError('labels must be (physical time id, row name) pairs')
+            name=label[1]
+            return 1 if name in ('left_nonpenetration','right_nonpenetration') else 2 if name.endswith(':upper') else 0
+        kind=np.fromiter((row_kind(label) for label in labels),np.int8,count=len(labels))
+        indices=np.flatnonzero(kind)
+        penetration=kind[indices]==1
+        with np.errstate(over='raise',invalid='raise',divide='raise'):
+            distance=np.where(penetration,-margins[indices]-policy.penetration_deadzone_m,
+                              values[indices]-policy.support_hover_deadzone_m)
+            factors=np.sqrt(weights[indices])
+            factors[penetration]=factors[penetration]*np.sqrt(policy.penetration_weight)/policy.penetration_scale_m
+            factors[~penetration]=factors[~penetration]*np.sqrt(policy.support_weight)/policy.support_scale_m
+            residual=factors*np.maximum(distance,0.)
+            derivative=np.where(distance>0.,-factors,0.)
+        return dict(residual=residual,indices=indices,derivative_per_margin_m=derivative,
+            parts={'ice_penetration':float(residual[penetration]@residual[penetration]/2),
+                   'ice_support_hover':float(residual[~penetration]@residual[~penetration]/2)},
+            diagnostics=None)
     indices = []
     kinds = []
     excess = []

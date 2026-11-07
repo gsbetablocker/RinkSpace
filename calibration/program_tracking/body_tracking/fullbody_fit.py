@@ -69,10 +69,11 @@ def right_jacobian(v):
 
 
 class FullBodyProblem:
-    def __init__(self,reference,projector,ledger,seconds,mode,log=None,*,state_factory=WindowState):
+    def __init__(self,reference,projector,ledger,seconds,mode,log=None,*,state_factory=WindowState,
+                 source_frames=None,execution=None):
         self.reference=reference;self.projector=projector;self.obs=load(ledger);self.log=log
         self.layout=getattr(reference,'layout',OBSERVATION_LAYOUT)
-        self.execution=get_body_execution(reference)
+        self.execution=get_body_execution(reference) if execution is None else execution
         # Native camera calls are separate from parallel body-world evaluations.
         self.projector.body_execution=self.execution
         if hasattr(self.projector,'core'):
@@ -84,7 +85,16 @@ class FullBodyProblem:
         self.state=state_factory(reference,seconds,mode)
         from .body_clock import source_seconds
         native_seconds=source_seconds(reference.p)
-        self.frames=np.flatnonzero((native_seconds>=seconds[0]-1e-9)&(native_seconds<=seconds[1]+1e-9))
+        eligible=(native_seconds>=seconds[0]-1e-9)&(native_seconds<=seconds[1]+1e-9)
+        if source_frames is None:
+            self.frames=np.flatnonzero(eligible)
+        else:
+            frames=np.asarray(source_frames)
+            if (frames.ndim!=1 or not len(frames) or frames.dtype.kind not in 'iu'
+                or frames[0]<0 or frames[-1]>=len(eligible) or np.any(frames[1:]<=frames[:-1])
+                or not eligible[frames].all()):
+                raise ValueError('Source row selection must preserve the global exposure order and scope')
+            self.frames=frames.astype(np.intp,copy=True)
         self.n=len(self.frames);self.size=self.state.size;self.start=time.perf_counter();self.evaluations=0
         self.tau=float(projector.p['rig'][37])
         tau=projector.readout_times(self.frames)if hasattr(projector,'readout_times')else np.full(self.n,self.tau)

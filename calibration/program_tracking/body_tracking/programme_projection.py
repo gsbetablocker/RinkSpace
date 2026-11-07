@@ -7,8 +7,11 @@ prepares full display meshes. Every invocation requires a new output folder.
 from __future__ import annotations
 import argparse
 import copy
+from hashlib import sha256
+from io import BytesIO
 import json
 from pathlib import Path
+import re
 import sys
 
 sys.path[:0] = [str(Path(__file__).resolve().parents[3]), str(Path(__file__).resolve().parents[3] / 'src')]
@@ -80,6 +83,21 @@ def source_rows(project, assets, pts, *, review_evidence=None):
                 additions.append(dict(episode_id=episode['id'],pts=int(row['pts']),
                     source_track_id=row.get('source_track_id'),source_file=str(source_path),
                     source_file_sha256=episode['source_sha256']))
+        programme_rows={}
+        for row in evidence.get('full_source_skate_structures',{}).get('rows',[]):
+            if not row['id'].startswith(('s09_', 'finish_')) or row.get('evidence_status')!='observed':
+                continue
+            key=(int(row['pts']),int(row['foot']))
+            entry=programme_rows.setdefault(key,dict(pts=key[0],foot=key[1],features={},
+                source_track_id=row['source_track_id'],source_anatomical_identity='source sequence inference',
+                overlay_role='source_review; candidate participation separately registered'))
+            feature=copy.deepcopy(row['source_annotation'])
+            feature.update(pixel_uncertainty_radius_px=row['pixel_uncertainty_radius_px'],
+                completeness=row.get('completeness','unknown'),source_id=row['id'])
+            entry['features'][row['structure_feature']]=feature
+            additions.append(dict(episode_id=row['source_track_id'],pts=key[0],source_id=row['id'],
+                source_file=str(review_evidence)))
+        result['source_structures'].extend(programme_rows.values())
     status = np.full((len(pts), 2), 'unknown', dtype='U48')
     for key, rows in result.items():
         for row in rows:
@@ -106,13 +124,35 @@ def fit_participation(prepared,parameter,*,saved=None,document=None):
     evidence_sha=digest(prepared/'source_evidence.json')
     if str(saved.get('source_evidence_sha256',''))!=evidence_sha:
         raise ValueError('Saved candidate does not bind this prepared source evidence')
-    weights=load(parameter.parent.parent/'objective_block_weights.npz')
+    stage = parameter.parent.parent
+
+    def verified_bytes(field, filename):
+        if field not in saved:
+            raise ValueError('Saved candidate is missing objective identity: ' + field)
+        value = np.asarray(saved[field])
+        expected = value.item() if value.ndim == 0 else None
+        if not isinstance(expected, str) or re.fullmatch(r'[0-9a-fA-F]{64}', expected) is None:
+            raise ValueError('Expected a scalar SHA256 text value: ' + field)
+        raw = (stage / filename).read_bytes()
+        actual = sha256(raw).hexdigest()
+        if actual != expected.lower():
+            raise ValueError('Saved objective hash mismatch: ' + filename)
+        return raw, actual
+
+    weights_raw, weights_sha = verified_bytes('objective_block_weights_sha256', 'objective_block_weights.npz')
+    verified_bytes('objective_policy_sha256', 'objective_policy.json')
+    weights = load(BytesIO(weights_raw))
     feature_rows=document.get('full_source_skate_structures',{}).get('rows',[])if float(weights.get('full_source_skate_structure',0.))>0 else []
     feature_rows=[{k:copy.deepcopy(row[k])for k in('id','pts','foot','structure_feature','source_status')if k in row}
         for row in feature_rows if row.get('optimization_enabled')and row.get('role')=='fit']
     support_rows=[{k:copy.deepcopy(row[k])for k in('pts','foot','phase')if k in row}
         for row in document.get('source_support_evidence',[]) if row.get('optimization_enabled')and row.get('role')=='fit']
     if float(weights.get('native_source_support_contact',0.))<=0:support_rows=[]
+    for episode in document.get('source_episode_review',{}).get('episodes',[]):
+        key='episode/'+episode['episode_id']+'_source_band/native_source_support_contact'
+        if float(weights.get(key,0.))>0:
+            support_rows.extend(dict(pts=row['pts'],foot=row['foot'],phase=episode['episode_id'])
+                                for row in episode.get('native_support_bands',[]))
     extra=[]
     for episode in document.get('additional_unassigned_source_episodes',[]):
         # This block has the same finite default weight as SequenceActions.
@@ -123,7 +163,7 @@ def fit_participation(prepared,parameter,*,saved=None,document=None):
             extra.append(dict(pts=group['pts'],episode_id=episode['id'],feature_rows_count=max(counts,default=0),
                 source_anatomical_identity='unknown',support_enabled=bool(episode.get('support_enabled',False))))
     return dict(description_zh='入拟合范围按本候选实际保存的目标登记；局部源描线不代表完整冰刀或已确认接冰。',
-        source_evidence_sha256=evidence_sha,objective_weights_sha256=digest(parameter.parent.parent/'objective_block_weights.npz'),
+        source_evidence_sha256=evidence_sha,objective_weights_sha256=weights_sha,
         feature_rows=feature_rows,support_rows=support_rows,
         unassigned_source_sets=[dict(pts=row['pts'],feature_rows_count=max((len(b.get('rows',[]))for b in row.get('branches',[])),default=0))
             for row in document.get('unassigned_source_skate_sets',[]) if 'pts'in row]+extra)
@@ -305,15 +345,26 @@ def generate(project, prepared, parameter, result, output, *, variant=VARIANT, r
     return report
 
 
-def merge_review_assets(paths, output, *, primary_variant=VARIANT):
+def merge_review_assets(paths, output, *, primary_variant=VARIANT, source_revision_variant=None):
     """Combine separately replayed candidates, preserving source rows verbatim."""
     output=Path(output).resolve()
     if output.exists():raise FileExistsError(output)
+    paths=list(paths)
+    revision=None
+    if source_revision_variant is not None:
+        documents=[read(path) for path in paths]
+        matches=[doc for doc in documents if source_revision_variant in doc['variants']]
+        if len(matches)!=1:raise ValueError('Expected exactly one explicit source review revision')
+        revision=matches[0]
     arrays={};variants={};bindings={};fit_bindings={};primary=None;source=None;inputs=[]
     for entry in paths:
         entry=Path(entry).resolve();doc=read(entry)
         content={k:doc.get(k,[]) for k in SOURCE_FIELDS}
-        if source is None:source=content
+        if revision is not None:
+            for key,rows in content.items():
+                if revision.get(key,[])[:len(rows)]!=rows:
+                    raise ValueError('Source review revision must preserve each inherited row: '+key)
+        elif source is None:source=content
         elif source!=content:raise ValueError('Candidates must use the same unchanged source evidence')
         values=load(entry.parent/doc['projection_npz'])
         for key,value in values.items():
@@ -332,6 +383,10 @@ def merge_review_assets(paths, output, *, primary_variant=VARIANT):
     primary.update(projection_npz=npz.name,variants=variants,prediction_bindings=bindings,
         source_structure_fit_variants=fit_bindings,
         independently_replayed_assets=inputs)
+    if revision is not None:
+        primary.update({key:revision.get(key,[]) for key in SOURCE_FIELDS})
+        primary['source_evidence_binding']=revision['source_evidence_binding']
+        primary['source_overlay_revision_variant']=source_revision_variant
     write(target,primary)
     from rinkspace.storage import AssetStore
     from rinkspace.viewer3d.blade_review import BladeReview

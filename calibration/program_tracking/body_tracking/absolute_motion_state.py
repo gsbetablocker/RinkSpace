@@ -5,9 +5,10 @@ pose curve added back. Each MotionDelta carries its own immutable parameter
 and clock context, including during parallel local FK replay.
 """
 from dataclasses import dataclass
+from collections import OrderedDict
 import copy
 import numpy as np
-from scipy.sparse import coo_matrix,csr_matrix,issparse,vstack
+from scipy.sparse import csr_matrix,issparse,vstack
 from .absolute_motion_curve import AbsoluteMotionCurve,_exp,_log
 from .fullbody_fit import right_jacobian
 
@@ -65,13 +66,14 @@ def evaluate_curve(curve,t,*,control_increments=None,with_blocks=False,basis=Non
     b=B[np.arange(len(t))[:,None],idx] if issparse(B) else np.take_along_axis(B,idx,axis=1)
     b=b.toarray() if issparse(b) else np.asarray(b)
     r=curve.rotation_controls[idx]
-    D=r[:,:-1].swapaxes(-1,-2)@r[:,1:];phi=curve._check_log_chart()[idx[:,:-1]]
+    phi=curve._check_log_chart()[idx[:,:-1]]
     beta=np.cumsum(b[:,::-1],axis=1)[:,::-1][:,1:]
     E=_exp(beta[:,:,None,None]*phi)
     tails=[E[:,1]@E[:,2],E[:,2],np.broadcast_to(np.eye(3),E[:,0].shape)]
     rotation=r[:,0]@E[:,0]@tails[0]
     result=dict(P=B@curve.position_controls,Q=rotation[:,0],local_R=rotation[:,1:],rotations=rotation)
     if with_blocks:
+        D=r[:,:-1].swapaxes(-1,-2)@r[:,1:]
         W=right_jacobian(beta[:,:,None,None]*phi)*beta[:,:,None,None,None]
         W=W@inverse_right_jacobian(phi)
         C=[tails[j].swapaxes(-1,-2)@W[:,j] for j in range(3)]
@@ -95,20 +97,42 @@ class MotionDelta(np.ndarray):
         return self.owner.rotation_chain(blocks,self.parameters,self.sample_times,sample_indices=sample_indices)
 
 
+def _sampled_clock(times,indices):
+    """Evaluate only requested source samples; retain their order/duplicates.
+
+    Control indices always stay global. This compacts numerical scratch, not
+    the fitted state, trajectory, time support or observation inventory.
+    """
+    clock=np.atleast_1d(np.asarray(times,float));indices=np.asarray(indices,int)
+    unique,inverse=np.unique(indices,return_inverse=True)
+    return clock[unique],inverse.reshape(indices.shape)
+
+
 class AbsoluteMotionState:
     state_kind='absolute_motion_v1';use_pose_cost_guard=False;is_absolute=True
     def __init__(self,reference,seconds,mode='full'):
         self.reference=reference;self.curve=reference.absolute_curve;self.knots=self.curve.knots.copy()
         self.m=len(self.curve.position_controls);self.active=np.arange(69);self.d=69;self.size=self.m*69
         self.seconds=tuple(seconds);self.mode=mode;self.taper=0.;self.bounds_time=self.knots[[3,-4]].copy()
-        self._last_parameters=None;self._evaluations={};self._basis={}
+        self._last_parameters=None;self._evaluations={};self._basis=OrderedDict()
+        self._basis_bytes=0
         self._fixed_values={};self._curve_parameters=None;self._current_curve=None
     def basis(self,t,derivative=0):
         t=np.atleast_1d(t).astype(float);key=(t.tobytes(),derivative)
-        if key not in self._basis:
-            if len(self._basis)>=24:self._basis.clear()
-            self._basis[key]=self.curve.basis_sparse(t,derivative)
-        return self._basis[key]
+        cached=self._basis.get(key)
+        if cached is not None:
+            self._basis.move_to_end(key)
+            return cached[0]
+        basis=self.curve.basis_sparse(t,derivative)
+        storage=basis.data.nbytes+basis.indices.nbytes+basis.indptr.nbytes+len(key[0])
+        ceiling=24*1024**2
+        if storage<=ceiling:
+            while self._basis_bytes+storage>ceiling:
+                _,(_,retired)=self._basis.popitem(last=False)
+                self._basis_bytes-=retired
+            self._basis[key]=(basis,storage)
+            self._basis_bytes+=storage
+        return basis
     def current_curve(self,x):
         x=np.asarray(x)
         if self._curve_parameters is None or not np.array_equal(x,self._curve_parameters):
@@ -148,28 +172,32 @@ class AbsoluteMotionState:
     def chain(self,local,x,t,*,sample_indices=None):
         local=np.asarray(local,float);n,k,d=local.shape
         if d!=69:raise ValueError('Absolute local tangent requires all69 columns')
+        pick=np.arange(len(t)) if sample_indices is None else np.asarray(sample_indices,int)
+        if pick.shape!=(n,):raise ValueError('Local rows and sampled clock differ')
+        if not n:return csr_matrix((0,self.size))
         if n>512:
-            pick=np.arange(len(t)) if sample_indices is None else np.asarray(sample_indices,int)
             return vstack([self.chain(local[a:a+512],x,t,sample_indices=pick[a:a+512]) for a in range(0,n,512)],format='csr')
-        _,s,mapping=self.linearization(x,t);pick=np.arange(len(t)) if sample_indices is None else np.asarray(sample_indices,int)
-        if len(pick)!=n:raise ValueError('Local rows and sampled clock differ')
-        # General cavity/physics factors are sparse in the local joint axes.
-        # Keep the lower-memory per-support assembly here; motion and exposure
-        # factors use their dedicated direct-CSR paths below.
-        rr=[];cc=[];vv=[];groups=local.reshape(n,k,23,3)
-        rows=np.broadcast_to(np.arange(n*k).reshape(n,k,1),(n,k,69))
+        clock,pick=_sampled_clock(t,pick)
+        _,s,mapping=self.linearization(x,clock)
+        # The four supports are already in canonical control order. Fill
+        # bounded per-sample slots directly instead of sorting another COO.
+        groups=local.reshape(n,k,23,3)
+        values=np.empty((n,k,4,69))
         for j in range(4):
-            val=np.einsum('nkgc,ngcd->nkgd',groups,mapping[pick,j]).reshape(n,k,69)
-            col=s['control_indices'][pick,j,None,None]*69+np.arange(69)[None,None,:]
-            mask=val!=0.;vv.append(val[mask]);rr.append(rows[mask]);cc.append(np.broadcast_to(col,val.shape)[mask])
-        out=coo_matrix((np.concatenate(vv),(np.concatenate(rr),np.concatenate(cc))),shape=(n*k,self.size)).tocsr();out.eliminate_zeros();return out
+            values[:,:,j]=np.einsum('nkgc,ngcd->nkgd',groups,mapping[pick,j]).reshape(n,k,69)
+        support=(s['control_indices'][pick,:,None]*69+np.arange(69)).astype(np.int32)
+        return ordered_slot_csr(values.reshape(n,k,4*69),support.reshape(n,4*69),self.size)
     def rotation_chain(self,blocks,x,t,*,sample_indices=None):
         """Chain joint-diagonal 3x3 factors without expanding zero 69-columns."""
         blocks=np.asarray(blocks,float);n,j=blocks.shape[:2]
         if blocks.shape!=(n,22,3,3):raise ValueError('Expected22 joint-diagonal rotation blocks')
-        _,s,mapping=self.linearization(x,t)
         pick=np.arange(len(t)) if sample_indices is None else np.asarray(sample_indices,int)
-        if len(pick)!=n:raise ValueError('Rotation rows and sampled clock differ')
+        if pick.shape!=(n,):raise ValueError('Rotation rows and sampled clock differ')
+        if not n:return csr_matrix((0,self.size))
+        if n>512:
+            return vstack([self.rotation_chain(blocks[a:a+512],x,t,sample_indices=pick[a:a+512]) for a in range(0,n,512)],format='csr')
+        clock,pick=_sampled_clock(t,pick)
+        _,s,mapping=self.linearization(x,clock)
         values=np.einsum('njac,nsjcd->njasd',blocks,mapping[pick,:,1:]).reshape(n*j*3,12)
         row,column=np.nonzero(values)
         controls=(s['control_indices'][pick,None,:,None]*69
@@ -187,14 +215,28 @@ class AbsoluteMotionState:
             no_inherited_high_frequency_curve=np.array(True))
 
 
+def ordered_slot_csr(values,columns,size):
+    n,k,width=values.shape
+    take=values!=0.
+    selected=np.broadcast_to(columns[:,None,:],values.shape)[take]
+    counts=np.count_nonzero(take,axis=-1).ravel()
+    ptr=np.empty(n*k+1,dtype=np.int32)
+    ptr[0]=0
+    np.cumsum(counts,out=ptr[1:])
+    return csr_matrix((values[take],selected,ptr),shape=(n*k,size))
+
+
 def chain_exposure(local,delta,sample_indices=None):
     local=np.asarray(local);n,k,nodes,d=local.shape
     if nodes!=5 or d!=69:raise ValueError('Native projection requires five69-column shutter nodes')
-    indices=np.arange(n*5).reshape(n,5) if sample_indices is None else np.asarray(sample_indices)
+    indices=np.arange(n*5).reshape(n,5) if sample_indices is None else np.asarray(sample_indices,int)
+    if indices.shape!=(n,5):raise ValueError('Exposure rows and sampled clock differ')
+    if not n:return csr_matrix((0,delta.owner.size))
     if n>2048:
         return vstack([chain_exposure(local[a:a+2048],delta,sample_indices=indices[a:a+2048]) for a in range(0,n,2048)],format='csr')
-    _,state,mapping=delta.owner.linearization(delta.parameters,delta.sample_times)
-    controls=state['control_indices'][indices];first=controls.min(axis=(1,2))
+    clock,pick=_sampled_clock(delta.sample_times,indices)
+    _,state,mapping=delta.owner.linearization(delta.parameters,clock)
+    controls=state['control_indices'][pick];first=controls.min(axis=(1,2))
     width=int((controls.max(axis=(1,2))-first).max())+1
     if width>nodes*4:
         # Arbitrary, widely separated diagnostic clocks need no dense gap buffer.
@@ -207,13 +249,11 @@ def chain_exposure(local,delta,sample_indices=None):
     for node in range(nodes):
         groups=local[:,:,node].reshape(n,k,23,3)
         for support in range(4):
-            contribution=np.einsum('nkgc,ngcd->nkgd',groups,mapping[indices[:,node],support]).reshape(n,k,69)
+            contribution=np.einsum('nkgc,ngcd->nkgd',groups,mapping[pick[:,node],support]).reshape(n,k,69)
             slot=controls[:,node,support]-first
             values[row,:,slot,:]+=contribution
-    values=values.reshape(n*k,width*69);rr,cc=np.nonzero(values)
-    col=(first[rr//k]*69+cc).astype(np.int32)
-    ptr=np.r_[0,np.cumsum(np.bincount(rr,minlength=n*k))].astype(np.int32)
-    return csr_matrix((values[rr,cc],col,ptr),shape=(n*k,delta.owner.size))
+    columns=(first[:,None]*69+np.arange(width*69)).astype(np.int32)
+    return ordered_slot_csr(values.reshape(n,k,width*69),columns,delta.owner.size)
 
 
 def absolute_reference(shared,curve,*,root=None):

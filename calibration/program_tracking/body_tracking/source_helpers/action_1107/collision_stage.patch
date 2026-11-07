@@ -1,0 +1,99 @@
+--- a/complete_actions_v2.py
++++ b/collision_stage.py
+@@ -16 +16,2 @@
+-from calibration.program_tracking.body_tracking.programme_anatomy import ProgrammeAnatomy
++from calibration.program_tracking.body_tracking.programme_anatomy import ProgrammeAnatomy, anatomy_geometry
++from calibration.program_tracking.body_tracking.programme_anatomy_review import parts_for_sample, triangle_crossings
+@@ -35,6 +36,11 @@
+-PARENT=ROOT/'solve_v1'
+-OUT=ROOT/'solve_v2'
+-RANGES=((47.56,50.64),(97.40,98.36),(104.08,105.12),(116.90,118.22),
+-        (143.76,151.80),(155.38,166.38),(171.04,185.30))
+-MAX_SECONDS=315.
+-MAX_ACCEPTED=3
++PARENT=ROOT/'solve_v2'
++OUT=ROOT/'collision_v3'
++RANGES=((97.16,98.48),(103.94,105.24),(144.28,145.78))
++RECHECK=(
++    (97.79,97.89,('left_shank','right_shank')),
++    (104.52,104.60,('left_shank','right_shank')),
++    (144.94,145.02,('left_blade_rear','right_blade_front')),
++    (144.98,145.04,('left_blade_front','right_blade_rear')),
++)
++MAX_SECONDS=175.
++MAX_ACCEPTED=2
+@@ -90,2 +96,2 @@
+-    joints=(1,2,3,4,5,6,7,8,9,12,13,14,16,17,18,19,20,21)
+-    chain=np.r_[np.arange(6),*[np.arange(3*j+3,3*j+6) for j in joints]]
++    joints=(1,2,4,5,7,8)
++    chain=np.concatenate([np.arange(3*j+3,3*j+6) for j in joints])
+@@ -170,0 +177,6 @@
++            if b.name=='self_collision':
++                multipliers=np.ones((len(anatomy.times),len(anatomy.pairs)))
++                for lo,hi,pair in RECHECK:
++                    near=(anatomy.times+t[0]>=lo-.09)&(anatomy.times+t[0]<=hi+.09)
++                    multipliers[near,anatomy.pairs.index(pair)]=4.
++                w=w*multipliers.ravel()
+@@ -174 +186 @@
+-            if jac:jj.append(b.jacobian[:,cols]*w)
++            if jac:jj.append(b.jacobian[:,cols].multiply(np.broadcast_to(w,(len(q),))[:,None]).tocsr())
+@@ -220,0 +233,31 @@
++
++def mesh_rows(ref,state,x,t,geometry):
++    capsules,boxes,labels=geometry
++    selected={}
++    for lo,hi,pair in RECHECK:
++        for tick in range(round(100*lo),round(100*hi)+1):
++            selected.setdefault(tick,set()).add(pair)
++    out=[]
++    for tick,pairs in sorted(selected.items()):
++        seconds=tick/100.
++        times=np.array([seconds-t[0]])
++        d=state.increments(x[17:],times)
++        body=fk_state(ref,ref.at(times),d)
++        parts=parts_for_sample(ref,body,capsules,boxes,labels,{k for pair in pairs for k in pair})
++        for a,b in sorted(pairs):
++            out.append(dict(seconds=seconds,pair=[a,b],triangles=triangle_crossings(parts[a],parts[b])))
++    return out
++
++def local_source_guard(p):
++    body=p.body
++    frames=body.frames[body.of]
++    sec=body.reference.p['pts'][frames]/12800.
++    j=body.oj
++    uv=body.cache['uv'][body.of,body.layout.body_landmarks[body.model_oj]]
++    err=np.linalg.norm(uv-body.obs['uv'][frames,j],axis=1)
++    result={}
++    for lo,hi in RANGES:
++        for group,inds in [('torso',[5,6,11,12]),('legs',[13,14,15,16])]:
++            mask=(sec>=lo)&(sec<=hi)&np.isin(j,inds)
++            if mask.any():result[f'{lo:.2f}/{group}']=float(np.percentile(err[mask],95))
++    return result
+@@ -350,0 +394,4 @@
++            anatomy_geometry_packet=anatomy_geometry(ref)
++            first_mesh=mesh_rows(ref,p.body.state,x,t,anatomy_geometry_packet)
++            selected_mesh=first_mesh
++            first_source=local_source_guard(p)
+@@ -351,0 +399 @@
++            write_json(OUT/'collision_timeline_before.json',first_mesh)
+@@ -402,0 +451,13 @@
++                        local_source=local_source_guard(p)
++                        gate['local_torso_and_leg_projection']=all(local_source[key]<=old+max(2.,.1*old)
++                            for key,old in first_source.items())
++                        ok=ok and gate['local_torso_and_leg_projection']
++                        if ok:
++                            mesh=mesh_rows(ref,p.body.state,y,t,anatomy_geometry_packet)
++                            new_cross=sum(z['triangles']>0 for z in mesh)
++                            old_cross=sum(z['triangles']>0 for z in selected_mesh)
++                            new_tri=sum(z['triangles'] for z in mesh)
++                            old_tri=sum(z['triangles'] for z in selected_mesh)
++                            gate['actual_mesh_improvement']=new_cross<=old_cross and new_tri<old_tri
++                            gate['mesh_comparison']=[old_cross,new_cross,old_tri,new_tri]
++                            ok=ok and gate['actual_mesh_improvement']
+@@ -408 +469,2 @@
+-                            found=True;accepted+=1;selected=m;x=y;val=trial
++                            found=True;accepted+=1;selected=m;x=y;val=trial;selected_mesh=mesh
++                            write_json(OUT/'collision_timeline_after.json',mesh)
+@@ -432 +494 @@
+-    memory=ProcessMemoryGuard(ROOT/'solve_v2_resources',22.)
++    memory=ProcessMemoryGuard(ROOT/'collision_v3_resources',22.)

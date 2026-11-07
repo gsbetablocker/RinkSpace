@@ -38,10 +38,33 @@ def witness_local_derivatives(binding,d,state,witness,rotation,feet):
     return local,shoe
 
 class NativeSupportContactFactors(SourceSupportLocationFactors):
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
-        self.frames=np.asarray([r['frame']for r in self.rows]);self.times=(self.ref.times[self.frames,None]+np.linspace(-.5,.5,5)*self.body.tau).ravel();self.base=self.ref.at(self.times)
-        self.legacy=SourceSupportLocationFactors(*args,**kwargs)
+    def __init__(self,*args,native_bands=None,**kwargs):
+        if native_bands is None:
+            super().__init__(*args,**kwargs)
+            self.legacy=SourceSupportLocationFactors(*args,**kwargs)
+        else:
+            self.problem=args[0]
+            self.body=self.problem.body
+            self.ref=self.problem.reference
+            self.binding=self.problem.binding
+            self.ratio=self.binding.ratio
+            self.legacy=None
+            lookup={int(pts):i for i,pts in enumerate(self.ref.p['pts'])}
+            self.rows=[]
+            for r in native_bands:
+                polyline=np.asarray(r['polyline_uv'],float)
+                radius=float(r['radius_px'])
+                if (r['foot'] not in (0,1) or polyline.shape[1:]!=(2,) or len(polyline)<2
+                    or not np.isfinite(polyline).all() or radius<=0 or r['objective_weight']<=0):
+                    raise ValueError('Invalid native candidate support band')
+                self.rows.append(dict(frame=lookup[r['pts']],pts=r['pts'],foot=r['foot'],
+                    objective_weight=r['objective_weight'],feature=dict(
+                        source_annotation=dict(points_uv=polyline),
+                        mapping=dict(pixel_uncertainty_radius_px=[radius]))))
+            self.feet=np.asarray([r['foot'] for r in self.rows],int)
+        self.frames=np.asarray([r['frame'] for r in self.rows],int)
+        self.times=(self.ref.times[self.frames,None]+np.linspace(-.5,.5,5)*self.body.tau).ravel()
+        self.base=self.ref.at(self.times)
 
     def evaluate(self,x,jacobian=False):
         x=np.asarray(x)
@@ -64,6 +87,12 @@ class NativeSupportContactFactors(SourceSupportLocationFactors):
             J=hstack([csr_matrix((len(residual),17)),BJ],format='csr')
         # Preserve the old camera-conditional XY diagnostic, but do not claim
         # that its convexified Z=0 footprint is a measured contact observation.
-        legacy=self.legacy.evaluate(x,False)['metrics'];legacy.update(native_source_support_contacts=metrics,source_support_location_optimization_semantics='native support candidate band plus existing finite ice; old planar whole-line footprint diagnostic only')
+        legacy={} if self.legacy is None else self.legacy.evaluate(x,False)['metrics']
+        legacy.update(native_source_support_contacts=metrics,source_support_location_optimization_semantics='native support candidate band plus existing finite ice; old planar whole-line footprint diagnostic only')
         self.association_signature=signature(w['feature_index'],w['interior'],str(associations));self.last=dict(residual=residual,jac=J,parts={'native_source_support_contact':float(residual@residual/2)},image_cost=float(residual@residual/2),metrics=legacy)
+        if self.legacy is None:
+            from .weighted_blocks import block
+            self.last['weighted_blocks']=[block('native_source_support_contact',residual,J,
+                dict(source_pts=np.array([r['pts'] for r in self.rows]),unit='px'),
+                self.association_signature)]
         return self.last

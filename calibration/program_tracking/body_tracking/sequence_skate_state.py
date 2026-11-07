@@ -4,9 +4,9 @@ All controls belong to one state. Missing pixels do not remove the estimated
 trajectory; evidence status is stored separately by the sequence ledger.
 """
 import numpy as np
-from scipy.sparse import coo_matrix, csr_matrix
+from scipy.sparse import coo_matrix, csr_matrix, vstack
 from .absolute_motion_curve import AbsoluteMotionCurve, clamped_cubic_knots, _exp
-from .absolute_motion_state import AbsoluteMotionState, MotionDelta, evaluate_curve
+from .absolute_motion_state import AbsoluteMotionState, MotionDelta, evaluate_curve, _sampled_clock
 
 SHOE_SCHEMA='rinkspace.relative_skate_so3_v1'
 
@@ -51,10 +51,16 @@ class SequenceState(AbsoluteMotionState):
         return self._shoe_current
     def shoe_evaluation(self,x,t,with_blocks=False):
         curve=self.shoe_current_curve(x);t=np.atleast_1d(t).astype(float);key=(t.tobytes(),with_blocks)
-        if key not in self._shoe_evaluations:
+        cached=self._shoe_evaluations.get(key)
+        if cached is None:
             a=np.asarray(x)[self.body_size:].reshape(self.shoe_m,2,3)
-            self._shoe_evaluations[key]=evaluate_curve(curve,t,control_increments=a,with_blocks=with_blocks)
-        return self._shoe_evaluations[key]
+            cached=evaluate_curve(curve,t,control_increments=a,with_blocks=with_blocks)
+            # Mirror the body-state cache: physics batches must not accumulate
+            # until an unrelated shoe control happens to change.
+            if len(t)<=10000:
+                if len(self._shoe_evaluations)>=4:self._shoe_evaluations.clear()
+                self._shoe_evaluations[key]=cached
+        return cached
     def increments(self,x,t):
         d,_,_=self._evaluation(x,t,with_blocks=False)
         out=MotionDelta(d,self,x,np.atleast_1d(t))
@@ -64,9 +70,13 @@ class SequenceState(AbsoluteMotionState):
         """Local rows d residual / d right skate tangent (two feet x three)."""
         local=np.asarray(local,float);n,k,d=local.shape
         if d!=6:raise ValueError('Expected two right skate tangents')
-        e=self.shoe_evaluation(x,t,with_blocks=True)
         pick=np.arange(len(t)) if sample_indices is None else np.asarray(sample_indices,int)
-        if len(pick)!=n:raise ValueError('Shoe clock and rows differ')
+        if pick.shape!=(n,):raise ValueError('Shoe clock and rows differ')
+        if not n:return csr_matrix((0,self.size))
+        if n>512:
+            return vstack([self.shoe_chain(local[a:a+512],x,t,sample_indices=pick[a:a+512]) for a in range(0,n,512)],format='csr')
+        clock,pick=_sampled_clock(t,pick)
+        e=self.shoe_evaluation(x,clock,with_blocks=True)
         blocks=e['rotation_right_blocks'][pick]
         values=np.einsum('nkfa,nsfab->nksfb',local.reshape(n,k,2,3),blocks).reshape(n,k,24)
         cols=(e['control_indices'][pick,:,None]*6+np.arange(6)[None,None,:]+self.body_size).reshape(n,24)

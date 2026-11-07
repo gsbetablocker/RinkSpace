@@ -62,7 +62,7 @@ class ProcessMemoryGuard:
         times=[wintypes.FILETIME()for _ in range(4)]
         if not self.kernel.GetProcessTimes(self.process,*[ctypes.byref(v)for v in times]):raise ctypes.WinError(ctypes.get_last_error())
         cpu=[(int(v.dwHighDateTime)*2**32+int(v.dwLowDateTime))*1e-7 for v in times[2:]]
-        return dict(seconds=time.perf_counter()-self.started,private_bytes=int(counter.PrivateUsage),working_set_bytes=int(counter.WorkingSetSize),peak_commit_bytes=self.peak,limit_bytes=self.limit,system_free_physical_bytes=int(system.ullAvailPhys),batch_stop_for_system_pressure=self.pressure,cpu_kernel_seconds=cpu[0],cpu_user_seconds=cpu[1],cpu_core_seconds=sum(cpu),pid=os.getpid())
+        return dict(seconds=time.perf_counter()-self.started,private_bytes=int(counter.PrivateUsage),working_set_bytes=int(counter.WorkingSetSize),peak_working_set_bytes=int(counter.PeakWorkingSetSize),peak_commit_bytes=self.peak,limit_bytes=self.limit,system_free_physical_bytes=int(system.ullAvailPhys),batch_stop_for_system_pressure=self.pressure,cpu_kernel_seconds=cpu[0],cpu_user_seconds=cpu[1],cpu_core_seconds=sum(cpu),pid=os.getpid())
 
     def _record(self):
         with (self.output/'memory.jsonl').open('a',encoding='utf-8',buffering=1)as stream:

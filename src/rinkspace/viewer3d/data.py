@@ -271,8 +271,8 @@ class ResultCatalog:
     def frame_for_seconds(self,seconds):
         return int(np.argmin(abs(self.seconds-float(seconds))))
 
-    def navigation_points(self):
-        """Read optional exact-source cut navigation; never choose a nearby PTS."""
+    def navigation_points(self, section="cuts"):
+        """Read optional exact-source navigation from the bound programme."""
         value=self.config.get('source_navigation')
         if not value:return []
         path=self.assets.resolve(value,base=self.config_path.parent,must_exist=True)
@@ -282,6 +282,15 @@ class ResultCatalog:
         if tuple(document.get('time_base',()))!=self.time_base:
             raise ValueError('Navigation source time base differs from player')
         lookup={int(p):i for i,p in enumerate(self.pts)};rows=[]
+        if section=='events':
+            for row in document.get('events',[]):
+                start,end=row.get('start_pts'),row.get('end_pts')
+                if (any(type(p)is not int or p not in lookup for p in (start,end))
+                    or start>end or not isinstance(row.get('label'),str)):
+                    raise ValueError('Event navigation requires an ordered native PTS range')
+                rows.append(dict(row,start_frame=lookup[start],end_frame=lookup[end]))
+            return rows
+        if section!='cuts':raise ValueError('Unknown navigation section: '+section)
         for row in document.get('cuts',[]):
             stamps=[row.get('previous_pts'),row.get('pts')]
             if any(isinstance(p,bool) or not isinstance(p,int) or p not in lookup for p in stamps):
