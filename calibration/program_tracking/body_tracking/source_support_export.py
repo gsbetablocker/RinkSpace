@@ -11,12 +11,22 @@ def apply_source_support(packet, evidence, *, shot_id=None):
     never propagated to neighbours or selected using predicted foot heights.
     Unknown/ambiguous rows leave the incoming contact labels untouched. Source
     phase and all model geometry fields are deliberately outside this mapping.
+    Optional ``source_shot_ids`` identifies the actual shot at each exact PTS;
+    when present, evidence must explicitly match that per-exposure identity.
     """
     pts = np.asarray(packet['pts'])
     if pts.ndim != 1 or pts.dtype.kind not in 'iu' or np.any(np.diff(pts) <= 0):
         raise ValueError('Support export requires unique ordered integer source PTS')
     if 'source_pts' in packet and not np.array_equal(packet['source_pts'], pts):
         raise ValueError('Support export source PTS identity differs')
+    source_shots = None
+    if 'source_shot_ids' in packet:
+        source_shots = np.asarray(packet['source_shot_ids'])
+        if source_shots.shape != pts.shape or source_shots.dtype.kind not in 'US':
+            raise ValueError('Support export source shot identities require one nonempty string per source PTS')
+        source_shots = source_shots.astype(str, copy=False)
+        if np.any(source_shots == ''):
+            raise ValueError('Support export source shot identities require one nonempty string per source PTS')
     time_base = np.asarray(packet['time_base'])
     if time_base.shape != (2,) or time_base.dtype.kind not in 'iu' or np.any(time_base <= 0):
         raise ValueError('Support export requires an explicit integer source time base')
@@ -43,10 +53,12 @@ def apply_source_support(packet, evidence, *, shot_id=None):
         item['pts'] = int(p)
         if 'source_time_base' in row and not np.array_equal(row['source_time_base'], time_base):
             raise ValueError('Support evidence source time base differs')
-        if shot_id is not None and row.get('shot_id', shot_id) != shot_id:
+        if source_shots is None and shot_id is not None and row.get('shot_id', shot_id) != shot_id:
             raise ValueError('Support evidence shot identity differs')
         if int(p) not in lookup:
             item['status'] = 'source_exposure_absent';continue
+        if source_shots is not None and row.get('shot_id') != source_shots[lookup[int(p)]]:
+            raise ValueError('Support evidence shot identity differs at exact source PTS')
         feet = row.get('feet', [])
         if (len(feet) != 1 or isinstance(feet[0], (bool, np.bool_))
                 or not isinstance(feet[0], (int, np.integer)) or feet[0] not in (0, 1)):

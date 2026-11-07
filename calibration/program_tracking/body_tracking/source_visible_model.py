@@ -8,6 +8,7 @@ import numpy as np
 
 
 def camera_centres(camera,frames,rows=None):
+    if hasattr(camera,'camera_centres'):return camera.camera_centres(frames,rows=rows)
     times=np.asarray(camera.p['motion_times'])[frames].copy()
     if rows is not None:times+=float(camera.p['rig'][37])*(np.clip(rows,0,1079)/1079-.5)
     out=camera.core.evaluate_motion_camera(camera.p['rig'],camera.p['controls'],float(camera.p['first_control_time']),float(camera.p['control_dt']),times)

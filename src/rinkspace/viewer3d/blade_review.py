@@ -6,6 +6,7 @@ from pathlib import Path
 import numpy as np
 
 from .source import native_pts, region_outline
+from calibration.program_tracking.body_tracking.fullbody_review import COCO_EDGES
 
 
 class BladeReview:
@@ -41,6 +42,12 @@ class BladeReview:
                     if suffix == 'axis_rate_rad_s' and not np.isnan(values[0]).all():
                         raise ValueError('First blade direction rate must remain unknown')
                     model[suffix] = values.copy()
+                body_key = prefix + '_COCO_uv'
+                if body_key in saved:
+                    body = np.asarray(saved[body_key], dtype=float)
+                    if body.shape != (len(pts), 17, 2) or np.isinf(body).any():
+                        raise ValueError('Invalid model body projection ' + body_key)
+                    model['COCO_uv'] = body.copy()
                 for suffix, shape in [('pitch_degrees', (len(pts), 2)),
                                       ('roll_degrees', (len(pts), 2)),
                                       ('runner_min_x_fraction', (len(pts), 2)),
@@ -190,7 +197,7 @@ def skate_axis_primitives(state, *, unit_ratio=1., ice_normal_world=None):
     return result
 
 
-def overlay_primitives(current, *, include_model_reference=True, include_model_contours=False,
+def overlay_primitives(current, *, include_model_reference=True, include_model_contours=False, include_model_body=False,
                        include_source_structures=True, include_source_legacy=True, include_ice_grid=False):
     """Native primitives; source structures and model diagnostics are explicit layers."""
     green = (.2, 1., .4, 1.);orange = (1., .54, .12, 1.)
@@ -203,6 +210,10 @@ def overlay_primitives(current, *, include_model_reference=True, include_model_c
         point=np.asarray(point,float)
         if np.isfinite(point).all():result.append(dict(kind='text',points=point[None],color=color,text=text))
     model=current['model']
+    if model is not None and include_model_body and 'COCO_uv' in model:
+        for a, b in COCO_EDGES:
+            line(model['COCO_uv'][[a, b]], (.72, .3, 1., 1.), 2.,
+                 evidence_kind='model_body_projection', model_joint_indices=(a, b))
     if model is not None and include_model_reference:
         for foot in range(2):
             boot,blade=model['boot_uv'][foot],model['blade_uv'][foot]

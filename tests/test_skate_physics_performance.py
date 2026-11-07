@@ -18,7 +18,7 @@ from scipy.spatial.transform import Rotation
 def load_kernel(project=None):
     project=Path(project) if project is not None else Path(__file__).resolve().parents[1]
     directory=project/'calibration/program_tracking/body_tracking'
-    namespace=dict(np=np,coo_matrix=coo_matrix,csr_matrix=csr_matrix,Rotation=Rotation,NORMALIZATION=.005)
+    namespace=dict(np=np,coo_matrix=coo_matrix,csr_matrix=csr_matrix,Rotation=Rotation,NORMALIZATION=.005,__package__='calibration.program_tracking.body_tracking',__name__='calibration.program_tracking.body_tracking._physics_test')
     for filename,names in [('fullbody_state.py',{'matrices'}),
                            ('fullbody_fit.py',{'skew','right_jacobian'}),
                            ('skate_physics.py',{'fk_state','body_constraint_jacobian'})]:
@@ -47,7 +47,8 @@ class SyntheticBinding:
         O=P[:,None]+np.einsum('nij,nfj->nfi',Q,local)
         return R,O
 
-    def deformation(self,joints,frames):
+    def deformation(self,joints,frames,skate_relative_R=None):
+        if skate_relative_R is not None:raise AssertionError('This fixture exercises the legacy rigid registration')
         relative=frames[:,[4,5]].transpose(0,1,3,2)@frames[:,[7,8]]
         return np.stack((relative[:,:,2,1],relative[:,:,0,2],relative[:,:,1,0]),axis=-1)
 

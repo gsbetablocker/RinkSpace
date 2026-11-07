@@ -86,14 +86,14 @@ truth is created at an occlusion. The winning branch has a piecewise Jacobian.
                 for row in raw:
                     track=candidate['association_by_observation'][row['source_track_id']];item=copy.deepcopy(row)
                     item['foot']=candidate['fixed_body_foot_by_track'][track];item['episode_track_id']=track;rows.append(item)
-                self.episode_factors.append(FullSkateStructureFactors(problem,dict(rows=rows)))
+                self.episode_factors.append(FullSkateStructureFactors(problem,dict(rows=rows,association_policy=episode.get('association_policy',{}))))
     def episode_evaluate(self,x,jacobian):
         if self.episode_choice is None:
             values=[f.evaluate(x,False)for f in self.episode_factors];self.episode_costs=[v['image_cost']for v in values];self.episode_choice=int(np.argmin(self.episode_costs))
         factor=self.episode_factors[self.episode_choice];out=factor.evaluate(x,jacobian);cost=out['image_cost']
         from .weighted_blocks import signature
         self.association_signature=signature(str(self.episode_choice),factor.association_signature)
-        associations=dict(candidate_id=self.episode['candidates'][self.episode_choice]['candidate_id'],candidate_costs=self.episode_costs,
+        associations=dict(episode_id=self.episode.get('episode_id'),candidate_id=self.episode['candidates'][self.episode_choice]['candidate_id'],candidate_costs=self.episode_costs,
             candidate=self.episode['candidates'][self.episode_choice],fixed_whole_episode=True,physical_identity_confirmed=False,association_from='source candidate set scored on common body state at explicit outer boundary')
         for row in out['metrics'].get('visible_runner_contours',[]):row['source_anatomical_foot']=None;row['foot_is_model_association']=True
         self.last=dict(residual=out['residual'],jac=out['jac'],parts={'unassigned_source_skate_sets':cost},image_cost=cost,

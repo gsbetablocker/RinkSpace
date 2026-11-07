@@ -20,6 +20,7 @@ from .boot_delivery import check_inputs,deliver
 
 def camera_centres(camera,frames):
     """Frozen-camera data, shared by all footwear trials in one problem."""
+    if hasattr(camera,'camera_centres'):return camera.camera_centres(frames)
     pose=camera.core.evaluate_motion_camera(camera.p['rig'],camera.p['controls'],float(camera.p['first_control_time']),
         float(camera.p['control_dt']),camera.p['motion_times'][frames])
     if np.any(pose['status']):raise ValueError('Native camera failed at a footwear source midpoint')
@@ -229,7 +230,7 @@ class BootWindowProblem(FullBodyProblem):
                 rr=np.broadcast_to(fr[:,None,None]*extra.shape[1]+np.arange(extra.shape[1])[None,:,None],val.shape).ravel()
                 cc=np.broadcast_to(kn[:,None,None]*self.state.d+np.arange(self.state.d),val.shape).ravel()
                 J=coo_matrix((val.ravel(),(rr,cc)),shape=(rows,self.size)).tocsr();J.eliminate_zeros()
-            base['jac']=vstack((base['jac'],J),format='csr')
+            if not getattr(self,'split_jacobian_only',False):base['jac']=vstack((base['jac'],J),format='csr')
             base['phases']['compatibility_sparse_seconds']=time.perf_counter()-sparse_start
         first=len(base['residual'])
         base['compatibility_residual']=extra.ravel()
@@ -242,6 +243,8 @@ class BootWindowProblem(FullBodyProblem):
         base.setdefault('block_slices',{})['foot_compatibility']=slice(first,first+rows)
         base['residual']=np.r_[base['residual'],extra.ravel()]
         base['parts']['foot_cavity_support']=float(np.sum(extra**2)/2);base['foot_compatibility_added']=True
+        if resident is not None:base['resident_collar_unknown']=getattr(resident,'baseline_collar_unknown',None)
+        if resident is not None and hasattr(resident,'release_scratch'):resident.release_scratch()
         return base
 
 

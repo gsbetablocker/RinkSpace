@@ -19,7 +19,7 @@ def load_kernel(directory):
     directory=Path(directory)
     contact=ast.parse((directory/'skate_contact.py').read_text(encoding='utf8'))
     weight=next(n for n in contact.body if isinstance(n,ast.FunctionDef) and n.name=='trapezoid_time_weights')
-    namespace={'np':np}
+    namespace={'np':np,'__package__':'calibration.program_tracking.body_tracking','__name__':'calibration.program_tracking.body_tracking._contact_test'}
     exec(compile(ast.Module(body=[weight],type_ignores=[]),str(directory/'skate_contact.py'),'exec'),namespace)
     source=ast.parse((directory/'skate_physics.py').read_text(encoding='utf8'))
     pure=[n for n in source.body if not isinstance(n,(ast.Import,ast.ImportFrom))]
@@ -33,6 +33,7 @@ def load_kernel(directory):
 class RigidPointBinding:
     """One exact rigid support vertex per foot, sufficient for row semantics."""
     ratio=1.0
+    reference=types.SimpleNamespace(p={'pts':np.array([0,256]),'time_base':np.array([1,12800])})
 
     def packet(self):
         return {'template':{

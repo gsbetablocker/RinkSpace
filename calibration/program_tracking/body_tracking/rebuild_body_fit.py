@@ -20,12 +20,12 @@ from .fullprogramme_body_sequence import _basis,_second_derivative_basis,_differ
 
 class FixedNativeProjector:
     def __init__(self,packet,library):
-        self.p=packet;self.core=NativeCore(library);self.scale=float(packet['metres_per_scene_unit'])
+        self.p=packet;self.core=NativeCore(library);self.scale=float(packet['metres_per_scene_unit']);self.image_height=int(packet.get('image_height',1080))
     def project(self,world_m,indices):
         points=np.asarray(world_m,float);frames=np.asarray(indices,int)
         times=np.repeat(self.p['motion_times'][frames],points.shape[1])
         r=self.core.project_motion(self.p['rig'],self.p['controls'],float(self.p['first_control_time']),
-            float(self.p['control_dt']),1080,times,points.reshape(-1,3)/self.scale)
+            float(self.p['control_dt']),self.image_height,times,points.reshape(-1,3)/self.scale)
         if np.any(r['status']):raise ValueError('Native projection domain failure: '+str(np.unique(r['status'],return_counts=True)))
         return r['uv'].reshape(points.shape[0],points.shape[1],2)
     def with_jacobian(self,world,indices):
@@ -33,7 +33,7 @@ class FixedNativeProjector:
             points=np.asarray(world,float);frames=np.asarray(indices,int)
             times=np.repeat(self.p['motion_times'][frames],points.shape[1])
             result=self.core.project_motion_xyz_jacobian(self.p['rig'],self.p['controls'],
-                float(self.p['first_control_time']),float(self.p['control_dt']),1080,
+                float(self.p['first_control_time']),float(self.p['control_dt']),self.image_height,
                 times,points.reshape(-1,3)/self.scale)
             if np.any(result['status']):
                 raise ValueError('Native motion XYZ derivative domain failure: '+str(np.unique(result['status'],return_counts=True)))

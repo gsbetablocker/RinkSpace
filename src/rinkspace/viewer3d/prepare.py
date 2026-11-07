@@ -9,10 +9,47 @@ from calibration.program_tracking.body_tracking.footwear_geometry import extra_r
 from .data import ResultCatalog,CachedSequence,load_npz,digest,source_support_state,_rotations,MESH_CACHE_SCHEMA
 
 
+def _body_parameters(packet):
+    beta=np.asarray(packet['shared_betas'])
+    scale=np.asarray(packet['body_scale'])
+    if beta.ndim!=1 or not len(beta) or beta.dtype.kind not in 'fiu' or not np.isfinite(beta).all():
+        raise ValueError('Invalid surface shared_betas: finite one-dimensional coefficients required')
+    if scale.shape!=() or scale.dtype.kind not in 'fiu' or not np.isfinite(scale) or float(scale)<=0:
+        raise ValueError('Invalid surface shared_body_scale: positive finite scalar required')
+    return beta.copy(),float(scale)
+
+
+def _variant_surface_packet(catalog,saved):
+    """Own only this surface's shape/scale; never mutate the shared catalog."""
+    packet=dict(catalog.packet)
+    if 'shared_betas' in saved:
+        beta=np.asarray(saved['shared_betas'])
+        expected=np.asarray(catalog.packet['shared_betas'])
+        if beta.shape!=expected.shape or beta.ndim!=1 or not len(beta) or beta.dtype.kind not in 'fiu' or not np.isfinite(beta).all():
+            raise ValueError('Invalid saved surface shared_betas dimensions/values')
+        packet['shared_betas']=beta.copy()
+    if 'shared_body_scale' in saved:
+        scale=np.asarray(saved['shared_body_scale'])
+        if scale.shape!=() or scale.dtype.kind not in 'fiu' or not np.isfinite(scale) or float(scale)<=0:
+            raise ValueError('Invalid saved surface shared_body_scale')
+        packet['body_scale']=scale.copy()
+    return packet
+
+
+def _surface_matches_packet(surface,packet):
+    actual=getattr(surface,'packet',{})
+    return ('shared_betas' in actual and 'body_scale' in actual
+            and np.array_equal(actual['shared_betas'],packet['shared_betas'])
+            and np.array_equal(actual['body_scale'],packet['body_scale']))
+
+
 class FullSurface:
     """Expand the exact existing compact model to its full SMPL-X surface."""
-    def __init__(self,catalog):
-        p=catalog.packet
+    def __init__(self,catalog,packet=None):
+        self.packet=dict(catalog.packet if packet is None else packet)
+        beta,scale=_body_parameters(self.packet)
+        self.packet.update(shared_betas=beta.copy(),body_scale=np.array(scale))
+        p=self.packet
         self.body=CompactBody(catalog.root/'compact_smplx.npz',p['shared_betas'],float(p['body_scale']))
         with np.load(catalog.model_path,allow_pickle=False) as z:
             template=z['v_template'].astype(np.float32)
@@ -143,7 +180,11 @@ def prepare_variant(catalog,variant,surface=None):
     source_flags,warning_identity=catalog.source_identity()
     if warning_identity!=identity['source_identity_sha256']:
         raise ValueError('Source identity warnings changed during cache preparation')
-    state=catalog.parameters(v);surface=surface or FullSurface(catalog)
+    state=catalog.parameters(v)
+    surface_packet=_variant_surface_packet(catalog,state['saved'])
+    has_saved_shape=any(key in state['saved'] for key in ('shared_betas','shared_body_scale'))
+    if surface is None or (has_saved_shape and not _surface_matches_packet(surface,surface_packet)):
+        surface=FullSurface(catalog,packet=surface_packet)
     catalog.cache_root.mkdir(parents=True,exist_ok=True)
     staging=catalog.cache_root/('.preparing_'+v['id']+'_'+uuid.uuid4().hex[:8]);staging.mkdir()
     fullbody=v['kind']=='fullbody';ratio=state['unit_ratio']
@@ -216,6 +257,11 @@ def prepare_variant(catalog,variant,surface=None):
         equipment_description='saved fixed-topology boot surface with local dynamic upper; rigid lower-boot and blade attachment' if dynamic_surface else ('saved rigid 14-vertex shell and lower-edge strip' if fullbody or state['geometry'] is not None else 'original five-point blade proxy; no fitted boot shell in this old variant')
         if versioned_skate:equipment_description='saved connected lower-skate solids, fixed-topology articulated upper and cavity, exact dual edges and contact witnesses; legacy landmarks are observation adapters only'
         metadata=dict(schema=MESH_CACHE_SCHEMA,identity=identity,variant=v,frames=n,vertices_per_frame=len(surface.shaped),source_time_base=list(getattr(catalog,'time_base',(1,12800))),source_first_last_pts=[int(catalog.pts[0]),int(catalog.pts[-1])],world_up='Z',display_unit='metre',display_metres_per_scene_unit=catalog.scale,old_result_metres_per_scene_unit=catalog.legacy_scale,candidate_metres_per_scene_unit=state['metres_per_scene_unit'],body_length_ratio=state['length_ratio'],uniform_unit_reexpression_ratio=ratio,time_semantics='all body vertices, native joints and equipment evaluated at common source mid-exposure; rolling-shutter row samples are not mixed into a 3D pose',surface='full 10475-vertex SMPL-X model with effective local_R_mid' if fullbody else 'full 10475-vertex SMPL-X model with existing shared beta and pose corrections',equipment=equipment_description,source_result=str(catalog.result_path(v).resolve()),saved_coco_mid_maximum_reconstruction_error_m=max_saved_error,saved_native22_mid_maximum_reconstruction_error_m=max_native_error,full_vs_compact_coco_maximum_error_m=max_surface_error,saved_nominal_blade_minimum_maximum_error_m=max_blade_error,no_new_pose_or_root_fit=True,no_neural_inference=True,no_foot_lock_or_ground_snapping=True,accuracy_accepted=False,seconds=time.perf_counter()-start)
+        actual_surface_packet=getattr(surface,'packet',surface_packet)
+        metadata.update(shared_betas=None if 'shared_betas' not in actual_surface_packet else np.asarray(actual_surface_packet['shared_betas']).tolist(),
+            shared_body_scale=None if 'body_scale' not in actual_surface_packet else float(actual_surface_packet['body_scale']),
+            surface_parameter_source=dict(shared_betas='saved variant' if 'shared_betas' in state['saved'] else 'catalog default',
+                shared_body_scale='saved variant' if 'shared_body_scale' in state['saved'] else 'catalog default'))
         metadata['motion_diagnostics']=dict(saved_fields=list(state['motion_diagnostics']),
             com='saved conditional-metric mass-model approximation; not measured true centre of mass',
             blade_material_order=['rear','middle','front'],foot_order='existing saved foot 0/1; anatomical identity not inferred',
@@ -232,11 +278,11 @@ def prepare_variant(catalog,variant,surface=None):
                                 body_reference_label=reference,body_reference='parent '+reference+' trajectory',
                                 body_refinement_intervals_seconds=intervals,
                                 outside_window='body inherited from parent '+reference+' trajectory; shared footwear binding can still apply')
-            else:metadata.update(optimized_frames=int(np.count_nonzero(state['saved']['window_mask'])),outside_window='old J1 reference, reexpressed in candidate length units')
+            else:metadata.update(optimized_frames=int(np.count_nonzero(state['saved']['window_mask'])),outside_window=catalog.config.get('display_outside_window_label','old J1 reference, reexpressed in candidate length units'))
             if 'footwear_binding_applied_mask' in footwear:
                 binding_frames=int(np.count_nonzero(footwear['footwear_binding_applied_mask']))
                 metadata.update(footwear_binding_applied_frames=binding_frames,
-                                footwear_binding_scope='shared across all S01 exposures' if binding_frames==n else 'saved application mask')
+                                footwear_binding_scope=catalog.config.get('display_footwear_binding_scope','shared across all S01 exposures' if binding_frames==n else 'saved application mask'))
             metadata['candidate_provenance']={k:value.tolist() for k,value in state['saved'].items() if ('reference' in k or 'ledger' in k) and k!='skate_reference_world_mid' and value.dtype.kind in 'USbiuf'}
             metadata['footwear_display']=dict(topology='saved' if versioned_skate else v.get('shell_topology','saved' if dynamic_surface else 'open_collar'),saved_dynamic_surface=dynamic_surface or versioned_skate,retriangulated=False,coordinates_modified=False)
             if versioned_skate:
@@ -250,13 +296,12 @@ def prepare_variant(catalog,variant,surface=None):
 
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--project');p.add_argument('--data-root');p.add_argument('--config');p.add_argument('--variant');p.add_argument('--all',action='store_true');a=p.parse_args();catalog=ResultCatalog(a.project,a.data_root,a.config);surface=None
+    p=argparse.ArgumentParser();p.add_argument('--project');p.add_argument('--data-root');p.add_argument('--config');p.add_argument('--variant');p.add_argument('--all',action='store_true');a=p.parse_args();catalog=ResultCatalog(a.project,a.data_root,a.config)
     variants=catalog.variants if a.all else [catalog.variant(a.variant or catalog.config['default_variant'])]
     for v in variants:
         path,_=catalog.cache_path(v)
         if (path/'metadata.json').is_file():continue
-        if surface is None:surface=FullSurface(catalog)
-        prepare_variant(catalog,v,surface)
+        prepare_variant(catalog,v)
     print(json.dumps(dict(ready=True,variants=[v['id'] for v in variants])),flush=True)
 
 if __name__=='__main__':main()

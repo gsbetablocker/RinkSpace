@@ -18,7 +18,8 @@ def track_local(blocks):
 class ActualMotionFactors:
     def __init__(self,problem,parent):
         self.problem=problem;self.body=problem.body;self.ref=problem.reference;self.times=self.ref.times
-        self.source=self.ref.p['pts']/12800.;self.base=self.ref.at(self.times);self.parent=parent.at(self.times)
+        from .body_clock import source_seconds
+        self.source=source_seconds(self.ref.p);self.base=self.ref.at(self.times);self.parent=parent.at(self.times)
         self.prior_R=np.concatenate((self.parent['Q'][:,None],self.parent['local_R']),axis=1)
         self.weights=trapezoid_time_weights(self.times);self.last=None
         # These finite engineering scales are not acceptance bands or maximum speeds.
@@ -45,7 +46,8 @@ class ActualMotionFactors:
             from .weighted_blocks import block,full_columns
             named.append(full_columns(block(name,r,J,dict(source_pts=self.ref.p['pts']))))
         weight=np.ones((n,22))*np.sqrt(self.weights[:,None]*self.config['pose_prior_weight'])/.6
-        weight[((self.source>=89.24)&(self.source<=89.44)),21]*=np.sqrt(.035)
+        generic=getattr(self.ref,'source_document',{}).get('generic_context',False)
+        if not generic:weight[((self.source>=89.24)&(self.source<=89.44)),21]*=np.sqrt(.035)
         error=_log(self.prior_R.swapaxes(-1,-2)@R);z=error*weight[...,None];r,D=robust_vector(z,delta=2.)
         J=None
         if jacobian:
@@ -62,6 +64,9 @@ class ActualMotionFactors:
         t=self.source[1:-1];phase=np.where((t>=86.8)&(t<=92.46),1.,.16)
         # Allow genuine changes at takeoff, landing, grasp/release rather than forcing uniform spin.
         phase[((t>=80.8)&(t<=82.4))|((t>=92.4)&(t<=93.2))]=.10
+        if generic:
+            from .phase_ledger import phase_weights
+            phase=phase_weights(self.ref,self.ref.p['pts'][1:-1],default=.16)
         scale=np.full(22,80.);scale[0]=60.;w=np.sqrt((h[:-1]+h[1:])[:,None]/2*phase[:,None])/scale[None]
         z=alpha*w[...,None];r,D=robust_vector(z,delta=3.)
         if jacobian:
@@ -83,6 +88,9 @@ class ActualMotionFactors:
         # rather than a pelvis zero-acceleration target, supplies gravity.
         w=np.repeat((np.sqrt(self.weights)/12.)[:,None],3,axis=1)
         vertical_relax=(self.source>=81.30)&(self.source<=81.62)
+        if generic:
+            from .phase_ledger import flight_mask
+            vertical_relax=flight_mask(self.ref,self.ref.p['pts'])
         w[vertical_relax,2]=0.;r=Pacc*w
         if jacobian:
             from scipy.sparse import kron,diags

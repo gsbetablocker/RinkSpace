@@ -47,7 +47,9 @@ class ClipReference(SkateReference):
         self.hand_metadata={k:initial[k] for k in META if k in initial}
         self.hand_curves=None
         if 'hand_local_R' in initial:
-            ht=(initial['hand_prior_pts']-p['pts'][0])/12800. if 'hand_prior_pts' in initial else self.times
+            from .body_clock import time_base
+            tb=time_base(p)
+            ht=(initial['hand_prior_pts']-p['pts'][0])*tb[0]/tb[1] if 'hand_prior_pts' in initial else self.times
             self.hand_curves=hand_curves(ht,initial.get('hand_prior_local_R',initial['hand_local_R']))
         elif self.hand_metadata:raise ValueError('Hand schema present without archived hand state')
 

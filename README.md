@@ -8,7 +8,7 @@ RinkSpace 研究如何从花样滑冰转播中恢复冰场、连续围挡、广�
 
 **冈田芽衣短节目的重构处理起点为原片 22.120 秒，PTS 283136，原生时基 1/12800。** 当前处理范围与历史物理镜头范围的差别见[范围文件](events/ankara_2026/programmes/okada_mei_sp/rebuild_scope.json)和[源时间说明](events/ankara_2026/programmes/okada_mei_sp/README.md#analysis-start)解释。起点前的原片与观测保留；19.960 秒准备画面另作开头人体姿势和位置辅助，不改变节目处理起点。
 
-S01 人体与共享足鞋已有可回放候选；[主比较入口](launchers/START_3D_COMPARISON.cmd)默认从原片 22.120 秒加载 `skate_s01_1103`。三段动作、源支撑和 GVHMR／ExMR 旋转对照仍有根轨迹、图像或接触失败，完整节目人体追踪尚未完成。S05 完整951曝光的新候选及旧对照使用[源像素与软支持检查入口](launchers/START_3D_SOURCE_FUSION_SUPPORT.cmd)，仍有漂移、刀具俯仰和局部图像退化，未通过整体视觉验收。当前版本、范围和限制集中见[节目结果导航](events/ankara_2026/programmes/okada_mei_sp/README.md#人体与足鞋结果)，操作与默认配置见[播放器说明](docs/RESULTS_3D_PLAYER_ZH.md)。
+S01 人体与共享足鞋已有可回放候选；[主比较入口](launchers/START_3D_COMPARISON.cmd)保留用户目视较满意的 `skate_s01_1103`。全节目人体开发候选现已覆盖 S01–S09、22.120–188.680 秒的 8329 个曝光；[1107 新旧与尺度／深度对照](launchers/START_3D_PROGRAMME_TRAJECTORY_1107.cmd)保留 1106 旧候选、关联失败及四个实际运行分支。101.66、140.92 秒的源画面投影已有改善，旋转漂移、刀具接冰、视线深度和世界轨迹仍未通过准确性验收。S05 的 76–95 秒／951 曝光属于历史子范围，完整 S05 为 74.140–101.640 秒／1376 曝光。当前绑定、失败及旧入口见[节目结果导航](events/ankara_2026/programmes/okada_mei_sp/README.md#人体与足鞋结果)和[播放器说明](docs/RESULTS_3D_PLAYER_ZH.md)。
 
 ## 快速试用：合成数据
 

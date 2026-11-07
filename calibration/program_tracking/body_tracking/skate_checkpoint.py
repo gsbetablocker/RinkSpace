@@ -23,13 +23,14 @@ CAMERA_LOCATION_FIELDS = {
 
 def checkpoint_identity(binding, project, camera_info):
     programme = Path(project)/'events/ankara_2026/programmes/okada_mei_sp'
+    dependency=getattr(binding.reference,'identity_dependencies',None)
     return dict(
         base_skate_parameters_json=np.array(json.dumps(asdict(binding.base_parameters))),
         R_FB_initial=np.asarray(binding.R0).copy(),
         t_FB_initial_solver=np.asarray(binding.t0).copy(),
         template_version=np.array(TEMPLATE_VERSION), binding_version=np.array(BINDING_VERSION),
-        parent_hand_parameters_sha256=np.array(digest(programme/'opening_hand_1103.npz')),
-        parent_timing_parameters_sha256=np.array(digest(programme/'opening_timing_1103.npz')),
+        parent_hand_parameters_sha256=np.array(digest(programme/'opening_hand_1103.npz')if dependency is None else dependency['hand_sha256']),
+        parent_timing_parameters_sha256=np.array(digest(programme/'opening_timing_1103.npz')if dependency is None else dependency['timing_sha256']),
         camera_binding_json=np.array(json.dumps(camera_info, sort_keys=True)),
     )
 

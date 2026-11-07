@@ -189,10 +189,13 @@ def keypoints(data, output, batch_size=8):
     raw=np.concatenate(result).astype(np.float32)
     from exmr.preprocessing.keypoints import VISIBILITY_THRESHOLD
     kp=raw[:,:23].copy();kp[:,17:23,2]=(kp[:,17:23,2]>VISIBILITY_THRESHOLD['rtmw']).astype(np.float32)
-    kp[:,:17]=d['coco17']
+    # A source-specific shared body cache may be absent (FS preparation used
+    # explicit zero placeholders). Never replace actual detector pixels by it.
+    shared=d['coco17'];valid_shared=np.isfinite(shared).all(-1)&(shared[...,2]>0)
+    kp[:,:17]=np.where(valid_shared[...,None],shared,kp[:,:17])
     np.savez_compressed(output/'keypoints.npz',source_pts=d['source_pts'],coco63_native_network=raw,
         coco23_shared_body=kp,foot_semantics=np.array('COCO anatomical foot points; not blade or shoe observations'))
-    log('complete',model_sha256=digest(path),body17_unchanged=True)
+    log('complete',model_sha256=digest(path),shared_body_points_preserved=int(valid_shared.sum()),missing_shared_points_keep_native=True)
 
 
 def sam_features(data, output, batch_size=8):

@@ -104,6 +104,7 @@ def test_delivery_retains_old_candidate_and_uses_actual_source_scope(tmp_path, m
                               surface=object(), record=lambda: {'parameter_provenance': {}})
     ref = SimpleNamespace(p={'pts': pts}, times=pts/12800.-22.12, binding=binding,
                           new_refinements=[(HaloWindow(), np.arange(69.)), (ContinuousShotWindow(), np.zeros(69))])
+    binding.reference = ref
     saved.update(checkpoint_identity(binding, project, {}))
     np.savez_compressed(checkpoint, **saved)
     monkeypatch.setattr(delivery, 'export_candidate', lambda *args: dict(packet))

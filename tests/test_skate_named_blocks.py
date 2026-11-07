@@ -88,6 +88,8 @@ class NamedBlocksTests(unittest.TestCase):
         joint.source_motion = SimpleNamespace(evaluate=lambda x, jacobian=False:
             dict(residual=np.empty(0), jac=csr_matrix((0, 2)), parts={}, metrics={}))
         joint.size = 19
+        joint.image_time_weight = .02
+        joint.bounded_memory = False
         joint.cache = joint.cache_x = None
         joint.compatibility_width = 32
         joint.cavity_rows_per_frame = 2

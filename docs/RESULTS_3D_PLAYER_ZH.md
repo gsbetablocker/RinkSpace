@@ -27,6 +27,8 @@ S05 源结构入口可逐帧查看完整源轮廓，用“上一／下一源标�
 
 本轮完整76–95秒、951曝光的新旧比较使用 [START_3D_SOURCE_FUSION_SUPPORT.cmd](../launchers/START_3D_SOURCE_FUSION_SUPPORT.cmd)，显式选择 `support_grounded`，保留旧版本并预备完整缓存。此候选仅有有限改善，91.20秒刀具俯仰及局部鞋刀退化仍未解决，界面标记未通过视觉验收；[结果身份](../events/ankara_2026/programmes/okada_mei_sp/spin_support_correction_1106_audit.json)不将工程加载通过解释为画面准确。
 
+全节目开发对照使用 [START_3D_PROGRAMME_TRAJECTORY_1107.cmd](../launchers/START_3D_PROGRAMME_TRAJECTORY_1107.cmd)：22.120–188.680 秒、8329 原生曝光，新旧和四个尺度／深度诊断及足部关联失败共 7 版，均已有缓存。镜头切换导航使用相邻真实 PTS；人体形状和尺度按每个候选自己的保存值显示。紫色骨架和粉色钢刃是模型回投，源轮廓与条件支撑另行标识，局部鞋底不等同完整钢刃或接冰真值。该入口不改变旧默认；[结果和限制](../events/ankara_2026/programmes/okada_mei_sp/README.md#whole-programme-body)明确保留未通过世界轨迹与接冰验收的状态。
+
 ## 怎么操作
 
 | 要做的事 | 操作 |

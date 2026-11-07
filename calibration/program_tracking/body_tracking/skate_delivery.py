@@ -46,12 +46,14 @@ def export_candidate(root, out, ref, camera, info, evidence):
     # minimum or a point in the hollow below the solid runner centreline.
     p=template_packet['parameters'];reference_x=.4*p.sole_length_m
     reference_B=np.array([[reference_x,0.,float(profile_height(reference_x,p))+p.blade_web_height_m]])
-    origin_seconds=pts[0]/12800.
+    from .body_clock import source_seconds,time_base
+    source_clock=source_seconds(ref.p);origin_seconds=source_clock[0]
     shutter=float(camera.p['rig'][37])
     for first in range(0,n,32):
         frames=np.arange(first,min(first+32,n));t=times[frames]
         mid_reference=ref.at(t);mid=ref.world(mid_reference)
-        node_times=(t[:,None]+np.linspace(-.5,.5,5)*shutter).ravel()
+        tau=camera.readout_times(frames)if hasattr(camera,'readout_times')else np.full(len(frames),shutter)
+        node_times=(t[:,None]+np.linspace(-.5,.5,5)*tau[:,None]).ravel()
         nodes=ref.world(ref.at(node_times));count=len(frames)
         projection=moving_projection(camera,nodes['world'].reshape(count,5,layout.point_count,3),frames)
         uv=projection['uv']
@@ -67,7 +69,8 @@ def export_candidate(root, out, ref, camera, info, evidence):
         append('P_uv_dynamic',moving_projection(camera,nodes['P'].reshape(count,5,1,3),frames)['uv'][:,0])
         append('world_at_row',projection['world']*ratio)
         append('inside_exposure_rows',projection['inside_exposure_rows'])
-        append('source_row_time',pts[frames,None]/12800.+shutter*(np.clip(uv[...,1],0,1079)/1079-.5))
+        height=int(getattr(camera,'image_height',1080))
+        append('source_row_time',source_clock[frames,None]+tau[:,None]*(np.clip(uv[...,1],0,height-1)/(height-1)-.5))
 
         gear=mid['footwear'];R,O=gear['boot_R'],gear['boot_O']
         lower=transform(R,O,template['vertices'])*ratio
@@ -125,6 +128,11 @@ def export_candidate(root, out, ref, camera, info, evidence):
     gear=packet['gear_world_mid']
     mask=np.zeros(n,bool)
     for state,_ in ref.new_refinements:mask|=np.any(state.basis(times)!=0.,axis=1)
+    absolute=getattr(ref,'absolute_curve',None)
+    if absolute is not None and not ref.new_refinements:
+        # An absolute-state solve has no additive correction windows. Empty
+        # legacy refinements do not mean its entire source clock was frozen.
+        mask=(times>=absolute.knots[3])&(times<=absolute.knots[-4])
     record=binding.record();layout_record=layout.record()
     dimensions={name:(float(value)*ratio if name.endswith('_m') else value)
         for name,value in template['derived_dimensions'].items()}
@@ -162,14 +170,16 @@ def export_candidate(root, out, ref, camera, info, evidence):
         footwear_integration=np.array('shared static T_FB and shape; same body/FK, exact lower-skate contact; source unknown labels retained'),
         skate_export_provenance_json=np.array(json.dumps(dict(parent_result=str(source_path),parent_sha256=digest(source_path),
             reference_hashes=ref.hashes,implementation_sha256=digest(__file__),exposure_nodes=5,
-            source_time_base=[1,12800],new_body_refinement_intervals_seconds=[list(ws.seconds) for ws,_ in ref.new_refinements],
+            source_time_base=list(time_base(ref.p)),new_body_refinement_intervals_seconds=[list(ws.seconds) for ws,_ in ref.new_refinements],
             shared_footwear_scope='all saved source exposures',length_conversion='solver geometry times ratio once; physics height already metric',
             no_fit_performed_by_export=True),sort_keys=True)),
         solver_config_json=np.array(json.dumps(dict(export_only=True,body_state='ref.at(t)',shared_parameters=17,exposure_nodes=5))),
         active_blocks_json=np.array(json.dumps(dict(shared_binding=17,body_columns=[ws.active.tolist() for ws,_ in ref.new_refinements]))),
         stopping_reason_json=np.array(json.dumps('export of supplied state; optimizer status belongs to caller')),costs_json=np.array('{}'))
     from .source_support_export import apply_source_support
-    apply_source_support(packet,evidence,shot_id=info.get('shot',{}).get('id'))
+    shot=info.get('shot',{})
+    if 'shot_ids' in ref.p:packet['source_shot_ids']=np.asarray(ref.p['shot_ids']).copy()
+    apply_source_support(packet,evidence,shot_id=shot.get('id') if isinstance(shot,dict) else shot)
     destination=out/'fitted';destination.mkdir(parents=True,exist_ok=True)
     np.savez_compressed(destination/'result.npz',**packet)
     return packet

@@ -18,6 +18,27 @@ from .fullbody_state import WindowState
 from .body_execution import get_body_execution
 
 
+def body_joint_assignment(observations):
+    """Explicit source-label correspondence, never a change of body identity."""
+    n=len(observations['pts']);identity=np.broadcast_to(np.arange(17),(n,17))
+    if'model_joint_ids'not in observations:return identity
+    ids=np.asarray(observations['model_joint_ids'])
+    if ids.shape!=(n,17)or ids.dtype.kind not in'iu':raise ValueError('Invalid source/body joint assignment shape/type')
+    if np.any(ids[:,0]!=0):raise ValueError('Nose cannot be reassigned to another point kind')
+    for a in range(1,17,2):
+        if not np.all(np.sort(ids[:,a:a+2],axis=1)==np.array([a,a+1])):
+            raise ValueError('Source correspondence must preserve each bilateral joint kind')
+    changed=np.any(ids!=identity,axis=1)
+    if np.any(changed):
+        raw=np.asarray(observations.get('body_joint_assignment_provenance_json'))
+        if raw.shape!=()or raw.dtype.kind!='U':raise ValueError('Explicit source assignment provenance required')
+        provenance=json.loads(str(raw))
+        if provenance.get('kind')!='source_observation_correspondence'or provenance.get('source_measurements_unchanged')is not True:
+            raise ValueError('Source assignment must retain original measurements and declared role')
+        if provenance.get('source_pts')!=observations['pts'][changed].tolist():raise ValueError('Source assignment PTS provenance differs')
+    return ids
+
+
 def footwear_rows(root,frames,pts):
     root=Path(root);review_path=root/'next_round_20261029/J1_s2/source_review.json'
     review=json.loads(review_path.read_text(encoding='utf8'))
@@ -61,12 +82,18 @@ class FullBodyProblem:
         self.ledger_path=Path(ledger)
         np.testing.assert_array_equal(self.obs['pts'],reference.p['pts'])
         self.state=state_factory(reference,seconds,mode)
-        self.frames=np.flatnonzero((reference.p['pts']/12800>=seconds[0]-1e-9)&(reference.p['pts']/12800<=seconds[1]+1e-9))
+        from .body_clock import source_seconds
+        native_seconds=source_seconds(reference.p)
+        self.frames=np.flatnonzero((native_seconds>=seconds[0]-1e-9)&(native_seconds<=seconds[1]+1e-9))
         self.n=len(self.frames);self.size=self.state.size;self.start=time.perf_counter();self.evaluations=0
-        self.tau=float(projector.p['rig'][37]);self.times=(reference.times[self.frames,None]+np.linspace(-.5,.5,5)*self.tau).ravel()
-        if abs(self.tau)/2>np.min(np.diff(reference.times))+1e-12:raise ValueError('Readout crosses an additional source-pose knot')
-        self.ref=reference.at(self.times);self.B=self.state.basis(self.times).reshape(self.n,5,self.state.m)
-        self.eval_basis=self.B.reshape(-1,self.state.m)
+        self.tau=float(projector.p['rig'][37])
+        tau=projector.readout_times(self.frames)if hasattr(projector,'readout_times')else np.full(self.n,self.tau)
+        self.times=(reference.times[self.frames,None]+tau[:,None]*np.linspace(-.5,.5,5)).ravel()
+        if np.max(abs(tau))/2>np.min(np.diff(reference.times))+1e-12:raise ValueError('Readout crosses an additional source-pose knot')
+        self.ref=reference.at(self.times)
+        absolute=getattr(self.state,'is_absolute',False)
+        self.B=None if absolute else self.state.basis(self.times).reshape(self.n,5,self.state.m)
+        self.eval_basis=None if absolute else self.B.reshape(-1,self.state.m)
         provided=getattr(reference,'footwear_observations',None)
         if provided is None:
             self.gear,self.gear_sources=footwear_rows(reference.root,self.frames,reference.p['pts'])
@@ -87,6 +114,8 @@ class FullBodyProblem:
             ids=sorted(set(ids));fi.extend([f]*len(ids));pi.extend(ids)
         self.fi=np.asarray(fi);self.pi=np.asarray(pi);self.uv_rows=(self.fi*self.layout.point_count+self.pi)[:,None]*2+np.arange(2)
         self.of,self.oj=np.nonzero(self.obs['use'][self.frames])
+        assignment=body_joint_assignment(self.obs)
+        self.model_oj=assignment[self.frames[self.of],self.oj]
         # This scatter structure depends only on the frozen window and basis.
         # Assemble values each linearization, never rediscover support in it.
         self.spline_scatter=[]
@@ -102,7 +131,7 @@ class FullBodyProblem:
         # Sample actual delta/velocity/acceleration, with the taper included.
         self.prior_matrices=[];self.prior_offsets={}
         active=self.state.active;angular=active>=3
-        for order,linear_scale,angular_degrees,name in [(0,.35,25,'reference_deviation'),(1,3.,400,'correction_velocity'),(2,15.,800,'correction_acceleration')]:
+        for order,linear_scale,angular_degrees,name in ([] if absolute else [(0,.35,25,'reference_deviation'),(1,3.,400,'correction_velocity'),(2,15.,800,'correction_acceleration')]):
             scale=np.where(angular,np.deg2rad(angular_degrees),linear_scale)
             B=csr_matrix(self.state.basis(reference.times[self.frames],order))
             # Integral quadrature at native cadence; 25 Hz-equivalent old scale.
@@ -123,7 +152,7 @@ class FullBodyProblem:
 
     def body_factors(self,uv):
         fi,j=self.of,self.oj;sig=self.obs['sigma_px'][self.frames[fi],j]
-        point_ids=self.layout.body_landmarks[j]
+        point_ids=self.layout.body_landmarks[getattr(self,'model_oj',j)]
         error=(uv[fi,point_ids]-self.obs['uv'][self.frames[fi],j])/sig[:,None]
         # Isotropic pseudo-Huber on each 2D group, not independent coordinates.
         c=2.;s=np.sum(error**2,axis=1);u=np.sqrt(1+s/c**2);k=np.sqrt(2/(u+1))
@@ -135,7 +164,7 @@ class FullBodyProblem:
         return residual,A,dict(body_pixels=float(residual@residual/2)),error
 
     def evaluate(self,x,jacobian=False):
-        if self.cache_x is not None and np.array_equal(x,self.cache_x) and (not jacobian or self.cache['jac'] is not None):return self.cache
+        if self.cache_x is not None and np.array_equal(x,self.cache_x) and (not jacobian or self.cache['jac'] is not None or self.cache.get('_split_jacobian_ready',False)):return self.cache
         tick=time.perf_counter();phase={}
         reuse=self.cache is not None and self.cache_x is not None and np.array_equal(x,self.cache_x)
         if reuse:
@@ -148,7 +177,11 @@ class FullBodyProblem:
             start=time.perf_counter();delta=np.zeros((len(self.times),69))
             if getattr(self.state,"is_absolute",False):delta=self.state.increments(x,self.times)
             else:delta[:,self.state.active]=self.eval_basis@np.asarray(x).reshape(self.state.m,self.state.d)
-            s=self.reference.world(self.ref,delta);W=s['world'].reshape(self.n,5,self.layout.point_count,3)
+            if getattr(self.reference,'bounded_memory',False):
+                from .memory_bounded import world_batches
+                s=world_batches(self.reference,self.ref,delta,samples=1280)
+            else:s=self.reference.world(self.ref,delta)
+            W=s['world'].reshape(self.n,5,self.layout.point_count,3)
             nodes=W[self.fi,:,self.pi][:,:,None];phase['world_seconds']=time.perf_counter()-start
             start=time.perf_counter()
             proj=moving_projection(self.projector,nodes,self.frames[self.fi],jacobian=jacobian)
@@ -163,36 +196,62 @@ class FullBodyProblem:
         forward=(delta,s,W,nodes,proj,uv,br,BA,bparts,errors,gr,GA,gparts,choices)
         residual=[br,gr];parts={**bparts,**gparts};data_rows=len(br)+len(gr);matrices=[]
         if jacobian:
-            start=time.perf_counter();jp=proj['pixel_jac_nodes'][:,0];derivatives=[]
+            start=time.perf_counter();jp=proj['pixel_jac_nodes'][:,0]
             Jr=right_jacobian(delta[:,3:6]);rot_axes=s['Q']@Jr
             radial=(s['world']-s['P'][:,None]).reshape(W.shape)[self.fi,:,self.pi]
             observed_axes=rot_axes.reshape(self.n,5,3,3)[self.fi]
             columns=self.state.active[self.state.active>=6]
             only_coco=bool(np.all(self.pi>=self.layout.equipment_count) and hasattr(self.execution,'world_coco_derivatives'))
-            if only_coco:
-                physical=dict(self.execution.world_coco_derivatives(self.reference,self.ref,delta,columns,step=1e-5))
-                points=self.pi-self.layout.equipment_count;point_count=17
-            else:
-                physical=dict(self.execution.world_derivatives(self.reference,self.ref,delta,columns,step=1e-5))
-                points=self.pi;point_count=self.layout.point_count
-            for active in self.state.active:
-                if active<3:
-                    derivative=np.zeros_like(radial);derivative[...,active]=1
-                elif active<6:
-                    derivative=np.cross(observed_axes[:,:,:,active-3],radial)
-                else:
-                    derivative=physical[int(active)].reshape(self.n,5,point_count,3)[self.fi,:,points]
-                derivatives.append(np.einsum('mplc,mlc->mpl',jp,derivative))
-            local=np.stack(derivatives,axis=-1)
-            phase['local_derivatives_seconds']=time.perf_counter()-start
-            start=time.perf_counter()
             if hasattr(delta,'chain'):
+                # Residual batches share the exact global controls and source
+                # clock. No independent fit/window or state stitching occurs.
                 from .absolute_motion_state import chain_exposure
-                indices=self.fi[:,None]*5+np.arange(5)
-                observed=chain_exposure(local,delta,sample_indices=indices)
-                scatter=coo_matrix((np.ones(self.uv_rows.size),(self.uv_rows.ravel(),np.arange(self.uv_rows.size))),shape=(uv.size,self.uv_rows.size)).tocsr()
-                U=scatter@observed
+                from .memory_bounded import slice_delta,slice_reference
+                chunks=[];chain_seconds=0.
+                for first in range(0,self.n,256):
+                    from .memory_guard import check_memory_budget
+                    check_memory_budget()
+                    last=min(first+256,self.n);obs=np.flatnonzero((self.fi>=first)&(self.fi<last))
+                    node_ids=np.arange(first*5,last*5);part=slice_delta(delta,node_ids)
+                    source=slice_reference(self.ref,node_ids,len(delta))
+                    fn=self.execution.world_coco_derivatives if only_coco else self.execution.world_derivatives
+                    physical=dict(fn(self.reference,source,part,columns,step=1e-5))
+                    points=self.pi[obs]-(self.layout.equipment_count if only_coco else 0)
+                    point_count=17 if only_coco else self.layout.point_count
+                    derivatives=[]
+                    for active in self.state.active:
+                        if active<3:
+                            derivative=np.zeros_like(radial[obs]);derivative[...,active]=1
+                        elif active<6:derivative=np.cross(observed_axes[obs,:,:,active-3],radial[obs])
+                        else:derivative=physical[int(active)].reshape(last-first,5,point_count,3)[self.fi[obs]-first,:,points]
+                        derivatives.append(np.einsum('mplc,mlc->mpl',jp[obs],derivative))
+                    local=np.stack(derivatives,axis=-1);del physical,derivatives
+                    tick_chain=time.perf_counter()
+                    chunks.append(chain_exposure(local,part,sample_indices=(self.fi[obs]-first)[:,None]*5+np.arange(5)))
+                    chain_seconds+=time.perf_counter()-tick_chain
+                    del local,part
+                    if self.log and (first==0 or last==self.n or last%1024==0):
+                        self.log.write(json.dumps(dict(event='bounded_image_jacobian',frames_completed=last,total_frames=self.n,seconds=time.perf_counter()-start,global_variables=self.size))+'\n');self.log.flush()
+                observed=vstack(chunks,format='csr');del chunks
+                phase['local_derivatives_seconds']=time.perf_counter()-start-chain_seconds
+                start=time.perf_counter()
+                columns_uv=self.uv_rows.ravel()
+                matrices=[BA[:,columns_uv]@observed,GA[:,columns_uv]@observed]
+                phase['sparse_chain_seconds']=chain_seconds+time.perf_counter()-start
+                del observed
             else:
+                fn=self.execution.world_coco_derivatives if only_coco else self.execution.world_derivatives
+                physical=dict(fn(self.reference,self.ref,delta,columns,step=1e-5))
+                points=self.pi-(self.layout.equipment_count if only_coco else 0);point_count=17 if only_coco else self.layout.point_count
+                derivatives=[]
+                for active in self.state.active:
+                    if active<3:
+                        derivative=np.zeros_like(radial);derivative[...,active]=1
+                    elif active<6:derivative=np.cross(observed_axes[:,:,:,active-3],radial)
+                    else:derivative=physical[int(active)].reshape(self.n,5,point_count,3)[self.fi,:,points]
+                    derivatives.append(np.einsum('mplc,mlc->mpl',jp,derivative))
+                local=np.stack(derivatives,axis=-1);del physical,derivatives
+                phase['local_derivatives_seconds']=time.perf_counter()-start;start=time.perf_counter()
                 # Only nonzero exposure-node basis supports are assembled.
                 vv=[]
                 for node in range(5):
@@ -200,21 +259,22 @@ class FullBodyProblem:
                     values=local[obs,:,node,:]*weight
                     vv.append(values.ravel())
                 U=coo_matrix((np.concatenate(vv),(self.spline_rows,self.spline_cols)),shape=(uv.size,self.size)).tocsr()
-            U.eliminate_zeros();matrices=[BA@U,GA@U]
-            phase['sparse_chain_seconds']=time.perf_counter()-start
+                U.eliminate_zeros();matrices=[BA@U,GA@U]
+                phase['sparse_chain_seconds']=time.perf_counter()-start
         prior_values=dict(self.prior_rows(x))
         for name,matrix in self.prior_matrices:
             r=prior_values[name];residual.append(r);parts[name]=float(r@r/2)
             if jacobian:matrices.append(matrix)
-        r=np.concatenate(residual);J=vstack(matrices,format='csr') if jacobian else None
+        split=bool(getattr(self,'split_jacobian_only',False))
+        r=np.concatenate(residual);J=vstack(matrices,format='csr') if jacobian and not split else None
         from .weighted_blocks import block
-        named=[block('body_pixels',br,None if not jacobian else matrices[0],dict(frame_indices=self.of,joint_indices=self.oj)),
+        named=[block('body_pixels',br,None if not jacobian else matrices[0],dict(frame_indices=self.of,joint_indices=self.oj,model_joint_indices=getattr(self,'model_oj',self.oj))),
                block('old_gear_pixels',gr,None if not jacobian else matrices[1],dict(choices=choices))]
         for i,(name,matrix)in enumerate(self.prior_matrices):named.append(block('body_'+name,prior_values[name],None if not jacobian else matrices[2+i]))
         self.cache_x=np.array(x,copy=True);self.evaluations+=1
         self.cache=dict(residual=r,jac=J,parts=parts,uv=uv,world=s,data_rows=data_rows,choices=choices,
                         eval_seconds=time.perf_counter()-tick,normalized_body_error=errors,
-                        phases=phase,forward_reused=bool(reuse),_forward=forward,weighted_blocks=named)
+                        phases=phase,forward_reused=bool(reuse),_forward=forward,weighted_blocks=named,_split_jacobian_ready=bool(split and jacobian))
         if self.log:
             self.log.write(json.dumps(dict(event='evaluation',mode=self.state.mode,window=self.state.seconds,
                 evaluation=self.evaluations,cost=float(r@r/2),parts=parts,with_jacobian=jacobian,

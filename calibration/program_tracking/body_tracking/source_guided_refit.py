@@ -314,19 +314,22 @@ def native_metrics(problem,value):
 
 def diagnose(project,stage,parameter,output):
     from .directional_receipt import Block,source_guided_direction,probe
+    from .audit_probe_contract import choose_source_names,restore_saved_objective
     output=Path(output)
     if output.exists():raise FileExistsError(output)
     output.mkdir(parents=True);log_path=output/'progress.jsonl'
     print(json.dumps(dict(main_log=str(log_path.resolve()),diagnostic_only=True)),flush=True)
     with log_path.open('a',encoding='utf-8',buffering=1)as log:
         p,x,execution,info,mass,saved=prepare(project,stage,parameter,output,log)
+        restored=restore_saved_objective(p,stage,saved)
+        write_json(output/'objective_replay.json',restored)
         with execution.limits():
             start=time.perf_counter();first=p.evaluate(x,True)
             write_json(output/'registry.json',verify(first['weighted_blocks'],first['residual'],first['jac']))
             write_json(output/'baseline_metrics.json',native_metrics(p,first))
             blocks=[Block(b.name,b.residual,b.jacobian,b.association)for b in first['weighted_blocks']]
             np.savez_compressed(output/'probe_baseline.npz',x=x,source_pts=p.reference.p['pts'],actual_weighted_residual=first['residual'])
-            source_names=['full_source_skate_structure','complete_runner_extent','source_support_location_xy']
+            source_names=choose_source_names(blocks)
             scales=np.full(len(x),.1);m=p.body.state.m;d=p.body.state.d
             lower=np.concatenate([np.arange(6+(j-1)*3,9+(j-1)*3)for j in (1,2,4,5,7,8,10,11)])
             columns=lambda local:np.concatenate([17+i*d+np.asarray(local)for i in range(m)])

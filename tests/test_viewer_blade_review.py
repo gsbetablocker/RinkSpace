@@ -33,6 +33,8 @@ def model_diagnostics():
 def test_old_asset_keeps_original_fields_and_unknown_text(tmp_path):
     review=review_asset(tmp_path);current=review.at('candidate',1256)
     assert set(current['model'])=={'blade_uv','boot_uv','axis_rate_rad_s'}
+    assert not any(row.get('evidence_kind')=='model_body_projection'
+                   for row in overlay_primitives(current,include_model_body=True))
     lines=diagnostic_lines(current)
     assert len(lines)==4
     assert '原片刀轴：unknown' in lines[1]
@@ -153,3 +155,38 @@ def test_axis_glyphs_use_saved_transform_and_existing_axis_scale_without_mutatio
         assert 'foot %d'%foot in arrow['name'] and 'not source contact' in arrow['name']
     assert len(skate_axis_primitives(state))==6
     for key in state:np.testing.assert_array_equal(state[key],before[key])
+
+
+def test_optional_body_projection_uses_each_variants_own_pixels_and_preserves_source(tmp_path):
+    new = np.arange(68., dtype=float).reshape(2, 17, 2)
+    old = new+500.
+    review_asset(tmp_path, test_COCO_uv=new, old_COCO_uv=old,
+        old_blade_uv=np.zeros((2, 2, 3, 2)), old_boot_uv=np.zeros((2, 2, 2, 2)),
+        old_axis_rate_rad_s=np.array([[np.nan, np.nan], [0., 0.]]))
+    path = tmp_path/'review.json'
+    document = json.loads(path.read_text(encoding='utf8'))
+    document['variants']['comparison'] = 'old'
+    document['source_structures'] = [dict(pts=1256, foot=0, features=dict(
+        boot_outline=dict(points_uv=[[3., 4.], [5., 6.]], status='observed')))]
+    path.write_text(json.dumps(document), encoding='utf8')
+    review = BladeReview(path)
+    for variant, expected in [('candidate', new), ('comparison', old)]:
+        current = review.at(variant, 1256)
+        np.testing.assert_array_equal(current['model']['COCO_uv'], expected[1])
+        disabled = overlay_primitives(current)
+        assert not any(p.get('evidence_kind') == 'model_body_projection' for p in disabled)
+        enabled = overlay_primitives(current, include_model_body=True)
+        body = [p for p in enabled if p.get('evidence_kind') == 'model_body_projection']
+        bones = {p['model_joint_indices'] for p in body}
+        assert {(5, 7), (7, 9), (6, 8), (8, 10), (11, 13), (13, 15), (12, 14), (14, 16)} <= bones
+        for primitive in body:
+            np.testing.assert_array_equal(primitive['points'], expected[1, list(primitive['model_joint_indices'])])
+            assert primitive['kind'] == 'line' and primitive['color'] == (.72, .3, 1., 1.)
+        source_before = [p for p in disabled if p.get('evidence_kind') == 'source_structure']
+        source_after = [p for p in enabled if p.get('evidence_kind') == 'source_structure']
+        assert len(source_before) == len(source_after) == 1
+        np.testing.assert_array_equal(source_before[0]['points'], source_after[0]['points'])
+        assert source_before[0]['color'] == source_after[0]['color']
+    for variant, pts in [('missing', 1256), ('candidate', 1255)]:
+        assert not any(p.get('evidence_kind') == 'model_body_projection'
+                       for p in overlay_primitives(review.at(variant, pts), include_model_body=True))

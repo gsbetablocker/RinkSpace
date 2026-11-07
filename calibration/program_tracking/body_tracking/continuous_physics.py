@@ -25,14 +25,15 @@ class ContinuousMassGeometry:
         return out['specific_angular_momentum_world_m2ps'],rates,out
 
 class ConfirmedFlightFactors:
-    def __init__(self,problem,mass_geometry):
+    def __init__(self,problem,mass_geometry,*,episode=None):
         self.problem=problem;self.body=problem.body;self.ref=problem.reference;self.mass=mass_geometry
-        source=self.ref.p['pts']/12800.;ledger=getattr(self.ref,'source_document',{}).get('source_episode_review')
+        from .body_clock import source_seconds,time_base
+        source=source_seconds(self.ref.p);ledger=getattr(self.ref,'source_document',{}).get('source_episode_review')
         if ledger:
-            intervals=[e for e in ledger['episodes']if e['kind']=='flight_visible_candidate'];mask=np.zeros(len(source),bool)
+            intervals=[e for e in ledger['episodes']if e['kind']=='flight_visible_candidate']if episode is None else[episode];mask=np.zeros(len(source),bool)
             if len(intervals)!=1:raise ValueError('Current flight factor requires one explicitly reviewed flight core')
             episode=intervals[0];mask=(self.ref.p['pts']>=episode['start_pts'])&(self.ref.p['pts']<=episode['end_pts_inclusive'])
-            interval=[episode['start_pts']/12800.,episode['end_pts_inclusive']/12800.]
+            interval=source_seconds(self.ref.p,[episode['start_pts'],episode['end_pts_inclusive']]).tolist()
         else:mask=(source>=81.36-1e-9)&(source<=81.46+1e-9);interval=[81.36,81.46]
         self.frames=np.flatnonzero(mask);self.times=self.ref.times[self.frames];self.base=self.ref.at(self.times)
         # One source-supported interior: exact onset and landing are excluded.

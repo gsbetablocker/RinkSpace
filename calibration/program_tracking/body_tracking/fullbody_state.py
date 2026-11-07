@@ -72,7 +72,8 @@ class WindowState:
     """C2 attachment to the unchanged reference, local cubic spline support."""
     def __init__(self,reference,seconds,mode='full',spacing=.4,taper=.2):
         self.reference=reference;self.seconds=tuple(map(float,seconds));self.mode=mode
-        self.bounds_time=np.asarray(seconds)-reference.p['pts'][0]/12800.
+        from .body_clock import source_seconds
+        self.bounds_time=np.asarray(seconds)-source_seconds(reference.p)[0]
         a,b=self.bounds_time;self.taper=float(taper)
         inner=np.arange(a+spacing,b-1e-9,spacing)
         self.knots=np.r_[[a]*4,inner,[b]*4];self.m=len(self.knots)-4

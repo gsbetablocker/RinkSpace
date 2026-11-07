@@ -115,7 +115,7 @@ class SpinGraspFactors:
         self.problem=problem;self.body=problem.body;self.ref=problem.reference;self.binding=problem.binding
         self.relations=relations;self.geometry=self.ref.grasp_geometry;self.config=relations['factor_parameters']
         pts=self.ref.p['pts']
-        chosen=source_sample_indices(pts,self.body.state.seconds,relations['phase_boundaries_seconds']);self.pts=pts[chosen]
+        chosen=source_sample_indices(pts,relations.get('context_source_seconds',self.body.state.seconds),relations['phase_boundaries_seconds']);self.pts=pts[chosen]
         self.times=(self.pts-pts[0])/12800.;self.base=self.ref.at(self.times);self.B=self.body.state.basis(self.times)
         held=relations['grip_interval'];interval=GripInterval(source_id=relations['source_id'],shot_id=relations['shot_id'],time_base=tuple(relations['time_base']),**{k:tuple(v) if k=='evidence_pts' else v for k,v in held.items() if k in ('start_pts','end_pts','hand','foot','state','role','evidence_pts','provenance')})
         self.held=interval.admitted_pts(self.pts,source_id=relations['source_id'],shot_id=relations['shot_id'],time_base=relations['time_base'])
@@ -127,11 +127,12 @@ class SpinGraspFactors:
             self.support_mask|=mask;self.support_phase_weight[mask]=interval['weight']
         self.support_times=self.times[self.support_mask];self.support_B=self.B[self.support_mask]
         self.support_base={k:v[self.support_mask] for k,v in self.base.items() if isinstance(v,np.ndarray) and v.shape[0]==len(self.times)}
-        self.support_dt=trapezoid_time_weights(self.support_times,singleton_duration_s=.04)
+        self.support_dt=trapezoid_time_weights(self.support_times,singleton_duration_s=.04)if len(self.support_times)else np.empty(0)
         self.image_rows=[r for r in relations['body_regions'] if r['role']=='fit' and r['visibility'] in ('visible','partially_visible')]
         lookup={int(v):i for i,v in enumerate(pts)};self.image_frames=np.array([lookup[r['pts']] for r in self.image_rows],int)
         self.image_times=(self.ref.times[self.image_frames,None]+np.linspace(-.5,.5,5)*self.body.tau).ravel()
-        self.image_base=self.ref.at(self.image_times);self.image_B=self.body.state.basis(self.image_times).reshape(-1,5,self.body.state.m)
+        self.image_base=self.ref.at(self.image_times)
+        self.image_B=None if getattr(self.body.state,'is_absolute',False) else self.body.state.basis(self.image_times).reshape(-1,5,self.body.state.m)
 
     def geometry_at(self,delta):
         # Equivalent Q^T(X-P), with root algebraically eliminated on BOTH chains.

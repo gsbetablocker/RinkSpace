@@ -151,8 +151,10 @@ class BodyExecution:
         if self.config.compatibility_backend != 'cuda_resident':return None
         if self._compatibility_backend is not None:
             raise ValueError('A resident compatibility execution owner belongs to one immutable window')
-        from .body_resident_torch import ResidentFootLinearization
-        self._compatibility_backend=ResidentFootLinearization(reference,ref,binding)
+        from .body_resident_torch import ResidentFootLinearization,ChunkedResidentFootLinearization
+        if getattr(reference,'bounded_memory',False) and len(ref['P'])>self.config.gpu_batch_size:
+            self._compatibility_backend=ChunkedResidentFootLinearization(reference,ref,binding,batch_size=self.config.gpu_batch_size)
+        else:self._compatibility_backend=ResidentFootLinearization(reference,ref,binding)
         return self._compatibility_backend
 
     def record(self):

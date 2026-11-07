@@ -271,6 +271,27 @@ class ResultCatalog:
     def frame_for_seconds(self,seconds):
         return int(np.argmin(abs(self.seconds-float(seconds))))
 
+    def navigation_points(self):
+        """Read optional exact-source cut navigation; never choose a nearby PTS."""
+        value=self.config.get('source_navigation')
+        if not value:return []
+        path=self.assets.resolve(value,base=self.config_path.parent,must_exist=True)
+        document=json.loads(path.read_text(encoding='utf8'))
+        if document.get('schema')!='rinkspace.viewer-source-navigation.v1':
+            raise ValueError('Unsupported source navigation schema')
+        if tuple(document.get('time_base',()))!=self.time_base:
+            raise ValueError('Navigation source time base differs from player')
+        lookup={int(p):i for i,p in enumerate(self.pts)};rows=[]
+        for row in document.get('cuts',[]):
+            stamps=[row.get('previous_pts'),row.get('pts')]
+            if any(isinstance(p,bool) or not isinstance(p,int) or p not in lookup for p in stamps):
+                raise ValueError('Navigation requires exact saved source exposures')
+            previous,frame=(lookup[p] for p in stamps)
+            if frame!=previous+1 or not isinstance(row.get('label'),str):
+                raise ValueError('Navigation cut must join adjacent source exposures')
+            rows.append(dict(row,previous_frame=previous,frame=frame))
+        return rows
+
     def common_fingerprint(self):
         if self._common_fingerprint is None:
             paths=[self.root/'input.npz',self.root/'compact_smplx.npz',self.model_path,Path(__file__),Path(__file__).with_name('prepare.py'),self.project/'calibration/program_tracking/body_tracking/rebuild_body_geometry.py',self.project/'calibration/program_tracking/body_tracking/footwear_geometry.py']

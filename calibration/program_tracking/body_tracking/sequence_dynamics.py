@@ -60,7 +60,11 @@ class SequenceShoeDynamics:
             mats.append(J)
         R=s['R'];phi=_log(R[1:]@R[:-1].swapaxes(-1,-2));omega=phi/h[:,None,None]
         a=2/(h[:-1]+h[1:]);alpha=a[:,None,None]*np.diff(omega,axis=0)
-        source=self.ref.p['pts'][1:-1]/12800.;phase=np.ones(len(a));phase[((source>=80.8)&(source<=82.4))|((source>=92.2)&(source<=93.2))]=.1
+        from .body_clock import source_seconds
+        source=source_seconds(self.ref.p)[1:-1];phase=np.ones(len(a));phase[((source>=80.8)&(source<=82.4))|((source>=92.2)&(source<=93.2))]=.1
+        if getattr(self.ref,'source_document',{}).get('generic_context',False):
+            from .phase_ledger import phase_weights
+            phase=phase_weights(self.ref,self.ref.p['pts'][1:-1])
         weight=np.sqrt((h[:-1]+h[1:])/2*phase)/self.config['actual_shoe_angular_acceleration_scale_rad_s2']
         z=alpha*weight[:,None,None];ra,D=robust_vector(z,delta=3.);rows.append(ra.ravel())
         parts['actual_skate_so3_angular_acceleration']=float(np.sum(ra*ra)/2)
@@ -132,7 +136,8 @@ class TemporalContactFactors:
         gap=runner_height-hh[ix,feet,pb]
         return d,s,f,qr,qp,n,co,u,gap,runner_height,hh[ix,feet,pb]
     def associate(self,x):
-        values=self.geometry(x);u=values[7];gap=values[8];rh=values[9];ph=values[10];t=self.pts/12800.;N=len(t)
+        from .body_clock import source_seconds
+        values=self.geometry(x);u=values[7];gap=values[8];rh=values[9];ph=values[10];t=source_seconds(self.ref.p,self.pts);N=len(t)
         modes=np.full((N,2),6,int);status=np.full((N,2),'unknown',dtype='<U16');costs=np.zeros((N,2,7))
         for foot in (0,1):
             cost=np.zeros((N,7));supported=(t>=81.62)&(t<=92.46)&(foot==1)
@@ -185,6 +190,12 @@ class TemporalContactFactors:
                 return np.concatenate((D.reshape(N,2,3)*dr,(derivative_u*du)[:,:,None],np.zeros((N,2,1))),axis=-1).reshape(N,10)
             body=[];h=1e-6
             for a in self.body.state.active:
+                # These factors depend only on rigid skate direction. Other
+                # joints and translations have exactly zero derivatives;
+                # retain their zero columns without replaying whole-body FK.
+                influencing={3,4,5}|{6+3*(j-1)+axis for j in(1,2,4,5,7,8)for axis in range(3)}
+                if a not in influencing:
+                    body.append(np.zeros((N,10)));continue
                 plus=d.copy();minus=d.copy();plus[:,a]+=h;minus[:,a]-=h
                 body.append(terms(fk_state(self.ref,self.base,plus),fk_state(self.ref,self.base,minus),h))
             local=np.stack(body,-1);BJ=d.chain(local)

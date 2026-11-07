@@ -54,6 +54,30 @@ def test_identity_mismatches_fail(changes, match):
         apply_source_support(packet(), [support(**changes)], shot_id='s05')
 
 
+def test_per_exposure_shots_preserve_exact_cross_cut_identity_and_legacy_behavior():
+    p = packet()
+    p['source_shot_ids'] = np.array(['s02', 's05', 's05'])
+    evidence = [support(id='before_cut', pts=100, feet=[0], mode='pick', shot_id='s02'),
+                support(), support(id='absent', pts=357, shot_id='s02')]
+    apply_source_support(p, evidence, shot_id='programme')
+    assert p['source_support_mode_mid'].tolist() == [['pick', 'unknown'], ['unknown', 'glide'], ['unknown', 'unknown']]
+    assert json.loads(str(p['source_support_export_json']))['rows'][-1]['status'] == 'source_exposure_absent'
+    for row in (support(shot_id='s02'), {k: v for k, v in support().items() if k != 'shot_id'}):
+        with pytest.raises(ValueError, match='shot identity'):
+            apply_source_support(p, [row], shot_id='programme')
+    legacy = packet()
+    apply_source_support(legacy, [support()], shot_id='s05')
+    assert legacy['source_support_mode_mid'][1, 1] == 'glide'
+    apply_source_support(legacy, [{k: v for k, v in support().items() if k != 'shot_id'}], shot_id='s05')
+    assert legacy['source_support_mode_mid'][1, 1] == 'glide'
+    with pytest.raises(ValueError, match='shot identity'):
+        apply_source_support(packet(), [support(shot_id='s02')], shot_id='s05')
+    invalid = packet()
+    invalid['source_shot_ids'] = np.array(['s02', 's05'])
+    with pytest.raises(ValueError, match='per source PTS'):
+        apply_source_support(invalid, [support()], shot_id='programme')
+
+
 def test_conflicting_source_modes_do_not_select_a_geometric_winner():
     p = packet()
     apply_source_support(p, [support(), support(id='other', mode='pick')])

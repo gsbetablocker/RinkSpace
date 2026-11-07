@@ -14,7 +14,7 @@ _LOCK=threading.RLock()
 
 @contextmanager
 def sparse_direct_trf(problem):
-    if getattr(problem,'linear_solver_backend','lsmr')!='sparse_direct':
+    if getattr(problem,'linear_solver_backend','lsmr')not in('sparse_direct','cuda_resident'):
         yield;return
     import scipy.optimize._lsq.trf as trf
     thread=threading.get_ident();records=getattr(problem,'linear_solver_statistics',None)
@@ -23,7 +23,7 @@ def sparse_direct_trf(problem):
         old_right,old_regularized,old_lsmr=trf.right_multiplied_operator,trf.regularized_lsq_operator,trf.lsmr
         def right(J,d):
             op=old_right(J,d)
-            if threading.get_ident()==thread and issparse(J):op._rinkspace_sparse=(J,np.asarray(d),None)
+            if threading.get_ident()==thread and (issparse(J)or hasattr(J,'solve_scaled')):op._rinkspace_sparse=(J,np.asarray(d),None)
             return op
         def regularized(J,diag):
             op=old_regularized(J,diag)
@@ -35,11 +35,23 @@ def sparse_direct_trf(problem):
             if threading.get_ident()!=thread or tagged is None:return old_lsmr(op,rhs,**options)
             start=time.perf_counter();matrix,scale,diagonal=tagged;row=dict(backend='sparse_direct',columns=matrix.shape[1],rows=matrix.shape[0]);fallback=None
             try:
-                scaled=matrix.multiply(scale).tocsr();m,n=scaled.shape
+                if hasattr(matrix,'solve_scaled'):
+                    solution,device=matrix.solve_scaled(rhs,scale,diagonal,float(options.get('damp',0.)))
+                    row.update(device,total_seconds=time.perf_counter()-start,fallback=False);records.append(row)
+                    if getattr(problem,'log',None) is not None:
+                        import json;problem.log.write(json.dumps(dict(event='linear_solve',**row))+'\n');problem.log.flush()
+                    return(solution,)
+                m,n=matrix.shape
                 penalty=np.full(n,float(options.get('damp',0.))**2)
                 if diagonal is not None:penalty+=diagonal**2
-                gram=(scaled.T@scaled).tocsc();gram.setdiag(gram.diagonal()+penalty);gram.sum_duplicates();gram.sort_indices()
-                right_hand=np.asarray(scaled.T@np.asarray(rhs)[:m]).ravel()
+                # Scale the much smaller normal matrix, rather than copying
+                # the entire programme Jacobian for every trust-region solve.
+                gram=(matrix.T@matrix).tocsc()
+                for first in range(0,n,1024):
+                    last=min(first+1024,n);lo,hi=map(int,gram.indptr[[first,last]])
+                    gram.data[lo:hi]*=scale[gram.indices[lo:hi]]*np.repeat(scale[first:last],np.diff(gram.indptr[first:last+1]))
+                gram.setdiag(gram.diagonal()+penalty);gram.sum_duplicates();gram.sort_indices()
+                right_hand=scale*np.asarray(matrix.T@np.asarray(rhs)[:m]).ravel()
                 if diagonal is not None:right_hand+=diagonal*np.asarray(rhs)[m:]
                 row['assembly_seconds']=time.perf_counter()-start;tick=time.perf_counter()
                 factor=splu(gram,permc_spec='MMD_AT_PLUS_A',diag_pivot_thresh=0.,options={'SymmetricMode':True})
@@ -49,7 +61,9 @@ def sparse_direct_trf(problem):
                 tolerance=max(float(options.get('atol',1e-6)),float(options.get('btol',1e-6)))*.1
                 if not np.isfinite(solution).all() or not np.isfinite(error) or error>tolerance:
                     raise ArithmeticError('normal-system relative residual '+str(error))
-                row.update(solve_seconds=time.perf_counter()-tick,normal_nnz=gram.nnz,factor_nnz=factor.L.nnz+factor.U.nnz,relative_normal_residual=error,total_seconds=time.perf_counter()-start,fallback=False)
+                # SuperLU exposes this scalar directly. Asking for L/U merely
+                # to count entries materializes two additional large matrices.
+                row.update(solve_seconds=time.perf_counter()-tick,normal_nnz=gram.nnz,factor_nnz=int(factor.nnz),relative_normal_residual=error,total_seconds=time.perf_counter()-start,fallback=False)
                 records.append(row)
                 if getattr(problem,'log',None) is not None:
                     import json;problem.log.write(json.dumps(dict(event='linear_solve',**row))+'\n')
@@ -58,6 +72,10 @@ def sparse_direct_trf(problem):
                 return (solution,)
             except (RuntimeError,ArithmeticError,ValueError) as exc:fallback=str(exc)
             row.update(total_seconds=time.perf_counter()-start,fallback=True,fallback_reason=fallback);records.append(row)
+            if hasattr(matrix,'solve_scaled'):
+                if getattr(problem,'log',None) is not None:
+                    import json;problem.log.write(json.dumps(dict(event='GPU_linear_failure',**row))+'\n');problem.log.flush()
+                raise ArithmeticError('GPU linear solve failed without an unbounded LSMR retry: '+fallback)
             return old_lsmr(op,rhs,**options)
         trf.right_multiplied_operator=right;trf.regularized_lsq_operator=regularized;trf.lsmr=direction
         try:yield

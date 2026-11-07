@@ -13,19 +13,21 @@ from scipy.sparse import coo_matrix,diags
 from .rebuild_body_fit import ArticulatedSplineProblem
 
 
-def row_weights(row,node_count=3):
-    row=np.asarray(row);inside=(row>=0)&(row<=1079)
+def row_weights(row,node_count=3,*,image_height=1080):
+    last=int(image_height)-1
+    if last<=0:raise ValueError('Positive image height required')
+    row=np.asarray(row);inside=(row>=0)&(row<=last)
     # Preserve the historical out-of-image endpoint convention. Such points
     # remain explicitly flagged; this is not physical exposure evidence.
-    r=2*np.clip(row,0,1079)/1079-1
+    r=2*np.clip(row,0,last)/last-1
     if node_count==3:
-        return np.stack((r*(r-1)/2,1-r*r,r*(r+1)/2),-1),np.stack((r-.5,-2*r,r+.5),-1)*(2/1079)*inside[...,None]
+        return np.stack((r*(r-1)/2,1-r*r,r*(r+1)/2),-1),np.stack((r-.5,-2*r,r+.5),-1)*(2/last)*inside[...,None]
     if node_count!=5:raise ValueError('Exposure interpolation supports 3 or 5 nodes')
     # The source-pose Slerp has a velocity knot at the exposure midpoint.
     # Split there instead of smoothing both one-sided velocities together.
     left=r<0;q=np.where(left,2*r+1,2*r-1)
     w=np.stack((q*(q-1)/2,1-q*q,q*(q+1)/2),-1)
-    dw=np.stack((q-.5,-2*q,q+.5),-1)*(4/1079)*inside[...,None]
+    dw=np.stack((q-.5,-2*q,q+.5),-1)*(4/last)*inside[...,None]
     value=np.zeros((*row.shape,5));derivative=np.zeros_like(value)
     for j in range(3):
         value[...,j]+=w[...,j]*left;value[...,j+2]+=w[...,j]*(~left)
@@ -35,21 +37,22 @@ def row_weights(row,node_count=3):
 
 def moving_projection(projector,nodes,frames,*,jacobian=False,projection=None):
     node_count=nodes.shape[1]
+    height=int(getattr(projector,'image_height',1080))
     if node_count not in (3,5):raise ValueError("Expected 3 or 5 exposure nodes")
     if projection is None:
         uv=projector.project(nodes[:,node_count//2],frames)
         for iteration in range(64):
-            weights,_=row_weights(uv[:,:,1],node_count);world=np.einsum('nkl,nlkc->nkc',weights,nodes)
+            weights,_=row_weights(uv[:,:,1],node_count,image_height=height);world=np.einsum('nkl,nlkc->nkc',weights,nodes)
             new=projector.project(world,frames)
             error=float(np.max(np.abs(new-uv)));uv=new
             if error<1e-8:break
         else:raise ValueError('Moving-body row projection failed to converge')
-        weights,dw=row_weights(uv[:,:,1],node_count);world=np.einsum('nkl,nlkc->nkc',weights,nodes)
-        out=dict(uv=uv,world=world,row_weights=weights,row_iterations=iteration+1,inside_exposure_rows=(uv[:,:,1]>=0)&(uv[:,:,1]<=1079))
+        weights,dw=row_weights(uv[:,:,1],node_count,image_height=height);world=np.einsum('nkl,nlkc->nkc',weights,nodes)
+        out=dict(uv=uv,world=world,row_weights=weights,row_iterations=iteration+1,inside_exposure_rows=(uv[:,:,1]>=0)&(uv[:,:,1]<=height-1))
     else:
         # Internal same-state fun->jac reuse. Caller owns exact x/binding keys.
         out=dict(projection);uv=out['uv'];world=out['world'];weights=out['row_weights']
-        _,dw=row_weights(uv[:,:,1],node_count)
+        _,dw=row_weights(uv[:,:,1],node_count,image_height=height)
     if jacobian:
         _,jp=projector.with_jacobian(world,frames)
         wrow=np.einsum('nkl,nlkc->nkc',dw,nodes)

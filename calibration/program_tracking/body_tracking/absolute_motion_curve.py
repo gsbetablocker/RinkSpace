@@ -22,6 +22,7 @@ length conversion exactly once before evaluating SI physics.
 from dataclasses import dataclass
 import numpy as np
 from scipy.interpolate import BSpline
+from scipy.sparse import csr_matrix, diags
 from scipy.spatial.transform import Rotation
 
 
@@ -93,7 +94,6 @@ class AbsoluteMotionCurve:
                     or np.max(abs(np.linalg.norm(q,axis=-1)-1.))>1e-7):
                 raise ValueError('Invalid archived SU(2) edge chart reference')
             self.edge_reference_quaternion=q.copy()
-        self._basis = BSpline(self.knots, np.eye(m), 3, extrapolate=False)
         self._check_log_chart()
 
     def _check_log_chart(self):
@@ -151,14 +151,42 @@ class AbsoluteMotionCurve:
         rotations = np.concatenate((np.asarray(s['Q'])[:, None], np.asarray(s['local_R'])), axis=1)
         return cls(k, s['P'], rotations)
 
-    def basis(self, seconds, derivative=0):
+    def basis_sparse(self, seconds, derivative=0):
+        """Exact cubic basis derivatives with at most four supported controls.
+
+        Each differentiation maps adjacent coefficients by
+        ``c'_i = k * (c_{i+1} - c_i) / (t_{i+k+1} - t_{i+1})``.
+        Applying that sparse map to the lower-degree design matrix avoids an
+        M-by-M identity coefficient array, including for derivative orders 1..3.
+        """
         t = np.atleast_1d(np.asarray(seconds, float))
         if (t.ndim != 1 or not np.isfinite(t).all()
                 or np.any(t < self.knots[3]) or np.any(t > self.knots[-4])):
             raise ValueError("Evaluation requires source times inside the archived domain, including camera readout padding")
         if derivative not in (0, 1, 2, 3):
             raise ValueError("Unsupported derivative")
-        return self._basis(t, derivative)
+        if len(t) == 0:
+            return csr_matrix((0, len(self.position_controls)), dtype=float)
+        derivative = int(derivative)
+        knots = self.knots
+        degree = 3
+        coefficients = None
+        for _ in range(derivative):
+            count = len(knots)-degree-1
+            scale = degree/(knots[degree+1:degree+count]-knots[1:count])
+            difference = diags((-scale, scale), (0, 1), shape=(count-1, count), format='csr')
+            coefficients = difference if coefficients is None else difference @ coefficients
+            knots = knots[1:-1]
+            degree -= 1
+        basis = csr_matrix(BSpline.design_matrix(t, knots, degree, extrapolate=False))
+        if coefficients is not None:
+            basis = basis @ coefficients
+        basis.eliminate_zeros()
+        return basis
+
+    def basis(self, seconds, derivative=0):
+        """Dense compatibility interface; production callers can use CSR."""
+        return self.basis_sparse(seconds, derivative).toarray()
 
     def evaluate(self, seconds):
         b = self.basis(seconds)
@@ -176,7 +204,7 @@ class AbsoluteMotionCurve:
         return dict(P=b @ self.position_controls, Q=out[:, 0], local_R=out[:, 1:], rotations=out)
 
     def position_derivative(self, seconds, order):
-        return self.basis(seconds, order) @ self.position_controls
+        return self.basis_sparse(seconds, order) @ self.position_controls
 
     def retracted(self, position_increment, rotation_increment):
         """New optimization state, with per-control right SO(3) increments."""

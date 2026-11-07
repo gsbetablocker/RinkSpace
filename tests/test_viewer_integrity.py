@@ -88,7 +88,7 @@ def catalog(tmp_path,kind='pose'):
     c.project.mkdir();c.root.mkdir()
     c.pts=np.array([283136,283392,283648],np.int64)
     c.scale=60.;c.legacy_scale=60.;c.unit_ratio=1.
-    c._common_fingerprint=None
+    c._common_fingerprint=None;c.config={}
     c.packet=dict(pts=c.pts,fit_time_seconds=np.array([0.,.02,.04]),pose_axis_angle=np.zeros((3,21,3)),lower_body_inferred=np.array([True,False,False]))
     write_npz(c.root/'input.npz',**c.packet)
     write_npz(c.root/'compact_smplx.npz',placeholder=np.zeros(1))
@@ -610,3 +610,61 @@ def test_dynamic_hand_channel_reaches_surface_and_cached_state(tmp_path):
     skin.sample_vertices(joints,frames,ids,hand_local_R=changed[:n],double_precision=True)
     assert skin._sample_double_cache is cached
     np.testing.assert_array_equal(cached[1][0],skin.shaped[ids])
+
+
+
+def test_saved_variant_shape_scale_are_surface_local_and_legacy_defaults_survive(tmp_path,monkeypatch):
+    c=fullbody_catalog(tmp_path)
+    c.packet.update(shared_betas=np.zeros(10),body_scale=np.array(1.))
+    write_npz(c.root/'input.npz',**c.packet)
+    original_packet={key:value.copy() for key,value in c.packet.items()}
+    saved=DATA.load_npz(c.root/'result.npz')
+    c.variants=[dict(id=name,kind='fullbody',result=name+'.npz') for name in ('nominal','scaled','legacy')]
+    for name,scale,beta in [('nominal',1.,np.zeros(10)),('scaled',1.4,np.r_[.2,np.zeros(9)]),('legacy',1.,np.zeros(10))]:
+        z=dict(saved)
+        if name!='legacy':z.update(shared_betas=beta,shared_body_scale=np.array(scale))
+        factor=scale*(1+beta[0])
+        native=np.full((len(c.pts),22,3),factor*.5)
+        z['native22_world_mid']=z['P_world_mid'][:,None]+np.einsum('nij,nkj->nki',z['Q_world_mid'],native)
+        write_npz(c.root/(name+'.npz'),**z)
+
+    constructed=[]
+    class ShapedSurface(MatrixSurface):
+        def __init__(self,catalog,packet=None):
+            super().__init__()
+            self.packet=dict(catalog.packet if packet is None else packet)
+            assert self.packet is not catalog.packet
+            scale=float(self.packet['body_scale']);factor=scale*(1+float(self.packet['shared_betas'][0]))
+            self.vertex_value=.25*factor;self.joint_value=factor
+            constructed.append(self)
+    monkeypatch.setattr(PREPARE,'FullSurface',ShapedSurface)
+    nominal=PREPARE.prepare_variant(c,'nominal')
+    # A caller-provided surface from the other variant must not leak its shape.
+    scaled=PREPARE.prepare_variant(c,'scaled',constructed[0])
+    legacy=PREPARE.prepare_variant(c,'legacy')
+    sequences=[DATA.CachedSequence(path)for path in (nominal,scaled,legacy)]
+    np.testing.assert_array_equal(sequences[0].vertices,sequences[2].vertices)
+    assert not np.array_equal(sequences[0].vertices,sequences[1].vertices)
+    for name,seq in zip(('nominal','scaled','legacy'),sequences):
+        raw=DATA.load_npz(c.root/(name+'.npz'))
+        np.testing.assert_allclose(seq.state['P'],raw['P_world_mid']*3)
+        np.testing.assert_allclose(seq.state['gear'],raw['gear_world_mid']*3)
+        assert seq.meta['body_length_ratio']==.5 and seq.meta['uniform_unit_reexpression_ratio']==3.
+    assert sequences[1].meta['shared_body_scale']==1.4
+    np.testing.assert_array_equal(sequences[1].meta['shared_betas'],np.r_[.2,np.zeros(9)])
+    assert sequences[2].meta['shared_body_scale']==1.
+    assert sequences[2].meta['surface_parameter_source']['shared_body_scale']=='catalog default'
+    for key in original_packet:np.testing.assert_array_equal(c.packet[key],original_packet[key])
+
+
+@pytest.mark.parametrize('field,value',[
+    ('shared_betas',np.zeros((1,10))),('shared_betas',np.zeros(11)),('shared_betas',np.full(10,np.nan)),
+    ('shared_body_scale',np.array([1.])),('shared_body_scale',np.array(0.)),
+    ('shared_body_scale',np.array(-1.)),('shared_body_scale',np.array(np.inf)),
+])
+def test_invalid_saved_surface_shape_scale_rejected_before_cache_publish(tmp_path,field,value):
+    c=fullbody_catalog(tmp_path);c.packet.update(shared_betas=np.zeros(10),body_scale=np.array(1.))
+    replace_npz(c.root/'result.npz',**{field:value})
+    with pytest.raises(ValueError,match='surface shared_'):
+        PREPARE.prepare_variant(c,'fixture',MatrixSurface())
+    assert not list(c.cache_root.glob('fixture_*/metadata.json'))

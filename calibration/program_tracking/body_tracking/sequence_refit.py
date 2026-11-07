@@ -19,8 +19,8 @@ from .exmr_integration import PROGRAMME,CASE_FIELD,case_identity,save_packet
 
 
 class SequenceActions:
-    def __init__(self,problem,prior,mass,document,x):
-        self.existing=ExistingActionsWithBootAxes(problem,prior,mass,document)
+    def __init__(self,problem,prior,mass,document,x,*,base_factors=None):
+        self.existing=ExistingActionsWithBootAxes(problem,prior,mass,document)if base_factors is None else base_factors
         self.shoe=SequenceShoeDynamics(problem);self.modes=TemporalContactFactors(problem,x);self.last=None
         self.contour=None
         if 'visible_runner_contours' in document:
@@ -49,6 +49,10 @@ class SequenceActions:
         if document.get('unassigned_source_skate_sets'):
             from .source_skate_structure_factors import UnassignedSkateSetFactors
             self.unassigned=UnassignedSkateSetFactors(problem,document['unassigned_source_skate_sets'],episode=document.get('source_episode_review',{}).get('late_identity_episode'))
+        self.extra_unassigned_episodes=[]
+        for entry in document.get('additional_unassigned_source_episodes',[]):
+            from .source_skate_structure_factors import UnassignedSkateSetFactors
+            self.extra_unassigned_episodes.append((entry['id'],UnassignedSkateSetFactors(problem,entry['groups'],episode=entry['episode'])))
     def evaluate(self,x,jacobian=False):
         outputs=[self.existing.evaluate(x,jacobian),self.shoe.evaluate(x,jacobian),self.modes.evaluate(x,jacobian)]
         if self.contour is not None:outputs.append(self.contour.evaluate(x,jacobian))
@@ -56,10 +60,22 @@ class SequenceActions:
         if self.source_locations is not None:outputs.append(self.source_locations.evaluate(x,jacobian))
         if self.structure_extent is not None:outputs.append(self.structure_extent.evaluate(x,jacobian))
         if self.unassigned is not None:outputs.append(self.unassigned.evaluate(x,jacobian))
+        for episode_id,factor in self.extra_unassigned_episodes:
+            value=factor.evaluate(x,jacobian).copy()
+            value['parts']={'additional_unassigned_source_'+episode_id:value['image_cost']}
+            outputs.append(value)
         out=dict(residual=np.concatenate([v['residual'] for v in outputs]),jac=vstack([v['jac'] for v in outputs],format='csr') if jacobian else None,parts={},metrics={})
-        for v in outputs:out['parts'].update(v['parts']);out['metrics'].update(v['metrics'])
+        for v in outputs:
+            out['parts'].update(v['parts'])
+            for key,item in v['metrics'].items():
+                if key=='visible_unassigned_skate_contours':out['metrics'].setdefault(key,[]).extend(item)
+                elif key=='source_unassigned_episode':
+                    out['metrics'].setdefault('source_unassigned_episodes',[]).append(item)
+                    out['metrics'].setdefault(key,item)
+                else:out['metrics'][key]=item
         out['image_cost']=self.existing.grasp.last.get('image_cost',0.)+sum(v.get('image_cost',0.) for v in outputs[1:])
         factors=[self.shoe,self.modes]+([] if self.contour is None else [self.contour])+([] if self.extent is None else [self.extent])+([] if self.source_locations is None else [self.source_locations])+([] if self.structure_extent is None else [self.structure_extent])+([] if self.unassigned is None else [self.unassigned])
+        factors.extend(f for _,f in self.extra_unassigned_episodes)
         out['factor_row_counts']=outputs[0]['factor_row_counts']+[(type(f).__name__,len(v['residual'])) for f,v in zip(factors,outputs[1:])]
         from .weighted_blocks import block,signature
         out['weighted_blocks']=[]
@@ -73,7 +89,7 @@ class SequenceActions:
 class SequenceJoint(ContinuousJoint):
     def evaluate(self,x,jacobian=False):
         out=super().evaluate(x,jacobian)
-        out['source_group_costs']=dict(body_pixels=.02*out['raw_data_parts'].get('body_pixels',0.),existing_shoe_regions=out['parts'].get('support_image',0.))
+        out['source_group_costs']=dict(body_pixels=self.image_time_weight*out['raw_data_parts'].get('body_pixels',0.),existing_shoe_regions=out['parts'].get('support_image',0.))
         if not hasattr(self,'source_group_baseline'):self.source_group_baseline={'body_pixels':out['source_group_costs']['body_pixels']}
         return out
     def additional_trial_quality(self,value,relative_limit):

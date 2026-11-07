@@ -81,6 +81,8 @@ class ResultsPlayer(Viewer):
         self.source_texture = None
         self.source_texture_pts = None
         self.source_error = ''
+        self.source_navigation = catalog.navigation_points()
+        self.source_navigation_index = 0
         self.source_regions = (SupportObservations(catalog.support_observations,catalog.time_base,shot=catalog.config.get('source_shot'))
                                if catalog.support_observations else None)
         review_asset=catalog.config.get('blade_review_asset')
@@ -90,6 +92,7 @@ class ResultsPlayer(Viewer):
         has_source_structures=bool(self.blade_review and self.blade_review.rows.get('source_structures'))
         self.show_model_reference=not has_source_structures
         self.show_model_runner=bool(catalog.config.get('source_review_model_runner_default',False))
+        self.show_model_body=bool(catalog.config.get('source_review_model_body_default',False))
         self.show_legacy_source=not has_source_structures
         self.show_source_ice_grid=False
         self.world_region_nodes = []
@@ -552,6 +555,7 @@ class ResultsPlayer(Viewer):
                 if self.blade_review is not None:
                     _,self.show_blade_review=imgui.checkbox('原片源结构描线（非模型）',self.show_blade_review)
                     _,self.show_model_runner=imgui.checkbox('模型钢刃回投（深粉下缘／浅粉上缘）',self.show_model_runner)
+                    _,self.show_model_body=imgui.checkbox('模型人体回投（紫色；模型预测）',self.show_model_body)
                     _,self.show_model_reference=imgui.checkbox('模型参考轴（蓝／橙；不是轮廓）',self.show_model_reference)
                     _,self.show_legacy_source=imgui.checkbox('旧源区域与短线段',self.show_legacy_source)
                     _,self.show_source_ice_grid=imgui.checkbox('冰面坐标辅助网格（相机回投）',self.show_source_ice_grid)
@@ -564,7 +568,7 @@ class ResultsPlayer(Viewer):
                             following=[p for p in source_pts if p>pts];self.seek(int(np.searchsorted(self.catalog.pts,following[0] if following else source_pts[0])))
                         pts=int(self.catalog.pts[self.frame])
                         current_sources=self.blade_review.rows['source_structures'].get(pts,[])
-                        imgui.text('完整鞋刀源描线：%d / %d曝光；当前帧：%s'%(len(source_pts),len(self.catalog.pts),'有' if current_sources else '尚未标注'))
+                        imgui.text('鞋刀源描线（含局部）：%d / %d曝光；当前帧：%s'%(len(source_pts),len(self.catalog.pts),'有' if current_sources else '尚未标注'))
                         imgui.text_wrapped('源描线：青鞋体，橙鞋底/鞋跟，紫刀架，绿钢刃，红刀齿区域，蓝刀尾；虚线为局部分界/推断。')
                         fit_binding=self.blade_review.document.get('source_structure_fit_variants',{}).get(self.variant['id'])
                         if fit_binding:
@@ -599,7 +603,8 @@ class ResultsPlayer(Viewer):
                         rows=review['source_regions'] if self.show_legacy_source else []
                     else:rows=self.source_regions.at(pts) if self.source_regions else []
                     primitives=(overlay_primitives(review,include_model_reference=self.show_model_reference,
-                        include_model_contours=self.show_model_runner,include_source_structures=self.show_blade_review,
+                        include_model_contours=self.show_model_runner,include_model_body=self.show_model_body,
+                        include_source_structures=self.show_blade_review,
                         include_source_legacy=self.show_legacy_source,include_ice_grid=self.show_source_ice_grid) if review is not None else [])
                     width,height=self.source_image_size
                     display_width=max(100.,imgui.get_content_region_available()[0])
@@ -609,7 +614,8 @@ class ResultsPlayer(Viewer):
                         source_points=[np.asarray(f.get('points_uv',[]),float)for f in source_row['features'].values()if len(f.get('points_uv',[]))]
                         if source_points:crops.append((source_row.get('foot'),source_row.get('source_track_id'),np.concatenate(source_points)))
                     if not crops:
-                        bounds=[primitive['points'] for primitive in primitives if primitive['kind']!='text']
+                        bounds=[primitive['points'] for primitive in primitives if primitive['kind']!='text'
+                                and primitive.get('evidence_kind')!='model_body_projection']
                         if review is None:bounds=[region_outline(row)for row in rows]
                         if bounds:crops=[(None,None,np.concatenate(bounds))]
                     for source_foot,source_track,points in crops:
@@ -729,14 +735,25 @@ class ResultsPlayer(Viewer):
                     imgui.text('本帧人体：本轮窗口优化候选' if bool(refined[f]) else '本帧人体：沿用 '+reference)
                     intervals=self.variant.get('body_refinement_intervals_seconds',self.catalog.config.get('body_refinement_intervals_seconds',[]))
                     if intervals:imgui.text_wrapped('人体新增优化仅原片 '+ '、'.join('%g–%g 秒'%tuple(interval) for interval in intervals)+'；其他人体沿用 '+reference+'。')
-                imgui.text_wrapped('整节目人体尚未完成；鞋内配合与接触仍未验收。')
+                imgui.text_wrapped(self.catalog.config.get('body_scope_label','整节目人体尚未完成；鞋内配合与接触仍未验收。'))
             elif window is not None:
                 if bool(window[f]):imgui.text_colored('本帧：本轮窗口内优化候选，未核验',1.,.78,.32)
                 else:imgui.text_colored('本帧：段外保存参考，未参与本轮优化',1.,.7,.35)
-                imgui.text_wrapped('保存时间轴用于对照；本轮只优化标记窗口，整节目人体尚未完成。')
+                imgui.text_wrapped(self.catalog.config.get('body_scope_label','保存时间轴用于对照；本轮只优化标记窗口，整节目人体尚未完成。'))
             else:imgui.text('本帧：历史保存候选，未参与本轮全身优化')
             imgui.text('原片时间：%06.3f 秒  |  PTS %d'%(seconds,self.catalog.pts[f]))
             imgui.text('当前片段帧：%d / %d'%(f+1,len(self.catalog.pts)))
+            if self.source_navigation:
+                labels=[row['label'] for row in self.source_navigation]
+                changed,selected=imgui.combo('摄影切镜',self.source_navigation_index,labels)
+                if changed:
+                    self.source_navigation_index=selected
+                    self.seek(self.source_navigation[selected]['frame'])
+                cut=self.source_navigation[self.source_navigation_index]
+                if imgui.button('切前一曝光'):self.seek(cut['previous_frame'])
+                imgui.same_line()
+                if imgui.button('切后一曝光'):self.seek(cut['frame'])
+                imgui.text('精确 PTS %d → %d'%(cut['previous_pts'],cut['pts']))
             s=self.sequence.state
             if self.blade_review is not None:
                 for line in diagnostic_lines(self.blade_review.at(self.variant['id'],int(self.catalog.pts[f]))):

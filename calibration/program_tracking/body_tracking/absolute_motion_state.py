@@ -7,7 +7,7 @@ and clock context, including during parallel local FK replay.
 from dataclasses import dataclass
 import copy
 import numpy as np
-from scipy.sparse import coo_matrix,csr_matrix
+from scipy.sparse import coo_matrix,csr_matrix,issparse,vstack
 from .absolute_motion_curve import AbsoluteMotionCurve,_exp,_log
 from .fullbody_fit import right_jacobian
 
@@ -60,9 +60,11 @@ def inverse_right_jacobian(v):
 
 
 def evaluate_curve(curve,t,*,control_increments=None,with_blocks=False,basis=None):
-    t=np.atleast_1d(t).astype(float);B=curve.basis(t) if basis is None else basis
+    t=np.atleast_1d(t).astype(float);B=curve.basis_sparse(t) if basis is None else basis
     m=len(curve.position_controls);idx=np.clip(np.searchsorted(curve.knots,t,side='right')-4,0,m-4)[:,None]+np.arange(4)
-    b=np.take_along_axis(B,idx,axis=1);r=curve.rotation_controls[idx]
+    b=B[np.arange(len(t))[:,None],idx] if issparse(B) else np.take_along_axis(B,idx,axis=1)
+    b=b.toarray() if issparse(b) else np.asarray(b)
+    r=curve.rotation_controls[idx]
     D=r[:,:-1].swapaxes(-1,-2)@r[:,1:];phi=curve._check_log_chart()[idx[:,:-1]]
     beta=np.cumsum(b[:,::-1],axis=1)[:,::-1][:,1:]
     E=_exp(beta[:,:,None,None]*phi)
@@ -103,7 +105,9 @@ class AbsoluteMotionState:
         self._fixed_values={};self._curve_parameters=None;self._current_curve=None
     def basis(self,t,derivative=0):
         t=np.atleast_1d(t).astype(float);key=(t.tobytes(),derivative)
-        if key not in self._basis:self._basis[key]=self.curve.basis(t,derivative)
+        if key not in self._basis:
+            if len(self._basis)>=24:self._basis.clear()
+            self._basis[key]=self.curve.basis_sparse(t,derivative)
         return self._basis[key]
     def current_curve(self,x):
         x=np.asarray(x)
@@ -120,14 +124,22 @@ class AbsoluteMotionState:
         if cached is None or (with_blocks and cached[2] is None):
             B=self.basis(t);cur=self.current_curve(x)
             s=evaluate_curve(cur,t,control_increments=x.reshape(self.m,69)[:,3:].reshape(self.m,22,3),with_blocks=with_blocks,basis=B)
-            if key not in self._fixed_values:self._fixed_values[key]=evaluate_curve(self.curve,t,basis=B)
+            if key not in self._fixed_values:
+                if len(self._fixed_values)>=4:self._fixed_values.clear()
+                self._fixed_values[key]=evaluate_curve(self.curve,t,basis=B)
             base=self._fixed_values[key];rot=_log(base['rotations'].swapaxes(-1,-2)@s['rotations'])
             d=np.c_[s['P']-base['P'],rot.reshape(len(t),66)];mapping=None
             if with_blocks:
                 mapping=np.empty((len(t),4,23,3,3));mapping[:,:,0]=s['position_weights'][:,:,None,None]*np.eye(3)
                 mapping[:,:,1:]=inverse_right_jacobian(rot)[:,None]@s['rotation_right_blocks']
-            self._evaluations[key]=(d,s,mapping)
-        return self._evaluations[key]
+            cached=(d,s,mapping)
+            # Large physics clocks are transient. Retaining every shutter,
+            # midpoint and factor clock would defeat bounded derivative batches.
+            if len(t)<=10000:
+                if len(self._evaluations)>=4:self._evaluations.clear()
+                self._evaluations[key]=cached
+            return cached
+        return cached
     def linearization(self,x,t):return self._evaluation(x,t,with_blocks=True)
     def increments(self,x,t):
         d,_,_=self._evaluation(x,t,with_blocks=False);return MotionDelta(d,self,x,np.atleast_1d(t))
@@ -136,6 +148,9 @@ class AbsoluteMotionState:
     def chain(self,local,x,t,*,sample_indices=None):
         local=np.asarray(local,float);n,k,d=local.shape
         if d!=69:raise ValueError('Absolute local tangent requires all69 columns')
+        if n>512:
+            pick=np.arange(len(t)) if sample_indices is None else np.asarray(sample_indices,int)
+            return vstack([self.chain(local[a:a+512],x,t,sample_indices=pick[a:a+512]) for a in range(0,n,512)],format='csr')
         _,s,mapping=self.linearization(x,t);pick=np.arange(len(t)) if sample_indices is None else np.asarray(sample_indices,int)
         if len(pick)!=n:raise ValueError('Local rows and sampled clock differ')
         # General cavity/physics factors are sparse in the local joint axes.
@@ -176,6 +191,8 @@ def chain_exposure(local,delta,sample_indices=None):
     local=np.asarray(local);n,k,nodes,d=local.shape
     if nodes!=5 or d!=69:raise ValueError('Native projection requires five69-column shutter nodes')
     indices=np.arange(n*5).reshape(n,5) if sample_indices is None else np.asarray(sample_indices)
+    if n>2048:
+        return vstack([chain_exposure(local[a:a+2048],delta,sample_indices=indices[a:a+2048]) for a in range(0,n,2048)],format='csr')
     _,state,mapping=delta.owner.linearization(delta.parameters,delta.sample_times)
     controls=state['control_indices'][indices];first=controls.min(axis=(1,2))
     width=int((controls.max(axis=(1,2))-first).max())+1

@@ -49,7 +49,7 @@ def fk_state(reference,ref,delta):
     native=(pos-body.J[0])*body.scale
     from .sequence_skate_state import relative_rotation
     relative=relative_rotation(reference,ref,delta)
-    R,O=reference.binding.transforms(P,Q,native,rot,skate_relative_R=relative)
+    R,O=reference.binding.transforms(P,Q,native,rot,**({} if relative is None else dict(skate_relative_R=relative)))
     nativeW=P[:,None]+np.einsum('nij,nkj->nki',Q,native)
     return dict(skate_relative_R=relative,P=P,Q=Q,local_R=local,frames=rot,native=native,native_world=nativeW,R=R,O=O,**({} if 'hand_local_R' not in ref else {'hand_local_R':ref['hand_local_R']}))
 
@@ -77,7 +77,7 @@ def batch_features(binding,R,O,state=None):
         ids.append(group['id']);semantics.append(group['semantic']);eligible.append(group.get('support_eligible',False))
     upper_index=None
     if state is not None and 'native' in state:
-        alpha=binding.deformation(state['native'],state['frames'],skate_relative_R=state.get('skate_relative_R'))
+        alpha=binding.deformation(state['native'],state['frames'],**({} if state.get('skate_relative_R') is None else dict(skate_relative_R=state['skate_relative_R'])))
         upper=binding.deform(p['upper'],alpha)
         z=np.einsum('nfj,nfvj->nfv',normals,upper)
         upper_index=np.argmin(z,axis=-1)
@@ -88,7 +88,7 @@ def batch_features(binding,R,O,state=None):
         ids=ids,semantics=semantics,eligible=eligible,upper_index=upper_index)
 
 
-def constraints(binding,state,times,source_origin,evidence):
+def constraints(binding,state,times,source_origin,evidence,*,time_weights=None):
     features=batch_features(binding,state['R'],state['O'],state);h=features['height']
     allow=np.array([ALLOWANCE[s] for s in features['semantics']]);clear=h+allow
     k=np.argmin(clear,axis=-1);n=len(times);ni=np.arange(n)[:,None];feet=np.arange(2)[None]
@@ -96,8 +96,13 @@ def constraints(binding,state,times,source_origin,evidence):
     witness=state['O']+np.einsum('nfij,nfj->nfi',state['R'],q)
     margins=[];rows=[];labels=[];weights=[];values=[];upper_rows=[];gaps=np.full(n,np.nan)
     support_groups=[]
-    tw=trapezoid_time_weights(times,singleton_duration_s=.02)
+    from .body_clock import time_base,sample_period
+    tb=time_base(binding.reference.p)
+    tw=trapezoid_time_weights(times,singleton_duration_s=sample_period(binding.reference.p)) if time_weights is None else np.asarray(time_weights)
+    if tw.shape!=(len(times),)or not np.isfinite(tw).all()or np.any(tw<=0):raise ValueError('Positive weights on the full physical clock required')
+    plane_known=getattr(binding.reference,'ice_plane_known',True)
     for i,t in enumerate(times):
+        if not plane_known:continue  # no invented absolute ice plane for a new scene
         time_id=int(round((t+source_origin)*1e9))
         for f in range(2):
             margins.append(clearance[i,f]);rows.append((i,f,q[i,f],1.))
@@ -105,7 +110,7 @@ def constraints(binding,state,times,source_origin,evidence):
             labels.append((time_id,('left','right')[f]+'_nonpenetration'));weights.append(tw[i]);values.append(clearance[i,f])
         # A source image constrains only its own exposure midpoint, not a
         # fabricated dense run of contact labels between reviewed images.
-        matches=[r for r in evidence if abs(t+source_origin-r['pts']/12800.)<1e-8]
+        matches=[r for r in evidence if abs(t+source_origin-r['pts']*tb[0]/tb[1])<1e-8]
         for r in matches:
             members=r.get('feet',[0,1]);kind=r.get('mode','glide')
             # Known flight and unknown contact receive only the universal
@@ -140,7 +145,7 @@ def body_constraint_jacobian(reference,state,delta,active,B,evaluation):
     """
     active=np.asarray(active,dtype=int);d=len(active);rows=evaluation['rows']
     count=len(rows);local=np.zeros((count,d));ratio=reference.binding.ratio
-    if not count or not d:return csr_matrix((count,B.shape[1]*d))
+    if not count or not d:return csr_matrix((count,delta.owner.size if hasattr(delta,'owner') else B.shape[1]*d))
     fr=np.fromiter((r[0] for r in rows),dtype=int,count=count)
     foot=np.fromiter((r[1] for r in rows),dtype=int,count=count)
     q=np.asarray([r[2] for r in rows]);sign=np.fromiter((r[3] for r in rows),dtype=float,count=count)

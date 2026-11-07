@@ -3,6 +3,15 @@ from dataclasses import asdict, dataclass
 from copy import deepcopy
 import math
 from numbers import Integral
+import numpy as np
+
+
+def jacobian_reserve_seconds(cached_x,cached_value,requested_x,uncached_seconds):
+    """An exact already-assembled J consumes no new full-J wall-time reserve."""
+    if (cached_x is not None and cached_value is not None
+            and cached_value.get('jac')is not None and np.array_equal(cached_x,requested_x)):
+        return 0.
+    return float(uncached_seconds)
 
 
 _REASON_CATEGORIES = dict(wall_budget='budget', accepted_budget='budget', outer_budget='budget',

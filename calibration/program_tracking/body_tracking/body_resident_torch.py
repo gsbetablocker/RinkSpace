@@ -7,10 +7,94 @@ Only a changed delta is uploaded, and residual plus local derivatives return
 in one packed download per linearization. No per-column device readback.
 """
 from __future__ import annotations
-import time
+import time,copy
 import numpy as np
 import torch
 from .torch_foot_compatibility import TorchFootCompatibility
+
+
+class ChunkedResidentFootLinearization:
+    """One live device batch, one global residual and unchanged local columns.
+
+    The full programme never resides in repeated +/- skin scratch tensors.
+    Batch boundaries do not create fitted states, priors or optimization cuts.
+    """
+    def __init__(self,reference,ref,binding,*,batch_size=1024,device='cuda'):
+        self.reference=reference;self.ref=ref;self.binding=binding;self.n=len(ref['P'])
+        self.batch_size=int(batch_size);self.device=device;self.fixed_x=binding.x.copy()
+        self._owner=None;self._base_owner=None;self._range=None;self._measurements=[];self.prepare_seconds=0.
+        self._calls=0
+
+    def _batch(self,a,b):
+        if self._range!=(a,b):
+            if self._owner is not None:
+                torch.cuda.synchronize()
+                self._measurements.append(self._owner.measurement())
+            self._owner=None  # release before allocating the next skin owner
+            if self._base_owner is None:
+                # Immutable body, skin, shoe and source arrays upload once.
+                # Only mutable pose/derivative scratch is bounded by the batch.
+                self._base_owner=ResidentFootLinearization(self.reference,self.ref,self.binding,device=self.device)
+                self.prepare_seconds=self._base_owner.prepare_seconds
+            self._owner=self._base_owner.batch_view(a,b)
+            self._range=(a,b)
+        return self._owner
+
+    def matches(self,binding):return np.array_equal(self.fixed_x,binding.x)
+
+    def evaluate(self,delta,columns=None,*,step=1e-5,skate_relative_R=None):
+        columns=None if columns is None else list(map(int,columns));baseline=None;values=None
+        unknown=None
+        for a in range(0,self.n,self.batch_size):
+            b=min(a+self.batch_size,self.n);owner=self._batch(a,b)
+            r,J=owner.evaluate(np.asarray(delta)[a:b],columns,step=step,skate_relative_R=None if skate_relative_R is None else skate_relative_R[a:b])
+            if baseline is None:
+                baseline=np.empty((self.n,r.shape[1]),r.dtype)
+                values=np.empty((len(J),self.n,r.shape[1]),r.dtype)
+            baseline[a:b]=r
+            for j,value in enumerate(J):values[j,a:b]=value
+            if owner.baseline_collar_unknown is not None:
+                if unknown is None:unknown=np.empty((self.n,2),bool)
+                unknown[a:b]=owner.baseline_collar_unknown
+        self._calls+=1
+        self.baseline_collar_unknown=unknown
+        return baseline,list(values)
+
+    def shoe_derivatives(self,delta,skate_relative_R,*,step=1e-5):
+        baseline=None;values=None
+        for a in range(0,self.n,self.batch_size):
+            b=min(a+self.batch_size,self.n);owner=self._batch(a,b)
+            r,J=owner.shoe_derivatives(np.asarray(delta)[a:b],skate_relative_R[a:b],step=step)
+            if baseline is None:
+                baseline=np.empty((self.n,r.shape[1]),r.dtype);values=np.empty((self.n,*J.shape[1:]),J.dtype)
+            baseline[a:b]=r;values[a:b]=J
+        return baseline,values
+
+    def clear_result_cache(self):
+        if self._owner is not None:self._owner.clear_result_cache()
+
+    def release_scratch(self):
+        if self._owner is not None:self._owner.clear_result_cache()
+        # One release at the CPU/GPU phase boundary, never per kernel/batch.
+        # Immutable device constants and all compiled kernels stay resident.
+        torch.cuda.empty_cache()
+
+    def reset_measurement(self):
+        self._measurements=[];self._calls=0
+        if self._owner is not None:self._owner.reset_measurement()
+
+    def measurement(self):
+        if self._owner is not None:torch.cuda.synchronize()
+        rows=self._measurements+([] if self._owner is None else[self._owner.measurement()]);out={}
+        for row in rows:
+            for key,value in row.items():
+                if isinstance(value,(int,float)):out[key]=out.get(key,0)+value
+        return dict(out,programme_calls=self._calls,device_batch_samples=self.batch_size,device_batches_prepared=len(rows),timing_scope='sum of serial bounded device batches; static preparation wall reported separately')
+
+    def record(self):
+        return dict(kind='bounded_cuda_resident_native55_selected_skin_foot',samples=self.n,
+            device_batch_samples=self.batch_size,simultaneous_device_scratch_owners=1,immutable_uploads=1,
+            prepare_seconds=self.prepare_seconds,unchanged_global_parameter_state=True)
 
 
 class ResidentFootLinearization:
@@ -74,6 +158,14 @@ class ResidentFootLinearization:
 
     def matches(self,binding):
         return np.array_equal(self.fixed_x,binding.x)
+
+    def batch_view(self,first,last):
+        """Share immutable device constants, own only this batch's pose cache."""
+        result=copy.copy(self);result.n=last-first
+        for name in ('refP','refQ','refLocal','tail'):setattr(result,name,getattr(self,name)[first:last])
+        result.consumer=copy.copy(self.consumer);result.consumer.skate_relative_R=None
+        result._last_delta=result._pose=result._last_skate_relative_R=result._device_skate_relative_R=None
+        result.reset_measurement();return result
 
     def record(self):
         return dict(kind='cuda_resident_native55_selected_skin_foot',device=str(self.device),device_info=self.device_info,
@@ -270,6 +362,7 @@ class ResidentFootLinearization:
         compute_end=self._event('compute')
         pose=self._current_pose(values,changed,device_delta)
         residual=self.consumer.evaluate(pose['base_native'],pose['frames'],pose['samples'])
+        baseline_unknown=None if self.consumer.last_collar_metrics is None else self.consumer.last_collar_metrics['unknown']
         self._counts['consumer_calls']+=1
         derivatives=[];last_joint=None;subtree=None
         offset=0;columns=[] if columns is None else columns
@@ -289,6 +382,9 @@ class ResidentFootLinearization:
         host=time.perf_counter()
         end=self._event('d2h')
         array=packed.cpu().numpy();end.record()
+        self.baseline_collar_unknown=None if baseline_unknown is None else baseline_unknown.cpu().numpy()
+        if self.baseline_collar_unknown is not None:
+            self._counts['d2h_bytes']+=self.baseline_collar_unknown.nbytes;self._counts['d2h_calls']+=1
         self._counts['d2h_host_blocking_seconds']+=time.perf_counter()-host
         self._counts['d2h_calls']+=1;self._counts['d2h_bytes']+=array.nbytes
         width=residual.numel()

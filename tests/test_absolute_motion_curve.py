@@ -1,6 +1,8 @@
 """Small mathematical checks; no model assets, neural inference, or native DLL."""
 import unittest
 import numpy as np
+from scipy.interpolate import BSpline
+from scipy.sparse import isspmatrix_csr
 from scipy.spatial.transform import Rotation
 from calibration.program_tracking.body_tracking.absolute_motion_curve import AbsoluteMotionCurve, clamped_cubic_knots, greville_times, actual_angular_motion
 
@@ -23,6 +25,24 @@ class CurveChecks(unittest.TestCase):
         motion = actual_angular_motion(s['Q'], t)
         np.testing.assert_allclose(motion['omega'][:, 2], 4*np.pi, atol=2e-12)
         self.assertLess(np.max(np.abs(motion['alpha'])), 1e-9)
+
+    def test_sparse_basis_matches_independent_dense_spline_derivatives(self):
+        c = self.curve()
+        t = np.array([1., 0., .19, .19, np.nextafter(.19, 0.),
+                      np.nextafter(.19, 1.), .423, 0., .08, 1.])
+        reference = BSpline(c.knots, np.eye(len(c.position_controls)), 3, extrapolate=False)
+        for derivative in range(4):
+            with self.subTest(derivative=derivative):
+                basis = c.basis_sparse(t, derivative)
+                self.assertTrue(isspmatrix_csr(basis))
+                self.assertEqual(basis.dtype, np.dtype('float64'))
+                self.assertLessEqual(basis.nnz, 4*len(t))
+                expected = reference(t, derivative)
+                np.testing.assert_allclose(basis.toarray(), expected, rtol=5e-15, atol=5e-12)
+                np.testing.assert_array_equal(c.basis(t, derivative), basis.toarray())
+                np.testing.assert_allclose(c.position_derivative(t, derivative),
+                                           expected @ c.position_controls, rtol=5e-15, atol=5e-12)
+                np.testing.assert_array_equal(c.basis([], derivative), reference([], derivative))
 
     def test_actual_controls_can_change_without_frozen_reference_added_back(self):
         c = self.curve()
