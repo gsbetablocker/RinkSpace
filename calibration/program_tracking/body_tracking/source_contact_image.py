@@ -63,7 +63,8 @@ class NativeSupportContactFactors(SourceSupportLocationFactors):
                         mapping=dict(pixel_uncertainty_radius_px=[radius]))))
             self.feet=np.asarray([r['foot'] for r in self.rows],int)
         self.frames=np.asarray([r['frame'] for r in self.rows],int)
-        self.times=(self.ref.times[self.frames,None]+np.linspace(-.5,.5,5)*self.body.tau).ravel()
+        tau=self.problem.camera.readout_times(self.frames) if hasattr(self.problem.camera,'readout_times') else np.full(len(self.frames),self.body.tau)
+        self.times=(self.ref.times[self.frames,None]+np.linspace(-.5,.5,5)*tau[:,None]).ravel()
         self.base=self.ref.at(self.times)
 
     def evaluate(self,x,jacobian=False):

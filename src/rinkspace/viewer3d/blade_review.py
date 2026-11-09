@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from contextlib import ExitStack
 import numpy as np
 
 from .source import native_pts, region_outline
@@ -18,20 +19,35 @@ class BladeReview:
             raise ValueError('Unsupported blade player review schema')
         if time_base is not None and 'time_base' in self.document and tuple(self.document['time_base']) != tuple(time_base):
             raise ValueError('Blade review time base differs from player source')
-        projection = self.document['projection_npz']
-        projection = (assets.resolve(projection, base=path.parent, must_exist=True) if assets is not None
-                      else path.parent / projection)
         self.variants = self.document['variants']
         if not isinstance(self.variants, dict) or any(not isinstance(k, str) or not isinstance(v, str) or not v
                                                       for k, v in self.variants.items()):
             raise ValueError('Invalid blade review variant mapping')
-        with np.load(projection, allow_pickle=False) as saved:
-            pts = saved['pts']
+        layers=self.document.get('projection_layers')
+        if layers is None:
+            layers=[dict(path=self.document['projection_npz'],variants=list(self.variants))]
+        resolve=lambda value: (assets.resolve(value,base=path.parent,must_exist=True)
+                               if assets is not None else path.parent/value)
+        with ExitStack() as stack:
+            packets={};pts=None
+            for layer in layers:
+                candidate=stack.enter_context(np.load(resolve(layer['path']),allow_pickle=False))
+                clock=candidate['pts']
+                if pts is None:pts=clock
+                elif not np.array_equal(pts,clock):raise ValueError('Projection layers do not share the same source PTS')
+                if 'time_base' in candidate and 'time_base' in self.document and tuple(candidate['time_base'])!=tuple(self.document['time_base']):
+                    raise ValueError('Projection layer source time base differs')
+                for variant in layer['variants']:
+                    if variant in packets:raise ValueError('Duplicate layered projection variant')
+                    packets[variant]=candidate
+            if pts is None or packets.keys()!=self.variants.keys():
+                raise ValueError('Projection layers do not match declared variants')
             if pts.ndim != 1 or pts.dtype.kind not in 'iu' or not len(pts) or np.any(np.diff(pts.astype(np.int64)) <= 0):
                 raise ValueError('Blade review requires ordered unique native PTS')
             self.index = {native_pts(value): index for index, value in enumerate(pts)}
             self.models = {}
             for variant, prefix in self.variants.items():
+                saved=packets[variant]
                 model = {}
                 for suffix, shape in [('blade_uv', (len(pts), 2, 3, 2)),
                                       ('boot_uv', (len(pts), 2, 2, 2)),
@@ -85,7 +101,31 @@ class BladeReview:
                                 or not np.isfinite(edge_values).all()):
                             raise ValueError('Invalid saved actual runner projection')
                         model[edge_suffix] = edge_values.copy()
+                for suffix in ('pelvis_ice_uv','com_ice_uv'):
+                    key=prefix+'_'+suffix
+                    if key in saved:
+                        uv=np.asarray(saved[key])
+                        if uv.shape!=(len(pts),2) or not np.isfinite(uv).all():raise ValueError('Invalid frozen-camera trajectory UV')
+                        model[suffix]=uv
+                key=prefix+'_boot_outline_uv'
+                if key in saved:
+                    curves=np.asarray(saved[key])
+                    if (curves.ndim!=5 or curves.shape[:2]!=(len(pts),2) or curves.shape[-2:]!=(2,2)
+                            or not np.isfinite(curves).all()):raise ValueError('Invalid projected boot surface edges')
+                    model['boot_outline_uv']=curves
                 self.models[variant] = model
+        self.reviewed_matches={}
+        for variant,rows in self.document.get('reviewed_model_contours',{}).items():
+            if variant not in self.variants:raise ValueError('Reviewed contours lack a projection variant')
+            by_pts={}
+            for row in rows:
+                stamp=native_pts(row['pts'])
+                if stamp not in self.index or row['foot'] not in (0,1):raise ValueError('Invalid reviewed model contour clock or identity')
+                points=np.asarray(row['model_uv'],float)
+                if points.ndim!=2 or points.shape[-1]!=2 or len(points)<2 or not np.isfinite(points).all():
+                    raise ValueError('Invalid exact-source model contour')
+                by_pts.setdefault(stamp,[]).append(row)
+            self.reviewed_matches[variant]=by_pts
         self.rows = {}
         for key in ('source_boot_axes', 'source_regions', 'source_visibility', 'source_steel_segments', 'axis_metrics',
                     'source_structures', 'source_plane_locations', 'source_ice_grid'):
@@ -128,7 +168,7 @@ class BladeReview:
         pts = native_pts(pts)
         frame = self.index.get(pts)
         model = self.models.get(variant)
-        current = dict(pts=pts, model=None)
+        current = dict(pts=pts,model=None,reviewed_model_contours=self.reviewed_matches.get(variant,{}).get(pts,[]))
         if model is not None and frame is not None:
             current['model'] = {key: values[frame] for key, values in model.items()}
         current.update({key: rows.get(pts, []) for key, rows in self.rows.items()})
@@ -198,7 +238,8 @@ def skate_axis_primitives(state, *, unit_ratio=1., ice_normal_world=None):
 
 
 def overlay_primitives(current, *, include_model_reference=True, include_model_contours=False, include_model_body=False,
-                       include_source_structures=True, include_source_legacy=True, include_ice_grid=False):
+                       include_source_structures=True, include_source_legacy=True, include_ice_grid=False,
+                       include_trajectory=False):
     """Native primitives; source structures and model diagnostics are explicit layers."""
     green = (.2, 1., .4, 1.);orange = (1., .54, .12, 1.)
     blue, yellow, white = (.3, .45, 1., 1.), (1., .86, .15, 1.), (.94, .98, 1., 1.)
@@ -228,6 +269,17 @@ def overlay_primitives(current, *, include_model_reference=True, include_model_c
             for foot in range(2):
                 for edge in model[suffix][foot]:
                     line(edge,color,width,evidence_kind='model_actual_runner',foot=foot,model_curve_role=suffix)
+        for foot,curves in enumerate(model.get('boot_outline_uv',[])):
+            for segment in curves:
+                if np.any(segment[0]!=segment[1]):line(segment,(.41,.87,1.,.85),1.25,evidence_kind='model_boot_projection',foot=foot)
+        for row in current.get('reviewed_model_contours',[]):
+            line(row['model_uv'],(1.,.78,.94,1.),2.,evidence_kind='matched_model_contour',foot=row['foot'],feature=row['semantic'])
+    if model is not None and include_trajectory:
+        for key,name,color in [('pelvis_ice_uv','G',blue),('com_ice_uv','COM',yellow)]:
+            if key not in model:continue
+            point=model[key][None]
+            result.append(dict(kind='point',points=point,color=color,evidence_kind='model_plane_trajectory'))
+            label(point[0]+[6.,6.],name,color)
     if include_ice_grid:
         for row in current.get('source_ice_grid',[]):
             for grid in row['lines']:line(grid['points_uv'],(.65,.65,.65,.55),1.,evidence_kind='auxiliary_ice_coordinates')
@@ -252,14 +304,19 @@ def overlay_primitives(current, *, include_model_reference=True, include_model_c
                 'blade_assembly_outline':(.53,.25,.71,1.),'runner_lower_edge':(.08,.69,.22,1.),
                 'runner_upper_edge':(.08,.45,.25,1.),'toe_pick':(.86,.16,.18,1.),'rear_extension':(.2,.31,.84,1.),
                 'front_stanchion':(.63,.25,.69,1.),'rear_stanchion':(.63,.25,.69,1.),
-                'diagonal_brace':(.67,.25,.55,1.),'ice_interface':(.75,.57,0.,1.)}
+                'diagonal_brace':(.67,.25,.55,1.),'ice_interface':(.75,.57,0.,1.),
+                'boot_shell':(.12,.65,.8,1.),'heel_shell':(.12,.65,.8,1.),'toe_shell':(.12,.65,.8,1.),'outsole':(.88,.49,.08,1.),
+                'rear_mount':(.63,.25,.69,1.),'front_mount':(.63,.25,.69,1.),
+                'anatomical_landmark_region':(.99,.88,.23,1.),'support_neighborhood':(.8,.65,.12,1.)}
         for row in current.get('source_structures',[]):
             for key,feature in row['features'].items():
                 points=np.asarray(feature.get('points_uv',[]),float)
                 if points.size==0:continue
                 if feature.get('closed'):points=np.r_[points,points[:1]]
-                color=colors.get(key,(.37,.37,.37,1.));status=feature.get('status','unknown')
+                group='anatomical_landmark_region' if key.startswith('anatomical_landmark_region_') else feature.get('semantic',key)
+                color=colors.get(group,(.37,.37,.37,1.));status=feature.get('status','unknown')
                 metadata=dict(evidence_kind='source_structure',feature=key,source_status=status,foot=row['foot'])
+                if feature.get('role')=='check':label(points[0],'check',color)
                 if status=='observed':line(points,color,2.,**metadata)
                 else:
                     for a,b in zip(points[:-1],points[1:]):

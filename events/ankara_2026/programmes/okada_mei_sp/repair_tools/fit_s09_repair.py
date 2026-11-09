@@ -22,9 +22,7 @@ from calibration.program_tracking.body_tracking.programme_joint_limits import JO
 from calibration.program_tracking.body_tracking.rebuild_exposure_body import moving_projection
 from calibration.program_tracking.body_tracking.rebuild_prepare import digest, load
 from calibration.program_tracking.body_tracking.sequence_skate_state import SequenceState, shoe_curve_from_packet
-from calibration.program_tracking.body_tracking.skate_physics import fk_state
-from calibration.program_tracking.body_tracking.source_contact_image import NativeSupportContactFactors, witness_local_derivatives
-from calibration.program_tracking.body_tracking.source_support_locations import _runner_witness
+from calibration.program_tracking.body_tracking.source_contact_image import NativeSupportContactFactors
 from calibration.program_tracking.body_tracking.trajectory_backend import load_reference
 
 ALL_LEGS=(1,2,4,5,7,8,10,11)
@@ -77,7 +75,7 @@ def save_curve(saved,actual,active):
                 absolute_rotation_edge_reference_quaternion=actual.edge_reference_quaternion.copy())
 
 
-def fit_case(name,settings,saved,shared,camera,doc,prepared,observations,stored,marks,ice,anatomy_cap,axis):
+def fit_case(name,settings,saved,shared,camera,doc,prepared,observations,stored,marks,ice,axis):
     started=time.perf_counter()
     base=curve_from_packet(saved)
     pts=shared.p['pts']
@@ -177,14 +175,7 @@ def fit_case(name,settings,saved,shared,camera,doc,prepared,observations,stored,
         bands=[dict(b,objective_weight=1.0) for b in marks['left_runner_ice_interface_bands'] if b['role']=='fit']
         position=[r for r in ice if r['role']=='fit']
         np.testing.assert_array_equal([b['pts'] for b in bands],[r['pts'] for r in position])
-        idx=np.searchsorted(pts,[r['pts'] for r in position])
-        yz=np.array([b['polyline_uv'] for b in bands]).mean(1)[:,1]
-        support_ts=shared.times[idx]+camera.readout_times(idx)*(yz/(camera.image_height-1)-.5)
-        support_base=ref.at(support_ts)
-        targets=np.array([r['world_xy_model_m'] for r in position])
-        cov=np.array([r['covariance_model_m2'] for r in position])
-        W=4.3*np.linalg.inv(np.linalg.cholesky(cov))
-        feet=np.zeros(len(idx),int)
+        # The plane rows only check provenance; their pixels already enter as native bands.
         factor=NativeSupportContactFactors(SimpleNamespace(reference=ref,binding=ref.binding,camera=camera,
             body=SimpleNamespace(state=state,tau=tau[0]),size=state.size+17),native_bands=bands)
         mass=ContinuousMassGeometry(ref)
@@ -247,14 +238,6 @@ def fit_case(name,settings,saved,shared,camera,doc,prepared,observations,stored,
             e=entry_factor.evaluate(dx,True)
             add('entry_support_skate_image_bands',5.5*e['residual'],5.5*e['jac'][:,17+cols])
         if factor is not None:
-            ds=state.increments(dx,support_ts)
-            ps=fk_state(ref,support_base,ds)
-            R=ps['R'][:,0];O=ps['O'][:,0]
-            wt=_runner_witness(ref.binding,R,O)
-            error=np.einsum('nij,nj->ni',W,wt['world'][:,:2]*ratio-targets)
-            local,_=witness_local_derivatives(ref.binding,ds,ps,wt,R,feet)
-            J=ds.chain(np.einsum('nij,njc->nic',W*ratio,local[:,:2]))[:,cols]
-            add('runner_world_xy_camera_conditional',*robust_pairs(error,J,4.3))
             F=factor.evaluate(dx,True)
             add('native_visible_runner_bands',3.3*F['residual'],3.3*F['jac'][:,17+cols])
             C,Jc,_=com_local_jacobians(mass,mid_ref,dm)
@@ -263,7 +246,7 @@ def fit_case(name,settings,saved,shared,camera,doc,prepared,observations,stored,
             add('finite_COM_depth_curvature',accel,A@mid_j)
 
         V=limits.values(dm,native)[0][:,limit_ids]
-        penalty=np.maximum(V-anatomy_cap[limit_ids][None,:,None],0.)
+        penalty=V
         deriv=np.zeros((n,3*len(limit_ids),69))
         eps=1e-6
         for k,joint_ix in enumerate(limit_ids):
@@ -272,8 +255,8 @@ def fit_case(name,settings,saved,shared,camera,doc,prepared,observations,stored,
                 u,v=np.asarray(dm).copy(),np.asarray(dm).copy()
                 u[:,idx+a]+=eps;v[:,idx+a]-=eps
                 d=(limits.values(u,native)[0][:,joint_ix]-limits.values(v,native)[0][:,joint_ix])/(2*eps)
-                deriv[:,3*k:3*k+3,idx+a]=d*(penalty[:,k]>0)
-        add('finite_anatomical_excess',70*penalty,70*dm.chain(deriv)[:,cols])
+                deriv[:,3*k:3*k+3,idx+a]=d
+        add('finite_anatomical_domain',70*penalty,70*dm.chain(deriv)[:,cols])
         add('local_control_prior',reg@x,reg)
         residual=np.concatenate(values)
         J=vstack(blocks,format='csr')
@@ -332,8 +315,9 @@ def fit_case(name,settings,saved,shared,camera,doc,prepared,observations,stored,
 
 def main():
     parser=argparse.ArgumentParser()
-    for key in ('project','prepared','source','parameter','result','annotations','ice','anatomy-metrics','before-audit','output'):
+    for key in ('project','prepared','source','parameter','result','annotations','ice','before-audit','output'):
         parser.add_argument('--'+key,type=Path,required=True)
+    parser.add_argument('--anatomy-metrics',type=Path,help='Deprecated archived input; no programme peak can grant a local joint allowance')
     parser.add_argument('--cases',nargs='+',choices=list(CASES),default=list(CASES))
     parser.add_argument('--entry-detail',action='store_true',
                         help='Use the second-pass bounds and support-runner evidence for spin_entry')
@@ -344,8 +328,6 @@ def main():
     shared,camera,info,doc,_=load_reference(args.project,args.prepared,args.source)
     marks=json.loads(args.annotations.read_text('utf8'))
     ice=json.loads(args.ice.read_text('utf8'))
-    anatomy=json.loads(args.anatomy_metrics.read_text('utf8'))['physical_diagnostics']['anatomical_joint_domain']['joints']
-    cap=np.array([r['peak_dimensionless_violation'] for r in anatomy])
     axis=load(args.before_audit)['camera_planar_axes'][:,1]
     start=load(args.parameter)
     p=start
@@ -357,7 +339,7 @@ def main():
         settings=CASES[name]
         if args.entry_detail:
             settings=dict(settings,xy=.06,z=.06,pose=.66,entry_detail=True)
-        p,q=fit_case(name,settings,p,shared,camera,doc,args.prepared,obs,stored,marks,ice,cap,axis)
+        p,q=fit_case(name,settings,p,shared,camera,doc,args.prepared,obs,stored,marks,ice,axis)
         result.append(q)
         interim=args.output.with_name(args.output.stem+'_'+name+'_checkpoint.npz')
         with interim.open('xb') as f:np.savez_compressed(f,**p)
@@ -368,7 +350,8 @@ def main():
     receipt=dict(parent_sha256=digest(args.parameter),candidate_sha256=digest(args.output),
                  annotations_sha256=digest(args.annotations),ice_footprints_sha256=digest(args.ice),
                  camera_sha256=info['state_sha256'],cases=result,accuracy_accepted=False,
-                 scope='Exact revised whole curve with local source-supported leg and view-depth corrections.')
+                 acceptance='proposal_only', full_objective_replayed=False,
+                 scope='Local proposal on the exact whole curve; requires separate full replay and structure review.')
     with args.output.with_suffix('.json').open('x',encoding='utf8') as f:json.dump(receipt,f,indent=2)
     log(event='complete',output=str(args.output),sha256=receipt['candidate_sha256'])
 

@@ -2,6 +2,7 @@
 from pathlib import Path
 import io
 import os
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -58,6 +59,8 @@ def test_constraints_match_reference_bounds_and_separate_source_weights(syntheti
         dict(id="test_right_pick", pts=round((origin+times[2])*12800), feet=[1], mode="pick"),
         dict(id="test_uncertain_foot", pts=round((origin+times[4])*12800), feet=[0, 1], mode="glide"),
     ]
+    native_pts = round(origin * 12800) + np.arange(9) * 256
+    b.reference = SimpleNamespace(p={"pts": native_pts, "time_base": [1, 12800]})
     actual = constraints(b, dict(R=R, O=O), times, origin, evidence)
     expected, weights = [], []
     time_weights = trapezoid_time_weights(times)

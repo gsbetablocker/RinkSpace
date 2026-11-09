@@ -394,7 +394,12 @@ class ProgrammeSurfaceFactor:
         validate_response_policy(self.packet,self.geometry.response_policy)
         self.times=self.packet['times'];self.scale_m=float(scale_m)
         self.weight=np.sqrt(trapezoid_time_weights(self.times))[self.packet['sample']]/self.scale_m
-        self.association=signature(self.packet['sample'],self.packet['vertex'],self.packet['face_vertices'],self.packet['bary'],self.packet['normal'])
+        if 'witness_share' in self.packet:
+            share=self.packet['witness_share']
+            if share.shape!=self.weight.shape or np.any(~np.isfinite(share) | (share<=0) | (share>1)):
+                raise ValueError('Invalid shared semantic witness budget')
+            self.weight*=np.sqrt(share)
+        self.association=signature(self.packet['sample'],self.packet['vertex'],self.packet['face_vertices'],self.packet['bary'],self.packet['normal'],self.packet.get('witness_share'))
         self.normal_mode=document.get('programme_structure',{}).get('surface_normal_mode',FROZEN_NORMAL_MODE)
         if self.normal_mode not in (FROZEN_NORMAL_MODE,MOVING_NORMAL_MODE):
             raise ValueError('Unknown surface normal mode: '+str(self.normal_mode))

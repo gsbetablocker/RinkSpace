@@ -51,6 +51,15 @@ class SequenceActions:
         if document.get('unassigned_source_skate_sets'):
             from .source_skate_structure_factors import UnassignedSkateSetFactors
             self.unassigned=UnassignedSkateSetFactors(problem,document['unassigned_source_skate_sets'],episode=document.get('source_episode_review',{}).get('late_identity_episode'))
+        self.reviewed_skates=None
+        self.boot_axes=None
+        evidence=document.get('programme_skate_evidence')
+        if evidence:
+            from .programme_skate_evidence import ProgrammeSkateSourceFactors
+            self.reviewed_skates=ProgrammeSkateSourceFactors(problem,evidence)
+            tracked=evidence.get('tracked_sequence_policy',{})
+            if base_factors is not None and tracked.get('boot_axes_enabled') and document.get('boot_axis_observations'):
+                self.boot_axes=BootAxisFactors(problem,document,document['boot_axis_observations'])
         self.extra_unassigned_episodes=[]
         for entry in document.get('additional_unassigned_source_episodes',[]):
             from .source_skate_structure_factors import UnassignedSkateSetFactors
@@ -86,6 +95,8 @@ class SequenceActions:
             value=factor.evaluate(x,jacobian).copy()
             value['parts']={'additional_unassigned_source_'+episode_id:value['image_cost']}
             outputs.append(value)
+        if self.reviewed_skates is not None:outputs.append(self.reviewed_skates.evaluate(x,jacobian))
+        if self.boot_axes is not None:outputs.append(self.boot_axes.evaluate(x,jacobian))
         matrix=vstack([v['jac'] for v in outputs],format='csr') if jacobian and not self.split_jacobian_only else None
         out=dict(residual=np.concatenate([v['residual'] for v in outputs]),jac=matrix,parts={},metrics={})
         for v in outputs:
@@ -99,6 +110,8 @@ class SequenceActions:
         out['image_cost']=self.existing.grasp.last.get('image_cost',0.)+sum(v.get('image_cost',0.) for v in outputs[1:])
         factors=[self.shoe,self.modes]+([] if self.contour is None else [self.contour])+([] if self.extent is None else [self.extent])+([] if self.source_locations is None else [self.source_locations])+([] if self.structure_extent is None else [self.structure_extent])+([] if self.unassigned is None else [self.unassigned])
         factors.extend(f for _,f in self.extra_unassigned_episodes)
+        if self.reviewed_skates is not None:factors.append(self.reviewed_skates)
+        if self.boot_axes is not None:factors.append(self.boot_axes)
         out['factor_row_counts']=outputs[0]['factor_row_counts']+[(type(f).__name__,len(v['residual'])) for f,v in zip(factors,outputs[1:])]
         from .weighted_blocks import block,signature
         out['weighted_blocks']=[]

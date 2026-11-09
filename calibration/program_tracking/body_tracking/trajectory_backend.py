@@ -228,7 +228,7 @@ def seed_reference(shared,initial,document,camera):
     ref=absolute_reference(seed,curve,root=shared.root);ref.relative_skate_curve=shoe;ref.binding.reference=ref
     return ref,dict(body_controls=len(C),shoe_controls=len(gt),P_seed_max_solver_m=float(np.max(np.linalg.norm(curve.basis(t)@C-initial['P'],axis=-1))),no_fixed_dense_pose_added_back=True,whole_seconds=absolute[[0,-1]].tolist())
 
-def load_reference(project,prepared,source_evidence=None):
+def load_reference(project,prepared,source_evidence=None,*,native_library=None):
     from rinkspace.storage import AssetStore
     from rinkspace.viewer3d.prepare import FullSurface
     from .footwear_layout import OBSERVATION_LAYOUT
@@ -241,7 +241,7 @@ def load_reference(project,prepared,source_evidence=None):
         candidate_camera=document.get('programme_camera_candidate',{})
         record=candidate_camera.get('record')
         if record and digest(record)!=candidate_camera['record_sha256']:raise ValueError('Candidate camera record changed')
-        camera=ProgrammeCamera(project,p,p['shot_ids'],record_path=record);info=camera.info
+        camera=ProgrammeCamera(project,p,p['shot_ids'],record_path=record,native_library=native_library);info=camera.info
     else:
         spec=load(prepared/'static_camera.npz');camera=StaticCropCamera(p,spec['K_input'],spec['R_w2c'],spec['C_world_m']);info=json.loads((prepared/'camera_context.json').read_text(encoding='utf-8'))
     ref,seed_report=seed_reference(shared,initial,document,camera);ref.bounded_memory=True;ref.source_document=document;ref.observations_path=prepared/'observations.npz';ref.export_source_path=prepared/'export_source.npz';ref.ice_plane_known=bool(document['scene_contract']['ice_plane_known']);ref.ice_policy=None
@@ -262,6 +262,47 @@ def primary_policy(problem):
     problem.objective_block_weights=dict(body_pixels=np.repeat(weight,2),finite_network_pose_prior=.2,finite_parent_root_prior=.04,dynamic_foot_compatibility=.35,finite_relative_skate_wear_prior=.6,full_source_skate_structure=5.,complete_runner_extent=5.,complete_visible_structure_extent=5.,native_source_support_contact=2.,source_pixel_edge_profile=3.)
     problem.trajectory_primary_mode=True;problem.image_safe_trials=True;problem.source_group_baseline={}
     return dict(schema='rinkspace.trajectory-primary-policy.v1',priority=['P/G with reliable torso and source support','both attached skates and finite physics','decoration'],body_confidences=dict(face=.025,torso=.35,lower=.45,upper=.07,boot_occluded_ankle=.045),source_budget_multipliers={k:v for k,v in problem.objective_block_weights.items()if'source'in k or'extent'in k},raw_UV_sigma_use_unchanged=True,finite_ice_and_footwear_objective_retained=True,internal_mm_structure_not_delivery_gate=True,FS_reference_or_holdout_used_for_policy=False)
+
+def configure_programme_weights(problem,base,document,x):
+    """The same declared production weights for solve, proposal and replay."""
+    action=action_policy(document)
+    weights=primary_policy(problem)
+    if document.get('trajectory_reference')=='model_com':
+        weights.update(trajectory_reference='model_com',mass_is_proxy=True,
+            priority=['complete model COM trajectory with original source evidence','both attached skates and finite physics','decoration'],
+            com_motion_policy=document['com_motion_policy'])
+    if action:
+        family_weights=dict(episode_support=1., rotation_direction_path=12.,source_facing_cone=2.,rotation_path_impulse=1.4,
+            flight_integrated_com=1.,flight_specific_momentum=.8,native_source_support_contact=2.,
+            programme_parent_root_trust=.24,self_collision=.75,signed_joint_relation=.65,
+            step_runner_lateral=1.,step_runner_travel=.5)
+        if document.get('programme_structure',{}).get('enabled'):
+            joint_weight=float(document['programme_structure'].get('anatomical_domain_weight',8.))
+            if not np.isfinite(joint_weight) or joint_weight<=0:
+                raise ValueError('Finite positive anatomical domain objective weight required')
+            family_weights.update(surface_intersection=16.,anatomical_joint_domain=joint_weight,self_collision=.15,source_supported_grasp=1.)
+        if document.get('com_motion_policy',{}).get('confirmed_flight_acceleration_scale_mps2') is not None:
+            family_weights['flight_dense_com_acceleration']=1.
+        declared=base.evaluate(x[17:],False)['weighted_blocks']
+        for entry in declared:
+            family=entry.name.rsplit('/',1)[-1]
+            if family in family_weights:
+                problem.objective_block_weights[entry.name]=family_weights[family]
+            elif entry.name.startswith('episode/'):
+                raise ValueError('No declared weight for '+entry.name)
+        problem.objective_block_weights['temporal_contact_mode']=.55
+        weights.update(action_revision=action,episode_family_weights=family_weights,
+            robust_runner_mode_weight=.55,
+            exact_episode_weight_keys=[b.name for b in declared if b.name.startswith('episode/')])
+    evidence=document.get('programme_skate_evidence')
+    if evidence is not None:
+        new=evidence['weights']
+        problem.objective_block_weights.update(manual_native_leg=new['manual_landmark'],
+            ordered_native_skate=new['ordered_contour'],reviewed_native_support=new['native_support'])
+        weights.update(priority=['P/G and reliable body source', 'attached shoes and basic physics', 'decoration'],
+                       reviewed_source_weights=dict(new),conditional_plane_xy_is_diagnostic=True)
+    return weights
+
 
 def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_linear=False,device_batch=1024,quality_baseline=None,freeze_root=False,diagnostic_profile=False,protected_source_evidence=None,source_episode_choices=None,warm_start=None,save_linear_cache=False,source_conditioned_step=False,source_evidence=None,verify_action_direction=False):
     project,prepared,output=map(Path,(project,prepared,output))
@@ -421,34 +462,7 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
             context_record=bind_action_objective_context(problem,base,source_evidence,
                 saved=saved,legacy_stage=old_stage if saved is not None else None)
             log.write(json.dumps(dict(event='action_objective_context',**context_record))+'\n')
-        weights=primary_policy(problem)
-        if document.get('trajectory_reference')=='model_com':
-            weights.update(trajectory_reference='model_com',mass_is_proxy=True,
-                priority=['complete model COM trajectory with original source evidence','both attached skates and finite physics','decoration'],
-                com_motion_policy=document['com_motion_policy'])
-        if action:
-            family_weights=dict(episode_support=1., rotation_direction_path=12.,source_facing_cone=2.,rotation_path_impulse=1.4,
-                flight_integrated_com=1.,flight_specific_momentum=.8,native_source_support_contact=2.,
-                programme_parent_root_trust=.24,self_collision=.75,signed_joint_relation=.65,
-                step_runner_lateral=1.,step_runner_travel=.5)
-            if document.get('programme_structure',{}).get('enabled'):
-                joint_weight=float(document['programme_structure'].get('anatomical_domain_weight',8.))
-                if not np.isfinite(joint_weight) or joint_weight<=0:
-                    raise ValueError('Finite positive anatomical domain objective weight required')
-                family_weights.update(surface_intersection=16.,anatomical_joint_domain=joint_weight,self_collision=.15,source_supported_grasp=1.)
-            if document.get('com_motion_policy',{}).get('confirmed_flight_acceleration_scale_mps2') is not None:
-                family_weights['flight_dense_com_acceleration']=1.
-            declared=base.evaluate(x[17:],False)['weighted_blocks']
-            for entry in declared:
-                family=entry.name.rsplit('/',1)[-1]
-                if family in family_weights:
-                    problem.objective_block_weights[entry.name]=family_weights[family]
-                elif entry.name.startswith('episode/'):
-                    raise ValueError('No declared weight for '+entry.name)
-            problem.objective_block_weights['temporal_contact_mode']=.55
-            weights.update(action_revision=action,episode_family_weights=family_weights,
-                robust_runner_mode_weight=.55,
-                exact_episode_weight_keys=[b.name for b in declared if b.name.startswith('episode/')])
+        weights=configure_programme_weights(problem,base,document,x)
         write_json(output/'objective_policy.json',weights)
         np.savez_compressed(output/'objective_block_weights.npz',**problem.objective_block_weights)
         problem.checkpoint_extra.update(objective_phase=np.array(action.get('stage','trajectory_primary')),objective_policy_sha256=np.array(digest(output/'objective_policy.json')),objective_block_weights_sha256=np.array(digest(output/'objective_block_weights.npz')))
@@ -484,6 +498,14 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
             if unassigned is not None and unassigned.episode_factors:
                 restore_source_episode(unassigned,source_context,'source_association_unassigned_',
                     choice_key='source_association_episode_choice')
+        reviewed=getattr(problem.action_factors,'reviewed_skates',None)
+        if reviewed is not None:
+            matches=None if source_context is None else source_context.get('ordered_source_association_json')
+            if (matches is not None and str(source_context.get('source_evidence_sha256',''))==digest(source_evidence)):
+                reviewed.ordered.restore(json.loads(str(matches)))
+            elif saved is not None:
+                raise ValueError('Exact resume requires ordered source associations from the same ledger')
+            else:reviewed.ordered.associate(x[17:])
         hypothesis_records=[]
         for episode_id,factor in problem.action_factors.extra_unassigned_episodes:
             prefix='source_association_extra_'+episode_id+'_'
@@ -533,6 +555,8 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
                 value=getattr(selected,field,None)
                 if value is not None:frozen['source_association_unassigned_'+field]=np.asarray(value).copy()
         frozen.update(extra_associations)
+        if reviewed is not None:
+            frozen['ordered_source_association_json']=np.array(json.dumps(reviewed.ordered.association_record(),sort_keys=True))
         association_origin=('restored saved fixed source associations; missing historical diagnostic scores remain empty'
             if saved is not None else 'archived global seed for existing tracks; recorded first common warm state for new episode tracks')
         problem.checkpoint_extra.update(frozen,source_association_origin=np.array(association_origin),source_evidence_sha256=np.array(digest(source_evidence)))

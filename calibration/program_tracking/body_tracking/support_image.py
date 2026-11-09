@@ -34,8 +34,15 @@ class SupportImageFactors:
         for selected,(_,o,_) in zip(self.planar_rows,self.rows):
             if selected and (o.kind!='support_contact_region' or o.contact_state!='supported'):
                 raise ValueError('Nominal-ice position reference requires an explicit source-supported contact region')
-        self.times=(self.reference.times[self.frames,None]+np.linspace(-.5,.5,5)*self.body.tau).ravel()
-        self.ref=self.reference.at(self.times);self.B=self.body.state.basis(self.times).reshape(-1,5,self.body.state.m)
+        camera=problem.camera
+        readout=(camera.readout_times(self.frames) if hasattr(camera,'readout_times')
+                 else np.full(len(self.frames),self.body.tau))
+        self.times=(self.reference.times[self.frames,None]+np.linspace(-.5,.5,5)*readout[:,None]).ravel()
+        self.ref=self.reference.at(self.times)
+        state=self.body.state
+        # Absolute state already chains the five nodes through its sparse
+        # support. The dense basis is only used by the legacy local spline.
+        self.B=None if getattr(state,'is_absolute',False) else state.basis(self.times).reshape(-1,5,state.m)
         arcs=self.binding.packet()['template']['contact_arcs']
         self.arcs={a['id']:a for a in arcs if a['semantic']=='runner'}
         self.arc_ids={} if arc_ids is None else dict(arc_ids)

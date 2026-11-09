@@ -174,8 +174,28 @@ def fit_participation(prepared,parameter,*,saved=None,document=None,source_evide
             for row in document.get('unassigned_source_skate_sets',[]) if 'pts'in row]+extra)
 
 
+def boot_outline(equipment, faces):
+    """Visible contour of the existing projected 14-vertex shoe adapter."""
+    uv=np.asarray(equipment)[:,:,:14]
+    faces=np.asarray(faces)
+    adjacency={}
+    for i,tri in enumerate(faces):
+        for a,b in zip(tri,np.roll(tri,1)):
+            adjacency.setdefault(tuple(sorted((a,b))),[]).append(i)
+    p=uv[:,:,faces]
+    u,v=p[...,1,:]-p[...,0,:],p[...,2,:]-p[...,0,:]
+    signed=u[...,0]*v[...,1]-u[...,1]*v[...,0]
+    edges=uv[:,:,np.asarray(list(adjacency))].copy()
+    for j,near in enumerate(adjacency.values()):
+        if len(near)==1:continue
+        z=signed[...,near]
+        hidden=~((z.min(-1)<0)&(z.max(-1)>0))
+        edges[:,:,j,1]=np.where(hidden[...,None],edges[:,:,j,0],edges[:,:,j,1])
+    return edges
+
+
 def generate(project, prepared, parameter, result, output, *, variant=VARIANT, review_evidence=None,
-             source_evidence=None, batch_frames=512):
+             source_evidence=None, batch_frames=512, replay_fit_binding=None):
     project, prepared, parameter, result, output = map(lambda p: Path(p).resolve(),
                                                      (project, prepared, parameter, result, output))
     source_evidence = prepared/'source_evidence.json' if source_evidence is None else Path(source_evidence).resolve()
@@ -189,14 +209,23 @@ def generate(project, prepared, parameter, result, output, *, variant=VARIANT, r
         raise FileExistsError('Every projection registration requires a new output directory: ' + str(output))
     if not output.is_relative_to(Path(assets.data).resolve()):
         raise ValueError('Projection artifacts must stay under the configured Data root')
-    hashes = {str(p): digest(p) for p in (prepared / 'input.npz', prepared / 'observations.npz',
+    from .programme_skate_evidence import programme_observation_path
+    observations = programme_observation_path(prepared, source_evidence)
+    hashes = {str(p): digest(p) for p in (prepared / 'input.npz', observations,
               prepared / 'initial.npz', prepared / 'fixed_binding.npz', source_evidence, parameter, result)}
     saved, exported = load(parameter), load(result)
-    for field, name in (('prepared_input_sha256', 'input.npz'),
-                        ('prepared_observations_sha256', 'observations.npz')):
-        if str(saved[field]) != hashes[str(prepared / name)]:
+    for field, path in (('prepared_input_sha256', prepared / 'input.npz'),
+                        ('prepared_observations_sha256', observations)):
+        if str(saved[field]) != hashes[str(path)]:
             raise ValueError('Saved final parameter differs from prepared identity: ' + field)
-    fit_binding = fit_participation(prepared, parameter, saved=saved, source_evidence=source_evidence)
+    if replay_fit_binding is None:
+        fit_binding = fit_participation(prepared, parameter, saved=saved, source_evidence=source_evidence)
+    else:
+        fit_binding=copy.deepcopy(replay_fit_binding)
+        if (fit_binding['parameter_sha256']!=hashes[str(parameter)]
+                or fit_binding['source_evidence_sha256']!=hashes[str(source_evidence)]
+                or str(saved['source_evidence_sha256'])!=hashes[str(source_evidence)]):
+            raise ValueError('Explicit replay fit registration differs from the saved candidate/source')
     ref, camera, info, _, _ = load_reference(project, prepared, source_evidence=source_evidence)
     validate_checkpoint_identity(saved, ref.fixed_checkpoint_identity)
     # Reuse the camera returned by the explicit prepared loader. No camera is
@@ -300,6 +329,13 @@ def generate(project, prepared, parameter, result, output, *, variant=VARIANT, r
         source_contact_truth_status=np.full((n, 2), 'unmeasured', dtype='U16'),
         contact_mode=np.full((n, 2), 'unknown', dtype='U16'),
         edge_mode=np.full((n, 2), 'unknown', dtype='U16'), mode_conflict=np.zeros((n, 2), bool), **axes)
+    if replay_fit_binding is not None:
+        values['boot_outline_uv']=boot_outline(exported['equipment_uv'],exported['boot_surface_faces'])
+        g=exported['G_world_mid']
+        com_ice=exported['com_world_mid'].copy();com_ice[:,2]=0.
+        on_ice=camera.project(np.stack((g,com_ice),axis=1)/ratio,np.arange(n))
+        values['pelvis_ice_uv']=on_ice[:,0]
+        values['com_ice_uv']=on_ice[:,1]
     arrays = dict(pts=pts.copy(), time_base=np.asarray(tb), shot_ids=shots.copy(), readout_seconds=readout)
     if not variant or not variant.replace('_', '').isalnum():
         raise ValueError('A stable projection variant identifier is required')

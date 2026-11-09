@@ -98,6 +98,7 @@ class ResultsPlayer(Viewer):
         has_source_structures=bool(self.blade_review and self.blade_review.rows.get('source_structures'))
         self.show_model_reference=not has_source_structures
         self.show_model_runner=bool(catalog.config.get('source_review_model_runner_default',False))
+        self.show_source_model_trajectory=bool(catalog.config.get('source_review_model_trajectory_default',False))
         self.show_model_body=bool(catalog.config.get('source_review_model_body_default',False))
         self.show_legacy_source=not has_source_structures
         self.show_source_ice_grid=False
@@ -603,9 +604,10 @@ class ResultsPlayer(Viewer):
                 imgui.text('当前保存版本：'+self.variant['id'])
                 if self.blade_review is not None:
                     _,self.show_blade_review=imgui.checkbox('原片源结构描线（非模型）',self.show_blade_review)
-                    _,self.show_model_runner=imgui.checkbox('模型钢刃回投（深粉下缘／浅粉上缘）',self.show_model_runner)
+                    _,self.show_model_runner=imgui.checkbox('模型鞋刀回投（粉色钢刃／浅蓝鞋体）',self.show_model_runner)
                     _,self.show_model_body=imgui.checkbox('模型人体回投（紫色；模型预测）',self.show_model_body)
                     _,self.show_model_reference=imgui.checkbox('模型参考轴（蓝／橙；不是轮廓）',self.show_model_reference)
+                    _,self.show_source_model_trajectory=imgui.checkbox('骨盆 G / COM 冰面投影（模型）',self.show_source_model_trajectory)
                     _,self.show_legacy_source=imgui.checkbox('旧源区域与短线段',self.show_legacy_source)
                     _,self.show_source_ice_grid=imgui.checkbox('冰面坐标辅助网格（相机回投）',self.show_source_ice_grid)
                     source_pts=sorted(self.blade_review.rows.get('source_structures',{}))
@@ -618,7 +620,7 @@ class ResultsPlayer(Viewer):
                         pts=int(self.catalog.pts[self.frame])
                         current_sources=self.blade_review.rows['source_structures'].get(pts,[])
                         imgui.text('鞋刀源描线（含局部）：%d / %d曝光；当前帧：%s'%(len(source_pts),len(self.catalog.pts),'有' if current_sources else '尚未标注'))
-                        imgui.text_wrapped('源描线：青鞋体，橙鞋底/鞋跟，紫刀架，绿钢刃，红刀齿区域，蓝刀尾；虚线为局部分界/推断。')
+                        imgui.text_wrapped('源描线：青鞋体，橙鞋底，紫刀架，绿钢刃；只画原片可见范围。标有“check”的线未用于拟合。')
                         fit_binding=self.blade_review.document.get('source_structure_fit_variants',{}).get(self.variant['id'])
                         if fit_binding:
                             imgui.text_wrapped(fit_binding['description_zh'])
@@ -654,17 +656,19 @@ class ResultsPlayer(Viewer):
                     primitives=(overlay_primitives(review,include_model_reference=self.show_model_reference,
                         include_model_contours=self.show_model_runner,include_model_body=self.show_model_body,
                         include_source_structures=self.show_blade_review,
-                        include_source_legacy=self.show_legacy_source,include_ice_grid=self.show_source_ice_grid) if review is not None else [])
+                        include_source_legacy=self.show_legacy_source,include_ice_grid=self.show_source_ice_grid,
+                         include_trajectory=self.show_source_model_trajectory) if review is not None else [])
                     width,height=self.source_image_size
                     display_width=max(100.,imgui.get_content_region_available()[0])
                     self.gui_source_image(rows,(0.,0.,float(width),float(height)),display_width,primitives)
                     crops=[]
                     for source_row in ([] if review is None else review.get('source_structures',[])):
                         source_points=[np.asarray(f.get('points_uv',[]),float)for f in source_row['features'].values()if len(f.get('points_uv',[]))]
-                        if source_points:crops.append((source_row.get('foot'),source_row.get('source_track_id'),np.concatenate(source_points)))
+                        if source_points and any(not k.startswith('anatomical_landmark_region') for k in source_row['features']):
+                            crops.append((source_row.get('foot'),source_row.get('source_track_id'),np.concatenate(source_points)))
                     if not crops:
                         bounds=[primitive['points'] for primitive in primitives if primitive['kind']!='text'
-                                and primitive.get('evidence_kind')!='model_body_projection']
+                                and primitive.get('evidence_kind') not in ('model_body_projection','model_plane_trajectory')]
                         if review is None:bounds=[region_outline(row)for row in rows]
                         if bounds:crops=[(None,None,np.concatenate(bounds))]
                     for source_foot,source_track,points in crops:
@@ -823,7 +827,14 @@ class ResultsPlayer(Viewer):
                 if imgui.button('动作起点'):self.seek(episode['start_frame'])
                 imgui.same_line()
                 if imgui.button('动作终点'):self.seek(episode['end_frame'])
+                worst=episode.get('worst_pts')
+                if type(worst)is int:
+                    j=int(np.searchsorted(self.catalog.pts,worst))
+                    if episode['start_frame']<=j<=episode['end_frame'] and self.catalog.pts[j]==worst:
+                        imgui.same_line()
+                        if imgui.button('最差曝光'):self.seek(j)
                 imgui.text('动作原片区间 %.2f–%.2f 秒'%(self.catalog.seconds[episode['start_frame']],self.catalog.seconds[episode['end_frame']]))
+                if episode.get('reason_zh'):imgui.text_wrapped(episode['reason_zh'])
             s=self.sequence.state
             if self.blade_review is not None:
                 for line in diagnostic_lines(self.blade_review.at(self.variant['id'],int(self.catalog.pts[f]))):

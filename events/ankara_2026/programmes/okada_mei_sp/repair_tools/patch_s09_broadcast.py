@@ -58,7 +58,7 @@ def patch_stream(args,p,segments,file):
         '-c:v','libx264','-preset','ultrafast','-crf','0','-video_track_timescale','12800',str(file)])
     started=time.perf_counter()
     limit=sum(b-a for a,b in segments)
-    panel=legend()
+    panel=legend(getattr(p,'show_runner',False))
     details=[]
     count=0
     last=started

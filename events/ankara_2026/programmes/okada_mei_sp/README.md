@@ -86,6 +86,19 @@ S09 修订在留出的 150.980 秒帧将膝踝最大投影偏差从 281.1 降到
 
 原投影复现见[源时钟与显示核对](repair_tools/audit_s09_source_motion.py)。[LSp](repair_tools/fit_lsp_arm_continuity.py)和[S09](repair_tools/fit_s09_repair.py)使用已登记输入和局部连续控制。[完整三维导出](repair_tools/export_checked_s09_state.py)与[原片对照](repair_tools/compare_s09_repair.py)复用冻结模型和相机。[九镜头回投](repair_tools/render_programme_body_com.py)包含人体、冰面网格和 COM；[修订回投](repair_tools/patch_s09_broadcast.py)重绘受影响的图层和 COM 尾迹，以固定 50 帧顺序编码并核对原音。运行需要相符的本机模型、输入、原片与 FFmpeg。两版 MP4 与完整拟合数组留在 Data，路径和 SHA 由节目绑定登记。
 
+<a id="skate-evidence-1109"></a>
+### 全节目鞋体与钢片候选（2026-11-09，待复核）
+
+[同帧播放器](../../../../launchers/START_SKATE_EVIDENCE_1109.cmd)在原片 22.120–188.680 秒的 8329 个曝光中切换 LSp 连续版、S09 源证据版及[鞋刀新候选](programme_skate_evidence_1109.json)。开启鞋刀证据图层可区分鞋体、钢片、拟合与检查描线；在“完整动作”中选“最差曝光”可直达记录的失败帧。原有默认和历史候选保留。
+
+鞋体与钢片按可见边界进入全动作目标；检查点和派生冰面位置不参加求解。局部计算只提出候选，验收重放全片目标和结构；关节退化按同一曝光和同一关节比较。相对旧 S09，鞋刀描线的加权目标从 24.77 降到 12.94；150.980 秒留出膝踝、150.840 秒右膝和 161.480 秒支撑带仍未通过。完整投影、同帧图和离线审计包由[候选记录](programme_skate_evidence_1109.json)连接 Data；保留完整 LSp 根旋转、S01 和 2A。
+
+[九镜头复核候选](programme_full_review_1109.json)按原片顺序审阅全片，并对问题段加密。S05 后脚蹬伸修订了原检测对应，S05、S06 与 S09 伸腿后半段的连续修正通过同源全片重放。[同帧播放器](../../../../launchers/START_FULL_REVIEW_1109.cmd)提供自动失败导航，S02、S04 和联合旋转换足的剩余问题可直接定位。
+
+[连续刀姿](programme_blade_continuous_1109.json)、[原片短时跟踪](programme_blade_tracks_1109.json)和[人体链与双鞋复核](programme_skate_chain_v1.json)保留了后续工程候选。最后一版在 8329 个原片曝光重放全目标和结构检查，S05 局部得到改善。整节目冰刀回投仍有明显错位，候选尚未通过视觉验收。实际源 Jacobian 和候选检查入口见[导出](repair_tools/prepare_chain_replay.py)与[重放](repair_tools/recover_physical_events.py)。
+
+[独立两鞋试验](independent_shoes_review_1109.json)使用同一冻结相机求解双鞋位姿。用户复核判定失败。39 条留出钢片描线的中位偏差为 17.9 像素，模型仍有方向突跳。轨迹、回投和复核记录保存在 Data。
+
 <a id="人体整合与根轨迹对照2026-11-04未验收"></a>
 
 ### S05 与动作中间结果导航

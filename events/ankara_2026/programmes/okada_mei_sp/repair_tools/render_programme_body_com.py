@@ -37,6 +37,7 @@ COM_COLOR = (32, 198, 255)
 BODY_COLOR = (240, 229, 51)
 SHOE_COLOR = (232, 236, 127)
 GRID_COLOR = (160, 125, 82)
+RUNNER_COLORS = ((255, 237, 33), (247, 61, 236))
 
 PROJECTION = """
 #version 430
@@ -284,7 +285,7 @@ class Programme:
         config = json.loads(read_json(args.config))
         variant = next(v for v in config['variants'] if v['id']==config['latest_review_variant'])
         self.variant = variant['id']
-        self.scope_path = args.config.parent/'rebuild_scope.json'
+        self.scope_path = getattr(args,'scope',None) or args.config.parent/'rebuild_scope.json'
         self.scope = json.loads(read_json(self.scope_path))
         self.pts, self.shots, time_base = required_clock(self.scope)
         np.testing.assert_array_equal(time_base,[1,12800])
@@ -353,7 +354,11 @@ class Programme:
         self.scene_root = args.data_root/config['scene_root']
         self.paths = scene_paths(self.camera.core,native_scene,self.scene_root,
                                  old_camera['state']['compact_sha256'],self.scale)
-        self.raster = Raster(self.mesh_vertices+1+TRAIL,self.paths,self.body_faces,self.shoe_faces)
+        self.show_runner = getattr(args,'show_runner',False)
+        self.runner_local = np.asarray(template['edges'])[:,::4].reshape(-1,3)
+        self.runner_start = self.mesh_vertices+1+TRAIL
+        self.runner_count = len(self.runner_local)*2 if self.show_runner else 0
+        self.raster = Raster(self.runner_start+self.runner_count,self.paths,self.body_faces,self.shoe_faces)
         self.scene_points = np.concatenate([path for _,path in self.paths])
         self.path_slices = []
         at = self.raster.moving_count
@@ -400,7 +405,11 @@ class Programme:
         mesh = np.concatenate([skin,shoes],axis=1).reshape(len(frames),5,self.mesh_vertices,3)/self.solver_scale
         earlier = np.maximum(frames[:,None]-4*np.arange(TRAIL,0,-1),0)
         trail = np.broadcast_to(self.com_ground[earlier][:,None],(len(frames),5,TRAIL,3))
-        return np.concatenate([mesh,(C/self.scale)[:,:,None],trail],axis=2)
+        parts = [mesh,(C/self.scale)[:,:,None],trail]
+        if self.show_runner:
+            runner=transform(pose['R'],pose['O'],self.runner_local)
+            parts.append(runner.reshape(len(frames),5,self.runner_count,3)/self.solver_scale)
+        return np.concatenate(parts,axis=2)
 
     def compare_native(self, frames, nodes, projected):
         """Compare an actual spread of moving mesh, COM and static ice points."""
@@ -408,6 +417,8 @@ class Programme:
         vertices = np.r_[rng.choice(self.body_vertices,128,replace=False),
                          np.linspace(self.body_vertices,self.mesh_vertices-1,34,dtype=int),
                          self.mesh_vertices,self.mesh_vertices+1,self.mesh_vertices+TRAIL]
+        if self.show_runner:
+            vertices=np.r_[vertices,np.linspace(self.runner_start,self.runner_start+self.runner_count-1,16,dtype=int)]
         checks = []
         for j, frame in enumerate(frames):
             f = np.array([frame])
@@ -460,14 +471,18 @@ def source_time(pts):
     return f'{ms//60000:02d}:{ms//1000%60:02d}.{ms%1000:03d}'
 
 
-def legend():
-    image = Image.new('RGB',(610,44),(23,29,37))
+def legend(show_runner=False):
+    image = Image.new('RGB',(860 if show_runner else 610,44),(23,29,37))
     font = ImageFont.truetype('C:/Windows/Fonts/msyh.ttc',18)
     draw = ImageDraw.Draw(image)
     for x, text, color in ((14,'人体与冰鞋',BODY_COLOR),(151,'COM 冰面投影',COM_COLOR),
                            (324,'拟合冰面网格', (192,188,172))):
         draw.line((x,22,x+16,22),fill=color[::-1],width=3)
         draw.text((x+24,9),text,font=font,fill=(238,242,248))
+    if show_runner:
+        for x,text,color in zip((475,595),('左刀下缘','右刀下缘'),RUNNER_COLORS):
+            draw.line((x,22,x+16,22),fill=color[::-1],width=3)
+            draw.text((x+24,9),text,font=font,fill=(238,242,248))
     return np.array(image)[:,:,::-1].copy()
 
 
@@ -498,8 +513,16 @@ def compose(raw, programme, frame, projected, panel):
             contour,_ = cv2.findContours(use.astype(np.uint8),cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
             cv2.drawContours(roi,contour,-1,color,1,cv2.LINE_AA)
 
+    if programme.show_runner:
+        runner = projected[programme.runner_start:programme.runner_start+programme.runner_count]
+        for foot,color in zip(runner.reshape(2,2,-1,4),RUNNER_COLORS):
+            for edge in foot:
+                lines=visible_polylines(edge)
+                if lines:
+                    cv2.polylines(canvas,lines,False,(20,25,32),4,cv2.LINE_AA,shift=4)
+                    cv2.polylines(canvas,lines,False,color,2,cv2.LINE_AA,shift=4)
     head = projected[programme.mesh_vertices]
-    track = np.vstack([projected[programme.mesh_vertices+1:programme.raster.moving_count],head])
+    track = np.vstack([projected[programme.mesh_vertices+1:programme.runner_start],head])
     trail = visible_polylines(track)
     if trail:
         cv2.polylines(canvas,trail,False,(41,50,57),4,cv2.LINE_AA,shift=4)
@@ -512,10 +535,10 @@ def compose(raw, programme, frame, projected, panel):
         cv2.circle(canvas,xy,2,COM_COLOR,-1,cv2.LINE_AA)
 
     y0,x0 = H-58,14
-    overlay = canvas[y0:y0+44,x0:x0+610]
+    overlay = canvas[y0:y0+44,x0:x0+panel.shape[1]]
     cv2.addWeighted(overlay,.20,panel,.80,0,overlay)
     cv2.putText(canvas,f'{programme.shots[frame].upper()}  {source_time(programme.pts[frame])}',
-                (x0+474,y0+27),cv2.FONT_HERSHEY_SIMPLEX,.58,(247,250,253),1,cv2.LINE_AA)
+                (x0+(721 if programme.show_runner else 474),y0+27),cv2.FONT_HERSHEY_SIMPLEX,.58,(247,250,253),1,cv2.LINE_AA)
     return canvas,body_pixels,com_visible,int(grid_pixels.sum())
 
 
@@ -538,7 +561,7 @@ def preview(args,p):
     target = args.output/'preview_final'
     target.mkdir(parents=True,exist_ok=False)
     _,_,sample = sample_frames(p)
-    panel = legend()
+    panel = legend(p.show_runner)
     audits = []
     started = time.perf_counter()
     reader = SourceVideo(str(p.source),(1,12800))
@@ -595,7 +618,7 @@ def render(args,p):
             raise ValueError('Expected one original 48 kHz programme audio stream')
     finally:
         audio.close()
-    panel = legend()
+    panel = legend(p.show_runner)
     reader = iter(source_frames(p.source,p.source_spec,p.pts))
     counts = np.zeros((len(p.pts),3),np.int32)
     body_data = np.zeros((len(p.pts),4),np.float32)
@@ -681,6 +704,8 @@ def render(args,p):
                   native_projection_max_error_px=max(max(r['moving_max_error_px'],r['ice_max_error_px']) for r in audits),
                   projection='Original Brown camera and its rolling readout, sampled at 193 rows spanning the sensor and a margin for GPU replay. Five exact articulated body samples per exposure.',
                   com='Same saved segment mass model as the body. World Z set to fitted ice plane, then projected using the current exposure and camera. Last 2.48 s in rink coordinates.',
+                  runner_overlay=dict(enabled=p.show_runner,component='both fixed lower runner edges per skate',
+                                      projection='same attached mesh and rolling native camera'),
                   notes=['Review rendering only. No source segmentation or correction for foreground occluders.',
                          'The grid uses the fitted rink boundary and the programme conditional scale.',
                          'The COM mark represents the fitted model, including during flight.'],
@@ -695,6 +720,8 @@ def main():
     for name in ('project','data-root','config','prepared','source-evidence','output','ffmpeg'):
         parser.add_argument('--'+name,type=Path,required=True)
     parser.add_argument('--preview',action='store_true')
+    parser.add_argument('--show-runner',action='store_true',help='Show the left and right material runner edges in distinct colours')
+    parser.add_argument('--scope',type=Path,help='Explicit programme clock and source registration')
     parser.add_argument('--batch',type=int,default=12)
     args=parser.parse_args()
     programme=Programme(args)

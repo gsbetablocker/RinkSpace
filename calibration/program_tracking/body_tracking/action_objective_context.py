@@ -267,7 +267,7 @@ def _legacy_root(primary, root, problem, saved, stage):
     return root_anchor, records, provenance
 
 
-def bind_action_objective_context(problem, primary, source_evidence, *, saved=None, legacy_stage=None):
+def bind_action_objective_context(problem, primary, source_evidence, *, saved=None, legacy_stage=None, verified_chart_rebase=False):
     """Bind before the first factor evaluation/weight declaration of this run.
 
     ``saved=None`` means a new objective, including explicit warm starts.
@@ -295,8 +295,15 @@ def bind_action_objective_context(problem, primary, source_evidence, *, saved=No
             context = json.loads(_text(saved, CONTEXT))
             if context.get('schema') != SCHEMA or context.get('source_evidence_sha256') != source_hash:
                 raise ValueError('Action objective context schema/source identity mismatch')
-            if context.get('layout') != layout:
-                raise ValueError('Action objective context changed source clock, seed or control layout')
+            old_layout = context.get('layout')
+            if old_layout != layout:
+                # Only an explicit warm review can request this, after replay
+                # of the saved trajectories on their full exposure clocks.
+                changed = {k for k in layout if not isinstance(old_layout,dict)
+                           or old_layout.get(k)!=layout[k]}
+                if not (verified_chart_rebase and changed=={'body_edge_chart_sha256'}
+                        and set(old_layout)==set(layout)):
+                    raise ValueError('Action objective context changed source clock, seed or control layout: '+str(sorted(changed)))
             for key, expected in ((SOURCE_PTS, source_pts), (ROOT_PTS, root_pts)):
                 if key not in saved or not np.array_equal(saved[key], expected):
                     raise ValueError('Action objective context changed '+key)

@@ -25,7 +25,8 @@ def image_cost(parts):
     names={'body_pixels','old_gear_pixels','full_source_skate_structure',
         'source_pixel_edge_profile','complete_runner_extent','complete_visible_structure_extent',
         'source_support_location_xy','native_source_support_contact','unassigned_source_skate_sets',
-        'old_shoe_support_regions','body_source_regions'}
+        'old_shoe_support_regions','body_source_regions','manual_native_leg',
+        'ordered_native_skate','reviewed_native_support'}
     return sum(float(value) for name,value in parts.items()
         if name.rsplit('/',1)[-1] in names or name.startswith('additional_unassigned_source_'))
 
