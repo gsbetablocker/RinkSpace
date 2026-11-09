@@ -179,6 +179,10 @@ class AbsoluteMotionState:
             return vstack([self.chain(local[a:a+512],x,t,sample_indices=pick[a:a+512]) for a in range(0,n,512)],format='csr')
         clock,pick=_sampled_clock(t,pick)
         _,s,mapping=self.linearization(x,clock)
+        return self._chain_with_mapping(local,s,mapping,pick)
+    def _chain_with_mapping(self,local,s,mapping,pick):
+        """Fill one bounded tile using its caller-owned same-point mapping."""
+        n,k,_=local.shape
         # The four supports are already in canonical control order. Fill
         # bounded per-sample slots directly instead of sorting another COO.
         groups=local.reshape(n,k,23,3)
@@ -198,6 +202,9 @@ class AbsoluteMotionState:
             return vstack([self.rotation_chain(blocks[a:a+512],x,t,sample_indices=pick[a:a+512]) for a in range(0,n,512)],format='csr')
         clock,pick=_sampled_clock(t,pick)
         _,s,mapping=self.linearization(x,clock)
+        return self._rotation_chain_with_mapping(blocks,s,mapping,pick)
+    def _rotation_chain_with_mapping(self,blocks,s,mapping,pick):
+        n,j=blocks.shape[:2]
         values=np.einsum('njac,nsjcd->njasd',blocks,mapping[pick,:,1:]).reshape(n*j*3,12)
         row,column=np.nonzero(values)
         controls=(s['control_indices'][pick,None,:,None]*69

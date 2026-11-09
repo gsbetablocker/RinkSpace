@@ -300,3 +300,12 @@ def test_quality_failure_is_not_hidden_by_an_earlier_latched_budget_stop():
     assert decision['quality_failed']
     assert {r['code'] for r in decision['quality_reasons']} == {'image_cost_increase'}
     assert selected.step == 0
+
+
+def test_optional_budgets_allow_progress_without_a_wall_or_step_cap():
+    policy=RunPolicy(wall_seconds=None,max_accepted=None)
+    monitor=Monitor(policy,now=0.,violation_stagnation_enabled=False)
+    assert not monitor.observe(now=1.,violation_m=.1,image_cost=1.,pose_cost=1.,joint_cost=10.)['stop']
+    for i in range(1,20):
+        assert not monitor.observe(now=1000000.+i,accepted=True,violation_m=.1,image_cost=1.,pose_cost=1.,joint_cost=10./(i+1))['stop']
+    assert not monitor.reserve_evaluation(now=2000000.,estimated_seconds=1e9)['stop']

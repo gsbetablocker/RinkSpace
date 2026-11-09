@@ -101,9 +101,18 @@ def verify(blocks,r,J=None):
         if not np.array_equal(b.residual,r[start:stop]):raise ValueError('Residual block mismatch: '+b.name)
         if J is not None:
             if b.jacobian is None:raise ValueError('Missing actual block Jacobian: '+b.name)
+            if J.shape[1]!=b.jacobian.shape[1]:raise ValueError('Jacobian block width mismatch: '+b.name)
             if not np.isfinite(b.jacobian.data).all():raise ArithmeticError('Nonfinite actual weighted Jacobian: '+b.name)
             for a in range(start,stop,4096):
-                z=min(a+4096,stop);diff=(J[a:z]-b.jacobian[a-start:z-start]).tocsr()
+                z=min(a+4096,stop)
+                if J.format==b.jacobian.format=='csr':
+                    lo,hi=J.indptr[a],J.indptr[z]
+                    block_lo,block_hi=b.jacobian.indptr[a-start],b.jacobian.indptr[z-start]
+                    if (np.array_equal(J.indptr[a:z+1]-lo,b.jacobian.indptr[a-start:z-start+1]-block_lo)
+                            and np.array_equal(J.indices[lo:hi],b.jacobian.indices[block_lo:block_hi])
+                            and np.array_equal(J.data[lo:hi],b.jacobian.data[block_lo:block_hi])):
+                        continue
+                diff=(J[a:z]-b.jacobian[a-start:z-start]).tocsr()
                 if diff.nnz and np.max(abs(diff.data))>1e-13:raise ValueError('Jacobian block mismatch: '+b.name)
         c=float(b.residual@b.residual/2);cost+=c;rows.append(dict(name=b.name,start=start,stop=stop,rows=stop-start,cost=c,association=b.association))
         start=stop

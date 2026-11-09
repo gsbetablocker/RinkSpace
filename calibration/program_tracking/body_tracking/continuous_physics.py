@@ -14,7 +14,10 @@ class ContinuousMassGeometry:
         self.count=int(self.proxy['body_segment_count']);self.ids=self.proxy['segment_native_joint_ids'][:self.count]
         self.offsets=self.proxy['segment_com_rest_local_m'];self.mass=self.proxy['segment_mass_fractions'];self.inertia=self.proxy['segment_unit_mass_inertia_local_m2']
     def evaluate(self,base,delta):
-        s=fk_state(self.ref,base,delta);R=s['Q'][:,None]@s['frames'][:,self.ids]
+        return self.from_pose(fk_state(self.ref,base,delta))
+
+    def from_pose(self,s):
+        R=s['Q'][:,None]@s['frames'][:,self.ids]
         C=s['native_world'][:,self.ids]*self.binding.ratio+np.einsum('nsij,sj->nsi',R,self.offsets[:self.count])
         shoe=s['O']*self.binding.ratio+np.einsum('nfij,fj->nfi',s['R'],self.offsets[self.count:])
         return np.concatenate((C,shoe),axis=1),np.concatenate((R,s['R']),axis=1)
@@ -119,9 +122,11 @@ class ConfirmedFlightFactors:
             D=np.zeros((len(H)-1,len(H)));rows=np.arange(len(H)-1);D[rows,rows]=-1;D[rows,rows+1]=1
             L = self.momentum_operator if self.event_average else D/self.impulse_scale
             Jh=kron(csr_matrix(L),eye(3),format='csr')@Jh
-            J=hstack((csr_matrix((len(rp)+len(rh),17)),vstack((Jp,Jh),format='csr')),format='csr')
-        from .weighted_blocks import block
-        named=[block('flight_integrated_com',rp,None if not jacobian else J[:len(rp)]),block(self.momentum_name,rh,None if not jacobian else J[len(rp):])]
+        from .weighted_blocks import block,full_columns
+        named=[full_columns(block('flight_integrated_com',rp,Jp if jacobian else None)),
+               full_columns(block(self.momentum_name,rh,Jh if jacobian else None))]
+        if jacobian and not getattr(self.problem,'bounded_memory',False):
+            J=vstack([b.jacobian for b in named],format='csr')
         r=np.r_[rp,rh];return dict(residual=r,jac=J,parts={'flight_integrated_com':float(rp@rp/2),self.momentum_name:float(rh@rh/2)},weighted_blocks=named,metrics=dict(self.config,com_world_m=com.tolist(),specific_H_world_m2ps=H.tolist(),full_orbital_and_intrinsic=True,local_FK_derivatives_only=True,
             source_pts=self.ref.p['pts'][self.frames].tolist(),
             momentum_pts=self.ref.p['pts'][self.frames[1:-1]].tolist(),

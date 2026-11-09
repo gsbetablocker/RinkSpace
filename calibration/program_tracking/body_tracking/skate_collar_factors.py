@@ -183,6 +183,30 @@ def _sampled_signed_gap(points,polygon,*,return_association=False):
     return gap,nearest,(selected_fraction>0)&(selected_fraction<1),inside
 
 
+def resolve_vertex_section(vertices, faces, polygon, height, tolerance, *, z_changed=False):
+    """Resolve a vertex/plane coincidence from the original triangle identities.
+
+    This uses the existing independent section graph, never a convex hull or
+    proximity welding. An open, coplanar, branched or self-intersecting section
+    remains unknown. Successful rows retain the sampled endpoint/midpoint gap.
+    """
+    if z_changed:return dict(unknown=True,reason='inner:section_height_changed')
+    if not _simple_loops(np.asarray(polygon)[None],np.array([len(polygon)]),tolerance)[0]:
+        return dict(unknown=True,reason='inner:self_intersecting_or_degenerate_section')
+    # The 10 nm fast-screen tolerance is not a physical clearance. It can
+    # erase a valid tiny triangle-section edge as a vertex crosses the plane.
+    # Re-evaluate graph predicates at FP64 roundoff scale, preserving original
+    # edge/vertex identities; no geometric welding or contact tolerance change.
+    scale=max(float(np.max(np.abs(vertices),initial=0.)),float(np.max(np.abs(polygon),initial=0.)),abs(float(height)),np.finfo(float).tiny)
+    topology_tolerance=64*np.finfo(float).eps*scale
+    loop,reason=_section_polygon(vertices,faces,height,topology_tolerance)
+    if reason is not None:return dict(unknown=True,reason='body:'+reason)
+    points=np.concatenate((loop,(loop+np.roll(loop,-1,axis=0))*.5))
+    gap=float(_sampled_signed_gap(points[None],np.asarray(polygon)[None]).min())
+    return dict(unknown=False,reason='',minimum_sample_gap_solver=gap,
+        breach_solver=max(-gap,0.),sample_count=len(points),topology_tolerance_solver=topology_tolerance)
+
+
 def evaluate(binding,joints,frames,samples=None,*,hand_local_R=None,skate_relative_R=None):
     """Return nonnegative ``breach_solver[n,2]`` and explicit ``unknown``.
 
@@ -198,10 +222,10 @@ def evaluate(binding,joints,frames,samples=None,*,hand_local_R=None,skate_relati
     # A geometry-sized domain penalty prevents a lost section reducing the
     # objective. It is not a measured penetration or a new contact tolerance.
     domain_size=max(float(np.linalg.norm(np.ptp(spec.inner_vertices,axis=0))),np.finfo(float).eps)
-    residual_breach=np.full((n,2),domain_size);branches=[]
+    residual_breach=np.full((n,2),domain_size);branches=[];resolved_vertex=np.zeros((n,2),bool)
     result=dict(breach_solver=breach,residual_breach_solver=residual_breach,
                 unknown=unknown,unknown_reason=reason,sample_count=count,
-                minimum_sample_gap_solver=minimum)
+                minimum_sample_gap_solver=minimum,vertex_section_resolved=resolved_vertex)
     if n==0 or spec.inner_unknown_reason:return result
     if samples is None:
         kwargs={} if hand_local_R is None else dict(hand_local_R=hand_local_R)
@@ -243,6 +267,16 @@ def evaluate(binding,joints,frames,samples=None,*,hand_local_R=None,skate_relati
                 minimum[first:last,foot]=np.where(good,values,np.nan)
                 breach[first:last,foot]=np.where(good,np.maximum(-values,0.),0.)
                 residual_breach[first:last,foot]=np.where(good,breach[first:last,foot],domain_size)
+            if getattr(binding,'resolve_collar_vertex_sections',False):
+                for k in np.flatnonzero(np.isin(why,('body:vertex_on_section','body:self_intersecting_or_degenerate_section'))):
+                    resolved=resolve_vertex_section(body[k],spec.body_faces[foot],polygon[k],spec.height_solver,
+                        spec.tolerance_solver,z_changed=bool(z_changed[k]))
+                    i=first+k
+                    if not resolved['unknown']:
+                        resolved_vertex[i,foot]=True;unknown[i,foot]=False;reason[i,foot]=''
+                        minimum[i,foot]=resolved['minimum_sample_gap_solver'];count[i,foot]=resolved['sample_count']
+                        breach[i,foot]=residual_breach[i,foot]=resolved['breach_solver']
+                branches.append(resolved_vertex[first:last,foot])
     from .weighted_blocks import signature
     result['association_signature']=signature(*branches)
     return result

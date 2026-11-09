@@ -112,17 +112,27 @@ class VisibleRunnerContourFactors:
                 projected=np.einsum('nij,njl->nil',normal_projector,pixel)
                 tangent_change=np.einsum('nc,ncl->nl',self.source_uv-prediction,pb-pa)/np.maximum(np.sum(tangent*tangent,axis=-1),1e-20)[:,None]
                 projected+=interior[:,None,None]*tangent[:,:,None]*tangent_change[:,None,:]
-                return np.einsum('nij,njl->nil',D,projected)
-            h=1e-6;values=[];axes=np.asarray(getattr(self.problem,'factor_derivative_columns',self.body.state.active))
+                return np.einsum('nij,njl->nil',D,projected),projected
+            h=1e-6;values=[];raw_values=[];axes=np.asarray(getattr(self.problem,'factor_derivative_columns',self.body.state.active))
             for axis in axes:
                 plus=d.copy();minus=d.copy();plus[:,axis]+=h;minus[:,axis]-=h
-                values.append(derivative(fk_state(self.ref,self.base,plus),fk_state(self.ref,self.base,minus),h))
+                weighted,raw=derivative(fk_state(self.ref,self.base,plus),fk_state(self.ref,self.base,minus),h)
+                values.append(weighted);raw_values.append(raw)
             compact=np.stack(values,-1);local=np.zeros(compact.shape[:-1]+(69,));local[...,axes]=compact;BJ=chain_exposure(local,d,sample_indices=sample)
-            shoe=[]
+            raw_compact=np.stack(raw_values,-1);raw_local=np.zeros(raw_compact.shape[:-1]+(69,));raw_local[...,axes]=raw_compact
+            raw_BJ=chain_exposure(raw_local,d,sample_indices=sample)
+            shoe=[];raw_shoe=[]
             for f in (0,1):
-                for axis in range(3):shoe.append(derivative(fk_state(self.ref,self.base,perturb_relative(d,f,axis,h)),fk_state(self.ref,self.base,perturb_relative(d,f,axis,-h)),h))
+                for axis in range(3):
+                    weighted,raw=derivative(fk_state(self.ref,self.base,perturb_relative(d,f,axis,h)),fk_state(self.ref,self.base,perturb_relative(d,f,axis,-h)),h)
+                    shoe.append(weighted);raw_shoe.append(raw)
             BJ+=d.owner.shoe_exposure_chain(np.stack(shoe,-1),d.parameters,d.sample_times,sample_indices=sample)
             J=hstack((csr_matrix((len(residual),17)),BJ),format='csr')
+            raw_BJ+=d.owner.shoe_exposure_chain(np.stack(raw_shoe,-1),d.parameters,d.sample_times,sample_indices=sample)
+            # Proposal-only raw geometry also retains derivatives inside the
+            # original zero-cost uncertainty band. Original residual/J unchanged.
+            self.proposal_pixel_jacobian=hstack((csr_matrix((2*len(prediction),17)),raw_BJ),format='csr')
+            self.proposal_pixel_prediction=prediction.copy()
         if self.has_pixel_profiles:
             order=np.r_[np.c_[np.arange(len(prediction))*3,np.arange(len(prediction))*3+1].ravel(),np.arange(len(prediction))*3+2];residual=residual[order]
             if J is not None:J=J[order].tocsr()

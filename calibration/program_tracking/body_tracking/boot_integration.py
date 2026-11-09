@@ -172,34 +172,67 @@ class BootWindowProblem(FullBodyProblem):
         if 'hand_local_R'in s:kwargs['hand_local_R']=s['hand_local_R']
         return self.binding.compatibility_rows(j,s['frames'],**kwargs)/np.sqrt(2)
 
+    def _resident_rows(self,resident,d,jacobian,difference_step):
+        if type(self).compatibility_from_state is not BootWindowProblem.compatibility_from_state:
+            raise TypeError('Resident compatibility requires the audited original consumer')
+        if not resident.matches(self.binding):
+            raise ValueError('Resident compatibility shared geometry changed; create a new prepared owner')
+        started=time.perf_counter()
+        columns=self.state.active[self.state.active>=6] if jacobian else None
+        relative=getattr(d,'skate_relative_R',None)
+        fused=getattr(resident,'linearize_body_and_shoes',None)
+        shoe_local=timing=None
+        if jacobian and relative is not None and fused is not None:
+            resident.reset_measurement()
+            extra,values,shoe_local=fused(d,columns,body_step=difference_step,shoe_step=1e-8,
+                                         skate_relative_R=relative)
+            timing=resident.measurement()
+        else:
+            extra,values=resident.evaluate(d,columns,step=difference_step,skate_relative_R=relative)
+        return extra,values,shoe_local,timing,time.perf_counter()-started
+
     def evaluate(self,x,jacobian=False):
         key=self.binding.x.tobytes()
         if self.binding_key!=key:self.cache=None;self.cache_x=None;self.binding_key=key
-        base=super().evaluate(x,jacobian)
-        if base.get('foot_compatibility_added'):return base
-        forward_start=time.perf_counter()
-        d=self.state.increments(x,self.mid_times)
         resident=getattr(self,'resident_compatibility',None)
         difference_step=float(getattr(self,'compatibility_difference_step',1e-5))
+        overlap=0.
+        measured=None
+        split=getattr(self,'split_jacobian_only',False)
+        cached=self.cache_x is not None and np.array_equal(x,self.cache_x) and self.cache.get('foot_compatibility_added')
+        if cached and (not jacobian or self.cache['jac'] is not None or self.cache.get('_split_jacobian_ready')):
+            return self.cache
+        if (jacobian and split and hasattr(self.state,'shoe_chain')
+                and callable(getattr(resident,'linearize_body_and_shoes',None))):
+            from concurrent.futures import ThreadPoolExecutor
+            # The CUDA owner uses only this fixed midpoint delta and its own
+            # buffers. The CPU keeps sole ownership of image/state caches.
+            d=self.state.increments(x,self.mid_times)
+            start=time.perf_counter()
+            with ThreadPoolExecutor(max_workers=1) as pool:
+                pending=pool.submit(self._resident_rows,resident,d,jacobian,difference_step)
+                cpu_start=time.perf_counter()
+                base=super().evaluate(x,jacobian)
+                cpu_seconds=time.perf_counter()-cpu_start
+                measured=pending.result()
+            overlap=max(0.,cpu_seconds+measured[-1]-(time.perf_counter()-start))
+        else:
+            base=super().evaluate(x,jacobian)
+        if base.get('foot_compatibility_added'):return base
         shoe_local=None
-        if resident is not None:
-            if type(self).compatibility_from_state is not BootWindowProblem.compatibility_from_state:
-                raise TypeError('Resident compatibility requires the audited original consumer')
-            if not resident.matches(self.binding):
-                raise ValueError('Resident compatibility shared geometry changed; create a new prepared owner')
-            columns=self.state.active[self.state.active>=6] if jacobian else None
-            relative=getattr(d,'skate_relative_R',None)
-            fused=getattr(resident,'linearize_body_and_shoes',None)
-            if jacobian and relative is not None and fused is not None:
-                resident.reset_measurement()
-                extra,resident_values,shoe_local=fused(d,columns,body_step=difference_step,
-                    shoe_step=1e-8,skate_relative_R=relative)
-                base['fused_compatibility_timing']=resident.measurement()
+        forward_start=time.perf_counter()
+        if measured is None:
+            d=self.state.increments(x,self.mid_times)
+            if resident is not None:
+                measured=self._resident_rows(resident,d,jacobian,difference_step)
             else:
-                extra,resident_values=resident.evaluate(d,columns,step=difference_step,skate_relative_R=relative)
-        else:extra=self.compatibility(d)
+                extra=self.compatibility(d)
+        if measured is not None:
+            extra,resident_values,shoe_local,timing,_=measured
+            if timing is not None:base['fused_compatibility_timing']=timing
+            base['phases']['compatibility_cpu_overlap_seconds']=overlap
         rows=extra.size;blocks=[]
-        elapsed=time.perf_counter()-forward_start
+        elapsed=measured[-1] if measured is not None else time.perf_counter()-forward_start
         base['phases']['compatibility_forward_seconds']=elapsed if resident is None or not jacobian else 0.
         if resident is not None:
             base['phases']['compatibility_resident_'+('linearize' if jacobian else 'trial')+'_seconds']=elapsed

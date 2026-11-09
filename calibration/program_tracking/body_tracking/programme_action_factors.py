@@ -161,7 +161,7 @@ class SourceTurnPath:
             metrics.update(facing_rows=[dict(row, estimated_radians=float(value),
                 scaled_residual=float(residual)) for row, value, residual in zip(self.facing, heading, fr)])
         from .weighted_blocks import assemble
-        residual, matrix = assemble(named, jacobian)
+        residual, matrix = assemble(named, jacobian and not getattr(self.problem,'bounded_memory',False))
         return dict(residual=residual, jac=matrix, weighted_blocks=named,
                     parts={b.name: float(b.residual@b.residual/2) for b in named}, metrics=metrics)
 

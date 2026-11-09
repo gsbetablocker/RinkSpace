@@ -1,0 +1,163 @@
+{
+  "schema": "rinkspace.lsp-arm-source-revision.v1",
+  "event": "ankara_2026",
+  "programme": "okada_mei_sp",
+  "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "source_time_base": [
+    1,
+    12800
+  ],
+  "parent_observations": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/prepared_repair_lsp_occlusion/observations.npz",
+    "sha256": "36b850e21273e462731f7a4745d020a8148f3ef4e73bdcf75dba8d8204b7a00b"
+  },
+  "source_sequence": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_action_chain_1108/original_sequence.png",
+    "sha256": "3a00b8b1b72d1dcce295d0fe92214d63f727f40033f07e4fb1212e85f07f52d8"
+  },
+  "original_pixel_review": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_action_chain_1108/upper_source_identity.png",
+    "sha256": "47cd47727d6a45fa7e982b65cb9617c6cd6d57d56bb6cf0e94d28f48676cbf39"
+  },
+  "observations_before": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_action_chain_1108/upper_source_identity.json",
+    "sha256": "066b77f3dd22e77539e362d83c17df36373b869b5a614b3c550ffad990a57748"
+  },
+  "phases_zh": [
+    {
+      "seconds": [
+        161.34,
+        161.66
+      ],
+      "note": "左臂上举；右手向身后抬起的右刀接近，清晰抓住的准确时刻受模糊影响。"
+    },
+    {
+      "seconds": [
+        162.14,
+        162.84
+      ],
+      "note": "右手在自由右刀附近保持，左臂仍高举。支撑侧按多视角连续动作与已保存台账为左。"
+    },
+    {
+      "seconds": [
+        163.1,
+        163.56
+      ],
+      "note": "左肘开始屈曲，左手向右刀靠拢；到后段双手共同带起自由腿。"
+    },
+    {
+      "seconds": [
+        163.82,
+        165.2
+      ],
+      "note": "双手靠近刀刃，右腿从身后提过头顶并展开膝部，左腿继续支撑。手指具体材料点未知。"
+    },
+    {
+      "seconds": [
+        165.2,
+        165.42
+      ],
+      "note": "双手与右刀分开，右腿下落。区间边界未逐曝光测定。"
+    }
+  ],
+  "assignments": [
+    {
+      "source_pts": 2081792,
+      "joint_pairs": [
+        [
+          5,
+          6
+        ],
+        [
+          7,
+          8
+        ]
+      ],
+      "reason": "O6/O8 在连续高举的解剖左臂上；O9 已是可用左腕，旧重复 O10 保持未准入。"
+    },
+    {
+      "source_pts": 2082304,
+      "joint_pairs": [
+        [
+          5,
+          6
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          9,
+          10
+        ]
+      ],
+      "reason": "O6/O8/O10 整串在持续高举的左臂上。右臂沿头后持右刀；O7/O9 为错部位，另行记录。"
+    },
+    {
+      "source_pts": 2082560,
+      "joint_pairs": [
+        [
+          5,
+          6
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          9,
+          10
+        ]
+      ],
+      "reason": "O6/O8/O10 整串在持续高举的左臂上。右臂沿头后持右刀；O7/O9 为错部位，另行记录。"
+    }
+  ],
+  "exclusions": [
+    {
+      "source_pts": 2081792,
+      "joint_id": 7,
+      "reason": "点落在自由鞋刀轮廓，无法作为已映射右肘观测。"
+    },
+    {
+      "source_pts": 2082304,
+      "joint_id": 7,
+      "reason": "点落在躯干/裙摆，右肘及持刀腕在头后，无法支持此点身份。"
+    },
+    {
+      "source_pts": 2082304,
+      "joint_id": 9,
+      "reason": "点落在躯干/裙摆，右肘及持刀腕在头后，无法支持此点身份。"
+    },
+    {
+      "source_pts": 2082560,
+      "joint_id": 7,
+      "reason": "点落在躯干/裙摆，右肘及持刀腕在头后，无法支持此点身份。"
+    },
+    {
+      "source_pts": 2082560,
+      "joint_id": 9,
+      "reason": "点落在躯干/裙摆，右肘及持刀腕在头后，无法支持此点身份。"
+    },
+    {
+      "source_pts": 2082816,
+      "joint_id": 8,
+      "reason": "点落在躯干下部/裙摆，原片右臂从头后伸向右刀，排除错部位网络点。"
+    },
+    {
+      "source_pts": 2082816,
+      "joint_id": 10,
+      "reason": "点落在躯干下部/裙摆，原片右臂从头后伸向右刀，排除错部位网络点。"
+    },
+    {
+      "source_pts": 2083072,
+      "joint_id": 8,
+      "reason": "点落在躯干下部/裙摆，原片右臂从头后伸向右刀，排除错部位网络点。"
+    },
+    {
+      "source_pts": 2083072,
+      "joint_id": 10,
+      "reason": "点落在躯干下部/裙摆，原片右臂从头后伸向右刀，排除错部位网络点。"
+    }
+  ],
+  "ambiguity_zh": "仅修正五个有可见部位证据的曝光。肩中心受衣料和遮挡，仅保留现有候选位置；原 UV、sigma 与旧版 use 均保留。无新三维或接触精度断言。"
+}

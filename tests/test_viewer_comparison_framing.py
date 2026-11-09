@@ -9,6 +9,8 @@ import time
 import numpy as np
 import pytest
 
+from test_viewer_variant_transaction import headless_player_class
+
 
 SOURCE=Path(__file__).resolve().parents[1]/'src/rinkspace/viewer3d/verify_fullbody.py'
 NAMES={'continuous_playback'}
@@ -106,14 +108,6 @@ def test_clock_check_rejects_skipped_exposure_and_still_pauses():
     assert not player.run_animations
 
 
-def app_method(name,namespace):
-    source=SOURCE.with_name('app.py');tree=ast.parse(source.read_text(encoding='utf8'))
-    cls=next(node for node in tree.body if isinstance(node,ast.ClassDef) and node.name=='ResultsPlayer')
-    node=next(node for node in cls.body if isinstance(node,ast.FunctionDef) and node.name==name)
-    exec(compile(ast.Module(body=[node],type_ignores=[]),str(source),'exec'),namespace)
-    return namespace[name]
-
-
 def app_fixture(tmp_path,*,comparison=True):
     sequences={'old':sequence([0,0,0]),'new':sequence([6,-2,.3])};calls=[]
     for name,seq in sequences.items():
@@ -121,11 +115,13 @@ def app_fixture(tmp_path,*,comparison=True):
     def cached(path):calls.append(path);return next(seq for seq in sequences.values() if seq.path==path)
     catalog=SimpleNamespace(config={'comparison_variants':['old','new']} if comparison else {},pts=np.array([283136]),
                             variant=lambda name:{'id':name},cache_path=lambda variant:(sequences[variant['id']].path,{}))
-    player=SimpleNamespace(catalog=catalog,variant={'id':'new'},sequence=sequences['new'],frame=0,follow=True,
-                           scene=SimpleNamespace(camera=Camera([2,-2.7,1.3],[0,0,1])),window_size=(1600,900),save_session=Mock())
-    namespace={'np':np,'CachedSequence':cached,'fit_comparison_camera':FRAMING.fit_comparison_camera}
-    player.comparison_sequences=app_method('comparison_sequences',namespace).__get__(player)
-    player.set_view=app_method('set_view',namespace).__get__(player)
+    player_class = headless_player_class(dict(np=np, CachedSequence=cached, fit_comparison_camera=FRAMING.fit_comparison_camera))
+    player = player_class.__new__(player_class)
+    player.__dict__.update(
+        catalog=catalog, variant={'id': 'new'}, sequence=sequences['new'], follow=True,
+        trajectory_reference='pelvis', tracking_points=sequences['new'].state['P'],
+        scene=SimpleNamespace(current_frame_id=0, camera=Camera([2,-2.7,1.3], [0,0,1])),
+        window_size=(1600,900), save_session=Mock())
     return player,sequences,calls
 
 
@@ -150,7 +146,9 @@ def test_feet_normal_and_restored_views_do_not_apply_comparison_framing(tmp_path
     player.set_view(view,fit_comparison=fit_comparison)
     assert player.comparison_framing is None and calls==[]
     if view=='feet_oblique':assert player.scene.camera.ortho_size==.34
-    else:assert not player.scene.camera.is_ortho
+    else:
+        assert not player.scene.camera.is_ortho
+        np.testing.assert_allclose(player.scene.camera.target, [6., -2., .8])
 
 
 @pytest.mark.parametrize('view,axis',[('feet_side',1),('feet_end',0)])

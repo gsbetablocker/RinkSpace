@@ -1,0 +1,605 @@
+{
+  "schema": "rinkspace.programme-repair-source.v1",
+  "audit_baseline": "5e9e959204e0cd757763320fa6414ac26fb393da",
+  "trajectory_reference": "model_com",
+  "com_motion_policy": {
+    "acceleration_scale_mps2": 11.992339413356438,
+    "origin": "Same finite engineering scale as previous root prior, converted to metres; now acts on complete volume-proxy COM. Confirmed-flight intervals excluded; existing gravity/momentum factors remain.",
+    "model_is_proxy": true,
+    "quadrature": "native_exposure_and_curve_spans",
+    "quadrature_provenance": {
+      "reason": "Same continuous saved state showed a >700 m/s2 inter-frame COM acceleration near source 175.58625 s, versus 346.964 m/s2 native-centre finite differences; retain native exposures and physical exposure nodes, add quarter-span points from existing body knots.",
+      "evidence": {
+        "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/com_dense_probe.json",
+        "sha256": "9a128d3f4416edbcc2d3c10d28b2b0a7d7f949fc9489f9d6aef3bb9bc58a935d"
+      },
+      "new_trajectory_or_network": false,
+      "model_mass_is_proxy": true
+    }
+  },
+  "programme_opening": {
+    "enabled": true,
+    "start_pts": 283136,
+    "quiet_end_pts": 293120,
+    "hand_release_start_pts": 295680,
+    "hand_release_end_pts": 299520,
+    "source_time_base": [
+      1,
+      12800
+    ],
+    "quiet_native_joints": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "quiet_position_scale_m": 0.01,
+    "quiet_angle_scale_deg": 1,
+    "hand_relation_scale_m": 0.02,
+    "source_measure_s": 0.02,
+    "standing_scale_m": 0.01,
+    "standing_curvature_m": 0.002,
+    "standing_weight": 20,
+    "evidence": [
+      {
+        "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/opening_timing_1103.json",
+        "sha256": "d8c02c2e13422752eed24c2e074445e8788e7cf6e6e75a042c0c6b708dc00038"
+      },
+      {
+        "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/opening_hand_1103.json",
+        "sha256": "549424889cc89b76310e0fa17d97c2f92d68454992f0164665d6792b47f53808"
+      },
+      {
+        "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/opening_repair_1102/preparation_observation_review.json",
+        "sha256": "bc026fdc4001583b88fddf08d9762906d1d907a0fbdafb47cffa163c7f5ba33b"
+      },
+      {
+        "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/standing_source/source_frames.json",
+        "sha256": "d87ca2b8f51338528991740274ac6ffb617a464036eba6173fda2ccd1c7fc61d"
+      }
+    ],
+    "interpretation_zh": "22.12–22.90安静站立、手部运动；右手靠腰后释放。用户已确认19.96秒画面右侧前方较平鞋为解剖右脚，左脚也接冰；据准备动作连续性约束开头双脚接冰。首帧近景下肢不可见，确切材料接触点与承重分担仍未知。分别对双鞋最低可接冰钢件使用有限高度因子，不固定XY，不把旧相机反投影位置当世界测量。188.68末尾姿势不同，仅定性站立对照。",
+    "old_candidates_preserved": true,
+    "standing_contact_mode": "both_feet",
+    "user_confirmation": {
+      "source_pts": 255488,
+      "source_seconds": 19.96,
+      "image": {
+        "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/standing_source/255488.png",
+        "sha256": "bebf5e50e6b4d240c767c02f5a3ae16c7dceb8b1121aca677efa28f7ff4ee55e"
+      },
+      "authority": "explicit user confirmation in this chat",
+      "user_reply_zh": "右脚；另一只脚也接冰",
+      "foreground_flat_blade_anatomical_foot": "right",
+      "other_anatomical_foot": "left",
+      "both_feet_contact_ice": true,
+      "contact_material_points": "unresolved; do not flatten either complete blade",
+      "world_position_measured": false,
+      "programme_opening_inference": "Use continuity of the preparation/quiet stance; 22.12 s feet are outside the image, not an independently measured 3D contact"
+    },
+    "conditional_stance_reference": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/opening_timing_1103/hand_polish/fitted/result.npz",
+      "sha256": "b51774080fd82a9d98575ebe71b4786391c4ec5ebed034ee72859b7679f52d68",
+      "source_pts": 283136,
+      "native_joints": [
+        1,
+        2,
+        4,
+        5
+      ],
+      "scale_deg": 20,
+      "weight": 20,
+      "release_end_pts": 295680,
+      "meaning": "Finite conditional pelvis-relative native hip/knee rotation reference for source-observed crossed preparation pose. Broad 20-degree engineering scale, not measured 3D/clinical uncertainty; old P,Q, shoe height and world XY are not used. Both feet contact is separately constrained from user-confirmed source evidence.",
+      "history": {
+        "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/opening_history_comparison_r7.json",
+        "sha256": "6f0753c2de9211be885722cd37b6d82f1141fb05162a2286dfa592276ecf67f7"
+      }
+    },
+    "direction_check": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/out/repair_diagnosis/opening_source_v007_direction_check.json",
+      "sha256": "cd5c407cc1f5428ff7e51ba665855d0afb93a499e0a6e1afd668ed077b9d5bc9"
+    }
+  },
+  "solver_repair_validation": {
+    "projection": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/readonly_stack/implemented_projection_check.json",
+      "sha256": "0f8bea6aceb14b9754733321e9e26c8f5112f5a3fa82701cced4ce791e9920df"
+    },
+    "collar_false_unknown": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/out/repair_diagnosis/replay_collar_continuation5.json",
+      "sha256": "ff0ef1d515e8af54269c7e80a54646d41453e82e4c5c93289152af8e28daa081"
+    },
+    "collar_strict_cpu_gpu": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/out/repair_diagnosis/replay_collar_vertex_resolution_strict.json",
+      "sha256": "89612e4bac05b45ec37a91e0607d8d8adedb9939cfbbd9136f6097e340a74b6e"
+    },
+    "affine_2d_source_norm_guard": true,
+    "original_source_limits_retained": true,
+    "local_source_trust": {
+      "evidence": {
+        "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/out/repair_diagnosis/source_local_trust_replay_r7.json",
+        "sha256": "6c1bf7379cb6eef7c9152822ee164dc16181ec174b790a35cc0b6fb20b686090"
+      },
+      "source": {
+        "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_inputs/source_v005.json",
+        "sha256": "b7560db7cc0ff3bfd9cd14dc9e8b8ee1b39a6e569dfb86326f22c324f977a682"
+      },
+      "test": "tests/test_source_local_trust.py",
+      "meaning": "Numerical per-control feedback, not a source threshold or accuracy claim"
+    },
+    "complete_guard_feedback": {
+      "source": {
+        "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_inputs/source_v007.json",
+        "sha256": "d5bbbe360204363f8768b8d48264c41060734157b26c93e5da99079eda68dcf7"
+      },
+      "checks": {
+        "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_v7_validation.log",
+        "sha256": "949f42afa427a742cecbc3d14f22790012d04cb10bc907a68eceb87ce23fcde3"
+      },
+      "opening_check": {
+        "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/out/repair_diagnosis/opening_source_v007_direction_check.json",
+        "sha256": "cd5c407cc1f5428ff7e51ba665855d0afb93a499e0a6e1afd668ed077b9d5bc9"
+      },
+      "original_nonlinear_limits_unchanged": true
+    },
+    "contact_initializer": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/input_context_repair.json",
+      "sha256": "d9bc571e290cc7fe06521a12718f2e10e565e64533985ef59cff36d021c2d193"
+    },
+    "native_contact_revision_tests": {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/tests/test_programme_contact_revision.py",
+      "sha256": "e8abadc73e68f51531cea80bfc45757a8806d289e64b11c276a71f79ff527c00",
+      "passed_with_adjacent": 13
+    },
+    "lsp_identity": {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/lsp_source_identity_1108.json",
+      "sha256": "eea138d5d5dedaf32b0da55c3bd61583782211d7e6f61672cc3333490a1b574d"
+    },
+    "signed_joint_proposal": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/out/repair_diagnosis/signed_joint_proposal_check.json",
+      "sha256": "9b79de292e6727f7097d42156196e57ae60276b1fb1566dc5efe57fdb69519a9"
+    },
+    "source_surface_pair_progress": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/out/repair_diagnosis/surface_pair_progress_r10.json",
+      "sha256": "c793566e5687a683ec274f805e60c8eb6d5c705109c5fd85b7b7e4725bac090f"
+    },
+    "shoe_opening_surface_topology": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/out/repair_diagnosis/shank_boot_surface_topology.json",
+      "sha256": "6bdfdbe6ac77a7e05cbd53940fbaaa43ac6d16bc65283a01bbfc5856980a5cf2"
+    }
+  },
+  "camera_fresh_source_review": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/camera_fresh_source_disposition.json",
+    "sha256": "4286a86204972e6cf784d3b30a2a9f756d20d3c5c9ba282e1deb77da1ac7fa7e"
+  },
+  "current_solver_input": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_inputs/source_v013.json",
+    "sha256": "d0f6f877b5be1066a2226f974ed9cf9249465e154dcd94b55c389cef4a1e0b7b"
+  },
+  "surface_response_revision": {
+    "reason": "Actual own-shank / open collar sidewall witnesses used an external separating direction that moved an interior skin endpoint outward. Select the breached outer endpoint with the inward response only for own-collar sidewalls; keep all actual crossed faces and all other relations.",
+    "evidence": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/out/repair_diagnosis/shank_boot_witness_sign_r10.json",
+      "sha256": "497f53d1ebf3a15f804d8674aa68b663b2939340e0822073711ad5fb0e43b8d6"
+    },
+    "legacy_preserved": true,
+    "not_collision_free_claim": true,
+    "same_pose_ledger_check": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/surface_response_v010_same_pose.json",
+      "sha256": "c7672a0569f88b7d87fbc16b0e30728a886a3556de259ee01dfd9bf336b80a9d"
+    },
+    "tests": {
+      "new_test": {
+        "path": "D:/OneDrive/codex_projs/RinkSpace/tests/test_programme_surface_response.py",
+        "sha256": "66c8311a2580f1645a11d35fe0795a1101dd5a44238fbbe4379b35eda43066b4"
+      },
+      "passed_with_existing": 14
+    },
+    "policy": "own_collar_cavity_side_v1",
+    "refreshed_witnesses": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/surface_response_v010/adaptive/surface_scan.npz",
+      "sha256": "abe910cc945d3ffe337689515904c90612196ae7730b481c6233234079912ce7"
+    }
+  },
+  "opening_user_confirmation": {
+    "source_pts": 255488,
+    "source_seconds": 19.96,
+    "image": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/standing_source/255488.png",
+      "sha256": "bebf5e50e6b4d240c767c02f5a3ae16c7dceb8b1121aca677efa28f7ff4ee55e"
+    },
+    "authority": "explicit user confirmation in this chat",
+    "user_reply_zh": "右脚；另一只脚也接冰",
+    "foreground_flat_blade_anatomical_foot": "right",
+    "other_anatomical_foot": "left",
+    "both_feet_contact_ice": true,
+    "contact_material_points": "unresolved; do not flatten either complete blade",
+    "world_position_measured": false,
+    "programme_opening_inference": "Use continuity of the preparation/quiet stance; 22.12 s feet are outside the image, not an independently measured 3D contact"
+  },
+  "opening_competition_review": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/out/repair_diagnosis/opening_competition_r12.json",
+    "sha256": "e699a1f3bfadc47ec4e5cd19f41afe3d936c6f88caa6d238893a11b2d14cce2b"
+  },
+  "lsp_depth_branch_review": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/out/repair_diagnosis/lsp_knee_depth_branch_r12.json",
+    "sha256": "ec39142c4254f0d4791d37ed16fceffea1732b41303e1123969022ec5d672f49"
+  },
+  "com_viewer_real_cache_check": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/out/repair_diagnosis/viewer_com_headless_regression_1108.json",
+    "sha256": "e660f5dab603a601288ff6b13c4389502d040a15e44c339e0a48c97a7ef0a153"
+  },
+  "latest_accepted_review": {
+    "state": "repair_continuation15/r001",
+    "state_report": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/progress_r15_r001_state.json",
+      "sha256": "2b2578bfdf39c34f889f51a3884de7507a41e34dc5e0457b6d689b4ba6eed763"
+    },
+    "visual_review": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/render_repair15_r001_opening_lsp/visual_review.json",
+      "sha256": "4be33def94b8927128dcdd7ba7f638d9f168bd268f1df2de9432ce88a805d03d"
+    },
+    "surface_refresh": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_continuation15/latest.json",
+      "sha256": "4c4edb4af0eba07137954d2d71c043428f5e9888028e84dff705a49f0f930101"
+    },
+    "accuracy_accepted": false,
+    "r15_structural_review": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/summary_r15_structural_review.json",
+      "sha256": "817e3ef2aaa3a7983729aad8d2baa0f20c267df0ab9b4bdfca2a72d5c37bb7b4"
+    }
+  },
+  "active_continuation": {
+    "root": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_continuation16",
+    "main_log": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_continuation16/r001/progress.jsonl",
+    "driver_log": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_continuation16_run.log",
+    "prepared": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/prepared_repair_lsp_occlusion",
+    "initialization": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/dense_flight_initialization/initialization.json",
+      "sha256": "8c75953d7517f50ecffb6e118a617927c562aeb3cd7f2f9073821dd01d9a3ceb"
+    },
+    "initialization_parameter": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/dense_flight_initialization/solve/candidate.npz",
+      "sha256": "929b0617676471da8015c9fec41e0f0355b059d7f47c252c0d4cb066b45fd642"
+    },
+    "whole_state_change_at_input_revision": 0,
+    "accepted_motion_baseline": "repair_continuation15/r001",
+    "physical_accuracy_accepted": false
+  },
+  "restart_receipt": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/RESUMED_AFTER_RESTART.json",
+    "sha256": "c336ea151217e1dc05b33e424c610534a62093d807b665f71a8a287c47cc81e9"
+  },
+  "flight_nonincrease_guard": {
+    "enabled": true,
+    "validation": {
+      "reason_zh": "r12总成本下降而五段飞行H守恒均退化；逐段保留同源时钟、同质量代理及实际残差定义的范数不退化约束，进入同一个全局步和完整非线性守门，不独立拼轨迹。",
+      "baseline_review": {
+        "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/fixed_axel_flights_original.json",
+        "sha256": "14b2a5f972d054f237f8d92ab4653630fee77f242ee3e6f9548ce53a67740f4c"
+      },
+      "current_review": {
+        "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/fixed_axel_flights_r12.json",
+        "sha256": "ff2cc66a5cdca255c1e645a01f5e80f9d279a3c48bd5cde935d37a0cf706aaec"
+      },
+      "test": {
+        "path": "D:/OneDrive/codex_projs/RinkSpace/tests/test_programme_flight_guard.py",
+        "sha256": "3fcb9e312c51c317922151bbb311327598d75c33d4ed42dde849f19e3be70387"
+      },
+      "adjacent_tests_passed": 76,
+      "definition_identity_required": true,
+      "physical_accuracy_accepted": false
+    },
+    "actual_definition_identity": "04681ac81451b9c503d32cb1256a410879e03605a5225cf45ab2fb209f150f1c",
+    "scope": "Every confirmed flight COM/H block in the same 8329-exposure global state; relative non-degradation, not measured COM or acceptance."
+  },
+  "lsp_observation_mapping_clarification": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_source_jump_review/mapping_clarification.json",
+    "sha256": "3f0872ce2aa4018ccafa4c1ac962ae5039331737cf82669d777ab530d0137a9c"
+  },
+  "pending_source_visibility_revision": {
+    "evidence": {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/lsp_source_occlusion_1108.json",
+      "sha256": "71d8ec99f2150511afa3183595bf7adc39028b9eb1e14db048fdf981c7f872cb"
+    },
+    "prepared": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/prepared_repair_lsp_occlusion",
+    "observations": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/prepared_repair_lsp_occlusion/observations.npz",
+      "sha256": "36b850e21273e462731f7a4745d020a8148f3ef4e73bdcf75dba8d8204b7a00b"
+    },
+    "population_reassessment": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_occlusion_quality_reassessment.json",
+      "sha256": "188072bc392583ee1df86b32f148bd2970122314915ee17e5147fd2e5a4a80a7"
+    },
+    "raw_body_coordinates_preserved": true,
+    "removed_use_rows": 3,
+    "old_numeric_quality_thresholds_retained": true,
+    "continuation_status": "Active in repair_continuation15"
+  },
+  "pending_anatomical_weight_revision": {
+    "previous": 8,
+    "current": 32,
+    "probe": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/out/repair_diagnosis/lsp_cost_competition_r12.json",
+      "sha256": "11cee3e93f1e098b7a0ac0ca2700f202a374787fac63ff352f2e049c823c8fb3"
+    },
+    "meaning": "Finite objective priority, unchanged authored/rest/chart/ROM and source/flight/mesh guards; no accuracy claim",
+    "status": "Active in source_v012; legacy default 8 and all old candidates preserved"
+  },
+  "latest_com_source_clock_diagnostics": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/com_compare_r12/summary.json",
+    "sha256": "1e7e40498fd27fab6380e4a471ac8b111a59bced87660be49f6dc31177d7a5a9"
+  },
+  "viewer_real_gui_checks": {
+    "candidate": "r12 (latest complete at test time)",
+    "full_exposures": 8329,
+    "checks": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/viewer_gui_r12/checks.json",
+      "sha256": "8d94f38bca99951c4d8c1fccc08807bed862bcd0ea9511b9998d81dc3caf0bb2"
+    },
+    "follow_and_source_pts": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/viewer_gui_r12/follow_checks.json",
+      "sha256": "2ff91f012102696462b3ef46bee0d7adef40778cbb8670d64ac7ee7bbee49584"
+    },
+    "full_gui_every_frame": false,
+    "meaning": "All 8329 exposure identities, sequential actual OpenGL playback; ImGui and original video textures sampled separately"
+  },
+  "lower_limb_population_reassessment_tests": {
+    "passed": 24,
+    "tests": [
+      {
+        "path": "D:/OneDrive/codex_projs/RinkSpace/tests/test_lower_limb_quality_reassessment.py",
+        "sha256": "4d0c0811c09fbe41a6f9fb332b3ebf5db0867dbab9ecea789edf2bc5d0bccd35"
+      },
+      {
+        "path": "D:/OneDrive/codex_projs/RinkSpace/tests/test_body_source_revision.py",
+        "sha256": "b221f81cbb3d448ce5ee48c680c91e76adcc962d642ac64914fe833391af2e56"
+      }
+    ]
+  },
+  "pending_early_curvature_feedback": {
+    "meaning": "Before spending more iterations on other affine norm domains, check original nonlinear guards only for already-affine-feasible rows/groups; contract only their sparse dependencies and re-solve the complete coupled objective. Final complete affine/nonlinear guards and quadratic descent remain required.",
+    "tests": {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/tests/test_source_early_nonlinear_feedback.py",
+      "sha256": "545e3f3423fa5457915bc2acef7e13c14ecb2455d02f6b9515aaa3e93a188049"
+    },
+    "adjacent_tests_passed": 86,
+    "legacy_default": false,
+    "not_a_step_count_or_time_budget": true,
+    "status": "Active in source_v012; legacy default false"
+  },
+  "r14_unaccepted_trial": {
+    "reason": "Input visibility revision and validated earlier nonlinear curvature feedback",
+    "checkpoint": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/r14_input_revision_checkpoint.json",
+      "sha256": "af006e3b6964e9eda340662058369807326f62e6640ceb9f97231821e8fc6e63"
+    },
+    "closed_log": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_continuation14/r001/progress.jsonl",
+      "sha256": "1bc27ec9586e4b18cc8dfe820f07436a8cac4d82f0b20100b8846893fbe4e447"
+    },
+    "no_accepted_step": true,
+    "learned_numeric_trust": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/lsp_occlusion_initialization/inherited_unaccepted_numerical_feedback.json",
+      "sha256": "44de5c89318ff18598372952d332fb0e218c8eb1c5a995a1a81d95d4f9c172c9"
+    },
+    "process_tree_stopped": true
+  },
+  "r15_initial_contract": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/r15_initial_contract.json",
+    "sha256": "daa1793d753623498aafb5294cbeaa4ada9a2eea6034627f9038a3d143d95175"
+  },
+  "r15_count_metadata": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/r15_initial_count_correction.json",
+    "sha256": "d17cb0a3aa1d8a1d582298c77d15901fccd97ebd47802535c6dd2fdb0a7127c5",
+    "corrected_in_new_initialization": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/dense_flight_initialization/initialization.json",
+      "sha256": "8c75953d7517f50ecffb6e118a617927c562aeb3cd7f2f9073821dd01d9a3ceb"
+    },
+    "old_bound_files_unchanged": true
+  },
+  "pending_dense_flight_com": {
+    "evidence": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/progress_r15_r001_state.json",
+      "sha256": "2b2578bfdf39c34f889f51a3884de7507a41e34dc5e0457b6d689b4ba6eed763"
+    },
+    "reason_zh": "确认腾空内密集模型COM重力偏差峰约205m/s2，而原生积分/H十个守门均改善，证实曝光间曲率未被现有飞行项控制。",
+    "implementation": "optional same-state dense acceleration minus gravity, all three samples in the same reviewed flight interval, retaining original native COM/H guards",
+    "source_observations_changed": false,
+    "new_network": false,
+    "physics_acceptance": false,
+    "status": "active in source_v013",
+    "validation": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/dense_flight_repair_validation.json",
+      "sha256": "8653e7ac6e35b0d98e520033cb8bc58ef2c56b160a4a5021436752859b6aa16b"
+    }
+  },
+  "camera_contour_inventory": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/camera_contour_holdout_inventory.json",
+    "sha256": "d050d9f92f69b99c9fa8cd9daf06d7068d25cff6ceca0a990a5f54ee422f8169"
+  },
+  "lsp_peak_visibility_review": {
+    "report": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_peak_source_review/visual_review.json",
+      "sha256": "5023bb5064f95720a12e910dd57b409e435d89f9a3ff50390a30b98867fd7127"
+    },
+    "conclusion_zh": "162.66–162.72膝部可见、踝为鞋口粗代理，未发现新的明确成对错标；髋遮挡。没有据模型残差删除这些观测。",
+    "observations_changed": false
+  },
+  "latest_cut_diagnostics": {
+    "review": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/cut_review_r15_r001/cut_review.json",
+      "sha256": "d89e28a5f85d2016be610b6aafecbd44bad87acb03f1739c92e3b6cf3f573e97"
+    },
+    "summary": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/cut_review_r15_r001/comparison_summary.json",
+      "sha256": "22e5d271622190a4f8b5d9f15c18857f1fa8af415be84354d605c3d74d4a012a"
+    },
+    "independent_camera_holdout": false
+  },
+  "pending_camera_glyph_contour": {
+    "schema": "rinkspace.source-contour-extraction-attempt.v1",
+    "source_review": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/camera_transfer_source/contour_source_review.json",
+      "sha256": "ebd09f340f52cf624aee4c26a8115a63778d2081bea0044c4ae59c1d9e985566"
+    },
+    "script": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/extract_static_glyph_contour.py",
+      "sha256": "526eaeb3f9d9acadd09273f7e4c0baa01e2dfc34bf0f18c249835e1ed4c0575d"
+    },
+    "log": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/extract_static_glyph_contour.log",
+      "sha256": "58e65c736f6cb48568d966133e6a248c9fa83294531d87c9869fe21d167935cc"
+    },
+    "status": "failed before camera evaluation",
+    "source_failure": "The 20 percent contrast boundary at PTS1832192 did not produce a complete isolated glyph component inside the source-only search window; do not collapse the uncertainty envelope to force extraction.",
+    "participation_discovery": "PTS1835008 already contains Ad6.print.component001/path0 measurements inside the glyph; participation inventory pending full report, cannot declare this pair independent.",
+    "camera_evaluated": false,
+    "source_measurements_admitted": false,
+    "camera_changed": false,
+    "participation": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/camera_glyph_holdout_participation.json",
+      "sha256": "cc295e98a4e37658ea325e071aadf85dae13a9758a2a4a2812dd97c85dab665d"
+    },
+    "independence_scope": "143.36 anchor glyph is training evidence; 143.14 has no same-component rows in checked source ledgers, only a possible single target-measurement holdout, not an exposure-level or bidirectional holdout. Extraction incomplete; no camera evaluation or change."
+  },
+  "r16_initial_contract": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/r16_initial_contract.json",
+    "sha256": "e6b3cc5e0b4b49dca7a33f12a870ee92932269ad115d9adb34d1e8cdc20a80a4"
+  },
+  "local_step_activity": {
+    "report": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/r15_local_trust_activity.json",
+      "sha256": "cf31a2da65c87db79ab031d26f92a7987fbf2cbee803ecf1afe0bceab78ed23f"
+    },
+    "scope_zh": "LSp/开头所查控制未受r15新失败组收缩影响；LSp P、右膝、踝和鞋有原信赖盒触限，开头鞋也触限。没有据此放宽源证据或修改人体。",
+    "next_stage_logging": "Records complete nonlinear failed IDs as well as ready-domain IDs; proposal and acceptance rules unchanged."
+  },
+  "ice_height_interpretation_correction": {
+    "source": "User correction in this chat: existing modelling accuracy cannot establish real ice penetration at millimetre or necessarily centimetre precision.",
+    "withdrawn_claim_zh": "撤回把首帧模型参考面高度约10/13毫米及稍后-8毫米称为真实悬空/穿冰的说法。",
+    "interpretation_zh": "保存的Z=0相对高度仅为当前条件模型内部几何诊断；场地/相机/尺度/人体/鞋刀几何的不确定性尚未标定，不能据符号或毫米、厘米数量级判定真实接触或准确性。",
+    "numeric_height_alone_is_acceptance_or_tuning_trigger": false,
+    "shoe_step_limit_changed_in_response_to_these_heights": false,
+    "source_supported_stance_retained": true,
+    "no_new_metric_accuracy_threshold": true,
+    "existing_scales_are_engineering_only": {
+      "standing_scale_m": 0.01,
+      "standing_smooth_response_m": 0.002,
+      "ice_policy_role": "finite objective only; no accuracy or feasibility gate",
+      "independent_accuracy_or_uncertainty_calibration": false
+    },
+    "viewer_and_export_revision": {
+      "files": [
+        "D:/OneDrive/codex_projs/RinkSpace/src/rinkspace/viewer3d/app.py",
+        "D:/OneDrive/codex_projs/RinkSpace/calibration/program_tracking/body_tracking/programme_opening.py",
+        "D:/OneDrive/codex_projs/RinkSpace/scripts/continue_programme_structure.py"
+      ],
+      "meaning_zh": "明确高度仅是未校准模型相对参考冰面的残差；零线/绿色旧工程支持带不是精度声明或接冰验收；不改数值、接触先验、鞋步限或默认。"
+    }
+  },
+  "r16_surface_refresh_failure": {
+    "candidate": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_continuation16/r001/solve/candidate.npz",
+      "sha256": "69c83834d9f4c6d742d7356487b7248523565b9b4e90dc9f1075116cc211f521"
+    },
+    "refresh": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_continuation16/r001/refreshed_objective.json",
+      "sha256": "9bfc9766081ce34178168e180dcc8b3ffbb1d1b6d17e7e3b88b0b37ecc52529e"
+    },
+    "state_review": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/progress_r16_r001_state.json",
+      "sha256": "7f0c4f3233a2dc0e9de9a6fcdc671433af843103d8022e403eb8cebd84c128fc"
+    },
+    "inner_solver_accepted": true,
+    "retained_after_surface_refresh": false,
+    "same_new_association_cost": [
+      5844.097600712572,
+      6175.2893253860075
+    ],
+    "recovery_source": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_inputs/source_v014.json",
+      "sha256": "ee92cd92224df1624c11e24696df05062387d0e83ce95826b4aaacee020bd364"
+    },
+    "recovery_warm_start": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/dense_flight_initialization/solve/candidate.npz",
+      "sha256": "929b0617676471da8015c9fec41e0f0355b059d7f47c252c0d4cb066b45fd642"
+    },
+    "recovery_meaning_zh": "从r15同物理状态重新全节目求解，将r16失败试步新发现的实际模型表面冲突集预先反馈；不继承失败试步物理状态，不改变源像素、相机、关节分支和全部原有非线性阈值。旧状态与失败记录保留。",
+    "next_run": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_continuation17",
+    "accuracy_accepted": false,
+    "attribution": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/surface_refresh_attribution_r16_r001.json",
+      "sha256": "ceed64d82be42665ce7e30d514ca089e64d95cc59e4f7d897ffd63e2aef4c3cf"
+    }
+  },
+  "camera_isu_holdout_participation": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/camera_isu_holdout_participation.json",
+    "sha256": "22a37d345649e87733979384cff49d3252db9356c5ea5f4384cb9c71b880fd32"
+  },
+  "surface_normal_repair": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/moving_surface_normal_repair.json",
+    "sha256": "95296a779939ae11379f8183b0e7727a71700b30c8bbd49e589318ca558d001f"
+  },
+  "r16_cavity_switch_replay": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/cavity_direction_replay_r16_r001.json",
+    "sha256": "c9b949a43c8b99b387c41bc9b3ab6182441b49fdc1b090c77862cfc31b7b54b7"
+  },
+  "user_stop_1108": {
+    "status": "paused_by_explicit_user_request",
+    "requested_action_zh": "尽快在安全点停下，完整交接给新对话",
+    "stopped_at_utc": "2026-11-08T14:34:34.685Z",
+    "process_tree_verified_absent": [
+      9000,
+      18252,
+      28468,
+      26880,
+      12196,
+      23256,
+      24244
+    ],
+    "stop_receipt": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/stop_repair17_receipt.json",
+      "sha256": "7c8b0bdbcc062b5fe53fc441604d36a34abb9062ae59afc2fb71c8eb769d83a3"
+    },
+    "r17_status": "One complete inner accepted step saved immediately before stop; no fitted result, run summary or whole-surface refresh. Not qualified as continuation parent.",
+    "r17_parameter": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_continuation17/r001/solve/candidate.npz",
+      "sha256": "cbee3a5fa9a3ffc69ca10e1bc507283e3402ef47be8f05efd0c4afefc548b05f"
+    },
+    "r17_source": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_continuation17/inputs/source_001.json",
+      "sha256": "57eac5fb6674ff62923adced69bd6674443b062605ef03d893916f57596604af"
+    },
+    "r17_saved_state_arrays_read": 75,
+    "r17_x_finite": true,
+    "r17_fitted_result_exists": false,
+    "r17_refreshed_objective_exists": false,
+    "last_refreshed_parent": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_continuation15/r001/solve/candidate.npz",
+      "sha256": "3642d2eb1b45bc15b0eec2d2d13026bcb837709edc2ec180e378e3ed9f9266ee"
+    },
+    "recommended_r15_lineage_corrected_clone": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/dense_flight_initialization/solve/candidate.npz",
+      "sha256": "929b0617676471da8015c9fec41e0f0355b059d7f47c252c0d4cb066b45fd642"
+    },
+    "pending_new_modes": [
+      "programme_structure.surface_normal_mode=current_oriented_target_face_v1",
+      "programme_structure.solver_step.early_complete_nonlinear_proposal=true"
+    ],
+    "new_modes_used_in_production": false,
+    "no_restart_without_new_user_resume": true
+  },
+  "source_complete_proposal_tests": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/source_complete_proposal_test_status.json",
+    "sha256": "e6626443b346e776643fb1667883750d5e352e7c667fc160a51e5bc8cd5729dc"
+  }
+}

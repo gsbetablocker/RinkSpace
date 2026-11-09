@@ -48,7 +48,7 @@ class ActualMotionFactors:
         R=np.concatenate((s['Q'][:,None],s['local_R']),axis=1);n=len(R);rows=[];mats=[];parts={};named=[]
         def add(name,r,J):
             r=np.asarray(r).ravel();rows.append(r);parts[name]=float(r@r/2)
-            if jacobian:mats.append(J)
+            if jacobian and not getattr(self.problem,'bounded_memory',False):mats.append(J)
             from .weighted_blocks import block,full_columns
             named.append(full_columns(block(name,r,J,dict(source_pts=self.ref.p['pts']))))
         weight=np.ones((n,22))*np.sqrt(self.weights[:,None]*self.config['pose_prior_weight'])/.6
@@ -57,12 +57,11 @@ class ActualMotionFactors:
         error=_log(self.prior_R.swapaxes(-1,-2)@R);z=error*weight[...,None];r,D=robust_vector(z,delta=2.)
         J=None
         if jacobian:
-            blocks=D@((weight[...,None,None]*inverse_right_jacobian(error))@right_jacobian(np.asarray(d)[:,3:].reshape(n,22,3)))
-            J=d.rotation_chain(blocks)
+            pose_blocks=D@((weight[...,None,None]*inverse_right_jacobian(error))@right_jacobian(np.asarray(d)[:,3:].reshape(n,22,3)))
         add('finite_network_pose_prior',r,J)
         w=np.sqrt(self.weights*.2)/.75;rp=np.einsum('nij,nj->ni',self.root_transform,s['P']-self.parent['P'])*w[:,None]
         if jacobian:
-            local=np.zeros((n,3,69));local[:,:,:3]=w[:,None,None]*self.root_transform;J=d.chain(local)
+            root_local=np.zeros((n,3,69));root_local[:,:,:3]=w[:,None,None]*self.root_transform
         add('finite_parent_root_prior',rp,J)
         # SO(3) interval velocities are expressed in the same world/parent axes.
         h=np.diff(self.times);rel=R[1:]@R[:-1].swapaxes(-1,-2);phi=_log(rel);omega=phi/h[:,None,None]
@@ -81,32 +80,53 @@ class ActualMotionFactors:
             coeff=[a[:,None,None,None]*K[:-1]@T[:-2]/h[:-1,None,None,None],
                    -a[:,None,None,None]*(K[:-1]/h[:-1,None,None,None]+K[1:]/h[1:,None,None,None])@T[1:-1],
                    a[:,None,None,None]*K[1:]@T[2:]/h[1:,None,None,None]]
-            J=csr_matrix((r.size,self.body.size))
-            for offset,C in enumerate(coeff):
-                C=D@(w[...,None,None]*C)
-                J=J+d.rotation_chain(C,sample_indices=np.arange(n-2)+offset)
+            pose_tiles=[];root_tiles=[];acceleration_tiles=[]
+            state=self.body.state
+            # One tile plus its two-sample acceleration halo owns the mapping.
+            # Nothing is cached across x, clocks, seed/layout or binding changes.
+            for first in range(0,n,512):
+                last=min(first+512,n);stop=min(last+2,n)
+                _,sample,mapping=state.linearization(x,self.times[first:stop])
+                pick=np.arange(last-first)
+                pose_tiles.append(state._rotation_chain_with_mapping(pose_blocks[first:last],sample,mapping,pick))
+                root_tiles.append(state._chain_with_mapping(root_local[first:last],sample,mapping,pick))
+                end=min(last,n-2)
+                if end>first:
+                    piece=csr_matrix(((end-first)*22*3,self.body.size))
+                    for offset,C in enumerate(coeff):
+                        blocks=D[first:end]@(w[first:end,...,None,None]*C[first:end])
+                        piece=piece+state._rotation_chain_with_mapping(blocks,sample,mapping,np.arange(end-first)+offset)
+                    acceleration_tiles.append(piece)
+            from .weighted_blocks import block,full_columns
+            for i,tiles in enumerate((pose_tiles,root_tiles)):
+                matrix=vstack(tiles,format='csr');tiles.clear()
+                b=named[i];b.jacobian=full_columns(block(b.name,b.residual,matrix,b.provenance,b.association)).jacobian
+                if mats:mats[i]=matrix
+            J=vstack(acceleration_tiles,format='csr') if acceleration_tiles else csr_matrix((0,self.body.size))
+            acceleration_tiles.clear()
         add('actual_so3_angular_acceleration',r,J)
-        # Actual translation, not derivatives of a correction. No flight-root zero-acceleration target.
-        Pacc=self.body.state.basis(self.times,2)@self.body.state.current_curve(x).position_controls
-        # The old all-axis hole allowed large camera-ray translation spikes
-        # around the entry. Keep a finite horizontal curvature prior there.
-        # Vertical relaxation is retained; the confirmed-flight COM factor,
-        # rather than a pelvis zero-acceleration target, supplies gravity.
-        w=np.repeat((np.sqrt(self.weights)/12.)[:,None],3,axis=1)
-        vertical_relax=(self.source>=81.30)&(self.source<=81.62)
-        if generic:
-            from .phase_ledger import flight_mask
-            vertical_relax=flight_mask(self.ref,self.ref.p['pts'])
-        w[vertical_relax,2]=0.;r=Pacc*w
-        if jacobian:
-            from scipy.sparse import kron,diags
-            A=csr_matrix(self.body.state.basis(self.times,2))
-            K=kron(A,csr_matrix(np.c_[np.eye(3),np.zeros((3,66))]),format='csr')
-            J=diags(w.ravel())@K
-            if J.shape[1]<self.body.size:J=hstack((J,csr_matrix((J.shape[0],self.body.size-J.shape[1]))),format='csr')
-        add('actual_root_translation_acceleration',r,J)
-        residual=np.concatenate(rows);J=vstack(mats,format='csr') if jacobian else None
-        self.last=dict(residual=residual,jac=hstack((csr_matrix((len(residual),17)),J),format='csr') if jacobian else None,parts=parts,weighted_blocks=named,
+        if getattr(self.ref,'source_document',{}).get('trajectory_reference')!='model_com':
+            # Actual translation, not derivatives of a correction. No flight-root zero-acceleration target.
+            Pacc=self.body.state.basis(self.times,2)@self.body.state.current_curve(x).position_controls
+            # The old all-axis hole allowed large camera-ray translation spikes
+            # around the entry. Keep a finite horizontal curvature prior there.
+            # Vertical relaxation is retained; the confirmed-flight COM factor,
+            # rather than a pelvis zero-acceleration target, supplies gravity.
+            w=np.repeat((np.sqrt(self.weights)/12.)[:,None],3,axis=1)
+            vertical_relax=(self.source>=81.30)&(self.source<=81.62)
+            if generic:
+                from .phase_ledger import flight_mask
+                vertical_relax=flight_mask(self.ref,self.ref.p['pts'])
+            w[vertical_relax,2]=0.;r=Pacc*w
+            if jacobian:
+                from scipy.sparse import kron,diags
+                A=csr_matrix(self.body.state.basis(self.times,2))
+                K=kron(A,csr_matrix(np.c_[np.eye(3),np.zeros((3,66))]),format='csr')
+                J=diags(w.ravel())@K
+                if J.shape[1]<self.body.size:J=hstack((J,csr_matrix((J.shape[0],self.body.size-J.shape[1]))),format='csr')
+            add('actual_root_translation_acceleration',r,J)
+        residual=np.concatenate(rows);J=vstack(mats,format='csr') if mats else None
+        self.last=dict(residual=residual,jac=hstack((csr_matrix((len(residual),17)),J),format='csr') if J is not None else None,parts=parts,weighted_blocks=named,
             metrics=dict(actual_root_omega_world_rad_s=omega[:,0].tolist(),actual_right_wrist_interval_degrees=np.rad2deg(np.linalg.norm(phi[:,21],axis=1)).tolist(),
                 all_terminal_joint_orientations_regularized=True,finite_prior_config=self.config,no_zero_angular_velocity_target=True))
         return self.last

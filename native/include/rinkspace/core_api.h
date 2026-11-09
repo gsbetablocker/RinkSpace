@@ -69,6 +69,15 @@ RS_API int rs_project_motion_xyz_jacobian(const double* rig,size_t nr,
     double* output,size_t no,double* jacobian_xyz,size_t njac,
     int* point_status,size_t ns,int threads);
 RS_API int rs_motion_projection_openmp_enabled(void);
+/* Inclusive, double-precision triangle AABB pairs, filtered by the caller's
+ * sorted symmetric excluded-face CSR. Vertices and faces are packed xyz/triple
+ * rows. Output contains at most capacity packed pairs (a < b). Returns the
+ * total pair count, even when capacity is insufficient, or a negative error.
+ * This only accelerates broad phase; exact triangle crossings remain external. */
+RS_API int64_t rs_surface_aabb_pairs(
+    const double* vertices, size_t vertex_count, const int32_t* faces,
+    size_t face_count, const int32_t* excluded_rows, const int32_t* excluded_faces,
+    size_t exclusion_count, int32_t* output, size_t capacity);
 RS_API int rs_sample_entity_path(const double* board,size_t nboard,int kind,
     const double* parameters,size_t nparameters,const double* vertices,size_t nvertices,
     const double* stations,size_t n,double* xyz,size_t nxyz,int* status,size_t nstatus);

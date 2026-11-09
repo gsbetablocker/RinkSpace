@@ -3,7 +3,7 @@ project(rinkspace_core LANGUAGES CXX)
 option(RINKSPACE_ENABLE_CUDA "Build the resident CUDA evaluator/linearization" OFF)
 option(RINKSPACE_ENABLE_OPENMP "Parallelize independent CPU motion-projection rows" OFF)
 set(RINKSPACE_CUDSS_ROOT "" CACHE PATH "Existing cuDSS root for the optional native LM candidate")
-add_library(rinkspace_core SHARED src/core_api.cpp)
+add_library(rinkspace_core SHARED src/core_api.cpp src/surface_broadphase.cpp)
 # Some localized MSVC/Ninja combinations misdecode /showIncludes and record
 # zero header dependencies. Keep project-header changes explicit so CPU and
 # CUDA cannot silently use different revisions of the shared mathematics.

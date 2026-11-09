@@ -1,0 +1,213 @@
+{
+  "schema": "rinkspace.structure-camera-policy.v1",
+  "provenance": "工程有限软域；继承原膝/肘flex端界，不是医学ROM或个体测量。基按本次shaped rest的骨盆前向和骨链作者化；coupling方法参考Akhter & Black CVPR2015，数值为明确待验证模型选择。鞋内踝来自local_R，不用整鞋world bank。",
+  "sources": [
+    "https://openaccess.thecvf.com/content_cvpr_2015/html/Akhter_Pose-Conditioned_Joint_Angle_2015_CVPR_paper.html",
+    "https://github.com/vchoutas/smplify-x/blob/master/smplifyx/prior.py"
+  ],
+  "envelopes": {
+    "knee": {
+      "flex_degrees": [
+        -18,
+        170
+      ],
+      "flex_grid_degrees": [
+        -18,
+        0,
+        60,
+        120,
+        170
+      ],
+      "swing_axes_degrees": [
+        [
+          18,
+          12
+        ],
+        [
+          18,
+          12
+        ],
+        [
+          35,
+          18
+        ],
+        [
+          30,
+          18
+        ],
+        [
+          20,
+          14
+        ]
+      ],
+      "scale_degrees": [
+        18,
+        18
+      ]
+    },
+    "elbow": {
+      "flex_degrees": [
+        -24,
+        170
+      ],
+      "flex_grid_degrees": [
+        -24,
+        0,
+        90,
+        170
+      ],
+      "swing_axes_degrees": [
+        [
+          55,
+          25
+        ],
+        [
+          55,
+          25
+        ],
+        [
+          55,
+          30
+        ],
+        [
+          45,
+          25
+        ]
+      ],
+      "scale_degrees": [
+        24,
+        24
+      ]
+    },
+    "hip": {
+      "flex_degrees": [
+        -60,
+        155
+      ],
+      "flex_grid_degrees": [
+        -60,
+        0,
+        90,
+        155
+      ],
+      "swing_axes_degrees": [
+        [
+          80,
+          90
+        ],
+        [
+          95,
+          100
+        ],
+        [
+          100,
+          100
+        ],
+        [
+          80,
+          80
+        ]
+      ],
+      "scale_degrees": [
+        40,
+        40
+      ]
+    },
+    "ankle": {
+      "flex_degrees": [
+        -70,
+        70
+      ],
+      "flex_grid_degrees": [
+        -70,
+        0,
+        70
+      ],
+      "swing_axes_degrees": [
+        [
+          35,
+          30
+        ],
+        [
+          40,
+          35
+        ],
+        [
+          35,
+          30
+        ]
+      ],
+      "scale_degrees": [
+        25,
+        25
+      ]
+    },
+    "wrist": {
+      "flex_degrees": [
+        -100,
+        100
+      ],
+      "flex_grid_degrees": [
+        -100,
+        0,
+        100
+      ],
+      "swing_axes_degrees": [
+        [
+          65,
+          40
+        ],
+        [
+          80,
+          50
+        ],
+        [
+          65,
+          40
+        ]
+      ],
+      "scale_degrees": [
+        35,
+        35
+      ]
+    }
+  },
+  "geometry": {
+    "surface_scale_m": 0.03,
+    "contact_allowance_m": 0.003,
+    "accuracy_gate": false,
+    "temporal_check": "native+midpoint sampled; adaptive checks remain diagnostic"
+  },
+  "source_grasp_review": [
+    {
+      "episode_id": "lsp_grasp",
+      "hand": "right",
+      "foot": 1,
+      "source_seconds": [
+        161.32,
+        165.14
+      ],
+      "scope": "palm contact neighborhood only; blurred material unknown"
+    },
+    {
+      "episode_id": "lsp_grasp",
+      "hand": "left",
+      "foot": 1,
+      "source_seconds": [
+        163.54,
+        165.14
+      ],
+      "scope": "late inferred second palm near held shoe"
+    },
+    {
+      "episode_id": "ccosp_left_grasp",
+      "hand": "right",
+      "foot": 0,
+      "source_seconds": [
+        180.58,
+        184.52
+      ],
+      "scope": "palm contact neighborhood only; left hand on leg not exempt"
+    }
+  ]
+}

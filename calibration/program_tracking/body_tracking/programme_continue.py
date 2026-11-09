@@ -36,6 +36,28 @@ def inherited_episode_hypotheses(parent,evidence_sha256):
     return fields
 
 
+def inherited_contact_modes(parent, source_pts):
+    """Carry fixed contact semantics across an explicit input revision.
+
+    Body source labels may change without changing the native clock or the
+    physical support identity. Preserve that original association and record;
+    a newly inferred lower foot must not silently replace it.
+    """
+    from .action_objective_context import _modes
+    from .sequence_dynamics import MODE_NAMES
+    source_pts = np.asarray(source_pts)
+    if source_pts.ndim != 1 or np.any(np.diff(source_pts) <= 0):
+        raise ValueError('Contact revision requires the ordered native source clock')
+    if 'action_objective_source_pts' in parent:
+        np.testing.assert_array_equal(parent['action_objective_source_pts'], source_pts,
+                                      err_msg='Contact revision changed native source PTS')
+    factor = SimpleNamespace(times=source_pts, record=dict(mode_names=MODE_NAMES.tolist()))
+    _modes(factor, parent)
+    return {key: np.asarray(parent[key]).copy() for key in
+            ('sequence_contact_modes', 'sequence_contact_status',
+             'sequence_contact_mode_names', 'sequence_contact_association_json')}
+
+
 def apply_body_leg_assignment(prepared,parent_prepared,source_pts,provenance):
     """Repair explicit network label correspondence in a new input revision.
 
@@ -207,6 +229,8 @@ def initialize(project,parent_prepared,parent_parameter,prepared,output,*,scale_
         parent_accepted_steps=np.array(0),input_revision_initializer=np.array(True),
         input_revision_parent_parameter_sha256=np.array(digest(parent_parameter)))
     fields.update(inherited_episode_hypotheses(parent,digest(prepared/'source_evidence.json')))
+    if document.get('programme_structure',{}).get('enabled'):
+        fields.update(inherited_contact_modes(parent,p['pts']))
     np.savez_compressed(output/'solve/candidate.npz',**fields)
     write_json(output/'solve/candidate_selection.json',dict(retained_step=0,attempt_step=0,available=True,quality_failed=False))
     report=dict(parent_prepared=str(parent_prepared),parent_parameter=str(parent_parameter),parent_parameter_sha256=digest(parent_parameter),

@@ -1,0 +1,340 @@
+{
+  "schema": "rinkspace.result-viewer.v1",
+  "event": "ankara_2026",
+  "programme": "okada_mei_sp",
+  "scene_root": "runs/body_s01_20261029/fullbody_1102",
+  "scene_label": "camera_solver_refined_1102 冻结场景",
+  "metric_binding": "runs/body_s01_20261029/fullbody_1102/metric_binding.json",
+  "metric_binding_base": "data",
+  "model_asset": "environments/body/GVHMR/inputs/checkpoints/body_models/smplx/SMPLX_NEUTRAL.npz",
+  "source_video": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4",
+  "source_time_base": [
+    1,
+    12800
+  ],
+  "diagnostic_semantics": {
+    "com": "形状体积分配与鞋质量近似的模型 COM，非实测人体质心",
+    "blade_material": "每只刀固定材料点：后／中／前；不是接冰点",
+    "witness": "移动最低点／接触候选，非真实接冰"
+  },
+  "shot": "programme_action_1107",
+  "source_run": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\trajectory_action_1107\\action_player",
+  "session_id": "programme_lsp_continuity_1109",
+  "default_variant": "programme_action_physics_1107",
+  "initial_source_pts": 2001408,
+  "initial_view": "side",
+  "initial_wear_inspection": false,
+  "source_identity_field": "source_identity_suspect",
+  "source_navigation": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\structure_camera_1108\\player_install\\source_navigation.json",
+  "source_programme_scope": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\rebuild_scope.json",
+  "source_review_model_body_default": true,
+  "body_window_scope": "九镜头8329曝光的统一连续开发候选；身体、鞋刀与接触准确性未验收。",
+  "body_scope_label": "全节目九镜头连续开发候选；本帧是否参与本轮优化按保存mask显示。",
+  "footwear_scope_label": "装备按本轮保存数组显示；已保存的unknown不由显示端补造。",
+  "display_outside_window_label": "保存的全节目初状态；本帧未参与本轮优化。",
+  "display_footwear_binding_scope": "全节目保存的装备应用mask",
+  "review_status": "独立 LSp 对照入口。全节目 8329 个源曝光，旋转与抓刀连续性已核对，人体和接触准确性待复核。",
+  "initial_visible": {
+    "surface": true,
+    "skeleton": false,
+    "shoes": true,
+    "trajectory": false,
+    "pelvis": false,
+    "com": false,
+    "blade_material": false,
+    "contact": false,
+    "com_projection": false
+  },
+  "variants": [
+    {
+      "id": "programme_action_physics_1107",
+      "label": "九镜头连续轨迹与全身开发候选（未验收）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\trajectory_action_1107\\physics_guarded\\final\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "programme_initial",
+      "body_refinement_intervals_seconds": [
+        [
+          22.12,
+          188.68
+        ]
+      ]
+    },
+    {
+      "id": "programme_trajectory_1107",
+      "label": "旧全节目候选（原保存状态；本候选独立保存的钢刃诊断）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\trajectory_continue_1107\\temporal_joint_cached\\final\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "programme_initial",
+      "source_projection_origin": "own saved COCO_uv/equipment_uv",
+      "blade_review_available": true
+    },
+    {
+      "id": "programme_action_source_1107",
+      "label": "诊断对照 programme_action_source_1107（未验收；本候选独立保存的钢刃诊断）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\trajectory_action_1107\\source_path_v3\\final\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "programme_initial",
+      "conditional_diagnostic": true,
+      "user_accepted": false,
+      "accuracy_accepted": false,
+      "blade_review_available": true,
+      "source_projection_origin": "own saved COCO_uv/equipment_uv",
+      "diagnostic_record": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\programme_action_source_1107.json",
+      "diagnostic_record_sha256": "8c0f2d8707172158ad32f5f42753ab43b0aa553374a869d6d07bf995e94b4939",
+      "parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\programme_action_source_1107.npz",
+      "parameter_sha256": "f1b60ccf23c54b2d262f71e12b3e2257368f73f1c0e384b2bd734f000583d870"
+    },
+    {
+      "id": "programme_action_root_1107",
+      "label": "诊断对照 programme_action_root_1107（未验收；本候选独立保存的钢刃诊断）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\trajectory_action_1107\\root_tangent_v2\\final\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "programme_initial",
+      "conditional_diagnostic": true,
+      "user_accepted": false,
+      "accuracy_accepted": false,
+      "blade_review_available": true,
+      "source_projection_origin": "own saved COCO_uv/equipment_uv",
+      "diagnostic_record": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\programme_action_root_1107.json",
+      "diagnostic_record_sha256": "0727ba103a2897d7c82af26fa27c5f41797b8488c3cdeff06395ee1c830dd308",
+      "parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\programme_action_root_1107.npz",
+      "parameter_sha256": "f7d6e8003a667811f999e9750100e9575b98291b77360859c61ec40f323e9d73"
+    },
+    {
+      "id": "programme_action_axel_1107",
+      "label": "2A 轴修正版（单视角候选）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\trajectory_action_1107\\axel_axis_joint_1107\\final\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "programme_initial",
+      "body_refinement_intervals_seconds": [
+        [
+          22.12,
+          188.68
+        ]
+      ]
+    },
+    {
+      "id": "programme_action_finish_1107",
+      "label": "全节目动作修正版（S09／步法／结构候选）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\trajectory_action_1107\\action_completion_1107\\s09_v4\\final\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "programme_initial",
+      "body_refinement_intervals_seconds": [
+        [
+          22.12,
+          188.68
+        ]
+      ]
+    },
+    {
+      "id": "programme_structure_1108",
+      "label": "全节目结构候选（待复核）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\structure_camera_1108\\player_install\\programme_structure_1108\\final\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "programme_initial",
+      "body_refinement_intervals_seconds": [
+        [
+          22.12,
+          188.68
+        ]
+      ],
+      "user_accepted": false,
+      "accuracy_accepted": false,
+      "blade_review_available": true,
+      "source_projection_origin": "own saved COCO and native five-node shoe/blade UV",
+      "camera_binding": {
+        "record": {
+          "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\camera_solver_refined_1102.json",
+          "sha256": "9290062c2f8b7ef1e8f54908896e1c0249bf3ec731f51b97c1fbc6406704682e"
+        },
+        "state": {
+          "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\camera_solver_refined_1102.npz",
+          "sha256": "d6cfde1474a23d594a0395351ebbdb0ee15a6560ef77b27f069d239ee95bb3f3"
+        }
+      },
+      "projection_runtime": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_perf_1103\\native_cpu\\rinkspace_core.dll",
+        "sha256": "d228146cee739fe255d2b12c0ba9cb00647d5e6a2dffadcf0f2f53354a3bb71f"
+      },
+      "legacy_grid_reuse": {
+        "viewer_camera": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\camera_snapshot.npz",
+          "sha256": "d6cfde1474a23d594a0395351ebbdb0ee15a6560ef77b27f069d239ee95bb3f3"
+        },
+        "candidate_camera": {
+          "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\camera_solver_refined_1102.npz",
+          "sha256": "d6cfde1474a23d594a0395351ebbdb0ee15a6560ef77b27f069d239ee95bb3f3"
+        },
+        "identical_controls_rigs_scene_and_source_clock": true
+      },
+      "diagnostic_record": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\programme_structure_1108.json",
+      "diagnostic_record_sha256": "7265055eda26dbc665993678cc48e1fa1facd61f6ffcb92975b9975cf80384d6",
+      "parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\programme_structure_1108.npz",
+      "parameter_sha256": "27be6f2fdd6c17a85f751b6a94369ddf771a63e0ccfe0fd8f9a832d9b89d84a8"
+    },
+    {
+      "id": "programme_structure_camera_1108",
+      "label": "最新 · 联合检验候选（相机保留原值，待复核）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\structure_camera_1108\\player_install\\programme_structure_camera_1108\\final\\fitted\\result.npz",
+      "shell_topology": "saved",
+      "body_reference_label": "programme_initial",
+      "body_refinement_intervals_seconds": [
+        [
+          22.12,
+          188.68
+        ]
+      ],
+      "user_accepted": false,
+      "accuracy_accepted": false,
+      "blade_review_available": true,
+      "source_projection_origin": "own saved COCO and native five-node shoe/blade UV",
+      "camera_binding": {
+        "record": {
+          "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\camera_joint_1108_selected.json",
+          "sha256": "4bd2540f33ab45789de8f743500323d74d81f7188a328102adbea0616d233712"
+        },
+        "state": {
+          "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\camera_joint_1108_selected.npz",
+          "sha256": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710"
+        }
+      },
+      "projection_runtime": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_perf_1103\\native_cpu\\rinkspace_core.dll",
+        "sha256": "d228146cee739fe255d2b12c0ba9cb00647d5e6a2dffadcf0f2f53354a3bb71f"
+      },
+      "legacy_grid_reuse": {
+        "viewer_camera": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\fullbody_1102\\camera_snapshot.npz",
+          "sha256": "d6cfde1474a23d594a0395351ebbdb0ee15a6560ef77b27f069d239ee95bb3f3"
+        },
+        "candidate_camera": {
+          "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\camera_joint_1108_selected.npz",
+          "sha256": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710"
+        },
+        "identical_controls_rigs_scene_and_source_clock": true
+      },
+      "diagnostic_record": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\programme_structure_camera_1108.json",
+      "diagnostic_record_sha256": "5c93b508cb5c0670dbab53a2c91362585dcab009794a8798cab20a983aa9be89",
+      "parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\programme_structure_camera_1108.npz",
+      "parameter_sha256": "909055d5b46153f48c57fdec4e9b0f2c052f017796a37436d6bfe615c760131a"
+    },
+    {
+      "id": "programme_repair_1108",
+      "candidate_id": "programme_repair_1108",
+      "label": "全节目 COM 与足鞋修复候选（待复核）",
+      "kind": "fullbody",
+      "result": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\structure_camera_1108\\player_install\\programme_repair_1108\\final\\fitted\\result.npz",
+      "result_sha256": "1130d276cd9872c190a6a1069aad68280524f6cd93aaa4874f7f2060274a3c37",
+      "shell_topology": "saved",
+      "required_saved_diagnostics": [
+        "com_world_mid"
+      ],
+      "body_reference_label": "programme_initial",
+      "body_refinement_intervals_seconds": [
+        [
+          22.12,
+          188.68
+        ]
+      ],
+      "diagnostic_record": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\programme_repair_1108.json",
+      "diagnostic_record_sha256": "9dea01150a9a764bd0137862aa4f04e7210ceea7efa992b6d53c34ff7b8cc5bc",
+      "parameter": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\programme_repair_1108.npz",
+      "parameter_sha256": "30498f71332ededf7a141037f750adf59008b91a54a984a0cf7a0ea9c5abd6e7",
+      "user_accepted": false,
+      "accuracy_accepted": false,
+      "blade_review_available": true,
+      "camera_binding": {
+        "record": {
+          "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\camera_joint_1108_selected.json",
+          "sha256": "4bd2540f33ab45789de8f743500323d74d81f7188a328102adbea0616d233712"
+        },
+        "state": {
+          "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\camera_joint_1108_selected.npz",
+          "sha256": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710"
+        },
+        "shot_state_sha256": {
+          "s01": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710",
+          "s02": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710",
+          "s03": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710",
+          "s04": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710",
+          "s05": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710",
+          "s06": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710",
+          "s07": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710",
+          "s08": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710",
+          "s09": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710"
+        },
+        "frozen_camera_sha256": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710"
+      },
+      "source_projection_origin": "own saved COCO_uv and native five-node shoe/blade UV"
+    },
+    {
+      "id": "programme_lsp_continuity_1109",
+      "candidate_id": "programme_lsp_continuity_1109",
+      "label": "LSp 旋转连续修复（待复核）",
+      "kind": "fullbody",
+      "result": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/player_install/programme_lsp_continuity_1109/final/fitted/result.npz",
+      "result_sha256": "93aba36c8438c5c84679ad460a40981338e66ea32ec2ad94e23152300707bea9",
+      "shell_topology": "saved",
+      "required_saved_diagnostics": [
+        "com_world_mid"
+      ],
+      "body_reference_label": "programme_repair_1108",
+      "body_refinement_intervals_seconds": [
+        [
+          156.88,
+          159.14
+        ],
+        [
+          161.8,
+          163.82
+        ]
+      ],
+      "diagnostic_record": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/programme_lsp_continuity_1109.json",
+      "diagnostic_record_sha256": "afa8dc8277f9969964279b2c0c8063dcee0814a8cb967a7cb379699b59c97313",
+      "parameter": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/programme_lsp_continuity_1109.npz",
+      "parameter_sha256": "043606dfd5a0644b3b5edf305ba51011f16d1f773e268f1734ba5b9593c67563",
+      "user_accepted": false,
+      "accuracy_accepted": false,
+      "blade_review_available": true,
+      "camera_binding": {
+        "record": {
+          "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\camera_joint_1108_selected.json",
+          "sha256": "4bd2540f33ab45789de8f743500323d74d81f7188a328102adbea0616d233712"
+        },
+        "state": {
+          "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\camera_joint_1108_selected.npz",
+          "sha256": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710"
+        },
+        "shot_state_sha256": {
+          "s01": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710",
+          "s02": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710",
+          "s03": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710",
+          "s04": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710",
+          "s05": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710",
+          "s06": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710",
+          "s07": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710",
+          "s08": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710",
+          "s09": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710"
+        },
+        "frozen_camera_sha256": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710"
+      },
+      "source_projection_origin": "own five-node projections on the repaired spline support, verified identical r26 outside support"
+    }
+  ],
+  "blade_review_asset": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/player_install/programme_lsp_continuity_1109/blade_review/programme_blade_review.json",
+  "source_review_model_runner_default": true,
+  "latest_review_variant": "programme_lsp_continuity_1109",
+  "comparison_variants": [
+    "programme_repair_1108",
+    "programme_lsp_continuity_1109"
+  ],
+  "trajectory_reference": "com"
+}

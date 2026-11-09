@@ -12,6 +12,33 @@ from scipy.sparse import csr_matrix
 from scipy.sparse.linalg import LinearOperator
 
 
+def _coalesce_gram_tiles(tiles, *, max_rows=1024, max_nnz=2_000_000):
+    """Group adjacent Gram tiles for elementwise normal-matrix scaling.
+
+    Reuse the known row/value offsets without a row-pointer download. A single
+    tile larger than a budget remains intact; no new matrix entries or changes
+    to arithmetic are introduced by grouping the launch ranges.
+    """
+    if max_rows < 1 or max_nnz < 1:
+        raise ValueError('Normal scaling group budgets must be positive')
+    groups=[]
+    current=None
+    for first,last,a,b in tiles:
+        if first < 0 or a < 0 or last < first or b < a or (first == last and a != b):
+            raise ValueError('Invalid Gram tile range')
+        if current is not None:
+            if first != current[1] or a != current[3]:
+                raise ValueError('Gram tiles must be contiguous in rows and values')
+            if last-current[0] <= max_rows and b-current[2] <= max_nnz:
+                current=(current[0],last,current[2],b)
+                continue
+            groups.append(current)
+        current=(first,last,a,b)
+    if current is not None:
+        groups.append(current)
+    return groups
+
+
 class CuDSS:
     def __init__(self):
         root=Path(os.environ.get('RINKSPACE_DATA_ROOT','D:/CodexData/RinkSpace_Data'))/'runtime_tools/cudss/0.8-cu13'
@@ -263,6 +290,7 @@ class GPUJacobian(LinearOperator):
     def __init__(self,matrix,*,shared_prefix=0,session=None,layout=None):
         import torch
         self.torch=torch;matrix=matrix.tocsr();self.prefix=int(shared_prefix);self._gram=None
+        self._normal_transpose=None;self._transpose_argument=None;self._transpose_result=None
         if not np.isfinite(matrix.data).all():raise ArithmeticError('Nonfinite actual weighted CSR before GPU upload')
         if self.prefix and matrix.nnz and np.min(matrix.indices)<self.prefix:raise ValueError('Frozen prefix has nonzero Jacobian columns')
         started=time.perf_counter();cols=matrix.shape[1]-self.prefix
@@ -285,7 +313,8 @@ class GPUJacobian(LinearOperator):
         but their device data must not overlap the new FK/J/Gram workspace.
         """
         if self.released:return
-        self.J=None;self._gram=None;self._diag=None;self._gram_tiles=None
+        self.J=None;self._gram=None;self._diag=None;self._gram_tiles=None;self._scaling_tiles=None
+        self._normal_transpose=None;self._transpose_argument=None;self._transpose_result=None
         self._dss=None;self.released=True
         self.torch.cuda.empty_cache()
 
@@ -302,9 +331,18 @@ class GPUJacobian(LinearOperator):
     def _rmatvec(self,x):
         if self.released:raise RuntimeError('Retired GPU linearization used after replacement')
         if not np.isfinite(x).all():raise ArithmeticError('Nonfinite input refused before GPU transpose product')
-        t=self.torch.as_tensor(np.ascontiguousarray(x).reshape(-1,1),dtype=self.torch.float64,device=self.device)
-        result=self.torch.sparse.mm(self.J.transpose(0,1),t).cpu().numpy().ravel()
+        argument=np.ascontiguousarray(x).reshape(-1)
+        if self._transpose_argument is not None and np.array_equal(argument,self._transpose_argument):
+            return self._transpose_result.copy()
+        t=self.torch.as_tensor(argument[:,None],dtype=self.torch.float64,device=self.device)
+        prepared=self._normal_transpose is not None
+        operator=self._normal_transpose if prepared else self.J.transpose(0,1)
+        result=self.torch.sparse.mm(operator,t).cpu().numpy().ravel()
         if not np.isfinite(result).all():raise ArithmeticError('Nonfinite GPU CSR transpose product')
+        self._transpose_argument=argument.copy();self._transpose_result=result.copy()
+        if prepared:
+            self._normal_transpose=None;del operator
+            self.torch.cuda.empty_cache()
         return result
 
     def _prepare_gram(self):
@@ -356,6 +394,7 @@ class GPUJacobian(LinearOperator):
                 self._gram_tiles.append((first,last,total,stop))
                 total=stop
                 del left,gram,zero_diag,rr
+            self._normal_transpose=transpose
             del transpose
             index=index[:total];data=data[:total]
             self._diag=diagonal
@@ -364,13 +403,39 @@ class GPUJacobian(LinearOperator):
             if not bool(valid.all().item()):raise ArithmeticError('GPU Gram lost its canonical diagonal')
             end.record();end.synchronize()
             self._gram=(row,index,data)
-            # cuDSS has a separate allocator. Return the completed transpose
-            # and SpGEMM scratch at this phase boundary, not per tile.
+            self._scaling_tiles=_coalesce_gram_tiles(self._gram_tiles)
+            # Retain the CSR transpose through the first J.T@rhs, avoiding a
+            # redundant CSC conversion. That product releases it before cuDSS.
+            # Return only completed SpGEMM scratch at this phase boundary.
             torch.cuda.empty_cache()
             self._gram_seconds=time.perf_counter()-started
             self.gram_record=dict(gram_backend='CUDA_FP64_block_SpGEMM',gram_device_block_rows=block_rows,
                 gram_GPU_wall_seconds=self._gram_seconds,gram_GPU_event_seconds=begin.elapsed_time(end)*.001,
-                gram_H2D_bytes=0,gram_D2H_bytes=offsets.nbytes+1,normal_storage_capacity=capacity)
+                gram_H2D_bytes=0,gram_D2H_bytes=offsets.nbytes+1,normal_storage_capacity=capacity,
+                normal_scaling_groups=len(self._scaling_tiles),
+                normal_scaling_max_rows=max((last-first for first,last,a,b in self._scaling_tiles),default=0),
+                normal_scaling_max_nnz=max((b-a for first,last,a,b in self._scaling_tiles),default=0))
+
+    def scaled_normal_objective(self,rhs,scale,*,damp=0.):
+        """Same FP64 J normal model for a box-constrained linear trial.
+
+        Return (value, gradient) in Jacobian-scaled coordinates. Only vectors
+        cross the host boundary; the already assembled normal CSR stays on GPU.
+        """
+        torch=self.torch;self._prepare_gram();row,index,base=self._gram
+        normal=torch.sparse_csr_tensor(row,index,base,size=(self.shape[1],self.shape[1]))
+        s=torch.as_tensor(np.asarray(scale),dtype=torch.float64,device=self.device)
+        b=torch.as_tensor(scale*self.rmatvec(rhs),dtype=torch.float64,device=self.device)
+        penalty=float(damp)**2
+        def objective(z):
+            t=torch.as_tensor(np.ascontiguousarray(z),dtype=torch.float64,device=self.device)
+            product=s*torch.sparse.mm(normal,(s*t)[:,None])[:,0]+penalty*t
+            value=(t@(product*.5-b)).item()
+            gradient=(product-b).cpu().numpy()
+            if not np.isfinite(value) or not np.isfinite(gradient).all():
+                raise ArithmeticError('Nonfinite bounded GPU normal objective')
+            return float(value),gradient
+        return objective
 
     def solve_scaled(self,rhs,scale,diagonal=None,damp=0.):
         torch=self.torch;self._prepare_gram();row,index,base=self._gram;n=self.shape[1]
@@ -388,7 +453,7 @@ class GPUJacobian(LinearOperator):
                 values=base.clone()
                 A=torch.sparse_csr_tensor(row,index,values,size=(n,n))
             s=torch.as_tensor(scale,dtype=torch.float64,device=self.device)
-            for first,last,a,b in self._gram_tiles:
+            for first,last,a,b in self._scaling_tiles:
                 rr=torch.repeat_interleave(s[first:last],(row[first+1:last+1]-row[first:last]).long(),output_size=b-a)
                 values[a:b]*=rr*torch.index_select(s,0,index[a:b])
             penalty=np.full(n,float(damp)**2)

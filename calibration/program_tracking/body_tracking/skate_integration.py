@@ -1,6 +1,6 @@
 """Joint body/shared-skate/contact refinement on frozen source exposures."""
 from pathlib import Path
-import argparse,json,time,copy
+import argparse,hashlib,json,time,copy
 import numpy as np
 from scipy.optimize import least_squares
 from scipy.sparse import csr_matrix,hstack,vstack,diags
@@ -19,6 +19,41 @@ from .ice_soft import IceSoftPolicy,ice_soft_rows
 from .fullbody_round import write_json
 from .footwear_layout import OBSERVATION_LAYOUT
 from .skate_checkpoint import checkpoint_identity,validate_checkpoint_identity
+
+
+def snapshot_objective_kernels(output):
+    """Snapshot the current objective implementation and return its manifest SHA."""
+    implementation = {}
+    source_dir = output / 'source_snapshot'
+    source_dir.mkdir(exist_ok=True)
+    for name in ('skate_integration.py','skate_binding.py','skate_physics.py','skate_template.py',
+                 'skate_contact.py','contact_feasibility.py','footwear_layout.py','fullbody_fit.py',
+                 'fullbody_state.py','boot_integration.py','body_execution.py',
+                 'compact_body_derivatives.py','selected_surface_linearization.py',
+                 'body_resident_torch.py','torch_foot_compatibility.py','body_foot_cuda_bridge.py','body_foot_cuda.cu',
+                 'footwear_pixel_factors.py','skate_run_policy.py',
+                  'skate_collar_factors.py','skate_collar_review.py','skate_checkpoint.py','opening_live.py',
+                  'opening_motion.py','opening_timing.py','skating_action_factors.py',
+                  'ice_soft.py','action_live.py','action_integration.py','root_trajectory.py','root_repair.py',
+                  'support_anchor_factors.py','support_image.py','stage_quality.py','source_support_export.py',
+                  'hand_state.py','rebuild_body_geometry.py','compact_body_torch.py','spin_grasp_factors.py',
+                  'grasp_temporal_factors.py','spin_grasp_refinement.py',
+                  'absolute_motion_curve.py','absolute_motion_state.py','sequence_skate_state.py',
+                  'sequence_refit.py','sequence_dynamics.py','continuous_motion_factors.py','continuous_physics.py',
+                  'memory_bounded.py','memory_guard.py','body_gpu_linear.py','body_linear_solver.py',
+                  'trajectory_backend.py','trajectory_root_init.py','trajectory_probe.py',
+                  'programme_camera.py','body_clock.py','weighted_blocks.py',
+                  'phase_ledger.py','episode_factor_adapter.py','event_physics.py','action_objective_context.py',
+                  'programme_action_factors.py','programme_anatomy.py','programme_source_step.py','programme_guard_proposals.py','source_contact_image.py',
+                  'visible_runner_contours.py','source_skate_structure_factors.py',
+                  'complete_runner_extent.py','programme_surface.py','programme_grasp.py','programme_joint_limits.py',
+                 'anatomical_chart.py','programme_com.py','programme_opening.py'):
+        payload = Path(__file__).with_name(name).read_bytes()
+        implementation[name] = hashlib.sha256(payload).hexdigest()
+        (source_dir / name).write_bytes(payload)
+    manifest = output / 'kernel_manifest.json'
+    write_json(manifest, implementation)
+    return digest(manifest)
 
 
 class SkateReference(FrozenReference):
@@ -549,6 +584,9 @@ class JointContactProblem:
             extra['jac']=None
             r,J,scaled=pack_weighted(named,getattr(self,'objective_block_weights',{}),jacobian)
             v['residual']=r;v['jac']=J;v['weighted_blocks']=scaled
+            # The packed row views own the complete same-point Jacobian.
+            # Raw action blocks retained for reporting need no second copy.
+            for b in named:b.jacobian=None
             v['weighted_parts']={b.name:float(b.residual@b.residual/2)for b in scaled}
             v['legacy_image_cost']=v['image_cost']
             from .weighted_blocks import image_cost
@@ -669,30 +707,11 @@ class JointContactProblem:
             internal_temporal_freezes=hasattr(self,'active_parameter_indices'),
             local_control_seconds=getattr(self,'local_control_seconds',None),
             record_acceptance_before_jacobian=record_before_jacobian))
-        implementation={}
-        source_dir=self.output/'source_snapshot';source_dir.mkdir(exist_ok=True)
-        for name in ('skate_integration.py','skate_binding.py','skate_physics.py','skate_template.py',
-                     'skate_contact.py','contact_feasibility.py','footwear_layout.py','fullbody_fit.py',
-                     'fullbody_state.py','boot_integration.py','body_execution.py',
-                     'compact_body_derivatives.py','selected_surface_linearization.py',
-                     'body_resident_torch.py','torch_foot_compatibility.py','body_foot_cuda_bridge.py','body_foot_cuda.cu',
-                     'footwear_pixel_factors.py','skate_run_policy.py',
-                      'skate_collar_factors.py','skate_checkpoint.py','opening_live.py',
-                      'opening_motion.py','opening_timing.py','skating_action_factors.py',
-                      'ice_soft.py','action_live.py','action_integration.py','root_trajectory.py','root_repair.py',
-                      'support_anchor_factors.py','support_image.py','stage_quality.py','source_support_export.py',
-                      'hand_state.py','rebuild_body_geometry.py','compact_body_torch.py','spin_grasp_factors.py',
-                      'grasp_temporal_factors.py','spin_grasp_refinement.py',
-                      'absolute_motion_curve.py','absolute_motion_state.py','sequence_skate_state.py',
-                      'sequence_refit.py','sequence_dynamics.py','continuous_motion_factors.py','continuous_physics.py',
-                      'memory_bounded.py','memory_guard.py','body_gpu_linear.py','body_linear_solver.py',
-                      'trajectory_backend.py','trajectory_root_init.py','trajectory_probe.py',
-                      'programme_camera.py','body_clock.py','weighted_blocks.py',
-                      'phase_ledger.py','episode_factor_adapter.py','event_physics.py',
-                      'programme_action_factors.py','programme_anatomy.py','programme_source_step.py','source_contact_image.py'):
-            path=Path(__file__).with_name(name);implementation[name]=digest(path)
-            (source_dir/name).write_bytes(path.read_bytes())
-        write_json(self.output/'kernel_manifest.json',implementation)
+        kernel_manifest_sha256 = snapshot_objective_kernels(self.output)
+        self.checkpoint_extra = {
+            **getattr(self, 'checkpoint_extra', {}),
+            'kernel_manifest_sha256': np.array(kernel_manifest_sha256),
+        }
         def execution_record():
             record=self.body.execution.record();backend=getattr(self,'linear_solver_backend','lsmr')
             record['actual_joint_linear_solver_backend']=backend
@@ -759,7 +778,8 @@ class JointContactProblem:
                 source_seconds=list(self.body.state.seconds),parts=last_value['parts'],**last_value['gate'],
                 raw_data_parts=last_value['raw_data_parts'],numerical_convergence=False,user_accepted=False,
                 acceptance_calibrated=False,run_policy=monitor.record(),state_kind=self.state_kind,
-                selection=retention.record(),source_motion_metrics=last_value.get('source_motion_metrics',{}))
+                selection=retention.record(),source_motion_metrics=last_value.get('source_motion_metrics',{}),
+                kernel_manifest_sha256=kernel_manifest_sha256)
             record['stage_update']='updated' if self.accepted else 'no_update'
             record['quality_baseline_scope']='stage-local monitor; cross-stage comparison is separately recorded'
             record['pose_guard_scope']='source groups, not the mixed motion regularizer' if not getattr(self.body.state,'use_pose_cost_guard',True) else 'legacy stage-local pose-cost guard'
@@ -769,8 +789,9 @@ class JointContactProblem:
             self.log.write(json.dumps(record)+'\n');write_json(self.output/'candidate.json',record)
             return last_x,record
         jacobian_seconds=float(getattr(self,'jacobian_seconds_hint',0.));requested_stop=False
-        def guarded(z,jacobian=False):
-            nonlocal jacobian_seconds,last_linearization,requested_stop
+        trial_counter=0
+        def guarded(z,jacobian=False,*,origin='trf'):
+            nonlocal jacobian_seconds,last_linearization,requested_stop,trial_counter
             if (self.output/'STOP_AFTER_ACCEPTED').is_file():
                 requested_stop=True;raise StopFit()
             # SciPy TRF requests a new Jacobian only after accepting its cached
@@ -783,6 +804,14 @@ class JointContactProblem:
             from .skate_run_policy import jacobian_reserve_seconds
             reserve=jacobian_reserve_seconds(self.cache_x,self.cache,expand(z),jacobian_seconds)if jacobian else 0.
             if monitor.reserve_evaluation(now=now,estimated_seconds=reserve)['stop']:raise StopFit()
+            if not jacobian:trial_counter+=1
+            trial_id=None if jacobian else trial_counter
+            def trial_result(finite,reason=None):
+                if jacobian:return
+                self.log.write(json.dumps(dict(event='trial_result',trial_id=trial_id,origin=origin,
+                    seconds=time.perf_counter()-self.start,duration_seconds=time.perf_counter()-now,
+                    accepted=self.accepted,finite=bool(finite),rejection_reason=reason,
+                    linearization_id=getattr(getattr(self,'_linear_layout',None),'linearization_id',None)))+'\n')
             from .absolute_motion_curve import RotationChartDomainError
             from .runner_interior import RunnerCoordinateDomainError
             try:
@@ -795,9 +824,10 @@ class JointContactProblem:
                     rejected={name:info for name,info in groups.items() if info['rejected']}
                     if rejected:
                         self.log.write(json.dumps(dict(event='trial_source_group_quality_rejected',
-                            accepted=self.accepted,seconds=time.perf_counter()-self.start,
+                            accepted=self.accepted,trial_id=trial_id,seconds=time.perf_counter()-self.start,
                             before_full_residual=True,precheck_seconds=time.perf_counter()-precheck_start,
                             groups=rejected))+'\n')
+                        trial_result(False,'source_precheck')
                         return dict(residual=np.full_like(initial_value['residual'],np.inf))
                 value=self.evaluate(full,jacobian)
             except (RotationChartDomainError,RunnerCoordinateDomainError) as error:
@@ -805,7 +835,8 @@ class JointContactProblem:
                 # SciPy TRF treats nonfinite trial residuals as rejected and
                 # contracts its trust radius. Never accept/project/rewrite a
                 # branch-invalid pose or replace the last accepted candidate.
-                self.log.write(json.dumps(dict(event='trial_domain_rejected',domain=type(error).__name__,message=str(error),accepted=self.accepted))+'\n')
+                self.log.write(json.dumps(dict(event='trial_domain_rejected',trial_id=trial_id,seconds=time.perf_counter()-self.start,domain=type(error).__name__,message=str(error),accepted=self.accepted))+'\n')
+                trial_result(False,type(error).__name__)
                 return dict(residual=np.full_like(initial_value['residual'],np.inf))
             if not jacobian and getattr(self,'image_safe_trials',False):
                 image_trial=image_trial_quality(None if monitor.baseline is None else monitor.baseline.get('image_cost'),
@@ -813,19 +844,24 @@ class JointContactProblem:
                 if image_trial['rejected']:
                     # Keep the real evaluate/cache value. Only TRF's trial return
                     # is nonfinite, so it contracts without accepting this state.
-                    self.log.write(json.dumps(dict(event='trial_image_quality_rejected',accepted=self.accepted,
+                    self.log.write(json.dumps(dict(event='trial_image_quality_rejected',accepted=self.accepted,trial_id=trial_id,
                         seconds=time.perf_counter()-self.start,**image_trial))+'\n')
+                    trial_result(False,'image_quality')
                     return dict(residual=np.full_like(initial_value['residual'],np.inf))
             extra_guard=getattr(self,'additional_trial_quality',None)
             if not jacobian and getattr(self,'image_safe_trials',False) and extra_guard is not None:
                 groups=extra_guard(value,monitor.policy.max_image_cost_increase)
                 if any(g['rejected'] for g in groups.values()):
-                    self.log.write(json.dumps(dict(event='trial_source_group_quality_rejected',accepted=self.accepted,
+                    self.log.write(json.dumps(dict(event='trial_source_group_quality_rejected',accepted=self.accepted,trial_id=trial_id,
                         seconds=time.perf_counter()-self.start,groups=groups))+'\n')
+                    trial_result(False,'source_quality')
                     return dict(residual=np.full_like(initial_value['residual'],np.inf))
             if jacobian:
                 jacobian_seconds=max(jacobian_seconds,time.perf_counter()-now)
                 last_linearization=np.array(z,copy=True)
+            else:
+                finite=np.isfinite(value['residual']).all()
+                trial_result(finite,None if finite else 'nonfinite_residual')
             return value
         while True:
             # A supplied same-state seed J is still exact before the first
@@ -841,6 +877,7 @@ class JointContactProblem:
                 z=expand(reduced)
                 self.accepted+=1;v=self.evaluate(z,False)
                 self.log.write(json.dumps(dict(event='accepted',outer=self.outer,iteration=self.accepted,
+                    seconds=time.perf_counter()-self.start,
                     cost=float(v['residual']@v['residual']/2),parts=v['parts'],**v['gate']))+'\n')
                 status=observe_candidate(z,v,accepted=True)
                 if status['stop']:raise StopFit()
@@ -871,33 +908,112 @@ class JointContactProblem:
                         return reduced
                     return full[:,selection]
                 source_margins=getattr(self,'source_conditioned_margins',None)
+                archived = getattr(self, 'archived_source_direction', None)
                 if source_margins is not None and self.outer==1:
-                    from .programme_source_step import source_conditioned_direction
+                    from .programme_source_step import source_conditioned_direction, backtracking_fractions, resolved_descent
                     reduced=x[selection]
-                    value=guarded(reduced,True)
-                    margins=source_margins(value)
-                    if margins is not None:
-                        op=selected_jacobian(reduced)
+                    residual_only = archived is not None and archived.get('residual_only',False)
+                    value=self.evaluate(x,False) if residual_only else guarded(reduced,True)
+                    margins = source_margins(value) if archived is None else None
+                    if margins is not None or archived is not None:
+                        from scipy.optimize._lsq.common import make_strictly_feasible
+                        nonlinear_check=getattr(self,'source_nonlinear_direction_quality',None)
+                        trust_state={}
+                        def check_source_direction(move):
+                            from .absolute_motion_curve import RotationChartDomainError
+                            from .runner_interior import RunnerCoordinateDomainError
+                            try:
+                                trial=make_strictly_feasible(reduced+move,lower[selection],upper[selection],rstep=0.)
+                                return nonlinear_check(expand(trial))
+                            except (RotationChartDomainError,RunnerCoordinateDomainError):return None
+                        def source_step_progress(**fields):
+                            nonlocal requested_stop
+                            if (self.output/'STOP_AFTER_ACCEPTED').is_file():
+                                requested_stop=True;raise StopFit()
+                            self.log.write(json.dumps(dict(event='source_direction_progress',**fields))+'\n')
+                        op=None if residual_only else selected_jacobian(reduced)
                         try:
-                            move,receipt=source_conditioned_direction(op,value,
-                                (lower[selection]-reduced,upper[selection]-reduced),margins,selection)
+                            if archived is None:
+                                move,receipt=source_conditioned_direction(op,value,
+                                    (lower[selection]-reduced,upper[selection]-reduced),margins,selection,
+                                    control_step_limit=(None if getattr(self,'source_control_step_limit',None) is None else self.source_control_step_limit[selection]),
+                                    nonlinear_source_check=(check_source_direction if nonlinear_check is not None else None),trust_state=trust_state,
+                                    **getattr(self,'source_proposal_options',{}),
+                                    progress=source_step_progress)
+                            else:
+                                move = archived['move']
+                                trust_state['control_step_limit'] = archived['limits']
+                                receipt = dict(archived_direction=archived['path'],
+                                               archived_direction_sha256=archived['sha256'],
+                                               direction_reoptimized=False,
+                                               residual_only_replay=residual_only,
+                                               original_nonlinear_guard_required=True,
+                                               all_active_controls_retained=True)
+                            response=None if op is None else op.matvec(move)
+                            np.savez_compressed(self.output/'source_direction.npz',x=x,selection=selection,direction=move,
+                                numerical_trust_limit=trust_state.get('control_step_limit',np.empty(0)))
                         finally:
-                            op.release()
+                            if op is not None:op.release()
                         self.log.write(json.dumps(dict(event='source_conditioned_direction',**receipt))+'\n')
                         baseline_cost=float(value['residual']@value['residual']/2)
+                        baseline_weighted_parts = {
+                            b.name: float(b.residual @ b.residual / 2) for b in value['weighted_blocks']
+                        }
                         from scipy.optimize._lsq.common import make_strictly_feasible
-                        for fraction in (1.,.5,.25,.125):
+                        kept_source_step=False
+                        for fraction in backtracking_fractions():
                             trial=make_strictly_feasible(reduced+fraction*move,lower[selection],upper[selection],rstep=0.)
-                            trial_value=guarded(trial,False)
+                            trial_value=guarded(trial,False,origin='source_conditioned')
                             residual=trial_value['residual']
                             trial_cost=float(residual@residual/2) if np.isfinite(residual).all() else None
-                            keep=trial_cost is not None and trial_cost<baseline_cost
+                            keep=resolved_descent(trial_cost,baseline_cost)
+                            blocks = trial_value.get('weighted_blocks')
+                            # A post-evaluation quality rejection leaves the actual state cached.
+                            if blocks is None and self.cache is not None and np.array_equal(self.cache_x, expand(trial)):
+                                blocks = self.cache.get('weighted_blocks')
+                            weighted_parts = None if blocks is None else {
+                                b.name: float(b.residual @ b.residual / 2) for b in blocks
+                            }
+                            predicted_parts={};offset=0;worst_cavity=[]
+                            if response is not None:
+                                for original_block in value['weighted_blocks']:
+                                    end=offset+len(original_block.residual)
+                                    predicted=original_block.residual+fraction*response[offset:end]
+                                    predicted_parts[original_block.name]=float(predicted@predicted/2)
+                                    if original_block.name=='cavity_AL' and blocks is not None:
+                                        current_block=next(b for b in blocks if b.name=='cavity_AL')
+                                        difference=np.abs(current_block.residual-predicted)
+                                        labels=original_block.provenance.get('labels',[])
+                                        for k in np.argsort(difference)[-8:][::-1]:
+                                            worst_cavity.append(dict(row=int(k),label=labels[k] if len(labels)>k else None,
+                                                before=float(original_block.residual[k]),predicted=float(predicted[k]),
+                                                actual=float(current_block.residual[k]),absolute_linear_error=float(difference[k])))
+                                    offset=end
                             self.log.write(json.dumps(dict(event='source_conditioned_trial',fraction=fraction,
-                                cost=trial_cost,baseline_cost=baseline_cost,quality_valid=trial_cost is not None,accepted=keep))+'\n')
+                                predicted_parts=predicted_parts if response is not None else None,
+                                model_agreement_available=response is not None,worst_cavity_linearization=worst_cavity,
+                                cost=trial_cost,baseline_cost=baseline_cost,quality_valid=trial_cost is not None,
+                                accepted=keep,weighted_parts=weighted_parts,
+                                baseline_weighted_parts=baseline_weighted_parts))+'\n')
                             if keep:
+                                kept_source_step=True
+                                if (nonlinear_check is not None or archived is not None) and 'control_step_limit' in trust_state:
+                                    numerical_limit=self.source_control_step_limit.copy()
+                                    numerical_limit[selection]=trust_state['control_step_limit']
+                                    # Unmeasured linear agreement grants no trust growth on the next run.
+                                    predicted_decrease=(baseline_cost-sum(predicted_parts.values())
+                                                        if response is not None else 0.)
+                                    agreement=(baseline_cost-trial_cost)/predicted_decrease if predicted_decrease>0 else 0.
+                                    self.checkpoint_extra.update(source_numerical_step_limit=numerical_limit,
+                                        source_numerical_step_base=self.source_control_step_base.copy(),
+                                        source_numerical_accepted_fraction=np.array(fraction),
+                                        source_numerical_model_agreement=np.array(agreement))
                                 x=expand(trial)
                                 accepted(trial)
                                 break
+                        if not kept_source_step:
+                            return save_candidate(dict(reason='source_conditioned_no_resolved_descent',
+                                original_nonlinear_guards_unchanged=True,needs_diagnosis=True))
                 with sparse_direct_trf(self):
                     if getattr(self,'linear_solver_backend','')=='cuda_resident':
                         from .body_gpu_linear import gpu_trf

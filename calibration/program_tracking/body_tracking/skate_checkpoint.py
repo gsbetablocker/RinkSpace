@@ -23,7 +23,7 @@ CAMERA_LOCATION_FIELDS = {
 
 def checkpoint_identity(binding, project, camera_info):
     programme = Path(project)/'events/ankara_2026/programmes/okada_mei_sp'
-    dependency=getattr(binding.reference,'identity_dependencies',None)
+    dependency=getattr(getattr(binding,'reference',None),'identity_dependencies',None)
     return dict(
         base_skate_parameters_json=np.array(json.dumps(asdict(binding.base_parameters))),
         R_FB_initial=np.asarray(binding.R0).copy(),
@@ -62,8 +62,11 @@ def validate_checkpoint_identity(saved, expected=None):
             if key.endswith('_json'):
                 left, right = _json(a), _json(b)
                 if key == 'camera_binding_json':
-                    left = {k: v for k, v in left.items() if k not in CAMERA_LOCATION_FIELDS}
-                    right = {k: v for k, v in right.items() if k not in CAMERA_LOCATION_FIELDS}
+                    def content(value):
+                        if isinstance(value,dict):return {k:content(v) for k,v in value.items() if k not in CAMERA_LOCATION_FIELDS}
+                        if isinstance(value,list):return [content(v) for v in value]
+                        return value
+                    left,right=content(left),content(right)
                 equal = left == right
             elif key in ('R_FB_initial', 't_FB_initial_solver'):
                 left, right = np.asarray(a), np.asarray(b)

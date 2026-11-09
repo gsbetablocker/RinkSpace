@@ -119,26 +119,49 @@ def closest_segments_batch(a,b,c,d):
     return delta[i,choice],S[i,choice],T[i,choice]
 
 
+_BOX_FACE_PAIRS = np.triu_indices(6, 1)
+
+
 def capsule_box_separation(a,b,centre,R,half):
-    """Sample the line at box-face crossings, interval minima and endpoints."""
+    """Minimum signed box distance along each capsule centreline."""
     endpoints=np.einsum('nki,nij->nkj',np.stack((a-centre,b-centre),axis=1),R)
     lo=endpoints[:,0]
     v=endpoints[:,1]-lo
+    half=np.broadcast_to(half,lo.shape)
+
+    # Outside the box, the squared distance is quadratic between face crossings.
     denom=np.where(np.abs(v)>1e-14,v,np.inf)
     cuts=np.concatenate((np.zeros((len(a),1)),np.ones((len(a),1)),
                          np.clip((-half-lo)/denom,0,1),np.clip((half-lo)/denom,0,1)),axis=1)
     cuts.sort(axis=1)
     middle=.5*(cuts[:,:-1]+cuts[:,1:])
     q=lo[:,None]+middle[...,None]*v[:,None]
-    outside=np.abs(q)>half
-    edge=np.sign(q)*half
+    outside=np.abs(q)>half[:,None]
+    edge=np.sign(q)*half[:,None]
     quadratic=np.sum((v[:,None]*outside)**2,axis=-1)
     stationary=np.sum((edge-lo[:,None])*v[:,None]*outside,axis=-1)/np.maximum(quadratic,1e-30)
     stationary=np.clip(stationary,cuts[:,:-1],cuts[:,1:])
-    times=np.concatenate((cuts,middle,stationary),axis=1)
-    q=np.abs(lo[:,None]+times[...,None]*v[:,None])-half
+    times=np.concatenate((cuts,stationary),axis=1)
+    q=np.abs(lo[:,None]+times[...,None]*v[:,None])-half[:,None]
     sdf=np.linalg.norm(np.maximum(q,0.),axis=-1)+np.minimum(np.max(q,axis=-1),0.)
-    return np.min(sdf,axis=1)
+    minimum=np.min(sdf,axis=1)
+
+    # Inside, the SDF is the upper envelope of six affine face distances.
+    # Besides the endpoints, its minimum can occur where two faces tie.
+    enters_box=np.any(~np.any(outside,axis=-1),axis=1)
+    if np.any(enters_box):
+        p,d,h=lo[enters_box],v[enters_box],half[enters_box]
+        offsets=np.concatenate((p-h,-p-h),axis=1)
+        slopes=np.concatenate((d,-d),axis=1)
+        i,j=_BOX_FACE_PAIRS
+        slope_difference=slopes[:,i]-slopes[:,j]
+        crossings=np.divide(offsets[:,j]-offsets[:,i],slope_difference,
+                            out=np.zeros_like(slope_difference),where=slope_difference!=0.)
+        crossings=np.clip(crossings,0.,1.)
+        excess=np.abs(p[:,None]+crossings[...,None]*d[:,None])-h[:,None]
+        interior_minimum=np.min(np.max(excess,axis=-1),axis=1)
+        minimum[enters_box]=np.minimum(minimum[enters_box],interior_minimum)
+    return minimum
 
 
 def box_separation(a,A,ha,b,B,hb):
@@ -199,6 +222,7 @@ class ProgrammeAnatomy:
                 chain.add(joint)
                 joint=parents[joint]
             ancestry[name]=chain
+        self.part_joint_ancestry=ancestry
         self.pair_joint_dependencies=np.asarray([
             [joint in (ancestry[a]|ancestry[b]) for joint in range(1,22)]
             for a,b in self.pairs])
@@ -300,6 +324,44 @@ class ProgrammeAnatomy:
             values[take,p]=depth
         return values,broad_count,singular
 
+    def capsule_local_jacobian(self,state,delta,active,selected,pairs,lookup,weight,local):
+        """Closest-segment envelope derivative; retain FD near singular branches."""
+        from .fullbody_fit import right_jacobian
+        handled=np.zeros(len(selected),bool)
+        ids=[i for i,(a,b) in enumerate(self.pairs) if a in self.capsules and b in self.capsules]
+        geometry,_=self.world_geometry(slice_reference(state,active,len(self.times)),
+            {name for i in ids for name in self.pairs[i]})
+        axes={}
+        for pair in ids:
+            rows=np.flatnonzero(pairs==pair)
+            if not len(rows):continue
+            a,b=self.pairs[pair];samples=lookup[rows]
+            ac,ar,ah=geometry[a];bc,br,bh=geometry[b]
+            separation,s,t=closest_segments_batch(ac[samples],ar[samples],bc[samples],br[samples])
+            distance=np.linalg.norm(separation,axis=-1)
+            u=ar[samples]-ac[samples];v=br[samples]-bc[samples]
+            nonparallel=np.linalg.norm(np.cross(u,v),axis=-1)>1e-6*np.linalg.norm(u,axis=-1)*np.linalg.norm(v,axis=-1)
+            # These rows use the existing central difference, including the
+            # signed separating-axis branch at centreline coincidence.
+            valid=(distance>1e-5)&nonparallel&(ah+bh-.12*min(ah,bh)-distance>1e-5)
+            rows=rows[valid];samples=samples[valid]
+            if not len(rows):continue
+            normal=separation[valid]/distance[valid,None]
+            pa=ac[samples]+s[valid,None]*(ar[samples]-ac[samples])
+            pb=bc[samples]+t[valid,None]*(br[samples]-bc[samples])
+            aa=self.part_joint_ancestry[a];bb=self.part_joint_ancestry[b]
+            for joint in aa^bb:
+                column=6+3*(joint-1)
+                if joint not in axes:
+                    axes[joint]=state['Q'][active]@state['frames'][active,joint]@right_jacobian(delta[:,column:column+3])
+                origin=state['native_world'][active[samples],joint]*self.ratio
+                point=pa if joint in aa else pb
+                sign=-1. if joint in aa else 1.
+                derivative=sign*np.einsum('ni,nij->nj',np.cross(point-origin,normal),axes[joint][samples])
+                local[rows,0,column:column+3]=weight[selected[rows],None]*derivative
+            handled[rows]=True
+        return handled
+
     def collision(self,x,jacobian):
         d=self.state.increments(x,self.times)
         state=fk_state(self.ref,self.base,d)
@@ -319,10 +381,11 @@ class ProgrammeAnatomy:
                 step=1e-6
                 local=np.zeros((n,1,69))
                 shoe=np.zeros((n,1,6))
+                analytic=self.capsule_local_jacobian(state,d,active,selected,pairs,lookup,weight,local)
                 for target,dependency,offset in ((local,self.pair_joint_dependencies,6),
                                                   (shoe,self.pair_shoe_dependencies,0)):
                     for group in range(dependency.shape[1]):
-                        rows=np.flatnonzero(dependency[pairs,group])
+                        rows=np.flatnonzero(dependency[pairs,group]&~analytic)
                         if not len(rows):continue
                         samples,reindex=np.unique(lookup[rows],return_inverse=True)
                         mask=np.zeros((len(samples),len(self.pairs)),bool)
@@ -424,8 +487,10 @@ class ProgrammeAnatomy:
 
     def evaluate(self,x,jacobian=False):
         collision,collision_metrics=self.collision(x,jacobian)
-        hinges,hinge_metrics=self.hinges(x,jacobian)
-        blocks=[collision,hinges]
+        if getattr(self,'hinges_enabled',True):
+            hinges,hinge_metrics=self.hinges(x,jacobian);blocks=[collision,hinges]
+        else:
+            hinge_metrics={'replaced_by':'anatomical_joint_domain'};blocks=[collision]
         return dict(residual=np.concatenate([b.residual for b in blocks]),
             jac=vstack([b.jacobian for b in blocks],format='csr') if jacobian and not getattr(self.problem,'bounded_memory',False) else None,
             parts={b.name:float(b.residual@b.residual/2) for b in blocks},weighted_blocks=blocks,

@@ -55,10 +55,15 @@ class SequenceActions:
         for entry in document.get('additional_unassigned_source_episodes',[]):
             from .source_skate_structure_factors import UnassignedSkateSetFactors
             self.extra_unassigned_episodes.append((entry['id'],UnassignedSkateSetFactors(problem,entry['groups'],episode=entry['episode'])))
-    def source_trial_rows(self,x):
+    def source_trial_rows(self,x,*,include_unassigned=False):
         value=self.contour.evaluate(x,False)
         self.prechecked_contour=(np.array(x,copy=True),value)
-        return value['metrics']['visible_runner_contours']
+        rows=list(value['metrics']['visible_runner_contours'])
+        if include_unassigned:
+            for factor in [self.unassigned]+[f for _,f in self.extra_unassigned_episodes]:
+                if factor is not None:
+                    rows.extend(factor.evaluate(x,False)['metrics'].get('visible_unassigned_skate_contours',[]))
+        return rows
 
     def evaluate(self,x,jacobian=False):
         from .skate_physics import fk_state

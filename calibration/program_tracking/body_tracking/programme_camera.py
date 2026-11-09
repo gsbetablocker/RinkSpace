@@ -9,11 +9,11 @@ from .source_visible_model import camera_centres
 
 class ProgrammeCamera:
     image_height=1080
-    def __init__(self,project,packet,shot_ids):
+    def __init__(self,project,packet,shot_ids,*,record_path=None):
         self.shot_ids=np.asarray(shot_ids);self.cameras={};self.first={};infos={};poses={}
         for shot in dict.fromkeys(self.shot_ids.tolist()):
             ix=np.flatnonzero(self.shot_ids==shot);part=dict(packet,pts=packet['pts'][ix])
-            camera,info,state,pose=camera_binding(project,SimpleNamespace(p=part),shot_id=shot)
+            camera,info,state,pose=camera_binding(project,SimpleNamespace(p=part),record_path=record_path,shot_id=shot)
             self.cameras[shot]=camera;self.first[shot]=int(ix[0]);infos[shot]=info;poses[shot]=pose
         # Only sparse S05 source factors consume this historical scalar readout.
         # Full body, exporter and dispatcher use per-exposure rig/readout below.

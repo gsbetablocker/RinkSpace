@@ -4,7 +4,8 @@ import json
 import numpy as np
 import pytest
 
-from calibration.program_tracking.body_tracking.programme_projection import fit_participation
+from calibration.program_tracking.body_tracking import trajectory_backend
+from calibration.program_tracking.body_tracking.programme_projection import fit_participation, generate
 from calibration.program_tracking.body_tracking.rebuild_prepare import digest
 
 
@@ -41,6 +42,48 @@ def objective(tmp_path):
     saved = dict(source_evidence_sha256=digest(evidence), **{WEIGHTS: digest(weights), POLICY: digest(policy)})
     np.savez(parameter, **saved)
     return prepared, parameter, evidence, weights, policy, saved, fit_row, support
+
+
+@pytest.mark.parametrize('selection', ['default', 'bound_stage', 'wrong_stage'])
+def test_generate_checks_and_passes_the_exact_source_to_reference(objective, tmp_path, monkeypatch, selection):
+    prepared, parameter, evidence, _, _, saved, _, _ = objective
+    monkeypatch.setenv('RINKSPACE_DATA_ROOT', str(tmp_path))
+    for name in ('input', 'observations', 'initial', 'fixed_binding'):
+        np.savez(prepared / (name + '.npz'), fixture=1)
+    exported = tmp_path / 'result.npz'
+    np.savez(exported, fixture=1)
+    source_override = None
+    selected = evidence
+    if selection != 'default':
+        source_override = parameter.parent.parent / 'source_revision.json'
+        source_override.write_text('{"revision":"stage"}', encoding='utf-8')
+        selected = source_override
+        if selection == 'bound_stage':
+            saved['source_evidence_sha256'] = digest(selected)
+    np.savez(parameter, **saved, prepared_input_sha256=digest(prepared / 'input.npz'),
+             prepared_observations_sha256=digest(prepared / 'observations.npz'))
+
+    class StartReference(RuntimeError):
+        pass
+
+    seen = []
+
+    def stop_before_replay(project, directory, *, source_evidence):
+        assert project == tmp_path.resolve() and directory == prepared.resolve()
+        seen.append(source_evidence)
+        raise StartReference
+
+    monkeypatch.setattr(trajectory_backend, 'load_reference', stop_before_replay)
+    output = tmp_path / 'projection'
+    if selection == 'wrong_stage':
+        with pytest.raises(ValueError, match='does not bind this source evidence'):
+            generate(tmp_path, prepared, parameter, exported, output, source_evidence=source_override)
+        assert not seen
+    else:
+        with pytest.raises(StartReference):
+            generate(tmp_path, prepared, parameter, exported, output, source_evidence=source_override)
+        assert seen == [selected.resolve()]
+    assert not output.exists()
 
 
 def snapshot(*paths):

@@ -18,8 +18,8 @@ from .skate_checkpoint import checkpoint_identity, validate_checkpoint_identity
 from .skate_diagnostics import ice_objective_mode, _legacy_ice_diagnostics
 
 
-def export_candidate(root, out, ref, camera, info, evidence):
-    """Write ``out/fitted/result.npz`` from the single saved body/FK state.
+def export_candidate(root, out, ref, camera, info, evidence, *, write=True):
+    """Build a result from one body/FK state and write it unless deferred.
 
     The historical solver unit is converted to conditional scene metres once.
     Physics clearance/support heights already use that metric unit, whereas
@@ -180,8 +180,9 @@ def export_candidate(root, out, ref, camera, info, evidence):
     shot=info.get('shot',{})
     if 'shot_ids' in ref.p:packet['source_shot_ids']=np.asarray(ref.p['shot_ids']).copy()
     apply_source_support(packet,evidence,shot_id=shot.get('id') if isinstance(shot,dict) else shot)
-    destination=out/'fitted';destination.mkdir(parents=True,exist_ok=True)
-    np.savez_compressed(destination/'result.npz',**packet)
+    if write:
+        destination=out/'fitted';destination.mkdir(parents=True,exist_ok=True)
+        np.savez_compressed(destination/'result.npz',**packet)
     return packet
 
 

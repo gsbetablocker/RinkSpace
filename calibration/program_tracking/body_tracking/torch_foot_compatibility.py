@@ -4,8 +4,9 @@
 ``binding.compatibility_rows(...)/sqrt(2)``. Inputs use body-local solver units;
 samples must follow ``binding.sample_ids`` including its collar union order.
 FK, all pose blend shapes, and dynamic hand skinning belong to the caller.
-Only construction reads NumPy or uploads constants. Evaluations never read a
-device value on the host and retain the trial's live section topology choices.
+Normal sections stay on device. Opt-in vertex/plane coincidences use the
+existing CPU triangle-identity graph on only the affected samples; their
+resolved distances return to the same device residual and finite differences.
 The CUDA section is a nonsmooth finite-difference consumer, not an autograd op.
 """
 from __future__ import annotations
@@ -59,6 +60,8 @@ class TorchFootCompatibility:
         if self.collar_enabled:
             from .skate_collar_factors import prepare
             spec=prepare(binding)
+            self.resolve_vertex_sections=bool(getattr(binding,'resolve_collar_vertex_sections',False))
+            self.collar_body_faces=spec.body_faces
             self.collar_positions=upload(binding.collar_sample_positions,torch.int64)
             self.topologies=[{name:upload(getattr(top,name),torch.int64) for name in
                 ('edges','triangle_edges','edge_faces','edge_face_counts')} for top in spec.body]
@@ -127,8 +130,23 @@ class TorchFootCompatibility:
                      vertices[:,self.ends[:,1],:2]*self.fraction[None,:,None]).contiguous()
             z_changed=torch.any((vertices[:,:,2]-self.inner[None,:,2]).abs()>self.tolerance,dim=1).contiguous()
             body=locals_[foot][:,self.collar_positions].contiguous()
-            results.append(self.kernel(body,self.topologies[foot],polygon,z_changed,
-                self.section_height,self.tolerance,self.domain,stream))
+            result=self.kernel(body,self.topologies[foot],polygon,z_changed,
+                self.section_height,self.tolerance,self.domain,stream)
+            if self.resolve_vertex_sections:
+                from .skate_collar_factors import resolve_vertex_section
+                indices=torch.nonzero((result['unknown_reason_code']==2)|(result['unknown_reason_code']==7)).flatten()
+                if indices.numel():
+                    chosen=indices.cpu().numpy();b=body[indices].cpu().numpy();poly=polygon[indices].cpu().numpy()
+                    changed=z_changed[indices].cpu().numpy()
+                    for j,i in enumerate(chosen):
+                        resolved=resolve_vertex_section(b[j],self.collar_body_faces[foot],poly[j],
+                            self.section_height,self.tolerance,z_changed=bool(changed[j]))
+                        if not resolved['unknown']:
+                            result['unknown_reason_code'][int(i)]=0;result['unknown'][int(i)]=False
+                            for key in ('minimum_sample_gap_solver','sample_count','breach_solver'):
+                                result[key][int(i)]=resolved[key]
+                            result['residual_breach_solver'][int(i)]=resolved['breach_solver']
+            results.append(result)
         self.last_collar_metrics={key:torch.stack([result[key] for result in results],dim=1) for key in results[0]}
         return self.last_collar_metrics['residual_breach_solver']
 

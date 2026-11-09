@@ -29,6 +29,9 @@ class FrameObserver(Node):
 class ResultsPlayer(Viewer):
     def __init__(self, catalog, variant=None, restore=True, size=(1600, 900)):
         self.catalog = catalog
+        self.trajectory_reference = catalog.config.get('trajectory_reference', 'pelvis')
+        if self.trajectory_reference not in ('pelvis', 'com'):
+            raise ValueError('Invalid trajectory_reference; expected pelvis or com')
         C.update_conf(dict(window_type='pyglet', device='cpu', z_up=True, scene_fps=50, playback_fps=50,
             run_animations=False, auto_set_floor=False, auto_set_camera_target=False,
             server_enabled=False, backface_culling=False, shadows_enabled=False,
@@ -65,12 +68,13 @@ class ResultsPlayer(Viewer):
         self.visible = dict(surface=True, skeleton=True, shoes=True, trajectory=True, pelvis=True,
                             rink_lines=True, boards=True, ice=True, wear=False,
                             footbed=False, cavity=False, axes=False, blade_axes=False, collar=False,
-                            contact=True, skate_reference=False, com=True, blade_material=True)
+                            contact=True, skate_reference=False, com=True, blade_material=True,
+                            com_projection=False, pelvis_trajectory=False)
         for key,value in catalog.config.get('initial_visible',{}).items():
             if key in self.visible:self.visible[key]=bool(value)
         self.layers = {}
         self.variant_nodes = []
-        self.last_p = None
+        self.last_tracking_position = None
         self.observer = None
         self._last_saved = 0.
         self._last_status = None
@@ -112,7 +116,8 @@ class ResultsPlayer(Viewer):
         self.scene.add(self.observer)
         initial_pts = old.get('source_pts', catalog.config['initial_source_pts'])
         self.scene.current_frame_id = int(np.argmin(abs(catalog.pts - initial_pts)))
-        self.last_p = self.sequence.state['P'][self.frame].copy()
+        self.last_tracking_position = (self.tracking_points[self.frame].copy()
+                                       if self.tracking_points is not None else None)
         if restore and old.get('camera'):self.set_view('free',fit_comparison=False)
         else:self.set_view(catalog.config.get('initial_view','free') if not restore else 'free')
         if old.get('camera'):
@@ -174,7 +179,15 @@ class ResultsPlayer(Viewer):
         np.testing.assert_array_equal(sequence.state['pts'], self.catalog.pts)
         frame = self.frame
         s = sequence.state
-        last_p = s['P'][frame].copy()
+        use_com = self.trajectory_reference == 'com'
+        tracking_points = s.get('com_world_mid') if use_com else s['P']
+        last_tracking_position = (tracking_points[frame].copy()
+                                  if tracking_points is not None else None)
+        # The cache already expresses points in display metres. Differentiate on
+        # the source clock, independently of playback speed or the observing view.
+        com_velocity = (np.gradient(tracking_points, self.catalog.seconds, axis=0,
+                                      edge_order=2 if len(tracking_points)>2 else 1)
+                        if use_com and tracking_points is not None else None)
         connections = np.asarray([(int(p),j) for j,p in enumerate(s['parents']) if j and p>=0],np.int32)
         versioned_skate='template_version' in s
         dynamic=versioned_skate or 'boot_surface' in s
@@ -316,13 +329,23 @@ class ResultsPlayer(Viewer):
                         color=arrow['color'],name=arrow['name'],is_selectable=False)))
             layers.update(wear=[],footbed=footbed_nodes,cavity=cavity_nodes,axes=axis_nodes,collar=collar_nodes,
                           blade_axes=blade_axis_nodes,contact=contact_nodes,skate_reference=reference_nodes,com=com_nodes,blade_material=material_nodes)
-            trajectory=keep(Lines(s['G'],r_base=.018,color=(1.,.75,.12,1),name='Whole saved clip pelvis vertical projection',is_selectable=False))
-            layers['trajectory']=[trajectory]
+            ground_path = keep(Lines(s['G'], r_base=.018, color=(1.,.75,.12,1),
+                                     name='Whole saved clip pelvis vertical projection', is_selectable=False))
+            layers['trajectory'] = [] if use_com else [ground_path]
+            layers['pelvis_trajectory'] = [ground_path] if use_com else []
+            layers['com_projection'] = []
+            if use_com and tracking_points is not None:
+                layers['trajectory'] = [keep(Lines(tracking_points, r_base=.018, color=(.45,1.,.22,1.),
+                    name='Saved mass-model COM 3D trajectory', is_selectable=False))]
+                projected = tracking_points.copy()
+                projected[:, 2] = 0.
+                layers['com_projection'] = [keep(Lines(projected, r_base=.012, color=(.1,.88,.78,1.),
+                    name='Saved mass-model COM vertical projection onto reference ice', is_selectable=False))]
             vertical=keep(Lines(np.stack([s['P'],s['G']],axis=1),r_base=.007,color=(1.,.27,.67,1),name='P to G world vertical',is_selectable=False))
             pelvis=keep(Spheres(s['P'][:,None],radius=.032,color=(1.,.27,.67,1),name='P pelvis',is_selectable=False))
             ground=keep(Spheres(s['G'][:,None],radius=.04,color=(1.,.78,.12,1),name='G pelvis projection',is_selectable=False))
             layers['pelvis']=[vertical,pelvis,ground]
-            for key in ('surface','skeleton','shoes','trajectory','pelvis','wear','footbed','cavity','axes','blade_axes','collar','contact','skate_reference','com','blade_material'):
+            for key in ('surface','skeleton','shoes','trajectory','pelvis','wear','footbed','cavity','axes','blade_axes','collar','contact','skate_reference','com','blade_material','com_projection','pelvis_trajectory'):
                 for node in layers[key]:
                     node.current_frame_id=frame
                     node.enabled=self.visible.get(key,False)
@@ -343,7 +366,10 @@ class ResultsPlayer(Viewer):
         old_nodes = self.variant_nodes
         previous_variant=getattr(self,'variant',{}).get('id')
         self.sequence=sequence;self.variant=definition
-        self.layers=layers;self.variant_nodes=nodes;self.last_p=last_p
+        self.layers=layers;self.variant_nodes=nodes
+        self.tracking_points = tracking_points
+        self.last_tracking_position = last_tracking_position
+        self.com_velocity = com_velocity
         if old_nodes:
             self.scene.remove(*old_nodes)
             # Clear the global normals LRU only after a successful switch.
@@ -357,6 +383,8 @@ class ResultsPlayer(Viewer):
                 self.fit_grasp_view()
         if getattr(self,'view_mode','') in ('support_top','support_side'):
             self.last_view_center=self.support_view_center()
+        elif self.trajectory_reference=='com' and getattr(self,'view_mode','') in ('feet','feet_oblique','feet_side','feet_end'):
+            self.last_view_center=self.feet_view_center()
 
     def apply_visibility(self):
         for key,nodes in self.layers.items():
@@ -370,6 +398,7 @@ class ResultsPlayer(Viewer):
                 self._pre_wear_visibility=self.visible.copy()
                 self._pre_wear_boot_alpha=getattr(self,'boot_alpha',.62);self.boot_alpha=.40
             self.visible.update(surface=True,shoes=True,skeleton=False,trajectory=False,pelvis=False,
+                                com_projection=False,pelvis_trajectory=False,
                                 rink_lines=False,boards=False,ice=False,wear=True,collar=True,
                                 footbed='footbed' in diagnostic_layers,cavity='cavity' in diagnostic_layers,axes='axes' in diagnostic_layers)
             if 'blade_axes' in self.visible:self.visible['blade_axes']='blade_axes' in diagnostic_layers
@@ -384,7 +413,7 @@ class ResultsPlayer(Viewer):
             if node.name.startswith('Boot candidate'):node.color=(*node.color[:3],self.boot_alpha)
 
     def frame_changed(self, frame):
-        p=self.sequence.state['P'][frame]
+        p = self.tracking_points[frame] if self.tracking_points is not None else None
         if getattr(self,'view_mode','')=='grasp':
             if self.follow:self.fit_grasp_view(frame)
         elif getattr(self,'view_mode','') in ('support_top','support_side'):
@@ -394,13 +423,26 @@ class ResultsPlayer(Viewer):
                 cam=self.scene.camera
                 cam.position=cam.position+displacement;cam.target=cam.target+displacement
             self.last_view_center=center
-        elif self.follow and self.last_p is not None:
-            displacement=p-self.last_p
+        elif self.trajectory_reference=='com' and getattr(self,'view_mode','') in ('feet','feet_oblique','feet_side','feet_end'):
+            center=self.feet_view_center(frame)
+            if self.follow and getattr(self,'last_view_center',None) is not None:
+                displacement=center-self.last_view_center
+                cam=self.scene.camera
+                cam.position=cam.position+displacement;cam.target=cam.target+displacement
+            self.last_view_center=center
+        elif self.follow and p is not None and self.last_tracking_position is not None:
+            displacement = p - self.last_tracking_position
             cam=self.scene.camera
             cam.position=cam.position+displacement;cam.target=cam.target+displacement
-        self.last_p=p.copy()
+        self.last_tracking_position = p.copy() if p is not None else None
         for row,node in getattr(self,'world_region_nodes',[]):
             node.enabled=row['pts']==int(self.catalog.pts[frame])
+
+    def feet_view_center(self,frame=None):
+        """Follow the actual pair of shoes in the dedicated close-up views."""
+        s=self.sequence.state
+        index=self.frame if frame is None else frame
+        return s.get('skate_lower',s['gear'])[index].reshape(-1,3).mean(axis=0).copy()
 
     def support_view_center(self):
         """Only select the saved physical foot; never choose by minimum height."""
@@ -450,7 +492,11 @@ class ResultsPlayer(Viewer):
         return sequences
 
     def set_view(self, view, *, fit_comparison=True):
-        cam=self.scene.camera;p=self.sequence.state['P'][self.frame].copy();p[2]=.8
+        cam=self.scene.camera
+        p = (self.tracking_points[self.frame].copy()
+             if self.tracking_points is not None else cam.target.copy())
+        if self.trajectory_reference == 'pelvis':
+            p[2] = .8
         cam.up=np.array([0.,0.,1.]);cam.is_ortho=False
         if view in ('support_top','support_side'):
             p=self.support_view_center();self.last_view_center=p.copy()
@@ -476,7 +522,8 @@ class ResultsPlayer(Viewer):
             cam.position=np.array([42.,-48.,40.]);cam.target=np.zeros(3);self.follow=False
         elif view in ('feet','feet_oblique','feet_side','feet_end'):
             state=self.sequence.state
-            p=state.get('skate_lower',state['gear'])[self.frame].reshape(-1,3).mean(axis=0)
+            p=self.feet_view_center()
+            if self.trajectory_reference=='com':self.last_view_center=p.copy()
             if view=='feet_oblique':offset=[.40,-.65,.95]
             elif view in ('feet_side','feet_end'):
                 if 'skate_R' in state:axis=state['skate_R'][self.frame,0,:,1 if view=='feet_side' else 0].copy()
@@ -579,7 +626,7 @@ class ResultsPlayer(Viewer):
                             support_count=sum(1 for row in fit_binding.get('support_rows',[])if row['pts']==pts)
                             unassigned_count=sum(row.get('feature_rows_count',0)for row in fit_binding.get('unassigned_source_sets',[])if row['pts']==pts)
                             imgui.text('当前曝光直接入拟合：%d条结构 / %d条未分左右结构 / %d条支撑位置'%(count,unassigned_count,support_count))
-                        else:imgui.text_wrapped('此旧候选未使用本轮完整描线；源图层用于同帧比较。')
+                        else:imgui.text_wrapped('缺少此候选的完整描线参与记录；源图层用于同帧比较。')
                 mask=state.get('support_image_in_optimization')
                 used='unknown（未保存）' if mask is None else ('是' if np.any(mask) else '否')
                 if self.show_legacy_source:imgui.text('保存状态中旧源区域的整体入优化标记：'+used)
@@ -745,6 +792,16 @@ class ResultsPlayer(Viewer):
             else:imgui.text('本帧：历史保存候选，未参与本轮全身优化')
             imgui.text('原片时间：%06.3f 秒  |  PTS %d'%(seconds,self.catalog.pts[f]))
             imgui.text('当前片段帧：%d / %d'%(f+1,len(self.catalog.pts)))
+            if self.trajectory_reference == 'com':
+                if self.tracking_points is None:
+                    imgui.text_wrapped('本候选缺少保存的质量近似 COM，主轨迹和速率不可用。')
+                else:
+                    position = self.tracking_points[f]
+                    velocity = self.com_velocity[f]
+                    imgui.text('估算 COM XYZ：%.3f / %.3f / %.3f 条件米' % tuple(position))
+                    imgui.text('COM 速率：%.3f 条件米/秒' % np.linalg.norm(velocity))
+                    imgui.text('水平 %.3f | 竖直 %+.3f（按源时钟差分）' %
+                               (np.linalg.norm(velocity[:2]), velocity[2]))
             if self.source_navigation:
                 labels=[row['label'] for row in self.source_navigation]
                 changed,selected=imgui.combo('摄影切镜',self.source_navigation_index,labels)
@@ -795,7 +852,15 @@ class ResultsPlayer(Viewer):
             imgui.set_next_item_width(150)
             changed,index=imgui.combo('播放速度',[.25,.5,1.,2.].index(self.speed),['0.25 倍','0.5 倍','1 倍','2 倍'])
             if changed:self.speed=[.25,.5,1.,2.][index];self.playback_fps=50*self.speed
-            _,self.follow=imgui.checkbox('播放时跟随运动员（保留观察角度）',self.follow)
+            if self.trajectory_reference=='com' and self.view_mode in ('feet','feet_oblique','feet_side','feet_end'):
+                _, self.follow = imgui.checkbox('播放时跟随双鞋（保留观察角度）', self.follow)
+            elif self.trajectory_reference == 'com' and self.view_mode not in ('grasp', 'support_top', 'support_side'):
+                if self.tracking_points is None:
+                    imgui.text('本候选的 COM 跟随不可用。')
+                else:
+                    _, self.follow = imgui.checkbox('播放时跟随 COM（保留观察角度）', self.follow)
+            else:
+                _, self.follow = imgui.checkbox('播放时跟随运动员（保留观察角度）', self.follow)
             imgui.text('取消跟随后，当前观察位置固定；拖动仍可自由旋转／平移。')
             imgui.separator()
             for i,(label,key) in enumerate([('自由 / 回到人体  X','free'),('侧视 XZ','side'),('侧视 YZ','end'),('俯视','top'),('全冰场','rink')]):
@@ -808,7 +873,16 @@ class ResultsPlayer(Viewer):
             imgui.text('左键拖动：旋转  |  右键拖动：平移')
             imgui.text('滚轮：缩放；暂停后也可自由观察')
             imgui.separator()
-            for label,key in [('人体表面','surface'),('人体骨架','skeleton'),('鞋和冰刀','shoes'),('整段骨盆投影轨迹','trajectory'),('骨盆 P、地面投影 G 与竖线','pelvis'),('冰场线和广告','rink_lines'),('围挡','boards'),('冰面','ice')]:
+            layers = [('人体表面','surface'),('人体骨架','skeleton'),('鞋和冰刀','shoes')]
+            if self.trajectory_reference == 'com':
+                if self.tracking_points is not None:
+                    layers.extend([('整段 COM 三维轨迹（绿）','trajectory'),
+                                   ('COM 向参考冰面竖直投影轨迹（青绿）','com_projection')])
+                layers.append(('整段骨盆投影 G 轨迹（黄，对照）','pelvis_trajectory'))
+            else:
+                layers.append(('整段骨盆投影轨迹','trajectory'))
+            layers.extend([('骨盆 P、地面投影 G 与竖线','pelvis'),('冰场线和广告','rink_lines'),('围挡','boards'),('冰面','ice')])
+            for label,key in layers:
                 changed,self.visible[key]=imgui.checkbox(label,self.visible[key])
                 if changed:self.apply_visibility()
             imgui.set_next_item_width(175)
@@ -886,15 +960,16 @@ class ResultsPlayer(Viewer):
                     mode=str(s['skate_contact_mode'][f,foot]);confidence=s['skate_contact_confidence'][f,foot]
                     label={'unknown':'未知','airborne':'腾空','glide':'滑行候选','pick':'刀齿候选'}[mode]
                     imgui.text('足 %d 接触：%s；保存置信度 %.2f'%(foot,label,confidence))
-                imgui.text('允许入冰后的最小余量 0/1：%.2f / %.2f 条件毫米'%tuple(s['skate_clearance_m'][f]*1000))
+                imgui.text('模型冰面余量 0/1：%.4g / %.4g 条件米（含工程容差）'%tuple(s['skate_clearance_m'][f]))
                 gap=s['skate_support_gap_m'][f]
-                imgui.text('已知支持组候选最低高：'+('未知' if not np.isfinite(gap) else '%.2f 条件毫米'%(gap*1000)))
-                self.gui_height_plot('最小非穿透余量（橙 / 青）；零线为允许边界',
+                imgui.text('支持候选相对模型冰面的高度：'+('未知' if not np.isfinite(gap) else '%.4g 条件米'%gap))
+                imgui.text_wrapped('场地、相机、人体与鞋刀的联合误差尚未标定；这些数值不能判定毫米级或厘米级的真实悬空、穿冰或接触。')
+                self.gui_height_plot('模型冰面余量（橙 / 青）；零线仅为工程参考',
                     [(s['skate_clearance_m'][:,0]*1000,(.98,.43,.14,1.)),(s['skate_clearance_m'][:,1]*1000,(.12,.85,1.,1.))])
                 band=np.array([-2.,3.])*self.sequence.meta['uniform_unit_reexpression_ratio']
-                self.gui_height_plot('已知支持组候选最低高；空白为未知',
+                self.gui_height_plot('支持候选的模型高度；空白为未知',
                     [(s['skate_support_gap_m']*1000,(.55,1.,.65,1.))],band=band)
-                imgui.text_wrapped('绿带 %.2f 至 %.2f 条件毫米为首轮工程支持范围（候选原单位 −2 至 +3 毫米）。候选最低高不判定具体哪只足接冰。witness 会沿刀弧移动，其导数不是刀具速度。'%tuple(band))
+                imgui.text_wrapped('曲线使用条件毫米换算显示；绿带 %.2f 至 %.2f 是旧版工程参考，并非测量误差范围或接冰验收标准。接触结论需源图和连续运动证据。witness 会沿刀弧移动，其导数不是刀具速度。'%tuple(band))
                 imgui.text_wrapped('刃线按局部 y 两侧显示，未推定内/外刃；真实入冰量和压力未知。')
             else:
                 imgui.text('接冰状态：未知（显示程序不强制贴冰）')

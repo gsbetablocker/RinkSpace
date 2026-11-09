@@ -68,6 +68,23 @@ class CompleteRunnerExtentFactors:
                 reliability=float(row.get('reliability',1.)))for _ in range(self.count)])
         self.last=None
 
+    def restore_visible_mask(self,mask):
+        mask=np.asarray(mask)
+        if mask.dtype.kind!='b' or mask.shape!=(len(self.rows),self.count):
+            raise ValueError('Saved complete runner mask has an invalid layout')
+        sides=mask.reshape(-1,2,81).all(axis=2).argmax(axis=1)
+        expected=np.arange(self.count)[None]//81==sides[:,None]
+        if not np.array_equal(mask,expected):
+            raise ValueError('Saved runner visibility must select one complete 81-point side')
+        self.visible_mask=mask.copy()
+        from .source_contour_contract import polyline_measure_weights
+        for i,side in enumerate(sides):
+            measure=polyline_measure_weights(self.curves[side][:,[0,2]])
+            budget=self.rows[i]['contour_frame_budget']*self.rows[i]['feature_budget_fraction']
+            for k in range(self.count):
+                self.factor_rows[i*self.count+k]['objective_weight']=float(budget*measure[k%81])if mask[i,k]else 0.
+        self.visibility_record=dict(model_side=sides.tolist(),semantics='camera-near visible lower branch; no anatomical edge identity',fixed_inner=True)
+
     def evaluate(self,x,jacobian=False):
         x=np.asarray(x,float)
         if x.shape==(self.problem.size,):
@@ -87,14 +104,7 @@ class CompleteRunnerExtentFactors:
             from .source_visible_model import camera_centres
             centres=camera_centres(self.problem.camera,self.frames,[np.median(v[:,1])for v in self.source])
             local_camera=np.einsum('nji,nj->ni',R[:,2],centres-O[:,2]);sides=(local_camera[:,1]>=0).astype(int)
-            self.visible_mask=np.zeros((n,self.count),bool)
-            from .source_contour_contract import polyline_measure_weights
-            for i,side in enumerate(sides):
-                ids=side*81+np.arange(81);self.visible_mask[i,ids]=True
-                measure=polyline_measure_weights(self.curves[side][:,[0,2]])
-                budget=self.rows[i]['contour_frame_budget']*self.rows[i]['feature_budget_fraction']
-                for k in range(self.count):self.factor_rows[i*self.count+k]['objective_weight']=float(budget*measure[k%81])if self.visible_mask[i,k]else 0.
-            self.visibility_record=dict(model_side=sides.tolist(),semantics='camera-near visible lower branch; no anatomical edge identity',fixed_inner=True)
+            self.restore_visible_mask(np.arange(self.count)[None]//81==sides[:,None])
         uv=projection['uv'];closest=[];projectors=[];segments=[];alphas=[]
         for i,source in enumerate(self.source):
             A=source[:-1];V=np.diff(source,axis=0);length2=np.sum(V*V,axis=1)

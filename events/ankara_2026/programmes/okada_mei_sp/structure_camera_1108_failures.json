@@ -1,0 +1,98 @@
+{
+  "schema": "rinkspace.structure-camera-failure-navigation.v1",
+  "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "time_base": [
+    1,
+    12800
+  ],
+  "accuracy_accepted": false,
+  "meaning_zh": "八个完整复核区间，保留进入、动作和退出；区间内几何冲突或运动诊断尚未通过，不要求用户逐帧标注。八个切镜另有独立导航。",
+  "events": [
+    {
+      "label": "S01：保留旧版；新结构冲突仍在",
+      "start_pts": 283136,
+      "end_pts": 575488,
+      "source_seconds": [
+        22.12,
+        44.96
+      ],
+      "status": "accuracy_not_accepted"
+    },
+    {
+      "label": "3F—3T：双腿与鞋刀相交残留",
+      "start_pts": 611840,
+      "end_pts": 655360,
+      "source_seconds": [
+        47.8,
+        51.2
+      ],
+      "status": "accuracy_not_accepted"
+    },
+    {
+      "label": "2A：完整方向、轴与表面冲突",
+      "start_pts": 993280,
+      "end_pts": 1011200,
+      "source_seconds": [
+        77.6,
+        79
+      ],
+      "status": "accuracy_not_accepted"
+    },
+    {
+      "label": "FCSp：跳入、抓握、旋转与退出",
+      "start_pts": 1039360,
+      "end_pts": 1216000,
+      "source_seconds": [
+        81.2,
+        95
+      ],
+      "status": "accuracy_not_accepted"
+    },
+    {
+      "label": "深屈步法：97.82与104.56双小腿冲突",
+      "start_pts": 1244160,
+      "end_pts": 1344000,
+      "source_seconds": [
+        97.2,
+        105
+      ],
+      "status": "accuracy_not_accepted"
+    },
+    {
+      "label": "S08端部与后续步法：相机／鞋刀诊断",
+      "start_pts": 1735680,
+      "end_pts": 1932800,
+      "source_seconds": [
+        135.6,
+        151
+      ],
+      "status": "accuracy_not_accepted"
+    },
+    {
+      "label": "LSp：抓鞋、局部关节与旋转进程",
+      "start_pts": 1999360,
+      "end_pts": 2118400,
+      "source_seconds": [
+        156.2,
+        165.5
+      ],
+      "status": "accuracy_not_accepted"
+    },
+    {
+      "label": "CCoSp：降低、真实换足、提鞋与退出",
+      "start_pts": 2199040,
+      "end_pts": 2365440,
+      "source_seconds": [
+        171.8,
+        184.8
+      ],
+      "status": "accuracy_not_accepted"
+    }
+  ],
+  "evidence": {
+    "fixed_and_flights": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/final_comparison.json",
+    "actual_pose_orientation": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/final_orientation/report.json",
+    "cut_comparison": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/out/cut_review_final/cut_review.json",
+    "camera_selection": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/camera_round6/report.json"
+  }
+}

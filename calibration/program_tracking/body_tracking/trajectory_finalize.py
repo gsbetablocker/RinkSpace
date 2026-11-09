@@ -4,6 +4,7 @@ No fitting, camera/scale correction, alignment or replacement of old results.
 """
 from pathlib import Path
 import argparse,json,re,shutil
+from hashlib import sha256
 import numpy as np
 from scipy.spatial.transform import Rotation
 from .rebuild_prepare import load,digest
@@ -43,6 +44,46 @@ def finalization_paths(project,stage,*,candidate_id=DEFAULT_CANDIDATE_ID,output=
         candidate_id=candidate_id,variant_id='programme_trajectory' if candidate_id==DEFAULT_CANDIDATE_ID else candidate_id)
 
 
+def _stage_source_document(project, prepared, stage):
+    """Resolve the exact bytes bound to this run, with the legacy prepared fallback."""
+    summary_path = stage/'run_summary.json'
+    summary = json.loads(summary_path.read_text(encoding='utf-8')) if summary_path.is_file() else {}
+    keys = ('source_evidence', 'source_evidence_sha256')
+    if not any(key in summary for key in keys):
+        path = (prepared/'source_evidence.json').resolve()
+        content = path.read_bytes()
+        return json.loads(content), dict(path=str(path), sha256=sha256(content).hexdigest())
+
+    source, expected = (summary.get(key) for key in keys)
+    if not isinstance(source, str) or not source or not isinstance(expected, str) or not expected:
+        raise ValueError('Incomplete run summary source evidence identity')
+    path = Path(source)
+    # Relative paths can be recorded by the backend when started from the
+    # project or by a caller using another working directory.
+    candidates = [path] if path.is_absolute() else [project/path, path]
+    for candidate in candidates:
+        candidate = candidate.resolve()
+        if candidate.is_file():
+            content = candidate.read_bytes()
+            if sha256(content).hexdigest() == expected:
+                return json.loads(content), dict(path=str(candidate), sha256=expected)
+    raise ValueError('Run summary source evidence missing or changed: '+source)
+
+
+def _validate_com_export(result, frames):
+    vectors = ('com_world_mid', 'com_velocity_world_mps', 'com_acceleration_world_mps2',
+        'com_specific_angular_momentum_world_m2ps', 'com_required_specific_external_force_world_mps2')
+    metadata = ('com_mass_model', 'com_derivative_method', 'com_segment_mass_fractions',
+        'com_derivative_interior', 'trajectory_reference')
+    missing = [name for name in vectors+metadata if name not in result]
+    if missing:
+        raise ValueError('Incomplete model COM export: '+', '.join(missing))
+    if (str(result['trajectory_reference']) != 'model_com'
+            or any(result[name].shape != (frames, 3) for name in vectors)
+            or result['com_derivative_interior'].shape != (frames,)):
+        raise ValueError('Model COM export differs from the full source clock')
+
+
 def finalize(project,prepared,stage,*,candidate_id=DEFAULT_CANDIDATE_ID,output=None,viewer_config=None):
     project,prepared,stage=map(Path,(project,prepared,stage))
     paths=finalization_paths(project,stage,candidate_id=candidate_id,output=output,viewer_config=viewer_config)
@@ -50,17 +91,47 @@ def finalize(project,prepared,stage,*,candidate_id=DEFAULT_CANDIDATE_ID,output=N
     raw=stage/'fitted/result.npz';z=load(raw);p=load(prepared/'input.npz');obs=load(prepared/'observations.npz')
     scope_path=project/'events/ankara_2026/programmes/okada_mei_sp/rebuild_scope.json';scope=json.loads(scope_path.read_text(encoding='utf-8'));pts,shots,tb=required_clock(scope)
     np.testing.assert_array_equal(z['pts'],pts);np.testing.assert_array_equal(p['pts'],pts);np.testing.assert_array_equal(z['time_base'],tb)
-    context=ProgrammeContext.from_scope(scope_path,body_id='ankara_2026/okada_mei_sp/logical_source_person_0',shape=np.r_[p['shared_betas'],p['body_scale']],metres_per_scene_unit=float(z['metres_per_scene_unit']),equipment_sha256=digest(prepared/'fixed_binding.npz'),camera_sha256=digest(prepared/'camera_context.json'))
+    source_document, source_identity = _stage_source_document(project, prepared, stage)
+    parameter=load(stage/'solve/candidate.npz')
+    for payload, key in ((parameter, 'source_evidence_sha256'), (z, 'source_action_ledger_sha256')):
+        if key in payload and str(payload[key]) != source_identity['sha256']:
+            raise ValueError('Final candidate source evidence differs from '+key)
+    if source_document.get('trajectory_reference') == 'model_com':
+        _validate_com_export(z, len(pts))
+    camera_selection=source_document.get('programme_camera_candidate',{})
+    selected_record=camera_selection.get('record')
+    selected_camera=None
+    if selected_record:
+        if digest(selected_record)!=camera_selection['record_sha256']:raise ValueError('Final candidate camera record changed')
+        selected_camera=ProgrammeCamera(project,p,shots,record_path=selected_record)
+        camera_record=selected_camera.info
+        parameter_binding=json.loads(str(parameter['camera_binding_json']))
+        result_binding=json.loads(str(z['camera_binding_json']))
+        for binding in (parameter_binding,result_binding):
+            if binding['state_sha256']!=camera_record['state_sha256']:raise ValueError('Final result camera differs from selected candidate')
+    else:camera_record=json.loads((prepared/'camera_context.json').read_text(encoding='utf-8'))
+    camera_digest=camera_record['state_sha256'] if selected_record else digest(prepared/'camera_context.json')
+    context=ProgrammeContext.from_scope(scope_path,body_id='ankara_2026/okada_mei_sp/logical_source_person_0',shape=np.r_[p['shared_betas'],p['body_scale']],metres_per_scene_unit=float(z['metres_per_scene_unit']),equipment_sha256=digest(prepared/'fixed_binding.npz'),camera_sha256=camera_digest)
     packet=context.packet()
     # The absolute curve is active over this whole source clock. The legacy
     # correction-layer mask is empty for an absolute state, not a frozen body.
-    parameter=load(stage/'solve/candidate.npz')
-    if str(parameter['state_kind'])!='absolute_motion_v1':raise ValueError('Expected the actual saved full absolute body state')
+    kind = str(parameter['state_kind'])
+    if kind == 'sequence_skates_v1':
+        from .absolute_motion_state import curve_from_packet
+        from .sequence_skate_state import shoe_curve_from_packet
+        body, skates = curve_from_packet(parameter), shoe_curve_from_packet(parameter)
+        first, last = p['fit_time_seconds'][[0, -1]]
+        if (body.rotation_controls.shape[1] != 22 or skates is None
+                or skates.rotation_controls.shape[1] != 2
+                or any(not (curve.knots[3] <= first <= last <= curve.knots[-4])
+                       for curve in (body, skates))):
+            raise ValueError('Expected a whole-programme absolute body and both attached skate curves')
+    elif kind != 'absolute_motion_v1':
+        raise ValueError('Expected the actual saved full absolute body state')
     out.mkdir(parents=True,exist_ok=False);(out/'fitted').mkdir()
-    camera_record=json.loads((prepared/'camera_context.json').read_text(encoding='utf-8'))
     packet.update(shots=[dict(shot_id=s['id'],valid_pts=[s['processing']['first_pts'],s['processing']['last_pts']],
         frozen_camera_state_sha256=camera_record['shots'][s['id']]['state_sha256'])for s in scope['shots']],
-        source_evidence=dict(path=str(prepared/'source_evidence.json'),sha256=digest(prepared/'source_evidence.json')),
+        source_evidence=source_identity,
         continuous_state_registry=dict(kind=str(parameter['state_kind']),parameter_sha256=digest(stage/'solve/candidate.npz'),
             source_clock_sha256=digest(prepared/'input.npz'),root_and_body_control_count=int(len(parameter['absolute_knots'])-4),
             per_frame_identity_reset=False,shoe_translation='attached via saved body FK and one shared binding'))
@@ -91,7 +162,7 @@ def finalize(project,prepared,stage,*,candidate_id=DEFAULT_CANDIDATE_ID,output=N
     spin=(t>=88)&(t<=92)
     metrics['spin88_92']=dict(pelvis_XY_span_m=np.ptp(z['P_world_mid'][spin,:2],axis=0).tolist(),right_fixed_blade_reference_XY_span_m=np.ptp(z['skate_reference_world_mid'][spin,1,:2],axis=0).tolist(),meaning='fixed model material reference; not observed contact point')
     # Check the same native per-shot camera against saved per-row world points.
-    camera=ProgrammeCamera(project,p,shots);ratio=float(z['body_length_ratio']);closure=[]
+    camera=selected_camera if selected_camera is not None else ProgrammeCamera(project,p,shots);ratio=float(z['body_length_ratio']);closure=[]
     for first in range(0,len(pts),128):
         ids=np.arange(first,min(first+128,len(pts)));uv=camera.project(z['world_at_row'][ids]/ratio,ids)
         closure.append(abs(uv[:,96:]-z['COCO_uv'][ids]))

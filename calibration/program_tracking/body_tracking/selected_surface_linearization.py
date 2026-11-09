@@ -204,3 +204,34 @@ class SelectedSurfaceLinearization:
                     pose_effect+=moved
                 output[k][start:stop]=self.samples[start:stop]+pose_effect*self.scale
         return output
+
+    def derivative(self,joint,right_axis):
+        """Exact selected-skin derivative of one current local right rotation."""
+        return self.derivatives(joint,np.asarray(right_axis)[:,None,:])[:,0]
+
+    def derivatives(self,joint,right_axes):
+        """Reuse one subtree blend for all right axes of this joint."""
+        from .fullbody_fit import skew
+        joint=int(joint);axes=np.asarray(right_axes,dtype=np.float64)
+        if not 1<=joint<22 or axes.ndim!=3 or axes.shape[0]!=self.n or axes.shape[2]!=3:
+            raise ValueError('Expected a native body joint and right axes at each sample')
+        directions=axes.shape[1]
+        ids=self._skin_indices[joint];weights=self._skin_weights[joint]
+        total=self._weight_sums[joint]
+        local_change=self._local[:,joint-1,None]@skew(axes)
+        pose_dirs=self._posedirs[(joint-1)*9:joint*9]
+        output=np.empty((self.n,directions,self.vertices,3))
+        world_axes=np.einsum('nij,naj->nai',self._frames[:,joint],axes)
+        for first in range(0,self.n,self.chunk_size):
+            stop=min(first+self.chunk_size,self.n);n=stop-first
+            dposed=(local_change[first:stop].reshape(n*directions,9)@pose_dirs).reshape(n,directions,self.vertices,3)
+            value=np.einsum('nvij,navj->navi',self._blend_R[first:stop],dposed)
+            if len(ids):
+                rot=self._rotation[first:stop,ids]
+                subtree_R=(rot.reshape(n,len(ids),9).transpose(0,2,1)@weights).transpose(0,2,1).reshape(n,self.vertices,3,3)
+                subtree_t=(self._translation[first:stop,ids].transpose(0,2,1)@weights).transpose(0,2,1)
+                relative=(np.einsum('nvij,nvj->nvi',subtree_R,self._posed[first:stop])+subtree_t
+                          -total[None,:,None]*self._position[first:stop,joint,None])
+                value+=np.cross(world_axes[first:stop,:,None],relative[:,None])
+            output[first:stop]=value*self.scale
+        return output

@@ -1,5 +1,7 @@
 """Fixed checkpoint identity and dispatch only: no real model, solve or UI."""
+import hashlib
 import json
+from pathlib import Path
 import shutil
 from types import SimpleNamespace
 
@@ -170,6 +172,24 @@ def test_moving_identical_parent_files_and_camera_paths_can_replay(tmp_path, mon
     assert calls == ['build', 'layers', 'problem', 'inspect', 'deliver']
 
 
+def test_multishot_identity_ignores_nested_locations_but_rejects_state_change(tmp_path):
+    c = case(tmp_path)
+    shots = {shot: dict(state_path=f'D:/before/{shot}.npz',
+                        native_library='D:/before/native.dll', state_sha256=sha * 64)
+             for shot, sha in (('s01', 'a'), ('s02', 'b'))}
+    info = dict(c.info, shot='programme', shots=shots)
+    saved = checkpoint_identity(c.binding, c.project, info)
+    moved_shots = {shot: dict(record, state_path=f'D:/after/{shot}.npz',
+                              native_library='D:/after/native.dll')
+                   for shot, record in shots.items()}
+    moved = dict(info, shots=moved_shots)
+    validate_checkpoint_identity(saved, checkpoint_identity(c.binding, c.project, moved))
+
+    moved_shots['s02']['state_sha256'] = 'c' * 64
+    with pytest.raises(ValueError, match='identity mismatch: camera_binding_json'):
+        validate_checkpoint_identity(saved, checkpoint_identity(c.binding, c.project, moved))
+
+
 def test_shared_controls_cannot_change_before_delivery(tmp_path, monkeypatch):
     c = case(tmp_path); c.binding.x[0] = .001; before = files(tmp_path)
     with pytest.raises(ValueError, match='shared_x'):
@@ -187,8 +207,22 @@ def test_future_checkpoint_fields_keep_existing_fixed_identity(tmp_path):
     problem.al = SimpleNamespace(multiplier=np.zeros(2), penalty=10.)
     problem.state_kind = 'continuous_shot'
     problem.ice_policy = integration.IceSoftPolicy(.005, .05, 1., .025, .08, 1.)
+    # A saved legacy candidate has no kernel-manifest field.
+    validate_checkpoint_identity(c.saved, c.identity)
+    manifest_sha = integration.snapshot_objective_kernels(c.out / 'fit')
+    problem.checkpoint_extra = {'kernel_manifest_sha256': np.array(manifest_sha)}
     packet = problem.checkpoint_fields(c.saved['x'])
     validate_checkpoint_identity(packet, c.identity)
+    assert packet['kernel_manifest_sha256'].item() == manifest_sha
+    fit = c.out / 'fit'
+    manifest_bytes = (fit / 'kernel_manifest.json').read_bytes()
+    assert hashlib.sha256(manifest_bytes).hexdigest() == manifest_sha
+    manifest = json.loads(manifest_bytes)
+    for name in ('programme_surface.py', 'programme_joint_limits.py',
+                 'anatomical_chart.py', 'selected_surface_linearization.py', 'programme_source_step.py'):
+        payload = (fit / 'source_snapshot' / name).read_bytes()
+        assert payload == Path(integration.__file__).with_name(name).read_bytes()
+        assert manifest[name] == hashlib.sha256(payload).hexdigest()
     for key in IDENTITY_FIELDS:
         assert packet[key].dtype == c.identity[key].dtype
         assert packet[key].tobytes() == c.identity[key].tobytes()

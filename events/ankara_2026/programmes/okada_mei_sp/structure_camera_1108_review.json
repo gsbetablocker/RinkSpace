@@ -1,0 +1,1144 @@
+{
+  "schema": "rinkspace.structure-camera-review.v1",
+  "generated_utc": "2026-11-08T04:06:43.805Z",
+  "status_zh": "完整候选和播放器已交付；结构、接触、世界定位与整体准确性验收未通过。",
+  "candidate_artifacts_delivered": true,
+  "accuracy_accepted": false,
+  "numerical_convergence": false,
+  "full_physical_repair": false,
+  "audit_baseline_commit": "5e9e959204e0cd757763320fa6414ac26fb393da",
+  "scope": {
+    "source_frames": 8329,
+    "source_seconds": [
+      22.12,
+      188.68
+    ],
+    "source_pts": [
+      283136,
+      2415104
+    ],
+    "time_base": [
+      1,
+      12800
+    ],
+    "shots": 9,
+    "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+    "one_continuous_body_and_equipment_state": true,
+    "no_per_shot_world_alignment": true,
+    "body_networks_run": 0,
+    "system_rebuilt": false,
+    "commit_or_push_executed": false,
+    "conditional_metres_per_scene_unit": 59.96169706678219
+  },
+  "delivery": {
+    "baseline_variant": "programme_action_finish_1107",
+    "old_default_variant": "programme_action_physics_1107",
+    "structure_variant": "programme_structure_1108",
+    "camera_body_variant": "programme_structure_camera_1108",
+    "latest_entry": {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/launchers/START_STRUCTURE_CAMERA_1108.cmd",
+      "sha256": "95a3ad3995445efb48202709dc9d27820f692a420bdb973b75b73783ad1e2ca0"
+    },
+    "comparison_config": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\viewer3d_structure_camera_1108.json",
+      "sha256": "2074c0daa36013a28c78a48b610017fda1fcf1f31f97bdbbb8cb5858dd1250b0"
+    },
+    "candidate_records": {
+      "programme_structure_1108": {
+        "record": {
+          "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/programme_structure_1108.json",
+          "sha256": "7265055eda26dbc665993678cc48e1fa1facd61f6ffcb92975b9975cf80384d6"
+        },
+        "parameter": {
+          "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\programme_structure_1108.npz",
+          "sha256": "27be6f2fdd6c17a85f751b6a94369ddf771a63e0ccfe0fd8f9a832d9b89d84a8"
+        },
+        "result": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\structure_camera_1108\\player_install\\programme_structure_1108\\final\\fitted\\result.npz",
+          "sha256": "3cfbc3194364237522aa95a3eb45da32cbe44de7c46531dbdaf8b40ca0aa755f"
+        }
+      },
+      "programme_structure_camera_1108": {
+        "record": {
+          "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/programme_structure_camera_1108.json",
+          "sha256": "5c93b508cb5c0670dbab53a2c91362585dcab009794a8798cab20a983aa9be89"
+        },
+        "parameter": {
+          "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\programme_structure_camera_1108.npz",
+          "sha256": "909055d5b46153f48c57fdec4e9b0f2c052f017796a37436d6bfe615c760131a"
+        },
+        "result": {
+          "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\structure_camera_1108\\player_install\\programme_structure_camera_1108\\final\\fitted\\result.npz",
+          "sha256": "2d78c4c1a4bbf5e988dda0c00af22435e6ed138029e7c2ec40e5b4f09e8afc07"
+        }
+      }
+    },
+    "baseline_parameter": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/trajectory_action_1107/action_completion_1107/s09_v4/solve/candidate.npz",
+      "sha256": "2f6f178655860ac6fb3de4a072ceda67b61ce5a3bf9127e5b6cdd5281f5b7e9c"
+    },
+    "baseline_result": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/trajectory_action_1107/action_completion_1107/s09_v4/final/fitted/result.npz",
+      "sha256": "e12319ca7fb45389806620a4757d993065272af1faa895c96f99acba01825db1"
+    },
+    "preservation": {
+      "old_default_unchanged": true,
+      "old_six_variants_exact": true,
+      "old_variant_count": 6,
+      "installed_variant_count": 8,
+      "comparison_uses_same_eight_variants": true,
+      "comparison_default_unchanged": true,
+      "baseline_parameter_sha256": "2f6f178655860ac6fb3de4a072ceda67b61ce5a3bf9127e5b6cdd5281f5b7e9c",
+      "baseline_result_sha256": "e12319ca7fb45389806620a4757d993065272af1faa895c96f99acba01825db1",
+      "baseline_camera_sha256": "d6cfde1474a23d594a0395351ebbdb0ee15a6560ef77b27f069d239ee95bb3f3"
+    },
+    "additional_ambiguous_candidate_zh": "没有经背景检查支持且需另装为第四版的相机备选。所有被拒绝试探及历史尺度／深度分支保留；未复制零变化相机来冒充另一独立拟合。",
+    "selection_zh": "本轮相机—人体候选使用独立相机版本记录；端部变化被留出背景拒绝，数值仍为原相机。该名称不代表相机校正成功。"
+  },
+  "implementation": {
+    "segment_box_zh": "修复线段位于盒内时有符号距离极小值的漏检，保留盒外精确距离语义；按当前函数语义合并，没有覆盖更晚工作树。",
+    "surface_zh": "以当前 posed SMPL-X、实际手通道、变形鞋及钢刃三角面筛选和窄相位；保留接缝面，按拓扑和局部语义过滤。选中带源时间与面/边身份的定向见证进入同一全节目残差及两端 FK/LBS/鞋绑定 Jacobian；内部相交的整体平移导数抵消。",
+    "surface_limits_zh": "开口语义片的定向面距离仅用于局部解缠，不是可靠全局穿透深度。没有封闭包含、共面全面覆盖或严格 CCD 证书；native+midpoint 与自适应细化仍是采样。",
+    "anatomy_zh": "从实际 local_R 和左右 rest 解剖基建立固定全序列分支的 twist/swing；膝肘与必要髋踝采用随屈曲耦合的离轴范围。有限工程域及来源不确定性保留，未逐帧硬裁剪或把 rotvec 分量直接命名为临床角。",
+    "grasp_zh": "S09 连续原片的抓握、换足、进出动作已记录并加入有限因素。掌面局部点到实际有限鞋面参与同状态求解；浅层局部抓握例外不豁免整臂或全部同侧部件，深层 crossing 仍报告。",
+    "physics_zh": "原五个 flight、有限冰面、rocker、移动接触材料、鞋内踝绑定、源换足和完整上肢 COM/H 均保留；没有贴地后处理、foot-lock、独立拼轨迹或渲染器改姿态。"
+  },
+  "optimization": {
+    "additional_structure_accepted_steps": 4,
+    "additional_joint_accepted_steps": 1,
+    "total_parent_accepted_steps": 32,
+    "total_final_accepted_steps": 37,
+    "stages": [
+      {
+        "stage": "structure_round1c",
+        "additional_accepted_steps": 1,
+        "root_profile_fixed": true,
+        "run_summary": {
+          "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/structure_round1c/run_summary.json",
+          "sha256": "8502c385b09a6a1c0cc19e7c4d42434e124bedb62b1105978003337a11fe4396"
+        },
+        "association_refresh": {
+          "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/structure_round1c/surface_refresh.json",
+          "sha256": "8707271ae07b9b560680eb30137aa0eea372419848e6d13ec70cc0631cdeb4a9"
+        },
+        "stop": [
+          {
+            "code": "accepted_budget",
+            "category": "budget",
+            "message": "Accepted-step budget reached.",
+            "accepted": 1,
+            "limit": 1
+          }
+        ],
+        "convergence_claim": false
+      },
+      {
+        "stage": "structure_round2",
+        "additional_accepted_steps": 1,
+        "root_profile_fixed": true,
+        "run_summary": {
+          "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/structure_round2/run_summary.json",
+          "sha256": "abe52c47ac4e07d6f9bc79e7af35dc02a92fc21c779937624cb97f40033932bb"
+        },
+        "association_refresh": {
+          "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/structure_round2/surface_refresh.json",
+          "sha256": "478417f9180a5fd9088fc1775306878780ca5cbebb6d54714b3764cb8430aebf"
+        },
+        "stop": [
+          {
+            "code": "accepted_budget",
+            "category": "budget",
+            "message": "Accepted-step budget reached.",
+            "accepted": 1,
+            "limit": 1
+          }
+        ],
+        "convergence_claim": false
+      },
+      {
+        "stage": "structure_round3",
+        "additional_accepted_steps": 1,
+        "root_profile_fixed": true,
+        "run_summary": {
+          "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/structure_round3/run_summary.json",
+          "sha256": "8d206519dec101ea9ecf7f03d1df6fe3dfa2f2e4ced2a84424d71d2d4a2a5fb2"
+        },
+        "association_refresh": {
+          "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/structure_round3/surface_refresh.json",
+          "sha256": "03979e170f092058eb67365ce00a212250a28ceeb2ae741b2eecc9c5fbffae44"
+        },
+        "stop": [
+          {
+            "code": "accepted_budget",
+            "category": "budget",
+            "message": "Accepted-step budget reached.",
+            "accepted": 1,
+            "limit": 1
+          }
+        ],
+        "convergence_claim": false
+      },
+      {
+        "stage": "structure_round4",
+        "additional_accepted_steps": 1,
+        "root_profile_fixed": true,
+        "run_summary": {
+          "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/structure_round4/run_summary.json",
+          "sha256": "d8f126724273d3cae731202cd557b6f15a91826af1b60dbc01d2e6b7d1f9b78b"
+        },
+        "association_refresh": {
+          "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/structure_round4/surface_refresh.json",
+          "sha256": "d57293916e5af64f9e57c1a83abf8439e0b5fd318dc64a1a70db446fdfc72c55"
+        },
+        "stop": [
+          {
+            "code": "accepted_budget",
+            "category": "budget",
+            "message": "Accepted-step budget reached.",
+            "accepted": 1,
+            "limit": 1
+          }
+        ],
+        "convergence_claim": false
+      },
+      {
+        "stage": "joint_round1",
+        "additional_accepted_steps": 1,
+        "root_profile_fixed": false,
+        "run_summary": {
+          "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/joint_round1/run_summary.json",
+          "sha256": "e4df88dfcdaa4bacc6fbb9601d5fbf479e02bb55ed843d7f248ff90ed6c4a722"
+        },
+        "association_refresh": {
+          "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/joint_round1/surface_refresh.json",
+          "sha256": "bd21c06b9b965a856f0c3fa8286901dc8993abbabd80e406a89cbc5cb98e95cc"
+        },
+        "stop": [
+          {
+            "code": "accepted_budget",
+            "category": "budget",
+            "message": "Accepted-step budget reached.",
+            "accepted": 1,
+            "limit": 1
+          }
+        ],
+        "convergence_claim": false
+      }
+    ],
+    "final_refreshed_adaptive_full_body_objective": {
+      "before": 8387.496313917356,
+      "after": 8378.006309652548,
+      "same_association": true,
+      "passed": true
+    },
+    "last_step_fraction": 0.125,
+    "stop_explanation_zh": "每阶段 accepted_budget=1 用于在接受后全片刷新窄相位，再在同一关联和目标下复评。保存的四步结构更新与一步开放 P 的更新均有真实接受证据；这组交付状态没有达到数值收敛，也没有证明完整主目标停滞。最后更大的 1、0.5、0.25 试探因完整目标（包括穿戴内腔项）退化未接受；没有无限提高惩罚或删除难接触。",
+    "source_guards_zh": "既有可靠源保护与新增关节峰值／表面峰值保护按保存记录通过，但聚合保护不表示每条源投影均改善。S02 躯干 p95 与多项 H 指标略退化仍列入报告。",
+    "cost_comparison_zh": "新增源方向和抓握、刷新表面关联会改变目标版本；不跨这些版本比较总代价来计算收益。",
+    "first_full_J_last_stage_seconds": 174.1694008000013,
+    "last_stage_wall_seconds": 403.2110090999995
+  },
+  "surface_acceptance": {
+    "fixed_checks": {
+      "baseline": {
+        "fixed_39": {
+          "checks": 39,
+          "checks_with_crossings": 25
+        },
+        "dense_36": {
+          "checks": 36,
+          "checks_with_crossings": 16
+        }
+      },
+      "structure": {
+        "fixed_39": {
+          "checks": 39,
+          "checks_with_crossings": 25
+        },
+        "dense_36": {
+          "checks": 36,
+          "checks_with_crossings": 16
+        }
+      },
+      "joint": {
+        "fixed_39": {
+          "checks": 39,
+          "checks_with_crossings": 25
+        },
+        "dense_36": {
+          "checks": 36,
+          "checks_with_crossings": 16
+        }
+      }
+    },
+    "fixed_item_disappearance_zh": "固定39项和36项中，没有原先相交的整项变成通过；三候选分别仍为25/39与16/36。",
+    "common_sample_transitions": [
+      {
+        "before": "baseline",
+        "after": "structure",
+        "common_samples": 16657,
+        "before_only_samples": 0,
+        "after_only_samples": 708,
+        "semantic_pair_sample_transitions": {
+          "disappeared": {
+            "native": 276,
+            "interpolated_midpoint": 269,
+            "interpolated_adaptive": 0
+          },
+          "retained": {
+            "native": 40256,
+            "interpolated_midpoint": 40229,
+            "interpolated_adaptive": 0
+          },
+          "new": {
+            "native": 211,
+            "interpolated_midpoint": 214,
+            "interpolated_adaptive": 0
+          }
+        }
+      },
+      {
+        "before": "baseline",
+        "after": "joint",
+        "common_samples": 16657,
+        "before_only_samples": 0,
+        "after_only_samples": 706,
+        "semantic_pair_sample_transitions": {
+          "disappeared": {
+            "native": 282,
+            "interpolated_midpoint": 283,
+            "interpolated_adaptive": 0
+          },
+          "retained": {
+            "native": 40250,
+            "interpolated_midpoint": 40215,
+            "interpolated_adaptive": 0
+          },
+          "new": {
+            "native": 218,
+            "interpolated_midpoint": 224,
+            "interpolated_adaptive": 0
+          }
+        }
+      },
+      {
+        "before": "structure",
+        "after": "joint",
+        "common_samples": 17363,
+        "before_only_samples": 2,
+        "after_only_samples": 0,
+        "semantic_pair_sample_transitions": {
+          "disappeared": {
+            "native": 7,
+            "interpolated_midpoint": 15,
+            "interpolated_adaptive": 0
+          },
+          "retained": {
+            "native": 40460,
+            "interpolated_midpoint": 40428,
+            "interpolated_adaptive": 3500
+          },
+          "new": {
+            "native": 8,
+            "interpolated_midpoint": 11,
+            "interpolated_adaptive": 1
+          }
+        }
+      }
+    ],
+    "transition_meaning_zh": "共同采样处的语义部件对×时刻出现/消失，不是独立碰撞事件数或严重度。baseline→joint 消失565、残留80465、新增442；只有新候选才有的706个自适应样本不拿来伪造前后差值。完整持续区间、分类和定向见证排序见 surface_events。",
+    "native_plus_midpoint_samples": 16657,
+    "joint_adaptive_extra_samples": 706,
+    "joint_total_sample_times": 17363,
+    "joint_selected_adaptive_witnesses": 84152,
+    "new_sample_examples": [
+      {
+        "pair": [
+          "left_boot",
+          "right_boot"
+        ],
+        "start_s": 144.96,
+        "end_s": 144.96,
+        "samples": 1,
+        "witness_m": -0.04735022992194426
+      },
+      {
+        "pair": [
+          "left_blade_front",
+          "right_blade_front"
+        ],
+        "start_s": 32.42,
+        "end_s": 32.42,
+        "samples": 1,
+        "witness_m": -0.04213862128299907
+      },
+      {
+        "pair": [
+          "left_blade_rear",
+          "right_blade_rear"
+        ],
+        "start_s": 117.74000000000001,
+        "end_s": 117.74000000000001,
+        "samples": 1,
+        "witness_m": -0.036342150992084314
+      }
+    ],
+    "depth_limit_zh": "new_sample_examples.witness_m 是定向三角面分离见证，不能解释为真实穿透厚度。约98%的目标语义片是开口片；合法邻接/自脚在鞋内/浅层源抓握、真正 crossing、拓扑不明与代理项分别保留。"
+  },
+  "anatomical_review": {
+    "coordinate_semantics_zh": "旧 anatomical_frames 中 FK_frames 是 root-local，global_root_R 单独保存。final_orientation 的数组明确导出 FK_frames_world=global_root_R @ FK_frames，并逐曝光检查 root_R 与最终 Q 一致；不可把 root-local frames 直接叫世界 FK。",
+    "full_native_arrays_preserved": true,
+    "synthetic_rest_tests": [
+      "neutral",
+      "positive flexion",
+      "slight extension",
+      "deep flexion",
+      "off-axis"
+    ],
+    "right_knee_16260": {
+      "baseline": {
+        "twist_deg": 184.1034672885134,
+        "swing_deg": 49.4605151388824
+      },
+      "structure": {
+        "twist_deg": 184.00831636329264,
+        "swing_deg": 48.74198133242701
+      },
+      "joint": {
+        "twist_deg": 184.00510952032772,
+        "swing_deg": 48.71727824427178
+      }
+    },
+    "branch_explanation_zh": "162.60秒右膝原主值约−175.8965度与固定分支+184.1035度是同一旋转表示；最终作者化轴 twist 约+184.0051度、swing约48.7173度。关节中心夹角155.89度不是同一量，不据此判真实反折。该模型结构异常仍未解决。",
+    "normalized_violation_peaks": {
+      "baseline": {
+        "left_knee": 4.1293463040609515,
+        "right_knee": 5.045897316804776,
+        "left_elbow": 2.3873359410948405,
+        "right_elbow": 2.235244567388094,
+        "left_hip": 0.10042069523719205,
+        "right_hip": 0,
+        "left_ankle": 2.668851236186054,
+        "right_ankle": 2.041018709118395,
+        "left_wrist": 0.7229382663543477,
+        "right_wrist": 3.7395643285691675
+      },
+      "structure": {
+        "left_knee": 4.019634941810139,
+        "right_knee": 5.018247181942966,
+        "left_elbow": 2.3224828852408397,
+        "right_elbow": 2.1819395027294517,
+        "left_hip": 0.09623068571108497,
+        "right_hip": 0,
+        "left_ankle": 2.6074255175414685,
+        "right_ankle": 2.010898709027612,
+        "left_wrist": 0.7029577699818341,
+        "right_wrist": 3.6944212529733234
+      },
+      "joint": {
+        "left_knee": 4.015445117669977,
+        "right_knee": 5.017408701058393,
+        "left_elbow": 2.3200141641036787,
+        "right_elbow": 2.179928188699525,
+        "left_hip": 0.09614591567389943,
+        "right_hip": 0,
+        "left_ankle": 2.605082149859433,
+        "right_ankle": 2.0096060358695196,
+        "left_wrist": 0.7022031852243306,
+        "right_wrist": 3.6928051642160757
+      }
+    },
+    "clinical_or_accuracy_claim": false
+  },
+  "trajectory_and_source": {
+    "definitions_zh": "P为骨盆位置，G=(Px,Py,0)，COM另算；条件米制未独立标定。旧相机反投影范围与网络世界先验仅是带有限不确定性的条件量。",
+    "joint_shift_vs_original_baseline_m": {
+      "P": {
+        "n": 8329,
+        "n_finite": 8329,
+        "p50": 0.00002639037089912593,
+        "p95": 0.0001168983428282634,
+        "max": 0.00039938347975121934,
+        "worst": {
+          "source_pts": 2081024,
+          "source_seconds": 162.58
+        }
+      },
+      "G": {
+        "n": 8329,
+        "n_finite": 8329,
+        "p50": 0.000026157376188706837,
+        "p95": 0.00011645293153577109,
+        "max": 0.00039909464442988094,
+        "worst": {
+          "source_pts": 2081024,
+          "source_seconds": 162.58
+        }
+      },
+      "COM": {
+        "n": 8329,
+        "n_finite": 8329,
+        "p50": 0.0001275606715654134,
+        "p95": 0.00039602104507005954,
+        "max": 0.002436561622119001,
+        "worst": {
+          "source_pts": 283136,
+          "source_seconds": 22.12
+        }
+      }
+    },
+    "used_source_uv_rows": 140487,
+    "source_identity_zh": "同一原UV/use/sigma和既有6个曝光源关节重绑定逐候选复用；不按候选重选更有利身份。",
+    "torso_error_by_candidate_px": {
+      "baseline": {
+        "programme": {
+          "n": 33012,
+          "n_finite": 33012,
+          "p50": 4.35183949545119,
+          "p95": 17.741238353314714,
+          "max": 124.84620528073326,
+          "worst": {
+            "source_pts": 2221568,
+            "source_seconds": 173.56
+          }
+        },
+        "s01": {
+          "n": 4325,
+          "n_finite": 4325,
+          "p50": 3.938866340641705,
+          "p95": 13.840845700986316,
+          "max": 74.8076344375759,
+          "worst": {
+            "source_pts": 284928,
+            "source_seconds": 22.26
+          }
+        },
+        "s02": {
+          "n": 2268,
+          "n_finite": 2268,
+          "p50": 4.048354162641659,
+          "p95": 14.041650920825052,
+          "max": 62.986792333375384,
+          "worst": {
+            "source_pts": 701184,
+            "source_seconds": 54.78
+          }
+        },
+        "s09": {
+          "n": 9008,
+          "n_finite": 9008,
+          "p50": 5.493873682349884,
+          "p95": 23.774140110869208,
+          "max": 124.84620528073326,
+          "worst": {
+            "source_pts": 2221568,
+            "source_seconds": 173.56
+          }
+        }
+      },
+      "structure": {
+        "programme": {
+          "n": 33012,
+          "n_finite": 33012,
+          "p50": 4.340401644467393,
+          "p95": 17.729764249558645,
+          "max": 124.84749630106995,
+          "worst": {
+            "source_pts": 2221568,
+            "source_seconds": 173.56
+          }
+        },
+        "s01": {
+          "n": 4325,
+          "n_finite": 4325,
+          "p50": 3.925040534966426,
+          "p95": 13.829786135907298,
+          "max": 74.68524885680908,
+          "worst": {
+            "source_pts": 284928,
+            "source_seconds": 22.26
+          }
+        },
+        "s02": {
+          "n": 2268,
+          "n_finite": 2268,
+          "p50": 4.039912605659333,
+          "p95": 14.079988940969697,
+          "max": 62.98068313787646,
+          "worst": {
+            "source_pts": 701184,
+            "source_seconds": 54.78
+          }
+        },
+        "s09": {
+          "n": 9008,
+          "n_finite": 9008,
+          "p50": 5.487749951210424,
+          "p95": 23.7754334062718,
+          "max": 124.84749630106995,
+          "worst": {
+            "source_pts": 2221568,
+            "source_seconds": 173.56
+          }
+        }
+      },
+      "joint": {
+        "programme": {
+          "n": 33012,
+          "n_finite": 33012,
+          "p50": 4.339866272703167,
+          "p95": 17.72987400071547,
+          "max": 124.84809740430525,
+          "worst": {
+            "source_pts": 2221568,
+            "source_seconds": 173.56
+          }
+        },
+        "s01": {
+          "n": 4325,
+          "n_finite": 4325,
+          "p50": 3.925036787833634,
+          "p95": 13.828732123490179,
+          "max": 74.6802165923492,
+          "worst": {
+            "source_pts": 284928,
+            "source_seconds": 22.26
+          }
+        },
+        "s02": {
+          "n": 2268,
+          "n_finite": 2268,
+          "p50": 4.039397719331089,
+          "p95": 14.08209516997666,
+          "max": 62.980408264518424,
+          "worst": {
+            "source_pts": 701184,
+            "source_seconds": 54.78
+          }
+        },
+        "s09": {
+          "n": 9008,
+          "n_finite": 9008,
+          "p50": 5.486813266564443,
+          "p95": 23.77523539937071,
+          "max": 124.84809740430525,
+          "worst": {
+            "source_pts": 2221568,
+            "source_seconds": 173.56
+          }
+        }
+      }
+    },
+    "native_prediction_shift_limit_zh": "全17点最大变化36.15px来自22.12秒未使用且原先出画面的踝预测；实际used重绑定后下肢最大2.6713px，躯干最大0.5709px。不可混作同一有效观测变化。",
+    "meaning_zh": "P/G最大约0.40mm，主要保存了原轨迹；没有证明原世界轨迹误差已修复。"
+  },
+  "motion_and_contact": {
+    "flight_com_and_H": {
+      "jump_3f": {
+        "source_pts": [
+          617216,
+          623360
+        ],
+        "COM_gravity_rms_m": 0.013387675762668774,
+        "specific_H_rms_m2ps": 0.05270722273780037,
+        "full_orbital_and_intrinsic": true,
+        "baseline_COM_gravity_rms_m": 0.01341327321686128,
+        "baseline_specific_H_rms_m2ps": 0.05253287754933221
+      },
+      "jump_3t": {
+        "source_pts": [
+          635648,
+          640256
+        ],
+        "COM_gravity_rms_m": 0.015650919722879072,
+        "specific_H_rms_m2ps": 0.07170881146201136,
+        "full_orbital_and_intrinsic": true,
+        "baseline_COM_gravity_rms_m": 0.01570416938269284,
+        "baseline_specific_H_rms_m2ps": 0.07139580719902096
+      },
+      "jump_2a": {
+        "source_pts": [
+          996864,
+          1000192
+        ],
+        "COM_gravity_rms_m": 0.007226340651529254,
+        "specific_H_rms_m2ps": 0.06079146797616921,
+        "full_orbital_and_intrinsic": true,
+        "baseline_COM_gravity_rms_m": 0.007196203460161788,
+        "baseline_specific_H_rms_m2ps": 0.06041283393205145
+      },
+      "entry_flight_core": {
+        "source_pts": [
+          1041408,
+          1042944
+        ],
+        "COM_gravity_rms_m": 0.003222927794973074,
+        "specific_H_rms_m2ps": 0.017335565771452465,
+        "full_orbital_and_intrinsic": true,
+        "baseline_COM_gravity_rms_m": 0.003195994608395984,
+        "baseline_specific_H_rms_m2ps": 0.01645610896101441
+      },
+      "jump_3lz": {
+        "source_pts": [
+          1501696,
+          1506816
+        ],
+        "COM_gravity_rms_m": 0.015618710158212604,
+        "specific_H_rms_m2ps": 0.061180169889771395,
+        "full_orbital_and_intrinsic": true,
+        "baseline_COM_gravity_rms_m": 0.01573070470178603,
+        "baseline_specific_H_rms_m2ps": 0.06119359501539691
+      }
+    },
+    "H_limit_zh": "五个flight中四个比原基线略差，3Lz略好；不把总目标下降说成所有物理量改善。",
+    "axel_zh": "完整2A源方向锥及17个连续样本保留，78.02秒躯干轴倾角约10.949度。约1.4886的root世界Z yaw积分只是代理，不是实际整套动作转数或900度约束。",
+    "s09_orientation_zh": "LSp/CCoSp连续源序列、完整换足和退出已读图登记；未用unknown抹掉可见的持续旋转。实际骨盆/胸廓/鞋SO3角速度分解、身体轴和世界Z投影、heel-to-toe方向均保存；LSp仍有约157.78–157.98和162.60–162.82秒胸廓轴向负速度段，不能宣称停滞或反向已修复。源采样与遮挡不足以裁定这些短暂差异。",
+    "shoe_quantity_semantics_zh": "分别输出鞋体原点、固定钢刃材料点、实际变形鞋网格最低顶点、允许间隙因素的活动见证与稀疏源轮廓。旧221/264近端点计数是模型支持诊断，不能自动判同数量错误接冰；原片换足和允许转换已保留。",
+    "grasp_zh": "S09右掌/右鞋、左掌/右鞋、右掌/左鞋的最终中位距离约0.1505、0.1176、0.1850米；源支持抓握，当前几何仍明显不满足。只对源证据较弱的获取边界保留不确定性。",
+    "source_contact_truth": "not_independently_measured"
+  },
+  "camera_and_cuts": {
+    "cuts_right_source_seconds": [
+      44.98,
+      56.32,
+      58.28,
+      74.14,
+      101.66,
+      111.38,
+      136.16,
+      143.6
+    ],
+    "all_eight_have_source_static_and_motion": true,
+    "endpoint_windows": [
+      {
+        "shot": "s05",
+        "side": "end",
+        "source_seconds": [
+          101.19075826833871,
+          101.64
+        ],
+        "static_rank": 9,
+        "validation_pass": false,
+        "stop": "final_entity_holdout_rejected_original_camera_retained"
+      },
+      {
+        "shot": "s08",
+        "side": "start",
+        "source_seconds": [
+          136.16,
+          136.60924173166129
+        ],
+        "static_rank": 9,
+        "validation_pass": false,
+        "stop": "final_entity_holdout_rejected_original_camera_retained"
+      },
+      {
+        "shot": "s08",
+        "side": "end",
+        "source_seconds": [
+          143.1507582683387,
+          143.58
+        ],
+        "static_rank": 9,
+        "validation_pass": false,
+        "stop": "final_entity_holdout_rejected_original_camera_retained"
+      }
+    ],
+    "selected_camera_control_change_max": 0,
+    "camera_record_hash_change_zh": "新NPZ哈希因版本/选择元数据改变；全部运动控制、rig、场景与源时钟数值和原状态一致。8329曝光×5原生求值节点已绑定并比较。",
+    "gauge_zh": "仅开放三个镜头端部的native C2 pan/tilt/log_f方向，固定场景、尺度、静态rig、主点/畸变、readout及入瞳模型规律。没有跨cut平滑不同物理相机，端部导数只与本镜头内部比。",
+    "validation_limit_zh": "留出为本轮增量试探的实体分区，原静态点曾用于既有标定；不是独立相机标定真值。三窗均被最终实体留出拒绝，S08末A3的尝试RMS由3.3497升至4.2989px。",
+    "all_background": {
+      "rows": 2213335,
+      "valid": 2213335,
+      "invalid": 0,
+      "invalid_native_status_counts": {},
+      "rms_px": 2.314955759029237,
+      "p95_px": 4.7777770758116045,
+      "mean_signed_uv_px": [
+        0.00004539123176140901,
+        -0.00001282405115435317
+      ],
+      "exposures": 8329,
+      "exposures_with_rows": 8329,
+      "exposures_with_valid_rows": 8329
+    },
+    "all_background_shards": 72,
+    "all_background_source_identity_preserved": true,
+    "static_outside_programme_rows": 0,
+    "three_trials": {
+      "evidence": {
+        "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/final_joint_trials_adaptive.json",
+        "sha256": "3ffed1627a9014893637b1b27bf990fb6d78386806cddb66f5a70cbe1c77bba4"
+      },
+      "numerical_equivalences": [
+        [
+          "baseline",
+          "camera_only"
+        ],
+        [
+          "body_only",
+          "joint"
+        ]
+      ],
+      "independent_optimization_runs": 1,
+      "full_simultaneous_camera_body_solve_verified": false,
+      "meaning_zh": "在同一刷新关联和完整增广目标下比较body-only/camera-only/joint。因为相机被留出拒绝，camera-only等于结构输入，body-only与joint数值相同；不能称三次独立非零联合拟合。"
+    },
+    "cut_limit_zh": "八个cut使用相同80个源PTS，复用原源图与背景实体，运动图使用真实dt和两侧分别的相机曲线。单侧外推差不是同步多视图测量；136.16附近P/G速度凹口在切镜前已开始，根因没有被相机零更新解决。"
+  },
+  "external_validation": {
+    "complete_frames": 300,
+    "input_camera": 7,
+    "other_cameras_role": "evaluation_only",
+    "alignment": "identity; no fitted translation/rotation/scale; no per-frame Procrustes",
+    "selection_uses_reference_or_other_cameras": false,
+    "networks_rerun": false,
+    "ankara_camera_correction_applied": false,
+    "absolute_body_m": {
+      "count": 3522,
+      "median": 0.5980612977502738,
+      "p95": 1.8794236810137597,
+      "maximum": 2.091827708266344,
+      "mean": 0.801474550166619
+    },
+    "pelvis_m": {
+      "count": 300,
+      "median": 0.6381037238501018,
+      "p95": 1.8673113541823136,
+      "maximum": 1.9354261215397484,
+      "mean": 0.8226143410783714
+    },
+    "root_relative_body_m": {
+      "count": 3522,
+      "median": 0.0852156025757673,
+      "p95": 0.24516675706445,
+      "maximum": 0.8282381320042368,
+      "mean": 0.10690657878872754
+    },
+    "accuracy_accepted": false,
+    "meaning_zh": "同后端完整300帧FS试次已实际运行；没有Theia对齐或反推缩放。绝对body中位误差约0.598m、骨盆约0.638m，不能用小输入视角误差宣告世界定位通过，也不能据此归为唯一网络原因。"
+  },
+  "engineering_checks": {
+    "regression": {
+      "passed": 108,
+      "subtests_passed": 126,
+      "evidence": {
+        "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/final_regression.log",
+        "sha256": "41fd87607ca18cfc1c388aa71b671d49805c33ad55b387654a70c2646006adde"
+      }
+    },
+    "archive_test_sources_preserved": true,
+    "real_direction_checks": [
+      {
+        "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/baseline/real_direction_check.json",
+        "sha256": "cb5f697d7cf32548327eda7cf3f181f550f114bb007869bb98e90cc1555ea212"
+      },
+      {
+        "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/grasp_direction_check.json",
+        "sha256": "547644b3459f437b0ab82e516312e5290cbf1ea04f3edd006dc43ba585612ebc"
+      },
+      {
+        "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/joint_round1/weighted_direction_check.json",
+        "sha256": "822f69543ce4f8eb36565b9f3729b9134079e104a5d2bd6aab5e3a30e1e16bc0"
+      }
+    ],
+    "jacobian_limit_zh": "新表面、解剖、抓握因素已用实际局部变量方向核对。旧GPU foot/cavity块在很小差分步长下仍有约1–2%方向差异；没有把全体旧块宣称为精确导数。",
+    "actual_OpenGL_renderer": {
+      "side_checks": 267,
+      "side_passed": true,
+      "free_checks": 51,
+      "free_passed": true,
+      "full_exposures": 8329,
+      "compared_variants": 3,
+      "side_instants": 9,
+      "free_instants": 1,
+      "saved_geometry_unchanged": true,
+      "visible_player_opened": false
+    },
+    "visual_review_zh": "五张最终同世界静态图未见清楚的整体改善；104.56秒补充free视角。静态模型图不证明真实接触、三维无穿透或动作转数。",
+    "path_check": {
+      "items": 16837,
+      "over_limit": 0,
+      "read_errors": 0,
+      "raw_output_zh": "通过：检查 16837 项路径；超限 0 项，读取错误 0 项，跳过链接 0 项。"
+    },
+    "powershell_launcher_syntax_passed": true,
+    "git_diff_check_passed": true
+  },
+  "failure_navigation": {
+    "maximum_complete_events": 8,
+    "events": [
+      {
+        "label": "S01：保留旧版；新结构冲突仍在",
+        "start_pts": 283136,
+        "end_pts": 575488,
+        "source_seconds": [
+          22.12,
+          44.96
+        ],
+        "status": "accuracy_not_accepted"
+      },
+      {
+        "label": "3F—3T：双腿与鞋刀相交残留",
+        "start_pts": 611840,
+        "end_pts": 655360,
+        "source_seconds": [
+          47.8,
+          51.2
+        ],
+        "status": "accuracy_not_accepted"
+      },
+      {
+        "label": "2A：完整方向、轴与表面冲突",
+        "start_pts": 993280,
+        "end_pts": 1011200,
+        "source_seconds": [
+          77.6,
+          79
+        ],
+        "status": "accuracy_not_accepted"
+      },
+      {
+        "label": "FCSp：跳入、抓握、旋转与退出",
+        "start_pts": 1039360,
+        "end_pts": 1216000,
+        "source_seconds": [
+          81.2,
+          95
+        ],
+        "status": "accuracy_not_accepted"
+      },
+      {
+        "label": "深屈步法：97.82与104.56双小腿冲突",
+        "start_pts": 1244160,
+        "end_pts": 1344000,
+        "source_seconds": [
+          97.2,
+          105
+        ],
+        "status": "accuracy_not_accepted"
+      },
+      {
+        "label": "S08端部与后续步法：相机／鞋刀诊断",
+        "start_pts": 1735680,
+        "end_pts": 1932800,
+        "source_seconds": [
+          135.6,
+          151
+        ],
+        "status": "accuracy_not_accepted"
+      },
+      {
+        "label": "LSp：抓鞋、局部关节与旋转进程",
+        "start_pts": 1999360,
+        "end_pts": 2118400,
+        "source_seconds": [
+          156.2,
+          165.5
+        ],
+        "status": "accuracy_not_accepted"
+      },
+      {
+        "label": "CCoSp：降低、真实换足、提鞋与退出",
+        "start_pts": 2199040,
+        "end_pts": 2365440,
+        "source_seconds": [
+          171.8,
+          184.8
+        ],
+        "status": "accuracy_not_accepted"
+      }
+    ],
+    "source": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\structure_camera_1108_failures.json",
+      "sha256": "8ac049fb518966771e971ae95e8d53f7bbba006ec0b7a7abf4a5b8929ff60c0e"
+    }
+  },
+  "evidence": {
+    "task": {
+      "path": "D:/CodexData/RinkSpace_Data/handoff/1107/structure_camera_5e9e9592/CODEX_TASK_ZH.md",
+      "sha256": "0f591a93c384e3f5510eb931079a710ce8958761d10c9a1bdc30d08affc55381"
+    },
+    "audit": {
+      "path": "D:/CodexData/RinkSpace_Data/handoff/1107/structure_camera_5e9e9592/AUDIT_ZH.md",
+      "sha256": "9df6e83b69b9697db653361f23152ebb2070a46a2dd71b3dbaebe27ecf2c3aba"
+    },
+    "integration": {
+      "path": "D:/CodexData/RinkSpace_Data/handoff/1107/structure_camera_5e9e9592/INTEGRATION_MAP.md",
+      "sha256": "62dfd58ca1e334952e540f64029d3e1e45406ad364b8abf6837c7947709e9c8b"
+    },
+    "archive": {
+      "path": "D:/CodexData/RinkSpace_Data/handoff/1107/RinkSpace_5e9e9592_Structure_Camera_Codex_20261107.zip",
+      "sha256": "a8cfb38fc6f25dcc3a05dce7538a4f63466858b16148d9997605ad9129ac526d"
+    },
+    "original_viewer_config": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/preserved/viewer3d_programme_action_1107.before_install.json",
+      "sha256": "800caae1ae4889946f09877b69c5b87c5a4156aab1dc7be86cf8ec408afd910e"
+    },
+    "comparison_config": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\viewer3d_structure_camera_1108.json",
+      "sha256": "2074c0daa36013a28c78a48b610017fda1fcf1f31f97bdbbb8cb5858dd1250b0"
+    },
+    "launcher_cmd": {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/launchers/START_STRUCTURE_CAMERA_1108.cmd",
+      "sha256": "95a3ad3995445efb48202709dc9d27820f692a420bdb973b75b73783ad1e2ca0"
+    },
+    "launcher_ps1": {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/launchers/START_STRUCTURE_CAMERA_1108.ps1",
+      "sha256": "28bb70fc245676bb46b7124c79b278fa2cb2a1ba2305dd7b0fa9bb8ebad945dc"
+    },
+    "failure_navigation": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\structure_camera_1108_failures.json",
+      "sha256": "8ac049fb518966771e971ae95e8d53f7bbba006ec0b7a7abf4a5b8929ff60c0e"
+    },
+    "player_navigation": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/player_install/source_navigation.json",
+      "sha256": "fe8f660995493d05a417185dbc1b3052244af0633a6c0152c283641b1b30e958"
+    },
+    "player_install": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/player_install/player_validation.json",
+      "sha256": "1ca43cfcca8f4cffa669a7b36e0fd6d9155d6e2c18f0d450dadccce2e01758c8"
+    },
+    "installation_inputs": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/player_install/installation_inputs.json",
+      "sha256": "4700172f5b4507c018b5bcd7ea7e0c9b1b50fad0223fe3b617f03905a5a92ce4"
+    },
+    "fixed_mesh_flights": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/final_comparison.json",
+      "sha256": "9dafca567d0f8802e00cc78437f834e96c0cf38857a6610c8d28322d13f16c75"
+    },
+    "surface_events": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/final_surface_events.json",
+      "sha256": "37dc409ec2b8f6552fbd2a20741429585996866a8b670e8d6dbfcfd717b9c673"
+    },
+    "final_surface_native_midpoint": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/joint_round1/surface/surface_scan.json",
+      "sha256": "94f54caffba14ab9402f5a4af5135783a954d8d31aad827f96cfee306ab4ee23"
+    },
+    "final_surface_adaptive": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/joint_round1/adaptive_surface/surface_scan.json",
+      "sha256": "f53d1785cba29c583ce878a1db4df8e3c61ef6d1abf88e9082d4e6f876ee5226"
+    },
+    "final_surface_refresh": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/joint_round1/surface_refresh_adaptive.json",
+      "sha256": "32feb0c26e17a66c827d150bd312f2b416c347ff5c453264fa28ef23a25f8fe2"
+    },
+    "joint_summary": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/final_joint_summary.json",
+      "sha256": "315be8782d85d6ac949b125a6cbf4858867ef64a9c0027dc58a1fadd11b1ca16"
+    },
+    "actual_orientation": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/final_orientation/report.json",
+      "sha256": "10b73437ae4949318b4dd707b919b2261ff08bc2f6d97b2d9c03b10a83c2394f"
+    },
+    "joint_axes": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/out/joint_axes/joint_axes.json",
+      "sha256": "b4e96a839ab1dff5ad46dd17e22faaef03e9f991d4968d7467c168dc13994d0f"
+    },
+    "source_orientation_review": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/s09_orientation_review.json",
+      "sha256": "8234c723d78a9438b32476a3fb3ace3557bf74012af63b4fc472b86140362cd9"
+    },
+    "source_review": {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/structure_camera_1108_source_review.json",
+      "sha256": "8234c723d78a9438b32476a3fb3ace3557bf74012af63b4fc472b86140362cd9"
+    },
+    "source_policy": {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/structure_camera_1108_policy.json",
+      "sha256": "1ab49d0838d00bdb4ab8baa34772507e4c090a33adaa7cac5f3549c319b4f0a9"
+    },
+    "grasp": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/final_grasp_metrics.json",
+      "sha256": "d92dc974ab75f3547b1200907744ee122cdcf4a9db294b72eea310dc3ebe1a63"
+    },
+    "surface_direction": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/baseline/real_direction_check.json",
+      "sha256": "cb5f697d7cf32548327eda7cf3f181f550f114bb007869bb98e90cc1555ea212"
+    },
+    "grasp_direction": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/grasp_direction_check.json",
+      "sha256": "547644b3459f437b0ab82e516312e5290cbf1ea04f3edd006dc43ba585612ebc"
+    },
+    "joint_weighted_direction": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/joint_round1/weighted_direction_check.json",
+      "sha256": "822f69543ce4f8eb36565b9f3729b9134079e104a5d2bd6aab5e3a30e1e16bc0"
+    },
+    "camera_selection": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/camera_round6/report.json",
+      "sha256": "59d52a09d7eed40b2a0b60e53999d71df46e46a49f7c2f041d8808146b70acac"
+    },
+    "selected_camera": {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_joint_1108_selected.json",
+      "sha256": "4bd2540f33ab45789de8f743500323d74d81f7188a328102adbea0616d233712"
+    },
+    "selected_camera_state": {
+      "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_joint_1108_selected.npz",
+      "sha256": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710"
+    },
+    "native_full_background": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/native_camera_all/receipt.json",
+      "sha256": "f6935af3052fde7774dfc130ef822804f14d6639cb91144108144a73742cc9a8"
+    },
+    "native_camera_bindings": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/native_camera_all/candidate_bindings.json",
+      "sha256": "34da896c43f3580b6683a2c2647cef350cf51505c06f946c0c210b3a98f55283"
+    },
+    "cut_source": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/cut_review/cut_review.json",
+      "sha256": "216da62290eaf0117fd9f7d3579cd7f5a5fc534a856c6d4a81482822fbf3603e"
+    },
+    "cut_source_visual": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/cut_review/baseline_visual_review_zh.json",
+      "sha256": "1060d4222a97fd0ac9c815ae67d2e1649671e6d565430709ce9d91682fb96a5a"
+    },
+    "cut_background": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/cut_background_baseline/cut_background.json",
+      "sha256": "c301a787c2992b595dab50310bedb4b7911aa91ba29665c2aa4760f9c2266f33"
+    },
+    "cut_final_motion": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/out/cut_review_final/cut_review.json",
+      "sha256": "67de61c7e0b24ae4a0b038981b93d29d79757b4cb944f16de5a927f207858fb5"
+    },
+    "three_trial_same_objective": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/final_joint_trials_adaptive.json",
+      "sha256": "3ffed1627a9014893637b1b27bf990fb6d78386806cddb66f5a70cbe1c77bba4"
+    },
+    "reprojection": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/final_reprojection.json",
+      "sha256": "d81ce1127962264233795498e4395d54c9675498c2dcf1bbc8e62df8befbe45c"
+    },
+    "fs_complete_trial": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/fs_structure_evaluation/metrics.json",
+      "sha256": "19c1b96a405cb1481b59bbe2c84832bdd81d55bf0be255985931aad929c06d2f"
+    },
+    "regression_log": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/final_regression.log",
+      "sha256": "41fd87607ca18cfc1c388aa71b671d49805c33ad55b387654a70c2646006adde"
+    },
+    "mesh_renderer": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/final_mesh_review/checks.json",
+      "sha256": "e03f367070fbbbf982c905baeaa9ea111afb5619fd2dae7edda597b70401019f"
+    },
+    "mesh_free_renderer": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/final_mesh_free/checks.json",
+      "sha256": "fc153af59fe127d9f8faf467004722946a526daf3836f94d0f3f8f2a6b0d1d12"
+    },
+    "mesh_visual_notes": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/final_mesh_visual_notes_zh.json",
+      "sha256": "493dc2352e6dacddb91b515b229580e23368ac9a2b48bc0cd0e59b1834863923"
+    },
+    "other_viewed_image_notes": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/viewed_image_notes_zh.json",
+      "sha256": "89d7ae3699e85510d14dec92ee306b027d8cd4519a750523a8fbab278c7f27ce"
+    },
+    "workspace_checks": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/final_workspace_checks.json",
+      "sha256": "0a5bcd593db63d6ec545b154884b490f44486abac0c880f69b6a2f37a332299e"
+    },
+    "path_check": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/final_path_check.log",
+      "sha256": "4a8c4649c79eda11193669fc7e437be02ff77366113227bd5a719b073c925b75"
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "schema": "rinkspace.body-source-revision.v1",
+  "role": "Source visibility review for fitting; not independent final holdout",
+  "parent_revision": {
+    "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/lsp_source_identity_1108.json",
+    "sha256": "eea138d5d5dedaf32b0da55c3bd61583782211d7e6f61672cc3333490a1b574d"
+  },
+  "source_frames": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_source_jump_review/source_frames.json",
+    "sha256": "8b179db0578b5cd5403809149126395a25be3b42722203bf0a3dfde199ea87fb"
+  },
+  "visual_review": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_source_jump_review/visual_review.json",
+    "sha256": "3ae98240ab956d41035fcb1dbde8645c172399bdfbf389687ac9f097145f5bb5"
+  },
+  "mapping_clarification": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_source_jump_review/mapping_clarification.json",
+    "sha256": "3f0872ce2aa4018ccafa4c1ac962ae5039331737cf82669d777ab530d0137a9c"
+  },
+  "review_images": [
+    {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_source_jump_review/mapped_2081024.png",
+      "sha256": "9412856bf2ffff159f5acb4702e82b6f53e01024ac4b18b51a117c8de5e85ab7"
+    },
+    {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_source_jump_review/mapped_2081280.png",
+      "sha256": "2696d5cc6cb6d69c29d4b625842e4d742d80c3aeeacbc5e6768a80eddb786693"
+    }
+  ],
+  "assignments": [],
+  "exclusions": [
+    {
+      "source_pts": 2081024,
+      "joint_id": 14,
+      "reason": "At 162.58 s the free knee is occluded by dark costume/body overlap; its joint location cannot be independently identified in the source image. Retain raw detector coordinates as an unverified network estimate; no replacement UV."
+    },
+    {
+      "source_pts": 2081024,
+      "joint_id": 16,
+      "reason": "At 162.58 s the free ankle is occluded by dark costume/body overlap; its joint location cannot be independently identified in the source image. Retain raw detector coordinates as an unverified network estimate; no replacement UV."
+    },
+    {
+      "source_pts": 2081280,
+      "joint_id": 16,
+      "reason": "At 162.60 s the free ankle detector lies in dark costume near the hip detector with no independently identifiable ankle. Retain raw coordinates as an unverified network estimate; no replacement UV."
+    }
+  ],
+  "basis_zh": "已保存的源图可见性审阅；不依据模型残差大小删除。未知点不补造关节位置，不交换模型物理左右。",
+  "uncertainties_zh": [
+    "162.60的自由膝与可见屈腿轮廓相容，保留其有限检测代理。",
+    "162.62自由踝模糊但不能明确判定错误，保留原有限检测代理。",
+    "保留所有原始检测、之前身份修订和排除记录；该修订的统计口径须单独记录，不能把移除3点算成模型精度提升。"
+  ],
+  "physical_model_identity_changed": false,
+  "raw_UV_sigma_confidence_changed": false,
+  "network_rerun": false,
+  "old_versions_preserved": true
+}

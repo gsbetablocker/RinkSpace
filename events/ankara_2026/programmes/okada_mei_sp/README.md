@@ -58,6 +58,34 @@ S05 当前源结构只有 36 个曝光、40 条鞋刀轮廓及 32 条条件支�
 
 FS-Jump3D验证支线已实际完成一个300帧、12视角试次；相机7单独输入ExMR，其他视角用于评价，没有训练或姿态/世界配准。其输入图像误差较小仍伴随明显视线深度误差，说明单视角图像贴合不足以证明世界定位；不能据此断言S05的唯一错误来源。[试次与结果身份](../../../../configs/continuous_inputs/fs_jump3d_skater_a_axel_1_1106.json)连接 `Data/runs/fs_jump3d_1106/RESULT_ZH.md`，原视频、完整模型输出和验证证据留Data。
 
+<a id="structure-camera-1108"></a>
+### 全节目结构与相机联合检验（2026-11-08，未验收）
+
+[结构与相机对照播放器](../../../../launchers/START_STRUCTURE_CAMERA_1108.cmd)提供原基线、结构候选和相机—人体检验候选的同源、同世界切换，均为 22.120–188.680 秒的完整 8329 曝光。该独立入口显式选择最新候选；原动作播放器的默认仍为 `programme_action_physics_1107`，原有六个候选、满意的 S01 和 2A 旧版均保留。结构检验的审核基线为 `5e9e9592`，复用原网络输入和人体系统。
+
+| 对照 | 最终绑定 | 本轮实际状态 |
+|---|---|---|
+| 原基线 `programme_action_finish_1107` | [原结果](programme_action_finish_1107.json) | 原参数、原相机与保存数组不变；不是旧默认物理版 |
+| 结构候选 `programme_structure_1108` | [结果](programme_structure_1108.json)、[参数](programme_structure_1108.npz) | 四个真实接受步，原相机与 P 固定；接通真实表面、解剖限制和源抓握反馈 |
+| 相机—人体检验候选 `programme_structure_camera_1108` | [结果](programme_structure_camera_1108.json)、[参数](programme_structure_camera_1108.npz) | 另一个开放 P 的接受步；三个端部相机试探均被背景留出拒绝，最终相机数值保留原值 |
+
+[验收记录](structure_camera_1108_review.json)绑定实际运行、参数和相机哈希、全片表面扫描、local_R/rest 轴与世界 FK、五个 flight 的 COM/H、2A 方向及 S09 完整换足和退出。[相机选择记录](fit_v11/camera_joint_1108_selected.json)单列零变化的原因；新哈希含选择元数据，不表示标定改善。8 个切镜均保存源图、静态背景和两侧独立的相机／运动对照，复用原生 Brown、rolling shutter 和五曝光求值，不跨切镜平滑物理相机。
+
+确定性 segment/box 距离缺陷已修复，实际皮肤／鞋刀见证进入同一全节目残差与 Jacobian，接受后刷新窄相位；膝肘等限制改用固定分支与耦合解剖表达。原 `FK_frames` 为 root-local，复核另导出 `global_root_R @ FK_frames` 的世界姿态。局部抓握例外、有限冰面、rocker、真实源换足及完整上肢质量／惯量均保留。
+
+**准确性未通过。** 固定精查仍有 25/39 项、密集精查仍有 16/36 项相交，没有整项消失；全片共同采样也有新增冲突。开口表面定向距离不等于穿透深度，自适应采样不等于严格连续无碰撞证明。162.60 秒膝部异常、LSp/CCoSp 短时旋转疑点和掌鞋几何距离仍在；五个 flight 中四个 H 指标略退化。新候选 P/G 最大变化约 0.40 mm，主要保留了原轨迹，不能据此宣称世界定位修好。完整 FS 同后端试次的绝对身体中位误差约 0.598 m，亦未通过。
+
+[八个完整失败事件导航](structure_camera_1108_failures.json)已接入播放器，八个切镜另有导航。各阶段的一步限制用于刷新表面关联；累计 4+1 个接受步不代表数值收敛。108 个相关测试及 126 个子测试通过，实际 OpenGL 侧视 267 项和补充视角 51 项检查通过；这只验证工程接线、完整源时钟和回放，不替代准确性验收。完整证据位于 `Data/runs/body_s01_20261029/structure_camera_1108/`，由验收记录精确定位。
+
+<a id="lsp-s09-source-repair-1109"></a>
+### LSp 与 S09 源证据修订（2026-11-09，未验收）
+
+[修复候选](programme_repair_1108.json)保留结构修复后的数值状态。[LSp 连续性候选](programme_lsp_continuity_1109.json)按原片重复姿态校正整圈相位，另检验抓刀臂、可见刀刃和支撑刀的同步。[S09 源证据候选](programme_s09_evidence_1109.json)在冻结相机与场景下继续修订原片 150.980 秒附近和 157.240 秒附近的腿，以及 159.820–163.900 秒沿视线的骨盆与 COM 漂移。两版均覆盖原片 22.120–188.680 秒的 8329 个曝光，既有默认入口与历史候选均保留。
+
+S09 修订在留出的 150.980 秒帧将膝踝最大投影偏差从 281.1 降到 32.4 像素。157.240 秒参与拟合，该帧膝踝最大偏差从 112.7 降到 12.1 像素，邻近自由鞋轮廓与模型内部鞋脚贴合仍有问题。沿视线的 COM 拟合摆幅从 1.052 降到 0.520 米，剩余深度受单视角和支撑刀反投影不确定性限制。报告的数值仅描述图像对照与模型，真实接冰和世界轨迹精度尚未验收。
+
+原投影复现见[源时钟与显示核对](repair_tools/audit_s09_source_motion.py)。[LSp](repair_tools/fit_lsp_arm_continuity.py)和[S09](repair_tools/fit_s09_repair.py)使用已登记输入和局部连续控制。[完整三维导出](repair_tools/export_checked_s09_state.py)与[原片对照](repair_tools/compare_s09_repair.py)复用冻结模型和相机。[九镜头回投](repair_tools/render_programme_body_com.py)包含人体、冰面网格和 COM；[修订回投](repair_tools/patch_s09_broadcast.py)重绘受影响的图层和 COM 尾迹，以固定 50 帧顺序编码并核对原音。运行需要相符的本机模型、输入、原片与 FFmpeg。两版 MP4 与完整拟合数组留在 Data，路径和 SHA 由节目绑定登记。
+
 <a id="人体整合与根轨迹对照2026-11-04未验收"></a>
 
 ### S05 与动作中间结果导航

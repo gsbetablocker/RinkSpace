@@ -1,0 +1,109 @@
+{
+  "schema": "rinkspace.body-source-revision.v1",
+  "role": "source review for repair; not independent final holdout",
+  "source_frames": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_source_identity/source_frames.json",
+    "sha256": "926594f43ef949d3ac9e55f6be0364727e60d913699ec9f459b9ca06fcc6f69b"
+  },
+  "detector_trace": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_raw_observation_trace_r10.json",
+    "sha256": "4cad44c3a9daae1759375375b65393ed4f4cf981575a9484f8dfd3843f4e40b4"
+  },
+  "review_images": [
+    {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_source_identity/identity_16190.png",
+      "sha256": "006ff3bcc9ea9aa8a5a263a2732f51f56f3725b03f0b2dbd817cf3c4afce43f5"
+    },
+    {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_source_identity/identity_16264.png",
+      "sha256": "8de8ccd5d8ed6806d35ab3b6733955fe6aa65415ddac91ab7cc06ad0da1c8d03"
+    }
+  ],
+  "reviewer": "gpt-6.1-terra max; main session also inspected source overlay at 162.62–162.66",
+  "assignments": [
+    {
+      "source_pts": 2072320,
+      "joint_pairs": [
+        [
+          13,
+          14
+        ],
+        [
+          15,
+          16
+        ]
+      ],
+      "evidence_zh": "接冰支撑腿和屈起自由腿在相邻真实曝光连续；仅中间帧两个膝/踝的检测标签成对反转。髋和腕不由此交换。"
+    },
+    {
+      "source_pts": 2081792,
+      "joint_pairs": [
+        [
+          13,
+          14
+        ],
+        [
+          15,
+          16
+        ]
+      ],
+      "evidence_zh": "接冰支撑腿和屈起自由腿在相邻真实曝光连续；仅中间帧两个膝/踝的检测标签成对反转。髋和腕不由此交换。"
+    }
+  ],
+  "exclusions": [
+    {
+      "source_pts": 2081536,
+      "joint_id": 10,
+      "reason": "R wrist detector point duplicates the same visible raised wrist as L wrist; second anatomical wrist is not measured here. Preserve raw UV and mark duplicate target ineligible; no replacement UV."
+    },
+    {
+      "source_pts": 2081792,
+      "joint_id": 10,
+      "reason": "R wrist detector point duplicates the same visible raised wrist as L wrist; second anatomical wrist is not measured here. Preserve raw UV and mark duplicate target ineligible; no replacement UV."
+    },
+    {
+      "source_pts": 2083328,
+      "joint_id": 9,
+      "reason": "L wrist detector point lies near the elbow of the raised arm while the visible wrist/sleeve cuff is clearly higher. Keep original UV; point is not a measured wrist. No replacement UV."
+    },
+    {
+      "source_pts": 2083840,
+      "joint_id": 9,
+      "reason": "L wrist detector point lies near the elbow of the raised arm while the visible wrist/sleeve cuff is clearly higher. Keep original UV; point is not a measured wrist. No replacement UV."
+    }
+  ],
+  "physical_model_identity_changed": false,
+  "raw_UV_sigma_confidence_changed": false,
+  "network_rerun": false,
+  "uncertainties_zh": [
+    "裙摆遮挡髋与大腿根，髋关联未改也不宣称已证实。",
+    "自由踝附近存在运动模糊，身份重关联不提高像素定位精度。",
+    "高举腕的解剖身份依赖较长源序列；移除重复R行不把保留L行提升为人体真值。",
+    "另一只手的精确腕位置及三维接触未知，不补造UV。",
+    "162.56–162.92抽检的其他鞋/头/弯臂遮挡区腕点保持原有限检测代理，不因模型误差删除，也不宣称真实可见。"
+  ],
+  "basis_zh": "源图的同一物理腿/同一袖口连续性；不是模型残差、人体先验或旧相机反投影。",
+  "additional_wrist_review_images": [
+    {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_source_identity/wrist_identity_lsp_01.png",
+      "sha256": "64a45bb04a7d47b0cc269776598642ef7dc0a9d47b7b11ccd1c63f742be7d2aa"
+    },
+    {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_source_identity/wrist_identity_lsp_02.png",
+      "sha256": "bfa78ae855a7dd65415eed531067635ff2b71e10da8783c8bd7247b4d282e967"
+    }
+  ],
+  "wrist_review_zh": {
+    "confirmed_duplicate_pts": [
+      2081536,
+      2081792
+    ],
+    "confirmed_wrong_kind_near_elbow_pts": [
+      2083328,
+      2083840
+    ],
+    "uncertain_other_arm_points_preserved": true,
+    "high_arm_R_label_at_2082304": "本帧另一腕位置不可辨；未根据单帧假设两腕整体交换，保留检测代理及不确定性。",
+    "no_replacement_uv": true
+  }
+}

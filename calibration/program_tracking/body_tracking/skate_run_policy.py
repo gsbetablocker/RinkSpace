@@ -91,8 +91,8 @@ class CandidateRetention:
 
 @dataclass(frozen=True)
 class RunPolicy:
-    wall_seconds: float = 900
-    max_accepted: int = 8
+    wall_seconds: float | None = 900
+    max_accepted: int | None = 8
     max_outer: int = 1
     stagnation_window: int = 4
     min_violation_improvement_m: float = .0001
@@ -107,9 +107,11 @@ class RunPolicy:
         for name in ('wall_seconds', 'min_violation_improvement_m', 'min_joint_relative_improvement',
                      'max_image_cost_increase', 'max_pose_cost_increase'):
             value = getattr(self, name)
+            if name=='wall_seconds' and value is None:continue
             if not math.isfinite(value) or value < 0:raise ValueError(name+' must be finite and nonnegative')
         for name in ('max_accepted', 'max_outer', 'stagnation_window'):
             value = getattr(self, name)
+            if name=='max_accepted' and value is None:continue
             if isinstance(value, bool) or not isinstance(value, Integral) or value < (1 if name == 'stagnation_window' else 0):
                 raise ValueError(name+' must be a nonnegative integer (stagnation_window >= 1)')
 
@@ -201,8 +203,8 @@ class Monitor:
         estimate=float(estimated_seconds)
         if not math.isfinite(estimate) or estimate<0:raise ValueError('estimated_seconds must be finite and nonnegative')
         status=self.observe(now=now)
-        remaining=self.policy.wall_seconds-(float(now)-self.start_now)
-        if not status['stop'] and estimate>remaining:
+        remaining=None if self.policy.wall_seconds is None else self.policy.wall_seconds-(float(now)-self.start_now)
+        if not status['stop'] and remaining is not None and estimate>remaining:
             self.stop_reasons=[dict(code='evaluation_budget_reserve',category='budget',
                 message='Estimated evaluation cannot finish within remaining solve budget.',
                 estimated_seconds=estimate,remaining_seconds=remaining)]
@@ -251,9 +253,9 @@ class Monitor:
             reasons.append(dict(code=code, category=_REASON_CATEGORIES[code], message=message, **details))
         self.quality_diagnostics = [];self.progress_diagnostics = []
         p = self.policy
-        if sample['elapsed_seconds'] >= p.wall_seconds:
+        if p.wall_seconds is not None and sample['elapsed_seconds'] >= p.wall_seconds:
             stop('wall_budget', 'Wall-time budget reached.', elapsed_seconds=sample['elapsed_seconds'], limit_seconds=p.wall_seconds)
-        if self.accepted >= p.max_accepted:
+        if p.max_accepted is not None and self.accepted >= p.max_accepted:
             stop('accepted_budget', 'Accepted-step budget reached.', accepted=self.accepted, limit=p.max_accepted)
         if self.outer_completed >= p.max_outer:
             stop('outer_budget', 'Completed outer-solve budget reached.', outer_completed=self.outer_completed, limit=p.max_outer)

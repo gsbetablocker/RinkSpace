@@ -1,0 +1,125 @@
+{
+  "schema": "rinkspace.source-orientation-review.v1",
+  "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "time_base": [
+    1,
+    12800
+  ],
+  "source_contact_sheets": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/out/s09_orientation_source/orientation_source.json",
+  "reviewers": [
+    "gpt-6.1-terra/max lsp_orientation_images",
+    "gpt-6.1-terra/max ccosp_orientation_images"
+  ],
+  "classification": "chest/front or exposed back relative to original source camera; no physical foot identity inferred from image side",
+  "limits": "0.12 s sampled real exposures, not frame-by-frame coverage; no exact turns or world-Z spin sign asserted",
+  "lsp": {
+    "front": [
+      156.74,
+      157.1,
+      157.58,
+      158.06,
+      160.1,
+      160.46,
+      161.3,
+      161.78
+    ],
+    "back": [
+      156.5,
+      157.34,
+      157.82,
+      158.3,
+      158.66,
+      159.26,
+      159.86,
+      161.54,
+      162.02,
+      162.5,
+      163.34,
+      163.7,
+      164.18,
+      164.66,
+      165.14
+    ],
+    "uncertain_front": [
+      163.94,
+      164.42,
+      164.9
+    ],
+    "source_progress": "Repeated front/back changes through the grab and high leg phase; no evident long stop or reversal; intervening motion remains unobserved.",
+    "grasp_acquisition": {
+      "original_pixels": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/lsp_acquisition_native_pixels.png",
+      "source_pts": [
+        2064640,
+        2064896,
+        2065664,
+        2066688,
+        2067712,
+        2070784,
+        2073856,
+        2075392
+      ],
+      "finding": "Original-resolution sequence shows reaching and sustained hand/shoe adjacency; motion blur prevents exact finger closure or onset at161.32. Use finite positional expectation and retain acquisition uncertainty."
+    }
+  },
+  "ccosp": {
+    "front": [
+      173.04,
+      173.76,
+      174.48,
+      174.96,
+      175.32,
+      175.68,
+      176.52,
+      178.92,
+      179.4,
+      180.36,
+      181.32,
+      181.68,
+      182.52,
+      183,
+      183.48,
+      183.96,
+      184.52
+    ],
+    "back": [
+      172.08,
+      172.2,
+      172.68,
+      172.8,
+      173.4,
+      173.52,
+      174.12,
+      174.24,
+      175.2,
+      175.56,
+      175.92,
+      176.28,
+      176.76,
+      177.24,
+      178.08,
+      178.56,
+      179.64,
+      180.12,
+      180.24,
+      180.6,
+      180.72,
+      181.08,
+      181.44,
+      181.92,
+      182.28,
+      182.76,
+      183.24,
+      183.72,
+      184.2
+    ],
+    "unknown_or_oblique": [
+      172.32,
+      172.44,
+      172.92,
+      179.88,
+      184.44,
+      184.62
+    ],
+    "source_progress": "172.08 first support bent turn; approximately174.60–175.32 lowers into sit;178.80–179.40 visible transfer transition;180.36–180.60 rises/lifts foot;184.52 still held,184.62 releasing. Repeated front/back through complete second part, no evident long stall or reversal; sampled data do not establish exact turns."
+  }
+}

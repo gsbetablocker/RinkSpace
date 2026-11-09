@@ -116,14 +116,19 @@ def source_rows(project, assets, pts, *, review_evidence=None):
     return result, status, binding
 
 
-def fit_participation(prepared,parameter,*,saved=None,document=None):
+def fit_participation(prepared,parameter,*,saved=None,document=None,source_evidence=None):
     """Register admitted factors only when their actual saved objective binds them."""
     prepared,parameter=Path(prepared),Path(parameter)
     saved=load(parameter)if saved is None else saved
-    document=read(prepared/'source_evidence.json')if document is None else document
-    evidence_sha=digest(prepared/'source_evidence.json')
+    evidence_path=prepared/'source_evidence.json' if source_evidence is None else Path(source_evidence)
+    evidence_bytes=evidence_path.read_bytes()
+    evidence_sha=sha256(evidence_bytes).hexdigest()
     if str(saved.get('source_evidence_sha256',''))!=evidence_sha:
-        raise ValueError('Saved candidate does not bind this prepared source evidence')
+        raise ValueError('Saved candidate does not bind this source evidence: '+str(evidence_path))
+    bound_document=json.loads(evidence_bytes)
+    if document is not None and document!=bound_document:
+        raise ValueError('Supplied source evidence document differs from its bound bytes')
+    document=bound_document
     stage = parameter.parent.parent
 
     def verified_bytes(field, filename):
@@ -169,9 +174,11 @@ def fit_participation(prepared,parameter,*,saved=None,document=None):
             for row in document.get('unassigned_source_skate_sets',[]) if 'pts'in row]+extra)
 
 
-def generate(project, prepared, parameter, result, output, *, variant=VARIANT, review_evidence=None, batch_frames=512):
+def generate(project, prepared, parameter, result, output, *, variant=VARIANT, review_evidence=None,
+             source_evidence=None, batch_frames=512):
     project, prepared, parameter, result, output = map(lambda p: Path(p).resolve(),
                                                      (project, prepared, parameter, result, output))
+    source_evidence = prepared/'source_evidence.json' if source_evidence is None else Path(source_evidence).resolve()
     from rinkspace.storage import AssetStore
     from .trajectory_backend import load_reference
     from rinkspace.viewer3d.blade_review import BladeReview
@@ -183,13 +190,14 @@ def generate(project, prepared, parameter, result, output, *, variant=VARIANT, r
     if not output.is_relative_to(Path(assets.data).resolve()):
         raise ValueError('Projection artifacts must stay under the configured Data root')
     hashes = {str(p): digest(p) for p in (prepared / 'input.npz', prepared / 'observations.npz',
-              prepared / 'initial.npz', prepared / 'fixed_binding.npz', parameter, result)}
+              prepared / 'initial.npz', prepared / 'fixed_binding.npz', source_evidence, parameter, result)}
     saved, exported = load(parameter), load(result)
     for field, name in (('prepared_input_sha256', 'input.npz'),
                         ('prepared_observations_sha256', 'observations.npz')):
         if str(saved[field]) != hashes[str(prepared / name)]:
             raise ValueError('Saved final parameter differs from prepared identity: ' + field)
-    ref, camera, info, source_document, _ = load_reference(project, prepared)
+    fit_binding = fit_participation(prepared, parameter, saved=saved, source_evidence=source_evidence)
+    ref, camera, info, _, _ = load_reference(project, prepared, source_evidence=source_evidence)
     validate_checkpoint_identity(saved, ref.fixed_checkpoint_identity)
     # Reuse the camera returned by the explicit prepared loader. No camera is
     # created, resampled or updated by the final-state projection path below.
@@ -274,10 +282,7 @@ def generate(project, prepared, parameter, result, output, *, variant=VARIANT, r
         difference(midO * ratio, exported['skate_origin_world_mid'][frames], 'skate_origin_world_mid_m', replay_errors)
         print(json.dumps(dict(event='programme_projection', completed=int(frames[-1] + 1), total=n)), flush=True)
     source, source_status, source_binding = source_rows(project, assets, pts,
-        review_evidence=prepared/'source_evidence.json'if review_evidence is None else review_evidence)
-    # Participation comes from this saved objective/input, never from the mere
-    # presence of an overlay copied for review.
-    fit_binding=fit_participation(prepared,parameter,saved=saved,document=source_document)
+        review_evidence=source_evidence if review_evidence is None else review_evidence)
     axes = blade_axes_diagnostics(rotations)
     rates = np.full((n, 2), np.nan)
     F = rotations[..., :, 0]
@@ -326,13 +331,14 @@ def generate(project, prepared, parameter, result, output, *, variant=VARIANT, r
         fixed_material_stations=['rear', 'middle', 'front'],
         COCO_uv_origin='Copied from the same-chain saved result; midpoint state replay verified, COCO pixels not independently re-estimated',
         prediction_binding=dict(parameter=str(parameter), parameter_sha256=hashes[str(parameter)],
-            result=str(result), result_sha256=hashes[str(result)]),
+            result=str(result), result_sha256=hashes[str(result)], camera_state_sha256=info['state_sha256']),
         model_source_separation='Model diagnostics are predictions. Source evidence/unknown statuses remain independent.')
     write(json_path, document)
     BladeReview(json_path, assets=assets, time_base=tb)
     report = dict(schema='rinkspace.programme-five-node-projection.v1', frames=n, shots=9,
         time_base=list(tb), first_last_pts=pts[[0, -1]].tolist(), batch_frames=batch_frames, exposure_nodes=5,
         prepared=str(prepared), parameter=str(parameter), result=str(result), source_file_sha256=hashes,
+        source_evidence=str(source_evidence), camera_state_sha256=info['state_sha256'],
         source_evidence_binding=source_binding, saved_midpoint_replay_maximum_errors=replay_errors,
         output_asset=dict(path=str(json_path), sha256=digest(json_path)),
         output_projection=dict(path=str(npz_path), sha256=digest(npz_path)),
@@ -444,9 +450,12 @@ def main(argv=None):
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--variant',default=VARIANT)
     parser.add_argument('--review-evidence',type=Path,help='Source-only review overlay; never changes a candidate\'s saved fit participation')
+    parser.add_argument('--source-evidence', type=Path, help='Exact stage source evidence bound by the saved parameter')
     parser.add_argument('--batch-frames',type=int,default=512)
     args = parser.parse_args(argv)
-    report = generate(args.project, args.prepared, args.parameter, args.result, args.output,variant=args.variant,review_evidence=args.review_evidence,batch_frames=args.batch_frames)
+    report = generate(args.project, args.prepared, args.parameter, args.result, args.output,
+                      variant=args.variant, review_evidence=args.review_evidence,
+                      source_evidence=args.source_evidence, batch_frames=args.batch_frames)
     print(json.dumps(dict(asset=report['output_asset']['path'], frames=report['frames'])), flush=True)
 
 

@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 
 from test_viewer_integrity import DATA, PREPARE, Surface, catalog, replace_npz
-from test_viewer_comparison_framing import app_fixture, app_method, FRAMING
+from test_viewer_comparison_framing import app_fixture, FRAMING
 
 
 PATH=Path(__file__).resolve().parents[1]/'src/rinkspace/viewer3d/source.py'
@@ -70,11 +70,13 @@ def test_source_regions_keep_exact_pts_roles_and_unknown(tmp_path):
 
 
 @pytest.mark.parametrize('view',['support_top','support_side'])
-def test_fixed_support_foot_camera_changes_no_pts_or_saved_geometry(tmp_path,view):
-    player,sequences,_=app_fixture(tmp_path,comparison=False)
+@pytest.mark.parametrize('reference', ['pelvis', 'com'])
+def test_fixed_support_foot_camera_changes_no_pts_or_saved_geometry(tmp_path,view,reference):
+    player,_,_=app_fixture(tmp_path,comparison=False)
     player.catalog.config['support_foot']=1
-    player.support_view_center=app_method('support_view_center',{'np':np}).__get__(player)
-    player.set_view=app_method('set_view',{'np':np}).__get__(player)
+    player.trajectory_reference = reference
+    if reference == 'com':
+        player.tracking_points = np.array([[100., 20., 1.]])
     # A much lower other foot must not change the explicit source association.
     player.sequence.state['gear'][0,0,:,2]=-100.
     before={key:value.copy() for key,value in player.sequence.state.items()}

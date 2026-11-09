@@ -1,0 +1,97 @@
+{
+  "schema": "rinkspace.local-programme-motion-candidate.v1",
+  "candidate_id": "programme_lsp_continuity_1109",
+  "parent_variant": "programme_repair_1108",
+  "parent_parameter_sha256": "30498f71332ededf7a141037f750adf59008b91a54a984a0cf7a0ea9c5abd6e7",
+  "parameter": {
+    "path": "D:/OneDrive/codex_projs/RinkSpace/events/ankara_2026/programmes/okada_mei_sp/programme_lsp_continuity_1109.npz",
+    "sha256": "043606dfd5a0644b3b5edf305ba51011f16d1f773e268f1734ba5b9593c67563"
+  },
+  "result": {
+    "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/player_install/programme_lsp_continuity_1109/final/fitted/result.npz",
+    "sha256": "93aba36c8438c5c84679ad460a40981338e66ea32ec2ad94e23152300707bea9"
+  },
+  "source_pts": [
+    283136,
+    2415104
+  ],
+  "source_time_base": [
+    1,
+    12800
+  ],
+  "source_frames": 8329,
+  "camera_sha256": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710",
+  "scope_seconds": [
+    [
+      156.88,
+      159.14
+    ],
+    [
+      161.8,
+      163.82
+    ]
+  ],
+  "manual_source_cycle_triplets_seconds": [
+    [
+      157.34,
+      157.8,
+      158.26
+    ],
+    [
+      162.48,
+      162.9,
+      163.32
+    ]
+  ],
+  "unchanged_native_frames": 8113,
+  "unchanged_projection_frames": 8111,
+  "review": {
+    "native_export": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/player_install/programme_lsp_continuity_1109/final/export_receipt.json",
+      "sha256": "729a129b9672110febb5331e179b8f423a7c37519627f7148f68d894eed0439c"
+    },
+    "lsp_motion": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_spin_continuity_1109/dense_final/spin_continuity.json",
+      "sha256": "6674d1f4b2090f2996edc390153bc03f49bf5ae7f2331a8dff4fe56c910982a8"
+    },
+    "rotation_plot": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_spin_continuity_1109/dense_final/spin_continuity.png",
+      "sha256": "3b3d94f9b086334016bccffa61ae3064e2518eb6844f1a15b02bbcdd9ee5a95f"
+    },
+    "model_grasp": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_spin_continuity_1109/continuous_grip_comparison.json",
+      "sha256": "005b4e1876b701f47206f6167cc3ee997593489bd65d31d15b925f5fc77654ed"
+    },
+    "mesh_surface": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_spin_continuity_1109/final_surface/surface_scan.json",
+      "sha256": "70f063c2f4d5fa80a40b5560fdb2b00ff37ae916e29b31349bed3cbc4ad06cd4"
+    },
+    "original_overlay": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_spin_continuity_1109/phase_continuous_overlay.png",
+      "sha256": "f5eecf85fe4d81ce4d939ab28555593526e07fd77678db2b9b0e452f5dab7bf9"
+    },
+    "native_fit": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_spin_continuity_1109/spin_phase_arm_continuous.json",
+      "sha256": "0dc4fdff6876b4bcb9dd805395fd2d32dd065e7d563cf0d8f69bacf3493deb79"
+    },
+    "source_joint_review": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_spin_continuity_1109/reviewed_source_landmarks.json",
+      "sha256": "bbf0a353390c1b3d2a9c1c4614fc954bae9ddd8270e5323984dcb12f76a5a5e1"
+    },
+    "source_turn_counts": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_spin_continuity_1109/source_turn_seed.json",
+      "sha256": "f4314c5f02c813309ce1507bc5ca646b74c48516d4c2ae99e38a303a6a0918c9"
+    },
+    "right_arm_branch": {
+      "path": "D:/CodexData/RinkSpace_Data/runs/body_s01_20261029/structure_camera_1108/repair_diagnosis/lsp_spin_continuity_1109/spin_phase_arm_branch_seed.json",
+      "sha256": "17ac88902719ca537bd35450242e814ca7656d7e049d26b7db071d65cbc800a6"
+    }
+  },
+  "accuracy_accepted": false,
+  "user_accepted": false,
+  "notes": [
+    "用源片重复姿态确定每段丢失的整圈，保留骨盆转向的非匀速变化。",
+    "重选抓刀臂旋转分支，检查掌面、可见刀刃、躯干和支撑刀同步。",
+    "模型表面相交和脚靴内部匹配仍有局部残差，接触状态未验收。"
+  ]
+}
