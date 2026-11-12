@@ -1,0 +1,93 @@
+{
+  "schema": "rinkspace.okada-whole-skate-review.v1",
+  "candidate": "whole_skate_socket_1112",
+  "source": {
+    "video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+    "time_base": [
+      1,
+      12800
+    ],
+    "pts": [
+      283136,
+      2415104
+    ],
+    "exposures": 8329,
+    "shots": [
+      "s01",
+      "s02",
+      "s03",
+      "s04",
+      "s05",
+      "s06",
+      "s07",
+      "s08",
+      "s09"
+    ],
+    "foot_axis": [
+      "L",
+      "R"
+    ]
+  },
+  "camera_sha256": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710",
+  "parent": {
+    "id": "programme_skate_chain_v1",
+    "parameter_sha256": "9bc5e1ef51caad2f789a4121d42a61ff24444d337b26c3f57bf23971f7dcd5e9",
+    "binding": {
+      "data_path": "runs/body_s01_20261029/structure_camera_1108/programme_skate_tracks_1109/attached_chain_1110/recovery_1112/recovery_binding.json",
+      "sha256": "aeb8e6162558373080519d14b346bdb618346b64a0fb7a32de1a77864384b51e",
+      "bytes": 2147
+    }
+  },
+  "visual": {
+    "file": "whole_follow_evidence.npz",
+    "data_path": "runs/body_s01_20261029/structure_camera_1108/skate_video_v1/whole_overlap_1112/whole_follow_evidence.npz",
+    "sha256": "6271f67bdedaa89d36274c7c67930da8f52a9b7e4ea3aa2033b7ad5286be6022",
+    "bytes": 7173046,
+    "missing_foot_exposures": 1331,
+    "extent_uncertain": 4009,
+    "unresolved_visible_identity": 19
+  },
+  "source_correction": {
+    "file": "source_correction.json",
+    "data_path": "runs/body_s01_20261029/structure_camera_1108/skate_video_v1/body_skate_fit_1112/reviewed/source_correction.json",
+    "sha256": "39f9255f1c42b6eb57d8c8e6299b7c4ddaab0d1c64a1f8889cc1860718aab3de",
+    "bytes": 9057
+  },
+  "controls": {
+    "source_reviewed": {
+      "file": "whole_skate_joint_reviewed_1112.npz",
+      "data_path": "runs/body_s01_20261029/structure_camera_1108/skate_video_v1/body_skate_fit_1112/reviewed/controls.npz",
+      "sha256": "2ada766f1a048f278427cd4fbb2dafe95e17f2b47883270359991df5eadb1e25",
+      "bytes": 2840071
+    },
+    "socket_aligned": {
+      "file": "whole_skate_socket_1112.npz",
+      "data_path": "runs/body_s01_20261029/structure_camera_1108/skate_video_v1/body_skate_fit_1112/foot_fit/aligned_reviewed/controls.npz",
+      "sha256": "083c73658948f332b08af172391417e6eb19bcbdde9456325330ef936d6f5eb6",
+      "bytes": 3100917
+    }
+  },
+  "accuracy_accepted": false,
+  "local_review": {
+    "audit": {
+      "data_path": "runs/body_s01_20261029/structure_camera_1108/skate_video_v1/body_skate_fit_1112/foot_fit/aligned_reviewed/audit.json",
+      "sha256": "2b125acd8d3c747934951ee00906c3f10908c88d4a4c63b72d12282851575ee8",
+      "bytes": 24259
+    },
+    "navigation": {
+      "data_path": "runs/body_s01_20261029/structure_camera_1108/skate_video_v1/body_skate_fit_1112/foot_fit/aligned_reviewed/navigation.json",
+      "sha256": "45ae26fc264129b0c27574f809cf42baa33dce2abb71d18212a92f36f57e35c0",
+      "bytes": 64249
+    },
+    "result": {
+      "data_path": "runs/body_s01_20261029/structure_camera_1108/skate_video_v1/body_skate_fit_1112/foot_fit/aligned_reviewed/fitted/result.npz",
+      "sha256": "511ac7e5533399f3f331421ea01bfe72eeb92ca490d597fc581687215f5c77f3"
+    },
+    "player": "runs/body_s01_20261029/structure_camera_1108/skate_video_v1/body_skate_fit_1112/foot_fit/aligned_reviewed/START_REFITTED_3D.cmd",
+    "video": {
+      "data_path": "runs/body_s01_20261029/structure_camera_1108/skate_video_v1/body_skate_fit_1112/foot_fit/aligned_reviewed/body_skates_before_after.mp4",
+      "sha256": "fa2c2ebf2ea58078e1176ec3c945d4d76dc095f7c9707a24c5dde8a8d4558b08"
+    },
+    "visual_video": "runs/body_s01_20261029/structure_camera_1108/skate_video_v1/whole_overlap_1112/whole_skate_follow_review.mp4"
+  }
+}

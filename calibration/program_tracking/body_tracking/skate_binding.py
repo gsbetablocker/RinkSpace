@@ -268,6 +268,17 @@ class SkateBinding(FootwearBinding):
             walls=np.stack(walls,axis=2);edge=np.roll(walls,-1,axis=2)-walls
             inward=np.stack([-edge[...,1],edge[...,0]],-1)/np.linalg.norm(edge,axis=-1)[...,None]
             margins=np.sum(inward*(foot[:,:,None,1:]-walls),axis=-1)
+            if getattr(self,'respect_open_collar',False):
+                # upper_topology omits the bridge between the two rim
+                # corners (j=3) at these x sections. Its infinite section
+                # half-plane must not close the opening in the wear fit.
+                collar_end=int(np.max(p['collar'])//6)
+                open_roof=cells[3]<collar_end
+                margins[:,:,3]=np.where(open_roof,np.inf,margins[:,:,3])
+                above=foot[:,:,2]>=np.maximum(walls[:,:,3,1],walls[:,:,4,1])
+                through=(foot[:,:,1]>=walls[:,:,4,0])&(foot[:,:,1]<=walls[:,:,3,0])
+                at_opening=open_roof&above&through
+                margins[:,:,1:6]=np.where(at_opening[...,None],np.inf,margins[:,:,1:6])
             lining=.003/self.ratio
             violations.append(np.concatenate((np.maximum(-margins,0),
                 np.maximum(lining-query,0)[...,None],

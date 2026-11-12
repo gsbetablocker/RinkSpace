@@ -1,7 +1,7 @@
 {
   "schema": "rinkspace.body-control-field-audit.v1",
-  "audit_date": "2026-11-09",
-  "scope": "Five previous compact S01 packages plus 25 subsequent S01/event initialization, control and root-reference packages; complete field metadata, no model/template/image payload. Four 2026-11-04 source-support and own-initial-reference spin comparison parameter archives; no raw ExMR animation/model/surface/image payload. Added 2026-11-04 grasp, support-foot, continuous entry and mass-weighted gravity initial/control parameters; original failed candidates remain retained. Added 2026-11-05 absolute continuous v1/v2 control/initialization candidates, explicit SU(2) edge-chart references and local leg-association repair; no complete surface, model weights or source image payload. Added 2026-11-05 boot-contour/axis and conditional runner-support bounded candidates; existing absolute controls and frozen identity, no new shoe DOF or full surface/model/image payload. Added bounded runner-interior/mode failures and whole-S05 body/relative-skate curves, full-source boundary plus camera-conditioned XY fitting controls; no complete body surfaces/model weights/image payload. Added 2026-11-06 whole-S05 source-fusion and native support/pixel-profile candidates, including failed retained parameters; shared camera/template fixed, no model weights, full surfaces or source image buffers. Added whole-programme 8329-exposure continuous controls, 1106/1107 candidates and retained association/scale/depth diagnostics; no complete body surfaces/model weights/source image buffers. Added the 1107 whole-programme action source, physics, conditional root, 2A axis and S09/step/structure control candidates. Added the 2026-11-08/09 structure, fixed-camera comparison, programme repair, LSp continuity and S09 source-evidence controls. Added five 2026-11-09 full-programme skate source, whole-programme review, continuous blade and chain control archives.",
+  "audit_date": "2026-11-12",
+  "scope": "Five previous compact S01 packages plus 25 subsequent S01/event initialization, control and root-reference packages; complete field metadata, no model/template/image payload. Four 2026-11-04 source-support and own-initial-reference spin comparison parameter archives; no raw ExMR animation/model/surface/image payload. Added 2026-11-04 grasp, support-foot, continuous entry and mass-weighted gravity initial/control parameters; original failed candidates remain retained. Added 2026-11-05 absolute continuous v1/v2 control/initialization candidates, explicit SU(2) edge-chart references and local leg-association repair; no complete surface, model weights or source image payload. Added 2026-11-05 boot-contour/axis and conditional runner-support bounded candidates; existing absolute controls and frozen identity, no new shoe DOF or full surface/model/image payload. Added bounded runner-interior/mode failures and whole-S05 body/relative-skate curves, full-source boundary plus camera-conditioned XY fitting controls; no complete body surfaces/model weights/image payload. Added 2026-11-06 whole-S05 source-fusion and native support/pixel-profile candidates, including failed retained parameters; shared camera/template fixed, no model weights, full surfaces or source image buffers. Added whole-programme 8329-exposure continuous controls, 1106/1107 candidates and retained association/scale/depth diagnostics; no complete body surfaces/model weights/source image buffers. Added the 1107 whole-programme action source, physics, conditional root, 2A axis and S09/step/structure control candidates. Added the 2026-11-08/09 structure, fixed-camera comparison, programme repair, LSp continuity and S09 source-evidence controls. Added five 2026-11-09 full-programme skate source, whole-programme review, continuous blade and chain control archives. Includes the 1112 whole-skate review controls and source-UV observations.",
   "files": [
     {
       "path": "opening_motion_1103.npz",
@@ -28883,12 +28883,569 @@
           "array_bytes": 8060
         }
       ]
+    },
+    {
+      "path": "skate_video_1112/whole_skate_joint_reviewed_1112.npz",
+      "bytes": 2840071,
+      "sha256": "2ada766f1a048f278427cd4fbb2dafe95e17f2b47883270359991df5eadb1e25",
+      "fields": [
+        {
+          "name": "state_schema_version",
+          "dtype": "<U28",
+          "shape": [],
+          "array_bytes": 112
+        },
+        {
+          "name": "absolute_rotation_log_chart",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "absolute_rotation_edge_reference_quaternion",
+          "dtype": "<f8",
+          "shape": [
+            1249,
+            22,
+            4
+          ],
+          "array_bytes": 879296
+        },
+        {
+          "name": "absolute_knots",
+          "dtype": "<f8",
+          "shape": [
+            1254
+          ],
+          "array_bytes": 10032
+        },
+        {
+          "name": "absolute_position_controls",
+          "dtype": "<f8",
+          "shape": [
+            1250,
+            3
+          ],
+          "array_bytes": 30000
+        },
+        {
+          "name": "absolute_rotation_controls",
+          "dtype": "<f8",
+          "shape": [
+            1250,
+            22,
+            3,
+            3
+          ],
+          "array_bytes": 1980000
+        },
+        {
+          "name": "relative_skate_schema",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "relative_skate_knots",
+          "dtype": "<f8",
+          "shape": [
+            378
+          ],
+          "array_bytes": 3024
+        },
+        {
+          "name": "relative_skate_rotation_controls",
+          "dtype": "<f8",
+          "shape": [
+            374,
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 53856
+        },
+        {
+          "name": "shared",
+          "dtype": "<f8",
+          "shape": [
+            24
+          ],
+          "array_bytes": 192
+        },
+        {
+          "name": "seed_shared",
+          "dtype": "<f8",
+          "shape": [
+            24
+          ],
+          "array_bytes": 192
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            17
+          ],
+          "array_bytes": 136
+        },
+        {
+          "name": "source_pts",
+          "dtype": "<i8",
+          "shape": [
+            8329
+          ],
+          "array_bytes": 66632
+        },
+        {
+          "name": "source_time_base",
+          "dtype": "<i8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "camera_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "fitting_frames",
+          "dtype": "<i8",
+          "shape": [
+            29
+          ],
+          "array_bytes": 232
+        },
+        {
+          "name": "held_out_frames",
+          "dtype": "<i8",
+          "shape": [
+            595
+          ],
+          "array_bytes": 4760
+        },
+        {
+          "name": "silhouette_fitting_frames",
+          "dtype": "<i8",
+          "shape": [
+            24
+          ],
+          "array_bytes": 192
+        },
+        {
+          "name": "eligible_whole_skates",
+          "dtype": "|b1",
+          "shape": [
+            8329,
+            2
+          ],
+          "array_bytes": 16658
+        },
+        {
+          "name": "visual_path",
+          "dtype": "<U132",
+          "shape": [],
+          "array_bytes": 528
+        },
+        {
+          "name": "initialization",
+          "dtype": "<U105",
+          "shape": [],
+          "array_bytes": 420
+        },
+        {
+          "name": "optimization_step",
+          "dtype": "<U11",
+          "shape": [],
+          "array_bytes": 44
+        },
+        {
+          "name": "fit_summary_json",
+          "dtype": "<U540",
+          "shape": [],
+          "array_bytes": 2160
+        }
+      ]
+    },
+    {
+      "path": "skate_video_1112/whole_skate_socket_1112.npz",
+      "bytes": 3100917,
+      "sha256": "083c73658948f332b08af172391417e6eb19bcbdde9456325330ef936d6f5eb6",
+      "fields": [
+        {
+          "name": "state_schema_version",
+          "dtype": "<U28",
+          "shape": [],
+          "array_bytes": 112
+        },
+        {
+          "name": "absolute_rotation_log_chart",
+          "dtype": "<U15",
+          "shape": [],
+          "array_bytes": 60
+        },
+        {
+          "name": "absolute_rotation_edge_reference_quaternion",
+          "dtype": "<f8",
+          "shape": [
+            1249,
+            22,
+            4
+          ],
+          "array_bytes": 879296
+        },
+        {
+          "name": "absolute_knots",
+          "dtype": "<f8",
+          "shape": [
+            1254
+          ],
+          "array_bytes": 10032
+        },
+        {
+          "name": "absolute_position_controls",
+          "dtype": "<f8",
+          "shape": [
+            1250,
+            3
+          ],
+          "array_bytes": 30000
+        },
+        {
+          "name": "absolute_rotation_controls",
+          "dtype": "<f8",
+          "shape": [
+            1250,
+            22,
+            3,
+            3
+          ],
+          "array_bytes": 1980000
+        },
+        {
+          "name": "relative_skate_schema",
+          "dtype": "<U31",
+          "shape": [],
+          "array_bytes": 124
+        },
+        {
+          "name": "relative_skate_knots",
+          "dtype": "<f8",
+          "shape": [
+            378
+          ],
+          "array_bytes": 3024
+        },
+        {
+          "name": "relative_skate_rotation_controls",
+          "dtype": "<f8",
+          "shape": [
+            374,
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 53856
+        },
+        {
+          "name": "shared",
+          "dtype": "<f8",
+          "shape": [
+            24
+          ],
+          "array_bytes": 192
+        },
+        {
+          "name": "seed_shared",
+          "dtype": "<f8",
+          "shape": [
+            24
+          ],
+          "array_bytes": 192
+        },
+        {
+          "name": "x",
+          "dtype": "<f8",
+          "shape": [
+            17
+          ],
+          "array_bytes": 136
+        },
+        {
+          "name": "source_pts",
+          "dtype": "<i8",
+          "shape": [
+            8329
+          ],
+          "array_bytes": 66632
+        },
+        {
+          "name": "source_time_base",
+          "dtype": "<i8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "camera_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "fitting_frames",
+          "dtype": "<i8",
+          "shape": [
+            2883
+          ],
+          "array_bytes": 23064
+        },
+        {
+          "name": "held_out_frames",
+          "dtype": "<i8",
+          "shape": [
+            595
+          ],
+          "array_bytes": 4760
+        },
+        {
+          "name": "silhouette_fitting_frames",
+          "dtype": "<i8",
+          "shape": [
+            2424
+          ],
+          "array_bytes": 19392
+        },
+        {
+          "name": "eligible_whole_skates",
+          "dtype": "|b1",
+          "shape": [
+            8329,
+            2
+          ],
+          "array_bytes": 16658
+        },
+        {
+          "name": "visual_path",
+          "dtype": "<U132",
+          "shape": [],
+          "array_bytes": 528
+        },
+        {
+          "name": "initialization",
+          "dtype": "<U105",
+          "shape": [],
+          "array_bytes": 420
+        },
+        {
+          "name": "optimization_step",
+          "dtype": "<i8",
+          "shape": [],
+          "array_bytes": 8
+        },
+        {
+          "name": "fit_summary_json",
+          "dtype": "<U6242",
+          "shape": [],
+          "array_bytes": 24968
+        },
+        {
+          "name": "wear_reference_ankle_controls",
+          "dtype": "<f8",
+          "shape": [
+            1250,
+            2,
+            3,
+            3
+          ],
+          "array_bytes": 180000
+        },
+        {
+          "name": "wear_model",
+          "dtype": "<U33",
+          "shape": [],
+          "array_bytes": 132
+        },
+        {
+          "name": "wear_reference_ankle_chart",
+          "dtype": "<f8",
+          "shape": [
+            1249,
+            2,
+            4
+          ],
+          "array_bytes": 79936
+        },
+        {
+          "name": "wear_respect_open_collar",
+          "dtype": "|b1",
+          "shape": [],
+          "array_bytes": 1
+        },
+        {
+          "name": "socket_shift_boot_units",
+          "dtype": "<f8",
+          "shape": [
+            2,
+            3
+          ],
+          "array_bytes": 48
+        },
+        {
+          "name": "socket_kinematics",
+          "dtype": "<U44",
+          "shape": [],
+          "array_bytes": 176
+        }
+      ]
+    },
+    {
+      "path": "skate_video_1112/whole_follow_evidence.npz",
+      "bytes": 7173046,
+      "sha256": "6271f67bdedaa89d36274c7c67930da8f52a9b7e4ea3aa2033b7ad5286be6022",
+      "fields": [
+        {
+          "name": "region",
+          "dtype": "<f4",
+          "shape": [
+            8329,
+            2,
+            80,
+            2
+          ],
+          "array_bytes": 10661120
+        },
+        {
+          "name": "status",
+          "dtype": "|u1",
+          "shape": [
+            8329,
+            2
+          ],
+          "array_bytes": 16658
+        },
+        {
+          "name": "extent",
+          "dtype": "|u1",
+          "shape": [
+            8329,
+            2
+          ],
+          "array_bytes": 16658
+        },
+        {
+          "name": "tracking_anchor_pts",
+          "dtype": "<i8",
+          "shape": [
+            8329,
+            2
+          ],
+          "array_bytes": 133264
+        },
+        {
+          "name": "mask_agreement",
+          "dtype": "<f4",
+          "shape": [
+            8329,
+            2
+          ],
+          "array_bytes": 66632
+        },
+        {
+          "name": "source_pts",
+          "dtype": "<i8",
+          "shape": [
+            8329
+          ],
+          "array_bytes": 66632
+        },
+        {
+          "name": "shot_ids",
+          "dtype": "<U3",
+          "shape": [
+            8329
+          ],
+          "array_bytes": 99948
+        },
+        {
+          "name": "time_base",
+          "dtype": "<i8",
+          "shape": [
+            2
+          ],
+          "array_bytes": 16
+        },
+        {
+          "name": "source_video_sha256",
+          "dtype": "<U64",
+          "shape": [],
+          "array_bytes": 256
+        },
+        {
+          "name": "revision",
+          "dtype": "|u1",
+          "shape": [
+            8329,
+            2
+          ],
+          "array_bytes": 16658
+        },
+        {
+          "name": "partial_occlusion",
+          "dtype": "|b1",
+          "shape": [
+            8329,
+            2
+          ],
+          "array_bytes": 16658
+        },
+        {
+          "name": "review_rejected",
+          "dtype": "|b1",
+          "shape": [
+            8329,
+            2
+          ],
+          "array_bytes": 16658
+        },
+        {
+          "name": "visibility_revision",
+          "dtype": "|u1",
+          "shape": [
+            8329,
+            2
+          ],
+          "array_bytes": 16658
+        },
+        {
+          "name": "skate_occluded",
+          "dtype": "|b1",
+          "shape": [
+            8329,
+            2
+          ],
+          "array_bytes": 16658
+        },
+        {
+          "name": "identity_unresolved",
+          "dtype": "|b1",
+          "shape": [
+            8329,
+            2
+          ],
+          "array_bytes": 16658
+        }
+      ]
     }
   ],
   "observed_contents": [
     "optimized control vectors and local rotations including inherited pose priors",
     "source PTS, scales, binding hashes and limited vertex-selection indices",
-    "shared lower-skate controls, spline layers/knots and augmented-Lagrangian state"
+    "shared lower-skate controls, spline layers/knots and augmented-Lagrangian state",
+    "native PTS and whole-skate UV outlines, visibility, identity and checked source anchors"
   ],
   "excluded_contents": [
     "SMPL-X body template, shape/pose blend bases, skinning weights and full-body topology",
