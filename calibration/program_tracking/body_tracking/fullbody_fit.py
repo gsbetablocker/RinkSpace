@@ -219,8 +219,6 @@ class FullBodyProblem:
                 from .memory_bounded import slice_delta,slice_reference
                 chunks=[];chain_seconds=0.
                 for first in range(0,self.n,256):
-                    from .memory_guard import check_memory_budget
-                    check_memory_budget()
                     last=min(first+256,self.n);obs=np.flatnonzero((self.fi>=first)&(self.fi<last))
                     node_ids=np.arange(first*5,last*5);part=slice_delta(delta,node_ids)
                     source=slice_reference(self.ref,node_ids,len(delta))

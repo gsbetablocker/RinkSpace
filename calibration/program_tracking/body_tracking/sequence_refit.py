@@ -53,6 +53,17 @@ class SequenceActions:
             self.unassigned=UnassignedSkateSetFactors(problem,document['unassigned_source_skate_sets'],episode=document.get('source_episode_review',{}).get('late_identity_episode'))
         self.reviewed_skates=None
         self.boot_axes=None
+        self.whole_skate=None
+        self.whole_additions=[]
+        whole=document.get('whole_skate_source')
+        if whole:
+            from .programme_whole_skate import WholeSkateSourceFactor,DirectedBootSourceFactor,SupportShoePhase
+            self.whole_skate=WholeSkateSourceFactor(problem,whole)
+            self.whole_additions.append(self.whole_skate)
+            if whole.get('directed_boot_rows'):
+                self.whole_additions.append(DirectedBootSourceFactor(problem,whole['directed_boot_rows']))
+            if whole.get('support_shoe_phase'):
+                self.whole_additions.append(SupportShoePhase(problem,whole['support_shoe_phase']))
         evidence=document.get('programme_skate_evidence')
         if evidence:
             from .programme_skate_evidence import ProgrammeSkateSourceFactors
@@ -97,6 +108,7 @@ class SequenceActions:
             outputs.append(value)
         if self.reviewed_skates is not None:outputs.append(self.reviewed_skates.evaluate(x,jacobian))
         if self.boot_axes is not None:outputs.append(self.boot_axes.evaluate(x,jacobian))
+        outputs.extend(f.evaluate(x,jacobian) for f in self.whole_additions)
         matrix=vstack([v['jac'] for v in outputs],format='csr') if jacobian and not self.split_jacobian_only else None
         out=dict(residual=np.concatenate([v['residual'] for v in outputs]),jac=matrix,parts={},metrics={})
         for v in outputs:
@@ -112,6 +124,7 @@ class SequenceActions:
         factors.extend(f for _,f in self.extra_unassigned_episodes)
         if self.reviewed_skates is not None:factors.append(self.reviewed_skates)
         if self.boot_axes is not None:factors.append(self.boot_axes)
+        factors.extend(self.whole_additions)
         out['factor_row_counts']=outputs[0]['factor_row_counts']+[(type(f).__name__,len(v['residual'])) for f,v in zip(factors,outputs[1:])]
         from .weighted_blocks import block,signature
         out['weighted_blocks']=[]
@@ -129,6 +142,9 @@ class SequenceJoint(ContinuousJoint):
     def evaluate(self,x,jacobian=False):
         out=super().evaluate(x,jacobian)
         out['source_group_costs']=dict(body_pixels=self.image_time_weight*out['raw_data_parts'].get('body_pixels',0.),existing_shoe_regions=out['parts'].get('support_image',0.))
+        named=out.get('weighted_parts',out['raw_data_parts'])
+        if 'whole_skate_source' in named:
+            out['source_group_costs']['whole_skate_source']=named['whole_skate_source']
         if not hasattr(self,'source_group_baseline'):self.source_group_baseline={'body_pixels':out['source_group_costs']['body_pixels']}
         return out
     def additional_trial_quality(self,value,relative_limit):

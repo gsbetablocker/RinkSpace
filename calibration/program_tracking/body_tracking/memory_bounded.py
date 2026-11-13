@@ -21,8 +21,6 @@ def world_batches(reference,base,delta,*,samples):
     n=len(delta);arrays={}
     keys=('P','Q','local_R','native','coco','gear','frames','world','hand_local_R','skate_relative_R')
     for first in range(0,n,samples):
-        from .memory_guard import check_memory_budget
-        check_memory_budget()
         ids=np.arange(first,min(first+samples,n))
         state=reference.world(slice_reference(base,ids,n),slice_delta(delta,ids))
         for key in keys:
@@ -39,8 +37,6 @@ def contact_batches(problem,x,times,jacobian,*,samples=512,soft_policy=None):
     ref=problem.reference;weights=trapezoid_time_weights(times,singleton_duration_s=sample_period(ref.p));pieces=[];matrices=[]
     schedule=source_support_schedule(times,problem.origin,problem.evidence,time_base(ref.p))
     for first in range(0,len(times),samples):
-        from .memory_guard import check_memory_budget
-        check_memory_budget()
         last=min(first+samples,len(times));ts=times[first:last]
         base=ref.at(ts);delta=problem.body.state.increments(x[17:],ts);state=fk_state(ref,base,delta)
         part=constraints(problem.binding,state,ts,problem.origin,problem.evidence,

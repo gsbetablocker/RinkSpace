@@ -136,7 +136,14 @@ class PrimaryActions:
                     if digest(surface_path)!=structure['surface_witnesses_sha256']:
                         raise ValueError('Surface association version changed')
                     anatomy.hinges_enabled=False
-                    self.factors.append(ProgrammeSurfaceFactor(problem,document,load(surface_path),scale_m=cfg['geometry']['surface_scale_m']))
+                    surface=ProgrammeSurfaceFactor(problem,document,load(surface_path),scale_m=cfg['geometry']['surface_scale_m'])
+                    if structure.get('collar_fit')=='oriented_surface':
+                        own_collar=int(np.count_nonzero(surface.response_signs<0))
+                        if not own_collar:raise ValueError('The oriented surface ledger has no own-shank/collar crossings')
+                        if self.log is not None:
+                            self.log.write(json.dumps(dict(event='collar_fit',method='oriented_surface',
+                                own_shank_collar_witnesses=own_collar,planar_section_usage='diagnostic'))+'\n')
+                    self.factors.append(surface)
                     self.factors.append(ProgrammeJointLimits(problem,cfg,warm if warm is not None else np.zeros(problem.body.size),anchor=anchor))
                     if structure.get('source_grasp_factors'):
                         from .programme_grasp import ProgrammeGraspFactors
@@ -171,7 +178,9 @@ def seed_reference(shared,initial,document,camera):
     initial=dict(initial)
     if'hand_local_R'in initial:
         from .hand_state import SCHEMA,MEAN
-        initial.update(hand_pose_schema_version=np.array(SCHEMA),hand_mean_convention=np.array(MEAN),hand_pose_origin=np.array('explicit frozen saved hands; unobserved context retains generic model hand prior'),hand_prior_sha256=np.array(digest(shared.root/'initial.npz')))
+        initial.update(hand_pose_schema_version=np.array(SCHEMA),hand_mean_convention=np.array(MEAN),
+            hand_pose_origin=np.asarray(initial.get('hand_pose_origin','explicit frozen saved hands; unobserved context retains generic model hand prior')),
+            hand_prior_sha256=np.array(digest(shared.root/'initial.npz')))
     t=shared.times;half=max(abs(camera.readout_times(np.arange(len(t)))))/2;lo,hi=t[0]-half-.005,t[-1]+half+.005
     explicit=shared.root/'absolute_seed_state.npz'
     if explicit.is_file():
@@ -234,6 +243,15 @@ def load_reference(project,prepared,source_evidence=None,*,native_library=None):
     from .footwear_layout import OBSERVATION_LAYOUT
     from .footwear_geometry import INITIAL
     prepared=Path(prepared);p=load(prepared/'input.npz');initial=load(prepared/'initial.npz');document=json.loads(Path(source_evidence if source_evidence is not None else prepared/'source_evidence.json').read_text(encoding='utf-8'))
+    structure=document.get('programme_structure',{})
+    collar_fit=structure.get('collar_fit','section_surrogate')
+    if collar_fit=='oriented_surface':
+        from .programme_surface import CAVITY_RESPONSE_POLICY,MOVING_NORMAL_MODE
+        if (not action_policy(document).get('structure_enabled') or not structure.get('enabled')
+                or structure.get('surface_response_policy')!=CAVITY_RESPONSE_POLICY
+                or structure.get('surface_normal_mode')!=MOVING_NORMAL_MODE):
+            raise ValueError('Oriented collar fitting requires the current own-collar surface response')
+    elif collar_fit!='section_surrogate':raise ValueError('Unknown collar fit method: '+str(collar_fit))
     model=json.loads((prepared/'model_identity.json').read_text(encoding='utf-8'));model_path=Path(model['path']);assert digest(model_path)==model['sha256']
     surface=FullSurface(SimpleNamespace(root=prepared,packet=p,model_path=model_path));fixed=load(prepared/'fixed_binding.npz')if(prepared/'fixed_binding.npz').exists()else None
     shared=SimpleNamespace(root=prepared,p=p,times=p['fit_time_seconds'],body=surface.body,geometry=INITIAL.copy()if fixed is None else fixed['shared_geometry'],layout=OBSERVATION_LAYOUT,binding=SimpleNamespace(x=np.zeros(17)),new_refinements=[],refinements=[],hashes=dict(input=digest(prepared/'input.npz'),observations=digest(prepared/'observations.npz'),model=model['sha256']))
@@ -249,8 +267,13 @@ def load_reference(project,prepared,source_evidence=None,*,native_library=None):
     ref.binding=SkateBinding(ref,surface,info)
     if fixed is not None:
         ref.binding.base_parameters=SkateParameters(**json.loads(str(fixed['base_skate_parameters_json'])));ref.binding.R0=fixed['R_FB_initial'];ref.binding.t0=fixed['t_FB_initial_solver'];ref.binding.x=fixed['x'];ref.binding._parameter_key=None;ref.binding._packet=None
-        if bool(fixed['collar_constraints_enabled']):ref.binding.enable_collar_constraints()
-    ref.binding.resolve_collar_vertex_sections=bool(document.get('programme_structure',{}).get('resolve_collar_vertex_sections',False))
+        if 'fixed_boot_geometry_json' in fixed:
+            fixed_boot=json.loads(str(fixed['fixed_boot_geometry_json']))
+            ref.binding.fixed_upper_height_log=float(fixed_boot['upper_height_log'])
+            ref.binding.respect_open_collar=bool(fixed_boot['respect_open_collar'])
+            ref.fixed_skate_mount=ref.binding.fixed_skate_mount=bool(fixed_boot['fixed_skate_mount'])
+        if bool(fixed['collar_constraints_enabled']) and collar_fit=='section_surrogate':ref.binding.enable_collar_constraints()
+    ref.binding.resolve_collar_vertex_sections=bool(structure.get('resolve_collar_vertex_sections',False))
     ref.binding.reference=ref;ref.fixed_checkpoint_identity=checkpoint_identity(ref.binding,project,info)
     ref.footwear_observations=dict(visible_rows=[],blade_rows=[],landmark_rows=[],provenance={'source':'explicit programme structure document; no invented FS steel pixels'})
     ref.grasp_relations=json.loads((prepared/'grasp_relations.json').read_text(encoding='utf-8'))if(prepared/'grasp_relations.json').exists()else None
@@ -267,6 +290,26 @@ def configure_programme_weights(problem,base,document,x):
     """The same declared production weights for solve, proposal and replay."""
     action=action_policy(document)
     weights=primary_policy(problem)
+    whole=document.get('whole_skate_source')
+    if whole:
+        problem.objective_block_weights.update(whole['weights'])
+        weights['whole_skate_source_weights']=dict(whole['weights'])
+    if document.get('programme_exmr') or document.get('programme_audit_repair'):
+        if document.get('programme_structure',{}).get('collar_fit')=='oriented_surface':
+            weights['collar_fit']=dict(objective='current oriented intersections of actual shank skin and shoe inner sidewalls',
+                planar_section_usage='diagnostic',foot_cavity_retained=True)
+        body=problem.body
+        inside=body.obs['inside_tracked_shoe_proxy'][body.frames[body.of],body.oj]
+        ankle=np.isin(getattr(body,'model_oj',body.oj),[15,16])
+        row_weight=problem.objective_block_weights['body_pixels'][::2].copy()
+        row_weight[ankle]=weights['body_confidences']['lower']
+        row_weight[ankle&inside]=weights['body_confidences']['boot_occluded_ankle']
+        problem.objective_block_weights['body_pixels']=np.repeat(row_weight,2)
+        weights.update(raw_UV_sigma_use_unchanged=False,
+            ankle_source_policy=dict(inside_skate_proxy_rows=int(np.sum(ankle&inside)),
+                other_admitted_ankle_rows=int(np.sum(ankle&~inside)),
+                proxy_sigma='native pixel distance inside a tracked shoe',
+                other_ankle_sigma='admitted source estimate'))
     if document.get('trajectory_reference')=='model_com':
         weights.update(trajectory_reference='model_com',mass_is_proxy=True,
             priority=['complete model COM trajectory with original source evidence','both attached skates and finite physics','decoration'],
@@ -311,6 +354,11 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
     source_evidence=Path(source_evidence)if source_evidence is not None else prepared/'source_evidence.json'
     ref,camera,info,document,seed=load_reference(project,prepared,source_evidence);write_json(output/'seed_report.json',seed)
     step_policy=document.get('programme_structure',{}).get('solver_step',{})
+    if source_conditioned_step and step_policy.get('cavity_collar_nonincrease_guard',False):
+        feedback=step_policy.get('local_source_trust_feedback',{})
+        if not (gpu_linear and feedback.get('enabled')
+                and feedback.get('include_existing_structure_and_body_guards')):
+            raise ValueError('Cavity trial guard requires GPU linear algebra and complete source-conditioned feedback')
     archived_direction=step_policy.get('archived_source_direction') or {}
     residual_only_replay=bool(archived_direction.get('residual_only_replay',False))
     if residual_only_replay and (not (source_conditioned_step and gpu_linear and max_accepted==1
@@ -442,6 +490,30 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
                 episodes=held_flights,columns=held.tolist(),samples=len(held_times),
                 all_source_and_physics_rows_retained=True,existing_nonincrease_guards_retained=True,
                 scope='Conditional continuation of the complete programme with exact saved flight controls'))
+        if getattr(ref,'fixed_skate_mount',False):
+            body_columns=np.arange(17,17+problem.body.state.body_size)
+            problem.active_parameter_indices=np.intersect1d(
+                getattr(problem,'active_parameter_indices',body_columns),body_columns)
+            problem.local_control_seconds='whole-programme body; shared shoe geometry and static ankle mount'
+        focus=document.get('programme_audit_repair',{}).get('followup_intervals_pts')
+        if focus is not None:
+            stamps=np.asarray(focus)
+            pts=ref.p['pts']
+            if (stamps.ndim!=2 or stamps.shape[1]!=2 or not len(stamps) or stamps.dtype.kind not in 'iu'
+                    or np.any(stamps[:,0]>stamps[:,1]) or not np.isin(stamps,pts).all()):
+                raise ValueError('Follow-up intervals must use ordered native source PTS')
+            windows=ref.times[np.searchsorted(pts,stamps)]
+            state=problem.body.state
+            # Select coefficients by their full cubic support. Every programme
+            # residual and guard remains active, including both sides of a window.
+            active=np.flatnonzero(np.any((state.knots[:-4,None]<=windows[:,1])
+                                        & (state.knots[4:,None]>=windows[:,0]),axis=1))
+            columns=17+(69*active[:,None]+np.arange(69)).ravel()
+            selected=getattr(problem,'active_parameter_indices',np.arange(17,problem.size))
+            problem.active_parameter_indices=np.intersect1d(selected,columns)
+            if not len(problem.active_parameter_indices):
+                raise ValueError('The follow-up windows have no active body coefficients')
+            problem.local_control_seconds=sec[np.searchsorted(pts,stamps)].tolist()
         protected_values=x[protected_columns].copy()
         if saved is not None:
             from .action_objective_context import validate_resume_selection
@@ -449,6 +521,7 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         problem.linear_solver_backend=('archived_nonlinear_replay' if residual_only_replay else
                                        'cuda_resident' if gpu_linear else 'sparse_direct')
         problem.linear_runtime=linear_runtime
+        problem.release_factorization_on_relinearize=bool(document.get('programme_exmr') or document.get('programme_audit_repair'))
         problem.checkpoint_extra=dict(programme_context_json=np.array(json.dumps(document.get('programme_scope',document['scene_contract']),sort_keys=True)),prepared_input_sha256=np.array(digest(prepared/'input.npz')),prepared_observations_sha256=np.array(digest(prepared/'observations.npz')))
         if document.get('programme_structure',{}).get('enabled') and start_packet is not None:
             modes=problem.action_factors.modes
@@ -540,6 +613,13 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         elif saved is not None and'source_association_hypotheses_json'in saved:
             problem.checkpoint_extra['source_association_hypotheses_json']=saved['source_association_hypotheses_json'].copy()
         initial_action=problem.action_factors.evaluate(x[17:] if document.get('programme_structure',{}).get('enabled') else np.zeros(problem.body.size),False)
+        if problem.action_factors.whole_skate is not None:
+            factor=problem.action_factors.whole_skate
+            frames=np.searchsorted(ref.p['pts'],[int(round(t*12800)) for t in (84.64,84.76,84.80,151.02)])
+            check=factor.check_direction(x[17:],frames)
+            write_json(output/'whole_skate_direction.json',check)
+            if check['relative']>5.e-3 and check['max_abs']>2.e-6:
+                raise ValueError('Native whole-skate directional derivative disagrees')
         frozen={}
         for label,factor in(('contour',problem.action_factors.contour),('runner_extent',problem.action_factors.extent)):
             if factor is None:continue
@@ -600,7 +680,8 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         if action:
             record_action_factors(problem,first,output/'initial_action_factors.json',jacobian=not residual_only_replay)
             if not residual_only_replay and (verify_action_direction or save_linear_cache
-                    or (saved is None and (warm_start is None or diagnostic_profile))):
+                    or (saved is None and (warm_start is None or diagnostic_profile)
+                        and problem.action_factors.whole_skate is None)):
                 action_direction_check(problem,x,first,output/'weighted_direction_check.json')
             else:
                 log.write(json.dumps(dict(event='action_direction_diagnostic_deferred',
@@ -627,10 +708,6 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         flight_guard=None;dense_flight_guard=None
         cavity_trial_guard = None
         if step_policy.get('cavity_collar_nonincrease_guard', False):
-            feedback = step_policy.get('local_source_trust_feedback', {})
-            if not (source_conditioned_step and feedback.get('enabled')
-                    and feedback.get('include_existing_structure_and_body_guards')):
-                raise ValueError('Cavity trial guard requires the complete source-conditioned feedback')
             from .programme_guard_proposals import ProgrammeCavityTrialGuard
             cavity_trial_guard = ProgrammeCavityTrialGuard(problem, first)
         if step_policy.get('flight_nonincrease_guard',False):
@@ -666,6 +743,10 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
             return checks
         def guard(value,relative_limit):
             checks=source_checks(value['action_metrics'].get('visible_runner_contours',[])+value['action_metrics'].get('visible_unassigned_skate_contours',[]))
+            if problem.action_factors.whole_skate is not None:
+                from .skate_run_policy import image_trial_quality
+                checks['whole_skate_source']=image_trial_quality(whole_source_before,
+                    value['source_group_costs']['whole_skate_source'],relative_limit)
             torso=body_groups(problem,value,observation_mask=guard_observations)['torso'];checks['torso']=dict(rejected=torso['pixel_p95']>torso_before['pixel_p95']+max(2.,.1*torso_before['pixel_p95']),before=torso_before['pixel_p95'],after=torso['pixel_p95'],meaning='same source population across stages; finite engineering source guard, not 3D truth')
             for row in value.get('action_metrics',{}).get('anatomical_joint_domain',{}).get('joints',[]):
                 if row['name'] in joint_peaks:
@@ -681,6 +762,7 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
             checks.update(turn_episode_image_checks(turn_before,
                 turn_episode_image_metrics(problem,base.turn_factors,guard_observations)))
             return checks
+        whole_source_before=first['source_group_costs'].get('whole_skate_source')
         problem.additional_trial_quality=guard
         if problem.action_factors.contour is not None:
             problem.early_source_trial_quality=lambda z: source_checks(problem.action_factors.source_trial_rows(z[17:]))
@@ -695,7 +777,9 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
                 problem.source_control_step_base=limit.copy()
                 problem.source_proposal_options=dict(retain_affine_cuts=bool(step_policy.get('retain_affine_cuts',False)),
                     affine_guard_reserve_fraction=float(step_policy.get('affine_guard_reserve_fraction',0.)),
-                    early_nonlinear_ready_feedback=bool(step_policy.get('early_nonlinear_ready_feedback',False)),early_complete_nonlinear_proposal=bool(step_policy.get('early_complete_nonlinear_proposal',False)))
+                    early_nonlinear_ready_feedback=bool(step_policy.get('early_nonlinear_ready_feedback',False)),early_complete_nonlinear_proposal=bool(step_policy.get('early_complete_nonlinear_proposal',False)),
+                    check_fraction_before_refinement=bool((document.get('programme_exmr') or document.get('programme_audit_repair'))
+                        and step_policy.get('early_complete_nonlinear_proposal')))
                 local_feedback=bool(step_policy.get('local_source_trust_feedback',{}).get('enabled'))
                 inherited=None
                 if local_feedback and start_packet is not None and 'source_numerical_step_limit'in start_packet:
@@ -766,6 +850,7 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
             if complete_guard_feedback:
                 if not local_feedback:raise ValueError('Complete guard feedback requires local numerical trust')
                 problem.source_nonlinear_direction_quality=lambda z: proposal_context['current'].check(z)
+                problem.release_source_proposal=proposal_context.clear
         if diagnostic_profile:problem.image_safe_trials=False
         quality=dict(source=baseline,torso=torso_before,turn_episodes=turn_before,stage_reset_allowed=False)
         if population is not None:quality['body_observation_reference']=population
@@ -780,6 +865,9 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         result,report=problem.solve(x,RunPolicy(wall_seconds=remaining,max_accepted=max_accepted,max_outer=1,allow_penalty_growth=False,stagnation_window=12))
         if freeze_root:np.testing.assert_array_equal(result[root_columns],profile_root)
         if len(protected_columns):np.testing.assert_array_equal(result[protected_columns],protected_values)
+        if problem.action_factors.whole_skate is not None:
+            problem.action_factors.whole_skate.associate(result[17:])
+            problem.cache=problem.cache_x=None
         final=problem.evaluate(result,False)
         write_json(output/'final_metrics.json',dict(groups=body_groups(problem,final),
             weighted_parts={b.name:float(b.residual@b.residual/2)for b in final['weighted_blocks']},
@@ -799,11 +887,20 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         native_state=candidate.at(candidate.times)
         C,Rot=mass.evaluate(native_state,np.zeros((len(candidate.times),69)))
         packet['com_world_mid']=mass.com(C)
+        if document.get('programme_exmr') or document.get('programme_audit_repair'):
+            packet['com_projection_world_mid']=packet['com_world_mid'].copy()
+            packet['com_projection_world_mid'][:,2]=0.
+            packet['trajectory_reference']=np.array('model_com')
+            key='programme_audit_repair' if document.get('programme_audit_repair') else 'programme_exmr'
+            packet[key+'_json']=np.array(json.dumps(document[key],sort_keys=True))
         if document.get('trajectory_reference')=='model_com':
             from .programme_com import export_com_diagnostics
             packet.update(export_com_diagnostics(mass,candidate.times,C,Rot))
             packet.update(com_physics_quadrature_path=np.array(str(output/'com_physics_quadrature.npz')),
                 com_physics_quadrature_sha256=np.array(digest(output/'com_physics_quadrature.npz')))
+        elif document.get('programme_exmr') or document.get('programme_audit_repair'):
+            from .programme_com import export_com_diagnostics
+            packet.update(export_com_diagnostics(mass,candidate.times,C,Rot))
         if action:
             body_fk=fk_state(candidate,native_state,np.zeros((len(candidate.times),69)))
             packet['native_body_local_R_mid']=body_fk['local_R']
@@ -837,7 +934,7 @@ def main():
     ap.add_argument('--source-evidence',type=Path,help='Versioned objective document on the same immutable prepared inputs')
     ap.add_argument('--wall-seconds',type=float,help='Optional explicit wall budget; omitted means no wall budget')
     ap.add_argument('--max-accepted',type=int,help='Optional accepted-step checkpoint boundary; omitted means no accepted-step budget')
-    ap.add_argument('--memory-gib',type=float,default=12.)
+    ap.add_argument('--memory-gib',type=float,default=0.,help='Optional Windows process commit ceiling in GiB; 0 records telemetry only')
     ap.add_argument('--warm-start',type=Path,help='Same immutable input and prior, explicitly revised objective');ap.add_argument('--resume',type=Path);ap.add_argument('--gpu-linear',action='store_true');ap.add_argument('--device-batch',type=int,default=1024);ap.add_argument('--quality-baseline',type=Path)
     ap.add_argument('--freeze-root',action='store_true');ap.add_argument('--diagnostic-profile',action='store_true')
     ap.add_argument('--protected-source-evidence',type=Path)
@@ -858,7 +955,9 @@ def main():
     from .memory_guard import ProcessMemoryGuard
     memory=ProcessMemoryGuard(a.output.parent/(a.output.name+'_resources'),a.memory_gib)
     try:run(a.project,a.prepared,a.output,wall_seconds=a.wall_seconds,max_accepted=a.max_accepted,resume=a.resume,gpu_linear=a.gpu_linear,device_batch=a.device_batch,quality_baseline=a.quality_baseline,freeze_root=a.freeze_root,diagnostic_profile=a.diagnostic_profile,protected_source_evidence=a.protected_source_evidence,source_episode_choices=choices,warm_start=a.warm_start,save_linear_cache=a.save_linear_cache,source_conditioned_step=a.source_conditioned_step,source_evidence=a.source_evidence,verify_action_direction=a.verify_action_direction)
-    except MemoryError:
-        write_json(a.output/'MEMORY_LIMIT.json',dict(status='stopped_at_process_memory_ceiling',no_auto_restart=True,**memory.snapshot()));raise
+    except MemoryError as error:
+        write_json(a.output/'MEMORY_LIMIT.json',dict(status='host_allocation_failed',
+            error_type=type(error).__name__,error=str(error),**memory.snapshot()))
+        raise
     finally:memory.close()
 if __name__=='__main__':main()

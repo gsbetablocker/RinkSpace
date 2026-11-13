@@ -91,6 +91,8 @@ class SkateBinding(FootwearBinding):
     def packet(self,x=None):
         x=self.x if x is None else np.asarray(x,float)
         key=x[12:].tobytes()
+        fixed_height=getattr(self,'fixed_upper_height_log',None)
+        if fixed_height is not None:key+=np.float64(fixed_height).tobytes()
         if key==self._parameter_key:return self._packet
         p=self._solver_parameters(x)
         # Construct in actual metric coordinates first: the reference kernel
@@ -159,6 +161,7 @@ class SkateBinding(FootwearBinding):
         self._packet=dict(parameters=p,template=template,upper=outer,inner=inner,
             adapter=adapter,edges=edges,xs=xs,floor=floor,width=width,rise=rise,
             targets=targets,collar=np.r_[np.arange(cuff+1)*6+3,np.arange(cuff,-1,-1)*6+4,3])
+        if fixed_height is not None:self._packet=scale_upper(self._packet,fixed_height)
         return self._packet
 
     def parameters(self,x=None):
@@ -334,6 +337,8 @@ class SkateBinding(FootwearBinding):
     def record(self):
         R,t,_=self.parameters();p=self.packet();T=np.broadcast_to(np.eye(4),(2,4,4)).copy()
         T[:,:3,:3]=R;T[:,:3,3]=t*self.ratio
+        provenance=dict(p['template']['parameter_provenance'])
+        if 'upper_height_log' in p:provenance['shared_upper_height_scale']=float(np.exp(p['upper_height_log']))
         return dict(schema=BINDING_VERSION,template_version=TEMPLATE_VERSION,binding_version=BINDING_VERSION,
             T_FB=T.tolist(),units='conditional scene metres',world_up='Z',template_axes='x heel-to-toe; y local left; z up',
             metric_binding=self.metric_binding,old_axis_conversion=NEW_B_TO_OLD.tolist(),
@@ -341,7 +346,7 @@ class SkateBinding(FootwearBinding):
             old_boot_align_applied=False,old_blade_pitch_applied=False,per_frame_equipment_parameters=0,
             shared_parameters_solver_unit=self.x.tolist(),shape_parameters={k:getattr(p['parameters'],k)*self.ratio for k in SHAPE_NAMES},
             main_rocker_ft=self.main_rocker_ft,layout=self.layout.record(),
-            parameter_provenance=p['template']['parameter_provenance'],
+            parameter_provenance=provenance,
             foot_correspondences=[{k:(v*self.ratio).tolist() for k,v in d.items()} for d in self.foot_correspondences],
             anatomical_prior='shared-beta generic SMPL-X skin; not measured athlete foot',
             cavity='3mm inward offset per convex yz section; footbed above outsole; open collar; co-deformed with upper',
@@ -349,3 +354,17 @@ class SkateBinding(FootwearBinding):
             collar_section_in_solver=getattr(self,'collar_constraints_enabled',False),
             collar_section_factor='real shank triangle crossing endpoints and midpoints at 1mm below inner rim; finite surrogate, independent section review required',
             independent_3d_truth=False)
+
+
+def scale_upper(packet, height_log):
+    """Apply the recorded common upper scale about the actual outsole interface."""
+    out=dict(packet)
+    factor=np.exp(height_log)
+    for name in ('upper','inner','adapter'):
+        vertices=packet[name].copy()
+        points=vertices[:14] if name=='adapter' else vertices
+        floor=np.interp(points[:,0],packet['xs'],packet['floor'])
+        points[:,2]=floor+factor*(points[:,2]-floor)
+        out[name]=vertices
+    out.update(rise=packet['rise']*factor,upper_height_log=height_log)
+    return out

@@ -310,7 +310,7 @@ def contract_source_trust(margins, selection, limits, direction, check, *, progr
         all_global_controls_still_coupled=True)
 
 
-def source_conditioned_direction(gpu, value, bounds, margins, selection, *, control_step_limit=None, progress=None, nonlinear_source_check=None, trust_state=None, retain_affine_cuts=False, affine_guard_reserve_fraction=0., early_nonlinear_ready_feedback=False, early_complete_nonlinear_proposal=False):
+def source_conditioned_direction(gpu, value, bounds, margins, selection, *, control_step_limit=None, progress=None, nonlinear_source_check=None, trust_state=None, retain_affine_cuts=False, affine_guard_reserve_fraction=0., early_nonlinear_ready_feedback=False, early_complete_nonlinear_proposal=False, check_fraction_before_refinement=False):
     """Solve the same coupled quadratic with source-conditioned local trust boxes."""
     if not 0<=affine_guard_reserve_fraction<.2:raise ValueError('Affine tolerance must stay inside the original unused guard reserve')
     if affine_guard_reserve_fraction and nonlinear_source_check is None:raise ValueError('Guard-reserve proposal tolerance requires original nonlinear feedback')
@@ -318,6 +318,8 @@ def source_conditioned_direction(gpu, value, bounds, margins, selection, *, cont
         raise ValueError('Early ready-domain feedback requires the original nonlinear check')
     if early_complete_nonlinear_proposal and not early_nonlinear_ready_feedback:
         raise ValueError('Complete nonlinear proposal exit requires full early nonlinear feedback')
+    if check_fraction_before_refinement and not early_complete_nonlinear_proposal:
+        raise ValueError('Fraction-first proposal requires complete nonlinear feedback')
     scale=1./np.maximum(gpu.scale_inv,1e-6)
     if progress is not None:progress(phase='normal_solve_start')
     step,linear=gpu.solve_scaled(-value['residual'],scale,damp=.07)
@@ -326,7 +328,7 @@ def source_conditioned_direction(gpu, value, bounds, margins, selection, *, cont
         A=csr_matrix((0,len(step)));slack=np.empty(0);labels=[]
     else:
         source,slack,labels=margins;A=(source[:,selection].multiply(scale)).tocsr()
-    bounded=None;projection=None;feedback=[];early_checks=0;nonlinear_completed_early=False
+    bounded=None;projection=None;feedback=[];early_checks=0;nonlinear_completed_early=False;checked_fraction=None
     if control_step_limit is None:
         shrink=max(1.,raw_scaled_norm);step/=shrink
         initial=(A@step).tolist();norms=np.asarray(A.multiply(A).sum(axis=1)).ravel()
@@ -394,6 +396,24 @@ def source_conditioned_direction(gpu, value, bounds, margins, selection, *, cont
                     cut_labels.extend(added)
                     if unit=='px':pixel_cuts=True
                     else:nonpixel_cut_units.update(dict.fromkeys(added,unit))
+                if check_fraction_before_refinement and not feedback and not cut_rounds:
+                    baseline=float(value['residual']@value['residual']/2)
+                    for fraction in backtracking_fractions():
+                        trial=fraction*step
+                        predicted_change=float(objective(trial)[0])
+                        if not resolved_descent(baseline+predicted_change,baseline):break
+                        checks=nonlinear_source_check(trial*scale)
+                        passed=(isinstance(checks,CompleteNonlinearGuardChecks) and bool(checks)
+                                and not any(row['rejected'] for row in checks.values()))
+                        improved=passed and resolved_descent(getattr(checks,'objective_cost',None),baseline)
+                        if progress is not None:progress(phase='source_fraction_before_refinement',
+                            fraction=fraction,guards_pass=passed,actual_descent=improved,
+                            failed_guards=None if checks is None else sum(row['rejected'] for row in checks.values()))
+                        if improved:
+                            step=trial;checked_fraction=fraction;nonlinear_completed_early=True;break
+                    if nonlinear_completed_early:
+                        for label in cut_labels:nonpixel_cut_units.pop(label,None)
+                        break
                 if not cuts:break
                 A=vstack([A,*cuts],format='csr');slack=np.r_[slack,cut_slack];labels=[*labels,*cut_labels];cut_rounds+=1
                 pixel_cut_rounds+=int(pixel_cuts)
@@ -492,7 +512,7 @@ def source_conditioned_direction(gpu, value, bounds, margins, selection, *, cont
         original_nonlinear_guard_required=True,all_active_controls_retained=True,
         proposal_constraint_units=getattr(margins,'constraint_units',dict(source='px')),
         early_nonlinear_ready_feedback_checks=early_checks,
-        nonlinear_completed_early=nonlinear_completed_early)
+        nonlinear_completed_early=nonlinear_completed_early,checked_fraction_before_refinement=checked_fraction)
     return step,receipt
 
 

@@ -8,6 +8,14 @@
 
 `deliver_body_skate_fit.py` 从连续控制导出同一人体状态的全节目、质心、冰面投影和鞋刀，再生成原片／旧候选／新候选对照。节目绑定给出 Data 下的 `START_REFITTED_3D.cmd`、对照视频、结果和失败导航。两份公开控制包和整鞋轮廓保持实际运行的原字节。
 
+## 1113 开场与方向审核
+
+[1113 候选](../../events/ankara_2026/programmes/okada_mei_sp/skate_video_1112/audit_followup_1113.json)登记同一人体、整鞋、质心与冰面投影的控制及回投。`programme_audit_repair` 负责由 1112 回放导入共同状态。`motion_review.source_audit` 以原生曝光计算双鞋的源投影和运动差分，`motion_review.scoped_fit`、`direction_fit`、`cut_position_fit` 和 `spin_entry_fit` 使用局部源锚点，`motion_review.refit_audit` 核对修订后的连续曲线。`programme_motion_followup` 从同一组已选控制生成回放和原片对照。全节目 ExMR 比较属于历史试验。
+
+使用 Data 中的 prepared、evidence 和节目绑定指明的控制，从项目根在 `body_cuda` 环境用 `python -B -m experiments.skate_video_v1.<模块> --help` 查看各命令。开场入口还需要上一镜站姿参数和原片数值锚点，方向入口使用各段源锚点及父控制。当前核对使用开发证据，核对范围和失败事件均保存在绑定中。
+
+`htd_review.prepare_pva` 与 `infer_pva` 使用外部作者实现和权重。`audit_fs_pva` 计算独立多机位参照误差，`audit_programme_pva` 与 `native_ablation` 对比节目动力学，`entry_pose_ablation --flight --variant-grid --kinematic` 对比 S05 入旋肩肘。官方权重和 PVA 输入输出保存在 Data。入旋二维误差有局部改善，肘角越界增多，速度场也低估绝对滑行速度。官方来源与版本见[资产记录](../../docs/THIRD_PARTY_ASSETS.md)。
+
 ## 原片和原生重放核对
 
 需要登记的原片、相机、恢复绑定、人体观察、已安装的本地模型和原生运行库。设置 `RINKSPACE_SKATE_RECOVERY_BINDING` 指向本机恢复绑定，并在项目根用 `vision_cuda` 环境执行。`$visual` 指包含 `whole_follow_evidence.npz` 的目录，可使用公开节目绑定中的数值包。`$controls` 指 `whole_skate_socket_1112.npz`。收据路径在 Data 下。

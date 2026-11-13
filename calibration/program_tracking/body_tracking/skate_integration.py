@@ -27,7 +27,7 @@ def snapshot_objective_kernels(output):
     source_dir = output / 'source_snapshot'
     source_dir.mkdir(exist_ok=True)
     for name in ('skate_integration.py','skate_binding.py','skate_physics.py','skate_template.py',
-                 'skate_contact.py','contact_feasibility.py','footwear_layout.py','fullbody_fit.py',
+                 'skate_contact.py','contact_feasibility.py','footwear_layout.py','fullbody_fit.py','rebuild_exposure_body.py',
                  'fullbody_state.py','boot_integration.py','body_execution.py',
                  'compact_body_derivatives.py','selected_surface_linearization.py',
                  'body_resident_torch.py','torch_foot_compatibility.py','body_foot_cuda_bridge.py','body_foot_cuda.cu',
@@ -45,7 +45,7 @@ def snapshot_objective_kernels(output):
                   'programme_camera.py','body_clock.py','weighted_blocks.py',
                   'phase_ledger.py','episode_factor_adapter.py','event_physics.py','action_objective_context.py',
                   'programme_action_factors.py','programme_anatomy.py','programme_source_step.py','programme_guard_proposals.py','source_contact_image.py',
-                  'visible_runner_contours.py','source_skate_structure_factors.py',
+                  'visible_runner_contours.py','source_skate_structure_factors.py','programme_whole_skate.py',
                   'complete_runner_extent.py','programme_surface.py','programme_grasp.py','programme_joint_limits.py',
                  'anatomical_chart.py','programme_com.py','programme_opening.py'):
         payload = Path(__file__).with_name(name).read_bytes()
@@ -552,7 +552,8 @@ class JointContactProblem:
         if support_value is not None:named.append(block('old_shoe_support_regions',support_value['residual'],support_value['jac'],dict(rows=support.rows)))
         named.append(block('cavity_AL',ral,Jal,dict(labels=e['labels'],dynamic_selected_rows=dynamic_which,neutral_selected_rows=neutral_which),signature(dynamic_which,neutral_which,collar_unknown,np.asarray(ral)>0,compatibility_branch,collar_branch)))
         gate=physical_feasibility(e['margin_m'],tolerance_m=FEASIBILITY_TOLERANCE,row_labels=e['labels'])
-        gate['scope']='foot_cavity_and_collar_only; ice excluded from feasibility'
+        gate['scope']=('foot_cavity_and_collar_only' if self.binding.collar_constraints_enabled
+                       else 'foot_cavity_only')+'; ice excluded from feasibility'
         gate['collar_unknown_sections']=collar_unknown
         gate['ice_is_delivery_gate']=False
         if collar_unknown:gate['feasible']=False
@@ -644,7 +645,7 @@ class JointContactProblem:
             multiplier=self.al.multiplier,penalty=np.array(self.al.penalty),state_kind=np.array(self.state_kind),
             collar_constraints_enabled=np.array(self.binding.collar_constraints_enabled),
             ice_mode=np.array('finite_soft_objective'),ice_is_delivery_gate=np.array(False),
-            al_row_scope=np.array('foot_cavity_and_collar_only'),
+            al_row_scope=np.array('foot_cavity_and_collar_only' if self.binding.collar_constraints_enabled else 'foot_cavity_only'),
             ice_soft_policy_json=np.array(json.dumps(vars(self.ice_policy),sort_keys=True)))
 
     def solve(self,initial=None,run_policy=None):
@@ -653,7 +654,10 @@ class JointContactProblem:
         from .body_gpu_linear import CuDSSSession,DeviceCSRLayout
         with CuDSSSession(getattr(self,'linear_runtime',None)) as session:
             self._linear_session=session
-            self._linear_layout=DeviceCSRLayout()
+            # A new symbolic analysis needs only the actual current sparsity.
+            # Keep exact repeats, but skip unioning old inactive entries.
+            release_between_steps=getattr(self,'release_factorization_on_relinearize',False)
+            self._linear_layout=DeviceCSRLayout(retain_inactive_slots=not release_between_steps)
             try:
                 return self._solve(initial,run_policy)
             finally:
@@ -696,6 +700,8 @@ class JointContactProblem:
                 or (not self.optimize_shared and np.any(selection<17))):
             raise ValueError('Invalid explicit active parameter selection')
         self.parameter_selection=selection
+        contiguous_body_columns=(selection[0]==17 and selection[-1]-16==len(selection)
+                                 and (not self.optimize_shared or selection[-1]+1==self.size))
         frozen_initial=x.copy()
         record_before_jacobian=bool(getattr(self,'record_acceptance_before_jacobian',False))
         last_linearization=None;last_recorded=x[selection].copy()
@@ -813,6 +819,7 @@ class JointContactProblem:
                     accepted=self.accepted,finite=bool(finite),rejection_reason=reason,
                     linearization_id=getattr(getattr(self,'_linear_layout',None),'linearization_id',None)))+'\n')
             from .absolute_motion_curve import RotationChartDomainError
+            from .rebuild_exposure_body import MovingBodyProjectionDomainError
             from .runner_interior import RunnerCoordinateDomainError
             try:
                 full=expand(z)
@@ -830,7 +837,7 @@ class JointContactProblem:
                         trial_result(False,'source_precheck')
                         return dict(residual=np.full_like(initial_value['residual'],np.inf))
                 value=self.evaluate(full,jacobian)
-            except (RotationChartDomainError,RunnerCoordinateDomainError) as error:
+            except (RotationChartDomainError,RunnerCoordinateDomainError,MovingBodyProjectionDomainError) as error:
                 if jacobian:raise
                 # SciPy TRF treats nonfinite trial residuals as rejected and
                 # contracts its trust radius. Never accept/project/rewrite a
@@ -888,9 +895,9 @@ class JointContactProblem:
                     if getattr(self,'linear_solver_backend','')=='cuda_resident':
                         if value.get('_gpu_jacobian') is None:
                             from .body_gpu_linear import GPUJacobian
-                            if np.array_equal(selection,np.arange(17,self.size)):
+                            if contiguous_body_columns:
                                 value['_gpu_jacobian']=GPUJacobian(value['jac'],shared_prefix=17,
-                                    session=self._linear_session,layout=self._linear_layout)
+                                    column_stop=selection[-1]+1,session=self._linear_session,layout=self._linear_layout)
                             else:
                                 # A declared profile freezes P in expand(), not
                                 # just in its Jacobian. Select only real active
@@ -921,11 +928,12 @@ class JointContactProblem:
                         trust_state={}
                         def check_source_direction(move):
                             from .absolute_motion_curve import RotationChartDomainError
+                            from .rebuild_exposure_body import MovingBodyProjectionDomainError
                             from .runner_interior import RunnerCoordinateDomainError
                             try:
                                 trial=make_strictly_feasible(reduced+move,lower[selection],upper[selection],rstep=0.)
                                 return nonlinear_check(expand(trial))
-                            except (RotationChartDomainError,RunnerCoordinateDomainError):return None
+                            except (RotationChartDomainError,RunnerCoordinateDomainError,MovingBodyProjectionDomainError):return None
                         def source_step_progress(**fields):
                             nonlocal requested_stop
                             if (self.output/'STOP_AFTER_ACCEPTED').is_file():
@@ -953,7 +961,12 @@ class JointContactProblem:
                             np.savez_compressed(self.output/'source_direction.npz',x=x,selection=selection,direction=move,
                                 numerical_trust_limit=trust_state.get('control_step_limit',np.empty(0)))
                         finally:
-                            if op is not None:op.release()
+                            if op is not None:
+                                op.release()
+                                self._linear_session.release_factorization()
+                            release=getattr(self,'release_source_proposal',None)
+                            if release is not None:release()
+                            margins=None
                         self.log.write(json.dumps(dict(event='source_conditioned_direction',**receipt))+'\n')
                         baseline_cost=float(value['residual']@value['residual']/2)
                         baseline_weighted_parts = {
@@ -1019,6 +1032,7 @@ class JointContactProblem:
                         from .body_gpu_linear import gpu_trf
                         fit=gpu_trf(lambda z:guarded(z)['residual'],selected_jacobian,x[selection],lower[selection],upper[selection],callback=accepted,options=dict(atol=1e-7,btol=1e-7),
                             log=self.log,
+                            release_factorization_on_relinearize=bool(getattr(self,'release_factorization_on_relinearize',False)),
                             warm_relative=bool(getattr(self,'action_warm_relative_trf',False)))
                     else:
                         fit=least_squares(lambda z:guarded(z)['residual'],x[selection],jac=selected_jacobian,

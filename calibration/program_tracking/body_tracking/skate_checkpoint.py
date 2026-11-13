@@ -24,6 +24,12 @@ CAMERA_LOCATION_FIELDS = {
 def checkpoint_identity(binding, project, camera_info):
     programme = Path(project)/'events/ankara_2026/programmes/okada_mei_sp'
     dependency=getattr(getattr(binding,'reference',None),'identity_dependencies',None)
+    fixed = {}
+    if hasattr(binding, 'fixed_upper_height_log'):
+        fixed['fixed_boot_geometry_json'] = np.array(json.dumps(dict(
+            upper_height_log=binding.fixed_upper_height_log,
+            respect_open_collar=bool(getattr(binding, 'respect_open_collar', False)),
+            fixed_skate_mount=bool(getattr(binding, 'fixed_skate_mount', False))), sort_keys=True))
     return dict(
         base_skate_parameters_json=np.array(json.dumps(asdict(binding.base_parameters))),
         R_FB_initial=np.asarray(binding.R0).copy(),
@@ -31,7 +37,7 @@ def checkpoint_identity(binding, project, camera_info):
         template_version=np.array(TEMPLATE_VERSION), binding_version=np.array(BINDING_VERSION),
         parent_hand_parameters_sha256=np.array(digest(programme/'opening_hand_1103.npz')if dependency is None else dependency['hand_sha256']),
         parent_timing_parameters_sha256=np.array(digest(programme/'opening_timing_1103.npz')if dependency is None else dependency['timing_sha256']),
-        camera_binding_json=np.array(json.dumps(camera_info, sort_keys=True)),
+        camera_binding_json=np.array(json.dumps(camera_info, sort_keys=True)), **fixed,
     )
 
 
@@ -56,7 +62,12 @@ def validate_checkpoint_identity(saved, expected=None):
     if expected is None:
         return
     mismatched = []
-    for key in IDENTITY_FIELDS:
+    fields = IDENTITY_FIELDS + (('fixed_boot_geometry_json',) if
+        'fixed_boot_geometry_json' in saved or 'fixed_boot_geometry_json' in expected else ())
+    for key in fields:
+        if key not in saved or key not in expected:
+            mismatched.append(key)
+            continue
         a, b = saved[key], expected[key]
         try:
             if key.endswith('_json'):

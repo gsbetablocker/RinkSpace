@@ -48,6 +48,8 @@ GVHMR 的 DPVO 子模块在历史盘点中为空，[固定安装说明](https://
 
 ExMR camera-only 比较固定[官方 ExMR](https://github.com/twehrbein/ExMR)提交 `eac72e47339b404c0443f5fb323412e2ce432410`。局部补丁保留[完整上游许可及署名](../environments/third_party_licenses/EXMR_LICENSE.txt)，包括 Leibniz University Hannover 与 GVHMR 原作者通知，衍生修改沿用原教育／研究／非营利和非商业条件。SAM 3D Body／DINOv3 与 HaMeR 分别按各自许可处理；固定资产 revision、SHA 和许可来源见[结果依赖索引](../events/ankara_2026/programmes/okada_mei_sp/spin_models_1104_audit.json)。模型字节、完整第三方实现和运行环境留 Data，仓库保存接线、依赖和局部补丁。当前 HaMeR 只抽取原网络 token，没有加载或分发 MANO 手模型。
 
+HTD 审核调用[作者 HTD-Refine](https://github.com/ant-research/HTD-Refine/tree/2fcd6ddef3c4eb75a636062245f80a0136c09b7e)及[作者 PVA-Net 权重](https://drive.google.com/file/d/1dffyj3cdH1Myw2-tzgKTXryaO72Gbys1/view)，固定代码提交与权重 SHA 见[节目审核绑定](../events/ankara_2026/programmes/okada_mei_sp/skate_video_1112/audit_followup_1113.json)。仓库保存 RinkSpace 输入适配和数值对照源码。上游代码、模型和本地原始输入继续放在 Data，保留原许可和署名。
+
 ## 权重与小型数据
 
 | 资产 | 登记字节数 | 来源与限制 |

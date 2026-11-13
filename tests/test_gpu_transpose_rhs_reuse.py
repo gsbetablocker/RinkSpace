@@ -31,3 +31,30 @@ def test_prepared_transpose_and_same_rhs_reuse_do_not_change_normal_model(monkey
     np.testing.assert_allclose(gradient,dense.T@(dense@z-rhs)+.07**2*z,rtol=1e-13,atol=1e-13)
     op.release();assert op._transpose_argument is None and op._transpose_result is None
     with pytest.raises(RuntimeError,match='Retired'):op.rmatvec(rhs)
+
+
+@pytest.mark.parametrize('retain_inactive_slots',[True,False])
+def test_active_column_window_preserves_products_and_reuses_slots(monkeypatch,retain_inactive_slots):
+    torch = pytest.importorskip('torch')
+    if not torch.cuda.is_available():
+        pytest.skip('CUDA hardware check')
+    from calibration.program_tracking.body_tracking.body_gpu_linear import DeviceCSRLayout, GPUJacobian
+
+    monkeypatch.setattr(DeviceCSRLayout, 'row_batch', 2)
+    layout = DeviceCSRLayout(retain_inactive_slots=retain_inactive_slots)
+    dense = np.array([[0., 1., 0., 8.], [0., 0., 0., 9.],
+                      [0., 3., 4., 0.], [0., 0., 2., 0.], [0., 0., 0., 0.]])
+    changed = dense.copy()
+    changed[1, 2] = 2.
+    changed[2, 1] = 0.
+    rhs = np.arange(1., 6.)
+    for index, full in enumerate((dense, dense * 2., changed, dense)):
+        expected = full[:, 1:3]
+        operator = GPUJacobian(csr_matrix(full), shared_prefix=1, column_stop=3, layout=layout)
+        np.testing.assert_allclose(operator @ np.array([2., 3.]), expected @ [2., 3.])
+        np.testing.assert_allclose(operator.rmatvec(rhs), expected.T @ rhs)
+        np.testing.assert_allclose(operator.scale_inv, np.linalg.norm(expected, axis=0))
+        assert operator.transfer['inactive_entries_skipped'] == 2
+        assert operator.transfer['host_slice_value_bytes_avoided'] == np.count_nonzero(expected) * 8
+        assert operator.transfer['jacobian_structure_reused'] == (index == 1 or (retain_inactive_slots and index == 3))
+        operator.release()

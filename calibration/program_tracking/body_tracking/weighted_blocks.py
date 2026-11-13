@@ -26,7 +26,7 @@ def image_cost(parts):
         'source_pixel_edge_profile','complete_runner_extent','complete_visible_structure_extent',
         'source_support_location_xy','native_source_support_contact','unassigned_source_skate_sets',
         'old_shoe_support_regions','body_source_regions','manual_native_leg',
-        'ordered_native_skate','reviewed_native_support'}
+        'ordered_native_skate','reviewed_native_support','whole_skate_source','directed_boot_source'}
     return sum(float(value) for name,value in parts.items()
         if name.rsplit('/',1)[-1] in names or name.startswith('additional_unassigned_source_'))
 
@@ -70,7 +70,9 @@ def pack_weighted(blocks,weights,jacobian=False):
                 last=min(first+4096,len(factor));lo,hi=map(int,source.indptr[[first,last]])
                 data[at+lo:at+hi]=source.data[lo:hi]*np.repeat(factor[first:last],np.diff(source.indptr[first:last+1]))
             at=stop
-    if jacobian:J=csr_matrix((data,indices,ptr),shape=(len(r),columns),copy=False)
+    if jacobian:
+        J=csr_matrix((data,indices,ptr),shape=(len(r),columns),copy=False)
+        J.sum_duplicates()
     named=[WeightedBlock(b.name,r[a:z],None if J is None else row_view(J,int(a),int(z)),b.provenance,b.association)for b,a,z in zip(blocks,offsets[:-1],offsets[1:])]
     return r,J,named
 

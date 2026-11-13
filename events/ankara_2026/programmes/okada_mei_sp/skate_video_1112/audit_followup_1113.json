@@ -1,0 +1,160 @@
+{
+  "schema": "rinkspace.okada-whole-skate-followup.v1",
+  "candidate": "programme_opening_skate_direction_1113",
+  "source": {
+    "video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+    "time_base": [
+      1,
+      12800
+    ],
+    "pts": [
+      283136,
+      2415104
+    ],
+    "exposures": 8329,
+    "shots": [
+      "s01",
+      "s02",
+      "s03",
+      "s04",
+      "s05",
+      "s06",
+      "s07",
+      "s08",
+      "s09"
+    ],
+    "foot_axis": [
+      "L",
+      "R"
+    ]
+  },
+  "camera_sha256": "82767b29e90059c7d8b8d0b64df6c273c1946e398674b929c442feb59e331710",
+  "base_commit": "cd1b970eede0ec7f155d1ec277e61076a3ce029d",
+  "base_binding": "record.json",
+  "visual": "whole_follow_evidence.npz",
+  "parameter": {
+    "file": "whole_skate_opening_direction_1113.npz",
+    "data_path": "runs/body_s01_20261029/structure_camera_1108/skate_audit_cd1/opening_direction_1113/refit/solve/candidate.npz",
+    "sha256": "9ad485d66ef2c4ee2100f64f378b274fda94b2757b6c4cb000243c5bf80d5fac",
+    "bytes": 10411625
+  },
+  "comparison_parameter": {
+    "data_path": "runs/body_s01_20261029/structure_camera_1108/skate_audit_cd1/joint_repair_detail/solve/candidate.npz",
+    "sha256": "2f92be43f240e8e68612c38d63496a4569a1222583084e8672ac2741354191c7",
+    "bytes": 10409215
+  },
+  "mode": "continuous absolute body and attached whole skates",
+  "local_review": {
+    "player": "runs/body_s01_20261029/structure_camera_1108/skate_audit_cd1/opening_direction_1113/refit/START_REFITTED_3D.cmd",
+    "result": {
+      "data_path": "runs/body_s01_20261029/structure_camera_1108/skate_audit_cd1/opening_direction_1113/refit/fitted/result.npz",
+      "sha256": "9df455f41f036d24b7ca2c3b57c0cc9e4ece026818a60d1a77d8ea54781fa6b3",
+      "bytes": 523449138
+    },
+    "video": {
+      "data_path": "runs/body_s01_20261029/structure_camera_1108/skate_audit_cd1/opening_direction_1113/refit/body_skates_before_after.mp4",
+      "sha256": "5ee29a58ff6fbd43e0414c01370785368d54c0dd9411258bedc4abd185be56eb",
+      "bytes": 669986687
+    },
+    "navigation": {
+      "data_path": "runs/body_s01_20261029/structure_camera_1108/skate_audit_cd1/opening_direction_1113/refit/navigation.json",
+      "sha256": "a5061d0df0f653236f9a2923764e2a63df9158da87294a2609827b04b0638dcb",
+      "bytes": 75780
+    },
+    "audit": {
+      "data_path": "runs/body_s01_20261029/structure_camera_1108/skate_audit_cd1/opening_direction_1113/refit/review_audit.json",
+      "sha256": "decbdd62d92c253758ef71befa37ba187f00f93cc04b542768a458108f3c0f96",
+      "bytes": 105722
+    },
+    "source_body": {
+      "data_path": "runs/body_s01_20261029/structure_camera_1108/skate_audit_cd1/prepared_refined/observations.npz",
+      "sha256": "715886784ce7d2ced4d456d3a75231772997e68f5d47582c5f2319d892b3bc09",
+      "bytes": 1190158
+    },
+    "source_evidence": {
+      "data_path": "runs/body_s01_20261029/structure_camera_1108/skate_audit_cd1/surface_ready/source_evidence_detail.json",
+      "sha256": "b3344b7e10b0282533162e512aa493a01164a35ffe5dbc688260d86391a79fdc",
+      "bytes": 31052429
+    },
+    "viewer_verification": {
+      "data_path": "runs/body_s01_20261029/structure_camera_1108/skate_audit_cd1/opening_direction_1113/refit/viewer_verified.json",
+      "sha256": "48c3635cbcaffd8bdd06f403ee32d08e888f8d67bb0d6e435ea1b40b58604253",
+      "bytes": 370
+    }
+  },
+  "source_checks": {
+    "opening_prior_pts": 255488,
+    "opening_occluded_feet": "inferred_from_prior_shot_and_first_visible_frames",
+    "comparison_role": "development",
+    "direct_direction_rows": 20,
+    "direction_median_deg": [
+      78.80626630008865,
+      2.205646454232606
+    ],
+    "current_failures": [
+      {
+        "source_seconds": [
+          22.12,
+          23.94
+        ],
+        "finding": "开场可见上身已按原图核对，举臂和手部轮廓仍有偏差。画外双足依赖前镜站姿与后续入画状态。"
+      },
+      {
+        "source_seconds": [
+          44.94,
+          45.0
+        ],
+        "finding": "切镜前后两鞋回投偏离。44.96 秒右鞋出现在两鞋之间。"
+      },
+      {
+        "source_seconds": [
+          47.28,
+          47.46
+        ],
+        "finding": "并步时左鞋部分遮挡，轮廓仍向右鞋偏移。47.30 秒参考鞋端平均误差 34.81 px。"
+      },
+      {
+        "source_seconds": [
+          101.64,
+          101.72
+        ],
+        "finding": "右鞋中心位置改善，近端视的方向和钢片投影仍有偏差。"
+      },
+      {
+        "source_seconds": [
+          157.26,
+          157.26
+        ],
+        "finding": "旧右鞋轮廓圈到另一只鞋，排除这行，不修改这帧的模型。"
+      },
+      {
+        "source_seconds": [
+          172.8,
+          173.62
+        ],
+        "finding": "快速转体和遮挡下，右鞋方向与边界仍欠明确。"
+      }
+    ]
+  },
+  "htd_review": {
+    "role": "independent local audit",
+    "selected_for_programme": false,
+    "source_revision": "2fcd6ddef3c4eb75a636062245f80a0136c09b7e",
+    "checkpoint_sha256": "a6e5f95a287a45dc1e4944fe7381e7d0c5fe02d4009c5794b09717077a4e1a26",
+    "report": {
+      "data_path": "runs/body_s01_20261029/structure_camera_1108/skate_audit_cd1/htd_review_1113/RESULT_ZH.md",
+      "sha256": "2ab7ba2478a4891858040f4226341fe45132127d704c7eac55c68041e4c49cce",
+      "bytes": 6781
+    },
+    "source_seconds": [
+      81.26,
+      81.56
+    ],
+    "held_arm_RMS_px": [
+      116.83608841843841,
+      41.16014150841391,
+      40.93127495892824
+    ]
+  },
+  "accuracy_accepted": false
+}

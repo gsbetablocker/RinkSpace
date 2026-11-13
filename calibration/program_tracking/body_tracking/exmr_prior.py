@@ -65,6 +65,19 @@ def transform_pixels(xy, affine):
     return np.einsum('ij,...j->...i', affine[:2, :2], xy)+affine[:2, 2]
 
 
+def source_shot_slices(packet):
+    pts = packet['source_pts']
+    shots = packet.get('shot_ids', np.full(len(pts), 'clip'))
+    if pts.dtype.kind not in 'iu' or shots.shape != pts.shape or np.any(np.diff(pts) <= 0):
+        raise ValueError('Require strictly increasing native source PTS')
+    cuts = np.r_[0, np.flatnonzero(shots[1:] != shots[:-1]) + 1, len(pts)]
+    groups = [slice(int(a), int(b)) for a, b in zip(cuts[:-1], cuts[1:])]
+    if (len(set(shots.tolist())) != len(groups)
+            or any(g.stop - g.start < 2 or np.any(np.diff(pts[g]) != 512) for g in groups)):
+        raise ValueError('Require continuous real 25 Hz source PTS in each shot')
+    return groups
+
+
 def prepare(prepared, contract, output, size=1024):
     """Known raw person boxes, with each released model's own crop semantics."""
     import cv2
@@ -74,8 +87,7 @@ def prepare(prepared, contract, output, size=1024):
     frame_dir=output/'frames';frame_dir.mkdir(exist_ok=True)
     d=load(prepared);c=json.loads(Path(contract).read_text(encoding='utf8'))
     pts=d['source_pts'];n=len(pts)
-    if pts.dtype.kind not in 'iu' or n<2 or not np.all(np.diff(pts)==512):
-        raise ValueError('Require original continuous uniform25Hz real source PTS')
+    shots = source_shot_slices(d)
     protocol='raw_person_rect_bbox__sam_padding1.25__exmr_aspect0.75_enlarge1.2_v2'
     identity=dict(gvhmr_prepared_sha256=digest(prepared),protocol=protocol,size=size)
     identity_path=output/'input_identity.json'
@@ -110,8 +122,14 @@ def prepare(prepared, contract, output, size=1024):
     affines=np.array(affines);K=np.array(K);boxes=np.array(boxes,np.float32);raw_boxes=np.array(raw_boxes,np.float32)
     log=Progress(output,'prepare');valid_fraction=[];closure=[]
     video=c['source']['path']
+    expected_frames = d.get('source_frame_bgr_sha256')
+    if expected_frames is None and digest(video) != c['source']['sha256']:
+        raise ValueError('Source video bytes do not match the programme binding')
+    frame_hashes = []
     for i,(stamp,bgr) in enumerate(_official_frames(video,pts)):
-        if hashlib.sha256(bgr.tobytes()).hexdigest()!=str(d['source_frame_bgr_sha256'][i]):
+        actual_hash = hashlib.sha256(bgr.tobytes()).hexdigest()
+        frame_hashes.append(actual_hash)
+        if expected_frames is not None and actual_hash != str(expected_frames[i]):
             raise ValueError(f'Source content differs at PTS {stamp}')
         path=frame_dir/f'{i:06d}.png';camera=d['camera25'][i]
         Kn=np.array([[np.exp(camera[6]),0,camera[8]],[0,np.exp(camera[7]),camera[9]],[0,0,1.]])
@@ -133,15 +151,18 @@ def prepare(prepared, contract, output, size=1024):
             if image is None or image.shape[:2]!=(size,size):raise ValueError('Invalid cached crop')
         valid_fraction.append(float(((mx>=0)&(mx<bgr.shape[1])&(my>=0)&(my<bgr.shape[0])).mean()))
         if i%32==0 or i==n-1:log('source_crops',completed=i+1,total=n)
+    extra = {key: d[key] for key in ('shot_ids',) if key in d}
     np.savez_compressed(output/'prepared.npz',source_pts=pts,source_time_base=np.array([1,12800]),
         bbox_xys=boxes,bbox_xyxy=raw_boxes,K_input=K.astype(np.float32),rect_to_input_affine=affines,
         bbox_raw_rect_xyxy=np.array(full_raw),bbox_model_rect_xys=np.array(full_model),
         coco17=kp,R_w2c=d['R_w2c'],K_rect=d['K_rect'],camera25=d['camera25'],
-        bbox_inferred=d['bbox_inferred'],source_mapping_missing=d['source_mapping_missing'])
+        bbox_inferred=d['bbox_inferred'],source_mapping_missing=d['source_mapping_missing'],
+        source_frame_bgr_sha256=np.asarray(frame_hashes),**extra)
     write_json(output/'preparation.json',dict(schema='rinkspace.exmr.same-source-input.v2',protocol=protocol,
         exmr_commit=EXMR_COMMIT,gvhmr_prepared=str(Path(prepared).resolve()),
         gvhmr_prepared_sha256=digest(prepared),source_video=video,source_pts=[int(pts[0]),int(pts[-1])],
-        frames=n,fps=25,temporal_context='same complete 76-95 second continuous input as original GVHMR',
+        frames=n,fps=25,temporal_context='one continuous 25 Hz sequence per source shot',
+        shots=[dict(first_pts=int(pts[g.start]),last_pts=int(pts[g.stop-1]),frames=g.stop-g.start) for g in shots],
         virtual_image_size=size,storage='lossless PNG; original source pixels and native Brown rays',
         person_bbox='raw known person bbox mapped through native Brown inverse; not the expanded GVHMR square',
         sam_crop='released raw bbox -> GetBBoxCenterScale padding1.25 -> native512 input',
@@ -198,7 +219,7 @@ def keypoints(data, output, batch_size=8):
     log('complete',model_sha256=digest(path),shared_body_points_preserved=int(valid_shared.sum()),missing_shared_points_keep_native=True)
 
 
-def sam_features(data, output, batch_size=8):
+def sam_features(data, output, batch_size=8, *, save_native=True):
     torch=runtime(data)
     from exmr.preprocessing import body_features as mod
     output=Path(output);d=load(output/'prepared.npz');log=Progress(output,'sam')
@@ -220,7 +241,8 @@ def sam_features(data, output, batch_size=8):
     extractor=mod.SamBodyFeatures(Path(data)/'cache/pretrained/exmr/sam-3d-body-dinov3',
         fp16=False,batch_size=batch_size,num_workers=0,device='cuda')
     original=extractor.model.forward_step
-    native_dir=output/'sam3db_body_native';native_dir.mkdir(exist_ok=True)
+    native_dir=output/'sam3db_body_native'
+    if save_native:native_dir.mkdir(exist_ok=True)
     cursor=0
     def save_forward(batch,*args,**kw):
         nonlocal cursor
@@ -236,17 +258,19 @@ def sam_features(data, output, batch_size=8):
         np.savez_compressed(path,source_pts=d['source_pts'][cursor:cursor+count],**arrays)
         cursor+=count;log('native_body_saved',completed=cursor,total=len(d['source_pts']),fields=list(arrays))
         return out
-    extractor.model.forward_step=save_forward
+    if save_native:extractor.model.forward_step=save_forward
     with torch.inference_mode():
         token=extractor(output/'frames',torch.from_numpy(d['bbox_xyxy']),torch.from_numpy(d['K_input']))
     np.savez_compressed(output/'body_features.npz',source_pts=d['source_pts'],body_feat=token.numpy())
     # Native output is MHR, not mislabeled as SMPL-X. Exact original model fields are kept.
-    np.savez_compressed(native_dir/'topology.npz',faces=extractor.model.head_pose.faces.detach().cpu().numpy())
-    write_json(native_dir/'native_output.json',dict(model='SAM 3D Body DINOv3',model_format='native MHR',
-        source_pts=d['source_pts'].tolist(),raw_output='unmodified body decoder return; tensor values saved before discarded by ExMR feature extractor',
-        units='model native units and axes; no conversion claimed here',
-        world_processing=False,features_reused_without_second_forward=True))
-    log('complete',frames=cursor,peak_cuda_bytes=int(torch.cuda.max_memory_allocated()))
+    if save_native:
+        np.savez_compressed(native_dir/'topology.npz',faces=extractor.model.head_pose.faces.detach().cpu().numpy())
+        write_json(native_dir/'native_output.json',dict(model='SAM 3D Body DINOv3',model_format='native MHR',
+            source_pts=d['source_pts'].tolist(),raw_output='unmodified body decoder return; tensor values saved before discarded by ExMR feature extractor',
+            units='model native units and axes; no conversion claimed here',
+            world_processing=False,features_reused_without_second_forward=True))
+    np.testing.assert_equal(len(token),len(d['source_pts']))
+    log('complete',frames=len(token),peak_cuda_bytes=int(torch.cuda.max_memory_allocated()))
 
 
 def hand_features(data, output, batch_size=8):
@@ -316,7 +340,7 @@ def hand_features(data, output, batch_size=8):
     log('complete',peak_cuda_bytes=int(torch.cuda.max_memory_allocated()))
 
 
-def infer(data, output):
+def infer(data, output, *, include_shared=True):
     torch=runtime(data)
     from exmr.model.exmr import ExMR
     from exmr.geometry.rotation_conversions import matrix_to_rotation_6d
@@ -329,26 +353,38 @@ def infer(data, output):
     log('loading_model',frames=len(pts),camera_only=True)
     model=ExMR.from_pretrained(checkpoint,model_path,device='cuda')
     R=torch.from_numpy(d['R_w2c']).float()
-    ang=matrix_to_rotation_6d(R[1:]@R[:-1].mT);ang=torch.cat([ang,ang[-1:]],dim=0)
+    groups=source_shot_slices(d)
     from exmr.preprocessing.keypoints import VISIBILITY_THRESHOLD
     native23=k['coco63_native_network'][:,:23].copy()
     native23[:,:,2]=(native23[:,:,2]>VISIBILITY_THRESHOLD['rtmw']).astype(np.float32)
     common={name:torch.from_numpy(array).float()[None].cuda() for name,array in dict(
-        bbx_xys=d['bbox_xys'],K_fullimg=d['K_input'],cam_angvel=ang.numpy(),
+        bbx_xys=d['bbox_xys'],K_fullimg=d['K_input'],
         body_feat=body['body_feat'],hand_feat=hand['hand_feat']).items()}
     stage_checks={}
     # Main ExMR uses its released RTMW visibility protocol. A cheap control keeps
     # the original GVHMR COCO17 exactly, isolating the effect of its 2D input.
-    for input_name,points,prefix in [('native23',native23,'exmr'),
-            ('shared17',k['coco23_shared_body'],'exmr_shared17')]:
+    modes=[('native23',native23,'exmr')]
+    if include_shared:modes.append(('shared17',k['coco23_shared_body'],'exmr_shared17'))
+    for input_name,points,prefix in modes:
         log('inference_started',frames=len(pts),body_input=input_name,
             source_pts=[int(pts[0]),int(pts[-1])],postprocess=False,
             snap_to_ground=False,smooth_incam=False,smooth_global=False,fps=25)
-        with torch.inference_mode():out=model(**common,kp2d=torch.from_numpy(points).float()[None].cuda(),
-            postprocess=False,snap_to_ground=False,smooth_incam=False,smooth_global=False,
-            camera_only=True,fps=25)
-        cpu={key:{k:v[0].cpu().numpy() for k,v in out[key].items()}
-            for key in ('smplx_incam_prefoot','smplx_incam_postfoot','smplx_incam')}
+        sequences=[]; static=[]
+        keys=('smplx_incam_prefoot','smplx_incam_postfoot','smplx_incam')
+        for group in groups:
+            rotation=R[group]
+            ang=matrix_to_rotation_6d(rotation[1:]@rotation[:-1].mT)
+            ang=torch.cat([ang,ang[-1:]],dim=0)[None].cuda()
+            with torch.inference_mode():
+                out=model(**{name:value[:,group] for name,value in common.items()},cam_angvel=ang,
+                    kp2d=torch.from_numpy(points[group]).float()[None].cuda(),
+                    postprocess=False,snap_to_ground=False,smooth_incam=False,smooth_global=False,
+                    camera_only=True,fps=25)
+            sequences.append({key:{k:v[0].cpu().numpy() for k,v in out[key].items()} for key in keys})
+            static.append(out['static_conf_logits'][0].cpu().numpy())
+            log('shot_inferred',first_pts=int(pts[group.start]),last_pts=int(pts[group.stop-1]),
+                frames=group.stop-group.start,body_input=input_name)
+        cpu={key:{k:np.concatenate([seq[key][k] for seq in sequences]) for k in sequences[0][key]} for key in keys}
         pre,post,final=(cpu[key] for key in ('smplx_incam_prefoot','smplx_incam_postfoot','smplx_incam'))
         for field in ('global_orient','transl','betas'):
             np.testing.assert_array_equal(pre[field],post[field]);np.testing.assert_array_equal(post[field],final[field])
@@ -363,14 +399,15 @@ def infer(data, output):
             if target.exists():raise FileExistsError('Preserve existing network output: '+str(target))
             np.savez_compressed(target,pts=pts,source_pts=pts,R_w2c=d['R_w2c'],K_rect=d['K_rect'],**arrays)
         np.savez_compressed(output/(prefix+'_static_diagnostic.npz'),source_pts=pts,
-            static_conf_logits=out['static_conf_logits'][0].cpu().numpy(),used_for_contact_truth=np.array(False))
+            static_conf_logits=np.concatenate(static),used_for_contact_truth=np.array(False))
         stage_checks[input_name]=dict(root_translation_shape_unchanged_by_refiners=True,
             foot_refiner_changed_only_ankles=True,hand_refiner_changed_only_elbows_wrists_and_fingers=True,
             maximum_ankle_axis_angle_change_rad=float(np.max(np.abs(pre['body_pose'][:,18:24]-post['body_pose'][:,18:24]))))
         log('camera_candidates_saved',body_input=input_name,prefix=prefix)
     write_json(output/'inference.json',dict(exmr_commit=EXMR_COMMIT,checkpoint_sha256=digest(checkpoint),
         smplx_sha256=digest(model_path),frames=len(pts),source_pts=[int(pts[0]),int(pts[-1])],
-        source_time_base=[1,12800],fps=25,one_continuous_model_call_per_input=True,input_controls=['native23','shared17'],
+        source_time_base=[1,12800],fps=25,one_continuous_model_call_per_input=len(groups)==1,
+        continuous_shots=len(groups),input_controls=[name for name,_,_ in modes],
         temporal_compatibility='25Hz explicit real source sequence; model trained frame-index cadence is not recalibrated',
         world_branch_executed=False,postprocess=False,snap_to_ground=False,
         smooth_incam=False,smooth_global=False,orientation_normalization=False,
@@ -378,7 +415,7 @@ def infer(data, output):
         control_body_input='original GVHMR COCO17, extra6 RTMW anatomical foot points with binary visibility',
         extra6='RTMW anatomical foot landmarks, not skate contacts',stage_checks=stage_checks,
         network_static_logits_contact_truth=False,peak_cuda_bytes=int(torch.cuda.max_memory_allocated())))
-    log('complete',candidates=['exmr_prefoot','exmr_postfoot','exmr_final','exmr_shared17_final'])
+    log('complete',candidates=[prefix+'_'+s for _,_,prefix in modes for s in ('prefoot','postfoot','final')])
 
 
 def main(argv=None):

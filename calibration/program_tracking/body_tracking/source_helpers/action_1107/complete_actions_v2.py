@@ -25,7 +25,7 @@ from calibration.program_tracking.body_tracking.skate_integration import Contact
 from calibration.program_tracking.body_tracking.contact_feasibility import ContactAL
 from calibration.program_tracking.body_tracking.ice_soft import IceSoftPolicy
 from calibration.program_tracking.body_tracking.fullbody_fit import FullBodyProblem, body_joint_assignment
-from calibration.program_tracking.body_tracking.memory_guard import ProcessMemoryGuard, check_memory_budget
+from calibration.program_tracking.body_tracking.memory_guard import ProcessMemoryGuard
 from calibration.program_tracking.body_tracking.weighted_blocks import block, signature, verify
 
 PROJECT=Path(r"D:/OneDrive/codex_projs/RinkSpace")
@@ -356,7 +356,6 @@ def run():
             accepted=0;trials=[]
             for k in range(MAX_ACCEPTED):
                 if time.monotonic()-tick>MAX_SECONDS:break
-                check_memory_budget()
                 start_J=time.monotonic()
                 r,J,costs,local_gate=local(x,True)
                 column_scale=bounds/.2

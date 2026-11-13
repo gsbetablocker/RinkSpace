@@ -110,7 +110,8 @@ def image_frame(inputs, src, packet, i):
 
 
 def chapters(inputs, output, stem):
-    document = read(output / "navigation.json")
+    path = output / "navigation.json"
+    document = read(path) if path.is_file() else {"cuts": [], "events": []}
     entries = {int(inputs.pts[0]): "Programme start"}
     for row in document["cuts"]:
         entries[row["pts"]] = row["label"]

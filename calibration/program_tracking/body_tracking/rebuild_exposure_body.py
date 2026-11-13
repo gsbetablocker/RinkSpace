@@ -13,6 +13,10 @@ from scipy.sparse import coo_matrix,diags
 from .rebuild_body_fit import ArticulatedSplineProblem
 
 
+class MovingBodyProjectionDomainError(ValueError):
+    """The proposed exposure motion has no resolved locally contractive row."""
+
+
 def row_weights(row,node_count=3,*,image_height=1080):
     last=int(image_height)-1
     if last<=0:raise ValueError('Positive image height required')
@@ -46,7 +50,7 @@ def moving_projection(projector,nodes,frames,*,jacobian=False,projection=None):
             new=projector.project(world,frames)
             error=float(np.max(np.abs(new-uv)));uv=new
             if error<1e-8:break
-        else:raise ValueError('Moving-body row projection failed to converge')
+        else:raise MovingBodyProjectionDomainError('Moving-body row projection failed to converge')
         weights,dw=row_weights(uv[:,:,1],node_count,image_height=height);world=np.einsum('nkl,nlkc->nkc',weights,nodes)
         out=dict(uv=uv,world=world,row_weights=weights,row_iterations=iteration+1,inside_exposure_rows=(uv[:,:,1]>=0)&(uv[:,:,1]<=height-1))
     else:
@@ -57,7 +61,7 @@ def moving_projection(projector,nodes,frames,*,jacobian=False,projection=None):
         _,jp=projector.with_jacobian(world,frames)
         wrow=np.einsum('nkl,nlkc->nkc',dw,nodes)
         a=np.einsum('nkpc,nkc->nkp',jp,wrow);denom=1-a[:,:,1]
-        if np.any(np.abs(a[:,:,1])>=1):raise ValueError('Moving-body row map is not locally contractive')
+        if np.any(np.abs(a[:,:,1])>=1):raise MovingBodyProjectionDomainError('Moving-body row map is not locally contractive')
         pixel=jp+a[:,:,:,None]*jp[:,:,1,None,:]/denom[:,:,None,None]
         metric=np.broadcast_to(np.eye(3),(*world.shape[:2],3,3))+wrow[:,:,:,None]*jp[:,:,1,None,:]/denom[:,:,None,None]
         out['pixel_jac_nodes']=pixel[:,:,:,None,:]*weights[:,:,None,:,None]

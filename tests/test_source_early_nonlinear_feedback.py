@@ -5,6 +5,7 @@ import pytest
 from scipy.sparse import csr_matrix
 
 from calibration.program_tracking.body_tracking.programme_source_step import (
+    CompleteNonlinearGuardChecks,
     SourceMargins,
     source_conditioned_direction,
 )
@@ -175,3 +176,29 @@ def test_default_waits_for_every_affine_domain_before_nonlinear_feedback(early):
     assert [row["local_trust_round"] for row in events if row["phase"] == "source_projection_start"].count(0) > 1
     np.testing.assert_array_equal(limits, [.2, 1., 1., 1.])
     np.testing.assert_allclose(step, [.2, .5, .8, .7], atol=4e-8, rtol=0.)
+
+
+def test_fraction_first_keeps_a_complete_guarded_descent():
+    margins, ready, unfinished = domains("flight")
+    events = []
+
+    def check(point):
+        x, _, z, _ = point
+        result = CompleteNonlinearGuardChecks({
+            ready: dict(rejected=.25*x + 2.*x*x > READY_CAP),
+            unfinished: dict(rejected=np.hypot(.6,z) > 1.02),
+        })
+        result.objective_cost = 2. + CoupledNormal.objective(point)[0]
+        return result
+
+    step, report = source_conditioned_direction(
+        CoupledNormal(),VALUE,(-1.,1.),margins,ACTIVE,control_step_limit=LIMITS,
+        nonlinear_source_check=check,early_nonlinear_ready_feedback=True,
+        early_complete_nonlinear_proposal=True,check_fraction_before_refinement=True,
+        progress=lambda **event:events.append(event),
+    )
+    np.testing.assert_allclose(step,.25*PREFERRED,atol=1.e-9)
+    assert report["checked_fraction_before_refinement"] == .25
+    assert report["nonlinear_completed_early"]
+    probes=[event for event in events if event["phase"]=="source_fraction_before_refinement"]
+    assert [event["guards_pass"] for event in probes] == [False,False,True]

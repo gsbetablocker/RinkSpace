@@ -417,8 +417,13 @@ class ProgrammeSurfaceFactor:
             if skin is None:skin=geometry.surface.sample_vertices(posed['native'],posed['frames'],skin_ids,hand_local_R=posed.get('hand_local_R'),double_precision=True)
             out[:,mask]=skin*ratio
         if np.any(~mask):
-            alpha=self.ref.binding.deformation(posed['native'],posed['frames'],skate_relative_R=posed['skate_relative_R'])
-            upper=self.ref.binding.deform(geometry.upper_vertices,alpha)
+            template_count=len(geometry.template_vertices)
+            local_gear=(ids[~mask]-geometry.skin_count)%geometry.gear_count
+            upper_ids=np.unique(local_gear[local_gear>=template_count]-template_count)
+            upper=None
+            if len(upper_ids):
+                alpha=self.ref.binding.deformation(posed['native'],posed['frames'],skate_relative_R=posed['skate_relative_R'])
+                upper=self.ref.binding.deform(geometry.upper_vertices[upper_ids],alpha)
             axes=posed['Q'].swapaxes(-1,-2)[:,None]@posed['R']
             origins=np.einsum('nji,nfj->nfi',posed['Q'],posed['O']-posed['P'][:,None])
             for foot in (0,1):
@@ -426,7 +431,11 @@ class ProgrammeSurfaceFactor:
                 take=(ids>=begin)&(ids<begin+geometry.gear_count)
                 if not np.any(take):continue
                 localids=ids[take]-begin
-                local=np.concatenate([np.broadcast_to(geometry.template_vertices,(len(out),*geometry.template_vertices.shape)),upper[:,foot]],axis=1)[:,localids]
+                rigid=localids<template_count
+                local=np.empty((len(out),len(localids),3))
+                local[:,rigid]=geometry.template_vertices[localids[rigid]]
+                if not rigid.all():
+                    local[:,~rigid]=upper[:,foot,np.searchsorted(upper_ids,localids[~rigid]-template_count)]
                 out[:,take]=(np.einsum('nij,nvj->nvi',axes[:,foot],local)+origins[:,foot,None])*ratio
         return out
 
@@ -465,9 +474,14 @@ class ProgrammeSurfaceFactor:
                 gap[rows]=contract(vertices)
             residual[rows]=np.maximum(-gap[rows],0.)*self.weight[rows]
             if not jacobian:continue
+            active=gap[rows]<0
+            if not np.any(active):
+                jac.append((rows,csr_matrix((len(rows),self.state.size))))
+                continue
             local=np.zeros((len(rows),1,69));shoe=np.zeros((len(rows),1,6))
-            gain=-self.weight[rows]*(gap[rows]<0)
-            has_gear=np.any(~skin_mask)
+            gain=-self.weight[rows]*active
+            gear_rows=~skin_mask[va] | np.any(~skin_mask[vb],axis=1)
+            has_gear=np.any(active & gear_rows)
             for joint in range(1,22):
                 columns=6+3*(joint-1)+np.arange(3)
                 axes=right_jacobian(np.asarray(d[:,columns]))
@@ -482,11 +496,19 @@ class ProgrammeSurfaceFactor:
                         dv[:,~skin_mask]=(zp-zm)/(2e-6)
                     local[:,0,column]=gain*contract(dv)
             if has_gear:
+                # A relative rotation changes the shoe attachment and upper,
+                # with the identical posed native skeleton and hands.
+                def relative_vertices(rotation):
+                    R,O=self.ref.binding.transforms(posed['P'],posed['Q'],posed['native'],posed['frames'],
+                        skate_relative_R=rotation)
+                    gear_pose=dict(posed,R=R,O=O,skate_relative_R=rotation)
+                    return self._selected(gear_pose,ids[~skin_mask])
                 for foot in (0,1):
                     for axis in range(3):
-                        plus=perturb_relative(d,foot,axis,1e-6);minus=perturb_relative(d,foot,axis,-1e-6)
+                        plus=perturb_relative(d,foot,axis,1e-6).skate_relative_R
+                        minus=perturb_relative(d,foot,axis,-1e-6).skate_relative_R
                         dv=np.zeros_like(vertices)
-                        dv[:,~skin_mask]=(self._selected(fk_state(self.ref,base,plus),ids[~skin_mask])-self._selected(fk_state(self.ref,base,minus),ids[~skin_mask]))/(2e-6)
+                        dv[:,~skin_mask]=(relative_vertices(plus)-relative_vertices(minus))/(2e-6)
                         shoe[:,0,3*foot+axis]=gain*contract(dv)
             # Both skin supports, gear skin deformation and relative shoe chain
             # are scattered. Root P and Q remain identically zero locally.

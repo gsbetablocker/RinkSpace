@@ -127,9 +127,10 @@ class ProgrammeCavityTrialGuard:
                     model_foot=foot)
 
     def record(self):
+        scope = ('relative cavity and collar model AL' if len(self.kinds) == 4 else 'relative foot cavity model AL')
         return dict(caps=dict(zip(self.kinds, self.caps.tolist())), source_frames=len(self.times),
                     numerical_allowance='1e-7 * max(1, baseline weighted norm)',
-                    scope='relative cavity and collar model AL; no ice rows or calibrated acceptance')
+                    scope=scope+'; no ice rows or calibrated acceptance')
 
 
 class ProgrammeGuardProposals:
@@ -144,6 +145,8 @@ class ProgrammeGuardProposals:
         self.joint_caps=np.array([joint_caps[n]+1e-5 for n in NAMES]);self.surface_cap=-float(surface_peak)+1e-6
         terms={b.name:b for b in value['weighted_blocks']};joint=terms['anatomical_joint_domain'];surface=terms['surface_intersection']
         self.joint_jac=joint.jacobian;self.surface_jac=surface.jacobian
+        whole_skate=terms.get('whole_skate_source')
+        self.whole_skate_jac=None if whole_skate is None else whole_skate.jacobian
         self.joint_shape=(len(self.joint.times),len(self.joint.joints),3)
         joint_scale=np.broadcast_to(self.joint.weights[:,None,None],self.joint_shape).ravel()*np.sqrt(problem.objective_block_weights['anatomical_joint_domain'])
         joint_cap=np.broadcast_to(self.joint_caps[None,:,None],self.joint_shape).ravel()
@@ -164,6 +167,14 @@ class ProgrammeGuardProposals:
         self.pixel_delta=body.cache['uv'][body.of,body.layout.body_landmarks[getattr(body,'model_oj',joints)]]-body.obs['uv'][frames,joints]
         self.start_pixels=np.linalg.norm(self.pixel_delta,axis=1)
         balls=list(source_margins.image_balls)
+        if whole_skate is not None:
+            norm=float(np.linalg.norm(whole_skate.residual))
+            if norm>0.:
+                radius=norm*np.sqrt(1.05)
+                balls.append(dict(source_id='whole_skate_source',model_foot=None,
+                    unit='weighted whole-skate residual norm',guard_margin=radius-norm,
+                    jacobian=whole_skate.jacobian,offset=whole_skate.residual[None].copy(),
+                    radius=np.array([radius]),labels=['whole_skate_source']))
         if flight_guard is not None:balls.extend(flight_guard.domains(value))
         if dense_flight_guard is not None:balls.extend(dense_flight_guard.domains(value))
         for i,g in enumerate(self.groups):
@@ -185,6 +196,8 @@ class ProgrammeGuardProposals:
             return self.dense_flight_guard.dependency(key)
         if self.flight_guard is not None and key.startswith('__flight__/'):
             return self.flight_guard.dependency(key)
+        if key=='whole_skate_source' and self.whole_skate_jac is not None:
+            return dict(jacobian=self.whole_skate_jac,model_foot=None)
         fields=key.split('/');matrix=None
         if fields[0]=='__joint__':
             row=int(fields[1]);matrix=self.joint_jac[row]
@@ -230,4 +243,6 @@ class ProgrammeGuardProposals:
                 rejected=bool(checks[g['name']]['rejected'] and now>cap)
             result[key]=dict(rejected=bool(rejected),before=cap,after=now,original_radius_px=None,model_foot=None,unit=unit,
                 original_nonlinear_guard_unchanged=True)
-        return CompleteNonlinearGuardChecks(result)
+        checked=CompleteNonlinearGuardChecks(result)
+        checked.objective_cost=float(value['residual']@value['residual']/2)
+        return checked

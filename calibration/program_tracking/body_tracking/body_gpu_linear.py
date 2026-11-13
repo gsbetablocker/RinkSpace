@@ -113,6 +113,12 @@ class CuDSSSession:
                 self.call('cudssDestroy',self.handle)
                 self.handle=ctypes.c_void_p()
 
+    def release_factorization(self):
+        """Retire a completed proposal's matrix before the next nonlinear linearization."""
+        self.stream.synchronize()
+        self._release_matrices()
+        self.torch.cuda.empty_cache()
+
     def __exit__(self,*exc):
         self.close()
 
@@ -189,30 +195,50 @@ class CuDSSSession:
 
 class DeviceCSRLayout:
     """Canonical slots retained across numeric evaluations of one control layout."""
-    def __init__(self):
+    row_batch = 16384
+
+    def __init__(self,*,retain_inactive_slots=True):
         self.shape=None
         self.epoch=0
         self.linearization_id=0
+        self.retain_inactive_slots=retain_inactive_slots
         self.row=self.columns=self.row_device=self.columns_device=None
 
-    def upload(self,matrix,prefix,torch):
+    def upload(self,matrix,prefix,torch,stop=None):
         matrix.sum_duplicates()
         ptr=matrix.indptr.astype(np.int32,copy=False)
         col=matrix.indices.astype(np.int32,copy=False)
-        shape=(matrix.shape,prefix)
+        stop=matrix.shape[1] if stop is None else stop
+        streamed=stop<matrix.shape[1] and len(col)>0 and col.max()>=stop
+        if streamed:
+            ptr,col=self._clip_structure(ptr,col,stop)
+
+        def read_values(first,last):
+            lo,hi=matrix.indptr[first],matrix.indptr[last]
+            values=matrix.data[lo:hi]
+            if streamed and ptr[last]-ptr[first]!=hi-lo:
+                values=values[matrix.indices[lo:hi]<stop]
+            return values
+
+        shape=(matrix.shape,prefix,stop)
         same=self.shape==shape
         equal=same and np.array_equal(ptr,self.row) and np.array_equal(col,self.columns)
         reused=equal
         layout_bytes=0
-        if equal:
-            values=torch.from_numpy(matrix.data).to('cuda')
+        active_entries=len(col)
+        aligned=(self._merge_slots(matrix.shape[0],stop,ptr,col,read_values,torch)
+                 if same and not equal and self.retain_inactive_slots else None)
+        if aligned is not None:
+            ptr,col,values=aligned
+            reused=ptr is self.row
+        elif streamed:
+            values=torch.empty(active_entries,dtype=torch.float64,device='cuda')
+            for first in range(0,matrix.shape[0],self.row_batch):
+                last=min(first+self.row_batch,matrix.shape[0])
+                values[ptr[first]:ptr[last]].copy_(torch.from_numpy(read_values(first,last)))
         else:
-            aligned=self._merge_slots(matrix,ptr,col,torch) if same else None
-            if aligned is None:
-                values=torch.from_numpy(matrix.data).to('cuda')
-            else:
-                ptr,col,values=aligned
-                reused=ptr is self.row
+            values=torch.from_numpy(matrix.data).to('cuda')
+        if not equal:
             if not reused:
                 self.epoch+=1
                 self.shape=shape
@@ -227,19 +253,41 @@ class DeviceCSRLayout:
         return self.row_device,self.columns_device,values,dict(
             linearization_id=self.linearization_id,jacobian_structure_epoch=self.epoch,
             jacobian_structure_reused=reused,jacobian_structure_H2D_bytes=layout_bytes,
-            retained_structural_zero_slots=len(col)-matrix.nnz,
+            retained_structural_zero_slots=len(col)-active_entries,
+            inactive_entries_skipped=matrix.nnz-active_entries,
+            host_slice_value_bytes_avoided=active_entries*matrix.data.itemsize if stop<matrix.shape[1] else 0,
             jacobian_H2D_bytes=layout_bytes+values.numel()*values.element_size())
 
-    def _merge_slots(self,matrix,ptr,col,torch):
+    def _clip_structure(self,ptr,col,stop):
+        """Filter each row without staging a second full array of Jacobian values."""
+        clipped_ptr=np.empty_like(ptr);clipped_ptr[0]=0
+        clipped_col=np.empty_like(col)
+        written=0
+        for first in range(0,len(ptr)-1,self.row_batch):
+            last=min(first+self.row_batch,len(ptr)-1)
+            lo,hi=int(ptr[first]),int(ptr[last]);tile=col[lo:hi]
+            keep=tile<stop
+            if keep.all():
+                counts=ptr[first+1:last+1]-lo
+            else:
+                cumulative=np.empty(len(keep)+1,dtype=ptr.dtype);cumulative[0]=0
+                np.cumsum(keep,dtype=ptr.dtype,out=cumulative[1:])
+                counts=cumulative[ptr[first+1:last+1]-lo]
+                tile=tile[keep]
+            clipped_ptr[first+1:last+1]=written+counts
+            clipped_col[written:written+len(tile)]=tile
+            written+=len(tile)
+        return clipped_ptr,clipped_col[:written]
+
+    def _merge_slots(self,row_count,width,ptr,col,read_values,torch):
         # Merge the actual fixed row support and newly active witnesses.
         # Once a slot is admitted it remains even when its value is zero.
         # Bound the structural overhang independently from the live values.
         slots=[]
-        width=matrix.shape[1]
         count=0
         extra_limit=(64*1024**2)//(4+8)
-        for lo in range(0,matrix.shape[0],16384):
-            hi=min(lo+16384,matrix.shape[0])
+        for lo in range(0,row_count,self.row_batch):
+            hi=min(lo+self.row_batch,row_count)
             left,right=int(self.row[lo]),int(self.row[hi])
             a,b=int(ptr[lo]),int(ptr[hi])
             previous=self.columns[left:right]
@@ -259,7 +307,7 @@ class DeviceCSRLayout:
                 else:
                     indices=(union%width).astype(np.int32)
                     counts=np.bincount(union//width,minlength=hi-lo)
-            slots.append((lo,hi,a,b,indices,counts,mapping))
+            slots.append((lo,hi,indices,counts,mapping))
             count+=len(indices)
             if count-b>extra_limit:
                 return None
@@ -270,16 +318,17 @@ class DeviceCSRLayout:
         if growth:
             row[0]=0
         out=0
-        for lo,hi,a,b,indices,counts,mapping in slots:
+        for lo,hi,indices,counts,mapping in slots:
             stop=out+len(indices)
             if growth:
                 np.cumsum(counts,out=row[lo+1:hi+1])
                 row[lo+1:hi+1]+=out
                 columns[out:stop]=indices
-            tile=matrix.data[a:b]
+            tile=read_values(lo,hi)
             if mapping is not None:
-                tile=np.zeros(len(indices),dtype=tile.dtype)
-                tile[mapping]=matrix.data[a:b]
+                aligned=np.zeros(len(indices),dtype=tile.dtype)
+                aligned[mapping]=tile
+                tile=aligned
             result[out:stop].copy_(torch.from_numpy(tile))
             out=stop
         return row,columns,result
@@ -287,15 +336,17 @@ class DeviceCSRLayout:
 
 class GPUJacobian(LinearOperator):
     """A real FP64 CSR operator; no host array impersonates device memory."""
-    def __init__(self,matrix,*,shared_prefix=0,session=None,layout=None):
+    def __init__(self,matrix,*,shared_prefix=0,column_stop=None,session=None,layout=None):
         import torch
         self.torch=torch;matrix=matrix.tocsr();self.prefix=int(shared_prefix);self._gram=None
         self._normal_transpose=None;self._transpose_argument=None;self._transpose_result=None
         if not np.isfinite(matrix.data).all():raise ArithmeticError('Nonfinite actual weighted CSR before GPU upload')
         if self.prefix and matrix.nnz and np.min(matrix.indices)<self.prefix:raise ValueError('Frozen prefix has nonzero Jacobian columns')
-        started=time.perf_counter();cols=matrix.shape[1]-self.prefix
+        stop=matrix.shape[1] if column_stop is None else int(column_stop)
+        if not self.prefix<stop<=matrix.shape[1]:raise ValueError('Invalid active Jacobian column window')
+        started=time.perf_counter();cols=stop-self.prefix
         layout=DeviceCSRLayout() if layout is None else layout
-        row,index,values,transfer=layout.upload(matrix,self.prefix,torch)
+        row,index,values,transfer=layout.upload(matrix,self.prefix,torch,stop)
         self.device=values.device;self.J=torch.sparse_csr_tensor(row,index,values,size=(matrix.shape[0],cols))
         norm=torch.zeros(cols,dtype=torch.float64,device=self.device)
         for first in range(0,len(values),4_000_000):
@@ -305,7 +356,7 @@ class GPUJacobian(LinearOperator):
         self.transfer=dict(transfer,jacobian_H2D_seconds=time.perf_counter()-started)
         self._dss=session;self.released=False;super().__init__(dtype=np.dtype('float64'),shape=(matrix.shape[0],cols))
 
-    def release(self):
+    def release(self,*,release_factorization=False):
         """Retire a completed linearization while TRF still holds its wrapper.
 
         SciPy requests the next Jacobian only after accepting its new fun state.
@@ -313,10 +364,12 @@ class GPUJacobian(LinearOperator):
         but their device data must not overlap the new FK/J/Gram workspace.
         """
         if self.released:return
+        session=self._dss
         self.J=None;self._gram=None;self._diag=None;self._gram_tiles=None;self._scaling_tiles=None
         self._normal_transpose=None;self._transpose_argument=None;self._transpose_result=None
         self._dss=None;self.released=True
-        self.torch.cuda.empty_cache()
+        if release_factorization and session is not None:session.release_factorization()
+        else:self.torch.cuda.empty_cache()
 
     def _matmat(self,x):
         if self.released:raise RuntimeError('Retired GPU linearization used after replacement')
@@ -472,7 +525,8 @@ class GPUJacobian(LinearOperator):
         return x.cpu().numpy(),record
 
 
-def gpu_trf(fun,jac,x0,lower,upper,*,callback,options,warm_relative=False,log=None):
+def gpu_trf(fun,jac,x0,lower,upper,*,callback,options,warm_relative=False,
+            release_factorization_on_relinearize=False,log=None):
     """The installed SciPy TRF, with its identical adaptive Jacobian scaling."""
     origin=None
     if warm_relative:
@@ -508,7 +562,9 @@ def gpu_trf(fun,jac,x0,lower,upper,*,callback,options,warm_relative=False,log=No
     active=None
     def replacing_jac(z):
         nonlocal active
-        if active is not None:active.release();active=None
+        if active is not None:
+            active.release(release_factorization=release_factorization_on_relinearize)
+            active=None
         result=jac(z)
         if isinstance(result,GPUJacobian):active=result
         return result

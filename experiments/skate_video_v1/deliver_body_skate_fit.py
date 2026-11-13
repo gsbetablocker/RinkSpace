@@ -1,6 +1,7 @@
 """Replay the jointly fitted state, audit it, and render the native-source comparison."""
 from argparse import ArgumentParser
 from concurrent.futures import ThreadPoolExecutor
+from copy import copy
 from dataclasses import asdict
 import json
 from pathlib import Path
@@ -122,8 +123,9 @@ def open_collar_clearance(problem, ref):
                 sole_wall_mm=quantiles(np.asarray(floor) * binding.ratio * 1000))
 
 
-def archived_edge_check(problem, ref):
-    rows = [row for row in problem.i.checks if row["semantic"] == "runner_lower_edge" and row["foot"] in (0, 1)]
+def archived_edge_check(problem, ref, rows=None):
+    if rows is None:
+        rows = [row for row in problem.i.checks if row["semantic"] == "runner_lower_edge" and row["foot"] in (0, 1)]
     if not rows:
         return {}, {}
     frames = np.unique([problem.i.index[row["pts"]] for row in rows])
@@ -427,23 +429,28 @@ def comparison(problem, assembly, face, uv, shoe, j, i, source, captured, titles
     return canvas
 
 
-def render_video(problem, output, *, proof_only=False, baseline=None):
+def render_video(problem, output, *, proof_only=False, baseline=None, references=None,
+                 proof_seconds=PROOF_SECONDS, source_window=None, parameter=None, refit_label=None):
     # Existing NVENC writer and exact PTS validation consume the generator.
     # The earlier isolated experiments use short sibling imports.
     sys.path.insert(0, str(Path(__file__).parent))
     from render_review import render
     sys.path.pop(0)
     cv2.setNumThreads(2)
-    old = old_ref(problem) if baseline is None else saved_ref(problem, baseline / "controls.npz")
-    refs = [old, saved_ref(problem, output / "controls.npz")]
-    titles = ("SOURCE", "BEFORE  |  Restored joint fit", "AFTER  |  Whole skate joint refit") if baseline is None else (
-        "SOURCE", "BEFORE  |  Previous joint fit", "AFTER  |  Revised skate attachment")
+    if references is None:
+        old = old_ref(problem) if baseline is None else saved_ref(problem, baseline / "controls.npz")
+        refs = [old, saved_ref(problem, output / "controls.npz")]
+        titles = ("SOURCE", "BEFORE  |  Restored joint fit", "AFTER  |  Whole skate joint refit") if baseline is None else (
+            "SOURCE", "BEFORE  |  Previous joint fit", "AFTER  |  Revised skate attachment")
+    else:
+        refs = references
+        titles = ("SOURCE", "BEFORE  |  Previous joint fit", "AFTER  |  " + (refit_label or "ExMR + native body/skate fit"))
     assemblies = [Assembly(r.binding) for r in refs]
     ids, face = display_mesh(refs[0].binding.surface)
     emit("native_reprojection_start", body_render_vertices=len(ids), body_render_triangles=len(face),
          skate_render_vertices=[len(a.vertices) for a in assemblies],
          body_full_vertices=len(refs[0].binding.surface.shaped), output=str(output / VIDEO))
-    wanted = {int(np.argmin(abs(problem.i.times - s))) for s in PROOF_SECONDS}
+    wanted = {int(np.argmin(abs(problem.i.times - s))) for s in proof_seconds}
     proof = output / "frames"
     proof.mkdir(exist_ok=True)
     captured = {i: proof / f"pts_{problem.i.pts[i]}.jpg" for i in wanted}
@@ -455,9 +462,20 @@ def render_video(problem, output, *, proof_only=False, baseline=None):
             comparison(problem, assemblies, face, uv, shoe, 0, i, source, captured, titles)
         return
 
+    first,last=0,len(problem.i.pts)
+    review_inputs=problem.i
+    if source_window is not None:
+        a,b=problem.i.tb
+        first,last=np.searchsorted(problem.i.pts,np.rint(np.asarray(source_window)*b/a).astype(np.int64))
+        if not 0 <= first < last <= len(problem.i.pts):
+            raise ValueError("Empty or invalid native source review window")
+        review_inputs=copy(problem.i)
+        for key in ("pts","times","shots"):
+            setattr(review_inputs,key,getattr(problem.i,key)[first:last])
+
     def generate():
-        read_frames = iter(problem.i.frames(0, len(problem.i.pts)))
-        batches = iter(np.array_split(np.arange(len(problem.i.pts)), int(np.ceil(len(problem.i.pts) / 20))))
+        read_frames = iter(problem.i.frames(first, last))
+        batches = iter(np.array_split(np.arange(first,last), int(np.ceil((last-first) / 20))))
         with ThreadPoolExecutor(max_workers=2) as pool:
             def submit(frames):
                 return [pool.submit(projection_batch, problem, r, frames, a, ids)
@@ -476,14 +494,14 @@ def render_video(problem, output, *, proof_only=False, baseline=None):
                     yield comparison(problem, assemblies, face, uv, shoe, j, i, src, captured, titles)
                 frames = following
 
-    if not (output / "navigation.json").is_file():
+    if source_window is None and not (output / "navigation.json").is_file():
         navigation(problem, output)
-    render(problem.i, output, VIDEO, generate(), SIZE)
+    render(review_inputs, output, VIDEO, generate(), SIZE)
     atomic_json(output / "video_receipt.json", dict(path=str(output / VIDEO), sha256=digest(output / VIDEO),
-                exposures=len(problem.i.pts), source_time_base=list(problem.i.tb),
-                source_pts=[int(problem.i.pts[0]), int(problem.i.pts[-1])],
+                exposures=len(review_inputs.pts), source_time_base=list(problem.i.tb),
+                source_pts=[int(review_inputs.pts[0]), int(review_inputs.pts[-1])],
                 native_library=problem.info["native_library"], camera_sha256=problem.i.camera_sha,
-                controls_sha256=digest(output / "controls.npz"), five_actual_exposure_nodes=True,
+                controls_sha256=digest(parameter or (output / "controls.npz")), five_actual_exposure_nodes=True,
                 render_body_vertices=len(ids), render_body_triangles=len(face),
                 rendering="same full body model with render-only mesh reduction; dense mesh in 3D player"))
 
