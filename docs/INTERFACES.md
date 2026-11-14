@@ -47,7 +47,9 @@ python -m rinkspace model preview-print-installation --scene FILE --assets FILE 
 
 公共入口已接入当前 native 实体语义、既有线／圈联合读数和 `SourceFeedbackRead` 的实际使用回执。围挡正面读取蓝带上沿与黄带下沿；只见顶面时使用朝冰边缘，顶面、外侧设备和人物不能获得广告身份。现有官方 S06 顶面证据只在源 SHA、整数 PTS、时基及原生 RGB 哈希全部一致时保留原 UV 与相关身份；新环境的剖面复读另存诊断，不能覆盖它。其它画面缺证据时保留未知。
 
-读取入口不调用求解或修改模型；输出保留逐帧读数、知识消费回执、模型版本与 native 引用。`enable_candidate_admission: true` 才启用候选准入，默认关闭，输出 `native_material.candidate_admission_enabled` 记录实际选择。旧 `observe audit` 已撤销。真实检查范围以 source_reader_audit.json 为准，局部检查不表示全 S01–S09 自动取点完成。
+读取入口输出逐帧读数、知识消费回执、模型版本与 native 引用。`enable_candidate_admission: true` 显式启用候选准入，实际选择见 `native_material.candidate_admission_enabled`。[节目取点检查](../events/ankara_2026/programmes/okada_mei_sp/source_reader_audit.json)记录历史验证范围。
+
+`python -m rinkspace observe check-source --request FILE --out DIR` 对照源读数并输出修复候选。`python -m rinkspace observe programme --job FILE --out DIR [--resume] [--previous-job FILE]` 按节目 job 的原生 PTS 组织读取与导航。`--resume` 用于取点产物，源覆盖与定位验收按 [VALIDATION](VALIDATION.md) 判断。
 
 ## 2. 完整节目范围与源时钟〔prepare/review 已接入〕
 

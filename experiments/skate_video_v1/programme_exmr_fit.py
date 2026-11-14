@@ -283,13 +283,18 @@ def seat_legs(problem, P, Q, local, old):
         initial_ankle_position_discrepancy_m=statistics(np.linalg.norm(ankle-(target-displacement[:,None]),axis=-1)))
 
 
-def direct_spin_seed(problem, current, old, rows):
+def direct_spin_seed(problem, current, old, rows, *, episode):
     """Choose a continuous source-supported yaw branch for the seated-leg initialization."""
+    if len(rows)<2:
+        raise ValueError("Directed spin initialization requires two native source anchors")
     ref=saved_ref(problem,current)
     pts=problem.i.pts
     frame=np.searchsorted(pts,[r["pts"] for r in rows])
     times=problem.ref.times
-    foot=1
+    foot=episode["foot"]
+    if foot not in (0,1) or any(row["foot"]!=foot for row in rows):
+        raise ValueError("Directed spin rows must use the source support foot")
+    np.testing.assert_array_equal(pts[frame],[row["pts"] for row in rows])
     basis=old["R"][:,foot]
     yaw=np.unwrap(np.arctan2(basis[:,1,0],basis[:,0,0]))
     pivot=old["O"][:,foot]+basis@old["pivot"][foot]
@@ -334,12 +339,21 @@ def direct_spin_seed(problem, current, old, rows):
         a,b=frame[[0,-1]]
         signal=yaw.copy()
         signal[a:b+1]=PchipInterpolator(times[frame],selected)(times[a:b+1])
-        # Taper only the unobserved transition outside the directed source chord.
-        for i,step in ((a,-1),(b,1)):
-            ix=i+step*np.arange(1,5)
-            u=np.arange(1,5)/5.
-            offset=np.arctan2(np.sin(signal[i]-yaw[i]),np.cos(signal[i]-yaw[i]))
-            signal[ix]+=offset*(1-u*u*(3-2*u))
+        start,stop=np.searchsorted(pts,[episode["start_pts"],episode["end_pts_inclusive"]])
+        if not 0<=start<a<b<stop<len(pts):
+            raise ValueError("Directed anchors must lie inside the observed support episode")
+        np.testing.assert_array_equal(pts[[start,stop]],
+                                      [episode["start_pts"],episode["end_pts_inclusive"]])
+        # Carry the measured phase into the episode rather than pulling back
+        # towards the old yaw immediately after the last signed image chord.
+        # Torso turn is an initialization cue. The main factors retain the
+        # independent shoe motion, anatomy, support and source residuals.
+        for edge,ids,endpoint in ((a,np.arange(start,a),start),(b,np.arange(b+1,stop+1),stop)):
+            guided=signal[edge]+pelvis[ids]-pelvis[edge]
+            old_branch=yaw[ids]+2*np.pi*np.round((guided-yaw[ids])/(2*np.pi))
+            u=np.clip(np.abs(times[ids]-times[edge])/abs(times[endpoint]-times[edge]),0.,1.)
+            taper=u*u*(3.-2.*u)
+            signal[ids]=guided*(1.-taper)+old_branch*taper
         delta=signal-yaw
         R=Rotation.from_rotvec(np.column_stack((np.zeros((len(yaw),2)),delta))).as_matrix()@basis
         old=dict(old,R=old["R"].copy(),O=old["O"].copy())
@@ -428,7 +442,9 @@ def prepare(visual, previous, job):
     obs["sigma_px"]=sigma
     obs["inside_tracked_shoe_proxy"]=hidden
     whole=source_roles(visual,previous,job,problem.i.camera_sha)
-    old,direction=direct_spin_seed(problem,previous/"controls.npz",old,whole["directed_boot_rows"])
+    spin=next(e for e in read(problem.i.document_path)["source_episode_review"]["episodes"]
+              if e["episode_id"]=="spin_support")
+    old,direction=direct_spin_seed(problem,previous/"controls.npz",old,whole["directed_boot_rows"],episode=spin)
     P=root_on_original_camera(problem,Q,network_local,hand,old["P"],obs)
     P,local,seat=seat_legs(problem,P,Q,network_local,old)
     clock=problem.ref.times
@@ -562,7 +578,8 @@ def repair_representation(visual, previous, job, source, destination):
     packet=load(source/"initial.npz")
     roles=load(job/"whole_skate_roles.npz")
     old=load(job/"displayed_baseline.npz")
-    old,turn=direct_spin_seed(problem,previous/"controls.npz",old,doc["whole_skate_source"]["directed_boot_rows"])
+    old,turn=direct_spin_seed(problem,previous/"controls.npz",old,doc["whole_skate_source"]["directed_boot_rows"],
+                              episode=doc["whole_skate_source"]["support_shoe_phase"])
     time=ref.times
     frames=np.arange(len(time))
     raw_pose={key:packet[key] for key in ("P","Q","local_R","hand_local_R")}

@@ -251,7 +251,10 @@ def prepare(visual, previous, job, *, refine=False):
                          development_windows=((150.90,151.14),))
     roles = load(job/"whole_skate_roles.npz")
     mount,pivot = direct_ankle_binding(archived,base,roles["visible"])
-    phase, direction = direct_spin_seed(problem,controls,dict(base,pivot=pivot),whole["directed_boot_rows"])
+    spin=next(e for e in read(problem.i.document_path)["source_episode_review"]["episodes"]
+              if e["episode_id"]=="spin_support")
+    phase, direction = direct_spin_seed(problem,controls,dict(base,pivot=pivot),whole["directed_boot_rows"],
+                                        episode=spin)
     phase_change = phase["R"][:,1]@base["R"][:,1].swapaxes(-1,-2)
     angle = np.unwrap(np.arctan2(phase_change[:,1,0],phase_change[:,0,0]))
     phase_at = PchipInterpolator(t,angle,extrapolate=False)
@@ -270,7 +273,8 @@ def prepare(visual, previous, job, *, refine=False):
     target = target_pose(times,replay)
     before_R = replay["local_R"][:,ANKLES-1]
     new_R = target["local_R"][:,ANKLES-1]
-    transition = (t>=84.46)&(t<=85.04)
+    from calibration.program_tracking.body_tracking.body_clock import source_interval_mask
+    transition = source_interval_mask(problem.i.pts, problem.i.tb, "84.46", "85.04")
     # Knots in the observed directional transition allow the existing curve
     # to follow the source branch without changing resolution across the programme.
     transition_breaks = t[transition] if direction["kept"] else np.empty(0)

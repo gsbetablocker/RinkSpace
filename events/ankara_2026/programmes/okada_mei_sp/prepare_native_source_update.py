@@ -418,6 +418,7 @@ def replace_source_groups(original, state, manifest, mapping, packets, correctio
     """Merge groups in shot blocks, retaining original rows and numeric origins."""
     path_ids = list(mapping['path_ids']); lookup = {path:i for i,path in enumerate(path_ids)}
     incoming, group_owner, group_counts, partial_spans = defaultdict(list), {}, Counter(), {}
+    group_packet_indices = defaultdict(list)
     explicit_parent_ids, explicit_parent_sets = {}, {}
     for packet_index, packet in enumerate(packets):
         z = {key:value.copy() for key,value in packet['points'].items()}
@@ -439,8 +440,15 @@ def replace_source_groups(original, state, manifest, mapping, packets, correctio
         for pts, path in groups:
             key = packet['shot_id'], pts, path
             if key in group_owner:
-                raise ValueError('Multiple packets claim the same replacement group')
-            group_owner[key] = packet_index
+                # Independent current-source fragments may append to the same
+                # curve/exposure. Only explicit empty replacement authorities
+                # are composable: any actual retirement remains exclusive.
+                if not (explicit and not declared_ids[pts, path_ids[path]]
+                        and key in explicit_parent_ids and not explicit_parent_ids[key]):
+                    raise ValueError('Multiple packets claim the same replacement group')
+            else:
+                group_owner[key] = packet_index
+            group_packet_indices[key].append(packet_index)
             if explicit:
                 explicit_parent_ids[key] = tuple(declared_ids[pts, path_ids[path]])
                 explicit_parent_sets[key] = set(explicit_parent_ids[key])
@@ -502,6 +510,7 @@ def replace_source_groups(original, state, manifest, mapping, packets, correctio
             changes.append(dict(shot_id=shot['id'], pts=pts, native_path_id=path_ids[path],
                 parent_row_indices=old_groups.get((pts,path), []), old_rows=len(old_groups.get((pts,path), [])),
                 incoming_rows=group_counts[key], packet_index=group_owner[key],
+                packet_indices=group_packet_indices[key],
                 partial_line_spans=([span.tolist() for span in partial_spans[key]] if key in partial_spans else None),
                 action=('replace_remeasured_line_spans' if key in partial_spans else
                         ('replace_measured_group' if (pts,path) in old_groups else 'add_measured_group'))))

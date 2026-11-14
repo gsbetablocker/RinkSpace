@@ -2,13 +2,13 @@
 
 RinkSpace 研究如何从花样滑冰转播中恢复冰场、连续围挡、广告与相机的共同几何模型，再将选手运动连接到统一场地和原始视频时间轴。
 
-项目处于研究验证阶段。当前开发分支为 `rebuild`；本页描述该分支的工作区能力，公开默认分支和冻结审阅包各有自己的版本范围。安卡拉赛事与冈田芽衣节目是开发样本，完整节目定位、相机物理参数、人体空间位置及跨赛事能力尚未完成验证。
+RinkSpace 处于研究验证阶段。`rebuild` 是当前开发分支和公开默认分支，[`main`](https://github.com/gsbetablocker/RinkSpace/tree/main) 保存 2026-10-24 的旧版。安卡拉的冈田芽依和金书贤短节目是实际开发样本，独立相机物理标定、人体空间位置和跨赛事能力仍待验证。
 
-当前原生核心支持 CPU／GPU 共用几何、完整时变相机、共享场景与曲线位置的联合连续 LM，可安全停止并在同一进程继续。冈田芽衣短节目已接入 S01–S09 九镜头、三个物理机位，完成真实联合拟合与完整回放；当前采用用户指定的 `camera_solver_refined_1102` 暂定最终状态。该状态未达到一阶数值收敛，局部投影运动、源特征覆盖与独立物理标定仍有限制，精确绑定和人工确认范围见[节目入口](events/ankara_2026/programmes/okada_mei_sp/README.md)。完整磁盘断点恢复和全节目自动取点尚未交付，能力与缺口见[实现状态](docs/REBUILD.md)。
+安卡拉两套短节目已在同一冰场几何上完成拟合和整片回放，并于 2026-11-13 登记为[暂定最终版本](events/ankara_2026/README.md#暂定最终版本)。整片视觉验收仍待完成。原生核心支持共同几何、时变相机、输入准备和连续 GPU LM，接口及能力边界见[实现状态](docs/REBUILD.md)。
 
-**冈田芽衣短节目的重构处理起点为原片 22.120 秒，PTS 283136，原生时基 1/12800。** 当前处理范围与历史物理镜头范围的差别见[范围文件](events/ankara_2026/programmes/okada_mei_sp/rebuild_scope.json)和[源时间说明](events/ankara_2026/programmes/okada_mei_sp/README.md#analysis-start)解释。起点前的原片与观测保留；19.960 秒准备画面另作开头人体姿势和位置辅助，不改变节目处理起点。
+两套节目的源时间、镜头划分和回放入口见[赛事索引](events/ankara_2026/README.md)。
 
-S01 人体与共享足鞋已有可回放候选；[主比较入口](launchers/START_3D_COMPARISON.cmd)保留用户目视较满意的 `skate_s01_1103`。全节目人体开发候选现已覆盖 S01–S09、22.120–188.680 秒的 8329 个曝光；[1107 新旧与尺度／深度对照](launchers/START_3D_PROGRAMME_TRAJECTORY_1107.cmd)保留 1106 旧候选、关联失败及四个实际运行分支。101.66、140.92 秒的源画面投影已有改善，旋转漂移、刀具接冰、视线深度和世界轨迹仍未通过准确性验收。S05 的 76–95 秒／951 曝光属于历史子范围，完整 S05 为 74.140–101.640 秒／1376 曝光。当前绑定、失败及旧入口见[节目结果导航](events/ankara_2026/programmes/okada_mei_sp/README.md#人体与足鞋结果)和[播放器说明](docs/RESULTS_3D_PLAYER_ZH.md)。
+冈田芽依的[人体与鞋刀候选](events/ankara_2026/programmes/okada_mei_sp/README.md#人体与足鞋结果)已覆盖完整处理区间。可从[播放器说明](docs/RESULTS_3D_PLAYER_ZH.md)查找最新全片候选和 S01 对照。人体空间位置和真实接冰仍待独立验收。
 
 ## 快速试用：合成数据
 
@@ -34,10 +34,10 @@ python -m pytest tests/test_geometry.py tests/test_motion.py tests/test_mosaic.p
 
 | 内容 | 入口 |
 |---|---|
-| 三维检查 S01 人体结果 | 双击 [launchers/START_3D_RESULTS.cmd](launchers/START_3D_RESULTS.cmd)；[操作说明](docs/RESULTS_3D_PLAYER_ZH.md) |
+| 本地三维结果及回放 | [播放器说明](docs/RESULTS_3D_PLAYER_ZH.md) |
 | 代码结构、算法与接口 | [架构](docs/ARCHITECTURE.md)、[求解方法](docs/SOLVER.md)、[接口合同](docs/INTERFACES.md) |
 | 已实现能力与缺口 | [实现状态](docs/REBUILD.md)、[原生核心](native/README.md) |
-| 当前赛事模型与节目输入 | [安卡拉场景](events/ankara_2026/scene/README.md)、[冈田芽衣短节目](events/ankara_2026/programmes/okada_mei_sp/README.md) |
+| 当前赛事模型与节目结果 | [安卡拉赛事](events/ankara_2026/README.md) · [冈田芽依短节目](events/ankara_2026/programmes/okada_mei_sp/README.md) · [金书贤短节目](events/ankara_2026/programmes/jin_shuxian_sp/README.md) |
 | 数据来源、公开范围与失败快照 | [离线审阅](docs/GITHUB_REVIEW.md)、[冻结节目快照](events/ankara_2026/programmes/okada_mei_sp/review/README.md) |
 | 准确性、源时间与尺度 | [验证说明](docs/VALIDATION.md) |
 | 历史后端 | [rinkfit](calibration/rinkfit/README.md)、[solver_runtime](calibration/solver_runtime/README.md) |
@@ -50,7 +50,7 @@ python -m pytest tests/test_geometry.py tests/test_motion.py tests/test_mosaic.p
 python -B scripts/read_offline_review.py --check
 ~~~
 
-该命令检查归档目录、成员与大小，不执行求解。公开树保留代码、模型、参数和必要数值观测，不分发 ISU 比赛视频、截图或叠加画面。原像素核对需要按[官方来源与源时间](docs/GITHUB_REVIEW.md#官方视频与源时间)取得对应素材。冻结九镜头失败快照与历史六镜头停止状态按各自输入和版本解释，与当前九镜头候选分别登记。
+该命令检查归档目录、成员与大小，不执行求解。公开树保留代码、模型、参数和必要数值观测，不分发 ISU 比赛视频、截图或叠加画面。原像素核对需要按[官方来源与源时间](docs/GITHUB_REVIEW.md#官方视频与源时间)取得对应素材。冻结九镜头失败快照和历史六镜头试验按各自的源区间与版本解释。
 
 ## 许可
 

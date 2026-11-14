@@ -12,7 +12,8 @@ $env:TMP = $env:TEMP
 $env:PYTHONDONTWRITEBYTECODE = '1'
 $env:PYTHONNOUSERSITE = '1'
 $rinkProjectRoot = Split-Path -Parent $PSScriptRoot
-$rinkPythonPath = Join-Path $rinkProjectRoot '.venv\Scripts\python.exe'
+. (Join-Path $rinkProjectRoot 'launchers/LOCAL_PYTHON.ps1')
+$rinkPythonPath = Get-RinkSpacePythonPath $rinkProjectRoot
 $rinkLauncherPath = Join-Path $PSScriptRoot 'run_rinkspace_d_only.py'
 $rinkLauncherArguments = @('--memory-mib', $MemoryMiB, '--log', $LogPath)
 if ($AllowExistingPaging) { $rinkLauncherArguments += '--allow-existing-paging' }

@@ -194,6 +194,30 @@ int main(){
         values[3]*=1.+.03*sample;values[9]*=1.-.01*sample;
         values[39+50]=.002;values[39+54]=-.003;values[39+62]=.004;
         IceToleranceGeometry<double> g(board,values.data());
+        for(int edge=0;edge<8;++edge){
+            const int row=edge/2,left=edge%2?3:0,right=3-left;
+            const int old_code=300+3*row+(edge%2?2:0);
+            const int new_code=lane_to_left_goal_first_code+edge;
+            double old_line[6],new_line[6];int kind=-1;
+            require(tolerant_shared_entity_definition(board,6,values.data(),values.size(),
+                old_code,kind,old_line,6,127u,false)==Status::ok&&kind==0,"legacy Lane edge");
+            require(tolerant_shared_entity_definition(board,6,values.data(),values.size(),
+                new_code,kind,new_line,6,127u,false)==Status::ok&&kind==0,"extended Lane edge");
+            for(int axis=0;axis<3;++axis)
+                require(old_line[right+axis]==new_line[right+axis],"unchanged Lane right endpoint");
+            require(new_line[left]<old_line[left],"Lane extends left");
+            const double a=(old_line[left+1]-old_line[right+1])/(old_line[left]-old_line[right]);
+            close(new_line[left+1],old_line[left+1]+a*(new_line[left]-old_line[left]),2e-16,
+                "Lane extension stays on the original carrier");
+            close(new_line[left],g.carrier_x(3)+g.carrier_slope(3)*new_line[left+1],2e-16,
+                "Lane left endpoint is on the actual tilted goal");
+            std::set<int> support;
+            require(ice_tolerance_layout_support(new_code,[&](int i){support.insert(i);}),
+                "extended Lane has sparse layout support");
+            require(support.count(24)&&support.count(ice_nominal_size+75)&&
+                support.count(ice_nominal_size+80)&&!support.count(10+row),
+                "extended Lane depends on the goal carrier instead of the old left support");
+        }
         check_source_support(board,values,sample,support_stats);
         std::array<double,206> margins{};int visited=0;
         ice_tolerance_margins(g,[&](int id,double value){

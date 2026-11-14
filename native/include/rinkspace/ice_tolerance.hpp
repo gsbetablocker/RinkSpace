@@ -10,6 +10,10 @@ constexpr int ice_nominal_size=39,ice_deviation_count=107;
 constexpr int ice_tolerance_layout_size=ice_nominal_size+ice_deviation_count;
 constexpr double ice_relative_tolerance=.01;
 constexpr int ice_tolerance_margin_count=206;
+// Paired codes select Lane upper and lower edges that terminate at the left
+// goal line. Codes 300–311 retain their original finite support.
+constexpr int lane_to_left_goal_first_code=312;
+constexpr int lane_to_left_goal_stop_code=320;
 RS_HD inline bool shared_layout_size_valid(size_t n){return n==33||n==35||n==39||n==ice_tolerance_layout_size;}
 RS_HD inline bool shared_options_valid(size_t n,unsigned options){
     if(options&64u)return n==ice_tolerance_layout_size&&options==127u;
@@ -59,6 +63,11 @@ template<class T> struct IceToleranceGeometry {
         return nominal[index]+scale*d[72+index];
     }
     RS_HD T carrier_slope(int index)const{return d[77+index];}
+    RS_HD Vec3Value<T> lane_left_goal_node(int row,int sign)const{
+        const T x0=carrier_x(3),k=carrier_slope(3),a=side_slope(row,sign);
+        const T x=x0+k*side_y(row,sign,x0)/(1-k*a);
+        return {x,side_y(row,sign,x),0};
+    }
     RS_HD T level(T x,T y)const{
         using std::abs;using std::pow;
         const T u=std::max(T(0),(abs(x)-(board.half_length-board.rx))/board.rx);
@@ -235,6 +244,9 @@ template<class Include> RS_HD inline bool ice_tolerance_layout_support(int code,
     if(code>=100&&code<132){int index=(code-100)/4,ring=(code-100)%4;house(index);include(4);if(ring<3)include(5+ring);deviation(16+4*index+ring);return true;}
     if(code>=200&&code<204){int row=code-200;centre(row);include(14+row);return true;}
     if(code>=300&&code<312){int row=(code-300)/3;lane(row,false);include(10+row);return true;}
+    if(code>=lane_to_left_goal_first_code&&code<lane_to_left_goal_stop_code){
+        lane((code-lane_to_left_goal_first_code)/2,false);carrier(3);return true;
+    }
     if(code>=320&&code<324){lane(code-320,true);return true;}
     if(code>=400&&code<=404){carrier(code-400);return true;}
     if(code==405){carrier(0);include(20);deviation(90);return true;}
@@ -264,6 +276,14 @@ template<class T> RS_HD inline Status tolerant_shared_entity_definition(const T*
         if(edge==0)return line({q[10+row],g.side_y(row,1,q[10+row]),0},top);
         if(edge==1)return line(top,bottom);
         return line(bottom,{q[10+row],g.side_y(row,-1,q[10+row]),0});}
+    if(code>=lane_to_left_goal_first_code&&code<lane_to_left_goal_stop_code){
+        const int edge=code-lane_to_left_goal_first_code,row=edge/2,sign=edge%2?-1:1;
+        const auto left=g.lane_left_goal_node(row,sign),right=g.lane_node(row,sign,false);
+        if(!finite_scalar(left.x)||!finite_scalar(left.y)||left.x>=right.x||g.level(left.x,left.y)>1e-12)
+            return Status::outside_support;
+        // Preserve the direction of the corresponding legacy edge.
+        return sign>0?line(left,right):line(right,left);
+    }
     if(code>=320&&code<324){const int row=code-320;return line(g.lane_node(row,1,true),g.lane_node(row,-1,true));}
     if(code>=400&&code<=404){SegmentValue<T> carrier{};auto status=g.carrier(code-400,carrier);if(status!=Status::ok)return status;return line(carrier.a,carrier.b);}
     if(code==405)return circle(g.midpoint(0),g.hockey_radius(0));

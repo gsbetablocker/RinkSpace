@@ -291,9 +291,12 @@ def sample_model(scene,core,samples=361):
         line=by_code[200+row]['parameters'];n=by_code[301+row*3]['parameters'][0]
         r=by_code[119+row*4]['parameters'][0]
         if not r<line[3]<n:raise ValueError('M1 connection must extend past R and stop before N')
-    goal_left_x=endpoints(403)[0,0]
-    lane_left=[by_code[300+i*3]['parameters'][0] for i in range(4)]
-    if scene.get('shared_geometry_options',0)&4 and min(lane_left)<goal_left_x-1e-12:
+    goal_left=endpoints(403)
+    by_label={p['label']:p for p in by_code.values()}
+    lane_sides=[(by_label[f'ice.lane{row}:edge0'],by_label[f'ice.lane{row}:edge2'])
+                for row in range(1,5)]
+    lane_left=[upper['parameters'][0] for upper,_ in lane_sides]
+    if scene.get('shared_geometry_options',0)&4 and min(lane_left)<goal_left[0,0]-1e-12:
         raise ValueError('Lane drawing support crosses the left goal line')
     centre_rows=[by_code[103+i*4]['parameters'][:3] for i in range(4)]
     lower_gap=scene['board'][1]+centre_rows[0][1];upper_gap=scene['board'][1]-centre_rows[-1][1]
@@ -304,6 +307,16 @@ def sample_model(scene,core,samples=361):
             'M3':{'common_circle_radius_spread':float(np.ptp(radii)),**m3},
             'M1':{'connection_stops_before_N':True,'physical_edge_count':12,'connection_count':4,'ring_boundary_count':32,'lane_left_not_before_left_goal_line':True,'lane_left_support_values':lane_left,'bottom_long_side_centre_gap':lower_gap,'top_long_side_centre_gap':upper_gap,'long_side_gap_difference':abs(lower_gap-upper_gap)},
             'path_count':len(shapes),'new_source_observations':0,'fit_executed':False}
+    if scene['constraints']['M1'].get('lane_long_sides_end_on_left_goal_line',False):
+        left_ends=np.asarray([p for upper,lower in lane_sides
+                             for p in (upper['parameters'][:3],lower['parameters'][3:])])
+        direction=goal_left[1]-goal_left[0]
+        relative=left_ends-goal_left[0]
+        t=relative@direction/(direction@direction)
+        error=float(np.max(np.linalg.norm(relative-t[:,None]*direction,axis=1)))
+        if error>1e-12 or np.any((t<0)|(t>1)):
+            raise ValueError('Lane left ends must lie on the finite left goal line')
+        checks['M1']['lane_left_goal_endpoint_error']=error
     if scene.get('shared_geometry_options',0)&16:
         left,right=[np.asarray(by_code[k]['parameters']) for k in (410,411)]
         mirror_x=np.array([-1.,1.,1.]);mirror_y=np.array([1.,-1.,1.])
@@ -321,8 +334,8 @@ def sample_model(scene,core,samples=361):
         marks=[endpoints(320+row) for row in range(4)]
         xs=np.concatenate([line[:,0] for line in marks])
         endpoint_error=max(float(np.max(abs(line[:,1]-np.array([
-            by_code[300+3*row]['parameters'][1],by_code[302+3*row]['parameters'][1]]))))
-            for row,line in enumerate(marks))
+            upper['parameters'][1],lower['parameters'][1]]))))
+            for line,(upper,lower) in zip(marks,lane_sides))
         relation=dict(count=4,shared_X_spread=float(np.ptp(xs)),
             short_side_parallel_error=float(max(abs(line[1,0]-line[0,0]) for line in marks)),
             lane_side_endpoint_error=endpoint_error)

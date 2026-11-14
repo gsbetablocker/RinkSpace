@@ -7,7 +7,8 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $taskProject = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
-$taskPython = Join-Path $taskProject '.venv/Scripts/python.exe'
+. (Join-Path $taskProject 'launchers/LOCAL_PYTHON.ps1')
+$taskPython = Get-RinkSpacePythonPath $taskProject
 $taskShell = (Get-Process -Id $PID).Path
 $taskConfigPath = Join-Path $taskProject 'events/ankara_2026/programmes/okada_mei_sp/full_source_complete_cycle_comparison_20261010.json'
 $taskRoot = [IO.Path]::GetFullPath($OutputRoot)

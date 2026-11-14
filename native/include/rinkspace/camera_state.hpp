@@ -132,6 +132,85 @@ template<class T> struct MotionCameraStateValue {CameraValue<T> camera;T pan,til
 using MotionCameraState=MotionCameraStateValue<double>;
 struct MotionInstant : MotionCameraState {Vec3 ray;double depth;};
 RS_HD inline double quadratic_min(double c1,double c2,double r2){double v=std::fmin(1.,1+c1*r2+c2*r2*r2);if(c2>0){const double t=-c1/(2*c2);if(t>0&&t<r2)v=std::fmin(v,1+c1*t+c2*t*t);}return v;}
+// Minimum of 1+linear*r+a*r^2+b*r^4 on [0,radius]. The derivative is a
+// depressed cubic, monotone on at most two positive-radius intervals. Bracket
+// every stationary point instead of combining extrema at different radii.
+RS_HD inline double radial_quartic_lower(double a,double b,double linear,double radius){
+    auto value=[&](double r){return 1+r*(linear+r*(a+b*r*r));};
+    auto derivative=[&](double r){return linear+r*(2*a+4*b*r*r);};
+    double points[3]={0.,radius,radius};int count=2;
+    if(b!=0.&&a*b<0.){const double split=std::sqrt(-a/(6*b));
+        if(split>0.&&split<radius){points[1]=split;points[2]=radius;count=3;}}
+    double lower=std::fmin(1.,value(radius));
+    for(int i=0;i+1<count;++i){
+        double lo=points[i],hi=points[i+1],flo=derivative(lo),fhi=derivative(hi);
+        lower=std::fmin(lower,std::fmin(value(lo),value(hi)));
+        if(!((flo<0.&&fhi>0.)||(flo>0.&&fhi<0.)))continue;
+        for(int iteration=0;iteration<64;++iteration){
+            const double mid=lo+(hi-lo)/2;if(!(mid>lo&&mid<hi))break;
+            const double fmid=derivative(mid);
+            if((flo<0.)==(fmid<0.)){lo=mid;flo=fmid;}else{hi=mid;fhi=fmid;}}
+        // A derivative bound on this final bracket also covers rounding of
+        // its stationary point. The original positive optical margin stays.
+        const double slope=std::abs(linear)+2*std::abs(a)*hi+4*std::abs(b)*hi*hi*hi;
+        lower=std::fmin(lower,std::fmin(value(lo),value(hi))-slope*(hi-lo));
+    }
+    const double scale=1+std::abs(linear)*radius+std::abs(a)*radius*radius+std::abs(b)*radius*radius*radius*radius;
+    return lower-64*std::numeric_limits<double>::epsilon()*scale;
+}
+RS_HD inline double brown_disk_lower(double k1,double k2,double tangential_norm,double radius){
+    const double r2=radius*radius;
+    const double old=std::fmin(quadratic_min(k1,k2,r2),quadratic_min(3*k1,5*k2,r2))-6*tangential_norm*radius;
+    if(old>1e-10)return old;
+    // At EACH radius, the radial Jacobian eigenvalues are L and L+2*r^2*L'.
+    // The tangential Jacobian is bounded below by -6*|p|*r. Weyl's bound is
+    // therefore minimized at one common radius, over the COMPLETE disk.
+    // This is still a sufficient positive-definiteness certificate, never a
+    // waiver for an actual fold or for any unexamined radius/direction.
+    return std::fmax(old,std::fmin(radial_quartic_lower(k1,k2,-6*tangential_norm,radius),
+                                 radial_quartic_lower(3*k1,5*k2,-6*tangential_norm,radius)));
+}
+// Outward-rounded intervals used only to tighten a failed sufficient row-rate
+// certificate. They enclose the same camera function over the whole window.
+struct CameraRange {double lo,hi;};
+RS_HD inline double camera_down(double x){return std::nextafter(x,-std::numeric_limits<double>::infinity());}
+RS_HD inline double camera_up(double x){return std::nextafter(x,std::numeric_limits<double>::infinity());}
+RS_HD inline CameraRange camera_range(double x,double span=0.){return {camera_down(x-span),camera_up(x+span)};}
+RS_HD inline CameraRange operator+(CameraRange a,CameraRange b){return {camera_down(a.lo+b.lo),camera_up(a.hi+b.hi)};}
+RS_HD inline CameraRange operator-(CameraRange a,CameraRange b){return {camera_down(a.lo-b.hi),camera_up(a.hi-b.lo)};}
+RS_HD inline CameraRange operator*(CameraRange a,CameraRange b){
+    const double x=a.lo*b.lo,y=a.lo*b.hi,z=a.hi*b.lo,w=a.hi*b.hi;
+    return {camera_down(std::fmin(std::fmin(x,y),std::fmin(z,w))),camera_up(std::fmax(std::fmax(x,y),std::fmax(z,w)))};
+}
+RS_HD inline CameraRange operator/(CameraRange a,CameraRange b){return a*CameraRange{camera_down(1/b.hi),camera_up(1/b.lo)};}
+RS_HD inline CameraRange camera_square(CameraRange a){
+    return {a.lo<=0&&a.hi>=0?0.:camera_down(std::fmin(a.lo*a.lo,a.hi*a.hi)),camera_up(std::fmax(a.lo*a.lo,a.hi*a.hi))};
+}
+RS_HD inline double camera_abs_upper(CameraRange a){return finite_scalar(a.lo)&&finite_scalar(a.hi)?std::fmax(std::abs(a.lo),std::abs(a.hi)):std::numeric_limits<double>::infinity();}
+RS_HD inline double signed_row_speed_bound(const MotionRig& r,const MotionInstant& m,double half,double zd,
+        Vec3 velocity,double acceleration,double zoom_rate,double zoom_acceleration,Vec3 span,
+        double k1span,double k2span,double p1span,double p2span){
+    const auto one=camera_range(1.),two=camera_range(2.),six=camera_range(6.);
+    const auto rx=camera_range(m.ray.x,span.x),ry=camera_range(m.ray.y,span.y),rz=camera_range(m.ray.z,span.z);
+    const auto vx=camera_range(velocity.x,acceleration*half),vy=camera_range(velocity.y,acceleration*half),vz=camera_range(velocity.z,acceleration*half);
+    const auto x=rx/rz,y=ry/rz,xp=(vx-x*vz)/rz,yp=(vy-y*vz)/rz;
+    const auto x2=camera_square(x),y2=camera_square(y),r2=x2+y2,r4=camera_square(r2),xy=x*y;
+    const auto k1=camera_range(m.camera.k1,k1span),k2=camera_range(m.camera.k2,k2span);
+    const auto p1=camera_range(m.camera.p1,p1span),p2=camera_range(m.camera.p2,p2span);
+    const auto zoom=camera_range(zoom_rate,zoom_acceleration*half);
+    const CameraRange hinge{std::fmax(0.,camera_down(r.wide_boundary-m.logf-zd*half)),std::fmax(0.,camera_up(r.wide_boundary-m.logf+zd*half))};
+    const auto k1dot=(camera_range(r.k11)-two*camera_range(r.wide_coefficients[0])*hinge)*zoom;
+    const auto k2dot=(camera_range(r.k21)-two*camera_range(r.wide_coefficients[1])*hinge)*zoom;
+    const auto p1dot=(camera_range(0.)-two*camera_range(r.wide_coefficients[2])*hinge)*zoom;
+    const auto p2dot=(camera_range(0.)-two*camera_range(r.wide_coefficients[3])*hinge)*zoom;
+    const auto L=one+k1*r2+k2*r4;
+    const auto jyx=two*xy*(k1+two*k2*r2)+two*p1*x+two*p2*y;
+    const auto jyy=L+two*y2*(k1+two*k2*r2)+six*p1*y+two*p2*x;
+    const auto brown=y*L+p1*(r2+two*y2)+two*p2*xy;
+    const auto direct=y*(k1dot*r2+k2dot*r4)+p1dot*(r2+two*y2)+two*p2dot*xy;
+    const CameraRange fy{camera_down(std::exp(m.logf-zd*half-r.eta/2)),camera_up(std::exp(m.logf+zd*half-r.eta/2))};
+    return camera_abs_upper(fy*(zoom*brown+jyx*xp+jyy*yp+direct)+camera_range(r.cyz)*zoom);
+}
 template<class T,class U> RS_HD inline Status motion_camera_from_values(const MotionRigValue<U>& r,const T* tr,MotionCameraStateValue<T>& out){
     using std::exp;using std::log;
     const auto pan=scalar_cast<T>(r.pan),tilt=scalar_cast<T>(r.tilt),pivot=scalar_cast<T>(r.pivot);
@@ -164,7 +243,7 @@ RS_HD inline Status motion_instant_from_camera(const MotionRig& r,const MotionCa
     if(!finite(out.ray))return Status::nonfinite;if(out.depth<=0)return Status::behind_camera;
     const double x=out.ray.x/out.depth,y=out.ray.y/out.depth,r2=x*x+y*y;
     if(r2>r.radius*r.radius)return static_cast<Status>(8);
-    const double lower=std::fmin(quadratic_min(c.k1,c.k2,r2),quadratic_min(3*c.k1,5*c.k2,r2))-6*std::hypot(c.p1,c.p2)*std::sqrt(r2);
+    const double lower=brown_disk_lower(c.k1,c.k2,std::hypot(c.p1,c.p2),std::sqrt(r2));
     if(!(lower>1e-10))return static_cast<Status>(8);
     return project(c,X,uv);
 }
@@ -202,7 +281,8 @@ RS_HD inline Status contraction_bound_window(const MotionRig& r,const MotionSpli
     else status=motion_instant(r,s,X,t,m,uv);if(status!=Status::ok)return status;
     const double omega=rates[0]+rates[1],zd=rates[2],zabs=std::abs(m.z)+zd*half;
     const double speed3=omega*(std::sqrt(dot(sub(X,r.pivot),sub(X,r.pivot)))+std::abs(r.spacing))+(std::abs(r.pupil1)+2*std::abs(r.pupil2)*zabs)*zd;
-    Vec3 velocity_bound{speed3,speed3,speed3},span{speed3*half,speed3*half,speed3*half};
+    Vec3 velocity_bound{speed3,speed3,speed3},span{speed3*half,speed3*half,speed3*half},signed_velocity{};
+    double acceleration_bound=0.,signed_zoom_rate=0.,zoom_acceleration_bound=0.;
     if(directional){
         double k[12],extrema[27];status=s.kinematics(t,k);if(status!=Status::ok)return status;
         status=s.derivative_extrema(t-half,t+half,extrema);if(status!=Status::ok)return status;
@@ -214,6 +294,7 @@ RS_HD inline Status contraction_bound_window(const MotionRig& r,const MotionSpli
         Vec3 velocity=add(mul(k[4],cross3(r.tilt,tilted)),
             mul(k[3],apply(m.camera.rotation,cross3(r.pan,sub(X,r.pivot)))));
         velocity.z-=(r.pupil1+2*r.pupil2*m.z)*k[5];
+        signed_velocity=velocity;signed_zoom_rate=k[5];
         const double acceleration_angles=std::abs(extrema[9])+std::abs(extrema[12]);
         const double acceleration_zoom=std::abs(extrema[15]);
         const double distance=std::sqrt(dot(sub(X,r.pivot),sub(X,r.pivot)))+std::abs(r.spacing);
@@ -224,6 +305,7 @@ RS_HD inline Status contraction_bound_window(const MotionRig& r,const MotionSpli
         const double acceleration=std::nextafter(((acceleration_angles+omega*omega)*distance+
             (std::abs(r.pupil1)+2*std::abs(r.pupil2)*zabs)*acceleration_zoom+
             2*std::abs(r.pupil2)*zd*zd)*(1+2e-10)+1e-8,std::numeric_limits<double>::infinity());
+        acceleration_bound=acceleration;zoom_acceleration_bound=acceleration_zoom;
         const Vec3 v{std::abs(velocity.x)*(1+2e-10)+1e-8,std::abs(velocity.y)*(1+2e-10)+1e-8,std::abs(velocity.z)*(1+2e-10)+1e-8};
         velocity_bound={v.x+acceleration*half,v.y+acceleration*half,v.z+acceleration*half};
         span={half*(v.x+acceleration*half/2),half*(v.y+acceleration*half/2),half*(v.z+acceleration*half/2)};
@@ -246,8 +328,17 @@ RS_HD inline Status contraction_bound_window(const MotionRig& r,const MotionSpli
     const double ybrown=y*L+p1*(r2+2*y*y)+2*p2*x*y,direct=y*(std::abs(r.k11)*r2+std::abs(r.k21)*r2*r2)*zd+hinge_rate*(y*(std::abs(r.wide_coefficients[0])*r2+std::abs(r.wide_coefficients[1])*r2*r2)+std::abs(r.wide_coefficients[2])*(r2+2*y*y)+2*std::abs(r.wide_coefficients[3])*x*y);
     const double fymax=std::exp(m.logf+zd*half-r.eta/2),speed=std::nextafter((fymax*(ybrown*zd+jyx*xp+jyy*yp+direct)+std::abs(r.cyz)*zd)*(1+2e-10)+1e-8,std::numeric_limits<double>::infinity());
     bound=std::abs(r.tau)*speed/(height-1);
+    if(directional&&bound>=1-1e-9){
+        // Keeping signed products lets this enclosure converge to the actual
+        // derivative as the certified covering partition is subdivided. The
+        // absolute-term sum above need not converge when terms cancel.
+        const double tight=signed_row_speed_bound(r,m,half,zd,signed_velocity,acceleration_bound,
+            signed_zoom_rate,zoom_acceleration_bound,span,k1span,k2span,
+            std::abs(r.wide_coefficients[2])*hinge_rate*half,std::abs(r.wide_coefficients[3])*hinge_rate*half);
+        bound=std::fmin(bound,std::abs(r.tau)*tight/(height-1));
+    }
     const double k1lo=m.camera.k1-k1span,k2lo=m.camera.k2-k2span;
-    const double fold=std::fmin(quadratic_min(k1lo,k2lo,r2),quadratic_min(3*k1lo,5*k2lo,r2))-6*std::hypot(p1,p2)*radius;
+    const double fold=brown_disk_lower(k1lo,k2lo,std::hypot(p1,p2),radius);
     return radius<=r.radius&&fold>1e-10&&finite_scalar(bound)&&bound<1-1e-9?Status::ok:static_cast<Status>(9);
 }
 RS_HD inline Status contraction_bound_interval(const MotionRig& r,const MotionSpline& s,Vec3 X,double lo_time,double hi_time,int height,double& bound,const MotionProjectionContext* context=nullptr){

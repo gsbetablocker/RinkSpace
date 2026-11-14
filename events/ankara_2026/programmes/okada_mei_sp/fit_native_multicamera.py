@@ -285,7 +285,7 @@ def solve(args):
     i=int(rows[k]);observations.append(dict(row=i,observation_id=str(z['observation_ids'][i]),source_row=int(z['source_rows'][i]),pts=int(z['pts'][i]),camera_index=int(camera_ids[i]),path_id=paths[i],uv=z['uv'][i].tolist(),fitted_uv=view['values'][j,3:5].tolist(),error_px=float(errors[k])))
    detail=dict(**safe(summary),observations=observations)
   prepared.write(out/'current_error_hotspots.pending.json',detail);(out/'current_error_hotspots.pending.json').replace(out/'current_error_hotspots.json')
-  progress_log.write(f"{int(step):5d} {time.monotonic()-start:10.3f} {cost:18.7f} {0. if last_cost is None else last_cost-cost:14.7f} {status} "+' '.join(f"{key}:rms={d['rms']:.4f},max={d['maximum']:.3f},gt20={d['above_20px']}" for key,d in per.items())+'\n');last_cost=cost
+  progress_log.write(f"{int(step):5d} {time.monotonic()-start:10.3f} {cost:18.7f} {0. if last_cost is None else last_cost-cost:14.7f} {status} "+' '.join(f"{key}:rms={float('nan') if d['rms'] is None else d['rms']:.4f},max={float('nan') if d['maximum'] is None else d['maximum']:.3f},gt20={d['above_20px']}" for key,d in per.items())+'\n');last_cost=cost
   last_summary=summary;emit('quality',quality_wall_ms=1000*(time.monotonic()-quality_started),**summary);return summary
  with native.resident(camera=camera,rigs=rig,camera_ids=camera_ids[rows],controls=v['controls'],path_ids=rp,stations=v['stations'][rows],pts=z['pts'][rows],observed=z['uv'][rows],scene_directions=sd,scene_charts=charts,motion_times=times[rows]) as resident:
   resident.configure_camera_parameters(directions=rd,lower=lower,upper=upper,max_readout=m['max_readout'])
@@ -358,7 +358,7 @@ def solve(args):
     accepted+=1
     checkpoint();quality(current_errors(),int(record['summary']['trial_count']),'accepted',curve_refinement='included_in_native_candidate_cost')
    else:
-    progress_log.write(f"{int(record['summary']['trial_count']):5d} {time.monotonic()-start:10.3f} {last_cost:18.7f} {0.:14.7f} rejected "+' '.join(f"{key}:rms={d['rms']:.4f},max={d['maximum']:.3f},gt20={d['above_20px']}" for key,d in last_summary['shots'].items())+'\n')
+    progress_log.write(f"{int(record['summary']['trial_count']):5d} {time.monotonic()-start:10.3f} {last_cost:18.7f} {0.:14.7f} rejected "+' '.join(f"{key}:rms={float('nan') if d['rms'] is None else d['rms']:.4f},max={float('nan') if d['maximum'] is None else d['maximum']:.3f},gt20={d['above_20px']}" for key,d in last_summary['shots'].items())+'\n')
    if args.trials is not None and record['summary']['trial_count']>=args.trials:return False
    return not (out/'stop_requested').exists()
   try:

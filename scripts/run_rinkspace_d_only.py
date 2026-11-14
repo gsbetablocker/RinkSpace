@@ -99,7 +99,7 @@ def main():
             handles=[msvcrt.get_osfhandle(f.fileno()) for f in (empty,stream)]
             for h in handles:os.set_handle_inheritable(h,True)
             si=StartupInfo();si.cb=ctypes.sizeof(si);si.flags=0x100;si.stdin=handles[0];si.stdout=si.stderr=handles[1]
-            command=ctypes.create_unicode_buffer(subprocess.list2cmdline([str(ROOT/'.venv/Scripts/python.exe'),'-B',str(a.script.resolve()),*a.arguments]))
+            command=ctypes.create_unicode_buffer(subprocess.list2cmdline([sys.executable,'-B',str(a.script.resolve()),*a.arguments]))
             environment=ctypes.create_unicode_buffer('\0'.join(f'{key}={value}' for key,value in sorted(env.items()))+'\0\0')
             if not k.CreateProcessW(None,command,None,None,True,0x4|0x400,environment,str(ROOT),ctypes.byref(si),ctypes.byref(process)):
                 raise ctypes.WinError(ctypes.get_last_error())

@@ -92,7 +92,9 @@ class ModelCOMMotionFactor:
         np.testing.assert_array_equal(self.times[native_rows],self.ref.times)
         self.source_pts_float[native_rows]=self.ref.p['pts']
         flight=flight_mask(self.ref,self.source_pts_float)
-        w=np.sqrt(trapezoid_time_weights(self.times)[1:-1])/self.scale
+        from .continuous_motion_factors import reviewed_cut_weight
+        w=np.sqrt(trapezoid_time_weights(self.times)[1:-1]*
+                  reviewed_cut_weight(self.ref,self.times[1:-1]))/self.scale
         w[flight[1:-1]]=0.
         self.w=w;self.operator=kron(diags(w)@self.A,eye(3),format='csr')
         self.flight_rows={};self.flight_operators={};self.flight_weights={}
@@ -149,6 +151,7 @@ class ModelCOMMotionFactor:
             C,_=self.mass.evaluate(self.base,d);com=self.mass.com(C)
         r=np.asarray(self.operator@com.ravel())
         acceleration=self.A@com;magnitude=np.linalg.norm(acceleration,axis=1);peak=int(np.argmax(magnitude))
+        self.last_acceleration = acceleration
         from .body_clock import time_base
         numerator,denominator=time_base(self.ref.p);source_seconds=self.source_pts_float[1:-1]*numerator/denominator
         lsp=(source_seconds>=156.2)&(source_seconds<=165.2)

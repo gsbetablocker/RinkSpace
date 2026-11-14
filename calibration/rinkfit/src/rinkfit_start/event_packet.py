@@ -118,7 +118,7 @@ def start_physical_backend(run_dir, executable, resume=None, packet_manifest=Non
                            physical_run_dir=None, runtime_path=None,
                            extend_resource_from=None):
     root,run=read_run(run_dir); executable=Path(executable).expanduser().resolve()
-    if not executable.is_file():raise ValueError('Build the event-specific rinkfit_event executable first; see CODEX_START.md')
+    if not executable.is_file():raise ValueError('Build the event-specific rinkfit_event executable first; see calibration/rinkfit/README.md')
     env=os.environ.copy()
     for name in ['build_recipe.json','direct_build_recipe.json']:
         recipe_path=executable.parent/name

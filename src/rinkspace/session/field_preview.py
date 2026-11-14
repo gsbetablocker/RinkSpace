@@ -98,6 +98,7 @@ def full_top(scene,data,out):
     c.text((70,165),'同一 native 核心生成；全部尺寸与半轴数值尚未重新拟合，L = 1，米制未验证。',27,AMBER)
     ax=chart(c,(130,235,2140,1160),(-.555,.555),(-.30,.30))
     shapes=data['shapes'];by={p.get('generated_code'):p for p in shapes}
+    by_label={p['label']:p for p in shapes}
     draw(c,ax,shapes)
     draw_faceoff_row_guides(c,ax,by)
     for i in range(8):
@@ -109,14 +110,15 @@ def full_top(scene,data,out):
         ax.label(q[0],label,(0,-24),28,color(by[code]))
         for xyz in q[[0,-1]]:c.marker(ax.xy(xyz),'support',GRAY,4)
     for row in range(4):
-        lane=by[300+row*3];line=by[200+row]
+        lane=by_label[f'ice.lane{row+1}:edge0'];line=by[200+row]
         q=np.asarray(lane['xyz']);middle=(q[0]+q[-1])/2
         ax.label(middle,f'Lane {row+1}',(0,-14),23,NAVY)
         ax.label(np.asarray(line['xyz'])[0]+[.21,0,0],f'M{row+1}',(0,16),22,AMBER)
         endpoint=np.asarray(line['xyz'])[-1];c.marker(ax.xy(endpoint),'support',AMBER,5)
         ax.label(endpoint,f'S{row+1}',(-7,19),20,AMBER,'rm')
-        for code,index in ((300+row*3,0),(302+row*3,-1)):
-            c.marker(ax.xy(np.asarray(by[code]['xyz'])[index]),'support',GRAY,4)
+        for edge,index in ((0,0),(2,-1)):
+            side=by_label[f'ice.lane{row+1}:edge{edge}']
+            c.marker(ax.xy(np.asarray(side['xyz'])[index]),'support',GRAY,4)
     for code,label in [(410,'K左 半椭圆'),(411,'K右 半椭圆')]:
         p=by[code];ax.label(p['xyz'][len(p['xyz'])//2],label,(0,39),21,BLUE)
     for code,label in [(420,'T左下'),(421,'T左上'),(422,'T右下'),(423,'T右上')]:
@@ -124,7 +126,8 @@ def full_top(scene,data,out):
     gaps=draw_equal_margins(c,ax,scene,by)
     c.text((70,1475),'青绿：F/R 四层圈边界    深蓝：Lane 三条实体边    橙：连接中线    红：C / C0 / 球门与争球圈',27)
     c.text((70,1527),'蓝色直线：B1 / B2    淡蓝填充：两端半椭圆蓝区    棕：梯形边    灰绿：同一连续围挡',27)
-    c.text((70,1579),'空心标记：绘制支持或未测连接点，不是新增源观测。中线 S1–S4 均在 N 线左侧；Lane 左侧开口。',26)
+    lane_left='Lane 两条长边接左底线。' if 'lane_left_goal_endpoint_error' in data['checks']['M1'] else 'Lane 左侧开口。'
+    c.text((70,1579),'空心标记显示绘制支持或未测连接点。中线 S1–S4 均在 N 线左侧。'+lane_left,26)
     c.text((70,1631),f'd上 = d下 = {gaps[0]:.6f} L（外圈至长边）；所有靶圈、Lane 和连接中线共用居中四行。',26)
     c.text((70,1683),'靶圈原有 center / inner / middle / outer 四层不变；它们及半椭圆蓝区取轮廓，其余线全部取宽度中线。',26)
     c.text((70,1735),'灰虚线仅示 A 圆心共行，d 为尺寸辅助；所有尺寸仍未重新拟合，辅助线不计入实体或观测。',26,GRAY)

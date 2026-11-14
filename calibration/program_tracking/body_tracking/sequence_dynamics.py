@@ -8,7 +8,7 @@ from .skate_physics import fk_state,batch_features
 from .skate_contact import trapezoid_time_weights
 from .runner_interior import runner_longitudinal_coordinate,runner_interior_band,longitudinal_barrier
 from .runner_support_factors import runner_tangent_limits,runner_mode_terms
-from .continuous_motion_factors import robust_vector
+from .continuous_motion_factors import robust_vector, reviewed_cut_weight
 
 
 def _full(J):return hstack((csr_matrix((J.shape[0],17)),J),format='csr')
@@ -87,6 +87,7 @@ class SequenceShoeDynamics:
         if getattr(self.ref,'source_document',{}).get('generic_context',False):
             from .phase_ledger import phase_weights
             phase=phase_weights(self.ref,self.ref.p['pts'][1:-1])
+        phase*=reviewed_cut_weight(self.ref,self.times[1:-1])
         weight=np.sqrt((h[:-1]+h[1:])/2*phase)/self.config['actual_shoe_angular_acceleration_scale_rad_s2']
         z=alpha*weight[:,None,None];ra,D=robust_vector(z,delta=3.);rows.append(ra.ravel())
         parts['actual_skate_so3_angular_acceleration']=float(np.sum(ra*ra)/2)

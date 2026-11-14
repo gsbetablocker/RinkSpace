@@ -542,8 +542,10 @@ def gpu_trf(fun,jac,x0,lower,upper,*,callback,options,warm_relative=False,
         x0=np.zeros_like(origin)
         lower,upper=lower-origin,upper-origin
     import scipy.optimize._lsq.trf as trf
+    from inspect import signature
     from scipy.optimize._optimize import _wrap_callback
     from .body_linear_solver import _LOCK
+    has_callback = 'callback' in signature(trf.trf).parameters
     old=trf.compute_jac_scale
     old_radius=trf.update_tr_radius
     def radius(*args,**kwargs):
@@ -560,11 +562,17 @@ def gpu_trf(fun,jac,x0,lower,upper,*,callback,options,warm_relative=False,
         else:inv=np.maximum(inv,previous)
         return 1/inv,inv
     active=None
-    def replacing_jac(z):
-        nonlocal active
+    last_linearized = np.asarray(x0).copy()
+    def replacing_jac(z, _residual=None):
+        nonlocal active, last_linearized
         if active is not None:
             active.release(release_factorization=release_factorization_on_relinearize)
             active=None
+        # Older SciPy calls this after every accepted TRF update. Record the
+        # update before building its next Jacobian, as the main solver does.
+        if not has_callback and callback is not None and not np.array_equal(z,last_linearized):
+            last_linearized = np.array(z,copy=True)
+            callback(z)
         result=jac(z)
         if isinstance(result,GPUJacobian):active=result
         return result
@@ -576,8 +584,9 @@ def gpu_trf(fun,jac,x0,lower,upper,*,callback,options,warm_relative=False,
             # scaling for LinearOperator; all values and column norms are real.
             f0=fun(x0)
             if not np.isfinite(f0).all():raise ArithmeticError('Initial state fails the guarded source quality; no nonfinite residual sent to GPU')
+            callback_options = {'callback': _wrap_callback(callback)} if has_callback else {}
             result=trf.trf(fun,replacing_jac,np.asarray(x0),f0,replacing_jac(x0),lower,upper,
-                1e-7,1e-7,1e-4,None,'jac',None,'lsmr',dict(options),0,callback=_wrap_callback(callback))
+                1e-7,1e-7,1e-4,None,'jac',None,'lsmr',dict(options),0,**callback_options)
             if origin is not None:result.x+=origin
             result.message=f'SciPy TRF status {result.status}; accuracy is reviewed separately'
             return result

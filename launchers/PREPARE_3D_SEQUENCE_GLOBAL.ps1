@@ -10,10 +10,11 @@ param(
 )
 $ErrorActionPreference='Stop'
 $projectRoot=Split-Path -Parent $PSScriptRoot
+. (Join-Path $PSScriptRoot 'LOCAL_PYTHON.ps1')
 $env:PYTHONPATH=(Join-Path $projectRoot 'src')+';'+$projectRoot
 $env:PYTHONDONTWRITEBYTECODE='1'
 $env:PYTHONIOENCODING='utf-8'
-$basePython=Join-Path $projectRoot '.venv\Scripts\python.exe'
+$basePython=Get-RinkSpacePythonPath $projectRoot
 $dataRoot=(& $basePython -B -X utf8 -c 'import sys; from rinkspace.storage import configured_data_root; print(configured_data_root(sys.argv[1]))' $projectRoot | Out-String).Trim()
 if ($LASTEXITCODE -ne 0 -or -not $dataRoot) { throw 'Cannot resolve RinkSpace Data directory.' }
 $python=Join-Path $dataRoot 'runtime_tools\vision_cuda\Scripts\python.exe'

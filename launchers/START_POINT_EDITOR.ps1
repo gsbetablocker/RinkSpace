@@ -13,6 +13,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $env:PYTHONDONTWRITEBYTECODE = '1'
 $projectRoot = Split-Path -Parent $PSScriptRoot
+. (Join-Path $PSScriptRoot 'LOCAL_PYTHON.ps1')
 $batchSuffix = 'events\ankara_2026\programmes\okada_mei_sp\source_datasets\frame_by_frame_review_20261013\first_shot_remaining_50fps\repair_20261014'
 if ([string]::IsNullOrWhiteSpace($Dataset)) {
     $Dataset = Join-Path $projectRoot $batchSuffix
@@ -60,7 +61,7 @@ try {
     if ([string]::IsNullOrWhiteSpace($SourceMedia)) { $SourceMedia = $Media }
     $sourceMediaPath = Resolve-EditorDirectory $SourceMedia 'Source media'
     $modelPath = Resolve-EditorDirectory $Model 'Model'
-    $pythonPath = Join-Path $projectRoot '.venv\Scripts\python.exe'
+    $pythonPath = Get-RinkSpacePythonPath $projectRoot
     if (-not (Test-Path -LiteralPath $pythonPath -PathType Leaf)) {
         throw "Project Python is missing: $pythonPath"
     }

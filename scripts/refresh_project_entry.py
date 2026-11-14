@@ -1,14 +1,8 @@
-"""Refresh the local project panel from owned models and existing source records.
-
-No fitting, training, decoding, dependency installation, or video rendering.
-The active chat owns CURRENT_TASK; retain its latest block when replacing HTML.
-"""
+"""Generate the local results page from the event's designated programme fits."""
 from __future__ import annotations
 
 import argparse
 import ctypes
-from datetime import datetime, timezone, timedelta
-import hashlib
 import html
 import json
 import os
@@ -20,169 +14,150 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from rinkspace.storage import AssetStore
-TASK = re.compile(r"<!-- CURRENT_TASK_BEGIN -->.*?<!-- CURRENT_TASK_END -->", re.S)
-ENTRY = re.compile(r'<script[^>]*id="entry-data"[^>]*>(.*?)</script>', re.S)
 
-
-def read(path: Path):
-    return json.loads(path.read_text(encoding="utf-8-sig"))
+EVENT = Path("events/ankara_2026")
+PROGRAMMES = (("okada_mei_sp", "冈田芽依"), ("jin_shuxian_sp", "金书贤"))
+PANEL = "<!-- RINKSPACE_RESULT_PANEL -->"
+REVIEW = re.compile(r"<!-- CURRENT_TASK_BEGIN -->.*?<!-- CURRENT_TASK_END -->", re.S)
 
 
 def esc(value):
     return html.escape(str(value), quote=True)
 
 
-def href(path: Path):
-    try:
-        return path.resolve().relative_to(ROOT).as_posix()
-    except ValueError:
-        return path.resolve().as_uri()
+def link(path, label):
+    return f'<a href="{esc(Path(path).relative_to(ROOT).as_posix())}">{esc(label)}</a>'
 
 
-def link(path: Path, label=None):
-    return f'<a href="{esc(href(path))}">{esc(label or path.name)}</a>'
+def current_result(directory):
+    candidates = []
+    for path in directory.rglob("provisional_final_*.json"):
+        record = json.loads(path.read_text(encoding="utf-8-sig"))
+        designation = record.get("designation", {})
+        if (record.get("schema") == "rinkspace.provisional_final_programme_fit.v1"
+                and record.get("programme_id") == directory.name
+                and designation.get("status") == "provisional_final"):
+            candidates.append((designation["designated_on"], path, record))
+    if not candidates:
+        return None
+    newest_date = max(candidate[0] for candidate in candidates)
+    latest = [candidate for candidate in candidates if candidate[0] == newest_date]
+    if len(latest) != 1:
+        raise ValueError(f"Multiple designated programme fits on {newest_date}: {directory}")
+    return latest[0]
 
 
-def sha(path: Path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def path_svg(points, *, color="#216f82", width=.25, closed=False):
-    if not points:
-        return ""
-    pairs = " ".join(f"{float(p[0]):.6f},{-float(p[1]):.6f}" for p in points)
-    tag = "polygon" if closed else "polyline"
-    return f'<{tag} points="{pairs}" fill="none" stroke="{color}" stroke-width="{width}"/>'
-
-
-def plan(scene):
-    """Use the exported model geometry; no schematic replacement or confidence mask."""
-    boundary = scene.get("ice_boundary", {}).get("points_xyz", [])
-    if not boundary:
-        return '<p class="small">模型没有导出冰面轮廓；保留缺失状态。</p>'
-    xs, ys = [float(p[0]) for p in boundary], [float(p[1]) for p in boundary]
-    left, bottom = min(xs)-9, -max(ys)-9
-    width, height = max(xs)-min(xs)+18, max(ys)-min(ys)+18
-    parts = [f'<svg class="rink-plan" viewBox="{left} {bottom} {width} {height}" role="img" aria-label="该版本实际冰场标记和已建模广告">']
-    parts += [path_svg(c.get("polygon_xyz", []), color="#d6e4e9", width=.12, closed=True)
-              for c in scene.get("ice_grid", {}).get("cells", [])]
-    parts.append(path_svg(boundary, color="#64798c", width=.5, closed=True))
-    for feature in scene.get("ice_features", []):
-        label = feature.get("id", "?")
-        if feature.get("kind") == "circle":
-            rings = feature.get("rings") or [feature]
-            for ring in rings:
-                center = ring.get("center_xyz", feature.get("center_xyz"))
-                if center is not None and ring.get("radius") is not None:
-                    parts.append(f'<circle cx="{float(center[0])}" cy="{-float(center[1])}" r="{float(ring["radius"])}" fill="none" stroke="#33859a" stroke-width=".24"/>')
+def programme_section(store, key, name):
+    directory = ROOT / EVENT / "programmes" / key
+    binding = current_result(directory)
+    if binding is None:
+        result = '<p>暂未登记完整拟合。</p>'
+    else:
+        date, record_path, record = binding
+        review = record["full_review"]
+        first, last = review["original_source_seconds"]
+        video_path = Path(review["video"]["path"])
+        video_path = store.resolve(video_path if video_path.is_absolute() else store.data / video_path)
+        result = (
+            f'<p>{esc(date)} 暂定最终版 <strong>{esc(record["version_id"])}</strong>'
+            f' · {record["shot_count"]} 个镜头 · {record["source_native_PTS"]["exposures"]:,} 个原生帧。</p>'
+            f'<p>原片 {first:.3f}–{last:.3f} 秒。视觉验收见节目页及登记绑定的审阅记录。</p>'
+            f'<p>{link(record_path, "版本登记")}</p>'
+        )
+        if video_path.is_file():
+            result += (
+                '<div class="surface"><p>本地冰场回放地址，供 PotPlayer 使用</p>'
+                f'<code>{esc(video_path)}</code> '
+                f'<button type="button" data-copy-path="{esc(video_path)}">复制路径</button>'
+                '<p class="copy-status" role="status"></p></div>'
+            )
         else:
-            segments = feature.get("paint_segments_xyz", feature.get("segments_xyz", []))
-            if segments:
-                parts += [path_svg(p) for p in segments]
-            elif feature.get("polygon_xyz"):
-                parts.append(path_svg(feature["polygon_xyz"], closed=bool(feature.get("closed"))))
-            if feature.get("centerline_xyz"):
-                parts.append(path_svg(feature["centerline_xyz"], color="#447691"))
-        center = feature.get("center_xyz")
-        if center:
-            parts.append(f'<text x="{float(center[0])+.7}" y="{-float(center[1])-.7}" font-size="2.4" fill="#346373">{esc(label)}</text>')
-    for ad in scene.get("advertisements", []):
-        curves = ad.get("fitted_boundary_curves_xyz", {})
-        parts += [path_svg(p, color="#bf7640", width=.45) for p in curves.values() if isinstance(p, list)]
-        corners = list(ad.get("corners_xyz_scene_units", {}).values())
-        if corners:
-            x = sum(p[0] for p in corners)/len(corners)
-            y = sum(p[1] for p in corners)/len(corners)
-            parts.append(f'<text x="{x}" y="{-y-1.2}" text-anchor="middle" font-size="2.5" fill="#925d31">Ad{esc(ad.get("user_number", "?"))}</text>')
-    return "".join(parts)+"</svg>"
+            result += '<p>本地缺少该版整片回放文件。</p>'
+    if (directory / "README.md").is_file():
+        result += f'<p>{link(directory / "README.md", "节目范围、结果与人工确认")}</p>'
+    return (
+        f'<section class="entry-view" id="{esc(key)}" data-view="{esc(key)}" hidden>'
+        f'<h1 tabindex="-1">{esc(name)}短节目</h1>{result}</section>'
+    )
 
 
-def model_panel(scene_path: Path, title: str):
-    scene = read(scene_path)
-    counts = f'{len(scene.get("ice_features", []))} 个冰面标记 · {len(scene.get("advertisements", []))} 个有几何的广告'
-    rows = []
-    for name, value in scene.get("parameters", {}).items():
-        rows.append(f'<tr><td>{esc(name)}</td><td><pre>{esc(json.dumps(value, ensure_ascii=False, indent=2))}</pre></td></tr>')
-    cameras = list(scene_path.parent.glob("*camera*.npz"))
-    files = " · ".join([link(scene_path, "完整场地数据")]+[link(p, "相机模型参数") for p in cameras])
-    return (f'<details class="surface model"><summary><strong>{esc(title)}</strong> · {esc(counts)} · 未通过完整定位验收</summary>'
-            f'<p class="small">场景 SHA {sha(scene_path)[:16]}；以下投影来自此文件的实际几何。米制仍需独立验证，未建模广告不补造。</p>'
-            +plan(scene)+f'<p>{files}</p><details><summary>场地参数与模型定义</summary><table><thead><tr><th>参数</th><th>当前值／状态</th></tr></thead><tbody>'
-            +"".join(rows)+f'</tbody></table><p class="small">单项固定／自由状态和逐曝光相机由相应运行契约定义；本页面不把导出字段数量当成求解自由度。</p></details></details>')
-
-
-def source_time(pts, base):
-    seconds = int(pts)*base
-    hours = int(seconds//3600)
-    minutes = int(seconds%3600//60)
-    return f"{hours:02d}:{minutes:02d}:{seconds%60:06.3f}"
-
-
-def programme(event: Path, entry):
-    directory = event/"programmes/okada_mei_sp"
-    latest = Path(entry["full_video_path"])
-    num, den = map(int, entry["source_time_base"].split("/"))
-    rows = []
-    names = {"main_long_side":"长边主机位", "secondary_long_side":"长边副机位", "low_end":"低位端部"}
-    for shot in entry["shots"]:
-        status = "存在已知偏差" if shot["validation"] == "known_issue" else "尚未通过完整镜头验收"
-        rows.append(f'<li class="shot"><div class="time">{source_time(shot["start_pts"], num/den)}<span class="to">至 {source_time(shot["end_pts_exclusive"], num/den)}</span></div><div class="shot-body"><strong>镜头 {shot["shot_index"]} · {esc(names.get(shot["camera_id"], shot["camera_id"]))}</strong><p>{status} · {shot["frame_count"]} 次原片显示</p></div></li>')
-    files = sorted(directory.rglob("*.npz"))+sorted(directory.rglob("FROZEN*.json"))
-    retained = " · ".join(link(p) for p in files)
-    observations = ROOT/"configs/rink_vision.json"
-    return ('<section class="section entry-view" id="programme" data-view="programme" hidden><h1 tabindex="-1">冈田芽衣 · 短节目</h1>'
-            '<p>安卡拉赛事的开发节目 · 原片 04:08:36.283–04:11:25.000（结束不含）</p>'
-            '<div class="surface"><strong>最新已有完整工作版 · 2026-10-05</strong><p>9 镜头，全部已建模网格、广告编号与骨盆投影；贴合和世界位置仍未验收。用 PotPlayer 播放。</p>'
-            f'<div class="path-row"><code class="path">{esc(latest)}</code><button class="copy" data-copy-path="{esc(latest)}">复制视频路径</button></div><p class="copy-status small" role="status"></p>'
-            f'<details><summary>节目模型数据与来源</summary><p>{retained or "正在登记模型数据"}</p><p><code>{esc(directory)}</code> · {link(Path(entry["current_video_delivery"]["frozen_inputs_path"]), "原始冻结来源")}</p></details></div>'
-            '<div class="program-layout"><div><h3>完整源时间轴</h3><ol class="timeline">'+"".join(rows)+'</ol></div><div><h3>已知问题与核验依据</h3><p>冰面漆线、Lane、靶圈与广告仍有明显偏差；旋转段曾出现共同投影漂移。身体位置和接触不能仅凭轨迹平滑判定准确。</p>'
-            f'<p>{link(directory/"model_constraints/user_work_priorities_20261005.json", "八处人工指出的问题与工程取舍")} · {link(observations, "当前视觉样本配置")}</p>'
-            '<p class="small">此完整视频使用 10 月 5 日冻结模型，与当前工作候选分别绑定。模型更新不会把旧视频自动升级为新成果。</p></div></div></section>')
-
-
-def content(entry, current_task):
-    event = ROOT/"events/ankara_2026"
-    manifest = read(event/"manifest.json")
-    resources = {r["id"]:ROOT/r["project_path"] for r in manifest["resources"]}
-    models = model_panel(resources["working_scene"], "工作候选 · "+manifest["working_model"]["q_sha256"][:12])
-    models += model_panel(resources["registered_v025_scene"], "正式登记基线 · v0.25")
-    constraints = sorted((event/"model_constraints").rglob("*.json"))
-    links = " · ".join(link(p) for p in constraints)
-    return ('<section id="project" class="entry-view" data-view="project"><h1 tabindex="-1">花样滑冰转播的空间分析</h1><p class="lead">为不同赛事建立各自的三维冰场与相机模型，持续定位场地和选手，恢复轨迹并支持运动分析。</p>'
-            +current_task
-            +'<section class="section"><h2>赛事</h2><a class="surface entry-link" href="#/events/ankara_2026"><strong>2026 JGP 安卡拉</strong><span>查看冰场、广告、机位、共同模型与节目结果 →</span></a>'
-            '<p class="small">已有开发赛事；跨赛事能力仍需对应真实画面验证。</p></section>'
-            '<details class="section surface" id="folders"><summary>公共能力与文件归属</summary><p>公共代码、环境、最终视觉参数和求解接口留在 OneDrive。场地、广告和相机安装归所属赛事；节目保存源时间、模型绑定及自己的结果。大量原片、帧图、数组、检查点和日志保存在 Data。</p><p>'
-            +link(ROOT/"README.md", "项目与技术说明")+'</p></details></section>'
-            '<section class="section entry-view" id="event" data-view="event" hidden><h1 tabindex="-1">2026 JGP 安卡拉</h1><p class="lead">共同冰场、广告与机位模型，同赛事节目共享。</p>'
-            '<section class="section"><h2>节目与结果</h2><a class="surface entry-link" href="#/events/ankara_2026/programmes/okada_mei_sp"><strong>冈田芽衣 · 短节目</strong><span>完整网格视频、源时间轴、轨迹与待修偏差 →</span></a></section>'
-            '<section class="section"><h2>场地与相机模型</h2>'
-            +models+f'<details class="surface"><summary>机位、广告与人工约束</summary><p>{links}</p><p>{link(event/"manifest.json", "文件身份、角色与原始来源")}</p><p class="small">这些事实仅适用于本赛事，不成为所有花滑冰场的默认布局或设备。</p></details></section>'
-            +'</section>'+programme(event, entry))
+def render(store, previous):
+    old_reviews = REVIEW.search(previous) if PANEL in previous else None
+    reviews = old_reviews.group() if old_reviews else "<!-- CURRENT_TASK_BEGIN --><!-- CURRENT_TASK_END -->"
+    programme_links = "".join(
+        f'<li><a href="#/events/ankara_2026/programmes/{key}">{esc(name)}短节目</a></li>'
+        for key, name in PROGRAMMES
+    )
+    sections = "".join(programme_section(store, key, name) for key, name in PROGRAMMES)
+    event_docs = " · ".join(
+        link(path, label) for path, label in (
+            (ROOT / EVENT / "README.md", "赛事版本与来源"),
+            (ROOT / EVENT / "scene/README.md", "共同冰场与广告"),
+            (ROOT / "docs/RESULTS_3D_PLAYER_ZH.md", "人体与鞋刀播放器"),
+        ) if path.is_file()
+    )
+    return (
+        '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">'
+        '<meta name="viewport" content="width=device-width, initial-scale=1">'
+        '<title>RinkSpace</title><style>'
+        'body{margin:0;background:#f5f7f9;color:#233748;font:16px/1.65 system-ui,sans-serif}'
+        'main{max-width:60rem;margin:auto;padding:1.5rem}a{color:#08687a}h1{line-height:1.2}'
+        'header{display:flex;gap:1rem;align-items:baseline}header>a{font-weight:700}'
+        '.surface{padding:1rem;border:1px solid #dbe4eb;border-radius:.5rem;background:#fff}'
+        'code{overflow-wrap:anywhere}details{margin-top:1rem}button{font:inherit;cursor:pointer}'
+        '[hidden]{display:none!important}</style></head><body>' + PANEL
+        + '<main><header><a href="#/">RinkSpace</a><nav id="entry-breadcrumb" aria-label="当前位置"></nav></header>'
+        '<section class="entry-view" data-view="project"><h1 tabindex="-1">花样滑冰转播的空间分析</h1>'
+        '<p><a href="#/events/ankara_2026">2026 JGP 安卡拉</a></p>'
+        f'<p>{link(ROOT / "README.md", "项目说明")}</p></section>'
+        '<section class="entry-view" data-view="event" hidden><h1 tabindex="-1">2026 JGP 安卡拉</h1>'
+        f'<ul>{programme_links}</ul><p>{event_docs}</p>'
+        f'<details id="source-reviews"><summary>历史片段取点审阅</summary>{reviews}</details></section>'
+        + sections
+        + JS.replace("__PROJECT_URI__", json.dumps(ROOT.as_uri())).replace("__DATA_URI__", json.dumps(store.data.as_uri()))
+        + '</main></body></html>'
+    )
 
 
 JS = r'''<script>
 (()=>{
+const eventPath='#/events/ankara_2026', okadaPath=eventPath+'/programmes/okada_mei_sp';
 const routes={
   '#/':{view:'project',title:'RinkSpace',crumbs:[['RinkSpace','#/']]},
-  '#/events/ankara_2026':{view:'event',title:'2026 JGP 安卡拉 · RinkSpace',crumbs:[['RinkSpace','#/'],['2026 JGP 安卡拉','#/events/ankara_2026']]},
-  '#/events/ankara_2026/programmes/okada_mei_sp':{view:'programme',title:'冈田芽衣 · 短节目 · RinkSpace',crumbs:[['RinkSpace','#/'],['2026 JGP 安卡拉','#/events/ankara_2026'],['冈田芽衣 · 短节目','#/events/ankara_2026/programmes/okada_mei_sp']]}
+  [eventPath]:{view:'event',title:'2026 JGP 安卡拉',crumbs:[['RinkSpace','#/'],['2026 JGP 安卡拉',eventPath]]},
+  [okadaPath]:{view:'okada_mei_sp',title:'冈田芽依短节目',crumbs:[['RinkSpace','#/'],['2026 JGP 安卡拉',eventPath],['冈田芽依短节目',okadaPath]]},
+  [eventPath+'/programmes/jin_shuxian_sp']:{view:'jin_shuxian_sp',title:'金书贤短节目',crumbs:[['RinkSpace','#/'],['2026 JGP 安卡拉',eventPath],['金书贤短节目',eventPath+'/programmes/jin_shuxian_sp']]}
 };
+const aliases={'#project':'#/','#event':eventPath,'#programme':okadaPath,'#current-task':eventPath};
 function navigate(){
-  const original=location.hash;
-  const aliases={'#project':'#/','#event':'#/events/ankara_2026','#programme':'#/events/ankara_2026/programmes/okada_mei_sp','#current-task':'#/','#folders':'#/'};
-  const route=routes[aliases[original]||original]||routes['#/'];
+  const hash=location.hash;
+  const route=routes[aliases[hash]||hash]||routes['#/'];
   document.querySelectorAll('[data-view]').forEach(section=>{section.hidden=section.dataset.view!==route.view;});
   document.title=route.title;
-  const breadcrumb=document.getElementById('entry-breadcrumb');breadcrumb.replaceChildren();
-  route.crumbs.forEach(([label,target],index)=>{if(index){const divider=document.createElement('span');divider.textContent=' / ';divider.setAttribute('aria-hidden','true');breadcrumb.append(divider);}const item=document.createElement(index===route.crumbs.length-1?'span':'a');item.textContent=label;if(item.tagName==='A')item.href=target;else item.setAttribute('aria-current','page');breadcrumb.append(item);});
-  const active=document.querySelector('[data-view="'+route.view+'"]');
-  if(original==='#current-task'||original==='#folders'){const target=document.querySelector(original);if(target){if(target.tagName==='DETAILS')target.open=true;target.scrollIntoView();}}
-  else {window.scrollTo(0,0);active.querySelector('h1')?.focus({preventScroll:true});}
+  const breadcrumb=document.getElementById('entry-breadcrumb');
+  breadcrumb.replaceChildren();
+  route.crumbs.forEach(([label,target],index)=>{
+    if(index)breadcrumb.append(' / ');
+    const item=document.createElement(index===route.crumbs.length-1?'span':'a');
+    item.textContent=label;
+    if(item.tagName==='A')item.href=target;else item.setAttribute('aria-current','page');
+    breadcrumb.append(item);
+  });
+  window.scrollTo(0,0);
+  document.querySelector('[data-view="'+route.view+'"] h1')?.focus({preventScroll:true});
 }
-window.addEventListener('hashchange',navigate);navigate();
+window.addEventListener('hashchange',navigate);
+navigate();
 })();
-document.querySelectorAll('[data-copy-path]').forEach(b=>b.addEventListener('click',async()=>{let ok=false;try{await navigator.clipboard.writeText(b.dataset.copyPath);ok=true}catch{let t=document.createElement('textarea');t.value=b.dataset.copyPath;document.body.append(t);t.select();ok=document.execCommand('copy');t.remove()}let s=b.closest('.surface')?.querySelector('.copy-status');if(s)s.textContent=ok?'路径已复制，可粘贴到 PotPlayer。':'请选中路径复制。'}));
+document.querySelectorAll('[data-copy-path]').forEach(button=>button.addEventListener('click',async()=>{
+  const status=button.closest('.surface').querySelector('.copy-status');
+  try {
+    await navigator.clipboard.writeText(button.dataset.copyPath);
+    status.textContent='路径已复制，可粘贴到 PotPlayer。';
+  } catch {
+    status.textContent='请选中路径复制。';
+  }
+}));
 const projectRoot=__PROJECT_URI__+'/', dataRoot=__DATA_URI__+'/';
 document.querySelectorAll('a[href],img[src]').forEach(el=>{
   const attr=el.tagName==='IMG'?'src':'href', h=el.getAttribute(attr);
@@ -230,58 +205,40 @@ def replace_capturing_previous(target: Path, replacement: Path, backup: Path):
 
 
 def refresh():
-    target = AssetStore(ROOT).project_entry()
-    target.parent.mkdir(parents=True, exist_ok=True)
-    if not target.exists():
-        legacy = ROOT / "START_HERE.html"
-        if not legacy.is_file():
-            raise FileNotFoundError("Local panel needs an existing entry-data binding; the public CLI works without it")
-        with target.open("xb") as handle:
-            handle.write(legacy.read_bytes())
     store = AssetStore(ROOT)
+    target = store.project_entry()
+    target.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        original = target.read_bytes()
+    except FileNotFoundError:
+        output = render(store, "").encode("utf-8")
+        try:
+            with target.open("xb") as handle:
+                handle.write(output)
+            return {"entry": str(target), "bytes": len(output)}
+        except FileExistsError:
+            original = target.read_bytes()
+
+    expected = original
     temp_root = store.data / "tmp" if store.configured else store.project / "outputs/tmp"
     temp_root.mkdir(parents=True, exist_ok=True)
-    original = target.read_bytes()
-    expected = original
-    backups = []
-    conflicts = 0
     while True:
-        source = original.decode("utf-8-sig")
-        current, data = TASK.search(source), ENTRY.search(source)
-        if current is None or data is None:
-            raise ValueError("Active task and legacy result bindings must remain present")
-        head = source.split("</head>", 1)[0]
-        head = re.sub(r'<!-- LOCAL_ENTRY_BASE_BEGIN -->.*?<!-- LOCAL_ENTRY_BASE_END -->', "", head, flags=re.S)
-        head = head.replace('<script>if(location.protocol!=="file:")document.querySelector("base").href="/assets/project/";</script>', "")
-        head = re.sub(r'<base[^>]*>', "", head, flags=re.I)
-        head = re.sub(r'<!-- PROJECT_ENTRY_STYLE_BEGIN -->.*?<!-- PROJECT_ENTRY_STYLE_END -->', '', head, flags=re.S)
-        head += '<!-- PROJECT_ENTRY_STYLE_BEGIN --><style>.rink-plan{width:100%;display:block;max-height:450px;background:#fff}.model{margin-top:12px}summary{cursor:pointer}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;margin:6px 0}table{width:100%;border-collapse:collapse}td,th{text-align:left;vertical-align:top;padding:8px;border-bottom:1px solid #e1e9ec}.model>summary{font-size:15px}details.surface>summary{list-style-position:inside}.entry-view[hidden]{display:none!important}.entry-view>h1:focus{outline:none}.entry-link{display:flex;justify-content:space-between;align-items:center;gap:16px;text-decoration:none;margin-top:10px}.entry-link strong{font-size:18px}.entry-link span{font-size:14px;color:var(--muted)}.entry-link:hover{border-color:var(--accent)}#entry-breadcrumb{display:block;font-size:14px}header>a{font-size:23px;font-weight:700;text-decoration:none;color:var(--ink)}@media(max-width:650px){.entry-link{align-items:flex-start;flex-direction:column}}</style><!-- PROJECT_ENTRY_STYLE_END --></head>'
-        sections = content(json.loads(data.group(1)), current.group())
-        body = ('<body><main><header><a href="#/">RinkSpace</a><nav id="entry-breadcrumb" aria-label="当前位置">RinkSpace</nav></header>'
-                +sections
-                +'<footer>唯一入口：START_HERE.html · <a href="README.md">项目说明</a> · <a href="calibration/solver_runtime/README.md">求解接口</a> · <a href="launchers/CHECK_PATHS.cmd">OneDrive 路径检查</a></footer>'
-                +'<script type="application/json" id="entry-data">'+data.group(1)+'</script>'+JS.replace('__PROJECT_URI__', json.dumps(ROOT.as_uri())).replace('__DATA_URI__', json.dumps(AssetStore(ROOT).data.as_uri()))+'</main></body></html>')
-        output = (head+body).encode("utf-8")
+        output = render(store, original.decode("utf-8-sig")).encode("utf-8")
+        if output == expected:
+            return {"entry": str(target), "bytes": len(output)}
         with tempfile.NamedTemporaryFile(dir=temp_root, suffix=".entry.html", delete=False) as handle:
             temporary = Path(handle.name)
             handle.write(output)
-        with tempfile.NamedTemporaryFile(dir=temp_root, suffix=".entry.previous.html", delete=False) as handle:
-            backup = Path(handle.name)
-        backup.unlink()
-        backups.append(backup)
-        displaced = replace_capturing_previous(target, temporary, backup)
-        if displaced != expected:
-            # A writer updated the entry during rendering. Its complete version
-            # is now in backup; use that CURRENT_TASK and entry-data next time.
-            # Our own output is the expected target until another writer acts.
+        backup = temporary.with_suffix(".previous.html")
+        try:
+            displaced = replace_capturing_previous(target, temporary, backup)
+            if displaced == expected:
+                return {"entry": str(target), "bytes": len(output)}
+            # A source-review writer saved an update during rendering.
             original, expected = displaced, output
-            conflicts += 1
-            continue
-        for saved in backups:
-            saved.unlink(missing_ok=True)
-        return {"entry":str(target), "task_block_preserved":True,
-                "result_binding_preserved":True, "bytes":len(output),
-                "concurrent_versions_reconciled":conflicts}
+        finally:
+            temporary.unlink(missing_ok=True)
+            backup.unlink(missing_ok=True)
 
 
 if __name__ == "__main__":

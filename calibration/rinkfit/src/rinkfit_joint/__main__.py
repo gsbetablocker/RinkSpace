@@ -7,7 +7,7 @@ from .io_utils import read_json, write_json, read_jsonl
 
 def main():
     bundle=Path(__file__).resolve().parents[2]
-    parser=argparse.ArgumentParser(description="三机位九镜头接入与审查；生产求解由 Codex 按 CODEX_START.md 接入")
+    parser=argparse.ArgumentParser(description="三机位九镜头接入与审查。接入说明见 calibration/rinkfit/README.md。")
     parser.add_argument("--bundle",type=Path,default=bundle,help="Immutable joint package data root")
     sub=parser.add_subparsers(dest="command",required=True)
     p=sub.add_parser("prepare",help="准备全部数据、机位图、材料交叉表、源审查和8434帧任务")

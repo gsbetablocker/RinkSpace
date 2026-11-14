@@ -11,6 +11,9 @@ import os
 from pathlib import Path
 import sys
 import types
+from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
+from threading import Event
 from unittest.mock import patch
 
 import numpy as np
@@ -179,6 +182,45 @@ def test_invalid_display_geometry_cannot_publish(tmp_path,kw):
         with pytest.raises((ValueError,AssertionError)):
             PREPARE.prepare_variant(c,'fixture',Surface(**kw))
     assert not list(c.cache_root.glob('fixture_*/metadata.json'))
+    assert not list(c.cache_root.glob('.preparing_*'))
+
+
+def test_competing_bakes_reuse_the_published_cache(tmp_path, monkeypatch):
+    c = catalog(tmp_path)
+    path, _ = c.cache_path('fixture')
+    staging = c.cache_root / f'.preparing_{path.name}'
+    staging.mkdir(parents=True)
+    (staging / 'interrupted').write_text('unfinished', encoding='utf-8')
+    baking = Event()
+    second_caller_waiting = Event()
+    writes = []
+    original_lock = PREPARE._cache_writer_lock
+    original_write = PREPARE._write_variant_cache
+
+    @contextmanager
+    def observe_lock(lock_path):
+        if baking.is_set():
+            second_caller_waiting.set()
+        with original_lock(lock_path):
+            yield
+
+    def observe_write(*args):
+        writes.append(args[3])
+        assert not (staging / 'interrupted').exists()
+        baking.set()
+        assert second_caller_waiting.wait(5)
+        return original_write(*args)
+
+    monkeypatch.setattr(PREPARE, '_cache_writer_lock', observe_lock)
+    monkeypatch.setattr(PREPARE, '_write_variant_cache', observe_write)
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        first = pool.submit(PREPARE.prepare_variant, c, 'fixture', Surface())
+        assert baking.wait(5)
+        second = pool.submit(PREPARE.prepare_variant, c, 'fixture', Surface())
+        assert first.result(timeout=5) == second.result(timeout=5) == path
+    assert writes == [staging]
+    assert not staging.exists()
+    assert len(DATA.CachedSequence(path).vertices) == len(c.pts)
 
 
 def test_finite_mismatch_is_still_rejected(tmp_path):

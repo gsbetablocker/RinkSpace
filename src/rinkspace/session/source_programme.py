@@ -201,7 +201,9 @@ def navigation_result_target(root, shot, dependencies):
 
 def _verified_job(job_path):
     path=Path(job_path).resolve();job=json.loads(path.read_text(encoding='utf-8-sig'))
-    for name in ('scope_ref','scene_ref','source_routes_ref','navigation_ref','vision_config_ref','source_reidentification_ref'):
+    names = ('scope_ref','scene_ref','source_routes_ref','navigation_ref','vision_config_ref','source_reidentification_ref')
+    names += tuple(name for name in ('native_library_ref','parameter_state_ref') if name in job)
+    for name in names:
         ref=job[name]
         if digest(job_reference_path(path,job,name))!=ref['sha256']:raise ValueError('Job input changed: '+name)
     if digest(job['source']['registered_path'])!=job['source']['sha256']:raise ValueError('Original video SHA differs')
@@ -325,8 +327,11 @@ def run_programme(job_path, out, *, resume=False, interrupt_after_commit=None, p
         record=dict(unix_time=time.time(),**_json_safe(event));line=json.dumps(record,ensure_ascii=True,allow_nan=False)
         log.write(line+'\n');print(line,flush=True)
     print('MAIN LOG: '+str((out/'programme.log').resolve()),flush=True)
-    library=Path(job['roots']['data'])/'build/native_s01_audit_20261027/rinkspace_core.dll'
-    geometry=NativeSourceGeometry(job_reference_path(path,job,'scene_ref'),library)
+    library=(job_reference_path(path,job,'native_library_ref') if 'native_library_ref' in job
+        else Path(job['roots']['data'])/'build/native_s01_audit_20261027/rinkspace_core.dll')
+    state_path=job_reference_path(path,job,'parameter_state_ref') if 'parameter_state_ref' in job else None
+    geometry=NativeSourceGeometry(job_reference_path(path,job,'scene_ref'),library,
+        **({'parameter_state_path':state_path} if state_path is not None else {}))
     if not all(hasattr(geometry.core._lib,s) for s in ('rs_g1_create','rs_g3_attach','rs_g4_solve','rs_g2_sparse_info')):
         raise ValueError('Current native GPU capabilities unavailable')
     scope=json.loads(job_reference_path(path,job,'scope_ref').read_text(encoding='utf-8-sig'))

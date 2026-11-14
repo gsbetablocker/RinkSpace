@@ -13,7 +13,8 @@ def _array(value):
     return value.detach().cpu().numpy() if hasattr(value, 'detach') else np.asarray(value)
 
 
-def read_board_contacts(rgb, old_uv, exclusion, *, binding, authority, spacing=24.):
+def read_board_contacts(rgb, old_uv, exclusion, *, binding, authority, spacing=24.,
+                        source_query_points_uv=None):
     import torch
     from rinkspace.vision_source_topology import read_board_foot_material_profiles
     from rinkspace.session.chromatic_line_navigation import source_board_foot_component_support
@@ -24,12 +25,24 @@ def read_board_contacts(rgb, old_uv, exclusion, *, binding, authority, spacing=2
         raise ValueError('At least two finite source navigation queries and positive spacing required')
     if mask.shape!=rgb.shape[:2]:
         raise ValueError('Source exclusion and original RGB differ')
-    order=np.argsort(old[:,0],kind='stable');nav=old[order]
-    columns=np.arange(np.ceil(nav[0,0]/spacing)*spacing,nav[-1,0],spacing)
-    columns=columns[~np.isin(columns,old[:,0])]
-    extra=np.c_[columns,np.interp(columns,nav[:,0],nav[:,1])]
-    unsorted=np.vstack([old,extra]);sort=np.argsort(unsorted[:,0],kind='stable')
-    queries=unsorted[sort];old_query_indices=np.argsort(sort)[:len(old)]
+    if source_query_points_uv is None:
+        order=np.argsort(old[:,0],kind='stable');nav=old[order]
+        columns=np.arange(np.ceil(nav[0,0]/spacing)*spacing,nav[-1,0],spacing)
+        columns=columns[~np.isin(columns,old[:,0])]
+        extra=np.c_[columns,np.interp(columns,nav[:,0],nav[:,1])]
+        unsorted=np.vstack([old,extra]);sort=np.argsort(unsorted[:,0],kind='stable')
+        queries=unsorted[sort];old_query_indices=np.argsort(sort)[:len(old)]
+    else:
+        # Scope-only callers may ask for new actual RGB columns between
+        # existing navigation stations. Read exactly those points: do not
+        # replay the old profiles or create a second regular query grid.
+        requested=np.asarray(source_query_points_uv,float)
+        if (requested.ndim!=2 or requested.shape[1]!=2 or not len(requested)
+                or not np.isfinite(requested).all()
+                or len(np.unique(requested[:,0]))!=len(requested)):
+            raise ValueError('Finite distinct explicit source query columns required')
+        queries=requested[np.argsort(requested[:,0],kind='stable')]
+        old_query_indices=np.empty(0,np.int64)
     component_support,component_evidence=source_board_foot_component_support(rgb,mask)
     packet=read_board_foot_material_profiles(rgb,
         dict(source_binding=binding,instances=[dict(object_id='current_source_exclusion',
@@ -72,6 +85,8 @@ def read_board_contacts(rgb, old_uv, exclusion, *, binding, authority, spacing=2
             ('rgb_profile','sampled_native_uv','offsets_native_px','valid_mask')},
         source_role_flags=lower['flags'],material_role_authority=authority,
         source_query_spacing_px=float(spacing),source_2D_material_component_evidence=component_evidence,
+        explicit_source_query_points_only=source_query_points_uv is not None,
+        original_queries_reread=source_query_points_uv is None,
         source_2D_material_selected_pair_support_fraction=_array(pairs['selected_source_component_support_fraction']),
         dense_queries_are_fit_observations=False,
         source_UV_synthesized=False,fit_eligible=False)

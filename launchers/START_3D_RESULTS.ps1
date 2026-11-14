@@ -2,6 +2,7 @@
 param([string]$Variant='', [switch]$Fresh, [switch]$Wait, [string]$Config='')
 $ErrorActionPreference='Stop'
 $projectRoot=Split-Path -Parent $PSScriptRoot
+. (Join-Path $PSScriptRoot 'LOCAL_PYTHON.ps1')
 $env:PYTHONPATH=(Join-Path $projectRoot 'src')+';'+$projectRoot
 $env:PYTHONDONTWRITEBYTECODE='1'
 $env:PYTHONIOENCODING='utf-8'
@@ -15,7 +16,7 @@ function Quote-PlayerArgument([string]$Value) {
     return '"'+$escaped+'"'
 }
 try {
-    $basePython=Join-Path $projectRoot '.venv\Scripts\python.exe'
+    $basePython=Get-RinkSpacePythonPath $projectRoot
     if (-not (Test-Path -LiteralPath $basePython)) { throw 'Project Python is missing.' }
     $dataRoot=(& $basePython -B -c 'import sys; from rinkspace.storage import configured_data_root; print(configured_data_root(sys.argv[1]))' $projectRoot | Out-String).Trim()
     if ($LASTEXITCODE -ne 0 -or -not $dataRoot) { throw 'Cannot resolve the RinkSpace Data directory.' }

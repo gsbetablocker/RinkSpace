@@ -34,8 +34,6 @@ def main(argv: list[str] | None = None) -> int:
     o.add_argument("--job", required=True); o.add_argument("--out", required=True)
     o.add_argument("--resume", action="store_true")
     o.add_argument("--previous-job", help="Authenticate existing source records when execution instructions changed")
-    o = observe_sub.add_parser("audit", help="Audit one exact exposure against a frozen reviewed reference")
-    o.add_argument("--case", required=True); o.add_argument("--assets", required=True); o.add_argument("--out", required=True)
     p = sub.add_parser("prepare", help="Compile current immutable observations and scope")
     p.add_argument("--input", required=True); p.add_argument("--scope", required=True)
     p.add_argument("--shots", required=True); p.add_argument("--out", required=True)
@@ -126,11 +124,9 @@ def main(argv: list[str] | None = None) -> int:
             elif args.observe_command == "check-source":
                 from .session.source_check import run_source_check
                 result = run_source_check(args.request, args.out)
-            elif args.observe_command == "programme":
+            else:
                 from .session.source_programme import run_programme
                 result = run_programme(args.job, args.out, resume=args.resume, previous_job=args.previous_job)
-            else:
-                raise ValueError("The O worksheet audit entry was withdrawn; use observe read with the complete source reader")
             print(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False))
             return result.get("exit_code", 0)
         if args.command == "prepare":

@@ -4,7 +4,6 @@ from pathlib import Path
 
 import cv2
 import numpy as np
-from scipy.spatial import cKDTree
 from scipy.spatial.transform import Rotation
 
 from calibration.program_tracking.body_tracking.rebuild_exposure_body import moving_projection
@@ -12,6 +11,7 @@ from calibration.program_tracking.body_tracking.rebuild_prepare import load
 from calibration.program_tracking.body_tracking.skate_physics import fk_state
 from ..body_skate_fit import Assembly
 from ..inputs import atomic_json, digest
+from ..outline_metric import outline_distances
 from ..programme_motion_followup import bind
 
 
@@ -48,14 +48,7 @@ def angles_between(v,w):
     return np.degrees(np.arctan2(v[...,0]*w[...,1]-v[...,1]*w[...,0],np.sum(v*w,axis=-1)))
 
 def silhouette_score(assembly, verts, polygon):
-    if not np.isfinite(verts).all() or not np.isfinite(polygon).all():
-        return np.nan
-    try:
-        boundary=np.concatenate(assembly.raster(verts))
-    except ValueError:
-        return np.nan
-    return float(.55*np.median(cKDTree(boundary).query(polygon)[0])+
-                 .45*np.median(cKDTree(polygon).query(boundary)[0]))
+    return outline_distances(assembly, verts, polygon)[1]
 
 def main(args):
     cv2.setNumThreads(1)

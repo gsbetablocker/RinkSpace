@@ -78,8 +78,8 @@ def _edge_points(image: np.ndarray, hsv: np.ndarray, component: np.ndarray,
     steps = np.arange(-20., 21., dtype=np.float32)
     sx = xy[:, None, 0] + normals[:, None, 0]*steps
     sy = xy[:, None, 1] + normals[:, None, 1]*steps
-    in_image = ((sx[:, 0] >= 1) & (sx[:, -1] < IMAGE_SIZE[1]-1)
-                & (sy[:, 0] >= 1) & (sy[:, -1] < IMAGE_SIZE[0]-1))
+    in_image = ((sx >= 1) & (sx < IMAGE_SIZE[1]-1)
+                & (sy >= 1) & (sy < IMAGE_SIZE[0]-1)).all(axis=1)
     xy, normals, sx, sy = xy[in_image], normals[in_image], sx[in_image], sy[in_image]
     if not len(xy):
         return (np.empty((0, 2)), np.empty((0, 2)),

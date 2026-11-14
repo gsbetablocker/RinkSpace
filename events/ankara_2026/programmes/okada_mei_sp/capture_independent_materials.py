@@ -10,7 +10,7 @@ from rinkspace.core.native import NativeCore
 from rinkspace.vision_programme_ice_review import IceProgrammeSourceReader
 from rinkspace.session.material_tracks import qualify_visible_line_fragments
 from rinkspace.session.panel_boundaries import read_panel_boundary
-from capture_native_panels import native_panel_inventory
+from capture_native_panels import native_panel_inventory, single_panel
 from prepare_independent_navigation import frames
 
 
@@ -170,17 +170,43 @@ def spaced_indices(uv,spacing=48.):
 
 
 def capture(args):
-    root=args.root;index=json.loads((root/'index.json').read_text('utf8'));base=json.loads((root.parent/'baseline.json').read_text('utf8'))
-    world=dict(np.load(root/'native_world.npz',allow_pickle=False));cuts=json.loads((root/'native_world.json').read_text('utf8'))['cuts'];lookup={c['id']:c for c in cuts}
-    core=NativeCore(base['inputs']['library']['path']);paths=native_ice_inventory(cuts,world['xyz']);panels=[p for p in native_panel_inventory(cuts) if p['panel_instance'] in ('Ad1','Ad2','Ad3','Ad4','Ad5','Ad6','Ad7')]
+    root=args.root;index_path=Path(getattr(args,'index',None) or root/'index.json').resolve(strict=True)
+    index_bytes=index_path.read_bytes();index=json.loads(index_bytes);base=json.loads((root.parent/'baseline.json').read_text('utf8'))
+    world_path=(root/'native_world.npz').resolve(strict=True);cuts_path=(root/'native_world.json').resolve(strict=True)
+    world=dict(np.load(world_path,allow_pickle=False));cuts=json.loads(cuts_path.read_text('utf8'))['cuts'];lookup={c['id']:c for c in cuts}
+    native_world_inputs={name:dict(path=str(path),sha256=hashlib.sha256(path.read_bytes()).hexdigest())for name,path in (('npz',world_path),('json',cuts_path))}
+    selected_shots=[]
+    for sid in args.shots:
+        shot=next(s for s in index['shots']if s['shot_id']==sid)
+        cam=shot['camera_index']if 'camera_index'in shot else(2 if shot['known_rig_id']=='end'else 0)
+        if type(cam)is not int or not 0<=cam<len(world['rig']):raise ValueError(f'Invalid native camera_index for {sid}: {cam!r}')
+        selected_shots.append((shot,cam))
+    rig_bindings=[dict(shot_id=shot['shot_id'],known_rig_id=shot.get('known_rig_id'),camera_index=cam,
+        camera_index_basis='explicit_index_shot'if 'camera_index'in shot else'legacy_main_end_default')for shot,cam in selected_shots]
+    selected_rigs=[dict(camera_index=cam,rig=world['rig'][cam],dtype=world['rig'][cam].dtype.str,
+        sha256=hashlib.sha256(world['rig'][cam].tobytes()).hexdigest())for cam in sorted({cam for _,cam in selected_shots})]
+    core=NativeCore(base['inputs']['library']['path']);paths=native_ice_inventory(cuts,world['xyz']);panels=native_panel_inventory(cuts)
+    all_native_panels=bool(getattr(args,'all_native_panels',False))
+    if all_native_panels:
+        # Inventory requires four unique boundaries; all four also need current
+        # localized native samples. No unlocalized installation is invented.
+        panels=[p for p in panels if all(0<=lookup[name]['begin']<lookup[name]['end']<=len(world['xyz'])
+            and lookup[name]['end']-lookup[name]['begin']>=2
+            and np.isfinite(world['xyz'][lookup[name]['begin']:lookup[name]['end']]).all()for name in p['path_ids'])]
+    else:
+        panels=[p for p in panels if p['panel_instance']in('Ad1','Ad2','Ad3','Ad4','Ad5','Ad6','Ad7')]
     for p in panels:
-        if p['panel_instance']=='Ad6':p['material_signal']='red'
+        if p['panel_instance']in('Ad6','Ad19'):p['material_signal']='red'
+    if getattr(args,'native_badges',False):
+        for instance in ('Ad9','Ad22','Ad11','Ad24','Ad12','Ad25'):
+            badge=single_panel(instance,'outer_ring')
+            if all(name in lookup for name in badge['path_ids']):panels.append(badge)
     reader=IceProgrammeSourceReader(None,source_sha256=index['source']['actual_sha256'],time_base='1/12800',native_paths=paths,
         sample_spacing_px=24.,search_radius_px=40.,separate_bands=True,prepared_source_context=dict(source_sha256=index['source']['actual_sha256'],time_base='1/12800',authority=[dict(path=base['inputs']['scene']['path'],sha256=base['inputs']['scene']['sha256'])]))
     args.output.mkdir(parents=True,exist_ok=True);cv2.setNumThreads(2);start=time.monotonic()
-    write(args.output/'binding.json',dict(schema='rinkspace.independent_material_capture.v1',source_sha256=index['source']['actual_sha256'],baseline=base['inputs'],native_ice_inventory=[{k:v for k,v in p.items()if k!='xyz'}for p in paths],panels=panels,independent_source_capture=True,legacy_new_shot_inputs_read=False,query_spacing_px=24,fit_spacing_px=48,short_feature_minimum_samples=4,nav_is_not_observation=True,person_mask_root=str(root/'person_masks'),pixel_domain='native_distorted',source_time_base='1/12800'))
-    for sid in args.shots:
-        shot=next(s for s in index['shots']if s['shot_id']==sid);cam=2 if shot['known_rig_id']=='end'else 0
+    write(args.output/'binding.json',dict(schema='rinkspace.independent_material_capture.v1',source_sha256=index['source']['actual_sha256'],baseline=base['inputs'],native_ice_inventory=[{k:v for k,v in p.items()if k!='xyz'}for p in paths],panels=panels,all_native_panels=all_native_panels,native_badges=bool(getattr(args,'native_badges',False)),source_index=dict(path=str(index_path),sha256=hashlib.sha256(index_bytes).hexdigest()),native_world_inputs=native_world_inputs,shot_rig_bindings=rig_bindings,selected_rigs=selected_rigs,independent_source_capture=True,legacy_new_shot_inputs_read=False,query_spacing_px=24,fit_spacing_px=48,short_feature_minimum_samples=4,nav_is_not_observation=True,person_mask_root=str(root/'person_masks'),pixel_domain='native_distorted',source_time_base='1/12800'))
+    for shot,cam in selected_shots:
+        sid=shot['shot_id']
         navfile=root/sid/'navigation/poses_reanchored.npz'
         if not navfile.exists():navfile=root/sid/'navigation/poses.npz'
         nav=dict(np.load(navfile));poses=nav['poses'].copy();pts_index={int(p):i for i,p in enumerate(nav['pts'])};folder=args.output/sid;folder.mkdir(exist_ok=True)
@@ -208,7 +234,7 @@ def capture(args):
                     for ci,path in enumerate(panel['path_ids']):
                         group=[p for p in pp if p['curve']==ci]
                         for k in spaced_indices([p['uv']for p in group]):
-                            q=group[k];rows.append(dict(q,path_id=path,entity=panel['panel_instance'],source_identity_basis='independent known-rig native ordering and complete source colored-panel exterior',capture_family='panel'));panel_count+=1
+                            q=group[k];rows.append(dict(q,path_id=path,entity=panel['panel_instance'],source_identity_basis='independent known-rig native ordering and complete source colored-panel exterior',capture_family='panel',native_material_definition=panel.get('source_identity_basis')));panel_count+=1
                 iceprojections={p['native_path_id']:dict(uv=piece(p['native_path_id']),valid=np.isfinite(piece(p['native_path_id'])).all(1))for p in paths}
                 if args.panels_only:
                     z={};fragments=[];ice_report={'status':'deferred_until_independent_panel_initialization'}
@@ -241,5 +267,5 @@ def capture(args):
 
 
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--root',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--shots',nargs='+',default=['s07','s08','s09']);p.add_argument('--pts',nargs='+',type=int);p.add_argument('--stride',type=int,default=1);p.add_argument('--panels-only',action='store_true');capture(p.parse_args())
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--root',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--shots',nargs='+',default=['s07','s08','s09']);p.add_argument('--pts',nargs='+',type=int);p.add_argument('--stride',type=int,default=1);p.add_argument('--panels-only',action='store_true');p.add_argument('--all-native-panels',action='store_true',help='Use every localized complete four-boundary native panel');p.add_argument('--index',type=Path,help='Explicit capture index; default: root/index.json');p.add_argument('--native-badges',action='store_true',help='Also read retained native badge exteriors as pending original-RGB candidates');capture(p.parse_args())
 if __name__=='__main__':main()

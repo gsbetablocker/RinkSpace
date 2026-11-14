@@ -7,7 +7,8 @@ param(
 $ErrorActionPreference = 'Stop'
 $project = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 if (!$DataRoot) {
-    $basePython = Join-Path $project '.venv\Scripts\python.exe'
+    . (Join-Path $project 'launchers/LOCAL_PYTHON.ps1')
+    $basePython = Get-RinkSpacePythonPath $project
     $env:PYTHONPATH = Join-Path $project 'src'
     $DataRoot = (& $basePython -B -X utf8 -c 'import sys; from rinkspace.storage import configured_data_root; print(configured_data_root(sys.argv[1]))' $project | Out-String).Trim()
     if ($LASTEXITCODE -ne 0 -or !$DataRoot) { throw 'Cannot resolve the RinkSpace Data directory.' }

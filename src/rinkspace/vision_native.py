@@ -20,15 +20,35 @@ class NativeSourceGeometry:
     Source UV, neural shapes and old world coordinates never modify this scene.
     Shape fitting in the reader is an image-evidence diagnostic, not a world model.
     """
-    def __init__(self, scene_path, library_path):
+    def __init__(self, scene_path, library_path, *, parameter_state=None, parameter_state_path=None):
         from .core.native import NativeCore
         from .review.scene import sample_scene
-        from .domain.scene_assets import read_scene_assets
+        from .domain.scene_assets import read_scene_assets, scene_content_identity
         self.scene_path = Path(scene_path).resolve()
-        self.scene = json.loads(self.scene_path.read_text(encoding='utf-8-sig'))
+        definition = json.loads(self.scene_path.read_text(encoding='utf-8-sig'))
         self.refs = [file_ref(self.scene_path), file_ref(library_path)]
+        if parameter_state_path is not None:
+            if parameter_state is not None:
+                raise ValueError('Supply a parameter state or its file, not both')
+            from .domain.parameters import load_parameter_state
+            state_path = Path(parameter_state_path).resolve(strict=True)
+            parameter_state = load_parameter_state(state_path)
+            state_record = json.loads(state_path.read_text(encoding='utf-8-sig'))
+            for reference in (state_path, state_path.parent/state_record['parameter_layout_ref'],
+                              state_path.parent/state_record['values_ref']['path']):
+                self.refs.append(file_ref(reference))
+        self.parameter_state = parameter_state
+        self.numeric_state = None
+        if parameter_state is not None:
+            revision = scene_content_identity(definition, self.scene_path)
+            if parameter_state.layout['scene_content_revision'] != revision:
+                raise ValueError('Source reader parameter state belongs to another native scene')
+            self.numeric_state = dict(layout_revision=parameter_state.layout['layout_revision'],
+                values_sha256=hashlib.sha256(parameter_state.values.astype('<f8').tobytes()).hexdigest(),
+                value_count=len(parameter_state.values), active_columns=len(parameter_state.active_columns()))
+        self.scene = definition if parameter_state is None else parameter_state.apply_scene(definition)
         self.core = NativeCore(library_path)
-        self.samples = sample_scene(self.scene, self.core, self.scene_path)
+        self.samples = sample_scene(definition, self.core, self.scene_path, parameter_state=parameter_state)
         self.paths = {}
         self.ambiguous_aliases = set()
         declared = {p['id']:p for p in self.scene['paths']}
@@ -141,13 +161,16 @@ class NativeSourceGeometry:
                 native_geometry=dict(scene=self.refs[0], path_id=row['id'], entity_id=row['entity_id'],
                     measurement=row.get('measurement', 'contour'), native_kind=row['kind']),
                 world_geometry_optimized=False)
+            if self.numeric_state is not None:
+                guide['native_geometry']['numeric_state'] = dict(self.numeric_state)
             if role == 'painted_stroke_center_axis':
                 guide.setdefault('signal', 'dark_band')
             result.append(guide)
         return result, dict(scene=self.refs[0], library=self.refs[1],
             model_path_count=len(self.samples['cuts']), unresolved=unresolved, conflicts=conflicts,
             native_geometry_authoritative=True, geometry_modified=False,
-            source_UV_rewritten=False, fitted_image_shapes_modify_world_geometry=False)
+            source_UV_rewritten=False, fitted_image_shapes_modify_world_geometry=False,
+            **({'numeric_state':dict(self.numeric_state)} if self.numeric_state is not None else {}))
 
     def ice_inventory(self):
         """Measurement definitions come only from the loaded native paths."""

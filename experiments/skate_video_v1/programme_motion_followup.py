@@ -8,7 +8,7 @@ import numpy as np
 
 from calibration.program_tracking.body_tracking.absolute_motion_state import absolute_reference, curve_from_packet
 from calibration.program_tracking.body_tracking.continuous_physics import ContinuousMassGeometry
-from calibration.program_tracking.body_tracking.fullbody_fit import body_joint_assignment
+from calibration.program_tracking.body_tracking.actual_observation_ledger import update_source_observation_export
 from calibration.program_tracking.body_tracking.programme_com import export_com_diagnostics
 from calibration.program_tracking.body_tracking.rebuild_prepare import load
 from calibration.program_tracking.body_tracking.sequence_skate_state import shoe_curve_from_packet
@@ -93,11 +93,13 @@ def export(args):
                   ice_plane_known=np.array(ref.ice_plane_known),
                   source_action_ledger_sha256=np.array(digest(args.evidence)),
                   body_refinement_window_mask=mask, window_mask=mask)
-    observations = load(args.prepared / "observations.npz")
+    ledger = args.prepared / "observations.npz"
+    observations = load(ledger)
     np.testing.assert_array_equal(observations["pts"], pts)
-    result["source_body_model_joint_ids"] = body_joint_assignment(observations)
-    if "body_joint_assignment_provenance_json" in observations:
-        result["body_joint_assignment_provenance_json"] = observations["body_joint_assignment_provenance_json"]
+    # This export only replays the controls. A matching optimizer receipt is
+    # required before claiming objective use for any admitted observation.
+    update_source_observation_export(result, observations, ledger, np.empty(0, dtype=int))
+    result["source_observation_objective_known"] = np.array(False)
     result["trajectory_evidence_status"] = np.where(
         observations["use"].sum(1) >= 4, "source_constrained_estimate", "temporal_inference")
     result["position_uncertainty_status"] = np.full(

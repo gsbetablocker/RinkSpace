@@ -1,6 +1,8 @@
 """Joint body/shared-skate/contact refinement on frozen source exposures."""
 from pathlib import Path
-import argparse,hashlib,json,time,copy
+from shutil import copyfile
+from tempfile import TemporaryDirectory
+import argparse,hashlib,json,os,time,copy
 import numpy as np
 from scipy.optimize import least_squares
 from scipy.sparse import csr_matrix,hstack,vstack,diags
@@ -19,6 +21,17 @@ from .ice_soft import IceSoftPolicy,ice_soft_rows
 from .fullbody_round import write_json
 from .footwear_layout import OBSERVATION_LAYOUT
 from .skate_checkpoint import checkpoint_identity,validate_checkpoint_identity
+
+
+def _publish_checkpoint_copy(source, destination):
+    """Publish another name for an immutable checkpoint, with a copy fallback."""
+    with TemporaryDirectory(prefix='.checkpoint-', dir=destination.parent) as stage:
+        temporary = Path(stage) / destination.name
+        try:
+            os.link(source, temporary)
+        except OSError:
+            copyfile(source, temporary)
+        temporary.replace(destination)
 
 
 def snapshot_objective_kernels(output):
@@ -47,7 +60,10 @@ def snapshot_objective_kernels(output):
                   'programme_action_factors.py','programme_anatomy.py','programme_source_step.py','programme_guard_proposals.py','source_contact_image.py',
                   'visible_runner_contours.py','source_skate_structure_factors.py','programme_whole_skate.py',
                   'complete_runner_extent.py','programme_surface.py','programme_grasp.py','programme_joint_limits.py',
-                 'anatomical_chart.py','programme_com.py','programme_opening.py'):
+                 'anatomical_chart.py','programme_com.py','programme_opening.py',
+                 'actual_observation_ledger.py','scoped_candidate.py',
+                 'programme_repair_factors.py','programme_quality_guard.py','programme_skate_replay.py',
+                 'source_structure_extent.py'):
         payload = Path(__file__).with_name(name).read_bytes()
         implementation[name] = hashlib.sha256(payload).hexdigest()
         (source_dir / name).write_bytes(payload)
@@ -648,9 +664,9 @@ class JointContactProblem:
             al_row_scope=np.array('foot_cavity_and_collar_only' if self.binding.collar_constraints_enabled else 'foot_cavity_only'),
             ice_soft_policy_json=np.array(json.dumps(vars(self.ice_policy),sort_keys=True)))
 
-    def solve(self,initial=None,run_policy=None):
+    def solve(self,initial=None,run_policy=None,*,proposals=(),proposal_only=False):
         if getattr(self,'linear_solver_backend','')!='cuda_resident':
-            return self._solve(initial,run_policy)
+            return self._solve(initial,run_policy,proposals=proposals,proposal_only=proposal_only)
         from .body_gpu_linear import CuDSSSession,DeviceCSRLayout
         with CuDSSSession(getattr(self,'linear_runtime',None)) as session:
             self._linear_session=session
@@ -659,16 +675,16 @@ class JointContactProblem:
             release_between_steps=getattr(self,'release_factorization_on_relinearize',False)
             self._linear_layout=DeviceCSRLayout(retain_inactive_slots=not release_between_steps)
             try:
-                return self._solve(initial,run_policy)
+                return self._solve(initial,run_policy,proposals=proposals,proposal_only=proposal_only)
             finally:
                 self._linear_layout=self._linear_session=None
 
-    def _solve(self,initial,run_policy):
+    def _solve(self,initial,run_policy,*,proposals=(),proposal_only=False):
         from .skate_run_policy import RunPolicy,Monitor,CandidateRetention,structural_progress_is_observable,image_trial_quality
         self.output.mkdir(parents=True,exist_ok=True)
-        prior=self.output/'last_accepted.npz'
-        if prior.exists():
-            archive=self.output/'history'/('before_'+digest(prior)[:12]);archive.mkdir(parents=True,exist_ok=True)
+        prior_checkpoint=self.output/'last_accepted.npz'
+        if prior_checkpoint.exists():
+            archive=self.output/'history'/('before_'+digest(prior_checkpoint)[:12]);archive.mkdir(parents=True,exist_ok=True)
             for name in ('last_accepted.npz','latest.json','parameter_selection.json','kernel_manifest.json'):
                 path=self.output/name
                 if path.exists():(archive/name).write_bytes(path.read_bytes())
@@ -745,14 +761,17 @@ class JointContactProblem:
                 quality_metrics=metrics,quality_failures=failures)
             retention.observe(z,value,step=self.accepted,decision=status,metrics=monitor.latest)
             self.binding.x=z[:17].copy()
+            value_checkpoint=getattr(self,'accepted_value_checkpoint',None)
+            if value_checkpoint is not None:
+                self.checkpoint_extra.update(value_checkpoint(value))
             np.savez_compressed(self.output/'attempt.pending.npz',**self.checkpoint_fields(z))
             (self.output/'attempt.pending.npz').replace(self.output/'last_attempt.npz')
             if not status['quality_failed']:
-                from shutil import copyfile
                 for role in ('good','accepted'):
-                    temporary=self.output/(role+'.pending.npz')
-                    copyfile(self.output/'last_attempt.npz',temporary)
-                    temporary.replace(self.output/('last_'+role+'.npz'))
+                    _publish_checkpoint_copy(
+                        self.output/'last_attempt.npz',
+                        self.output/('last_'+role+'.npz'),
+                    )
             write_json(self.output/'candidate_selection.json',retention.record())
             # Initial-domain failure and solver-return observations must also
             # persist the actual policy state, not an empty pre-solve record.
@@ -763,7 +782,7 @@ class JointContactProblem:
         initial_value=self.evaluate(x,False)
         if getattr(self,'stage_quality',None) is not None:
             self.stage_quality.begin(x,initial_value)
-        observe_candidate(x,initial_value)
+        initial_status=observe_candidate(x,initial_value)
         if self.bounded_memory:initial_value={'residual':initial_value['residual'].copy()}
         def save_candidate(reason):
             selected=retention.selected
@@ -778,6 +797,9 @@ class JointContactProblem:
             self.body.binding_key=None
             last_value=self.evaluate(last_x,False)
             write_json(self.output/'execution_policy.json',execution_record())
+            value_checkpoint=getattr(self,'accepted_value_checkpoint',None)
+            if value_checkpoint is not None:
+                self.checkpoint_extra.update(value_checkpoint(last_value))
             np.savez_compressed(self.output/'candidate.pending.npz',**self.checkpoint_fields(last_x))
             (self.output/'candidate.pending.npz').replace(self.output/'candidate.npz')
             record=dict(event='candidate_saved',stop=reason,candidate_checkpoint=str(self.output/'candidate.npz'),
@@ -794,8 +816,12 @@ class JointContactProblem:
                 record['cross_stage_quality']=self.stage_quality.record()
             self.log.write(json.dumps(record)+'\n');write_json(self.output/'candidate.json',record)
             return last_x,record
+        if monitor.policy.max_accepted == 0:
+            return save_candidate(initial_status)
         jacobian_seconds=float(getattr(self,'jacobian_seconds_hint',0.));requested_stop=False
         trial_counter=0
+        surface_guard=getattr(self,'scoped_surface_trial',None)
+        surface_trial_cost=float(initial_value['residual']@initial_value['residual']/2)
         def guarded(z,jacobian=False,*,origin='trf'):
             nonlocal jacobian_seconds,last_linearization,requested_stop,trial_counter
             if (self.output/'STOP_AFTER_ACCEPTED').is_file():
@@ -857,11 +883,19 @@ class JointContactProblem:
                     return dict(residual=np.full_like(initial_value['residual'],np.inf))
             extra_guard=getattr(self,'additional_trial_quality',None)
             if not jacobian and getattr(self,'image_safe_trials',False) and extra_guard is not None:
+                candidate_guard=getattr(self,'full_candidate_guard',None)
                 groups=extra_guard(value,monitor.policy.max_image_cost_increase)
+                if candidate_guard is not None:
+                    groups.update(candidate_guard(full,value))
                 if any(g['rejected'] for g in groups.values()):
                     self.log.write(json.dumps(dict(event='trial_source_group_quality_rejected',accepted=self.accepted,trial_id=trial_id,
                         seconds=time.perf_counter()-self.start,groups=groups))+'\n')
                     trial_result(False,'source_quality')
+                    return dict(residual=np.full_like(initial_value['residual'],np.inf))
+            if (not jacobian and surface_guard is not None and not np.array_equal(full,x)):
+                r=value['residual']
+                if r@r/2 < surface_trial_cost and not surface_guard(full,value):
+                    trial_result(False,'refreshed_surface')
                     return dict(residual=np.full_like(initial_value['residual'],np.inf))
             if jacobian:
                 jacobian_seconds=max(jacobian_seconds,time.perf_counter()-now)
@@ -870,6 +904,32 @@ class JointContactProblem:
                 finite=np.isfinite(value['residual']).all()
                 trial_result(finite,None if finite else 'nonfinite_residual')
             return value
+        for name, trial in proposals:
+            trial=np.asarray(trial)
+            if trial.shape!=x.shape or not np.isfinite(trial).all():
+                raise ValueError('Invalid external candidate vector: '+name)
+            inactive=np.ones(len(x),bool);inactive[selection]=False
+            if np.any(trial[inactive]!=frozen_initial[inactive]):
+                raise ValueError('External candidate changed inactive controls: '+name)
+            if np.any(trial<lower) or np.any(trial>upper):
+                raise ValueError('External candidate lies outside parameter chart bounds: '+name)
+            prior=self.evaluate(x,False)
+            before=float(prior['residual']@prior['residual']/2)
+            surface_trial_cost=before
+            value=guarded(trial[selection],origin=name)
+            residual=value['residual']
+            after=float(residual@residual/2) if np.isfinite(residual).all() else None
+            accepted=after is not None and after<before-1e-10
+            self.log.write(json.dumps(dict(event='external_proposal',label=name,accepted=accepted,
+                before=before,after=after,active_columns=len(selection)))+'\n')
+            if accepted:
+                x=trial.copy()
+                last_recorded=x[selection].copy()
+                self.accepted+=1
+                status=observe_candidate(x,value,accepted=True)
+                if status['stop']:return save_candidate(status)
+        if proposal_only:
+            return save_candidate(dict(reason='scoped_proposals_checked',tested=len(proposals)))
         while True:
             # A supplied same-state seed J is still exact before the first
             # inner solve. Later AL/association phases must invalidate it.
@@ -877,12 +937,13 @@ class JointContactProblem:
                 self.cache=None;self.cache_x=None
             self.outer+=1
             def accepted(reduced):
-                nonlocal last_recorded
+                nonlocal last_recorded,surface_trial_cost
                 if record_before_jacobian:
                     if np.array_equal(reduced,last_recorded):return
                     last_recorded=np.array(reduced,copy=True)
                 z=expand(reduced)
                 self.accepted+=1;v=self.evaluate(z,False)
+                surface_trial_cost=float(v['residual']@v['residual']/2)
                 self.log.write(json.dumps(dict(event='accepted',outer=self.outer,iteration=self.accepted,
                     seconds=time.perf_counter()-self.start,
                     cost=float(v['residual']@v['residual']/2),parts=v['parts'],**v['gate']))+'\n')

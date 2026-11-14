@@ -6,6 +6,32 @@ from .absolute_motion_state import inverse_right_jacobian
 from .fullbody_fit import right_jacobian
 from .skate_contact import trapezoid_time_weights
 
+def reviewed_cut_weight(reference, times):
+    """Increase acceleration weight only around declared live camera edits."""
+    repair = getattr(reference,'source_document',{}).get('scoped_candidate_import',{})
+    policy = repair.get('camera_cut_continuity')
+    weight = np.ones(len(times))
+    if policy is None:
+        return weight
+    pts = reference.p['pts']
+    cuts = np.asarray(policy['cut_pts'])
+    indices = np.searchsorted(pts, cuts)
+    if (cuts.ndim != 1 or cuts.dtype.kind not in 'iu' or not len(cuts)
+            or np.any(np.diff(cuts) <= 0) or np.any(indices == 0) or np.any(indices >= len(pts))):
+        raise ValueError('Expected ordered camera cut PTS')
+    np.testing.assert_array_equal(pts[indices], cuts)
+    shots = reference.p['shot_ids']
+    if np.any(shots[indices] == shots[indices-1]):
+        raise ValueError('Camera cut weighting requires an actual change of shot')
+    half = float(policy['half_width_s'])
+    multiplier = float(policy['acceleration_weight_multiplier'])
+    if not np.isfinite([half,multiplier]).all() or half <= 0 or multiplier < 1:
+        raise ValueError('Invalid camera cut acceleration weighting')
+    mid = (reference.times[indices-1]+reference.times[indices])*.5
+    q = np.clip(np.abs(np.asarray(times)[:,None]-mid)/half,0.,1.)
+    return weight + (multiplier-1)*np.max((1.-q*q)**2,axis=1)
+
+
 def robust_vector(value,delta=3.):
     s=np.sum(value*value,axis=-1);u=np.sqrt(1+s/delta**2);k=np.sqrt(2/(u+1));dk=-k/(4*delta**2*u*(u+1))
     return value*k[...,None],k[...,None,None]*np.eye(3)+2*dk[...,None,None]*value[...,None]*value[...,None,:]
@@ -72,6 +98,7 @@ class ActualMotionFactors:
         if generic:
             from .phase_ledger import phase_weights
             phase=phase_weights(self.ref,self.ref.p['pts'][1:-1],default=.16)
+        phase*=reviewed_cut_weight(self.ref,self.times[1:-1])
         scale=np.full(22,80.);scale[0]=60.;w=np.sqrt((h[:-1]+h[1:])[:,None]/2*phase[:,None])/scale[None]
         z=alpha*w[...,None];r,D=robust_vector(z,delta=3.)
         if jacobian:

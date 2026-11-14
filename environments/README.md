@@ -17,9 +17,9 @@
 | 历史 Ceres 后端 | [rinkfit](../calibration/rinkfit/README.md)、[solve2](../calibration/solve2/native/README.md)、[原生 recipe](native-build-recipes-observed.json) | 与当前 native LM 的构建和状态合同分别解释 |
 | 历史 GTSAM | [独立候选配置](gtsam-reconstruction-candidate.yml) | NumPy 1.26／GTSAM 4.2.2 栈，与主 NumPy 2.x 分开，候选未验收 |
 
-`launchers/INSTALL_LOCAL.cmd` 安装 dev／acquisition，不含 advanced。setuptools 只发现 `src` 下的包；`calibration` 中的历史模块需要完整源码 checkout，普通 wheel 不包含全部赛事运行依赖。
+`launchers/INSTALL_LOCAL.cmd` 安装 dev／acquisition。配置 Data 后，基础解释器位于 `<Data>/runtime_tools/local_python/Scripts/python.exe`。未配置 Data 时使用项目内 `.venv`。setuptools 发现 `src` 下的包，`calibration` 中的历史模块需要完整源码 checkout。
 
-S01 全身／足鞋／开头优化入口使用 SciPy 的 `least_squares(callback=...)` 保存已接受状态，该接口从 [SciPy 1.16.0](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.least_squares.html) 提供；`advanced` 下限已同步。现有 `.venv` 的实际版本为 1.17.1，见[观察清单](requirements-solver-observed.txt)。Data 中其他环境的历史锁不因此改写，报告绘制和播放器可继续使用各自现有环境。
+S01 全身／足鞋／开头优化入口使用 SciPy 的 `least_squares(callback=...)` 保存已接受状态。该接口从 [SciPy 1.16.0](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.least_squares.html) 提供，是 `advanced` 的依赖下限。本机基础 Python 环境的 SciPy 版本为 1.17.1，见[观察清单](requirements-solver-observed.txt)。
 
 ## 当前本机 GPU 与人体环境
 
@@ -71,6 +71,8 @@ python -B scripts/run_body_performance.py scripts/run_opening_timing.py --root <
 原 `--backend cuda` 保留一个 FP64 compact FK／LBS CUDA adapter，兼容块仍使用 CPU；它与 hybrid 的执行范围不同。两者使用现有 vision_cuda（SciPy 支持 callback），不选用 SciPy 1.13.1 尚不支持当前拟合 callback 的 body_cuda。轻量附加依赖见 [requirements-body-performance.txt](requirements-body-performance.txt)。
 
 该入口复用全身、鞋体、开头及其派生问题，不改相机记录、观测、损失、参数布局和停止条件。移除启动包装即可回到原执行配置；环境只作用于新子进程，已有运行不会切换。新库可用 `python -B scripts/build_core.py --out <Data内构建目录> --generator Ninja --openmp`重建，CPU／GPU 场地库仍分别保存。
+
+全节目人体拟合使用[连续轨迹后端](../calibration/program_tracking/body_tracking/trajectory_backend.py)和相符的节目 prepared 数据。该后端的 `--gpu-linear` 选择 cuDSS 线性路径，单窗口包装器的 `--backend hybrid` 控制兼容性扰动执行位置。全节目运行参数可用 `python -B -m calibration.program_tracking.body_tracking.trajectory_backend --help` 查阅。实际输入与同状态性能对照见[全节目复核源码](../calibration/program_tracking/body_tracking/source_helpers/action_1107/README.md)。
 
 完整 Joint 测量入口为 [profile_contact_solver.py](../scripts/profile_contact_solver.py)，覆盖身体、足鞋／鞋口兼容性、冰面、支撑图像和当前抓握因子。`--kind current_spin`读取已有初值、观测与检查点，默认 `--operation evaluate` 只测一次 fresh 完整 Jacobian。
 

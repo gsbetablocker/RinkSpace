@@ -1,6 +1,8 @@
 import hashlib
 import copy
 import json
+from pathlib import Path
+from types import SimpleNamespace
 
 import cv2
 import numpy as np
@@ -276,3 +278,391 @@ def test_normalized_float64_gradient_q50_anchor_is_exact_not_approximately_accep
     assert {v['anchor_source_readout_coordinate_domain'] for v in restored.frames[0]['label'].values()}=={'actual_gradient_q50_float64'}
     restored=IceSourceMaterialIdentityGraph.load_compact_state(path);changed=copy.deepcopy(row);changed['uv'][0][1]+=1e-9
     with pytest.raises(ValueError,match='saved readouts'):restored.apply_confirmed_source_rows([changed],source_scope_review=review)
+
+
+def source_translation_correspondence(graph, current, path, *, shift):
+    """Exact correspondence for this test's rendered vertical translation."""
+    before=graph.frames[-1]
+    support=np.concatenate([before['uv'][:,None],before['sides']],axis=1)
+    target=support+[0.,shift]
+    valid=np.ones(support.shape[:2],bool)
+    errors=np.zeros(support.shape[:2],np.float32)
+    np.savez_compressed(path,source_support_uv=support,target_support_uv=target,
+        valid_FB=valid,FB_error_native_px=errors)
+    rgb,m=current;binding=m['source_binding']
+    previous=dict(source_sha256=graph.source_sha256,actual_pts=before['pts'],
+        native_pts=before['binding']['native_pts'],shot_id=before['binding']['shot_id'],time_base=graph.time_base,
+        decoded_native_RGB_sha256=before['RGB_sha256'])
+    now=dict(source_sha256=graph.source_sha256,actual_pts=binding['source_pts'],native_pts=binding['source_pts'],
+        shot_id=binding['shot_id'],time_base=graph.time_base,decoded_native_RGB_sha256=hashlib.sha256(rgb.tobytes()).hexdigest())
+    return dict(source_support_uv=support,target_support_uv=target,valid_FB=valid,FB_error_native_px=errors,
+        previous_binding=previous,current_binding=now,method='rendered_source_translation_forward_backward',
+        raw_reference=dict(path=str(path),sha256=hashlib.sha256(path.read_bytes()).hexdigest()))
+
+
+@pytest.mark.parametrize('anchored',[False,True])
+def test_external_correspondence_links_actual_readouts_without_LK_or_new_semantic_authority(tmp_path,monkeypatch,anchored):
+    import rinkspace.vision_ice_identity_graph as module
+    graph=IceSourceMaterialIdentityGraph(inventory(),source_sha256='a'*64,time_base='1/1000')
+    first,last=frame(10),frame(20,45)
+    mask=np.zeros(first[0].shape[:2],bool)
+    graph.consume(*first,mask,source_ice_scope_mask=~mask)
+    flow=source_translation_correspondence(graph,last,tmp_path/'translation.npz',shift=45)
+    def no_LK(*args,**kwargs):raise AssertionError('External source flow must not invoke LK')
+    monkeypatch.setattr(module,'_point_source_flow',no_LK)
+    rows=[anchor(last[1])] if anchored else []
+    result=graph.consume(*last,mask,source_ice_scope_mask=~mask,selected_rows=rows,source_flow_correspondence=flow)
+    assert len(graph.frames[1]['parents'])==6
+    assert np.array_equal(graph.frames[1]['uv'],last[1]['candidate_sides'].mean(1))
+    assert all(link[2]['source_RGB_matching_method']==flow['method'] for link in graph.frames[1]['parents'].values())
+    assert all(link[2]['source_flow_correspondence_reference']==flow['raw_reference'] for link in graph.frames[1]['parents'].values())
+    assert all('source_forward_backward_LK_error_px' not in link[2] for link in graph.frames[1]['parents'].values())
+    if anchored:
+        assert {row['actual_pts'] for row in result['rows']}=={10}
+        temporal=result['rows'][0]['temporal_evidence']
+        assert temporal['source_RGB_tracking_method']==flow['method']
+        assert temporal['source_RGB_tracking_methods']==[flow['method']]
+    else:
+        assert not result['rows'] and all(not f['label'] for f in graph.frames)
+
+
+@pytest.mark.parametrize('change',[
+    'previous_pts','current_pts','native_pts','previous_RGB','current_RGB','source','shot','clock','support',
+    'support_shape','target_nonfinite','valid_type','error_negative','error_nonfinite','error_shape',
+    'method','raw_hash','unknown_field'])
+def test_external_correspondence_rejects_wrong_binding_or_malformed_support_before_mutating_graph(tmp_path,change):
+    graph=IceSourceMaterialIdentityGraph(inventory(),source_sha256='a'*64,time_base='1/1000')
+    first,last=frame(10),frame(20,2);mask=np.zeros(first[0].shape[:2],bool)
+    graph.consume(*first,mask,source_ice_scope_mask=~mask)
+    flow=source_translation_correspondence(graph,last,tmp_path/'translation.npz',shift=2)
+    if change=='previous_pts':flow['previous_binding']['actual_pts']+=1
+    elif change=='current_pts':flow['current_binding']['actual_pts']+=1
+    elif change=='native_pts':flow['current_binding']['native_pts']+=1
+    elif change=='previous_RGB':flow['previous_binding']['decoded_native_RGB_sha256']='c'*64
+    elif change=='current_RGB':flow['current_binding']['decoded_native_RGB_sha256']='c'*64
+    elif change=='source':flow['previous_binding']['source_sha256']='c'*64
+    elif change=='shot':flow['current_binding']['shot_id']='other'
+    elif change=='clock':flow['previous_binding']['time_base']='1/50'
+    elif change=='support':flow['source_support_uv'][0,0,1]+=1e-9
+    elif change=='support_shape':flow['source_support_uv']=flow['source_support_uv'][:,:2]
+    elif change=='target_nonfinite':flow['target_support_uv'][0,0,0]=np.nan
+    elif change=='valid_type':flow['valid_FB']=flow['valid_FB'].astype(np.uint8)
+    elif change=='error_negative':flow['FB_error_native_px'][0,0]=-.01
+    elif change=='error_nonfinite':flow['FB_error_native_px'][0,0]=np.inf
+    elif change=='error_shape':flow['FB_error_native_px']=flow['FB_error_native_px'][:,0]
+    elif change=='method':flow['method']=''
+    elif change=='raw_hash':flow['raw_reference']['sha256']='c'*64
+    else:flow['unknown']=True
+    previous_gray=graph.previous_gray
+    with pytest.raises(ValueError,match='External source flow'):
+        graph.consume(*last,mask,source_ice_scope_mask=~mask,source_flow_correspondence=flow)
+    assert len(graph.frames)==len(graph.catalog)==1 and graph.previous_gray is previous_gray
+    assert not graph.frames[0]['parents'] and not graph.frames[0]['children']
+
+
+@pytest.mark.parametrize('gate',['FB','valid','previous_mask','current_mask','scope','target_bounds'])
+def test_external_correspondence_still_requires_original_FB_and_both_frame_pixel_gates(tmp_path,gate):
+    graph=IceSourceMaterialIdentityGraph(inventory(),source_sha256='a'*64,time_base='1/1000')
+    first,last=frame(10),frame(20,2);mask=np.zeros(first[0].shape[:2],bool)
+    before_mask=mask.copy()
+    if gate=='previous_mask':
+        pix=np.rint(first[1]['candidate_sides']).astype(int).reshape(-1,2)
+        before_mask[pix[:,1],pix[:,0]]=True
+    graph.consume(*first,before_mask,source_ice_scope_mask=~mask)
+    flow=source_translation_correspondence(graph,last,tmp_path/'translation.npz',shift=2)
+    current_mask=mask.copy();scope=~mask
+    if gate=='FB':flow['FB_error_native_px'][:]=2.01
+    elif gate=='valid':flow['valid_FB'][:]=False
+    elif gate in ('previous_mask','current_mask','scope'):
+        flow['valid_FB'][:,0]=False  # Only the actually occluded side supports remain.
+        if gate!='previous_mask':
+            pix=np.rint(flow['target_support_uv'][:,1:]).astype(int).reshape(-1,2)
+            if gate=='current_mask':current_mask[pix[:,1],pix[:,0]]=True
+            else:scope[pix[:,1],pix[:,0]]=False
+    else:flow['target_support_uv'][...,0]=-100.
+    result=graph.consume(*last,current_mask,source_ice_scope_mask=scope,selected_rows=[anchor(last[1])],
+        source_flow_correspondence=flow)
+    assert not graph.frames[1]['parents'] and not result['rows']
+
+
+def test_external_correspondence_FB_boundary_and_one_accepted_support_keep_normal_median_rule(tmp_path):
+    from rinkspace.vision_ice_identity_graph import _source_support_flow_predictions
+    graph=IceSourceMaterialIdentityGraph(inventory(),source_sha256='a'*64,time_base='1/1000')
+    first,last=frame(10),frame(20,2);mask=np.zeros(first[0].shape[:2],bool)
+    graph.consume(*first,mask,source_ice_scope_mask=~mask)
+    flow=source_translation_correspondence(graph,last,tmp_path/'translation.npz',shift=2)
+    flow['valid_FB'][:,:2]=False;flow['FB_error_native_px'][:]=2.
+    graph.consume(*last,mask,source_ice_scope_mask=~mask,source_flow_correspondence=flow)
+    assert len(graph.frames[1]['parents'])==6
+    support=flow['source_support_uv'];delta=np.array([[12.,1.],[-8.,3.],[10.,5.]])
+    predicted,good,error=_source_support_flow_predictions(graph.frames[0],support,support+delta,
+        np.ones(support.shape[:2],bool),np.zeros(support.shape[:2]),mask,mask)
+    np.testing.assert_array_equal(predicted,graph.frames[0]['uv']+[0.,3.])
+    assert good.all() and not error.any()
+
+
+@pytest.mark.parametrize('empty_frame',[False,True])
+def test_external_correspondence_cannot_invent_previous_material_nodes(tmp_path,empty_frame):
+    graph=IceSourceMaterialIdentityGraph(inventory(),source_sha256='a'*64,time_base='1/1000')
+    first,last=frame(10),frame(20,2);mask=np.zeros(first[0].shape[:2],bool)
+    if empty_frame:
+        for key in ('candidate_uv','candidate_sides','candidate_query','candidate_flags','query_curve','query_normal'):
+            first[1][key]=first[1][key][:0]
+        graph.consume(*first,mask,source_ice_scope_mask=~mask)
+    with pytest.raises(ValueError,match='previous actual material nodes'):
+        graph.consume(*last,mask,source_ice_scope_mask=~mask,source_flow_correspondence={})
+
+
+def test_external_correspondence_evidence_survives_compact_roundtrip_and_export(tmp_path):
+    graph=IceSourceMaterialIdentityGraph(inventory(),source_sha256='a'*64,time_base='1/1000')
+    first,last=frame(10),frame(20,2);mask=np.zeros(first[0].shape[:2],bool)
+    authority=tmp_path/'authority.json';authority.write_text('{}')
+    row=offline_anchor(*first,authority)
+    row['source_seed_reference'].update(native_pts=10,shot_id='one',source_material_class='static_painted_ice',
+        decoded_native_RGB_sha256=first[1]['decoded_native_RGB_sha256'])
+    graph.consume(*first,mask,source_ice_scope_mask=~mask,selected_rows=[row])
+    flow=source_translation_correspondence(graph,last,tmp_path/'translation.npz',shift=2)
+    graph.consume(*last,mask,source_ice_scope_mask=~mask,source_flow_correspondence=flow)
+    saved=tmp_path/'graph.npz';reference=graph.save_compact_state(saved)
+    restored=IceSourceMaterialIdentityGraph.load_compact_state(saved)
+    assert restored.frames[1]['parents']==graph.frames[1]['parents']
+    assert restored.frames[1]['source_flow_correspondence_receipt']==graph.frames[1]['source_flow_correspondence_receipt']
+    exported=restored.export_confirmed_source_rows(source_graph_reference=reference)
+    recovered=next(r for r in exported['rows'] if r['actual_pts']==20)['temporal_evidence']
+    assert recovered['source_RGB_tracking_method']=='preserved_'+flow['method']
+    assert recovered['source_RGB_tracking_methods']==[flow['method']]
+    assert all(link['source_flow_correspondence_reference']==flow['raw_reference']
+               for link in recovered['actual_material_adjacency_evidence'])
+
+
+def test_mixed_external_and_LK_evidence_names_all_actual_matching_methods():
+    from rinkspace.vision_ice_identity_graph import _tracking_method_evidence
+    evidence=_tracking_method_evidence([{},dict(source_RGB_matching_method='actual_GPUFlow_FB')])
+    assert evidence['source_RGB_tracking_method']=='mixed_actual_material_support_correspondence_and_RGB_context'
+    assert evidence['source_RGB_tracking_methods']==['actual_GPUFlow_FB','bidirectional_actual_material_support_LK_and_RGB_context']
+
+
+def saved_translation_graph(tmp_path, *, shifts=(0,2,4), empty_middle=False, masks=None):
+    graph=IceSourceMaterialIdentityGraph(inventory(),source_sha256='a'*64,time_base='1/1000')
+    exposures=[frame(10*(i+1),shift) for i,shift in enumerate(shifts)]
+    cleared=np.zeros(exposures[0][0].shape[:2],bool)
+    if masks is None:masks=[cleared for _ in exposures]
+    authority=tmp_path/'source-anchor.json';authority.write_text('{}')
+    source=offline_anchor(*exposures[0],authority)
+    source['source_seed_reference'].update(native_pts=10,shot_id='one',source_material_class='static_painted_ice',
+        decoded_native_RGB_sha256=exposures[0][1]['decoded_native_RGB_sha256'])
+    for i,(rgb,m) in enumerate(exposures):
+        if empty_middle and i==1:
+            for key in ('candidate_uv','candidate_sides','candidate_query','candidate_flags','query_curve','query_normal'):
+                m[key]=m[key][:0]
+        graph.consume(rgb,m,masks[i],source_ice_scope_mask=~cleared,selected_rows=[source] if not i else [])
+    original=tmp_path/'original-LK.npz';graph.save_compact_state(original)
+    restored=IceSourceMaterialIdentityGraph.load_compact_state(original)
+    correspondences=[];frame_masks=[]
+    for i,f in enumerate(restored.frames):
+        binding=dict(source_sha256='a'*64,actual_pts=f['pts'],native_pts=f['binding']['native_pts'],
+            shot_id=f['binding']['shot_id'],time_base='1/1000',decoded_native_RGB_sha256=f['RGB_sha256'])
+        mask_path=tmp_path/f'mask-{i}.npz'
+        np.savez_compressed(mask_path,native_hw=np.array(masks[i].shape,np.int32),
+            mask_packbits=np.packbits(masks[i].reshape(-1),bitorder='little'))
+        frame_masks.append(dict(source_binding=binding,mask=masks[i],
+            raw_reference=dict(path=str(mask_path),sha256=hashlib.sha256(mask_path.read_bytes()).hexdigest())))
+        if i:
+            previous=SimpleNamespace(frames=[restored.frames[i-1]],source_sha256='a'*64,time_base='1/1000')
+            correspondences.append(source_translation_correspondence(previous,exposures[i],
+                tmp_path/f'pair-{i}.npz',shift=shifts[i]-shifts[i-1]))
+    return restored,correspondences,frame_masks
+
+
+def test_offline_source_flow_relinks_saved_nodes_without_RGB_profiles_or_array_changes(tmp_path,monkeypatch):
+    import rinkspace.vision_ice_identity_graph as module
+    original,pairs,masks=saved_translation_graph(tmp_path,shifts=(0,45))
+    old_digest=hashlib.sha256((tmp_path/'original-LK.npz').read_bytes()).hexdigest()
+    def no_RGB(*args,**kwargs):raise AssertionError('Offline relinking must not decode RGB, run LK, or reread profiles')
+    monkeypatch.setattr(module,'_point_source_flow',no_RGB)
+    monkeypatch.setattr(module,'_measured_material_descriptors',no_RGB)
+    monkeypatch.setattr(IceSourceMaterialIdentityGraph,'_nodes',no_RGB)
+    monkeypatch.setattr(cv2,'cvtColor',no_RGB)
+    accessed=[]
+    class LazyMasks:
+        def __len__(self):return len(masks)
+        def __getitem__(self,index):accessed.append(index);return masks[index]
+    rebuilt=original.relink_source_flow_correspondences(pairs,frame_masks=LazyMasks())
+    assert accessed==[0,1] and len(rebuilt.frames[1]['parents'])==6
+    assert rebuilt is not original and rebuilt.previous_gray is rebuilt.previous_mask is None
+    for before,after in zip(original.frames,rebuilt.frames):
+        for key,value in before.items():
+            if isinstance(value,np.ndarray):
+                assert after[key] is value and not value.flags.writeable
+        assert before['binding']==after['binding']
+    receipt=rebuilt.source_flow_relink_receipt
+    assert receipt['source_frames']==2 and receipt['adjacent_source_pairs']==1
+    assert receipt['actual_source_adjacency_edges']==6 and receipt['explicit_original_anchor_nodes']==6
+    assert not receipt['source_RGB_decoded_again'] and not receipt['source_quantiles_remeasured']
+    assert rebuilt.inventory==original.inventory
+    assert not original.frames[1]['label'] and not original.frames[1]['parents']
+    assert hashlib.sha256((tmp_path/'original-LK.npz').read_bytes()).hexdigest()==old_digest
+    saved=tmp_path/'external-flow-graph.npz';reference=rebuilt.save_compact_state(saved)
+    rows=rebuilt.export_confirmed_source_rows(source_graph_reference=reference)['rows']
+    assert {r['actual_pts'] for r in rows}=={10,20}
+    assert all(r['uv']==original.frames[i]['uv'].tolist() for i,r in enumerate(rows))
+    reloaded=IceSourceMaterialIdentityGraph.load_compact_state(saved)
+    assert reloaded.source_flow_relink_receipt==receipt
+    assert reloaded.frames[1]['parents']==rebuilt.frames[1]['parents']
+    assert reloaded.frames[0]['source_flow_mask_receipt']==rebuilt.frames[0]['source_flow_mask_receipt']
+
+
+def test_offline_relink_does_not_reuse_old_forward_labels_as_independent_anchors(tmp_path):
+    original,pairs,masks=saved_translation_graph(tmp_path)
+    assert all(proof['direction']=='forward' for proof in original.frames[1]['label'].values())
+    old_labels=[copy.deepcopy(f['label']) for f in original.frames]
+    old_edges=sum(len(f['parents']) for f in original.frames)
+    for pair in pairs:pair['valid_FB'][:]=False
+    rebuilt=original.relink_source_flow_correspondences(pairs,frame_masks=masks)
+    assert len(rebuilt.frames[0]['label'])==6
+    assert all(not f['label'] for f in rebuilt.frames[1:])
+    assert old_labels==[f['label'] for f in original.frames]
+    assert rebuilt.source_flow_relink_receipt['original_actual_source_adjacency_edges']==old_edges
+    assert rebuilt.source_flow_relink_receipt['actual_source_adjacency_edges']==0
+    assert not rebuilt.source_flow_relink_receipt['old_propagated_labels_reused_as_anchors']
+
+
+def test_offline_zero_node_frame_keeps_zero_edges_and_cannot_be_skipped(tmp_path):
+    original,pairs,masks=saved_translation_graph(tmp_path,empty_middle=True)
+    rebuilt=original.relink_source_flow_correspondences(pairs,frame_masks=masks)
+    assert [len(f['ids']) for f in rebuilt.frames]==[6,0,6]
+    assert all(not f['parents'] for f in rebuilt.frames)
+    assert not rebuilt.frames[2]['label']
+    assert rebuilt.source_flow_relink_receipt['zero_node_source_pairs']==2
+    assert rebuilt.source_flow_relink_receipt['adjacent_source_pairs']==2
+    with pytest.raises(ValueError,match='every saved adjacent'):
+        original.relink_source_flow_correspondences(pairs[:1],frame_masks=masks)
+
+
+@pytest.mark.parametrize('change',['pair_time','pair_source','pair_UV','pair_order','mask_time','mask_bytes','mask_hash'])
+def test_offline_relink_rejects_wrong_original_pair_or_preserved_mask(tmp_path,change):
+    original,pairs,masks=saved_translation_graph(tmp_path)
+    if change=='pair_time':pairs[0]['current_binding']['actual_pts']+=1
+    elif change=='pair_source':pairs[0]['previous_binding']['source_sha256']='c'*64
+    elif change=='pair_UV':pairs[0]['source_support_uv'][0,1,0]+=1e-9
+    elif change=='pair_order':pairs.reverse()
+    elif change=='mask_time':masks[0]['source_binding']['actual_pts']+=1
+    elif change=='mask_bytes':
+        masks[0]['mask']=masks[0]['mask'].copy();masks[0]['mask'][0,0]=True
+    else:masks[0]['raw_reference']['sha256']='c'*64
+    old_labels=[copy.deepcopy(f['label']) for f in original.frames]
+    with pytest.raises(ValueError):original.relink_source_flow_correspondences(pairs,frame_masks=masks)
+    assert old_labels==[f['label'] for f in original.frames]
+
+
+@pytest.mark.parametrize('masked_frame',[0,1])
+def test_offline_relink_checks_original_before_and_current_combined_masks(tmp_path,masked_frame):
+    masks=[np.zeros((140,240),bool) for _ in range(2)]
+    source=frame(10*(masked_frame+1),2*masked_frame)[1]['candidate_sides']
+    pix=np.rint(source).astype(int).reshape(-1,2)
+    masks[masked_frame][pix[:,1],pix[:,0]]=True
+    original,pairs,records=saved_translation_graph(tmp_path,shifts=(0,2),masks=masks)
+    pairs[0]['valid_FB'][:,0]=False
+    rebuilt=original.relink_source_flow_correspondences(pairs,frame_masks=records)
+    assert not rebuilt.frames[1]['parents'] and not rebuilt.frames[1]['label']
+
+
+def test_legacy_compact_graph_without_method_groups_keeps_LK_evidence(tmp_path):
+    original,_,_=saved_translation_graph(tmp_path,shifts=(0,2))
+    with np.load(tmp_path/'original-LK.npz',allow_pickle=False) as saved:
+        fields={key:saved[key] for key in saved.files if key!='actual_source_edge_evidence_group_indices'}
+    metadata=json.loads(str(fields['metadata_json'].item()))
+    metadata.pop('actual_source_edge_evidence_groups')
+    fields['metadata_json']=json.dumps(metadata)
+    path=tmp_path/'legacy-LK.npz';np.savez_compressed(path,**fields)
+    restored=IceSourceMaterialIdentityGraph.load_compact_state(path)
+    assert len(restored.frames[1]['parents'])==len(original.frames[1]['parents'])==6
+    for node,(_,_,evidence) in restored.frames[1]['parents'].items():
+        assert evidence['source_forward_backward_LK_error_px']==original.frames[1]['parents'][node][2]['source_forward_backward_LK_error_px']
+        assert 'source_flow_correspondence_reference' not in evidence
+
+
+
+def incremental_added_node_graph(tmp_path, *, with_guard=False):
+    masks=None
+    if with_guard:
+        masks=[np.zeros((140,240),bool)for _ in range(4)]
+        for value in masks:value[0,0]=True
+    old,pairs,records=saved_translation_graph(tmp_path,shifts=(0,2,4,6),masks=masks)
+    guard_ref=None
+    if with_guard:
+        guard=np.zeros((140,240),np.uint8);guard[0,0]=255
+        guard_path=tmp_path/'original-guard.png';cv2.imwrite(str(guard_path),guard)
+        guard_ref=dict(path=str(guard_path),sha256=hashlib.sha256(guard_path.read_bytes()).hexdigest())
+        for record in records:
+            path=Path(record['raw_reference']['path'])
+            np.savez_compressed(path,native_hw=np.array(record['mask'].shape,np.int32),
+                mask_packbits=np.packbits(record['mask'].reshape(-1),bitorder='little'),
+                metadata_json=json.dumps(dict(original_guard=guard_ref)))
+            record['raw_reference']['sha256']=hashlib.sha256(path.read_bytes()).hexdigest()
+    baseline=old.relink_source_flow_correspondences(pairs,frame_masks=records)
+    baseline_path=tmp_path/'baseline-flow.npz';baseline.save_compact_state(baseline_path)
+    baseline=IceSourceMaterialIdentityGraph.load_compact_state(baseline_path)
+    extended=IceSourceMaterialIdentityGraph.load_compact_state(baseline_path)
+    value=extended.frames[1]
+    for key in ('ids','query_ids','uv','sides','normal','width','curve','descriptor','raw_uv','quantiles'):
+        if key not in value:continue
+        added=value[key][:1].copy()
+        if key in ('ids','query_ids'):added[:]=99
+        elif key in ('uv','sides','raw_uv','quantiles'):added+=np.array([6.,0.])
+        value[key]=np.concatenate([value[key],added])
+    path=tmp_path/'extended-nodes.npz';extended.save_compact_state(path)
+    extended=IceSourceMaterialIdentityGraph.load_compact_state(path)
+    previous=SimpleNamespace(frames=[extended.frames[1]],source_sha256='a'*64,time_base='1/1000')
+    changed={0:pairs[0],1:source_translation_correspondence(previous,frame(30,4),
+        tmp_path/'changed-pair-1.npz',shift=2.)}
+    return extended,baseline,changed,records,guard_ref
+
+
+def test_incremental_relink_only_changed_pairs_reuses_old_edges_without_propagated_seeds(tmp_path,monkeypatch):
+    import rinkspace.vision_ice_identity_graph as module
+    extended,baseline,pairs,masks,_=incremental_added_node_graph(tmp_path)
+    pairs[1]['valid_FB'][:]=False
+    def no_RGB(*args,**kwargs):raise AssertionError('Cached incremental relinking must not decode RGB or run LK')
+    monkeypatch.setattr(module,'_point_source_flow',no_RGB)
+    monkeypatch.setattr(module,'_measured_material_descriptors',no_RGB)
+    rebuilt=extended.relink_changed_source_flow_correspondences(baseline,pairs,frame_masks=masks)
+    receipt=rebuilt.source_flow_relink_receipt
+    assert receipt['added_material_nodes']==1 and receipt['changed_node_frame_ordinals']==[1]
+    assert receipt['changed_pair_ordinals']==[0,1]
+    assert receipt['actual_relinked_source_pairs']==2 and receipt['reused_source_pairs']==1
+    assert len(rebuilt.frames[1]['parents'])==7 and not rebuilt.frames[2]['parents']
+    assert len(rebuilt.frames[3]['parents'])==6
+    assert not rebuilt.frames[2]['label'] and not rebuilt.frames[3]['label']
+    assert receipt['explicit_original_anchor_nodes']==6
+    assert not receipt['old_propagated_labels_reused_as_anchors']
+    assert rebuilt.frames[3]['parents']==baseline.frames[3]['parents']
+    assert len(baseline.frames[1]['ids'])==6 and len(extended.frames[1]['ids'])==7
+
+
+@pytest.mark.parametrize('change',['missing_pair','extra_pair','old_readout'])
+def test_incremental_relink_rejects_incomplete_changed_scope_or_changed_old_pixels(tmp_path,change):
+    extended,baseline,pairs,masks,_=incremental_added_node_graph(tmp_path)
+    if change=='missing_pair':pairs.pop(0)
+    elif change=='extra_pair':pairs[2]=pairs[1]
+    else:
+        extended.frames[0]['uv']=extended.frames[0]['uv'].copy()
+        extended.frames[0]['uv'][0,0]+=1e-9
+    with pytest.raises(ValueError):
+        extended.relink_changed_source_flow_correspondences(baseline,pairs,frame_masks=masks)
+
+
+@pytest.mark.parametrize('change',['shrink_scope','release_guard'])
+def test_incremental_relink_never_excludes_old_clear_pixels_or_releases_original_guard(tmp_path,change):
+    extended,baseline,pairs,masks,guard_ref=incremental_added_node_graph(tmp_path,with_guard=True)
+    value=masks[1]['mask'].copy()
+    value[1,1]=True if change=='shrink_scope' else value[1,1]
+    if change=='release_guard':value[0,0]=False
+    path=tmp_path/'changed-mask.npz'
+    np.savez_compressed(path,native_hw=np.array(value.shape,np.int32),
+        mask_packbits=np.packbits(value.reshape(-1),bitorder='little'),
+        metadata_json=json.dumps(dict(original_guard=guard_ref)))
+    masks[1]=dict(source_binding=masks[1]['source_binding'],mask=value,
+        raw_reference=dict(path=str(path),sha256=hashlib.sha256(path.read_bytes()).hexdigest()))
+    with pytest.raises(ValueError):
+        extended.relink_changed_source_flow_correspondences(baseline,pairs,frame_masks=masks)

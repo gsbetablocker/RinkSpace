@@ -41,6 +41,158 @@ def board_foot_material_authority(contract_path):
         scope="confirmed reference event material; source pixels independently RGB-read")
 
 
+_BOARD_MATERIAL_ORDER = ('blue_cap', 'white_board_face', 'yellow_board_foot', 'white_ice')
+
+
+def _role_sha256(value):
+    if not isinstance(value, str) or len(value) != 64 or any(c not in '0123456789abcdef' for c in value):
+        raise ValueError('Material-role evidence needs an exact SHA256')
+    return value
+
+
+def _role_file_ref(reference):
+    if not isinstance(reference, dict) or not reference.get('path'):
+        raise ValueError('Material-role human semantics need an explicit file_ref path/SHA256')
+    expected = _role_sha256(reference.get('sha256'))
+    path = Path(reference['path']).resolve(strict=True)
+    raw = path.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != expected:
+        raise ValueError('Material-role human semantics file_ref SHA256 differs')
+    return dict(path=str(path), sha256=expected), json.loads(raw.decode('utf-8-sig'))
+
+
+def _role_query_binding(binding):
+    """An exposure identity, with an explicit event and native pixel grid."""
+    if not isinstance(binding, dict) or not isinstance(binding.get('event_id'), str) or not binding['event_id']:
+        raise ValueError('Same-event material transfer requires current event_id')
+    pts = binding.get('source_pts')
+    if isinstance(pts, (bool, np.bool_)) or not isinstance(pts, (int, np.integer)):
+        raise ValueError('Material transfer needs actual integer source PTS')
+    try:
+        clock = Fraction(str(binding['time_base']))
+    except (KeyError, ValueError, ZeroDivisionError) as error:
+        raise ValueError('Material transfer needs the actual source time_base') from error
+    hw = binding.get('native_hw')
+    if (clock <= 0 or not isinstance(hw, (tuple, list, np.ndarray)) or len(hw) != 2
+            or any(isinstance(x, (bool, np.bool_)) or not isinstance(x, (int, np.integer)) or x <= 0 for x in hw)):
+        raise ValueError('Material transfer needs positive native_hw/time_base')
+    result = dict(event_id=binding['event_id'], source_sha256=_role_sha256(binding.get('source_sha256')),
+                  source_pts=int(pts), time_base=str(clock), native_hw=list(map(int, hw)))
+    for name in ('source_id','programme_id','shot_id','camera_group_id','rig_id','installation_id','image_domain','crop_xyxy'):
+        if name in binding:
+            value = binding[name]
+            result[name] = value.tolist() if isinstance(value, np.ndarray) else value
+    return result
+
+
+def _current_board_material_order(evidence, binding, rgb_sha256, *, rgb=None):
+    """Validate current source witnesses; they locate no output boundary UV."""
+    query = _role_query_binding(binding)
+    rgb_sha256 = _role_sha256(rgb_sha256)
+    if (not isinstance(evidence, dict)
+            or _role_query_binding(evidence.get('source_binding')) != query
+            or evidence.get('RGB_sha256') != rgb_sha256
+            or tuple(evidence.get('material_order', ())) != _BOARD_MATERIAL_ORDER
+            or evidence.get('actual_current_RGB_read') is not True
+            or evidence.get('yellow_reflection_is_not_board_material') is not True):
+        raise ValueError('Current RGB material-order evidence differs from the query exposure/roles')
+    uv = np.asarray(evidence.get('sample_uv'))
+    samples = np.asarray(evidence.get('sample_RGB'))
+    h, w = query['native_hw']
+    if (uv.ndim != 3 or uv.shape[1:] != (4,2) or len(uv) == 0 or uv.dtype.kind not in 'iu'
+            or samples.shape != (len(uv),4,3) or samples.dtype.kind not in 'iu'
+            or np.any(uv < 0) or np.any(uv[...,0] >= w) or np.any(uv[...,1] >= h)
+            or np.any(samples < 0) or np.any(samples > 255)
+            or np.any(uv[...,0] != uv[:, :1, 0]) or np.any(uv[:,1:,1] <= uv[:,:-1,1])):
+        raise ValueError('Material-order witnesses need original integer cap/face/foot/ice samples down each column')
+    if rgb is not None:
+        image = np.asarray(rgb)
+        if (image.dtype != np.uint8 or image.shape != (h,w,3)
+                or hashlib.sha256(image.tobytes()).hexdigest() != rgb_sha256
+                or not np.array_equal(image[uv[...,1], uv[...,0]], samples)):
+            raise ValueError('Material-order witnesses/RGB SHA256 differ from actual current RGB')
+    return dict(source_binding=query, RGB_sha256=rgb_sha256, material_order=list(_BOARD_MATERIAL_ORDER),
+                actual_current_RGB_read=True, yellow_reflection_is_not_board_material=True,
+                sample_uv=uv.tolist(), sample_RGB=samples.tolist(),
+                witness_pixels_are_navigation_and_material_context_only=True,
+                output_boundary_UV_confirmed=False)
+
+
+def same_event_board_foot_material_authority(reference_file_ref, source_binding, *,
+                                            material_order_evidence, rgb_sha256):
+    """Derive same-event semantics without transferring human pixel approval.
+
+    reference_file_ref is {path, sha256} for board_source_roles.json; its pinned
+    existing_event_semantics JSON is also authenticated. source_binding requires
+    event_id/source_sha256/source_pts/time_base/native_hw. Evidence requires that
+    same source_binding, RGB_sha256, material_order=[blue_cap,white_board_face,
+    yellow_board_foot,white_ice], actual_current_RGB_read=true and
+    yellow_reflection_is_not_board_material=true, plus sample_uv[N,4,2] and
+    sample_RGB[N,4,3] from native integer pixels down each source column.
+    The foot reader checks these witnesses against the actual input RGB and
+    independently reads every reported boundary through its existing profiles.
+    """
+    reference, packet = _role_file_ref(reference_file_ref)
+    query = _role_query_binding(source_binding)
+    definition = packet.get('definition', {})
+    if (packet.get('schema') != 'rinkspace.ice-contact-material-role-confirmation.v1'
+            or packet.get('event_id') != query['event_id']
+            or packet.get('authority', {}).get('kind') not in ('direct_user_confirmation','direct_user_drawing')
+            or packet['authority'].get('human_authority') is not True
+            or packet.get('authority_scope', {}).get('semantic_role_authoritative') is not True
+            or packet['authority_scope'].get('automatically_confirms_new_UV') is not False
+            or definition.get('bottom_strip_region_belongs_to') != 'board'
+            or definition.get('bottom_strip_is_ice') is not False
+            or definition.get('bottom_strip_material_in_reference') != 'very_narrow_pale_yellow_board_bottom_strip'
+            or definition.get('lower_strip_edge') != 'ice_contact_board_bottom_strip_to_ice'
+            or definition.get('yellow_reflection_is_not_board_material') is not True):
+        raise ValueError('Same-event transfer requires pinned original human event material semantics')
+    semantics_ref, semantics = _role_file_ref(packet.get('existing_event_semantics'))
+    if (semantics.get('event_id') != query['event_id']
+            or semantics.get('authority', {}).get('kind') not in ('direct_user_confirmation','direct_user_drawing')
+            or semantics.get('definitions', {}).get('yellow_bottom_strip_belongs_to') != 'board'):
+        raise ValueError('Reference human event semantics differ from current event/material role')
+    original_source = packet.get('reference_source')
+    if not isinstance(original_source, dict) or not _role_sha256(original_source.get('source_sha256')):
+        raise ValueError('Original human reference_source must remain explicit')
+    evidence = _current_board_material_order(material_order_evidence, query, rgb_sha256)
+    return dict(kind='same_event_material_role_transfer', human_authority=False,
+        human_pixel_confirmation=False, event_id=query['event_id'], reference=reference['path'],
+        reference_file_ref=reference, reference_human_semantics_file_ref=semantics_ref,
+        reference_authority_kind=packet['authority']['kind'], reference_source=dict(original_source),
+        query_source_binding=query, current_RGB_sha256=rgb_sha256,
+        current_material_order_evidence=evidence,
+        board_foot_material='warm_yellow_strip_belongs_to_board', definition=definition,
+        automatically_confirms_new_UV=False, user_annotation_pixel_coordinates_loaded=False,
+        source_pixel_accuracy_accepted=False,
+        scope='same-event material roles only; every new boundary UV requires current original-RGB profiles')
+
+
+def _validate_same_event_board_foot_authority(authority, binding, rgb):
+    """Reauthenticate a serialized transfer at its actual consumer exposure."""
+    query = _role_query_binding(binding)
+    if (authority.get('kind') != 'same_event_material_role_transfer'
+            or authority.get('human_authority') is not False
+            or authority.get('human_pixel_confirmation') is not False
+            or authority.get('automatically_confirms_new_UV') is not False
+            or authority.get('source_pixel_accuracy_accepted') is not False
+            or authority.get('user_annotation_pixel_coordinates_loaded') is not False
+            or authority.get('event_id') != query['event_id']
+            or _role_query_binding(authority.get('query_source_binding')) != query):
+        raise ValueError('Same-event material transfer is not current source-bound semantic evidence')
+    evidence = _current_board_material_order(authority.get('current_material_order_evidence'), query,
+                                            authority.get('current_RGB_sha256'), rgb=rgb)
+    regenerated = same_event_board_foot_material_authority(authority.get('reference_file_ref'), query,
+        material_order_evidence=evidence, rgb_sha256=authority['current_RGB_sha256'])
+    for key in ('reference','reference_source','reference_human_semantics_file_ref',
+                'reference_authority_kind','board_foot_material','definition'):
+        if authority.get(key) != regenerated[key]:
+            raise ValueError('Same-event material transfer changed its original reference/role: '+key)
+    for name in ('decoded_native_RGB_sha256','decoded_native_rgb_sha256','RGB_sha256'):
+        if name in binding and binding[name] != authority['current_RGB_sha256']:
+            raise ValueError('Current source binding RGB SHA256 differs from material witnesses')
+
+
 def _run_points(runs):
     return (np.concatenate([np.column_stack((np.arange(x, x+n), np.full(n, y)))
                             for y, x, n in runs]).astype(np.int64)
@@ -1676,7 +1828,8 @@ def read_board_foot_material_profiles(rgb, instances, topology, *, material_role
                                     source_material_component_support=None):
     """Read both observed material interfaces; a board foot is part of the board.
 
-    The caller supplies the event's directly confirmed warm-yellow foot role.
+    The caller supplies a direct source role or an authenticated same-event
+    transfer bound to current RGB material-order witnesses.
     Its location is NOT supplied. SAM and existing fragments only navigate;
     every reported UV is a fresh original-RGB signed material-profile peak.
     """
@@ -1689,13 +1842,16 @@ def read_board_foot_material_profiles(rgb, instances, topology, *, material_role
         _same_frame(binding, prediction["source_binding"])
         if prediction.get("probabilities_conditioned_on_geometry", False):
             raise ValueError("Board-material type search must use original RGB without a geometry prior")
-    if (material_role_authority.get("kind") not in ("direct_user_confirmation", "direct_user_drawing")
+    image = np.asarray(rgb)
+    transferred = material_role_authority.get('kind') == 'same_event_material_role_transfer'
+    if transferred:
+        _validate_same_event_board_foot_authority(material_role_authority, binding, image)
+    elif (material_role_authority.get("kind") not in ("direct_user_confirmation", "direct_user_drawing")
             or not material_role_authority.get("reference")
             or material_role_authority.get("source_sha256") != binding["source_sha256"]):
         raise ValueError("The source-bound board-foot role needs its actual user confirmation")
     if material_role_authority.get("board_foot_material") != "warm_yellow_strip_belongs_to_board":
         raise ValueError("This material reader requires its explicitly confirmed event material")
-    image = np.asarray(rgb)
     h, w = image.shape[:2]
     graphics=source_graphic_rectangle_candidates(image,binding)
     ice_masks = [instance["region_mask"] for instance in instances["instances"] if instance["kind"] == "ice_region"]
@@ -1876,7 +2032,8 @@ def read_board_foot_material_profiles(rgb, instances, topology, *, material_role
         source_local_material_direction_evidence=direction_evidence,
         source_broadcast_graphic_candidates=graphics,
         source_broadcast_graphic_material_support_evidence=graphic_support,
-        direct_user_material_role_confirmed=True, material_role_authority=material_role_authority,
+        direct_user_material_role_confirmed=not transferred, same_event_material_role_transferred=transferred,
+        human_pixel_confirmation=False, material_role_authority=material_role_authority,
         annotation_pixel_coordinates_used_as_input=False,
         source_model_semantics_used_only_for_search_and_candidate_role_ranking=False,
         source_model_semantics_used_only_for_search_and_context_disagreement=prediction is not None,

@@ -14,6 +14,7 @@
 | rink_vision.pt | SHA256 `26e792f2381a9bd66c484b8cfa38b13993f5c6cf11b52ef84ee22da65041f208`，对应训练 step 9200；162 个编码器张量／108876544 字节与基础权重一致，208 个存储均为模型状态，未发现额外原图缓冲区；[来源与训练记录](../models/rink_vision.provenance.json)、[SAM2 许可](../models/SAM2_LICENSE.txt)保留 |
 | GVHMR 补丁 | 固定上游提交 `6ec3ca39336c50492c0fae65fba2fb831fc7d866`；[原许可](../environments/third_party_patches/GVHMR_LICENSE.txt)、补丁和研究引用见[资产说明](THIRD_PARTY_ASSETS.md)，保留上游教育／研究／非营利及衍生修改非商业条件 |
 | ExMR camera-only补丁 | 固定提交 `eac72e47339b404c0443f5fb323412e2ce432410`；[完整上游许可与署名](../environments/third_party_licenses/EXMR_LICENSE.txt)原字节保留，教育／研究／非营利及衍生修改非商业条件继续适用；完整源码、SAM/HaMeR/RTMW权重及网络原始输出留Data，固定资产身份见[依赖索引](../events/ankara_2026/programmes/okada_mei_sp/spin_models_1104_audit.json) |
+| HTD-Refine 与 PVA-Net | 固定提交 `2fcd6ddef3c4eb75a636062245f80a0136c09b7e` 的外部源码适用 AGPL-3.0-only；公开内容为项目输入适配与复核代码，checkpoint 许可另行核对。 [来源与署名](THIRD_PARTY_ASSETS.md#htd-refine) |
 | Ceres／Abseil、SciPy、oneTBB | 原许可证和署名保留；分别适用 BSD、嵌入组件的 Apache 等原条件，项目声明不缩减第三方授权 |
 | 项目辅助代码 | ViTPose helper 与 calibration companion 按项目分项声明处理；[helper 来源](../calibration/program_tracking/body_tracking/source_helpers/run_vitpose_h.provenance.json)、[companion 来源](../src/rinkspace/calibration_companion/provenance.json)保留，实际运行依赖仍适用原许可 |
 | 外部模型与框架 | GVHMR、HMR2、ViTPose、SMPL-X、YOLO、RAFT 及 RTMW 运行实现／权重留在 Data；[FootMR 与 CoTracker 的当前源码接线、固定提交和权重身份](../environments/body-runtime-sources.json)已实际接入，不能再将 CoTracker 描述成仅有参考链接。PIDNet／SMP 仍按原核查范围解释 |
@@ -23,7 +24,7 @@
 
 [播放器](RESULTS_3D_PLAYER_ZH.md)连接外部 AITViewer 1.14.2；本机该发行物附 MIT 许可，Pyglet 2.1.19 附 BSD 三条款许可。原文、安装元数据 SHA 与源码证据见[播放器依赖记录](../environments/viewer3d-provenance.json)。这描述指定版本的现有字节，不给全部历史版本或整个仓库改标 MIT。
 
-本项目显式选择 Pyglet 窗口后端。AITViewer 上游默认配置和安装依赖仍含 PyQt6；本机 PyQt6 6.12.0 发行物附 GPLv3，PyQt6-Qt6 6.12.0 元数据标 LGPL v3，二者不能混为一项 LGPL 依赖。[Riverbank 官方说明](https://en.riverbankcomputing.com/software/pyqt)列出 GPLv3 与商业许可两种路径；本记录未取得商业授权材料。若改为 Qt 后端或分发含 Qt／PyQt 的组合程序，需按实际使用与原许可另行核对，不能沿用项目保留权利声明作为第三方授权。
+本项目显式选择 Pyglet 窗口后端。AITViewer 上游默认配置和安装依赖仍含 PyQt6；本机 PyQt6 6.12.0 发行物附 GPLv3，PyQt6-Qt6 6.12.0 元数据标 LGPL v3，二者不能混为一项 LGPL 依赖。[Riverbank 官方说明](https://www.riverbankcomputing.com/software/pyqt/)列出 GPLv3 与商业许可两种路径；本记录未取得商业授权材料。若改为 Qt 后端或分发含 Qt／PyQt 的组合程序，需按实际使用与原许可另行核对，不能沿用项目保留权利声明作为第三方授权。
 
 公开树仅保留连接源码、依赖定义、许可原文与身份记录，不附播放器安装环境或 Qt／PyQt 实现。安装锁中出现库、运行时实际加载库以及组合分发是不同事实；默认后端选择不替代整个依赖闭包的许可核查。
 
@@ -50,6 +51,8 @@
 
 2026-11-13 开场与整鞋方向修正版新增一份连续人体与整鞋控制，包含绝对位置与 SO(3) 控制、相对鞋控制、原生 PTS、角色及求解来源。完整人体表面、源像素、网络权重与原始网络输出保存在 Data。
 
+切镜连续性、首旋修订和此前的整鞋候选各公开一份从保存结果提取的运动控制。字段包括连续位置与转动、鞋姿及安装参数、共享人体尺度、原生 PTS 和绑定 SHA-256。完整候选的加权残差、来源关联、模型与回放数组留在 Data。
+
 具体文件 SHA、字节数、字段名、dtype 和 shape 见[字段索引](../events/ankara_2026/programmes/okada_mei_sp/body_parameters_1103_fields.json)，较早三份参数的完整身份由[节目绑定](../events/ankara_2026/programmes/okada_mei_sp/README.md#历史人体候选导航)定位。
 
 这些参数不含 SMPL-X 模板、形变基、蒙皮权重、人体面表、完整人体表面或广播像素缓冲区；紧凑模型、模型文件和表面缓存继续留在 Data。重放需要相符模型与本地输入。[SMPL-X 官方模型条款](https://smpl-x.is.tue.mpg.de/modellicense.html)与代码包许可分别核对，当前网页不替代已安装版本附带的许可原文。字段清单不认证第三方先验或数值输出可自由再分发、商用，也不将独立优化控制值直接等同于上游附带的模型动画。
@@ -63,6 +66,8 @@
 冻结 review 的 [manifest](../events/ankara_2026/programmes/okada_mei_sp/review/manifest.json)通过 `public_withheld/public_media_derivative` 登记原机位图片、native 截图及叠加画面的排除与派生身份。分类掩膜、项目场地图、观测坐标、方差、状态和统计 W 按各自类型保存，不因为文件名或含色值测量而当作完整广播图像删除。
 
 观测 JSON／GZ／NPZ 中的颜色采样、剖面、ROI 测量与原 SHA 保持原值，以保留数据和状态合同；这些数据不会因此获得第三方额外许可。小型相机控制数组、广告数值模板及 Ad3／Ad7 数值源库不含广播图像缓冲区。历史模板、导入快照及回执按[归档映射](../events/ankara_2026/scene/archive.json)定位。
+
+安卡拉共同场景发布两套节目的源时钟、相机和冰场数值参数，以及 Ad2／15、Ad3／16 的来源测量和用于拟合的局部轮廓。完整广告图稿、源画面与回放均留在 Data。 [共同场景登记](../events/ankara_2026/scene/provisional_final_1113.json)
 
 [YouTube 许可说明](https://support.google.com/youtube/answer/2797468?hl=en)与[使用条款](https://www.youtube.com/static?template=terms)不自动授予观看者服务外再分发权。两条具体视频的实际 CC 字段未取得，不能把平台默认值当作视频许可证据；当前公开范围不分发这些画面。
 

@@ -15,9 +15,11 @@
 | `-VerifyBackendsOnly` | 只核验已有原生后端 |
 
 ~~~powershell
-& .\.venv\Scripts\python.exe -B -m calibration.solver_runtime status
-& .\.venv\Scripts\python.exe -B -m calibration.solver_runtime verify-backends
-& .\.venv\Scripts\python.exe -B -m calibration.solver_runtime named66 --output <Data中的新目录> <明确的输入参数>
+. .\launchers\LOCAL_PYTHON.ps1
+$python = Get-RinkSpacePythonPath (Get-Location).Path
+& $python -B -m calibration.solver_runtime status
+& $python -B -m calibration.solver_runtime verify-backends
+& $python -B -m calibration.solver_runtime named66 --output <Data中的新目录> <明确的输入参数>
 ~~~
 
 named66 与 v12 各自转交原驱动，依赖对应完整输入、状态和 profile。命令可调用不等于历史候选已通过定位验收。

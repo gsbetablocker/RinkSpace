@@ -39,6 +39,9 @@ def command_environment(project, data_root, profile, backend, script, script_arg
         raise ValueError('python_base must be project or data')
     base = project if selected['python_base'] == 'project' else data_root
     executable = Path(python) if python else base / selected['python']
+    if not python and selected['python_base'] == 'project' and not executable.is_file():
+        from rinkspace.storage import AssetStore
+        executable = AssetStore(project, data_root=data_root).resolve(executable)
     library = data_root / profile['native_library']
     target = Path(script)
     if not target.is_absolute():

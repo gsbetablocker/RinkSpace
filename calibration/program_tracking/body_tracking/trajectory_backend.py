@@ -36,8 +36,7 @@ from .programme_camera import ProgrammeCamera,StaticCropCamera
 from .trajectory_probe import GROUPS,body_groups
 from .weighted_blocks import block,verify
 from .programme_action_factors import (action_policy, SourceTurnPath, ProgrammeRootTrust,
-    choose_source_path_hypothesis, record_action_factors, action_direction_check,
-    turn_episode_image_metrics, turn_episode_image_checks)
+    choose_source_path_hypothesis, record_action_factors, action_direction_check)
 
 class GripOnly(SpinGraspFactors):
     def continuous_support(self,x,jacobian):return np.empty(0),csr_matrix((0,self.problem.size))if jacobian else None,[]
@@ -87,6 +86,13 @@ class PrimaryActions:
         self.motion=ActualMotionFactors(problem,parent)
         self.grasp=SimpleNamespace(last={'image_cost':0.})
         self.factors=[self.motion]
+        repair=document.get('scoped_candidate_import')
+        if repair:
+            from .programme_repair_factors import ProgrammeComponentIce, ProgrammeRootCurvature
+            self.factors.extend((ProgrammeComponentIce(problem,repair),ProgrammeRootCurvature(problem,repair)))
+            if opening_lunge := repair.get('opening_lunge'):
+                from .programme_repair_factors import ProgrammeOpeningLunge
+                self.factors.append(ProgrammeOpeningLunge(problem,opening_lunge))
         if document.get('trajectory_reference')=='model_com':
             from .programme_com import ModelCOMMotionFactor
             self.factors.append(ModelCOMMotionFactor(problem,mass,document['com_motion_policy']))
@@ -290,6 +296,9 @@ def configure_programme_weights(problem,base,document,x):
     """The same declared production weights for solve, proposal and replay."""
     action=action_policy(document)
     weights=primary_policy(problem)
+    if repair:=document.get('scoped_candidate_import'):
+        problem.objective_block_weights.update(repair['weights'])
+        weights['scoped_repair_weights']=repair['weights']
     whole=document.get('whole_skate_source')
     if whole:
         problem.objective_block_weights.update(whole['weights'])
@@ -347,12 +356,26 @@ def configure_programme_weights(problem,base,document,x):
     return weights
 
 
-def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_linear=False,device_batch=1024,quality_baseline=None,freeze_root=False,diagnostic_profile=False,protected_source_evidence=None,source_episode_choices=None,warm_start=None,save_linear_cache=False,source_conditioned_step=False,source_evidence=None,verify_action_direction=False):
+def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_linear=False,device_batch=1024,quality_baseline=None,freeze_root=False,diagnostic_profile=False,protected_source_evidence=None,source_episode_choices=None,warm_start=None,save_linear_cache=False,source_conditioned_step=False,source_evidence=None,verify_action_direction=False,scoped_import=None,proposal=None,proposal_only=False):
     project,prepared,output=map(Path,(project,prepared,output))
     if output.exists():raise FileExistsError(output)
     output.mkdir(parents=True);log_path=output/'progress.jsonl';print(json.dumps(dict(main_log=str(log_path.resolve()),whole_prepared_state=True)),flush=True);started=time.perf_counter()
     source_evidence=Path(source_evidence)if source_evidence is not None else prepared/'source_evidence.json'
     ref,camera,info,document,seed=load_reference(project,prepared,source_evidence);write_json(output/'seed_report.json',seed)
+    repair=document.get('scoped_candidate_import')
+    if scoped_import is not None and (not repair or resume is not None or warm_start is not None):
+        raise ValueError('Scoped import needs an explicit revised objective and exclusive start mode')
+    if proposal is not None and (not repair or (scoped_import is None and resume is None)):
+        raise ValueError('An external proposal requires a verified scoped import or its exact resume')
+    if proposal_only and not proposal:
+        raise ValueError('--proposal-only requires explicit proposals')
+    if repair and scoped_import is None and resume is None:
+        raise ValueError('Choose scoped import or exact resume for this repair objective')
+    import_receipt=None
+    if scoped_import is not None:
+        from .scoped_candidate import import_scoped_candidate
+        parent_packet,import_x,import_receipt=import_scoped_candidate(
+            ref,camera,prepared,document,repair,Path(scoped_import))
     step_policy=document.get('programme_structure',{}).get('solver_step',{})
     if source_conditioned_step and step_policy.get('cavity_collar_nonincrease_guard',False):
         feedback=step_policy.get('local_source_trust_feedback',{})
@@ -417,6 +440,8 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         sec=source_seconds(ref.p);problem=SequenceJoint(ref,camera,prepared/'observations.npz',tuple(sec[[0,-1]]),document.get('supports',[]),output/'solve',log,'sequence_skates_v1',optimize_shared=False,ice_policy=policy,record_acceptance_before_jacobian=True)
         problem.body.compatibility_difference_step=1e-8
         x=np.r_[ref.binding.x,np.zeros(problem.body.size)]
+        if scoped_import is not None:
+            x=import_x
         if start_packet is not None:
             if start_packet['x'].shape!=x.shape:raise ValueError('Start control layout changed')
             np.testing.assert_array_equal(problem.body.state.knots,start_packet['absolute_knots'])
@@ -495,7 +520,8 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
             problem.active_parameter_indices=np.intersect1d(
                 getattr(problem,'active_parameter_indices',body_columns),body_columns)
             problem.local_control_seconds='whole-programme body; shared shoe geometry and static ankle mount'
-        focus=document.get('programme_audit_repair',{}).get('followup_intervals_pts')
+        focus=(repair['focus_pts'] if repair else
+               document.get('programme_audit_repair',{}).get('followup_intervals_pts'))
         if focus is not None:
             stamps=np.asarray(focus)
             pts=ref.p['pts']
@@ -508,7 +534,20 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
             # residual and guard remains active, including both sides of a window.
             active=np.flatnonzero(np.any((state.knots[:-4,None]<=windows[:,1])
                                         & (state.knots[4:,None]>=windows[:,0]),axis=1))
-            columns=17+(69*active[:,None]+np.arange(69)).ravel()
+            if repair:
+                windows_by_track=repair.get('tracks_by_window')
+                if windows_by_track is not None:
+                    if len(windows_by_track)!=len(windows):raise ValueError('Repair track selection and source windows differ')
+                    pieces=[]
+                    for window,tracks in zip(windows,windows_by_track,strict=True):
+                        controls=np.flatnonzero((state.knots[:-4]<window[1])&(state.knots[4:]>window[0]))
+                        axes=np.r_[np.arange(3) if -1 in tracks else np.empty(0,int),
+                                   *[3+3*track+np.arange(3) for track in tracks if track>=0]]
+                        if np.any((axes<0)|(axes>=69)):raise ValueError('Invalid repair track')
+                        pieces.append((69*controls[:,None]+axes).ravel())
+                    columns=17+np.unique(np.concatenate(pieces))
+                else:columns=17+(69*active[:,None]+np.arange(69)).ravel()
+            else:columns=17+(69*active[:,None]+np.arange(69)).ravel()
             selected=getattr(problem,'active_parameter_indices',np.arange(17,problem.size))
             problem.active_parameter_indices=np.intersect1d(selected,columns)
             if not len(problem.active_parameter_indices):
@@ -518,6 +557,10 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         if saved is not None:
             from .action_objective_context import validate_resume_selection
             validate_resume_selection(problem,old_stage)
+            if 'multiplier' not in saved or saved['multiplier'].shape!=problem.al.multiplier.shape:
+                raise ValueError('Resume changed cavity row layout')
+            problem.al.multiplier[:]=saved['multiplier']
+            problem.al.penalty=float(saved['penalty'])
         problem.linear_solver_backend=('archived_nonlinear_replay' if residual_only_replay else
                                        'cuda_resident' if gpu_linear else 'sparse_direct')
         problem.linear_runtime=linear_runtime
@@ -540,6 +583,8 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         np.savez_compressed(output/'objective_block_weights.npz',**problem.objective_block_weights)
         problem.checkpoint_extra.update(objective_phase=np.array(action.get('stage','trajectory_primary')),objective_policy_sha256=np.array(digest(output/'objective_policy.json')),objective_block_weights_sha256=np.array(digest(output/'objective_block_weights.npz')))
         problem.checkpoint_extra['parent_accepted_steps']=np.array(parent_steps)
+        if repair:
+            problem.checkpoint_extra['scoped_import_parent_sha256']=np.array(repair['parent_sha256'])
         if document.get('programme_structure',{}).get('enabled'):
             problem.checkpoint_extra['programme_structure_json']=np.array(json.dumps(document['programme_structure'],sort_keys=True))
             for factor in base.factors:
@@ -572,6 +617,15 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
                 restore_source_episode(unassigned,source_context,'source_association_unassigned_',
                     choice_key='source_association_episode_choice')
         reviewed=getattr(problem.action_factors,'reviewed_skates',None)
+        whole=problem.action_factors.whole_skate
+        if repair and whole is not None:
+            if saved is None:
+                whole.associate(x[17:])
+            else:
+                whole.restore_checkpoint(saved)
+        structure_extent=problem.action_factors.structure_extent
+        if repair and saved is not None and structure_extent is not None:
+            structure_extent.restore_checkpoint(saved)
         if reviewed is not None:
             matches=None if source_context is None else source_context.get('ordered_source_association_json')
             if (matches is not None and str(source_context.get('source_evidence_sha256',''))==digest(source_evidence)):
@@ -635,6 +689,10 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
                 value=getattr(selected,field,None)
                 if value is not None:frozen['source_association_unassigned_'+field]=np.asarray(value).copy()
         frozen.update(extra_associations)
+        if repair and whole is not None:
+            frozen.update(whole.checkpoint_fields())
+        if repair and structure_extent is not None:
+            frozen.update(structure_extent.checkpoint_fields())
         if reviewed is not None:
             frozen['ordered_source_association_json']=np.array(json.dumps(reviewed.ordered.association_record(),sort_keys=True))
         association_origin=('restored saved fixed source associations; missing historical diagnostic scores remain empty'
@@ -673,13 +731,50 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
             write_json(output/'source_path_hypotheses.json',dict(seed_selected=False,
                 exact_resume_state_preserved=True,parameter_sha256=digest(start_parameter)))
         tick=time.perf_counter()
-        log.write(json.dumps(dict(event=('initial_replay_residual_start' if residual_only_replay
-                                        else 'initial_linearization_start'),setup_seconds=tick-started))+'\n')
-        first=problem.evaluate(x,not residual_only_replay)
-        first_J=None if residual_only_replay else time.perf_counter()-tick
+        need_first_jacobian=not residual_only_replay and (not repair or (max_accepted!=0 and proposal is None))
+        log.write(json.dumps(dict(event=('initial_linearization_start' if need_first_jacobian
+                                        else 'initial_replay_residual_start'),setup_seconds=tick-started))+'\n')
+        first=problem.evaluate(x,need_first_jacobian)
+        first_J=time.perf_counter()-tick if need_first_jacobian else None
+        if repair:
+            from .scoped_candidate import require_full_repair_rows,verify_import_projection
+            coverage=require_full_repair_rows(problem,first,jacobian=need_first_jacobian)
+            write_json(output/'initial_repair_factor_rows.json',coverage)
+            if saved is not None:
+                from .weighted_blocks import signature
+                current=first['residual']
+                saved_sha=str(saved['scoped_weighted_residual_sha256'])
+                record=dict(original_weighted_residual_sha256=saved_sha,rows=len(current),
+                            weighted_cost=float(current@current/2))
+                if 'scoped_weighted_residual' in saved:
+                    prior=saved['scoped_weighted_residual']
+                    if signature(prior)!=saved_sha:
+                        raise ValueError('Saved weighted residual changed')
+                    np.testing.assert_allclose(current,prior,rtol=0,atol=2e-8,
+                                               err_msg='Exact resume changed actual weighted rows')
+                    record.update(resumed_weighted_residual_sha256=signature(current),
+                                  max_abs_difference=float(np.max(np.abs(current-prior))))
+                else:
+                    current_sha=signature(np.round(current,9))
+                    if current_sha!=saved_sha:
+                        raise ValueError('Exact resume changed the weighted rows after 1e-9 quantization')
+                    record.update(resumed_weighted_residual_sha256=current_sha,quantization=1e-9)
+                write_json(output/'resumed_residual.json',record)
+            if verify_action_direction:
+                from .programme_repair_factors import repair_direction_check
+                write_json(output/'repair_direction_check.json',repair_direction_check(problem,base,x[17:]))
+            if import_receipt is not None:
+                projection_check = verify_import_projection
+                if repair.get('registered_camera_transition'):
+                    from .scoped_candidate import record_import_reprojection
+                    projection_check = record_import_reprojection
+                projection_check(problem,import_receipt,repair['parent_result'])
+                import_receipt.update(revised_evidence_sha256=digest(source_evidence),
+                    active_columns=problem.active_parameter_indices.tolist(),weighted_blocks=coverage)
+                write_json(output/'scoped_import.json',import_receipt)
         if action:
-            record_action_factors(problem,first,output/'initial_action_factors.json',jacobian=not residual_only_replay)
-            if not residual_only_replay and (verify_action_direction or save_linear_cache
+            record_action_factors(problem,first,output/'initial_action_factors.json',jacobian=need_first_jacobian)
+            if need_first_jacobian and (verify_action_direction or save_linear_cache
                     or (saved is None and (warm_start is None or diagnostic_profile)
                         and problem.action_factors.whole_skate is None)):
                 action_direction_check(problem,x,first,output/'weighted_direction_check.json')
@@ -694,76 +789,50 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
             log.write(json.dumps(dict(event='first_J_snapshot',seconds=time.perf_counter()-snapshot_start))+'\n')
         write_json(output/'weighted_registry.json',verify(first['weighted_blocks'],first['residual'],first['jac']))
         write_json(output/'initial_metrics.json',dict(groups=body_groups(problem,first),weighted_parts={b.name:float(b.residual@b.residual/2)for b in first['weighted_blocks']},structure=first['gate']))
-        # A fixed per-source baseline survives every primary stage. Decoration
-        # never gets to rank a candidate using a lower aggregate image cost.
-        baseline={r['id']:(float(np.percentile(r['outside_visible_band_px'],95)),float(r['pixel_uncertainty_radius_px']))for r in first['action_metrics'].get('visible_runner_contours',[])+first['action_metrics'].get('visible_unassigned_skate_contours',[])}
-        torso_before=body_groups(problem,first)['torso']
-        if frozen_baseline is not None:
-            baseline.update(original['source']);torso_before=original['torso']
-        turn_before=turn_episode_image_metrics(problem,base.turn_factors,guard_observations)
-        turn_before.update(original.get('turn_episodes',{}))
-        structural_before=first.get('action_metrics',{})
-        joint_peaks={v['name']:v['peak_dimensionless_violation'] for v in structural_before.get('anatomical_joint_domain',{}).get('joints',[])}
-        surface_peak=structural_before.get('surface_intersection',{}).get('worst_signed_gap_m')
-        flight_guard=None;dense_flight_guard=None
-        cavity_trial_guard = None
-        if step_policy.get('cavity_collar_nonincrease_guard', False):
-            from .programme_guard_proposals import ProgrammeCavityTrialGuard
-            cavity_trial_guard = ProgrammeCavityTrialGuard(problem, first)
-        if step_policy.get('flight_nonincrease_guard',False):
-            from .programme_flight_guard import ProgrammeFlightGuard
-            from .weighted_blocks import signature
-            definition=[ref.p['pts'],ref.p['time_base'],ref.body.J,ref.binding.ratio,ref.binding.x,
-                mass.ids,mass.offsets,mass.mass,mass.inertia]
-            for wrapped in sorted((f for f in base.factors if isinstance(getattr(f,'factor',None),ConfirmedFlightFactors)),key=lambda f:f.episode_id):
-                factor=wrapped.factor
-                if not factor.event_average:raise ValueError('Per-flight guard requires the same event-average physics')
-                prefix='episode/'+wrapped.episode_id+'/'
-                definition.extend((prefix,ref.p['pts'][factor.frames],factor.times,factor.gravity,
-                    factor.position_operator,factor.position_offset,factor.momentum_operator,
-                    problem.objective_block_weights[prefix+'flight_integrated_com'],
-                    problem.objective_block_weights[prefix+'flight_specific_momentum']))
-            flight_guard=ProgrammeFlightGuard(first,previous=original.get('flight_guard'),
-                definition_identity=signature(*definition))
-            dense_factor=next((f for f in base.factors if type(f).__name__=='ModelCOMMotionFactor' and f.flight_rows),None)
-            if dense_factor is not None:
-                from .programme_flight_guard import ProgrammeDenseFlightGuard
-                dense_definition=definition+[dense_factor.times,dense_factor.source_pts_float,
-                    dense_factor.gravity,np.array(dense_factor.flight_scale)]
-                for episode,rows in sorted(dense_factor.flight_rows.items()):
-                    dense_definition.extend((episode,rows,dense_factor.flight_weights[episode]))
-                dense_flight_guard=ProgrammeDenseFlightGuard(first,previous=original.get('dense_flight_guard'),
-                    definition_identity=signature(*dense_definition))
-        if document.get('com_motion_policy',{}).get('confirmed_flight_acceleration_scale_mps2') is not None and dense_flight_guard is None:
-            raise ValueError('Dense flight physics requires the original native-flight and new dense guards')
-        def source_checks(rows):
-            checks={}
-            for row in rows:
-                old,radius=baseline[row['id']];now=float(np.percentile(row['outside_visible_band_px'],95));checks[row['id']]=dict(rejected=now>old+.25*radius,before=old,after=now,original_radius_px=radius,model_foot=row.get('foot'))
-            return checks
-        def guard(value,relative_limit):
-            checks=source_checks(value['action_metrics'].get('visible_runner_contours',[])+value['action_metrics'].get('visible_unassigned_skate_contours',[]))
-            if problem.action_factors.whole_skate is not None:
-                from .skate_run_policy import image_trial_quality
-                checks['whole_skate_source']=image_trial_quality(whole_source_before,
-                    value['source_group_costs']['whole_skate_source'],relative_limit)
-            torso=body_groups(problem,value,observation_mask=guard_observations)['torso'];checks['torso']=dict(rejected=torso['pixel_p95']>torso_before['pixel_p95']+max(2.,.1*torso_before['pixel_p95']),before=torso_before['pixel_p95'],after=torso['pixel_p95'],meaning='same source population across stages; finite engineering source guard, not 3D truth')
-            for row in value.get('action_metrics',{}).get('anatomical_joint_domain',{}).get('joints',[]):
-                if row['name'] in joint_peaks:
-                    before=joint_peaks[row['name']];now=row['peak_dimensionless_violation']
-                    checks['joint_peak_'+row['name']]=dict(rejected=now>before+1e-5,before=before,after=now,meaning='engineering domain severity; not clinical angle')
-            if surface_peak is not None:
-                now=value['action_metrics']['surface_intersection']['worst_signed_gap_m']
-                checks['actual_surface_witness_peak']=dict(rejected=now<surface_peak-1e-6,before=surface_peak,after=now,meaning='same version oriented witness; whole-surface refresh follows accepted step')
-            if flight_guard is not None:checks.update(flight_guard.checks(value))
-            if dense_flight_guard is not None:checks.update(dense_flight_guard.checks(value))
-            if cavity_trial_guard is not None:
-                checks.update(cavity_trial_guard.checks(value))
-            checks.update(turn_episode_image_checks(turn_before,
-                turn_episode_image_metrics(problem,base.turn_factors,guard_observations)))
-            return checks
-        whole_source_before=first['source_group_costs'].get('whole_skate_source')
+        from .programme_quality_guard import build_programme_guards
+        guards=build_programme_guards(problem,base,ref,mass,document,first,original,
+            guard_observations,use_saved_source_baseline=frozen_baseline is not None)
+        guard,source_checks=guards.check,guards.source_checks
+        baseline,torso_before,turn_before=guards.baseline,guards.torso_before,guards.turn_before
+        joint_peaks,surface_peak=guards.joint_peaks,guards.surface_peak
+        flight_guard,dense_flight_guard,cavity_trial_guard=(
+            guards.flight_guard,guards.dense_flight_guard,guards.cavity_trial_guard)
         problem.additional_trial_quality=guard
+        if repair:
+            from .scoped_candidate import weighted_residual_identity
+            problem.accepted_value_checkpoint=weighted_residual_identity
+        if repair:
+            from .programme_quality_guard import ScopedProgrammeGuard
+            saved_guard=None
+            if saved is not None:
+                guard_path=old_stage/'scoped_guard_baseline.npz'
+                if digest(guard_path)!=str(saved['scoped_guard_baseline_sha256']):
+                    raise ValueError('Exact resume changed the frozen scoped guard baseline')
+                saved_guard=load(guard_path)
+            scoped_guard=ScopedProgrammeGuard(problem,base,repair,first,x,saved=saved_guard)
+            guard_path=output/'scoped_guard_baseline.npz'
+            if saved is None:
+                np.savez_compressed(guard_path,**scoped_guard.checkpoint())
+            else:
+                import shutil
+                shutil.copyfile(old_stage/'scoped_guard_baseline.npz',guard_path)
+            problem.checkpoint_extra['scoped_guard_baseline_sha256']=np.array(digest(guard_path))
+            problem.full_candidate_guard=scoped_guard.checks
+            from .programme_skate_replay import ScopedSurfaceGuard
+            surface_cost_path=output/'scoped_parent_costs.json'
+            if saved is None:
+                residual=first['residual']
+                costs=[float(residual@residual/2),first['weighted_parts']['surface_intersection']]
+                write_json(surface_cost_path,costs)
+            else:
+                previous=old_stage/surface_cost_path.name
+                if digest(previous)!=str(saved['scoped_parent_costs_sha256']):
+                    raise ValueError('Exact resume changed the scoped parent objective costs')
+                costs=json.loads(previous.read_text(encoding='utf-8'))
+                surface_cost_path.write_bytes(previous.read_bytes())
+            problem.checkpoint_extra['scoped_parent_costs_sha256']=np.array(digest(surface_cost_path))
+            parent_x=np.r_[x[:17],np.zeros(problem.body.size)]
+            problem.scoped_surface_trial=ScopedSurfaceGuard(problem,base,document,parent_x,output,costs)
         if problem.action_factors.contour is not None:
             problem.early_source_trial_quality=lambda z: source_checks(problem.action_factors.source_trial_rows(z[17:]))
         if source_conditioned_step:
@@ -862,18 +931,34 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         del first
         print(json.dumps(dict(event='primary_fit_start',frames=len(ref.times),variables=problem.size,first_full_J_seconds=first_J,wall_seconds=wall_seconds)),flush=True)
         remaining=None if wall_seconds is None else max(30.,wall_seconds-(time.perf_counter()-started)-30.)
-        result,report=problem.solve(x,RunPolicy(wall_seconds=remaining,max_accepted=max_accepted,max_outer=1,allow_penalty_growth=False,stagnation_window=12))
+        proposals=()
+        if proposal is not None:
+            from .scoped_candidate import proposal_vector
+            proposals=tuple((path.stem,proposal_vector(problem,path,repair['parent_sha256']))
+                            for path in map(Path,proposal))
+        result,report=problem.solve(x,RunPolicy(wall_seconds=remaining,max_accepted=max_accepted,max_outer=1,allow_penalty_growth=False,stagnation_window=12),proposals=proposals,proposal_only=proposal_only)
         if freeze_root:np.testing.assert_array_equal(result[root_columns],profile_root)
         if len(protected_columns):np.testing.assert_array_equal(result[protected_columns],protected_values)
-        if problem.action_factors.whole_skate is not None:
+        if problem.action_factors.whole_skate is not None and not repair:
             problem.action_factors.whole_skate.associate(result[17:])
             problem.cache=problem.cache_x=None
         final=problem.evaluate(result,False)
+        full_checks=guard(final,.05)
+        if repair:
+            reused_surface=None
+            if saved is not None and (old_stage/'retained_surface.json').is_file():
+                reused_surface=json.loads((old_stage/'retained_surface.json').read_text(encoding='utf8'))
+                if digest(reused_surface['surface_path'])!=reused_surface['surface_sha256']:
+                    raise ValueError('Resume changed the retained surface cache')
+            problem.scoped_surface_trial.finalize(result,final,reused=reused_surface)
+            full_checks.update(scoped_guard.checks(result,final))
+            write_json(output/'final_repair_factor_rows.json',require_full_repair_rows(problem,final))
+            write_json(output/'opening_curvature_validation.json',scoped_guard.opening_validation(result,final))
         write_json(output/'final_metrics.json',dict(groups=body_groups(problem,final),
             weighted_parts={b.name:float(b.residual@b.residual/2)for b in final['weighted_blocks']},
-            structure=final['gate'],primary_guards=guard(final,.05),
+            structure=final['gate'],primary_guards=full_checks,
             physical_diagnostics={key:final.get('action_metrics',{}).get(key) for key in (
-                'opening_source_standing','anatomical_joint_domain','surface_intersection',
+                'opening_source_standing','opening_lunge','anatomical_joint_domain','surface_intersection',
                 'source_supported_grasp','actual_model_com_acceleration','confirmed_flight_dense_com')}))
         if action:record_action_factors(problem,final,output/'final_action_factors.json',jacobian=False)
         for factor in base.factors:
@@ -906,12 +991,15 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
             packet['native_body_local_R_mid']=body_fk['local_R']
             packet['native_body_FK_world_R_mid']=body_fk['Q'][:,None]@body_fk['frames']
             packet['source_action_ledger_sha256']=np.array(digest(source_evidence))
+        if repair and (lunge := repair.get('opening_lunge')):
+            packet['opening_lunge_prior_json']=np.array(json.dumps(lunge,sort_keys=True))
+            left, right = lunge['right_support_pts']
+            packet['opening_lunge_inferred_contact_mask']=(ref.p['pts']>=left)&(ref.p['pts']<=right)
         packet.update(P_velocity_world_mps=candidate.root_derivative(candidate.times,1)*candidate.binding.ratio,source_shot_ids=ref.p.get('shot_ids',np.full(len(ref.times),'FS_cam7')),trajectory_evidence_status=np.where(np.asarray(problem.body.obs['use']).sum(1)>=4,'source_constrained_estimate','temporal_inference'),position_uncertainty_status=np.full(len(ref.times),'conditional_scale_and_depth; no independent accuracy acceptance'),ice_plane_known=np.array(ref.ice_plane_known),sequence_contact_modes=problem.action_factors.modes.modes,sequence_contact_status=problem.action_factors.modes.status,
             shared_betas=np.asarray(ref.p['shared_betas']).copy(),shared_body_scale=np.asarray(ref.p['body_scale']).copy())
-        from .fullbody_fit import body_joint_assignment
-        packet['source_body_model_joint_ids']=body_joint_assignment(problem.body.obs).copy()
-        if'body_joint_assignment_provenance_json'in problem.body.obs:
-            packet['body_joint_assignment_provenance_json']=problem.body.obs['body_joint_assignment_provenance_json'].copy()
+        from .actual_observation_ledger import update_actual_observation_ledger
+        update_actual_observation_ledger(packet,problem.body)
+        packet['source_observation_objective_known']=np.array(True)
         fitted=output/'fitted';fitted.mkdir(exist_ok=True)
         pending=fitted/'result.pending.npz'
         pack_started=time.perf_counter()
@@ -923,7 +1011,7 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         summary=dict(parameter=str(output/'solve/candidate.npz'),result=str(output/'fitted/result.npz'),source_frames=len(ref.times),whole_seconds=sec[[0,-1]].tolist(),accepted_steps=parent_steps+problem.accepted,source_evidence=str(source_evidence),source_evidence_sha256=digest(source_evidence),additional_accepted_steps=problem.accepted,retained_step=parent_steps+report['selection']['retained_step'],stop=report['stop'],first_full_J_seconds=first_J,wall_seconds=time.perf_counter()-started,engineering_ready=True,trajectory_candidate=True,external_validation_status='not_evaluated_here',source_visual_review='pending',accuracy_accepted=False,ice_plane_known=ref.ice_plane_known,primary_guard_baseline=str(output/'primary_quality_baseline.json'),no_per_shot_alignment=True)
         summary.update(root_profile_fixed=freeze_root,diagnostic_profile=diagnostic_profile,
             source_protected_initialization=protected_source_evidence is not None,
-            original_primary_guards_pass=not any(v['rejected']for v in guard(final,.05).values()),
+            original_primary_guards_pass=not any(v['rejected']for v in full_checks.values()),
             trajectory_candidate=not diagnostic_profile)
         write_json(output/'run_summary.json',summary);write_json(output/'result_status.json',{k:summary[k]for k in ('engineering_ready','trajectory_candidate','external_validation_status','source_visual_review','accuracy_accepted')});print(json.dumps(dict(event='trajectory_primary_complete',accepted=problem.accepted,result=summary['result'])),flush=True)
     execution.close();return summary
@@ -936,6 +1024,11 @@ def main():
     ap.add_argument('--max-accepted',type=int,help='Optional accepted-step checkpoint boundary; omitted means no accepted-step budget')
     ap.add_argument('--memory-gib',type=float,default=0.,help='Optional Windows process commit ceiling in GiB; 0 records telemetry only')
     ap.add_argument('--warm-start',type=Path,help='Same immutable input and prior, explicitly revised objective');ap.add_argument('--resume',type=Path);ap.add_argument('--gpu-linear',action='store_true');ap.add_argument('--device-batch',type=int,default=1024);ap.add_argument('--quality-baseline',type=Path)
+    ap.add_argument('--scoped-import',type=Path,help='Verify exact scoped geometry, then bind a declared new objective')
+    ap.add_argument('--proposal',type=Path,action='append',
+                    help='Same-layout scoped controls to check on the complete imported objective, in order')
+    ap.add_argument('--proposal-only',action='store_true',
+                    help='Evaluate supplied proposals, then export the best retained state without a new linear step')
     ap.add_argument('--freeze-root',action='store_true');ap.add_argument('--diagnostic-profile',action='store_true')
     ap.add_argument('--protected-source-evidence',type=Path)
     ap.add_argument('--save-linear-cache',action='store_true',
@@ -954,7 +1047,7 @@ def main():
     if a.output.exists():raise FileExistsError(a.output)
     from .memory_guard import ProcessMemoryGuard
     memory=ProcessMemoryGuard(a.output.parent/(a.output.name+'_resources'),a.memory_gib)
-    try:run(a.project,a.prepared,a.output,wall_seconds=a.wall_seconds,max_accepted=a.max_accepted,resume=a.resume,gpu_linear=a.gpu_linear,device_batch=a.device_batch,quality_baseline=a.quality_baseline,freeze_root=a.freeze_root,diagnostic_profile=a.diagnostic_profile,protected_source_evidence=a.protected_source_evidence,source_episode_choices=choices,warm_start=a.warm_start,save_linear_cache=a.save_linear_cache,source_conditioned_step=a.source_conditioned_step,source_evidence=a.source_evidence,verify_action_direction=a.verify_action_direction)
+    try:run(a.project,a.prepared,a.output,wall_seconds=a.wall_seconds,max_accepted=a.max_accepted,resume=a.resume,gpu_linear=a.gpu_linear,device_batch=a.device_batch,quality_baseline=a.quality_baseline,freeze_root=a.freeze_root,diagnostic_profile=a.diagnostic_profile,protected_source_evidence=a.protected_source_evidence,source_episode_choices=choices,warm_start=a.warm_start,save_linear_cache=a.save_linear_cache,source_conditioned_step=a.source_conditioned_step,source_evidence=a.source_evidence,verify_action_direction=a.verify_action_direction,scoped_import=a.scoped_import,proposal=a.proposal,proposal_only=a.proposal_only)
     except MemoryError as error:
         write_json(a.output/'MEMORY_LIMIT.json',dict(status='host_allocation_failed',
             error_type=type(error).__name__,error=str(error),**memory.snapshot()))

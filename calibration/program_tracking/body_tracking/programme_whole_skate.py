@@ -93,6 +93,37 @@ class WholeSkateSourceFactor:
         self.matches = tuple(matches)
         self.association_signature = signature(*(a for group in matches for a in group[:2]))
 
+    def checkpoint_fields(self):
+        if self.matches is None:
+            raise ValueError("Whole-skate correspondences must be frozen before checkpoint")
+        return dict(whole_skate_match_frames=np.concatenate([v[1] for v in self.batches]),
+                    whole_skate_match_feet=np.concatenate([np.full(len(v[1]),v[0]) for v in self.batches]),
+                    whole_skate_match_vertices=np.concatenate([m[0] for m in self.matches]),
+                    whole_skate_match_fraction=np.concatenate([m[1] for m in self.matches]),
+                    whole_skate_match_target=np.concatenate([m[2] for m in self.matches]),
+                    whole_skate_match_normal=np.concatenate([m[3] for m in self.matches]),
+                    whole_skate_match_sha256=np.array(signature(*(a for m in self.matches for a in m))))
+
+    def restore_checkpoint(self, packet):
+        frames = np.concatenate([v[1] for v in self.batches])
+        feet = np.concatenate([np.full(len(v[1]),v[0]) for v in self.batches])
+        np.testing.assert_array_equal(packet['whole_skate_match_frames'],frames)
+        np.testing.assert_array_equal(packet['whole_skate_match_feet'],feet)
+        values = tuple(packet['whole_skate_match_'+k] for k in ('vertices','fraction','target','normal'))
+        if any(len(v)!=len(frames) or not np.isfinite(v).all() for v in values):
+            raise ValueError("Invalid saved whole-skate association")
+        edges, fractions, targets, normals = values
+        if (edges.dtype.kind not in 'iu' or edges.shape != (*fractions.shape,2)
+                or targets.shape != edges.shape or normals.shape != edges.shape
+                or np.any((edges<0)|(edges>=len(self.assembly.vertices)))
+                or np.any((fractions<0)|(fractions>1))):
+            raise ValueError("Saved whole-skate association changed its geometry")
+        stop = np.cumsum([len(v[1]) for v in self.batches])[:-1]
+        self.matches = tuple(zip(*(np.split(v,stop) for v in values),strict=True))
+        if signature(*(a for m in self.matches for a in m)) != str(packet['whole_skate_match_sha256']):
+            raise ValueError("Saved whole-skate association hash changed")
+        self.association_signature = signature(*(a for group in self.matches for a in group[:2]))
+
     def _batch(self, x, batch, match, jacobian):
         p = self.problem
         foot, frames, times, base = batch
@@ -221,20 +252,28 @@ class DirectedBootSourceFactor:
             pr = moving_projection(p.camera, points(s), frames, jacobian=jacobian)
             vector = pr["uv"][:, 1] - pr["uv"][:, 0]
             expected = np.array([r["toe_uv"] for r in rows]) - np.array([r["heel_uv"] for r in rows])
-            scale = np.sqrt(.02) / np.asarray([r["sigma_px"] for r in rows])
+            # Residuals are a pixel chord, not a normalized direction angle.
+            # The same endpoint error then gives a wider angle range for a
+            # foreshortened heel-to-toe span.
+            sigma = np.asarray([r["sigma_px"] for r in rows])
+            scale = np.sqrt(.02) / sigma
             err = vector - expected
             residuals.append((scale[:, None] * err).ravel())
             if jacobian:
                 B, S = native_point_derivative(p, base, d, points, foot, pr["pixel_jac_nodes"])
                 jacobians.append(chain(p, d, times, scale[:, None, None, None] * (B[:, 1] - B[:, 0]),
                                        scale[:, None, None, None] * (S[:, 1] - S[:, 0])))
-            metrics.extend(dict(pts=int(stamp), foot=foot, distance_px=float(value))
-                           for stamp, value in zip(stamps, np.linalg.norm(err, axis=-1), strict=True))
+            span = np.linalg.norm(expected, axis=-1)
+            metrics.extend(dict(pts=int(stamp),foot=foot,distance_px=float(value),
+                                source_span_px=float(length),
+                                angle_uncertainty_rad=float(np.arctan2(noise,length)))
+                           for stamp,value,length,noise in zip(stamps,np.linalg.norm(err,axis=-1),span,sigma,strict=True))
         r = np.concatenate(residuals)
         J = vstack(jacobians, format="csr") if jacobian else None
         cost = float(r @ r / 2)
         return dict(residual=r, jac=J, parts={self.name:cost}, metrics={self.name:metrics},
-                    image_cost=cost, weighted_blocks=[block(self.name, r, J, self.rows)])
+                    image_cost=cost, weighted_blocks=[block(self.name, r, J, self.rows,
+                                                             signature(self.rows))])
 
 
 class SupportShoePhase:

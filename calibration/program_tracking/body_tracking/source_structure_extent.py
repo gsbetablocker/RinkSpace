@@ -15,6 +15,20 @@ class CompleteStructureExtentFactors:
         self.problem=problem;self.body=problem.body;self.ref=problem.reference;self.binding=problem.binding;self.rows=document['rows'];self.count=int(document.get('samples_per_complete_feature',64));self.geometry=structure_geometry(self.binding)
         lookup={int(pt):i for i,pt in enumerate(self.ref.p['pts'])};self.frames=np.asarray([lookup[r['pts']]for r in self.rows]);self.feet=np.asarray([r['foot']for r in self.rows]);self.times=(self.ref.times[self.frames,None]+np.linspace(-.5,.5,5)*self.body.tau).ravel();self.base=self.ref.at(self.times);self.q=None;self.visibility_record=[];self.last=None
 
+    def checkpoint_fields(self):
+        if self.q is None:
+            raise ValueError('Complete visible structure has no material association')
+        return dict(source_structure_extent_ids=np.array([r['id'] for r in self.rows]),
+                    source_structure_extent_q=self.q.copy())
+
+    def restore_checkpoint(self,saved):
+        np.testing.assert_array_equal(saved['source_structure_extent_ids'],
+                                      [r['id'] for r in self.rows])
+        q=np.asarray(saved['source_structure_extent_q'],float)
+        if q.shape!=(len(self.rows),self.count,3) or not np.isfinite(q).all():
+            raise ValueError('Invalid saved complete-structure material samples')
+        self.q=q.copy()
+
     def evaluate(self,x,jacobian=False):
         x=np.asarray(x)
         if x.shape==(self.problem.size,):x=x[17:]

@@ -835,15 +835,25 @@ __global__ void lm_scale_joint_step(LinearView l,SolverView s,double scale,doubl
 // A curve station that leaves declared temporal support can be initialized
 // at the observed-row pose. This is only a recovery proposal: the unchanged
 // implicit forward and original objective decide acceptance, with no UV clamp.
-__global__ void lm_restore_station_domain(View trial,LinearView l,SolverView s,const int* statuses){
+__global__ void lm_restore_station_domain(View accepted,View trial,LinearView l,SolverView s,const int* statuses){
     int id=blockIdx.x*blockDim.x+threadIdx.x;if(id>=s.nlocal)return;
     s.restored_locals[id]=0;if(s.lower[id]==s.upper[id])return;
     const int row=s.representatives[id];
     trial=row_camera_view(trial,size_t(row));
     if(trial.profile_enabled&&trial.profile_ids&&trial.profile_ids[row]>=0)return;
-    if(statuses[row]!=int(Status::no_intersection))return;
+    if(statuses[row]==int(Status::ok))return;
     const auto rig=motion_rig(trial.rig,trial.nr==43?trial.rig+38:nullptr);const MotionSpline spline{trial.controls,trial.nc,trial.first,trial.dt};
     Vec3 xyz{},tangent{};MotionProjection strict{};
+    // A linearized nuisance-station update can leave the physical projection
+    // domain while its shared camera update remains usable. Re-anchor only
+    // at the original accepted station, and only when the SAME strict
+    // implicit forward is valid under the TRIAL shared state. Full raw-pixel
+    // cost and the prediction for the actually applied locals are recomputed.
+    const double previous=accepted.stations[row];
+    if(previous!=trial.stations[row]&&geometry_at(trial,row,previous,xyz,tangent)==Status::ok&&
+            project_motion(rig,spline,trial.height,xyz,trial.times[row],strict,trial.projection_time_half)==Status::ok){
+        const_cast<double*>(trial.stations)[row]=previous;s.restored_locals[id]=1;return;}
+    if(statuses[row]!=int(Status::no_intersection))return;
     double station=trial.stations[row];
     const double observed_u=trial.observed[2*row],observed_v=trial.observed[2*row+1];
     if(observed_v<0||observed_v>trial.height-1)return;
@@ -1472,7 +1482,15 @@ struct Solver {
         cuda_check(cudaMemcpyAsync(&change,quadratic_work.data+3,sizeof(double),cudaMemcpyDeviceToHost,s));cuda_check(cudaStreamSynchronize(s));downloads+=sizeof(result)+sizeof(double);
         if(stop.load())throw SolverStopped{};if(result[1])throw std::runtime_error("invalid bounded quadratic conditional minimum");
         qp_line_wall_ms+=millis(line_started);
-        return result[0]==0&&(alpha==1.||change==0.);
+        if(std::getenv("RINKSPACE_TRACE_LM_ACTIVESET")){
+            std::fprintf(stderr,"LM_QP_LINE alpha=%.17g shared_change=%.17g changed_locals=%d\n",alpha,change,result[0]);std::fflush(stderr);}
+        // A feasible shortened line is an inexact LM candidate, with its
+        // scalar locals already minimized conditionally above. Once their
+        // working set is unchanged, refactorizing the same quadratic merely
+        // approaches the same curved face in progressively smaller steps.
+        // Finish this inner attempt and let the ORIGINAL pixel gain test
+        // accept/reject it. This is not an outer convergence certificate.
+        return result[0]==0;
     }
     // Restore camera and observed-print boundaries in the current joint Schur
     // metric, jointly retaining discovered boundary cuts and dual multipliers.
@@ -1941,7 +1959,7 @@ struct Solver {
                 ++inner[40];++inner[41];if(changed==0.){timings[7]+=finish(s);return reject_boundary();}--restoration;continue;}
             shared_trial_validated=!shared_cache_option||std::strcmp(shared_cache_option,"0");
             evaluate_kernel<<<unsigned((v.n+127)/128),128,0,s>>>(trial,trial_output.data,trial_status.data);
-            if(view.nlocal){lm_restore_station_domain<<<(view.nlocal+127)/128,128,0,s>>>(trial,l.device,view,trial_status.data);lm_share_restored_stations<<<unsigned((v.n+127)/128),128,0,s>>>(trial,l.device,view);lm_actual_locals<<<(view.nlocal+127)/128,128,0,s>>>(v,trial,l.device,view);
+            if(view.nlocal){lm_restore_station_domain<<<(view.nlocal+127)/128,128,0,s>>>(v,trial,l.device,view,trial_status.data);lm_share_restored_stations<<<unsigned((v.n+127)/128),128,0,s>>>(trial,l.device,view);lm_actual_locals<<<(view.nlocal+127)/128,128,0,s>>>(v,trial,l.device,view);
                 lm_evaluate_restored<<<unsigned((v.n+127)/128),128,0,s>>>(trial,l.device,view,trial_output.data,trial_status.data);}
             if(restoration==40)break;
             cuda_check(cudaMemcpyAsync(step.data,applied.data,step.bytes(),cudaMemcpyDeviceToDevice,s));

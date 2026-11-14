@@ -1038,7 +1038,8 @@ class SourceRinkReader:
         if native_geometry is None and self.config.get("native_geometry"):
             from .vision_native import NativeSourceGeometry
             spec = self.config["native_geometry"]
-            native_geometry = NativeSourceGeometry(ROOT / spec["scene"], ROOT / spec["library"])
+            native_geometry = NativeSourceGeometry(ROOT / spec["scene"], ROOT / spec["library"],
+                parameter_state_path=ROOT / spec["parameter_state"] if spec.get("parameter_state") else None)
         self.native_geometry = native_geometry
         self.material_reader = None
         if native_geometry is not None:

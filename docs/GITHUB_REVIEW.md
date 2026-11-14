@@ -5,9 +5,9 @@
 <a id="public-cleanup"></a>
 ## 公开资产与存储边界
 
-公开树保留项目源码、当前场景定义、小型参数、来源索引、必要数值观测和选定的冻结审阅包。名义场景、冰面容差版本与资产库存见[场景索引](../events/ankara_2026/scene/README.md)；求解后的数值状态由对应候选绑定，输入和人工确认见[节目入口](../events/ankara_2026/programmes/okada_mei_sp/README.md#有界结果与人工确认)。
+公开树保留源码、场景定义、小型参数、来源索引、必要数值观测和选定的冻结审阅包。[赛事入口](../events/ankara_2026/README.md)登记场景与两套节目结果。默认分支 `rebuild` 对应当前开发版，`main` 为 2026-10-24 旧版。各版本以对应 Git 提交收录的绑定为准。
 
-比赛视频、截图、叠加画面、完整第三方广告图稿、安装环境和编译库不随公开源码分发。大型运行输入、检查点、日志和诊断产物留在本机 Data；选定离线包的具体范围见下文。环境版本清单不等于附带安装包，公开源码也不保证所有本机实验可仅凭克隆复跑。
+比赛视频、截图、叠加画面、完整第三方广告图稿、安装环境和编译库留在本机 Data。运行输入、检查点、逐轮日志及诊断产物由结果绑定定位。下文的冻结离线包另含指定的工程失败证据。
 
 [独立 PTZ 检验工具](../tools/ptz_verifier/README_zh.md)公开源码、测试、配置示例和历史试跑摘要；原私人交付的比赛配对图、特征缓存、图像报告及本机交接文件不进入公开树。其试跑结果为证据不足，不能作为主相机参数的认证。
 
@@ -19,28 +19,25 @@
 
 完整拟合输出、SMPL-X 模型与完整表面、网络原始输出、原图、叠图和播放器缓存保留在本机 Data。历史绝对路径登记当时的运行身份；重放需要配置 Data 根并取得相符模型和输入。运行日志、调试报告及文档原文按已有运行目录与归档追查。
 
-
-2026-11-06／07 全节目人体开发状态的公开增量包含共同连续控制、条件尺度／深度与关联失败参数、来源绑定和播放器配置；9 镜头、8329 曝光的覆盖不表示世界轨迹或接冰验收通过。完整输入、源图、网络原始读数、拟合数组、缓存和逐轮失败证据留 Data；公开字段和许可范围仍由同一人体参数索引记录。
-
 ## 当前模型与数值来源
 
-当前开发工作区已接通共同 native 几何、时变相机、prepare／review 和连续 GPU LM。当前采用 `camera_solver_refined_1102` 暂定最终状态，覆盖 S01–S09 九镜头、三个物理机位，已执行真实联合拟合并导出完整回放；该状态未达到一阶数值收敛，独立物理标定和完整节目准确性验证仍未完成。精确输入、数值状态、原生库与视频见[当前结果绑定](../events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_solver_refined_1102.json)，人工确认范围见[节目入口](../events/ankara_2026/programmes/okada_mei_sp/README.md#有界结果与人工确认)，能力缺口见 [REBUILD](REBUILD.md)。
+2026-11-13 的[赛事登记](../events/ankara_2026/README.md#暂定最终版本)收录共同冰场 `shared_joint_review_1113`、金书贤 24 镜头 `stability_review_1113` 与冈田芽依 9 镜头 `joint_review_1113`。两套节目各自绑定源 PTS、相机、数值状态与本地回放，独立物理标定和整片视觉验收仍待完成。
+
+[共同冰场与相机复核源码](../events/ankara_2026/tools/joint_review_1113/README.md)和[冈田芽依切镜与首旋源码](../events/ankara_2026/programmes/okada_mei_sp/tools/body_review_1113/README.md)记录该轮的实现与来源。金书贤较早的相机试验可通过[历史归档索引](../events/ankara_2026/programmes/jin_shuxian_sp/camera_trial_archive_1113.json)在 Data 核对，各节目当前控制参数随版本登记提供。
 
 广告的小型相机与控制数组见 [ad_cameras](../events/ankara_2026/programmes/okada_mei_sp/ad_cameras/)。Ad3 的[数值行库](../events/ankara_2026/programmes/okada_mei_sp/ad3_sources/rows.npz)／[对应表](../events/ankara_2026/programmes/okada_mei_sp/ad3_sources/correspondence.json)，以及 Ad7 的[数值行库](../events/ankara_2026/programmes/okada_mei_sp/ad7_sources/rows.npz)／[对应表](../events/ankara_2026/programmes/okada_mei_sp/ad7_sources/correspondence.json)保留源 UV、PTS 与身份，不含广播图像缓冲区。来源候选和参考轮廓不因公开、导入或测试通过而自动获得拟合资格。
 
-数值定义、原像素核对、覆盖完整与定位准确分别判断。完整范围见[节目 scope](../events/ankara_2026/programmes/okada_mei_sp/rebuild_scope.json)；图像与视频核对需要本地对应素材。
+源范围见[冈田芽依范围](../events/ankara_2026/programmes/okada_mei_sp/rebuild_scope.json)与[金书贤范围](../events/ankara_2026/programmes/jin_shuxian_sp/rebuild_scope.json)。原像素与整片贴合按[验证说明](VALIDATION.md)用对应素材核对。
 
 ## 官方视频与源时间
 
-| 用途 | 官方来源 | 时间与身份 |
+| 节目 | 官方单节目来源 | 拟合处理区间（原片首末帧） |
 |---|---|---|
-| 当前处理源 | [ISU Skating：Mei OKADA / Ankara 2026](https://www.youtube.com/watch?v=O6j8L8TmfKo) | 1920×1080，50/1 fps，time_base=1/12800 |
-| 当前重构处理起点 | [同一单节目视频](https://www.youtube.com/watch?v=O6j8L8TmfKo&t=22s) | 00:22.120，PTS 283136；S01 处理至 00:44.960，共 1143 个曝光 |
-| S01 物理镜头与历史取点范围 | [同一单节目视频](https://www.youtube.com/watch?v=O6j8L8TmfKo&t=20s) | 00:20.020–00:44.960，PTS 256256–575488，共 1248 帧 |
-| 九镜头冻结失败快照 | [同一单节目视频](https://www.youtube.com/watch?v=O6j8L8TmfKo&t=20s) | 00:20.020–03:08.680，PTS 256256–2415104，共 8434 帧 |
-| 历史全场源对齐 | [ISU Skating 全场来源](https://www.youtube.com/watch?v=oxXu1avhrvs&t=14916s) | 04:08:36.283333 的旧帧对应单节目 00:20.020，仅作历史对齐 |
+| 冈田芽依短节目 | [ISU Skating：Mei OKADA](https://www.youtube.com/watch?v=O6j8L8TmfKo) · [源选择记录](../events/ankara_2026/programmes/okada_mei_sp/primary_source_selection.json) | 00:22.120–03:08.680，PTS 283136–2415104，8,329 个曝光 |
+| 金书贤短节目 | [ISU Skating：Shuxian JIN](https://www.youtube.com/watch?v=SW1IewLFUyI) · [源选择记录](../events/ankara_2026/programmes/jin_shuxian_sp/primary_source_selection.json) | 00:32.300–03:20.720，PTS 413440–2569216，8,422 个原生帧 |
 
-源哈希、频道身份、表征差异与对应关系见[源选择记录](../events/ankara_2026/programmes/okada_mei_sp/primary_source_selection.json)。网页整数秒链接仅帮助定位，实际重建以本地文件原生 PTS／time_base 为准；不能用平均 FPS 或固定秒差替代已核实的帧对应。同一 URL 的不同下载表征不预设字节相同。
+两个单节目源均为 1920×1080、50 fps，时基为 `1/12800`。全场回放的帧对应、源哈希与下载表征由各节目源选择记录维护。冈田 2026-10-19 冻结失败快照使用历史范围 00:20.020–03:08.680，共 8,434 帧。
+
 
 ## 冻结九镜头失败快照
 
@@ -64,7 +61,7 @@ Python 的 `Review.read(原路径或逻辑路径)` 可读取字节。`resource_m
 
 2026-10-21 的六镜头运行已停止，精确输入和状态见 [status.json](../events/ankara_2026/programmes/okada_mei_sp/fit_joint6/status.json)及 [scope.json](../events/ankara_2026/programmes/okada_mei_sp/fit_joint6/scope.json)。历史 GPU 确实执行，候选未收敛或验收；observed-row 粗初始化没有通过严格滚动快门验收，保存检查点不代表具备严格恢复入口。
 
-撤回的资格数不等于错点率，其余 active 也不表示全部准确。公开树保留代码与状态，大型数值输入、日志、检查点及原片证据在对应 Data 补充包中。它与当前九镜头候选分开解释。
+撤回的资格数不等于错点率，其余 active 也不表示全部准确。公开树保留代码与状态，大型数值输入、日志、检查点及原片证据在对应 Data 补充包中。六镜头试验的覆盖和失败结论仅适用于该次冻结输入。
 
 ## 复现限制
 

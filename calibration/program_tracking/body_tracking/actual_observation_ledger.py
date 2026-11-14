@@ -40,18 +40,17 @@ def source_ledger_export(observations, packet_pts, objective_frames, *, ledger_s
                 source_observation_use_semantics=np.array('actual loaded ledger admission; source_observation_objective_use additionally restricts the objective source frames'))
 
 
-def update_actual_observation_ledger(packet, body):
-    """Update an export from body.obs and the actual cached objective indices.
+def update_source_observation_export(packet, observations, ledger_path, objective_frames,
+                                     *, objective_indices=None):
+    """Bind an export to the loaded ledger and the explicitly consumed rows."""
+    from .fullbody_fit import body_joint_assignment
 
-    The file SHA names original observations.npz. The loaded-array SHA additionally
-    records later in-memory visibility, association, UV and sigma changes.
-    """
     original = packet.get('source_observation_use')
-    fields = source_ledger_export(body.obs, packet['pts'], body.frames,
-        ledger_sha256=hashlib.sha256(Path(body.ledger_path).read_bytes()).hexdigest())
-    if hasattr(body, 'of') and hasattr(body, 'oj'):
-        frames = np.asarray(body.frames)
-        of, oj = np.asarray(body.of), np.asarray(body.oj)
+    fields = source_ledger_export(observations, packet['pts'], objective_frames,
+        ledger_sha256=hashlib.sha256(Path(ledger_path).read_bytes()).hexdigest())
+    if objective_indices is not None:
+        frames = np.asarray(objective_frames)
+        of, oj = map(np.asarray, objective_indices)
         if (of.ndim != 1 or oj.shape != of.shape or of.dtype.kind not in 'iu'
                 or oj.dtype.kind not in 'iu' or np.any(of < 0) or np.any(of >= len(frames))
                 or np.any(oj < 0) or np.any(oj >= 17)):
@@ -63,9 +62,14 @@ def update_actual_observation_ledger(packet, body):
         fields['source_observation_objective_use'] = objective
     if original is not None and 'source_observation_initial_use' not in packet:
         packet['source_observation_initial_use'] = np.asarray(original).copy()
+    fields['source_observation_admitted'] = fields['source_observation_use'].copy()
+    fields['source_body_model_joint_ids'] = body_joint_assignment(observations).copy()
+    if 'body_joint_assignment_provenance_json' in observations:
+        fields['body_joint_assignment_provenance_json'] = observations['body_joint_assignment_provenance_json'].copy()
     arrays = hashlib.sha256()
-    for key in ('pts', 'use', 'uv', 'sigma_px'):
-        value = np.ascontiguousarray(body.obs[key])
+    for key in ('pts', 'use', 'uv', 'sigma_px', 'model_joint_ids'):
+        value = np.ascontiguousarray(fields['source_body_model_joint_ids']
+            if key == 'model_joint_ids' else observations[key])
         arrays.update(key.encode('ascii'))
         arrays.update(value.dtype.str.encode('ascii'))
         arrays.update(str(value.shape).encode('ascii'))
@@ -73,6 +77,13 @@ def update_actual_observation_ledger(packet, body):
     fields['source_observation_loaded_arrays_sha256'] = np.array(arrays.hexdigest())
     packet.update(fields)
     return packet
+
+
+def update_actual_observation_ledger(packet, body):
+    """Export the body problem's actual objective scatter and admission."""
+    indices = (body.of, body.oj) if hasattr(body, 'of') and hasattr(body, 'oj') else None
+    return update_source_observation_export(packet, body.obs, body.ledger_path, body.frames,
+                                            objective_indices=indices)
 
 
 def admitted_support_image_mask(packet_pts, factor):

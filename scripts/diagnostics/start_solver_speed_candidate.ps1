@@ -20,7 +20,8 @@ $taskOutput = [IO.Path]::GetFullPath($Output, $taskProjectRoot)
 $taskBoot = $taskOutput + '.bootstrap'
 if (-not $taskOutput.StartsWith($taskResourceRoot.TrimEnd('\','/') + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) { throw 'New output must remain inside the configured Data resource root.' }
 if ((Test-Path -LiteralPath $taskOutput) -or (Test-Path -LiteralPath $taskBoot)) { throw 'Use a new output and bootstrap directory; existing evidence is preserved.' }
-$taskPython = Join-Path $taskProjectRoot '.venv/Scripts/python.exe'
+. (Join-Path $taskProjectRoot 'launchers/LOCAL_PYTHON.ps1')
+$taskPython = Get-RinkSpacePythonPath $taskProjectRoot
 $taskPowerShell = (Get-Process -Id $PID).Path
 $taskMonitorScript = Join-Path $taskProjectRoot 'scripts/diagnostics/monitor_solver_cpu.ps1'
 foreach ($taskRequired in @($taskPython, $taskMonitorScript, $taskConfig.source_options.'--camera-seed', $taskConfig.source_options.'--truth-restoration-state')) {

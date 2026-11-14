@@ -53,3 +53,30 @@ def test_red_ad_without_long_yellow_body_stays_unresolved():
     result=read_board_contacts(image,[[96,280],[960,280],[1800,280]],
         np.zeros(image.shape[:2],bool),binding=binding,authority=authority)
     assert not result['old_query_supported'].any()
+
+
+def test_explicit_scope_queries_do_not_replay_old_columns():
+    image,binding,authority=source()
+    requested=np.array([[981.,305.],[119.,305.],[555.,305.]])
+    result=read_board_contacts(image,[[96,305],[1800,305]],
+        np.zeros(image.shape[:2],bool),binding=binding,authority=authority,
+        spacing=48.,source_query_points_uv=requested)
+    assert np.array_equal(result['queries'],requested[[1,2,0]])
+    assert result['explicit_source_query_points_only'] is True
+    assert result['original_queries_reread'] is False
+    assert len(result['old_query_indices'])==len(result['old_query_fresh_uv'])==0
+    assert result['original_RGB_profiles']['sampled_native_uv'].shape[0]==3
+    assert result['source_material_accepted'].all()
+    assert np.all((result['candidate_source_uv'][:,1]>315)&(result['candidate_source_uv'][:,1]<316))
+    assert result['dense_queries_are_fit_observations'] is False
+
+
+def test_explicit_scope_queries_keep_actual_material_support_mask_gate():
+    image,binding,authority=source();mask=np.zeros(image.shape[:2],bool)
+    mask[302:308,950:970]=True
+    result=read_board_contacts(image,[[96,305],[1800,305]],mask,
+        binding=binding,authority=authority,spacing=48.,
+        source_query_points_uv=np.array([[960.,305.],[1200.,305.]]))
+    assert result['source_mask_conflict'].tolist()==[True,False]
+    assert result['source_material_accepted'].tolist()==[False,True]
+    assert result['original_queries_reread'] is False

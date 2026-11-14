@@ -48,7 +48,14 @@ GVHMR 的 DPVO 子模块在历史盘点中为空，[固定安装说明](https://
 
 ExMR camera-only 比较固定[官方 ExMR](https://github.com/twehrbein/ExMR)提交 `eac72e47339b404c0443f5fb323412e2ce432410`。局部补丁保留[完整上游许可及署名](../environments/third_party_licenses/EXMR_LICENSE.txt)，包括 Leibniz University Hannover 与 GVHMR 原作者通知，衍生修改沿用原教育／研究／非营利和非商业条件。SAM 3D Body／DINOv3 与 HaMeR 分别按各自许可处理；固定资产 revision、SHA 和许可来源见[结果依赖索引](../events/ankara_2026/programmes/okada_mei_sp/spin_models_1104_audit.json)。模型字节、完整第三方实现和运行环境留 Data，仓库保存接线、依赖和局部补丁。当前 HaMeR 只抽取原网络 token，没有加载或分发 MANO 手模型。
 
-HTD 审核调用[作者 HTD-Refine](https://github.com/ant-research/HTD-Refine/tree/2fcd6ddef3c4eb75a636062245f80a0136c09b7e)及[作者 PVA-Net 权重](https://drive.google.com/file/d/1dffyj3cdH1Myw2-tzgKTXryaO72Gbys1/view)，固定代码提交与权重 SHA 见[节目审核绑定](../events/ankara_2026/programmes/okada_mei_sp/skate_video_1112/audit_followup_1113.json)。仓库保存 RinkSpace 输入适配和数值对照源码。上游代码、模型和本地原始输入继续放在 Data，保留原许可和署名。
+冈田芽依的人体比较及相关候选使用了 Meta 的 SAM 3D Body／DINOv3。研究结果按 SAM License 第 1(b)(ii) 项标明对 SAM Materials 的使用。 [Meta 模型许可](https://huggingface.co/facebook/sam-3d-body-dinov3/blob/main/LICENSE)
+
+<a id="htd-refine"></a>
+### HTD-Refine 与 PVA-Net
+
+HTD 审核针对提交 `2fcd6ddef3c4eb75a636062245f80a0136c09b7e`。随该修订保存的 README 将上游代码标为 AGPL-3.0-only，署名为 Dingkun Wei、Zehong Shen、Yan Xia、Georgios Pavlakos、Yujun Shen 和 Xiaowei Zhou。 [固定修订说明](https://github.com/ant-research/HTD-Refine/blob/2fcd6ddef3c4eb75a636062245f80a0136c09b7e/README.md) · [原许可证](https://github.com/ant-research/HTD-Refine/blob/2fcd6ddef3c4eb75a636062245f80a0136c09b7e/LICENSE)
+
+PVA-Net 权重取自上游说明列出的下载目录，权重 SHA 见[节目审核绑定](../events/ankara_2026/programmes/okada_mei_sp/skate_video_1112/audit_followup_1113.json)。该说明把 checkpoint 与代码分开，现有登记尚缺该权重的具体再分发授权。仓库中的输入适配器在本机导入上游 PVA-Net，并保存项目数值对照源码；上游实现、权重、原始输入与原始输出均在 Data。分发组合应用时须按实际组合核对 AGPL 与各依赖的适用条款。
 
 ## 权重与小型数据
 

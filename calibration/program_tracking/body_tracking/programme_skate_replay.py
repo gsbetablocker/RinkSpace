@@ -156,6 +156,104 @@ def refresh_surface(problem,parent_scan,parent_x,x,doc,emit,*,exact_saved_pose=F
                        sampled_not_collision_free_certificate=True)
 
 
+class ScopedSurfaceGuard:
+    """Check actual changed surface samples and both candidates on common witnesses."""
+
+    def __init__(self, problem, primary, document, parent_x, output, parent_costs):
+        self.problem = problem
+        self.document = document
+        self.parent_x = parent_x.copy()
+        self.output = output
+        self.reference = problem.reference
+        self.surface = next(f for f in primary.factors if isinstance(f, ProgrammeSurfaceFactor))
+        self.scan = load(document['programme_structure']['surface_witnesses'])
+        cfg = load_json(document['programme_structure']['policy'])
+        self.allowance = float(cfg['geometry']['contact_allowance_m'])
+        self.specification = document['scoped_candidate_import']
+        self.parent_cost, self.parent_surface_cost = parent_costs
+        self.serial = 0
+        self.last_pass = None
+        self.passes = {}
+
+    def emit(self, event, **values):
+        self.problem.log.write(json.dumps(dict(event=event, **values)) + '\n')
+
+    def __call__(self, x, value):
+        if np.array_equal(x, self.parent_x):
+            return False
+        if self.last_pass is not None and np.array_equal(x,self.last_pass):
+            return True
+        self.serial += 1
+        try:
+            new, coverage = refresh_surface(self.problem,self.scan,self.parent_x,x,self.document,
+                                             self.emit,exact_saved_pose=True)
+        except ValueError as error:
+            if 'unchanged sample' not in str(error):
+                raise
+            self.emit('surface_cache_probe_recheck',reason=str(error))
+            new, coverage = refresh_surface(self.problem,self.scan,self.parent_x,x,self.document,
+                                             self.emit,exact_saved_pose=True,rescan_all=True)
+        geometry = self.surface.geometry
+        common = common_witnesses([self.scan,new], geometry)
+        factor = ProgrammeSurfaceFactor(self.problem,self.document,common,scale_m=self.surface.scale_m)
+        before = factor.evaluate(self.parent_x[17:])['residual']
+        old_gap = factor.last_gap.copy()
+        after = factor.evaluate(x[17:])['residual']
+        new_gap = factor.last_gap
+        weight = float(self.problem.objective_block_weights.get('surface_intersection',1.))
+        # Replace the old surface contribution on both sides of the same
+        # revised objective. The resume objective keeps its original rows.
+        cost0 = self.parent_cost-self.parent_surface_cost+float(before@before/2)*weight
+        residual = value['residual']
+        cost1 = float(residual@residual/2)-value['weighted_parts']['surface_intersection']+float(after@after/2)*weight
+        parts = geometry.parts
+        a,b = parts[common['face_a']], parts[common['face_b']]
+        groups = np.c_[np.minimum(a,b),np.maximum(a,b)]
+        from .programme_repair_factors import sampled_windows
+        bad = []
+        for window in self.specification['focus_pts']:
+            active = sampled_windows(self.reference,self.problem.body.state,factor.times,[window])
+            use = active[common['sample']]
+            for left,right in np.unique(groups[use],axis=0):
+                rows = use & (groups[:,0]==left) & (groups[:,1]==right)
+                first, last = old_gap[rows].min(), new_gap[rows].min()
+                if last < min(first,0.)-self.allowance:
+                    indices=np.flatnonzero(rows)
+                    sample=int(common['sample'][indices[np.argmin(new_gap[rows])]])
+                    bad.append(dict(window_pts=window, pair=[str(geometry.part_names[left]),
+                        str(geometry.part_names[right])], before_m=float(first), after_m=float(last),
+                        source_seconds=float(new['source_seconds'][sample])))
+        rejected = bool(bad) or cost1 >= cost0
+        name = f'surface_trial_{self.serial:03}'
+        receipt=dict(rejected=rejected, common_witnesses=len(before), same_weighted_cost_before=cost0,
+            same_weighted_cost_after=cost1, gap_allowance_m=self.allowance, regressions=bad,
+            total_triangle_pairs=int(new['crossing_counts'].sum()), **coverage)
+        if not rejected:
+            archive=self.output/(name+'.npz')
+            save(archive, **new)
+            receipt['surface_sha256'] = digest(archive)
+            receipt['parameter_vector_signature'] = signature(x)
+            self.last_pass = x.copy()
+            self.passes[receipt['parameter_vector_signature']] = (archive,receipt)
+        write(self.output/(name+'.json'),receipt)
+        self.emit('scoped_surface_trial',receipt=name+'.json',**receipt)
+        return not rejected
+
+    def finalize(self, x, value, *, reused=None):
+        """Bind the retained geometry to the successful surface verification."""
+        identity=signature(x)
+        if identity not in self.passes:
+            if reused is not None and reused['parameter_vector_signature']==identity:
+                write(self.output/'retained_surface.json',reused)
+                return
+            if np.array_equal(x,self.parent_x):
+                return
+            if not self(x,value):
+                raise ValueError('Retained candidate failed its refreshed surface validation')
+        archive, receipt = self.passes[identity]
+        write(self.output/'retained_surface.json',dict(**receipt,surface_path=str(archive.resolve())))
+
+
 def surface_events(scan, events, clock):
     parts=scan['parts'];ids=scan['pair_counts']
     out={}

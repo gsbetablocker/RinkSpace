@@ -10,7 +10,7 @@
 | 用户明确的项目长期协作、存储与证据边界 | [AGENTS.md](AGENTS.md) |
 | 原片、机位接入、场地拟合范围、广告几何 | [BUILD_SPEC](docs/rink_model/BUILD_SPEC.md) |
 | 赛事实体、取点定义、安装事实、参数 | 所属赛事；[安卡拉场景](events/ankara_2026/scene/README.md) |
-| 单节目源时钟、镜头范围、输入与结果记录 | 所属节目；[冈田芽衣短节目](events/ankara_2026/programmes/okada_mei_sp/README.md) |
+| 单节目源时钟、镜头范围、输入与结果记录 | 所属节目，入口见[安卡拉赛事](events/ankara_2026/README.md) |
 | 模块职责／数值算法／精确接口／已实现能力 | [ARCHITECTURE](docs/ARCHITECTURE.md)／[SOLVER](docs/SOLVER.md)／[INTERFACES](docs/INTERFACES.md)／[REBUILD](docs/REBUILD.md) |
 | 启动、重启与续算 | [运行要求](docs/SOLVER.md#run-contract) |
 | 完整镜头、独立证据、尺度与身体／接触验收 | [VALIDATION](docs/VALIDATION.md) |
@@ -27,7 +27,7 @@
 | [scripts/build_core.py](scripts/build_core.py)、[构建说明](native/README.md#构建与检查) | 原生 CPU／CUDA 构建；`--check-toolchain` 先检查原生子进程访问及现有工具，记录实际工具路径与版本 |
 | [INSTALL_LOCAL.cmd](launchers/INSTALL_LOCAL.cmd)、[START_LOCAL.cmd](launchers/START_LOCAL.cmd) | 基础安装与本地服务；安装器选择 dev/acquisition，不含 advanced |
 | [START_POINT_EDITOR.cmd](launchers/START_POINT_EDITOR.cmd)、[参数](launchers/START_POINT_EDITOR.ps1) | 指定 Dataset、Media、SourceMedia、Model、Port，编辑有源身份的观测 |
-| [refresh_project_entry.py](scripts/refresh_project_entry.py) | 刷新 Data 中的结果面板，保留 CURRENT_TASK 与冻结绑定 |
+| [refresh_project_entry.py](scripts/refresh_project_entry.py) | 由赛事和节目版本登记生成本机结果面板 |
 | [START_FAST_SOLVER.ps1](launchers/START_FAST_SOLVER.ps1)、[solver_runtime](calibration/solver_runtime/README.md)、[rinkfit](calibration/rinkfit/README.md) | 历史后端／样本入口；只能按相符的输入、完整状态和 profile 使用，不代表新引擎已支持 solve/resume |
 
 共享映射为 [storage.defaults.json](configs/storage.defaults.json)。新机器可复制 [storage.example.json](configs/storage.example.json) 为受忽略的 `configs/storage.json`，填入绝对 Data 根，或设置 `RINKSPACE_DATA_ROOT`。显式 `AssetStore(root, data_root=...)` 优先于环境变量和本机文件；未配置 Data 时，通用工作台使用受忽略的 outputs，pytest 缓存使用系统临时目录。
@@ -36,11 +36,13 @@ GPU Python 环境位于 Data 的 `runtime_tools/vision_cuda`、`runtime_tools/bo
 
 原生库、cuDSS 和历史 Ceres 运行副本分别位于 Data 的 `runtime_tools/native_core`、`runtime_tools/cudss` 和 `runtime_tools/ceres`。旧地址在共享映射中保留；源码、构建身份、补丁与许可仍在 OneDrive。历史 source_datasets 审阅页面按 `AssetStore.review_page()` 定位到 Data/results，旧页面精确路径也可通过同一映射查询。
 
-source-edge 的运行库与链接中间文件位于 `Data/runtime_tools/program_tracking_native`，历史路径由共享映射解析；构建脚本通过各自 `RS_BIN` 指定导入库位置。基础 `.venv` 由本机安装入口管理并受 Git 忽略，公开树保存依赖定义。
+source-edge 的运行库与链接中间文件位于 `Data/runtime_tools/program_tracking_native`，历史路径由共享映射解析。构建脚本通过各自 `RS_BIN` 指定导入库位置。配置 Data 后，基础 Python 位于 `Data/runtime_tools/local_python`，安装与启动脚本使用同一存储配置。本机旧 `.venv\Scripts\python.exe` 和激活命令仍可调用同一环境。未配置 Data 的工作区可在项目内安装 `.venv`。
 
 历史文件迁移由 Data 中 `maintenance/publication_20261103/native_artifact_moves.json` 和 `maintenance/publication_20261104/onedrive_archive_moves.json` 定位。人体复核源码与原件身份见[来源索引](events/ankara_2026/programmes/okada_mei_sp/body_verification_sources_1103.json)；其中 `source_helpers/` 的历史脚本带有固定路径和顶层写入操作，按索引说明显式运行。
 
-`AssetStore.project_entry()` 定位到 `Data/workbench/START_HERE.html`；Web `/` 在该文件存在时显示面板，否则显示通用工作台。审阅页经 source_datasets → results 定位 Data 产物。旧根页面和历史快捷方式仅本机保留；刷新器可用旧页面首次初始化，无冻结绑定时无需生成面板。
+金书贤节目相机试验的旧路径、SHA-256 和 Data 地址见[相机试验归档](events/ankara_2026/programmes/jin_shuxian_sp/camera_trial_archive_1113.json)。历史单镜头快捷方式原文保存在 Data 的 `maintenance/launchers_20261105`，实际操作使用通用点位编辑器。
+
+`AssetStore.project_entry()` 定位到 `Data/workbench/START_HERE.html`。本机 Web `/` 在面板存在时显示版本导航，否则显示通用工作台。刷新器按节目登记生成面板。历史页面原文保存在 Data 的既有文档归档，片段取点页从面板的历史审阅区或对应数据集入口读取。
 
 场景历史资产与导入／安装中间文件的旧路径、SHA、字节数和 Data 地址见[归档映射](events/ankara_2026/scene/archive.json)。`AssetStore(root).resolve(old_path, must_exist=True)` 查询原件；原件内部相对引用仍以原项目目录为基准，经同一 AssetStore 解析。共享 `legacy_paths` 与本机设置按键合并，本机同名项优先。当前场景求值、prepare/review 和公开测试不要求这些历史原件存在。
 

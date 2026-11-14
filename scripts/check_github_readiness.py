@@ -38,6 +38,11 @@ LOCAL_ONLY = {
     "events/ankara_2026/programmes/okada_mei_sp/audit_1017.html",
     "events/ankara_2026/programmes/okada_mei_sp/fit_joint9/recovery_1019.html",
     "events/ankara_2026/programmes/okada_mei_sp/fit_joint9/review.html",
+    "events/ankara_2026/programmes/jin_shuxian_sp/camera_assignments_user_confirmed_1105.json",
+    "events/ankara_2026/programmes/jin_shuxian_sp/working_fit_1103.json",
+    "events/ankara_2026/programmes/okada_mei_sp/resume_shot1.json",
+    "events/ankara_2026/programmes/okada_mei_sp/review_20261011_pause_handoff.json",
+    "events/ankara_2026/programmes/okada_mei_sp/programme_trajectory_1106_player.md",
     "events/ankara_2026/programmes/okada_mei_sp/fit_v11/audit_1018.html",
     "events/ankara_2026/programmes/okada_mei_sp/fit_v11/status.html",
 }

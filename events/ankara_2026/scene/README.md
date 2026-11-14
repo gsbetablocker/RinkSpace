@@ -1,6 +1,6 @@
 # 当前共同场景与广告资产
 
-本页保存安卡拉赛事的模型资产和取点定义；通用来源、拟合范围与广告几何见[建模与接入](../../../docs/rink_model/BUILD_SPEC.md)，整镜头判定见[验证说明](../../../docs/VALIDATION.md)。求解后的数值状态与基础资产分别绑定，当前实验见[节目入口](../programmes/okada_mei_sp/README.md)。
+本页保存安卡拉赛事的模型资产和取点定义；通用来源、拟合范围与广告几何见[建模与接入](../../../docs/rink_model/BUILD_SPEC.md)，整镜头判定见[验证说明](../../../docs/VALIDATION.md)。求解后的数值状态与基础资产分别绑定，两套完整拟合见[赛事版本登记](../README.md#暂定最终版本)。
 
 <a id="ice-observations"></a>
 ## 当前冰面取点定义
@@ -13,7 +13,9 @@ F1–F4/R1–R4 八组靶圈的 center、inner、middle、outer 四层圆，以�
 
 ## 当前资产与审核状态
 
-名义结构入口为 [field/model.json](field/model.json)；当前暂定最终状态使用 [field/ad4_physical_supported.json](field/ad4_physical_supported.json)，实际广告版本由所选场景的 advertisement_assets 及 SHA 确定。名义文件保存 `unfitted_structure_candidate` 基础结构与初值；已求解参数位于运行的 ParameterState／数值快照，不能把基础文件当成最新拟合状态，也不能把它的状态扩展为“从未进行过真实拟合”。冰面／围挡保留 M1–M5 已确认结构关系，尺寸、相机物理和已验证米制仍需相应证据。
+两套节目采用同一份[冰场暂定最终版几何](provisional_final_1113.json)。该记录绑定[结构文件](field/jin_s14_1111.json)和[共同数值快照](field/shared_joint_review_1113.npz)，编译后有 68 条冰面、2 条围挡和 852 条广告路径。26 个广告均有定位，包括 Ad15、Ad16。
+
+[名义结构](field/model.json)保存 `unfitted_structure_candidate` 基础结构和初值。冰面与围挡的人工确认见赛事约束，尺寸、相机物理和米制验证见各自的证据记录。
 
 下表列出名义模型的基础资产；当前运行资产以所选场景的引用为准。名义模型中，13 套共享模板对应 26 个广告身份，每对共享模板和尺寸，安装独立；Ad15、Ad16 未定位，其余实例有源参考。基础模型包含 68 条冰面、2 条围挡、558 条已定位广告路径，共 628 条；固定交点等 Feature 按实际输入另行编译。
 
@@ -39,10 +41,11 @@ F1–F4/R1–R4 八组靶圈的 center、inner、middle、outer 四层圆，以�
 |---|---|---|
 | 严格名义结构 | [field/model.json](field/model.json) | 选项合计 63、layout39；共享关系由构造严格满足 |
 | 冰面容差初始化结构 | [field/ice_tolerance_current.json](field/ice_tolerance_current.json) | 选项合计 127、layout146；在名义结构后增加 107 个相对偏差 |
-| 当前九镜头运行场景 | [field/ad4_physical_supported.json](field/ad4_physical_supported.json) | 选项合计 127、layout146；具体资产及数值状态由当前结果绑定确定 |
+| 冈田芽依 2026-11-02 拟合场景 | [field/ad4_physical_supported.json](field/ad4_physical_supported.json) | 选项合计 127、layout146；具体资产及数值见[该次拟合绑定](../programmes/okada_mei_sp/fit_v11/camera_solver_refined_1102.json) |
+| 金书贤早期工作场景 | [field/ad4_lane_to_left_goal.json](field/ad4_lane_to_left_goal.json) | 八条 Lane 长边分别沿各自直线延长到左底线；实际数值见[节目历史索引](../programmes/jin_shuxian_sp/README.md#历史索引) |
 | Lane 横段迁移快照 | [field/lane_transverse_current.json](field/lane_transverse_current.json) | 选项合计 63、layout39；保留容差版本之前的结构与初值 |
 
-容差版本的尺寸、位置与方向按 `ice_tolerance` 声明相对共同名义量允许 ±1%。长度以对应名义尺寸归一化，位置采用局部参照长度，方向采用横向漂移／前进长度；迭代不会重新归零共同名义量。图元类型、共享接点、同一靶圈内部同心关系、有限支持与严格顺序保留；其他共线、平行、等距与对称关系按声明放宽。该版本已用于六镜头真实拟合及当前九镜头候选，数值状态和验收范围见[节目入口](../programmes/okada_mei_sp/README.md)。
+容差版本的尺寸、位置与方向按 `ice_tolerance` 声明相对共同名义量允许 ±1%。长度以对应名义尺寸归一化，位置采用局部参照长度，方向采用横向漂移／前进长度；迭代不会重新归零共同名义量。图元类型、共享接点、同一靶圈内部同心关系、有限支持与严格顺序保留；其他共线、平行、等距与对称关系按声明放宽。该容差定义已用于历史六镜头和 2026-11-02 九镜头拟合，数值状态和验收范围见[节目入口](../programmes/okada_mei_sp/README.md)。
 
 Lane1–Lane4 各有一条连接本 Lane 上下长边的短线，四线共线且平行冰场短边，人工确认见 [lane_transverse_20261029.json](../model_constraints/lane_transverse_20261029.json)。严格名义结构通过选项 32 共享 `shared_layout[35]` 的一个 X 坐标，各线端点 Y 由既有 Lane 位置与宽度生成；容差版本的偏差另按上表声明处理。
 

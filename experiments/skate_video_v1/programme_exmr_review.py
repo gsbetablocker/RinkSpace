@@ -13,6 +13,7 @@ from scipy.spatial import cKDTree
 from .body_skate_fit import Assembly, Problem, projection
 from .deliver_body_skate_fit import archived_edge_check, open_collar_clearance, render_video, saved_ref
 from .inputs import PROJECT, atomic_json, atomic_npz, digest, distribute, emit, read
+from .outline_metric import outline_distances
 from .programme_exmr_fit import CASES, statistics
 from calibration.program_tracking.body_tracking.absolute_motion_curve import _log
 from calibration.program_tracking.body_tracking.absolute_motion_state import absolute_reference, curve_from_packet
@@ -58,14 +59,13 @@ def outline(problem, ref, use):
             w = assembly.points(state, foot, transforms=(state["R"],state["O"]))
             uv = projection(problem.camera, w, group)["uv"]
             for i, pixels in zip(group,uv,strict=True):
-                try:
-                    boundary = np.concatenate(assembly.raster(pixels))
-                except ValueError:
+                legacy, _ = outline_distances(assembly, pixels, problem.region[i,foot])
+                if not np.isfinite(legacy) and np.isfinite(pixels).all():
                     # Record a finite distance to the projected model even for a grossly misplaced trial.
-                    boundary = pixels
-                source = distribute(problem.region[i,foot],96,closed=True)
-                result[i,foot] = .5*(cKDTree(boundary).query(source)[0].mean()
-                                    +cKDTree(source).query(boundary)[0].mean())
+                    source = distribute(problem.region[i,foot],96,closed=True)
+                    legacy = .5*(cKDTree(pixels).query(source)[0].mean()
+                                 +cKDTree(source).query(pixels)[0].mean())
+                result[i,foot] = legacy
     return result
 
 

@@ -10,6 +10,69 @@
 static void require(bool yes,const char* why){if(!yes)throw std::runtime_error(why);}
 static void close(double x,double y,double tol,const char* why){require(std::abs(x-y)<tol,why);}
 
+static void common_radius_optical_certificate(){
+    using namespace rinkspace;
+    // A real rejected candidate: the previous radial minimum occurred at
+    // zero, while its tangential worst case occurred at the outer radius.
+    const double k1=3.623119412865475,k2=-10.141940536285457;
+    const double p1=.4402630092474693,p2=.15928386519829768;
+    const Vec3 X{-.40071000818988517,-.049142221322012826,1.};
+    const double radius=std::hypot(X.x,X.y),p=std::hypot(p1,p2),r2=radius*radius;
+    const double old=std::min(quadratic_min(k1,k2,r2),quadratic_min(3*k1,5*k2,r2))-6*p*radius;
+    require(old<-.13,"reproduce the overly conservative optical certificate");
+    const double lower=brown_disk_lower(k1,k2,p,radius);
+    require(lower>.18,"common-radius certificate proves the complete disk positive");
+    // Independent 2x2 Brown Jacobians over radii and azimuths. These samples
+    // check the analytic lower bound; they never authorize projection.
+    const double cases[][4]={{k1,k2,p,radius},{-2.,4.,.1,.8},{4.,-2.,.2,1.},
+        {-.5,-.8,.3,.7},{0.,0.,.2,.4},{.1,.2,0.,1.},{-4.,1.,.1,1.}};
+    for(const auto& c:cases){
+        const double bound=brown_disk_lower(c[0],c[1],c[2],c[3]);
+        for(int ir=0;ir<=128;++ir)for(int ia=0;ia<96;++ia){
+            const double r=c[3]*ir/128,angle=6.2831853071795864769*ia/96;
+            const double x=r*std::cos(angle),y=r*std::sin(angle),q=r*r;
+            const double L=1+c[0]*q+c[1]*q*q,a=c[0]+2*c[1]*q;
+            // Rotate tangential p to camera x; the complete disk is invariant.
+            const double jxx=L+2*x*x*a+6*c[2]*x,jyy=L+2*y*y*a+2*c[2]*x;
+            const double jxy=2*x*y*a+2*c[2]*y;
+            const double eigen=(jxx+jyy-std::hypot(jxx-jyy,2*jxy))/2;
+            require(bound<=eigen+2e-12,"disk certificate never exceeds a true Brown eigenvalue");
+        }
+    }
+    MotionRig rig{};rig.R0={{1,0,0,0,1,0,0,0,1}};rig.pan={0,0,1};rig.tilt={1,0,0};
+    rig.fref=1000.;rig.radius=2.;rig.cx=960.;rig.cy=539.5;
+    rig.k10=k1;rig.k20=k2;rig.p1=p1;rig.p2=p2;rig.tau=.0313;
+    double controls[24];for(int i=0;i<8;++i){controls[3*i]=controls[3*i+1]=0.;controls[3*i+2]=std::log(1000.);}
+    MotionSpline spline{controls,8,-2.,1.};MotionInstant instant{};MotionProjection rolling{};Vec2 uv{};
+    require(motion_instant(rig,spline,X,0.,instant,uv)==Status::ok,"valid instantaneous source ray retained");
+    require(project_motion(rig,spline,1080,X,0.,rolling)==Status::ok,"same full rolling-row equation retained");
+    close(uv.x,rolling.uv.x,1e-8,"static rolling projection u agrees");
+    close(uv.y,rolling.uv.y,1e-8,"static rolling projection v agrees");
+    rig.k10-=4.;
+    require(motion_instant(rig,spline,X,0.,instant,uv)==static_cast<Status>(8),"actual optical fold stays rejected");
+    rig.k10=k1;rig.radius=radius*.9;
+    require(motion_instant(rig,spline,X,0.,instant,uv)==static_cast<Status>(8),"declared optical radius stays enforced");
+}
+
+static void cancelled_projected_row_rate_certificate(){
+    using namespace rinkspace;
+    constexpr double focal=10000.,rate=20.,tau=.032,y=.2,r2=.2;
+    MotionRig rig{};rig.R0={{1,0,0,0,1,0,0,0,1}};rig.pan={0,0,1};rig.tilt={1,0,0};
+    rig.fref=focal;rig.radius=2.;rig.cx=960.;rig.cy=539.5-focal*y;rig.k11=-1/r2;rig.tau=tau;
+    double controls[24];constexpr double first=-.08,dt=.02;
+    for(int i=0;i<8;++i){controls[3*i]=controls[3*i+1]=0.;controls[3*i+2]=std::log(focal)+rate*(first+i*dt);}
+    MotionSpline spline{controls,8,first,dt};const Vec3 X{.4,y,1.};
+    // Independently, v(t)=cy+focal*y*exp(rate*t)*(1-rate*t).
+    // Its derivative is small although the two zoom/lens terms are large.
+    double maximum=0.;for(int i=0;i<=1024;++i){const double t=-tau/2+tau*i/1024;
+        maximum=std::max(maximum,std::abs(-focal*y*rate*rate*t*std::exp(rate*t)*tau/1079));}
+    require(maximum<.524,"independent complete-exposure row contraction");
+    MotionProjection projected{};
+    require(project_motion(rig,spline,1080,X,0.,projected)==Status::ok,"signed product certificate retains unique rolling root");
+    close(projected.uv.y,539.5,1e-7,"independent analytic rolling root");
+    require(projected.contraction>=maximum&&projected.contraction<1.,"certificate covers all exposure derivatives");
+}
+
 // A large lens basis is not a large actual lens coefficient. This deliberately
 // exercises the same cancellation that an absolute-basis certificate misses,
 // while an independent pinhole/rotation oracle has an ordinary unique RS root.
@@ -116,6 +179,8 @@ static void cancelled_zoom_rs_certificate(){
 }
 
 int main(){try{
+    common_radius_optical_certificate();
+    cancelled_projected_row_rate_certificate();
     cancelled_zoom_rs_certificate();
     {
         rinkspace::MotionRig rig{};rig.R0={{1,0,0,0,1,0,0,0,1}};rig.pan={0,0,1};rig.tilt={1,0,0};rig.pivot={0,0,-3};

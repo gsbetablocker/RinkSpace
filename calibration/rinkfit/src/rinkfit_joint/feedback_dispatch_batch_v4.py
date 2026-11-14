@@ -6,7 +6,6 @@ share one verified source dependency batch before any new RGB read.
 The original reader/dispatcher modules remain immutable.
 """
 from pathlib import Path
-import os
 import subprocess
 import sys
 import json
@@ -14,7 +13,7 @@ from .io_utils import read_json, write_json
 from . import feedback_task_codec_v1 as task_codec
 
 
-from .feedback_dispatch import source_reader_python
+from .feedback_dispatch import source_reader_environment, source_reader_python
 
 
 from .feedback_dispatch_batch_v1 import prepare_reuse_decisions
@@ -37,8 +36,7 @@ def dispatch_checkpoint_reviews(task_documents, review_run, output, *, device='c
         job=output.parent/(output.name+'.job.json')
         write_json(job,dict(task_documents=list(map(str,task_documents)),review_run=str(review_run),
                            output=str(output),device=device,packet_path=None if packet_path is None else str(packet_path)))
-        env=os.environ.copy();env['PYTHONPATH']=os.pathsep.join([str(project),str(project/'src'),
-            str(project/'calibration/rinkfit/src'),str(project/'.venv/Lib/site-packages'),env.get('PYTHONPATH','')])
+        env=source_reader_environment(project)
         worker=source_reader_python(interpreter)
         # Preflight once per worker, avoiding one repeated dependency failure per frame.
         probe=subprocess.run([str(worker),'-c','import torch,cv2,av,scipy; print(torch.__version__)'],env=env,capture_output=True,text=True)

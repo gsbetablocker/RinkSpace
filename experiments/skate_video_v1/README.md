@@ -1,4 +1,4 @@
-# 冈田芽衣全节目鞋刀复核
+# 冈田芽依全节目鞋刀复核
 
 [节目绑定](../../events/ankara_2026/programmes/okada_mei_sp/skate_video_1112/record.json)对应原片 22.120–188.680 秒的九个镜头、8329 个曝光。鞋体和冰刀作为一个刚性组件追踪。轮廓使用源画幅 UV，第二轴为运动员左、右脚，整数 PTS 使用 `1/12800` 时基。没有可用轮廓时 `status` 为零。`extent`、遮挡和身份标志决定轮廓能否进入全鞋目标。三维状态在这些曝光仍可求值。
 
@@ -8,7 +8,7 @@
 
 `deliver_body_skate_fit.py` 从连续控制导出同一人体状态的全节目、质心、冰面投影和鞋刀，再生成原片／旧候选／新候选对照。节目绑定给出 Data 下的 `START_REFITTED_3D.cmd`、对照视频、结果和失败导航。两份公开控制包和整鞋轮廓保持实际运行的原字节。
 
-## 1113 开场与方向审核
+## 1113 开场与方向实验
 
 [1113 候选](../../events/ankara_2026/programmes/okada_mei_sp/skate_video_1112/audit_followup_1113.json)登记同一人体、整鞋、质心与冰面投影的控制及回投。`programme_audit_repair` 负责由 1112 回放导入共同状态。`motion_review.source_audit` 以原生曝光计算双鞋的源投影和运动差分，`motion_review.scoped_fit`、`direction_fit`、`cut_position_fit` 和 `spin_entry_fit` 使用局部源锚点，`motion_review.refit_audit` 核对修订后的连续曲线。`programme_motion_followup` 从同一组已选控制生成回放和原片对照。全节目 ExMR 比较属于历史试验。
 
@@ -29,4 +29,6 @@ python -B -m experiments.skate_video_v1.verify_review recovery $binding $previou
 
 ## 审阅限制
 
-最新候选在 845 条留出整鞋对照中将轮廓中位误差从 8.32 px 降到 7.11 px。39 条历史冰刃描线的中位误差从 11.81 px 降到 6.70 px。人体关键点中位误差从 4.61 px 升到 4.82 px，开放鞋口模型的最大鞋壁冲突中位值从 7.04 mm 升到 11.47 mm。原片跟踪仍有 1331 个单脚曝光未跟住、4009 个单脚曝光范围待确认，另有 19 个可见单脚曝光身份未解决。90.120 秒左鞋仍有明显偏差。像素对照、条件尺度和实机回放均不能单独验证世界位姿或接冰准确性。
+`whole_skate_socket_1112` 的 [1112 复核](../../events/ankara_2026/programmes/okada_mei_sp/skate_video_1112/record.json)记录了 845 条留出整鞋对照，轮廓中位误差由 8.32 降至 7.11 px。同期人体关键点中位误差由约 4.62 升至 4.82 px，最大鞋壁冲突中位值由 7.04 升至 11.47 mm。指标仅适用于这个绑定。
+
+[1113 开场与方向绑定](../../events/ankara_2026/programmes/okada_mei_sp/skate_video_1112/audit_followup_1113.json)保存该实验自己的指标与失败位置。使用 11 月 13 日登记相机和共同冰场的[切镜与首旋候选](../../events/ankara_2026/programmes/okada_mei_sp/README.md#人体与足鞋结果)在节目页登记，仍待独立三维与接冰验收。

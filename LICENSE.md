@@ -19,6 +19,8 @@
 | SciPy 派生滤波实现 | 保留 [SCIPY_LICENSE.txt](calibration/rinkfit/cpp/source_image_gpu/SCIPY_LICENSE.txt)及源码归属说明 |
 | oneTBB 相关保全材料 | 保留 [Apache 原许可](environments/native_support_preserved/round3_legacy/tbb_control/LICENSE.txt)；外部运行依赖按其各自条件处理 |
 | GVHMR 衍生补丁 | [gvhmr-local.patch](environments/third_party_patches/gvhmr-local.patch)适用[原始 GVHMR 许可](environments/third_party_patches/GVHMR_LICENSE.txt)，其中的教育、研究、非营利及衍生修改非商业限制继续有效 |
+| ExMR 相机补丁 | [exmr_camera.patch](environments/exmr_camera.patch)保留 [ExMR 上游许可和署名](environments/third_party_licenses/EXMR_LICENSE.txt)，沿用该衍生作品的教育、研究、非营利及修改条件 |
+| HTD-Refine 与 PVA-Net | 外部 HTD-Refine 源码适用 AGPL-3.0-only。所用代码、权重及原始推理结果留 Data，权重的发布链接与许可证据分别登记。项目包含调用与数值复核代码，见[第三方资产](docs/THIRD_PARTY_ASSETS.md#htd-refine) |
 | SAM2 上游部分与派生权重 | SAM2 上游部分保留 [Apache-2.0 原文](models/SAM2_LICENSE.txt)。[rink_vision.pt](models/rink_vision.pt)的固定基础来源、字节核验与修改见[来源记录](models/rink_vision.provenance.json)，训练材料与使用边界见[许可核查](docs/LICENSING_REVIEW.md)；本声明不把完整派生权重重新许可为 MIT |
 | 三维播放器使用的 AITViewer／Pyglet | 当前外部版本为 AITViewer 1.14.2（[MIT 原文](environments/third_party_licenses/AITVIEWER_LICENSE.txt)）及 Pyglet 2.1.19（[BSD 原文](environments/third_party_licenses/PYGLET_LICENSE.txt)）；项目连接代码与这些外部实现分别适用各自许可 |
 | Qt／PyQt6 外部依赖 | AITViewer 的安装锁包含 PyQt6 与 Qt。所选 PyQt6 发行物保留 [GPLv3 原文](environments/third_party_licenses/PYQT6_GPL3.txt)，Qt 包保留[自身许可](environments/third_party_licenses/PYQT6_QT6_LICENSE.txt)；默认播放器使用 Pyglet。依赖安装、实际加载和组合分发分别核对，见[播放器核查](docs/LICENSING_REVIEW.md#viewer3d) |

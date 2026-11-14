@@ -38,7 +38,8 @@ $env:MKL_NUM_THREADS='1'
 $env:OMP_NUM_THREADS='1'
 $env:PYTHONDONTWRITEBYTECODE='1'
 $env:PYTHONPATH="$TaskRepo/src;$TaskRepo"
-$TaskPython=if ([string]::IsNullOrWhiteSpace($Python)) { Join-Path $TaskRepo '.venv/Scripts/python.exe' } else { $Python }
+. (Join-Path $TaskRepo 'launchers/LOCAL_PYTHON.ps1')
+$TaskPython=if ([string]::IsNullOrWhiteSpace($Python)) { Get-RinkSpacePythonPath $TaskRepo } else { $Python }
 $TaskArguments=@('-B','-m','calibration.program_tracking.body_tracking.fullprogramme_camera_rebind',
     '--v8-directory',$TaskV8,'--camera',$Camera,'--scale-source',$ScaleSource,
     '--body-fit-clock-evidence',$ClockEvidence,

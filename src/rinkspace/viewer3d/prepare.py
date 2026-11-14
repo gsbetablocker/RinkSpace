@@ -1,7 +1,13 @@
 """Bake existing articulated results to display meshes; never fit or infer poses."""
 from __future__ import annotations
+from contextlib import contextmanager
 from pathlib import Path
-import argparse,json,os,time,uuid
+import argparse
+import errno
+import json
+import os
+import shutil
+import time
 import numpy as np
 from scipy.spatial import cKDTree
 from calibration.program_tracking.body_tracking.rebuild_body_geometry import CompactBody
@@ -177,6 +183,58 @@ def prepare_variant(catalog,variant,surface=None):
     path,identity=catalog.cache_path(variant)
     if (path/'metadata.json').is_file():return path
     v=catalog.variant(variant) if isinstance(variant,str) else variant
+    root = catalog.cache_root.resolve()
+    if path.parent.resolve() != root or path.resolve() != root / path.name:
+        raise ValueError(f'Invalid mesh cache path: {path}')
+    root.mkdir(parents=True, exist_ok=True)
+    with _cache_writer_lock(root / f'.{path.name}.lock'):
+        if (path / 'metadata.json').is_file():
+            return path
+        if path.exists():
+            raise FileExistsError(f'Mesh cache destination is incomplete: {path}')
+        staging = root / f'.preparing_{path.name}'
+        if staging.resolve() != staging:
+            raise ValueError(f'Invalid mesh staging path: {staging}')
+        if staging.exists():
+            shutil.rmtree(staging)
+        staging.mkdir()
+        try:
+            frames, seconds = _write_variant_cache(catalog, v, identity, staging, surface)
+            staging.rename(path)
+        finally:
+            if staging.exists():
+                shutil.rmtree(staging)
+    print(json.dumps(dict(variant=v['id'], frames=frames, seconds=seconds, path=str(path))), flush=True)
+    return path
+
+
+@contextmanager
+def _cache_writer_lock(path):
+    with path.open('a+b') as lock:
+        if os.name != 'nt':
+            import fcntl
+            fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+            yield
+            return
+
+        import msvcrt
+        while True:
+            try:
+                msvcrt.locking(lock.fileno(), msvcrt.LK_NBLCK, 1)
+            except OSError as exc:
+                if exc.errno != errno.EACCES:
+                    raise
+                time.sleep(0.1)
+            else:
+                break
+        try:
+            yield
+        finally:
+            lock.seek(0)
+            msvcrt.locking(lock.fileno(), msvcrt.LK_UNLCK, 1)
+
+
+def _write_variant_cache(catalog, v, identity, staging, surface):
     source_flags,warning_identity=catalog.source_identity()
     if warning_identity!=identity['source_identity_sha256']:
         raise ValueError('Source identity warnings changed during cache preparation')
@@ -185,12 +243,17 @@ def prepare_variant(catalog,variant,surface=None):
     has_saved_shape=any(key in state['saved'] for key in ('shared_betas','shared_body_scale'))
     if surface is None or (has_saved_shape and not _surface_matches_packet(surface,surface_packet)):
         surface=FullSurface(catalog,packet=surface_packet)
-    catalog.cache_root.mkdir(parents=True,exist_ok=True)
-    staging=catalog.cache_root/('.preparing_'+v['id']+'_'+uuid.uuid4().hex[:8]);staging.mkdir()
     fullbody=v['kind']=='fullbody';ratio=state['unit_ratio']
-    n=len(catalog.pts);vertices=np.lib.format.open_memmap(staging/'vertices.npy',mode='w+',dtype=np.float32,shape=(n,len(surface.shaped),3))
+    n = len(catalog.pts)
     joints=np.empty((n,22,3));cocos=np.empty((n,17,3));gear=np.empty((n,2,48 if fullbody or state['geometry'] is not None else 5,3));max_surface_error=0.;max_saved_error=0.;max_native_error=0.;max_blade_error=0.;start=time.perf_counter()
-    with (staging/'progress.jsonl').open('w',encoding='utf8',buffering=1) as log:
+    with (
+        (staging / 'progress.jsonl').open('w', encoding='utf8', buffering=1) as log,
+        (staging / 'vertices.npy').open('wb') as mesh,
+    ):
+        np.lib.format.write_array_header_1_0(mesh, dict(
+            descr=np.dtype(np.float32).str, fortran_order=False,
+            shape=(n, len(surface.shaped), 3),
+        ))
         for a in range(0,n,16):
             b=min(a+16,n)
             if fullbody:
@@ -202,7 +265,7 @@ def prepare_variant(catalog,variant,surface=None):
             max_surface_error=max(max_surface_error,error)
             local,coco,native=local*state['length_ratio'],coco*state['length_ratio'],native*state['length_ratio']
             P,Q=state['P'][a:b],state['Q'][a:b]
-            vertices[a:b]=((np.einsum('nij,nvj->nvi',Q,local)+P[:,None])*ratio).astype(np.float32)
+            vertices=((np.einsum('nij,nvj->nvi',Q,local)+P[:,None])*ratio).astype(np.float32)
             bodyworld=P[:,None]+np.einsum('nij,nkj->nki',Q,coco);cocos[a:b]=bodyworld*ratio
             nativeworld=P[:,None]+np.einsum('nij,nkj->nki',Q,native);joints[a:b]=nativeworld*ratio
             saved=state['saved'].get('COCO_world_mid',state['saved'].get('COCO_world_m'))
@@ -219,10 +282,10 @@ def prepare_variant(catalog,variant,surface=None):
             else:gear[a:b]=(P[:,None,None]+np.einsum('nij,nfkj->nfki',Q,proxy))*ratio
             # Check the actual stored float32 vertices too: a finite float64
             # transformation can overflow during the display-format cast.
-            for label,values in (('vertices',vertices[a:b]),('joints',joints[a:b]),('coco',cocos[a:b]),('gear',gear[a:b])):
+            for label,values in (('vertices',vertices),('joints',joints[a:b]),('coco',cocos[a:b]),('gear',gear[a:b])):
                 if not np.isfinite(values).all():raise ValueError('Nonfinite display geometry: '+label)
+            mesh.write(vertices.tobytes())
             log.write(json.dumps(dict(variant=v['id'],prepared_frames=b,total_frames=n,seconds=time.perf_counter()-start))+'\n')
-        vertices.flush();del vertices
         if max_saved_error>1e-7 or max_native_error>1e-7 or max_surface_error>2e-5 or max_blade_error>1e-7:raise ValueError(f'Display geometry differs from saved results: {max_saved_error}, {max_native_error}, {max_surface_error}, {max_blade_error}')
         P=state['P']*ratio;G=P.copy();G[:,2]=0
         if fullbody:
@@ -288,11 +351,7 @@ def prepare_variant(catalog,variant,surface=None):
             if versioned_skate:
                 metadata['footwear_display'].update(template_version=str(footwear['template_version']),binding_version=str(footwear['binding_version']),parameter_provenance=json.loads(str(footwear['parameter_provenance_json'])),contact_witness='moving minimum; not a material-point velocity',support_gap='eligible support-group minimum raw height; NaN means unknown',clearance='minimum height plus semantic allowed entry')
         (staging/'metadata.json').write_text(json.dumps(metadata,ensure_ascii=False,indent=2),encoding='utf8')
-    assert staging.resolve().is_relative_to(catalog.cache_root.resolve()) and path.resolve().is_relative_to(catalog.cache_root.resolve())
-    if path.exists():raise FileExistsError('Another cache preparation finished; preserve both paths')
-    staging.rename(path)
-    print(json.dumps(dict(variant=v['id'],frames=n,seconds=time.perf_counter()-start,path=str(path))),flush=True)
-    return path
+    return n, time.perf_counter() - start
 
 
 def main():

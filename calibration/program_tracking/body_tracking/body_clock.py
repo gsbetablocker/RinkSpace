@@ -1,5 +1,6 @@
 """Explicit source clock shared by body, shoe, physics and export consumers."""
 from fractions import Fraction
+from math import ceil, floor
 import numpy as np
 
 def time_base(packet):
@@ -14,6 +15,16 @@ def time_base(packet):
 
 def source_seconds(packet,pts=None):
     a,b=time_base(packet);return np.asarray(packet['pts']if pts is None else pts)*a/b
+
+def source_interval_mask(pts, tb, start_seconds, end_seconds):
+    """Inclusive selection on the integer source clock, before fit-time mapping."""
+    tick=Fraction(*map(int,tb))
+    first=ceil(Fraction(str(start_seconds))/tick)
+    last=floor(Fraction(str(end_seconds))/tick)
+    pts=np.asarray(pts)
+    if pts.dtype.kind not in 'iu':
+        raise ValueError('Source interval requires integer PTS')
+    return (pts>=first)&(pts<=last)
 
 def sample_period(packet):
     pts=np.asarray(packet['pts']);a,b=time_base(packet)

@@ -1,0 +1,111 @@
+{
+  "schema": "rinkspace.programme-primary-source-selection.v1",
+  "event_id": "ankara_2026",
+  "programme_id": "jin_shuxian_sp",
+  "recorded_date_local": "2026-11-03",
+  "authority": "explicit_user_instruction_in_current_chat",
+  "processing_policy": "ISU_official_single_programme_native_50fps_PTS",
+  "primary_source": {
+    "id": "SW1IewLFUyI",
+    "url": "https://www.youtube.com/watch?v=SW1IewLFUyI",
+    "title": "Shuxian JIN (CHN) | Junior Women Short Program | Ankara 2026",
+    "channel": "Skating ISU",
+    "channel_id": "UCVZpqbnDjHyScSYGFPMUtYA",
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\media\\originals\\SW1IewLFUyI.mp4",
+    "sha256": "1c1742c3381369292570f98676ff99ee4ef9caff76f06399d847fc68966bcd27",
+    "bytes": 51811829,
+    "format_id": "399",
+    "representation": "original_official_video_track",
+    "native_fps": "50/1",
+    "time_base": "1/12800",
+    "native_pts_step": 256,
+    "width": 1920,
+    "height": 1080,
+    "native_packet_count": 17407,
+    "duration_pts": 4456192,
+    "duration_seconds": 348.14,
+    "contains_audio": false,
+    "clipped": false,
+    "crop": null,
+    "resize": null,
+    "original_time_offset_seconds": 0
+  },
+  "clock_verification": {
+    "probe_path": "@data/runs/jin_sp_20261103/official50_probe.json",
+    "packet_index_path": "@data/runs/jin_sp_20261103/official50_packets.npz",
+    "packet_clock_sha256": "cf5ecc270e78d7cbb9ba9858ced3ae48ba2c299553b5c460e63ab294a25d105d",
+    "actual_packet_PTS_checked": true,
+    "decoded_exposure_cadence_checked": false,
+    "actual_decoded_frame_count": 17407,
+    "decoded_PTS_continuity_checked": true,
+    "independent_exposure_cadence": "unclassified; nominal native delivery is 50fps"
+  },
+  "programme_scope": {
+    "status": "actual_timer_native_cuts_and_full_broadcast_rechecked_1109",
+    "path": "rebuild_scope.json",
+    "actual_programme_range": {
+      "first_pts": 413440,
+      "last_pts": 2569216,
+      "stop_pts_exclusive": 2569472,
+      "native_frame_count": 8422,
+      "first_source_seconds": 32.3,
+      "last_source_seconds": 200.72
+    },
+    "verified_clock_receipt": {
+      "path": "@data/runs/jin_sp_20261103/audit/source_clock_recheck_1109/selected_range/receipt.json",
+      "sha256": "b6edb00f9bb7b7e52507cc326a42397c174d3eebf4a1d27958855d39a490e332"
+    }
+  },
+  "full_broadcast_correspondence": {
+    "source_id": "oxXu1avhrvs",
+    "first_full_pts": 34445824,
+    "last_full_pts": 37034496,
+    "time_base_num": 1,
+    "time_base_den": 15360,
+    "candidate_mapping": "@data/runs/jin_sp_20261103/audit/source_clock_recheck_1109/selected_range/official50_to_full.csv",
+    "inverse_mapping": "@data/runs/jin_sp_20261103/audit/source_clock_recheck_1109/selected_range/full_to_official50.csv",
+    "exact_visual_anchor": "@data/runs/jin_sp_20261103/verified_anchor_pair.json",
+    "constant_offset_used": false,
+    "duplicate_full_presentations_not_unique_exposures": true,
+    "status": "actual_frame_fingerprint_correspondence_with_individually_visual_verified_anchor; uniqueness_not_claimed",
+    "verified_mapping_receipt": {
+      "path": "@data/runs/jin_sp_20261103/audit/source_clock_recheck_1109/selected_range/receipt.json",
+      "sha256": "b6edb00f9bb7b7e52507cc326a42397c174d3eebf4a1d27958855d39a490e332"
+    },
+    "source_path": "@data/events/ankara_2026/media/originals/oxXu1avhrvs.mp4",
+    "source_sha256": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891",
+    "first_full_seconds": 2242.5666666666666,
+    "last_full_seconds": 2411.1,
+    "full_display_frames": 10113,
+    "mutual_image_matches": 8419,
+    "unmatched_official_pts": [
+      417536,
+      1586688,
+      1691392
+    ],
+    "verified_tables": {
+      "official_to_full": {
+        "path": "@data/runs/jin_sp_20261103/audit/source_clock_recheck_1109/selected_range/official50_to_full.csv",
+        "sha256": "c3be8473999f09db03883cf2e9cb1f1bfb320408cdd9ad99c970cfe67782dd5d"
+      },
+      "full_to_official": {
+        "path": "@data/runs/jin_sp_20261103/audit/source_clock_recheck_1109/selected_range/full_to_official50.csv",
+        "sha256": "c9f1230409ca88a7fca5d50a22a7be037566809b17eeaae1f2b32d58fd2f517c"
+      },
+      "shots": {
+        "path": "@data/runs/jin_sp_20261103/audit/source_clock_recheck_1109/selected_range/shots.csv",
+        "sha256": "415d3ea0d3127d437c0ad945f737c057a5201e33add4be7a1ff2f54d283f2bd8"
+      }
+    }
+  },
+  "current_scope_record": {
+    "path": "events/ankara_2026/programmes/jin_shuxian_sp/rebuild_scope.json",
+    "sha256": "d2c30d08fd90d062a3641c1eb0892c581a80119794785750978b559aa91334a6"
+  },
+  "historical_source_record": {
+    "base": "data",
+    "path": "maintenance/agents_audit_20261025/documentation_sources.zip",
+    "member": "20261114/events/ankara_2026/programmes/jin_shuxian_sp/primary_source_selection.json",
+    "sha256": "2baea037cf84126332e78053c04904135f75b69f660f320b921ef99dcd85a8f6"
+  }
+}

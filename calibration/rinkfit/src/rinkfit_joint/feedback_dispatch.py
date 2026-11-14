@@ -24,6 +24,14 @@ def source_reader_python(explicit=None):
     return interpreter
 
 
+def source_reader_environment(project):
+    env = os.environ.copy()
+    paths = [project, project / 'src', project / 'calibration/rinkfit/src',
+             resolve_asset(project, '.venv/Lib/site-packages')]
+    env['PYTHONPATH'] = os.pathsep.join([*map(str, paths), env.get('PYTHONPATH', '')])
+    return env
+
+
 def dispatch_checkpoint_reviews(task_documents, review_run, output, *, device='cuda', packet_path=None,
                                 interpreter=None, _in_worker=False):
     output=Path(output).resolve();review_run=Path(review_run).resolve()
@@ -41,8 +49,7 @@ def dispatch_checkpoint_reviews(task_documents, review_run, output, *, device='c
         job=output.parent/(output.name+'.job.json')
         write_json(job,dict(task_documents=list(map(str,task_documents)),review_run=str(review_run),
                            output=str(output),device=device,packet_path=None if packet_path is None else str(packet_path)))
-        env=os.environ.copy();env['PYTHONPATH']=os.pathsep.join([str(project),str(project/'src'),
-            str(project/'calibration/rinkfit/src'),str(project/'.venv/Lib/site-packages'),env.get('PYTHONPATH','')])
+        env=source_reader_environment(project)
         worker=source_reader_python(interpreter)
         # Preflight once per worker, avoiding one repeated dependency failure per frame.
         probe=subprocess.run([str(worker),'-c','import torch,cv2,av,scipy; print(torch.__version__)'],env=env,capture_output=True,text=True)

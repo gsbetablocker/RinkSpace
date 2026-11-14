@@ -16,15 +16,15 @@
 
 ## 当前真实样本
 
-[冈田芽衣短节目](../events/ankara_2026/programmes/okada_mei_sp/README.md)当前采用用户于 2026-11-02 指定的 `camera_solver_refined_1102` 暂定最终状态，覆盖 S01–S09 九镜头、三个物理机位，原片 22.120–188.680 秒、8329 个曝光。真实联合求解与完整回放均已执行；求解因代价进展停滞退出，未达到一阶数值收敛。S08 开头局部运动偏差、边界曝光的亚帧轨迹尖峰及独立物理标定限制仍保留。
+安卡拉的金书贤与冈田芽依短节目使用同一冰场几何，分别登记 24 镜头的 `stability_review_1113` 与 9 镜头的 `joint_review_1113`。相机、共同场景、源时钟和回放见[赛事暂定最终版本](../events/ankara_2026/README.md#暂定最终版本)。两套完整拟合均待整片视觉验收。
 
-当前实验采用七字段原始像素点，不含 W；共享场景、相机与 station 进入同一像素平方误差目标。精确点数、曝光、输入 SHA、场景和数值状态由节目入口及其[暂定最终结果绑定](../events/ankara_2026/programmes/okada_mei_sp/fit_v11/camera_solver_refined_1102.json)维护。
+冈田芽依 2026-11-02 的历史联合求解采用七字段原始像素点，共享场景、相机与 station 进入同一像素平方误差目标。该次求解因代价进展停滞退出，未达到一阶数值收敛。输入、局部误差及物理标定限制见[历史记录](../events/ankara_2026/programmes/okada_mei_sp/README.md#2026-11-02-历史版本)。
 
 S01／S04 等轴焦距、六镜头 Lane 与历史九镜头 joint_mount_flex 基线各有对应快照的人工网格反馈，确认范围见节目入口。中间相机简化与冰面容差候选按各自状态解释；画面基本满意不表示机械／光学参数或运动轨迹已验证。冻结历史包见[离线审阅](GITHUB_REVIEW.md)。
 
 ## 原生几何与相机
 
-可显式选择冰面容差场景：启用选项 64 后，选项合计为 127、布局为 layout146，增加 107 个相对共同名义量的有界偏差。图元与接线保持，原选项兼容。该版本已用于六镜头真实拟合及当前九镜头候选；数值状态与人工验收见节目入口。
+可显式选择冰面容差场景：启用选项 64 后，选项合计为 127、布局为 layout146，增加 107 个相对共同名义量的有界偏差。图元与接线保持，原选项兼容。该容差定义已用于历史六镜头和 2026-11-02 九镜头拟合；数值状态与人工验收见节目入口。
 
 `NativeSceneGPU` 编译显式选择的场景，只将本次输入引用的路径装入问题；完整场景库存仍由场景模型维护。冰面、围挡、固定连接点和广告共享同一 native 几何定义。未定位广告保留未定位状态，不能补造安装。
 
@@ -57,7 +57,9 @@ S01／S04 等轴焦距、六镜头 Lane 与历史九镜头 joint_mount_flex 基�
 <a id="人体局部拟合执行层"></a>
 ## 人体与鞋刀拟合执行层
 
-S01 全身、共享鞋体与开头分支复用同一身体／鞋刀目标，支持紧凑 FK/LBS、脚部采样缓存、局部导数 CPU 并行、同状态前向复用和共享鞋参的身体重放。独立 CPU 原生库提供完整运动相机的 XYZ 解析导数及可选 OpenMP，保持 ABI2；旧库继续使用原导数入口。`hybrid` 在单窗口、冻结共享鞋参条件下，将 native55 FK、选中皮肤与足腔／鞋口兼容性精确扰动留在 GPU；身体解析导数、相机、CSR 装配和 SciPy TRF 仍在 CPU；连续绝对状态默认用稀疏直接 GN 方向，其他状态及数值回退保留 LSMR。配置与同状态测量见[环境说明](../environments/README.md#人体求解执行优化)；GPU 常驻身体 Jacobian、相机和线性求解尚未实现。
+单窗口人体拟合支持紧凑 FK/LBS、局部导数并行与共享鞋参重放。`hybrid` 在单窗口、冻结共享鞋参时将 native55 FK、选中皮肤和足腔／鞋口精确扰动放在 GPU，身体解析导数、相机、CSR 装配和 SciPy TRF 仍在 CPU。
+
+[全节目人体后端](../calibration/program_tracking/body_tracking/trajectory_backend.py)提供 `--gpu-linear`，用 cuDSS 求解连续状态的线性子问题。全节目路径仍含 CPU 侧导数与装配；环境、输入和性能核对见[环境说明](../environments/README.md#人体求解执行优化)。
 
 [scripts/repair_action_root.py](../scripts/repair_action_root.py)复用已保存姿态和固定鞋刀，先优化根平移，再在剩余预算内调整姿态。`continuous_root` 对实际根加速度求残差，`continuous_pose` 保持已修根曲线；源阶段和条件初值由节目 `root_trajectory_1103.json` 登记。预算监视可按测得的 Jacobian 耗时预留出口，真实运行的停止原因以对应结果绑定为准。
 
@@ -67,9 +69,9 @@ GVHMR／ExMR 相机坐标对照复用同一固定鞋刀、native 投影和现有
 
 `ballistic_com_factors.py` 从同一身体／鞋刀状态计算分段体积质量近似质心，在有原片支持的腾空内部对质心加速度减去重力形成有限残差；不把骨盆或网络静止概率当质心／接冰真值。`spin_entry_motion.py` 保留整段连续状态、旧质量基线和失败候选；该次实际结果及剩余回投误差见[入旋记录](../events/ankara_2026/programmes/okada_mei_sp/spin_entry_1104_audit.json)。
 
-`sequence_skate_state.py`／`sequence_refit.py` 在一个完整 S05 状态中联合调整人体和踝枢轴相对鞋 SO(3) 曲线，无独立小窗拼接或逐帧自由鞋位姿。`source_skate_structure_factors.py` 将实际钢刃、刀齿区域、刀尾及刀架的原生源轮廓接入同一投影链；`complete_runner_extent.py` 对明确完整可见的下缘补反向覆盖，并与正向项分摊原预算。`source_support_locations.py` 使用同源、相机／冰面条件化的有限支撑 XY 范围，范围内不吸引到中点，Z 仍由原有有限软项处理；未分左右的可见鞋刀保留集合匹配和身份未知。
+`sequence_skate_state.py`／`sequence_refit.py` 在一个 S05 旋转窗口的连续状态中联合调整人体和踝枢轴相对鞋 SO(3) 曲线，无独立小窗拼接或逐帧自由鞋位姿。`source_skate_structure_factors.py` 将实际钢刃、刀齿区域、刀尾及刀架的原生源轮廓接入同一投影链；`complete_runner_extent.py` 对明确完整可见的下缘补反向覆盖，并与正向项分摊原预算。`source_support_locations.py` 使用同源、相机／冰面条件化的有限支撑 XY 范围，范围内不吸引到中点，Z 仍由原有有限软项处理；未分左右的可见鞋刀保留集合匹配和身份未知。
 
-当前实际覆盖76–95秒951曝光；源观测为36曝光40条轮廓、32条支撑位置，其余为连续估计。`source_structure_trajectory.py` 导出双脚完整曲线、原生 UV、固定材料点及移动几何见证，并核对真实结果与 PTS；`sequence_delivery.py --family source_structure` 复用现有播放器及旧缓存。新的来源装配、候选和反向覆盖均已真实运行，源码检查与几何闭合不代替准确性验收；刀尾、支撑位置及转出身份仍有[明确失败](../events/ankara_2026/programmes/okada_mei_sp/spin_source_structure_1106_audit.json)。
+历史源结构候选覆盖原片 76.000–95.000 秒、951 个曝光。完整 S05 的处理范围为 74.140–101.640 秒、1,376 个曝光，见[节目范围](../events/ankara_2026/programmes/okada_mei_sp/rebuild_scope.json)。源轮廓、条件支撑及其余曝光的连续估计由[候选绑定](../events/ankara_2026/programmes/okada_mei_sp/spin_source_structure_1106_audit.json)说明。
 
 ## 工程检查
 
@@ -80,7 +82,7 @@ GVHMR／ExMR 相机坐标对照复用同一固定鞋刀、native 投影和现有
 ## 尚未完成
 
 - 完整优化器磁盘检查点与跨进程严格恢复，统一数据集 `rinkspace solve/resume` 命令。
-- 当前九镜头的完整源特征覆盖核查、完整原片视觉验收与定位准确性验证。
+- 两套节目各自的完整源特征覆盖核查、整片视觉验收与定位准确性验证。
 - 当前相机物理参数和场地尺度的独立验证。
 - 全节目自动取点、同赛事独立节目与跨赛事验证。
 - 真实人体位置、垂直投影及冰刀接触的独立验证。
