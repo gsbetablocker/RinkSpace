@@ -22,6 +22,7 @@ void reset(){status_downloads=all_downloads=0;}
 #include "../src/core_gpu.cu"
 #undef cudaMemcpyAsync
 #include "rinkspace/ice_actual_chart.hpp"
+#include "motion_spline_rates_cases.hpp"
 
 struct Fixture {
     void* handle=nullptr;
@@ -131,11 +132,35 @@ void check_boundary_retraction(){
     }
     std::cout<<"PASS B01: actual CUDA ordinary/constrained nonzero radius retractions keep inclusive X and radius bounds\n";
 }
+__global__ void motion_spline_rates_kernel(motion_spline_rates_test::Result* results){
+    const int index=threadIdx.x;
+    results[index]=motion_spline_rates_test::run_case(index);
+}
+
+void check_motion_spline_rates_cuda(){
+    using namespace motion_spline_rates_test;
+    DeviceBuffer<Result> device;
+    device.allocate(case_count);
+    motion_spline_rates_kernel<<<1,case_count>>>(device.data);
+    cuda_check(cudaGetLastError());
+    cuda_check(cudaDeviceSynchronize());
+    Result actual[case_count];
+    cuda_check(cudaMemcpy(actual,device.data,sizeof(actual),cudaMemcpyDeviceToHost));
+    for(int i=0;i<case_count;++i){
+        const auto host=run_case(i);
+        if(!passes(i,host)||!passes(i,actual[i])||!agrees(i,host,actual[i])){
+            throw std::runtime_error(std::string("MotionSpline::rates CPU/CUDA case failed: ")+case_names[i]);
+        }
+    }
+    std::cout<<"PASS MotionSpline::rates ("<<case_count<<" CUDA cases match CPU)\n";
+}
+
 int main(){
     int count=0;auto status=cudaGetDeviceCount(&count);
     if(status!=cudaSuccess||count==0){
         std::cout<<"NOT RUN: CUDA device unavailable: "<<cudaGetErrorString(status)<<"\n";return 77;
     }
+    check_motion_spline_rates_cuda();
     check_boundary_retraction();
     check_backend_diagnostics();
 }

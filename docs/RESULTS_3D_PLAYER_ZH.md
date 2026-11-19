@@ -6,6 +6,8 @@
 
 | 用途 | 启动入口 | 版本和范围 |
 |---|---|---|
+| 冈田芽衣当前全节目人体与鞋刀 | [最新结果登记](../events/ankara_2026/programmes/okada_mei_sp/fit_v11/body_spin_pair_1119.json)的 `launcher.path` | 双击 `START_REFITTED_3D.cmd`，从同一 8,329 个曝光查看或逐帧比较两段旋转的修订 |
+| 人体与鞋刀联合拟合对照 | [上一版回放及参数](../events/ankara_2026/programmes/okada_mei_sp/fit_v11/body_joint_1119.json) | 供比较原片回投和三维质心、刀刃轨迹 |
 | 全节目首旋修订 | [首旋结果绑定](../events/ankara_2026/programmes/okada_mei_sp/fit_v11/body_first_spin_1113.json)的 `data_root_artifacts.viewer.path` | Data 内 `START_REFITTED_3D.cmd`，覆盖 22.120–188.680 秒。修订窗口为 81.140–93.320 秒 |
 | 全节目切镜对照 | [切镜结果绑定](../events/ankara_2026/programmes/okada_mei_sp/fit_v11/body_cut_continuity_1113.json)的 `data_root_artifacts.viewer.path` | Data 内 `START_REFITTED_3D.cmd`，在同一登记相机下检查八处切镜 |
 | S01 全身与鞋刀 | [START_3D_COMPARISON.cmd](../launchers/START_3D_COMPARISON.cmd) | `skate_s01_1103`，从原片 22.120 秒开始 |
@@ -83,6 +85,5 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\launchers\START_3D_SPIN_MO
 
 | 回放 | 原片首末帧 | 地址字段 |
 |---|---|---|
-| 冈田芽依暂定最终冰场回放 | 22.120–188.680 秒 | [节目登记](../events/ankara_2026/programmes/okada_mei_sp/fit_v11/provisional_final_1113.json)的 `full_review.video` |
-| 金书贤暂定最终冰场回放 | 32.300–200.720 秒 | [节目登记](../events/ankara_2026/programmes/jin_shuxian_sp/provisional_final_1113.json)的 `full_review.video` |
-| 冈田芽依首旋人体与整鞋对照 | 22.120–188.680 秒 | [首旋候选](../events/ankara_2026/programmes/okada_mei_sp/fit_v11/body_first_spin_1113.json)的 `data_root_artifacts.full_overlay` |
+| 冈田芽衣当前人体与鞋刀回投 | 22.120–188.680 秒 | [人体结果登记](../events/ankara_2026/programmes/okada_mei_sp/fit_v11/body_spin_pair_1119.json)的 `reprojection.path` |
+| 安卡拉四节目当前冰场回放 | 见各节目原片首末帧 | [赛事入口](../events/ankara_2026/README.md#暂定最终版本)中各节目的 `full_review.video.path` |

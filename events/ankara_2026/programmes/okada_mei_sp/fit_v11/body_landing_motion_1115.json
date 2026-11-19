@@ -1,0 +1,263 @@
+{
+  "schema": "rinkspace.okada_landing_motion.v1",
+  "candidate_id": "okada_landing_motion_1115",
+  "baseline": {
+    "path": "events/ankara_2026/programmes/okada_mei_sp/fit_v11/body_phase_motion_1115.json",
+    "sha256": "dd62c1219795094ad34bf5d7c02dd21b5d349056b8f2526a83b196ac26d6e088"
+  },
+  "source_clock_controls": {
+    "path": "events/ankara_2026/programmes/okada_mei_sp/fit_v11/body_landing_motion_1115_controls.npz",
+    "sha256": "90de3b431db274f8ee6ca6df1d3b2ddca03af8bc29b921017e270bcbf9fb79c5"
+  },
+  "review_report": {
+    "path": "events/ankara_2026/programmes/okada_mei_sp/fit_v11/body_landing_motion_1115_report.md",
+    "sha256": "e1ac1a9d1613fde7767cd62199478d6a0d11f15e6b3f4ac16f53df9922355560"
+  },
+  "source_exposures": 8329,
+  "source_time_base": [
+    1,
+    12800
+  ],
+  "source_video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "native_camera_sha256": "2e0fc2705fd5e2935ac87037e6681c7d031a55f83827bfd8e3e8e3fc6d58799c",
+  "same_shared_scene_sha256": "13bd87094a58b3433eaf25cf67738e6bc26ce13ffdd594f1c1b7f17f118f2a59",
+  "motion_quality_passed": false,
+  "remaining": [
+    "相对历史姿态 R 仍有新增的关节软域超出曝光",
+    "采样网格仍存在鞋口穿插见证",
+    "相对 M 有 12 个新增语义表面对，最深见证为 81.45 秒 right_shank / right_boot 的 10.54 mm",
+    "冻结鞋底位置样本的中位像素偏差有所上升"
+  ],
+  "accuracy_accepted": false,
+  "user_accepted": false,
+  "data_root_artifacts": {
+    "solve_state": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/joint_fit_11/solve/candidate.npz",
+      "sha256": "7800a3f26d24fd11e753dac9fecc171b687da989f878e3266366d01965b6b01a"
+    },
+    "result": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/joint_fit_11/fitted/result.npz",
+      "sha256": "aca919ddd7ab95423a89edb9ccecd254470cb29c2809bfca540f954da0fc9049"
+    },
+    "comparison": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/release/comparison.json",
+      "sha256": "a5ef31475a5916b47661819e6ad3321d7f0a7b6afbb255fbe2e082df456d7d0b"
+    },
+    "viewport": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/release/playback/START_PHASE_MOTION_3D.cmd",
+      "sha256": "8eebaa9f5f304b9342d0a783ae0b695469117171ff5e982945a03f558c65b93f"
+    },
+    "player_config": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/release/playback/viewer3d.json",
+      "sha256": "0e9d1680dda3be6d4d52adc57f95dbe335a1d3ef788bf4ca49a2d66076cced97"
+    },
+    "player_check": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/release/player_check/checks.json",
+      "sha256": "29b45f1f2a7c717ee1a38d53b508407bb9752e3eaacc04928f0b6ca77cf47d06"
+    },
+    "primary_log": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/joint_fit_11/progress.jsonl",
+      "sha256": "f105982d8618277d4ad62f814381bb2097a72c3e666af67c60d5d99316c55850"
+    },
+    "renewed_surface": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/joint_fit_11/retained_surface.json",
+      "sha256": "2b811591d26c2a0ce778e4feda9bd3bea7ab6ca402c87b965860c66fb76c442d"
+    },
+    "com_quadrature": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/joint_fit_11/com_physics_quadrature.npz",
+      "sha256": "63925d68249688a9c26fbe91c3eacacc2f2ea41388afb4d0cb4b86921d3e3593"
+    },
+    "selected_trials": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/release/selection.json",
+      "sha256": "ae371ce0a4efd0c6774dba2131afdfb265584f58bd29f26e632df5f12ed0dbc4"
+    },
+    "observations": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/input/observations.npz",
+      "sha256": "4c68014e102f8b288e1559bf2dc3d62cb1ba2dadc88cb902abf5a48a6afbe7fc"
+    },
+    "source_evidence": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/input/source.json",
+      "sha256": "d34cb6046b2ae920f4bc0d423ea45065770145bf304aad1deda434cc9b93f481"
+    },
+    "primary_guard": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/joint_fit_11/primary_quality_baseline.json",
+      "sha256": "758620e8e9a827302bec4fb7d1e8ed7e0f80026916a67ac825763f71a2791114"
+    },
+    "objective": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/joint_fit_11/objective_policy.json",
+      "sha256": "43d447ad1e37642c2d277960bf51d953be4ee32f9f1421d8ebb3b2cb884a272b"
+    },
+    "root_model_derivatives": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/actual_transition_derivatives.json",
+      "sha256": "08dc193b444e1ea621431cf6cdad6245ff77c3080ffc6db42a11b1c86db55a10"
+    },
+    "geometry_probe": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/continuous_cuff_probe.json",
+      "sha256": "b8b1479a902078b15d35128bbe1f9cdb5c36fc5ba6a3f43207e12534234160af"
+    },
+    "ballistic_correction": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/ballistic_correction_09.json",
+      "sha256": "f9f66cdb50616661f4dc549981a5a71e797723ca2a4d087e8ecda25f4d73dbb9"
+    },
+    "tests": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/tests_landing_final.log",
+      "sha256": "f69e0d444ab82f98ba0b1a47c412321e627d1bef67422b636c963ce2e2478d37"
+    },
+    "ankle_cavity_candidates": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/joint_cavity_candidates.json",
+      "sha256": "44b5e5b997bb8ee9f42f0d24caea64d795e76e072890a57fd6dda198bb5c3d00"
+    },
+    "rejected_further_cuff": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/ballistic_cuff_refine_wide.py.log",
+      "sha256": "76df9e5643a85814aaef24df2b65ee32e4add320b41f244472e8eb28a35bc241"
+    },
+    "cuff_followup_measurements": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/cuff_followup_curve_probes.json",
+      "sha256": "9939de9f39fb2bec9c53a2eb88928c4bcd5c31b331b56ec2c8d0bdfe0b2251e2"
+    },
+    "partial_mesh_scope_probe": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/surface_scope_probe.json",
+      "sha256": "a19db28212fe0465df863c387b3a8ff02ff374339c09534a0906ce97dbfbc802"
+    },
+    "final_targets": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/cuff_targets_05.json",
+      "sha256": "55f35f52eab1013f2800aee900a1a51768667636a5ef3c568e747740fb772109"
+    },
+    "local_potplayer": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/release/playback/landing_M_L.mp4",
+      "sha256": "7ea4eb0f314a82083c9e93ba0c2289ac2194fccc34f38b3b7290c604002301a7"
+    },
+    "media_manifest": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/release/playback/media.json",
+      "sha256": "229c7757d058d6dcd4c225159cbbe3a5310a5d52c5fa666592767af2407058ed"
+    },
+    "landing_fit_01/progress.jsonl": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/landing_fit_01/progress.jsonl",
+      "sha256": "ef7c7435ac13d11fa3cf3477add88c893351342d587ef186a0e6ebe644303e09"
+    },
+    "landing_fit_01/resumed_residual.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/landing_fit_01/resumed_residual.json",
+      "sha256": "024359f89851a04f287b60542c7df5723ee3eb64c6b1291f4c571850f6e50903"
+    },
+    "landing_fit_01/scoped_directions.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/landing_fit_01/scoped_directions.json",
+      "sha256": "5caecc49e4ae1343971bdb67b699b803ebf0131d3995cf1af7110890bbc6f67c"
+    },
+    "landing_fit_02/progress.jsonl": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/landing_fit_02/progress.jsonl",
+      "sha256": "2a2be869fad45c8e46406cb09cba60d1bd158f47ef6f39dfaa5268cdfd161a74"
+    },
+    "landing_fit_02/resumed_residual.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/landing_fit_02/resumed_residual.json",
+      "sha256": "024359f89851a04f287b60542c7df5723ee3eb64c6b1291f4c571850f6e50903"
+    },
+    "landing_fit_03/progress.jsonl": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/landing_fit_03/progress.jsonl",
+      "sha256": "9fa907a0405f9187bd2acfe4043677b2ddbc8ccbd507c3278203cdf8479f2bea"
+    },
+    "landing_fit_03/resumed_residual.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/landing_fit_03/resumed_residual.json",
+      "sha256": "024359f89851a04f287b60542c7df5723ee3eb64c6b1291f4c571850f6e50903"
+    },
+    "landing_fit_03/scoped_directions.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/landing_fit_03/scoped_directions.json",
+      "sha256": "509bd234776a81207e9d6b61a180267b7e72d4731e4d2c22c9bca3f214fb0925"
+    },
+    "landing_fit_04/progress.jsonl": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/landing_fit_04/progress.jsonl",
+      "sha256": "62a211ce665b9233bd16a6f0a02a3c818d6b27b11758457d3195a175c0a954f7"
+    },
+    "landing_fit_04/resumed_residual.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/landing_fit_04/resumed_residual.json",
+      "sha256": "024359f89851a04f287b60542c7df5723ee3eb64c6b1291f4c571850f6e50903"
+    },
+    "landing_fit_05/progress.jsonl": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/landing_fit_05/progress.jsonl",
+      "sha256": "10d09382ef5e2d8c0dbd2774fc2ea024218fca4e9b2815dd2d910745446a806c"
+    },
+    "landing_fit_05/resumed_residual.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/landing_fit_05/resumed_residual.json",
+      "sha256": "024359f89851a04f287b60542c7df5723ee3eb64c6b1291f4c571850f6e50903"
+    },
+    "landing_fit_05/scoped_directions.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/landing_fit_05/scoped_directions.json",
+      "sha256": "30822fa9c2b66761e6bfcbf12742a4f2ebd42e7ddc213858732873a0172e6d3c"
+    },
+    "cuff_fit_06/progress.jsonl": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/cuff_fit_06/progress.jsonl",
+      "sha256": "651a1611e1c0fdc8316f49fad4e65758fbe3c7941aca199a9209ff9cfd7efd8b"
+    },
+    "cuff_fit_06/resumed_residual.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/cuff_fit_06/resumed_residual.json",
+      "sha256": "024359f89851a04f287b60542c7df5723ee3eb64c6b1291f4c571850f6e50903"
+    },
+    "cuff_fit_06/scoped_directions.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/cuff_fit_06/scoped_directions.json",
+      "sha256": "d4f63e0cdfad2856e0364dd6390d0ce4c7ec06dcb2fc19b5fbf5f681b9bb2990"
+    },
+    "cuff_fit_06/phase_surface_trials.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/cuff_fit_06/phase_surface_trials.json",
+      "sha256": "d365e3e2dda13475aa380eb7abb058d97f82fa00cc1e324e9a6c7e553563e931"
+    },
+    "root_fit_07/progress.jsonl": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/root_fit_07/progress.jsonl",
+      "sha256": "4e811072e87e6821cc6e5160029a9d9e41ef9eb0b387fb2dd7dda314f554fc0d"
+    },
+    "root_fit_07/resumed_residual.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/root_fit_07/resumed_residual.json",
+      "sha256": "024359f89851a04f287b60542c7df5723ee3eb64c6b1291f4c571850f6e50903"
+    },
+    "root_fit_07/run_summary.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/root_fit_07/run_summary.json",
+      "sha256": "6ec99ba307b548b6bc5d9fa10ffc75aaf2e05248d0465a0945d09dedad56fac9"
+    },
+    "combined_fit_08/progress.jsonl": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/combined_fit_08/progress.jsonl",
+      "sha256": "78b486cc34b055a0113a3861bae0597246065177f55894afd205f424c3623e40"
+    },
+    "combined_fit_08/resumed_residual.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/combined_fit_08/resumed_residual.json",
+      "sha256": "57ad0780c373212b0f27e4955fb9f6350e110c6526e1869d70b580fdcf547c5e"
+    },
+    "combined_fit_08/run_summary.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/combined_fit_08/run_summary.json",
+      "sha256": "e0d0858db0328a7b64ec854d61c023f24ebe8cb83b7f992b5b46d8c74379fdae"
+    },
+    "combined_fit_09/progress.jsonl": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/combined_fit_09/progress.jsonl",
+      "sha256": "be81993a96e2944fe52b568d4cc9e8b7262fc347bd3410530b464da933e93b71"
+    },
+    "combined_fit_09/resumed_residual.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/combined_fit_09/resumed_residual.json",
+      "sha256": "57ad0780c373212b0f27e4955fb9f6350e110c6526e1869d70b580fdcf547c5e"
+    },
+    "combined_fit_09/run_summary.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/combined_fit_09/run_summary.json",
+      "sha256": "2d4f5668b9c111e12d0d1b7c2bc7fbe7984303cd4f370259f69fb71551ce35e4"
+    },
+    "joint_fit_10/progress.jsonl": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/joint_fit_10/progress.jsonl",
+      "sha256": "6a9c7eeff4f7ead7cd79f602257ea633182692bea62acc3175b6f3385210bbf6"
+    },
+    "joint_fit_10/resumed_residual.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/joint_fit_10/resumed_residual.json",
+      "sha256": "6215192ee931a4bc108c9ac812d600f671f2a8681b4f4ed8762adce7f60872f1"
+    },
+    "joint_fit_10/run_summary.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/joint_fit_10/run_summary.json",
+      "sha256": "3cfd301d5382262b593ca4777aabe8378397e3c46ef6d6df40850ffef08a2aeb"
+    },
+    "joint_fit_11/progress.jsonl": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/joint_fit_11/progress.jsonl",
+      "sha256": "f105982d8618277d4ad62f814381bb2097a72c3e666af67c60d5d99316c55850"
+    },
+    "joint_fit_11/resumed_residual.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/joint_fit_11/resumed_residual.json",
+      "sha256": "6215192ee931a4bc108c9ac812d600f671f2a8681b4f4ed8762adce7f60872f1"
+    },
+    "joint_fit_11/run_summary.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/landing_motion_1115/joint_fit_11/run_summary.json",
+      "sha256": "d7bcc7dd549309df518ba0903479c848cc5e0a09338793cf097fe341fedb60cd"
+    }
+  }
+}

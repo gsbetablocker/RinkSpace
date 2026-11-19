@@ -492,8 +492,12 @@ RS_API int rs_gpu_attach_scene(void* handle,const double* values,size_t nv,const
         }
         std::vector<double> scene_data(data,data+nd),scene_directions(directions,directions+nj);
         std::vector<double> scene_lower(lower,lower+nv),scene_upper(upper,upper+nv),input=p->input;
-        if(p->host.options&64u)for(size_t i=6+ice_nominal_size;i<6+ice_tolerance_layout_size;++i){
+        if((p->host.options&64u)&&!(p->host.options&128u))for(size_t i=6+ice_nominal_size;i<6+ice_tolerance_layout_size;++i){
             scene_lower[i]=std::max(scene_lower[i],-.01);scene_upper[i]=std::min(scene_upper[i],.01);}
+        if(p->host.options&128u)for(int d=0;d<ice_deviation_count;++d)
+            if((d>=16&&d<56)||(d>=90&&d<107)){
+                const size_t i=6+ice_nominal_size+d;
+                scene_lower[i]=std::max(scene_lower[i],-1.+64*std::numeric_limits<double>::epsilon());}
         input.insert(input.end(),values,values+nv);
         DeviceBuffer<ScenePath> device_paths;DeviceBuffer<double> device_data,device_input;
         // Keep both old views and their owners valid until every upload succeeds.

@@ -143,3 +143,30 @@ def test_parallel_faces_preserve_serial_certificate_and_face_order(windowed):
         for name in ("constraint_records", "normalized_constraint_jacobian", "projected_retained_descent"):
             np.testing.assert_allclose(parallel[name], serial[name], rtol=1e-13, atol=1e-13)
         assert p.performance_metrics()["stationarity_recomputations"] == 2
+
+
+@pytest.mark.parametrize("camera_count", [1, 3])
+def test_mount_only_faces_preserve_serial_certificate_for_long_storage(camera_count):
+    from test_camera_envelope import CameraEnvelopeTests
+    camera = CameraEnvelopeTests(); camera.setUp(); f = problem_fixture()
+    rigs = np.tile(camera.rig, (camera_count, 1)); rigs[:, 16] = -f.kw["board"][1]
+    kw = {**f.kw, "rig": rigs, "controls": np.tile([0., .15, np.log(100.)], (256, 1))}
+    for name in ("codes", "stations", "times", "observed"):
+        kw[name] = np.concatenate([f.kw[name]] * camera_count)
+    kw["codes"] = np.zeros(4 * camera_count, np.int32)
+    kw["camera_ids"] = np.repeat(np.arange(camera_count, dtype=np.int32), 4)
+    rd = np.zeros((27 * camera_count, 2)); rd[7, 0] = 1.; rd[15, 1] = 1.
+    with ResidentResidualProblem(f.core, **kw) as p:
+        p.configure_geometry([dict(kind=4, vertices=[[0., 3., 0.]], parameters=[])])
+        p.configure_camera_parameters(directions=rd, max_readout=.08)
+        p.configure_mount_constraints(side="negative_y", camera_index=0)
+        p.configure_pixel_linearization(directions=np.zeros((256, 3, 2)),
+            local_ids=np.full(4 * camera_count, -1), local_scales=[])
+        f.attach(p)
+        with patch.dict(os.environ, RINKSPACE_STATIONARITY_FACE_BACKEND="serial"):
+            serial = p.stationarity_diagnostics(include_constraints=True)
+        with patch.dict(os.environ, RINKSPACE_STATIONARITY_FACE_BACKEND="parallel"):
+            parallel = p.stationarity_diagnostics(include_constraints=True)
+        assert serial["active_constraint_count"] > 0
+        for name in ("constraint_records", "normalized_constraint_jacobian", "projected_retained_descent"):
+            np.testing.assert_allclose(parallel[name], serial[name], rtol=1e-13, atol=1e-13)

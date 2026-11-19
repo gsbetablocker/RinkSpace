@@ -74,6 +74,20 @@ class SourceReviewTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'SHA-256 mismatch'):
             exporter.verify_source_review(extracted)
 
+    def test_root_handoffs_are_excluded_from_export_and_rejected_in_archive(self):
+        for name in ('.hermes/plans/tracked.md', '.hermes/plans/untracked.md', 'docs/plans/public.md'):
+            path = self.root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(name, encoding='utf-8')
+        subprocess.run(['git', '-C', str(self.root), 'add', '.hermes/plans/tracked.md'], check=True)
+        result = self.export()
+        with zipfile.ZipFile(result['path'], 'a') as archive:
+            self.assertIn('docs/plans/public.md', archive.namelist())
+            self.assertFalse(any(name.startswith('.hermes/') for name in archive.namelist()))
+            archive.writestr('.hermes/plans/inserted.md', 'local')
+        with self.assertRaisesRegex(ValueError, 'Forbidden'):
+            exporter.verify_source_review(result['path'])
+
     def test_record_escape_and_oversize_do_not_publish(self):
         with self.assertRaises(ValueError):
             exporter.export_source_review(self.root, test_records=['../secret.json'])

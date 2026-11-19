@@ -38,9 +38,11 @@ def import_scoped_candidate(reference, camera, prepared, document, specification
                 raise ValueError('Scoped camera transition changed world units: '+key)
         expected = dict(expected, camera_binding_json=parent['camera_binding_json'])
     validate_checkpoint_identity(parent, expected)
-    for key, name in (('prepared_input_sha256', 'input.npz'),
-                      ('prepared_observations_sha256', 'observations.npz')):
-        if str(parent[key]) != digest(prepared / name):
+    from .programme_skate_evidence import programme_observation_path
+    parent_observations = programme_observation_path(prepared, specification['parent_evidence'])
+    for key, path in (('prepared_input_sha256', prepared / 'input.npz'),
+                      ('prepared_observations_sha256', parent_observations)):
+        if str(parent[key]) != digest(path):
             raise ValueError('Scoped import changed ' + key)
     if str(parent['source_evidence_sha256']) != specification['parent_evidence_sha256']:
         raise ValueError('Parent checkpoint and declared source ledger differ')
@@ -89,13 +91,19 @@ def import_scoped_candidate(reference, camera, prepared, document, specification
                 maxima[label] = max(maxima[label], float(np.max(np.abs(lhs[key]-rhs[key]))*scale))
     if max(maxima.values()) > 3e-10:
         raise ValueError(f'Scoped import is not a zero-update replay: {maxima}')
-    # Use the exact saved curve as the new tangent origin. This also makes
-    # future resume independent of the superseded chart/root objective.
-    reference.absolute_curve = curve
-    reference.relative_skate_curve = shoe
-    x = np.r_[parent['x'][:17], np.zeros(state.size)]
+    preserve_chart = specification.get('retain_parent_objective_context', False)
+    if preserve_chart:
+        if transition or parent_observations == programme_observation_path(prepared, document):
+            raise ValueError('An observation-only refit needs a new ledger and the original camera')
+        x = parent['x'].copy()
+    else:
+        # A scoped geometry import normally uses the saved curve as the new chart.
+        reference.absolute_curve = curve
+        reference.relative_skate_curve = shoe
+        x = np.r_[parent['x'][:17], np.zeros(state.size)]
     receipt = dict(schema='rinkspace.scoped-candidate-import.v1', parent=str(parent_path),
         parent_sha256=specification['parent_sha256'], historical_objective_reused=False,
+        parent_tangent_chart_retained=preserve_chart,
         source_exposures=n, shutter_nodes=int(shutter.size), midpoint_samples=n-1,
         source_pts=pts[[0,-1]].tolist(), source_time_base=list(time_base(reference.p)),
         prepared_input_sha256=str(parent['prepared_input_sha256']),
@@ -153,12 +161,19 @@ def require_full_repair_rows(problem, value, *, jacobian=False):
     blocks = {block.name:block for block in value['weighted_blocks']}
     missing = [name for name in expected if name not in blocks or not len(blocks[name].residual)]
     flights = [name for name in blocks if name.endswith('/flight_integrated_com')]
+    dense = [name for name in blocks if name.endswith('/flight_dense_com_acceleration')]
+    if problem.reference.source_document.get('com_motion_policy',{}).get('confirmed_flight_acceleration_scale_mps2') is not None:
+        episodes = problem.reference.source_document['source_episode_review']['episodes']
+        required = {'episode/'+e['episode_id']+'/flight_dense_com_acceleration'
+                    for e in episodes if e['kind']=='flight_visible_candidate'}
+        if set(dense) != required or any(not len(blocks[name].residual) for name in dense):
+            raise ValueError('Dense flight rows do not cover the declared source flights')
     if missing or not flights:
         raise ValueError(f'Incomplete revised programme objective: {missing}, flights={flights}')
     selection = problem.active_parameter_indices
     out = {}
     for name, block in blocks.items():
-        if name not in expected and name not in flights and not name.endswith('/flight_specific_momentum'):
+        if name not in expected and name not in flights and name not in dense and not name.endswith('/flight_specific_momentum'):
             continue
         entry = dict(rows=len(block.residual), weighted_cost=float(block.residual@block.residual/2),
                      source_association=block.association)
@@ -169,10 +184,12 @@ def require_full_repair_rows(problem, value, *, jacobian=False):
     return out
 
 
-def proposal_vector(problem, path, parent_sha256):
+def proposal_vector(problem, path, parent_sha256, parent_vector=None):
     """Convert a proposal's explicit geometry into the main stage's chart."""
     packet = load(path)
-    if str(packet['scoped_repair_parent_sha256']) != parent_sha256:
+    parent_key = ('scoped_import_parent_sha256' if parent_vector is not None
+                  else 'scoped_repair_parent_sha256')
+    if str(packet[parent_key]) != parent_sha256:
         raise ValueError('Proposal was generated against a different parent')
     validate_checkpoint_identity(packet, problem.reference.fixed_checkpoint_identity)
     state = problem.body.state
@@ -181,6 +198,19 @@ def proposal_vector(problem, path, parent_sha256):
     np.testing.assert_array_equal(packet['x'][:17], problem.binding.x)
     np.testing.assert_array_equal(shoe_curve_from_packet(packet).rotation_controls,
                                   state.shoe_curve.rotation_controls)
+    if parent_vector is not None:
+        np.testing.assert_array_equal(packet['scoped_parent_parameter_vector'],parent_vector)
+        if str(packet['prepared_input_sha256']) != str(problem.checkpoint_extra['prepared_input_sha256']):
+            raise ValueError('Same-chart proposal changed the prepared geometry')
+        x = packet['x'].copy()
+        if x.shape != parent_vector.shape or not np.isfinite(x).all():
+            raise ValueError('Same-chart proposal has an invalid parameter layout')
+        for current, expected in ((state.current_curve(x[17:]),candidate),
+                                  (state.shoe_current_curve(x[17:]),shoe_curve_from_packet(packet))):
+            np.testing.assert_allclose(current.position_controls,expected.position_controls,atol=2e-12,rtol=0)
+            np.testing.assert_allclose(current.rotation_controls,expected.rotation_controls,atol=2e-11,rtol=0)
+            np.testing.assert_allclose(current._check_log_chart(),expected._check_log_chart(),atol=3e-10,rtol=0)
+        return x
     dr = _log(state.curve.rotation_controls.swapaxes(-1,-2) @ candidate.rotation_controls)
     unchanged = np.all(state.curve.rotation_controls==candidate.rotation_controls,axis=(-2,-1))
     dr[unchanged]=0.
@@ -192,6 +222,41 @@ def proposal_vector(problem, path, parent_sha256):
     # The central rotations alone do not validate a lifted edge branch.
     np.testing.assert_allclose(got._check_log_chart(),candidate._check_log_chart(),atol=3e-10,rtol=0)
     return x
+
+
+def compare_objective_replay(old, registry, blocks, declared_changes):
+    """Check same-pose rows by name across a declared objective revision."""
+    offset = 0
+    previous = {}
+    for entry in registry:
+        name, start, stop = (entry[k] for k in ('name', 'start', 'stop'))
+        if name in previous or start != offset or not start <= stop <= len(old):
+            raise ValueError('Invalid parent weighted row registry: '+name)
+        previous[name] = old[start:stop]
+        offset = stop
+    if offset != len(old):
+        raise ValueError('Parent registry does not cover the weighted residual')
+    current = {entry.name:entry.residual for entry in blocks}
+    if len(current) != len(blocks):
+        raise ValueError('Duplicate current weighted row names')
+    all_names = previous.keys() | current.keys()
+    if declared_changes - all_names:
+        raise ValueError('Declared revised rows were not consumed')
+    changed, unchanged, maximum = {}, 0, 0.
+    for name in sorted(all_names):
+        if name in declared_changes:
+            a = previous.get(name, np.empty(0)); b = current.get(name, np.empty(0))
+            changed[name] = dict(before_rows=len(a),after_rows=len(b),
+                                 before_cost=float(a@a/2),after_cost=float(b@b/2))
+            continue
+        if name not in current or name not in previous:
+            raise ValueError('Undeclared weighted row population change: '+name)
+        a, b = previous[name], current[name]
+        if a.shape != b.shape or not np.allclose(a,b,rtol=0.,atol=2.e-8):
+            raise ValueError('Undeclared same-pose weighted residual change: '+name)
+        unchanged += len(a)
+        maximum = max(maximum,float(np.max(abs(a-b),initial=0.)))
+    return dict(changes=changed,unchanged_rows=unchanged,unchanged_maximum_abs_difference=maximum)
 
 
 def weighted_residual_identity(value):

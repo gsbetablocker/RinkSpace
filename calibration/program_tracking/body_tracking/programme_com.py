@@ -88,9 +88,10 @@ class ModelCOMMotionFactor:
         from .body_clock import time_base
         numerator,denominator=time_base(self.ref.p)
         self.source_pts_float=self.ref.p['pts'][0]+self.times*denominator/numerator
-        native_rows=np.searchsorted(self.times,self.ref.times)
-        np.testing.assert_array_equal(self.times[native_rows],self.ref.times)
-        self.source_pts_float[native_rows]=self.ref.p['pts']
+        self.native_rows=np.searchsorted(self.times,self.ref.times)
+        np.testing.assert_array_equal(self.times[self.native_rows],self.ref.times)
+        self.source_pts_float[self.native_rows]=self.ref.p['pts']
+        self.native_A=self.A if len(self.times)==len(self.native_rows) else acceleration_operator(self.ref.times)
         flight=flight_mask(self.ref,self.source_pts_float)
         from .continuous_motion_factors import reviewed_cut_weight
         w=np.sqrt(trapezoid_time_weights(self.times)[1:-1]*
@@ -116,16 +117,16 @@ class ModelCOMMotionFactor:
                 raise ValueError('Overlapping reviewed dense flight intervals')
             claimed=np.zeros(len(self.times)-2,bool)
             measure=trapezoid_time_weights(self.times)[1:-1]
+            from .phase_motion_quality import flight_stencil_rows
             for episode in episodes:
                 name=episode['episode_id']
                 if name in self.flight_rows:raise ValueError('Duplicate dense flight episode')
-                inside=(self.source_pts_float>=episode['start_pts'])&(self.source_pts_float<=episode['end_pts_inclusive'])
                 # All three derivative samples must belong to this same reviewed
                 # interior. No onset/landing force is inferred across its boundary.
-                keep=inside[:-2]&inside[1:-1]&inside[2:]
-                if not keep.any() or np.any(keep&claimed):
+                rows=flight_stencil_rows(self.source_pts_float,episode)
+                if not len(rows) or np.any(claimed[rows]):
                     raise ValueError('Empty or overlapping reviewed dense flight interior')
-                claimed|=keep;rows=np.flatnonzero(keep)
+                claimed[rows]=True
                 weight=np.sqrt(measure[rows])/self.flight_scale
                 self.flight_rows[name]=rows;self.flight_weights[name]=weight
                 self.flight_operators[name]=kron(diags(weight)@self.A[rows],eye(3),format='csr')
@@ -152,6 +153,8 @@ class ModelCOMMotionFactor:
         r=np.asarray(self.operator@com.ravel())
         acceleration=self.A@com;magnitude=np.linalg.norm(acceleration,axis=1);peak=int(np.argmax(magnitude))
         self.last_acceleration = acceleration
+        self.last_native_acceleration = (acceleration if self.native_A is self.A
+                                         else self.native_A@com[self.native_rows])
         from .body_clock import time_base
         numerator,denominator=time_base(self.ref.p);source_seconds=self.source_pts_float[1:-1]*numerator/denominator
         lsp=(source_seconds>=156.2)&(source_seconds<=165.2)
@@ -192,6 +195,26 @@ class ModelCOMMotionFactor:
             if jacobian:J=vstack([entry.jacobian for entry in entries],format='csr')
         return dict(residual=r,jac=J,parts={entry.name:float(entry.residual@entry.residual/2)for entry in entries},
             weighted_blocks=entries,metrics=metrics)
+
+    def acceleration_rows(self, x, rows, *, native=False, jacobian=False):
+        """Re-evaluate selected derivative stencils on the same curve and mass."""
+        times, operator = (self.ref.times, self.native_A) if native else (self.times, self.A)
+        rows = np.asarray(rows, dtype=int)
+        samples = np.unique(rows[:,None]+np.arange(3))
+        clock = times[samples]
+        state = self.p.body.state
+        base = self.ref.at(clock)
+        delta = state.increments(x,clock)
+        derivative = operator[rows][:,samples]
+        if not jacobian:
+            centres,_ = self.mass.evaluate(base,delta)
+            return derivative@self.mass.com(centres),None
+        position, body, shoe = com_local_jacobians(self.mass,base,delta)
+        matrix = delta.chain(body)
+        if hasattr(state,'shoe_chain'):
+            matrix += state.shoe_chain(shoe,x,clock)
+        local = kron(derivative,eye(3,format='csr'),format='csr')@matrix
+        return derivative@position,hstack((csr_matrix((local.shape[0],17)),local),format='csr')
 
 
     def export(self,x,path,**identity):

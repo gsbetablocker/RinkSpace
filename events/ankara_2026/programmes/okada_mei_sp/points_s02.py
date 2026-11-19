@@ -21,7 +21,7 @@ sys.path[:0] = [str(ROOT), str(ROOT/'src'), str(PROG)]
 import cv2
 import numpy as np
 from rinkspace.vision_native import NativeSourceGeometry, file_ref
-from ice_points_s04 import read, write, rows, material_path, select_representatives
+from ice_points_s04 import SOURCE_INDEX, read, write, rows, material_path, select_representatives
 from review_points_s04 import CurrentNativeGrid as SharedNativeGrid
 
 DATA = Path('D:/CodexData/RinkSpace_Data')
@@ -135,7 +135,7 @@ def inventory():
             refs.append(file_ref(d['rows_file']))
             for _,r in rows(d['rows_file']):
                 if r['shot_id']=='s02':extra[r['feature_id']]+=1
-    withdrawn={};index=DATA/'runs/okada_s02_s09_observations_20261026/source_index.sqlite'
+    withdrawn={};index=DATA / SOURCE_INDEX
     with sqlite3.connect(index.as_uri()+'?mode=ro',uri=True)as db:
         for key,payload in db.execute("select id,payload from qualification where shot='s02'"):
             withdrawn[key]=json.loads(payload)

@@ -63,6 +63,8 @@ def snapshot_objective_kernels(output):
                  'anatomical_chart.py','programme_com.py','programme_opening.py',
                  'actual_observation_ledger.py','scoped_candidate.py',
                  'programme_repair_factors.py','programme_quality_guard.py','programme_skate_replay.py',
+                 'phase_motion_quality.py','programme_flight_guard.py','scoped_phase_quality.py',
+                 'scoped_motion_step.py','scoped_motion_domains.py',
                  'source_structure_extent.py'):
         payload = Path(__file__).with_name(name).read_bytes()
         implementation[name] = hashlib.sha256(payload).hexdigest()
@@ -849,6 +851,10 @@ class JointContactProblem:
             from .runner_interior import RunnerCoordinateDomainError
             try:
                 full=expand(z)
+                if not jacobian and getattr(self,'enforce_rotation_lift_continuity',False):
+                    state=self.body.state
+                    previous=state.current_curve(expand(last_recorded)[17:])
+                    state.current_curve(full[17:]).check_continuous_edge_update(previous)
                 precheck=getattr(self,'early_source_trial_quality',None)
                 if (not jacobian and getattr(self,'image_safe_trials',False) and precheck is not None
                         and (self.cache_x is None or not np.array_equal(self.cache_x,full))):

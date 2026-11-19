@@ -8,7 +8,7 @@ import argparse,collections,gzip,hashlib,json,shutil,sqlite3,time
 import re
 import cv2,numpy as np
 import points_s06 as common
-from ice_points_s04 import read,write,rows
+from ice_points_s04 import SOURCE_INDEX,read,write,rows
 from rinkspace.vision_native import NativeSourceGeometry,file_ref
 
 ROOT=common.ROOT;PROG=common.PROG;DATA=common.DATA;REC=common.REC;SCENE=common.SCENE
@@ -111,7 +111,7 @@ def inventory():
         refs.append(file_ref(p))
         for i,r in rows(p):
             if r.get('source_row_id')in ids:corrections[r['source_row_id']]=dict(record=r,source=str(p),jsonl_line_0based=i)
-    index=DATA/'runs/okada_s02_s09_observations_20261026/source_index.sqlite'
+    index=DATA / SOURCE_INDEX
     if index.exists():
         refs.append(file_ref(index))
         with sqlite3.connect(index.as_uri()+'?mode=ro',uri=True)as db:

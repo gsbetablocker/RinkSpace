@@ -116,17 +116,24 @@ class ScopedProgrammeGuard:
         self.policy = spec['guard']
         self.pts = self.ref.p['pts']
         self.scope = []
-        self.opening_physical = sampled_windows(self.ref,self.state,self.ice.times,[spec['opening_pts']])
+        self.physical_times = self.ice.times
+        if spec.get('phase_objective_replay_registry'):
+            clock = problem.physics_times
+            local = sampled_windows(self.ref,self.state,clock,spec['focus_pts'])
+            self.physical_times = np.union1d(self.physical_times,clock[local])
+        self.objective_ice_indices = np.searchsorted(self.physical_times,self.ice.times)
+        self.extra_ice_indices = np.flatnonzero(~np.isin(self.physical_times,self.ice.times))
+        self.opening_physical = sampled_windows(self.ref,self.state,self.physical_times,[spec['opening_pts']])
         self.opening_native = sampled_windows(self.ref,self.state,self.ref.times,[spec['opening_pts']])
         for window in spec['focus_pts']:
             ts = self.ref.times
             local = sampled_windows(self.ref,self.state,ts,[window])
-            mid = sampled_windows(self.ref,self.state,self.ice.times,[window])
+            mid = sampled_windows(self.ref,self.state,self.physical_times,[window])
             nearby = local[:-2]|local[1:-1]|local[2:]
             self.scope.append((window,local,mid,nearby))
         self.radii = np.array([self.ice.policy['tolerance_m'].get(k,self.ice.policy['tolerance_m']['solid'])
                               for k in self.ice.part_names])
-        self.identity = signature(self.pts,self.state.knots,self.ice.times,
+        self.identity = signature(self.pts,self.state.knots,self.physical_times,
                                   self.joints.association,self.policy,spec['focus_pts'])
         self.anchor = self.snapshot(x,value)
         if saved is not None:
@@ -161,17 +168,28 @@ class ScopedProgrammeGuard:
         k=self.state.current_curve(x[17:])
         rotation=evaluate_curve(k,self.ref.times)['rotations']
         angle=np.rad2deg(np.linalg.norm(_log(rotation[:-1].swapaxes(-1,-2)@rotation[1:]),axis=-1))
-        root=k.position_derivative(self.ice.times,2)*self.ref.binding.ratio
+        root=k.position_derivative(self.physical_times,2)*self.ref.binding.ratio
+        heights=self.ice.last_height.copy()
+        if len(self.extra_ice_indices):
+            from .programme_repair_factors import component_ice
+            from .skate_physics import fk_state
+            t=self.physical_times[self.extra_ice_indices]
+            pose=fk_state(self.ref,self.ref.at(t),self.state.increments(x[17:],t))
+            extra=component_ice(self.ref.binding,pose)[1]
+            extended=np.empty((len(self.physical_times),*heights.shape[1:]))
+            extended[self.objective_ice_indices]=heights
+            extended[self.extra_ice_indices]=extra
+            heights=extended
         whole=self.problem.action_factors.whole_skate
         silhouette=whole.last_distances.copy()
         directed=np.full((len(self.pts),2),np.nan)
         for row in value['action_metrics'].get('directed_boot_source',[]):
             i=np.searchsorted(self.pts,row['pts'])
             directed[i,row['foot']]=row['distance_px']
-        return dict(pixel=pixels,ice=self.ice.last_height.copy(),
+        return dict(pixel=pixels,ice=heights,
             anatomy=self.joints.last_values.copy(),
             cavity=np.maximum(0.,-value['contact']['margin_m'].reshape(-1,self.problem.cavity_rows_per_frame)[1:]),
-            root=np.linalg.norm(root,axis=1),com=np.linalg.norm(self.com.last_acceleration,axis=1),
+            root=np.linalg.norm(root,axis=1),com=np.linalg.norm(self.com.last_native_acceleration,axis=1),
             angle=angle,silhouette=silhouette,directed=directed)
 
     def checks(self,x,value):

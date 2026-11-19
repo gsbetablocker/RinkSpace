@@ -38,7 +38,12 @@ class NativeSceneGPU:
         self.scene_path=Path(scene_path).resolve()
         scene=json.loads(self.scene_path.read_text(encoding="utf-8-sig"))
         self.ice_relative_limit=None
-        if scene.get('shared_geometry_options',0)&64:
+        if scene.get('shared_geometry_options',0)&128:
+            schema={255:'rinkspace.free_ice_metric.v1',511:'rinkspace.free_ice_metric.v2',
+                    1023:'rinkspace.free_ice_metric.v3'}.get(scene['shared_geometry_options'])
+            if not schema or scene.get('ice_metric_freedom',{}).get('schema')!=schema:
+                raise ValueError('Free ice geometry requires its matching native metric declaration')
+        elif scene.get('shared_geometry_options',0)&64:
             from ..domain.ice_tolerance import scene_relative_limit
             self.ice_relative_limit=scene_relative_limit(scene,core)
         self.parameter_state=parameter_state or SceneParameterModel(scene,self.scene_path).initial_state
@@ -62,7 +67,9 @@ class NativeSceneGPU:
         from ..core.gpu import ResidentResidualProblem
         if self.scene.get('shared_geometry_options',0)&64:
             from ..domain.ice_tolerance import scene_physical_bounds
-            required_lower,required_upper=scene_physical_bounds(self.parameter_state,self.ice_relative_limit)
+            options=self.scene['shared_geometry_options']
+            required_lower,required_upper=scene_physical_bounds(self.parameter_state,self.ice_relative_limit,
+                free_metric=bool(options&128),signed_offsets={511:1,1023:9}.get(options,0))
             scene_lower=required_lower if scene_lower is None else np.maximum(required_lower,scene_lower)
             scene_upper=required_upper if scene_upper is None else np.minimum(required_upper,scene_upper)
         ids=list(path_ids)

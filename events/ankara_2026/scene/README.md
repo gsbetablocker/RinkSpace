@@ -1,6 +1,10 @@
 # 当前共同场景与广告资产
 
-本页保存安卡拉赛事的模型资产和取点定义；通用来源、拟合范围与广告几何见[建模与接入](../../../docs/rink_model/BUILD_SPEC.md)，整镜头判定见[验证说明](../../../docs/VALIDATION.md)。求解后的数值状态与基础资产分别绑定，两套完整拟合见[赛事版本登记](../README.md#暂定最终版本)。
+[赛事指定记录](current_fit.json)选用 [`s14_boards_1118`](s14_boards_1118.json)。四套节目共用 404 项 `lane4_side_1118` 场地数值、922 条路径和 26 个已定位广告实例。加载[场地数值](field/lane4_side_1118.npz)时使用[配套结构](field/crease_offset_1118.json)，详见[坐标表](lane4_side_1118_coordinates.json)及[赛事入口](../README.md)。
+
+四条 LANE 右封口漆线各自拟合位置与斜率，[此前的共线记录](../model_constraints/geometry_relations_current.json)保留其原始适用范围。LANE4 上长边采用右封口与左侧内横线的可读漆边约束，中段缺少可独立读取的双沿。斜视围挡时，上沿取竖直广告面与顶面的交线。
+
+通用场景接入见[建模说明](../../../docs/rink_model/BUILD_SPEC.md)，完整镜头的判定见[验证说明](../../../docs/VALIDATION.md)。
 
 <a id="ice-observations"></a>
 ## 当前冰面取点定义
@@ -13,7 +17,7 @@ F1–F4/R1–R4 八组靶圈的 center、inner、middle、outer 四层圆，以�
 
 ## 当前资产与审核状态
 
-两套节目采用同一份[冰场暂定最终版几何](provisional_final_1113.json)。该记录绑定[结构文件](field/jin_s14_1111.json)和[共同数值快照](field/shared_joint_review_1113.npz)，编译后有 68 条冰面、2 条围挡和 852 条广告路径。26 个广告均有定位，包括 Ad15、Ad16。
+2026-11-17 的 [`trapezoid_shared4_1116`](provisional_final_1117.json) 保留为本次修复前的暂定最终几何基线。相对[2026-11-13 场地登记](provisional_final_1113.json)，本版更新四条梯形线的世界坐标，其余 918 条路径一致。场地共 68 条冰面、2 条围挡和 852 条广告路径，26 个广告均有定位。Chen Xi Jin 的最新场地复查版含同一组梯形线端点，具体结构见[节目登记](../programmes/chen_xi_jin_sp/provisional_final_1117.json)。
 
 [名义结构](field/model.json)保存 `unfitted_structure_candidate` 基础结构和初值。冰面与围挡的人工确认见赛事约束，尺寸、相机物理和米制验证见各自的证据记录。
 

@@ -439,7 +439,7 @@ class ProgrammeSurfaceFactor:
                 out[:,take]=(np.einsum('nij,nvj->nvi',axes[:,foot],local)+origins[:,foot,None])*ratio
         return out
 
-    def evaluate(self,x,jacobian=False):
+    def evaluate(self,x,jacobian=False,*,signed_proposal=False):
         from .fullbody_fit import right_jacobian
         packet=self.packet;n=len(packet['sample']);residual=np.zeros(n);jac=[]
         self.last_parameters=np.array(x,copy=True);self.last_gap=np.zeros(n)
@@ -472,9 +472,9 @@ class ProgrammeSurfaceFactor:
             else:
                 def contract(v):return np.einsum('ni,ni->n',normal,v[lookup,va]-np.einsum('ni,nij->nj',bary,v[lookup[:,None],vb]))
                 gap[rows]=contract(vertices)
-            residual[rows]=np.maximum(-gap[rows],0.)*self.weight[rows]
+            residual[rows]=(-gap[rows] if signed_proposal else np.maximum(-gap[rows],0.))*self.weight[rows]
             if not jacobian:continue
-            active=gap[rows]<0
+            active=np.ones(len(rows),bool) if signed_proposal else gap[rows]<0
             if not np.any(active):
                 jac.append((rows,csr_matrix((len(rows),self.state.size))))
                 continue

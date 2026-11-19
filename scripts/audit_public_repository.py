@@ -170,13 +170,17 @@ def role(path: str, preserved: dict[str, list[str]]) -> str:
     return "configuration_documentation_or_other"
 
 
+def local_handoff_path(path: str) -> bool:
+    return path.replace("\\", "/").casefold().startswith(".hermes/plans/")
+
+
 def local_review_reasons(path: str) -> list[str]:
     name = Path(path).name.lower()
     parts = {part.lower() for part in Path(path).parts}
     reasons = []
     if name.startswith(".env") or name in {"local.json", "credentials.json", "token.json"}:
         reasons.append("local_configuration_or_credential_filename")
-    if parts & {".agents", ".codex", "diagnostics", "history", "review_20261005"}:
+    if local_handoff_path(path) or parts & {".agents", ".codex", "diagnostics", "history", "review_20261005"}:
         reasons.append("agent_session_or_historical_evidence_context")
     if path.endswith(".provenance.json") or name.endswith("_status.json") or "preservation_manifest" in name:
         reasons.append("local_provenance_or_status_review")

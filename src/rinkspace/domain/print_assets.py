@@ -56,7 +56,12 @@ def resolve_instance(assets,instance_id):
     except KeyError as exc:
         raise PrintBindingError('missing_print_parameter_reference',instance_id=instance_id,reference=str(exc)) from exc
     validate_template_topology(template)
-    if template['size_class_id']!=size['id'] or size['kind']!='print_size' or size['size']!=2:
+    policy=instance.get('size_binding_policy','shared_template')
+    if policy not in ('shared_template','independent_instance'):
+        raise PrintBindingError('unknown_print_size_policy',instance_id=instance_id)
+    shared_matches=template['size_class_id']==size['id']
+    explicit_instance=(policy=='independent_instance' and instance.get('size_class_ref')==size['id'])
+    if (not shared_matches and not explicit_instance) or size['kind']!='print_size' or size['size']!=2:
         raise PrintBindingError('invalid_shared_print_size',instance_id=instance_id)
     if placement['kind']!='print_placement' or placement['size']!=3:
         raise PrintBindingError('invalid_print_placement',instance_id=instance_id)

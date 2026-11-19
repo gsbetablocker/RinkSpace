@@ -25,6 +25,7 @@ def revise_body_observations(observations,assignments,exclusions,provenance):
     seen=set();changes=[]
     for entry in assignments:
         i=frame(entry['source_pts']);pairs=entry['joint_pairs']
+        evidence={k:entry[k] for k in ('event_id','reason','evidence_pts') if k in entry}
         if not pairs:raise ValueError('Explicit bilateral pairs required')
         for pair in pairs:
             if len(pair)!=2:raise ValueError('Bilateral joint pair required')
@@ -34,7 +35,7 @@ def revise_body_observations(observations,assignments,exclusions,provenance):
             key=(i,a)
             if key in seen or not np.array_equal(ids[i,[a,b]],[a,b]):raise ValueError('Duplicate or already revised correspondence')
             seen.add(key);ids[i,[a,b]]=[b,a]
-            changes.append(dict(source_pts=int(pts[i]),joint_pair=[int(a),int(b)],before=[int(a),int(b)],after=[int(b),int(a)]))
+            changes.append(dict(source_pts=int(pts[i]),joint_pair=[int(a),int(b)],before=[int(a),int(b)],after=[int(b),int(a)],**evidence))
     removed=[];used=set()
     for entry in exclusions:
         i=frame(entry['source_pts']);j=entry['joint_id']
@@ -88,9 +89,12 @@ def revised_quality_population(baseline,old_observations,new_observations,new_re
     result=copy.deepcopy(baseline)
     previous=result.get('body_observation_reference')
     result['body_observation_reference']=dict(new_reference)
+    protected_roles=(body_joint_assignment(old_observations)[:,protected]
+                     !=body_joint_assignment(new_observations)[:,protected]) & new_use[:,protected]
     result['body_source_revision']=dict(previous_quality_population=previous,source_revision=revision,
         all_existing_source_torso_turn_limits_unchanged=True,protected_torso_lower_population_identical=True,
-        excluded_rows=len(actual),reason='Original source images show duplicate/wrong-target detections; no model residual criterion')
+        reattached_protected_rows=int(np.count_nonzero(protected_roles)),
+        excluded_rows=len(actual),reason='Source-reviewed observation admission; no model residual criterion')
     for key in ('source','torso','turn_episodes'):
         if key in baseline:assert result[key]==baseline[key]
     return result
@@ -98,7 +102,7 @@ def revised_quality_population(baseline,old_observations,new_observations,new_re
 
 def reassess_lower_limb_quality_population(baseline,old_observations,new_observations,new_reference,revision,
                                           *,reference_projection,reference_pts,turn_source_pts,reference_identity):
-    """Explicit source-visibility reassessment, retaining every numeric limit.
+    """Replay source-reviewed correspondence and visibility with frozen limits.
 
     Replays one immutable saved pose on both populations. This is an admission
     change, not a model improvement or a reset to the current candidate's errors.
@@ -107,15 +111,23 @@ def reassess_lower_limb_quality_population(baseline,old_observations,new_observa
     for key in ('pts','uv','sigma_px','confidence'):
         if key in old_observations:
             np.testing.assert_array_equal(old_observations[key],new_observations[key],err_msg='Source changed: '+key)
-    old_ids=body_joint_assignment(old_observations);new_ids=body_joint_assignment(new_observations)
-    np.testing.assert_array_equal(old_ids,new_ids,err_msg='Visibility reassessment cannot change identities')
     pts=np.asarray(old_observations['pts']);np.testing.assert_array_equal(reference_pts,pts)
+    np.testing.assert_array_equal(new_observations['pts'],pts)
+    old_ids=body_joint_assignment(old_observations);new_ids=body_joint_assignment(new_observations)
+    verified_ids=old_ids.copy()
+    for entry in revision.get('new_assignments', []):
+        stamp=entry['source_pts'];i=int(np.searchsorted(pts,stamp));pair=entry['joint_pair']
+        if i==len(pts) or pts[i]!=stamp or not np.array_equal(verified_ids[i,pair],entry['before']):
+            raise ValueError('Visibility reassessment has an invalid correspondence declaration')
+        verified_ids[i,pair]=entry['after']
+    np.testing.assert_array_equal(verified_ids,new_ids,err_msg='Visibility reassessment cannot change undeclared identities')
     old_use=np.asarray(old_observations['use']);new_use=np.asarray(new_observations['use'])
     if old_use.dtype.kind!='b' or new_use.dtype.kind!='b' or old_use.shape!=new_use.shape or np.any(new_use&~old_use):
         raise ValueError('Unexpected source admission change')
     rows,joints=np.nonzero(old_use&~new_use)
-    if not len(rows) or np.any(~np.isin(joints,GROUPS['lower_limbs'])):
-        raise ValueError('Explicit lower-limb-only visibility reassessment required')
+    lower=np.isin(joints,GROUPS['lower_limbs'])
+    if not lower.any() or np.any(np.isin(joints,GROUPS['torso'])):
+        raise ValueError('Explicit lower-limb visibility reassessment required with the protected torso population retained')
     declared=revision['derived_use_exclusions']
     expected={(int(r['source_pts']),int(r['joint_id'])) for r in declared}
     actual={(int(pts[i]),int(j)) for i,j in zip(rows,joints)}
@@ -126,18 +138,19 @@ def reassess_lower_limb_quality_population(baseline,old_observations,new_observa
     projection=np.asarray(reference_projection,float)
     if projection.shape!=old_observations['uv'].shape:
         raise ValueError('Reference projection must contain every native body point')
-    assigned=projection[np.arange(len(pts))[:,None],old_ids]
-    pixels=np.linalg.norm(assigned-old_observations['uv'],axis=-1)
+    frames=np.arange(len(pts))[:,None]
+    previous_pixels=np.linalg.norm(projection[frames,old_ids]-old_observations['uv'],axis=-1)
+    current_pixels=np.linalg.norm(projection[frames,new_ids]-new_observations['uv'],axis=-1)
     protected=np.zeros_like(old_use);protected[:,[*GROUPS['torso'],*GROUPS['lower_limbs']]]=True
-    if not np.isfinite(pixels[old_use&protected]).all():
+    if not (np.isfinite(previous_pixels[old_use&protected]).all() and np.isfinite(current_pixels[new_use&protected]).all()):
         raise ValueError('Nonfinite protected reference projection')
-    def metrics(mask):
+    def metrics(pixels,mask):
         values=pixels[mask]
         if not len(values):raise ValueError('Empty reassessed body quality population')
         return dict(observations=int(len(values)),pixel_p95=float(np.percentile(values,95)))
     torso=np.zeros_like(old_use);torso[:,GROUPS['torso']]=True
     np.testing.assert_array_equal(old_use&torso,new_use&torso)
-    torso_replay=metrics(old_use&torso)
+    torso_replay=metrics(previous_pixels,old_use&torso)
     expected_episodes={name.rsplit('/',1)[0] for name in baseline['turn_episodes']}
     if set(turn_source_pts)!=expected_episodes:raise ValueError('Turn episode population differs')
     result=copy.deepcopy(baseline);replay={}
@@ -147,22 +160,24 @@ def reassess_lower_limb_quality_population(baseline,old_observations,new_observa
         if selected.dtype.kind not in 'iu' or len(np.unique(selected))!=len(selected) or not np.isin(selected,pts).all():
             raise ValueError('Turn rows must be distinct native source PTS')
         mask=np.zeros_like(old_use);mask[:,GROUPS[group]]=np.isin(pts,selected)[:,None]
-        before=metrics(old_use&mask);after=metrics(new_use&mask)
+        before=metrics(previous_pixels,old_use&mask);after=metrics(current_pixels,new_use&mask)
         if before['observations']!=previous['observations']:
             raise ValueError('Original turn population count differs: '+name)
         result['turn_episodes'][name]['observations']=after['observations']
         replay[name]=dict(same_saved_pose_before=before,same_saved_pose_after=after,
+                         surviving_rows=int(np.sum(old_use&new_use&mask)),retired_rows=before['observations']-after['observations'],
                          retained_baseline_p95_px=previous['pixel_p95'],
                          retained_limit_px=previous['pixel_p95']+max(2.,.1*previous['pixel_p95']))
     result['body_observation_reference']=dict(new_reference)
     result['body_source_revision']=dict(previous_quality_population=baseline.get('body_observation_reference'),
         previous_revision=baseline.get('body_source_revision'),source_revision=revision,
         all_existing_source_torso_turn_numeric_limits_unchanged=True,protected_population_explicitly_reassessed=True,
-        excluded_rows=len(actual),reference_projection=dict(reference_identity),same_pose_replay=replay,
+        excluded_rows=len(actual),excluded_lower_limb_rows=int(lower.sum()),reference_projection=dict(reference_identity),same_pose_replay=replay,
         same_pose_torso_replay=torso_replay,original_torso_guard_metadata=baseline['torso'],
+        same_pose_torso_after=metrics(current_pixels,new_use&torso),
         reference_pose_is_not_original_threshold_replay=True,
         accuracy_improvement_claim=False,stage_baseline_reset=False,
-        reason='Source-only occlusion evidence; unchanged original numeric limits and exact surviving-row counts')
+        reason='Source-only correspondence and visibility evidence; original numeric limits and exact surviving-row counts retained')
     for key in ('source','torso','flight_guard','stage_reset_allowed'):
         if key in baseline:assert result[key]==baseline[key]
     assert all(result['turn_episodes'][key]['pixel_p95']==value['pixel_p95'] for key,value in baseline['turn_episodes'].items())

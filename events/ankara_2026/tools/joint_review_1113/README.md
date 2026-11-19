@@ -1,6 +1,6 @@
 # 安卡拉共同冰场与相机复核源码
 
-[赛事登记](../../README.md#暂定最终版本)固定两套节目的相机与共同冰场。此处保存对应的项目源码，[来源清单](source_manifest.json)记录迁入前的 Data 路径及 SHA-256。已迁入的入口通过 `AssetStore` 定位本机 Data；实际运行读写 `Data/runs/ankara_joint_1113`。准备好的数据包含原始源 PTS、UV、角色和权重。
+[2026-11-13 冻结登记](../../scene/provisional_final_1113.json)固定当日两套节目的相机与共同冰场。此处保存对应的项目源码，[来源清单](source_manifest.json)记录迁入前的 Data 路径及 SHA-256。已迁入的入口通过 `AssetStore` 定位本机 Data；实际运行读写 `Data/runs/ankara_joint_1113`。准备好的数据包含原始源 PTS、UV、角色和权重。
 
 | 环节 | 入口 |
 |---|---|

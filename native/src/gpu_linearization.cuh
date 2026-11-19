@@ -108,7 +108,7 @@ RS_HD inline double component_h(const double* h,const ComponentPlan& c,int i,int
     return h[c.packed_h+(i<=j?upper_index(c.dim,i,j):upper_index(c.dim,j,i))];
 }
 RS_HD inline ScenePrimitive<LocalJet> scene_primitive_direction(const View& v,const LinearView& l,int path,int column){
-    ScenePrimitive<LocalJet> result;LocalJet board[6],layout[ice_tolerance_layout_size];
+    ScenePrimitive<LocalJet> result;LocalJet board[6],layout[ice_lane_centre_layout_size];
     for(int k=0;k<6;++k)board[k]={v.board[k],l.scene_directions[size_t(k)*l.q+column]};
     for(size_t k=0;k<v.nl;++k)layout[k]={v.layout[k],l.scene_directions[(6+k)*l.q+column]};
     int code=v.scene_paths[path].code;result.status=shared_entity_definition(board,6,layout,v.nl,code,result.kind,result.parameters,
@@ -409,17 +409,17 @@ struct Linearization {
                 else active=scene_dirs[k*q+j]!=0.;
                 if(active){parameter_columns[k].push_back(j);scene_active[j]=1;}
             }
-            if(v.nl==ice_tolerance_layout_size&&v.options==127u){ice_relation_offsets.push_back(0);
+            if(v.options&64u){ice_relation_offsets.push_back(0);
                 for(int id=0;id<ice_tolerance_margin_count;++id){std::vector<int> cols;
-                    ice_relation_source_support(id,[&](int source){cols.insert(cols.end(),parameter_columns[source].begin(),parameter_columns[source].end());});
+                    ice_relation_source_support(id,[&](int source){cols.insert(cols.end(),parameter_columns[source].begin(),parameter_columns[source].end());},v.nl);
                     std::sort(cols.begin(),cols.end());cols.erase(std::unique(cols.begin(),cols.end()),cols.end());
                     ice_relation_columns.insert(ice_relation_columns.end(),cols.begin(),cols.end());ice_relation_offsets.push_back(bounded(ice_relation_columns.size()));}}
             for(size_t k=0;k<v.npaths;++k){auto path=v.scene_paths[k];auto& cols=scene_columns[k];
                 auto include=[&](int begin,int count){for(int a=begin;a<begin+count;++a)cols.insert(cols.end(),parameter_columns[a].begin(),parameter_columns[a].end());};
                 int kind=v.paths[7*k];if(path.type||kind==3||kind==7)include(0,6);
                 if(path.type==1){
-                    if(v.nl!=ice_tolerance_layout_size||v.options!=127u||
-                       !ice_tolerance_layout_support(path.code,[&](int index){include(6+index,1);}))include(6,int(v.nl));
+                    if(!(v.options&64u)||
+                       !ice_tolerance_layout_support(path.code,[&](int index){include(6+index,1);},v.nl))include(6,int(v.nl));
                 }
                 if(path.type==2){include(path.size,2);include(path.placement,3);if(path.family)include(path.shape,path.shape_count);}
                 std::sort(cols.begin(),cols.end());cols.erase(std::unique(cols.begin(),cols.end()),cols.end());

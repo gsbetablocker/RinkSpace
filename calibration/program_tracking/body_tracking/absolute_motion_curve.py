@@ -111,6 +111,29 @@ class AbsoluteMotionCurve:
             self._log_chart_cache=(rotation,chart,steps)
         return steps
 
+    def check_continuous_edge_update(self, previous):
+        """Reject a solver step that jumps between opposite SU(2) lifts.
+
+        Both endpoints can pass the archived chart's seam test while a large
+        trial crosses that seam. Such a jump changes the spline's rotation
+        path even when the control matrices barely move. This checks the
+        numerical update, not the athlete's speed or an edge angle of pi.
+        """
+        if self.edge_reference_quaternion is None:
+            return
+        if self.rotation_controls.shape!=previous.rotation_controls.shape:
+            raise ValueError('A rotation update requires the same control layout')
+        lifts=[]
+        for curve in (previous,self):
+            v=curve._check_log_chart();a=np.linalg.norm(v,axis=-1)
+            scale=np.divide(np.sin(a/2),a,out=np.full_like(a,.5),where=a>1e-12)
+            lifts.append(np.concatenate((v*scale[...,None],np.cos(a/2)[...,None]),axis=-1))
+        dot=np.sum(lifts[0]*lifts[1],axis=-1)
+        crossed=np.argwhere(dot<0.)
+        if len(crossed):
+            raise RotationChartDomainError('Trial jumps across an archived SU(2) edge-chart seam: '
+                +str(crossed[:8].tolist()))
+
     def _validate_log_chart(self):
         relative=self.rotation_controls[:-1].swapaxes(-1,-2)@self.rotation_controls[1:]
         if self.edge_reference_quaternion is None:

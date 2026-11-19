@@ -8,23 +8,27 @@ namespace rinkspace {
 // previous trial. The old layouts and options retain their original meanings.
 constexpr int ice_nominal_size=39,ice_deviation_count=107;
 constexpr int ice_tolerance_layout_size=ice_nominal_size+ice_deviation_count;
+constexpr int ice_crease_layout_size=ice_tolerance_layout_size+1;
+constexpr int ice_lane_centre_layout_size=ice_crease_layout_size+8;
 constexpr double ice_relative_tolerance=.01;
 constexpr int ice_tolerance_margin_count=206;
 // Paired codes select Lane upper and lower edges that terminate at the left
 // goal line. Codes 300–311 retain their original finite support.
 constexpr int lane_to_left_goal_first_code=312;
 constexpr int lane_to_left_goal_stop_code=320;
-RS_HD inline bool shared_layout_size_valid(size_t n){return n==33||n==35||n==39||n==ice_tolerance_layout_size;}
+RS_HD inline bool shared_layout_size_valid(size_t n){return n==33||n==35||n==39||n==ice_tolerance_layout_size||n==ice_crease_layout_size||n==ice_lane_centre_layout_size;}
 RS_HD inline bool shared_options_valid(size_t n,unsigned options){
-    if(options&64u)return n==ice_tolerance_layout_size&&options==127u;
+    if(options&512u)return n==ice_lane_centre_layout_size&&options==1023u;
+    if(options&256u)return n==ice_crease_layout_size&&options==511u;
+    if(options&64u)return n==ice_tolerance_layout_size&&(options==127u||options==255u);
     return (n==33||n==35||n==39)&&!(options&~63u)&&
         (!((options&4u)||(options&8u))||(options&2u))&&
         (!(options&16u)||((options&2u)&&n>=35))&&(!(options&32u)||n==39);
 }
 
 template<class T> struct IceToleranceGeometry {
-    const T* q;const T* d;BoardShapeValue<T> board;
-    RS_HD IceToleranceGeometry(const T* b,const T* p):q(p),d(p+39),board{b[0],b[1],b[2],b[3],b[4],b[5]}{}
+    const T* q;const T* d;BoardShapeValue<T> board;bool free_metric,independent_lane_centres;
+    RS_HD IceToleranceGeometry(const T* b,const T* p,unsigned options=127u):q(p),d(p+39),board{b[0],b[1],b[2],b[3],b[4],b[5]},free_metric((options&128u)!=0),independent_lane_centres((options&512u)!=0){}
     RS_HD T row_y(int row)const{
         T adjustment=0,total=0;for(int j=0;j<3;++j){total+=d[j];if(j<row)adjustment+=d[j];}
         const T margin=board.half_width-1.5*q[3];
@@ -44,10 +48,18 @@ template<class T> struct IceToleranceGeometry {
         const auto f=house(row),r=house(row+4);
         return q[9]*(1+d[48+row]+(x-f.x)*(d[52+row]-d[48+row])/(r.x-f.x));
     }
-    RS_HD T side_y(int row,int sign,T x)const{return centre_y(row,x)+sign*width(row,x)/2;}
+    RS_HD T lane_offset_slope(int row)const{
+        if(!independent_lane_centres)return T(0);
+        return q[9]*(q[ice_crease_layout_size+4+row]-q[ice_crease_layout_size+row])/(house(row+4).x-house(row).x);
+    }
+    RS_HD T side_y(int row,int sign,T x)const{
+        T y=centre_y(row,x)+sign*width(row,x)/2;
+        if(independent_lane_centres)y+=q[9]*q[ice_crease_layout_size+row]+(x-house(row).x)*lane_offset_slope(row);
+        return y;
+    }
     RS_HD T side_slope(int row,int sign)const{
         const auto f=house(row),r=house(row+4);
-        return centre_slope(row)+sign*q[9]*(d[52+row]-d[48+row])/(2*(r.x-f.x));
+        return centre_slope(row)+sign*q[9]*(d[52+row]-d[48+row])/(2*(r.x-f.x))+lane_offset_slope(row);
     }
     // A transverse carrier is x=x0+k*(y-row_y). Intersecting it with each
     // longitudinal side gives the SAME endpoints to both incident primitives.
@@ -130,6 +142,16 @@ template<class T,class Visit> RS_HD inline void ice_tolerance_margins(const IceT
     auto positive=[&](auto compute){if(requested<0||requested==id)visit(id,compute());++id;};
     auto strict=[&](auto compute){positive([&](){return compute()-64*std::numeric_limits<double>::epsilon();});};
     auto relative=[&](auto actual,T nominal,T scale){
+        if(g.free_metric){
+            if(requested<0||requested==id||requested==id+1){
+                const auto family=ice_relation_meta(id).family;T margin=1.;
+                if(family==IceRelationFamily::row_gap||family==IceRelationFamily::lane_width_left||family==IceRelationFamily::lane_width_right)
+                    margin=actual()-64*std::numeric_limits<double>::epsilon();
+                else if(family==IceRelationFamily::row_clearance){using std::abs;margin=g.board.half_width-abs(actual());}
+                positive([&](){return margin;});positive([&](){return margin;});
+            }else id+=2;
+            return;
+        }
         if(requested<0||requested==id||requested==id+1){const T e=actual()-nominal,t=.01*scale;
             positive([&](){return t-e;});positive([&](){return t+e;});}else id+=2;};
     const T pitch=q[3],width=q[9],margin=g.board.half_width-1.5*pitch;
@@ -185,7 +207,7 @@ template<class T> RS_HD inline T ice_tolerance_margin(const IceToleranceGeometry
 // Ambient board/layout support of a finite relation. This follows the typed
 // construction, never the derivative's value at one fitted state. Some
 // cancelling intermediates deliberately retain conservative support.
-template<class Include> RS_HD inline bool ice_relation_source_support(int relation,Include include){
+template<class Include> RS_HD inline bool ice_relation_source_support(int relation,Include include,size_t layout_size=ice_tolerance_layout_size){
     const auto meta=ice_relation_meta(relation);if(!meta.valid())return false;
     auto q=[&](int i){include(6+i);};auto d=[&](int i){q(ice_nominal_size+i);};
     auto row_y=[&](){include(1);q(3);for(int i=0;i<4;++i)d(i);};
@@ -193,7 +215,7 @@ template<class Include> RS_HD inline bool ice_relation_source_support(int relati
     auto house=[&](int i){house_x(i);row_y();if(i>=4)d(12+i%4);};
     auto centre=[&](int row){house(row);house(row+4);};
     auto width=[&](int row){house_x(row);house_x(row+4);q(9);d(48+row);d(52+row);};
-    auto side=[&](int row){centre(row);width(row);};
+    auto side=[&](int row){centre(row);width(row);if(layout_size==ice_lane_centre_layout_size){q(ice_crease_layout_size+row);q(ice_crease_layout_size+4+row);}};
     auto node=[&](int row,bool transverse){side(row);q(transverse?35:8);d((transverse?64:56)+row);d((transverse?68:60)+row);};
     auto carrier=[&](int index,bool endpoints){q(index==0?20:(index<3?19:24));d(72+index);d(77+index);if(endpoints)for(int i=0;i<5;++i)include(i);};
     const int row=meta.row;
@@ -233,12 +255,13 @@ template<class Include> RS_HD inline bool ice_relation_source_support(int relati
 // Board coordinates are included independently by the scene planner.
 // This follows the same finite geometry generators below; no numeric-zero
 // derivative at one fitted state is used to infer independence.
-template<class Include> RS_HD inline bool ice_tolerance_layout_support(int code,Include include){
+template<class Include> RS_HD inline bool ice_tolerance_layout_support(int code,Include include,size_t layout_size=ice_tolerance_layout_size){
     auto deviation=[&](int index){include(ice_nominal_size+index);};
     auto row_y=[&](){include(3);for(int j=0;j<4;++j)deviation(j);};
     auto house=[&](int index){include(index<4?0:1);row_y();deviation(4+index);if(index>=4)deviation(12+index%4);};
     auto centre=[&](int row){house(row);house(row+4);};
     auto lane=[&](int row,bool transverse){centre(row);include(9);deviation(48+row);deviation(52+row);
+        if(layout_size==ice_lane_centre_layout_size){include(ice_crease_layout_size+row);include(ice_crease_layout_size+4+row);}
         include(transverse?35:8);deviation((transverse?64:56)+row);deviation((transverse?68:60)+row);};
     auto carrier=[&](int index){include(index==0?20:(index<3?19:24));deviation(72+index);deviation(77+index);};
     if(code>=100&&code<132){int index=(code-100)/4,ring=(code-100)%4;house(index);include(4);if(ring<3)include(5+ring);deviation(16+4*index+ring);return true;}
@@ -251,19 +274,27 @@ template<class Include> RS_HD inline bool ice_tolerance_layout_support(int code,
     if(code>=400&&code<=404){carrier(code-400);return true;}
     if(code==405){carrier(0);include(20);deviation(90);return true;}
     if(code>=406&&code<=409){int index=code-406;include(20);include(25);include(27);deviation(82+index);deviation(86+index);deviation(91+index);return true;}
-    if(code==410||code==411){int side=code-410;carrier(3+side);include(29);include(30);deviation(95+2*side);deviation(96+2*side);return true;}
+    if(code==410||code==411){int side=code-410;carrier(3+side);include(29);include(30);deviation(95+2*side);deviation(96+2*side);
+        if(side==0&&layout_size>=ice_crease_layout_size)include(ice_tolerance_layout_size);
+        return true;}
     if(code>=420&&code<=423){int index=code-420;carrier(3+index/2);include(33);include(34);deviation(99+index);deviation(103+index);return true;}
     return false;
 }
 template<class T> RS_HD inline Status tolerant_shared_entity_definition(const T* bp,size_t nb,const T* q,size_t nq,
         int code,int& kind,T* out,size_t no,unsigned options,bool check_relations=true){
     using std::abs;using std::atan;
-    if(!bp||nb!=6||!q||nq!=ice_tolerance_layout_size||options!=127u||!out||!finite_array(q,nq))return Status::invalid_argument;
+    if(!bp||nb!=6||!q||!(options&64u)||!shared_options_valid(nq,options)||!out||!finite_array(q,nq))return Status::invalid_argument;
     const bool ellipse=code==410||code==411;if(no!=(ellipse?8u:6u))return Status::invalid_argument;
-    IceToleranceGeometry<T> g(bp,q);
+    IceToleranceGeometry<T> g(bp,q,options);
     if(!g.board.valid()||!(q[0]<q[1]&&q[3]>0&&q[4]>0&&0<q[5]&&q[5]<q[6]&&q[6]<q[7]&&q[7]<1&&q[9]>0&&
         q[19]>0&&q[20]>0&&q[24]>0&&q[25]>0&&q[27]>0&&q[29]>0&&q[30]>0&&q[33]>0&&q[34]>0&&g.board.half_width>1.5*q[3]))return Status::invalid_argument;
-    if(check_relations)for(int i=0;i<ice_deviation_count;++i)if(abs(g.d[i])>.01)return Status::outside_support;
+    if(check_relations&&!g.free_metric)for(int i=0;i<ice_deviation_count;++i)if(abs(g.d[i])>.01)return Status::outside_support;
+    if(check_relations&&g.free_metric){
+        // Metric ties are removed, but physical radii, widths, semiaxes and
+        // trapezoid spans remain positive. No percentage box is imposed.
+        for(int i=16;i<56;++i)if(!(g.d[i]>-1.))return Status::outside_support;
+        for(int i=90;i<107;++i)if(!(g.d[i]>-1.))return Status::outside_support;
+    }
     if(check_relations)for(int index=0;index<5;++index){SegmentValue<T> line{};if(g.carrier(index,line)!=Status::ok)return Status::outside_support;}
     bool valid=true;if(check_relations)ice_tolerance_margins(g,[&](int,T value){if(!finite_scalar(value)||value < -1e-14)valid=false;});
     if(!valid)return Status::outside_support;
@@ -288,7 +319,21 @@ template<class T> RS_HD inline Status tolerant_shared_entity_definition(const T*
     if(code>=400&&code<=404){SegmentValue<T> carrier{};auto status=g.carrier(code-400,carrier);if(status!=Status::ok)return status;return line(carrier.a,carrier.b);}
     if(code==405)return circle(g.midpoint(0),g.hockey_radius(0));
     if(code>=406&&code<=409)return circle(g.faceoff(code-406),g.hockey_radius(code-405));
-    if(ellipse){const int side=code-410;kind=6;store3(out,g.midpoint(3+side));
+    if(ellipse){const int side=code-410;kind=6;
+        auto centre=g.midpoint(3+side);
+        if(side==0&&(options&256u)){
+            using std::sqrt;
+            SegmentValue<T> goal{};if(g.carrier(3,goal)!=Status::ok)return Status::outside_support;
+            const auto d=sub(goal.a,goal.b);
+            const T half=sqrt(d.x*d.x+d.y*d.y)/2;
+            const T available=half-g.crease_axis(0,1);
+            if(!(available>0))return Status::outside_support;
+            const T u=q[ice_tolerance_layout_size],slope=g.carrier_slope(3);
+            // Both endpoints stay on the finite goal line at every trial.
+            const T dy=(available*u/sqrt(1+u*u))/sqrt(1+slope*slope);
+            centre=add(centre,Vec3Value<T>{slope*dy,dy,0});
+        }
+        store3(out,centre);
         out[3]=g.crease_axis(side,0);out[4]=g.crease_axis(side,1);out[5]=-atan(g.carrier_slope(3+side));
         out[6]=side?pi/2:-pi/2;out[7]=out[6]+pi;return Status::ok;}
     if(code>=420&&code<=423)return line(g.trapezoid_goal(code-420),g.trapezoid_board(code-420));

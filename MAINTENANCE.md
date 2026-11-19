@@ -16,7 +16,7 @@
 | 完整镜头、独立证据、尺度与身体／接触验收 | [VALIDATION](docs/VALIDATION.md) |
 | 公开资产整理、媒体与离线数据边界 | [GITHUB_REVIEW](docs/GITHUB_REVIEW.md#public-cleanup) |
 
-同一要求只在适用位置维护正文。一次任务的取值、处理顺序和失败留在已有的赛事／节目记录或会话；需要接手时链接现有范围与绑定，不另造任务书。历史记录只供追查，不能用其中的“当前”“必须”“下一步”选择今天的模型或扩大授权。
+项目规则按上表归属。历史任务交接和过程记录保存在本机，当前状态以明确登记的模型、程序和源证据为准。
 
 ## 本机工具与存储解析
 
@@ -40,11 +40,13 @@ source-edge 的运行库与链接中间文件位于 `Data/runtime_tools/program_
 
 历史文件迁移由 Data 中 `maintenance/publication_20261103/native_artifact_moves.json` 和 `maintenance/publication_20261104/onedrive_archive_moves.json` 定位。人体复核源码与原件身份见[来源索引](events/ankara_2026/programmes/okada_mei_sp/body_verification_sources_1103.json)；其中 `source_helpers/` 的历史脚本带有固定路径和顶层写入操作，按索引说明显式运行。
 
-金书贤节目相机试验的旧路径、SHA-256 和 Data 地址见[相机试验归档](events/ankara_2026/programmes/jin_shuxian_sp/camera_trial_archive_1113.json)。历史单镜头快捷方式原文保存在 Data 的 `maintenance/launchers_20261105`，实际操作使用通用点位编辑器。
+2026-11-19 归档的工作报告和原文见 Data 的 `maintenance/publication_20261119/archive_manifest.json`。金书贤节目相机试验的旧路径、SHA-256 和 Data 地址见[相机试验归档](events/ankara_2026/programmes/jin_shuxian_sp/camera_trial_archive_1113.json)。历史单镜头快捷方式原文保存在 Data 的 `maintenance/launchers_20261105`，实际操作使用通用点位编辑器。
 
-`AssetStore.project_entry()` 定位到 `Data/workbench/START_HERE.html`。本机 Web `/` 在面板存在时显示版本导航，否则显示通用工作台。刷新器按节目登记生成面板。历史页面原文保存在 Data 的既有文档归档，片段取点页从面板的历史审阅区或对应数据集入口读取。
+`AssetStore.project_entry()` 定位到 `Data/workbench/START_HERE.html`。本机 Web `/` 在面板存在时显示版本导航，否则显示通用工作台。刷新器从[赛事暂定最终版指定记录](events/ankara_2026/scene/current_fit.json)读取联合登记，再按其实际覆盖的节目显示场地版本、源区间、回放和视觉验收状态，不按文件日期猜测。历史页面原文保存在 Data 的既有文档归档，片段取点页从面板的历史审阅区或对应数据集入口读取。
 
 场景历史资产与导入／安装中间文件的旧路径、SHA、字节数和 Data 地址见[归档映射](events/ankara_2026/scene/archive.json)。`AssetStore(root).resolve(old_path, must_exist=True)` 查询原件；原件内部相对引用仍以原项目目录为基准，经同一 AssetStore 解析。共享 `legacy_paths` 与本机设置按键合并，本机同名项优先。当前场景求值、prepare/review 和公开测试不要求这些历史原件存在。
+
+冈田芽衣全节目鞋刀源观测由 AssetStore 解析到节目 Data 的 `source_work/body_skate_whole_1115.json`。原始曝光、像素坐标及观测资格随该记录保存。
 
 旧地址别名见 [path_aliases.json](configs/path_aliases.json)，ResourceRegistry 的适用范围见[资源接口](docs/PORTABLE_RESOURCES.md)。
 

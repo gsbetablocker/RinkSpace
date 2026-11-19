@@ -1,0 +1,53 @@
+{
+  "schema": "rinkspace.okada_phase_observation_revision.v1",
+  "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "time_base": [
+    1,
+    12800
+  ],
+  "events": [
+    {
+      "id": "s09-2176768-110",
+      "previous_status": "occluded_unknown",
+      "status": "occluded_unknown",
+      "observation_pts": [
+        2176768,
+        2177024,
+        2177280
+      ],
+      "evidence_pts": [
+        2176000,
+        2176256,
+        2176512,
+        2176768,
+        2177024,
+        2177280,
+        2177536
+      ],
+      "evidence_files": [
+        "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\structure_camera_1108\\audit_af48_1113\\trusted_motion_1115\\source_images\\2176768_full.png",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\structure_camera_1108\\audit_af48_1113\\trusted_motion_1115\\source_images\\2176768_clean.jpg",
+        "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\structure_camera_1108\\audit_af48_1113\\trusted_motion_1115\\source_images\\2176768_source.jpg"
+      ],
+      "reason": "完整原片和邻帧显示右前臂与躯干重叠，三处曝光腕点无法可靠确认。保留原 UV、sigma 及历史准入，仅撤出本轮目标。",
+      "retire_slots": [
+        10
+      ]
+    }
+  ],
+  "focus_pts": [
+    [
+      993280,
+      1006080
+    ],
+    [
+      1035264,
+      1060352
+    ]
+  ],
+  "com_motion_policy": {
+    "quadrature": "native_exposure_and_curve_spans",
+    "confirmed_flight_acceleration_scale_mps2": 8.0
+  },
+  "definition_note": "8 m/s² 是连续二阶质心重力残差的工程定标。时长由原生曝光及曲线内部的梯形时间权重决定。未声明为测量误差。"
+}

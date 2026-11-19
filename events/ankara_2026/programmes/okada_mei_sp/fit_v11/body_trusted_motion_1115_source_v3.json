@@ -1,0 +1,394 @@
+{
+  "schema": "rinkspace.okada.trusted_motion_source_review.v1",
+  "programme": "okada_mei_sp",
+  "baseline": "okada_body_identity_1114",
+  "previous_decisions": "body_identity_1114_review.json",
+  "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "time_base": [
+    1,
+    12800
+  ],
+  "focus_pts": [
+    [
+      1038592,
+      1044736
+    ]
+  ],
+  "tracks_by_window": [
+    [
+      -1,
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21
+    ]
+  ],
+  "source_images_data_relative": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/trusted_motion_1115/source_images",
+  "events": [
+    {
+      "id": "s01-303616-wrist",
+      "status": "source_position_wrong_retired",
+      "observation_pts": [
+        303616
+      ],
+      "evidence_pts": [
+        303104,
+        303360,
+        303616,
+        303872,
+        304128
+      ],
+      "evidence_files": [
+        "303616_full.png",
+        "303616_screen.jpg",
+        "303616_upper_0.jpg",
+        "303616_upper_1.jpg"
+      ],
+      "reason": "23.72 秒背面朝镜头，画面右臂持续向外展开。右腕 10 临时缩回到袖内；前后腕点均在手袖交界，右肘仍在袖中可信。",
+      "retire_slots": [
+        10
+      ]
+    },
+    {
+      "id": "s02-658688-elbow-wrist",
+      "status": "source_position_wrong_retired",
+      "observation_pts": [
+        658688
+      ],
+      "evidence_pts": [
+        658176,
+        658432,
+        658688,
+        658944,
+        659200
+      ],
+      "evidence_files": [
+        "658688_full.png",
+        "658688_upper_0.jpg",
+        "658688_upper_1.jpg",
+        "659200_screen.jpg"
+      ],
+      "reason": "51.46 秒向画面左下的左袖与手连续，7 落在背部内部、9 落在髋部。51.42、51.44 和 51.48 同一袖口仍可追踪。",
+      "retire_slots": [
+        7,
+        9
+      ]
+    },
+    {
+      "id": "s02-retained-identity-screen-sample",
+      "status": "prior_correspondence_rechecked",
+      "observation_pts": [
+        659200,
+        662528,
+        663552
+      ],
+      "evidence_pts": [
+        658944,
+        659456,
+        662272,
+        662784,
+        663296,
+        663808,
+        664064
+      ],
+      "evidence_files": [
+        "659200_screen.jpg",
+        "662528_screen.jpg",
+        "663552_screen.jpg"
+      ],
+      "reason": "51.50、51.76、51.84 秒筛查按原槽看到大跳；旧版已把互换腕点映射到连续肢体。侧视重叠肘不据此新增诊断。"
+    },
+    {
+      "id": "s05-1039104-031",
+      "previous_status": "model_pose",
+      "status": "model_pose_visible_region",
+      "observation_pts": [
+        1039104,
+        1039360
+      ],
+      "evidence_pts": [
+        1038592,
+        1038848,
+        1039104,
+        1039360,
+        1039616,
+        1039872
+      ],
+      "reason": "自由腿的连续轮廓位于旧模型膝的下方。保持原源行和解剖对应；网络代理点与可见腿线分别保留，膝中心深度未知。",
+      "evidence_files": [
+        "grid_1038080.png",
+        "grid_1039360.png",
+        "1039104_full.png",
+        "1039360_full.png"
+      ]
+    },
+    {
+      "id": "s05-1041920-existing-retirement",
+      "status": "confirmed_remap_with_prior_leg_retirement",
+      "observation_pts": [
+        1041920
+      ],
+      "evidence_pts": [
+        1041408,
+        1041664,
+        1041920,
+        1042176,
+        1042432
+      ],
+      "evidence_files": [
+        "1041920_screen.jpg",
+        "grid_1041920.png",
+        "1041920_arms.jpg"
+      ],
+      "reason": "81.40 秒没有换臂：原片 81.36–81.44 秒中同一右臂一直指向画面右上、左臂向左伸展。用三个肩/肘/腕对恢复解剖左右，仅继续使用原准入行。原版已退场的两肘腕行与四膝踝行仍退场；瞬时髋中心无法由裙和遮挡确认，髋绑定保留。",
+      "swap_pairs": [
+        [
+          5,
+          6
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          9,
+          10
+        ]
+      ]
+    },
+    {
+      "id": "s05-1213440-045",
+      "previous_status": "model_pose",
+      "status": "source_position_wrong_retired",
+      "observation_pts": [
+        1213440
+      ],
+      "evidence_pts": [
+        1212928,
+        1213184,
+        1213440,
+        1213696,
+        1213952
+      ],
+      "retire_slots": [
+        7,
+        9
+      ],
+      "evidence_files": [
+        "1213440_full.png",
+        "1213440_clean.jpg",
+        "1213440_source.jpg"
+      ],
+      "reason": "94.80 秒左袖仍连续向画面左侧伸出；7 落到腰旁，9 落至上臂附近。前后各两曝光可追踪同一左袖；偏差只出现在中心曝光。模糊腕端缺少足够精度作新点，撤回旧判、退场两行并保存 UV、sigma 和绑定。"
+    },
+    {
+      "id": "s07-1565952-1566464-right-wrist",
+      "status": "source_position_wrong_retired",
+      "observation_pts": [
+        1565952,
+        1566464
+      ],
+      "evidence_pts": [
+        1565440,
+        1565696,
+        1565952,
+        1566208,
+        1566464,
+        1566720,
+        1566976
+      ],
+      "evidence_files": [
+        "1565952_full.png",
+        "1566464_full.png",
+        "1566464_screen.jpg",
+        "1566464_upper_0.jpg",
+        "1566464_upper_1.jpg",
+        "1566464_upper_2.jpg"
+      ],
+      "reason": "122.34 和 122.38 秒右手仍直举于头上，腕槽 10 跳到头侧；中间 122.36 和随后 122.40 都回到上端。槽 8 一直位于近肘袖线，肘中心受遮挡而保留。",
+      "retire_slots": [
+        10
+      ]
+    },
+    {
+      "id": "s07-1637120-raised-wrist",
+      "status": "confirmed_remap_and_retirement",
+      "observation_pts": [
+        1637120
+      ],
+      "evidence_pts": [
+        1636608,
+        1636864,
+        1637120,
+        1637376,
+        1637632
+      ],
+      "evidence_files": [
+        "1637120_full.png",
+        "1637120_screen.jpg",
+        "1637120_upper_0.jpg",
+        "1637120_upper_1.jpg"
+      ],
+      "reason": "127.90 秒连续跟踪同一只上举左手，腕随袖口一直在头上，源 10 应绑定到左腕。源 9 跳到另一只手的袖口附近，右腕在此角度不能独立确认，退场 9。左肘 7 在腰侧，下撤该错误行，保留远侧右肘。",
+      "swap_pairs": [
+        [
+          9,
+          10
+        ]
+      ],
+      "retire_slots": [
+        7,
+        9
+      ]
+    },
+    {
+      "id": "s07-1637376-raised-elbow-wrist",
+      "status": "confirmed_remap_and_retirement",
+      "observation_pts": [
+        1637376
+      ],
+      "evidence_pts": [
+        1636864,
+        1637120,
+        1637376,
+        1637632,
+        1637888
+      ],
+      "evidence_files": [
+        "1637376_full.png",
+        "1637120_screen.jpg",
+        "1637120_upper_1.jpg",
+        "1637120_upper_2.jpg"
+      ],
+      "reason": "127.92 秒源 8、10 沿原片连续的上举左臂分别在肘和腕，应绑左侧。源 7 掉到腰侧，源 9 在躯干附近且远侧右腕受缩短重叠无法确认，两行退场。",
+      "swap_pairs": [
+        [
+          7,
+          8
+        ],
+        [
+          9,
+          10
+        ]
+      ],
+      "retire_slots": [
+        7,
+        9
+      ]
+    },
+    {
+      "id": "s08-1832704-074",
+      "previous_status": "model_pose",
+      "status": "source_position_wrong_retired",
+      "observation_pts": [
+        1832704
+      ],
+      "evidence_pts": [
+        1832192,
+        1832448,
+        1832704,
+        1832960,
+        1833216
+      ],
+      "retire_slots": [
+        9
+      ],
+      "evidence_files": [
+        "1832704_full.png",
+        "1832704_clean.jpg",
+        "1832704_source.jpg"
+      ],
+      "reason": "143.18 秒左袖近水平伸直至画面左侧；9 落在肩附近上臂。143.16 和 143.20 秒源腕恢复至远端；仅退场错误曝光腕行，不插补坐标。"
+    },
+    {
+      "id": "s09-retained-identity-screen-sample",
+      "status": "prior_correspondence_rechecked",
+      "observation_pts": [
+        2046464,
+        2046720
+      ],
+      "evidence_pts": [
+        2045952,
+        2046208,
+        2046464,
+        2046720,
+        2046976
+      ],
+      "evidence_files": [
+        "2046464_screen.jpg"
+      ],
+      "reason": "159.88–159.90 秒举臂保持，旧版已按真实左右改绑该双臂。明显的原槽收缩信号不另作重复换绑。"
+    },
+    {
+      "id": "s09-2176768-110",
+      "previous_status": "model_pose",
+      "status": "occluded_unknown",
+      "observation_pts": [
+        2176768,
+        2177024,
+        2177280
+      ],
+      "evidence_pts": [
+        2176000,
+        2176256,
+        2176512,
+        2176768,
+        2177024,
+        2177280,
+        2177536
+      ],
+      "evidence_files": [
+        "2176768_full.png",
+        "2176768_clean.jpg",
+        "2176768_source.jpg"
+      ],
+      "reason": "170.06–170.10 秒肩前动作、画面后侧小臂与躯干相互重叠，腕在数个曝光模糊或遮挡。撤回源右腕正确的断言，保留原值和历史准入，不列作可信模型修复目标。"
+    }
+  ],
+  "earlier_review": {
+    "path": "body_trusted_motion_1115_source.json",
+    "sha256": "a83819bb0bc64a14c9185e0a18ff3b6121df51ca693245d2a281f3e244aed34a"
+  },
+  "collapse_screen": {
+    "method": "旧全片双向原片光流 + 本曝光相对于邻帧的肘腕／膝踝到肩髋长度收缩；筛查未用模型。",
+    "screening_file": "collapsed_screen_finite.csv",
+    "minimum_pixels": 20,
+    "candidate_rows": 490,
+    "candidate_exposures": 413,
+    "rows_per_shot": {
+      "s09": 252,
+      "s02": 31,
+      "s03": 6,
+      "s08": 23,
+      "s05": 91,
+      "s07": 41,
+      "s01": 27,
+      "s06": 9,
+      "s04": 10
+    },
+    "coverage_exposures": 8329,
+    "unreviewed_candidates": "保留，未入拟合决策；有效评分也不等于源对应错误"
+  },
+  "round_two_review": {
+    "path": "body_trusted_motion_1115_source_final.json",
+    "sha256": "397a8f4b4ca26db95263c425c72aee264b681a389be683c12ee3824a93029611"
+  }
+}

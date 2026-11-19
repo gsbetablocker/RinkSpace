@@ -424,3 +424,49 @@ def test_exact_resume_compares_active_indices_instead_of_only_the_count(tmp_path
     receipt.write_text(json.dumps(dict(full_layout=22, selection=[17, 20, 21])), encoding='utf-8')
     with pytest.raises(ValueError, match='changed the complete active parameter selection'):
         context.validate_resume_selection(problem, tmp_path)
+def test_exact_surface_from_previous_proposal_is_rechecked_on_new_cost(tmp_path, monkeypatch):
+    from calibration.program_tracking.body_tracking import programme_skate_replay as replay
+
+    output = tmp_path / 'current'
+    output.mkdir()
+    previous = tmp_path / 'prior'
+    previous.mkdir()
+    archive = previous / 'surface_trial.npz'
+    coords = np.asarray([2.])
+    signature = replay.signature(coords)
+    np.savez(archive, source_seconds=[2.], crossing_counts=[3])
+    replay.write(previous/'retained_surface.json', dict(
+        parameter_vector_signature=signature, rejected=False, native_exposures=1,
+        checked_samples=1, fresh_samples=1, exactly_reused_samples=0, fresh_unchanged_probes=0,
+        exact_saved_curve_geometry=True, sampled_not_collision_free_certificate=True,
+        surface_path=str(archive), surface_sha256=replay.digest(archive)))
+    guard = replay.ScopedSurfaceGuard.__new__(replay.ScopedSurfaceGuard)
+    guard.proposal_surfaces = {signature: previous/'retained_surface.json'}
+    guard.parent_x = np.array([1.])
+    guard.parent_cost, guard.parent_surface_cost = 10., 1.
+    guard.scan = {}
+    guard.last_pass = None
+    guard.passes = {}
+    guard.serial = 0
+    guard.output = output
+    guard.surface = SimpleNamespace(geometry=SimpleNamespace(parts=np.array([0])), scale_m=1.)
+    guard.problem = SimpleNamespace(objective_block_weights={}, body=SimpleNamespace(state=None))
+    guard.reference = None
+    guard.document = {}
+    guard.allowance = .003
+    guard.specification = {'focus_pts': []}
+    guard.emit = lambda *_a, **_k: None
+    def common_witnesses(scans, _geometry):
+        np.testing.assert_array_equal(scans[1]['crossing_counts'], [3])
+        return {'face_a': np.array([0]), 'face_b': np.array([0])}
+    def factor(*_args, **_kwargs):
+        obj = SimpleNamespace(last_gap=np.ones(1))
+        obj.evaluate = lambda _x: {'residual':np.ones(1)}
+        return obj
+    monkeypatch.setattr(replay, 'common_witnesses', common_witnesses)
+    monkeypatch.setattr(replay, 'ProgrammeSurfaceFactor', factor)
+    value = {'residual':np.array([6.]), 'weighted_parts':{'surface_intersection':1.}}
+    assert not guard(coords,value)
+    record = replay.load_json(output/'surface_trial_001.json')
+    assert record['recomputed_cost_and_regional_guards']
+    assert record['same_weighted_cost_after'] > record['same_weighted_cost_before']

@@ -2,6 +2,7 @@
 #include "rinkspace/geometry.hpp"
 #include "rinkspace/camera_envelope.hpp"
 #include "rinkspace/motion_derivatives.hpp"
+#include "motion_spline_rates_cases.hpp"
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -179,6 +180,11 @@ static void cancelled_zoom_rs_certificate(){
 }
 
 int main(){try{
+    {
+        using namespace motion_spline_rates_test;
+        for(int i=0;i<case_count;++i)require(passes(i,run_case(i)),case_names[i]);
+        std::cout<<"PASS MotionSpline::rates ("<<case_count<<" CPU cases)\n";
+    }
     common_radius_optical_certificate();
     cancelled_projected_row_rate_certificate();
     cancelled_zoom_rs_certificate();

@@ -96,7 +96,7 @@ RS_HD inline Status scene_print_chart(const ScenePath& path,const double* data,c
 RS_HD inline Status shared_scene_point(const double* board,const double* layout,size_t nl,unsigned options,int code,
     double station,const double* directions,int q,int column,Vec3& xyz,Vec3& derivative){
     if(!shared_layout_size_valid(nl))return Status::invalid_argument;
-    LocalJet b[6],params[8],values[ice_tolerance_layout_size];for(int i=0;i<6;++i)b[i]={board[i],directions?directions[size_t(i)*q+column]:0.};
+    LocalJet b[6],params[8],values[ice_lane_centre_layout_size];for(int i=0;i<6;++i)b[i]={board[i],directions?directions[size_t(i)*q+column]:0.};
     for(size_t i=0;i<nl;++i)values[i]={layout[i],directions?directions[(6+i)*q+column]:0.};
     int kind;auto st=shared_entity_definition(b,6,values,nl,code,kind,params,(nl>=35&&(code==410||code==411))?8:6,options,false);
     if(st!=Status::ok)return st;

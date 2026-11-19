@@ -467,11 +467,11 @@ __device__ inline LocalJet ice_relation_value(View v,LinearView l,int relation,i
     if(column>=0&&l.ice_relation_offsets){int lo=l.ice_relation_offsets[relation],hi=l.ice_relation_offsets[relation+1];
         while(lo<hi){int middle=(lo+hi)/2;if(l.ice_relation_columns[middle]<column)lo=middle+1;else hi=middle;}
         if(lo==l.ice_relation_offsets[relation+1]||l.ice_relation_columns[lo]!=column)return LocalJet(0.,0.);}
-    LocalJet b[6],q[ice_tolerance_layout_size];
+    LocalJet b[6],q[ice_lane_centre_layout_size];
     auto value=[&](size_t i,double x){return LocalJet(x,column<0?0.:scene_chart_component(v.scene_values,l.scene_chart,l.scene_steps,l.q,column,i));};
     for(int i=0;i<6;++i)b[i]=value(i,v.board[i]);
-    for(int i=0;i<ice_tolerance_layout_size;++i)q[i]=value(6+i,v.layout[i]);
-    IceToleranceGeometry<LocalJet> g(b,q);return ice_tolerance_margin(g,relation);
+    for(size_t i=0;i<v.nl;++i)q[i]=value(6+i,v.layout[i]);
+    IceToleranceGeometry<LocalJet> g(b,q,v.options);return ice_tolerance_margin(g,relation);
 }
 // Existential nominal witnesses are replaced internally by actual group
 // ranges. Their old +/-1% boxes remain the final export/domain oracle.
@@ -521,11 +521,11 @@ __global__ void lm_retained_pick(View accepted,View trial,LinearView l,SolverVie
                 const double interior=64*std::numeric_limits<double>::epsilon();relation(14+row,1,interior);relation(8,14+row,interior);}}
         base+=17;
         if(accepted.options&64u){
-            IceToleranceGeometry<double> g(trial.board,trial.layout);
+            IceToleranceGeometry<double> g(trial.board,trial.layout,trial.options);
             // Keep every original relation, including invalid canonical aliases,
             // and the original inclusive raw-margin >= -1e-14 oracle.
             for(int id=lane;id<ice_relation_legacy_count;id+=blockDim.x){const double margin=ice_tolerance_margin(g,id);
-                if(!finite_scalar(margin)||ice_relation_is_independent(id))offer(base+id,margin+1e-14,id,1,5);}
+                if(!finite_scalar(margin)||g.free_metric||ice_relation_is_independent(id))offer(base+id,margin+1e-14,id,1,5);}
             base+=ice_relation_legacy_count;
             if(ice_actual_chart_enabled(l.scene_chart)){
                 if(lane<2){int group=lane,hi=0,lo=0;for(int i=1;i<4;++i){double x=trial.layout[39+4+4*group+i];
@@ -780,7 +780,7 @@ __global__ void lm_scene_domain(View trial,LinearView l,SolverView s){
     if(i<trial.nscene){double value=trial.scene_values[i];bad|=!finite_scalar(value)||value<l.scene_lower[i]||value>l.scene_upper[i];}
     if(i==0){const double* b=trial.board;bad|=!BoardShape{b[0],b[1],b[2],b[3],b[4],b[5]}.valid();
         if(trial.options&64u){double params[6];int kind;bad|=shared_entity_definition(b,6,trial.layout,trial.nl,100,kind,params,6,trial.options)!=Status::ok;
-            double worst=INFINITY,maximum=0.;IceToleranceGeometry<double> geometry(b,trial.layout);
+            double worst=INFINITY,maximum=0.;IceToleranceGeometry<double> geometry(b,trial.layout,trial.options);
             ice_tolerance_margins(geometry,[&](int,double margin){worst=fmin(worst,margin);});
             for(int j=0;j<ice_deviation_count;++j)maximum=fmax(maximum,fabs(trial.layout[39+j]));s.scalars[16]=worst;s.scalars[17]=maximum;}}
     if(i<trial.npaths){auto path=trial.scene_paths[i];
@@ -818,7 +818,7 @@ __global__ void lm_shared_domain_detail(View v,LinearView l,SolverView s,double*
             fail(2,int(k),0,0,x,l.scene_lower[k],l.scene_upper[k],fmin(x-l.scene_lower[k],l.scene_upper[k]-x));return;}}
         const double* b=v.board;if(!BoardShape{b[0],b[1],b[2],b[3],b[4],b[5]}.valid()){fail(3,0,0,0,0.,0.,0.,-1.);return;}
         if(v.options&64u){double p[6];int kind;if(shared_entity_definition(b,6,v.layout,v.nl,100,kind,p,6,v.options)!=Status::ok){
-            double worst=INFINITY;int id=-1;IceToleranceGeometry<double> geometry(b,v.layout);
+            double worst=INFINITY;int id=-1;IceToleranceGeometry<double> geometry(b,v.layout,v.options);
             ice_tolerance_margins(geometry,[&](int k,double margin){if(!finite_scalar(margin)||margin<worst){worst=margin;id=k;}});
             fail(4,id,0,0,worst,-1e-14,INFINITY,worst);return;}}
         for(size_t i=0;i<v.npaths;++i){const auto path=v.scene_paths[i];
@@ -1105,7 +1105,10 @@ struct Solver {
         if(l.host.scene_directions)planned+=sizeof(PrintConstraint)*double(probes.size()+1)+sizeof(PrintProbe)*double(probes.size())+8.*checked_product(v.nscene,size_t(q));
         if(l.host.mount_side)planned+=sizeof(MountConstraint);
         // Face records are allocated after deterministic count/prefix enumeration.
-        const size_t stationarity_cells=(l.host.envelope.enabled||l.host.mount_side)?(v.nc-3)*v.nrig:0;
+        // A mount constraint has no spline-cell dependence. With no motion
+        // envelope, enumerate it once per rig instead of allocating nc copies
+        // of an empty check for every other cell (especially fixed cameras).
+        const size_t stationarity_cells=(l.host.envelope.enabled?v.nc-3:(l.host.mount_side?1:0))*v.nrig;
         planned+=(2+3*stationarity_cells+3*probes.size())*sizeof(int)+8.*(2.*q+8.);
         planned+=4.*(q+nlocal)+4*sizeof(double)+sizeof(int)*v.npaths+8.*(q+8);
         size_t free,total;cuda_check(cudaMemGetInfo(&free,&total));

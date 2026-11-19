@@ -1,0 +1,158 @@
+{
+  "schema": "rinkspace.ankara.programme_source_quality_review.v1",
+  "date_local": "2026-11-16",
+  "event_id": "ankara_2026",
+  "programme_id": "nayeon_ko_sp",
+  "status": "visual_review_failed",
+  "accepted_grid_fit": null,
+  "source": {
+    "registered_video": "4orLyh1JO3M",
+    "sha256": "5741215b9b77a79866d938309d5a8ef01e5e7b64c6f191c97c9b5a118d0dac1a",
+    "original_size": [
+      1920,
+      1080
+    ],
+    "fps": 50,
+    "time_base": "1/12800",
+    "first_pts": 266240,
+    "last_pts": 2411776,
+    "frames": 8382,
+    "shots": "S02–S10"
+  },
+  "frozen_geometry": {
+    "registration": "../../scene/provisional_final_1113.json",
+    "version": "shared_joint_review_1113",
+    "numeric_sha256": "13bd87094a58b3433eaf25cf67738e6bc26ce13ffdd594f1c1b7f17f118f2a59",
+    "snapshot_sha256": "98fa1600a45c3fbd31ced7e73820b7eb50fc8738e52a00e047a7067a3ac7b733"
+  },
+  "sources": {
+    "original_ice_audit": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/nayeon_ko_sp/fit_1116/source_quality/ice_qualified/ice_source_qualification.json",
+    "ice_observations_retired_for_insufficient_original_support": 105023,
+    "red_sweep_identity_recheck": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/nayeon_ko_sp/fit_1116/source_quality/ice_reidentified/source_qualification.json",
+    "final_a3_reread": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/nayeon_ko_sp/fit_1116/source_quality/a3_source_floor/source_reads.json",
+    "primary_rail_reads": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/nayeon_ko_sp/fit_1116/source_quality/rail_native/rail_survey.json",
+    "pale_kickplate_rereads": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/nayeon_ko_sp/fit_1116/source_quality/rail_pale/rail_survey.json",
+    "top_face_reads": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/nayeon_ko_sp/fit_1116/source_quality/rail_near_direct/top_deck_source_summary.json",
+    "sequence_issues": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/nayeon_ko_sp/fit_1116/source_quality/reviewed_source/source_identity_review.json"
+  },
+  "fitting": {
+    "candidate_checkpoint": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/nayeon_ko_sp/fit_1116/source_quality/fit_sequence_review/camera.npz",
+    "original_point_packets": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/nayeon_ko_sp/fit_1116/source_quality/reviewed_source/shot_packets.json",
+    "solver_log": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/nayeon_ko_sp/fit_1116/source_quality/fit_sequence_review/solve.jsonl",
+    "localized_run_verification": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/nayeon_ko_sp/fit_1116/source_quality/sequence_local_verification.json",
+    "held_absolute_top_deck_distance_p90_px": {
+      "s04": {
+        "original_rows": 367,
+        "before": 39.24,
+        "after": 6.76
+      },
+      "s05": {
+        "original_rows": 350,
+        "before": 80.77,
+        "after": 5.33
+      }
+    },
+    "camera_assumption_zh": "S04、S05 在确认的机位归属下分别估计成像参数。最后用原片相对运动补足绝对点留出的时间段，并保留近侧顶边绝对点回查。留出点用于比较叠加位置。"
+  },
+  "sequence_review": {
+    "full_movie_stage": "fit_optics_motion",
+    "full_movie_manifest": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/nayeon_ko_sp/fit_1116/source_quality/full_native_review/review.json",
+    "decoded_frames": 8382,
+    "each_source_pts_exact": true,
+    "ordered_visual_samples": 606,
+    "ordered_frame_index": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/nayeon_ko_sp/fit_1116/source_quality/full_native_review/chronological_frames/source_frame_decode.json",
+    "measurement_comparison": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/nayeon_ko_sp/fit_1116/source_quality/full_native_comparison/comparison.json",
+    "final_local_clip_manifests": [
+      "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/nayeon_ko_sp/fit_1116/source_quality/sequence_video_checks/s02/review.json",
+      "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/nayeon_ko_sp/fit_1116/source_quality/sequence_video_checks/s03/review.json",
+      "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/nayeon_ko_sp/fit_1116/source_quality/sequence_video_checks/s04/review.json"
+    ],
+    "localized_candidate_qa_samples": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/nayeon_ko_sp/fit_1116/source_quality/sequence_native_cards",
+    "final_rerendered_local_frames_reviewed": 103,
+    "final_local_frame_check": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/nayeon_ko_sp/fit_1116/source_quality/sequence_video_checks/all_frames_decode.json"
+  },
+  "remaining": {
+    "left_goal_trapezoid_junction": {
+      "s03": {
+        "original_pts": 626176,
+        "original_seconds": 48.92,
+        "error_px": 38.06
+      },
+      "s06": {
+        "original_pts": 1582080,
+        "original_seconds": 123.6,
+        "error_px": 48.35
+      },
+      "full_exact_source_comparison": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/nayeon_ko_sp/fit_1116/source_quality/final_junction_pixels.json",
+      "independent_same_event_evidence": "junction_recheck_1116.json",
+      "attribution_zh": "相同低位机位的独立热身构图重现同向偏差。取点、遮挡和可用相机调整复查后，证据优先指向冻结梯形线接点相对于球门线与蓝区的位置。"
+    },
+    "s09": {
+      "additional_optics_trial": "D:/CodexData/RinkSpace_Data/events/ankara_2026/programmes/nayeon_ko_sp/fit_1116/source_quality/s09_optics_comparison/comparison.json",
+      "action_zh": "候选仍使用全段复核时的局部结果。额外方案的实测下沿偏差下降，同时冰面与印刷物留出点偏差上升。"
+    },
+    "review_summary_zh": "全段仍有可见错位，最新状态作为复核候选保留。"
+  },
+  "board_edges_review": {
+    "status": "reviewed_visible_misalignment_remains",
+    "source_clock": "1/12800",
+    "source_pts_inclusive": [
+      266240,
+      2411776
+    ],
+    "video": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\source_quality\\board_coverage\\full_board_review_1116\\nayeon_ko_ankara_grid_1080p50.mp4",
+    "video_sha256": "16c7662d1ad48d8c13fdbc545f80ed4a7aa86efcb6ee65574596a5d0aebc44e7",
+    "encoded_review": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\source_quality\\board_coverage\\full_board_review_1116\\review.json",
+    "geometry_value_sha256": "13bd87094a58b3433eaf25cf67738e6bc26ce13ffdd594f1c1b7f17f118f2a59",
+    "data_revision": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\source_quality\\board_coverage\\leg_finish_review",
+    "camera_snapshot": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\source_quality\\board_coverage\\board_release_camera\\camera.npz",
+    "camera_fit_selection": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\source_quality\\board_coverage\\board_release_camera\\selection.json",
+    "data_qualification": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\source_quality\\board_coverage\\picked_verified_all\\qualification.json",
+    "source_coverage": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\source_quality\\board_coverage\\encoded_review_checks_final\\coverage_verification.json",
+    "ordered_visual_inspection": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\source_quality\\board_coverage\\board_visual\\visual_samples.json",
+    "visual_quality_notes_zh": {
+      "visible_source_rule": "正面取蓝带上沿与黄带接冰下沿，只见顶盖时取朝冰侧。遮挡和没有可靠材料过渡的局部不取点。",
+      "s03_right": "原片 00:51.120 的右侧上沿已改善，右端下沿仍有可见偏离。低对比度下沿和相机标定仍限制定位。",
+      "s08": "镜尾回到蓝带上沿重新确认实际原片点。",
+      "s10": "恢复旋转时伸腿的原片蒙版并排除腿缘模糊区域的非围挡点。"
+    },
+    "source_reported_view": {
+      "shot": "s03",
+      "pts": 654336,
+      "seconds": 51.12,
+      "board_point_counts": {
+        "board/continuous/top": 75,
+        "board/continuous/bottom": 45
+      },
+      "right_side_native_90th_percentile_px": {
+        "top": {
+          "before": 5.858851760038656,
+          "after": 1.9906408400999076
+        },
+        "bottom": {
+          "before": 18.48653031612648,
+          "after": 13.227357788172254
+        }
+      }
+    },
+    "independent_check_records": [
+      "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\source_quality\\board_coverage\\check_selected\\comparison.json",
+      "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\source_quality\\board_coverage\\check_other_shots\\comparison.json",
+      "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\source_quality\\board_coverage\\check_after_visual\\comparison.json"
+    ],
+    "material_reacquisition": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\source_quality\\board_coverage\\post_source_changes.json",
+    "limb_fringe_check": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\source_quality\\board_coverage\\leg_finish_changes.json",
+    "confirmed_unresolved_intersections": [
+      {
+        "shot": "s03",
+        "source_pts": 626176,
+        "distance_px": 42.6764816665075
+      },
+      {
+        "shot": "s06",
+        "source_pts": 1582080,
+        "distance_px": 48.18406443143775
+      }
+    ]
+  }
+}

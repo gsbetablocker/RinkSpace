@@ -191,7 +191,13 @@ RS_API int rs_shared_entity_definition(const double* board,size_t nboard,const d
    * Finite typed coordinate groups are declared in ice_tolerance.hpp and
    * domain/ice_tolerance.py. Line/circle/ellipse kinds, shared attachment nodes,
    * ring/row/carrier order and finite supports remain exact. No penalty terms.
-   * Zero deviations reproduce option63; old options/layouts remain unchanged. */
+   * Zero deviations reproduce option63; old options/layouts remain unchanged.
+   * bit128 requires bit64 (options255): remove nominal percentage boxes and
+   * metric ties (equal radius, row spacing, alignment, width, parallelism).
+   * Nominal slots become coordinate references. Actual positive dimensions,
+   * nested rings, ordering, shared endpoints and finite supports remain.
+   * Callers remove nominal/deviation gauge redundancy in their active chart;
+   * this mode does not certify the physical geometry or add any prior. */
 RS_API int rs_shared_entity_definition_with_options(const double* board,size_t nboard,const double* layout,size_t nlayout,int feature_code,unsigned options,int* kind,double* parameters,size_t nparameters);
 /* Continuous board-course chart. Output the nine arc-length segment joins;
  * these joins are topology/display metadata, never bounds on fit stations. */

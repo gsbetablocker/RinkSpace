@@ -82,14 +82,14 @@ def test_cuda_all_new_scene_columns_and_independent_fd(core,monkeypatch):
         with make(bad,attach=False):pass
 
 
-def fit_fixture(core, code, active, target_parameters):
+def fit_fixture(core, code, active, target_parameters, *, options=127):
     """One synthetic finite LM trial; footage and saved production states absent."""
     seed=fixture.G2GPU();seed.setUp()
     board=np.array([.5,.25,.1,.12,1.85,.02])
     values=np.r_[board,nominal(),np.zeros(DEVIATION_COUNT)]
-    kind,parameters=core.shared_geometry(board,values[6:],code,options=127)
+    kind,parameters=core.shared_geometry(board,values[6:],code,options=options)
     rows=17
-    kw={**seed.kw,'board':board,'layout':values[6:],'options':127,
+    kw={**seed.kw,'board':board,'layout':values[6:],'options':options,
         'codes':np.zeros(rows,np.int32),'stations':np.linspace(.03,.97,rows),
         'times':np.linspace(0,.1,rows),'observed':np.zeros((rows,2))}
     with ResidentResidualProblem(core,**kw) as target:
@@ -108,6 +108,24 @@ def fit_fixture(core, code, active, target_parameters):
         device_budget_bytes=p.creation['free_after_alloc_bytes'],host_budget_bytes=2**30,
         damping_metric='jacobi',initial_lambda=.001)
     return p,values
+
+
+def test_free_metric_cuda_fit_crosses_old_box_with_physical_topology(core,monkeypatch):
+    monkeypatch.setenv('RINKSPACE_G2_LIBRARY',str(core.library_path))
+    monkeypatch.setenv('RINKSPACE_STATIONARITY_BACKEND','cpu')
+    q=np.r_[nominal(),np.zeros(DEVIATION_COUNT)]
+    q[39+16]=.08
+    kind,target=core.shared_geometry([.5,.25,.1,.12,1.85,.02],q,100,options=255)
+    with fit_fixture(core,100,[16],target,options=255)[0] as p:
+        result=p.solve(relative_cost_tolerance=1e-9)
+        value=p.export_state()['layout'][39+16]
+        assert value==pytest.approx(.08,abs=2e-7),result
+        assert np.max(p.evaluate_errors())<1e-5
+        p.linearize('cuda')
+        cuda=p.probe_rows(np.arange(17))
+        p.linearize('cpu')
+        np.testing.assert_allclose(cuda,p.probe_rows(np.arange(17),'cpu'),atol=1e-9,rtol=1e-8)
+        assert p.stationarity_diagnostics()['invalid']==0
 
 
 @pytest.mark.parametrize('sign',[-1.,1.])

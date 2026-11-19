@@ -60,36 +60,61 @@ def draw_config(samples):
     return world,paths,overview
 
 
-def image(raw,uv,status,paths,overview,points,pt,shot,i,length,metrics):
+def image(raw,uv,status,paths,overview,points,pt,shot,i,length,metrics,*,
+          subpixel_bits=0,occluded=None,label_anchors=None,path_starts=None):
     canvas=raw.copy()
     valid=(status==0)&np.isfinite(uv).all(axis=1)
     in_image=valid&(uv[:,0]>=0)&(uv[:,0]<W)&(uv[:,1]>=0)&(uv[:,1]<H)
-    pixels=np.rint(np.clip(np.nan_to_num(uv,nan=0.,posinf=1e7,neginf=-1e7),-1e7,1e7)).astype(np.int32)
+    scale=1<<subpixel_bits
+    pixels=np.rint(np.clip(np.nan_to_num(uv,nan=0.,posinf=1e7,neginf=-1e7),-1e7,1e7)*scale).astype(np.int32)
     labels={}
     by_color={}
-    for start,stop,closed,color,label in paths:
+    if path_starts is None:
+        projected_paths=paths
+    else:
+        # Entire polylines outside the sensor cannot affect the image.
+        # Reduce the same per-path bounding boxes before the drawing loop.
+        limit=np.iinfo(np.int32).max
+        visible=np.minimum.reduceat(np.where(valid[:,None],pixels,limit),path_starts,axis=0)
+        far=np.maximum.reduceat(np.where(valid[:,None],pixels,-limit),path_starts,axis=0)
+        hits=(visible<[W*scale,H*scale]).all(axis=1)&(far>=0).all(axis=1)
+        projected_paths=(paths[j] for j in np.flatnonzero(hits))
+    for start,stop,closed,color,label in projected_paths:
         p=pixels[start:stop];g=valid[start:stop]
         v=np.flatnonzero(in_image[start:stop])
         # Skip full offscreen polylines only when their bounding boxes
         # cannot cross the image. Preserve paths with both ends offscreen.
         if not len(v):
             p0=p[g]
-            if (not len(p0) or p0[:,0].min()>=W or p0[:,0].max()<0 or
-                p0[:,1].min()>=H or p0[:,1].max()<0):
+            if (not len(p0) or p0[:,0].min()>=W*scale or p0[:,0].max()<0 or
+                p0[:,1].min()>=H*scale or p0[:,1].max()<0):
                 continue
         if g.all():
             if len(p)>1:by_color.setdefault((color,closed),[]).append(p)
         else:
             for a,b in np.flatnonzero(np.diff(np.r_[False,g,False])).reshape(-1,2):
                 if b-a>1:by_color.setdefault((color,False),[]).append(p[a:b])
-        if len(v) and label:
+        if label_anchors is None and len(v) and label:
             labels.setdefault(label,[]).append(p[v[len(v)//2]])
     for (color,closed),p in by_color.items():
-        cv2.polylines(canvas,p,closed,color,1,cv2.LINE_AA)
+        cv2.polylines(canvas,p,closed,color,1,cv2.LINE_AA,shift=subpixel_bits)
     for label,v in labels.items():
-        text(canvas,label,np.clip(np.median(v,axis=0),[5,24],[W-90,H-20]),.46)
-    for xy in np.rint(points).astype(np.int32):
-        cv2.circle(canvas,tuple(xy),2,(0,0,255),-1,cv2.LINE_AA)
+        text(canvas,label,np.clip(np.median(v,axis=0)/scale,[5,24],[W-90,H-20]),.46)
+    if label_anchors is not None:
+        for label,index in label_anchors.items():
+            if in_image[index]:
+                x,y=uv[index]
+                if 7<=x<W-52 and 26<=y<H-5:
+                    at=(int(x),int(y)-4)
+                    if occluded is None or not occluded[int(y),int(x)]:
+                        text(canvas,label,at,.44)
+    for xy in np.rint(points*scale).astype(np.int32):
+        cv2.circle(canvas,tuple(xy),2*scale,(0,0,255),-1,cv2.LINE_AA,shift=subpixel_bits)
+    if occluded is not None:
+        cv2.copyTo(raw,occluded,canvas)
+        visible_indices=np.flatnonzero(in_image)
+        xy=np.floor(uv[visible_indices]).astype(np.int64)
+        in_image[visible_indices]&=occluded[xy[:,1],xy[:,0]]==0
     side=overview.copy()
     text(side,f'Source PTS {pt}',(18,H-68),.44)
     header=np.full((64,2560,3),18,np.uint8)

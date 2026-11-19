@@ -54,7 +54,7 @@ ExMR局部补丁保留[上游完整许可和署名](third_party_licenses/EXMR_LI
 
 ## 人体求解执行优化
 
-当前 `absolute_motion_v1` 连续人体入口已接入同关节三轴 GPU 扰动批处理、曲线/固定参考值复用、按需导数、旋转小块及五曝光节点 CSR 装配。只有人体图像观测的块仅生成被消费的 COCO 导数；独立鞋刀图像、内腔、鞋口、抓握和软冰面因子保留。
+`absolute_motion_v2` 入口已接入同关节三轴 GPU 扰动批处理、曲线/固定参考值复用、按需导数、旋转小块及五曝光节点 CSR 装配。只有人体图像观测的块仅生成被消费的 COCO 导数；独立鞋刀图像、内腔、鞋口、抓握和软冰面因子保留。
 
 `ContinuousJoint` 默认使用 [body_linear_solver.py](../calibration/program_tracking/body_tracking/body_linear_solver.py)的稀疏直接 GN 方向，保留 SciPy TRF 的缩放、边界、正则化及接受规则；正规系统残差检查失败或算子不支持时回退 LSMR。其他问题默认仍为 LSMR；程序化设置 `problem.linear_solver_backend='lsmr'` 可选原路径。测量按固定输入与接受步数限定比较范围，不推广到其他求解阶段。[实际记录](../events/ankara_2026/programmes/okada_mei_sp/body_performance_1105_audit.json)保留原始计时边界、逐项 CSR 差异、CPU/GPU计数及原版报告缺项；现有 A/B 参数不因代码更新而重新拟合。
 

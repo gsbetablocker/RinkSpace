@@ -22,6 +22,8 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[4]
 PROG = Path(__file__).resolve().parent
 DATA = Path('D:/CodexData/RinkSpace_Data')
+SOURCE_INDEX = Path('events/ankara_2026/programmes/okada_mei_sp/source_datasets') / (
+    'okada_s02_s09_observations_20261026/source_index.sqlite')
 REC = DATA / 'runs/okada_rec_1019/recover_v2'
 ADS = DATA / 'runs/native_ad_points_s04_20261026'
 OUT = DATA / 'runs/native_ice_points_s04_20261027'
@@ -111,7 +113,7 @@ def corrections():
                 if r['shot_id'] == 's04':
                     extra[r['native_pts']].append((n, r, str(dp)))
     # The authenticated source index stores original source IDs, not display IDs.
-    index = DATA / 'runs/okada_s02_s09_observations_20261026/source_index.sqlite'
+    index = DATA / SOURCE_INDEX
     withdrawn = {}
     with sqlite3.connect(index.as_uri() + '?mode=ro', uri=True) as db:
         for key, payload in db.execute("select id,payload from qualification where shot='s04'"):

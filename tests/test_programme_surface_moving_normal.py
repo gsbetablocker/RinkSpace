@@ -204,3 +204,28 @@ def test_actual_surface_sparse_chain_matches_body_and_target_rotation_directions
         if first == 12:
             frozen = legacy.evaluate(x, jacobian=True)["jac"] @ np.r_[np.zeros(17), direction]
             assert np.linalg.norm(frozen - derivative) > .1
+
+
+def test_proposal_has_signed_derivative_before_a_refreshed_witness_penetrates(surface_factor_fixture):
+    problem, packet, x = surface_factor_fixture
+    factor = ProgrammeSurfaceFactor(problem, {"programme_structure": {"surface_normal_mode": MOVING_NORMAL_MODE}}, packet)
+    direction = np.zeros_like(x).reshape(-1,69)
+    direction[:,15] = 1.
+    direction = direction.ravel()
+    for angle in (-2.4,-1.6,-.8,.8,1.6,2.4):
+        z = angle*direction
+        factor.evaluate(z)
+        if factor.last_gap.min() > .01:
+            break
+    else:
+        pytest.fail('Synthetic vertex could not be moved clear of the face')
+    clipped = factor.evaluate(z,jacobian=True)
+    signed = factor.evaluate(z,jacobian=True,signed_proposal=True)
+    np.testing.assert_array_equal(clipped['residual'],0.)
+    assert clipped['jac'].nnz == 0 and np.all(signed['residual']<0.)
+    slope = signed['jac']@np.r_[np.zeros(17),direction]
+    assert np.linalg.norm(slope)>.1
+    h=2.e-6
+    numeric=(factor.evaluate(z+h*direction,signed_proposal=True)['residual']-
+             factor.evaluate(z-h*direction,signed_proposal=True)['residual'])/(2*h)
+    np.testing.assert_allclose(slope,numeric,rtol=3.e-6,atol=2.e-8)

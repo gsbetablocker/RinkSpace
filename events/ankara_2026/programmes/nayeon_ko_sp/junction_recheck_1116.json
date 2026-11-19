@@ -1,0 +1,820 @@
+{
+  "schema": "rinkspace.programme_goal_junction_recheck.v1",
+  "date_local": "2026-11-16",
+  "event_id": "ankara_2026",
+  "programme_id": "nayeon_ko_sp",
+  "status": "visual_review_failed_frozen_left_trapezoid_join",
+  "accepted_grid_fit": null,
+  "programme_original": {
+    "id": "4orLyh1JO3M",
+    "url": "https://www.youtube.com/watch?v=4orLyh1JO3M",
+    "title": "Nayeon KO (KOR) | Junior Women Short Program | Ankara 2026",
+    "channel": "Skating ISU",
+    "channel_id": "UCVZpqbnDjHyScSYGFPMUtYA",
+    "registered_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\media\\originals\\4orLyh1JO3M.mp4",
+    "sha256": "5741215b9b77a79866d938309d5a8ef01e5e7b64c6f191c97c9b5a118d0dac1a",
+    "bytes": 118075260,
+    "format_id": "299",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "clipped": false,
+    "crop": null,
+    "resize": null,
+    "original_time_offset_seconds": 0,
+    "official_event_result_url": "https://results.isu.org/results/season2627/jgptur2026/SEG003.htm",
+    "original_audio": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\media\\originals\\4orLyh1JO3M.m4a",
+      "sha256": "eaedefb459f35c0cc1e23f97be23b9c776f56af95965c4047b5085e41a35e9e4",
+      "bytes": 5554067,
+      "format_id": "140",
+      "language": "en-US",
+      "codec": "aac",
+      "time_base": "1/44100",
+      "start_pts": 0,
+      "role": "official_original_audio_separate_track"
+    }
+  },
+  "required_shots": [
+    "s02",
+    "s03",
+    "s04",
+    "s05",
+    "s06",
+    "s07",
+    "s08",
+    "s09",
+    "s10"
+  ],
+  "excluded_shots": [
+    "s01"
+  ],
+  "ice_geometry": {
+    "version_id": "shared_joint_review_1113",
+    "status": "frozen_for_this_programme",
+    "registration": {
+      "path": "events/ankara_2026/scene/provisional_final_1113.json",
+      "sha256": "41598458e2ad62cebb10a4e39193a03098bcafeff41c1d2bd8d0a9e37f8526ad"
+    },
+    "snapshot": {
+      "path": "events/ankara_2026/scene/field/shared_joint_review_1113.npz",
+      "sha256": "98fa1600a45c3fbd31ced7e73820b7eb50fc8738e52a00e047a7067a3ac7b733"
+    },
+    "structure": {
+      "path": "events/ankara_2026/scene/field/jin_s14_1111.json",
+      "sha256": "08f0c39e8bcd17dff9dee9ad5b39b435859b436b72039d11ac69038c63c76216"
+    },
+    "native_library": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\build\\jin_lane_goal_1110\\rinkspace_core.dll",
+      "sha256": "19d377e4770f26f34ada0028c9428da8cd8372cc7dd1c7e5ea274f96e1d20a5e"
+    },
+    "value_sha256": "13bd87094a58b3433eaf25cf67738e6bc26ce13ffdd594f1c1b7f17f118f2a59",
+    "layout_revision": "d3cbb6e66b10572783e63304cf07a0469f31a570ee2d6ac70deac673fe3314b4",
+    "scene_parameters_active": false
+  },
+  "frozen_goal_trapezoid_join_xyz": [
+    -0.43087429558239826,
+    -0.05399504181994045,
+    0.0
+  ],
+  "source_recheck_zh": "源画面沿两条红线的非交叉区段取两侧漆边中线，再求交点。球门线、梯形线和蓝区共同留出复算一轮，随后放回球门线和蓝区并继续留出梯形线。",
+  "source_material_uncertainty_zh": "重采样离散度只反映该画面已取漆边的内部一致性，未计入场地尺度、局部模型或共同镜头误差。",
+  "near_left_goal_joins_by_original_pts": {
+    "626176": {
+      "shot": "s03",
+      "original_pts": 626176,
+      "original_source_seconds": 48.92,
+      "width_midpoints": {
+        "goal": 31,
+        "trapezoid": 58
+      },
+      "inferred_true_intersection_uv": [
+        1130.611815861696,
+        943.0052229652514
+      ],
+      "reread_dispersion_p90_px": 3.3553900548677165,
+      "residual_px": {
+        "joint_rework_local": 34.97037191383652,
+        "independent_camera": 38.052066518375916,
+        "without_trapezoid_camera": 38.06555776929023
+      },
+      "ice_offset_along_goal_normalized": 0.003985736664490023,
+      "ice_offset_across_goal_normalized": -5.985042668940464e-05,
+      "geometry_result": {
+        "board": {
+          "rows": 26,
+          "invalid": 0,
+          "rms": 2.2016296317615196,
+          "p50": 1.7934496759652752,
+          "p90": 3.1004139645064934,
+          "p95": 3.895490569170752,
+          "worst": 4.384659569798987
+        },
+        "ad": {
+          "rows": 114,
+          "invalid": 0,
+          "rms": 4.83462163760575,
+          "p50": 3.525813482984546,
+          "p90": 7.7379172726271515,
+          "p95": 9.083708534584778,
+          "worst": 13.401937274648011
+        },
+        "ice": {
+          "rows": 18,
+          "invalid": 0,
+          "rms": 3.402724318107538,
+          "p50": 3.2077778265235883,
+          "p90": 4.661569472446989,
+          "p95": 4.806628582580655,
+          "worst": 4.964386932732264
+        },
+        "blue_crease": {
+          "rows": 23,
+          "invalid": 0,
+          "rms": 3.2400925083805214,
+          "p50": 2.1513539961789148,
+          "p90": 4.50500900656681,
+          "p95": 6.544314212829263,
+          "worst": 7.346660546383836
+        },
+        "red_goal_line": {
+          "rows": 31,
+          "invalid": 0,
+          "rms": 2.1197484217359004,
+          "p50": 1.6247956815921645,
+          "p90": 3.348925849096503,
+          "p95": 3.4483698758175367,
+          "worst": 4.580512070760471
+        }
+      },
+      "matching_replay_pts": 205050880,
+      "matching_replay_clock": "03:42:29.667",
+      "matching_replay_status": "bidirectional_best"
+    },
+    "632064": {
+      "shot": "s03",
+      "original_pts": 632064,
+      "original_source_seconds": 49.38,
+      "width_midpoints": {
+        "goal": 24,
+        "trapezoid": 39
+      },
+      "inferred_true_intersection_uv": [
+        1174.9186717277792,
+        846.522982793998
+      ],
+      "reread_dispersion_p90_px": 3.674477685022083,
+      "residual_px": {
+        "joint_rework_local": 32.34538587862161,
+        "independent_camera": 34.69725824396165,
+        "without_trapezoid_camera": 34.67710356385656
+      },
+      "ice_offset_along_goal_normalized": 0.004053984247077734,
+      "ice_offset_across_goal_normalized": 8.665841828961743e-05,
+      "geometry_result": {
+        "board": {
+          "rows": 22,
+          "invalid": 0,
+          "rms": 9.289468782234609,
+          "p50": 4.501476119484222,
+          "p90": 12.7390016920042,
+          "p95": 19.687042866352808,
+          "worst": 20.330112224187012
+        },
+        "ad": {
+          "rows": 84,
+          "invalid": 0,
+          "rms": 4.751812915755339,
+          "p50": 3.928896141181087,
+          "p90": 7.5291266374015775,
+          "p95": 7.853292424097334,
+          "worst": 8.715444033278294
+        },
+        "ice": {
+          "rows": 21,
+          "invalid": 0,
+          "rms": 2.3878096487851455,
+          "p50": 1.0515003784998294,
+          "p90": 3.510867397395302,
+          "p95": 4.309720404837528,
+          "worst": 6.085728330409692
+        },
+        "blue_crease": {
+          "rows": 23,
+          "invalid": 0,
+          "rms": 2.422250413957459,
+          "p50": 1.4928130676170908,
+          "p90": 4.182143090981089,
+          "p95": 5.095975498275311,
+          "worst": 6.077057681043815
+        },
+        "red_goal_line": {
+          "rows": 24,
+          "invalid": 0,
+          "rms": 2.785519073031014,
+          "p50": 1.6573990872605324,
+          "p90": 5.064660037430296,
+          "p95": 5.43368059853587,
+          "worst": 5.517405181735383
+        }
+      },
+      "matching_replay_pts": 205058048,
+      "matching_replay_clock": "03:42:30.133",
+      "matching_replay_status": "bidirectional_best"
+    },
+    "639488": {
+      "shot": "s03",
+      "original_pts": 639488,
+      "original_source_seconds": 49.96,
+      "width_midpoints": {
+        "goal": 18,
+        "trapezoid": 28
+      },
+      "inferred_true_intersection_uv": [
+        1139.1052445465027,
+        752.5415377126118
+      ],
+      "reread_dispersion_p90_px": 4.090798436478547,
+      "residual_px": {
+        "joint_rework_local": 26.837094688955972,
+        "independent_camera": 27.661726981271823,
+        "without_trapezoid_camera": 27.649900118408965
+      },
+      "ice_offset_along_goal_normalized": 0.004823442786577555,
+      "ice_offset_across_goal_normalized": -0.00016993749770975592,
+      "geometry_result": {
+        "board": {
+          "rows": 18,
+          "invalid": 0,
+          "rms": 3.9797735769296145,
+          "p50": 2.4565043260139987,
+          "p90": 6.704476899163603,
+          "p95": 6.97676682613735,
+          "worst": 7.306386569812606
+        },
+        "ad": {
+          "rows": 57,
+          "invalid": 0,
+          "rms": 3.707588091730063,
+          "p50": 1.5977899210714923,
+          "p90": 6.677093466190391,
+          "p95": 7.408457098037693,
+          "worst": 9.965342300210148
+        },
+        "ice": {
+          "rows": 18,
+          "invalid": 0,
+          "rms": 18.9803790200541,
+          "p50": 5.612460021355386,
+          "p90": 32.50880228541518,
+          "p95": 34.26148543273192,
+          "worst": 37.73813043053461
+        },
+        "blue_crease": {
+          "rows": 18,
+          "invalid": 0,
+          "rms": 5.841641407083732,
+          "p50": 3.5208011142045716,
+          "p90": 11.093854200020498,
+          "p95": 11.383879128095982,
+          "worst": 11.833127593877977
+        },
+        "red_goal_line": {
+          "rows": 18,
+          "invalid": 0,
+          "rms": 2.0656311057594374,
+          "p50": 1.8470711637054138,
+          "p90": 3.251213717196795,
+          "p95": 3.4312466091294076,
+          "worst": 3.5096223165121625
+        }
+      },
+      "matching_replay_pts": 205067008,
+      "matching_replay_clock": "03:42:30.717",
+      "matching_replay_status": "bidirectional_best"
+    },
+    "661248": {
+      "shot": "s03",
+      "original_pts": 661248,
+      "original_source_seconds": 51.66,
+      "width_midpoints": {
+        "goal": 14,
+        "trapezoid": 29
+      },
+      "inferred_true_intersection_uv": [
+        636.9972546911054,
+        688.2115202432152
+      ],
+      "reread_dispersion_p90_px": 5.305574877746237,
+      "residual_px": {
+        "joint_rework_local": 22.4521787513885,
+        "independent_camera": 21.27484431777202,
+        "without_trapezoid_camera": 22.39206641766846
+      },
+      "ice_offset_along_goal_normalized": 0.004679020360196232,
+      "ice_offset_across_goal_normalized": -0.00020713012560455007,
+      "geometry_result": {
+        "board": {
+          "rows": 20,
+          "invalid": 0,
+          "rms": 1.2061386125317037,
+          "p50": 1.082024822187484,
+          "p90": 1.8939360490659283,
+          "p95": 1.9741438943204712,
+          "worst": 2.2553668442111414
+        },
+        "ad": {
+          "rows": 119,
+          "invalid": 0,
+          "rms": 2.4503545093327173,
+          "p50": 0.9338599465322186,
+          "p90": 4.581991385517905,
+          "p95": 5.341204735074803,
+          "worst": 8.707364410349246
+        },
+        "ice": {
+          "rows": 55,
+          "invalid": 0,
+          "rms": 3.028797979178158,
+          "p50": 0.9309879369630141,
+          "p90": 4.384259753091054,
+          "p95": 5.692360991115659,
+          "worst": 11.533852399729387
+        },
+        "red_goal_line": {
+          "rows": 14,
+          "invalid": 0,
+          "rms": 2.8662194598176227,
+          "p50": 2.533718226999504,
+          "p90": 4.307139243250616,
+          "p95": 5.01752865302538,
+          "worst": 5.980899511895715
+        }
+      },
+      "matching_replay_pts": 205093120,
+      "matching_replay_clock": "03:42:32.417",
+      "matching_replay_status": "bidirectional_best"
+    },
+    "1582080": {
+      "shot": "s06",
+      "original_pts": 1582080,
+      "original_source_seconds": 123.6,
+      "width_midpoints": {
+        "goal": 28,
+        "trapezoid": 32
+      },
+      "inferred_true_intersection_uv": [
+        403.1208994257931,
+        966.7503099840401
+      ],
+      "reread_dispersion_p90_px": 3.952528083080346,
+      "residual_px": {
+        "joint_rework_local": 46.50384102666634,
+        "independent_camera": 49.038923119168146,
+        "without_trapezoid_camera": 48.35017918817804
+      },
+      "ice_offset_along_goal_normalized": 0.0033762789631341613,
+      "ice_offset_across_goal_normalized": 0.0002694369195323297,
+      "geometry_result": {
+        "board": {
+          "rows": 26,
+          "invalid": 0,
+          "rms": 1.5916334922933089,
+          "p50": 1.4866210253333794,
+          "p90": 2.1130396535042655,
+          "p95": 2.6642292128135803,
+          "worst": 3.1506174286867377
+        },
+        "ad": {
+          "rows": 75,
+          "invalid": 0,
+          "rms": 3.7925101619325483,
+          "p50": 2.2162176532525653,
+          "p90": 6.18036450989632,
+          "p95": 7.537697963090433,
+          "worst": 9.094137837522762
+        },
+        "ice": {
+          "rows": 31,
+          "invalid": 0,
+          "rms": 5.25378880817421,
+          "p50": 2.8396794832545007,
+          "p90": 9.784137399765996,
+          "p95": 10.550616087876076,
+          "worst": 12.299571714034672
+        },
+        "blue_crease": {
+          "rows": 23,
+          "invalid": 0,
+          "rms": 3.7020164109748808,
+          "p50": 3.2204203899400627,
+          "p90": 5.52172498549373,
+          "p95": 6.272645444683048,
+          "worst": 7.64506139435171
+        },
+        "red_goal_line": {
+          "rows": 28,
+          "invalid": 0,
+          "rms": 3.895240659284548,
+          "p50": 3.2623229587909846,
+          "p90": 6.036762606906663,
+          "p95": 6.544906694696829,
+          "worst": 7.345447537175978
+        }
+      },
+      "matching_replay_pts": 206198016,
+      "matching_replay_clock": "03:43:44.350",
+      "matching_replay_status": "bidirectional_best"
+    },
+    "1590528": {
+      "shot": "s06",
+      "original_pts": 1590528,
+      "original_source_seconds": 124.26,
+      "width_midpoints": {
+        "goal": 31,
+        "trapezoid": 53
+      },
+      "inferred_true_intersection_uv": [
+        732.9865107637947,
+        970.4472616782017
+      ],
+      "reread_dispersion_p90_px": 2.987106479016656,
+      "residual_px": {
+        "joint_rework_local": 39.39073364293786,
+        "independent_camera": 44.017850074079874,
+        "without_trapezoid_camera": 43.64666770023568
+      },
+      "ice_offset_along_goal_normalized": 0.0035835464096254403,
+      "ice_offset_across_goal_normalized": -1.4970555973675092e-06,
+      "geometry_result": {
+        "board": {
+          "rows": 26,
+          "invalid": 0,
+          "rms": 1.9077323940993407,
+          "p50": 1.2378777295680057,
+          "p90": 3.134328469832844,
+          "p95": 3.5253426962277348,
+          "worst": 3.6459290764281076
+        },
+        "ad": {
+          "rows": 159,
+          "invalid": 0,
+          "rms": 2.0034555138043806,
+          "p50": 1.4509290826249486,
+          "p90": 2.7063167106770405,
+          "p95": 3.3386515204849543,
+          "worst": 8.410460365350993
+        },
+        "ice": {
+          "rows": 12,
+          "invalid": 0,
+          "rms": 2.6717339561054203,
+          "p50": 1.165146792682104,
+          "p90": 5.1863069158037876,
+          "p95": 5.939606905286536,
+          "worst": 6.45704666564464
+        },
+        "blue_crease": {
+          "rows": 23,
+          "invalid": 0,
+          "rms": 2.310368274646587,
+          "p50": 1.5068136692048553,
+          "p90": 3.6890916915525716,
+          "p95": 4.3651752919960805,
+          "worst": 4.460973814213459
+        },
+        "red_goal_line": {
+          "rows": 31,
+          "invalid": 0,
+          "rms": 2.3423580014314043,
+          "p50": 1.370977518311696,
+          "p90": 4.087643887068817,
+          "p95": 4.392160246777644,
+          "worst": 4.480522561740173
+        }
+      },
+      "matching_replay_pts": 206208256,
+      "matching_replay_clock": "03:43:45.017",
+      "matching_replay_status": "bidirectional_best"
+    },
+    "1599232": {
+      "shot": "s06",
+      "original_pts": 1599232,
+      "original_source_seconds": 124.94,
+      "width_midpoints": {
+        "goal": 19,
+        "trapezoid": 17
+      },
+      "inferred_true_intersection_uv": [
+        789.5427238417876,
+        1030.8025307019727
+      ],
+      "reread_dispersion_p90_px": 3.7193758029874218,
+      "residual_px": {
+        "joint_rework_local": 36.66795059128655,
+        "independent_camera": 38.795366992724254,
+        "without_trapezoid_camera": 38.5130253405661
+      },
+      "ice_offset_along_goal_normalized": 0.002625247305540948,
+      "ice_offset_across_goal_normalized": 9.520699834833766e-05,
+      "geometry_result": {
+        "board": {
+          "rows": 26,
+          "invalid": 0,
+          "rms": 2.2763190166676672,
+          "p50": 2.0182115710484085,
+          "p90": 3.3159049384331514,
+          "p95": 3.454354674114438,
+          "worst": 4.5747518804212755
+        },
+        "ad": {
+          "rows": 207,
+          "invalid": 0,
+          "rms": 2.9445386744936743,
+          "p50": 2.3903815164420177,
+          "p90": 4.617013975824642,
+          "p95": 5.237266377156989,
+          "worst": 7.554181447459077
+        },
+        "ice": {
+          "rows": 18,
+          "invalid": 0,
+          "rms": 11.85224547344682,
+          "p50": 2.5274142738037852,
+          "p90": 24.20486791483791,
+          "p95": 25.63197005283245,
+          "worst": 26.387506833316536
+        },
+        "blue_crease": {
+          "rows": 23,
+          "invalid": 0,
+          "rms": 3.4211637727541486,
+          "p50": 3.180179497294167,
+          "p90": 4.692726216774889,
+          "p95": 4.949692207936685,
+          "worst": 7.705968856528239
+        },
+        "red_goal_line": {
+          "rows": 19,
+          "invalid": 0,
+          "rms": 2.8677069327662905,
+          "p50": 1.8520800109526492,
+          "p90": 5.121404625131678,
+          "p95": 5.660086731236574,
+          "worst": 5.8822689591987976
+        }
+      },
+      "matching_replay_pts": 206218496,
+      "matching_replay_clock": "03:43:45.683",
+      "matching_replay_status": "bidirectional_best"
+    }
+  },
+  "same_event_footage": {
+    "registered_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\media\\originals\\oxXu1avhrvs.mp4",
+    "source_time_base": "1/15360",
+    "camera_view_zh": "三个独立原帧来自同场热身，使用同一低位端部机位重新构图。",
+    "camera_calibration_zh": "每帧用围挡 Ad6 红底边界、球门线中线和蓝区弧独立求转台姿态。保留共同低位机位标定，两支梯形线均留出。",
+    "near_left_goal_joins": {
+      "176111616": {
+        "seconds": 11465.6,
+        "measured_intersection_uv": [
+          999.4608759378248,
+          749.6645859144984
+        ],
+        "error_px": 32.51214279161077,
+        "signed_along_goal": 0.004723066198331135
+      },
+      "177921024": {
+        "seconds": 11583.4,
+        "measured_intersection_uv": [
+          1051.4986807349637,
+          850.7097435308976
+        ],
+        "error_px": 41.495206401964765,
+        "signed_along_goal": 0.0051555340985969585
+      },
+      "177925632": {
+        "seconds": 11583.7,
+        "measured_intersection_uv": [
+          804.3206290698812,
+          845.4967380705094
+        ],
+        "error_px": 39.77361663953341,
+        "signed_along_goal": 0.004993389179548675
+      }
+    },
+    "shared_camera_sensitivity": {
+      "baseline_fitted_ptz": {
+        "176111616": {
+          "junction_px": 32.51214279161077,
+          "blue_arc_p90_px": 3.5840206092953273
+        },
+        "177921024": {
+          "junction_px": 41.495206401964765,
+          "blue_arc_p90_px": 5.92418991499223
+        },
+        "177925632": {
+          "junction_px": 39.77361663953341,
+          "blue_arc_p90_px": 4.444953137576501
+        }
+      },
+      "shared_lens_and_mount_0": {
+        "176111616": {
+          "junction_px": 41.164874420681265,
+          "blue_arc_p90_px": 3.4208227517560523
+        },
+        "177921024": {
+          "junction_px": 52.20858383706126,
+          "blue_arc_p90_px": 4.522217021637976
+        },
+        "177925632": {
+          "junction_px": 50.24838237692333,
+          "blue_arc_p90_px": 2.525423420787014
+        }
+      },
+      "shared_lens_and_mount_6": {
+        "176111616": {
+          "junction_px": 0.6379613965449158,
+          "blue_arc_p90_px": 9.666599033167788
+        },
+        "177921024": {
+          "junction_px": 2.3962482844056257,
+          "blue_arc_p90_px": 15.588790201499192
+        },
+        "177925632": {
+          "junction_px": 1.0929563859624998,
+          "blue_arc_p90_px": 16.38765514293694
+        }
+      }
+    },
+    "other_camera_limit_zh": "长边机位的左端接点过于压缩、遮挡或超出画面。高位远景 04:00:18.000 能辨清右端接点，左端近支超出画面。左端结论来自多个构图和相机自由度对照，缺少不同物理机位对同一近支的可靠直接取点。"
+  },
+  "attribution_zh": "七个节目画面和三个热身画面都把真实接点定位在冻结接点的球门线外侧，离蓝区更远。原片重读和放宽相机不能同时消除该位移与邻近蓝区弧的偏差。优先复核梯形线在球门线上的局部相对位置，现有证据不足以定稿新的世界坐标。",
+  "comparison_on_same_development_pixels": {
+    "earlier_rework": {
+      "rows": 1130292,
+      "p90": 5.337211476906403
+    },
+    "localized_camera": {
+      "rows": 1130292,
+      "p90": 5.2967891226875095
+    }
+  },
+  "s06_new_direct_source_points": {
+    "shot": "s06",
+    "rows_added": 448,
+    "added_at_pts": {
+      "1371136": 38,
+      "1373440": 38,
+      "1374720": 38,
+      "1375744": 38,
+      "1376512": 38,
+      "1377280": 38,
+      "1377536": 38,
+      "1378304": 38,
+      "1378560": 38,
+      "1378816": 38,
+      "1379328": 38,
+      "1518592": 30
+    },
+    "remaining_without_source_uv": [],
+    "packet": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\junction_recheck\\s06_recovered_points\\s06.npz",
+    "geometry_sha256": "13bd87094a58b3433eaf25cf67738e6bc26ce13ffdd594f1c1b7f17f118f2a59",
+    "source_fit_comparison": {
+      "before": {
+        "restored_observations": {
+          "rows": 448,
+          "invalid": 0,
+          "rms": 4.181244308660531,
+          "p50": 1.8762281606687552,
+          "p90": 7.30213984645801,
+          "p95": 9.393269015190825,
+          "worst": 16.027486448685178
+        },
+        "nearby_preexisting_observations": {
+          "rows": 3885,
+          "invalid": 0,
+          "rms": 4.834537035677484,
+          "p50": 1.482386356789595,
+          "p90": 7.634816852487023,
+          "p95": 12.052137436423259,
+          "worst": 38.36691404796647
+        },
+        "restored_by_family": {
+          "Ad2": {
+            "rows": 30,
+            "invalid": 0,
+            "rms": 2.9562791601194065,
+            "p50": 1.9519136968556157,
+            "p90": 4.713706008069876,
+            "p95": 5.733716526309487,
+            "worst": 7.275594746667116
+          },
+          "F2": {
+            "rows": 418,
+            "invalid": 0,
+            "rms": 4.255620708751558,
+            "p50": 1.8658707780818544,
+            "p90": 7.451822477531442,
+            "p95": 9.55265361030788,
+            "worst": 16.027486448685178
+          }
+        }
+      },
+      "after": {
+        "restored_observations": {
+          "rows": 448,
+          "invalid": 0,
+          "rms": 4.108763310625625,
+          "p50": 1.8050972328913693,
+          "p90": 7.176801893759005,
+          "p95": 9.373132396082815,
+          "worst": 15.666666623853782
+        },
+        "nearby_preexisting_observations": {
+          "rows": 3885,
+          "invalid": 0,
+          "rms": 4.839665577496401,
+          "p50": 1.4792486151008242,
+          "p90": 7.671091227534912,
+          "p95": 12.110262997319367,
+          "worst": 38.36691404796647
+        },
+        "restored_by_family": {
+          "Ad2": {
+            "rows": 30,
+            "invalid": 0,
+            "rms": 2.926054237017465,
+            "p50": 1.9460453396745536,
+            "p90": 4.662784501174998,
+            "p95": 5.680240877308186,
+            "worst": 7.218127532452321
+          },
+          "F2": {
+            "rows": 418,
+            "invalid": 0,
+            "rms": 4.180798411766871,
+            "p50": 1.7884509145792005,
+            "p90": 7.509517580757215,
+            "p95": 9.533807207287156,
+            "worst": 15.666666623853782
+          }
+        }
+      }
+    }
+  },
+  "foreground_repairs": {
+    "frames_by_shot": {
+      "s04": 42,
+      "s06": 10,
+      "s10": 1
+    },
+    "local_native_render_recheck_pts": {
+      "s04": [
+        993280,
+        1050624
+      ],
+      "s06": [
+        1371136,
+        1518592
+      ],
+      "s10": [
+        2361344
+      ]
+    },
+    "geometry_or_camera_constraint": false
+  },
+  "full_scope_visual_review": {
+    "programme_source_bounds_seconds": [
+      20.8,
+      188.42
+    ],
+    "encoded_review_uses_pre_gap_repair_checkpoint": true,
+    "full_video_decoded_frames": 8382,
+    "encoded_native_pts_equal": true,
+    "modelled_paths_per_frame": 922,
+    "visual_samples_read_sequentially": 215,
+    "shot_start_end_and_local_hotspots_read": true,
+    "potplayer_window_read_access": "Computer Use was not approved to use PotPlayer 64 bit",
+    "potplayer_continuous_playback_verified": false,
+    "visual_acceptance": false
+  },
+  "evidence": {
+    "three_original_junction_comparisons": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\junction_recheck\\measured_and_frozen_junctions.jpg",
+    "updated_source_reads": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\junction_recheck\\source_reads\\source_reads.json",
+    "seven_source_original_camera_comparisons": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\junction_recheck\\camera_and_ice_comparison.json",
+    "same_event_original_camera_comparisons": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\junction_recheck\\event_material\\native_cross_check.json",
+    "same_event_camera_sensitivity": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\junction_recheck\\physical_camera_challenge\\result.json",
+    "non_goal_camera_solve": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\junction_recheck\\independent_camera\\solve.jsonl",
+    "trapezoid_withheld_camera_solve": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\junction_recheck\\without_trapezoid_camera\\solve.jsonl",
+    "camera_checkpoint_for_full_scope_review": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\junction_recheck\\without_trapezoid_camera\\camera.npz",
+    "all_original_projected_observations": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\junction_recheck\\all_frame_source_audit\\report.json",
+    "source_motion_audit": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\junction_recheck\\held_motion_audit\\motion.json",
+    "full_review_native_pts_manifest": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\junction_recheck\\full_review\\review.json",
+    "full_review_sheet_index": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\junction_recheck\\ordered_visual_review\\index.json",
+    "local_gap_repair_camera_checkpoint": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\junction_recheck\\s06_gap_camera\\camera.npz",
+    "local_gap_repair_solve": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\junction_recheck\\s06_gap_camera\\solve.jsonl",
+    "local_gap_repair_check": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\junction_recheck\\s06_gap_camera_comparison.json",
+    "foreground_only_verified": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\junction_recheck\\recovered_visibility\\verified\\receipt.json"
+  }
+}

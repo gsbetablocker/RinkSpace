@@ -14,7 +14,8 @@ from aitviewer.renderables.spheres import Spheres
 from .data import ResultCatalog, CachedSequence, shell_triangles, ribbon_triangles, simplify_curve
 from .framing import fit_comparison_camera, comparison_panel_sizes
 from .imgui_buffers import install_dynamic_buffers
-from .source import SourceVideo, SupportObservations, region_outline, source_value, observation_used, load_world_regions
+from .source import (SourceVideo, SupportObservations, region_outline, source_value, observation_used,
+                     load_world_regions, read_body_overlay, body_overlay_primitives)
 from .blade_review import BladeReview, overlay_primitives, diagnostic_lines, skate_axis_primitives
 
 
@@ -100,6 +101,7 @@ class ResultsPlayer(Viewer):
         self.show_model_runner=bool(catalog.config.get('source_review_model_runner_default',False))
         self.show_source_model_trajectory=bool(catalog.config.get('source_review_model_trajectory_default',False))
         self.show_model_body=bool(catalog.config.get('source_review_model_body_default',False))
+        self.show_body_observations=bool(catalog.config.get('source_body_observations_default',False))
         self.show_legacy_source=not has_source_structures
         self.show_source_ice_grid=False
         self.world_region_nodes = []
@@ -172,6 +174,8 @@ class ResultsPlayer(Viewer):
 
     def load_variant(self, name):
         definition = self.catalog.variant(name)
+        body_overlay = (read_body_overlay(self.catalog.result_path(definition), self.catalog.pts)
+                        if self.catalog.config.get('source_body_observations_default') else None)
         path,_ = self.catalog.cache_path(definition)
         if not (path/'metadata.json').is_file():
             from .prepare import prepare_variant
@@ -366,7 +370,7 @@ class ResultsPlayer(Viewer):
 
         old_nodes = self.variant_nodes
         previous_variant=getattr(self,'variant',{}).get('id')
-        self.sequence=sequence;self.variant=definition
+        self.sequence=sequence;self.variant=definition;self.body_overlay=body_overlay
         self.layers=layers;self.variant_nodes=nodes
         self.tracking_points = tracking_points
         self.last_tracking_position = last_tracking_position
@@ -602,6 +606,10 @@ class ResultsPlayer(Viewer):
                 pts=int(self.catalog.pts[self.frame]);state=self.sequence.state
                 imgui.text('原片 PTS %d  |  time_base %d/%d'%(pts,*self.catalog.time_base))
                 imgui.text('当前保存版本：'+self.variant['id'])
+                if self.body_overlay is not None:
+                    _,self.show_body_observations=imgui.checkbox('实际入拟合的人体点（青左／橙右）',self.show_body_observations)
+                    if self.blade_review is None:
+                        _,self.show_model_body=imgui.checkbox('模型人体回投（紫）',self.show_model_body)
                 if self.blade_review is not None:
                     _,self.show_blade_review=imgui.checkbox('原片源结构描线（非模型）',self.show_blade_review)
                     _,self.show_model_runner=imgui.checkbox('模型鞋刀回投（粉色钢刃／浅蓝鞋体）',self.show_model_runner)
@@ -658,6 +666,11 @@ class ResultsPlayer(Viewer):
                         include_source_structures=self.show_blade_review,
                         include_source_legacy=self.show_legacy_source,include_ice_grid=self.show_source_ice_grid,
                          include_trajectory=self.show_source_model_trajectory) if review is not None else [])
+                    if self.body_overlay is not None:
+                        body_items=body_overlay_primitives(self.body_overlay,self.frame,
+                            show_model=review is None and self.show_model_body)
+                        primitives.extend(p for p in body_items if self.show_body_observations
+                                          or p['evidence_kind']=='model_body_projection')
                     width,height=self.source_image_size
                     display_width=max(100.,imgui.get_content_region_available()[0])
                     self.gui_source_image(rows,(0.,0.,float(width),float(height)),display_width,primitives)
@@ -671,6 +684,14 @@ class ResultsPlayer(Viewer):
                                 and primitive.get('evidence_kind') not in ('model_body_projection','model_plane_trajectory')]
                         if review is None:bounds=[region_outline(row)for row in rows]
                         if bounds:crops=[(None,None,np.concatenate(bounds))]
+                    if self.body_overlay is not None:
+                        body_points=[p['points'] for p in primitives if p.get('evidence_kind')=='actual_body_observation']
+                        if body_points:
+                            point=np.concatenate(body_points);lower=np.maximum(point.min(0)-35,0)
+                            upper=np.minimum(point.max(0)+35,[width,height])
+                            if np.all(upper>lower):
+                                extent=upper-lower
+                                self.gui_source_image(rows,(*lower,*upper),min(display_width,400.*extent[0]/extent[1]),primitives)
                     for source_foot,source_track,points in crops:
                         lower=np.maximum(points.min(0)-35,0);upper=np.minimum(points.max(0)+35,[width,height])
                         if np.all(upper>lower):
@@ -785,9 +806,17 @@ class ResultsPlayer(Viewer):
                 imgui.text_colored('本帧装备：共享穿合绑定已作用' if bool(binding[f]) else '本帧装备：沿用保存的参考几何',1.,.78,.32)
                 if refined is not None:
                     reference=self.variant.get('body_reference_label','fullbody1102')
-                    imgui.text('本帧人体：本轮窗口优化候选' if bool(refined[f]) else '本帧人体：沿用 '+reference)
                     intervals=self.variant.get('body_refinement_intervals_seconds',self.catalog.config.get('body_refinement_intervals_seconds',[]))
-                    if intervals:imgui.text_wrapped('人体新增优化仅原片 '+ '、'.join('%g–%g 秒'%tuple(interval) for interval in intervals)+'；其他人体沿用 '+reference+'。')
+                    native_intervals=self.variant.get('body_refinement_intervals_pts')
+                    if native_intervals is not None:
+                        pts=int(self.catalog.pts[f])
+                        affected=any(first<=pts<=last for first,last in native_intervals)
+                        imgui.text('本帧人体：保存的控制更新影响此曝光' if affected else '本帧人体：沿用 '+reference)
+                        imgui.text('控制变化原片区间：%d 段（详见 A/B/C 报告）'%len(native_intervals))
+                    else:
+                        imgui.text('本帧人体：本轮窗口优化候选' if bool(refined[f]) else '本帧人体：沿用 '+reference)
+                        if intervals:
+                            imgui.text_wrapped('人体新增优化仅原片 '+ '、'.join('%g–%g 秒'%tuple(interval) for interval in intervals)+'；其他人体沿用 '+reference+'。')
                 imgui.text_wrapped(self.catalog.config.get('body_scope_label','整节目人体尚未完成；鞋内配合与接触仍未验收。'))
             elif window is not None:
                 if bool(window[f]):imgui.text_colored('本帧：本轮窗口内优化候选，未核验',1.,.78,.32)

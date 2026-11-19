@@ -115,17 +115,34 @@ struct MotionSpline {
         }return finite_array(out,27)?Status::ok:Status::nonfinite;
     }
     RS_HD Status rates(double lo,double hi,double* rates)const{
-        double q[3];if(evaluate(lo,q)!=Status::ok||evaluate(hi,q)!=Status::ok)return Status::outside_support;
-        const int begin=std::max(1,int(std::floor((lo-first)/dt))),end=std::min(int(count)-3,int(std::floor((hi-first)/dt)));
-        for(int c=0;c<3;++c){rates[c]=0;
-            for(int cell=begin;cell<=end;++cell){
-                const double u0=std::max(0.,(lo-first)/dt-cell),u1=std::min(1.,(hi-first)/dt-cell);
-                const double c0=controls[3*size_t(cell-1)+c],c1=controls[3*size_t(cell)+c],c2=controls[3*size_t(cell+1)+c],c3=controls[3*size_t(cell+2)+c];
-                const double a=(-c0+3*c1-3*c2+c3)/2,b=c0-2*c1+c2,d=(c2-c0)/2;
-                auto derivative=[&](double u){return std::abs((a*u*u+b*u+d)/dt);};
-                rates[c]=std::max(rates[c],std::max(derivative(u0),derivative(u1)));
-                if(a!=0){const double vertex=-b/(2*a);if(vertex>u0&&vertex<u1)rates[c]=std::max(rates[c],derivative(vertex));}
-            }rates[c]=std::nextafter(rates[c]+2e-11*(1+rates[c]),std::numeric_limits<double>::infinity());}return Status::ok;
+        if(!(lo<=hi))return Status::invalid_argument;
+        double value[3];
+        if(evaluate(lo,value)!=Status::ok||evaluate(hi,value)!=Status::ok)return Status::outside_support;
+
+        // Match basis() at the closed endpoints, including accepted roundoff.
+        int begin,end;double weights[4];
+        if(basis(lo,begin,weights)!=Status::ok||basis(hi,end,weights)!=Status::ok)return Status::outside_support;
+        const double start=(lo-first)/dt,stop=(hi-first)/dt;
+        for(int channel=0;channel<3;++channel)rates[channel]=0.;
+        for(int cell=begin;cell<=end;++cell){
+            const double u0=cell==begin?start-cell:0.,u1=cell==end?stop-cell:1.;
+            const double* c=controls+3*size_t(cell-1);
+            for(int channel=0;channel<3;++channel){
+                double times[3];const int n=camera_velocity_extremum_times(c,channel,u0,u1,times);
+                for(int i=0;i<n;++i){
+                    // Adjacent differences remove the offset before expansion.
+                    const double velocity=camera_spline_derivative(c,channel,times[i],dt,1);
+                    if(!finite_scalar(velocity))return Status::nonfinite;
+                    rates[channel]=std::max(rates[channel],std::abs(velocity));
+                }
+            }
+        }
+        for(int channel=0;channel<3;++channel){
+            const double rate=rates[channel];
+            rates[channel]=std::nextafter(rate+2e-11*(1+rate),std::numeric_limits<double>::infinity());
+            if(!finite_scalar(rates[channel]))return Status::nonfinite;
+        }
+        return Status::ok;
     }
 };
 template<class T> struct MotionCameraStateValue {CameraValue<T> camera;T pan,tilt,logf,z;};

@@ -53,6 +53,17 @@ def row_view(J,start,stop):
 
 def pack_weighted(blocks,weights,jacobian=False):
     """Write the final weighted CSR once; named blocks share its storage."""
+    if len({b.name for b in blocks})!=len(blocks):
+        raise ValueError('Duplicate weighted block name')
+    if jacobian:
+        if not blocks or blocks[0].jacobian is None:
+            raise ValueError('Weighted assembly requires actual block Jacobians')
+        columns=blocks[0].jacobian.shape[1]
+        for b in blocks:
+            if b.jacobian is None:
+                raise ValueError('Missing actual block Jacobian: '+b.name)
+            if b.jacobian.shape!=(len(b.residual),columns):
+                raise ValueError('Weighted block Jacobian shape mismatch: '+b.name)
     counts=[len(b.residual) for b in blocks];offsets=np.r_[0,np.cumsum(counts)]
     r=np.empty(int(offsets[-1]),float);J=None
     if jacobian:
@@ -97,6 +108,10 @@ def assemble(blocks,jacobian=False):
 
 
 def verify(blocks,r,J=None):
+    if len({b.name for b in blocks})!=len(blocks):
+        raise ValueError('Duplicate weighted block name')
+    if J is not None and J.shape[0]!=len(r):
+        raise ValueError('Jacobian row count differs from the weighted residual')
     start=0;cost=0.;rows=[]
     for b in blocks:
         stop=start+len(b.residual)

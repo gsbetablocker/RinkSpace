@@ -40,6 +40,25 @@ def test_same_pose_population_reassessment_keeps_numeric_limits_and_flight_caps(
     assert result['torso']['observations']==11
 
 
+def test_replay_handles_reviewed_bilateral_mapping_and_mixed_exits_in_one_packet():
+    baseline,obs,_,_,kwargs=fixture()
+    obs['uv'][1,15]=kwargs['reference_projection'][1,16]
+    updated,revision=revise_body_observations(obs,[dict(source_pts=20,joint_pairs=[[15,16]])],
+        [dict(source_pts=30,joint_id=j,reason='same-frame duplicate in source') for j in (9,15)],{})
+    result=call((baseline,obs,updated,revision,kwargs))
+    revised=result['body_source_revision']
+    assert revised['excluded_lower_limb_rows']==1
+    assert revised['excluded_rows']==2
+    replay=revised['same_pose_replay']['spin/lower_limbs']
+    assert replay['surviving_rows']==11 and replay['retired_rows']==1 and replay['retained_limit_px']==9.
+    assert replay['same_saved_pose_before']['observations']==12
+    assert replay['same_saved_pose_after']['observations']==11
+    frame=np.arange(3)[:,None]
+    mask=updated['use'][:,13:17]
+    errors=np.linalg.norm(kwargs['reference_projection'][frame,updated['model_joint_ids']]-obs['uv'],axis=-1)
+    assert replay['same_saved_pose_after']['pixel_p95']==np.percentile(errors[:,13:17][mask],95)
+
+
 @pytest.mark.parametrize('failure',['raw_uv','identity','undeclared','added','count','clock','missing_episode','nonfinite','reference_identity','non_native_turn'])
 def test_reassessment_rejects_unbound_or_changed_populations(failure):
     values=list(fixture());baseline,obs,updated,revision,kwargs=values

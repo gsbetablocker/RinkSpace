@@ -18,6 +18,18 @@ LEG_COLUMNS = (
 )
 
 
+def ambiguous_shoe_frames(packet):
+    """Mask identities are unproved during overlap and its immediate transitions."""
+    admitted=(packet['role']==1)&packet['visible']
+    uncertain=~admitted.all(1)|packet.get('partial_boundary',np.zeros_like(admitted)).any(1)
+    result=uncertain.copy();shots=packet['shot_ids']
+    for offset in range(1,5):
+        same=shots[offset:]==shots[:-offset]
+        result[offset:]|=uncertain[:-offset]&same
+        result[:-offset]|=uncertain[offset:]&same
+    return result
+
+
 def native_point_derivative(problem, base, delta, points, foot, derivative):
     """Differentiate actual upper deformation as well as rigid FK, at fixed associations."""
     native = np.zeros((*derivative.shape[:-1], 69))
@@ -29,14 +41,37 @@ def native_point_derivative(problem, base, delta, points, foot, derivative):
         b = points(fk_state(problem.reference, base, minus))
         return np.einsum("nkpac,nakc->nkpa", derivative, (a - b) / 2.e-6, optimize=True)
 
-    for axis in LEG_COLUMNS[foot]:
+    columns = LEG_COLUMNS[foot]
+    if getattr(problem, 'analytic_rigid_shoe_derivatives', False):
+        from .fullbody_fit import right_jacobian
+        pose = fk_state(problem.reference, base, delta)
+        world = points(pose).swapaxes(1, 2)
+        count = world.shape[0]
+        # Hip, knee and root rotations carry the boot rigidly. Only ankle
+        # rotation changes the upper cuff relative to its shank and therefore
+        # retains the exact deformation finite difference below.
+        for joint in (0, *((1, 4) if foot == 0 else (2, 5))):
+            first = 3 + 3*joint
+            axes = pose['Q'] @ right_jacobian(delta[:, first:first+3])
+            pivot = pose['P']
+            if joint:
+                axes = pose['Q'] @ pose['frames'][:, joint] @ right_jacobian(delta[:, first:first+3])
+                pivot = pose['native_world'][:, joint]
+            arm = world - pivot.reshape(count, 1, 5, 3)
+            vectors = axes.reshape(count, 5, 3, 3).swapaxes(-1, -2)
+            movement = np.cross(vectors[:, None], arm[..., None, :])
+            native[..., first:first+3] = np.einsum('nkpac,nkadc->nkpad', derivative, movement, optimize=True)
+        ankle = 7 + foot
+        columns = tuple(range(3+3*ankle, 6+3*ankle))
+    for axis in columns:
         plus, minus = delta.copy(), delta.copy()
         plus[:, axis] += 1.e-6
         minus[:, axis] -= 1.e-6
         native[..., axis] = column(plus, minus)
-    for axis in range(3):
-        shoe[..., 3 * foot + axis] = column(perturb_relative(delta, foot, axis, 1.e-6),
-                                            perturb_relative(delta, foot, axis, -1.e-6))
+    if not getattr(problem, 'fixed_relative_skates', False):
+        for axis in range(3):
+            shoe[..., 3 * foot + axis] = column(perturb_relative(delta, foot, axis, 1.e-6),
+                                                perturb_relative(delta, foot, axis, -1.e-6))
     return native, shoe
 
 
@@ -51,7 +86,7 @@ class WholeSkateSourceFactor:
 
     name = "whole_skate_source"
 
-    def __init__(self, problem, specification):
+    def __init__(self, problem, specification, *, frames=None):
         from experiments.skate_video_v1.body_skate_fit import Assembly
 
         self.problem = problem
@@ -60,23 +95,92 @@ class WholeSkateSourceFactor:
         if digest(path) != specification["sha256"]:
             raise ValueError("Whole-skate source roles or contours changed")
         self.packet = load(path)
+        self.distance_model = specification.get('distance_model', 'normal_arcsinh')
+        self.continuous_edge_matches = specification.get('continuous_edge_matches', False)
+        if self.distance_model not in ('normal_arcsinh', 'vector_pseudo_huber'):
+            raise ValueError('Unknown whole-skate source distance model')
+        if self.continuous_edge_matches and self.distance_model != 'vector_pseudo_huber':
+            raise ValueError('Continuous edge matches require the vector pixel objective')
         ref = problem.reference
         np.testing.assert_array_equal(self.packet["source_pts"], ref.p["pts"])
         np.testing.assert_array_equal(self.packet["time_base"], [1, 12800])
         np.testing.assert_array_equal(self.packet["camera_sha256"], problem.camera.info["state_sha256"])
         role = self.packet["role"]
+        selected = np.ones(len(role), dtype=bool)
+        if frames is not None:
+            frames = np.asarray(frames, dtype=int)
+            if np.any((frames < 0) | (frames >= len(role))):
+                raise ValueError("Whole-skate source frame outside native clock")
+            selected[:] = False
+            selected[frames] = True
+        if specification.get('ambiguous_source_union',False):
+            selected &= ~ambiguous_shoe_frames(self.packet)
         self.batches = []
         for foot in (0, 1):
-            frames = np.flatnonzero(role[:, foot] == 1)
+            frames = np.flatnonzero((role[:, foot] == 1) & selected)
             for first in range(0, len(frames), 32):
                 group = frames[first:first + 32]
                 times = exposure_times(problem, group)
                 self.batches.append((foot, group, times, ref.at(times)))
         self.matches = None
+        self.refresh_each_state = False
+        self.associated_parameters = None
         self.last_distances = None
         self.association_signature = ""
         self.group_provenance = dict(source_pts=ref.p["pts"].tolist(), role="fit",
                                      evidence_sha256=specification["sha256"], native_exposure_nodes=5)
+        if self.distance_model != 'normal_arcsinh' or self.continuous_edge_matches:
+            self.group_provenance.update(distance_model=self.distance_model,
+                                        continuous_edge_matches=self.continuous_edge_matches)
+
+    def _segment_matches(self, pixels, observed, boundary_valid=None, partial=False):
+        """Project onto actual boundary edges instead of snapping to vertices."""
+        from scipy.spatial import cKDTree
+        from experiments.skate_video_v1.inputs import distribute
+        outlines = self.assembly.raster(pixels)
+        boundary = np.concatenate(outlines)
+        pairs = self.assembly.edges
+        mids = pixels[pairs].mean(axis=1)
+        keep = cKDTree(boundary).query(mids)[0] < 1.55
+        pairs = pairs[keep]
+        if not len(pairs):
+            raise ValueError('No projected shoe boundary edges')
+
+        def closest(query, starts, ends):
+            edge = ends-starts
+            t = np.clip(np.einsum('qec,ec->qe', query[:, None]-starts, edge)
+                        / np.maximum(np.sum(edge*edge, axis=1), 1.e-12), 0., 1.)
+            projected = starts[None]+t[..., None]*edge[None]
+            selected = np.argmin(np.sum((query[:, None]-projected)**2, axis=-1), axis=1)
+            return selected, t[np.arange(len(query)), selected], projected[np.arange(len(query)), selected]
+
+        source = distribute(observed, 80, closed=True)
+        if boundary_valid is not None:
+            # Qualification addresses the ORIGINAL sampled pixels. Re-sampling
+            # the polygon would silently move the valid flags onto other arcs.
+            source = np.asarray(observed)
+            valid = np.asarray(boundary_valid, bool)
+            if valid.shape != (len(source),) or np.count_nonzero(valid) < 8:
+                raise ValueError('Insufficient qualified source boundary arcs')
+            ids = np.flatnonzero(valid)
+            take = np.rint(np.linspace(0, len(ids)-1, 40 if partial else 20)).astype(int)
+            target = source[ids[take]]
+        else:
+            valid = np.ones(len(source), bool)
+            target = distribute(observed, 20, closed=True)
+        i, a, _ = closest(target, pixels[pairs[:, 0]], pixels[pairs[:, 1]])
+        if partial:
+            # A visible arc must touch the model, but the model's unseen side
+            # must not collapse onto the small visible fragment. In particular,
+            # no completed outline is fabricated through the foreground boot.
+            return pairs[i], a, target, np.zeros((40, 2))
+        perimeter = distribute(max(outlines, key=len), 20, closed=True)
+        j, b, material = closest(perimeter, pixels[pairs[:, 0]], pixels[pairs[:, 1]])
+        segments = valid & np.roll(valid, -1)
+        if np.count_nonzero(segments) < 2:
+            raise ValueError('A complete source outline needs resolved adjacent arcs')
+        _, _, back = closest(material, source[segments], np.roll(source, -1, axis=0)[segments])
+        return np.r_[pairs[i], pairs[j]], np.r_[a, b], np.r_[target, back], np.zeros((40, 2))
 
     def _points(self, state, foot, selectors):
         return self.assembly.points(state, foot, selectors, (state["R"], state["O"]))
@@ -88,10 +192,20 @@ class WholeSkateSourceFactor:
             pose = fk_state(self.problem.reference, base, delta)
             nodes = self._points(pose, foot, None).reshape(len(frames), 5, -1, 3)
             uv = moving_projection(self.problem.camera, nodes, frames)["uv"]
-            rows = [self.assembly.associations(a, b) for a, b in zip(uv, self.packet["region"][frames, foot])]
+            associate = self._segment_matches if self.continuous_edge_matches else self.assembly.associations
+            if 'boundary_valid' in self.packet:
+                if not self.continuous_edge_matches:
+                    raise ValueError('Qualified source arcs require continuous boundary matching')
+                rows = [self._segment_matches(a,self.packet['region'][frame,foot],
+                            self.packet['boundary_valid'][frame,foot],
+                            bool(self.packet['partial_boundary'][frame,foot]))
+                        for a,frame in zip(uv,frames)]
+            else:
+                rows = [associate(a, b) for a, b in zip(uv, self.packet["region"][frames, foot])]
             matches.append(tuple(np.stack(values) for values in zip(*rows)))
         self.matches = tuple(matches)
         self.association_signature = signature(*(a for group in matches for a in group[:2]))
+        self.associated_parameters = np.array(x, copy=True)
 
     def checkpoint_fields(self):
         if self.matches is None:
@@ -138,6 +252,28 @@ class WholeSkateSourceFactor:
         difference = projection["uv"] - target
         signed = np.sum(difference * normal, axis=-1)
         radius = self.packet["sigma_px"][frames, foot, None]
+        if self.distance_model == 'vector_pseudo_huber':
+            # Symmetric nearest-boundary pixel distances retain both image
+            # components. A normal-only residual can hide a reversed forefoot
+            # behind a nearby parallel edge. Associations remain explicit and
+            # fixed during each derivative check, not material identities.
+            z = difference / radius[..., None]
+            u = np.sqrt(1. + np.sum(z*z, axis=-1) / 4.)
+            k = np.sqrt(2. / (u + 1.))
+            scale = np.sqrt(self.packet['measure_s'][frames, foot, None] / z.shape[1])
+            r = scale[..., None] * k[..., None] * z
+            J = None
+            if jacobian:
+                B, S = native_point_derivative(p, base, delta, points, foot,
+                                               projection['pixel_jac_nodes'])
+                dk = -k / (16. * u * (u + 1.))
+                D = k[..., None, None] * np.eye(2) + 2. * dk[..., None, None] * z[..., :, None] * z[..., None, :]
+                D *= (scale / radius)[..., None, None]
+                body = np.einsum('nkqp,nkpad->nkqad', D, B)
+                shoe = np.einsum('nkqp,nkpad->nkqad', D, S)
+                J = chain(p, delta, times, body.reshape(len(frames), -1, 5, 69),
+                          shoe.reshape(len(frames), -1, 5, 6))
+            return r.ravel(), J, np.median(np.linalg.norm(difference, axis=-1), axis=1)
         scaled = signed / radius
         scale = np.sqrt(self.packet["measure_s"][frames, foot, None] / signed.shape[1])
         r = scale * np.arcsinh(scaled)
@@ -152,7 +288,9 @@ class WholeSkateSourceFactor:
         return r.ravel(), J, np.median(np.linalg.norm(difference, axis=-1), axis=1)
 
     def evaluate(self, x, jacobian=False):
-        if self.matches is None:
+        if (self.matches is None or (self.refresh_each_state and
+                (self.associated_parameters is None or
+                 not np.array_equal(self.associated_parameters,x)))):
             self.associate(x)
         values = [self._batch(x, batch, match, jacobian)
                   for batch, match in zip(self.batches, self.matches, strict=True)]

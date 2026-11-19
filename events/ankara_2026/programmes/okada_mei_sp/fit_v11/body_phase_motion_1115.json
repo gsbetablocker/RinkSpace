@@ -1,0 +1,283 @@
+{
+  "schema": "rinkspace.okada_phase_motion.v1",
+  "candidate_id": "okada_phase_motion_1115",
+  "baseline": {
+    "path": "events/ankara_2026/programmes/okada_mei_sp/fit_v11/body_trusted_motion_1115.json",
+    "sha256": "02bb511e7a8edd082e709a70e86c75e2db099c27c9403abe46736859c0b71d91"
+  },
+  "source_clock_controls": {
+    "path": "events/ankara_2026/programmes/okada_mei_sp/fit_v11/body_phase_motion_1115_controls.npz",
+    "sha256": "6fbc14c6d1c0382ec0c06c7e85c5e142d2e73e12aca772f7ec83e6c9965eb4d2"
+  },
+  "review_report": {
+    "path": "events/ankara_2026/programmes/okada_mei_sp/fit_v11/body_phase_motion_1115_report.md",
+    "sha256": "ea595f11efcec35303f48fc71b934917295cf5d91befb02f594b574e2cdb0a56"
+  },
+  "source_revision": {
+    "path": "events/ankara_2026/programmes/okada_mei_sp/fit_v11/body_phase_motion_1115_source.json",
+    "sha256": "86d8230080526226244caf7a14cf455dc88ffb9a2ad0618012baf1f132d66056"
+  },
+  "shoe_evidence": {
+    "path": "events/ankara_2026/programmes/okada_mei_sp/fit_v11/body_phase_motion_1115_skate_source.json",
+    "sha256": "86d5063ff7af78f220fa5e7de90a34fc9e5492ee76d6bd618f6227fdddefe2d8"
+  },
+  "source_exposures": 8329,
+  "source_time_base": [
+    1,
+    12800
+  ],
+  "native_camera_sha256": "2e0fc2705fd5e2935ac87037e6681c7d031a55f83827bfd8e3e8e3fc6d58799c",
+  "same_shared_scene_sha256": "13bd87094a58b3433eaf25cf67738e6bc26ce13ffdd594f1c1b7f17f118f2a59",
+  "source_video_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "motion_quality_passed": false,
+  "remaining": [
+    "相对 R 仍有新增的膝／踝软域超出曝光",
+    "样本中有 17 个新增语义表面对，定向见证量逐项登记",
+    "落冰过渡稠密质心加速度 P95 仍升高，N 79.89 到 M 91.55 m/s²",
+    "鞋刀相邻曝光最大步幅仍升高，N 269.17 到 M 271.85 mm"
+  ],
+  "accuracy_accepted": false,
+  "user_accepted": false,
+  "data_root_artifacts": {
+    "数值账本及逐 PTS 回归": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/release/comparison.json",
+      "sha256": "5b1a28357f582bb5a2fd8e93eeb8d024321fe6ae12fd90f6aa28bc2a12d3b01c"
+    },
+    "同 PTS 三维入口": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/release/playback/START_PHASE_MOTION_3D.cmd",
+      "sha256": "8eebaa9f5f304b9342d0a783ae0b695469117171ff5e982945a03f558c65b93f"
+    },
+    "80.88–82.70 秒原片局部对照（PotPlayer）": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/release/playback/entry_spin_R_N_M.mp4",
+      "sha256": "8b691c5db24dfc83070c7a55d05e6d7e187cf57eec9dfb3f950f0f23ec820d77"
+    },
+    "实际三维连续回放回执": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/release/player_check/checks.json",
+      "sha256": "c5ffdeb30e00f0dc3442bb5d861fc48eba80384154e8bc2e558ffd46083303d3"
+    },
+    "观测退场账本": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/input/revision.json",
+      "sha256": "2e4b9c2afc69b9c5dd45add3b004eb0105e756d30f86905ef72a51bcc7a81cf2"
+    },
+    "N0 完整重放主日志": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/N0_phase/progress.jsonl",
+      "sha256": "4c97ded6e9997f10f828ade3ac8b044a7a55d6ad80eecd5b946bd72d3904d89a"
+    },
+    "同姿态目标变更": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/N0_phase/scoped_import.json",
+      "sha256": "504240383649bf9e75b7d8c53461e12f5ab4acb8f61916a002da5b52dc9617f4"
+    },
+    "M 求解主日志": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_joint_resume_09/progress.jsonl",
+      "sha256": "5a7745d61b686240175b8adc6de9fa1fb0afd5be53e6d532c2b2da4eba4b7611"
+    },
+    "重力行实测导数": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_joint_resume_09/phase_derivatives.json",
+      "sha256": "c5b0ef797df7847aa41c1557fb9a959e964f954fad1198b21c40d9d63cf26f97"
+    },
+    "根部活动集实际敏感性试验": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/phase_root_sensitivity.json",
+      "sha256": "e1f4729883abb9787591316ab5da66a9755ce6dee967d5b7b476ef83ba82a562"
+    },
+    "2A 固定相机原片投影": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/source_frames/jump_2a_same_pose_projection.jpg",
+      "sha256": "b4cd38b94a5b9ac232fe16a3f191565d00f4c6b024ff08b190327ea0c3188fec"
+    },
+    "穿插专项试步": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_cuff_resume_11/progress.jsonl",
+      "sha256": "f26b27f97fdf61c5563ac38201fd32cb1ed7afec7d59f1268e8b4b3f3d835791"
+    },
+    "全组穿插试步": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_surface_resume_10/progress.jsonl",
+      "sha256": "e25b80d9768f254e03603b552b676ed1144fe397351dfa1ce55ec709111e7798"
+    },
+    "最终选择与冻结证据角色": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/release/selection.json",
+      "sha256": "0f321254f3822b9afd08bf9ba5ced2a8bdf13f509e7009285345a4dab0b7f642"
+    },
+    "完整程序回归测试": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/tests_phase_delivered.log",
+      "sha256": "55b65f885a17c39e5550f55f9036e1e1972e3f5449e60b618c7ec9b217ddf6a3"
+    },
+    "曝光覆盖测试": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/tests_phase_exposure.log",
+      "sha256": "15103073d19d4af9a6ebd92de5af38938ac9621d896aae245ed41e3f623e47b7"
+    },
+    "原片叠加测试": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/tests_phase_overlay.log",
+      "sha256": "11af52e1ba880e7b0597f1332c71f37531f7209642075637b68aca8e15b18a6f"
+    },
+    "R_parameters": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/trusted_motion_1115/replay_reviewed/solve/candidate.npz",
+      "sha256": "5d5889c0da0384893452c649fce1fd7fcb7b883b663392078758c43012b60e13"
+    },
+    "R_result": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/trusted_motion_1115/replay_reviewed/fitted/result.npz",
+      "sha256": "572e4a61ee6a8ac71f403427cd97f7c559c09088cf0f64727365d84bf27d0f94"
+    },
+    "N_parameters": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/trusted_motion_1115/accepted_no_new_crossing_N/solve/candidate.npz",
+      "sha256": "210a523b9201a60373e78382cfab943d629f5a9e07f17f8ccdbc3940d323219e"
+    },
+    "N_result": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/trusted_motion_1115/accepted_no_new_crossing_N/fitted/result.npz",
+      "sha256": "115b7e1ef80c19d955e2b3707e66235f038ec1fe4c04c33b57d66822bdef5c49"
+    },
+    "N0_parameters": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/N0_phase/solve/candidate.npz",
+      "sha256": "466f94237099b932294c55f4024973b2f43203bdc128b843547c8446f2b6233d"
+    },
+    "N0_result": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/N0_phase/fitted/result.npz",
+      "sha256": "6b36df6b6d23b0138c13ff79455237d148712141810a942a4cf24875677c925b"
+    },
+    "M_parameters": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_joint_resume_09/solve/candidate.npz",
+      "sha256": "19369d6db8057f0f2f8c1876b4de77d5c7852832a20388a2741d51324fd74530"
+    },
+    "M_result": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_joint_resume_09/fitted/result.npz",
+      "sha256": "051ca84d71425a987d91b58854be596da1bb666bee0ed96539dc77208a1532b1"
+    },
+    "observations": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/input/observations.npz",
+      "sha256": "4c68014e102f8b288e1559bf2dc3d62cb1ba2dadc88cb902abf5a48a6afbe7fc"
+    },
+    "source_and_objective": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/input/source.json",
+      "sha256": "d34cb6046b2ae920f4bc0d423ea45065770145bf304aad1deda434cc9b93f481"
+    },
+    "frozen_guards": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/N0_phase/primary_quality_baseline.json",
+      "sha256": "11d67e8871da218796e353289cd426bd9dba788d1de1ac07e55c0eb8d00057ef"
+    },
+    "comparison": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/release/comparison.json",
+      "sha256": "5b1a28357f582bb5a2fd8e93eeb8d024321fe6ae12fd90f6aa28bc2a12d3b01c"
+    },
+    "com_quadrature": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_joint_resume_09/com_physics_quadrature.npz",
+      "sha256": "fbb769dff57e7465925728948169d4e3be3f6733cae085c6e145a7b536c9f87b"
+    },
+    "surface": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_joint_resume_09/retained_surface.json",
+      "sha256": "56f575ce7a469738dad0eaacc8a93514270d59607f25823aa9c2981660803ad3"
+    },
+    "viewer_config": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/release/playback/viewer3d.json",
+      "sha256": "430c829a71a8cb441c9028002667f802749a1ac31ec2e04758256d6eef0075eb"
+    },
+    "media": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/release/playback/media.json",
+      "sha256": "0e2e87f39d78a079c37f131827364b6fb908def46bb842d71f85430e2cf308cf"
+    },
+    "M_guards": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_joint_resume_09/final_metrics.json",
+      "sha256": "f7c68a7483aef475114f088cdf482f8e25bc150b65e7ad6bae07aebde2787f3f"
+    },
+    "solve_state": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_joint_resume_09/solve/candidate.npz",
+      "sha256": "19369d6db8057f0f2f8c1876b4de77d5c7852832a20388a2741d51324fd74530"
+    },
+    "result": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_joint_resume_09/fitted/result.npz",
+      "sha256": "051ca84d71425a987d91b58854be596da1bb666bee0ed96539dc77208a1532b1"
+    },
+    "source_evidence": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/input/source.json",
+      "sha256": "d34cb6046b2ae920f4bc0d423ea45065770145bf304aad1deda434cc9b93f481"
+    },
+    "entry_guarded_fit_08_main_log": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_guarded_fit_08/progress.jsonl",
+      "sha256": "066af30107d512ada32df90b5777ecd32c1dc1d948d8bacddbfa8557a9e0296a"
+    },
+    "entry_guarded_fit_08/run_summary.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_guarded_fit_08/run_summary.json",
+      "sha256": "758359950b6f7c62b3fa7557eca685849fad49f630983c1beaebdf5ac4121b9f"
+    },
+    "entry_guarded_fit_08/resumed_residual.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_guarded_fit_08/resumed_residual.json",
+      "sha256": "46d1bdacf76bebdf263ed5d92470b001cd01eb3d76bc265696e9109808c88e31"
+    },
+    "entry_joint_resume_09_main_log": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_joint_resume_09/progress.jsonl",
+      "sha256": "5a7745d61b686240175b8adc6de9fa1fb0afd5be53e6d532c2b2da4eba4b7611"
+    },
+    "entry_joint_resume_09/run_summary.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_joint_resume_09/run_summary.json",
+      "sha256": "df8a130663408a5320e717858d070e12ae117373acb07d0529a77b33faaa62ac"
+    },
+    "entry_joint_resume_09/phase_surface_trials.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_joint_resume_09/phase_surface_trials.json",
+      "sha256": "d365e3e2dda13475aa380eb7abb058d97f82fa00cc1e324e9a6c7e553563e931"
+    },
+    "entry_joint_resume_09/phase_derivatives.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_joint_resume_09/phase_derivatives.json",
+      "sha256": "c5b0ef797df7847aa41c1557fb9a959e964f954fad1198b21c40d9d63cf26f97"
+    },
+    "entry_joint_resume_09/resumed_residual.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_joint_resume_09/resumed_residual.json",
+      "sha256": "35cde340aba2ab9df9a1cf4e0bb489e6e1e205d0133b472ac9772fe0f5ed32a3"
+    },
+    "entry_joint_resume_09/scoped_directions.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_joint_resume_09/scoped_directions.json",
+      "sha256": "3e28ba4d7df88344826f8fa4b872f3484286fa50a701d7c927741799fb921032"
+    },
+    "entry_surface_resume_10_main_log": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_surface_resume_10/progress.jsonl",
+      "sha256": "e25b80d9768f254e03603b552b676ed1144fe397351dfa1ce55ec709111e7798"
+    },
+    "entry_surface_resume_10/phase_derivatives.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_surface_resume_10/phase_derivatives.json",
+      "sha256": "8ea77e185605c8bbe35d625483900521b0d4730264ab8b3b604841a6ac17b2ac"
+    },
+    "entry_surface_resume_10/resumed_residual.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_surface_resume_10/resumed_residual.json",
+      "sha256": "024359f89851a04f287b60542c7df5723ee3eb64c6b1291f4c571850f6e50903"
+    },
+    "entry_surface_resume_10/scoped_directions.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_surface_resume_10/scoped_directions.json",
+      "sha256": "e8fd17c71f777effca5439850ab2d162b38988474f931253e9bda3274f4f93b1"
+    },
+    "entry_cuff_resume_11_main_log": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_cuff_resume_11/progress.jsonl",
+      "sha256": "f26b27f97fdf61c5563ac38201fd32cb1ed7afec7d59f1268e8b4b3f3d835791"
+    },
+    "entry_cuff_resume_11/phase_derivatives.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_cuff_resume_11/phase_derivatives.json",
+      "sha256": "45e9136ad5dca9184476e7e7c517ad662fd89e8cafa5084be9f27c84e4e25780"
+    },
+    "entry_cuff_resume_11/resumed_residual.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_cuff_resume_11/resumed_residual.json",
+      "sha256": "024359f89851a04f287b60542c7df5723ee3eb64c6b1291f4c571850f6e50903"
+    },
+    "entry_cuff_resume_11/scoped_directions.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_cuff_resume_11/scoped_directions.json",
+      "sha256": "1fecbf7778d13884f00b72b46bc536b961faac7b2ae8265a97b9843247042dda"
+    },
+    "entry_targets.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_targets.json",
+      "sha256": "c4eec62a2215cc7155abec558dbdd0160edef2a8ee955ab02e1c8d15123ae72f"
+    },
+    "entry_joint_targets.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_joint_targets.json",
+      "sha256": "3055b4016eb0a0a0ae17c55e5a35bea8d5bd456904003927b47fc35ab009a54f"
+    },
+    "entry_surface_targets.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_surface_targets.json",
+      "sha256": "96cea15cee5f4ea75d007981596f34144ca98decb5dcc7549a4308fff6c6eab0"
+    },
+    "entry_cuff_targets.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/entry_cuff_targets.json",
+      "sha256": "701f3ead2bde6ed5ca3d9fdf8407a1b58e726a9280d28757f50c8ee5d493210e"
+    },
+    "phase_guarded_feedback_trials.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/phase_guarded_feedback_trials.json",
+      "sha256": "37df26b6ef80bfe3f2c59fb1c84abf90f48d6e1e44aed4ae67ef5ae0fafbe4ad"
+    },
+    "phase_final_surface_local_probe.json": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/phase_motion_1115/phase_final_surface_local_probe.json",
+      "sha256": "651255e47f9ebdcce01d4e6f6ce538fb0973a0788b4f07ef9ab2bb75f5097a3f"
+    }
+  }
+}

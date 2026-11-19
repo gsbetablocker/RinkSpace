@@ -106,17 +106,21 @@ def scene_relative_limit(scene, core=None):
     return limit
 
 
-def scene_physical_bounds(state, relative_limit=RELATIVE_LIMIT):
+def scene_physical_bounds(state, relative_limit=RELATIVE_LIMIT, *, free_metric=False, signed_offsets=0):
     """Intersect caller bounds with these native mandatory deviation bounds."""
     lower = np.full(len(state.values), -np.inf)
     upper = np.full(len(state.values), np.inf)
     for block in state.blocks.values():
         if block['available'] and block['kind'] == 'shared_geometry' and block['id'].endswith('/ice_tolerance'):
-            if block['size'] != DEVIATION_COUNT:
+            if signed_offsets not in ((0,1,9) if free_metric else (0,)) or block['size'] != DEVIATION_COUNT+signed_offsets:
                 raise ValueError('Native ice deviation block size differs')
             span = slice(block['offset'], block['offset'] + block['size'])
-            lower[span] = -relative_limit
-            upper[span] = relative_limit
+            if free_metric:
+                dimensions = np.r_[np.arange(16, 56), np.arange(90, 107)]
+                lower[block['offset'] + dimensions] = -1. + 64 * np.finfo(float).eps
+            else:
+                lower[span] = -relative_limit
+                upper[span] = relative_limit
     return lower, upper
 
 

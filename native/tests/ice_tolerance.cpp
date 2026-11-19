@@ -82,5 +82,63 @@ int main(){
     require(shared_entity_definition(board,6,changed.data(),changed.size(),200,kind,out,6,127)==Status::outside_support,"connection must pass R strictly");
     changed=q;changed[14]=changed[8];
     require(shared_entity_definition(board,6,changed.data(),changed.size(),200,kind,out,6,127)==Status::outside_support,"connection must stop before N strictly");
-    std::puts("ice tolerance: zero state, 107 geometry/margin derivatives, topology, order and bounds passed; no optimizer called");
+    // Explicit free-metric mode crosses the old percentage boundary, while
+    // preserving physical dimensions, nested rings and real shared nodes.
+    changed=q;changed[39+4]=.12;changed[39+16]=.20;
+    require(shared_entity_definition(board,6,changed.data(),changed.size(),100,kind,out,6,255)==Status::ok,"free metric beyond old percentage box");
+    close(out[0],q[0]+.12*q[3],1e-15,"independent house position");
+    close(out[3],q[4]*q[5]*1.20,1e-15,"independent house radius");
+    require(shared_entity_definition(board,6,changed.data(),changed.size(),100,kind,out,6,127)==Status::outside_support,"legacy box remains unchanged");
+    changed[39+16]=-1.01;
+    require(shared_entity_definition(board,6,changed.data(),changed.size(),100,kind,out,6,255)==Status::outside_support,"free metric rejects negative radius");
+    changed=q;changed[39+18]=1.;changed[39+19]=-.2;
+    require(shared_entity_definition(board,6,changed.data(),changed.size(),100,kind,out,6,255)==Status::outside_support,"free metric preserves ring order");
+    changed=q;changed[39]=.08;changed[39+12]=.04;changed[39+56]=.30;changed[39+60]=.04;
+    for(int code:codes)require(shared_entity_definition(board,6,changed.data(),changed.size(),code,kind,out,(code==410||code==411)?8:6,255)==Status::ok,"free spacing and nonparallel lines");
+    for(int column=0;column<ice_tolerance_layout_size;++column){
+        LocalJet b[6],v[ice_tolerance_layout_size];for(int i=0;i<6;++i)b[i]=board[i];
+        for(int i=0;i<ice_tolerance_layout_size;++i)v[i]={changed[i],i==column?1.:0.};
+        auto minus=changed,plus=changed;minus[column]-=epsilon;plus[column]+=epsilon;
+        for(int relation=0;relation<ice_tolerance_margin_count;++relation){
+            const auto a=ice_tolerance_margin(IceToleranceGeometry<LocalJet>(b,v,255),relation);
+            const auto lo=ice_tolerance_margin(IceToleranceGeometry<double>(board,minus.data(),255),relation);
+            const auto hi=ice_tolerance_margin(IceToleranceGeometry<double>(board,plus.data(),255),relation);
+            close(a.v,(hi-lo)/(2*epsilon),3e-7,"free topology margin derivative");
+        }
+    }
+    std::array<double,ice_crease_layout_size> shifted{};
+    std::copy(q.begin(),q.end(),shifted.begin());
+    double original_crease[8],moved_crease[8],goal[6];
+    require(shared_entity_definition(board,6,q.data(),q.size(),410,kind,original_crease,8,255)==Status::ok,"original crease");
+    require(shared_entity_definition(board,6,shifted.data(),shifted.size(),410,kind,moved_crease,8,511)==Status::ok,"free axial crease");
+    for(int j=0;j<8;++j)close(original_crease[j],moved_crease[j],0.,"zero axial shift preserves legacy geometry");
+    shifted[39+77+3]=.001;
+    shifted.back()=.24;
+    require(shared_entity_definition(board,6,shifted.data(),shifted.size(),410,kind,moved_crease,8,511)==Status::ok,"translated left crease");
+    require(shared_entity_definition(board,6,shifted.data(),shifted.size(),403,kind,goal,6,511)==Status::ok,"tilted finite goal line");
+    close(moved_crease[0]-goal[0],(moved_crease[1]-goal[1])*(goal[3]-goal[0])/(goal[4]-goal[1]),1e-13,"crease centre on the carrier");
+    require(moved_crease[1]>original_crease[1],"positive transverse shift");
+    bool own=false,other=false;
+    ice_tolerance_layout_support(410,[&](int j){own|=j==ice_tolerance_layout_size;},shifted.size());
+    ice_tolerance_layout_support(411,[&](int j){other|=j==ice_tolerance_layout_size;},shifted.size());
+    require(own&&!other,"native derivative belongs to the left crease only");
+    require(!shared_options_valid(shifted.size(),255)&&!shared_options_valid(q.size(),511),"incompatible layouts rejected");
+    std::array<double,ice_lane_centre_layout_size> lanes{};
+    std::copy(q.begin(),q.end(),lanes.begin());
+    lanes[ice_crease_layout_size+3]=.04;
+    lanes[ice_crease_layout_size+7]=-.03;
+    IceToleranceGeometry<double> free_lanes(board,lanes.data(),1023);
+    const auto f4=free_lanes.house(3),r4=free_lanes.house(7);
+    for(auto anchor:{std::pair<double,double>{f4.x,.04},{r4.x,-.03}}){
+        const auto x=anchor.first;
+        close((free_lanes.side_y(3,1,x)+free_lanes.side_y(3,-1,x))/2-free_lanes.centre_y(3,x),
+              q[9]*anchor.second,1e-14,"independent lane centre at the two real house sections");
+    }
+    for(int row=0;row<4;++row){
+        double top[6],cap[6],bottom[6];
+        for(auto part:{std::pair<int,double*>{312+2*row,top},{301+3*row,cap},{313+2*row,bottom}})
+            require(shared_entity_definition(board,6,lanes.data(),lanes.size(),part.first,kind,part.second,6,1023)==Status::ok,"finite independent lane path");
+        for(int j=0;j<3;++j){close(top[3+j],cap[j],0.,"upper cap vertex");close(cap[3+j],bottom[j],0.,"lower cap vertex");}
+    }
+    std::puts("ice tolerance: legacy and free metric geometry, axial crease, derivatives, topology and bounds passed");
 }

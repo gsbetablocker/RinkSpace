@@ -81,7 +81,13 @@ def update_source_observation_export(packet, observations, ledger_path, objectiv
 
 def update_actual_observation_ledger(packet, body):
     """Export the body problem's actual objective scatter and admission."""
+    from .fullbody_fit import body_joint_assignment
+
     indices = (body.of, body.oj) if hasattr(body, 'of') and hasattr(body, 'oj') else None
+    if indices is not None and hasattr(body, 'model_oj'):
+        expected = body_joint_assignment(body.obs)[body.frames[body.of], body.oj]
+        if not np.array_equal(body.model_oj, expected):
+            raise ValueError('Body objective scatter has a stale model joint mapping')
     return update_source_observation_export(packet, body.obs, body.ledger_path, body.frames,
                                             objective_indices=indices)
 

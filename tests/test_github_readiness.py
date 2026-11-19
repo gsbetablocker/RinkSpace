@@ -45,6 +45,8 @@ def test_tracked_cache_and_local_config_require_review_but_arrays_and_images_do_
     assert "tracked_runtime_or_cache" in readiness.tracked_review_reasons("pkg/__pycache__/cached.pyc")
     assert "tracked_compiled_artifact" in readiness.tracked_review_reasons("pkg/__pycache__/cached.pyc")
     assert readiness.tracked_review_reasons("configs/local.json")
+    assert readiness.tracked_review_reasons(".hermes/plans/handoff.md")
+    assert not readiness.tracked_review_reasons("docs/plans/example.md")
     assert readiness.tracked_review_reasons(".env")
     assert not readiness.tracked_review_reasons(".env.example")
     assert not readiness.tracked_review_reasons("events/example/scene.npz")

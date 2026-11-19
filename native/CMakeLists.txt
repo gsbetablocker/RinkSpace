@@ -81,6 +81,9 @@ if(BUILD_TESTING)
     add_test(NAME rinkspace_${ice_check} COMMAND rinkspace_${ice_check})
   endforeach()
   add_executable(rinkspace_core_smoke tests/core_smoke.cpp)
+  set(RINKSPACE_MOTION_RATES_CASES "${CMAKE_CURRENT_SOURCE_DIR}/tests/motion_spline_rates_cases.hpp")
+  set_property(SOURCE tests/core_smoke.cpp APPEND PROPERTY OBJECT_DEPENDS
+    "${RINKSPACE_PUBLIC_HEADERS};${RINKSPACE_MOTION_RATES_CASES}")
   target_link_libraries(rinkspace_core_smoke PRIVATE rinkspace_core)
   target_compile_features(rinkspace_core_smoke PRIVATE cxx_std_17)
   add_test(NAME rinkspace_core_smoke COMMAND rinkspace_core_smoke)
@@ -105,7 +108,7 @@ if(BUILD_TESTING)
     target_include_directories(rinkspace_g2_status_cuda PRIVATE include)
     target_compile_definitions(rinkspace_g2_status_cuda PRIVATE RINKSPACE_CORE_BUILD)
     set_property(SOURCE tests/g2_status_cuda.cu APPEND PROPERTY OBJECT_DEPENDS
-      "${RINKSPACE_PUBLIC_HEADERS};${CMAKE_CURRENT_SOURCE_DIR}/src/core_gpu.cu")
+      "${RINKSPACE_PUBLIC_HEADERS};${RINKSPACE_MOTION_RATES_CASES};${CMAKE_CURRENT_SOURCE_DIR}/src/core_gpu.cu")
     set_target_properties(rinkspace_g2_status_cuda PROPERTIES CUDA_STANDARD 17 CUDA_STANDARD_REQUIRED YES)
     target_compile_options(rinkspace_g2_status_cuda PRIVATE
       $<$<COMPILE_LANGUAGE:CUDA>:--expt-relaxed-constexpr;--fmad=false;--diag-error=20011;--diag-error=20014>)

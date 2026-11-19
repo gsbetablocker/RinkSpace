@@ -83,7 +83,7 @@ class PrimaryActions:
         from .episode_factor_adapter import EpisodeScopedFactor,validate_unique_episode_ids
         self.split_jacobian_only=getattr(problem,'bounded_memory',False)
         self.log=getattr(problem,'log',None)
-        self.motion=ActualMotionFactors(problem,parent)
+        self.motion=ActualMotionFactors(problem,parent,substeps=getattr(problem,'motion_prior_substeps',1))
         self.grasp=SimpleNamespace(last={'image_cost':0.})
         self.factors=[self.motion]
         repair=document.get('scoped_candidate_import')
@@ -187,7 +187,10 @@ def seed_reference(shared,initial,document,camera):
         initial.update(hand_pose_schema_version=np.array(SCHEMA),hand_mean_convention=np.array(MEAN),
             hand_pose_origin=np.asarray(initial.get('hand_pose_origin','explicit frozen saved hands; unobserved context retains generic model hand prior')),
             hand_prior_sha256=np.array(digest(shared.root/'initial.npz')))
-    t=shared.times;half=max(abs(camera.readout_times(np.arange(len(t)))))/2;lo,hi=t[0]-half-.005,t[-1]+half+.005
+    t=shared.times
+    half_readout=np.abs(camera.readout_times(np.arange(len(t))))/2
+    exposure_lo,exposure_hi=np.min(t-half_readout),np.max(t+half_readout)
+    half=max(half_readout);lo,hi=t[0]-half-.005,t[-1]+half+.005
     explicit=shared.root/'absolute_seed_state.npz'
     if explicit.is_file():
         from .absolute_motion_state import curve_from_packet
@@ -196,7 +199,10 @@ def seed_reference(shared,initial,document,camera):
         for key,name in(('prepared_input_sha256','input.npz'),('prepared_initial_sha256','initial.npz')):
             if str(packet[key])!=digest(shared.root/name):raise ValueError('Explicit prior seed identity changed: '+key)
         curve=curve_from_packet(packet,seed=True);shoe=shoe_curve_from_packet(packet,seed=True)
-        if shoe is None or curve.knots[3]>lo or curve.knots[-4]<hi:raise ValueError('Explicit prior seed does not cover the complete exposure clock')
+        # A frozen seed needs every actual exposure node. The extra padding
+        # used when creating new knots is not part of that observation clock.
+        if shoe is None or any(c.knots[3]>exposure_lo or c.knots[-4]<exposure_hi for c in (curve,shoe)):
+            raise ValueError('Explicit prior seed does not cover the complete exposure clock')
         # ClipReference's temporary P spline is superseded by this exact saved
         # absolute curve. Reuse that curve rather than fitting another dense
         # initialization spline solely to construct the read-only reference.
@@ -268,7 +274,8 @@ def load_reference(project,prepared,source_evidence=None,*,native_library=None):
         camera=ProgrammeCamera(project,p,p['shot_ids'],record_path=record,native_library=native_library);info=camera.info
     else:
         spec=load(prepared/'static_camera.npz');camera=StaticCropCamera(p,spec['K_input'],spec['R_w2c'],spec['C_world_m']);info=json.loads((prepared/'camera_context.json').read_text(encoding='utf-8'))
-    ref,seed_report=seed_reference(shared,initial,document,camera);ref.bounded_memory=True;ref.source_document=document;ref.observations_path=prepared/'observations.npz';ref.export_source_path=prepared/'export_source.npz';ref.ice_plane_known=bool(document['scene_contract']['ice_plane_known']);ref.ice_policy=None
+    from .programme_skate_evidence import programme_observation_path
+    ref,seed_report=seed_reference(shared,initial,document,camera);ref.bounded_memory=True;ref.source_document=document;ref.observations_path=programme_observation_path(prepared,document);ref.export_source_path=prepared/'export_source.npz';ref.ice_plane_known=bool(document['scene_contract']['ice_plane_known']);ref.ice_policy=None
     ref.identity_dependencies=dict(hand_sha256=digest(prepared/'initial.npz'),timing_sha256=digest(prepared/'input.npz'))
     ref.binding=SkateBinding(ref,surface,info)
     if fixed is not None:
@@ -356,13 +363,16 @@ def configure_programme_weights(problem,base,document,x):
     return weights
 
 
-def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_linear=False,device_batch=1024,quality_baseline=None,freeze_root=False,diagnostic_profile=False,protected_source_evidence=None,source_episode_choices=None,warm_start=None,save_linear_cache=False,source_conditioned_step=False,source_evidence=None,verify_action_direction=False,scoped_import=None,proposal=None,proposal_only=False):
+def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_linear=False,device_batch=1024,quality_baseline=None,freeze_root=False,diagnostic_profile=False,protected_source_evidence=None,source_episode_choices=None,warm_start=None,save_linear_cache=False,source_conditioned_step=False,source_evidence=None,verify_action_direction=False,scoped_import=None,proposal=None,proposal_only=False,scoped_motion_targets=None):
     project,prepared,output=map(Path,(project,prepared,output))
     if output.exists():raise FileExistsError(output)
     output.mkdir(parents=True);log_path=output/'progress.jsonl';print(json.dumps(dict(main_log=str(log_path.resolve()),whole_prepared_state=True)),flush=True);started=time.perf_counter()
     source_evidence=Path(source_evidence)if source_evidence is not None else prepared/'source_evidence.json'
     ref,camera,info,document,seed=load_reference(project,prepared,source_evidence);write_json(output/'seed_report.json',seed)
     repair=document.get('scoped_candidate_import')
+    preserve_context=bool(repair and repair.get('retain_parent_objective_context'))
+    if preserve_context and not (scoped_import is not None or resume is not None):
+        raise ValueError('An observation-only refit needs a verified scoped import or exact resume')
     if scoped_import is not None and (not repair or resume is not None or warm_start is not None):
         raise ValueError('Scoped import needs an explicit revised objective and exclusive start mode')
     if proposal is not None and (not repair or (scoped_import is None and resume is None)):
@@ -371,6 +381,21 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         raise ValueError('--proposal-only requires explicit proposals')
     if repair and scoped_import is None and resume is None:
         raise ValueError('Choose scoped import or exact resume for this repair objective')
+    motion_spec=None
+    if scoped_motion_targets is not None:
+        from .programme_skate_evidence import programme_observation_path
+        if not (preserve_context and (scoped_import or resume) and max_accepted != 0) or proposal or source_conditioned_step:
+            raise ValueError('Scoped motion requires a verified import or exact resume')
+        motion_path=Path(scoped_motion_targets)
+        motion_spec=json.loads(motion_path.read_text(encoding='utf-8'))
+        if (motion_spec['source_sha256'] != document['source_sha256'] or
+                motion_spec['observations_sha256'] != digest(programme_observation_path(prepared,document)) or
+                motion_spec['parent_sha256'] != repair['parent_sha256'] or
+                motion_spec['camera_sha256'] != info['state_sha256']):
+            raise ValueError('Reviewed motion regions belong to different native inputs')
+        motion_spec['sha256']=digest(motion_path)
+        if resume is not None and motion_spec.get('surface_proposal_from_rejected'):
+            raise ValueError('Exact resume refreshes its current geometry instead of using old trial directions')
     import_receipt=None
     if scoped_import is not None:
         from .scoped_candidate import import_scoped_candidate
@@ -396,6 +421,8 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         from .sequence_skate_state import shoe_curve_from_packet
         start_parameter=Path(resume if resume is not None else warm_start)
         start_packet=load(start_parameter)
+        if resume is not None and motion_spec is not None and str(start_packet['source_evidence_sha256'])!=digest(source_evidence):
+            raise ValueError('Exact scoped motion resume changed the source objective')
         camera_change=document.get('programme_camera_candidate',{})
         if (camera_change and warm_start is not None and
                 json.loads(str(start_packet['camera_binding_json']))['state_sha256']!=info['state_sha256']):
@@ -408,8 +435,8 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
                 explicit_revised_objective=True,same_global_body_and_scale=True,old_candidate_unchanged=True))
         else:validate_checkpoint_identity(start_packet,ref.fixed_checkpoint_identity)
         saved=start_packet if resume is not None else None
-        for field,name in(('prepared_input_sha256','input.npz'),('prepared_observations_sha256','observations.npz')):
-            if str(start_packet[field])!=digest(prepared/name):raise ValueError('Start changed immutable prepared identity: '+field)
+        for field,path in(('prepared_input_sha256',prepared/'input.npz'),('prepared_observations_sha256',ref.observations_path)):
+            if str(start_packet[field])!=digest(path):raise ValueError('Start changed immutable prepared identity: '+field)
         ref.absolute_curve=curve_from_packet(start_packet,seed=True)
         ref.relative_skate_curve=shoe_curve_from_packet(start_packet,seed=True)
         old_stage=start_parameter.parent.parent
@@ -420,8 +447,9 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
             parent_accepted_steps=parent_steps,original_seed_retained=True,
             original_objective_retained=saved is not None,baseline=str(old_stage/'primary_quality_baseline.json')))
     from .ice_soft import IceSoftPolicy
-    if saved is not None:
-        policy=IceSoftPolicy(**json.loads(str(saved['ice_soft_policy_json'])))
+    inherited=parent_packet if preserve_context and scoped_import is not None else saved
+    if inherited is not None:
+        policy=IceSoftPolicy(**json.loads(str(inherited['ice_soft_policy_json'])))
     else:
         policy_path=prepared/'ice_soft_policy.json'
         if not policy_path.is_file():raise FileNotFoundError('Prepared input must carry its explicit finite ice policy: '+str(policy_path))
@@ -437,7 +465,12 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
             linear_runtime=CuDSS()
             log.write(json.dumps(dict(event='cuda_linear_runtime_preloaded',
                 library=linear_runtime.path,cuda=torch.version.cuda))+'\n')
-        sec=source_seconds(ref.p);problem=SequenceJoint(ref,camera,prepared/'observations.npz',tuple(sec[[0,-1]]),document.get('supports',[]),output/'solve',log,'sequence_skates_v1',optimize_shared=False,ice_policy=policy,record_acceptance_before_jacobian=True)
+        sec=source_seconds(ref.p);problem=SequenceJoint(ref,camera,ref.observations_path,tuple(sec[[0,-1]]),document.get('supports',[]),output/'solve',log,'sequence_skates_v1',optimize_shared=False,ice_policy=policy,record_acceptance_before_jacobian=True)
+        if motion_spec is not None:
+            from .scoped_motion_step import target_observations
+            target_observations(problem,motion_spec)
+        log.write(json.dumps(dict(event='actual_body_observations',path=str(problem.body.ledger_path),
+            sha256=digest(problem.body.ledger_path),active_rows=len(problem.body.oj)))+'\n')
         problem.body.compatibility_difference_step=1e-8
         x=np.r_[ref.binding.x,np.zeros(problem.body.size)]
         if scoped_import is not None:
@@ -557,15 +590,16 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         if saved is not None:
             from .action_objective_context import validate_resume_selection
             validate_resume_selection(problem,old_stage)
-            if 'multiplier' not in saved or saved['multiplier'].shape!=problem.al.multiplier.shape:
+        if inherited is not None:
+            if 'multiplier' not in inherited or inherited['multiplier'].shape!=problem.al.multiplier.shape:
                 raise ValueError('Resume changed cavity row layout')
-            problem.al.multiplier[:]=saved['multiplier']
-            problem.al.penalty=float(saved['penalty'])
+            problem.al.multiplier[:]=inherited['multiplier']
+            problem.al.penalty=float(inherited['penalty'])
         problem.linear_solver_backend=('archived_nonlinear_replay' if residual_only_replay else
                                        'cuda_resident' if gpu_linear else 'sparse_direct')
         problem.linear_runtime=linear_runtime
         problem.release_factorization_on_relinearize=bool(document.get('programme_exmr') or document.get('programme_audit_repair'))
-        problem.checkpoint_extra=dict(programme_context_json=np.array(json.dumps(document.get('programme_scope',document['scene_contract']),sort_keys=True)),prepared_input_sha256=np.array(digest(prepared/'input.npz')),prepared_observations_sha256=np.array(digest(prepared/'observations.npz')))
+        problem.checkpoint_extra=dict(programme_context_json=np.array(json.dumps(document.get('programme_scope',document['scene_contract']),sort_keys=True)),prepared_input_sha256=np.array(digest(prepared/'input.npz')),prepared_observations_sha256=np.array(digest(ref.observations_path)))
         if document.get('programme_structure',{}).get('enabled') and start_packet is not None:
             modes=problem.action_factors.modes
             modes.modes=start_packet['sequence_contact_modes'].copy()
@@ -575,6 +609,9 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
             modes.association_signature=signature(modes.modes,modes.status)
         if action:
             from .action_objective_context import bind_action_objective_context
+            if preserve_context and scoped_import is not None:
+                parent_context=bind_action_objective_context(problem,base,repair['parent_evidence'],saved=parent_packet)
+                log.write(json.dumps(dict(event='parent_action_objective_context',**parent_context))+'\n')
             context_record=bind_action_objective_context(problem,base,source_evidence,
                 saved=saved,legacy_stage=old_stage if saved is not None else None)
             log.write(json.dumps(dict(event='action_objective_context',**context_record))+'\n')
@@ -608,7 +645,7 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         if set(source_episode_choices)-known_episodes:raise ValueError('Unknown explicit source association hypothesis')
         from .action_objective_context import resume_source_choices,restore_source_masks,restore_source_episode
         source_episode_choices=resume_source_choices(source_episode_choices,saved)
-        source_context=start_packet if document.get('programme_structure',{}).get('enabled') else saved
+        source_context=inherited if preserve_context else (start_packet if document.get('programme_structure',{}).get('enabled') else saved)
         if source_context is not None:
             restore_source_masks(problem.action_factors.contour,source_context,'source_association_contour_')
             restore_source_masks(problem.action_factors.extent,source_context,'source_association_runner_extent_')
@@ -619,18 +656,18 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         reviewed=getattr(problem.action_factors,'reviewed_skates',None)
         whole=problem.action_factors.whole_skate
         if repair and whole is not None:
-            if saved is None:
+            if inherited is None:
                 whole.associate(x[17:])
             else:
-                whole.restore_checkpoint(saved)
+                whole.restore_checkpoint(inherited)
         structure_extent=problem.action_factors.structure_extent
-        if repair and saved is not None and structure_extent is not None:
-            structure_extent.restore_checkpoint(saved)
+        if repair and inherited is not None and structure_extent is not None:
+            structure_extent.restore_checkpoint(inherited)
         if reviewed is not None:
             matches=None if source_context is None else source_context.get('ordered_source_association_json')
-            if (matches is not None and str(source_context.get('source_evidence_sha256',''))==digest(source_evidence)):
+            if matches is not None and (preserve_context or str(source_context.get('source_evidence_sha256',''))==digest(source_evidence)):
                 reviewed.ordered.restore(json.loads(str(matches)))
-            elif saved is not None:
+            elif inherited is not None:
                 raise ValueError('Exact resume requires ordered source associations from the same ledger')
             else:reviewed.ordered.associate(x[17:])
         hypothesis_records=[]
@@ -696,7 +733,7 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         if reviewed is not None:
             frozen['ordered_source_association_json']=np.array(json.dumps(reviewed.ordered.association_record(),sort_keys=True))
         association_origin=('restored saved fixed source associations; missing historical diagnostic scores remain empty'
-            if saved is not None else 'archived global seed for existing tracks; recorded first common warm state for new episode tracks')
+            if inherited is not None else 'archived global seed for existing tracks; recorded first common warm state for new episode tracks')
         problem.checkpoint_extra.update(frozen,source_association_origin=np.array(association_origin),source_evidence_sha256=np.array(digest(source_evidence)))
         np.savez_compressed(output/'source_associations.npz',**frozen)
         # Compare source quality before an expensive complete J. A rejected
@@ -771,6 +808,33 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
                 projection_check(problem,import_receipt,repair['parent_result'])
                 import_receipt.update(revised_evidence_sha256=digest(source_evidence),
                     active_columns=problem.active_parameter_indices.tolist(),weighted_blocks=coverage)
+                if preserve_context:
+                    with np.load(repair['parent_result'], allow_pickle=False) as parent_result:
+                        parent_body_rows = int(parent_result['source_observation_objective_use'].sum())*2
+                    body_rows = len(next(b for b in first['weighted_blocks'] if b.name=='body_pixels').residual)
+                    before = parent_packet['scoped_weighted_residual']
+                    after = first['residual']
+                    other_before, other_after = before[parent_body_rows:], after[body_rows:]
+                    import_receipt['same_pose_objective'] = dict(
+                        parent_body_scalar_rows=parent_body_rows, revised_body_scalar_rows=body_rows,
+                        parent_body_cost=float(before[:parent_body_rows]@before[:parent_body_rows]/2),
+                        revised_body_cost=float(after[:body_rows]@after[:body_rows]/2),
+                        parent_nonbody_scalar_rows=len(other_before), revised_nonbody_scalar_rows=len(other_after),
+                        nonbody_max_abs_difference=(float(np.max(abs(other_before-other_after)))
+                            if other_before.shape==other_after.shape else None))
+                    if registry := repair.get('phase_objective_replay_registry'):
+                        from .scoped_candidate import compare_objective_replay
+                        if digest(registry['path']) != registry['sha256']:
+                            raise ValueError('Parent named weighted rows changed')
+                        named=json.loads(Path(registry['path']).read_text(encoding='utf-8'))['blocks']
+                        declared={'body_pixels','actual_model_com_acceleration'}
+                        declared.update(b.name for b in first['weighted_blocks']
+                                        if b.name.endswith('/flight_dense_com_acceleration'))
+                        import_receipt['same_pose_named_objective']=compare_objective_replay(
+                            before,named,first['weighted_blocks'],declared)
+                    else:
+                        np.testing.assert_allclose(other_after,other_before,rtol=0,atol=2e-8,
+                            err_msg='Observation-only refit changed fixed non-body residuals at the baseline pose')
                 write_json(output/'scoped_import.json',import_receipt)
         if action:
             record_action_factors(problem,first,output/'initial_action_factors.json',jacobian=need_first_jacobian)
@@ -785,7 +849,7 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
             snapshot_start=time.perf_counter()
             cache=output/'linear_cache';cache.mkdir()
             for name,a in(('data',first['jac'].data),('indices',first['jac'].indices),('indptr',first['jac'].indptr),('residual',first['residual']),('x',x)):np.save(cache/(name+'.npy'),a)
-            write_json(cache/'identity.json',dict(shape=list(first['jac'].shape),prepared_input_sha256=digest(prepared/'input.npz'),prepared_observations_sha256=digest(prepared/'observations.npz'),objective_policy_sha256=digest(output/'objective_policy.json'),actual_weighted_CSR=True))
+            write_json(cache/'identity.json',dict(shape=list(first['jac'].shape),prepared_input_sha256=digest(prepared/'input.npz'),prepared_observations_sha256=digest(ref.observations_path),objective_policy_sha256=digest(output/'objective_policy.json'),actual_weighted_CSR=True))
             log.write(json.dumps(dict(event='first_J_snapshot',seconds=time.perf_counter()-snapshot_start))+'\n')
         write_json(output/'weighted_registry.json',verify(first['weighted_blocks'],first['residual'],first['jac']))
         write_json(output/'initial_metrics.json',dict(groups=body_groups(problem,first),weighted_parts={b.name:float(b.residual@b.residual/2)for b in first['weighted_blocks']},structure=first['gate']))
@@ -801,6 +865,7 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         if repair:
             from .scoped_candidate import weighted_residual_identity
             problem.accepted_value_checkpoint=weighted_residual_identity
+        proposal_surfaces={}
         if repair:
             from .programme_quality_guard import ScopedProgrammeGuard
             saved_guard=None
@@ -832,7 +897,14 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
                 surface_cost_path.write_bytes(previous.read_bytes())
             problem.checkpoint_extra['scoped_parent_costs_sha256']=np.array(digest(surface_cost_path))
             parent_x=np.r_[x[:17],np.zeros(problem.body.size)]
-            problem.scoped_surface_trial=ScopedSurfaceGuard(problem,base,document,parent_x,output,costs)
+            if preserve_context:
+                parent_x=x if saved is None else saved['scoped_parent_parameter_vector']
+                problem.checkpoint_extra['scoped_parent_parameter_vector']=parent_x.copy()
+            problem.scoped_surface_trial=ScopedSurfaceGuard(problem,base,document,parent_x,output,costs,
+                                                           proposal_surfaces=proposal_surfaces)
+            retained_path=old_stage/'retained_surface.json' if saved is not None else None
+            if motion_spec is not None and retained_path is not None and retained_path.is_file():
+                problem.scoped_surface_trial.bind_current_scan(x,retained_path)
         if problem.action_factors.contour is not None:
             problem.early_source_trial_quality=lambda z: source_checks(problem.action_factors.source_trial_rows(z[17:]))
         if source_conditioned_step:
@@ -847,8 +919,10 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
                 problem.source_proposal_options=dict(retain_affine_cuts=bool(step_policy.get('retain_affine_cuts',False)),
                     affine_guard_reserve_fraction=float(step_policy.get('affine_guard_reserve_fraction',0.)),
                     early_nonlinear_ready_feedback=bool(step_policy.get('early_nonlinear_ready_feedback',False)),early_complete_nonlinear_proposal=bool(step_policy.get('early_complete_nonlinear_proposal',False)),
-                    check_fraction_before_refinement=bool((document.get('programme_exmr') or document.get('programme_audit_repair'))
-                        and step_policy.get('early_complete_nonlinear_proposal')))
+                    check_fraction_before_refinement=bool(not preserve_context
+                        and (document.get('programme_exmr') or document.get('programme_audit_repair'))
+                        and step_policy.get('early_complete_nonlinear_proposal')),
+                    refine_failed_full_checks=preserve_context)
                 local_feedback=bool(step_policy.get('local_source_trust_feedback',{}).get('enabled'))
                 inherited=None
                 if local_feedback and start_packet is not None and 'source_numerical_step_limit'in start_packet:
@@ -923,20 +997,44 @@ def run(project,prepared,output,*,wall_seconds,max_accepted,resume=None,gpu_line
         if diagnostic_profile:problem.image_safe_trials=False
         quality=dict(source=baseline,torso=torso_before,turn_episodes=turn_before,stage_reset_allowed=False)
         if population is not None:quality['body_observation_reference']=population
+        if 'body_source_revision' in original:quality['body_source_revision']=original['body_source_revision']
         if flight_guard is not None:quality['flight_guard']=flight_guard.record()
         if dense_flight_guard is not None:quality['dense_flight_guard']=dense_flight_guard.record()
         if cavity_trial_guard is not None:
             quality['cavity_collar_trial_guard'] = cavity_trial_guard.record()
         write_json(output/'primary_quality_baseline.json',quality);problem.jacobian_seconds_hint=first_J or 0.
-        del first
+        motion_proposals=()
+        if motion_spec is not None:
+            from .scoped_motion_step import scoped_proposals, trial_receipt
+            problem.checkpoint_extra['scoped_motion_targets_sha256']=np.array(motion_spec['sha256'])
+            selected,directions,scale,measurements=scoped_proposals(problem,first,x,guards,scoped_guard,
+                                                                      guard_observations,motion_spec,output)
+            # Release the programme CSR before replaying independent full states.
+            flight_prefix='episode/entry_flight_core/'
+            baseline_for_trials=dict(residual=first['residual'], weighted_blocks=[b for b in first['weighted_blocks']
+                if b.name.startswith(flight_prefix)])
+            del first
+            motion_proposals=trial_receipt(problem,baseline_for_trials,selected,directions,scale,measurements,output,motion_spec)
+            del baseline_for_trials
+        else:
+            del first
         print(json.dumps(dict(event='primary_fit_start',frames=len(ref.times),variables=problem.size,first_full_J_seconds=first_J,wall_seconds=wall_seconds)),flush=True)
         remaining=None if wall_seconds is None else max(30.,wall_seconds-(time.perf_counter()-started)-30.)
-        proposals=()
+        proposals=motion_proposals
         if proposal is not None:
             from .scoped_candidate import proposal_vector
-            proposals=tuple((path.stem,proposal_vector(problem,path,repair['parent_sha256']))
-                            for path in map(Path,proposal))
-        result,report=problem.solve(x,RunPolicy(wall_seconds=remaining,max_accepted=max_accepted,max_outer=1,allow_penalty_growth=False,stagnation_window=12),proposals=proposals,proposal_only=proposal_only)
+            from .weighted_blocks import signature
+            proposed=[]
+            for path in map(Path,proposal):
+                vector=proposal_vector(problem,path,repair['parent_sha256'],
+                                       parent_vector=parent_x if preserve_context else None)
+                proposed.append((path.stem,vector))
+                if preserve_context:
+                    proposal_surfaces[signature(vector)]=path.parent.parent/'retained_surface.json'
+            proposals=tuple(proposed)
+            write_json(output/'proposal_inputs.json',[
+                dict(path=str(Path(path).resolve()), sha256=digest(path)) for path in proposal])
+        result,report=problem.solve(x,RunPolicy(wall_seconds=remaining,max_accepted=max_accepted,max_outer=1,allow_penalty_growth=False,stagnation_window=12),proposals=proposals,proposal_only=proposal_only or motion_spec is not None)
         if freeze_root:np.testing.assert_array_equal(result[root_columns],profile_root)
         if len(protected_columns):np.testing.assert_array_equal(result[protected_columns],protected_values)
         if problem.action_factors.whole_skate is not None and not repair:
@@ -1037,6 +1135,8 @@ def main():
         help='Also run the centred full-state derivative diagnostic on a continuation')
     ap.add_argument('--source-conditioned-step',action='store_true',
         help='Try one guarded whole-state step accounting for near-limit source evidence before TRF')
+    ap.add_argument('--scoped-motion-targets',type=Path,
+        help='Generate a metric-constrained native motion proposal from bound source regions')
     ap.add_argument('--source-episode-choice',action='append',default=[],metavar='EPISODE=INDEX',help='Explicit conditional source association; preserves source identity unknown')
     a=ap.parse_args()
     choices={}
@@ -1047,7 +1147,7 @@ def main():
     if a.output.exists():raise FileExistsError(a.output)
     from .memory_guard import ProcessMemoryGuard
     memory=ProcessMemoryGuard(a.output.parent/(a.output.name+'_resources'),a.memory_gib)
-    try:run(a.project,a.prepared,a.output,wall_seconds=a.wall_seconds,max_accepted=a.max_accepted,resume=a.resume,gpu_linear=a.gpu_linear,device_batch=a.device_batch,quality_baseline=a.quality_baseline,freeze_root=a.freeze_root,diagnostic_profile=a.diagnostic_profile,protected_source_evidence=a.protected_source_evidence,source_episode_choices=choices,warm_start=a.warm_start,save_linear_cache=a.save_linear_cache,source_conditioned_step=a.source_conditioned_step,source_evidence=a.source_evidence,verify_action_direction=a.verify_action_direction,scoped_import=a.scoped_import,proposal=a.proposal,proposal_only=a.proposal_only)
+    try:run(a.project,a.prepared,a.output,wall_seconds=a.wall_seconds,max_accepted=a.max_accepted,resume=a.resume,gpu_linear=a.gpu_linear,device_batch=a.device_batch,quality_baseline=a.quality_baseline,freeze_root=a.freeze_root,diagnostic_profile=a.diagnostic_profile,protected_source_evidence=a.protected_source_evidence,source_episode_choices=choices,warm_start=a.warm_start,save_linear_cache=a.save_linear_cache,source_conditioned_step=a.source_conditioned_step,source_evidence=a.source_evidence,verify_action_direction=a.verify_action_direction,scoped_import=a.scoped_import,proposal=a.proposal,proposal_only=a.proposal_only,scoped_motion_targets=a.scoped_motion_targets)
     except MemoryError as error:
         write_json(a.output/'MEMORY_LIMIT.json',dict(status='host_allocation_failed',
             error_type=type(error).__name__,error=str(error),**memory.snapshot()))

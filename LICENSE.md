@@ -4,7 +4,7 @@
 
 ## 项目开发内容
 
-项目开发代码（含 AI 辅助开发）按同一许可声明处理。对于项目作者依法享有权利、且未另行许可的内容，作者保留其权利；本声明不额外授予使用、修改、分发、再许可或商业利用的许可。已经存在的有效授权继续有效。
+项目开发的代码、文档和自有数值资产按本声明处理。对于项目作者依法享有权利、且未另行许可的内容，作者保留其权利；本声明不额外授予使用、修改、分发、再许可或商业利用的许可。已经存在的有效授权继续有效。
 
 
 ## 第三方内容
@@ -21,10 +21,11 @@
 | GVHMR 衍生补丁 | [gvhmr-local.patch](environments/third_party_patches/gvhmr-local.patch)适用[原始 GVHMR 许可](environments/third_party_patches/GVHMR_LICENSE.txt)，其中的教育、研究、非营利及衍生修改非商业限制继续有效 |
 | ExMR 相机补丁 | [exmr_camera.patch](environments/exmr_camera.patch)保留 [ExMR 上游许可和署名](environments/third_party_licenses/EXMR_LICENSE.txt)，沿用该衍生作品的教育、研究、非营利及修改条件 |
 | HTD-Refine 与 PVA-Net | 外部 HTD-Refine 源码适用 AGPL-3.0-only。所用代码、权重及原始推理结果留 Data，权重的发布链接与许可证据分别登记。项目包含调用与数值复核代码，见[第三方资产](docs/THIRD_PARTY_ASSETS.md#htd-refine) |
-| SAM2 上游部分与派生权重 | SAM2 上游部分保留 [Apache-2.0 原文](models/SAM2_LICENSE.txt)。[rink_vision.pt](models/rink_vision.pt)的固定基础来源、字节核验与修改见[来源记录](models/rink_vision.provenance.json)，训练材料与使用边界见[许可核查](docs/LICENSING_REVIEW.md)；本声明不把完整派生权重重新许可为 MIT |
+| SAM2 上游部分与派生权重 | SAM2 上游部分保留 [Apache-2.0 原文](models/SAM2_LICENSE.txt)。[rink_vision.pt](models/rink_vision.pt)的固定基础来源、字节核验与修改见[来源记录](models/rink_vision.provenance.json)，训练材料与使用边界见[许可核查](docs/LICENSING_REVIEW.md)；完整派生权重的使用还取决于训练材料及其他适用权利 |
 | 三维播放器使用的 AITViewer／Pyglet | 当前外部版本为 AITViewer 1.14.2（[MIT 原文](environments/third_party_licenses/AITVIEWER_LICENSE.txt)）及 Pyglet 2.1.19（[BSD 原文](environments/third_party_licenses/PYGLET_LICENSE.txt)）；项目连接代码与这些外部实现分别适用各自许可 |
 | Qt／PyQt6 外部依赖 | AITViewer 的安装锁包含 PyQt6 与 Qt。所选 PyQt6 发行物保留 [GPLv3 原文](environments/third_party_licenses/PYQT6_GPL3.txt)，Qt 包保留[自身许可](environments/third_party_licenses/PYQT6_QT6_LICENSE.txt)；默认播放器使用 Pyglet。依赖安装、实际加载和组合分发分别核对，见[播放器核查](docs/LICENSING_REVIEW.md#viewer3d) |
 | FootMR／CoTracker／RTMW | 作为 Data 中的外部人体／轨迹推理依赖登记，固定版本、文件身份及原许可见[第三方资产](docs/THIRD_PARTY_ASSETS.md)；实现与权重未随本次公开树分发 |
+| Ultralytics YOLO | 项目登记外部依赖及相关模型来源。Ultralytics 发行物适用相应版本的[上游许可](https://github.com/ultralytics/ultralytics/blob/main/LICENSE)或单独取得的商业授权，运行配置与权重保存在 Data。版本和权重授权证据见[第三方资产](docs/THIRD_PARTY_ASSETS.md) |
 | SMPL-X Python 包与模型 | 作为 Data 中的外部依赖使用，分别按取得版本的原始条款处理；模板、形变基、蒙皮权重、人体模型拓扑、紧凑模型导出与完整表面缓存不随公开树分发。节目控制参数的实际字段与先验来源见[许可核查](docs/LICENSING_REVIEW.md#body-parameters) |
 | 视频、截图、用户提供素材、标注及其他研究数据 | ISU 比赛视频、截图和叠加画面不随公开仓库分发；可提供官方频道 YouTube 地址及源时间戳供自行核对；原有测量记录保留；项目图、标注及数值观测按各自来源判断。软件许可证不自动覆盖其他第三方材料 |
 

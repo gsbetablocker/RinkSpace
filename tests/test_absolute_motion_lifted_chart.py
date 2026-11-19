@@ -2,7 +2,7 @@
 from types import SimpleNamespace
 import numpy as np
 import pytest
-from calibration.program_tracking.body_tracking.absolute_motion_curve import AbsoluteMotionCurve,clamped_cubic_knots,_exp,_log
+from calibration.program_tracking.body_tracking.absolute_motion_curve import AbsoluteMotionCurve,RotationChartDomainError,clamped_cubic_knots,_exp,_log
 from calibration.program_tracking.body_tracking.absolute_motion_state import (AbsoluteMotionState,evaluate_curve,curve_from_packet,with_warm_rotation_chart,LIFTED_SCHEMA)
 
 
@@ -26,6 +26,23 @@ def test_exact_warm_replay_and_continuous_pi_crossing():
     change=_log(evaluate_curve(before,t)['local_R'].swapaxes(-1,-2)@evaluate_curve(after,t)['local_R'])
     assert np.max(np.linalg.norm(change,axis=-1))<1e-3
     assert np.max(np.linalg.norm(after._check_log_chart(),axis=-1))>np.pi
+    after.check_continuous_edge_update(before)
+
+
+def test_small_control_step_cannot_jump_to_long_interpolation_path():
+    # Two valid endpoints straddle a stale archived chart seam. Checking
+    # only the endpoint's distance to that seam previously missed this.
+    knots=clamped_cubic_knots([0.,1.]);rv=np.zeros((4,22,3))
+    reference=np.zeros((3,22,4));reference[...,3]=1.
+    reference[0,4]=[0.,0.,np.sin(np.deg2rad(170)/2),np.cos(np.deg2rad(170)/2)]
+    rv[1:,4,2]=np.deg2rad(-9.)
+    before=AbsoluteMotionCurve(knots,np.zeros((4,3)),_exp(rv),reference)
+    rv[1:,4,2]=np.deg2rad(-11.)
+    after=AbsoluteMotionCurve(knots,np.zeros((4,3)),_exp(rv),reference)
+    assert np.linalg.norm(_log(before.rotation_controls[1,4].T@after.rotation_controls[1,4]))<.04
+    assert np.linalg.norm(after._check_log_chart()[0,4])>6.
+    with pytest.raises(RotationChartDomainError,match='jumps across'):
+        after.check_continuous_edge_update(before)
 
 
 def test_lifted_sparse_chain_and_checkpoint_replay():

@@ -11,6 +11,11 @@ from .fullbody_state import camera_binding
 from .rebuild_prepare import digest, load
 from .source_visible_model import camera_centres
 
+SHARED_SNAPSHOT_SCHEMAS = (
+    'rinkspace.ankara_shared_trapezoid_programme_fit.v1',
+    'rinkspace.programme_joint_refinement.v1',
+)
+
 
 def registered_camera_binding(record_path, record, packet, shot_ids, *, native_library=None):
     """Bind the exact per-shot spline and exposure clock of a registered review."""
@@ -19,7 +24,14 @@ def registered_camera_binding(record_path, record, packet, shot_ids, *, native_l
     from .rebuild_body_fit import FixedNativeProjector
 
     camera = record['camera']
-    geometry = record['geometry']
+    if record.get('schema') in SHARED_SNAPSHOT_SCHEMAS:
+        bound = record['geometry_binding']
+        geometry = dict(bound['snapshot'], structure=bound['structure'],
+                        native_library=bound['native_library'],
+                        value_sha256=bound['value_sha256'],
+                        layout_revision=bound['layout_revision'])
+    else:
+        geometry = record['geometry']
     for entry in (camera, geometry, geometry['structure'], geometry['native_library']):
         if digest(entry['path']) != entry['sha256']:
             raise ValueError('Registered camera or geometry changed: '+entry['path'])
@@ -29,9 +41,17 @@ def registered_camera_binding(record_path, record, packet, shot_ids, *, native_l
         raise ValueError('Registered camera and geometry disagree')
     g = load(geometry['path'])
     if (sha256(g['scene_values'].tobytes()).hexdigest() != geometry_sha
-            or str(g['layout_revision']) != geometry['layout_revision']
-            or str(g['scene_file_sha256']) != geometry['structure']['sha256']):
+            or str(g['layout_revision']) != geometry['layout_revision']):
         raise ValueError('Registered scene parameters do not match their structure')
+    if record.get('schema') in SHARED_SNAPSHOT_SCHEMAS:
+        if str(g['scene_values_sha256']) != geometry_sha:
+            raise ValueError('Shared scene snapshot has a mismatched value digest')
+        if 'layout_revision' in z and str(z['layout_revision']) != geometry['layout_revision']:
+            raise ValueError('Registered camera has a different scene layout')
+        # This snapshot binds its compiled layout, while the programme record
+        # binds the structure file checked above. Older snapshots store both.
+    elif str(g['scene_file_sha256']) != geometry['structure']['sha256']:
+        raise ValueError('Registered scene structure digest changed')
     np.testing.assert_array_equal(packet['pts'], z['source_pts'])
     np.testing.assert_array_equal(np.unique(z['shot_ids']), np.unique(shot_ids))
     if len(z['shot_ids']) != len(set(z['shot_ids'])):
@@ -88,6 +108,10 @@ def registered_camera_binding(record_path, record, packet, shot_ids, *, native_l
             length_export_ratio=scale/solver_scale, camera_changed_during_fit=False,
             scene_values_sha256=geometry_sha, scene_binding=geometry,
             source_time_base=[1,12800], old_reference_reprojected_on_current_camera=True)
+        if record.get('schema') in SHARED_SNAPSHOT_SCHEMAS:
+            infos[shot].update(registration_schema=record['schema'],
+                registration_sha256=digest(record_path),
+                registration_version=record['version_id'])
     return cameras, infos, poses
 
 
@@ -96,7 +120,7 @@ class ProgrammeCamera:
     def __init__(self,project,packet,shot_ids,*,record_path=None,native_library=None):
         self.shot_ids=np.asarray(shot_ids);self.cameras={};self.first={};infos={};poses={}
         record = {} if record_path is None else json.loads(Path(record_path).read_text(encoding='utf-8'))
-        if record.get('schema') == 'rinkspace.programme_joint_scene_review.v1':
+        if record.get('schema') in ('rinkspace.programme_joint_scene_review.v1', *SHARED_SNAPSHOT_SCHEMAS):
             self.cameras,infos,poses = registered_camera_binding(
                 record_path, record, packet, self.shot_ids, native_library=native_library)
             self.first = {shot: int(np.flatnonzero(self.shot_ids==shot)[0]) for shot in self.cameras}

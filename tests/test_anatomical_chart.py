@@ -138,3 +138,34 @@ def test_invalid_basis_and_envelope_rejected():
         JointEnvelope(-.5, 1.15, [0., 2.], [.2, .4], .6, .4, "")
     with pytest.raises(ValueError, match="coupled"):
         JointEnvelope(-.5, 1.15, [0., 2.], [[.2, .4], [0., .4]], .6, .4, "synthetic test")
+def test_programme_hinge_derivative_keeps_current_active_side():
+    """A near-limit fit must not average across the finite-difference step."""
+    from types import SimpleNamespace, MethodType
+    from scipy.sparse import csr_matrix
+    from calibration.program_tracking.body_tracking.programme_joint_limits import ProgrammeJointLimits, JOINTS
+
+    class Delta(np.ndarray):
+        def chain(self, local, sample_indices=None):
+            # This fixture has one independent source pose.
+            return csr_matrix(local.reshape(-1,69))
+
+    factor=object.__new__(ProgrammeJointLimits)
+    factor.times=np.array([0.]);factor.joints=JOINTS.copy();factor.weights=np.ones(1)
+    factor.ref=SimpleNamespace(p={'pts':np.array([283136])})
+    factor.configuration={};factor.association='near-boundary-test'
+    factor.state=SimpleNamespace(size=69,increments=lambda x,t:x.reshape(1,69).view(Delta))
+
+    def values(self,d,rows=None,*,signed=False):
+        raw=np.full((len(d),len(JOINTS),3),-1.)
+        raw[:,0,0]=.25e-6+d[:,15]
+        raw[:,0,1]=-.25e-6+d[:,16]
+        angles=SimpleNamespace(twist=np.zeros(raw.shape[:2]),swing=np.zeros(raw.shape[:2]))
+        return (raw if signed else np.maximum(raw,0.)),angles
+
+    factor.values=MethodType(values,factor)
+    x=np.zeros(69);value=factor.evaluate(x,True)
+    assert abs(value['jac'][0,17+15]-1.)<1e-12
+    assert value['jac'][1,17+16]==0.
+    direction=np.zeros(69);direction[15:17]=[.7,-.4];h=1e-8
+    numerical=(factor.evaluate(x+h*direction)['residual']-factor.evaluate(x-h*direction)['residual'])/(2*h)
+    np.testing.assert_allclose(value['jac'][:,17:]@direction,numerical,rtol=0,atol=1e-10)

@@ -1,0 +1,89 @@
+{
+  "schema": "rinkspace.event_joint_refinement.v1",
+  "event_id": "ankara_2026",
+  "version_id": "joint_dense_1118",
+  "status": "full_source_repair_candidate",
+  "user_visual_acceptance": false,
+  "geometry_binding": {
+    "version_id": "joint_dense_1118",
+    "status": "full_source_repair_candidate",
+    "snapshot": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\field\\joint_dense_1118.npz",
+      "sha256": "7a701f91e45947a64cbca2b7ba34414b838d03a41ed75aaae3343a243fc74f9e"
+    },
+    "structure": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\field\\free_ad16_1117.json",
+      "sha256": "8610b4040984cbf67008c4adc4573ccd0c80804184120c36ddb310069abd0eed"
+    },
+    "native_library": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\build\\ankara_dense_1118\\rinkspace_core.dll",
+      "sha256": "eb79dc1abd48d378945bf5d02b4f05b8f1af8305b2ef0e9524708a11cf215678"
+    },
+    "value_sha256": "31903397b7f1f96a55b4b430b52a83e0a56966f2a6dc4763b6f4638b5b1dab7a",
+    "layout_revision": "f1ba7a0decc8e1d877a8aa199e4797207bd76b2ee7edee03ae9829022388f70f",
+    "scene_parameters_active": false,
+    "coordinate_scale": "rink length = 1; not verified metres"
+  },
+  "coordinates": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\joint_dense_1118_coordinates.json",
+    "sha256": "220db42124fdede77af2bc1d101ab17e9ed18958059fe3a09ba899cb98d02c41"
+  },
+  "programmes": {
+    "jin": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\jin_shuxian_sp\\joint_dense_1118.json",
+      "sha256": "1c00913bc67682645ccec71bb56e4700f828dd833b191734a7082e65ad2b0eb4"
+    },
+    "okada": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\joint_dense_1118.json",
+      "sha256": "744847742a231f0ac2d6dd9f513339e8bf7ebacd6675d279f51bf4d0267ceb1c"
+    },
+    "chen": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\chen_xi_jin_sp\\joint_dense_1118.json",
+      "sha256": "4d6e76c5c3605b29c61af76d33b1d844381cb111e3e2d149ff3719054df7a90b"
+    },
+    "nayeon": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\joint_dense_1118.json",
+      "sha256": "25ca027140b04164964d05b5d7917f501cc6ac075508700632e965eb6b0447e5"
+    }
+  },
+  "selected_run": "repair/dense_delivery_1118",
+  "checkpoint": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\scene\\joint_refine_1117\\repair\\dense_delivery_1118\\state.npz",
+    "sha256": "bbcf099bc0885b3d0240f1727a0bd8d7500a4fe9d0dca0670282470a057ce76b"
+  },
+  "comparison": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\scene\\joint_refine_1117\\repair\\dense_delivery_1118\\comparison.json",
+    "sha256": "bf7f9f5943ad7cf210d1c88d54228e7fde63d51038f7cdea17a7b3ebccf09c85"
+  },
+  "prepared": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\scene\\joint_refine_1117\\repair\\prepared_v7\\setup.json",
+    "sha256": "f455e922fb9100be1a880cd83b68820a8598368a5c28ee017037ea0352fb2e16"
+  },
+  "source_motion": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\scene\\joint_refine_1117\\repair\\dense_delivery_1118\\repair_motion\\summary.json",
+    "sha256": "07611fe375b5ddfa7a54a037e00752797242d88e5f17e533fa89d77dbeae2ac9"
+  },
+  "visual_review": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\scene\\joint_refine_1117\\repair\\dense_delivery_1118\\visual_review.json",
+    "sha256": "e65f723a0b0c3246fb1c2d20089c911a75f93594626bf223c2b1e0b890f49ede"
+  },
+  "physical_mounts": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\scene\\joint_refine_1117\\repair\\dense_delivery_1118\\physical_mounts.json",
+    "sha256": "bb9ea00b30adc5778a16da6087d29faa504ddd19d85431ea74da01bd98dbe7e6"
+  },
+  "limitations": [
+    "Selected image reviews do not establish full continuous human acceptance; user_visual_acceptance remains false.",
+    "All reported point and flow errors reuse development source material. No independent final accuracy or verified metric scale.",
+    "Four shots retain small static P90 regressions: Jin S18, Okada S03/S05, Chen S07; exact before/after values are recorded.",
+    "Fast pans and weak ice marks remain uncertain. Four diagnostic motion-alert intervals are retained, not silently erased.",
+    "Nayeon S04 inherited Ad3 fast-pan rows retain a high residual tail despite improved dense boundaries; source blur and local alignment are unresolved.",
+    "Okada S08 crease arc is an unresolved low-confidence visual concern; not confirmed severe regression.",
+    "A3 source identity lacks support; unsupported free change rejected and earlier registered geometry retained. Eight innermost white-button radii remain frozen.",
+    "Same-house concentric rings, primitive types, connectivity and symmetric superellipse board family remain. Shared fitting does not establish arbitrary asymmetric geometry or physical dimensions.",
+    "Ice-flow coverage is weak: Okada has none; Nayeon only 26 adjacent frame medians. Board temporal improvements cannot certify every ice marking.",
+    "Jin has 83 source exposures without admitted geometric points. All frames are rendered; no neighbouring-frame or projected observations substituted.",
+    "Nayeon S01 remains outside user-assigned camera scope. Solver stagnation is not mathematical convergence."
+  ],
+  "rejected_sparse_version": "joint_free_1117: source thinning and severe Okada temporal regression",
+  "user_request": "Improve all four programmes while preserving earlier dense source points and local repairs"
+}

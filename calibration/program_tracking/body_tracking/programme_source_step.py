@@ -310,7 +310,7 @@ def contract_source_trust(margins, selection, limits, direction, check, *, progr
         all_global_controls_still_coupled=True)
 
 
-def source_conditioned_direction(gpu, value, bounds, margins, selection, *, control_step_limit=None, progress=None, nonlinear_source_check=None, trust_state=None, retain_affine_cuts=False, affine_guard_reserve_fraction=0., early_nonlinear_ready_feedback=False, early_complete_nonlinear_proposal=False, check_fraction_before_refinement=False):
+def source_conditioned_direction(gpu, value, bounds, margins, selection, *, control_step_limit=None, progress=None, nonlinear_source_check=None, trust_state=None, retain_affine_cuts=False, affine_guard_reserve_fraction=0., early_nonlinear_ready_feedback=False, early_complete_nonlinear_proposal=False, check_fraction_before_refinement=False, refine_failed_full_checks=False):
     """Solve the same coupled quadratic with source-conditioned local trust boxes."""
     if not 0<=affine_guard_reserve_fraction<.2:raise ValueError('Affine tolerance must stay inside the original unused guard reserve')
     if affine_guard_reserve_fraction and nonlinear_source_check is None:raise ValueError('Guard-reserve proposal tolerance requires original nonlinear feedback')
@@ -406,9 +406,13 @@ def source_conditioned_direction(gpu, value, bounds, margins, selection, *, cont
                         passed=(isinstance(checks,CompleteNonlinearGuardChecks) and bool(checks)
                                 and not any(row['rejected'] for row in checks.values()))
                         improved=passed and resolved_descent(getattr(checks,'objective_cost',None),baseline)
-                        if progress is not None:progress(phase='source_fraction_before_refinement',
-                            fraction=fraction,guards_pass=passed,actual_descent=improved,
-                            failed_guards=None if checks is None else sum(row['rejected'] for row in checks.values()))
+                        if progress is not None:
+                            failures = None if checks is None else {
+                                name: row for name, row in checks.items() if row['rejected']}
+                            progress(phase='source_fraction_before_refinement',
+                                fraction=fraction,guards_pass=passed,actual_descent=improved,
+                                failed_guards=None if failures is None else len(failures),
+                                failed_groups=failures)
                         if improved:
                             step=trial;checked_fraction=fraction;nonlinear_completed_early=True;break
                     if nonlinear_completed_early:
@@ -462,8 +466,19 @@ def source_conditioned_direction(gpu, value, bounds, margins, selection, *, cont
                             max_affine_norm_excess_by_unit=maximum,
                             full_quadratic_descent=True,outer_nonlinear_cost_and_guard_required=True)
                         break
+                    used_full_checks=False
+                    if (refine_failed_full_checks and diagnostic['status']=='passed'
+                            and first_full_check and first_full_check[0]
+                            and any(row['rejected'] for row in first_full_check[0].values())):
+                        # A fully re-evaluated nonlinear failure can identify
+                        # useful local trust dependencies even when its inner
+                        # affine approximation is still being refined.
+                        revised,diagnostic=contract_source_trust(margins,selection,limits,
+                            step*scale,nonlinear_source_check,progress=progress)
+                        used_full_checks=True
                     if diagnostic['status']=='contracted':
-                        diagnostic=dict(diagnostic,affine_incomplete=True,only_affine_ready_failures_used=True)
+                        diagnostic=dict(diagnostic,affine_incomplete=True,
+                            only_affine_ready_failures_used=not used_full_checks)
                         feedback.append(diagnostic);limits=revised;early_contracted=True
                         if progress is not None:progress(phase='source_local_trust_feedback',local_trust_round=len(feedback),**diagnostic)
                         break

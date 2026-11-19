@@ -46,6 +46,8 @@ CPU／GPU 共用 `geometry.hpp`、`entities.hpp`、`camera_state.hpp` 和 `proje
 
 `ice_relation_meta.hpp` 为 206 个原关系维护有限类型、精确同义面和结构支持。内部修正去除 14 个重复面，原 206 面仍是最终域检查；136／147 等仅近乎平行的面不会合并。仿射偏差界可在同一 cuDSS 分解下按多 RHS 求响应，并进入允许工作面释放的小 QP。容量按真实 RHS 数和约束面数增长，计入设备预算。
 
+自由冰面模式由 `ice_metric_freedom.schema` 声明。选项 255、511、1023 对应 `free_ice_metric.v1`／`v2`／`v3`，数值布局为 146、147、155。该模式移除名义百分比盒及选定的等距、对齐等度量关系，保留正尺寸、圆环嵌套和连接拓扑。当前安卡拉场地使用 [v3 结构](../events/ankara_2026/scene/field/crease_offset_1118.json)及其同版数值快照。
+
 `ice_actual_chart.hpp`／`ice_actual_witness.hpp` 支持八个实际 X 和 32 个实际 log-radius 的等价坐标，消去六个名义见证自由度，未固定其余几何零方向。输出仍为旧 layout146，见证必须通过原 inclusive ±1% 盒和全部关系。名义 X 使用极值区间中点，半径使用共同合法区间，逆变换采用稳定差分；失败不裁剪实际几何或放宽容差。联合 QP 的越界分离点可暂用未受界偏差表达几何，最终状态仍须原域合法。CPU 三项 `ice_relation_meta`、`ice_actual_witness`、`ice_actual_chart` 与 `tests/test_ice_actual_chart_gpu.py` 分别核验元数据、见证、导数和 CUDA 约束步；合成测试不替代真实节目验证。
 
 历史 ±5% 冰面候选的独立源码保存在 [ice5_joint_soc](../native_experiments/ice5_joint_soc/)，差异见 [ice5_joint_soc.patch](../native_experiments/ice5_joint_soc.patch)。本节构建入口与当前核心回归使用 `native/` 中的 ±1% 实现；实验树保留供追查原候选。

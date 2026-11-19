@@ -1,10 +1,7 @@
 # 冈田芽依短节目
 
-## 当前完整拟合：暂定最终状态
-
-2026-11-13 登记的 `joint_review_1113` 使用[安卡拉共同冰场](../../scene/provisional_final_1113.json)，覆盖 S01–S09、原片 00:22.120–03:08.680，共 8,329 个原生曝光。整片回放已导出，整片视觉验收、独立相机物理标定与米制验证仍待完成。
-
-[版本登记及本地回放地址](fit_v11/provisional_final_1113.json) · [相机参数](fit_v11/joint_review_1113_camera.npz) · [源观测、误差及原生库绑定](fit_v11/joint_review_1113.json)
+<a id="当前完整取点修复版"></a>
+当前 [s14_boards_1118](s14_boards_1118.json) 使用 [赛事共同几何](../../README.md#暂定最终版本)及本节目[相机参数](camera_lane4_side_1118.npz)。网格回放地址见登记的 `full_review.video`。用户整片视觉验收待完成。
 
 ## 源与范围
 
@@ -22,21 +19,17 @@
 
 ## 人体与足鞋结果
 
-全节目候选均覆盖上述 8,329 个曝光。人体空间位置、真实接冰和条件米制仍待独立验收。本地播放器、比较入口和历史依赖见[使用说明](../../../../docs/RESULTS_3D_PLAYER_ZH.md)。
+当前候选 [`body_spin_pair_1119`](fit_v11/body_spin_pair_1119.json) 覆盖 S01–S09 的 8,329 个曝光，沿用 `s14_boards_1118` 相机与 `lane4_side_1118` 冰场，拟合时将裸足身高固定为 153 cm。可旋转、逐帧查看的三维回放和同源带声回投见登记的 `launcher` 和 `reprojection`。数值状态见[连续参数](fit_v11/body_spin_pair_1119.npz)，操作见[播放器说明](../../../../docs/RESULTS_3D_PLAYER_ZH.md)。
 
-[人体拟合和复核源码](tools/body_review_1113/README.md)
+本版修订原片 159.080 秒附近的躬身转支撑脚和 175.720 秒附近的蹲转左刀尾。177.440–177.640 秒保留此前交付的人体与鞋刀结果。开场 22.120–23.960 秒双刀着冰为人工确认范围。躬身转深度仍依赖单机位估计，蹲转仍有局部鞋轮廓误差，整片人体位置和接冰待独立验证。
 
-| 结果 | 状态与入口 |
-|---|---|
-| `okada_first_spin_1113` | 当前首旋修订，以登记的 `joint_review_1113` 相机和共同冰场为准，改动窗口为原片 81.140–93.320 秒。局部回投和自由鞋方向仍有偏差。[运动控制](fit_v11/body_first_spin_1113_controls.npz) · [复核与本地回放](fit_v11/body_first_spin_1113.json) |
-| `okada_registered_cut_continuity_1113` | 首旋修订的前一候选，以相同相机检查八处切镜。部分切口的鞋刀方向与深度仍不稳定。[运动控制](fit_v11/body_cut_continuity_1113_controls.npz) · [复核与本地回放](fit_v11/body_cut_continuity_1113.json) |
-| S01 `skate_s01_1103` | 保留用户目视较满意的 S01 对照，原片 22.120–44.960 秒。鞋刀图像误差及接冰偏差仍在。[结果绑定](skate_s01_1103.json) · [S01 播放器](../../../../launchers/START_3D_COMPARISON.cmd) |
+对照结果见[世界轨迹基线](fit_v11/body_world_1119.json)、[人体与鞋刀联合拟合](fit_v11/body_joint_1119.json)、[身高对照](fit_v11/body_height_1119.json)及[用户目视较满意的 S01 对照](skate_s01_1103.json)。[人体拟合与复核源码](tools/body_review_1113/README.md)
 
 ## 有界结果与人工确认
 
 | 对象 | 确认范围 |
 |---|---|
-| `joint_review_1113` | 2026-11-13 指定为暂定最终拟合，整片视觉验收仍待完成。[登记](fit_v11/provisional_final_1113.json) |
+| `joint_review_1113` | 2026-11-13 的历史暂定最终拟合。[登记](fit_v11/provisional_final_1113.json) |
 | 历史九镜头 `joint_mount_flex` | 2026-11-01 用户认为网格贴合基本满意，局部仍有偏差。反馈绑定[当时的完整状态](fit_v11/camera_review_mount_flex.json) |
 | 六镜头 Lane 基线 | 用户认为该冻结版本的网格贴合基本满意。该状态为 927,425 点、4,463 个曝光，冻结状态 SHA-256 为 `54234d25cbf3e8d03dc3d52fdef5d367aa87ce59889cccd904ad1303ac175473`。[参数](native_lane_source_parameters.npz) |
 | S01／S04 等轴焦距基线 | 用户认可这两镜头的网格贴合，冻结状态 SHA-256 为 `c7bf576dc92a635fb254633c8fb1da1ce02f309cc42e2dba2d11fd72bf7c00c4`。对应的居中主点实验在同一 Data 运行的 `camera_models/center_pp_square/result.json` |

@@ -53,11 +53,12 @@ class ProgrammeJointLimits:
         self.weights=np.sqrt(trapezoid_time_weights(self.times))
         self.association=signature(self.chart.rest,self.chart.basis,self.chart.reference_twist)
 
-    def values(self,d,rows=None):
+    def values(self,d,rows=None,*,signed=False):
         rows=np.arange(len(self.times)) if rows is None else np.asarray(rows)
         rotation=self.base['local_R'][rows][:,self.joints-1]@matrices(np.asarray(d[:,6:]).reshape(-1,21,3)[:,self.joints-1])
         angles=self.chart.evaluate(rotation,sample_indices=rows)
-        values=np.stack([e.residual(angles_joint(angles,j)) for j,e in enumerate(self.envelopes)],axis=1)
+        values=np.stack([(e.signed_residual if signed else e.residual)(angles_joint(angles,j))
+                         for j,e in enumerate(self.envelopes)],axis=1)
         return values,angles
 
     def evaluate(self,x,jacobian=False):
@@ -72,8 +73,14 @@ class ProgrammeJointLimits:
                     columns=6+3*(self.joints[joints]-1)+axis
                     plus=centre.copy();minus=centre.copy()
                     plus[np.arange(n),columns]+=1e-6;minus[np.arange(n),columns]-=1e-6
-                    vp=self.values(plus,samples)[0];vm=self.values(minus,samples)[0]
-                    local[np.arange(n),:,columns]=self.weights[samples,None]*(vp-vm)[np.arange(n),joints]/(2e-6)
+                    # Differentiate the smooth signed boundary, then apply
+                    # the hinge's active side at the current state. A local
+                    # finite-difference step must not average active and
+                    # inactive sides merely because the fit is near a limit.
+                    vp=self.values(plus,samples,signed=True)[0];vm=self.values(minus,samples,signed=True)[0]
+                    derivative=(vp-vm)[np.arange(n),joints]/(2e-6)
+                    derivative*=values[samples,joints]>0
+                    local[np.arange(n),:,columns]=self.weights[samples,None]*derivative
                 rows=(3*(len(self.joints)*samples+joints))[:,None]+np.arange(3)
                 scatter=csr_matrix((np.ones(3*n),(rows.ravel(),np.arange(3*n))),shape=(residual.size,3*n))
                 J=scatter@d.chain(local,sample_indices=samples)
@@ -91,29 +98,30 @@ class ProgrammeJointLimits:
         return dict(residual=b.residual,jac=b.jacobian,parts={b.name:float(b.residual@b.residual/2)},weighted_blocks=[b],
             metrics=dict(anatomical_joint_domain=dict(joints=stats,association=self.association,clinical_angle_claim=False)))
 
-    def proposal_linearization(self,x):
+    def proposal_linearization(self,x,rows=None):
         """Signed forms of the same guard boundaries, also inside their limits.
 
         This only supplies a proposal domain; the original positive-part factor
         and nonlinear peak guard still decide the actual candidate.
         """
         from scipy.sparse import vstack
-        d=self.state.increments(x,self.times);delta=np.asarray(d)
-        values=np.empty((len(self.times),len(self.joints),3));pieces=[];order=[]
+        samples=np.arange(len(self.times)) if rows is None else np.asarray(rows,int)
+        d=self.state.increments(x,self.times[samples]);delta=np.asarray(d)
+        values=np.empty((len(samples),len(self.joints),3));pieces=[];order=[]
         for j,(joint,envelope) in enumerate(zip(self.joints,self.envelopes)):
-            samples=np.arange(len(self.times));joint_indices=np.full(len(samples),j,int)
+            joint_indices=np.full(len(samples),j,int)
             columns=6+3*(joint-1)+np.arange(3)
             centre=delta[:,columns]
             def evaluate(v):
-                rotation=self.base['local_R'][:,joint-1]@matrices(v)
+                rotation=self.base['local_R'][samples,joint-1]@matrices(v)
                 return envelope.signed_residual(self.chart.evaluate(rotation,sample_indices=samples,joint_indices=joint_indices))
             values[:,j]=evaluate(centre)
-            local=np.zeros((len(self.times),3,69))
+            local=np.zeros((len(samples),3,69))
             for axis,column in enumerate(columns):
                 plus=centre.copy();minus=centre.copy();plus[:,axis]+=1e-6;minus[:,axis]-=1e-6
                 local[:,:,column]=(evaluate(plus)-evaluate(minus))/(2e-6)
             pieces.append(d.chain(local))
-            order.extend((3*(len(self.joints)*np.arange(len(self.times))+j))[:,None]+np.arange(3))
+            order.extend((3*(len(self.joints)*np.arange(len(samples))+j))[:,None]+np.arange(3))
         order=np.asarray(order).ravel()
         return values.ravel(),vstack(pieces,format='csr')[np.argsort(order)]
 

@@ -14,7 +14,16 @@ def time_base(packet):
     return result[0]
 
 def source_seconds(packet,pts=None):
-    a,b=time_base(packet);return np.asarray(packet['pts']if pts is None else pts)*a/b
+    a,b=time_base(packet)
+    values=np.asarray(packet['pts']if pts is None else pts)
+    if values.dtype.kind in 'iu' and values.size:
+        bounds=np.iinfo(values.dtype)
+        if (a>bounds.max or int(values.min())*a<bounds.min
+                or int(values.max())*a>bounds.max):
+            # Preserve the integer product before conversion to seconds.
+            # Fixed-width multiplication must not wrap a valid source clock.
+            return np.asarray(values.astype(object)*a/b,dtype=float)
+    return values*a/b
 
 def source_interval_mask(pts, tb, start_seconds, end_seconds):
     """Inclusive selection on the integer source clock, before fit-time mapping."""
@@ -28,8 +37,34 @@ def source_interval_mask(pts, tb, start_seconds, end_seconds):
 
 def sample_period(packet):
     pts=np.asarray(packet['pts']);a,b=time_base(packet)
-    if pts.ndim!=1 or len(pts)<2 or pts.dtype.kind not in 'iu'or np.any(np.diff(pts)<=0):raise ValueError('Ordered native source exposures required')
-    return float(np.median(np.diff(pts)))*a/b
+    if pts.ndim!=1 or len(pts)<2 or pts.dtype.kind not in 'iu'or np.any(pts[1:]<=pts[:-1]):raise ValueError('Ordered native source exposures required')
+    # Compare before subtracting (unsigned clocks can otherwise wrap), and
+    # use wide differences only when a signed storage span can overflow.
+    wide=int(pts[-1])-int(pts[0])>np.iinfo(pts.dtype).max
+    differences=np.diff(pts.astype(object) if wide else pts)
+    return float(np.median(differences))*a/b
 
 def source_nanoseconds(packet,pts):
-    a,b=time_base(packet);return np.rint(np.asarray(pts,dtype=float)*a*1e9/b).astype(np.int64)
+    a,b=time_base(packet);values=np.asarray(pts)
+    bounds=np.iinfo(np.int64)
+    if values.dtype.kind in 'iu':
+        tick=Fraction(a*1_000_000_000,b)
+        result=np.empty(values.size,dtype=np.int64)
+        for i,value in enumerate(values.flat):
+            quotient,remainder=divmod(int(value)*tick.numerator,tick.denominator)
+            # Exact nearest-integer, ties-to-even, including negative PTS.
+            if 2*remainder>tick.denominator or (2*remainder==tick.denominator and quotient%2):
+                quotient+=1
+            if not bounds.min<=quotient<=bounds.max:
+                raise OverflowError('Source nanoseconds exceed signed 64-bit storage')
+            result[i]=quotient
+        result=result.reshape(values.shape)
+        return result[()] if values.ndim==0 else result
+    # Preserve the existing floating query convention, but never publish the
+    # int64 minimum sentinel produced by a nonfinite/out-of-range float cast.
+    rounded=np.rint(np.asarray(pts,dtype=float)*a*1e9/b)
+    if not np.isfinite(rounded).all():
+        raise ValueError('Source nanoseconds must be finite')
+    if any(not bounds.min<=int(value)<=bounds.max for value in np.asarray(rounded).flat):
+        raise OverflowError('Source nanoseconds exceed signed 64-bit storage')
+    return rounded.astype(np.int64)

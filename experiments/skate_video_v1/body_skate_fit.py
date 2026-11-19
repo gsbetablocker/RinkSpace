@@ -86,11 +86,19 @@ def revised_binding(seed, shared):
 
 
 class Assembly:
-    def __init__(self, binding):
+    def __init__(self, binding, *, exact_template=False):
         self.binding = binding
         packet = binding.packet()
         self.upper_count = len(packet["upper"])
         template = packet["template"]
+        if exact_template:
+            self.vertices = np.concatenate((packet['upper'], template['vertices']))
+            self.faces = np.asarray(np.concatenate((binding.faces,
+                np.asarray(template['faces']) + self.upper_count)), np.int32)
+            edges = np.sort(np.concatenate([self.faces[:, [0, 1]], self.faces[:, [1, 2]],
+                                            self.faces[:, [2, 0]]]), axis=1)
+            self.edges = np.unique(edges, axis=0)
+            return
         p = packet["parameters"]
         _, _, (rear, _, join, front) = _profile(p)
         x = np.r_[np.linspace(rear, join, 10)[:-1], np.linspace(join, front, 8)]
@@ -128,14 +136,14 @@ class Assembly:
             local = select[:, :, 0] + fraction[..., None] * (select[:, :, 1] - select[:, :, 0])
         return origin[:, foot, None] + np.einsum("nij,nkj->nki", rotation[:, foot], local)
 
-    def raster(self, pixels):
+    def raster(self, pixels, faces=None):
         origin = np.floor(pixels.min(0) - 3)
         wh = np.ceil(pixels.max(0) - origin + 3).astype(int) * SCALE
         if np.any(wh <= 0) or np.max(wh) > 700:
             raise ValueError("Skate projection outside plausible raster extent")
         model = np.zeros((wh[1], wh[0]), np.uint8)
         px = np.rint((pixels - origin) * SCALE).astype(np.int32)
-        for triangle in px[self.faces]:
+        for triangle in px[self.faces if faces is None else faces]:
             cv2.fillConvexPoly(model, triangle, 1)
         contours, _ = cv2.findContours(model, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
         if not contours:

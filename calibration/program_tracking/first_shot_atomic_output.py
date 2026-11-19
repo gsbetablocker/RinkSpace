@@ -20,15 +20,10 @@ def _check_reference(expected):
     return actual
 
 
-def write(path, value):
-    """Keep the original runtime JSON bytes; retry only Windows sharing errors."""
-    path = Path(path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_suffix(path.suffix + '.tmp')
-    temporary.write_text(json.dumps(value, ensure_ascii=False, indent=2,
-                                    allow_nan=False) + '\n', encoding='utf8')
-    # Literal policy of z190_joint_source_solver._write_json. Only serialization
-    # differs: this function preserves the original stage-runtime serialization.
+def replace_file(temporary, path):
+    """Publish completed bytes using the existing Windows sharing retry policy."""
+    temporary, path = Path(temporary), Path(path)
+    # Literal policy of z190_joint_source_solver._write_json.
     for attempt in range(64):
         try:
             temporary.replace(path)
@@ -37,6 +32,16 @@ def write(path, value):
             if getattr(error, 'winerror', None) not in (5, 32) or attempt == 63:
                 raise
             time.sleep(min(.05 * 2**attempt, .5))
+
+
+def write(path, value):
+    """Keep the original runtime JSON bytes; retry only Windows sharing errors."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + '.tmp')
+    temporary.write_text(json.dumps(value, ensure_ascii=False, indent=2,
+                                    allow_nan=False) + '\n', encoding='utf8')
+    replace_file(temporary, path)
 
 
 def install(expected_runtime_reference, expected_solver_reference):

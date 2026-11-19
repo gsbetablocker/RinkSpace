@@ -8,7 +8,7 @@ import argparse,base64,collections,copy,gzip,hashlib,itertools,json,re,shutil,sq
 import cv2,numpy as np
 import points_s02 as shared
 from rinkspace.vision_native import NativeSourceGeometry,file_ref
-from ice_points_s04 import read,write,rows,select_representatives,material_path
+from ice_points_s04 import SOURCE_INDEX,read,write,rows,select_representatives,material_path
 
 ROOT=shared.ROOT;PROG=shared.PROG;DATA=shared.DATA;REC=shared.REC;SCENE=shared.SCENE
 OUT=DATA/'runs/native_points_s06_20261027'
@@ -111,7 +111,7 @@ def inventory():
     excluded={};withdrawn={};manual=[]
     p=ICE.parent/'exclusions.jsonl.gz';refs.append(file_ref(p))
     for n,r in rows(p):excluded[r['source_row_id']]=dict(record=r,source=str(p),jsonl_line_0based=n)
-    index=DATA/'runs/okada_s02_s09_observations_20261026/source_index.sqlite'
+    index=DATA / SOURCE_INDEX
     with sqlite3.connect(index.as_uri()+'?mode=ro',uri=True)as db:
         for key,payload in db.execute("select id,payload from qualification where shot='s06'"):withdrawn[key]=json.loads(payload)
     # Apply later source-store revisions by stable source ID, not fit residual.

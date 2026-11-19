@@ -41,11 +41,209 @@ def track_local(blocks):
     for k in range(j):out[:,k,:,3+k*3:6+k*3]=blocks[:,k]
     return out.reshape(n,j*3,69)
 
+
+class ActualSkateAngularAcceleration:
+    """Finite acceleration prior on the composed world skate rotations.
+
+    Smooth local hip/knee/ankle tracks can still compose into a sharp skate
+    turn. This term evaluates the actual FK product, without a zero-speed
+    target, image observations, or inferred contact labels.
+    """
+    name='actual_skate_world_angular_acceleration'
+
+    def __init__(self,problem,times,scale_rad_s2=80.,feet=(0,1)):
+        self.problem=problem;self.times=np.asarray(times,float)
+        self.feet=np.asarray(feet,int)
+        if not len(self.feet) or np.any((self.feet<0)|(self.feet>1)) or len(np.unique(self.feet))!=len(self.feet):
+            raise ValueError('Expected distinct skate indices')
+        if len(self.times)<3 or np.any(np.diff(self.times)<=0):
+            raise ValueError('Skate acceleration needs increasing physical times')
+        self.scale=float(scale_rad_s2)
+        if not np.isfinite(self.scale) or self.scale<=0:
+            raise ValueError('Positive finite skate acceleration scale required')
+        self.base=problem.reference.at(self.times)
+
+    def evaluate(self,x,jacobian=False):
+        from scipy.sparse import block_diag,diags
+        from .skate_physics import fk_state
+        from .weighted_blocks import block,full_columns
+        p=self.problem;state=p.body.state;delta=state.increments(x,self.times)
+        pose=fk_state(p.reference,self.base,delta);R=pose['R'];n=len(R)
+        h=np.diff(self.times);relative=R[1:]@R[:-1].swapaxes(-1,-2)
+        phi=_log(relative);omega=phi/h[:,None,None]
+        a=2/(h[:-1]+h[1:]);alpha=a[:,None,None]*np.diff(omega,axis=0)
+        measure=np.sqrt((h[:-1]+h[1:])/2)/self.scale
+        take=(np.arange(n-2)[:,None,None]*6+self.feet[None,:,None]*3+np.arange(3)).ravel()
+        residual=(alpha*measure[:,None,None]).ravel()[take];J=None
+        if jacobian:
+            # Spatial tangent of the complete Q * hip * knee * ankle * mount
+            # product. Each leg joint affects only its own skate.
+            local=np.zeros((n,2,3,69));d=np.asarray(delta)
+            root=pose['Q']@right_jacobian(d[:,3:6])
+            local[:,:,:,3:6]=root[:,None]
+            for foot,joints in enumerate(((1,4,7),(2,5,8))):
+                for joint in joints:
+                    cols=6+3*(joint-1)+np.arange(3)
+                    axes=pose['Q']@pose['frames'][:,joint]@right_jacobian(d[:,cols])
+                    local[:,foot,:,cols[0]:cols[-1]+1]=axes
+            tangent=delta.chain(local.reshape(n,6,69))
+            if hasattr(state,'shoe_chain'):
+                shoe=np.zeros((n,6,6))
+                shoe[:,:3,:3]=R[:,0];shoe[:,3:,3:]=R[:,1]
+                tangent=tangent+state.shoe_chain(shoe,x,self.times)
+            inverse=inverse_right_jacobian(phi)
+            previous=block_diag(inverse.reshape(-1,3,3),format='csr')
+            following=block_diag((inverse@relative.swapaxes(-1,-2)).reshape(-1,3,3),format='csr')
+            velocity=diags(np.repeat(1/h,6))@(following@tangent[6:]-previous@tangent[:-6])
+            J=(diags(np.repeat(a*measure,6))@(velocity[6:]-velocity[:-6]))[take]
+        result=full_columns(block(self.name,residual,J,dict(
+            quadrature_times=self.times,quadrature_is_source_observation=False,
+            scale_rad_s2=self.scale,zero_angular_velocity_target=False,
+            complete_articulated_world_rotation=True,feet=self.feet)))
+        return dict(residual=residual,jac=result.jacobian,
+            parts={self.name:float(residual@residual/2)},weighted_blocks=[result],
+            metrics={self.name:dict(maximum_angular_speed_rad_s=float(np.linalg.norm(omega[:,self.feet],axis=-1).max()),
+                maximum_angular_acceleration_rad_s2=float(np.linalg.norm(alpha[:,self.feet],axis=-1).max()))})
+
+class ActualSkateInclinationRate:
+    """Finite continuity prior on sole inclination, invariant to world yaw.
+
+    The world-up direction expressed in skate coordinates is R[2, :]. Its
+    change detects heel/toe or edge rocking while allowing arbitrary yaw.
+    This is an explicitly selected motion prior, not a measured ice contact
+    or a flat-foot target. The mean inclination remains image determined.
+    """
+    name='actual_skate_inclination_rate'
+
+    def __init__(self,problem,times,feet=(0,1),scale_rad_s=1.,fade_seconds=.18):
+        self.problem=problem;self.times=np.asarray(times,float)
+        self.feet=np.asarray(feet,int);self.scale=float(scale_rad_s)
+        if len(self.times)<2 or np.any(np.diff(self.times)<=0):
+            raise ValueError('Inclination continuity needs increasing physical times')
+        if (not len(self.feet) or np.any((self.feet<0)|(self.feet>1))
+                or len(np.unique(self.feet))!=len(self.feet)):
+            raise ValueError('Expected distinct skate indices')
+        if not np.isfinite([self.scale,fade_seconds]).all() or self.scale<=0 or fade_seconds<0:
+            raise ValueError('Invalid inclination prior scale or fade')
+        h=np.diff(self.times);mid=(self.times[1:]+self.times[:-1])/2
+        taper=np.ones(len(h)) if fade_seconds==0 else np.minimum(
+            np.clip((mid-self.times[0])/fade_seconds,0.,1.),
+            np.clip((self.times[-1]-mid)/fade_seconds,0.,1.))
+        self.measure=np.sqrt(h*taper)/self.scale/h
+        self.base=problem.reference.at(self.times)
+
+    def evaluate(self,x,jacobian=False):
+        from scipy.sparse import diags
+        from .skate_physics import fk_state
+        from .weighted_blocks import block,full_columns
+        p=self.problem;state=p.body.state;delta=state.increments(x,self.times)
+        pose=fk_state(p.reference,self.base,delta);R=pose['R'];n=len(R)
+        vertical=R[:,:,2,:]
+        take=(np.arange(n-1)[:,None,None]*6+self.feet[None,:,None]*3+np.arange(3)).ravel()
+        residual=(np.diff(vertical,axis=0)*self.measure[:,None,None]).ravel()[take]
+        J=None
+        if jacobian:
+            d=np.asarray(delta);axes=np.zeros((n,2,3,69))
+            axes[:,:,:,3:6]=(pose['Q']@right_jacobian(d[:,3:6]))[:,None]
+            for foot,joints in enumerate(((1,4,7),(2,5,8))):
+                for joint in joints:
+                    first=6+3*(joint-1);cols=slice(first,first+3)
+                    axes[:,foot,:,cols]=pose['Q']@pose['frames'][:,joint]@right_jacobian(d[:,cols])
+            # d (ez . R ej) / d spatial rotation = (R ej) cross ez.
+            cross=np.stack((R[:,:,1,:],-R[:,:,0,:],np.zeros((n,2,3))),axis=-1)
+            local=np.einsum('nfki,nfid->nfkd',cross,axes).reshape(n,6,69)
+            tangent=delta.chain(local)
+            if hasattr(state,'shoe_chain'):
+                shoe=np.zeros((n,6,6))
+                for foot in (0,1):
+                    shoe[:,foot*3:foot*3+3,foot*3:foot*3+3]=cross[:,foot]@R[:,foot]
+                tangent+=state.shoe_chain(shoe,x,self.times)
+            J=(diags(np.repeat(self.measure,6))@(tangent[6:]-tangent[:-6]))[take]
+        result=full_columns(block(self.name,residual,J,dict(
+            quadrature_times=self.times,quadrature_is_source_observation=False,
+            scale_rad_s=self.scale,feet=self.feet,world_yaw_unconstrained=True,
+            absolute_inclination_target=None,contact_measurement=False)))
+        rate=np.diff(vertical[:,self.feet],axis=0)/np.diff(self.times)[:,None,None]
+        pitch=np.rad2deg(np.arcsin(np.clip(vertical[:,self.feet,0],-1,1)))
+        return dict(residual=residual,jac=result.jacobian,
+            parts={self.name:float(residual@residual/2)},weighted_blocks=[result],
+            metrics={self.name:dict(maximum_inclination_rate_rad_s=float(np.linalg.norm(rate,axis=-1).max()),
+                forward_axis_elevation_degrees_range=[float(pitch.min()),float(pitch.max())])})
+
+
+class ActualSkateAnkleAcceleration:
+    """Finite acceleration prior on each actual world ankle pivot after FK.
+
+    Coupled hip/knee changes can translate a skate despite a stable sole
+    orientation. This term constrains that trajectory without setting a
+    fixed position, velocity, ice height, or contact point.
+    """
+    name='actual_skate_ankle_acceleration'
+
+    def __init__(self,problem,times,feet=(0,1),scale_m_s2=8.):
+        self.problem=problem;self.times=np.asarray(times,float)
+        self.feet=np.asarray(feet,int);self.scale=float(scale_m_s2)
+        if len(self.times)<3 or np.any(np.diff(self.times)<=0):
+            raise ValueError('Ankle acceleration needs increasing physical times')
+        if (not len(self.feet) or np.any((self.feet<0)|(self.feet>1))
+                or len(np.unique(self.feet))!=len(self.feet)):
+            raise ValueError('Expected distinct skate indices')
+        if not np.isfinite(self.scale) or self.scale<=0:
+            raise ValueError('Positive finite ankle acceleration scale required')
+        self.base=problem.reference.at(self.times)
+
+    def evaluate(self,x,jacobian=False):
+        from scipy.sparse import diags
+        from .skate_physics import fk_state
+        from .weighted_blocks import block,full_columns
+        p=self.problem;state=p.body.state;delta=state.increments(x,self.times)
+        pose=fk_state(p.reference,self.base,delta);n=len(self.times)
+        pivot=pose['native_world'][:,[7,8]];ratio=p.binding.ratio
+        h=np.diff(self.times);a=2/(h[:-1]+h[1:])
+        velocity=np.diff(pivot,axis=0)/h[:,None,None]
+        acceleration=a[:,None,None]*np.diff(velocity,axis=0)*ratio
+        measure=np.sqrt((h[:-1]+h[1:])/2)/self.scale
+        take=(np.arange(n-2)[:,None,None]*6+self.feet[None,:,None]*3+np.arange(3)).ravel()
+        residual=(acceleration*measure[:,None,None]).ravel()[take];J=None
+        if jacobian:
+            d=np.asarray(delta);local=np.zeros((n,2,3,69))
+            local[:,:,:,:3]=np.eye(3)
+            root=pose['Q']@right_jacobian(d[:,3:6])
+            arm=pivot-pose['P'][:,None]
+            local[:,:,:,3:6]=np.cross(root[:,None].swapaxes(-1,-2),arm[:,:,None,:]).swapaxes(-1,-2)
+            for foot,joints in enumerate(((1,4),(2,5))):
+                for joint in joints:
+                    first=6+3*(joint-1);cols=slice(first,first+3)
+                    axes=pose['Q']@pose['frames'][:,joint]@right_jacobian(d[:,cols])
+                    arm=pivot[:,foot]-pose['native_world'][:,joint]
+                    local[:,foot,:,cols]=np.cross(axes.swapaxes(-1,-2),arm[:,None,:]).swapaxes(-1,-2)
+            position=delta.chain(local.reshape(n,6,69))*ratio
+            speed=diags(np.repeat(1/h,6))@(position[6:]-position[:-6])
+            J=(diags(np.repeat(a*measure,6))@(speed[6:]-speed[:-6]))[take]
+        result=full_columns(block(self.name,residual,J,dict(
+            quadrature_times=self.times,quadrature_is_source_observation=False,
+            scale_m_s2=self.scale,feet=self.feet,position_or_velocity_target=None,
+            contact_measurement=False,physical_scale_is_conditional=True)))
+        return dict(residual=residual,jac=result.jacobian,
+            parts={self.name:float(residual@residual/2)},weighted_blocks=[result],
+            metrics={self.name:dict(maximum_ankle_acceleration_conditional_m_s2=
+                float(np.linalg.norm(acceleration[:,self.feet],axis=-1).max()))})
+
+
 class ActualMotionFactors:
-    def __init__(self,problem,parent):
-        self.problem=problem;self.body=problem.body;self.ref=problem.reference;self.times=self.ref.times
+    def __init__(self,problem,parent,*,substeps=1,rotation_acceleration_loss='pseudo_huber'):
+        self.problem=problem;self.body=problem.body;self.ref=problem.reference
+        if rotation_acceleration_loss not in ('pseudo_huber','quadratic'):
+            raise ValueError('Unknown rotation acceleration loss')
+        if not isinstance(substeps,(int,np.integer)) or substeps<1:
+            raise ValueError('Motion quadrature requires a positive integer subdivision')
+        native_times=np.asarray(self.ref.times)
+        fractions=np.arange(substeps,dtype=float)/substeps
+        self.times=np.r_[(native_times[:-1,None]+np.diff(native_times)[:,None]*fractions).ravel(),native_times[-1]]
         from .body_clock import source_seconds
-        self.source=source_seconds(self.ref.p);self.base=self.ref.at(self.times);self.parent=parent.at(self.times)
+        self.source=np.interp(self.times,native_times,source_seconds(self.ref.p))
+        self.sample_pts=np.interp(self.times,native_times,self.ref.p['pts'])
+        self.base=self.ref.at(self.times);self.parent=parent.at(self.times)
         self.prior_R=np.concatenate((self.parent['Q'][:,None],self.parent['local_R']),axis=1)
         self.weights=trapezoid_time_weights(self.times);self.last=None
         # These finite engineering scales are not acceptance bands or maximum speeds.
@@ -53,13 +251,18 @@ class ActualMotionFactors:
             actual_rotation_acceleration_scale_rad_s2=80.,root_acceleration_scale_solver_s2=12.,
             transition_weight=.16,stable_weight=1.,right_wrist_outlier_prior_weight=.035,
             horizontal_entry_curvature='finite existing-scale prior; not a COM or contact measurement',
-            vertical_entry_prior_relaxation_seconds=[81.30,81.62])
+            vertical_entry_prior_relaxation_seconds=[81.30,81.62],
+            quadrature_substeps=int(substeps),quadrature_samples=len(self.times),
+            quadrature_is_source_observation=False,
+            rotation_acceleration_loss=rotation_acceleration_loss)
         policy=getattr(self.ref,'source_document',{}).get('root_prior_policy',{})
         confidence=float(policy.get('camera_ray_depth_confidence',1.))
         if not np.isfinite(confidence)or not 0<confidence<=1:raise ValueError('Finite camera-ray depth confidence required')
         self.root_transform=np.broadcast_to(np.eye(3),(len(self.times),3,3)).copy()
         if confidence!=1.:
             centres=np.asarray(self.body.camera_centres)
+            if substeps!=1:
+                centres=np.column_stack([np.interp(self.times,native_times,centres[:,k]) for k in range(3)])
             ray=self.parent['P']-centres;ray/=np.maximum(np.linalg.norm(ray,axis=1),1e-12)[:,None]
             self.root_transform+=(np.sqrt(confidence)-1)*ray[:,:,None]*ray[:,None,:]
         self.config['camera_ray_depth_confidence']=confidence
@@ -76,7 +279,8 @@ class ActualMotionFactors:
             r=np.asarray(r).ravel();rows.append(r);parts[name]=float(r@r/2)
             if jacobian and not getattr(self.problem,'bounded_memory',False):mats.append(J)
             from .weighted_blocks import block,full_columns
-            named.append(full_columns(block(name,r,J,dict(source_pts=self.ref.p['pts']))))
+            named.append(full_columns(block(name,r,J,dict(source_pts=self.ref.p['pts'],
+                quadrature_source_seconds=self.source,quadrature_is_source_observation=False))))
         weight=np.ones((n,22))*np.sqrt(self.weights[:,None]*self.config['pose_prior_weight'])/.6
         generic=getattr(self.ref,'source_document',{}).get('generic_context',False)
         if not generic:weight[((self.source>=89.24)&(self.source<=89.44)),21]*=np.sqrt(.035)
@@ -97,10 +301,14 @@ class ActualMotionFactors:
         phase[((t>=80.8)&(t<=82.4))|((t>=92.4)&(t<=93.2))]=.10
         if generic:
             from .phase_ledger import phase_weights
-            phase=phase_weights(self.ref,self.ref.p['pts'][1:-1],default=.16)
+            phase=phase_weights(self.ref,self.sample_pts[1:-1],default=.16)
         phase*=reviewed_cut_weight(self.ref,self.times[1:-1])
         scale=np.full(22,80.);scale[0]=60.;w=np.sqrt((h[:-1]+h[1:])[:,None]/2*phase[:,None])/scale[None]
-        z=alpha*w[...,None];r,D=robust_vector(z,delta=3.)
+        z=alpha*w[...,None]
+        if self.config['rotation_acceleration_loss']=='quadratic':
+            r=z;D=np.broadcast_to(np.eye(3),(*z.shape[:-1],3,3))
+        else:
+            r,D=robust_vector(z,delta=3.)
         if jacobian:
             K=inverse_right_jacobian(phi)@R[:-1]
             T=right_jacobian(np.asarray(d)[:,3:].reshape(n,22,3))
@@ -143,7 +351,7 @@ class ActualMotionFactors:
             vertical_relax=(self.source>=81.30)&(self.source<=81.62)
             if generic:
                 from .phase_ledger import flight_mask
-                vertical_relax=flight_mask(self.ref,self.ref.p['pts'])
+                vertical_relax=flight_mask(self.ref,self.sample_pts)
             w[vertical_relax,2]=0.;r=Pacc*w
             if jacobian:
                 from scipy.sparse import kron,diags

@@ -164,9 +164,23 @@ def programme_observation_path(prepared, source):
     if revision is None:
         return original
     current = Path(revision['path'])
-    if revision['parent_observations_sha256'] != digest(original) or revision['sha256'] != digest(current):
-        raise ValueError('Body source observation revision differs from its bound ledger')
-    return current
+    original_sha = digest(original)
+    visited = set()
+    while revision is not None:
+        path = Path(revision['path'])
+        resolved = path.resolve()
+        if resolved in visited or digest(path) != revision['sha256']:
+            break
+        visited.add(resolved)
+        # Some prepared bundles already include an earlier revision. Bind the
+        # active chain up to that exact ledger, then leave its archive intact.
+        if resolved == original.resolve() or revision['parent_observations_sha256'] == original_sha:
+            return current
+        parent = revision.get('previous_revision')
+        if parent is None or parent['sha256'] != revision['parent_observations_sha256']:
+            break
+        revision = parent
+    raise ValueError('Body source observation revision differs from its bound ledger')
 
 
 def validate_evidence(evidence, pts, tb, camera_sha256):
@@ -228,8 +242,34 @@ def exposure_times(problem, frames):
     return (problem.reference.times[frames,None] + np.linspace(-.5,.5,5)*tau[:,None]).ravel()
 
 
-class ManualNativeLegFactors:
-    """Independent source marks; do not overwrite the original COCO detector."""
+def native_point_response(error, radius, weights, *, cauchy=None):
+    """Pixel residual and derivative; detector outliers may use Cauchy loss.
+
+    The default retains the existing reviewed-point response. Cauchy has the
+    same small-error scale but reduces the influence of gross detector errors,
+    including joints hallucinated on clothing during source occlusion.
+    """
+    distance2=np.sum(error*error,axis=1);scale2=9*radius*radius
+    t=distance2/scale2
+    gain=(1+t)**-.25;radial=-1/(2*(scale2+distance2))
+    if cauchy is not None and np.any(cauchy):
+        q=t[cauchy];small=q<1.e-6
+        g=np.empty_like(q);v=np.empty_like(q)
+        g[small]=1-q[small]/4+13*q[small]**2/96
+        v[small]=(-.5+5*q[small]/12)/scale2[cauchy][small]
+        qn=q[~small];log=np.log1p(qn)
+        g[~small]=np.sqrt(log/qn)
+        v[~small]=(qn/((1+qn)*log)-1)/distance2[cauchy][~small]
+        gain[cauchy]=g;radial[cauchy]=v
+    w=weights/radius*gain
+    derivative=w[:,None,None]*(np.eye(2)+radial[:,None,None]*error[:,:,None]*error[:,None,:])
+    return w[:,None]*error,derivative
+
+
+class ManualNativeBodyFactors:
+    """Separate reviewed source marks on the same native articulated body."""
+    name = 'manual_native_body'
+    allowed_joints = tuple(range(17))
     def __init__(self, problem, rows):
         self.problem, self.rows = problem, rows
         ref = problem.reference
@@ -238,21 +278,28 @@ class ManualNativeLegFactors:
         self.frames = np.searchsorted(ref.p['pts'], unique)
         np.testing.assert_array_equal(ref.p['pts'][self.frames], unique)
         self.joints = np.array([r['joint'] for r in rows],int)
-        if not np.isin(self.joints, [13,14,15,16]).all():
-            raise ValueError('Manual leg evidence requires anatomical COCO knee/ankle')
+        if not np.isin(self.joints, self.allowed_joints).all():
+            raise ValueError('Unsupported anatomical COCO joint in '+self.name)
         self.times = exposure_times(problem, self.frames)
         self.base = ref.at(self.times) if len(rows) else None
         self.uv = np.array([r['uv'] for r in rows],float).reshape(-1,2)
+        self.is_region = np.array(['pixel_box' in r for r in rows],bool)
+        self.pixel_boxes = np.array([r.get('pixel_box',[[-np.inf,-np.inf],[np.inf,np.inf]])
+                                    for r in rows],float).reshape(-1,2,2)
+        if np.any(self.pixel_boxes[:,0]>self.pixel_boxes[:,1]):
+            raise ValueError('Invalid source image region')
         self.radius = np.array([r['radius_px'] for r in rows],float)
         self.weights = np.sqrt(np.array([source_support_weight_s(r) for r in rows]))
-        self.identity = signature(stamps,self.joints,self.uv,self.radius)
+        self.cauchy = np.array([r.get('loss')=='cauchy' for r in rows],bool)
+        self.identity = signature(stamps,self.joints,self.uv,self.radius,self.is_region,self.pixel_boxes)
+        if self.cauchy.any():self.identity=signature(self.identity,self.cauchy)
 
     def evaluate(self, x, jacobian=False):
         p = self.problem
         if not self.rows:
             J = csr_matrix((0,p.size)) if jacobian else None
-            return dict(residual=np.empty(0),jac=J,parts={'manual_native_leg':0.},
-                        metrics={'manual_native_leg':[]},weighted_blocks=[block('manual_native_leg',[],J)])
+            return dict(residual=np.empty(0),jac=J,parts={self.name:0.},
+                        metrics={self.name:[]},weighted_blocks=[block(self.name,[],J)])
         d = p.body.state.increments(x,self.times)
         local = np.asarray(d[:,6:]).reshape(-1,21,3)
         linear = CompactBodyLinearization(p.reference.body,self.base['local_R'],local,
@@ -264,12 +311,18 @@ class ManualNativeLegFactors:
         pr = moving_projection(p.camera,world.reshape(len(self.frames),5,17,3),self.frames,jacobian=jacobian)
         uv = pr['uv'][self.owner,self.joints]
         err = (uv-self.uv)
+        # A reviewed occlusion region supplies exclusion evidence only. Its
+        # centre is not an invented observation of the hidden joint.
+        response_axes=np.ones_like(err)
+        if self.is_region.any():
+            m=self.is_region;lo=self.pixel_boxes[m,0];hi=self.pixel_boxes[m,1]
+            err[m]=uv[m]-np.clip(uv[m],lo,hi)
+            response_axes[m]=(uv[m]<lo)|(uv[m]>hi)
         distance = np.linalg.norm(err,axis=1)
-        # A smooth scale for a human knee/ankle region; weak (not zero)
+        # A smooth scale for a reviewed joint region; weak (not zero)
         # interior attraction, bounded influence outside ~3 click radii.
-        denom = 1. + (distance/(3*self.radius))**2
-        w = self.weights/self.radius/denom**.25
-        residual = (w[:,None]*err).ravel()
+        response,S=native_point_response(err,self.radius,self.weights,cauchy=self.cauchy)
+        residual = response.ravel()
         J = None
         if jacobian:
             raw = pr['pixel_jac_nodes'][self.owner,self.joints]
@@ -278,22 +331,31 @@ class ManualNativeLegFactors:
             X = np.zeros((len(self.rows),5,3,69))
             X[...,:3] = np.eye(3)
             X[...,3:6] = -skew(rotated[sample,j]) @ (Q@right_jacobian(d[:,3:6]))[sample]
-            for axis in range(6,69):
+            axes=getattr(p,'active_body_pose_channels',range(6,69))
+            for axis in axes:
+                if axis<6:continue
                 der = linear.derivative(int(axis),kinematics=False)['coco']
                 X[...,axis] = np.einsum('nmij,nmj->nmi',Q[sample],der[sample,j])
             raw_local = np.einsum('nplc,nlck->nplk',raw,X)
-            S = w[:,None,None]*(np.eye(2)-err[:,:,None]*err[:,None,:]/
-                                   (2*(9*self.radius**2+distance**2))[:,None,None])
+            S*=response_axes[:,None,:]
             J = chain_exposure(np.einsum('nij,njlk->nilk',S,raw_local),d,sample_indices=sample)
             J = hstack((csr_matrix((len(residual),17)),J),format='csr')
         metrics = [dict(id=r['raw_group_id'],pts=r['pts'],foot=r['foot'],event_id=r['event_id'],
                          joint=r['joint'],role=r['role'],radius_px=r['radius_px'],
-                         distance_px=float(e),prediction=u.tolist(),source_uv=r['uv'])
+                         distance_px=float(e),prediction=u.tolist(),
+                         source_uv=None if 'pixel_box' in r else r['uv'],
+                         pixel_box=r.get('pixel_box'))
                    for r,e,u in zip(self.rows,distance,uv)]
-        b = block('manual_native_leg',residual,J,dict(source_pts=[r['pts'] for r in self.rows],
+        b = block(self.name,residual,J,dict(source_pts=[r['pts'] for r in self.rows],
                    raw_group_ids=[r['raw_group_id'] for r in self.rows],unit='px',role='fit'),self.identity)
         return dict(residual=residual,jac=J,parts={b.name:float(residual@residual/2)},
                     metrics={b.name:metrics},weighted_blocks=[b])
+
+
+class ManualNativeLegFactors(ManualNativeBodyFactors):
+    """Backward-compatible knee/ankle evidence and objective identity."""
+    name = 'manual_native_leg'
+    allowed_joints = (13,14,15,16)
 
 
 class ProgrammeSkateSourceFactors:

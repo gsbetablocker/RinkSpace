@@ -19,6 +19,7 @@ from aitviewer.viewer import Viewer
 from .app import ResultsPlayer
 from .data import ResultCatalog, digest
 from .framing import fit_comparison_camera, comparison_frustum_bounds
+from .source import body_overlay_primitives
 
 
 class HeadlessResultsPlayer(ResultsPlayer):
@@ -60,16 +61,25 @@ def continuous_playback(player,catalog,seconds):
     fps=float(player.playback_fps)
     if not np.isfinite(fps) or fps<=0:raise ValueError('Invalid playback FPS')
     player.seek(first);records=[];started=time.perf_counter()
+    check_source_image = bool(getattr(catalog,'source_video',None) and getattr(player,'body_overlay',None) is not None)
+    if check_source_image:
+        player.on_render(0.,0.,export=False)
     def record():
-        records.append(dict(local_frame=player.frame,source_pts=int(catalog.pts[player.frame]),
-                            displayed_source_pts=int(player.sequence.state['pts'][player.frame]),
-                            source_seconds=float(catalog.seconds[player.frame])))
+        selected = int(catalog.pts[player.frame])
+        row = dict(local_frame=player.frame, source_pts=selected,
+                   displayed_source_pts=int(player.sequence.state['pts'][player.frame]),
+                   source_seconds=float(catalog.seconds[player.frame]))
+        if check_source_image:
+            if player.source_texture_pts != selected or player.source_error:
+                raise AssertionError(f'Original source image lost sync at PTS {selected}')
+            row['source_image_pts'] = player.source_texture_pts
+        records.append(row)
     record();player.toggle_animation(True)
     try:
         for expected in range(first+1,last+1):
             # Advance one exposure despite binary rounding around int(dt*fps).
             render_time=player._last_frame_rendered_at+(1.+1e-8)/fps
-            player.on_render(render_time,1./fps,export=True)
+            player.on_render(render_time,1./fps,export=not check_source_image)
             record()
             if player.frame!=expected:raise AssertionError('Continuous playback skipped or repeated a source exposure')
     finally:player.toggle_animation(False)
@@ -81,9 +91,18 @@ def continuous_playback(player,catalog,seconds):
     return dict(requested_seconds=[start,end],playback_fps=fps,source_time_base=list(catalog.time_base),
                 source_first_last_pts=[int(expected_pts[0]),int(expected_pts[-1])],
                 exposures=len(records),rendered_steps=last-first,no_skipped_or_repeated_exposures=continuous,
+                also_verified_native_source_images=check_source_image,
                 source_pts_deltas=np.diff(actual_pts).tolist(),records=records,
                 rendering_wall_seconds=elapsed,rendered_steps_per_wall_second=(last-first)/max(elapsed,1e-12),
                 wall_render_rate_is_not_source_playback_fps=True)
+
+
+def playback_ranges(requested):
+    if requested is None:
+        return []
+    if len(requested)==2 and all(np.isscalar(v) for v in requested):
+        return [requested]
+    return requested
 
 
 def verify(config,output,project=None,data_root=None,variants=('ref1102','obs1102','full1102'),seconds=(36.02,26.26),wear_inspection=False,view='free',boot_section=0,inspection_layers=(),fit_comparison_bounds=False,playback_seconds=None):
@@ -149,6 +168,7 @@ def verify(config,output,project=None,data_root=None,variants=('ref1102','obs110
             report['fresh_startup']=startup
         player.follow=False
         comparison_sequences={}
+        saved_body_digests={}
         if fit_comparison_bounds:
             for name in variants:
                 player.load_variant(name);comparison_sequences[name]=player.sequence
@@ -170,6 +190,22 @@ def verify(config,output,project=None,data_root=None,variants=('ref1102','obs110
                 player.on_render(0.,0.,export=False)
                 if catalog.source_video:
                     check('actual GUI source image matches selected exposure',player.source_texture_pts==int(catalog.pts[frame]) and not player.source_error,variant=name,source_pts=int(catalog.pts[frame]),source_texture_pts=player.source_texture_pts)
+                if catalog.config.get('source_body_observations_default'):
+                    if name not in saved_body_digests:
+                        with np.load(catalog.result_path(catalog.variant(name)),allow_pickle=False) as result:
+                            saved_body_digests[name]=str(result['source_observation_ledger_sha256'])
+                    source_rows = body_overlay_primitives(player.body_overlay,frame,show_model=False)
+                    with np.load(catalog.result_path(catalog.variant(name)),allow_pickle=False) as result:
+                        slots=np.flatnonzero(result['source_observation_objective_use'][frame])
+                        ids=result['source_body_model_joint_ids'][frame,slots]
+                        uv=result['source_uv_native'][frame,slots]
+                    check('source overlay uses selected candidate ledger and native pixels',
+                        player.body_overlay['ledger_sha256']==saved_body_digests[name]
+                        and np.array_equal(slots,[r['source_slot'] for r in source_rows])
+                        and np.array_equal(ids,[r['model_joint'] for r in source_rows])
+                        and np.array_equal(uv,np.asarray([r['points'] for r in source_rows]).reshape((-1,2))),
+                        variant=name,source_pts=int(catalog.pts[frame]),slots=slots.tolist(),
+                        model_ids=ids.tolist(),ledger_sha256=saved_body_digests[name])
                 before=geometry_digest(player.sequence)
                 player.on_render(0.,0.,export=True)
                 image=player.renderer.get_current_frame_as_image().convert('RGB')
@@ -226,10 +262,25 @@ def verify(config,output,project=None,data_root=None,variants=('ref1102','obs110
             montage.save(path)
             report['comparisons'].append(dict(image=str(path),same_pts_same_camera=True,framing=framing,camera={key:value.tolist() if isinstance(value,np.ndarray) else value for key,value in reference_camera.items()},panels=entries))
 
-        if playback_seconds is not None:
-            report['continuous_playback']=continuous_playback(player,catalog,playback_seconds)
-            check('continuous playback preserves every source exposure',report['continuous_playback']['no_skipped_or_repeated_exposures'],
-                  exposures=report['continuous_playback']['exposures'],source_first_last_pts=report['continuous_playback']['source_first_last_pts'],playback_fps=report['continuous_playback']['playback_fps'])
+        playbacks=[]
+        intervals = playback_ranges(playback_seconds)
+        if intervals:
+            starting_variant = player.variant['id']
+            playback_variants = variants if catalog.config.get('source_body_observations_default') else [starting_variant]
+            for variant in playback_variants:
+                player.load_variant(variant)
+                for interval in intervals:
+                    receipt=continuous_playback(player,catalog,interval)
+                    receipt['variant']=variant
+                    check('continuous playback preserves every source exposure',receipt['no_skipped_or_repeated_exposures'],
+                        exposures=receipt['exposures'],source_first_last_pts=receipt['source_first_last_pts'],
+                        playback_fps=receipt['playback_fps'],variant=variant)
+                    playbacks.append(receipt)
+            player.load_variant(starting_variant)
+        if playbacks:
+            report['continuous_playback']=playbacks[0]
+            if len(playbacks)>1:
+                report['continuous_playback_ranges']=playbacks
 
         # Exercise the player's actual source clock, independent of wall-clock
         # rendering speed. AITViewer on_render advances int((t-last)*fps).
@@ -289,7 +340,8 @@ def main():
     parser.add_argument('--boot-section',type=int,choices=[0,1,2,3],default=0,help='0: full shell, 1/2: remove fixed side, 3: remove side facing observing camera')
     parser.add_argument('--inspection-layers',nargs='*',choices=['footbed','cavity','axes'],default=[],help='Independent optional diagnostic overlays; default is a clean physical comparison')
     parser.add_argument('--fit-comparison-bounds',action='store_true',help='Diagnostic orthographic camera fitting all selected candidates at the same source PTS; keeps the requested view direction')
-    parser.add_argument('--playback-seconds',nargs=2,type=float,metavar=('START','END'),help='Render every exposure in this source interval through the actual playback clock and record its PTS')
+    parser.add_argument('--playback-seconds',nargs=2,type=float,action='append',metavar=('START','END'),
+                        help='Render every exposure in a source interval and record its PTS. May be supplied more than once.')
     args=parser.parse_args();report=verify(args.config,args.output,args.project,args.data_root,args.variants,args.seconds,args.wear_inspection,args.view,args.boot_section,args.inspection_layers,args.fit_comparison_bounds,args.playback_seconds)
     print(json.dumps(dict(passed=report['passed'],output=str(Path(args.output).resolve()),opengl=report.get('opengl'),error=report.get('error')),ensure_ascii=False),flush=True)
     raise SystemExit(0 if report['passed'] else 1)

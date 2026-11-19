@@ -1,0 +1,611 @@
+{
+  "schema": "rinkspace.rebuild.programme_scope.v1",
+  "event_id": "ankara_2026",
+  "programme_id": "nayeon_ko_sp",
+  "recorded_local_date": "2026-11-16",
+  "status": "required_scope_not_fit_acceptance",
+  "completed_scope": "source_acquisition_native_clock_programme_bounds_replay_alignment_shot_camera_proposal",
+  "fit_status": "provisional_final_with_open_visual_residuals",
+  "source": {
+    "id": "4orLyh1JO3M",
+    "url": "https://www.youtube.com/watch?v=4orLyh1JO3M",
+    "title": "Nayeon KO (KOR) | Junior Women Short Program | Ankara 2026",
+    "channel": "Skating ISU",
+    "channel_id": "UCVZpqbnDjHyScSYGFPMUtYA",
+    "registered_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\media\\originals\\4orLyh1JO3M.mp4",
+    "sha256": "5741215b9b77a79866d938309d5a8ef01e5e7b64c6f191c97c9b5a118d0dac1a",
+    "bytes": 118075260,
+    "format_id": "299",
+    "codec": "h264",
+    "width": 1920,
+    "height": 1080,
+    "clipped": false,
+    "crop": null,
+    "resize": null,
+    "original_time_offset_seconds": 0,
+    "official_event_result_url": "https://results.isu.org/results/season2627/jgptur2026/SEG003.htm",
+    "original_audio": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\media\\originals\\4orLyh1JO3M.m4a",
+      "sha256": "eaedefb459f35c0cc1e23f97be23b9c776f56af95965c4047b5085e41a35e9e4",
+      "bytes": 5554067,
+      "format_id": "140",
+      "language": "en-US",
+      "codec": "aac",
+      "time_base": "1/44100",
+      "start_pts": 0,
+      "role": "official_original_audio_separate_track"
+    }
+  },
+  "source_clock": {
+    "time_base_num": 1,
+    "time_base_den": 12800,
+    "native_pts_step": 256,
+    "native_fps_num": 50,
+    "native_fps_den": 1,
+    "first_pts": 0,
+    "last_pts": 4393984,
+    "native_frame_count": 17165,
+    "measured_pts_gaps": 0,
+    "independent_exposure_cadence": "unverified"
+  },
+  "required_shot_ids": [
+    "s02",
+    "s03",
+    "s04",
+    "s05",
+    "s06",
+    "s07",
+    "s08",
+    "s09",
+    "s10"
+  ],
+  "required_shot_count": 9,
+  "processing_scope": {
+    "first_pts": 266240,
+    "last_pts": 2411776,
+    "stop_pts_exclusive": 2412032,
+    "native_frame_count": 8382
+  },
+  "analysis_start": {
+    "first_pts": 237824,
+    "source_seconds": 18.58,
+    "selection_basis": "00:18.580 取在原声配乐进入前一帧附近，以保留完整开场。原声出现持续乐音约在 00:18.600，稍后开始可见起势。右下计时在 00:20.820 淡入可辨 0:00，00:21.560 跳到 0:01。",
+    "music_onset_seconds_approx": 18.6
+  },
+  "analysis_stop": {
+    "last_pts": 2411776,
+    "source_seconds": 188.42,
+    "selection_basis": "03:07.420 首次显示最后读数 2:47。取 03:08.420 为末帧，保留抬臂终止姿势在全身景中的定格。03:08.440 切入终场特写时姿势已成立，随后收势。",
+    "final_timer": "2:47",
+    "post_performance_closeup_first_pts": 2412032,
+    "post_performance_closeup_first_full_pts": 207194368
+  },
+  "programme_timer_cues": [
+    {
+      "display": "0:00",
+      "short_pts": 266496,
+      "full_pts": 204619008,
+      "appearance": "fade_in_legible"
+    },
+    {
+      "display": "0:01",
+      "short_pts": 275968,
+      "full_pts": 204630272,
+      "appearance": "first_display"
+    },
+    {
+      "display": "2:47",
+      "short_pts": 2398976,
+      "full_pts": 207178496,
+      "appearance": "first_display_then_held"
+    }
+  ],
+  "rig_bindings": {
+    "main": {
+      "rig_id": "main",
+      "camera_index": 0,
+      "physical_rig_alias": "main_long_side",
+      "installation_id": "ankara_2026/main_long_side/broadcast_session",
+      "label_zh": "长边主机位"
+    },
+    "secondary": {
+      "rig_id": "secondary",
+      "camera_index": 1,
+      "physical_rig_alias": "secondary_long_side",
+      "installation_id": "ankara_2026/secondary_long_side/broadcast_session",
+      "label_zh": "长边副机位"
+    },
+    "end": {
+      "rig_id": "end",
+      "camera_index": 2,
+      "physical_rig_alias": "low_end",
+      "installation_id": "ankara_2026/low_end/broadcast_session",
+      "label_zh": "低位端部"
+    }
+  },
+  "shots": [
+    {
+      "id": "s01",
+      "shot_index": 1,
+      "live_role": "live_performance",
+      "rig_id": "main",
+      "camera_index": 0,
+      "camera_assignment_human_confirmed": false,
+      "rig_binding_status": "adjacent_views_inference_pending_user_review",
+      "alternative_rig_ids": [
+        "secondary",
+        "end"
+      ],
+      "camera_evidence_zh": "00:16.840 的开场准备广景凭固定围挡对应低位端部 2。00:16.860 切入特写时，选手由侧面切为近正面。结合三台机位的相对位置和 00:20.800 切入的长边副机位 1，暂列长边主机位 0。S01 本身缺少可明确对应的固定场地特征。",
+      "processing": {
+        "first_pts": 237824,
+        "last_pts": 265984,
+        "stop_pts_exclusive": 266240,
+        "native_frame_count": 111
+      },
+      "representative_pts": 251904,
+      "cut_boundary_status": "verified_original_adjacent_pts; programme_crop",
+      "source_correspondence": {
+        "first_full_pts": 204584704,
+        "last_full_pts": 204618496,
+        "stop_full_pts_exclusive": 204618752,
+        "full_display_frame_count": 133,
+        "full_time_base_num": 1,
+        "full_time_base_den": 15360,
+        "best_match_to_first_short_pts": 204584704,
+        "best_match_to_last_short_pts": 204618496
+      },
+      "fitting_scope": "excluded_by_user_20261116"
+    },
+    {
+      "id": "s02",
+      "shot_index": 2,
+      "live_role": "live_performance",
+      "rig_id": "secondary",
+      "camera_index": 1,
+      "camera_assignment_human_confirmed": true,
+      "rig_binding_status": "user_confirmed_for_processing_20261116",
+      "alternative_rig_ids": [],
+      "camera_evidence_zh": "00:24.040 的 Wyndham 与相邻标牌对应金书贤 S03 00:38.920。00:39.600 的场边蓝棚和围挡对应 Chen Xi JIN S18 03:06.860。跨机位静态围挡点对照支持副机位。",
+      "processing": {
+        "first_pts": 266240,
+        "last_pts": 524800,
+        "stop_pts_exclusive": 525056,
+        "native_frame_count": 1011
+      },
+      "representative_pts": 506880,
+      "cut_boundary_status": "verified_hard_cut_on_both_native_sources",
+      "source_correspondence": {
+        "first_full_pts": 204618752,
+        "last_full_pts": 204929024,
+        "stop_full_pts_exclusive": 204929280,
+        "full_display_frame_count": 1213,
+        "full_time_base_num": 1,
+        "full_time_base_den": 15360,
+        "best_match_to_first_short_pts": 204618752,
+        "best_match_to_last_short_pts": 204929024
+      }
+    },
+    {
+      "id": "s03",
+      "shot_index": 3,
+      "live_role": "live_performance",
+      "rig_id": "end",
+      "camera_index": 2,
+      "camera_assignment_human_confirmed": true,
+      "rig_binding_status": "user_confirmed_for_processing_20261116",
+      "alternative_rig_ids": [],
+      "camera_evidence_zh": "00:43.940 的蓝棚、座席与围挡对应金书贤 S14 01:57.420。00:51.900 的端墙和长边汇聚方向对应 Chen Xi JIN S13。",
+      "processing": {
+        "first_pts": 525056,
+        "last_pts": 694784,
+        "stop_pts_exclusive": 695040,
+        "native_frame_count": 664
+      },
+      "representative_pts": 562432,
+      "cut_boundary_status": "verified_hard_cut_on_both_native_sources",
+      "source_correspondence": {
+        "first_full_pts": 204929280,
+        "last_full_pts": 205133312,
+        "stop_full_pts_exclusive": 205133568,
+        "full_display_frame_count": 798,
+        "full_time_base_num": 1,
+        "full_time_base_den": 15360,
+        "best_match_to_first_short_pts": 204929280,
+        "best_match_to_last_short_pts": 205133312
+      }
+    },
+    {
+      "id": "s04",
+      "shot_index": 4,
+      "live_role": "live_performance",
+      "rig_id": "secondary",
+      "camera_index": 1,
+      "camera_assignment_human_confirmed": true,
+      "rig_binding_status": "user_confirmed_for_processing_20261116",
+      "alternative_rig_ids": [],
+      "camera_evidence_zh": "00:59.760 的座席与围挡对应 Chen Xi JIN S16 02:45.800。01:21.640 的同一组 64 个固定围挡点，副机位视角重投影 P90 为 2.6 px，主机位为 8.4 px，低位端部为 13.2 px。",
+      "processing": {
+        "first_pts": 695040,
+        "last_pts": 1132288,
+        "stop_pts_exclusive": 1132544,
+        "native_frame_count": 1709
+      },
+      "representative_pts": 948736,
+      "cut_boundary_status": "verified_hard_cut_on_both_native_sources",
+      "source_correspondence": {
+        "first_full_pts": 205133568,
+        "last_full_pts": 205658368,
+        "stop_full_pts_exclusive": 205658624,
+        "full_display_frame_count": 2051,
+        "full_time_base_num": 1,
+        "full_time_base_den": 15360,
+        "best_match_to_first_short_pts": 205133568,
+        "best_match_to_last_short_pts": 205658368
+      }
+    },
+    {
+      "id": "s05",
+      "shot_index": 5,
+      "live_role": "live_performance",
+      "rig_id": "main",
+      "camera_index": 0,
+      "camera_assignment_human_confirmed": true,
+      "rig_binding_status": "user_confirmed_for_processing_20261116",
+      "alternative_rig_ids": [],
+      "camera_evidence_zh": "01:33.000 的端部窗柱、场边蓝棚和围挡透视对应 Chen Xi JIN S10 01:26.660。",
+      "processing": {
+        "first_pts": 1132544,
+        "last_pts": 1247744,
+        "stop_pts_exclusive": 1248000,
+        "native_frame_count": 451
+      },
+      "representative_pts": 1190400,
+      "cut_boundary_status": "verified_hard_cut_on_both_native_sources",
+      "source_correspondence": {
+        "first_full_pts": 205658624,
+        "last_full_pts": 205796864,
+        "stop_full_pts_exclusive": 205797120,
+        "full_display_frame_count": 541,
+        "full_time_base_num": 1,
+        "full_time_base_den": 15360,
+        "best_match_to_first_short_pts": 205658624,
+        "best_match_to_last_short_pts": 205796864
+      }
+    },
+    {
+      "id": "s06",
+      "shot_index": 6,
+      "live_role": "live_performance",
+      "rig_id": "end",
+      "camera_index": 2,
+      "camera_assignment_human_confirmed": true,
+      "rig_binding_status": "user_confirmed_for_processing_20261116",
+      "alternative_rig_ids": [],
+      "camera_evidence_zh": "01:55.560 的端墙大屏、玻璃门和近侧围挡斜向关系对应金书贤 S14 01:58.920。",
+      "processing": {
+        "first_pts": 1248000,
+        "last_pts": 1646336,
+        "stop_pts_exclusive": 1646592,
+        "native_frame_count": 1557
+      },
+      "representative_pts": 1479168,
+      "cut_boundary_status": "verified_hard_cut_on_both_native_sources",
+      "source_correspondence": {
+        "first_full_pts": 205797120,
+        "last_full_pts": 206275072,
+        "stop_full_pts_exclusive": 206275328,
+        "full_display_frame_count": 1868,
+        "full_time_base_num": 1,
+        "full_time_base_den": 15360,
+        "best_match_to_first_short_pts": 205797120,
+        "best_match_to_last_short_pts": 206275072
+      }
+    },
+    {
+      "id": "s07",
+      "shot_index": 7,
+      "live_role": "live_performance",
+      "rig_id": "main",
+      "camera_index": 0,
+      "camera_assignment_human_confirmed": true,
+      "rig_binding_status": "user_confirmed_for_processing_20261116",
+      "alternative_rig_ids": [],
+      "camera_evidence_zh": "02:13.400 的座席、围挡和广告接缝对应 Chen Xi JIN S05 00:48.260，02:19.200 同时对应金书贤 S08 01:10.300。",
+      "processing": {
+        "first_pts": 1646592,
+        "last_pts": 1815296,
+        "stop_pts_exclusive": 1815552,
+        "native_frame_count": 660
+      },
+      "representative_pts": 1707520,
+      "cut_boundary_status": "verified_hard_cut_on_both_native_sources",
+      "source_correspondence": {
+        "first_full_pts": 206275328,
+        "last_full_pts": 206478336,
+        "stop_full_pts_exclusive": 206478592,
+        "full_display_frame_count": 794,
+        "full_time_base_num": 1,
+        "full_time_base_den": 15360,
+        "best_match_to_first_short_pts": 206275328,
+        "best_match_to_last_short_pts": 206478336
+      }
+    },
+    {
+      "id": "s08",
+      "shot_index": 8,
+      "live_role": "live_performance",
+      "rig_id": "secondary",
+      "camera_index": 1,
+      "camera_assignment_human_confirmed": true,
+      "rig_binding_status": "user_confirmed_for_processing_20261116",
+      "alternative_rig_ids": [],
+      "camera_evidence_zh": "02:23.140 的固定围挡对应金书贤 S03 00:38.920。相同 49 点在副机位视角的 P90 为 1.4 px，主机位为 2.6 px，低位端部为 119.9 px。02:24.800 的座席和场边结构又与金书贤 S09 相符。",
+      "processing": {
+        "first_pts": 1815552,
+        "last_pts": 1890816,
+        "stop_pts_exclusive": 1891072,
+        "native_frame_count": 295
+      },
+      "representative_pts": 1853440,
+      "cut_boundary_status": "verified_hard_cut_on_both_native_sources",
+      "source_correspondence": {
+        "first_full_pts": 206478592,
+        "last_full_pts": 206568448,
+        "stop_full_pts_exclusive": 206568704,
+        "full_display_frame_count": 352,
+        "full_time_base_num": 1,
+        "full_time_base_den": 15360,
+        "best_match_to_first_short_pts": 206478592,
+        "best_match_to_last_short_pts": 206568448
+      }
+    },
+    {
+      "id": "s09",
+      "shot_index": 9,
+      "live_role": "live_performance",
+      "rig_id": "end",
+      "camera_index": 2,
+      "camera_assignment_human_confirmed": true,
+      "rig_binding_status": "user_confirmed_for_processing_20261116",
+      "alternative_rig_ids": [],
+      "camera_evidence_zh": "02:36.560 的端部窗框、广告与围挡交角对应 Chen Xi JIN S06 00:53.800。",
+      "processing": {
+        "first_pts": 1891072,
+        "last_pts": 2031872,
+        "stop_pts_exclusive": 2032128,
+        "native_frame_count": 551
+      },
+      "representative_pts": 2003968,
+      "cut_boundary_status": "verified_hard_cut_on_both_native_sources",
+      "source_correspondence": {
+        "first_full_pts": 206568704,
+        "last_full_pts": 206738176,
+        "stop_full_pts_exclusive": 206738432,
+        "full_display_frame_count": 663,
+        "full_time_base_num": 1,
+        "full_time_base_den": 15360,
+        "best_match_to_first_short_pts": 206568960,
+        "best_match_to_last_short_pts": 206738176
+      }
+    },
+    {
+      "id": "s10",
+      "shot_index": 10,
+      "live_role": "live_performance",
+      "rig_id": "main",
+      "camera_index": 0,
+      "camera_assignment_human_confirmed": true,
+      "rig_binding_status": "user_confirmed_for_processing_20261116",
+      "alternative_rig_ids": [],
+      "camera_evidence_zh": "02:49.440 的明和地所围挡与座席对应 Chen Xi JIN S15 02:39.020。03:06.360 的 105 个固定围挡点相对于金书贤 S03，主机位视角重投影 P90 约 1.4 px，副机位约 5.5 px。两处之间为同一连续摇镜。",
+      "processing": {
+        "first_pts": 2032128,
+        "last_pts": 2411776,
+        "stop_pts_exclusive": 2412032,
+        "native_frame_count": 1484
+      },
+      "representative_pts": 2168832,
+      "cut_boundary_status": "verified_hard_cut_on_both_native_sources",
+      "source_correspondence": {
+        "first_full_pts": 206738432,
+        "last_full_pts": 207194112,
+        "stop_full_pts_exclusive": 207194368,
+        "full_display_frame_count": 1781,
+        "full_time_base_num": 1,
+        "full_time_base_den": 15360,
+        "best_match_to_first_short_pts": 206738432,
+        "best_match_to_last_short_pts": 207194112
+      }
+    }
+  ],
+  "full_broadcast_correspondence": {
+    "source_id": "oxXu1avhrvs",
+    "url": "https://www.youtube.com/watch?v=oxXu1avhrvs",
+    "source_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\media\\originals\\oxXu1avhrvs.mp4",
+    "source_sha256": "f685d27882e78f2446c734ceee4321dcb275a5ad1ebf81ea90bca68c2fcec891",
+    "bytes": 3392134310,
+    "width": 1920,
+    "height": 1080,
+    "codec": "av1",
+    "native_display_fps": 60,
+    "time_base_num": 1,
+    "time_base_den": 15360,
+    "native_pts_step": 256,
+    "first_full_pts": 204584704,
+    "last_full_pts": 207194112,
+    "stop_full_pts_exclusive": 207194368,
+    "full_display_frames": 10194,
+    "mutual_matches": 8490,
+    "nonmutual_short_pts": [
+      248320,
+      1815552,
+      1896448
+    ],
+    "constant_offset_used": false,
+    "one_to_one_exposure_mapping_claimed": false,
+    "method": "native_pts_gray_mae_bidirectional_and_visual_cut_pair_check",
+    "frame_correspondence": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\intake_1116\\frame_correspondence.csv",
+      "sha256": "0bdd621d5a979d979bb7b75eb6b6d2272fd158738e56ba075c02d5ae41d6630a"
+    }
+  },
+  "geometry_binding_role": "Frozen input to the earlier programme fit; for the designated joint geometry use current_result.path -> geometry_binding.",
+  "geometry_binding": {
+    "version_id": "trapezoid_shared4_1116",
+    "status": "frozen_for_this_programme",
+    "registration": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\trapezoid_shared4_1116.json",
+      "sha256": "06e34c1b0740ca9689135bf91e36495a8a6d67fda1401d30b5e35d327ae8d0e9"
+    },
+    "snapshot": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\field\\trapezoid_shared4_1116.npz",
+      "sha256": "c7a630957b6dd453931489b22fee92570965ce71c5d336904ff2df26646718c3"
+    },
+    "structure": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\field\\trapezoid_shared4_1116.json",
+      "sha256": "521ed7e9d0d0ef0e473e9ed9328c56af90356fd6871674cb8caffed498cbd52f"
+    },
+    "native_library": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\build\\jin_lane_goal_1110\\rinkspace_core.dll",
+      "sha256": "19d377e4770f26f34ada0028c9428da8cd8372cc7dd1c7e5ea274f96e1d20a5e"
+    },
+    "value_sha256": "13bd87094a58b3433eaf25cf67738e6bc26ce13ffdd594f1c1b7f17f118f2a59",
+    "layout_revision": "bf2af6c9d8350f47441e41dca634eeda32509ed2d8b7d2045e99cc87420db58b",
+    "scene_parameters_active": false,
+    "candidate_registration": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\trapezoid_shared4_1116.json"
+  },
+  "camera_assignment_evidence": {
+    "source_clock": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\intake_1116\\shot_clock.json",
+      "sha256": "444d7ff1042a04557dd38da517b0b1f4dd113ff029e3350631ede2aaea067a6f"
+    },
+    "representative_sheet": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\intake_1116\\shot_representatives.jpg",
+      "sha256": "c0fdcce6c4d9a7ba1b9bac7c4b130a41c2695ab96f54f5ae059c6ff2ea2685f7"
+    },
+    "source_clock_timer_sheet": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\intake_1116\\timer_two_sources.jpg",
+      "sha256": "863f367d3b757cadd7d6a9bfe03134b32bb45bb6ed7495adb25e6015ef23d35b"
+    },
+    "opening_audio_spectrum": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\intake_1116\\audio_opening.jpg",
+      "sha256": "22f1dad615b5818ddaf5a6dcb2cbdce0e60deb27816906bc653035887e3e6300"
+    },
+    "opening_and_finish_frames": [
+      {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\intake_1116\\opening_views.jpg",
+        "sha256": "f784bc6d6e46301c9ca119030b3dc8ccb44cd4ab72675b8e79be07fd9cd96bd7"
+      },
+      {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\intake_1116\\ending_detail.jpg",
+        "sha256": "d63e6f1b67f0dc3f85baf3549155b10aae322bc1b398a53e54d846a4ea8c38a7"
+      }
+    ],
+    "cut_pairs": [
+      {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\intake_1116\\cut_pairs_two_sources_1.jpg",
+        "sha256": "40ac7be905c831248cb1ee29120be611336cf5b234df25c22fc08757a65f022e"
+      },
+      {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\intake_1116\\cut_pairs_two_sources_2.jpg",
+        "sha256": "bda2e4c1741ba70fa0b000d909112a24f9d0bef545e40eb551773c8063c9eafe"
+      }
+    ],
+    "camera_reference_pairs": [
+      {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\intake_1116\\camera_reference_pairs_1.jpg",
+        "sha256": "ba13322578a64cf745024fb2205ffafa1d4f6bb94f74f0a77238e79f5d579bb3"
+      },
+      {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\intake_1116\\camera_reference_pairs_2.jpg",
+        "sha256": "8af4f9d46a60996b45292ce5e00c8cbd052afd8ab7c2a56065f6af194e5d4e7b"
+      }
+    ],
+    "static_scene_matches": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\intake_1116\\camera_transfer_matches.json",
+      "sha256": "76bacaf03b0654b942101b911bc03775a4a7abf3cc7d06f76bc881983f7ec33e"
+    },
+    "static_board_viewpoint_check": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\intake_1116\\camera_centre_diagnostic.json",
+      "sha256": "15ff7d349649e08055e07bbaa9521121d04af845b03195974f0387f238fd33ab"
+    },
+    "opening_adjacent_viewpoints": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\intake_1116\\opening_reference_viewpoints.json",
+      "sha256": "ef2e3ff1c936a1059ec30eba95bd46f18f1be25c1515b1ddf73cd9dffa73bea5"
+    }
+  },
+  "camera_assignment_user_decision": {
+    "date": "2026-11-16",
+    "source": "user_instruction",
+    "confirmed_fit_shot_ids": [
+      "s02",
+      "s03",
+      "s04",
+      "s05",
+      "s06",
+      "s07",
+      "s08",
+      "s09",
+      "s10"
+    ],
+    "excluded_fit_shot_ids": [
+      "s01"
+    ]
+  },
+  "performance_scope": {
+    "first_pts": 237824,
+    "last_pts": 2411776,
+    "stop_pts_exclusive": 2412032,
+    "native_frame_count": 8493
+  },
+  "excluded_fit_shot_ids": [
+    "s01"
+  ],
+  "current_result": {
+    "path": "events/ankara_2026/programmes/nayeon_ko_sp/s14_boards_1118.json",
+    "sha256": "63235cd23ecb6428083f1a2441b6b68aef1efd9375dcd8b80bc1cffd7364a85d",
+    "version_id": "s14_boards_1118",
+    "geometry_version_id": "lane4_side_1118",
+    "designation": "provisional_final",
+    "user_visual_acceptance": false
+  },
+  "current_grid_fit": {
+    "path": "events/ankara_2026/programmes/nayeon_ko_sp/s14_boards_1118.json",
+    "sha256": "63235cd23ecb6428083f1a2441b6b68aef1efd9375dcd8b80bc1cffd7364a85d"
+  },
+  "last_rejected_grid_fit": {
+    "version": "joint_polish",
+    "record": {
+      "path": "fit_1116.json",
+      "sha256": "dbe1e695fc6acff1b46e14d07a781bd786e85f01b62aa2ac5ff8810e5720cbdc",
+      "bytes": 58009
+    },
+    "camera": {
+      "path": "camera_fit_1116.npz",
+      "sha256": "3ad76674d94e7435b262f17bc89282d9bd85c28e4f84ad6d29dcd2799ae5f136",
+      "bytes": 208763
+    },
+    "footage_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\final_review\\nayeon_ko_ankara_grid_1080p50.mp4"
+  },
+  "historical_visual_rework_1116": {
+    "path": "visual_rework_1116.json",
+    "sha256": "b97af2ef307195f4d8a410617ae17aba885719853d9b2be5bc63c2d26fa445e2",
+    "bytes": 27189
+  },
+  "historical_grid_review_1116": {
+    "version": "trapezoid_shared4_1116",
+    "record": {
+      "path": "trapezoid_shared4_review_1116.json",
+      "sha256": "6c9d7e10c831a05e21b3ef5c5a4ebbd72351870ccc06907db9e8a2d28bfa0106",
+      "bytes": 21943
+    },
+    "camera": {
+      "path": "camera_trapezoid_shared4_1116.npz",
+      "sha256": "0513d4917aeb23da9d2fa7187b077cc6c81b38b88f0b2b6de249f7cb737d7d79",
+      "bytes": 209617
+    },
+    "footage_path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\nayeon_ko_sp\\fit_1116\\shared4_rework\\review_1116\\nayeon_ko_trapezoid_shared4_1080p50.mp4",
+    "visual_acceptance": "open_visual_residuals"
+  }
+}

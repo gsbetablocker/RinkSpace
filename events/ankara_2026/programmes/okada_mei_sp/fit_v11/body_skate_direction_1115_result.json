@@ -1,0 +1,414 @@
+{
+  "schema": "rinkspace.okada_left_skate_direction.v1",
+  "programme": "okada_mei_sp",
+  "title": "左脚鞋刀朝向与连续动作修正",
+  "source_seconds": [
+    22.12,
+    188.68
+  ],
+  "source_time_base": [
+    1,
+    12800
+  ],
+  "source_frames": 8329,
+  "changed_native_frames": 8329,
+  "physical_left_foot": 0,
+  "project_artifacts": {
+    "controls": {
+      "path": "events/ankara_2026/programmes/okada_mei_sp/fit_v11/body_skate_direction_1115_controls.npz",
+      "sha256": "9611112c7b24d0562ed058ab6fe3e43763a05f25f6bd74b7348104ec6e12d030",
+      "bytes": 4841149
+    },
+    "directed_source": {
+      "path": "events/ankara_2026/programmes/okada_mei_sp/fit_v11/body_skate_direction_1115.json",
+      "sha256": "4af31bd3c6b595792eab1e5cf2e2613c4fb40c89822f829e1596e2bb1ca46f2a",
+      "bytes": 190129
+    }
+  },
+  "data_root_artifacts": {
+    "comparison_video": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/source_motion_1115/delivery/source_motion_comparison.mp4",
+      "sha256": "5b0e214648a5a11ec24d544a5ae934574730b1146bb8f0cd5a4ba390ea85535d",
+      "bytes": 215723573
+    },
+    "comparison_clock": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/source_motion_1115/delivery/source_clock.json",
+      "sha256": "42dcb6010a1afdbe1074d02302882fd529aaa993a69666998f80c4763789761d",
+      "bytes": 114966
+    },
+    "resume_checkpoint": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/source_motion_1115/direction_turns/solve/candidate.npz",
+      "sha256": "e948ac53840f4a192c0a2dcdfebf158f0a8659a36708f029e2d42a90dd5240a0",
+      "bytes": 15802145
+    },
+    "main_log": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/source_motion_1115/direction_turns/progress.jsonl",
+      "sha256": "f9b3a483876d0120e9411b1bafe872b2daa39781150462a2891a2d9f49fd69bc",
+      "bytes": 94054
+    },
+    "source_evidence": {
+      "path": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/source_motion_1115/input/source.json",
+      "sha256": "43cc3526d9ead5ef1087f1dee9c4b4c1e2b345a02fa4c43fd66179bd4ebf3f78",
+      "bytes": 31038046
+    }
+  },
+  "model": {
+    "shared_body_and_boot_geometry_fixed": true,
+    "registered_camera_fixed": true,
+    "continuous_native_body_controls": true,
+    "actual_mesh_projection_nodes": 5,
+    "compact_replay_matches_full_checkpoint": true
+  },
+  "verification": {
+    "controls": {
+      "event": "final_controls_saved",
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\body_skate_direction_1115_controls.npz",
+      "bytes": 4841149,
+      "sha256": "9611112c7b24d0562ed058ab6fe3e43763a05f25f6bd74b7348104ec6e12d030",
+      "full_checkpoint": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\structure_camera_1108\\audit_af48_1113\\source_motion_1115\\direction_turns\\solve\\candidate.npz",
+      "full_checkpoint_sha256": "e948ac53840f4a192c0a2dcdfebf158f0a8659a36708f029e2d42a90dd5240a0",
+      "full_native_frames": 8329,
+      "changed_native_frames": 8329,
+      "scope_seconds": [
+        22.12,
+        188.68
+      ],
+      "compact_and_full_mesh_identical_at_source_seconds": [
+        22.12,
+        26.44,
+        27.44,
+        29.16,
+        44.2,
+        133.74,
+        159.0,
+        159.2,
+        159.4,
+        188.68
+      ],
+      "shared_geometry_unchanged": true,
+      "camera_unchanged": true,
+      "user_accepted": false
+    },
+    "directed_source_fit": {
+      "event": "final_directed_source_comparison",
+      "results": [
+        {
+          "label": "before",
+          "count": 61,
+          "median_px": 15.074161999030913,
+          "p95_px": 80.28279101745154,
+          "maximum_px": 109.07708361268341,
+          "source_27_44": [
+            {
+              "feature": "heel",
+              "source_uv": [
+                1187,
+                878
+              ],
+              "projected_uv": [
+                1193.6557519468915,
+                876.1110134122417
+              ],
+              "pixel_error": 6.9186201158382135
+            },
+            {
+              "feature": "toe",
+              "source_uv": [
+                1131,
+                886
+              ],
+              "projected_uv": [
+                1106.9088637804484,
+                897.8099200541858
+              ],
+              "pixel_error": 26.8301519942629
+            },
+            {
+              "feature": "runner_rear",
+              "source_uv": [
+                1197,
+                910
+              ],
+              "projected_uv": [
+                1198.6875612590434,
+                905.7988578535383
+              ],
+              "pixel_error": 4.527411880732874
+            }
+          ]
+        },
+        {
+          "label": "after",
+          "count": 61,
+          "median_px": 1.4758607610203045,
+          "p95_px": 7.747712095996445,
+          "maximum_px": 9.593824357258235,
+          "source_27_44": [
+            {
+              "feature": "heel",
+              "source_uv": [
+                1187,
+                878
+              ],
+              "projected_uv": [
+                1186.9655362234835,
+                878.474055781903
+              ],
+              "pixel_error": 0.4753068863875317
+            },
+            {
+              "feature": "toe",
+              "source_uv": [
+                1131,
+                886
+              ],
+              "projected_uv": [
+                1131.0155050791632,
+                885.8703433888602
+              ],
+              "pixel_error": 0.13058041312584256
+            },
+            {
+              "feature": "runner_rear",
+              "source_uv": [
+                1197,
+                910
+              ],
+              "projected_uv": [
+                1196.9660095836707,
+                909.4073136735233
+              ],
+              "pixel_error": 0.5936601974149114
+            }
+          ]
+        }
+      ],
+      "interpretation": "Error to61 visually estimated development source points, not an independent accuracy measurement; source normalization4-10 px is engineering uncertainty."
+    },
+    "visible_source_outline_review": {
+      "parameters": [
+        {
+          "label": "before",
+          "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\structure_camera_1108\\audit_af48_1113\\source_motion_1115\\source_resume\\solve\\candidate.npz",
+          "sha256": "57746730ef9d5ccf052eceb52625c2241d798ac9283e590fe09ebf9af6fca404"
+        },
+        {
+          "label": "current",
+          "path": "D:\\CodexData\\RinkSpace_Data\\runs\\body_s01_20261029\\structure_camera_1108\\audit_af48_1113\\source_motion_1115\\direction_turns\\solve\\last_accepted.npz",
+          "sha256": "e948ac53840f4a192c0a2dcdfebf158f0a8659a36708f029e2d42a90dd5240a0"
+        }
+      ],
+      "event": "whole_left_shoe_source_check",
+      "documented_excluded_source_pts": [
+        1054720,
+        1059072
+      ],
+      "scope": "visible native exposures except two source-confirmed advertisement mistracks; remaining development masks may include partial shoes, not independent acceptance",
+      "shots": [
+        {
+          "shot": "s01",
+          "count": 828,
+          "before_median_px": 3.6506070689911967,
+          "current_median_px": 3.3169243887591815,
+          "before_p95_px": 10.131052962653339,
+          "current_p95_px": 7.369448829982268,
+          "before_mean_iou": 0.6881228024033936,
+          "current_mean_iou": 0.7167950788653232
+        },
+        {
+          "shot": "s02",
+          "count": 287,
+          "before_median_px": 4.044280760808444,
+          "current_median_px": 3.518615381441363,
+          "before_p95_px": 14.716285611222174,
+          "current_p95_px": 9.31721076461295,
+          "before_mean_iou": 0.6764268676149865,
+          "current_mean_iou": 0.7269460297732061
+        },
+        {
+          "shot": "s03",
+          "count": 41,
+          "before_median_px": 4.120483051453237,
+          "current_median_px": 4.175737186861534,
+          "before_p95_px": 10.849395623532333,
+          "current_p95_px": 13.005083850721899,
+          "before_mean_iou": 0.7164955032566991,
+          "current_mean_iou": 0.7122746998610672
+        },
+        {
+          "shot": "s04",
+          "count": 521,
+          "before_median_px": 4.039018178829106,
+          "current_median_px": 3.4550338977083825,
+          "before_p95_px": 14.033976580675315,
+          "current_p95_px": 10.962137203172428,
+          "before_mean_iou": 0.6652123586821008,
+          "current_mean_iou": 0.7051093883365742
+        },
+        {
+          "shot": "s05",
+          "count": 778,
+          "before_median_px": 4.723601134608346,
+          "current_median_px": 3.613327365849133,
+          "before_p95_px": 15.256341590396168,
+          "current_p95_px": 11.57971389573635,
+          "before_mean_iou": 0.6557217555669712,
+          "current_mean_iou": 0.7085309268011847
+        },
+        {
+          "shot": "s06",
+          "count": 353,
+          "before_median_px": 4.09582570172621,
+          "current_median_px": 3.270948462227195,
+          "before_p95_px": 10.253359357936068,
+          "current_p95_px": 8.534017091003756,
+          "before_mean_iou": 0.6961324113103275,
+          "current_mean_iou": 0.746718611222716
+        },
+        {
+          "shot": "s07",
+          "count": 851,
+          "before_median_px": 3.810796932215453,
+          "current_median_px": 3.125409887003216,
+          "before_p95_px": 9.825865107856163,
+          "current_p95_px": 7.154297561358132,
+          "before_mean_iou": 0.6819978124126412,
+          "current_mean_iou": 0.7250586891989339
+        },
+        {
+          "shot": "s08",
+          "count": 181,
+          "before_median_px": 4.649136553310623,
+          "current_median_px": 3.523948736861004,
+          "before_p95_px": 15.623959588505198,
+          "current_p95_px": 8.084280032387202,
+          "before_mean_iou": 0.6761300778613724,
+          "current_mean_iou": 0.737117386530574
+        },
+        {
+          "shot": "s09",
+          "count": 1626,
+          "before_median_px": 4.585945326744395,
+          "current_median_px": 3.8669498408253338,
+          "before_p95_px": 11.532881562575362,
+          "current_p95_px": 8.524197317465156,
+          "before_mean_iou": 0.6681505996413853,
+          "current_mean_iou": 0.7098611644425953
+        }
+      ],
+      "worsened": [
+        {
+          "seconds": 158.94,
+          "before": 5.781391868379356,
+          "current": 15.180885221626855
+        },
+        {
+          "seconds": 158.96,
+          "before": 6.6319564495705405,
+          "current": 15.908211976005912
+        },
+        {
+          "seconds": 159.08,
+          "before": 4.186775847140223,
+          "current": 12.537559990712595
+        },
+        {
+          "seconds": 158.98,
+          "before": 7.701521201805512,
+          "current": 16.04300920515484
+        },
+        {
+          "seconds": 95.96,
+          "before": 10.385766391036245,
+          "current": 17.918736000322763
+        },
+        {
+          "seconds": 95.94,
+          "before": 8.58995482968518,
+          "current": 15.154215649466192
+        },
+        {
+          "seconds": 96.02,
+          "before": 8.74075051990213,
+          "current": 15.125982496432183
+        },
+        {
+          "seconds": 26.36,
+          "before": 9.039969137984924,
+          "current": 14.758882680731048
+        },
+        {
+          "seconds": 49.46,
+          "before": 3.6616878769002925,
+          "current": 9.244906133065818
+        },
+        {
+          "seconds": 25.72,
+          "before": 5.156059432500807,
+          "current": 10.70464943123
+        },
+        {
+          "seconds": 163.2,
+          "before": 13.096309123266256,
+          "current": 18.614503380970906
+        },
+        {
+          "seconds": 44.28,
+          "before": 4.8288769985362405,
+          "current": 10.340378376012819
+        }
+      ]
+    },
+    "adjacent_native_motion": {
+      "event": "final_native_continuity_check",
+      "checkpoint_sha256": "e948ac53840f4a192c0a2dcdfebf158f0a8659a36708f029e2d42a90dd5240a0",
+      "native_frames": 8329,
+      "all_body_FK_finite": true,
+      "same_shot_only": true,
+      "before_left_foot_rad_per_s": {
+        "median": 5.151365251761013,
+        "p95": 15.990099423174131,
+        "maximum": 39.843351753144496
+      },
+      "current_left_foot_rad_per_s": {
+        "median": 5.555370123819001,
+        "p95": 16.13581894121892,
+        "maximum": 45.6035539121767
+      },
+      "current_largest_step_source_seconds": [
+        48.56,
+        48.58,
+        48.54,
+        49.92,
+        48.6,
+        49.9
+      ],
+      "interpretation": "Adjacent SO3 diagnostic, not a physical speed measurement or nonincrease gate. Fastest native steps occur outside the directed26-29,44,133.74,159 s corrections.",
+      "full_source_review_limits": "Some source silhouettes are partial or blurred; documented background-advertisement mistracks excluded. Residual boot/cuff alignment errors remain, including158.94-159.08 and occluded95.94-96.02. No all-frame accuracy claim.",
+      "user_accepted": false
+    },
+    "source_pixel_unchanged": true,
+    "encoded_frames": 8329,
+    "encoded_source_samples": [
+      27.44,
+      159.2
+    ],
+    "related_unit_tests": "27 passed: test_scoped_motion_step.py and test_action_objective_context.py",
+    "renderer_verification": "Serial/process output identical; body-cache output identical at27.44,29.16,159.40; compact/full actual body and skate vertices identical at10 source exposures."
+  },
+  "observed_improvements": [
+    "27.44秒左鞋过大的侧面投影收回，鞋头、鞋跟和刀尾贴近原片",
+    "26-29秒及44秒附近的连续转脚方向修正",
+    "133.74秒倾斜鞋方向及159秒支撑脚正面/两侧朝向修正"
+  ],
+  "limits": [
+    "图像取点是开发用近似读数，误差统计不是独立准确性认证。",
+    "部分遮挡、运动模糊和鞋口轮廓仍有局部错位；包括95.94-96.02、158.94-159.08秒。",
+    "整段参数和视频已检查；未将逐帧运动自然性或真实三维准确性声明为全部验收通过。"
+  ],
+  "user_accepted": false,
+  "superseded_comparison_media": {
+    "result": "events/ankara_2026/programmes/okada_mei_sp/fit_v11/body_skate_whole_1115_result.json",
+    "reason": "同一比较视频路径已被全节目修订复用；本历史记录的旧视频SHA和旧模型保持原样，当前媒体以新结果绑定为准"
+  }
+}

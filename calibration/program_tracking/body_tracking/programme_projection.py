@@ -50,7 +50,7 @@ def difference(actual, expected, label, maximum, tolerance=2e-9):
         raise ValueError('Final parameter/result state differs: ' + label + ' ' + str(error))
 
 
-def source_rows(project, assets, pts, *, review_evidence=None):
+def source_rows(project, assets, pts, *, review_evidence=None, allow_missing_review_source=False):
     """Copy explicitly saved source fields verbatim; retain per-row IDs/status."""
     config_path = project / PROGRAMME / 'viewer3d_source_fusion_support_1106.json'
     config = read(config_path)
@@ -61,10 +61,15 @@ def source_rows(project, assets, pts, *, review_evidence=None):
     result = {key: copy.deepcopy(original.get(key, [])) for key in SOURCE_FIELDS}
     lookup = {int(p): i for i, p in enumerate(pts)}
     additions=[]
+    missing=[]
     if review_evidence is not None:
         evidence=read(review_evidence)
         for episode in evidence.get('additional_unassigned_source_episodes',[]):
             source_path=Path(episode['source_file'])
+            if allow_missing_review_source and not source_path.is_file():
+                missing.append(dict(episode_id=episode['id'],path=str(source_path),sha256=episode['source_sha256'],
+                                    source_pts=[int(group['pts']) for group in episode['groups']]))
+                continue
             if digest(source_path)!=episode['source_sha256']:
                 raise ValueError('Additional source review file changed: '+str(source_path))
             raw=read(source_path)
@@ -112,6 +117,7 @@ def source_rows(project, assets, pts, *, review_evidence=None):
         copied_fields=list(SOURCE_FIELDS), copied_counts={k: len(v) for k, v in result.items()},
         original_source_ids_pts_roles_visibility_uncertainty_preserved=True,
         no_interpolation=True, new_source_observations=len(additions),additional_source_rows=additions,
+        missing_review_source=missing,
         review_evidence=None if review_evidence is None else dict(path=str(review_evidence),sha256=digest(review_evidence)))
     return result, status, binding
 
@@ -195,7 +201,7 @@ def boot_outline(equipment, faces):
 
 
 def generate(project, prepared, parameter, result, output, *, variant=VARIANT, review_evidence=None,
-             source_evidence=None, batch_frames=512, replay_fit_binding=None):
+             source_evidence=None, batch_frames=512, replay_fit_binding=None, allow_missing_review_source=False):
     project, prepared, parameter, result, output = map(lambda p: Path(p).resolve(),
                                                      (project, prepared, parameter, result, output))
     source_evidence = prepared/'source_evidence.json' if source_evidence is None else Path(source_evidence).resolve()
@@ -311,7 +317,8 @@ def generate(project, prepared, parameter, result, output, *, variant=VARIANT, r
         difference(midO * ratio, exported['skate_origin_world_mid'][frames], 'skate_origin_world_mid_m', replay_errors)
         print(json.dumps(dict(event='programme_projection', completed=int(frames[-1] + 1), total=n)), flush=True)
     source, source_status, source_binding = source_rows(project, assets, pts,
-        review_evidence=source_evidence if review_evidence is None else review_evidence)
+        review_evidence=source_evidence if review_evidence is None else review_evidence,
+        allow_missing_review_source=allow_missing_review_source)
     axes = blade_axes_diagnostics(rotations)
     rates = np.full((n, 2), np.nan)
     F = rotations[..., :, 0]

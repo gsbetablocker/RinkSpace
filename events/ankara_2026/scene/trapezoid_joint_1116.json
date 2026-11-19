@@ -1,0 +1,166 @@
+{
+  "schema": "rinkspace.event_geometry_review_candidate.v1",
+  "event_id": "ankara_2026",
+  "version_id": "trapezoid_joint_1116",
+  "status": "candidate_pending_visual_acceptance",
+  "geometry_binding": {
+    "version_id": "trapezoid_joint_1116",
+    "status": "source_review_candidate",
+    "registration": {
+      "path": "events/ankara_2026/scene/provisional_final_1113.json",
+      "sha256": "41598458e2ad62cebb10a4e39193a03098bcafeff41c1d2bd8d0a9e37f8526ad"
+    },
+    "snapshot": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\field\\trapezoid_joint_1116.npz",
+      "sha256": "dd85063b9c9a7b378b1f2adbcb58df0c78408fd2251b2c29de07878decfe619c"
+    },
+    "structure": {
+      "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\field\\trapezoid_joint_1116.json",
+      "sha256": "60f50cf92de9b3649c87527b797aec8d7138c20bf8a5f8684874b47c4af523f2"
+    },
+    "native_library": {
+      "path": "D:\\CodexData\\RinkSpace_Data\\build\\jin_lane_goal_1110\\rinkspace_core.dll",
+      "sha256": "19d377e4770f26f34ada0028c9428da8cd8372cc7dd1c7e5ea274f96e1d20a5e"
+    },
+    "value_sha256": "13bd87094a58b3433eaf25cf67738e6bc26ce13ffdd594f1c1b7f17f118f2a59",
+    "layout_revision": "4c189cc229591d0688f559b59d5a51971f818647eaf8327324fd1079284be5bb",
+    "scene_parameters_active": false,
+    "candidate_registration": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\trapezoid_joint_1116.json"
+  },
+  "reference_geometry": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\provisional_final_1113.json",
+    "sha256": "41598458e2ad62cebb10a4e39193a03098bcafeff41c1d2bd8d0a9e37f8526ad"
+  },
+  "revised_path_ids": [
+    "demo_initial/goal_trapezoid_left_lower_outer:0",
+    "demo_initial/goal_trapezoid_left_upper_outer:0",
+    "demo_initial/goal_trapezoid_right_lower_outer:0",
+    "demo_initial/goal_trapezoid_right_upper_outer:0"
+  ],
+  "unchanged_path_count": 918,
+  "world_coordinates": {
+    "units": "rink length L=1",
+    "axes": "registered Ankara origin and axes",
+    "z": 0,
+    "segments_goal_to_board": {
+      "demo_initial/goal_trapezoid_left_lower_outer:0": [
+        [
+          -0.43085740570279724,
+          -0.059353573834716684,
+          0.0
+        ],
+        [
+          -0.5,
+          -0.06898737030213009,
+          0.0
+        ]
+      ],
+      "demo_initial/goal_trapezoid_left_upper_outer:0": [
+        [
+          -0.4312078166687136,
+          0.051818821916388064,
+          0.0
+        ],
+        [
+          -0.5,
+          0.07019741713026603,
+          0.0
+        ]
+      ],
+      "demo_initial/goal_trapezoid_right_lower_outer:0": [
+        [
+          0.4334795836973189,
+          -0.055397360919270944,
+          0.0
+        ],
+        [
+          0.5,
+          -0.06695680488168582,
+          0.0
+        ]
+      ],
+      "demo_initial/goal_trapezoid_right_upper_outer:0": [
+        [
+          0.432699349923797,
+          0.055219245968558935,
+          0.0
+        ],
+        [
+          0.5,
+          0.07350331643998805,
+          0.0
+        ]
+      ]
+    }
+  },
+  "camera_patch": {
+    "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\scene\\trapezoid_joint_1116_camera_patch.npz",
+    "sha256": "8ed4fe57e8c3d191243a7af6714c2fcaf7a8fd8acb74389144c9873cb687708f"
+  },
+  "programmes": {
+    "chen_xi_jin_sp": {
+      "source": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\media\\originals\\f0K6hM9vj7Y.mp4",
+        "sha256": "0ff79216ea2246f73c6893a29809bb08d5052f7745bacd0783fc11da98b0323d"
+      },
+      "baseline_camera": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\chen_xi_jin_sp\\camera_s12_ad1_1116.npz",
+        "sha256": "fac35468b6d9065a374c46f1c0d8f119a5aeddb74e9fcc0d0e2f5d7772a2a940"
+      },
+      "changed_shots": {
+        "s18": {
+          "control_arrays_prefix": "chen_s18",
+          "controls_with_change": 178,
+          "first_native_pts": 2363136,
+          "last_native_pts": 2444032
+        }
+      }
+    },
+    "okada_mei_sp": {
+      "source": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\programmes\\okada_mei_sp\\Mei OKADA (JPN) ｜ Junior Women Short Program ｜ Ankara 2026.mp4",
+        "sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d"
+      },
+      "baseline_camera": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\okada_mei_sp\\fit_v11\\joint_review_1113_camera.npz",
+        "sha256": "2e0fc2705fd5e2935ac87037e6681c7d031a55f83827bfd8e3e8e3fc6d58799c"
+      },
+      "changed_shots": {
+        "s02": {
+          "control_arrays_prefix": "okada_s02",
+          "controls_with_change": 334,
+          "first_native_pts": 575744,
+          "last_native_pts": 720640
+        },
+        "s08": {
+          "control_arrays_prefix": "okada_s08",
+          "controls_with_change": 243,
+          "first_native_pts": 1742848,
+          "last_native_pts": 1837824
+        }
+      }
+    },
+    "jin_shuxian_sp": {
+      "source": {
+        "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\media\\originals\\SW1IewLFUyI.mp4",
+        "sha256": "1c1742c3381369292570f98676ff99ee4ef9caff76f06399d847fc68966bcd27"
+      },
+      "baseline_camera": {
+        "path": "D:\\OneDrive\\codex_projs\\RinkSpace\\events\\ankara_2026\\programmes\\jin_shuxian_sp\\stability_review_1113_camera.npz",
+        "sha256": "1b3f505d5a28f490a533e4fb6b9305d7447446546bc3eaf5a3fa9005574fa16c"
+      },
+      "changed_shots": {
+        "s09": {
+          "control_arrays_prefix": "jin_s09",
+          "controls_with_change": 157,
+          "first_native_pts": 925696,
+          "last_native_pts": 1001472
+        }
+      }
+    }
+  },
+  "source_audit": {
+    "path": "D:\\CodexData\\RinkSpace_Data\\events\\ankara_2026\\scene\\trapezoid_joint_1116\\final_audit.json",
+    "sha256": "f9e50dc7acd4f8440d9c1c8b4d20a9a8050b738e44e3c3a149dd83649ddacda8"
+  }
+}

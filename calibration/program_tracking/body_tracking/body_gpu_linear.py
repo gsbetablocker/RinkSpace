@@ -242,10 +242,13 @@ class DeviceCSRLayout:
             if not reused:
                 self.epoch+=1
                 self.shape=shape
-                self.row=ptr
-                self.columns=col
-                self.row_device=torch.from_numpy(ptr).to('cuda')
-                self.columns_device=torch.from_numpy(col).to('cuda')
+                # Own the reference structure: callers may reuse and edit a
+                # CSR buffer after upload. Aliases would make a changed layout
+                # compare equal while the device still holds the old indices.
+                self.row=ptr.copy()
+                self.columns=col.copy()
+                self.row_device=torch.from_numpy(self.row).to('cuda')
+                self.columns_device=torch.from_numpy(self.columns).to('cuda')
                 if prefix:
                     self.columns_device.sub_(prefix)
                 layout_bytes=ptr.nbytes+col.nbytes
@@ -339,6 +342,10 @@ class GPUJacobian(LinearOperator):
     def __init__(self,matrix,*,shared_prefix=0,column_stop=None,session=None,layout=None):
         import torch
         self.torch=torch;matrix=matrix.tocsr();self.prefix=int(shared_prefix);self._gram=None
+        # A layout's diagnostic counter starts at one and is not a global
+        # numeric identity. This token stays unique for this linearization,
+        # including when a shared cuDSS session outlives the operator/layout.
+        self._numeric_identity=object()
         self._normal_transpose=None;self._transpose_argument=None;self._transpose_result=None
         if not np.isfinite(matrix.data).all():raise ArithmeticError('Nonfinite actual weighted CSR before GPU upload')
         if self.prefix and matrix.nnz and np.min(matrix.indices)<self.prefix:raise ValueError('Frozen prefix has nonzero Jacobian columns')
@@ -348,6 +355,11 @@ class GPUJacobian(LinearOperator):
         layout=DeviceCSRLayout() if layout is None else layout
         row,index,values,transfer=layout.upload(matrix,self.prefix,torch,stop)
         self.device=values.device;self.J=torch.sparse_csr_tensor(row,index,values,size=(matrix.shape[0],cols))
+        # A full CUDA CSC-to-CSR conversion temporarily expands this very
+        # large Jacobian. Stream exact CPU-transposed row blocks on small
+        # devices instead; the normal products and solve still run on CUDA.
+        self._host_J=(matrix[:,self.prefix:stop].tocsr()
+                      if os.environ.get('RINKSPACE_GPU_HOST_TRANSPOSE')=='1' else None)
         norm=torch.zeros(cols,dtype=torch.float64,device=self.device)
         for first in range(0,len(values),4_000_000):
             last=min(first+4_000_000,len(values));norm.scatter_add_(0,index[first:last].long(),values[first:last].square())
@@ -365,7 +377,7 @@ class GPUJacobian(LinearOperator):
         """
         if self.released:return
         session=self._dss
-        self.J=None;self._gram=None;self._diag=None;self._gram_tiles=None;self._scaling_tiles=None
+        self.J=None;self._host_J=None;self._gram=None;self._diag=None;self._gram_tiles=None;self._scaling_tiles=None
         self._normal_transpose=None;self._transpose_argument=None;self._transpose_result=None
         self._dss=None;self.released=True
         if release_factorization and session is not None:session.release_factorization()
@@ -387,6 +399,11 @@ class GPUJacobian(LinearOperator):
         argument=np.ascontiguousarray(x).reshape(-1)
         if self._transpose_argument is not None and np.array_equal(argument,self._transpose_argument):
             return self._transpose_result.copy()
+        if self._host_J is not None:
+            result=np.asarray(self._host_J.T@argument).ravel()
+            if not np.isfinite(result).all():raise ArithmeticError('Nonfinite exact host CSR transpose product')
+            self._transpose_argument=argument.copy();self._transpose_result=result.copy()
+            return result
         t=self.torch.as_tensor(argument[:,None],dtype=self.torch.float64,device=self.device)
         prepared=self._normal_transpose is not None
         operator=self._normal_transpose if prepared else self.J.transpose(0,1)
@@ -405,8 +422,9 @@ class GPUJacobian(LinearOperator):
             # are row blocks of ONE global normal matrix, never separate fits.
             block_rows=int(os.environ.get('RINKSPACE_GPU_GRAM_ROWS','96'))
             if block_rows<1:raise ValueError('GPU Gram row block must be positive')
-            transpose=self.J.transpose(0,1).to_sparse_csr()
-            offsets=transpose.crow_indices().cpu().numpy()
+            host_transpose=self._host_J is not None
+            transpose=self._host_J.T.tocsr() if host_transpose else self.J.transpose(0,1).to_sparse_csr()
+            offsets=transpose.indptr if host_transpose else transpose.crow_indices().cpu().numpy()
             capacity=min(n*n,704*n)
             row=torch.zeros(n+1,dtype=torch.int32,device=self.device)
             index=torch.empty(capacity,dtype=torch.int32,device=self.device)
@@ -418,8 +436,15 @@ class GPUJacobian(LinearOperator):
             begin.record()
             for first in range(0,n,block_rows):
                 last=min(n,first+block_rows);a,b=map(int,offsets[[first,last]])
-                left=torch.sparse_csr_tensor(transpose.crow_indices()[first:last+1]-a,
-                    transpose.col_indices()[a:b],transpose.values()[a:b],size=(last-first,self.shape[0]))
+                if host_transpose:
+                    left=torch.sparse_csr_tensor(
+                        torch.as_tensor(transpose.indptr[first:last+1]-a,dtype=torch.int32,device=self.device),
+                        torch.as_tensor(transpose.indices[a:b],dtype=torch.int32,device=self.device),
+                        torch.as_tensor(transpose.data[a:b],dtype=torch.float64,device=self.device),
+                        size=(last-first,self.shape[0]))
+                else:
+                    left=torch.sparse_csr_tensor(transpose.crow_indices()[first:last+1]-a,
+                        transpose.col_indices()[a:b],transpose.values()[a:b],size=(last-first,self.shape[0]))
                 gram=torch.sparse.mm(left,self.J)
                 # Keep an explicit diagonal even for structurally empty columns
                 # so later TRF damping uses the identical complete layout.
@@ -447,7 +472,9 @@ class GPUJacobian(LinearOperator):
                 self._gram_tiles.append((first,last,total,stop))
                 total=stop
                 del left,gram,zero_diag,rr
-            self._normal_transpose=transpose
+            transpose_transfer=(transpose.data.nbytes+transpose.indices.nbytes+
+                                transpose.indptr.nbytes) if host_transpose else 0
+            self._normal_transpose=None if host_transpose else transpose
             del transpose
             index=index[:total];data=data[:total]
             self._diag=diagonal
@@ -464,7 +491,9 @@ class GPUJacobian(LinearOperator):
             self._gram_seconds=time.perf_counter()-started
             self.gram_record=dict(gram_backend='CUDA_FP64_block_SpGEMM',gram_device_block_rows=block_rows,
                 gram_GPU_wall_seconds=self._gram_seconds,gram_GPU_event_seconds=begin.elapsed_time(end)*.001,
-                gram_H2D_bytes=0,gram_D2H_bytes=offsets.nbytes+1,normal_storage_capacity=capacity,
+                gram_H2D_bytes=transpose_transfer,gram_D2H_bytes=1 if host_transpose else offsets.nbytes+1,
+                transpose_policy='exact_host_CSR_row_blocks' if host_transpose else 'device_CSC_conversion',
+                reverse_product_backend='host_CSR' if host_transpose else 'CUDA',normal_storage_capacity=capacity,
                 normal_scaling_groups=len(self._scaling_tiles),
                 normal_scaling_max_rows=max((last-first for first,last,a,b in self._scaling_tiles),default=0),
                 normal_scaling_max_nnz=max((b-a for first,last,a,b in self._scaling_tiles),default=0))
@@ -492,7 +521,7 @@ class GPUJacobian(LinearOperator):
 
     def solve_scaled(self,rhs,scale,diagonal=None,damp=0.):
         torch=self.torch;self._prepare_gram();row,index,base=self._gram;n=self.shape[1]
-        matrix_key=(self.transfer['linearization_id'],scale.tobytes(),
+        matrix_key=(self._numeric_identity,self.transfer['linearization_id'],scale.tobytes(),
                     None if diagonal is None else diagonal.tobytes(),float(damp))
         if self._dss is not None and self._dss.matrix_key==matrix_key:
             A=self._dss.A

@@ -1,0 +1,50 @@
+{
+  "schema": "rinkspace.okada.trusted_motion_source_review.v1",
+  "programme": "okada_mei_sp",
+  "baseline": "okada_body_identity_1114",
+  "previous_decisions": "body_identity_1114_review.json",
+  "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "time_base": [1, 12800],
+  "focus_pts": [[1038592, 1044736]],
+  "tracks_by_window": [[-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]],
+  "source_images_data_relative": "runs/body_s01_20261029/structure_camera_1108/audit_af48_1113/trusted_motion_1115/source_images",
+  "events": [
+    {
+      "id": "s05-1039104-031",
+      "previous_status": "model_pose",
+      "status": "model_pose_visible_region",
+      "observation_pts": [1039104, 1039360],
+      "evidence_pts": [1038592, 1038848, 1039104, 1039360, 1039616, 1039872],
+      "reason": "自由腿的连续轮廓位于旧模型膝的下方。保持原源行和解剖对应；网络代理点与可见腿线分别保留，膝中心深度未知。"
+    },
+    {
+      "id": "s05-1213440-045",
+      "previous_status": "model_pose",
+      "status": "source_position_wrong_retired",
+      "observation_pts": [1213440],
+      "evidence_pts": [1212928, 1213184, 1213440, 1213696, 1213952],
+      "retire_slots": [7, 9],
+      "evidence_files": ["1213440_full.png", "1213440_clean.jpg", "1213440_source.jpg"],
+      "reason": "94.80 秒左袖仍连续向画面左侧伸出；7 落到腰旁，9 落至上臂附近。前后各两曝光可追踪同一左袖；偏差只出现在中心曝光。模糊腕端缺少足够精度作新点，撤回旧判、退场两行并保存 UV、sigma 和绑定。"
+    },
+    {
+      "id": "s08-1832704-074",
+      "previous_status": "model_pose",
+      "status": "source_position_wrong_retired",
+      "observation_pts": [1832704],
+      "evidence_pts": [1832192, 1832448, 1832704, 1832960, 1833216],
+      "retire_slots": [9],
+      "evidence_files": ["1832704_full.png", "1832704_clean.jpg", "1832704_source.jpg"],
+      "reason": "143.18 秒左袖近水平伸直至画面左侧；9 落在肩附近上臂。143.16 和 143.20 秒源腕恢复至远端；仅退场错误曝光腕行，不插补坐标。"
+    },
+    {
+      "id": "s09-2176768-110",
+      "previous_status": "model_pose",
+      "status": "occluded_unknown",
+      "observation_pts": [2176768, 2177024, 2177280],
+      "evidence_pts": [2176000, 2176256, 2176512, 2176768, 2177024, 2177280, 2177536],
+      "evidence_files": ["2176768_full.png", "2176768_clean.jpg", "2176768_source.jpg"],
+      "reason": "170.06–170.10 秒肩前动作、画面后侧小臂与躯干相互重叠，腕在数个曝光模糊或遮挡。撤回源右腕正确的断言，保留原值和历史准入，不列作可信模型修复目标。"
+    }
+  ]
+}

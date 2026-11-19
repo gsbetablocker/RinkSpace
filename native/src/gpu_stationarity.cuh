@@ -49,10 +49,10 @@ __device__ inline void stationarity_faces_range(View v,LinearView l,SolverView s
         if(only_print<0){
         for(size_t k=0;k<v.nscene;++k){if(l.scene_chart&&l.scene_chart[k]>=ice_chart_actual_x)continue;
             bounds(1,int(k),v.scene_values[k],l.scene_lower[k],l.scene_upper[k]);}
-        if(v.options&64u){IceToleranceGeometry<double> g(v.board,v.layout);
+        if(v.options&64u){IceToleranceGeometry<double> g(v.board,v.layout,v.options);
             ice_tolerance_margins(g,[&](int id,double margin){
                 if(!finite_scalar(margin)||margin< -stationarity_active_tolerance())count[1]|=1;
-                if(ice_relation_is_independent(id)){StationarityFace a{};a.family=6;a.index=id;offer(a,margin);}});}
+                if(g.free_metric||ice_relation_is_independent(id)){StationarityFace a{};a.family=6;a.index=id;offer(a,margin);}});}
         if(ice_actual_chart_enabled(l.scene_chart)){
             for(int group=0;group<6;++group){const int kind=group<2?6:7,n=group<2?4:8,id=group<2?group:group-2;
                 // Enumerating on demand retains every numerically active tie;
@@ -154,7 +154,7 @@ __global__ void lm_stationarity_print_faces(View v,LinearView l,SolverView s,Sta
     else stationarity_faces_range(v,l,s,nullptr,6,counts+3*i,-2,0,int(i));
 }
 __global__ void lm_stationarity_cell_faces(View v,LinearView l,SolverView s,StationarityFace* faces,size_t capacity,int* counts,int* total){
-    size_t i=size_t(blockIdx.x)*blockDim.x+threadIdx.x,cells=v.nc-3;if(i>=cells*v.nrig)return;
+    size_t i=size_t(blockIdx.x)*blockDim.x+threadIdx.x,cells=l.envelope.enabled?v.nc-3:1;if(i>=cells*v.nrig)return;
     if(faces)stationarity_write_part(v,l,s,faces,capacity,counts+3*i,total,int(i/cells),int(i%cells)+1,-1);
     else stationarity_faces_range(v,l,s,nullptr,stationarity_cell_capacity,counts+3*i,int(i/cells),int(i%cells)+1);
 }

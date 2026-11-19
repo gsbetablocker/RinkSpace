@@ -34,6 +34,29 @@ def test_both_instances_resolve_same_template_and_actual_size_block():
     assert native_instance_parameters(assets,'print_instance/Ad15')[:3]==[.41,.02,.2]
 
 
+def test_instance_size_requires_explicit_policy_and_keeps_shared_artwork():
+    assets=bind(source_assets())
+    original=resolve_instance(assets,'print_instance/Ad2')
+    original[2]['values']=[math.log(.08),math.log(.012)]
+    original[3]['values']=[.1,.01,0.]
+    other=resolve_instance(assets,'print_instance/Ad15')
+    other[3]['values']=[.41,.02,0.]
+    independent=deepcopy(original[2]);independent['id']='size/Ad15_independent'
+    independent['values'][0]+=math.log(1.06)
+    assets['parameter_blocks'].append(independent)
+    other[0]['size_block_id']=other[0]['size_class_ref']=independent['id']
+    with pytest.raises(PrintBindingError,match='invalid_shared_print_size'):
+        resolve_instance(assets,'print_instance/Ad15')
+    other[0]['size_binding_policy']='independent_instance'
+    assert resolve_instance(assets,'print_instance/Ad15')[1] is original[1]
+    assert native_instance_parameters(assets,'print_instance/Ad15')[3:]==pytest.approx([.0848,.012])
+    assert native_instance_parameters(assets,'print_instance/Ad2')[3:]==pytest.approx([.08,.012])
+    assert assets['observations']==source_assets()['observations']
+    other[0]['size_binding_policy']='typo'
+    with pytest.raises(PrintBindingError,match='unknown_print_size_policy'):
+        resolve_instance(assets,'print_instance/Ad15')
+
+
 def test_identity_attachment_creates_no_pixels_or_equality_factors():
     original=source_assets();saved=deepcopy(original);new=bind(original)
     assert original==saved

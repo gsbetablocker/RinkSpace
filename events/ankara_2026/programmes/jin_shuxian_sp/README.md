@@ -1,12 +1,7 @@
 # 金书贤安卡拉站短节目
 
-## 当前完整拟合
-
-2026-11-13 登记的 `stability_review_1113` 使用[安卡拉共同冰场](../../scene/provisional_final_1113.json)，覆盖 S01–S24、原片 00:32.300–03:20.720，共 8,422 个原生帧。整片回放已导出。整片视觉验收、独立相机物理标定和米制验证仍待完成。
-
-[版本登记及本地回放地址](provisional_final_1113.json) · [相机参数](stability_review_1113_camera.npz) · [稳定性复核与源观测](stability_review_1113.json)
-
-S04 原片 45.300 秒后数帧仍有小幅抖动，按用户决定暂缓修复。
+<a id="当前完整取点修复版"></a>
+当前 [`s14_boards_1118`](s14_boards_1118.json) 使用[赛事共同冰场](../../README.md#暂定最终版本)和本节目[相机参数](camera_s14_boards_1118.npz)。S14 使用远侧印刷边及近侧围挡重新约束相机。处理范围为 S01–S24、原片 00:32.300–03:20.720，共 8,422 个原生曝光。登记的 `full_review.video` 是本机 PotPlayer 回放地址，用户整片视觉验收待完成。
 
 ## 源与范围
 
@@ -18,6 +13,8 @@ S04 原片 45.300 秒后数帧仍有小幅抖动，按用户决定暂缓修复�
 | 镜头和机位 | 23 个切点已按原片复核。2026-11-05 确认 24 镜头的机位分配，其中 S05＝主 0、S09＝副 1、S16＝主 0、S17＝副 1。[镜头及确认范围](rebuild_scope.json) |
 
 ## 历史索引
+
+此前暂定版和密集观测版见[2026-11-17 登记](provisional_final_1117.json)及[密集观测登记](joint_dense_1118.json)。
 
 较早的 `joint_review_1113` 保留[相机参数及复核证据](joint_review_1113.json)，其首版整片回放已退役。早期[冻结几何](geometry_frozen_1103.json)记录冈田芽依 `camera_solver_refined_1102` 的参考基线。[相机试验归档](camera_trial_archive_1113.json)登记 Data 地址和 SHA-256，[范围文件](rebuild_scope.json)保留取点、机位确认和历史节目页的来源。[联合拟合与稳定性复核源码](../../tools/joint_review_1113/README.md)
 

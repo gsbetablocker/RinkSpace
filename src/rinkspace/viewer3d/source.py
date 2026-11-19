@@ -54,6 +54,44 @@ class SourceVideo:
         self.container.close()
 
 
+def read_body_overlay(path, pts):
+    """Load only the saved source rows and model pixels for this variant."""
+    with np.load(path, allow_pickle=False) as result:
+        np.testing.assert_array_equal(result['source_pts'], pts)
+        uv = result['source_uv_native']
+        use = result['source_observation_objective_use']
+        model_ids = result['source_body_model_joint_ids']
+        projected = result['COCO_uv']
+        ledger = str(result['source_observation_ledger_sha256'])
+    shape = (len(pts), 17)
+    if (use.dtype.kind != 'b' or use.shape != shape or uv.shape != (*shape, 2)
+            or projected.shape != uv.shape or not np.isfinite(uv[use]).all()
+            or model_ids.shape != shape or model_ids.dtype.kind not in 'iu'
+            or np.any((model_ids < 0) | (model_ids >= 17))):
+        raise ValueError('Saved body overlay does not match its actual source ledger')
+    return dict(uv=uv, use=use, model_ids=model_ids, projected=projected, ledger_sha256=ledger)
+
+
+def body_overlay_primitives(overlay, frame, *, show_model):
+    from .blade_review import COCO_EDGES
+
+    use, uv = overlay['use'][frame], overlay['uv'][frame]
+    model_ids = overlay['model_ids'][frame]
+    parts = []
+    for j in np.flatnonzero(use):
+        model_joint = int(model_ids[j])
+        color = ((.18, .85, 1., 1.) if model_joint % 2 else (1., .62, .21, 1.)) if model_joint else (.9, .9, .9, 1.)
+        parts.append(dict(kind='point', points=uv[j:j+1], color=color,
+                          evidence_kind='actual_body_observation', source_slot=int(j), model_joint=model_joint))
+    if show_model:
+        points = overlay['projected'][frame]
+        for a, b in COCO_EDGES:
+            if np.isfinite(points[[a, b]]).all():
+                parts.append(dict(kind='line', points=points[[a, b]], color=(.72, .3, 1., 1.), width=2.,
+                                  evidence_kind='model_body_projection', model_joint_indices=(a, b)))
+    return parts
+
+
 class SupportObservations:
     """Keep source roles/foot associations; do not propagate across exposures."""
     def __init__(self, path, time_base, *, shot=None):

@@ -152,6 +152,11 @@ class SequenceJoint(ContinuousJoint):
         return {key:image_trial_quality(base,value['source_group_costs'][key],relative_limit) for key,base in self.source_group_baseline.items()}
     def checkpoint_fields(self,x):
         out=super().checkpoint_fields(x)
+        whole=self.action_factors.whole_skate
+        if whole is not None and whole.refresh_each_state:
+            if not np.array_equal(whole.associated_parameters,x[17:]):
+                whole.associate(x[17:])
+            out.update(whole.checkpoint_fields())
         out.update(sequence_contact_modes=self.action_factors.modes.modes,
             sequence_contact_status=self.action_factors.modes.status,
             sequence_contact_mode_names=np.asarray(self.action_factors.modes.record['mode_names']),

@@ -118,7 +118,7 @@ review.render.render(prepared_dir, state_path, assets_path, shot_ids,
 
 ### 广告内部几何的共同可调状态
 
-当前安卡拉场景使用 `scene/print_layout_components.json` 的完整印刷图案分组，同一图案的文字行、标志、轮廓、内孔和间距共用一个正轴仿射变换。S01 仅 Ad2／3／4／6／7 的完整图案相对独立底板保留各 4 个坐标，共 20 个；Ad5 的解析矩形属于 MEIWA 图案本体，与其余印刷内容保持同一参考版式。整体尺寸和安装继续拟合。`print_shape` 仍有 10 个存储坐标，但六个非线性形变坐标为零且不活动，不能重开逐字、逐行或标志之间的独立形变。下述十维族是引擎的存储能力，不表示当前全部开放；参考图稿也未冒充实测印刷母版。
+以[安卡拉 S01 印刷版式](../events/ankara_2026/scene/print_layout_components.json)为例：同一图案的文字行、标志、轮廓、内孔和间距共用一个正轴仿射变换。该配置仅对 Ad2／3／4／6／7 的完整图案相对独立底板保留各 4 个坐标，共 20 个；Ad5 的解析矩形属于 MEIWA 图案本体，与其余印刷内容保持同一参考版式。整体尺寸和安装继续拟合。`print_shape` 有 10 个存储坐标，但该配置的六个非线性形变坐标为零且不活动，不开放逐字、逐行或标志之间的独立形变。这是节目配置，不是跨节目默认值；参考图稿不是实测印刷母版。
 
 实拍确认的彩色底板可显式声明 `PrintTemplate.material_domain={kind:physical_unit_panel,boundary_path_ids:[四边],evidence:{...}}`。它要求已有四边和单位面板坐标规约，不由文字名称或包围盒推断。原生十二整数 `ScenePath` 的 print 类型以 `code=1` 表示此关系，`code=0` 不声明包含；其它值拒绝。GPU 用同一图案求值和导数检查有限路径的四边包含条件，与围挡高度和相机边界共同修正步长，真实 trial 再验证。这里没有像素容许误差、观测权重或新自由度；底板尺寸与安装、印刷组件整体变换仍参与联合拟合，无观测路径不加入当前求解约束。
 
@@ -200,7 +200,7 @@ prepare与拟合重载共同检查packed members为int64一维、weights为float
 
 `configure_scene_parameters(values=..., records=..., data=..., directions=..., lower=..., upper=..., charts=...)` 接入共同几何、尺寸、安装与当前版式。`configure_camera_parameters(directions=..., max_readout=..., lower=..., upper=...)` 接入完整相机方向：基础 rig38 每机位 27 行，广角扩展 rig43 每机位 31 行；多机位按 rig 顺序堆叠为 `[rig_count * chart_size, retained_columns]`。物理范围按 rig 打包；长度与参考角规约显式保留。
 
-支持 layout146 的实际冰面坐标时，`rs_gpu_ice_actual_chart_version()=1`。完整图式使用代码 10 表示八个实际 X 增量、11 表示 32 个实际 log-radius 增量，12／13 表示六个旧名义量的见证输出。选择器 `actual_ice_chart_configuration` 仅消去这六个冗余方向，保留旧数值存储；存在额外名义量限制或不兼容活动方向时回退旧坐标。重新构造见证不对极值选择求导。原 107 个偏差盒界与 206 条关系继续验证最终状态；新坐标的梯度数值不能直接当作旧坐标的驻点证据。
+受限冰面模式使用 layout146 的实际坐标时，`rs_gpu_ice_actual_chart_version()=1`。完整图式使用代码 10 表示八个实际 X 增量、11 表示 32 个实际 log-radius 增量，12／13 表示六个旧名义量的见证输出。选择器 `actual_ice_chart_configuration` 仅消去这六个冗余方向，保留旧数值存储；存在额外名义量限制或不兼容活动方向时回退旧坐标。重新构造见证不对极值选择求导。原 107 个偏差盒界与 206 条关系继续验证最终状态；新坐标的梯度数值不能直接当作旧坐标的驻点证据。
 
 基础 chart 包含完整参考姿态、两转轴、支点、杆臂、轴间距、随变焦入瞳与光学、读出时间。广角 Brown 扩展保留所选 log-f 结点及其下方平方 hinge 的四个系数。`domain.camera.complete_camera_rig` 打包当前完整定义；兼容导入器不支持的旧扩展必须明确失败，不能省略后冒称等价。
 
@@ -219,6 +219,8 @@ Shot 可选 `local_motion_refinement=[{first_pts,last_pts,target_stride,channels
 `joined_zoom_domain=True` 另外对同一机组全部声明曝光区间（含行读出支撑）的最小至最大 log(f) 检查完整前向入瞳二次曲线，包括未拍到的中间焦段；切镜间的运动仍分开。该选项要求 `rs_camera_joined_zoom_domain_version()>=1`，C ABI 的 limits 为 `20+2K` 项，索引 19 为启用标志、索引 20 起为 K 个曝光区间。旧 10／19／`19+2K` 布局保持原义；未观测焦段不由此变成新的源观测。
 
 `project_motion` 对有限画外预测继续求同一隐式滚动快门方程，并认证深度、光学域、时间支持与唯一根。图像矩形不约束 station 或相机，渲染才裁切。`max_readout` 为稀疏列编译保留曝光中点前后相应支持；固定 rig 可在编译前用 `configure_projection_time_support(half_seconds=...)` 明确计算区间，必须包含完整允许读出。越界明确失败，不遗漏跨结点导数。
+
+自由冰面模式由 `ice_metric_freedom.schema` 声明。选项 255、511、1023 对应 `free_ice_metric.v1`／`v2`／`v3`，数值布局为 146、147、155。该模式移除名义百分比盒及选定的等距、对齐等度量关系，保留正尺寸、圆环嵌套和连接拓扑。当前安卡拉场地使用 [v3 结构](../events/ankara_2026/scene/field/crease_offset_1118.json)及其同版数值快照。
 
 ### 两种线性化目标〔已实现〕
 

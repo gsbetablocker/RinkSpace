@@ -38,7 +38,8 @@ def _safe_name(name):
             or any(ord(character) < 32 or ord(character) == 127 for character in name)):
         raise ValueError(f"Unsafe source-package path: {name!r}")
     path = PurePosixPath(name)
-    if path.is_absolute() or ".." in path.parts or any(p in BLOCKED_PARTS for p in path.parts):
+    if (path.is_absolute() or ".." in path.parts or any(p in BLOCKED_PARTS for p in path.parts)
+            or path.as_posix().casefold().startswith(".hermes/plans/")):
         raise ValueError(f"Forbidden source-package path: {name!r}")
     if name in {"configs/local.json", "configs/storage.json"} or path.parts[:2] == ("data", "input"):
         raise ValueError(f"Private configuration or original input is forbidden: {name}")

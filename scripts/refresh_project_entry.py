@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import ctypes
+import hashlib
 import html
 import json
 import os
@@ -16,7 +17,6 @@ sys.path.insert(0, str(ROOT / "src"))
 from rinkspace.storage import AssetStore
 
 EVENT = Path("events/ankara_2026")
-PROGRAMMES = (("okada_mei_sp", "冈田芽依"), ("jin_shuxian_sp", "金书贤"))
 PANEL = "<!-- RINKSPACE_RESULT_PANEL -->"
 REVIEW = re.compile(r"<!-- CURRENT_TASK_BEGIN -->.*?<!-- CURRENT_TASK_END -->", re.S)
 
@@ -29,50 +29,69 @@ def link(path, label):
     return f'<a href="{esc(Path(path).relative_to(ROOT).as_posix())}">{esc(label)}</a>'
 
 
-def current_result(directory):
-    candidates = []
-    for path in directory.rglob("provisional_final_*.json"):
-        record = json.loads(path.read_text(encoding="utf-8-sig"))
-        designation = record.get("designation", {})
-        if (record.get("schema") == "rinkspace.provisional_final_programme_fit.v1"
-                and record.get("programme_id") == directory.name
-                and designation.get("status") == "provisional_final"):
-            candidates.append((designation["designated_on"], path, record))
-    if not candidates:
-        return None
-    newest_date = max(candidate[0] for candidate in candidates)
-    latest = [candidate for candidate in candidates if candidate[0] == newest_date]
-    if len(latest) != 1:
-        raise ValueError(f"Multiple designated programme fits on {newest_date}: {directory}")
-    return latest[0]
+def event_relative(value):
+    parts = Path(value.replace("\\", "/")).parts
+    for index in range(len(parts) - 1):
+        if parts[index:index + 2] == EVENT.parts and ".." not in parts:
+            return Path(*parts[index:])
+    raise ValueError(f"Not a registered {EVENT} asset: {value}")
 
 
-def programme_section(store, key, name):
-    directory = ROOT / EVENT / "programmes" / key
-    binding = current_result(directory)
-    if binding is None:
-        result = '<p>暂未登记完整拟合。</p>'
-    else:
-        date, record_path, record = binding
-        review = record["full_review"]
-        first, last = review["original_source_seconds"]
-        video_path = Path(review["video"]["path"])
-        video_path = store.resolve(video_path if video_path.is_absolute() else store.data / video_path)
-        result = (
-            f'<p>{esc(date)} 暂定最终版 <strong>{esc(record["version_id"])}</strong>'
-            f' · {record["shot_count"]} 个镜头 · {record["source_native_PTS"]["exposures"]:,} 个原生帧。</p>'
-            f'<p>原片 {first:.3f}–{last:.3f} 秒。视觉验收见节目页及登记绑定的审阅记录。</p>'
-            f'<p>{link(record_path, "版本登记")}</p>'
+def checked_record(path, reference):
+    raw = path.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != reference["sha256"]:
+        raise ValueError(f"Registration SHA-256 mismatch: {path}")
+    return json.loads(raw)
+
+
+def designated_fit():
+    scene = ROOT / EVENT / "scene"
+    pointer = json.loads((scene / "current_fit.json").read_bytes())
+    registration = pointer["registration"]
+    if (pointer["event_id"] != EVENT.name or pointer["designation"]["status"] != "provisional_final"
+            or any(Path(name).name != name or not name.endswith(".json")
+                   for name in (registration["path"], pointer["previous_designation"]))):
+        raise ValueError("Invalid event designation")
+    event_path = scene / registration["path"]
+    event = checked_record(event_path, registration)
+    if event["event_id"] != pointer["event_id"]:
+        raise ValueError("Event registration identity mismatch")
+    programmes = {}
+    for reference in event["programmes"].values():
+        path = ROOT / event_relative(reference["path"])
+        record = checked_record(path, reference)
+        key = record["programme_id"]
+        if (key in programmes or path.parent != ROOT / EVENT / "programmes" / key
+                or record["event_id"] != event["event_id"] or record["version_id"] != event["version_id"]
+                or record["geometry_binding"] != event["geometry_binding"]):
+            raise ValueError(f"Inconsistent programme registration: {path}")
+        programmes[key] = (path, record)
+    if programmes.keys() != pointer["programme_names"].keys() or not programmes:
+        raise ValueError("Designated programme names differ from joint registration")
+    return pointer, event_path, event, programmes
+
+
+def programme_section(store, key, name, record_path, record):
+    directory = record_path.parent
+    review = record["full_review"]
+    first, last = review["source_seconds"]
+    video_path = store.resolve(event_relative(review["video"]["path"]), base=store.data)
+    acceptance = "已通过" if record["user_visual_acceptance"] else "尚未确认"
+    result = (
+        f'<p>暂定最终版 <strong>{esc(record["version_id"])}</strong> · 共同几何 {esc(record["geometry_binding"]["version_id"])}'
+        f' · {len(record["shots"])} 个镜头 · {review["frames"]:,} 个源曝光。</p>'
+        f'<p>原片 {first:.3f}–{last:.3f} 秒。复核登记：{esc(record["status"])}；用户整片视觉验收：{acceptance}。</p>'
+        f'<p>{link(record_path, "相机、源时间与回放登记")}</p>'
+    )
+    if video_path.is_file():
+        result += (
+            '<div class="surface"><p>本地冰场回放地址，供 PotPlayer 使用</p>'
+            f'<code>{esc(video_path)}</code> '
+            f'<button type="button" data-copy-path="{esc(video_path)}">复制路径</button>'
+            '<p class="copy-status" role="status"></p></div>'
         )
-        if video_path.is_file():
-            result += (
-                '<div class="surface"><p>本地冰场回放地址，供 PotPlayer 使用</p>'
-                f'<code>{esc(video_path)}</code> '
-                f'<button type="button" data-copy-path="{esc(video_path)}">复制路径</button>'
-                '<p class="copy-status" role="status"></p></div>'
-            )
-        else:
-            result += '<p>本地缺少该版整片回放文件。</p>'
+    else:
+        result += '<p>本地缺少该版整片回放文件。</p>'
     if (directory / "README.md").is_file():
         result += f'<p>{link(directory / "README.md", "节目范围、结果与人工确认")}</p>'
     return (
@@ -84,11 +103,13 @@ def programme_section(store, key, name):
 def render(store, previous):
     old_reviews = REVIEW.search(previous) if PANEL in previous else None
     reviews = old_reviews.group() if old_reviews else "<!-- CURRENT_TASK_BEGIN --><!-- CURRENT_TASK_END -->"
+    pointer, event_path, event, programmes = designated_fit()
+    names = pointer["programme_names"]
     programme_links = "".join(
         f'<li><a href="#/events/ankara_2026/programmes/{key}">{esc(name)}短节目</a></li>'
-        for key, name in PROGRAMMES
+        for key, name in names.items()
     )
-    sections = "".join(programme_section(store, key, name) for key, name in PROGRAMMES)
+    sections = "".join(programme_section(store, key, name, *programmes[key]) for key, name in names.items())
     event_docs = " · ".join(
         link(path, label) for path, label in (
             (ROOT / EVENT / "README.md", "赛事版本与来源"),
@@ -111,6 +132,10 @@ def render(store, previous):
         '<p><a href="#/events/ankara_2026">2026 JGP 安卡拉</a></p>'
         f'<p>{link(ROOT / "README.md", "项目说明")}</p></section>'
         '<section class="entry-view" data-view="event" hidden><h1 tabindex="-1">2026 JGP 安卡拉</h1>'
+        f'<p>{esc(pointer["designation"]["designated_on"])} 暂定最终版：{link(event_path, event["version_id"])}'
+        f' · 共同冰场 {esc(event["geometry_binding"]["version_id"])} · 用户整片视觉验收：'
+        f'{"已通过" if event["user_visual_acceptance"] else "尚未确认"}。</p>'
+        f'<p>{link(event_path.parent / pointer["previous_designation"], "历史：上一份暂定最终场地登记")}</p>'
         f'<ul>{programme_links}</ul><p>{event_docs}</p>'
         f'<details id="source-reviews"><summary>历史片段取点审阅</summary>{reviews}</details></section>'
         + sections
@@ -124,10 +149,12 @@ JS = r'''<script>
 const eventPath='#/events/ankara_2026', okadaPath=eventPath+'/programmes/okada_mei_sp';
 const routes={
   '#/':{view:'project',title:'RinkSpace',crumbs:[['RinkSpace','#/']]},
-  [eventPath]:{view:'event',title:'2026 JGP 安卡拉',crumbs:[['RinkSpace','#/'],['2026 JGP 安卡拉',eventPath]]},
-  [okadaPath]:{view:'okada_mei_sp',title:'冈田芽依短节目',crumbs:[['RinkSpace','#/'],['2026 JGP 安卡拉',eventPath],['冈田芽依短节目',okadaPath]]},
-  [eventPath+'/programmes/jin_shuxian_sp']:{view:'jin_shuxian_sp',title:'金书贤短节目',crumbs:[['RinkSpace','#/'],['2026 JGP 安卡拉',eventPath],['金书贤短节目',eventPath+'/programmes/jin_shuxian_sp']]}
+  [eventPath]:{view:'event',title:'2026 JGP 安卡拉',crumbs:[['RinkSpace','#/'],['2026 JGP 安卡拉',eventPath]]}
 };
+document.querySelectorAll('section[id][data-view]').forEach(section=>{
+  const path=eventPath+'/programmes/'+section.dataset.view, title=section.querySelector('h1').textContent;
+  routes[path]={view:section.dataset.view,title,crumbs:[...routes[eventPath].crumbs,[title,path]]};
+});
 const aliases={'#project':'#/','#event':eventPath,'#programme':okadaPath,'#current-task':eventPath};
 function navigate(){
   const hash=location.hash;

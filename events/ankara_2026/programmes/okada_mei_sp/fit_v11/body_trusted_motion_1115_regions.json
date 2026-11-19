@@ -1,0 +1,53 @@
+{
+  "schema": "rinkspace.okada.trusted_motion_regions.v1",
+  "source_sha256": "e8b53966d56e72f3842d92c3ecbe6e9cc7e4670b7d0c9bd12f58fd2cff5ad57d",
+  "parent_sha256": "fe881bc132f17f2d5ab4f975dc4724b93f4ab0692e981fef624d681340d0e0d0",
+  "observations_sha256": "c063dfaa39f1da4a26e9a584c2da12e91f8b9e7b14785103d667046dd1e33464",
+  "camera_sha256": "2e0fc2705fd5e2935ac87037e6681c7d031a55f83827bfd8e3e8e3fc6d58799c",
+  "time_base": [1, 12800],
+  "shot_id": "s05",
+  "source_review": "body_trusted_motion_1115_source.json",
+  "pixels": "原片 1920x1080。bounds_uv = [[xmin,ymin],[xmax,ymax]]；源图决定的可见带，覆盖服装／运动模糊和膝中心沿腿线的不确定度。与网络代理点分开；未写回观测。check 仅用于对照。",
+  "source_context": [
+    {"pts_range": [1036800, 1039872], "description": "左鞋近冰，右自由腿从画面左侧扫起。81.18–.20 右腿近水平，有清楚的纵向腿线，关节沿腿方向的准确位置较模糊。"},
+    {"pts_range": [1039872, 1040384], "description": "右腿和鞋转向镜头、明显缩短与模糊，跳过精确膝点，不据其定位三维关节中心。"},
+    {"pts_range": [1040640, 1042688], "description": "右腿从遮挡中向画面右侧伸出，左腿向画面左下后方延展。81.36–.42 左腿虽旋转且有运动模糊，轮廓没有支持一个曝光内的折起—反向折回。81.40 两个互换网络膝点此前已停用。"},
+    {"pts_range": [1042944, 1046784], "description": "右鞋向冰面收回并进入落冰；左腿扫到后方，之后近水平伸展。接触深度和刃侧不作单视角确认。"}
+  ],
+  "image_regions": [
+    {"pts": 1038592, "joint": 14, "bounds_uv": [[792,610],[861,640]], "sigma_uv": [28,13], "fit": false},
+    {"pts": 1038848, "joint": 14, "bounds_uv": [[792,600],[861,629]], "sigma_uv": [26,10]},
+    {"pts": 1039104, "joint": 14, "bounds_uv": [[803,592],[872,620]], "sigma_uv": [24,8]},
+    {"pts": 1039360, "joint": 14, "bounds_uv": [[821,578],[902,611]], "sigma_uv": [28,9]},
+    {"pts": 1039616, "joint": 14, "bounds_uv": [[830,561],[948,612]], "sigma_uv": [43,18], "fit": false},
+    {"pts": 1041408, "joint": 13, "bounds_uv": [[910,605],[973,649]], "sigma_uv": [31,22], "fit": false},
+    {"pts": 1041664, "joint": 13, "bounds_uv": [[917,596],[982,643]], "sigma_uv": [31,15]},
+    {"pts": 1042176, "joint": 13, "bounds_uv": [[957,550],[1012,604]], "sigma_uv": [32,25], "fit": false},
+    {"pts": 1039104, "joint": 16, "bounds_uv": [[650,578],[782,644]], "sigma_uv": [44,23], "fit": false},
+    {"pts": 1039104, "joint": 15, "bounds_uv": [[863,813],[923,858]], "sigma_uv": [27,21], "fit": false},
+    {"pts": 1041664, "joint": 15, "bounds_uv": [[812,715],[876,776]], "sigma_uv": [35,29], "fit": false},
+    {"pts": 1044736, "joint": 16, "bounds_uv": [[1084,778],[1131,830]], "sigma_uv": [27,25], "fit": false}
+  ],
+  "rotation_steps": [
+    {"pts_pair": [1041152,1041408], "track": 4, "relative_target": 0.85, "scale_deg": 12},
+    {"pts_pair": [1041408,1041664], "track": 4, "relative_target": 0.48, "scale_deg": 5},
+    {"pts_pair": [1041664,1041920], "track": 4, "relative_target": 0.68, "scale_deg": 8},
+    {"pts_pair": [1041920,1042176], "track": 4, "relative_target": 0.85, "scale_deg": 12}
+  ],
+  "proposal_rotation_semantics": "左膝局部右扰动的连续模型增量。相对目标用于方向生成，表示去除多余逐曝光折转，不代表图像测得角度。全身转动和其它局部关节按原目标和守卫判断。",
+  "root_box_m": 0.060,
+  "rotation_box_deg": 19.0,
+  "control_tracks": {
+    "-1": [81.09,81.56],
+    "0": [81.09,81.53],
+    "1": [81.10,81.53],
+    "2": [81.02,81.53],
+    "3": [81.11,81.52],
+    "4": [81.14,81.52],
+    "5": [81.05,81.53],
+    "6": [81.20,81.52],
+    "7": [81.14,81.53],
+    "8": [81.07,81.53],
+    "9": [81.26,81.52]
+  }
+}

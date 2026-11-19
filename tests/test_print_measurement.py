@@ -82,7 +82,8 @@ def test_every_current_registered_print_boundary_has_contour_semantics():
             'print_material_boundary', 'logo_outer_boundary',
             'printed_ink_open_boundary_arc'} <= roles
     empty = dict(pts=np.empty(0, dtype='<i8'), feature_index=np.empty(0, dtype='<i4'),
-                 active=np.empty(0, dtype='u1'))
+                 active=np.empty(0, dtype='u1'), kind=np.empty(0, dtype='u1'),
+                 local_index=np.empty(0, dtype='<i8'), support=np.empty((0, 2), dtype='<f8'))
     report = validate_current_feature_contracts({}, read_json(FIELD), features, empty,
                                                np.empty(0, dtype='<i8'), scene_path=FIELD)
     assert report['measurement']['all_current_features_valid']

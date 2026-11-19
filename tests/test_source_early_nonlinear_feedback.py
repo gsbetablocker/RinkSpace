@@ -202,3 +202,26 @@ def test_fraction_first_keeps_a_complete_guarded_descent():
     assert report["nonlinear_completed_early"]
     probes=[event for event in events if event["phase"]=="source_fraction_before_refinement"]
     assert [event["guards_pass"] for event in probes] == [False,False,True]
+
+
+def test_full_actual_failure_contracts_its_dependency_before_affine_completion():
+    margins, ready, unfinished = domains('flight')
+    events = []
+
+    def check(point):
+        actual = CompleteNonlinearGuardChecks({
+            ready: dict(rejected=False),
+            unfinished: dict(rejected=np.hypot(.6,point[2])>.93),
+        })
+        actual.objective_cost = 2. + CoupledNormal.objective(point)[0]
+        return actual
+
+    step, _ = source_conditioned_direction(CoupledNormal(),VALUE,(-1.,1.),margins,ACTIVE,
+        control_step_limit=LIMITS,nonlinear_source_check=check,early_nonlinear_ready_feedback=True,
+        early_complete_nonlinear_proposal=True,refine_failed_full_checks=True,
+        progress=lambda **event:events.append(event))
+    first = next(event for event in events if event['phase']=='source_local_trust_feedback')
+    assert first['affine_incomplete'] and not first['only_affine_ready_failures_used']
+    assert first['failed_source_ids']==[unfinished]
+    assert first['changed_global_columns']==[ACTIVE[2]]
+    assert not any(row['rejected'] for row in check(step).values())

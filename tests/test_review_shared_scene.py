@@ -60,8 +60,11 @@ def test_current_review_keeps_all_registered_field_and_located_print_paths(core)
     assert len(data['cuts']) == data['inventory']['path_count'] == len(expected['path_ids'])
     assert {cut['id'] for cut in data['cuts']} == expected['path_ids']
     assert set(data['inventory']['path_ids']) == expected['path_ids']
-    # Keep the original three-pair coverage as an exact subset of the full scene.
-    assert len(scene['paths']) == 66
+    field_paths = {path['id'] for path in scene['paths']}
+    transverse = {f'ice/lane{i}:F_transverse' for i in range(1, 5)}
+    assert transverse <= field_paths
+    assert len(field_paths - transverse) == 66
+    # The original print coverage remains an exact subset of the full scene.
     baseline = {'print_instance/Ad1', 'print_instance/Ad14',
                 'print_instance/Ad2', 'print_instance/Ad3'}
     assert sum(c.get('instance_id') in baseline for c in data['cuts']) == 92
